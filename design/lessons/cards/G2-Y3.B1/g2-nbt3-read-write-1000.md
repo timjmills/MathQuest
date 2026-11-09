@@ -1,0 +1,405 @@
+# Lesson card: I Can read and write numbers to 1,000
+
+**Lesson** `G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform` · **Unit** G2-Y3.B1 · **Grade** 2 · **CCSS** 2.NBT.A.3 · **EE** M.EE.2.NBT.3 · **Shape** `forms`
+
+Seeded by `node tests/scripts/ws-lesson-card.mjs --from-detailed` from the passed hand-written lesson (the E4 proof set).
+The machine block at the end is the source of truth (`design/lessons/cards/README.md`); this summary is for reading. The
+lane decides every open question (its `answer` and the `rule` it rests on) and closes the card with `Decided: lf-<lane>, <date>`.
+
+## Parts (skill + options)
+
+| Part | Skill | Options and floors |
+|---|---|---|
+| P0 question 1 → 1.NBT.A.1 Read and write numbers to 120 | `composing:number_word_form` | {"opts":{"wordform":["to_number"],"band":100,"zeroPlace":"none"},"minNum":21,"maxNum":99} |
+| P0 question 2 → 2.NBT.A.1 Hundreds, tens and ones | @R2 |  |
+| P0 question 3 → 2.NBT.A.1 The value of a digit | @R3 |  |
+| P2-P4 lesson skill | @R1 |  |
+| P4 Practice 1 | @R1 |  |
+| P4 Practice 2 | @R4 |  |
+| Mixed 1 | @R1 |  |
+| Mixed 2 | `composing:number_word_form` | {"opts":{"wordform":["to_number"],"band":1000,"zeroPlace":"some","answerSlot":"hto"},"minNum":101,"maxNum":999,"sectionLabel":"Number names"} |
+| Mixed 3 | @R2 |  |
+| Mixed 4 | @R3 |  |
+| P1 band A row 1 | `placevalue:more_less_10` | {"opts":{"band":100,"step":10,"dir":"more"},"minNum":10,"maxNum":99} |
+| P1 band A row 2 | `placevalue:compare` | {"opts":{"band":99,"closeness":"far"},"minNum":10,"maxNum":99} |
+| P1 band A row 3 | @R6 |  |
+| P1 band A row 4 | `placevalue:more_less_10` | {"opts":{"band":100,"step":1,"dir":"less"},"minNum":10,"maxNum":99} |
+| P1 band A row 5 | `placevalue:more_less_10` | {"opts":{"band":100,"step":10,"dir":"less"},"minNum":10,"maxNum":99} |
+| P1 band B row 1 | `placevalue:more_less_10` | {"opts":{"band":100,"step":10,"dir":"more"},"minNum":85,"maxNum":99} |
+| P1 band B row 2 | `placevalue:compare` | {"opts":{"band":99,"closeness":"close"},"minNum":10,"maxNum":99} |
+| P1 band B row 3 | @R6 |  |
+| P1 band B row 4 | `placevalue:more_less_10` | {"opts":{"band":100,"step":1,"dir":"less"},"minNum":85,"maxNum":99} |
+| P1 band B row 5 | `placevalue:more_less_10` | {"opts":{"band":100,"step":10,"dir":"less"},"minNum":85,"maxNum":99} |
+| P5 word problem | @R5 |  |
+| P6 exit 1: name, no 0 place | @R4 |  |
+| P6 exit 2: name, no tens word (Critical Atom) | @R4 |  |
+| P6 exit 3: numeral to expanded form, no 0 place (R9: combine is modelled nowhere) | @R1 |  |
+| P6 exit 4: numeral to expanded form, a 0 place | @R1 |  |
+| Spaced retrieval 1 | `placevalue:more_less_10` | {"opts":{"step":10,"dir":"more","band":100},"minNum":21,"maxNum":89} |
+| Spaced retrieval 2 | `placevalue:unit_form` | {"opts":{"band":99},"minNum":21,"maxNum":99} |
+| Spaced retrieval 3 | `placevalue:compare` | {"opts":{"band":99,"closeness":"close"}} |
+| Check Question (pvZeroTens, right D) | @R1 |  |
+
+Hand-written lines (story, hook, teaching notes, mistakes' words): **116**.
+
+## Open questions
+
+1. LR-3 (short lesson): the chart's Steps share an icon (start, write, write, check). The long pack keeps them; the short lesson needs one icon a step. Which icons? **Suggested:** start, write, look, check (a repeated icon swapped for an unused drawn one; parts.chart.shortIcons) **Decided:** start, write, look, check on the short lesson; the long pack keeps its own chart. (LESSON_RULES LR-3: one distinct drawn icon per step (sheet/lesson-icons.js ICON_IDS))
+
+## Machine block
+
+```json lesson-card
+{
+  "format": "lesson-card/1",
+  "id": "g2-nbt3-read-write-1000",
+  "lesson": "G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform",
+  "unit": "G2-Y3.B1",
+  "title": "I Can read and write numbers to 1,000",
+  "grade": "2",
+  "level": 2,
+  "strand": "Place Value",
+  "ccss": ["2.NBT.A.3"],
+  "ee": ["M.EE.2.NBT.3"],
+  "followOn": [{"title":"Write numbers to 1,000 in words","skill":"composing:number_word_form","opts":{"wordform":["to_words"]},"ccss":"2.NBT.A.3"}],
+  "cra": "Pictorial → Abstract",
+  "flowNote": "Chunk 1 (5a, 6a): steps 1–4. Chunk 2 (5b, 6b): step 5.",
+  "shape": "forms",
+  "fns": {},
+  "refs": {
+    "R1": {"categoryId":"placevalue","skillId":"expand","opts":{"band":999,"zeroPlace":"some"},"minNum":101,"maxNum":999},
+    "R2": {"categoryId":"placevalue","skillId":"unit_form","opts":{"band":999,"zeroPlace":"some"},"minNum":101,"maxNum":999},
+    "R3": {"categoryId":"placevalue","skillId":"value","opts":{"band":999,"zeroPlace":"some"},"minNum":101,"maxNum":999},
+    "R4": {
+      "categoryId": "composing",
+      "skillId": "number_word_form",
+      "opts": {"wordform":["to_number"],"band":1000,"zeroPlace":"some","answerSlot":"hto"},
+      "minNum": 101,
+      "maxNum": 999
+    },
+    "R5": {"categoryId":"placevalue","skillId":"combine","opts":{"band":999,"zeroPlace":"some"},"minNum":101,"maxNum":999},
+    "R6": {"categoryId":"placevalue","skillId":"unit_form","opts":{"band":99},"minNum":10,"maxNum":99}
+  },
+  "parts": {
+    "lesson": "@R1",
+    "prereqs": [
+      {
+        "ref": {"categoryId":"composing","skillId":"number_word_form","opts":{"wordform":["to_number"],"band":100,"zeroPlace":"none"},"minNum":21,"maxNum":99},
+        "items": 4,
+        "lesson": {"id":"1.NBT.A.1","title":"Read and write numbers to 120"},
+        "atom": {"n":1,"type":"Fact","skill":"Number words: 21 to 99","notes":"The tens and ones words. Prerequisite Check {pre.0.letters}."}
+      },
+      {
+        "ref": "@R2",
+        "items": 3,
+        "lesson": {"id":"2.NBT.A.1","title":"Hundreds, tens and ones"},
+        "atom": {"n":2,"type":"Conceptual","skill":"Places: 3 digits, 3 places","notes":"Prerequisite Check {pre.1.letters} (2.NBT.A.1)."}
+      },
+      {
+        "ref": "@R3",
+        "items": 2,
+        "lesson": {"id":"2.NBT.A.1","title":"The value of a digit"},
+        "atom": {"n":3,"type":"Conceptual","skill":"Value: the 4 in 347 is 40","notes":"Prerequisite Check {pre.2.letters} (2.NBT.A.1)."}
+      }
+    ],
+    "chart": {
+      "concepts": [{"id":"worth","text":"Write what each digit is worth."},{"id":"zero","text":"A 0 place still gets its part: 0."}],
+      "vocab": [
+        {"word":"digit","meaning":"one of 0 to 9","picture":{"kind":"glyph","text":"7"}},
+        {"word":"place","meaning":"hundreds, tens or ones","picture":{"kind":"text","text":"H  T  O"}},
+        {"word":"expanded form","meaning":"the number split by place","picture":{"kind":"text","text":"300 + 40 + 7"}}
+      ],
+      "steps": [
+        {"icon":"start","text":"Write the hundreds."},
+        {"icon":"write","text":"Write the tens."},
+        {"icon":"write","text":"Write the ones."},
+        {"icon":"check","text":"Read it with plus."}
+      ],
+      "chant": "Every place gets a part.",
+      "chartWide": true,
+      "sayWords": true,
+      "format": {"kind":"numbered steps with icons + a chant","why":"The one step pupils skip is the 0 place; a five-word chant said at step 2 cues it."},
+      "example": {"match":"hundreds place","test":"pvPlain"},
+      "second": {"test":"pvZeroTens","label":"No tens? The tens part is 0."},
+      "third": {"test":"pvZeroOnes","label":"No ones? The ones part is 0."},
+      "shortIcons": ["start","write","look","check"]
+    },
+    "weDo": {"guidedRows":3,"tailLast":true,"practiceShape":[9,1]},
+    "practice": {"pages":2,"sheets":[{},{"skill":"@R4","shape":[8,2],"chunk":"b","edgeLast":{"per":8,"cols":2,"wants":["pvZeroTens","pvTeen"]}}],"edgeTest":"pvEdge"},
+    "mixed": {
+      "skills": [
+        "@R1",
+        {
+          "categoryId": "composing",
+          "skillId": "number_word_form",
+          "opts": {"wordform":["to_number"],"band":1000,"zeroPlace":"some","answerSlot":"hto"},
+          "minNum": 101,
+          "maxNum": 999,
+          "sectionLabel": "Number names"
+        },
+        "@R2",
+        "@R3"
+      ],
+      "strip": false
+    },
+    "numberSense": {
+      "A": {
+        "items": [
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":10,"dir":"more"},"minNum":10,"maxNum":99},
+          {"categoryId":"placevalue","skillId":"compare","opts":{"band":99,"closeness":"far"},"minNum":10,"maxNum":99},
+          "@R6",
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":1,"dir":"less"},"minNum":10,"maxNum":99},
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":10,"dir":"less"},"minNum":10,"maxNum":99}
+        ]
+      },
+      "B": {
+        "items": [
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":10,"dir":"more"},"minNum":85,"maxNum":99},
+          {"categoryId":"placevalue","skillId":"compare","opts":{"band":99,"closeness":"close"},"minNum":10,"maxNum":99},
+          "@R6",
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":1,"dir":"less"},"minNum":85,"maxNum":99},
+          {"categoryId":"placevalue","skillId":"more_less_10","opts":{"band":100,"step":10,"dir":"less"},"minNum":85,"maxNum":99}
+        ]
+      }
+    },
+    "wordProblem": {"ref":"@R5","want":"pvZeroTens"},
+    "exit": {
+      "items": [
+        {
+          "case": "name, no 0 place",
+          "ref": "@R4",
+          "want": "pvNoZero",
+          "instr": "Write the number.",
+          "detects": "Parts side by side: three hundred forty-seven = 30047."
+        },
+        {
+          "case": "name, no tens word (Critical Atom)",
+          "ref": "@R4",
+          "want": "pvZeroTens",
+          "instr": "Write the number.",
+          "detects": "Drops the 0: six hundred five = 65."
+        },
+        {
+          "case": "numeral to expanded form, no 0 place",
+          "ref": "@R1",
+          "want": "pvNoZero",
+          "instr": "Write the number in expanded form.",
+          "detects": "Writes the digits, not their worth: 539 = 5 + 3 + 9."
+        },
+        {
+          "case": "numeral to expanded form, a 0 place",
+          "ref": "@R1",
+          "want": "pvZeroTens",
+          "instr": "Write the number in expanded form.",
+          "detects": "Writes 10 for the empty tens: 400 + 10 + 7."
+        }
+      ],
+      "instruction": "Write the number.",
+      "say": "{say.words} is __."
+    },
+    "retrieval": [
+      {"ref":{"categoryId":"placevalue","skillId":"more_less_10","opts":{"step":10,"dir":"more","band":100},"minNum":21,"maxNum":89},"ask":"{ret.0.text}"},
+      {
+        "ref": {"categoryId":"placevalue","skillId":"unit_form","opts":{"band":99},"minNum":21,"maxNum":99},
+        "ask": "How many tens in {ret.1.n}?",
+        "expect": "{ret.1.tens}"
+      },
+      {
+        "ref": {"categoryId":"placevalue","skillId":"compare","opts":{"band":99,"closeness":"close"}},
+        "ask": "Which is bigger: {ret.2.a} or {ret.2.b}?",
+        "expect": "{ret.2.big}"
+      }
+    ],
+    "checkQuestion": {"want":"pvZeroTens","correct":"D","board":"Write on the board: {cq.n}."},
+    "chunks": [
+      {"id":"a","name":"Numeral to expanded form"},
+      {
+        "id": "b",
+        "name": "Number name to numeral",
+        "skill": "@R4",
+        "lessonData": {
+          "skills": [],
+          "concepts": [{"id":"zero","text":"No tens word? Write 0 tens."}],
+          "vocab": [],
+          "steps": [
+            {"icon":"look","text":"Read the hundreds word."},
+            {"icon":"write","text":"Read the rest. Write the tens and ones."},
+            {"icon":"check","text":"Read the number back."}
+          ],
+          "chant": "Three boxes, three digits.",
+          "guidedRows": 2,
+          "format": {"kind":"numbered steps with icons + a chant","why":"Three boxes make the missing tens word visible: the T box cannot stay empty."},
+          "example": {"test":"pvPlain"},
+          "guided": ["pvPlain","pvZeroTens"],
+          "independent": ["pvZeroTens","pvZeroOnes"],
+          "second": {"test":"pvZeroTens","label":"No tens word? Write 0 tens."},
+          "third": {"test":"pvZeroOnes","label":"No ones word? Write 0 ones."},
+          "mixWith": []
+        }
+      }
+    ]
+  },
+  "timing": {"1":6,"2":5,"3":4,"4":2,"7":3,"8":9,"9":5,"10":4,"5a":5,"6a":4,"5b":5,"6b":4,"transitions":4},
+  "ranges": {"pool":{"kind":"range","lo":21,"hi":999},"boardOnly":[1000],"lesson":{"minNum":101,"maxNum":999,"band":999}},
+  "edgeCases": {"edgeTest":"pvEdge","caseNames":{"pvZeroTens":"0 tens","pvZeroOnes":"0 ones","pvTeen":"a teen"}},
+  "rulings": [{"id":"board-only","text":"1000 on the board only: never a pupil item, never on a key.","field":"ranges.boardOnly"}],
+  "misconceptions": [
+    {"id":"M-V6","name":"Digits, not values","step":1,"option":"A","looks":"{cq.n} = {cq.A}","fix":"Ask “What is the {cq.h} worth?”"},
+    {"id":"M-V5","name":"10 for no tens","step":3,"option":"B","looks":"{cq.n} = {cq.B}","fix":"No tens: the part is 0."},
+    {"id":"M-V14","name":"One place too big","step":1,"option":"C","looks":"{cq.n} = {cq.C}","fix":"A hundreds part has 2 zeros."},
+    {"id":null,"name":"Drops the 0","step":5,"looks":"{exit.1.wrong.MZ1} for {exit.1.n}","fix":"3 boxes, 3 digits.","caught":"Exit b · Practice 2"},
+    {
+      "id": null,
+      "name": "Parts side by side",
+      "step": 5,
+      "looks": "{exit.0.wrong.MV9} for {exit.0.n}",
+      "fix": "The rest goes in T and O.",
+      "caught": "Exit a · Practice 2"
+    },
+    {"id":null,"name":"Teen or ty swap","step":5,"looks":"230 for 213","fix":"Say the end: teen is ones.","caught":"Practice 2"}
+  ],
+  "vocabulary": [
+    {"word":"number name","gloss":"the number in words","diagram":{"kind":"text","text":"three hundred"}},
+    {"word":"place","gloss":"hundreds, tens or ones","diagram":{"kind":"pv","digits":"347"}},
+    {"word":"expanded form","gloss":"the number split by place","diagram":{"kind":"text","text":"300 + 40 + 7"}}
+  ],
+  "story": {
+    "instruction": "Read the story. Draw it. Solve.",
+    "lines": ["Sam has {wp.h} bags of 100 beads.","Sam has {wp.o} more beads.","How many beads does Sam have?"],
+    "answerLine": "Sam has __ beads.",
+    "say": "Sam has __ beads."
+  },
+  "hook": ["You wrote numbers to 100. Today: numbers to 1,000.","Today we write numbers three ways."],
+  "teach": {
+    "t1Boxes": [
+      {"kind":"tip","title":"Read, say, write numerals","text":"Pupils read names and say them. Writing number names is a follow-on lesson."},
+      {
+        "kind": "language",
+        "title": "No \"and\" in writing",
+        "text": "Pupils who say “three hundred and five” are right to say it. We write “three hundred five”."
+      },
+      {"kind":"watch","title":"The 0 place","text":"The mistake to stop today is 35 for 305: a 0 place still gets its part."}
+    ],
+    "howToTeach": "Draw the H T O chart first, every time. Chunk 1 (numeral to expanded form) comes first: the lowest writing load. In chunk 2, cover the end of the name and read the hundreds word first.",
+    "board": "H T O boxes for {b.chart2.words}: {b.chart2.hto}.",
+    "slotRows": [{"shape":"hto","use":"a number from its name, a digit a box"}],
+    "materials": ["Base-ten blocks (flats, rods, cubes)","H T O place chart on the board","Number word cards: hundred, tens, teens"],
+    "atoms": [
+      {"n":4,"type":"Category","skill":"Word parts: hundreds first","notes":"The rest is a 2-digit number."},
+      {"n":5,"type":"Conceptual","critical":true,"skill":"Zero holds a place: 305 = 300 + 0 + 5","notes":"No tens word: 0 tens."},
+      {"n":6,"type":"Comparative","skill":"Teen or ty: 13 is not 30","notes":"Two hundred thirteen is 213, not 230."},
+      {"n":7,"type":"Conceptual","skill":"Expanded form: digit × place","notes":"The 3 in 347 is worth 300, not 3."}
+    ],
+    "routine": [
+      {"step":"Write the hundreds part: the digit and two zeros.","tag":"New","check":"The H T O chart"},
+      {"step":"Write the tens part: the digit and one zero.","tag":"New","check":"“What is the 4 worth?”"},
+      {"step":"A 0 place: write 0 for its part.","tag":"New","check":"Is every box filled?","critical":true},
+      {"step":"Write the ones part. Read it with plus.","tag":"New","check":"Does it say the number?"},
+      {"step":"Name to numeral: hundreds word in H, the rest in T O.","tag":"New","check":"3 boxes, 3 digits"}
+    ],
+    "sections": {
+      "4": {"add":[{"say":"You wrote numbers to 100. Today: numbers to 1,000."},{"say":"Today we write numbers three ways."}]},
+      "8": {
+        "add": [
+          {"say":"Use the Steps at the top of the page."},
+          {"do":"Practice 2: read each name. Write one digit in each box.","note":"Look for 35 for three hundred five."},
+          {"do":"Circulate. Stop at every 0 place.","note":"Look for 3 + 4 + 7 (digits, not values)."}
+        ]
+      },
+      "9": {
+        "add": [
+          {"ask":"How many hundreds? How many ones?","note":"Expected: [[{wp.h}]] hundreds, [[{wp.o}]] ones."},
+          {"ask":"How many beads? Say it in words.","note":"Expected: [[{wp.eq}]]; said: {wp.words}."}
+        ]
+      },
+      "10": {"say":"Every place gets a part."},
+      "5a": {
+        "rows": [
+          {"do":"Put anchor chart 1 up. Point to {chart.n}."},
+          {"say":"The {chart.h} is worth {chart.hv}.","note":"Write [[{chart.hv}]] in the first box (step 1)."},
+          {"ask":"What is the {chart.t} worth?","note":"Expected: [[{chart.tv}]] (step 2)."},
+          {"ask":"What is the {chart.o} worth?","note":"Expected: [[{chart.ov}]] (step 3)."},
+          {"say":"{chart.n} is {chart.say}.","note":"Step 4: read it with plus. Pupils repeat twice."},
+          {"say":"In words: {chart.words}.","note":"The Say line: the same number, the third way."},
+          {"say":"{chart2.n}: no tens. The tens part is 0.","note":"Expected: [[{chart2.parts}]]."},
+          {"say":"{chart3.n}: no ones. The ones part is 0.","note":"Expected: [[{chart3.parts}]]."}
+        ],
+        "boxes": [{"kind":"watch","title":"The 0 place","text":"Say “0 tens” out loud every time a place is empty."}],
+        "name": "I Do 1: numeral to expanded form"
+      },
+      "6a": {
+        "rows": [
+          {"say":"Look at {we.0.n}. Step 1 is done in grey."},
+          {"ask":"Hundreds part? Tens part? Ones part?","note":"Expected ★: [[{we.0.parts}]]."},
+          {"do":"Pupils do {we.1.n} and {we.2.n} on their own.","note":"Expected ★: [[{we.1.parts}]] · [[{we.2.parts}]]."},
+          {"ask":"Read {we.1.n} with plus.","note":"Expected: “{we.1.say}” (step 4)."},
+          {"do":"Pupils do the Independent Practice. Walk and check.","note":"Expected ★★: [[{indepList}]]."}
+        ],
+        "boxes": [{"kind":"feedback","title":"Fix it at once","text":"Fix: point to the empty box and ask “What goes here?”"}]
+      },
+      "5b": {
+        "rows": [
+          {"do":"Put anchor chart 2 up. Point to {b.chart.words}."},
+          {"ask":"How many hundreds?","note":"Expected: [[{b.chart.h}]] in the H box (step 1)."},
+          {"ask":"Read the rest. How many tens? How many ones?","note":"Expected: [[{b.chart.t}]] tens, [[{b.chart.o}]] ones (step 2)."},
+          {"say":"Three boxes, three digits: {b.chart.n}.","note":"Step 3: read it back."},
+          {"say":"{b.chart2.Words}: no tens word. Write 0 tens.","note":"Expected: [[{b.chart2.n}]]."},
+          {"do":"Write 1000 on the board under Th H T O.","note":"Shown, not practised: one thousand is ten hundreds."},
+          {"say":"Ten hundreds is one thousand.","note":"A new place, Th. Pupils say it; nobody writes it today."}
+        ],
+        "boxes": [{"kind":"language","title":"Two parts","text":"Cover the end of the name with your hand: read the hundreds word first."}],
+        "name": "I Do 2: the name to the numeral"
+      },
+      "6b": {
+        "rows": [
+          {"say":"Read {b.we.0.words}. Step 1 is done in grey."},
+          {"ask":"H box? T box? O box?","note":"Expected ★: [[{b.we.0.hto}]]."},
+          {"do":"Pupils do {b.we.1.words} on their own.","note":"Expected ★: [[{b.we.1.n}]]: no tens word, so 0 tens."},
+          {"ask":"Is there a tens word in {b.we.1.words}?","note":"Expected: no, so [[0]] in the T box."},
+          {"do":"Pupils do the Independent Practice. Walk and check.","note":"Expected ★★: [[{b.indepList}]]."},
+          {"do":"A pupil stuck on a name: cover its end with your hand.","note":"Read the hundreds word first, then the rest."}
+        ],
+        "boxes": [{"kind":"feedback","title":"An empty box","text":"Point to it: “Is there a tens word? Then write 0.”"}]
+      }
+    },
+    "loop": {"half":"Reteach the 0 place with blocks (0 rods), then two more.","fewer":"Stop. Build {chart2.n} with blocks. Write each part as a group."},
+    "accepted": [
+      "Expanded form with a 0 part: 400 + 0 + 6 and 400 + 6 are both right; the key draws 400 + 0 + 6.",
+      "Number words with or without the hyphen (forty-seven, forty seven) are right.",
+      "A spoken “and” (three hundred and five) is not wrong; model the written form."
+    ],
+    "wrongAnswers": [
+      {"wrote":"{exit.1.wrong.MZ1} for {exit.1.words}","mistake":"Drops the 0","next":"H T O chart: 3 boxes, 3 digits."},
+      {"wrote":"{exit.0.wrong.MV9} for {exit.0.words}","mistake":"Parts side by side","next":"Read the last two words as one number."},
+      {"wrote":"230 for two hundred thirteen","mistake":"Teen or ty swap","next":"The Comparative atom card: teen is ones."},
+      {"wrote":"3 + 4 + 7 for 347","mistake":"Digits, not values","next":"“What is the 3 worth?” on the chart."}
+    ]
+  },
+  "open": [
+    {
+      "id": "lr3-icons",
+      "q": "LR-3 (short lesson): the chart's Steps share an icon (start, write, write, check). The long pack keeps them; the short lesson needs one icon a step. Which icons?",
+      "suggested": "start, write, look, check (a repeated icon swapped for an unused drawn one; parts.chart.shortIcons)",
+      "answer": "start, write, look, check on the short lesson; the long pack keeps its own chart.",
+      "rule": "LESSON_RULES LR-3: one distinct drawn icon per step (sheet/lesson-icons.js ICON_IDS)"
+    }
+  ],
+  "needs": [
+    {
+      "kind": "option",
+      "skill": "placevalue:unit_form",
+      "option": "zeroPlace",
+      "match": "option \"zeroPlace\" is not in placevalue:unit_form's schema",
+      "why": "the passed pack sets it; skill-options.js has no schema entry (add it, or rule it inert and drop it)"
+    },
+    {
+      "kind": "option",
+      "skill": "placevalue:value",
+      "option": "zeroPlace",
+      "match": "option \"zeroPlace\" is not in placevalue:value's schema",
+      "why": "the passed pack sets it; skill-options.js has no schema entry (add it, or rule it inert and drop it)"
+    }
+  ]
+}
+```
+
+Decided: lf-engine, 2026-11-07

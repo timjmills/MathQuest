@@ -2487,6 +2487,479 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-title-constant",
+   "check": "D13: the Prerequisite Check title is one constant (PREREQ_CHECK_TITLE), no 'Prerequisite check' spelling, no second literal in the lesson modules",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only title (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 'Prerequisite check' on the page, 'Prerequisite Check' in the registry and the part names"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "one exported constant used by the role, the registry, print-sheet and the detailed T-pages"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only title",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routing-one-builder",
+   "check": "D14: one routing-table builder (routingTableHtml), no second table, no claim that the detailed T6 prints it",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routing-export (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the role's comment claims T6 prints the same table"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "T6 kept (passed lessons byte-identical), the claim corrected; one builder"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routing-export",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-no-literal-styles",
+   "check": "D15: routeTagHtml / routingTableHtml carry classes (LESSON_ROUTE_CSS travels only with a routed page), no literal pt / #949494 / border / padding",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-styles (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 9pt, #949494, borders and paddings inline"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "classes + a routed-page-only stylesheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-styles",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routed-plan-units",
+   "check": "D16: the routed plan's numbers are named constants; routeTagMm / routeTagLines / routePlan / routedLayout unit-tested",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routed-plan (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 1.6 mm/char, 0.7 / 0.75, 40 mm gaps as literals, no unit tests"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "named constants, routedLayout exported and tested"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routed-plan",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-prereq-checks-field",
+   "check": "D12: every library prerequisite carries `checks` (what the question asks) distinct from its design `why`; the schema refuses one without",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only checks-field (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the routing table printed the design why"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "checks on every prerequisite, validated, printed"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only checks-field",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-bind-stamps-refuses",
+   "check": "D17: ws-lesson-coverage --bind-stamps refuses to bind a pass to a render that changed since the grade (or whose graded render is unknown)",
+   "kind": "fixture",
+   "rule": "ws-lesson-coverage --bind-stamps (lf-engine P1, critic lessons-phase0 r1 D17)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/fail",
+    "state": "an unstamped pass graded on render aaaa.bbbb, the current render cccc.dddd (the phase 0 re-bind of the samples to their LR-17 renders)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/pass",
+    "state": "an unstamped pass graded on the current render"
+   },
+   "command": "node tests/scripts/ws-lesson-coverage.cjs --bind-stamps --dry-run --data-root {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-parts-plugin",
+   "check": "D18: a dummy lesson part with its own build hook registers and is built through the registry dispatch; buildLesson names no core part list",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only parts-plugin (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: buildLesson skips a hard-coded list of the five core ids; only lesson-role parts plug in"
+   },
+   "pass": {
+    "commit": "88235078",
+    "state": "core flag + build hooks + buildPluggedParts; parts in registry order (orderParts, lf-vocab PR #36)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only parts-plugin",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-chart-sizing-fails",
+   "check": "Lesson 7 D1: chartPage reports sizing.mode / zoom / fallback / ok; a fallback zoom under 1 is a failure the build result carries (chartSizing, chartsOk)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only chart-sizing (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the 0.7 fallback zoom is silent"
+   },
+   "pass": {
+    "commit": "9d1b793f",
+    "state": "sizing.ok false on a fallback under 1, surfaced by buildLesson / buildDetailedLesson"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chart-sizing",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson2-page-fresh",
+   "check": "R1: lesson 2 (g1-oa1-bar-model-wp-20) builds - a story ref re-opens its page per try (pageFresh, both dealers) and reserves its rare late items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r1-page-fresh (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "no add_wp_20 item for the exit slip's put-together case: the story schema held for every try"
+   },
+   "pass": {
+    "commit": "4ab65c7b",
+    "state": "pageFresh + reserve: the lesson builds at seed 4242"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r1-page-fresh",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-practice-cap",
+   "check": "R2: a detailed Practice sheet holds its shape count (pageCap): the near-height pack does not lay 5 rows for 4 items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r2-practice-cap (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 1 and 6 Practice 17-19 % blank foot"
+   },
+   "pass": {
+    "commit": "f81be943",
+    "state": "pageCap = shape count"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r2-practice-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-dealer-seeds",
+   "check": "R4 / R5: a detailed pack builds at every seed (late item reserved and rebuilt); a spent pool keeps chart examples off Practice",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r4-r5-dealer (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 4 / 6 fail at 9 of 25 seeds; lesson 3a re-deals 2 x 3"
+   },
+   "pass": {
+    "commit": "8f2c89b6",
+    "state": "rebuild with the late item reserved; chartKeys last"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r4-r5-dealer",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-repeat-key",
+   "check": "Lesson 7 D2: repeatKey family+frame read by both dealers",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only d2-repeat-key (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "repeatKey compiled but unread"
+   },
+   "pass": {
+    "commit": "abcd6ab1",
+    "state": "refAccepts / dealOne1 / pack record read it"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only d2-repeat-key",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-floor",
+   "check": "critic r2 N2 / N3 / N4: a routed check question keeps 2 items, the table states the miss rule, bands print __/n, LR-6 on the check",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-floor (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "1-item questions, no miss rule, no __/n"
+   },
+   "pass": {
+    "commit": "eddc51fd",
+    "state": "floor 2, ROUTE_MISSED_RULE, scoreTag, lr6"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-floor",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-sheet-indep",
+   "check": "Every lesson sheet holds an Independent row, a Score and a blank foot <= 20 %",
+   "kind": "commit-pair",
+   "rule": "critic lf-engine r2 N1 (LR-18, LR-13, H13)",
+   "browser": true,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "sub L sheet lost its Independent row (critic r2 N1)"
+   },
+   "pass": {
+    "commit": "08ee129e",
+    "state": "fixed (P1b N1, checked P1c)"
+   },
+   "command": "node tests/scripts/ws-lesson-hash.cjs --sheets --only subtract-2-digit-regroup --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pool-capacity-3a",
+   "check": "An arrays-turn Practice sheet's allTest admits at least as many x families as its places plus the chart and Guided arrays (LR-5 one family a pack)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a LP-FAMILY-REPEAT (lf-engine P1d)",
+   "browser": false,
+   "fail": {
+    "commit": "96f0728f",
+    "state": "arrP1 (half-width cells, no 5s) admits 6 families for 4 places + 3 chart/Guided"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "full-width cells, arrays to 6 x 6: 12 families"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pool-capacity",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e24b-lesson2-near-twins",
+   "check": "E24b: no near twins on a page (lesson 2 P0 6+6 / 7+8, P4-1 7+4 / 8+5) on every seed",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 2 E24b (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson (E24b, --sweep); --sweep on lesson 2 times out (Runtime.callFunctionOn protocolTimeout) so no command yet. P0 passes at e13ef858; P4-1 still fails (greedy deal order).",
+   "fail": {
+    "commit": "96f0728f",
+    "state": "P0 6+6 / 7+8 and P4-1 7+4 / 8+5 near twins"
+   },
+   "pass": {
+    "commit": "",
+    "state": "not yet: P4-1 open"
+   }
+  },
+  {
+   "id": "lp-family-repeat-3a-p0",
+   "check": "LP-FAMILY-REPEAT on the 25-seed sweep: the x 2 Prerequisite Check facts once each (seed 3: 2 x 7 twice)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson --sweep (LP-FAMILY-REPEAT); fail = the 2 x 6 exclusion state before P0 went to 2 x 10 (live tree, sweep seed 3), pass = e13ef858 (sweep 25/25 OK on the live tree 538c2b58).",
+   "fail": {
+    "commit": "",
+    "state": "P0 2 x 6 to 2 x 9 for four items: seed 3 2 x 7 twice"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "P0 2 x 6 to 2 x 10"
+   }
+  },
+  {
+   "id": "e27-five-gap",
+   "check": "E27: counters in rows of at most 5, or 6 to 10 with the 5-group gap drawn",
+   "kind": "fixture",
+   "rule": "owner ruling 2026-11-07 lesson 3a arrays to 6 x 6; RP-21 (lf-engine P1d r2, lead-approved gate edit)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.fail.json",
+    "state": "a row of 6 evenly spaced (no gap)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.pass.json",
+    "state": "a row of 6 with 1.5 mm after the 5th"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --e27-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e12-practice-pages",
+   "check": "E12: Practice cells one height across Practice 1's two pages (lesson 3a)",
+   "kind": "commit-pair",
+   "rule": "lf-engine P1d r2 (owner ruling 2026-11-07, full-width Practice 1 over two pages)",
+   "browser": true,
+   "fail": {
+    "commit": "e13ef858",
+    "state": "P4-2 cells 1.6 mm shorter than P4-1 (continuation page flex height)"
+   },
+   "pass": {
+    "commit": "57d53341",
+    "state": "equalPages: every page of the sheet the first page's grid height"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --check --out /tmp/mq-bt-e12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "practice-units",
+   "check": "{p4.last} names Practice SHEETS: a sheet over two pages is one Practice k, its last row on its last page",
+   "kind": "commit-pair",
+   "rule": "lesson 3a live critic (T5 Watch 'Practice 3'), lf-engine P1d r3",
+   "browser": false,
+   "fail": {
+    "commit": "8f51b557",
+    "state": "one Practice k a page: Practice 1's second page named Practice 3"
+   },
+   "pass": {
+    "commit": "30e2825b",
+    "state": "practiceUnits: one unit a sheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only practice-units",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "solve-story-e24b",
+   "check": "a Practice sheet with `solve` deals stories SOLVED before the page (no near twins, first addends and wholes all different) through a generator deal pin; only lesson 2 sets it",
+   "kind": "commit-pair",
+   "rule": "lesson 2 E24b (Practice 1 near twins 7 + 4 / 8 + 5 at 4242: greedy deal order), lf-engine P1d attempt 2",
+   "browser": false,
+   "fail": {
+    "commit": "33d91021",
+    "state": "greedy deal: Practice 1 dealt 7 + 4 / 8 + 5 (no solver)"
+   },
+   "pass": {
+    "commit": "7ca55459",
+    "state": "solveStoryFacts + setDealPin: Practice 1 deals 4 + 9, 8 + 6 / 9 + 3, 5 + 6 / 9 + 9, 8 + 12"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only solve-story",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pack-feasible-p0",
+   "check": "lesson 2's Prerequisite Check draws no fact of the lesson's crossing-ten story pool, and a whole-pack assignment (every place that draws from the pool, LR-5 + LR-6) exists at seeds 1-25 + 4242 (lessons/pack-solve.js)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-08 (lesson 2 E24b): a Prerequisite Check never draws from the lesson's own pool; check the whole pack first",
+   "browser": false,
+   "fail": {
+    "commit": "24e55369",
+    "state": "P0 add_facts sums 11-16, parts to 9: 18 crossing-ten facts of the pool"
+   },
+   "pass": {
+    "commit": "ceb557b5",
+    "state": "P0 add_facts a teen and ones (constant 11-13, sums 13-19): no pool fact; 14 places solved at 26/26 seeds (was bed7067a; the check grew each place's own source on 2026-11-08, so the pass state is the first commit that holds both)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pack-feasible-sources",
+   "check": "each place of lesson 2's pack keeps its OWN item source at seeds 1-25 + 4242: P0's count / bond ranges survive any greedy first choice (two items 3 apart), the chart's add-to / equal-parts examples come from case pools of their own (with the pack's avoid keys) holding a fact outside Practice 1's solved set, Practice 1 has a whole-pack solution (lessons/pack-solve.js placeSources)",
+   "kind": "commit-pair",
+   "rule": "lead's order 2026-11-08 (lesson 2 E24b attempt 4 failed at seeds 2 and 5 while the whole-pack count was green): model each place's own item source",
+   "browser": false,
+   "fail": {
+    "commit": "00ca4b10",
+    "state": "attempt 4: P0 count 17-20, bonds 6-10 parts 3+; chart second / third from the main pool"
+   },
+   "pass": {
+    "commit": "ceb557b5",
+    "state": "P0 count 11-20, bonds within 10 parts 1+; second / third from case pools with the pack's avoid keys"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "p0-overlap",
+   "check": "where two Prerequisite Check questions of a detailed lesson can share an answer (lesson 2: count 11-20, + facts 13-19), the engine deals the P0 page against ONE answer set (print-sheet.js pageLr6 on a perQuestion pre-skill-check) and their ranges hold every item",
+   "kind": "commit-pair",
+   "rule": "lf-engine 2026-11-09 (lesson 2 E24b on the lane: P0 twin answers at 5 of 6 seeds; master's engine had the page-wide set from lf-placevalue 2026-11-08, the lane's did not)",
+   "browser": false,
+   "fail": {
+    "commit": "dcdb50d4",
+    "state": "lane pageLr6 on mixed-practice only: each P0 question dealt against its own items (seed 1: count 16, 13 and + facts 13 + 3 ...)"
+   },
+   "pass": {
+    "commit": "b1e30155",
+    "state": "lane pageLr6 also on pre-skill-check + perQuestion (master's line)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only p0-overlap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

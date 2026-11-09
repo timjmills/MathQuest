@@ -285,7 +285,7 @@ async function checkMain() {
 if (CHECK) checkMain().catch((e) => { console.error(e); console.log('ws-lesson-samples --check: FAIL'); process.exit(1); });
 else (async () => {
     fs.mkdirSync(OUT, { recursive: true });
-    const app = await open({ seed: 1 });
+    const app = await open({ seed: 1, lock: 'ws-lesson-samples' });
     const { page } = app;
     const summary = [];
     for (const l of LESSONS) {
