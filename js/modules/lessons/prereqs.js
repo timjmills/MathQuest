@@ -438,7 +438,7 @@ export const LESSONS = Object.freeze({
         format: { kind: 'numbered steps with icons', why: 'Five actions, the same on every item: find, read, say, circle, write the value.' },
         example: { match: 'place' },
         // The ring row of place names wraps in half the page: one panel a row, its step beside the drawing.
-        chartWide: true, chartRow: true,
+        chartWide: true, chartRow: true, guidedCols: 2,
         // The practice page: short cells, so twelve where they fit (lf-engine: practiceShapes, densest first).
         practiceShapes: [[12, 2], [10, 2], [8, 2], [6, 2]],
         mixWith: [{ key: 'placevalue:identify', opts: { band: 99, writeValue: false } }, { key: 'placevalue:more_less_10' }],
