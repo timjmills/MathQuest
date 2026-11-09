@@ -21,7 +21,7 @@
 //
 // Pure module (SCC-01): no window, no DOM, no state, no Math.random.
 
-import { L, esc, isTwin } from './units.js';
+import { L, esc, isTwin, GREY } from './units.js';
 
 /** The canvas every picture is drawn on (units), and the approved widths (mm). */
 export const PIC_CANVAS = Object.freeze({ w: 60, h: 40 });
@@ -60,6 +60,12 @@ function hopBack(x1, x2, y, hgt = 5) {
     return `<path d="M${r2(x1)} ${r2(y)} Q${r2(mx)} ${r2(y - hgt * 2)} ${r2(x2)} ${r2(y)}" fill="none" stroke="#000" stroke-width="${W.part}" ${NS}/>`
         + `<path d="M${r2(x2)} ${r2(y)} l2.2 -1.6 l-0.5 2.6 Z" fill="#000"/>`;
 }
+/**
+ * The FOCAL part (owner ruling R-1, 2026-11-09): the mark that shows the word. A picture marks it with F() in its drawing
+ * (sentinels, stripped from the printed pupil page, so that page is byte-identical); a picture with no F() mark takes its
+ * heavy (1.5 pt) marks, or the whole drawing when it says `focal: 'all'` (a picture that IS its idea: a digit, a flat).
+ */
+const F = (s) => `\u0001${s}\u0002`;
 /** A cross through a drawn object (taken away). */
 const cross = (x, y, r) => ln(x - r, y - r, x + r, y + r, W.heavy) + ln(x - r, y + r, x + r, y - r, W.heavy);
 /** A row of number cells (a track): values; `mark` = index of the heavy cell. */
@@ -110,6 +116,7 @@ function axis(x1, x2, y, ticks) {
 const PICS = {
     /* ---- Grade 3: multiplication table patterns (3.OA.D.9, 3.OA.C.7) */
     even: {
+        focal: 'all',
         alt: 'six dots in three pairs, none left over',
         draw: () => [0, 1, 2].map((i) => { const x = 14 + i * 16; return oval(x - 4.5, 8, 9, 24, W.part) + dot(x, 14) + dot(x, 26); }).join(''),
     },
@@ -141,7 +148,7 @@ const PICS = {
             const X = (v) => 5 + v * 4.2;
             let b = axis(X(0), X(12), 26, Array.from({ length: 13 }, (_, i) => X(i)));
             // (hops end just above the line, the landing dot on it: the arrow heads never sit on the dots - critic r1)
-            for (const v of [3, 6, 9, 12]) b += hop(X(v - 3) + 0.6, X(v) - 0.6, 22.5, 6) + dot(X(v), 26, 2) + tx(X(v), 34, 0, String(v), { size: 8 });
+            for (const v of [3, 6, 9, 12]) b += hop(X(v - 3) + 0.6, X(v) - 0.6, 22.5, 6) + F(dot(X(v), 26, 2) + tx(X(v), 34, 0, String(v), { size: 8 }));
             return b + tx(X(0), 34, 0, '0', { size: 8, weight: 400 });
         },
     },
@@ -163,19 +170,20 @@ const PICS = {
         alt: 'two, four, six, eight, each one two more, with a hop of plus two between',
         draw: () => {
             let b = '';
-            [2, 4, 6, 8].forEach((v, i) => { b += tx(6 + i * 14, 30, 0, String(v), { size: 9 }); if (i) b += hop(6 + (i - 1) * 14 + 2.5, 6 + i * 14 - 2.5, 24, 4) + tx(6 + (i - 0.5) * 14, 11, 0, '+2', { size: 8, weight: 400 }); });
+            [2, 4, 6, 8].forEach((v, i) => { b += tx(6 + i * 14, 30, 0, String(v), { size: 9 }); if (i) b += F(hop(6 + (i - 1) * 14 + 2.5, 6 + i * 14 - 2.5, 24, 4) + tx(6 + (i - 0.5) * 14, 11, 0, '+2', { size: 8, weight: 400 })); });
             // (the ellipsis starts just after the 8, inside the cropped drawing: its third dot was cut off - critic r3 "8..")
             return b + tx(51.5, 30, 0, '…', { size: 9, anchor: 'start' });
         },
     },
     /* ---- Grade 3: properties of multiplication (3.OA.B.5) */
     array: {
+        focal: 'all',
         alt: 'three rows of four dots in a rectangle',
         draw: () => dots(3, 4, 17.5, 9, 8.3, 2),
     },
     commutative: {
         alt: 'two rows of three dots turned to make three rows of two dots; two times three, three times two',
-        draw: () => dots(2, 3, 7, 7, 6, 2) + arrow(24, 11, 33, 11) + dots(3, 2, 39, 4, 6, 2)
+        draw: () => dots(2, 3, 7, 7, 6, 2) + F(arrow(24, 11, 33, 11)) + dots(3, 2, 39, 4, 6, 2)
             + tx(30, 33, 0, '2 × 3 = 3 × 2', { size: 8 }),
     },
     identity: {
@@ -220,6 +228,7 @@ const PICS = {
         },
     },
     'equal groups': {
+        focal: 'all',
         alt: 'three circles, each with four dots',
         draw: () => [0, 1, 2].map((i) => { const x = 11 + i * 19; return ring(x, 20, 8.5, W.part) + dots(2, 2, x - 3, 17, 6, 1.9); }).join(''),
     },
@@ -232,7 +241,7 @@ const PICS = {
     'count on': {
         // (r3: three cells, digits 8 units - grade 1 strips printed at 11 pt, critic r1 #17 / r2 #10)
         alt: 'a number track 113, 114, 115 with hops going forward',
-        draw: () => track([113, 114, 115], { x0: 4, y: 16, cw: 17, ch: 13, size: 8.5 }) + hop(12.5, 29.5, 14, 4) + hop(29.5, 46.5, 14, 4),
+        draw: () => track([113, 114, 115], { x0: 4, y: 16, cw: 17, ch: 13, size: 8.5 }) + F(hop(12.5, 29.5, 14, 4) + hop(29.5, 46.5, 14, 4)),
     },
     'one more': {
         alt: 'four dots, an arrow, then five dots with the new dot in a ring',
@@ -251,6 +260,7 @@ const PICS = {
         draw: () => track([104, 105, 106], { x0: 4, y: 16, cw: 17, ch: 13, mark: 2, size: 8.5 }) + hop(29.5, 46.5, 14, 4.5),
     },
     'hundred chart': {
+        focal: 'all',
         // (three rows, so it reads as a chart of rows of ten, not a two-row table - critic r1; three columns, digits 8.5 units - r3)
         alt: 'three rows of a number chart: 94 to 96, 104 to 106, 114 to 116, each number ten more than the one above',
         draw: () => table([[94, 95, 96], [104, 105, 106], [114, 115, 116]], { x0: 7, y0: 3.5, cw: 15.5, ch: 11, size: 8.5 }),
@@ -260,26 +270,32 @@ const PICS = {
     // the "one" is one unit, the ten 10 units long, the hundred 10 x 10, so a pupil never sees a "one" bigger than a unit of
     // the ten - critic r3 #8 / VQ-1; ws-vocab-unit V16)
     hundred: {
+        focal: 'all',
         alt: 'a flat square of ten by ten small squares',
         draw: () => { const u = BASE10_U, x = 5, y = 0; let b = rect(x, y, u * 10, u * 10, W.part); for (let j = 1; j < 10; j++) b += ln(x, y + u * j, x + u * 10, y + u * j, W.fine) + ln(x + u * j, y, x + u * j, y + u * 10, W.fine); return b; },
     },
     ten: {
+        focal: 'all',
         alt: 'a rod of 10 small squares in a line',
         draw: () => { const u = BASE10_U, x = 5, y = 17.5; let b = rect(x, y, u * 10, u, W.part); for (let j = 1; j < 10; j++) b += ln(x + u * j, y, x + u * j, y + u, W.fine); return b; },
     },
     one: {
+        focal: 'all',
         alt: 'a single small square',
         draw: () => rect(27.5, 17.5, BASE10_U, BASE10_U, W.part),
     },
     digit: {
+        focal: 'all',
         alt: 'one large figure seven',
         draw: () => tx(30, 21, 0, '7', { size: 26 }),
     },
     'expanded form': {
+        focal: 'all',
         alt: '300 plus 40 plus 7',
         draw: () => tx(30, 20, 0, '300 + 40 + 7', { size: 7.6 }),
     },
     'number name': {
+        focal: 'all',
         // (r3: bold, as large as the expanded form's digits - critic r2: the lightest, smallest text on any page)
         alt: 'three hundred forty-seven written in words',
         draw: () => tx(30, 13, 0, 'three hundred', { size: 8 }) + tx(30, 26, 0, 'forty-seven', { size: 8 }),
@@ -300,6 +316,7 @@ const PICS = {
         },
     },
     sequence: {
+        focal: 'all',
         alt: '5, 10, 15 and so on, numbers in order with commas',
         draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
     },
@@ -311,7 +328,7 @@ const PICS = {
             for (let i = 0; i < 4; i++) {
                 const a0 = -Math.PI / 2 + i * Math.PI / 2 + 0.42, a1 = a0 + Math.PI / 2 - 0.84;
                 const p0 = [c[0] + R * Math.cos(a0), c[1] + R * Math.sin(a0)], p1 = [c[0] + R * Math.cos(a1), c[1] + R * Math.sin(a1)];
-                b += `<path d="M${r2(p0[0])} ${r2(p0[1])} A${R} ${R} 0 0 1 ${r2(p1[0])} ${r2(p1[1])}" fill="none" stroke="#000" stroke-width="${W.part}" ${NS}/>`;
+                b += F(`<path d="M${r2(p0[0])} ${r2(p0[1])} A${R} ${R} 0 0 1 ${r2(p1[0])} ${r2(p1[1])}" fill="none" stroke="#000" stroke-width="${W.part}" ${NS}/>`);
                 const t = a1 + Math.PI / 2, hx = p1[0], hy = p1[1];
                 b += `<path d="M${r2(hx + 2.2 * Math.cos(t))} ${r2(hy + 2.2 * Math.sin(t))} L${r2(hx - 1.3 * Math.cos(a1))} ${r2(hy - 1.3 * Math.sin(a1))} L${r2(hx + 1.3 * Math.cos(a1))} ${r2(hy + 1.3 * Math.sin(a1))} Z" fill="#000"/>`;
             }
@@ -319,6 +336,7 @@ const PICS = {
         },
     },
     grow: {
+        focal: 'all',
         alt: 'three shapes made of squares: one square, then three, then five, each one bigger',
         draw: () => {
             const u = 7; let b = '';
@@ -347,6 +365,7 @@ const PICS = {
             + `<path d="M34.6 27 H47.4" stroke="#000" stroke-width="${W.heavy}" ${NS}/><path d="M50 27 l-2.8 -1.7 v3.4 Z M32 27 l2.8 -1.7 v3.4 Z" fill="#000"/>`,
     },
     equation: {
+        focal: 'all',
         alt: 'twelve equals three times four',
         draw: () => tx(30, 20, 0, '12 = 3 × 4', { size: 8.5 }),
     },
@@ -432,6 +451,50 @@ export function vocabPictureExtent(id) {
     return e;
 }
 
+/* ------------------------------------------------------------------------------ the focal part (owner R-1)
+ * After the pupil answers on screen the focal part gets a thick highlight; the printed KEY shows it in the single grey.
+ * The highlight is a HALO: a copy of the focal marks under the drawing, stroked thick in `currentColor` (the key: GREY;
+ * the screen: hidden until the cell is answered, then the host's highlight colour, css/screen-cell.css). The pupil page
+ * draws no halo and no focal group, byte for byte as before.
+ */
+const SENT = /[\u0001\u0002]/g;
+const HEAVY_EL = /<(rect|line|circle|path)\b[^>]*stroke-width="2"[^>]*\/>/g;
+/** The class a focal group and the halo carry (screen-cell.js and the CSS target them). */
+export const VOCAB_FOCAL_CLASS = 'mq-vfocal';
+export const VOCAB_HALO_CLASS = 'mq-vhalo';
+/** The halo's stroke (px, non-scaling): about 4.5 pt, three times the heavy mark. */
+export const VOCAB_HALO_W = 6;
+/** A picture's drawing with its focal part between sentinels (\u0001 ... \u0002). */
+function focalBody(id) {
+    const raw = PICS[id].draw();
+    if (/\u0001/.test(raw)) return raw;
+    if (PICS[id].focal === 'all') return F(raw);
+    return raw.replace(HEAVY_EL, (m) => F(m));
+}
+/** The focal segments of a picture (svg strings); every picture has at least one (ws-vocab-unit V22). */
+export const vocabPictureFocal = (id) => (hasVocabPicture(id) ? [...focalBody(id).matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]).filter((x) => /<(rect|line|circle|path|text)\b/.test(x)) : []);
+/** The halo copy of a focal segment: each mark stroked thick in currentColor; a filled mark (dot, text, arrow head) filled too. */
+function haloOf(seg) {
+    return seg.replace(/<(rect|line|circle|path|text)\b([^>]*?)(\/?)>/g, (m, tag, attrs, close) => {
+        const fillAttr = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
+        const filledMark = tag === 'text' || (tag !== 'line' && fillAttr !== undefined && fillAttr !== 'none');
+        const rest = attrs.replace(/\s(stroke|stroke-width|fill|stroke-linecap|stroke-linejoin|vector-effect)="[^"]*"/g, '');
+        return `<${tag}${rest} fill="${filledMark ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${VOCAB_HALO_W}" stroke-linejoin="round" stroke-linecap="round" ${NS}${close}>`;
+    });
+}
+/**
+ * Where the focal part is drawn: 'screen' in the twin (halo hidden until answered), 'key' on a printed answer key (ctx.keyPage,
+ * answered), else none - the printed pupil page, a model on a pupil page, the error-analysis work.
+ */
+const focalMode = (ctx) => (isTwin(ctx) ? 'screen' : ctx && ctx.keyPage && ctx.state === 'answered' ? 'key' : '');
+function bodyFor(id, mode) {
+    const fb = focalBody(id);
+    if (!mode) return fb.replace(SENT, '');
+    const segs = [...fb.matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]);
+    const halo = `<g class="${VOCAB_HALO_CLASS}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map(haloOf).join('')}</g>`;
+    return halo + fb.replace(/\u0001([^\u0001\u0002]*)\u0002/g, (m, x) => `<g class="${VOCAB_FOCAL_CLASS}" data-vfocal="1">${x}</g>`);
+}
+
 /**
  * The printed size (mm) of a picture fitted to a `wMm` x `hMm` box (default 3 : 2), and its scale (mm a canvas unit).
  * The box is the cell's room: the picture is drawn as large as its own extent allows inside it.
@@ -467,7 +530,7 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
     const e = vocabPictureExtent(id);
     const fit = vocabPictureFit(id, wMm, hMm, set);
     const w = fit.wMm;
-    const body = PICS[id].draw();
+    const body = bodyFor(id, focalMode(ctx));
     // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
     // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
     // (screen: `minPx` keeps the picture's text >= 14 px on a phone - critic r1 D8: 6-9 px digits at 390 px)
@@ -479,4 +542,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

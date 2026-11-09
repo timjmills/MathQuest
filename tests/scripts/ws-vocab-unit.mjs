@@ -14,6 +14,15 @@
 //     (pre-critic render 2026-11-07: "column" in two Match 3 cells of one page)
 // V6  every lesson set's first three words may sit in one Match 3 cell (the lesson page's first cell)
 // V7  every lesson set's six words split into two clash-free trios (the lesson page's two Match 3 cells)
+// V22 (owner R-1, r7) every library picture has a FOCAL part, drawn as targeted SVG (.mq-vfocal) on the key and the screen,
+//     with its halo (.mq-vhalo) in the single grey on the key and hidden on the screen until answered; the pupil page has neither
+// V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
+//     at most 14 words
+// --browser: V23 (R-1) card-390 and worksheet-1280 highlight after the answer and not before, the pupil print pages are
+//     byte-identical to 70cdbaf9 (sha256 per role / size / seed, tests/fixtures/precritic/vocab-pupil-hashes.json), the
+//     key's highlight is GREY only; V25 (R-2) a wrong answer shows and speaks the RIGHT word's explanation once, with
+//     sound off shows it and does not speak, a right answer shows none
+//   --pin-pupil   (with --browser) write the pupil hashes of this tree to the fixture (run on 70cdbaf9 only)
 
 import { pathToFileURL } from 'url';
 import path from 'path';
@@ -339,6 +348,47 @@ for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "$
     }
 }
 
+// V22 (owner R-1, lf-vocab r7): every picture's focal part is declared and drawn so it can be targeted
+{
+    const keyCtx = Object.assign(K.resolveCtx({ size: 'L', mode: 'print', state: 'answered' }), { keyPage: true });
+    const pupilCtx = K.resolveCtx({ size: 'L', mode: 'print', state: 'blank' });
+    const modelCtx = K.resolveCtx({ size: 'L', mode: 'print', state: 'answered' });
+    const twinCtx = K.resolveCtx({ size: 'L', mode: 'screen', options: { twin: true } });
+    const GREYV = '#949494';
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const segs = typeof P.vocabPictureFocal === 'function' ? P.vocabPictureFocal(id) : [];
+        if (!segs.length) { fail(`V22 "${id}": no focal part declared`); continue; }
+        const key = P.vocabPictureSVG(keyCtx, id, { wMm: 46 });
+        const groups = [...key.matchAll(/<g class="mq-vfocal" data-vfocal="1">([\s\S]*?)<\/g>/g)].map((m) => m[1]);
+        const marks = groups.reduce((n, g) => n + (g.match(/<(rect|line|circle|path|text)\b/g) || []).length, 0);
+        if (!marks) fail(`V22 "${id}": the key draws no targeted focal mark (.mq-vfocal)`);
+        const halo = /<g class="mq-vhalo"[^>]*style="color:([^";]+)"/.exec(key);
+        if (!halo) fail(`V22 "${id}": the key has no focal highlight (.mq-vhalo)`);
+        else if (halo[1].toLowerCase() !== GREYV) fail(`V22 "${id}": the key's highlight is ${halo[1]}, not the single grey ${GREYV}`);
+        const colours = new Set([...key.matchAll(/(?:stroke|fill|color)[=:]"?(#[0-9a-fA-F]{3,6}|rgb[^)"]*\)?)/g)].map((m) => m[1].toLowerCase()));
+        for (const c of colours) if (!['#000', GREYV].includes(c)) fail(`V22 "${id}": the key uses ${c} (only ink and the single grey)`);
+        for (const [nm, ctx] of [['pupil', pupilCtx], ['model', modelCtx]]) if (/mq-vfocal|mq-vhalo|\u0001|\u0002/.test(P.vocabPictureSVG(ctx, id, { wMm: 46 }))) fail(`V22 "${id}": the ${nm} print page draws the focal highlight`);
+        const tw = P.vocabPictureSVG(twinCtx, id, { wMm: 46 });
+        if (!/<g class="mq-vhalo"[^>]*visibility="hidden"/.test(tw) || !/class="mq-vfocal"/.test(tw)) fail(`V22 "${id}": the screen twin has no hidden halo and targeted focal part`);
+    }
+}
+
+// V24 (owner R-2, lf-vocab r7): every bank word's wrong-answer explanation
+{
+    const has = (txt, w) => new RegExp(`(^|[^a-z])${String(w).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(txt);
+    for (const [w, e] of Object.entries(W.VOCAB_WORDS)) {
+        const x = e && e.explain;
+        if (!x) { fail(`V24 "${w}": no explain`); continue; }
+        const lc = String(x).toLowerCase();
+        if (!has(lc, w)) fail(`V24 "${w}": its explain does not name its word`);
+        if (!lc.startsWith(`${String(w).toLowerCase()} means `)) fail(`V24 "${w}": its explain does not read "<Word> means ..."`);
+        const n = String(x).trim().split(/\s+/).length;
+        if (n > 14) fail(`V24 "${w}": its explain is ${n} words (at most 14)`);
+        const rest = lc.split(String(w).toLowerCase()).join(' ');
+        for (const o of e.notWith || []) if (has(rest, o)) fail(`V24 "${w}": its explain names "${o}", a word of its notWith list`);
+    }
+}
+
 // ---- --browser: the checks only a browser can measure (on precritic's path as gate vocab-unit-browser) -----------------
 if (process.argv.includes('--browser')) await browserChecks();
 async function browserChecks() {
@@ -365,6 +415,8 @@ async function browserChecks() {
         } finally { await sh.close(); }
     };
     try {
+        // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
+        if (ONLY && ONLY.every((k) => ['V23', 'V25'].includes(k))) { await r7Checks(page, fail); return; }
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -453,7 +505,151 @@ async function browserChecks() {
             if (skillId === 'vocab_grade_pictures' && res.some((t) => new Set(t.words.map((w) => w.y)).size !== t.words.length)) fail(`V19 ${skillId} worksheet-1280: the words are not one a row (${sigs[0]})`);
             if (skillId === 'vocab_pick3_words' && res.some((t) => ![1, t.pills.length].includes(new Set(t.pills.map((p) => p.y)).size))) fail(`V19 ${skillId} worksheet-1280: the pills wrap 2 + 1 (${sigs.join(' | ')})`);
         }
+        // V23 (owner R-1) + V25 (owner R-2), lf-vocab r7: the screen feedback, and the print pupil pages unchanged
+        await r7Checks(page, fail);
     } finally { await app2.close(); }
+}
+
+async function r7Checks(page, fail) {
+    // the pupil print pages' sha256, per skill / role / size / seed (V23: byte-identical to 70cdbaf9); the pin is read from THIS
+    // checkout's tests (a backtest row runs today's checks on an old tree with MQ_ROOT)
+    const PUPIL_PIN = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'fixtures', 'precritic', 'vocab-pupil-hashes.json');
+    const { createHash } = await import('crypto');
+    const fs = await import('fs');
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const SK = ['vocab_grade_pictures', 'vocab_pick3_words'];
+    // ---- the print pages: pupil hash, key highlight GREY only
+    const hashes = {};
+    let keyHalos = 0;
+    for (const skillId of SK) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) for (const seed of [7, 143869]) {
+        const r = await page.evaluate(async (a) => {
+            try {
+                const x = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'vocabulary', skillId: a.skillId }] }], size: a.size, paper: 'A4', seed: a.seed, key: true });
+                return { pupil: x.pupilHtml, key: x.keyHtml || '' };
+            } catch (e) { return { error: String(e && e.message || e) }; }
+        }, { skillId, role, size, seed });
+        const id = `${skillId} ${role} ${size} ${seed}`;
+        if (r.error) { fail(`V23 ${id}: not composed (${r.error})`); continue; }
+        hashes[id] = createHash('sha256').update(r.pupil).digest('hex').slice(0, 16);
+        if (/mq-vhalo|mq-vfocal/.test(r.pupil)) fail(`V23 ${id}: the pupil page draws the focal highlight`);
+        const halos = [...r.key.matchAll(/<g class="mq-vhalo"[^>]*>/g)].map((m) => m[0]);
+        keyHalos += halos.length;
+        for (const h of halos) if (!/style="color:#949494"/.test(h) || /visibility="hidden"/.test(h)) fail(`V23 ${id}: a key highlight is not shown in the single grey (${h})`);
+    }
+    if (!keyHalos) fail('V23: no key page shows the focal highlight');
+    if (process.argv.includes('--pin-pupil')) { fs.writeFileSync(PUPIL_PIN, JSON.stringify(hashes, null, 1) + '\n'); console.log(`ws-vocab-unit: pinned ${Object.keys(hashes).length} pupil hashes`); }
+    else {
+        const pin = fs.existsSync(PUPIL_PIN) ? JSON.parse(fs.readFileSync(PUPIL_PIN, 'utf8')) : null;
+        if (!pin) fail('V23: no pinned pupil hashes (tests/fixtures/precritic/vocab-pupil-hashes.json)');
+        else for (const [id, h] of Object.entries(pin)) if (hashes[id] !== h) fail(`V23 ${id}: the pupil print page changed (${hashes[id] || 'missing'} vs pinned ${h})`);
+    }
+    // ---- the screen: card-390 and worksheet-1280
+    // (in the page) the state of a host's vocabulary cell: highlight shown, glowing words, explanation
+    const READ = (sel) => {
+        const root = document.querySelector(sel);
+        if (!root) return null;
+        const cell = root.querySelector('.mq-vp, .mq-vm');
+        const halos = [...root.querySelectorAll('svg.mq-vpic .mq-vhalo')];
+        return {
+            cell: !!cell,
+            focal: [...root.querySelectorAll('svg.mq-vpic')].map((sv) => sv.querySelectorAll('.mq-vfocal *').length),
+            haloOn: halos.filter((h) => getComputedStyle(h).visibility === 'visible').length,
+            haloN: halos.length,
+            haloColor: halos.map((h) => getComputedStyle(h).color)[0] || '',
+            haloW: halos.map((h) => { const m = h.querySelector('*'); return m ? parseFloat(getComputedStyle(m).strokeWidth) : 0; })[0] || 0,
+            glow: [...root.querySelectorAll('.mq-vglow')].map((e) => e.textContent.trim()),
+            glowBg: [...root.querySelectorAll('.mq-vglow')].map((e) => getComputedStyle(e).backgroundColor)[0] || '',
+            explain: [...root.querySelectorAll('.mq-vexplain p')].map((e) => e.textContent.trim()),
+        };
+    };
+    // (in the page) answer the item right or wrong, the way the pupil does: tap a bank word / write the letters
+    const ANSWER = (a) => {
+        const st = window.state;
+        const q = a.host === 'card' ? st.currentQ : st.worksheetQs[a.i];
+        const root = document.querySelector(a.sel);
+        const p = q.cell.payload;
+        let want;
+        if (q.cell.template === 'vocab-pick3') {
+            const w = a.right ? p.word : p.bank.find((x) => x !== p.word);
+            root.querySelector(`button[data-mq-choice="${w}"]`).click();
+            want = { right: [p.word], wrong: a.right ? [] : [p.word] };
+        } else {
+            const L = ['A', 'B', 'C'];
+            const ins = [...root.querySelectorAll('.mq-vm-box input')];
+            // wrong: the first two rows swapped, the third right
+            const vals = p.order.map((wi) => L[wi]);
+            if (!a.right) { const t = vals[0]; vals[0] = vals[1]; vals[1] = t; }
+            ins.forEach((el, n) => { el.value = vals[n]; el.dispatchEvent(new Event('input', { bubbles: true })); });
+            want = { right: a.right ? p.order.map((wi) => p.words[wi]) : [p.words[p.order[2]]], wrong: a.right ? [] : [p.words[p.order[0]], p.words[p.order[1]]] };
+        }
+        return want;
+    };
+    const EXPECT = (want) => want.wrong.map((w) => `The answer is ${w}! ${W.VOCAB_WORDS[w].explain}`);
+    const judge = (tag, before, after, want, spoken, tts) => {
+        if (!before || !before.cell) { fail(`V23 ${tag}: no vocabulary cell`); return; }
+        if (before.haloOn || before.glow.length || before.explain.length) fail(`V23 ${tag}: highlighted BEFORE the answer (${JSON.stringify(before)})`);
+        if (before.focal.some((n) => !n)) fail(`V23 ${tag}: a picture with no targeted focal part (${before.focal})`);
+        if (!after) { fail(`V23 ${tag}: the cell is gone after the answer`); return; }
+        if (!after.haloN || after.haloOn !== after.haloN) fail(`V23 ${tag}: the focal part is not highlighted after the answer (${after.haloOn}/${after.haloN})`);
+        if (after.haloW < 4) fail(`V23 ${tag}: the highlight is not thick (${after.haloW} px)`);
+        if (/148, 148, 148/.test(after.haloColor)) fail(`V23 ${tag}: the screen highlight is the print grey (${after.haloColor})`);
+        if (JSON.stringify(after.glow.slice().sort()) !== JSON.stringify(want.right.slice().sort())) fail(`V23 ${tag}: the glowing words are ${JSON.stringify(after.glow)}, want ${JSON.stringify(want.right)}`);
+        if (after.glow.length && !/255, 2\d\d, \d+/.test(after.glowBg)) fail(`V23 ${tag}: the right word does not glow yellow (${after.glowBg})`);
+        const ex = EXPECT(want);
+        if (JSON.stringify(after.explain) !== JSON.stringify(ex)) fail(`V25 ${tag}: the explanation is ${JSON.stringify(after.explain)}, want ${JSON.stringify(ex)}`);
+        if (spoken) {
+            const wantSpoken = ex.length && tts ? [ex.join(' ')] : [];
+            if (JSON.stringify(spoken) !== JSON.stringify(wantSpoken)) fail(`V25 ${tag}: spoken ${JSON.stringify(spoken)}, want ${JSON.stringify(wantSpoken)} (sound ${tts ? 'on' : 'off'})`);
+        }
+    };
+    // card-390: wrong with sound on, wrong with sound off, right
+    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+    for (const skillId of SK) for (const [right, tts] of [[false, true], [false, false], [true, true]]) {
+        const tag = `${skillId} card-390 ${right ? 'right' : 'wrong'} sound ${tts ? 'on' : 'off'}`;
+        await page.evaluate((k, tts) => {
+            window.__spoken = []; window.speak = (t) => { window.__spoken.push(String(t)); };
+            const st = window.state; st.ttsEnabled = tts; st.quizMode = false; st.mapMode = false; st.category = 'vocabulary'; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+            window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
+        }, skillId, tts);
+        await sleep(400);
+        const before = await page.evaluate(READ, '#questionCard');
+        const want = await page.evaluate(ANSWER, { host: 'card', sel: '#questionCard', right });
+        await sleep(150);
+        await page.evaluate(() => { const b = document.querySelector('#qcCheckBtn'); if (b && !window.state.hasAnswered) b.click(); });
+        await sleep(250);
+        const after = await page.evaluate(READ, '#questionCard');
+        const spoken = await page.evaluate(() => window.__spoken);
+        judge(tag, before, after, want, spoken, tts);
+        // (a right answer's card moves on after 2.5 s: let that timer pass, or it replaces the next case's question)
+        if (right) await sleep(3200);
+    }
+    // worksheet-1280: item 1 wrong, item 2 right, then Check all (1 picture, 3 words grades a wrong tap only there: a model
+    // twin's verdict waits); the first wrong card's explanation is spoken, once
+    await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+    for (const skillId of SK) {
+        await page.evaluate((k) => {
+            window.__spoken = []; window.speak = (t) => { window.__spoken.push(String(t)); };
+            const st = window.state; st.ttsEnabled = true; st.category = 'vocabulary'; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3; window.initWorksheet();
+        }, skillId);
+        await sleep(900);
+        const before = [], want = [];
+        for (const [i, right] of [[0, false], [1, true]]) {
+            const sel = `#ws_card_${i}`;
+            before.push(await page.evaluate(READ, sel));
+            want.push(await page.evaluate(ANSWER, { host: 'worksheet', sel, i, right }));
+            await sleep(150);
+        }
+        await page.evaluate(() => { window.__spoken = []; window.checkAllWorksheet(); });
+        await sleep(300);
+        for (const [i, right] of [[0, false], [1, true]]) {
+            const after = await page.evaluate(READ, `#ws_card_${i}`);
+            judge(`${skillId} worksheet-1280 item ${i + 1} ${right ? 'right' : 'wrong'}`, before[i], after, want[i], null, true);
+        }
+        const spoken = await page.evaluate(() => window.__spoken);
+        const ex = EXPECT(want[0]).join(' ');
+        if (JSON.stringify(spoken) !== JSON.stringify([ex])) fail(`V25 ${skillId} worksheet-1280 Check all: spoken ${JSON.stringify(spoken)}, want once ${JSON.stringify([ex])}`);
+        await page.evaluate(() => { Array.from(document.body.children).filter((e) => getComputedStyle(e).position === 'fixed' && getComputedStyle(e).zIndex === '9999').forEach((e) => e.remove()); });
+    }
 }
 
 console.log(`ws-vocab-unit: ${W.VOCAB_SETS.length} lesson sets, ${P.VOCAB_PICTURE_IDS.length} pictures, ${items} items dealt`);

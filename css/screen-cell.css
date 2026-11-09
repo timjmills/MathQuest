@@ -1897,3 +1897,15 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 /* the library's sentence frame: the sign is written IN A CIRCLE on screen as on paper (the slot
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
+
+/* Vocabulary feedback (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). Additive, scoped to the vocabulary
+   cells. Before the answer nothing changes: the picture's halo (vocab-pictures.js) is drawn hidden. Once a host judges
+   the answer, screen-cell.js markVocabFeedback adds .mq-vfb: the focal part's thick halo shows, the right word glows
+   yellow, and a wrong answer's explanation sits under the cell. */
+.mq-vfb svg.mq-vpic .mq-vhalo { visibility: visible; color: #ffd400 !important; }
+.mq-vfb .mq-vglow { background: #fff27a; border-radius: 8px; box-shadow: 0 0 0 4px #fff27a, 0 0 14px 6px rgba(255, 212, 0, 0.75); }
+.mq-vfb button.mq-vglow { background: #fff27a !important; border-color: #000 !important; }
+.mq-vexplain { margin: 12px 0 0; padding: 10px 14px; border: 2px solid #000; border-left: 10px solid #ffd400; border-radius: 10px;
+    background: #fff; color: #000; font-family: 'Andika', 'Open Sans', sans-serif; font-size: 20px; line-height: 1.35; text-align: left; }
+.mq-vexplain p { margin: 0; }
+.mq-vexplain p + p { margin-top: 6px; }

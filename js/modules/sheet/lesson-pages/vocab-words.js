@@ -9,6 +9,9 @@
 // Every word here has a picture in the graphic library (graphics/vocab-pictures.js, the same id).
 //   meaning  the child-friendly meaning (at most 8 words; the teacher's line, never printed
 //            beside its own picture: that would be the answer)
+//   explain  the wrong-answer explanation on screen (owner ruling R-2, 2026-11-09): "<Word> means ...", one kid-friendly
+//            reason tied to the word's picture, in our own words, at most 14 words; it names its own word and never a
+//            word of its notWith list (ws-vocab-unit V24). Shown as "The answer is <word>! <explain>" and read aloud.
 //   notWith  words whose pictures could honestly be read as this word: never offered in the same
 //            item (a Match 3 trio or a 1-picture-3-words bank), so every item has ONE right answer
 //
@@ -17,57 +20,57 @@
 //
 // Pure module (SCC-01).
 
-/** Every word: meaning, the words it is never offered with. */
+/** Every word: meaning, the wrong-answer explanation, the words it is never offered with. */
 export const VOCAB_WORDS = Object.freeze({
-    even: { meaning: 'makes pairs, none left over', notWith: ['equal groups'] },
-    odd: { meaning: 'one is left over after making pairs', notWith: ['remainder', 'identity', 'equal groups'] },
-    product: { meaning: 'the answer when you multiply', notWith: [] },
-    factor: { meaning: 'a number you multiply', notWith: [] },
-    row: { meaning: 'a line going across', notWith: [] },
-    column: { meaning: 'a line going down', notWith: [] },
-    multiple: { meaning: 'a number you land on counting in steps', notWith: ['pattern', 'sequence', 'count on'] },
-    input: { meaning: 'the number that goes in', notWith: [] },
-    output: { meaning: 'the number that comes out', notWith: [] },
-    rule: { meaning: 'what we do to every number', notWith: ['pattern'] },
-    pattern: { meaning: 'numbers that change the same way', notWith: ['multiple', 'sequence', 'rule', 'repeat'] },
-    array: { meaning: 'things in equal rows', notWith: ['equal groups', 'distributive', 'commutative', 'even'] },
-    commutative: { meaning: 'turn it round, the answer stays the same', notWith: ['array'] },
-    identity: { meaning: 'times 1 keeps the number the same', notWith: ['equal groups', 'odd'] },
-    distributive: { meaning: 'split it into two easier parts', notWith: ['array'] },
-    step: { meaning: 'one part of the work, in order', notWith: [] },
-    total: { meaning: 'all of them together', notWith: ['unknown'] },
-    left: { meaning: 'what stays after some go', notWith: ['one less'] },
-    'equal groups': { meaning: 'groups with the same number in each', notWith: ['array', 'even', 'odd', 'identity', 'remainder', 'round up'] },
-    unknown: { meaning: 'the number we must find', notWith: ['total'] },
-    'count on': { meaning: 'say the next numbers from a start', notWith: ['after', 'multiple', 'pattern', 'one more'] },
-    'one more': { meaning: 'add one', notWith: ['after', 'count on'] },
-    'one less': { meaning: 'take one away', notWith: ['before', 'left'] },
-    before: { meaning: 'the number just behind', notWith: ['one less'] },
-    after: { meaning: 'the number just ahead', notWith: ['one more', 'count on'] },
-    'hundred chart': { meaning: 'numbers in rows of ten', notWith: [] },
-    hundred: { meaning: '100: ten tens', notWith: ['number name'] },
-    ten: { meaning: '10: ten ones', notWith: [] },
-    one: { meaning: '1: a single one', notWith: [] },
-    digit: { meaning: 'one of the figures 0 to 9', notWith: ['ones digit'] },
-    'expanded form': { meaning: 'the number split by place', notWith: [] },
-    'number name': { meaning: 'the number written in words', notWith: ['hundred'] },
-    'ones digit': { meaning: 'the digit in the ones place', notWith: ['digit'] },
-    repeat: { meaning: 'the same part comes again', notWith: ['pattern', 'cycle'] },
-    sequence: { meaning: 'numbers in order, one after another', notWith: ['pattern', 'multiple', 'term', 'first term'] },
-    cycle: { meaning: 'goes round and back to the start', notWith: ['repeat'] },
+    even: { meaning: 'makes pairs, none left over', explain: 'Even means the dots make pairs, with none left over.', notWith: ['equal groups'] },
+    odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot is left over.', notWith: ['remainder', 'identity', 'equal groups'] },
+    product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: [] },
+    factor: { meaning: 'a number you multiply', explain: 'Factor means a number you multiply, like the 4 and the 3.', notWith: [] },
+    row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: [] },
+    column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: [] },
+    multiple: { meaning: 'a number you land on counting in steps', explain: 'Multiple means a number you land on when you count in threes.', notWith: ['pattern', 'sequence', 'count on'] },
+    input: { meaning: 'the number that goes in', explain: 'Input means the number that goes in, on the In side.', notWith: [] },
+    output: { meaning: 'the number that comes out', explain: 'Output means the number that comes out, on the Out side.', notWith: [] },
+    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern'] },
+    pattern: { meaning: 'numbers that change the same way', explain: 'Pattern means numbers that change the same way, plus 2 each time.', notWith: ['multiple', 'sequence', 'rule', 'repeat'] },
+    array: { meaning: 'things in equal rows', explain: 'Array means things in equal rows, like 3 rows of 4 dots.', notWith: ['equal groups', 'distributive', 'commutative', 'even'] },
+    commutative: { meaning: 'turn it round, the answer stays the same', explain: 'Commutative means you can turn it round and the answer stays the same.', notWith: ['array'] },
+    identity: { meaning: 'times 1 keeps the number the same', explain: 'Identity means times 1 keeps the number the same, so 5 stays 5.', notWith: ['equal groups', 'odd'] },
+    distributive: { meaning: 'split it into two easier parts', explain: 'Distributive means you split it into two easier parts, then add them.', notWith: ['array'] },
+    step: { meaning: 'one part of the work, in order', explain: 'Step means one part of the work, done in order like stairs.', notWith: [] },
+    total: { meaning: 'all of them together', explain: 'Total means all of them together: 5 and 3 make the whole bar.', notWith: ['unknown'] },
+    left: { meaning: 'what stays after some go', explain: 'Left means what stays after some go: four are left.', notWith: ['one less'] },
+    'equal groups': { meaning: 'groups with the same number in each', explain: 'Equal groups means groups with the same number in each, like 4.', notWith: ['array', 'even', 'odd', 'identity', 'remainder', 'round up'] },
+    unknown: { meaning: 'the number we must find', explain: 'Unknown means the number we must find, the one in the box.', notWith: ['total'] },
+    'count on': { meaning: 'say the next numbers from a start', explain: 'Count on means say the next numbers from a start: 113, 114, 115.', notWith: ['after', 'multiple', 'pattern', 'one more'] },
+    'one more': { meaning: 'add one', explain: 'One more means add one: four dots and one more make five.', notWith: ['after', 'count on'] },
+    'one less': { meaning: 'take one away', explain: 'One less means take one away: six dots, cross one out.', notWith: ['before', 'left'] },
+    before: { meaning: 'the number just behind', explain: 'Before means the number just behind, so 104 comes before 105.', notWith: ['one less'] },
+    after: { meaning: 'the number just ahead', explain: 'After means the number just ahead, so 106 comes after 105.', notWith: ['one more', 'count on'] },
+    'hundred chart': { meaning: 'numbers in rows of ten', explain: 'Hundred chart means numbers in rows of ten, each row ten more.', notWith: [] },
+    hundred: { meaning: '100: ten tens', explain: 'Hundred means 100: ten tens make one big square.', notWith: ['number name'] },
+    ten: { meaning: '10: ten ones', explain: 'Ten means 10: ten ones in one long rod.', notWith: [] },
+    one: { meaning: '1: a single one', explain: 'One means 1: a single small square.', notWith: [] },
+    digit: { meaning: 'one of the figures 0 to 9', explain: 'Digit means one of the figures 0 to 9, like 7.', notWith: ['ones digit'] },
+    'expanded form': { meaning: 'the number split by place', explain: 'Expanded form means the number split by place: 300 plus 40 plus 7.', notWith: [] },
+    'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, not in figures.', notWith: ['hundred'] },
+    'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the figure in the ones place, like the 3 in 473.', notWith: ['digit'] },
+    repeat: { meaning: 'the same part comes again', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle'] },
+    sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term'] },
+    cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round and comes back to the start.', notWith: ['repeat'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
-    grow: { meaning: 'gets bigger each time', notWith: ['sequence', 'pattern'] },
-    term: { meaning: 'one number in a sequence', notWith: ['first term', 'sequence'] },
-    'first term': { meaning: 'the number a sequence starts with', notWith: ['term', 'sequence'] },
-    'times as many': { meaning: 'the same amount, again and again', notWith: ['compare'] },
-    compare: { meaning: 'find which is more, and by how much', notWith: ['times as many'] },
-    equation: { meaning: 'two sides that are equal', notWith: [] },
-    remainder: { meaning: 'what is left after equal groups', notWith: ['odd', 'equal groups', 'round up'] },
-    quotient: { meaning: 'the answer when you divide', notWith: ['round up'] },
-    divisor: { meaning: 'the number you divide by', notWith: [] },
-    dividend: { meaning: 'the number you divide up', notWith: [] },
-    'round up': { meaning: 'use one more group for what is left', notWith: ['remainder', 'equal groups', 'quotient'] },
+    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern'] },
+    term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 7 in the box.', notWith: ['first term', 'sequence'] },
+    'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 3.', notWith: ['term', 'sequence'] },
+    'times as many': { meaning: 'the same amount, again and again', explain: 'Times as many means the same amount again and again: 3 times.', notWith: ['compare'] },
+    compare: { meaning: 'find which is more, and by how much', explain: 'Compare means find which bar is longer, and by how much.', notWith: ['times as many'] },
+    equation: { meaning: 'two sides that are equal', explain: 'Equation means both sides are equal: 12 is the same as 3 times 4.', notWith: [] },
+    remainder: { meaning: 'what is left after equal groups', explain: 'Remainder means what is left over after making the groups.', notWith: ['odd', 'equal groups', 'round up'] },
+    quotient: { meaning: 'the answer when you divide', explain: 'Quotient means the answer when you divide, like the 3 in the box.', notWith: ['round up'] },
+    divisor: { meaning: 'the number you divide by', explain: 'Divisor means the number you divide by, like the 4.', notWith: [] },
+    dividend: { meaning: 'the number you divide up', explain: 'Dividend means the number you divide up, like the 13.', notWith: [] },
+    'round up': { meaning: 'use one more group for what is left', explain: 'Round up means use one more group for what is left over.', notWith: ['remainder', 'equal groups', 'quotient'] },
 });
 
 /**
@@ -124,4 +127,7 @@ export function compatible(words) {
 /** The grades that have sets (K = 0). */
 export const VOCAB_GRADES = Object.freeze([...new Set(VOCAB_SETS.map((s) => s.grade))].sort((a, b) => a - b));
 
-export default { VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
+/** The screen's wrong-answer line for a word (owner R-2): "The answer is <word>! <explain>". */
+export const vocabExplainLine = (w) => (VOCAB_WORDS[w] && VOCAB_WORDS[w].explain ? `The answer is ${w}! ${VOCAB_WORDS[w].explain}` : '');
+
+export default { vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
