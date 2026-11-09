@@ -3,10 +3,45 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: r5 rebuild done, clean before critic (sibling-compare structural only); ready for critic r4
-Updated: 2026-11-08
+State: r6 rebuild done, clean before critic (sibling-compare structural only); ready for critic r5
+Updated: 2026-11-09
 Builder profile: mq-opus-medium
 Critic rounds: 4: r4 FAIL min 6 (design/lanes/lf-vocab/critic-r4.md), r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
+
+## Round 6 (2026-11-09, fresh builder, Opus medium, rebuild after critic r4 FAIL min 6): OQ-1 + critic r4 #1-#5
+Times: start about 10:05 UTC, end 11:50 UTC. Base c7384923 (the owner re-signed the card with OQ-1; check-signed OK).
+
+Checks first (each FAILs on 90e2eee4; backtest rows in tests/fixtures/precritic/backtests.json, pass 4cb3fd66):
+| # | Finding | Check (new / extended) | Backtest row | On precritic's path | Rounds it would have saved |
+|---|---|---|---|---|---|
+| 1 | OQ-1: 2.5 mm "one", 25 x 2.5 mm "ten" | V16 extended: one unit WITHIN an item, unit >= 5 mm when no hundred (rendered through both cells, S/M/L) | vocab-v16-base10-per-item | y (vocab-unit) | 1 (r4) |
+| 2 | Pick 3 EA at S 30.1 % empty, ws-empty-band passed | ws-empty-band --slot-ink off (new, opt-in) | eb-vocab-pick3-ea-s-critic | y (empty-band-critic, vocab skills only) | 1 (r4) |
+| 3 | Pick 3 guided rows 377 / 290 px at L (4th round) | V18 extended: rendered row boxes, page by page, 6 grade/seed pairs incl. ws-grade-render's seed 143869, no exemption | vocab-v18-rendered-rows | y (vocab-unit-browser) | 3 (r2, r3, r4) |
+| 4 | Match 3 EA at S drawn at L's height | V20 new: EA cell at S <= 0.9 x L when S ink < 0.95 x L ink | vocab-v20-ea-s-height | y (vocab-unit-browser) | 1 (r4) |
+| 5 | "number name" with "hundred" in the bank | V17 extended: no word that may share a bank is printed in the picture's text; pair appended to LOOKALIKES | vocab-v17-printed-text | y (vocab-unit) | 1 (r4) |
+| 6 | "left" reads as take away | V21 new: declared `referent` (left, repeat required); the heavy mark is on it and nowhere else | vocab-v21-referent | y (vocab-unit) | 1 (r4) |
+| 7 | ws-empty-band counted empty slots as ink | --slot-ink off: empty slots not ink, text as glyph ink (no half-leading), LONGEST blank run between the cell's rules; legacy cells noted, not judged | eb-vocab-pick3-ea-s-critic | y | 1 (r4) |
+
+Fixes: base10UnitSet (vocab-pictures.js) - the unit is per item; Match 3 gives a base-ten slot (no hundred in the item) the
+row's spare width and a 52.5 mm box (unit 5.05 mm). Pick 3 EA at S: bank beside the picture (28 mm box), 6 a page (2 x 3).
+Match 3 EA at S: 18 mm pictures, no vertical pad, 4 a page (57 mm cells vs L 76 mm). guided.js evenRows: the rows take one
+share (page height / rows) even when the page cannot hold the tallest planned row (the planner counts a one-line hint; a
+two-line meaning hint drew row 1 at 100 mm). notWith number name <-> hundred (grade 2 set still splits: V7). "left": heavy
+bracket under the four that stay, crosses at part weight. Match 3 practice cell: the picture row is centred above the words,
+and in a row taller than 48 mm (review, pre-skill check) the work takes a quarter of the spare (EB-FOOT stays within 10 %).
+
+Gates (manifest applied for the run, not committed):
+- ws-vocab-unit: OK; ws-vocab-unit --browser: OK
+- ws-empty-band --skill both: OK; with --slot-ink off: OK (2 legacy pre-skill-check cells of grade 6 vocab skills noted, not judged)
+- ws-precritic --strict: 1 FAIL (sibling-compare, structural: no approved sibling) / spec-card check-signed PASS (owner re-signed)
+- ws-backtest --row (the 6 new rows): 6 PASS, `ws-backtest: OK`
+
+For lf-checks (--slot-ink off on the pinned skills, add_facts + mult_facts, --no-baseline --report-only): default 299 findings
+(EB-BAND 188, EB-SIDE 95, EB-FOOT 16) -> flag 2057 (EB-BAND 1374, EB-SIDE 127, EB-FOOT 556). The default is unchanged; a re-pin
+under the flag would be lf-checks' decision.
+
+Open for the critic: Match 3 EA at S prints its pictures 18 mm tall (4 a page); the In/Out table text is small there. Nits
+from r4 (letter anchor, card-390 alignment, repeated pupil name, caption sizes) were not in this brief and are not done.
 
 ## Round 5 (2026-11-08, fresh builder, rule 5, Opus medium): critic r3 #1-#10
 Times: start 12:52 UTC, end 14:39 UTC.

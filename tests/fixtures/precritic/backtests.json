@@ -1862,6 +1862,126 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-v16-base10-per-item",
+   "check": "Base-ten one / ten print a >= 5 mm unit when no hundred is in the item, one unit within an item (owner OQ-1; critic r4: a 2.5 mm \"one\" on grade 2)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V16",
+   "browser": false,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-vocab-pick3-ea-s-critic",
+   "check": "1 picture, 3 words error analysis at S: 30.1-30.2 % empty while ws-empty-band passed (critic r4 #1); the critic-aligned band (--slot-ink off)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --slot-ink off EB-BAND",
+   "browser": true,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_pick3_words --roles error-analysis --sizes S --hosts none --slot-ink off",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v18-rendered-rows",
+   "check": "1 picture, 3 words Guided rows unequal at L, 377 / 290 px, measured on the rendered row boxes (critic r4 #2, 4th round)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V18",
+   "browser": true,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v20-ea-s-height",
+   "check": "Match 3 error analysis at S drawn in L's 76 mm cell, 24-28 % empty (critic r4 #3): S cell <= 0.9 x L when its content is smaller",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V20",
+   "browser": true,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v17-printed-text",
+   "check": "\"number name\" offered with \"hundred\" while its picture prints \"three hundred forty-seven\" (critic r4 #4)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V17",
+   "browser": false,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v21-referent",
+   "check": "The \"left\" picture marks what goes, not what stays (critic r4 #5): a declared referent carries the heavy mark",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V21",
+   "browser": false,
+   "fail": {
+    "commit": "90e2eee4",
+    "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "4cb3fd66",
+    "state": "lf-vocab r6 fix, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V21",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
