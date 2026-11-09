@@ -34,6 +34,16 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## PARKED (2026-11-09: the owner's week cap is reached). Next round = the Q-S2 re-check of R-1 / R-2, in this order:
+1. The Match 3 wrong line, "<Word> is picture <L>! <Word> means ...". Glow ONLY the wrongly matched pictures, each with
+   its letter.
+2. Build V25+, V26, V27, V22+ and V24+ (spec: LESSONS_LEARNED "lf-vocab round 7"). Each must FAIL on 82e5007b and
+   have a backtest row.
+3. The 6 minor fixes from design/lanes/lf-vocab/critic-r6-narrow.md.
+4. The harness gaps: full-page answered shots on every host, and a quiz answered state.
+Then a narrow critic re-check of the screen hosts and the keys. Pending: the owner's answer on the yellow active-box
+pulse (the lead will relay it).
+
 ## Round 7 result (2026-11-09): narrow critic FAIL, min 7 (a near-miss: a Q-S2 re-check is allowed)
 - R-1 and R-2 are built (82e5007b). Gates are green: ws-vocab-unit and --browser, screen-answer, phone-card,
   chromebook-fit, boot-smoke, and 4 backtests.
