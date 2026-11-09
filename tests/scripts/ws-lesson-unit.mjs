@@ -486,7 +486,7 @@ for (const id of Object.keys(LIB.LESSONS)) {
     const ref = LIB.practiceRef(id);
     const d = LIB.lessonData(id);
     const f = PRE.lessonFor(ref.categoryId, ref.skillId);
-    const { prereqs, prereqsLive, ...rest } = d;
+    const { prereqs, prereqsLive, vocabZoom, roundOneNum, ...rest } = d;
     eq(rest, JSON.parse(JSON.stringify(f)), `library: lessonData(${id}) is lessonFor(${ref.categoryId}, ${ref.skillId}) plus prereqs`);
     ok(!('archetype' in d) && !('cases' in d) && !('caps' in d) && !('casesPending' in d), `library: lessonData(${id}) hands no library-only field to the engine`);
     ok(!('prereqs' in f), `prereqs.js: lessonFor(${ref.categoryId}, ${ref.skillId}) carries no prereqs (byte-identical packets)`);
@@ -508,6 +508,30 @@ ok(LIB.prereqCheckLive({ prereqs: [{}] }) && !LIB.prereqCheckLive({ prereqs: [] 
 ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, LIB.lessonById('Y2.B2.S18'), { prereqsLive: true })).some((m) => /prereqsLive/.test(m)), 'LR-17 switch: prereqsLive is false or absent');
 ok(SCHEMA.validateLesson('Y2.B2.S18', Object.assign({}, LIB.lessonById('Y2.B2.S18'), { warmup: [] })).some((m) => /Warm-up it prints/.test(m)), 'LR-17 switch: an off check needs its Warm-up');
 for (const [id, l] of Object.entries(LIB.LESSONS)) if ((l.prereqs || []).length) ok(l.prereqsLive === false, `LR-17 switch: library lesson ${id} with a check is off until its critic passes (landing)`);
+// LR-17b (landing 2026-11-09, lead decision A): the phase-0 look (critic r2 N1 vocabZoom, D11 roundOneNum) is OPT-IN on the
+// three samples and live only with their check: prereqsLive false prints exactly as master (ws-lesson-baseline proof).
+{
+    const CM = await imp('js/modules/sheet/lesson-pages/common.js');
+    const PR = await imp('js/modules/sheet/lesson-pages/practice.js');
+    const { resolveCtx } = await imp('js/modules/sheet/index.js');
+    eq(LIB.PHASE0_FLAGS, ['vocabZoom', 'roundOneNum'], 'LR-17b: the phase-0 flags');
+    eq(['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14'].map((id) => [!!LIB.lessonData(id).vocabZoom, !!LIB.lessonData(id).roundOneNum]), [[true, false], [true, false], [true, true]], 'LR-17b: vocabZoom on the three samples, roundOneNum on the round sample only');
+    eq(Object.entries(LIB.LESSONS).filter(([, l]) => LIB.PHASE0_FLAGS.some((f) => l[f])).map(([id]) => id).sort(), ['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14'], 'LR-17b: no other lesson carries a phase-0 flag');
+    for (const id of ['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14']) eq([CM.phase0On(LIB.lessonData(id), 'vocabZoom'), CM.phase0On(LIB.lessonData(id), 'roundOneNum')], [false, false], `LR-17b: ${id}'s flags are off while its check is off (master's packet)`);
+    ok(CM.phase0On({ vocabZoom: true, prereqs: [{}] }, 'vocabZoom') && !CM.phase0On({ vocabZoom: true, prereqs: [{}], prereqsLive: false }, 'vocabZoom')
+        && !CM.phase0On({ vocabZoom: true }, 'vocabZoom') && !CM.phase0On({ prereqs: [{}] }, 'vocabZoom') && !CM.phase0On(null, 'vocabZoom'), 'LR-17b: phase0On = flag true AND the check live');
+    const l14 = LIB.lessonById('Y4.B1.S14');
+    ok(!SCHEMA.validateLesson('Y4.B1.S14', l14, { skillExists: (k) => !!k }).some((m) => /LR-17b/.test(m)), 'LR-17b: the round sample\'s flags validate');
+    ok(SCHEMA.validateLesson('Y4.B1.S14', Object.assign({}, l14, { vocabZoom: 1 })).some((m) => /vocabZoom: true or absent/.test(m)), 'LR-17b: a flag is true or absent');
+    ok(SCHEMA.validateLesson('Y2.B2.S17', Object.assign({}, LIB.lessonById('Y2.B2.S17'), { roundOneNum: true })).some((m) => /roundOneNum: true needs/.test(m)), 'LR-17b: a flag needs `prereqs`');
+    // the engine: rounding cells fill the Independent rows as one-number answers only with roundOneNum live (D11)
+    const ctx = resolveCtx({ size: 'L', look: 'ican', mode: 'print' });
+    const cell = (i) => ({ q: { text: `${21 + i} → ?`, ans: 20, cell: { template: 'pv', payload: { kind: 'round' } } }, template: 'pv', render: () => '<i></i>', key: { value: '20', display: '20', slots: {} },
+        measured: Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 20, wMm: 30, slackMm: 10 }])), footprint: { wMm: 40, hMm: 20 } });
+    const rowsWith = (d) => PR.independentBand({ input: { skills: [{ categoryId: 'number_sense', skillId: 'nearest_10' }] }, ctx, m: { strip: 10 }, data: d, main: Array.from({ length: 18 }, (_, i) => cell(i)),
+        example: null, example2: null, example3: null, example4: null, weDo: [], extrasList: [], cur: { sections: [], used: 60, budget: 200 }, labels: {}, letter: 1 }).length;
+    eq([rowsWith(null), rowsWith({ roundOneNum: true, prereqs: [{}], prereqsLive: false }), rowsWith({ roundOneNum: true, prereqs: [{}] })], [6, 6, 12], 'LR-17b: rounding rows - flag off or check off: master\'s 6; on with the check live: 12');
+}
 eq(LIB.lessonRules('Y4.B1.S14').cases, ['roundUp', 'roundDown', 'endsFive', 'toHundred'], 'library: lessonRules gives the gates the cases');
 eq(LIB.lessonRules('Y2.B2.S18').caps, { onePlace: 1, underTen: 2 }, 'library: lessonRules gives the gates the caps');
 eq(LIB.lessonRules('Y3.B2.S12').cases, null, 'library: a routine with casesPending declares none');

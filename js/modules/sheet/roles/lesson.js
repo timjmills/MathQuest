@@ -57,7 +57,7 @@ import { hopsSvg } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad } from '../lesson-arch/line.js';
 import { isWordBar, chartStepsOf } from '../lesson-arch/story.js';
 import { winShare } from '../lesson-arch/grid.js';
-import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker } from '../lesson-pages/common.js';
+import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker, phase0On } from '../lesson-pages/common.js';
 import { pickExample, pickSecond, otherExamples, chartLayout, stateItems, finalItems, secondItems, sameFactForms, chartPage } from '../lesson-pages/chart.js';
 import { vocabItem, vocabOrder } from '../lesson-pages/vocab.js';
 import { warmShape } from '../lesson-pages/warm-up.js';
@@ -238,8 +238,9 @@ function planOnce(input = {}) {
     let indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
     // (critic r2 N1: a lesson sheet never drops its Independent Practice row - the Score and the pupil's own work - for a
     // few millimetres: the Vocabulary match on that page is drawn smaller, down to VOCAB_ZOOM_MIN, to make room for one
-    // row; only when that is not enough does the row go. A sheet whose row fits is unchanged.)
-    const vocabG = vocab ? groups.find((g) => g.sections[0] && g.sections[0].label === 'Vocabulary:' && cur.sections.includes(g.sections[0])) : null;
+    // row; only when that is not enough does the row go. A sheet whose row fits is unchanged. LR-17b: only on a lesson
+    // record with `vocabZoom` whose Prerequisite Check is live - phase0On; every other packet prints as master did.)
+    const vocabG = vocab && phase0On(data, 'vocabZoom') ? groups.find((g) => g.sections[0] && g.sections[0].label === 'Vocabulary:' && cur.sections.includes(g.sections[0])) : null;
     if (!indep.length && cur.indepShort > 0 && vocabG && vocabG.grow) {
         const content = Math.max(1, vocabG.grow.h - VOCAB_PAD_MM);
         const z = Math.floor((1 - (cur.indepShort + 1) / content) * 20) / 20;

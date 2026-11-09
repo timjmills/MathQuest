@@ -67,6 +67,11 @@
 //     prereqsLive?: false                              LR-17 switch: the check is written but OFF the
 //                                                      printed packet (Warm-up kept) until it passes its
 //                                                      critic; absent = live
+//     vocabZoom?: true                                 LR-17b phase-0 look: the lesson sheet's Vocabulary is drawn
+//                                                      smaller (0.95-0.75) so one Independent row fits; needs `prereqs`,
+//                                                      on only while the check is live
+//     roundOneNum?: true                               LR-17b phase-0 look: rounding cells count as one-number answers
+//                                                      in the Independent rows (more rows); needs `prereqs`, live only
 //     mixWith:  [{key, opts?, title?, ...floors}]      Mixed practice partners (EARLIER skills, LR-9)
 //     steps?:   ['Y1.B2.S9', ...]                      further WRM steps it teaches (aliases)
 //     note?:    '...'                                  why this step / this skill (a reviewer's note)
@@ -269,6 +274,10 @@ export function validateLesson(id, l, known = {}) {
     if (l.prereqsLive !== undefined && l.prereqsLive !== false) e('prereqsLive: false or absent (live)');
     if (l.prereqsLive === false && !(l.prereqs || []).length) e('prereqsLive: false needs `prereqs`');
     if (l.prereqsLive === false && !(l.warmup || []).length) e('prereqsLive: false needs the Warm-up it prints meanwhile');
+    for (const f of ['vocabZoom', 'roundOneNum']) {
+        if (l[f] !== undefined && l[f] !== true) e(`${f}: true or absent (LR-17b)`);
+        if (l[f] === true && !(l.prereqs || []).length) e(`${f}: true needs \`prereqs\` (LR-17b: the phase-0 look goes live with the check)`);
+    }
     if (l.prereqs !== undefined) bad.push(...validatePrereqs(id, l.prereqs, Object.assign({ strictIds: true }, known)));
     else if (!String(l.prereqsPending || '').trim()) e('LR-17: no Prerequisite Check (`prereqs`, or `prereqsPending`: why not yet)');
     if (!(l.mixWith || []).length) e('LR-18: no Mixed partners (the mixed part)');

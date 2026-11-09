@@ -11,7 +11,7 @@ import { resolveCtx } from '../index.js';
 import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { winShare } from '../lesson-arch/grid.js';
-import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt } from './common.js';
+import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt, phase0On } from './common.js';
 
 export const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
@@ -84,8 +84,10 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             return !!m && Number(m[1]) <= 144 && Number(m[2]) <= 12 && /^\d+$/.test(String(answerOf(it)));
         };
         // (a rounding cell "27 -> ___" is a one-number answer too - critic lessons-phase0 r1 D11: the round lesson's S sheet
-        // ended on a 50 mm blank foot under two rows; critic r2: on every lesson, never keyed on whether it has `prereqs`)
-        const roundOne = (it) => it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
+        // ended on a 50 mm blank foot under two rows. LR-17b: only on a lesson record with `roundOneNum` whose Prerequisite
+        // Check is live - phase0On; every other packet prints as master did)
+        const roundRows = phase0On(data, 'roundOneNum');
+        const roundOne = (it) => roundRows && it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
         const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it)));
         // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
         // six rows of bracket facts ran 2 mm past at S; taller problems keep the room they had.

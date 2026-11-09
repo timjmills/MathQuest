@@ -280,6 +280,7 @@ export const LESSONS = Object.freeze({
     'Y1.B2.S9': {
         routine: 'add-count-on',
         prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
+        vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'add-within-10',
         practice: { skill: 'addition:add_facts', opts: { band: 10, constant: [1, 2, 3] } },
         defaultFor: true,
@@ -303,6 +304,7 @@ export const LESSONS = Object.freeze({
     'Y2.B2.S18': {
         routine: 'sub-column-regroup',
         prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
+        vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'subtract-2-digit-regroup',
         practice: { skill: 'subtraction:sub_100_regroup' },
         defaultFor: true,

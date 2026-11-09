@@ -131,9 +131,15 @@ export function lessonData(idOrSlug) {
         // Warm-up, as master printed it) until the lesson's Prerequisite Check passes its critic; the record still
         // carries `prereqs` for the gates and prerequisiteSkillsFor.
         if (l.prereqsLive === false) out.prereqsLive = false;
+        // LR-17b: the phase-0 look flags (schema.js) travel with the check; the engine reads them only while it is live
+        // (sheet/lesson-pages/common.js phase0On).
+        for (const f of PHASE0_FLAGS) if (l[f] === true) out[f] = true;
     }
     return out;
 }
+
+/** LR-17b: the lesson-record flags of the phase-0 look (opt-in; on only while the lesson's Prerequisite Check is live). */
+export const PHASE0_FLAGS = Object.freeze(['vocabZoom', 'roundOneNum']);
 
 /** LR-17 switch: does this engine record (lessonData) open its packet with the Prerequisite Check? */
 export const prereqCheckLive = (data) => !!(data && Array.isArray(data.prereqs) && data.prereqs.length && data.prereqsLive !== false);

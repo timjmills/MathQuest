@@ -185,6 +185,7 @@ export const LESSONS = Object.freeze({
     'Y4.B1.S14': {
         routine: 'round-nearest-10',
         prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
+        vocabZoom: true, roundOneNum: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'round-nearest-10',
         practice: { skill: 'number_sense:nearest_10' },
         defaultFor: true,
