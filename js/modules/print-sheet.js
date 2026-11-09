@@ -4120,7 +4120,10 @@ async function buildRoleSheet(n, metaOf) {
     // (critic laned-restart r4 R4-2c: a role may measure one more column count for a section of supported problems -
     // review.js - so the sheet says when any skill ticks a support)
     const supported = n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.opts && Array.isArray(sk.opts.support) && sk.opts.support.length));
-    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported })) : [1, 2]) || [1, 2];
+    // (critic r7 R7-1: a div_facts Test lays out on its Independent page's grid - 5 columns of drawn arrays at S - so it says
+    // when the sheet is div_facts with a support; test.js measures the 5th column then)
+    const divSupported = supported && n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.categoryId === 'division' && sk.skillId === 'div_facts'));
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported }, divSupported ? { divSupported } : {})) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {
