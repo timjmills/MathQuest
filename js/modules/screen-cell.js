@@ -1100,7 +1100,8 @@ function _liveBindFn(el, fn, group = [], want = null) {
  *   - makes the right word glow yellow (pick3: the bank word; Match 3: each word whose box holds its right letter);
  *   - on a WRONG answer shows "The answer is <word>! <explain>" under the cell (Match 3: one line a wrongly matched word)
  *     and hands that text once to `speak` (the host passes hints-speech.js speakExplanation, which the sound toggle mutes).
- * Before the answer the cell is unchanged. Calling it again (a second try) replaces the earlier feedback.
+ * Before the answer the cell is unchanged. Calling it again (a second try) replaces the earlier feedback. Every mark it shows
+ * carries `mq-v-feedback`, which FEEDBACK_RE keeps out of the cell's black-and-white ink pass (monoCell): feedback chrome.
  * @returns {string} the explanation shown ('' for a right answer or a cell that is not a vocabulary cell)
  */
 export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
@@ -1111,14 +1112,14 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
     if (!cell) return '';
     const p = q.cell.payload;
     const norm = (s) => String(s == null ? '' : s).trim().toLowerCase();
-    cell.querySelectorAll('.mq-vglow').forEach((el) => el.classList.remove('mq-vglow'));
+    cell.querySelectorAll('.mq-vglow').forEach((el) => el.classList.remove('mq-vglow', 'mq-v-feedback'));
     const old = cell.parentElement && cell.parentElement.querySelector(':scope > .mq-vexplain');
     if (old) old.remove();
     cell.classList.add('mq-vfb');
     let wrongWords = [];
     if (tpl === 'vocab-pick3') {
         const btn = Array.from(cell.querySelectorAll('button[data-mq-choice]')).find((b) => norm(b.getAttribute('data-mq-choice')) === norm(p.word));
-        if (btn) btn.classList.add('mq-vglow');
+        if (btn) btn.classList.add('mq-vglow', 'mq-v-feedback');
         if (!ok) wrongWords = [String(p.word)];
     } else {
         const LET = ['A', 'B', 'C'];
@@ -1132,7 +1133,7 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
             const inp = box && box.querySelector('input');
             const got = norm(inp ? inp.value : box ? box.textContent : '');
             const right = got === norm(LET[wi]);
-            if (right || ok) { const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow'); }
+            if (right || ok) { const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback'); }
             else wrongWords.push(String(words[wi]));
         });
     }
@@ -1140,7 +1141,7 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
     const lines = wrongWords.map((w) => vocabExplainLine(w) || (VOCAB_WORDS[w] ? `The answer is ${w}!` : '')).filter(Boolean);
     if (!lines.length) return '';
     const box = document.createElement('div');
-    box.className = 'mq-vexplain';
+    box.className = 'mq-vexplain mq-v-feedback';
     box.setAttribute('role', 'status');
     for (const l of lines) { const para = document.createElement('p'); para.textContent = l; box.appendChild(para); }
     cell.insertAdjacentElement('afterend', box);

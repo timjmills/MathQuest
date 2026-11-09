@@ -454,7 +454,8 @@ export function vocabPictureExtent(id) {
 /* ------------------------------------------------------------------------------ the focal part (owner R-1)
  * After the pupil answers on screen the focal part gets a thick highlight; the printed KEY shows it in the single grey.
  * The highlight is a HALO: a copy of the focal marks under the drawing, stroked thick in `currentColor` (the key: GREY;
- * the screen: hidden until the cell is answered, then the host's highlight colour, css/screen-cell.css). The pupil page
+ * the screen: hidden until the cell is answered, then the host's highlight colour, css/screen-cell.css; the key writes GREY
+ * into each mark, since a key page paints the marks it adds in its key ink through `color`, sheet-kit.css). The pupil page
  * draws no halo and no focal group, byte for byte as before.
  */
 const SENT = /[\u0001\u0002]/g;
@@ -474,12 +475,12 @@ function focalBody(id) {
 /** The focal segments of a picture (svg strings); every picture has at least one (ws-vocab-unit V22). */
 export const vocabPictureFocal = (id) => (hasVocabPicture(id) ? [...focalBody(id).matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]).filter((x) => /<(rect|line|circle|path|text)\b/.test(x)) : []);
 /** The halo copy of a focal segment: each mark stroked thick in currentColor; a filled mark (dot, text, arrow head) filled too. */
-function haloOf(seg) {
+function haloOf(seg, ink = 'currentColor') {
     return seg.replace(/<(rect|line|circle|path|text)\b([^>]*?)(\/?)>/g, (m, tag, attrs, close) => {
         const fillAttr = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
         const filledMark = tag === 'text' || (tag !== 'line' && fillAttr !== undefined && fillAttr !== 'none');
         const rest = attrs.replace(/\s(stroke|stroke-width|fill|stroke-linecap|stroke-linejoin|vector-effect)="[^"]*"/g, '');
-        return `<${tag}${rest} fill="${filledMark ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="${VOCAB_HALO_W}" stroke-linejoin="round" stroke-linecap="round" ${NS}${close}>`;
+        return `<${tag}${rest} fill="${filledMark ? ink : 'none'}" stroke="${ink}" stroke-width="${VOCAB_HALO_W}" stroke-linejoin="round" stroke-linecap="round" ${NS}${close}>`;
     });
 }
 /**
@@ -491,7 +492,12 @@ function bodyFor(id, mode) {
     const fb = focalBody(id);
     if (!mode) return fb.replace(SENT, '');
     const segs = [...fb.matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]);
-    const halo = `<g class="${VOCAB_HALO_CLASS}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map(haloOf).join('')}</g>`;
+    // (screen: the class mq-v-feedback keeps the screen cell's black-and-white ink pass, screen-cell.js monoCell, off the
+    // halo - it is feedback chrome, as the host's green and red are; the r7 render drew the yellow halo grey)
+    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor')).join('')}</g>`;
+    // (the key leaves the drawing itself exactly as the pupil page draws it: a key page paints every mark it does not share
+    // with the pupil page in its key ink, so a wrapped focal part printed orange - r7 render. Its halo is the targeted mark.)
+    if (mode === 'key') return halo + fb.replace(SENT, '');
     return halo + fb.replace(/\u0001([^\u0001\u0002]*)\u0002/g, (m, x) => `<g class="${VOCAB_FOCAL_CLASS}" data-vfocal="1">${x}</g>`);
 }
 

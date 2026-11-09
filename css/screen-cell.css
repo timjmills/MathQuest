@@ -1903,7 +1903,8 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
    the answer, screen-cell.js markVocabFeedback adds .mq-vfb: the focal part's thick halo shows, the right word glows
    yellow, and a wrong answer's explanation sits under the cell. */
 .mq-vfb svg.mq-vpic .mq-vhalo { visibility: visible; color: #ffd400 !important; }
-.mq-vfb .mq-vglow { background: #fff27a; border-radius: 8px; box-shadow: 0 0 0 4px #fff27a, 0 0 14px 6px rgba(255, 212, 0, 0.75); }
+.mq-vfb svg.mq-vpic .mq-vhalo * { stroke-width: 10px; }
+.mq-vfb .mq-vglow { background: #fff27a !important; border-radius: 8px; box-shadow: 0 0 0 4px #fff27a, 0 0 14px 6px rgba(255, 212, 0, 0.75); }
 .mq-vfb button.mq-vglow { background: #fff27a !important; border-color: #000 !important; }
 .mq-vexplain { margin: 12px 0 0; padding: 10px 14px; border: 2px solid #000; border-left: 10px solid #ffd400; border-radius: 10px;
     background: #fff; color: #000; font-family: 'Andika', 'Open Sans', sans-serif; font-size: 20px; line-height: 1.35; text-align: left; }

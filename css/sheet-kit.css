@@ -560,3 +560,10 @@
    and the frame are one solid stroke when a PDF is rasterised (two abutting anti-aliased edges left a light seam: the frame
    read as a double line at 93 dpi). Additive. */
 .ws-page .ws-grid.facts > .ws-cell { background-clip: padding-box; }
+/* lf-vocab r7 (owner R-1, 2026-11-09): a vocabulary picture's focal highlight on the KEY is the single grey, not the key
+   ink - it marks the part the word names, it is not an answer the key adds. The halo (vocab-pictures.js, class mq-vhalo)
+   writes the grey into each mark; key-short.js tags it as an added mark, so this restores the grey over the key-ink rules
+   above (higher specificity). Additive. */
+.ws-page.ws-key.ws-key.ws-key.ws-key.ws-key svg .mq-vhalo [stroke="#949494"] { stroke: #949494 !important; }
+.ws-page.ws-key.ws-key.ws-key.ws-key.ws-key svg .mq-vhalo [fill="#949494"] { fill: #949494 !important; }
+.ws-page.ws-key.ws-key.ws-key.ws-key.ws-key svg .mq-vhalo [fill="none"] { fill: none !important; }

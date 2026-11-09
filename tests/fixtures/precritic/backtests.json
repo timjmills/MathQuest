@@ -1982,6 +1982,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-v22-focal",
+   "check": "Owner R-1: every picture declares a focal part, drawn targetable on the key (single grey) and screen (hidden halo), never on the pupil page",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V22",
+   "browser": false,
+   "fail": {
+    "commit": "70cdbaf9",
+    "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "b4a249b6",
+    "state": "lf-vocab r7 build, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v24-explain",
+   "check": "Owner R-2: every bank word has an explain naming its word, no notWith word, <= 14 words",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V24",
+   "browser": false,
+   "fail": {
+    "commit": "70cdbaf9",
+    "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "b4a249b6",
+    "state": "lf-vocab r7 build, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V24",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v23-v25-screen-feedback",
+   "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V23 + V25",
+   "browser": true,
+   "fail": {
+    "commit": "70cdbaf9",
+    "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+   },
+   "pass": {
+    "commit": "b4a249b6",
+    "state": "lf-vocab r7 build, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

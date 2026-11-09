@@ -359,9 +359,10 @@ for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "$
         const segs = typeof P.vocabPictureFocal === 'function' ? P.vocabPictureFocal(id) : [];
         if (!segs.length) { fail(`V22 "${id}": no focal part declared`); continue; }
         const key = P.vocabPictureSVG(keyCtx, id, { wMm: 46 });
-        const groups = [...key.matchAll(/<g class="mq-vfocal" data-vfocal="1">([\s\S]*?)<\/g>/g)].map((m) => m[1]);
-        const marks = groups.reduce((n, g) => n + (g.match(/<(rect|line|circle|path|text)\b/g) || []).length, 0);
-        if (!marks) fail(`V22 "${id}": the key draws no targeted focal mark (.mq-vfocal)`);
+        // (the key's targeted mark is its halo - the drawing itself stays as the pupil page draws it; the screen's is .mq-vfocal)
+        const haloMarks = ((/<g class="mq-vhalo"[^>]*>([\s\S]*?)<\/g>/.exec(key) || [])[1] || '').match(/<(rect|line|circle|path|text)\b/g) || [];
+        if (!haloMarks.length) fail(`V22 "${id}": the key draws no targeted focal mark (.mq-vhalo)`);
+        if (key.replace(/<g class="mq-vhalo"[^>]*>[\s\S]*?<\/g>/, '') !== P.vocabPictureSVG(pupilCtx, id, { wMm: 46 })) fail(`V22 "${id}": the key changes the drawing itself (only the halo may be added)`);
         const halo = /<g class="mq-vhalo"[^>]*style="color:([^";]+)"/.exec(key);
         if (!halo) fail(`V22 "${id}": the key has no focal highlight (.mq-vhalo)`);
         else if (halo[1].toLowerCase() !== GREYV) fail(`V22 "${id}": the key's highlight is ${halo[1]}, not the single grey ${GREYV}`);
@@ -369,7 +370,8 @@ for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "$
         for (const c of colours) if (!['#000', GREYV].includes(c)) fail(`V22 "${id}": the key uses ${c} (only ink and the single grey)`);
         for (const [nm, ctx] of [['pupil', pupilCtx], ['model', modelCtx]]) if (/mq-vfocal|mq-vhalo|\u0001|\u0002/.test(P.vocabPictureSVG(ctx, id, { wMm: 46 }))) fail(`V22 "${id}": the ${nm} print page draws the focal highlight`);
         const tw = P.vocabPictureSVG(twinCtx, id, { wMm: 46 });
-        if (!/<g class="mq-vhalo"[^>]*visibility="hidden"/.test(tw) || !/class="mq-vfocal"/.test(tw)) fail(`V22 "${id}": the screen twin has no hidden halo and targeted focal part`);
+        const twMarks = [...tw.matchAll(/<g class="mq-vfocal" data-vfocal="1">([\s\S]*?)<\/g>/g)].reduce((n, m) => n + (m[1].match(/<(rect|line|circle|path|text)\b/g) || []).length, 0);
+        if (!/<g class="mq-vhalo[^"]*"[^>]*visibility="hidden"/.test(tw) || !twMarks) fail(`V22 "${id}": the screen twin has no hidden halo and targeted focal part`);
     }
 }
 
@@ -416,7 +418,7 @@ async function browserChecks() {
     };
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
-        if (ONLY && ONLY.every((k) => ['V23', 'V25'].includes(k))) { await r7Checks(page, fail); return; }
+        if (ONLY && ONLY.every((k) => ['V23', 'V25'].includes(k))) { await r7Checks(page, fail, sheet); return; }
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -506,11 +508,11 @@ async function browserChecks() {
             if (skillId === 'vocab_pick3_words' && res.some((t) => ![1, t.pills.length].includes(new Set(t.pills.map((p) => p.y)).size))) fail(`V19 ${skillId} worksheet-1280: the pills wrap 2 + 1 (${sigs.join(' | ')})`);
         }
         // V23 (owner R-1) + V25 (owner R-2), lf-vocab r7: the screen feedback, and the print pupil pages unchanged
-        await r7Checks(page, fail);
+        await r7Checks(page, fail, sheet);
     } finally { await app2.close(); }
 }
 
-async function r7Checks(page, fail) {
+async function r7Checks(page, fail, sheet) {
     // the pupil print pages' sha256, per skill / role / size / seed (V23: byte-identical to 70cdbaf9); the pin is read from THIS
     // checkout's tests (a backtest row runs today's checks on an old tree with MQ_ROOT)
     const PUPIL_PIN = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'fixtures', 'precritic', 'vocab-pupil-hashes.json');
@@ -532,11 +534,26 @@ async function r7Checks(page, fail) {
         if (r.error) { fail(`V23 ${id}: not composed (${r.error})`); continue; }
         hashes[id] = createHash('sha256').update(r.pupil).digest('hex').slice(0, 16);
         if (/mq-vhalo|mq-vfocal/.test(r.pupil)) fail(`V23 ${id}: the pupil page draws the focal highlight`);
-        const halos = [...r.key.matchAll(/<g class="mq-vhalo"[^>]*>/g)].map((m) => m[0]);
+        const halos = [...r.key.matchAll(/<g [^>]*class="mq-vhalo"[^>]*>/g)].map((m) => m[0]);
         keyHalos += halos.length;
         for (const h of halos) if (!/style="color:#949494"/.test(h) || /visibility="hidden"/.test(h)) fail(`V23 ${id}: a key highlight is not shown in the single grey (${h})`);
+        // (the marks themselves carry the grey: a key page recolours what it adds through `color` - the r7 render drew them orange)
+        for (const [, g] of r.key.matchAll(/<g [^>]*class="mq-vhalo"[^>]*>([\s\S]*?)<\/g>/g)) for (const [t] of g.matchAll(/<(?:rect|line|circle|path|text)\b[^>]*>/g)) if (!/stroke="#949494"/.test(t) || /fill="(?!none|#949494)[^"]*"/.test(t)) { fail(`V23 ${id}: a key highlight mark is not GREY (${t.slice(0, 120)})`); break; }
     }
     if (!keyHalos) fail('V23: no key page shows the focal highlight');
+    // the PRINTED key's highlight as the browser paints it: every halo mark's stroke (and solid fill) is the grey, never the
+    // key ink (the r7 build's key drew it orange: the key page recolours the marks it adds, sheet-kit.css)
+    for (const skillId of SK) {
+        const k = await page.evaluate(async (a) => { const x = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'vocabulary', skillId: a }] }], size: 'L', paper: 'A4', seed: 42200, key: true }); return window.sheetDocument(x.keyHtml, 'k', { paper: 'A4' }); }, skillId);
+        const [paint, own] = await sheet(k, () => [[...document.querySelectorAll('.mq-vhalo *')].map((e) => { const cs = getComputedStyle(e); return `${cs.stroke}|${cs.fill}`; }),
+            [...document.querySelectorAll('svg.mq-vpic *:not(g)')].filter((e) => !e.closest('.mq-vhalo')).map((e) => { const cs = getComputedStyle(e); return `${cs.stroke}|${cs.fill}`; })]);
+        // (and the drawing itself stays black: the r7 build's key painted the focal marks it wrapped in the key ink)
+        const inked = own.filter((p) => p.split('|').some((c) => c !== 'none' && c !== 'rgb(0, 0, 0)'));
+        if (inked.length) fail(`V23 ${skillId} key: ${inked.length} of the picture's own mark(s) painted ${inked[0]} (the drawing stays black; only the halo is grey)`);
+        if (!paint.length) fail(`V23 ${skillId} key: no focal highlight painted`);
+        const bad = paint.filter((p) => !/^rgb\(148, 148, 148\)\|(none|rgb\(148, 148, 148\))$/.test(p));
+        if (bad.length) fail(`V23 ${skillId} key: ${bad.length} highlight mark(s) painted ${bad[0]} (want the single grey rgb(148, 148, 148))`);
+    }
     if (process.argv.includes('--pin-pupil')) { fs.writeFileSync(PUPIL_PIN, JSON.stringify(hashes, null, 1) + '\n'); console.log(`ws-vocab-unit: pinned ${Object.keys(hashes).length} pupil hashes`); }
     else {
         const pin = fs.existsSync(PUPIL_PIN) ? JSON.parse(fs.readFileSync(PUPIL_PIN, 'utf8')) : null;
@@ -555,7 +572,11 @@ async function r7Checks(page, fail) {
             focal: [...root.querySelectorAll('svg.mq-vpic')].map((sv) => sv.querySelectorAll('.mq-vfocal *').length),
             haloOn: halos.filter((h) => getComputedStyle(h).visibility === 'visible').length,
             haloN: halos.length,
-            haloColor: halos.map((h) => getComputedStyle(h).color)[0] || '',
+            // (the PAINTED stroke of the halo's marks: the screen cell's black-and-white ink pass rewrites colours inline, and
+            // the r7 build's yellow halo painted grey - its group's color was yellow, its marks were not)
+            haloColor: [...root.querySelectorAll('svg.mq-vpic .mq-vhalo *')].map((m) => getComputedStyle(m).stroke).find((c) => !/148, 148, 148/.test(c)) || [...root.querySelectorAll('svg.mq-vpic .mq-vhalo *')].map((m) => getComputedStyle(m).stroke)[0] || '',
+            haloGrey: [...root.querySelectorAll('svg.mq-vpic .mq-vhalo *')].filter((m) => !/255, 2\d\d, \d+/.test(getComputedStyle(m).stroke)).length,
+            exBorder: [...root.querySelectorAll('.mq-vexplain')].map((e) => getComputedStyle(e).borderLeftColor)[0] || '',
             haloW: halos.map((h) => { const m = h.querySelector('*'); return m ? parseFloat(getComputedStyle(m).strokeWidth) : 0; })[0] || 0,
             glow: [...root.querySelectorAll('.mq-vglow')].map((e) => e.textContent.trim()),
             glowBg: [...root.querySelectorAll('.mq-vglow')].map((e) => getComputedStyle(e).backgroundColor)[0] || '',
@@ -592,7 +613,8 @@ async function r7Checks(page, fail) {
         if (!after) { fail(`V23 ${tag}: the cell is gone after the answer`); return; }
         if (!after.haloN || after.haloOn !== after.haloN) fail(`V23 ${tag}: the focal part is not highlighted after the answer (${after.haloOn}/${after.haloN})`);
         if (after.haloW < 4) fail(`V23 ${tag}: the highlight is not thick (${after.haloW} px)`);
-        if (/148, 148, 148/.test(after.haloColor)) fail(`V23 ${tag}: the screen highlight is the print grey (${after.haloColor})`);
+        if (after.haloGrey) fail(`V23 ${tag}: ${after.haloGrey} highlight mark(s) are not painted yellow (${after.haloColor})`);
+        if (after.explain.length && !/255, 2\d\d, \d+/.test(after.exBorder)) fail(`V25 ${tag}: the explanation's yellow edge is painted ${after.exBorder}`);
         if (JSON.stringify(after.glow.slice().sort()) !== JSON.stringify(want.right.slice().sort())) fail(`V23 ${tag}: the glowing words are ${JSON.stringify(after.glow)}, want ${JSON.stringify(want.right)}`);
         if (after.glow.length && !/255, 2\d\d, \d+/.test(after.glowBg)) fail(`V23 ${tag}: the right word does not glow yellow (${after.glowBg})`);
         const ex = EXPECT(want);
