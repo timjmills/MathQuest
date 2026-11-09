@@ -2487,6 +2487,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-unit-form-rename-margin",
+   "check": "placevalue:unit_form rename=more at S: every side band clears the 30 % limit by at least 2 points (critic r4 N-r4-1: G2 passed at 29.9 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE --margin 2",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "r4 head on master: worst side band 29.9 %"
+   },
+   "pass": {
+    "commit": "a1c8d595",
+    "state": "write line +3 digits after the fixed slot width: worst 27 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --sizes S --hosts none --no-baseline --margin 2 --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-fixit-words",
+   "check": "placevalue:unit_form error-analysis: the Fix-it frame prints the words of the frame the pupil wrote in, never a singular taken from the answer (critic r3b G5)",
+   "kind": "commit-pair",
+   "rule": "ws-fixit-words FIX-WORDS",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "\"[ ] hundred\" under a \"hundreds\" frame (item 193)"
+   },
+   "pass": {
+    "commit": "a1c8d595",
+    "state": "Fix-it words from the pv frame"
+   },
+   "command": "node tests/scripts/ws-fixit-words.cjs --skills placevalue:unit_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-lesson-page-fill",
+   "check": "placevalue:identify lesson: no page before the last leaves 30 % or more of its body empty (critic r4 E-r4-1: L page 2 43 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE --page-fill",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "L page 2 43 % empty, 4 pages"
+   },
+   "pass": {
+    "commit": "07634a75",
+    "state": "Guided two across (guidedCols): 3 pages"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --sizes L --hosts none --no-baseline --page-fill --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
