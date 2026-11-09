@@ -199,7 +199,12 @@ export function weDoBand(env) {
     if (wideG && stepsZone && stripX && example) {
         const gw = guidedRowsOf(data);
         const set = pickWeDo(weDoPool, example, data, gw, exOthers).slice(0, gw);
-        if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
+        // (`guidedCols` n, lf-placevalue critic r4 E-r4-1: a chart that needs the width over Guided cells that do NOT - identify's
+        // numeral and its place words - stands its cells n across where they fit, so the Guided block is one row, not two full-width
+        // rows that left the page before it 43 % empty; opt-in, every other wide lesson keeps its rows)
+        const gc = Math.max(0, Math.min(3, Number(data.guidedCols) || 0));
+        if (set.length && gc >= 2 && set.length <= gc && fitsWidth(set, gc)) top = { set, cols: gc, h: Math.max(20, hAt(set, gc)) };
+        else if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
         const w3 = example ? pickWeDo(weDoPool, example, data, 3, exOthers) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);

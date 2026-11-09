@@ -44,7 +44,7 @@ const PV3C = 'Lane lf-placevalue, critic r3 + r3b grades for unchanged pages, cr
 const PV_IDS = [
     'placevalue:expand',
 ];
-const PV4 = 'Lane lf-placevalue, critic r3 / r3b / r3c grades for unchanged pages, critic r4 PASS for the changed pages (independent Opus medium critics; identify E-A1 compact ones picture, unit_form G2 rename=more at S; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md + critic-r3c.md + critic-r4.md, 2026-11-08';
+const PV4 = 'Lane lf-placevalue, critic r3 / r3b / r3c grades for unchanged pages, critic r4 + r5 PASS for the changed pages (independent Opus medium critics; identify E-A1 compact ones picture and r5 Guided two across, unit_form G2 rename=more at S with r5 margin and the G5 Fix-it words; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md + critic-r3c.md + critic-r4.md + critic-r5.md, 2026-11-08 / 2026-11-09';
 const PV4_IDS = [
     'placevalue:identify',
     'placevalue:unit_form',
