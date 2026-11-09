@@ -378,3 +378,15 @@ One line per finding: the rule, then the check.
 | N-r5-2 S/M vocabulary cell grew into freed height (capIfEmpty 0.3), ~43 % empty split above and below | PROPOSED: EB-BAND on the vocab band (`.mq-lvocabcell` is not a kit cell today) | none | not on path | 0 - reason: grade unchanged (24 % by EB rule); engine |
 - Lesson: a check's text reader on a DETACHED page must join text nodes with spaces (innerText has no layout there) - ws-fixit-words
   first ran words together and failed the fixed state; its backtest caught it before commit.
+
+## lf-engine landing (2026-11-09): the hash proof found engine drift beyond lesson 2 / g3-oa8 P0 (STOPPED, lead's rule)
+- **Finding L1 - a lane critic fix changes live packets.** The lane's P1b N1 (Vocabulary drawn smaller, `vocab.zoom` in
+  roles/lesson.js planOnce, so one Independent row fits) fires on lessons master prints without it: nearest_10 (L), placevalue
+  value (L), identify (S), sub_100_no_regroup (S), add/sub_wp_10/20(_plain) (S) - the lesson sheet's score goes /3 -> /4,
+  /4 -> /7, /9 -> /12. **Rule:** a lane fix to a shared engine page is opt-in (a lesson-data field) until the lesson it was made
+  for passes, or it lands with a re-graded critic. **Check:** `ws-lesson-baseline --all-lessons --check` against master
+  BEFORE a landing (it caught it; 0 critic rounds lost).
+- **Finding L2 - nearest_10's Practice page deals 3 rows on the lane, 2 on master** (L, seeds 4242 and 1): a lane practice-page
+  change (practiceShapes / rows) outside the extracted-equivalence the lane claimed. Same check.
+- **Process:** land a lane by its hash proof at EVERY lesson master prints (28 packets + 7 detailed, L and S, 2 seeds: 1,556 hashes,
+  12 min) - the lane's own baseline (3 samples + detailed at one seed) did not cover the place-value and story packets.

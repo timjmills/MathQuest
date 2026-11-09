@@ -937,3 +937,10 @@ is unsafe: use a second worktree.
 ws-fixit-words / --page-fill; N-r4-1 by --margin. **Speed-ups:** the r4 fix of G2 was invisible to its own measure because the bonus was
 added BEFORE a max() with the skill's fixed width (0.8 mm moved): measure the change's effect right after the edit (lowered-threshold probe).
 **Lost:** none; one backtest caught a tool bug (detached-DOM innerText) before commit.
+
+### lf-engine landing (2026-11-09)
+**Lost:** the landing stops at the proof (findings L1, L2 in LESSONS_LEARNED): the lane's refactor-guard baseline covered 3 samples +
+the detailed lessons at one seed, so drift on 20 other live packets went unseen for a week of lane rounds. **Fix (tool):**
+`ws-lesson-baseline --all-lessons --seeds --sizes --per-lesson` (every key of prereqs.js + samples + detailed); a lane that touches
+lesson-pages/* runs it against master before it reports. **Kept time:** node deep-compare of every prereqs.js record (master vs land)
+before any browser run caught 10 record differences (writeValue false on identify refs, 5 missing pv lessons) in seconds.

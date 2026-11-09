@@ -502,3 +502,10 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | P0 answer overlap: count 11-20 vs + facts 13-19 (also g2-nbt3, g3-oa5 P0 pairs) | `ws-lesson-unit --only p0-overlap` (ranges meet -> set wired, union holds every item) | p0-overlap (same row) | no (as above) | 1 round |
 | E9 / E35 lesson 2 | none this round: deferred by the lead until after the phase-0 landing | - | E9 / E35 are ws-detailed-lesson rows | - |
 | lf-placevalue critic rounds to pass all 5 lesson #1 skills | — | r1-r5 (expand r3; value, combine r3c; identify, unit_form r4; r5 margin / G5 / page split) - 6 r4-r5 findings: 3 new checks with backtests, 1 caught by an existing check (unfixed, hosts), 2 engine with reasons |
+
+### lf-engine landing (2026-11-09)
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| L1 vocab zoom (P1b N1) changes 7 live packets | `ws-lesson-baseline --all-lessons --check <master baseline>` | none yet: a commit-pair row (lane bd0ee8e7 FAIL / master f6216420 PASS) needs a baseline file per side; proposed | no: a landing gate (LANDING_PLAN step 4), not a lesson gate | 1 (caught before deploy) |
+| L2 nearest_10 Practice 3 rows vs 2 | same | same | no | (same) |
+| record drift (writeValue, pv records) | node deep-compare of lessonFor for every master key (scratch tool; to fold into ws-lesson-unit) | none | no | 1 |
