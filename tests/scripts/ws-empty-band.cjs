@@ -47,6 +47,10 @@
 //             (PAGE_RULES probes), not only a sample.
 //   EB-COLS   columns(L) <= columns(M) for the same role and options, unless M holds more problems a page: L is never the
 //             denser layout (R6-3).
+//   EB-TESTEQ (TEST-EQ-IND, opt-in `testEq`) every support's Test page holds the same count as its Independent page at each
+//             size (owner / lead 2026-11-09, critic r7 R7-1).
+//   EB-GAP    the fact-to-answer-line distance (fact text bottom to the line under it) spreads at most 1 mm across a
+//             render - a section, or a whole faded packet - that holds a fact starting under the number tab (critic r7 R7-2).
 //   EB-FACTX  across ALL pages of a faded packet the fact's left edge in its cell (the fact's text ink, slot and supports
 //             excluded) spreads at most 0.5 mm (facts card F4 "one x"; R6-5).
 // The opted skill also renders each offered support alone (and with the probes) on independent and test at every size, and
@@ -85,7 +89,8 @@ const PAGE_RULES = {
     // accepted: pages EB-PAGE accepts by a ruling - {size: count}: a page holding exactly that many cells at that size is at
     // the owner's ceiling (div_facts: "the supports-off page at S may hold 36", owner 2026-11-08; the Test follows the
     // Independent capacity, owner 2026-11-08 on critic r6 R6-1)
-    'division:div_facts': { accepted: { S: 36 }, probes: [{ for: ['off', 'touch', 'boxsign', 'skip', 'think'], opts: { constant: [12] } }, { for: ['array'], opts: { constant: [2, 3, 4] } }] },
+    // testEq: EB-TESTEQ judges every support's Test count against its Independent count (owner 2026-11-09)
+    'division:div_facts': { accepted: { S: 36 }, testEq: true, probes: [{ for: ['off', 'touch', 'boxsign', 'skip', 'think'], opts: { constant: [12] } }, { for: ['array'], opts: { constant: [2, 3, 4] } }] },
 };
 const PAGE_ROLES = new Set(['independent', 'more-practice', 'test', 'review']);
 const PAD_MM = 3, PAD_MM_7 = 2, FACTX_MM = 0.5;
@@ -140,18 +145,24 @@ function measureCells(scope) {
             const side = Math.max(box.l - inner.l, inner.r - box.r, 0);
             // page rules: the ink to each side rule (the border's inner edge, the pad included), the fact's own text ink left
             const bl = cr.left + parseFloat(cs.borderLeftWidth), br = cr.right - parseFloat(cs.borderRightWidth);
-            let factL = null;
+            let factL = null, factB = null, factT = null, lineB = null;
             const eq = [...c.querySelectorAll('.ws-eq, .ws-fact')].find((e) => !e.closest('[data-ws-support-on], [data-ws-label], .ws-tab') && visible(e));
             if (eq) {
                 const w = document.createTreeWalker(eq, NodeFilter.SHOW_TEXT); let n;
                 while ((n = w.nextNode())) {
                     if (!n.textContent.trim() || n.parentElement.closest('[data-ws-slot], [data-ws-support-on], [aria-hidden="true"]') || !visible(n.parentElement)) continue;
                     const rg = document.createRange(); rg.selectNodeContents(n);
-                    for (const r of rg.getClientRects()) if (r.width && (factL === null || r.left < factL)) factL = r.left;
+                    for (const r of rg.getClientRects()) if (r.width) { if (factL === null || r.left < factL) factL = r.left; if (factB === null || r.bottom > factB) factB = r.bottom; if (factT === null || r.top < factT) factT = r.top; }
                 }
+                // EB-GAP: the answer line UNDER the fact (a line slot that starts below the middle of the fact's text; the text's
+                // range box reaches past its line box, so the slot may start inside it)
+                const ln = eq.querySelector('[data-ws-slot][data-ws-shape="line"]');
+                const lr = ln && visible(ln) ? ln.getBoundingClientRect() : null;
+                if (lr && lr.width && factB !== null && lr.top >= (factT + factB) / 2 && lr.bottom > factB) lineB = lr.bottom;
             }
             const pr = rt.getBoundingClientRect();
             out.push({ gapL: +((box.l - bl) / MM).toFixed(2), gapR: +((br - box.r) / MM).toFixed(2), factL: factL === null ? null : +((factL - cr.left) / MM).toFixed(2),
+                lineGap: lineB === null ? null : +((lineB - factB) / MM).toFixed(2), underTab: !!c.querySelector('[data-ws-undertab]'),
                 x: +((cr.left - pr.left) / MM).toFixed(1), y: +((cr.top - pr.top) / MM).toFixed(1), yB: +((cr.bottom - pr.top) / MM).toFixed(1),
                 bodyB: +((footTop(rt) - pr.top) / MM).toFixed(1),
  page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
@@ -225,6 +236,28 @@ function judgeFactX(cells, where, F) {
     const lo = xs.reduce((a, c) => (c.factL < a.factL ? c : a)), hi = xs.reduce((a, c) => (c.factL > a.factL ? c : a));
     if (hi.factL - lo.factL > FACTX_MM) F('EB-FACTX', where, `the fact's left edge spreads ${(hi.factL - lo.factL).toFixed(2)} mm across the packet (p${lo.page} cell ${lo.label || lo.cell} at ${lo.factL} mm, p${hi.page} cell ${hi.label || hi.cell} at ${hi.factL} mm in its cell; limit ${FACTX_MM} mm, facts card F4 one x; critic r6 R6-5)`);
 }
+/** EB-GAP (critic r7 R7-2): the fact-to-answer-line distance (the fact's text bottom to the line under it) spreads at most
+ *  GAP_MM across one render - a section, or a whole faded packet. Cells whose line sits beside the fact are not read. */
+const GAP_MM = 1;
+function judgeGap(cells, where, F) {
+    // (scope, the brief of r7: a render where the fact starts UNDER the number tab - owner ruling 2026-11-09 (a), L - keeps the
+    // fact-to-line gap of its other cells; the S / M bare stage's line at the cell foot is its own ruling, critic r5 R5-6)
+    if (!cells.some((c) => c.underTab)) return;
+    const xs = cells.filter((c) => c.lineGap !== null && c.lineGap !== undefined);
+    if (xs.length < 2) return;
+    const lo = xs.reduce((a, c) => (c.lineGap < a.lineGap ? c : a)), hi = xs.reduce((a, c) => (c.lineGap > a.lineGap ? c : a));
+    if (hi.lineGap - lo.lineGap > GAP_MM) F('EB-GAP', where, `the fact-to-answer-line distance spreads ${(hi.lineGap - lo.lineGap).toFixed(2)} mm (p${lo.page} cell ${lo.label || lo.cell} ${lo.lineGap} mm, p${hi.page} cell ${hi.label || hi.cell} ${hi.lineGap} mm; limit ${GAP_MM} mm: one fact-to-line gap, critic r7 R7-2)`);
+}
+/** EB-TESTEQ (TEST-EQ-IND; owner / lead ruling 2026-11-09, critic r7 R7-1): a Test page prints the SAME count as the Independent
+ *  page of the same facts, support and size. by: {colKey: {S: {cols, n}, ...}}; compares 'test<tag>' with 'independent<tag>'. */
+function judgeTestEq(by, where, F) {
+    for (const [k, t] of Object.entries(by)) {
+        if (!/^test\b/.test(k)) continue;
+        const ind = by['independent' + k.slice(4)];
+        if (!ind) continue;
+        for (const size of ['S', 'M', 'L']) if (t[size] && ind[size] && t[size].n !== ind[size].n) F('EB-TESTEQ', `${where} ${k} ${size}`, `the Test prints ${t[size].n} (${t[size].cols} columns) where the Independent page of the same facts prints ${ind[size].n} (${ind[size].cols} columns): every support's Test deals the Independent count (lead / owner 2026-11-09, critic r7 R7-1)`);
+    }
+}
 /** EB-COLS: {S, M, L: {cols, n}} of one role and option set. */
 function judgeCols(by, where, F) {
     // (denser = more columns for no fewer problems: M's 2 x 8 = 16 beside-box cells against L's 3 x 4 = 12 is M holding
@@ -254,6 +287,14 @@ function selfTest() {
         // R6-5: the fact at 8.5 mm on page 1 and 13.8 mm on pages 2-3 (5.3 mm)
         { name: 'R6-5 fact x spreads 5.3 mm across the packet', got: run((F) => judgeFactX([{ page: 1, cell: 1, factL: 8.5 }, { page: 2, cell: 7, factL: 13.8 }, { page: 3, cell: 16, factL: 13.8 }], 'x', F)), want: 'EB-FACTX' },
         { name: 'R6-5 fixed: one x (0.3 mm)', got: run((F) => judgeFactX([{ page: 1, cell: 1, factL: 9.7 }, { page: 2, cell: 7, factL: 10.0 }, { page: 3, cell: 16, factL: 9.8 }], 'x', F)), want: null },
+        // R7-1: off Test M 21 against Independent 24; boxsign M 12 / 16
+        { name: 'R7-1 Test M 21 vs Independent 24', got: run((F) => judgeTestEq({ independent: { M: { cols: 3, n: 24 } }, test: { M: { cols: 3, n: 21 } } }, 'k', F)), want: 'EB-TESTEQ' },
+        { name: 'R7-1 boxsign M 12 vs 16', got: run((F) => judgeTestEq({ 'independent {support: boxsign}': { M: { cols: 2, n: 16 } }, 'test {support: boxsign}': { M: { cols: 3, n: 12 } } }, 'k', F)), want: 'EB-TESTEQ' },
+        { name: 'R7-1 fixed: Test = Independent', got: run((F) => judgeTestEq({ independent: { S: { cols: 4, n: 36 }, M: { cols: 3, n: 24 } }, test: { S: { cols: 4, n: 36 }, M: { cols: 3, n: 24 } } }, 'k', F)), want: null },
+        // R7-2: fade L, 11.1 mm on pages 1-2, 19.0 mm on page 3
+        { name: 'R7-2 fade L line gap 11.1 / 19.0 mm', got: run((F) => judgeGap([{ page: 1, cell: 1, lineGap: 11.1 }, { page: 2, cell: 7, lineGap: 11.1 }, { page: 3, cell: 16, lineGap: 19.0, underTab: true }], 'g', F)), want: 'EB-GAP' },
+        { name: 'EB-GAP judges only a render with an under-tab fact', got: run((F) => judgeGap([{ page: 1, cell: 1, lineGap: 9 }, { page: 3, cell: 16, lineGap: 19.5 }], 'g', F)), want: null },
+        { name: 'R7-2 fixed: one gap (0.4 mm spread)', got: run((F) => judgeGap([{ page: 1, cell: 1, lineGap: 11.1 }, { page: 3, cell: 16, lineGap: 11.5, underTab: true }, { page: 3, cell: 17, lineGap: null }], 'g', F)), want: null },
     ];
     let bad = 0;
     for (const c of cases) { const ok = c.want ? c.got.includes(c.want) : !c.got.length; if (!ok) bad++; console.log(`${ok ? 'ok  ' : 'FAIL'} ${c.name}: ${c.got.join(', ') || 'clean'}`); }
@@ -346,6 +387,7 @@ async function main() {
                         const pj = judgePages(cells, `${key} ${j.tag}`, F, j.noPage ? true : acc);
                         if (j.colKey) (colsAt[j.colKey] = colsAt[j.colKey] || {})[j.size] = pj;
                         if (j.fade) judgeFactX(cells, `${key} ${j.tag}`, F);
+                        judgeGap(cells, `${key} ${j.tag}`, F);
                     }
                     // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
                     if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
@@ -361,6 +403,7 @@ async function main() {
             // (denser = more columns for no fewer problems: M's 2 x 8 = 16 beside-box cells against L's 3 x 4 = 12 is M holding
             // more, not L crowding; R6-3's L 4 x 3 = 12 against M 3 x 4 = 12 is the 4th column buying nothing)
             for (const [k, by] of Object.entries(colsAt)) judgeCols(by, `${key} ${k}`, F);
+            if (pr && pr.testEq) judgeTestEq(colsAt, key, F);
             // screen hosts
             const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
             for (const host of HOSTS) for (const w of widths[host] || []) {
@@ -408,7 +451,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-PAGE', 'EB-PAD', 'EB-COLS', 'EB-FACTX', 'EB-READ', 'EB-VOCAB'];
+    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-PAGE', 'EB-PAD', 'EB-COLS', 'EB-TESTEQ', 'EB-GAP', 'EB-FACTX', 'EB-READ', 'EB-VOCAB'];
     for (const n of notes) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
