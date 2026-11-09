@@ -34,6 +34,21 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## Round 7 result (2026-11-09): narrow critic FAIL, min 7 (a near-miss: a Q-S2 re-check is allowed)
+- R-1 and R-2 are built (82e5007b). Gates are green: ws-vocab-unit and --browser, screen-answer, phone-card,
+  chromebook-fit, boot-smoke, and 4 backtests.
+- Critic scores (design/lanes/lf-vocab/critic-r6-narrow.md):
+  - Match 3 screens: 8 / 7 / 8 / 8
+  - pick3 screens: 8 / 8 / 8 / 9
+  - keys: 9 / 9 / 9 / 8
+  - explanations: 8 / 8 / 9 / 9
+- The fix for the 7: the Match 3 wrong line reads "<Word> is picture <L>! <Word> means ...", and only the wrongly
+  matched pictures glow, each with its letter. Six minor fixes are in LESSONS_LEARNED "lf-vocab round 7".
+- Owner question: yellow now means both "the active box" (2026-10-04 pulse) and "correct" (R-1).
+- The r5 PASS of the print pages is unaffected: the pupil pages are pinned byte-identical. The keys gained the grey
+  focal halo, which the critic scored 9 / 9 / 9 / 8.
+- Stopped at the $25 cap.
+
 ## PASS (2026-11-09): critic r5 PASS min 8
 - Both skills added to js/modules/redesign-passed.js (VOC_IDS, evidence design/lanes/lf-vocab/critic-r5.md).
   ws-redesign-passed is OK with the manifest applied. On the branch without the manifest the two ids are not live yet:
