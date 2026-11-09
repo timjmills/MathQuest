@@ -28,18 +28,19 @@ const PAGE = arg('page', 'P0');
                 return (pool.places || []).filter((x) => String(x.page) === PAGE).map((x) => ({
                     item: x.item, rep: x.rep, row: x.row,
                     skill: x.q && (x.q.skill || x.q.skillLabel || ''), text: x.q && String(x.q.text || '').replace(/\s+/g, ' ').slice(0, 60),
-                    ans: x.q && String(x.q.ans),
                 }));
             }, { LESSON, seed, PAGE });
         }
     } finally { await app.close(); }
+    // (the pool JSON keeps a place's item KEY - a count's number, a fact's "a+b" - not its question: the answer is read from it)
+    const ansOf = (x) => { const m = /^(\d+)\+(\d+)$/.exec(String(x.item)); return m ? String(+m[1] + +m[2]) : String(x.item); };
     let bad = 0;
     for (const seed of SEEDS) {
         const its = out[seed];
         if (!Array.isArray(its)) { console.log(`seed ${seed}: ${JSON.stringify(its)}`); bad++; continue; }
-        console.log(`seed ${seed} ${PAGE}: ${its.map((x) => `${x.text || x.item}=${x.ans}`).join(' | ')}`);
+        console.log(`seed ${seed} ${PAGE}: ${its.map((x) => `${x.item}=${ansOf(x)}`).join(' | ')}`);
         const by = new Map();
-        for (const x of its) by.set(x.ans, (by.get(x.ans) || 0) + 1);
+        for (const x of its) by.set(ansOf(x), (by.get(ansOf(x)) || 0) + 1);
         const tw = [...by].filter(([, c]) => c > 1).map(([a]) => a);
         if (tw.length) { console.log(`  TWIN answers on ${PAGE}: ${tw.join(', ')}`); bad++; }
     }
