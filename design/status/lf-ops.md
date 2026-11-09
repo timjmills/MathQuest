@@ -217,6 +217,7 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-09: DEPLOYED by the lead - master 4c5de5a2 (the div_facts support aids, bac3192d + stamp, STATUS, ledger rows; all gates green). Parked to next week. Next order (lead): the facts-roles task (shared fact roles + screen hosts) -> redesign-passed for div_facts -> the stories / g3-oa8 E9b / E12 regression (bisect) -> #4 fresh builder -> remaining BUILD skills.
 - 2026-11-09: narrow deploy branch built (bac3192d), gates equal to master.
 - 2026-11-09: div_facts aids r9: TEST-EQ-IND + EB-GAP, critic r8 narrow re-check PASS (lowest 8); deploy branch pending the lead.
 - 2026-11-09: L-width fix (a4c6b694, 17ce2fe1) + master merge (11720699); critic r7 FAIL lowest 7 (R7-1 Test M 21 vs 24, R7-2 fade L gap); stopped at the $35 cap.
