@@ -22,3 +22,11 @@ and `metrics.md`; this file is the one place to read them all.
 
 Speed-up worth spreading (lf-engine, 11-09): when one tree passes and another with the same data fails, diff the engine hunks
 since the merge base against the lane's extracted copies before rendering anything.
+| 2026-11-09 | lf-vocab | Base-ten "one" a 2.5 mm speck (OQ-1) | V16+ (one unit per item, ≥ 5 mm with no hundred) | vocab-v16-base10-per-item | precritic | 1 round |
+| 2026-11-09 | lf-vocab | pick3 error analysis at S, 30.1 % band | ws-empty-band --slot-ink off (opt-in, vocab only) | eb-vocab-pick3-ea-s-critic | precritic | 1 round |
+| 2026-11-09 | lf-vocab | pick3 guided rows unequal at L (survived 4 rounds) | V18+ (rendered row boxes, S/M/L) | vocab-v18-rendered-rows | precritic (vocab-unit-browser) | 3 rounds |
+| 2026-11-09 | lf-vocab | Match 3 error analysis at S drawn at L height | V20 (S ≤ 0.9 × L) | vocab-v20-ea-s-height | precritic | 1 round |
+| 2026-11-09 | lf-vocab | Picture text printed a bank word ("number name" with "hundred") | V17+ (no bank word in the picture's text) | vocab-v17-printed-text | precritic | 1 round |
+| 2026-11-09 | lf-vocab | "left" read as take-away | V21 (referent carries the heavy mark) | vocab-v21-referent | precritic | 1 round |
+| 2026-11-09 | lf-vocab | 8 r5 nits under the bar | none yet: proposed in LESSONS_LEARNED | — | — | 0 |
+| 2026-11-09 | lf-engine | Landing proof: lane's vocab zoom and nearest_10 practice rows silently changed 10 live lessons; the lane's refactor-guard baseline covered only 10 of 35 live packets | ws-lesson-baseline --all-lessons --check (every live packet, L+S, seeds 4242 + 1) — PROCESS RULE: runs on every engine change | landing backtest pair | landing gate | 1 round + 2 days unseen |
