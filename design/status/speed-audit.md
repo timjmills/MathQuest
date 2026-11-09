@@ -952,3 +952,7 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 (an HTML page diff of the round packet master vs land, then `git log -S roundOne`): 8e285251 -> 08ee129e. A synthetic
 `independentBand` test (18 measured rounding cells, no browser) proves flag off = 6 rows, on = 12 rows in milliseconds, and an
 84-hash subset baseline makes the commit-pair backtest 49 s instead of 2 x 12 min.
+**Lost (round 2, cont.):** ~2 h 30 on ws-backtest: the full run kept every commit-pair checkout (~600 MB) to the end, filled the disk, and
+79 rows read ERROR(checkout); the rerun was too slow to finish in budget (10 of the 79 rows re-run, all PASS). **Fix (tool):**
+ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
+start it first, alone, detached, and re-run only the failed rows by `--row`.
