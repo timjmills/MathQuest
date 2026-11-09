@@ -272,26 +272,72 @@ else {
         if (classOf(g) === 2 && lineMm < 55) fail(`V15 ${size} grade ${g}: the answer line is ${lineMm} mm (grades 4-5 need 55 mm)`);
     }
 }
-// V16 (one base-ten unit, critic r3 #8 / VQ-1): one, ten and hundred, drawn in the same box (every host box), print ONE
-// unit square: one's square, the ten rod's short side and a tenth of the hundred flat are the same in mm (within 3 %).
+// V16 (one base-ten unit WITHIN AN ITEM, critic r3 #8 / VQ-1, owner ruling OQ-1 2026-11-08): the one, ten and hundred of ONE
+// item (a Match 3 cell's three pictures; a 1 picture, 3 words cell's picture) print one unit square - one's square, the ten
+// rod's short side and a tenth of the hundred flat the same in mm (within 3 %); and an item with no hundred prints that unit
+// at >= 5 mm (critic r4 OQ-1: a 2.5 mm "one" and a 25 x 2.5 mm "ten" on grade 2). Rendered through the cells, S, M and L.
 {
     const unitOf = (svg, id) => {
         const r = readSvg(svg), sc = r.wMm / r.vb[2];
         const sides = [...svg.matchAll(/<rect [^>]*width="([\d.]+)" height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
-        const big = sides.sort((a, b) => b[0] * b[1] - a[0] * a[1])[0];
+        const big = sides.sort((x, y) => y[0] * y[1] - x[0] * x[1])[0];
         return (id === 'hundred' ? Math.min(...big) / 10 : Math.min(...big)) * sc;
     };
-    const boxes = [['match3 S', { wMm: 43, hMm: 25.4 }], ['match3 L', { wMm: 45, hMm: 26.7 }], ['pick3 2-3', { wMm: 72, hMm: 38 * 2 / 3 }], ['pick3 K-1', { wMm: 72, hMm: 70 * 2 / 3 }]];
-    for (const [tag, box] of boxes) {
-        const u = ['one', 'ten', 'hundred'].map((id) => unitOf(P.vocabPictureSVG(K.resolveCtx({ size: 'L', mode: 'print' }), id, Object.assign({}, box)), id));
-        if (Math.max(...u) > Math.min(...u) * 1.03) fail(`V16 ${tag}: the base-ten units differ (one ${u[0].toFixed(2)} mm, ten ${u[1].toFixed(2)} mm, hundred ${u[2].toFixed(2)} mm)`);
+    const svgsIn = (html) => [...html.matchAll(/<svg class="mq-vpic"[^]*?<\/svg>/g)].map((m) => ({ id: /data-vpic="([^"]+)"/.exec(m[0])[1], svg: m[0] }));
+    const items = [['vocab-match3', ['one', 'ten', 'hundred']], ['vocab-match3', ['ten', 'digit', 'one']], ['vocab-match3', ['digit', 'ten', 'expanded form']],
+        ['vocab-match3', ['one', 'number name', 'digit']], ['vocab-match3', ['hundred', 'one', 'digit']], ['vocab-pick3', ['one']], ['vocab-pick3', ['ten']], ['vocab-pick3', ['hundred']]];
+    for (const size of ['S', 'M', 'L']) for (const [tpl, words] of items) {
+        const ctx = K.resolveCtx({ size, mode: 'print' });
+        const payload = tpl === 'vocab-match3' ? { words, order: [1, 2, 0], grade: 2 } : { word: words[0], bank: [words[0], 'digit', 'expanded form'], grade: 2 };
+        const pics = svgsIn(K.renderCell({ cell: { template: tpl, v: 1, payload } }, ctx)).filter((x) => (P.BASE10_IDS || []).includes(x.id));
+        const u = pics.map((x) => unitOf(x.svg, x.id));
+        const tag = `${tpl} ${size} [${words.join(', ')}]`;
+        if (!u.length) { fail(`V16 ${tag}: no base-ten picture read`); continue; }
+        if (Math.max(...u) > Math.min(...u) * 1.03) fail(`V16 ${tag}: the base-ten units differ within the item (${pics.map((x, i) => `${x.id} ${u[i].toFixed(2)} mm`).join(', ')})`);
+        if (!words.includes('hundred') && Math.min(...u) < 5 - 0.02) fail(`V16 ${tag}: no hundred in the item, but the unit is ${Math.min(...u).toFixed(2)} mm (need >= 5 mm, owner OQ-1)`);
     }
 }
 // V17 (look-alikes, critic r1-r3): every critic-found look-alike pair is never offered together (notWith on either side).
 // APPEND-ONLY: a pair leaves only by an owner ruling. If a pair breaks a set's split (V7), change the set's words.
 export const LOOKALIKES = [['term', 'sequence'], ['first term', 'sequence'], ['round up', 'quotient'], ['round up', 'remainder'], ['multiple', 'pattern'],
-    ['grow', 'sequence'], ['grow', 'pattern']];
+    ['grow', 'sequence'], ['grow', 'pattern'], ['number name', 'hundred']];
 for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "${b}": a critic-found look-alike pair is not notWith`);
+// V17 (extended, critic r4 #4 / M-V2): a word a picture PRINTS is a look-alike of that picture's word - no word that may share
+// its bank or its Match 3 cell (same lesson set or grade, not notWith) appears as a whole word in the picture's printed text
+// ("number name" prints "three hundred forty-seven" while "hundred" sat in its bank)
+{
+    const textOf = (id) => [...P.vocabPictureSVG(K.resolveCtx({ size: 'L', mode: 'print' }), id, { wMm: 46 }).matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join(' ').toLowerCase();
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const txt = ` ${textOf(id).replace(/[^a-z0-9]+/g, ' ')} `;
+        if (!txt.trim()) continue;
+        const near = new Set(W.VOCAB_SETS.filter((st) => st.words.includes(id)).flatMap((st) => W.gradeWords(st.grade).concat(st.words)));
+        for (const b of near) if (b !== id && W.compatible([id, b]) && txt.includes(` ${String(b).toLowerCase()} `)) fail(`V17 "${id}": its picture prints "${b}", a word that may share its bank (make them notWith)`);
+    }
+}
+
+// V21 (referent, critic r4 #5 / M-V1): a picture whose word names a PART declares its `referent` (canvas x ranges), and the
+// heavy mark is on that part and nowhere else: each range carries a heavy stroke spanning >= 80 % of it, and no heavy stroke
+// lies outside the ranges ("left" marked the two crossed out, so it read as take away). Required: left, repeat.
+{
+    const NEED = ['left', 'repeat'];
+    for (const id of NEED) if (typeof P.vocabPictureReferent !== 'function' || !P.vocabPictureReferent(id)) fail(`V21 "${id}": no declared referent (the part its word names)`);
+    if (typeof P.vocabPictureReferent === 'function') for (const id of P.VOCAB_PICTURE_IDS) {
+        const ref = P.vocabPictureReferent(id);
+        if (!ref) continue;
+        const svg = P.vocabPictureSVG(K.resolveCtx({ size: 'L', mode: 'print' }), id, { wMm: 46 });
+        const heavy = [];
+        for (const [t] of svg.matchAll(/<(line|path|rect|circle)\b[^>]*>/g)) {
+            if (Number((/stroke-width="([\d.]+)"/.exec(t) || [])[1]) !== P.VOCAB_HEAVY) continue;
+            const xs = t.startsWith('<line') ? [/x1="([-\d.]+)"/, /x2="([-\d.]+)"/].map((re) => Number(re.exec(t)[1]))
+                : t.startsWith('<path') ? [...(/d="([^"]+)"/.exec(t) || ['', ''])[1].matchAll(/[MLH]\s*([-\d.]+)/g)].map((m) => Number(m[1]))
+                : t.startsWith('<rect') ? (() => { const x = Number(/x="([-\d.]+)"/.exec(t)[1]); return [x, x + Number(/width="([\d.]+)"/.exec(t)[1])]; })()
+                : (() => { const cx = Number(/cx="([-\d.]+)"/.exec(t)[1]), r = Number(/r="([\d.]+)"/.exec(t)[1]); return [cx - r, cx + r]; })();
+            heavy.push([Math.min(...xs), Math.max(...xs)]);
+        }
+        for (const [a, b] of ref) if (!heavy.some(([x0, x1]) => Math.min(x1, b) - Math.max(x0, a) >= 0.8 * (b - a))) fail(`V21 "${id}": the referent ${a}-${b} carries no heavy mark`);
+        for (const [x0, x1] of heavy) if (!ref.some(([a, b]) => x0 >= a - 1 && x1 <= b + 1)) fail(`V21 "${id}": a heavy mark at ${x0}-${x1} lies outside the referent (the eye goes to the wrong part)`);
+    }
+}
 
 // ---- --browser: the checks only a browser can measure (on precritic's path as gate vocab-unit-browser) -----------------
 if (process.argv.includes('--browser')) await browserChecks();
@@ -301,12 +347,12 @@ async function browserChecks() {
     const { open } = require(path.join(ROOT, 'tests', 'lib', 'ws-harness.cjs'));
     const app2 = await open({ seed: 1 });
     const { page } = app2;
-    const build = (skillId, role, size, opts) => page.evaluate(async (a) => {
+    const build = (skillId, role, size, opts, seed = 7) => page.evaluate(async (a) => {
         try {
-            const r = await window.buildSheet({ role: a.role, sections: [{ skills: [Object.assign({ categoryId: 'vocabulary', skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: 7, key: false });
+            const r = await window.buildSheet({ role: a.role, sections: [{ skills: [Object.assign({ categoryId: 'vocabulary', skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: a.seed, key: false });
             return { html: window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }) };
         } catch (e) { return { error: String(e && e.message || e) }; }
-    }, { skillId, role, size, opts });
+    }, { skillId, role, size, opts, seed });
     const sheet = async (html, fn, arg) => {
         const sh = await app2.browser.newPage();
         try {
@@ -333,17 +379,53 @@ async function browserChecks() {
             if (got.score == null) fail(`V11R ${skillId} ${role} ${size}: no Score on the page`);
             else if (got.score !== got.cells * pts) fail(`V11R ${skillId} ${role} ${size}: Score /${got.score} for ${got.cells} scored cells (owner Q-C: /${got.cells * pts})`);
         }
-        // V18 (critic r1 #6, r2 #4, r3 #6): the 1 picture, 3 words Guided rows are equal at S, M AND L (within 1 mm)
-        for (const size of ['S', 'M', 'L']) {
-            const b = await build('vocab_pick3_words', 'guided', size, { vocabGrade: 3 });
+        // V18 (critic r1 #6, r2 #4, r3 #6, r4 #2): the 1 picture, 3 words Guided rows are equal at S, M AND L (within 1 mm),
+        // measured on the RENDERED ROW BOXES of the printed page (the band's grid rows, from one row's top to the next row's
+        // top, the last to the grid's bottom) - never the planned cell height, with no "when there is room" exemption. Seeds:
+        // 7 and ws-grade-render's guided seed (the critic's page: a two-line meaning hint made row 1 377 px, row 2 290 px).
+        for (const size of ['S', 'M', 'L']) for (const [opts, seed] of [[{ vocabGrade: 3 }, 7], [null, 7], [null, 143869], [{ vocabGrade: 2 }, 143869], [{ vocabGrade: 4 }, 143869], [{ vocabGrade: 1 }, 143869]]) {
+            const b = await build('vocab_pick3_words', 'guided', size, opts, seed);
             if (b.error) { fail(`V18 guided ${size}: not composed (${b.error})`); continue; }
             const hs = await sheet(b.html, () => {
-                const pg = document.querySelector('body > section.ws-page, body > .ws-page');
-                const tops = new Map();
-                for (const c of pg.querySelectorAll('[data-ws-cell]')) { if (c.parentElement.closest('[data-ws-cell]')) continue; const r = c.getBoundingClientRect(); const k = Math.round(r.top); tops.set(k, Math.max(tops.get(k) || 0, r.height)); }
-                return [...tops.values()].map((h) => h * 25.4 / 96);
+                const out = [];
+                for (const pg of document.querySelectorAll('body > section.ws-page, body > .ws-page')) {
+                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    const tops = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))].sort((a, b) => a - b);
+                    const bottom = Math.max(...cells.map((c) => c.getBoundingClientRect().bottom));
+                    if (tops.length > 1) out.push(tops.map((t, i) => ((i + 1 < tops.length ? tops[i + 1] : bottom) - t) * 25.4 / 96));
+                }
+                return out;
             });
-            if (hs.length > 1 && Math.max(...hs) - Math.min(...hs) > 1) fail(`V18 guided ${size}: rows ${hs.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
+            for (const rows of hs) if (Math.max(...rows) - Math.min(...rows) > 1) fail(`V18 guided ${size} ${JSON.stringify(opts)} seed ${seed}: rows ${rows.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
+        }
+        // V20 (critic r4 #3, H13 "sized for a taller item than it holds"): on Error analysis, a cell at S whose content is
+        // smaller than at L is shorter than at L - cell height at S <= 0.9 x the height at L when the S ink is under 0.95 x
+        // the L ink (Match 3 EA at S drew L's 76 mm cell round 60 mm of work: 24-28 % empty). Median top-level cell; ink =
+        // text, drawings and stroked boxes from the first to the last.
+        for (const skillId of ['vocab_grade_pictures', 'vocab_pick3_words']) {
+            const m = {};
+            for (const size of ['S', 'L']) {
+                const b = await build(skillId, 'error-analysis', size);
+                if (b.error) { fail(`V20 ${skillId} error-analysis ${size}: not composed (${b.error})`); continue; }
+                m[size] = await sheet(b.html, () => {
+                    const pg = document.querySelector('body > section.ws-page, body > .ws-page');
+                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    const med = (a) => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
+                    const ink = cells.map((c) => {
+                        let t = Infinity, bt = -Infinity;
+                        for (const d of c.querySelectorAll('*')) {
+                            if (d.closest('[data-ws-label], .ws-letter, .ws-tab')) continue;
+                            const st = getComputedStyle(d); if (st.display === 'none' || st.visibility === 'hidden') continue;
+                            const own = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+                            const stroked = ['Top', 'Bottom', 'Left'].some((k) => parseFloat(st[`border${k}Width`]) > 0 && st[`border${k}Style`] !== 'none');
+                            if (own || stroked || d.tagName.toLowerCase() === 'svg') { const r = d.getBoundingClientRect(); if (r.height) { t = Math.min(t, r.top); bt = Math.max(bt, r.bottom); } }
+                        }
+                        return (bt - t) * 25.4 / 96;
+                    });
+                    return { cell: med(cells.map((c) => c.getBoundingClientRect().height * 25.4 / 96)), ink: med(ink) };
+                });
+            }
+            if (m.S && m.L && m.S.ink < 0.95 * m.L.ink && m.S.cell > 0.9 * m.L.cell) fail(`V20 ${skillId} error-analysis: the S cell is ${m.S.cell.toFixed(1)} mm for ${m.S.ink.toFixed(1)} mm of ink, the L cell ${m.L.cell.toFixed(1)} mm for ${m.L.ink.toFixed(1)} mm (S must be <= 0.9 x L when its content is smaller)`);
         }
         // V19 (critic r1 #10, r2 #7, r3 #4): the online worksheet at 1280 px: every tile of one template has the same
         // structure - Match 3 one word a row in a fixed column, every letter box at the same x in its tile; 1 picture, 3 words

@@ -206,11 +206,17 @@ const PICS = {
     },
     left: {
         // (r3: circles of 7 units, about 5 mm at 40 mm - critic r2: about 3 mm)
-        alt: 'six circles, two of them crossed out',
+        // (r6, critic r4 #5: the word names what STAYS, so the heavy mark is the bracket under the four circles left, in the
+        // "repeat" bracket's style; the two that go are crossed out at the part weight - V21 referent)
+        alt: 'six circles, two of them crossed out, the other four bracketed underneath',
+        referent: [[2.2, 38.6]],
         draw: () => {
             let b = '';
-            for (let i = 0; i < 6; i++) { const x = 6 + i * 9.6; b += ring(x, 20, 3.8, W.part); if (i >= 4) b += cross(x, 20, 3.8); }
-            return b;
+            for (let i = 0; i < 6; i++) {
+                const x = 6 + i * 9.6; b += ring(x, 20, 3.8, W.part);
+                if (i >= 4) b += ln(x - 3.8, 16.2, x + 3.8, 23.8, W.part) + ln(x - 3.8, 23.8, x + 3.8, 16.2, W.part);
+            }
+            return b + `<path d="M2.2 26 V30 H38.6 V26" fill="none" stroke="#000" stroke-width="${W.heavy}" ${NS}/>`;
         },
     },
     'equal groups': {
@@ -285,6 +291,7 @@ const PICS = {
     },
     repeat: {
         alt: '2, 4, 8 then 2, 4, 8 again, each set of three bracketed underneath',
+        referent: [[1.5, 27.5], [30.3, 56.3]],
         draw: () => {
             let b = '';
             [2, 4, 8, 2, 4, 8].forEach((v, i) => { b += tx(5 + i * 9.6, 15, 0, String(v), { size: 9 }); });
@@ -379,6 +386,14 @@ export const VOCAB_PICTURE_IDS = Object.freeze(Object.keys(PICS));
 export const hasVocabPicture = (id) => Object.prototype.hasOwnProperty.call(PICS, String(id));
 /** A picture's screen-reader description (never its word). */
 export const vocabPictureAlt = (id) => (hasVocabPicture(id) ? PICS[id].alt : '');
+/**
+ * The part of a picture its word NAMES, as canvas x ranges [[x0, x1], ...], for a picture that shows more than its referent
+ * ("left": the circles that stay, not the ones crossed out; "repeat": each repeated group). The heavy mark (W.heavy) is on
+ * these ranges and nowhere else (critic r4 #5, ws-vocab-unit V21). null for a picture with no declared referent.
+ */
+export const vocabPictureReferent = (id) => (hasVocabPicture(id) && PICS[id].referent ? PICS[id].referent.map((r) => r.slice()) : null);
+/** The heavy stroke width the referent carries (px, non-scaling). */
+export const VOCAB_HEAVY = W.heavy;
 
 /**
  * The extent of a picture's marks on the canvas, {x, y, w, h} in canvas units (strokes, dot radii and text boxes
@@ -421,14 +436,23 @@ export function vocabPictureExtent(id) {
  * The printed size (mm) of a picture fitted to a `wMm` x `hMm` box (default 3 : 2), and its scale (mm a canvas unit).
  * The box is the cell's room: the picture is drawn as large as its own extent allows inside it.
  */
-export function vocabPictureFit(id, wMm = 46, hMm) {
+/**
+ * The base-ten pictures whose fit sets the unit of an item (owner ruling OQ-1, 2026-11-08: the unit is PER ITEM, one unit
+ * within an item): with a hundred in the item, all three (the hundred's tenth); without one, the one and the ten (the ten
+ * rod's tenth), so "one" and "ten" print with a larger unit when no hundred shares their item. `set`: the item's words
+ * (default: the picture alone).
+ */
+export const base10UnitSet = (id, set) => ((Array.isArray(set) ? set : [id]).map(String).concat(String(id)).includes('hundred') ? BASE10_IDS : ['one', 'ten']);
+
+export function vocabPictureFit(id, wMm = 46, hMm, set) {
     const e = vocabPictureExtent(id);
     if (!e) return null;
     const bw = Math.max(PIC_WIDTHS.min, Math.min(PIC_WIDTHS.max, Number(wMm) || 46));
     const bh = Number(hMm) > 0 ? Number(hMm) : bw * PIC_CANVAS.h / PIC_CANVAS.w;
-    // a base-ten picture takes the scale at which ALL three fit the box, so one unit prints the same in each
+    // a base-ten picture takes the scale at which every base-ten picture of its ITEM fits the box (base10UnitSet), so one
+    // unit prints the same within the item (V16)
     const scale = BASE10_IDS.includes(String(id))
-        ? Math.min(...BASE10_IDS.map((b) => { const eb = vocabPictureExtent(b); return Math.min(bw / eb.w, bh / eb.h); }))
+        ? Math.min(...base10UnitSet(id, set).map((b) => { const eb = vocabPictureExtent(b); return Math.min(bw / eb.w, bh / eb.h); }))
         : Math.min(bw / e.w, bh / e.h);
     return { wMm: r2(e.w * scale), hMm: r2(e.h * scale), scale };
 }
@@ -438,10 +462,10 @@ export function vocabPictureFit(id, wMm = 46, hMm) {
  * marks. In the screen twin the same drawing at the host's --mq-k2 scale (one drawing, two scales, SP-1).
  * @returns {string} an inline SVG ('' for a word the library has no picture of)
  */
-export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0 } = {}) {
+export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {}) {
     if (!hasVocabPicture(id)) return '';
     const e = vocabPictureExtent(id);
-    const fit = vocabPictureFit(id, wMm, hMm);
+    const fit = vocabPictureFit(id, wMm, hMm, set);
     const w = fit.wMm;
     const body = PICS[id].draw();
     // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
@@ -449,10 +473,10 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0 } = {}) {
     // (screen: `minPx` keeps the picture's text >= 14 px on a phone - critic r1 D8: 6-9 px digits at 390 px)
     const ar = `aspect-ratio:${r2(e.w)} / ${r2(e.h)};`;
     // (a base-ten picture's screen floor is the set's: the hundred's floor, the ten and one in proportion - one unit)
-    if (minPx && BASE10_IDS.includes(String(id))) minPx = minPx * e.w / Math.max(...BASE10_IDS.map((b) => vocabPictureExtent(b).w));
+    if (minPx && BASE10_IDS.includes(String(id))) minPx = minPx * e.w / Math.max(...base10UnitSet(id, set).map((b) => vocabPictureExtent(b).w));
     const size = isTwin(ctx) ? `width:${minPx ? `max(${minPx}px, ${L(ctx, w)})` : L(ctx, w)};max-width:100%;height:auto;${ar}` : `width:${r2(w)}mm;max-width:100%;height:auto;${ar}`;
     return `<svg class="mq-vpic" data-vpic="${esc(id)}" viewBox="${r2(e.x)} ${r2(e.y)} ${r2(e.w)} ${r2(e.h)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(PICS[id].alt)}"`
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { PIC_CANVAS, PIC_WIDTHS, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

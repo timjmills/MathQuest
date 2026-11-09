@@ -23,7 +23,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, isTwin, sizeOf, textPt, KEY_FEATURES, S, slotValue } from './k2kit.js';
-import { vocabPictureSVG } from '../graphics/vocab-pictures.js';
+import { vocabPictureSVG, BASE10_IDS } from '../graphics/vocab-pictures.js';
 
 export const MATCH3_TEMPLATE = 'vocab-match3';
 const LET = ['A', 'B', 'C'];
@@ -52,13 +52,20 @@ register(MATCH3_TEMPLATE, {
         // (Error analysis shows the work at 2 mm less, and its letter boxes at the writing square, so 3 a page fit at L with
         // the Correct / Fix-it row under it: lf-vocab r5, critic r3 #3 - 2 a page left 35-40 % of each cell empty)
         const ea = ctx.state === 'wrong';
-        const picH = ea ? picH0 - 2 : picH0;
+        // (and at S its pictures 18 mm tall, so 4 a page fit at S and the cell is sized from what S draws, not L's 3 a page:
+        // critic r4 #3, 24-28 % empty bands at S; ws-vocab-unit V20)
+        const picH = ea ? (sizeOf(ctx) === 'S' ? 18 : picH0 - 2) : picH0;
         const show = ctx.state === 'answered' || ctx.state === 'traced' || ctx.state === 'wrong';
         const ink = ctx.state === 'traced' ? GREY : INK;
         // the letter at the picture's top left, beside it (not above: the cell stays a quarter of the page)
-        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : '1 1 0'};min-width:0;">`
+        // (owner ruling OQ-1: the base-ten unit is per ITEM - with no hundred in the item, the one and the ten print with the
+        // ten rod's unit, and the ten's slot takes the row's spare width (a 52.5 mm box) so that unit is >= 5 mm; V16)
+        const noHundred = !words.includes('hundred');
+        const wideOf = (w) => !twin && noHundred && BASE10_IDS.includes(String(w));
+        const boxW = (w) => (wideOf(w) ? 52.5 : picW);
+        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : wideOf(w) ? '1 1 0' : words.some(wideOf) ? '0 0 auto' : '1 1 0'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
-            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: picW, hMm: picH, minPx: twin ? 160 : 0 })}</span></div>`).join('');
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: boxW(w), hMm: picH, minPx: twin ? 160 : 0, set: words })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + (ea ? 0 : 2);
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
@@ -85,10 +92,13 @@ register(MATCH3_TEMPLATE, {
         const chart = ctx.chartZoom !== undefined && ctx.chartZoom !== null;
         const inChart = chart || Number(ctx.scaffoldLevel) >= 2;
         const guidedRow = !twin && !chart && Number(ctx.scaffoldLevel) >= 2;
+        // (lf-vocab r6: in a row taller than 48 mm - review, pre-skill check - the work takes a quarter of the extra height, its
+        // picture row centred in it, so the cell leaves no 30 % band under the words and the drawing stays within 10 % of its
+        // footprint on mixed practice; ws-empty-band --slot-ink off and EB-FOOT)
         // (a practice page's cell: at least 44 mm and at most 48 mm, so a row a page stretches (mixed practice, review) keeps the
         // drawing within 10 % of its footprint and leaves under 30 % below it - ws-empty-band EB-FOOT / EB-BAND, r5; 48 mm
         // as a minimum pushed the lesson Warm-up 3.4 mm off its page)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:48mm;';
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:calc(48mm + max(0mm, (100% - 48mm) / 4));';
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
@@ -101,8 +111,10 @@ register(MATCH3_TEMPLATE, {
             + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:12px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
         const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
-            + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, 1)} ${L(ctx, 2)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
-            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};">${pics}</div>`
+            + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${L(ctx, 2)} ${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
+            // (a practice cell's free height goes above AND below the pictures - the row centred in the room over the words, which
+            // stay at one y - so a row of flat pictures leaves no single blank band: ws-empty-band --slot-ink off, lf-vocab r6)
+            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:auto 0;' : ''}">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },
     answerKey(p) {

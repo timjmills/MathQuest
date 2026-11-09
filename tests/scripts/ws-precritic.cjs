@@ -834,7 +834,13 @@ function buildPlan(ctx) {
             add(gate('vocab-unit', 'ws-vocab-unit (picture vocabulary: every word drawn, one right answer, no word twice on a page, sets split into trios)', scope, 'node', 'ws-vocab-unit', []));
             // (lf-vocab r5, critic r3: the checks only a browser measures - the per-word Score on every offered role (V11R), the
             // 1 picture, 3 words Guided rows equal at S, M and L (V18), and one fixed worksheet-1280 tile layout per template (V19))
-            add(gate('vocab-unit-browser', 'ws-vocab-unit --browser (Score per word on every role, Guided rows equal at S/M/L, worksheet tiles one layout)', scope, 'browser', 'ws-vocab-unit', ['--browser']));
+            add(gate('vocab-unit-browser', 'ws-vocab-unit --browser (Score per word on every role, Guided rows equal at S/M/L, worksheet tiles one layout, EA cell at S <= 0.9 x L)', scope, 'browser', 'ws-vocab-unit', ['--browser']));
+            // (lf-vocab r6, critic r4 #1: the empty band measured AS THE CRITIC DOES - an empty answer slot is not ink, the longest
+            // blank run between the cell's rules - for the two picture vocabulary skills only; other lanes keep the default)
+            {
+                const vks = keys.filter((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k));
+                add(gate('empty-band-critic', 'ws-empty-band --slot-ink off (the critic\'s band: empty slots are not ink, longest blank run)', vks.join(', '), 'browser', 'ws-empty-band', ['--skill', vks.join(','), '--slot-ink', 'off'], { missingMsg: 'ws-empty-band is not in this tree' }));
+            }
             // the card's OTHER offered roles at S / M / L (lf-vocab critic-r3 render: Match 3 GUIDED at S overflowed while the
             // render gate above drew only lesson / test / independent; LESSONS_LEARNED lf-vocab last row)
             const vk = keys.filter((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k));

@@ -62,7 +62,10 @@ register(PICK3_TEMPLATE, {
         // grades 4-5: the picture beside the bank; K-3 the bank under the picture. The bank is ALWAYS one word a line
         // (critic r1 D4: "equal groups step odd" on one line - a pupil cannot tell three words from five)
         // (and a full-width teaching state - the Scripted Model's states, payload.wideState - lays its picture beside the bank too)
-        const beside = !twin && (gc === 2 || !!p.wideState);
+        // (and an Error analysis work at S - state `wrong`: the bank beside the picture, so the work and its judgement fit
+        // 6 a page in 2 x 3 with no empty band; critic r4 #1: the stacked work printed 4 a page at S, 30.1 % empty)
+        const eaS = !twin && ctx.state === 'wrong' && ctx.size === 'S';
+        const beside = !twin && (gc === 2 || !!p.wideState || eaS);
         // one line width a grade band, so the answer place stands in the same place in every cell (critic r1 D5, VQ-7)
         // (and at least 1.2 x the widest bank word at the answer font, grades 4-5 at least 55 mm: the line runs under the
         // picture and the bank - critic r3 #7, ~36 mm for "times as many"; ws-vocab-unit V15)
@@ -107,8 +110,9 @@ register(PICK3_TEMPLATE, {
         const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 76 - 3 - bankMm)) : pick3PicW(p);
         // the picture fills a box as tall as before and as wide as the cell allows, so a flat picture (the ten rod, a line of
         // digits) prints large (r3, rule 5: critic r2 #2 - the ten rod 3.4 mm tall in a 90 mm cell; ws-vocab-unit V9)
-        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - bankMm), hMm: 24 } : { wMm: 72, hMm: picW * 2 / 3 - (ctx.state === 'wrong' ? 3.5 : 0) };   // (Error analysis: 3 a page at L, critic r3 #3)   // (76 stuck out 0.4 mm at S: precritic r4)
-        const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0 }));
+        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - bankMm), hMm: eaS ? 28 : 24 } : { wMm: 72, hMm: picW * 2 / 3 - (ctx.state === 'wrong' ? 3.5 : 0) };   // (Error analysis: 3 a page at L, critic r3 #3)   // (76 stuck out 0.4 mm at S: precritic r4)
+        // (the item is its one picture: a "one" or a "ten" alone prints at the ten rod's unit, owner ruling OQ-1)
+        const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0, set: [p.word] }));
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
         if (beside) {

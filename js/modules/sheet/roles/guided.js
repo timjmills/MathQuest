@@ -990,7 +990,10 @@ export function plan(input = {}) {
             // (the share is at least the tallest row's content when the page holds that many rows of it: lf-vocab r5, critic r3
             // #6 - at L the Model row's tab and the hint line made it taller than the average, so the rows stayed 99 / 78 mm)
             const even = Math.max(Hr.reduce((a, b) => a + b, 0) / rows, Math.max(...w));
-            if (even * rows <= pg.avail + 0.5) Hr = Hr.map(() => even);
+            // (and when the page cannot give every row the tallest row's planned height, every row still takes ONE share - the
+            // page's height over the rows: the planned hint row (a two-line meaning hint) drew 100 / 77 mm at L while its
+            // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
+            Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
         }
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
