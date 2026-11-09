@@ -1,0 +1,116 @@
+  addition:add_wp_10_plain/S/1/key-p2: CHANGED
+  addition:add_wp_10_plain/S/1/keyHtml: CHANGED
+  addition:add_wp_10_plain/S/1/pupil-p2: CHANGED
+  addition:add_wp_10_plain/S/1/pupilHtml: CHANGED
+  addition:add_wp_10_plain/S/4242/key-p2: CHANGED
+  addition:add_wp_10_plain/S/4242/keyHtml: CHANGED
+  addition:add_wp_10_plain/S/4242/pupil-p2: CHANGED
+  addition:add_wp_10_plain/S/4242/pupilHtml: CHANGED
+  addition:add_wp_20/S/1/key-p2: CHANGED
+  addition:add_wp_20/S/1/keyHtml: CHANGED
+  addition:add_wp_20/S/1/pupil-p2: CHANGED
+  addition:add_wp_20/S/1/pupilHtml: CHANGED
+  addition:add_wp_20_plain/S/1/key-p2: CHANGED
+  addition:add_wp_20_plain/S/1/keyHtml: CHANGED
+  addition:add_wp_20_plain/S/1/pupil-p2: CHANGED
+  addition:add_wp_20_plain/S/1/pupilHtml: CHANGED
+  number_sense:nearest_10/L/1/key-p2: CHANGED
+  number_sense:nearest_10/L/1/key-p3: CHANGED
+  number_sense:nearest_10/L/1/keyHtml: CHANGED
+  number_sense:nearest_10/L/1/pupil-p2: CHANGED
+  number_sense:nearest_10/L/1/pupil-p3: CHANGED
+  number_sense:nearest_10/L/1/pupilHtml: CHANGED
+  number_sense:nearest_10/L/4242/key-p2: CHANGED
+  number_sense:nearest_10/L/4242/key-p3: CHANGED
+  number_sense:nearest_10/L/4242/keyHtml: CHANGED
+  number_sense:nearest_10/L/4242/pupil-p2: CHANGED
+  number_sense:nearest_10/L/4242/pupil-p3: CHANGED
+  number_sense:nearest_10/L/4242/pupilHtml: CHANGED
+  placevalue:identify/S/1/key-p2: CHANGED
+  placevalue:identify/S/1/keyHtml: CHANGED
+  placevalue:identify/S/1/pupil-p2: CHANGED
+  placevalue:identify/S/1/pupilHtml: CHANGED
+  placevalue:identify/S/4242/key-p2: CHANGED
+  placevalue:identify/S/4242/keyHtml: CHANGED
+  placevalue:identify/S/4242/pupil-p2: CHANGED
+  placevalue:identify/S/4242/pupilHtml: CHANGED
+  placevalue:value/L/1/key-p2: CHANGED
+  placevalue:value/L/1/keyHtml: CHANGED
+  placevalue:value/L/1/pupil-p2: CHANGED
+  placevalue:value/L/1/pupilHtml: CHANGED
+  placevalue:value/L/4242/key-p2: CHANGED
+  placevalue:value/L/4242/keyHtml: CHANGED
+  placevalue:value/L/4242/pupil-p2: CHANGED
+  placevalue:value/L/4242/pupilHtml: CHANGED
+  round/L/1/key-p2: CHANGED
+  round/L/1/key-p3: CHANGED
+  round/L/1/keyHtml: CHANGED
+  round/L/1/pupil-p2: CHANGED
+  round/L/1/pupil-p3: CHANGED
+  round/L/1/pupilHtml: CHANGED
+  round/L/4242/key-p2: CHANGED
+  round/L/4242/key-p3: CHANGED
+  round/L/4242/keyHtml: CHANGED
+  round/L/4242/pupil-p2: CHANGED
+  round/L/4242/pupil-p3: CHANGED
+  round/L/4242/pupilHtml: CHANGED
+  subtraction:sub_100_no_regroup/S/1/key-p2: CHANGED
+  subtraction:sub_100_no_regroup/S/1/keyHtml: CHANGED
+  subtraction:sub_100_no_regroup/S/1/pupil-p2: CHANGED
+  subtraction:sub_100_no_regroup/S/1/pupilHtml: CHANGED
+  subtraction:sub_100_no_regroup/S/4242/key-p2: CHANGED
+  subtraction:sub_100_no_regroup/S/4242/keyHtml: CHANGED
+  subtraction:sub_100_no_regroup/S/4242/pupil-p2: CHANGED
+  subtraction:sub_100_no_regroup/S/4242/pupilHtml: CHANGED
+  subtraction:sub_wp_20/S/1/key-p2: CHANGED
+  subtraction:sub_wp_20/S/1/keyHtml: CHANGED
+  subtraction:sub_wp_20/S/1/pupil-p2: CHANGED
+  subtraction:sub_wp_20/S/1/pupilHtml: CHANGED
+  subtraction:sub_wp_20/S/4242/key-p2: CHANGED
+  subtraction:sub_wp_20/S/4242/keyHtml: CHANGED
+  subtraction:sub_wp_20/S/4242/pupil-p2: CHANGED
+  subtraction:sub_wp_20/S/4242/pupilHtml: CHANGED
+  subtraction:sub_wp_20_plain/S/1/key-p2: CHANGED
+  subtraction:sub_wp_20_plain/S/1/keyHtml: CHANGED
+  subtraction:sub_wp_20_plain/S/1/pupil-p2: CHANGED
+  subtraction:sub_wp_20_plain/S/1/pupilHtml: CHANGED
+  subtraction:sub_wp_20_plain/S/4242/key-p2: CHANGED
+  subtraction:sub_wp_20_plain/S/4242/keyHtml: CHANGED
+  subtraction:sub_wp_20_plain/S/4242/pupil-p2: CHANGED
+  subtraction:sub_wp_20_plain/S/4242/pupilHtml: CHANGED
+  [add] 40/40 identical
+  [addition:add_facts] 40/40 identical
+  [addition:add_wp_10] 44/44 identical
+  [addition:add_wp_10_plain] 32/40 identical
+  [addition:add_wp_20] 36/40 identical
+  [addition:add_wp_20_plain] 36/40 identical
+  [addition:fact_family_sort] 44/44 identical
+  [g1-oa1-bar-model-wp-20] 52/52 identical
+  [g2-nbt3-read-write-1000] 74/74 identical
+  [g3-oa5-mult-properties] 60/60 identical
+  [g3-oa8-two-step-wp] 70/70 identical
+  [g3-oa9-input-output-rule] 56/56 identical
+  [g3-oa9-mult-table-patterns] 52/52 identical
+  [g4-nbt1-ten-times-value] 56/56 identical
+  [division:div_facts] 40/40 identical
+  [number_sense:nearest_10] 32/44 identical
+  [placevalue:combine] 40/40 identical
+  [placevalue:expand] 40/40 identical
+  [placevalue:identify] 32/40 identical
+  [placevalue:unit_form] 40/40 identical
+  [placevalue:value] 32/40 identical
+  [round] 32/44 identical
+  [sub] 40/40 identical
+  [subtraction:sub_100_no_regroup] 32/40 identical
+  [subtraction:sub_100_regroup] 40/40 identical
+  [subtraction:sub_100k_no_regroup] 40/40 identical
+  [subtraction:sub_10k_no_regroup] 40/40 identical
+  [subtraction:sub_1k_no_regroup] 40/40 identical
+  [subtraction:sub_1m_no_regroup] 40/40 identical
+  [subtraction:sub_2d_1d] 40/40 identical
+  [subtraction:sub_50_no_regroup] 40/40 identical
+  [subtraction:sub_wp_10] 40/40 identical
+  [subtraction:sub_wp_10_plain] 40/40 identical
+  [subtraction:sub_wp_20] 32/40 identical
+  [subtraction:sub_wp_20_plain] 32/40 identical
+ws-lesson-baseline: FAIL (80 of 1556 differ)
