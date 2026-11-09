@@ -3,10 +3,22 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: r6 rebuild done, clean before critic (sibling-compare structural only); ready for critic r5
+State: PASSED (critic r5 PASS min 8, 2026-11-09); deploy waits for lessons-phase0 on master
 Updated: 2026-11-09
 Builder profile: mq-opus-medium
-Critic rounds: 4: r4 FAIL min 6 (design/lanes/lf-vocab/critic-r4.md), r3 FAIL min 6, r2 FAIL min 7, r1 FAIL min 1 (report design/lanes/lf-vocab/critic-r3.md)
+Critic rounds: 5: r5 PASS min 8 (design/lanes/lf-vocab/critic-r5.md); r4 FAIL 6, r3 FAIL 6, r2 FAIL 7, r1 FAIL 1
+
+## PASS (2026-11-09): critic r5 PASS min 8
+- Both skills added to js/modules/redesign-passed.js (VOC_IDS, evidence design/lanes/lf-vocab/critic-r5.md).
+  ws-redesign-passed is OK with the manifest applied. On the branch without the manifest the two ids are not live yet:
+  apply the manifest in the same merge.
+- Screenshots (this container; critic set /tmp/claude-0/-home-user-MathQuest/f48f7b34-4da9-5560-ad2e-bb2137ed57c4/scratchpad/critic6):
+  - the lesson vocabulary pages: lesson/pilot-L-pupil-1.png, pilot-M-pupil-1.png, grade2-L-pupil-1.png,
+    props-L-pupil-1.png, and each one's -key-1.png;
+  - Match 3: skill/L/vocabulary__vocab_grade_pictures/independent-p1.png, independent-key-p1.png, card-390.png,
+    card-1280.png, worksheet-1280.png, quiz-1280.png;
+  - 1 picture, 3 words: skill/L/vocabulary__vocab_pick3_words/ (the same names), and grades/g1..g4.
+- Deploy: waits for lessons-phase0 and the lesson-pages registry on master (lead, 2026-11-09, option b).
 
 ## Round 6 (2026-11-09, fresh builder, Opus medium, rebuild after critic r4 FAIL min 6): OQ-1 + critic r4 #1-#5
 Times: start about 10:05 UTC, end 11:50 UTC. Base c7384923 (the owner re-signed the card with OQ-1; check-signed OK).

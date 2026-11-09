@@ -318,3 +318,15 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | Match 3 error analysis at S drawn at L's height (24-28 %, a near-miss) | A cell at S that draws less is shorter than at L | NEW: cell height at S <= 0.9 x height at L when its content shrinks |
 | "number name" offered with "hundred" while the picture prints "three hundred forty-seven" | A bank word that appears in the picture's printed text is a look-alike | NEW: no bank word in the picture's text (V17 extension) |
 | The "left" picture reads as take away (it marks what goes, not what stays) | A picture marks its referent with a heavy mark | NEW: each picture declares its referent, and a test checks that the referent carries the heavy mark |
+
+### lf-vocab round 6 and critic r5 (2026-11-09): PASS min 8. Findings-to-checks
+| Finding | Check | Backtest | On precritic? | Would have saved |
+|---|---|---|---|---|
+| OQ-1: base-ten "one" a 2.5 mm speck | V16 extended: one unit per item, >= 5 mm with no hundred | vocab-v16-base10-per-item | y | 1 |
+| pick3 error analysis at S: 30.1 % band | ws-empty-band --slot-ink off (critic-aligned) | eb-vocab-pick3-ea-s-critic | y (empty-band-critic) | 1 |
+| pick3 guided rows unequal at L (4 rounds) | V18: rendered row boxes at S/M/L, no exemption | vocab-v18-rendered-rows | y (vocab-unit-browser) | 3 |
+| Match 3 error analysis at S drawn at L height | V20: S cell <= 0.9 x L when S ink is smaller | vocab-v20-ea-s-height | y (vocab-unit-browser) | 1 |
+| "number name" with "hundred" in one bank | V17 extended: no bank word in the picture's printed text | vocab-v17-printed-text | y | 1 |
+| "left" read as take-away | V21: a required referent, which carries the heavy mark | vocab-v21-referent | y | 1 |
+| ws-empty-band counted empty slots as ink | --slot-ink off (opt-in; the default is unchanged; lf-checks decides the re-pin: 299 -> 2057 on the add_facts / mult_facts pins) | eb-vocab-pick3-ea-s-critic | y (vocab only) | 1 |
+| r5 nits, no score effect: Match 3 guided rows 15-18 % apart; guided answer line height differs within a row (VQ-7); letter anchor; card-390 box alignment; a repeated pupil name on error analysis; caption sizes within a row; lone "one" could be larger; a stale provider header comment | NOT built yet: row-spread at 10 % on every guided template; answer-place height within 2 mm across a row; letter-offset check; 390 box x alignment; distinct pupil names a page; one caption size a slot; provider header vs wrongAnswer ids lint. Reason: they are nits under the 8 bar and the round was capped; they go to the next vocabulary round | - | n | 0 (no score effect) |

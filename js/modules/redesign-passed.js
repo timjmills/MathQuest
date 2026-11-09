@@ -38,5 +38,10 @@ const VQ5_IDS = [
   'subtraction:sub_wp_10_plain',
   'subtraction:sub_wp_20_plain',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD])]);
+const VOC = 'Lane lf-vocab, critic r5 PASS min 8 (independent, more-practice, test, guided, error-analysis at S/M/L + keys, 10 screen hosts, grades 1-4, 4 lesson vocab pages); design/lanes/lf-vocab/critic-r5.md, 2026-11-09';
+const VOC_IDS = [
+  'vocabulary:vocab_grade_pictures',
+  'vocabulary:vocab_pick3_words',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...VOC_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...VOC_IDS.map((id) => [id, VOC])]);

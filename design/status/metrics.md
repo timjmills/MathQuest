@@ -493,3 +493,14 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Fast facts at S, columns | — | 10 (8 when answers > 99) |
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
 | simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
+
+### lf-vocab (2026-11-07 to 2026-11-09)
+| Metric | Value |
+|---|---|
+| Critic rounds to PASS | 5 (r1 min 1, r2 min 7, r3 min 6, r4 min 6, r5 PASS min 8) |
+| Builder rounds | 6 (build 1, r2, r3 fresh, r4 small, r5 fresh, r6 fresh) |
+| Rule 5 stops | 2 (r2: five survivors; r4: pick3 guided row equality survived 4 rounds) |
+| Rounds lost to a check that passed what the critic failed | 2 (r3: no empty-band check on guided / EA / worksheet; r4: ws-empty-band counted an empty slot as ink, V18 did not measure rendered rows) |
+| Checks added (ws-vocab-unit V1-V21 + vocab-unit-browser, vocab-roles-render, empty-band-critic) | 24 |
+| Backtest rows | 16 (vocab-sets-split, 8 r5 rows, 6 r6 rows, eb-vocab-match3-guided) |
+| Page counts (A4) | Match 3: 4 a page at S/M/L; 1 picture, 3 words: 4 / 6 / 8 a page (K-1 / 2-3 / 4-5) |
