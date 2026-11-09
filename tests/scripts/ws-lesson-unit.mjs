@@ -81,6 +81,36 @@ const LATE = {
         const srcPs = fs.readFileSync(path.join(ROOT, 'js/modules/sheet/roles/lesson.js'), 'utf8');
         ok(/Array\.isArray\(main\.hardAvoid\) \? \[Object\.assign\(\{\}, main, data\[k\]\.ref\)\]/.test(srcPs), 'pack-feasible: roles/lesson.js sources gives a hard-bound lesson\'s case pools the whole main ref (its avoid keys too)');
     },
+    // (P0 ANSWER OVERLAP, lf-engine 2026-11-09: lesson 2's count 11-20 shares answers with its + facts 13-19, and the lane's
+    // engine dealt each Prerequisite Check question against its own items only - twins 16 / 13 at seed 1, E24b. Where two
+    // questions of one detailed lesson's P0 can share an answer, the engine must deal the page against ONE answer set
+    // (print-sheet.js pageLr6 on a `perQuestion` pre-skill-check, master lf-placevalue 2026-11-08) and the union of their
+    // answers must hold every item. Read from the record and the source, no browser.)
+    async 'p0-overlap'() {
+        const src = fs.readFileSync(path.join(ROOT, 'js/modules/print-sheet.js'), 'utf8');
+        const wired = /const pageLr6 = \([^;]*n\.role === 'pre-skill-check' && n\.perQuestion\)/.test(src);
+        const span = (r) => {
+            const o = r.opts || {};
+            const lo = r.minNum !== undefined ? Number(r.minNum) : (o.constant && r.skillId === 'add_facts' ? Math.min(...o.constant) : 0);
+            const hi = r.maxNum !== undefined ? Number(r.maxNum) : Number(o.band) || 20;
+            return [lo, hi];
+        };
+        const one = (r) => r.minNum !== undefined || r.maxNum !== undefined;
+        let pairs = 0;
+        for (const d of Object.values(DET.DETAILED_LESSONS)) {
+            const qs = (d.prerequisites || []).filter((p) => p.ref && one(p.ref)).map((p) => ({ k: `${p.ref.categoryId}:${p.ref.skillId}`, n: Number(p.items) || 2, s: span(p.ref) }));
+            for (let i = 0; i < qs.length; i++) for (let j = i + 1; j < qs.length; j++) {
+                const [a, b] = [qs[i], qs[j]];
+                const lo = Math.max(a.s[0], b.s[0]), hi = Math.min(a.s[1], b.s[1]);
+                if (lo > hi) continue;
+                pairs++;
+                ok(wired, `p0-overlap: ${d.id} P0 ${a.k} (${a.s.join('-')}) and ${b.k} (${b.s.join('-')}) share answers ${lo}-${hi}, so the engine deals the Prerequisite Check page against one answer set (print-sheet.js pageLr6 on pre-skill-check + perQuestion)`);
+                const union = Math.max(a.s[1], b.s[1]) - Math.min(a.s[0], b.s[0]) + 1;
+                ok(union >= a.n + b.n, `p0-overlap: ${d.id} P0 ${a.k} and ${b.k}: ${a.n + b.n} items need ${a.n + b.n} different answers, their ranges hold ${union}`);
+            }
+        }
+        ok(pairs > 0, 'p0-overlap: at least one detailed lesson has two P0 questions whose answers can meet (lesson 2: count 11-20, + facts 13-19)');
+    },
     // (E24b attempt 2, lesson 2: the GREEDY deal order left Practice 1 the near twins 7 + 4 / 8 + 5 at seed 4242 though a set
     // without them existed. A `solve` sheet's stories are solved before it is dealt (print-sheet.js solveStoryFacts) and the
     // generator is pinned to the solved pairs (page-deal.js setDealPin). Read from the source, no browser.)
