@@ -740,10 +740,7 @@ function pvRenderBody(p, ctx0) {
         const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
         // A slot's width never tells the answer (round-3 re-grade): at least the longest number the
         // item prints, plus one where the answer can gain a digit (rounding, estimating).
-        // (lf-placevalue critic r3b G2: unit form's rename frames - `rowOnly`, one full-width row each - are about 76 mm of ink at S,
-        // 30 % empty each side of a 185 mm cell; their write line takes two more digits at S, the same on every item, so the
-        // line never tells the answer and the row reads as one band across the page)
-        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value')) + (p.rowOnly && ctx.size === 'S' ? 2 : 0);
+        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value'));
         const top = p.hideNumeral ? '' : undefined;
         // "Name the place": the letter over the underlined digit IS the answer, so the letters are
         // a hint here and fade by page role — Model and Guided keep them, Independent, More
@@ -788,7 +785,11 @@ function pvRenderBody(p, ctx0) {
                 // never gets a longer line than its neighbours.
                 // (`ghost`, lf-placevalue r1 F9: "900 + 1 = ____" and "400 + 60 + 4 = ____" took a half-width cell and a
                 // full-width row on one page, sorted by height; every item now reserves the widest expression its band deals)
-                const dg = Math.max(digits, Number(p.slotDigits) || 0);
+                // (lf-placevalue critic r3b G2 / r4 N-r4-1: unit form's rename frames - `rowOnly`, one full-width row each - are about
+                // 76 mm of ink at S, 30 % empty each side of a 185 mm cell; their write line takes three more digits at S, AFTER the
+                // skill's fixed width - added before it, two digits moved the band 0.8 mm (29.9 %) - the same on every item, so the
+                // line never tells the answer)
+                const dg = Math.max(digits, Number(p.slotDigits) || 0) + (p.rowOnly && ctx.size === 'S' ? 3 : 0);
                 const fr = frameHTML(ctx, p.frame, kv, dg, p.ghost ? String(p.ghost).replace(/\s*=\s*_+\s*$/, '') : '');
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${fr}</div>`;
             }
