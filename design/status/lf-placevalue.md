@@ -70,6 +70,20 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-09 ROUND 5 (lead, cap $20; branch claude/lf-placevalue-r5 from master 2fe21f2b): critic r5 (critic-r5.md) PASS for identify and
+  unit_form on every changed page. N-r4-1 margin (rename line +3 digits after the fixed width: 27 %), G5 (Fix-it words from the pv frame),
+  E-r4-1 (identify Guided two across, lesson data guidedCols: L 4 -> 3 pages) fixed. The unit_form worksheet host band (legacy cell) NOT
+  fixed: hosts-lane code. PNGs: design/status/lf-placevalue/r5-pass/. Lesson 1 --check / --repeats OK; boot-smoke, providers-unit OK.
+
+### Round 5 findings -> checks (owner 2026-11-09: every finding a check)
+| Finding | Check that now catches it | Backtest row (FAIL old -> PASS fix) | On precritic / detailed-lesson path | Would have saved |
+|---|---|---|---|---|
+| N-r4-1 unit_form rename=more S side band passed at 29.9 % (fragile) | ws-empty-band `--margin N` (EB-SIDE / EB-BAND at 30 - N %) | pv-unit-form-rename-margin (2fe21f2b FAIL -> a1c8d595 OK) | backtest only: `--margin` not default on precritic (it would flag every near-limit cell of every lane; proposed as a lane opt-in once pinned) | 1 round (r5) |
+| G5 error-analysis Fix-it singular word gives the answer | ws-fixit-words FIX-WORDS (new) | pv-unit-form-fixit-words (2fe21f2b FAIL -> a1c8d595 OK) | precritic (opt-in lf-placevalue newRow) | 2 rounds (r3b found it, open through r4) |
+| E-r4-1 identify lesson L page 2 43 % empty (page 3 never moved up) | ws-empty-band `--page-fill` EB-PAGE (new) | pv-identify-lesson-page-fill (2fe21f2b FAIL -> 07634a75 OK) | precritic (opt-in lf-placevalue empty-band args) | 1 round (r4 -> r5) |
+| unit_form worksheet host 32 % bottom band (legacy cell, rename=more) | ws-empty-band EB-BAND (exists; run with `--opts {"rename":"more"} --hosts worksheet`) | none yet: NOT FIXED (the cell is drawn by the legacy screen path, hosts lane) | precritic runs hosts with default opts only: option variants on hosts are not rendered | 0 (unfixed) - reason: hosts-lane code |
+| N-r5-1 identify lesson L warm-up cells EB-SIDE 31 % (lesson.js two across) | ws-empty-band EB-SIDE `--roles lesson` (exists) | none: ENGINE-ROLES (lead D3), not fixed by pv | precritic empty-band row renders lesson for the lane skills | 0 - reason: engine finding, lf-engine |
+| N-r5-2 S/M vocabulary cell grew into freed height (capIfEmpty 0.3), ~43 % empty split above and below | PROPOSED: EB-BAND on the vocab band (`.mq-lvocabcell` is not a kit cell today) | none | not on path | 0 - reason: grade unchanged (24 % by EB rule); engine |
 - 2026-11-08 critic r4 (critic-r4.md, 98fb4236): **placevalue:identify and placevalue:unit_form PASSED** (redesign-passed.js PV4, pv approved
   siblings; PNGs design/status/lf-placevalue/{identify-pass,unit_form-pass}/). All five lesson #1 skills now pass. Open: G2 margin 0.1 point
   (N-r4-1), G5 error-analysis Fix-it singular word (out of bar), E-r4-1 lesson.js page split, the unit_form worksheet host band (legacy, 32 %).

@@ -26,7 +26,8 @@ const SEED = parseInt(arg('seed', '7'), 10);
             const cells = await page.evaluate(async ({ categoryId, skillId, size, SEED }) => {
                 const r = await window.buildSheet({ role: 'error-analysis', sections: [{ skills: [{ categoryId, skillId }] }], size, seed: SEED, key: false });
                 const d = document.createElement('div'); d.innerHTML = r.pupilHtml;
-                return [...d.querySelectorAll('.ws-cell')].map((c) => c.innerText || c.textContent);
+                // (the text nodes joined by spaces: a detached page has no layout, so innerText runs the words of adjacent boxes together)
+                return [...d.querySelectorAll('.ws-cell')].map((c) => { const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT); const out = []; while (w.nextNode()) out.push(w.currentNode.nodeValue); return out.join(' '); });
             }, { categoryId, skillId, size, SEED });
             const words = (t) => (String(t).match(/[A-Za-z]+/g) || []);
             cells.forEach((t, i) => {

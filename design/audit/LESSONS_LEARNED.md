@@ -351,3 +351,15 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - critic r4 (2026-11-08): identify and unit_form PASS (E-A1, G2 fixed). N-r4-1: G2 passes by 0.1 point (29.9 % against 30 %): a fix
   that lands within 2 points of a limit is fragile -> PROPOSED: ws-empty-band warns (not fails) on bands of 28-30 %, and a lane
   sizes its fix to clear a limit by at least 3 points. E-r4-1 (lesson.js page split: identify L p2 43 % empty) is ENGINE-ROLES.
+
+## lf-placevalue round 5 (2026-11-09): every finding a check (owner)
+| Finding | Check that now catches it | Backtest row (FAIL old -> PASS fix) | On precritic / detailed-lesson path | Would have saved |
+|---|---|---|---|---|
+| N-r4-1 unit_form rename=more S side band passed at 29.9 % (fragile) | ws-empty-band `--margin N` (EB-SIDE / EB-BAND at 30 - N %) | pv-unit-form-rename-margin (2fe21f2b FAIL -> a1c8d595 OK) | backtest only: `--margin` not default on precritic (it would flag every near-limit cell of every lane; proposed as a lane opt-in once pinned) | 1 round (r5) |
+| G5 error-analysis Fix-it singular word gives the answer | ws-fixit-words FIX-WORDS (new) | pv-unit-form-fixit-words (2fe21f2b FAIL -> a1c8d595 OK) | precritic (opt-in lf-placevalue newRow) | 2 rounds (r3b found it, open through r4) |
+| E-r4-1 identify lesson L page 2 43 % empty (page 3 never moved up) | ws-empty-band `--page-fill` EB-PAGE (new) | pv-identify-lesson-page-fill (2fe21f2b FAIL -> 07634a75 OK) | precritic (opt-in lf-placevalue empty-band args) | 1 round (r4 -> r5) |
+| unit_form worksheet host 32 % bottom band (legacy cell, rename=more) | ws-empty-band EB-BAND (exists; run with `--opts {"rename":"more"} --hosts worksheet`) | none yet: NOT FIXED (the cell is drawn by the legacy screen path, hosts lane) | precritic runs hosts with default opts only: option variants on hosts are not rendered | 0 (unfixed) - reason: hosts-lane code |
+| N-r5-1 identify lesson L warm-up cells EB-SIDE 31 % (lesson.js two across) | ws-empty-band EB-SIDE `--roles lesson` (exists) | none: ENGINE-ROLES (lead D3), not fixed by pv | precritic empty-band row renders lesson for the lane skills | 0 - reason: engine finding, lf-engine |
+| N-r5-2 S/M vocabulary cell grew into freed height (capIfEmpty 0.3), ~43 % empty split above and below | PROPOSED: EB-BAND on the vocab band (`.mq-lvocabcell` is not a kit cell today) | none | not on path | 0 - reason: grade unchanged (24 % by EB rule); engine |
+- Lesson: a check's text reader on a DETACHED page must join text nodes with spaces (innerText has no layout there) - ws-fixit-words
+  first ran words together and failed the fixed state; its backtest caught it before commit.

@@ -911,3 +911,9 @@ detailed lessons that deal a pv skill are opt-in precritic rows (opt-in-rules.js
 **Speed-ups:** bisect by copying one changed file at a time into a clean master worktree with a 40 s probe (the lesson sheet's item
 count) instead of the 2 min full gate: the CSS file was found in four probes. A probe that `git stash`es while a background gate runs
 is unsafe: use a second worktree.
+
+### lf-placevalue round 5 (2026-11-09): 3 fixes + 3 new checks in one critic round
+**Rounds saved by the new checks:** G5 (open r3b -> r4) and E-r4-1 (r4 -> r5) would each have been caught before a critic by
+ws-fixit-words / --page-fill; N-r4-1 by --margin. **Speed-ups:** the r4 fix of G2 was invisible to its own measure because the bonus was
+added BEFORE a max() with the skill's fixed width (0.8 mm moved): measure the change's effect right after the edit (lowered-threshold probe).
+**Lost:** none; one backtest caught a tool bug (detached-DOM innerText) before commit.
