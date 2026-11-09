@@ -1332,6 +1332,1163 @@
    }
   },
   {
+   "id": "facts-print-fix",
+   "check": "the owner's fact set (+ − within 20, × ÷ 1-12, Pages 1, Auto) at S/M/L: Mixed up prints interleaved fact rows at the In sections counts (MIXFACTS), any fallback is exactly the In sections print (FALLBACK), fact-rows rules are drawn and one weight (ROWRULES), sign gap >= 0.3 em and digits >= 1.75 mm from the box (SIGNGAP), footers name skills in words (FOOTER) (owner 2026-11-05: Mixed up printed 20 problems on 2 pages; no row lines in the PDF; 3-digit dividends crowd the box)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print MIXFACTS / FALLBACK / ROWRULES / SIGNGAP / FOOTER",
+   "browser": true,
+   "fail": {
+    "commit": "18fbc70c2",
+    "state": "live: Mixed up fell back to the sparse 4-each plan; fact-rows rules were the ink seen through 0.75 pt gaps; the ÷ page at 10 columns had 1.55 mm clearance; a cross-category footer printed sub_facts"
+   },
+   "pass": {
+    "commit": "b84a624a8",
+    "state": "facts-print-fix: interleaved fact rows, fallback = In sections, drawn rules, ÷ Auto 9 at S, footers in words"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r2",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Sets 2: printed signs per skill equal the dialog counts and are balanced within 1 on a page (COUNTS); Problems mode prints fact rows with the exact count, ÷ stacked alone at <= 9 columns, pages >= 60 % or even, no wide cell, S != L (PROBLEMS); page k of n reads k/n and names its own skills (FOOTER); a + − × page is titled by its operations (TITLE); the design standard never says ÷ reaches 10 columns (DIVMAX9 docs) (print critic 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print COUNTS / PROBLEMS / FOOTER / TITLE / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "c2c0fe24f",
+    "state": "S + − × page printed 24/23/9 while the chips said 23 for ×; Problems 50 printed each skill its own grid, ÷ across; footers 1/1; title Facts; standard said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "91bd40cbe",
+    "state": "facts-print-fix r2: balanced keepShares + printedSkills, Problems-mode fact rows, k/n footers per page, operation titles, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r3",
+   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Columns Auto/5/9, Sets 2 and 3 (and three cases through the real dialog with Print pressed): every grid of every page of every set has the summary's columns and one digit size a group, per-skill totals equal the split of the request (SETPAGE); white under the grid in mm at most one row and the fewest pages with all groups planned together (FILL); Auto never above 9, 10 only when picked, never offered with division (AUTO9); PAGE_TYPES and the design standard never say division reaches 10 columns (DIVMAX9 docs) (print critic r3 2026-11-05, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print SETPAGE / FILL / AUTO9 / DIVMAX9 docs",
+   "browser": true,
+   "fail": {
+    "commit": "115302a69",
+    "state": "Problems 50 at S on 2 pages (72 + 169 mm white, ÷ alone); set 2 printed 10 columns beside set 1's 8; 35/32/31/32 at L for 33/33/32/32; 20 / 24 pt on pages of one print; Auto 10 at S; PT-FRW-9 said ÷ reaches 10"
+   },
+   "pass": {
+    "commit": "e023c34dc",
+    "state": "facts-print-fix r3: all groups planned together (÷ section shares the page), reach-based columns and digits, page-by-page counts, Auto 9, docs at most 9"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r4",
+   "check": "the owner's ÷ Mix page (seed 926447, Columns 9, Pages 1, S) and the ÷ Mix set at S/M/L in both arrangements, Problems 30/50/63/130 at S/M/L x Auto/5/9 x both arrangements, mult_facts alone at L: one baseline a row and centred items in a grid mixing forms (MIXBASE), one visible answer slot place (SLOTPOS), fraction '=' >= 0.25 em and centred (FRACEQ), bracket/fraction ink >= 2 mm from the border (CLEAR), brackets on the row geometry (BRKTRACK), rules counted on the pdfium raster (PDFIUM-RULES), footer names unbroken (FOOTWRAP), one section per ÷ form In sections (DIVSECTIONS), Size honoured with Mix (SIZEMIX), every page but the last within 8 mm and no row past 1.3 (FULLPAGE), one digit size a page (ONEDIGIT), one row height a section (ROWSAME) (print critic r4 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r4 MIXBASE / SLOTPOS / FRACEQ / CLEAR / BRKTRACK / PDFIUM-RULES / FOOTWRAP / DIVSECTIONS / SIZEMIX / FULLPAGE / ONEDIGIT / ROWSAME",
+   "browser": true,
+   "fail": {
+    "commit": "7fab88a7e",
+    "state": "÷ Mix rows zig-zag 6.2 mm, slots in three places, '=' 0.15 em from the bar, brackets 0.98 mm from the border, footer 'Division Facts (1-' / '12)', In sections mixes the forms, Problems pages 50-105 mm white with 1.7 stretch, 20 / 24 pt on one page, rows 37.27 vs 36.38 mm"
+   },
+   "pass": {
+    "commit": "aa1377878",
+    "state": "facts-print-fix r4: one three-line frame for mixed forms, ÷ sections In sections, planFactRows (every page but the last full, <= 1.3), one digit size a page, frame in the grid height, nowrap footer names, background-clip seam fix"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r5",
+   "check": "a sweep of the owner's fact set - Problems 20-150 by 5 x S/M/L x Columns Auto/5/9 x both arrangements, ÷ Mix In sections by 10, Pages 1 and 2 default and ÷ Mix (684 prints, built path): each skill within one row of its share in Pages mode or a note (SHARES), no empty cell before the last page (BLANKMID), ÷ never before + − × (DIVORDER), a title names one number only when the option fixes it (TITLEONE), the last page holds a full row or a note (ORPHAN), every page but the last filled (FULLPLAN), Columns 5 digits follow the Size (COLSIZE) (print critic r5 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --r5 SHARES / BLANKMID / DIVORDER / TITLEONE / ORPHAN / FULLPLAN / COLSIZE",
+   "browser": true,
+   "fail": {
+    "commit": "128455ad3",
+    "state": "÷ Mix In sections Pages 1 Big 2 / 2 / 1 / 15; the '÷ first' reorder left a 1-fact row and 4 empty cells on page 1; Problems 30 at M a 1-fact last page titled 'Divide by 6'; Columns 5 28 pt at S, M and L (BLANKMID 712, DIVORDER 172, ORPHAN 77, SHARES 45, FULLPLAN 43, TITLEONE 15, COLSIZE 1)"
+   },
+   "pass": {
+    "commit": "21304044e",
+    "state": "facts-print-fix r5: teacher's order kept, every section but the last in whole rows, Pages mode planned to the shares (one mixed ÷ section when needed), titles from the options, Size caps the digits with Columns picked"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --r5",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r6",
+   "check": "the MEASURED sweep (702 prints drawn print-emulated: ÷ Mix In sections Problems 10-60, the owner's set Problems 1-150 at Auto/7/9, Pages 1-3 at Columns Auto/6/7/9/10 on five skill lists, two-skill lists, Sets 2, and the real dialog at Big Columns 9): the total equals the request (TOTAL), each skill within one row of its share (SHARES), digits under the Size named in a note (SIZENOTE) and on the size button (SIZEBTN), measured white <= 8 mm beyond a full page on every page but the last and on the last in Pages mode (PAGESFULL), no empty cell mid-print, teacher's order, rows <= 1.3 (print critic r6 2026-11-05, lowest 3)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep TOTAL / SHARES / SIZENOTE / PAGESFULL / BLANKMID / DIVORDER / STRETCH / SIZEBTN",
+   "browser": true,
+   "fail": {
+    "commit": "1d4c97a5c",
+    "state": "÷ Mix In sections Problems 10 printed 26; Pages 2 last page 41.6 mm short beside 'every page is full'; Problems pages 16.8 mm short; Big / Medium digits dropped under a picked Columns with no note (TOTAL 59, SHARES 115, SIZENOTE 286, PAGESFULL 55)"
+   },
+   "pass": {
+    "commit": "bb4ca1fa9",
+    "state": "facts-print-fix r6: exact counts for groups under a row and merged ÷ forms in Problems mode, Pages mode fills the last page, per-page stretch where one height cannot fill all, size notes and buttons, bracket clearance"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r7",
+   "check": "the measured sweep with lists in the teacher's unusual orders (÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix +; both arrangements, Problems and Pages) and every picked Columns: the sections print in the list's order (ORDER; DIVORDER no longer exempts a ÷-first list), a section printing other columns than picked says why and the dialog offers facts Columns 5 and up (COLNOTE), a bracket's ink 2 mm from its border in bracket and mixed sections (BRKCLEAR), notes plain - no internal codes, at most two sentences (NOTEPLAIN) (print critic r7 2026-11-07, lowest 5)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep ORDER / COLNOTE / BRKCLEAR / NOTEPLAIN",
+   "browser": true,
+   "fail": {
+    "commit": "2bebf4f94",
+    "state": "÷ printed last whatever the list's order; Columns 1-4 printed 5 across silently; notes showed '(PT-FRW-5)' in 3-6 sentences (ORDER 84, NOTEPLAIN 272, COLNOTE 8)"
+   },
+   "pass": {
+    "commit": "313a81983",
+    "state": "facts-print-fix r7: groups in list order, Columns 5+ for facts with a note for a saved 1-4, one plain sentence a note"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "facts-print-fix-r8",
+   "check": "the measured sweep with Sets 2/3 over ÷-first and ÷-between lists (÷Mix −, − ÷Mix +, ÷Mix × − +, owner ÷ Mix; Problems and Pages): every set prints set 1's per-skill counts (SETSKILLDIFF) and sections a page (SETSHAPE) and keeps the shares; the ÷ cells' printed ink, rasterised at 300 dpi, >= 2.0 mm from the cell rules at 9 columns, Small and Big (BRKINK) (print critic r8 2026-11-07, lowest 6)",
+   "kind": "commit-pair",
+   "rule": "ws-simple-print --sweep SETSKILLDIFF / SETSHAPE / SHARES / BRKINK",
+   "browser": true,
+   "fail": {
+    "commit": "e0d7d1b09",
+    "state": "Sets 2 re-decided the ÷-form merge (÷ 15 against set 1's 20); the answer line printed 1.78 mm from the rule at Big, 9 columns (SETSHAPE 8, SETSKILLDIFF 6, SHARES 4, BRKINK 1)"
+   },
+   "pass": {
+    "commit": "cdaa80fc2",
+    "state": "facts-print-fix r8: sets reuse set 1's plan; the answer line and the mixed bracket room keep the printed ink >= 2.03 mm"
+   },
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-combine-dealer",
+   "check": "placevalue:combine, 120 seeded items: the zero place is never pinned to odd positions (itemIndex % 2) and no item or leading pair repeats on a page of 20",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform PERIOD / PAGE",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: zeroCase 60 of 60 at position 1 mod 2; 7 PAGE repeats"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "wantZero by dealIndex, the number by freshDeal (leading part cap 3, leading pair cap 1)"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --skill placevalue:combine",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-equation-row-cl40",
+   "check": "placevalue:expand at S and combine at L: the one-line equation row's ink stays out of the number tab's keep-out",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK",
+   "browser": true,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: combine L 8, expand S 40 CL40-INK"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "sheet-kit.css: pv equation-row cells take the tab spacer on the page and the measuring cell"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size S --skills placevalue:expand,placevalue:combine --baseline design/audit/baselines/print-lint.S.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-lesson-data",
+   "check": "the lesson page of placevalue identify / value / expand / combine / unit_form has lesson data (no fallback warm-up)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint LESSON-DATA",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: 5 pv skills no-lesson-data"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "lessons/prereqs.js lf-placevalue block"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --skill placevalue:expand,placevalue:combine,placevalue:identify,placevalue:unit_form,placevalue:value --rules LESSON-DATA",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-rulings-value-reader",
+   "check": "ws-card-rulings reads place value items (no 'a op b') for a range ruling that opts in with read: value, so the pv card's band rulings are checked instead of unreadable",
+   "kind": "fixture",
+   "rule": "ws-card-rulings read: value",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.operands-only.json",
+    "state": "the pv band rulings read as operand items: every pv item unreadable (no operands), the ruling cannot be checked"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.json",
+    "state": "the same rulings with read: value: q.ans and q.pv.{n, digit, place} read"
+   },
+   "command": "node tests/scripts/ws-card-rulings.mjs --rulings {fixture} --check rulings",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-kit",
+   "check": "placevalue:expand on the practice card / boss / race: the kit cell's boxes are the inputs and a Check / Next button is found (not the legacy expanded interactive)",
+   "kind": "commit-pair",
+   "rule": "ws-chromebook-fit (L5 paper = screen)",
+   "browser": true,
+   "fail": {
+    "commit": "4a137b93",
+    "state": "precritic r1: card / boss / race 'no Check / Next found' at 1366x650 and 1280x600"
+   },
+   "pass": {
+    "commit": "66c23cb5",
+    "state": "expand default form on inlineBlanks + the kit cell"
+   },
+   "command": "node tests/scripts/ws-chromebook-fit.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-offered-na",
+   "check": "ws-precritic: a card with a rulings block and no notOffered entry reads card-not-offered N/A (every option offered), not SKIPPED; a card with no block stays SKIPPED",
+   "kind": "commit-pair",
+   "rule": "ws-precritic PARSE.cardRulings (lead ruling R2)",
+   "browser": false,
+   "fail": {
+    "commit": "98351c32",
+    "state": "card-not-offered SKIPPED (no rulings) on the pv card, which offers every §7a option"
+   },
+   "pass": {
+    "commit": "809c55b7",
+    "state": "N/A 'every §7a option offered; no notOffered entry'"
+   },
+   "command": "node tests/scripts/ws-precritic-parse.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-wrong-per-slot",
+   "check": "a True or False? / Reason It statement given as one string is written slot by slot in a multi-slot pv frame (expand boxes, unit-form, value unit / notation)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F3 (critic lf-placevalue r1 F3)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: expand / unit_form true-false: the whole statement in each box"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F3",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-plural",
+   "check": "no \"1 ones\" / \"1 tens\" / \"1 hundreds\" in any pv worked step, step band, Say line or wrong work",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F11 (critic lf-placevalue r1 F11)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"1 hundreds is 1 × 100\", \"1 ones.\""
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F11",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-grade2-times",
+   "check": "a placevalue:value item outside form=notation has no × in its steps or Say line",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F12 (critic lf-placevalue r1 F12)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"Multiply the digit by its place: 3 tens is 3 × 10 = 30\" on a 2.NBT.1 page"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-model-not-ones",
+   "check": "item 0 of an identify / value page (the Model item) never asks the ones place",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F13 (critic lf-placevalue r1 F13)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: scripted model 559 with the ones digit underlined"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-h13-abs",
+   "check": "ws-print-lint --rules H13-ABS (opt-in): the empty band under the lowest ink of every kit cell is under 30 % of the cell less Hw; H13 / H13-ROW judged only against the row",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY H13-ABS (critic lf-placevalue r1 F1; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/h13-abs/fail.html",
+    "state": "placevalue:value independent L at 24b0c88a (critic r1 state): 12 cells of 51.5 mm, 14.6 mm empty under the 'worth ___' line in each (critic: 34 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/h13-abs/pass.html",
+    "state": "the same page with rows sized to the item: 15 cells of 41.6 mm (F1 fix: value L 12 -> >= 15)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules H13-ABS --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "lead ruling 2026-11-08: H13-ABS now uses RUBRIC H13 (30 % of the full cell, as ws-empty-band EB-BAND); this fail fixture (14.6 mm under the ink of a 51.5 mm cell, 28.3 %) is below the shared threshold. The live cases are covered by ws-empty-band rows eb-pv-value-band9999-L and eb-pv-unitform-more-S (lf-checks); re-arm with a fixture above 30 % when one is captured, never by editing this one."
+  },
+  {
+   "id": "optin-grid-even-all",
+   "check": "ws-print-lint --rules GRID-EVEN-ALL (opt-in): one cell geometry per section, a full-width cell included, across consecutive grids under one instruction",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN-ALL (critic lf-placevalue r1 F9; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/fail.html",
+    "state": "placevalue:combine independent L at 24b0c88a: 4 half-width cells (92.3 mm) over 7 full-width rows (184.9 mm) under one instruction"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/pass.html",
+    "state": "the same items, every cell full width (one geometry per section)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-wrong-fits-slots",
+   "check": "ws-node-lint --rules WRONG-FITS-SLOTS (opt-in): a multi-slot cell's wrongAnswer gives one value per graded write-in slot, each fitting its slot",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FITS-SLOTS (critic lf-placevalue r1 F3; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.fail.mjs",
+    "state": "a three-box expanded-form item whose wrongAnswer is one string ('4 + 0 + 3') with no per-slot values"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.pass.mjs",
+    "state": "the same item; wrongAnswer gives slots {part0: '4', part1: '0', part2: '3'}"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-wrong-fill",
+   "check": "ws-node-lint --rules WRONG-FILL (opt-in): what the True or False? and Reason It roles PRINT in each write-in slot of a false statement (their real prepare(), print-sheet's draw), never the whole statement in every box",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FILL (critic lf-placevalue r1 F3: expand true-false '5 + 0 + 3' in each box; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.fail.mjs",
+    "state": "a three-box cell that writes the role's one false value into every box (the r1 defect: the whole statement three times)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.pass.mjs",
+    "state": "the same cell writing its own part of the false statement into each box (as cells/pv.js does at b1094401)"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-slot-w-equal",
+   "check": "ws-slot-clip --slot-w-equal (opt-in): graded write-in slots of one kind in one section have one width (a width that tracks the answer gives it away)",
+   "kind": "fixture",
+   "rule": "ws-slot-clip SLOT-W-EQUAL (critic lf-placevalue r1 F10, L3; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/fail.html",
+    "state": "placevalue:value form=unit independent L at 53dd45c9: the place-word box 32 mm for tens / ones, 62 mm for hundreds"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/pass.html",
+    "state": "the same page at b1094401 (the pv builder's fix): every word box 44 mm"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --slot-w-equal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-draw-cap",
+   "check": "ws-slot-clip --draw-cap (opt-in): each place zone of a draw zone holds the item's digit x (8 mm)^2",
+   "kind": "fixture",
+   "rule": "ws-slot-clip DRAW-CAP (critic lf-placevalue r1 F15, H12; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/draw-cap/fail.html",
+    "state": "placevalue:identify review L at 53dd45c9 with the 691 mat at the critic's measured 19 x 19 mm zones: 9 tens disks need 576 mm2, the zone holds 361"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/draw-cap/pass.html",
+    "state": "the same page as printed at 53dd45c9: 38 mm place zones"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --draw-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-screen-digit",
+   "check": "ws-screen-slots --screen-digit (opt-in): the item's numeral on the card / worksheet / quiz is >= 56 / 48 / 40 px at 1280 / 820 / 390, Andika at weight >= 700",
+   "kind": "fixture",
+   "rule": "ws-screen-slots SCREEN-DIGIT (critic lf-placevalue r1 F7; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/fail.html",
+    "state": "placevalue:expand practice card at 1280, commit 53dd45c9: the number 24 px, weight 400"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/pass.html",
+    "state": "placevalue:value practice card at 1280, commit b1094401: 56 px Andika 700"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-options-render-bands",
+   "check": "ws-options-verify --render --bands (opt-in): the number-size values of band are printed and judged on L-OVERFLOW / L-WRAP against the default page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render --bands (critic lf-placevalue r1 F19 / F20; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "expand band=9999 / 99999 / 999999 and unit_form band=9999 at L: frames 12.7-114 mm out of their cells (critic r1: 13-16 mm at 9,999)"
+   },
+   "pass": {
+    "commit": "b1094401",
+    "state": "the pv builder's r1 fix: every band page at L inside its cells"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:expand,placevalue:unit_form --sizes L --bands --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-card-overflow",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-card-overflow-cbt",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-tagink",
+   "check": "An error-analysis tag never prints over the grey made-up answer in its box (critic lf-ops r1 check 9, D-MP-5 / D-AG-3)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-keyjoin",
+   "check": "A key writes one answer into one slot, never a joined '15, 15' (critic lf-ops r1 check 8, D-MP-6)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks KEYJOIN",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-size-s",
+   "check": "Size S is not M's layout with smaller drawings (critic lf-ops r1 check 4, D-AG-2, L1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SIZE-S",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title-cbt",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-sections-pagefill",
+   "check": "A two-skill sections sheet fills its pages and its last page to half (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: page 1 held 2 items, 64 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL / PG-23 (sections)",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills multiplication:mult_properties,multiplication:arrays_groups",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-option-fit",
+   "check": "Every pv cell fits every option value the signed card offers on every role (lf-placevalue precritic r3: combine band=999999 ran 13 mm past the page at L on test / review / guided / independent and on every lesson page; expand / unit_form opener Model and combine Reason It panels ran out of their cells)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (--card --card-opts); SCC-T4 content never shrinks, wrap only between units / before =",
+   "browser": true,
+   "fail": {
+    "commit": "b7962be0",
+    "state": "lf-placevalue critic r1 fix-round tree merged with the integration branch: combine 196 OVERFLOW findings"
+   },
+   "pass": {
+    "commit": "9f483f78",
+    "state": "lf-placevalue r2: two fixed lines for six-part expressions, Model and Reason It rows wrap between units"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:combine --card --card-opts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-wrong-differs",
+   "check": "the wrong work of a placevalue:identify True or False? / Reason It item is wrong in at least one graded slot (slot by slot, not the joined string) and never equals the key, over every offered band x writeValue x response x repeatDigit, 60 seeds each",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N1 WRONG-DIFFERS (critic lf-placevalue r2 N1)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: 564, the 6 underlined: wrong work 'tens, 60' is the key (M-V1 counted from the left lands on the middle digit); 23 of 2400 on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "identify writeValue wrong work drops every candidate naming the right place (providers/pv.js); 0 of 2400"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-printed-instruction",
+   "check": "a printed placevalue:identify page's instruction is the item's own library key (place-circle-value / place-write-value with writeValue on; place-write with response=bank), read the way print-sheet.js skillMeta reads it",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N2 PRINTED-INSTRUCTION (critic lf-placevalue r2 N2)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: every identify page prints 'Circle the place of the underlined digit.' (skillWords calls strings() with no item: PLACE_CIRCLE_3); 120 of 160 pages on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "the item names its library key (gen-pv q.instructionKey) and stringsBy's item-less pick reads the options; 0 of 160"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-combine-parts",
+   "check": "every placevalue:combine item shows 2 or more parts at every offered band x zeroPlace x order",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N3 COMBINE-PARTS (critic lf-placevalue r2 N3)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: band 99 zeroPlace=some deals '60 = ___' (one part, its own answer); 180 of 1800 on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "combine's zero place starts at 3 digits, a combine draw has >= 2 non-zero parts (gen-pv); 0 of 1800"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N3",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-place-word-live",
+   "check": "a placevalue:identify cell (print, size L, as the kit renders it) offers no place word above the number's highest place, every band x response x writeValue",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N4 PLACE-WORD-LIVE (VQ-LIVE for pv; critic lf-placevalue r2 N4, r1 band=99)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: 'ones tens hundreds' printed on 48 at band 99; 96 of 480 cells on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "identify offers one word per place the number has (gen-pv words = its places); 0 of 480"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-band-h13",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in): on a band page an H13-ABS finding fails on its own (30 % of the full cell), never excused as 'the default page has it too'",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (critic lf-placevalue r2 N5)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "value band=9999 L: 12 items 3x4, every cell 36-38 % empty under the worth line (the comma track on the table line height made each row 1.7 mm taller, so the page fill stopped at 4 rows)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "the comma track takes the digits line height: value band=9999 L 18 items 3x6, no H13-ABS"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:value --sizes L --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r3-band99-s",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in) on combine and expand band=99 at S: H13-ABS / H13 side bands on the 2-digit band page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (lf-placevalue r3 small fix pass; brief items 2 and 3)",
+   "browser": true,
+   "fail": {
+    "commit": "ce2d4c96",
+    "state": "combine band=99 S: 3x10 one-line \"30 + 6 = ____\" cells, 7.9 mm (35 %) under the ink of a 22.4 mm cell; expand band=99 S: one 2-place row in a 184.9 mm cell, 63.3 mm (34 %) side band"
+   },
+   "pass": {
+    "commit": "064e243e",
+    "state": "combine: two-part frames held to 3 across at S, \"= ____\" on its own line, 3x9 cells as tall as their ink; expand: the 2-place row stands 3 across at S, the number over \"= [ ] + [ ]\""
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:combine,placevalue:expand --sizes S --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-cell-h13-abs",
+   "check": "ws-cell-checks --h13-abs (opt-in): H13-ABS on every --card-opts option page (30 % of the full cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks H13-ABS (critic lf-placevalue r2 N6)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form rename=more S / M: 16 one-line items in 2 x 8 half-width cells of 23-26 mm, 36-44 % bands"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "rename frames are one full-width row a line (rowOnly): S 1 x 15, no band"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:unit_form --card --card-opts --h13-abs --opt-roles independent --rules H13-ABS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-review-one-layout",
+   "check": "ws-print-lint --roles review with the lane's opt-in H13-ABS / GRID-EVEN-ALL (the precritic review rows opt-in-rules.json adds): one layout in a mixed review section",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 / H13-ROW / H13-ABS on the review role (critic lf-placevalue r2 N7)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form review S: the mixed combine cells 3 across, '700 + 1 = ___' one line beside '600 + 10 + 1 / = ___' two (H13-ROW x6, cells 11 / 12 / 15)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "3-across combine frames wrap inside a ghost-wide box: every cell one geometry, 0 findings"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills placevalue:unit_form --roles review --size S --rules H13-ABS,GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-red-no-baseline",
+   "check": "ws-coverage-matrix --red-no-baseline PAGEFILL,H5 --rule-skills (opt-in): a lane's own row with a PAGEFILL / H5 finding and no baseline entry is RED, not PENDING(no-baseline)",
+   "kind": "commit-pair",
+   "rule": "ws-coverage-matrix --red-no-baseline (critic lf-placevalue r2 N8)",
+   "browser": true,
+   "pending": true,
+   "pendingReason": "the fix is in sheet/layout.js resolveSectionLayout (not a lane file): a footprint cannot say '1 column on Auto, 2 when asked'; set pass.commit when the engine change lands (the fail state runs today: RED on 5aadc52d and on dca16b12)",
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "expand / unit_form more-cols2: 1 column, 4 items, PAGEFILL at S / M / L"
+   },
+   "pass": {
+    "commit": null,
+    "state": "engine change not built (layout.js)"
+   },
+   "command": "node tests/scripts/ws-coverage-matrix.cjs --skills placevalue:expand,placevalue:unit_form --rows 'placevalue:expand|single/more-cols2+short,placevalue:unit_form|single/more-cols2+short' --baseline design/audit/matrix/baseline.json --red-no-baseline PAGEFILL,H5 --rule-skills placevalue:expand,placevalue:unit_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e24-family",
+   "check": "LP-FAMILY-REPEAT: repeats are × / ÷ families and story frames, not strings (lesson 7 critic r1 D2: chart 2 \"20 marbles shared\" 20 ÷ 4 back on P4-2 as 20 ÷ 5; 6 × 4 / 24 ÷ 6; 30 ÷ 6 / 30 ÷ 5; spaced retrieval 4 × 5)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --lp LP-FAMILY-REPEAT (tests/lib/ws-lesson-lp.cjs familyRepeat): the unordered family {a, b, a·b} of every × / ÷ place plus the spaced-retrieval facts, and the story frame (total + object), each on one place",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
+    "state": "lesson 7 packet read on 92cd31f3 (the commit critic r1 graded): 4 families and 2 frames on two places"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
+    "state": "the same packet with the critic's fix applied by hand (fresh families and frames); lesson 7 is not fixed yet"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-FAMILY-REPEAT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-text-no-x",
+   "check": "LP-TEXT: a \"no X this time\" script line fails when the page it names prints X (lesson 7 critic r1 D3: T5 §9 \"No step boxes this time\" over P5's Step 1 / Step 2 boxes); page codes resolve; Check Question choices = its \"four answers\"; \"Steps at the top\" names a page with a Steps band",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --lp LP-TEXT (textCheck)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
+    "state": "lesson 7 on 92cd31f3: T5 says \"No step boxes this time\""
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
+    "state": "the critic's script line: \"This time you draw it. Then write Step 1 and Step 2 in the boxes.\""
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-TEXT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-fallback",
+   "check": "LP-FALLBACK: a chart drawn below its sizing mode's floor (chartPage's silent fallback) fails (lesson 7 critic r1 D1: P2 at zoom 0.77, P2b at 0.7 in mode one)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --lp LP-FALLBACK: zoom from the DOM (.mq-cdraw), mode from the DOM (.mq-cfinalgrid final 0.85, .mq-cfinal grid3 0.8, else one / row 1) until the role reports sizing.mode",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
+    "state": "lesson 7 on 92cd31f3: charts at 0.77 / 0.7"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
+    "state": "the charts at zoom 1 (the critic's fix: measure the panel, zoom >= 1)"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-FALLBACK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-numbers",
+   "check": "LP-NUMBERS: no bare 4+ digit number on a teacher page, no near-look pair on a pupil page (lesson 6 critic r3 n2 T3 \"4000\", n1 92,163 / 92,715 on P4-2)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --lp LP-NUMBERS (a wrong answer quoted \"80039 for 839\" and digits written into an H T O chart are bare by design)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l6.fail.json",
+    "state": "lesson 6 packet read on e2994615 (the commit critic r3 graded)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-l6.pass.json",
+    "state": "n1 / n2 fixed by hand (4,000; 7,000; 47,715); not yet fixed on the branch"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --packet {fixture} --only LP-NUMBERS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-prereq",
+   "check": "LP-PREREQ: every writing slot of a Prerequisite Check cell is filled on its key, and no check cell carries a scaffold (lessons-phase0 r1 D1 box + \"Answer:\" line with only the line keyed; D8 exchange box on a check item)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --lp LP-PREREQ (prereq): keyEmpty per P0-key cell, traces / grey ink / Say / Steps on P0 cells",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-prereq.fail.json",
+    "state": "seeded: lesson 3a P0 with the phase 0 D1 and D8 shapes (phase 0's own check page is on lf-engine's branch; the patch carries the same check there)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-lp-prereq.pass.json",
+    "state": "lesson 3a P0 as built on 623fdd6d"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --packet {fixture} --only LP-PREREQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-raster",
+   "check": "LP-RASTER: every dark stroked rule of a pupil page or key leaves ink on pdfium's raster at 72 and 93 dpi (L20; found on lesson 5 P5: the 1.5 pt band rule under the Workspace is gone at 72 dpi)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --raster / --lp LP-RASTER (PyMuPDF paths, pypdfium2 raster; dashed cut lines and teacher thumbnails left out)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-raster.fail.pdf",
+    "state": "lesson 5 (g3-oa9-input-output-rule) P5 page, 623fdd6d seed 4242: 3 rules lost at 72 dpi"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-raster.pass.pdf",
+    "state": "lesson 6 P5 page (same page type), all 68 rules inked"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --raster {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-giveaway",
+   "check": "LP-GIVEAWAY: no Say / Steps band holds an item's key answer; Guided carries a hint Independent does not (lesson 4 critic r1 D1 P5 Say \"So 28 is ___\", D2 exit Say \"So 44 is ___\", D6 Guided = Independent)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --lp LP-GIVEAWAY (giveaway)",
+   "browser": true,
+   "fail": {
+    "commit": "a890f61f",
+    "state": "lesson 4 r1 (graded by critic r1, 582f8efe)"
+   },
+   "pass": {
+    "commit": "8b4ec4ae",
+    "state": "lesson 4 critic r3 PASS"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-mult-table-patterns --lp --only LP-GIVEAWAY --out /tmp/mq-bt-lp-giveaway",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-modelled",
+   "check": "LP-MODELLED: every task kind and story situation dealt on Practice / exit is on the anchor chart (or the T4 board) first (lesson 2 critic r1 D3: \"add to\" practised, only \"put together\" modelled; lesson 1 r1 D1: words to numeral practised, never modelled)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --lp LP-MODELLED (modelled): pool rep by skill, stories by situation (groups / share / add / take / together / compare)",
+   "browser": true,
+   "fail": {
+    "commit": "43f9483d",
+    "state": "lesson 2 as critic r1 graded it"
+   },
+   "pass": {
+    "commit": "0e1c71a3",
+    "state": "lesson 2 critic r4 PASS"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g1-oa1-bar-model-wp-20 --lp --only LP-MODELLED --out /tmp/mq-bt-lp-modelled",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-measure",
+   "check": "LP-MEASURE: every rendered pupil page and key measured (text >= 8 pt, writing slots >= 8 mm, blank foot <= 8 %), never the planner's counts (L16 / L19; the fact-family merge left lesson 6's Practice pages 19 % blank)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --lp LP-MEASURE (measureCheck)",
+   "browser": true,
+   "fail": {
+    "commit": "6bc3cbd8",
+    "state": "merge of fact families: lesson 6 P4-1 / P4-2 and keys 45 mm blank foot (bisected, lf-checks 2026-11-07)"
+   },
+   "pass": {
+    "commit": "56cf789c",
+    "state": "its first parent: lesson 6 as passed"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --lp --only LP-MEASURE --out /tmp/mq-bt-lp-measure",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lp-sweep",
+   "check": "LP-SWEEP: every seed 1-25 (x refresh when the builder takes it) through the built path, with the family / giveaway / modelled invariants (L21: the named case is not the input space; lesson 7 critic r1: E24 read one seed)",
+   "kind": "fixture",
+   "rule": "ws-detailed-lesson --sweep (live: builds seeds 1-25 in a detached document; --sweep-packets re-checks saved builds)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-sweep.fail.json",
+    "state": "lesson 3a (passed at seed 4242) on 623fdd6d, seeds 13 and 14: chart example 2 x 3 returns on Practice 1 (7 of 25 seeds)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-sweep.pass.json",
+    "state": "the same lesson and commit, seeds 1 and 2: clean"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --sweep-packets {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-combine-side-band",
+   "check": "placevalue:combine independent / more-practice / test / review at S, M and L: no cell has an empty band of 30 % or more of its width beside the ink (critic r3 F1: two-part rows right-aligned on a 3-part ghost left 54-60 mm on the left of a 185 mm cell; test M wrapped '= ____' under a centred expression)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "aacae5ea",
+    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+   },
+   "pass": {
+    "commit": "deb9e426",
+    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-detailed-lesson-1",
+   "check": "the live detailed lesson 1 (g2-nbt3-read-write-1000) self-check stays green on the lane's pv changes (lead 2026-11-08: E9c T4 90 %, E11 P4-1 cells 30 % empty, E24 606 repeat of a chart example, E24b twin answer 80 on P0)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --check E9c / E11 / E24 / E24b",
+   "browser": true,
+   "fail": {
+    "commit": "9b0972f7",
+    "state": "lead deploy hold: E9c, E11, E24, E24b FAIL"
+   },
+   "pass": {
+    "commit": "8d80d13b",
+    "state": "zero place drawn in the fresh deal, P0 dealt as one page, lesson refs noTabSpacer / inPlace false"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g2-nbt3-read-write-1000 --check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-vocab-ink",
+   "check": "placevalue:identify lesson: every vocabulary picture's drawing fills at least 70 % of its own box (critic r3c E-A1: 4 ones drawn in a ten-rod's height left the vocabulary cell 43 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-VOCAB (--vocab-ink)",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "critic r3c: EB-VOCAB 3 (lesson S / M / L)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "blocks picture `compact`: a ones-only picture one cube tall"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --vocab-ink --no-baseline --only EB-VOCAB",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-rename-side",
+   "check": "placevalue:unit_form rename=more at S: no cell has an empty band of 30 % or more beside its ink (critic r3b G2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "rename frames' write line two digits longer at S"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "skipcount-lesson-data",
    "check": "Lesson data + option help on the count-row family (critic skip-count r5 SC3, SC5)",
    "kind": "commit-pair",
@@ -1552,166 +2709,6 @@
    }
   },
   {
-   "id": "cc-card-overflow",
-   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-card-overflow-cbt",
-   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-tagink",
-   "check": "An error-analysis tag never prints over the grey made-up answer in its box (critic lf-ops r1 check 9, D-MP-5 / D-AG-3)",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks TAGINK",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-keyjoin",
-   "check": "A key writes one answer into one slot, never a joined '15, 15' (critic lf-ops r1 check 8, D-MP-6)",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks KEYJOIN",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-size-s",
-   "check": "Size S is not M's layout with smaller drawings (critic lf-ops r1 check 4, D-AG-2, L1)",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks SIZE-S",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-title",
-   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks TITLE, LESSON-OPT",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "cc-title-cbt",
-   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
-   "kind": "commit-pair",
-   "rule": "ws-cell-checks TITLE, LESSON-OPT",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "pl-sections-pagefill",
-   "check": "A two-skill sections sheet fills its pages and its last page to half (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: page 1 held 2 items, 64 % empty)",
-   "kind": "commit-pair",
-   "rule": "ws-print-lint L-DENSITY PAGEFILL / PG-23 (sections)",
-   "browser": true,
-   "fail": {
-    "commit": "c37053c",
-    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
-   },
-   "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
-   },
-   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills multiplication:mult_properties,multiplication:arrays_groups",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
    "id": "phone-focus-first-write-lf",
    "check": "FOCUS on a story worked in column boxes: the item's marked first write box after blank copy boxes (expect '') is right; the blank copy boxes stay blank (lead ruling 2026-11-07, active-box D6)",
    "kind": "commit-pair",
@@ -1746,359 +2743,6 @@
     "state": "fix (fresh builder): div_facts Test rows sized to 1.15 x the footprint (test.js fillToCeiling footprintRows), 0 findings at S / M / L"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills division:div_facts --h13-ink plain --roles test --size M --seed render --lints L-DENSITY",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix",
-   "check": "the owner's fact set (+ − within 20, × ÷ 1-12, Pages 1, Auto) at S/M/L: Mixed up prints interleaved fact rows at the In sections counts (MIXFACTS), any fallback is exactly the In sections print (FALLBACK), fact-rows rules are drawn and one weight (ROWRULES), sign gap >= 0.3 em and digits >= 1.75 mm from the box (SIGNGAP), footers name skills in words (FOOTER) (owner 2026-11-05: Mixed up printed 20 problems on 2 pages; no row lines in the PDF; 3-digit dividends crowd the box)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print MIXFACTS / FALLBACK / ROWRULES / SIGNGAP / FOOTER",
-   "browser": true,
-   "fail": {
-    "commit": "18fbc70c2",
-    "state": "live: Mixed up fell back to the sparse 4-each plan; fact-rows rules were the ink seen through 0.75 pt gaps; the ÷ page at 10 columns had 1.55 mm clearance; a cross-category footer printed sub_facts"
-   },
-   "pass": {
-    "commit": "b84a624a8",
-    "state": "facts-print-fix: interleaved fact rows, fallback = In sections, drawn rules, ÷ Auto 9 at S, footers in words"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r2",
-   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Sets 2: printed signs per skill equal the dialog counts and are balanced within 1 on a page (COUNTS); Problems mode prints fact rows with the exact count, ÷ stacked alone at <= 9 columns, pages >= 60 % or even, no wide cell, S != L (PROBLEMS); page k of n reads k/n and names its own skills (FOOTER); a + − × page is titled by its operations (TITLE); the design standard never says ÷ reaches 10 columns (DIVMAX9 docs) (print critic 2026-11-05, lowest 3)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print COUNTS / PROBLEMS / FOOTER / TITLE / DIVMAX9 docs",
-   "browser": true,
-   "fail": {
-    "commit": "c2c0fe24f",
-    "state": "S + − × page printed 24/23/9 while the chips said 23 for ×; Problems 50 printed each skill its own grid, ÷ across; footers 1/1; title Facts; standard said ÷ reaches 10"
-   },
-   "pass": {
-    "commit": "91bd40cbe",
-    "state": "facts-print-fix r2: balanced keepShares + printedSkills, Problems-mode fact rows, k/n footers per page, operation titles, docs at most 9"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r3",
-   "check": "the owner's fact set at S/M/L, Pages 1 and Problems 50/130, both arrangements, Columns Auto/5/9, Sets 2 and 3 (and three cases through the real dialog with Print pressed): every grid of every page of every set has the summary's columns and one digit size a group, per-skill totals equal the split of the request (SETPAGE); white under the grid in mm at most one row and the fewest pages with all groups planned together (FILL); Auto never above 9, 10 only when picked, never offered with division (AUTO9); PAGE_TYPES and the design standard never say division reaches 10 columns (DIVMAX9 docs) (print critic r3 2026-11-05, lowest 5)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print SETPAGE / FILL / AUTO9 / DIVMAX9 docs",
-   "browser": true,
-   "fail": {
-    "commit": "115302a69",
-    "state": "Problems 50 at S on 2 pages (72 + 169 mm white, ÷ alone); set 2 printed 10 columns beside set 1's 8; 35/32/31/32 at L for 33/33/32/32; 20 / 24 pt on pages of one print; Auto 10 at S; PT-FRW-9 said ÷ reaches 10"
-   },
-   "pass": {
-    "commit": "e023c34dc",
-    "state": "facts-print-fix r3: all groups planned together (÷ section shares the page), reach-based columns and digits, page-by-page counts, Auto 9, docs at most 9"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r4",
-   "check": "the owner's ÷ Mix page (seed 926447, Columns 9, Pages 1, S) and the ÷ Mix set at S/M/L in both arrangements, Problems 30/50/63/130 at S/M/L x Auto/5/9 x both arrangements, mult_facts alone at L: one baseline a row and centred items in a grid mixing forms (MIXBASE), one visible answer slot place (SLOTPOS), fraction '=' >= 0.25 em and centred (FRACEQ), bracket/fraction ink >= 2 mm from the border (CLEAR), brackets on the row geometry (BRKTRACK), rules counted on the pdfium raster (PDFIUM-RULES), footer names unbroken (FOOTWRAP), one section per ÷ form In sections (DIVSECTIONS), Size honoured with Mix (SIZEMIX), every page but the last within 8 mm and no row past 1.3 (FULLPAGE), one digit size a page (ONEDIGIT), one row height a section (ROWSAME) (print critic r4 2026-11-05, lowest 3)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print --r4 MIXBASE / SLOTPOS / FRACEQ / CLEAR / BRKTRACK / PDFIUM-RULES / FOOTWRAP / DIVSECTIONS / SIZEMIX / FULLPAGE / ONEDIGIT / ROWSAME",
-   "browser": true,
-   "fail": {
-    "commit": "7fab88a7e",
-    "state": "÷ Mix rows zig-zag 6.2 mm, slots in three places, '=' 0.15 em from the bar, brackets 0.98 mm from the border, footer 'Division Facts (1-' / '12)', In sections mixes the forms, Problems pages 50-105 mm white with 1.7 stretch, 20 / 24 pt on one page, rows 37.27 vs 36.38 mm"
-   },
-   "pass": {
-    "commit": "aa1377878",
-    "state": "facts-print-fix r4: one three-line frame for mixed forms, ÷ sections In sections, planFactRows (every page but the last full, <= 1.3), one digit size a page, frame in the grid height, nowrap footer names, background-clip seam fix"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --r4",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r5",
-   "check": "a sweep of the owner's fact set - Problems 20-150 by 5 x S/M/L x Columns Auto/5/9 x both arrangements, ÷ Mix In sections by 10, Pages 1 and 2 default and ÷ Mix (684 prints, built path): each skill within one row of its share in Pages mode or a note (SHARES), no empty cell before the last page (BLANKMID), ÷ never before + − × (DIVORDER), a title names one number only when the option fixes it (TITLEONE), the last page holds a full row or a note (ORPHAN), every page but the last filled (FULLPLAN), Columns 5 digits follow the Size (COLSIZE) (print critic r5 2026-11-05, lowest 3)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print --r5 SHARES / BLANKMID / DIVORDER / TITLEONE / ORPHAN / FULLPLAN / COLSIZE",
-   "browser": true,
-   "fail": {
-    "commit": "128455ad3",
-    "state": "÷ Mix In sections Pages 1 Big 2 / 2 / 1 / 15; the '÷ first' reorder left a 1-fact row and 4 empty cells on page 1; Problems 30 at M a 1-fact last page titled 'Divide by 6'; Columns 5 28 pt at S, M and L (BLANKMID 712, DIVORDER 172, ORPHAN 77, SHARES 45, FULLPLAN 43, TITLEONE 15, COLSIZE 1)"
-   },
-   "pass": {
-    "commit": "21304044e",
-    "state": "facts-print-fix r5: teacher's order kept, every section but the last in whole rows, Pages mode planned to the shares (one mixed ÷ section when needed), titles from the options, Size caps the digits with Columns picked"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --r5",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r6",
-   "check": "the MEASURED sweep (702 prints drawn print-emulated: ÷ Mix In sections Problems 10-60, the owner's set Problems 1-150 at Auto/7/9, Pages 1-3 at Columns Auto/6/7/9/10 on five skill lists, two-skill lists, Sets 2, and the real dialog at Big Columns 9): the total equals the request (TOTAL), each skill within one row of its share (SHARES), digits under the Size named in a note (SIZENOTE) and on the size button (SIZEBTN), measured white <= 8 mm beyond a full page on every page but the last and on the last in Pages mode (PAGESFULL), no empty cell mid-print, teacher's order, rows <= 1.3 (print critic r6 2026-11-05, lowest 3)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print --sweep TOTAL / SHARES / SIZENOTE / PAGESFULL / BLANKMID / DIVORDER / STRETCH / SIZEBTN",
-   "browser": true,
-   "fail": {
-    "commit": "1d4c97a5c",
-    "state": "÷ Mix In sections Problems 10 printed 26; Pages 2 last page 41.6 mm short beside 'every page is full'; Problems pages 16.8 mm short; Big / Medium digits dropped under a picked Columns with no note (TOTAL 59, SHARES 115, SIZENOTE 286, PAGESFULL 55)"
-   },
-   "pass": {
-    "commit": "bb4ca1fa9",
-    "state": "facts-print-fix r6: exact counts for groups under a row and merged ÷ forms in Problems mode, Pages mode fills the last page, per-page stretch where one height cannot fill all, size notes and buttons, bracket clearance"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r7",
-   "check": "the measured sweep with lists in the teacher's unusual orders (÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix +; both arrangements, Problems and Pages) and every picked Columns: the sections print in the list's order (ORDER; DIVORDER no longer exempts a ÷-first list), a section printing other columns than picked says why and the dialog offers facts Columns 5 and up (COLNOTE), a bracket's ink 2 mm from its border in bracket and mixed sections (BRKCLEAR), notes plain - no internal codes, at most two sentences (NOTEPLAIN) (print critic r7 2026-11-07, lowest 5)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print --sweep ORDER / COLNOTE / BRKCLEAR / NOTEPLAIN",
-   "browser": true,
-   "fail": {
-    "commit": "2bebf4f94",
-    "state": "÷ printed last whatever the list's order; Columns 1-4 printed 5 across silently; notes showed '(PT-FRW-5)' in 3-6 sentences (ORDER 84, NOTEPLAIN 272, COLNOTE 8)"
-   },
-   "pass": {
-    "commit": "313a81983",
-    "state": "facts-print-fix r7: groups in list order, Columns 5+ for facts with a note for a saved 1-4, one plain sentence a note"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "facts-print-fix-r8",
-   "check": "the measured sweep with Sets 2/3 over ÷-first and ÷-between lists (÷Mix −, − ÷Mix +, ÷Mix × − +, owner ÷ Mix; Problems and Pages): every set prints set 1's per-skill counts (SETSKILLDIFF) and sections a page (SETSHAPE) and keeps the shares; the ÷ cells' printed ink, rasterised at 300 dpi, >= 2.0 mm from the cell rules at 9 columns, Small and Big (BRKINK) (print critic r8 2026-11-07, lowest 6)",
-   "kind": "commit-pair",
-   "rule": "ws-simple-print --sweep SETSKILLDIFF / SETSHAPE / SHARES / BRKINK",
-   "browser": true,
-   "fail": {
-    "commit": "e0d7d1b09",
-    "state": "Sets 2 re-decided the ÷-form merge (÷ 15 against set 1's 20); the answer line printed 1.78 mm from the rule at Big, 9 columns (SETSHAPE 8, SETSKILLDIFF 6, SHARES 4, BRKINK 1)"
-   },
-   "pass": {
-    "commit": "cdaa80fc2",
-    "state": "facts-print-fix r8: sets reuse set 1's plan; the answer line and the mixed bracket room keep the printed ink >= 2.03 mm"
-   },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "e24-family",
-   "check": "LP-FAMILY-REPEAT: repeats are × / ÷ families and story frames, not strings (lesson 7 critic r1 D2: chart 2 \"20 marbles shared\" 20 ÷ 4 back on P4-2 as 20 ÷ 5; 6 × 4 / 24 ÷ 6; 30 ÷ 6 / 30 ÷ 5; spaced retrieval 4 × 5)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --lp LP-FAMILY-REPEAT (tests/lib/ws-lesson-lp.cjs familyRepeat): the unordered family {a, b, a·b} of every × / ÷ place plus the spaced-retrieval facts, and the story frame (total + object), each on one place",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
-    "state": "lesson 7 packet read on 92cd31f3 (the commit critic r1 graded): 4 families and 2 frames on two places"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
-    "state": "the same packet with the critic's fix applied by hand (fresh families and frames); lesson 7 is not fixed yet"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-FAMILY-REPEAT",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-text-no-x",
-   "check": "LP-TEXT: a \"no X this time\" script line fails when the page it names prints X (lesson 7 critic r1 D3: T5 §9 \"No step boxes this time\" over P5's Step 1 / Step 2 boxes); page codes resolve; Check Question choices = its \"four answers\"; \"Steps at the top\" names a page with a Steps band",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --lp LP-TEXT (textCheck)",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
-    "state": "lesson 7 on 92cd31f3: T5 says \"No step boxes this time\""
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
-    "state": "the critic's script line: \"This time you draw it. Then write Step 1 and Step 2 in the boxes.\""
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-TEXT",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-fallback",
-   "check": "LP-FALLBACK: a chart drawn below its sizing mode's floor (chartPage's silent fallback) fails (lesson 7 critic r1 D1: P2 at zoom 0.77, P2b at 0.7 in mode one)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --lp LP-FALLBACK: zoom from the DOM (.mq-cdraw), mode from the DOM (.mq-cfinalgrid final 0.85, .mq-cfinal grid3 0.8, else one / row 1) until the role reports sizing.mode",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.fail.json",
-    "state": "lesson 7 on 92cd31f3: charts at 0.77 / 0.7"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l7.pass.json",
-    "state": "the charts at zoom 1 (the critic's fix: measure the panel, zoom >= 1)"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --packet {fixture} --only LP-FALLBACK",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-numbers",
-   "check": "LP-NUMBERS: no bare 4+ digit number on a teacher page, no near-look pair on a pupil page (lesson 6 critic r3 n2 T3 \"4000\", n1 92,163 / 92,715 on P4-2)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --lp LP-NUMBERS (a wrong answer quoted \"80039 for 839\" and digits written into an H T O chart are bare by design)",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l6.fail.json",
-    "state": "lesson 6 packet read on e2994615 (the commit critic r3 graded)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-l6.pass.json",
-    "state": "n1 / n2 fixed by hand (4,000; 7,000; 47,715); not yet fixed on the branch"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --packet {fixture} --only LP-NUMBERS",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-prereq",
-   "check": "LP-PREREQ: every writing slot of a Prerequisite Check cell is filled on its key, and no check cell carries a scaffold (lessons-phase0 r1 D1 box + \"Answer:\" line with only the line keyed; D8 exchange box on a check item)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --lp LP-PREREQ (prereq): keyEmpty per P0-key cell, traces / grey ink / Say / Steps on P0 cells",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-prereq.fail.json",
-    "state": "seeded: lesson 3a P0 with the phase 0 D1 and D8 shapes (phase 0's own check page is on lf-engine's branch; the patch carries the same check there)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-lp-prereq.pass.json",
-    "state": "lesson 3a P0 as built on 623fdd6d"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --packet {fixture} --only LP-PREREQ",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-raster",
-   "check": "LP-RASTER: every dark stroked rule of a pupil page or key leaves ink on pdfium's raster at 72 and 93 dpi (L20; found on lesson 5 P5: the 1.5 pt band rule under the Workspace is gone at 72 dpi)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --raster / --lp LP-RASTER (PyMuPDF paths, pypdfium2 raster; dashed cut lines and teacher thumbnails left out)",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-raster.fail.pdf",
-    "state": "lesson 5 (g3-oa9-input-output-rule) P5 page, 623fdd6d seed 4242: 3 rules lost at 72 dpi"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-raster.pass.pdf",
-    "state": "lesson 6 P5 page (same page type), all 68 rules inked"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-input-output-rule --raster {fixture}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-giveaway",
-   "check": "LP-GIVEAWAY: no Say / Steps band holds an item's key answer; Guided carries a hint Independent does not (lesson 4 critic r1 D1 P5 Say \"So 28 is ___\", D2 exit Say \"So 44 is ___\", D6 Guided = Independent)",
-   "kind": "commit-pair",
-   "rule": "ws-detailed-lesson --lp LP-GIVEAWAY (giveaway)",
-   "browser": true,
-   "fail": {
-    "commit": "a890f61f",
-    "state": "lesson 4 r1 (graded by critic r1, 582f8efe)"
-   },
-   "pass": {
-    "commit": "8b4ec4ae",
-    "state": "lesson 4 critic r3 PASS"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa9-mult-table-patterns --lp --only LP-GIVEAWAY --out /tmp/mq-bt-lp-giveaway",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-modelled",
-   "check": "LP-MODELLED: every task kind and story situation dealt on Practice / exit is on the anchor chart (or the T4 board) first (lesson 2 critic r1 D3: \"add to\" practised, only \"put together\" modelled; lesson 1 r1 D1: words to numeral practised, never modelled)",
-   "kind": "commit-pair",
-   "rule": "ws-detailed-lesson --lp LP-MODELLED (modelled): pool rep by skill, stories by situation (groups / share / add / take / together / compare)",
-   "browser": true,
-   "fail": {
-    "commit": "43f9483d",
-    "state": "lesson 2 as critic r1 graded it"
-   },
-   "pass": {
-    "commit": "0e1c71a3",
-    "state": "lesson 2 critic r4 PASS"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g1-oa1-bar-model-wp-20 --lp --only LP-MODELLED --out /tmp/mq-bt-lp-modelled",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-measure",
-   "check": "LP-MEASURE: every rendered pupil page and key measured (text >= 8 pt, writing slots >= 8 mm, blank foot <= 8 %), never the planner's counts (L16 / L19; the fact-family merge left lesson 6's Practice pages 19 % blank)",
-   "kind": "commit-pair",
-   "rule": "ws-detailed-lesson --lp LP-MEASURE (measureCheck)",
-   "browser": true,
-   "fail": {
-    "commit": "6bc3cbd8",
-    "state": "merge of fact families: lesson 6 P4-1 / P4-2 and keys 45 mm blank foot (bisected, lf-checks 2026-11-07)"
-   },
-   "pass": {
-    "commit": "56cf789c",
-    "state": "its first parent: lesson 6 as passed"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g4-nbt1-ten-times-value --lp --only LP-MEASURE --out /tmp/mq-bt-lp-measure",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "lp-sweep",
-   "check": "LP-SWEEP: every seed 1-25 (x refresh when the builder takes it) through the built path, with the family / giveaway / modelled invariants (L21: the named case is not the input space; lesson 7 critic r1: E24 read one seed)",
-   "kind": "fixture",
-   "rule": "ws-detailed-lesson --sweep (live: builds seeds 1-25 in a detached document; --sweep-packets re-checks saved builds)",
-   "fail": {
-    "fixture": "tests/fixtures/precritic/lesson-sweep.fail.json",
-    "state": "lesson 3a (passed at seed 4242) on 623fdd6d, seeds 13 and 14: chart example 2 x 3 returns on Practice 1 (7 of 25 seeds)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/lesson-sweep.pass.json",
-    "state": "the same lesson and commit, seeds 1 and 2: clean"
-   },
-   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --sweep-packets {fixture}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

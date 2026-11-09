@@ -25,7 +25,7 @@
 
 import { esc, blank } from '../cell.js';
 import { register } from '../registry.js';
-import { SIZES } from '../tokens.js';
+import { SIZES, blankWidth } from '../tokens.js';
 
 export const DISK_SIZES = {
     S: { d: 8, head: 4, pt: 9 },
@@ -137,7 +137,7 @@ export function diskMatSVG({ places, counts = null, size = 'L', pxPerMm = 0, dis
  * Ink only: black on white, no fill, no colour (INK-1).
  * @param {number} n  a whole number >= 0
  */
-export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, size = '1.9em', heads: showHeads = true } = {}) {
+export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, size = '1.9em', heads: showHeads = true, tight = false } = {}) {
     const s = String(Math.floor(Math.abs(Number(n) || 0)));
     const cols = [];
     for (let i = 0; i < s.length; i++) {
@@ -150,12 +150,16 @@ export function numeralTracksHTML(n, { underline = 0, cut = 0, arrow = false, si
     const cutAt = (c) => cut && c.place === cut;
     const td = (inner, style = '') => `<td style="padding:0;text-align:center;${style}">${inner}</td>`;
     const heads = cols.map(c => c.comma ? td('', 'width:0.3em;')
-        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:1.6;font-weight:${cutAt(c) ? 700 : 400};`
+        // (`tight`, lf-placevalue r1 F1: a cell answered in place - name the place, write the value - sets the letters and
+        // the digits on their own line heights, so the cell is as tall as its ink and a page holds more rows)
+        : td(LETTER[c.place] || '', `width:2.2em;font-size:max(0.42em, 8pt);line-height:${tight === 'S' ? 1.1 : tight ? 1.25 : 1.6};font-weight:${cutAt(c) ? 700 : 400};`
             + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
-    const digits = cols.map(c => c.comma ? td(',', 'width:0.3em;')
+    // (critic r2 N5: the comma track takes the digits' line height - on the table's own line height it made every 4-digit
+    // row 1.7 mm taller at L, and the band 9,999 page lost its fill to 4 rows of 43 % bands)
+    const digits = cols.map(c => c.comma ? td(',', `width:0.3em;line-height:${tight ? 1.05 : 1.15};`)
         : td(c.place === underline
             ? `<span style="display:inline-block;line-height:1;border-bottom:0.08em solid #000;padding:0 0.04em 0.04em;">${c.digit}</span>` : c.digit,
-            'width:0.95em;line-height:1.15;' + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
+            `width:0.95em;line-height:${tight ? 1.05 : 1.15};` + (cutAt(c) ? `border-right:${cutPt}pt solid #000;` : ''))).join('');
     const table = `<table class="pv-tracks" style="border-collapse:collapse;display:inline-table;vertical-align:bottom;`
         + `color:#000;font-weight:700;">`
         + `${showHeads ? `<tr>${heads}</tr>` : ''}<tr>${digits}</tr></table>`;
@@ -281,7 +285,7 @@ function piece(ctx, seg) {
 }
 
 /** A frame line with the slot where the text has "____". */
-function frameHTML(ctx, text, key, digits) {
+function frameHTML(ctx, text, key, digits, ghostExpr = '') {
     const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits, graded: true, order: 0,
         scopes: ['full', 'answer-only'] }, ctx, key);
     // A frame is words and numbers on one line (RM-27): numbers and signs at the working digit
@@ -301,16 +305,163 @@ function frameHTML(ctx, text, key, digits) {
             if (/^\d[\d,.]*$/.test(pre[i]) && pre[i + 1] && !/^\d|^[+−×÷=≈→<>-]$/.test(pre[i + 1])) { chunks.push(pre[i] + ' ' + pre[i + 1]); i++; }
             else chunks.push(pre[i]);
         }
-        let lastN = pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
-        if (lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
+        // lf-placevalue (WRAP-OP, combine's lesson panels "400 + 60 + / 4 ="): an expression of numbers and
+        // signs only never breaks; the whole of it goes with the slot. A row too wide for its column is then
+        // measured as not fitting and the layout takes fewer columns (DN-10), never a broken expression.
+        // On a narrow screen the line may break only BEFORE "=": the expression is one group, "= ____" the other.
+        const exprOnly = pre.length > 2 && pre.every((w) => /^\d[\d,.]*$|^[+−×÷=≈-]$/.test(w));
+        if (exprOnly && /^[=≈]$/.test(chunks[chunks.length - 1] || '')) {
+            const eq = chunks.pop();
+            const expr = chunks.splice(0).join(' ');
+            chunks.push(expr, eq);
+        }
+        let lastN = exprOnly ? 1 : pre.length <= 2 ? chunks.length : Math.min(1, chunks.length);
+        if (!exprOnly && lastN < chunks.length && /^[=≈]$/.test(chunks[chunks.length - lastN] || '')) lastN++;
         const tail = chunks.splice(chunks.length - lastN).join(' ');
         const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
         const grp = `<span class="pv-slotgroup" style="${nb}">${piece(ctx, tail)}${slot}${piece(ctx, parts[1])}</span>`;
-        const head = chunks.map((c) => (c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
-        return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head}${grp}</div>`;
+        // lf-placevalue r1 F9 (AX-4, one geometry a section): `ghostExpr` - the widest expression the section deals - is
+        // drawn invisibly in the same grid area as the expression, so every item's expression is as wide as the widest,
+        // and every item wraps (or not) exactly as the widest does: one line on every cell, or two on every cell.
+        // (lf-placevalue r3 F1 / F2, H13 side bands: the expression is CENTRED in the ghost-sized box, not right-aligned on
+        // an "=" column - "800 + 10" in the box of "800 + 10 + 4" left 54-60 mm (30-34 %) on its left in a full-width row;
+        // centred, the spare width splits each side of the ink and every cell keeps the same box)
+        const ghostPair = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:center;align-items:end;">`
+            + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
+            + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
+        // lf-placevalue r2 (combine band=999999: "300,000 + 50,000 + 3,000 + 400 + 40 + 7" is wider than the page at L,
+        // even in one column): a section whose widest expression has six or more parts draws every expression on two
+        // fixed lines - the first half of the parts, then "+" opening the second half (a line never ends on a sign,
+        // WRAP-OP) - each line as wide as the same line of the widest expression, so every item keeps one geometry (F9)
+        // and the height never depends on the column width it is measured at.
+        const ghostNums = ghostExpr ? String(ghostExpr).trim().split(/\s+/).filter((w) => /^\d/.test(w)) : [];
+        const halves = (e, k) => {
+            const nums = String(e).trim().split(/\s+/).filter((w) => /^\d/.test(w));
+            return [nums.slice(0, k).join(' + '), nums.length > k ? '+ ' + nums.slice(k).join(' + ') : ''];
+        };
+        const splitPair = (c) => {
+            const k = Math.ceil(ghostNums.length / 2);
+            const [a, b] = halves(c, k);
+            const [ga, gb] = halves(ghostExpr, k);
+            const line = (v, g) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:end;align-items:end;">`
+                + `<span style="grid-area:1 / 1;${nb}">${v ? piece(ctx, v) : ''}</span>`
+                + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, g)}</span></span>`;
+            return `${line(a, ga)}<span class="pv-break" style="flex-basis:100%;height:0;"></span>${line(b, gb)}`;
+        };
+        const split = exprOnly && ghostNums.length >= 6;
+        // (lf-placevalue r2: a cell drawn three or more across - Reason It's A / B panels - is narrower than "400 + 60 + 4":
+        // there the expression wraps between its units, "+ 60" opening the next line, never a line ending on a sign)
+        const units = (c) => {
+            const nums = String(c).trim().split(/\s+/).filter((w) => /^\d/.test(w));
+            return nums.map((v, i) => `<span class="pv-pair" style="${nb}">${piece(ctx, (i ? '+ ' : '') + v)}</span>`).join('');
+        };
+        if (exprOnly && Number(ctx.columns) >= 3) {
+            // (critic r2 N7, AX-4 in a mixed review 3 across: "700 + 1 = ___" on one line beside "600 + 10 + 1 / = ___" on two.
+            // With the section's widest expression (`ghostExpr`), the units wrap inside a box as wide as the ghost's, the
+            // ghost drawn invisibly in the same grid area: every item is as wide and as tall as the widest, one geometry)
+            const ghostUnits = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;align-items:end;justify-items:center;max-width:100%;">`
+                + `<span style="grid-area:1 / 1;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(c)}</span>`
+                + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;row-gap:2mm;">${units(ghostExpr)}</span></span>`;
+            const head3 = chunks.map((c) => (c.includes(' ') ? (ghostExpr ? ghostUnits(c) : units(c)) : piece(ctx, c))).join('');
+            // (lf-placevalue r3, H13-ABS combine band=99: a two-part frame "30 + 6 = ____" is one short line, and three
+            // across at S the dense rows stretch it into a 35 % empty band under the ink. Three or more across, a
+            // frame of at most two parts puts "= ____" on its own line under the parts: the cell is as tall as its
+            // two lines of ink, the type never smaller)
+            const nParts = (ghostExpr ? ghostNums : String(chunks.join(' ')).trim().split(/\s+/).filter((w) => /^\d/.test(w))).length;
+            const brk = nParts <= 2 ? '<span class="pv-break" style="flex-basis:100%;height:0;"></span>' : '';
+            return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${head3}${brk}${grp}</div>`;
+        }
+        // (lf-placevalue r3, H13 side bands, combine Test at M two across: "800 + 80 + 8 = ____" is about 1 mm wider than
+        // the 86 mm cell, so "= ____" wrapped under a CENTRED two-part expression and both lines' ink was 34 mm of 86
+        // (30-31 % each side). Where the one-line frame cannot fit the cell (estimated from the working digit size and the
+        // kit's blank width), the frame is drawn on two STEPPED lines in one box as wide as the widest line: the expression
+        // from the box's left, "= ____" ending at its right - every item the same box, the ink spanning it)
+        if (exprOnly && ghostExpr && !split && Number(ctx.columns) >= 2 && ctx.metrics && ctx.metrics.digitPt) {
+            const em = (ctx.metrics.digitPt / 72) * 25.4;
+            const toks = String(ghostExpr).trim().split(/\s+/);
+            const digitsN = toks.join('').replace(/[^0-9]/g, '').length;
+            const commasN = toks.join('').replace(/[^,.]/g, '').length;
+            const opsN = toks.filter((t) => !/^\d/.test(t)).length;
+            const exprMm = em * (0.55 * digitsN + 0.25 * commasN + 1.57 * opsN);
+            const grpMm = em * 1.37 + blankWidth(Math.max(1, Number(digits) || 1), ctx.size);
+            const innerMm = 186 / Number(ctx.columns) - 6.6;
+            if (exprMm + em * 0.28 + grpMm > innerMm) {
+                const lineBox = (c) => `<span class="pv-pair pv-ghostpair" style="display:inline-grid;justify-items:start;align-items:end;grid-row:1;">`
+                    + `<span style="grid-area:1 / 1;${nb}">${piece(ctx, c)}</span>`
+                    + `<span class="pv-ghost" aria-hidden="true" style="grid-area:1 / 1;visibility:hidden;${nb}">${piece(ctx, ghostExpr)}</span></span>`;
+                const exprC = chunks.find((c) => c.includes(' ')) || chunks[0] || '';
+                const rest = chunks.filter((c) => c !== exprC).map((c) => piece(ctx, c)).join('');
+                return `<div class="ws-eq pv-frame pv-stepped" style="font-weight:700;justify-content:center;">`
+                    + `<span style="display:inline-grid;row-gap:1mm;align-items:end;">${lineBox(exprC)}`
+                    + `<span style="grid-row:2;justify-self:end;display:inline-flex;align-items:flex-end;column-gap:0.2em;">${rest}${grp}</span></span></div>`;
+            }
+        }
+        const head = chunks.map((c) => (exprOnly && ghostExpr && c.includes(' ') ? (split ? splitPair(c) : ghostPair(c))
+            : c.includes(' ') ? `<span class="pv-pair" style="${nb}">${piece(ctx, c)}</span>` : piece(ctx, c))).join('');
+        return `<div class="ws-eq pv-frame" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:${ghostExpr ? 1 : 2}mm;">${head}${grp}</div>`;
     }
     const body = parts.length > 1 ? parts.map(s => piece(ctx, s)).join(slot) : `${piece(ctx, text)}${slot}`;
     return `<div class="ws-eq pv-frame" style="font-weight:700;">${body}</div>`;
+}
+
+/**
+ * lf-placevalue r1 (F8, F10, F19, F20): the frame of the five read-and-write skills (`inPlace`). Each slot is one unit
+ * with the words that follow it up to the next sign ("[ ] hundreds", "[ ] × 100"), so a place word or the closing
+ * "× 1" never wraps away from its box; the row wraps only between units, a "+" starting the next line. Boxes are the
+ * writing height (class pv-hw: Hw + stroke from the size, not a fixed 14 mm), so S draws smaller boxes than L.
+ * `slotChars` gives every slot one width (value in unit form: both from the widest place word, F10), `slotLabels` a
+ * small label over each slot.
+ */
+function unitBlanksHTML(ctx, p, keys, floor) {
+    const parts = String(p.frame || '').split('____');
+    const numKeys = (keys || []).map((k) => String(k === undefined ? '' : k)).filter((k) => /^\d/.test(k));
+    // (`slotDigits`: a box that only ever holds one digit - unit form, expanded notation - is drawn for one, on every item)
+    const width = Number(p.slotDigits) > 0 ? Number(p.slotDigits) : Math.max(floor, ...numKeys.map((k) => k.replace(/[^0-9]/g, '').length), 1);
+    const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;column-gap:0.2em;';
+    const labels = Array.isArray(p.slotLabels) ? p.slotLabels : null;
+    const slotAt = (i) => {
+        const k = keys && keys[i] !== undefined ? String(keys[i]) : '';
+        const num = /^\d/.test(k);
+        const spec = { id: `b${i}`, kind: num ? 'number' : 'text', shape: 'box', digits: num ? width : Math.max(1, k.length || 1),
+            graded: true, order: i, scopes: ['full', 'answer-only'] };
+        // (`slotChars`: a word's box, as wide as that many handwritten letters at this size's writing height)
+        if (Number(p.slotChars) > 0) spec.widthMm = Math.ceil(Number(p.slotChars) * 0.5 * (ctx.metrics.writeMm || 8) + 4);
+        const b = blank(spec, ctx, k);
+        if (!labels || !labels[i]) return b;
+        return `<span class="pv-labslot" style="display:inline-flex;flex-direction:column;align-items:center;">`
+            + `<span class="pv-slotlabel" style="font-size:${pt(ctx.metrics.zonePt)};font-weight:400;line-height:1.15;margin-bottom:0.6mm;">${esc(labels[i])}</span>${b}</span>`;
+    };
+    // the words after slot i, split at a "+": what comes before it stays with slot i, the "+" opens slot i + 1's unit
+    const after = [];
+    const before = [''];
+    for (let i = 1; i < parts.length; i++) {
+        const seg = parts[i];
+        const k = i < parts.length - 1 ? seg.lastIndexOf('+') : -1;
+        after.push(k >= 0 ? seg.slice(0, k) : seg);
+        before.push(k >= 0 ? seg.slice(k) : '');
+    }
+    const units = [];
+    if (parts[0].trim()) units.push(`<span class="pv-pair" style="${nb}">${piece(ctx, parts[0])}</span>`);
+    for (let i = 0; i < parts.length - 1; i++) {
+        units.push(`<span class="pv-slotgroup pv-unit" style="${nb}column-gap:0.3em;">${before[i].trim() ? piece(ctx, before[i]) : ''}${slotAt(i)}${after[i].trim() ? piece(ctx, after[i]) : ''}</span>`);
+    }
+    // (`oneLine`: a short frame of slots and no place words - "worth [ ] [ ]", "worth [ ] × [ ]" - is one unit: its two
+    // answers never sit on two lines)
+    // (a frame of four or more places, or expanded notation, may wrap between its units - one line is wider than the
+    // page at L; a 3-place unit-form frame is one line, so a lesson anchor that scales its drawing to the panel scales it whole)
+    // (a cell drawn three or more across - Reason It's A / B panels - is narrower than any 3-place row: it wraps too)
+    // (lf-placevalue r2: and the opener's half-width Model cell, `wrapToCell`, measured wrapped there)
+    const narrow = Number(ctx.columns) >= 3 || !!ctx.wrapToCell;
+    // (lf-placevalue r2, value form=unit in a half-page lesson panel: "worth [how many] [place]" is 10 mm wider than the
+    // panel. A `oneLine` frame keeps its slots as ONE unit - the two answers never part - and only its lead word
+    // ("worth") may stand on the line above them when the row is wider than its cell)
+    if (p.oneLine && parts[0].trim() && units.length > 2) {
+        const slotsOnly = units.slice(1).join('');
+        return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:1mm;column-gap:0.3em;">`
+            + `${units[0]}<span class="pv-slotgroup" style="${nb}column-gap:0.3em;">${slotsOnly}</span></div>`;
+    }
+    const wrap = p.oneLine || (parts.length - 1 < 4 && !/×/.test(String(p.frame || '')) && !narrow) ? 'nowrap;white-space:nowrap' : 'wrap';
+    return `<div class="ws-eq pv-frame pv-blanks pv-hw" style="font-weight:700;flex-wrap:${wrap};justify-content:center;row-gap:2mm;column-gap:0.3em;">${units.join('')}</div>`;
 }
 
 /** A frame with several slots: each "____" is slot b0, b1 … keyed by `keys[i]`. */
@@ -364,12 +515,13 @@ function slotFloor(p, grow) {
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
-function ringRow(ctx, items, correct, sizePt) {
+function ringRow(ctx, items, correct, sizePt, tight = false) {
     const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
+    // (`tight`, lf-placevalue r1 F1: the words keep their size and their ring's room, with less air between the rows)
     const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
-        + `padding:0.8mm 2.2mm;margin:1mm 2mm;${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
+        + `padding:0.8mm ${tight ? 1.8 : 2.2}mm;margin:${tight ? '0.5mm 1mm' : '1mm 2mm'};${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
     return `<div class="pv-ring-row" style="font-size:${pt(sizePt || ctx.metrics.digitPt * 0.75)};font-weight:700;text-align:center;`
-        + `line-height:1.6;">${cells}</div>`;
+        + `line-height:${tight ? 1.35 : 1.6};">${cells}</div>`;
 }
 
 /** Check-box choices ("Round up / Round down", "Correct / Fix it"): the key ticks the right one. */
@@ -388,6 +540,25 @@ function expandHTML(p, ctx) {
     const digits = String(p.n).length;
     const boxes = parts.map((v, i) => blank({ id: `part${i}`, kind: 'number', shape: 'box', digits, graded: true, order: i,
         scopes: ['full', 'answer-only'] }, ctx, fmt(v)));
+    // (lf-placevalue r2: the opener's Model sits in the half-width Model cell, `wrapToCell` - there a 3-place row wraps too,
+    // between its units; it is measured wrapped in that cell, so the Model band is as tall as the drawing)
+    if (p.inPlace && (parts.length >= 4 || Number(ctx.columns) >= 3 || ctx.wrapToCell)) {
+        // lf-placevalue r1 F19: a 4- or 5-place frame at L is wider than the page (13-16 mm out of its cell). The row may
+        // wrap, only between its units: "4,230 =", the first box, then "+ [ ]" pairs - the sign starts its line and never
+        // ends one (WRAP-OP), and a box never parts from its sign. A row that fits stays one line.
+        const nb = 'display:inline-flex;align-items:flex-end;flex-wrap:nowrap;white-space:nowrap;';
+        // (lf-placevalue r3, H13-ABS expand band=99: three or more across, a 2-place row "47 = [ ] + [ ]" is one short
+        // line in a dense row stretched 35 % past it; there the number stands on its own line and "= [ ] + [ ]" under
+        // it, as combine's "30 + 6" / "= ____": the cell is as tall as its two lines of ink, the type never smaller)
+        const twoLine = parts.length <= 2 && Number(ctx.columns) >= 3 && !ctx.wrapToCell;
+        const units = (twoLine
+            ? [`<span class="pv-pair" style="${nb}"><span>${esc(fmt(p.n))}</span></span><span class="pv-break" style="flex-basis:100%;height:0;"></span>`,
+                `<span class="pv-pair" style="${nb}"><span class="o">=</span>${boxes[0] || ''}</span>`]
+            : [`<span class="pv-pair" style="${nb}"><span>${esc(fmt(p.n))}</span><span class="o">=</span></span>`]
+                .concat(boxes.slice(0, 1).map((b) => `<span class="pv-pair" style="${nb}">${b}</span>`)))
+            .concat(boxes.slice(1).map((b) => `<span class="pv-pair" style="${nb}"><span class="o">+</span>${b}</span>`));
+        return `<div class="ws-eq pv-expand" style="font-weight:700;flex-wrap:wrap;justify-content:center;row-gap:2mm;">${units.join('')}</div>`;
+    }
     // The kit's equation row: boxes bottom-aligned with the digits, `+` and `=` in 1 em slots (TY-25).
     return `<div class="ws-eq pv-expand" style="font-weight:700;">`
         + `<span>${esc(fmt(p.n))}</span><span class="o">=</span>`
@@ -492,8 +663,53 @@ function orderHTML(p, ctx) {
 
 const keyDigits = (kv) => Math.max(2, String(kv === undefined ? '' : kv).replace(/[^0-9]/g, '').length);
 
-register('pv', {
-    render(p, ctx0) {
+/**
+ * lf-placevalue r1 F3: finished work handed over as ONE string ("5 + 0 + 3", "3 hundreds 4 tens 5 ones": True or False?
+ * and Reason It pass the provider's wrong value with no per-slot values) is written SLOT BY SLOT, as a pupil writes it -
+ * never the whole statement in each box. Returns {slotId: value} or null when the string cannot be read against the frame.
+ */
+const reEsc = (t) => String(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function frameLiteral(seg) {
+    // a frame's words and signs, any spacing; a place word also matches its singular ("1 hundred")
+    return String(seg).trim().split(/\s+/).filter(Boolean)
+        .map((w) => (/^[a-z]+s$/i.test(w) ? `${reEsc(w.slice(0, -1))}s?` : reEsc(w))).join('\\s*');
+}
+export function pvSlotsFromWork(p, value) {
+    const v = String(value === undefined || value === null ? '' : value).trim();
+    if (!v || !p) return null;
+    if (p.kind === 'expand') {
+        const parts = v.split('+').map((t) => t.trim());
+        if (parts.length !== (p.parts || []).length) return null;
+        return Object.fromEntries(parts.map((t, i) => [`part${i}`, t]));
+    }
+    if ((p.kind === 'place' || p.kind === 'place-bank') && p.writeValue) {
+        const m = v.match(/^(.*?),\s*([\d,]+)$/);
+        return m ? { answer: m[1].trim(), value: m[2] } : { answer: v };
+    }
+    if (p.kind !== 'blanks') return null;
+    const parts = String(p.frame || '').split('____');
+    const n = parts.length - 1;
+    if (n < 2) return null;
+    const body = parts.slice(1, -1).map((seg) => `\\s*(.+?)\\s*${frameLiteral(seg)}`).join('') + `\\s*(.+?)\\s*${frameLiteral(parts[n])}\\s*$`;
+    for (const head of [frameLiteral(parts[0]), '']) {
+        let m = null;
+        try { m = v.match(new RegExp(`^\\s*${head}${body}`)); } catch (e) { m = null; }
+        if (m) return Object.fromEntries(Array.from({ length: n }, (_, i) => [`b${i}`, m[i + 1].trim()]));
+    }
+    // no frame match: the numbers in order, one a box
+    const nums = v.match(/\d[\d,]*/g) || [];
+    return nums.length === n ? Object.fromEntries(nums.map((t, i) => [`b${i}`, t])) : null;
+}
+
+function pvRender(p, ctx0) {
+    const h = pvRenderBody(p, ctx0);
+    // (`noTabSpacer`, a detailed lesson's ref - cellPayload, 2026-11-08 ws-detailed-lesson E11 / E9c: its rows centre the equation
+    // clear of the number tab, so the CL-40 top spacer of sheet-kit.css is left off - on the page and on the measuring cell alike)
+    return p.noTabSpacer ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
+}
+
+function pvRenderBody(p, ctx0) {
+    {
         // Finished work that is RIGHT arrives as state `wrong` with the whole answer and no
         // per-slot values: draw it as the key does, so a multi-slot cell never writes the whole
         // answer into each of its boxes.
@@ -507,35 +723,59 @@ register('pv', {
             const est = p.kind === 'estimate' ? String((p.keys || [])[2] === undefined ? '' : p.keys[2]).replace(/,/g, '') : null;
             if (noSlots && (String(w.value).replace(/,/g, '') === kvs.replace(/,/g, '') || (est !== null && String(w.value).replace(/,/g, '') === est))) {
                 ctx = Object.assign({}, ctx0, { state: 'answered' });
+            } else if (noSlots) {
+                const slots = pvSlotsFromWork(p, w.value);
+                if (slots) ctx = Object.assign({}, ctx0, { wrong: Object.assign({}, w, { slots }) });
             }
         }
         const m = ctx.metrics;
-        const numeral = (opt) => numeralTracksHTML(p.n, { ...opt, size: pt(m.digitPt) });
-        const center = (h) => `<div style="text-align:center;margin:1mm 0 2mm;">${h}</div>`;
+        // lf-placevalue r1 F1 (`inPlace`, the five read-and-write skills): the cell is as tall as its ink - the
+        // numeral on its own line heights, 1 mm under it - so the rows hold more items, never smaller type.
+        const tight = !!p.inPlace;
+        // (at S the letters and the gap under the numeral are tighter still: a value cell then packs 3 x 10 rows without
+        // a stretched band; M and L keep 1 mm, so their rows fill as they are dealt)
+        const numeral = (opt) => numeralTracksHTML(p.n, { ...opt, size: pt(m.digitPt), tight: tight && ctx.size === 'S' ? 'S' : tight });
+        const center = (h) => `<div style="text-align:center;margin:${tight ? (ctx.size === 'S' ? '0 0 0.5mm' : '0 0 1mm') : '1mm 0 2mm'};">${h}</div>`;
         const big = (h) => `<span style="font-size:${pt(m.digitPt)};font-weight:700;">${h}</span>`;
         const kv = typeof p.keyValue === 'number' ? fmt(p.keyValue) : p.keyValue;
         // A slot's width never tells the answer (round-3 re-grade): at least the longest number the
         // item prints, plus one where the answer can gain a digit (rounding, estimating).
-        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value'));
+        // (lf-placevalue critic r3b G2: unit form's rename frames - `rowOnly`, one full-width row each - are about 76 mm of ink at S,
+        // 30 % empty each side of a 185 mm cell; their write line takes two more digits at S, the same on every item, so the
+        // line never tells the answer and the row reads as one band across the page)
+        const digits = Math.max(keyDigits(kv), slotFloor(p, p.kind !== 'value')) + (p.rowOnly && ctx.size === 'S' ? 2 : 0);
         const top = p.hideNumeral ? '' : undefined;
         // "Name the place": the letter over the underlined digit IS the answer, so the letters are
         // a hint here and fade by page role — Model and Guided keep them, Independent, More
         // practice and Test print the bare numeral (P-7). The key is the pupil page's facsimile.
-        const nameHeads = (Number(ctx.scaffoldLevel) || 0) >= 2;
+        // lf-placevalue r1 F5 (VQ-8 paper = screen): the item's own `heads` (its support option: labels prints the letters,
+        // none does not) decides on every page, as the card, worksheet and quiz draw it; an item without one keeps the fade.
+        const nameHeads = p.heads !== undefined ? !!p.heads : (Number(ctx.scaffoldLevel) || 0) >= 2;
+        // F4 (owner 2026-10-10, `writeValue`): "Value ____" under the place, graded with the digit's value; its line is as
+        // long as the number's own digits allow (the leading digit's value), never the answer's own length (L3).
+        const valueLine = () => {
+            if (!p.writeValue) return '';
+            const nd = String(Math.trunc(Math.abs(Number(p.n) || 0))).length;
+            const slot = blank({ id: 'value', kind: 'number', shape: 'line', digits: Math.max(3, nd + 1), separators: nd >= 4 ? 1 : 0,
+                graded: true, order: 1, scopes: ['full', 'answer-only'] }, ctx, p.value === undefined ? '' : fmt(p.value));
+            return `<div class="ws-eq pv-frame pv-valueline" style="font-weight:700;justify-content:center;flex-wrap:nowrap;white-space:nowrap;column-gap:0.3em;">`
+                + `<span style="font-size:${pt(m.textPt + 3)};font-weight:400;padding-bottom:0.12em;">Value</span>${slot}</div>`;
+        };
         switch (p.kind) {
             case 'place':
-                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2)}</div>`;
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
             case 'place-bank': {
-                const bank = `<div class="pv-bank" style="display:table;margin:0 auto 2mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`
+                const bank = `<div class="pv-bank" style="display:table;margin:0 auto ${tight ? 1 : 2}mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`
                     + `font-size:${pt(m.textPt + 1)};font-weight:700;">${(p.words || []).map(esc).join('&nbsp;&nbsp;&nbsp;')}</div>`;
                 const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits: 9, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
-                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${bank}<div style="text-align:center;">${slot}</div></div>`;
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${bank}<div style="text-align:center;">${slot}</div>${valueLine()}</div>`;
             }
             case 'value':
-                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
+                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, ...(p.heads !== undefined ? { heads: !!p.heads } : {}) }))}${frameHTML(ctx, p.frame, kv, digits)}</div>`;
             case 'blanks': {
-                const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place })) : '';
-                return `<div class="pv-cell">${pic}${blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, false))}</div>`;
+                const pic = p.place && !p.hideNumeral ? center(numeral({ underline: p.place, ...(p.heads !== undefined ? { heads: !!p.heads } : {}) })) : '';
+                const fr = p.inPlace ? unitBlanksHTML(ctx, p, p.keys, slotFloor(p, false)) : blanksHTML(ctx, p.frame, p.keys, p.words, slotFloor(p, false));
+                return `<div class="pv-cell">${pic}${fr}</div>`;
             }
             case 'expand':
                 return `<div class="pv-cell">${expandHTML(p, ctx)}</div>`;
@@ -543,10 +783,15 @@ register('pv', {
                 const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits: 15, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 return `<div class="pv-cell"><div class="ws-eq pv-frame" style="font-weight:700;"><span>${esc(fmt(p.n))}</span><span class="o">=</span>${slot}</div></div>`;
             }
-            case 'frame':
+            case 'frame': {
                 // `slotDigits` fixes the slot's width for the whole skill, so a 3-digit answer (100)
                 // never gets a longer line than its neighbours.
-                return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${frameHTML(ctx, p.frame, kv, Math.max(digits, Number(p.slotDigits) || 0))}</div>`;
+                // (`ghost`, lf-placevalue r1 F9: "900 + 1 = ____" and "400 + 60 + 4 = ____" took a half-width cell and a
+                // full-width row on one page, sorted by height; every item now reserves the widest expression its band deals)
+                const dg = Math.max(digits, Number(p.slotDigits) || 0);
+                const fr = frameHTML(ctx, p.frame, kv, dg, p.ghost ? String(p.ghost).replace(/\s*=\s*_+\s*$/, '') : '');
+                return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${fr}</div>`;
+            }
             case 'compare': {
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
@@ -668,7 +913,11 @@ register('pv', {
             default:
                 return `<div class="pv-cell">${esc(p.frame || '')}</div>`;
         }
-    },
+    }
+}
+
+register('pv', {
+    render: pvRender,
     answerKey(p) {
         const value = p.keyValue !== undefined ? p.keyValue : '';
         const display = typeof value === 'number' ? value.toLocaleString('en-US') : String(value);
@@ -678,6 +927,11 @@ register('pv', {
         if (p.kind === 'order') (p.sorted || []).forEach((v, i) => { slots[`o${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'chart') (p.keys || []).forEach((v, i) => { slots[`d${i}`] = { value: String(v), graded: true }; });
         if (p.kind === 'expand-line' && p.also) slots.answer.accept.push(String(p.also));
+        // F4: identify's "Value ____" line (writeValue) is graded too; the short key names both answers
+        if ((p.kind === 'place' || p.kind === 'place-bank') && p.writeValue && p.value !== undefined) {
+            slots.value = { value: fmt(p.value), graded: true, accept: [String(p.value)] };
+            return { value, display: `${display}, ${fmt(p.value)}`, slots };
+        }
         return { value, display, slots };
     },
     footprint(p, ctx) {
@@ -695,6 +949,30 @@ register('pv', {
         // numeral plus four one-line names.
         if (p.kind === 'word-choice' && wide) {
             return { wMm: 186, hMm: { S: 62, M: 70, L: 80 }[ctx.size] || 80, measure: false, factLike: false, maxCols: 1 };
+        }
+        // lf-placevalue r1 F1: the five read-and-write skills are answered IN PLACE (ring a word, write in a box or on a
+        // line): no working space, so rows pack to the measured height (`denseRoom` 1) and never stretch far past it
+        // (`inPlace`, layout IN_PLACE_FILL) - the page takes more rows instead of a 34-55 % band in every cell. A frame
+        // that may wrap (`inPlace` expand / unit form) is measured at every column count, never forced to one.
+        if (p.inPlace) {
+            // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
+            // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
+            // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
+            if (p.rowOnly) return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true, hardCap: true };
+            // (lf-placevalue r3, H13 side bands: at S a 2-place expanded row "47 = [ ] + [ ]" is a third of the full width - it
+            // may stand more across where the measured fit allows (three across it is drawn on two lines, expandHTML);
+            // M and L, and 3 places and more, keep the full-width row: two across the 2-column grid takes 8 rows, and
+            // their one line of ink left a 45 % band under it)
+            const wideIn = (p.kind === 'expand' && (nd > 2 || ctx.size !== 'S')) || p.kind === 'expand-line';
+            // (lf-placevalue r3, H13-ABS combine band=99 at S: a two-part frame is one 14.5 mm line, so the S dense page
+            // (30) stretched 3 x 10 rows 35 % past it, and its two-line form ("30 + 6" / "= ____", three or more across)
+            // in 5 x 6 rows held to the 82 % page fill left 33 %. Held to three across, the two-line cells take 3 x 9 rows
+            // as tall as their ink: 27 a page, every cell full)
+            const twoPart = p.kind === 'frame' && p.ghost && String(p.ghost).split(/\s+/).filter((w) => /^\d/.test(w)).length <= 2;
+            // (lf-placevalue r3 F2: held to 3 across at S, "10 + 4" / "= ____" in a 62 mm cell left 32-35 % each side; four
+            // across, the two-line frame fills its 46 mm cell - the layout still takes fewer where the measured fit says so)
+            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true };
+            return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}) };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },

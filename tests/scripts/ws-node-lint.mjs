@@ -47,6 +47,19 @@
 //   WRONG-FITS      the provider's wrongAnswer(q) has no more digits than the answer boxes the item's cell declares
 //                   (payload ansDigits / boxes): a NODE ESTIMATE - an item with no declared box count, or a non-number
 //                   wrong answer, is not judged (the browser lint L-ANSAREA measures write-on lines). Critic r1 D9 class.
+//   WRONG-FITS-SLOTS (lf-placevalue critic r1 F3, lead ruling D1 2026-11-07; opt-in) the per-slot form of WRONG-FITS: for an
+//                   item whose cell has TWO OR MORE graded write-in slots (data-ws-slot of shape box / line / cell / open /
+//                   strip; choice, ring, check, mark and draw zones are not written in), wrongAnswer(q) gives one value per
+//                   slot (`slots: {id: value}`; kind no-slot-value) and each value fits its slot (kind slot-too-long: its
+//                   digits within the slot's digit segments, its width at the cell's digit size within the slot's printed
+//                   width + 10 %, a node estimate). One-slot items stay WRONG-FITS's.
+//   WRONG-FILL      (lf-placevalue critic r1 F3; opt-in) what the True or False? and Reason It roles PRINT in each slot of a
+//                   false statement: each role's prepare() runs on the item with its real code, its call to the item's draw
+//                   is captured ({shown, shownSlots}) and the cell is drawn as print-sheet draws it (state wrong, wrong =
+//                   {value: shown, slots: shownSlots}); each graded write-in slot's printed text must fit the slot (kind
+//                   role-too-long) and a multi-slot cell may not print the whole statement in every slot (kind
+//                   whole-in-every-slot: "5 + 0 + 3" in each of three boxes).
+//                   --rule-skills a:b,c:d runs these two only on those skills (ws-precritic passes the opted-in lane's).
 //
 // Baseline: design/audit/baselines/node-lint.json pins today's FINDING KEYS per skill (critic r1 D5), not counts. A key
 // is rule|kind|#item|signature: the dealt item (seed hashSeed(category:skill) + index, so stable) and the normalised
@@ -79,7 +92,7 @@ const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? S
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
 // Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
 // ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
-const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS'];
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'WRONG-FITS-SLOTS', 'WRONG-FILL'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -90,6 +103,8 @@ const RULE_CITES = {
     'LESSON-DATA': 'critic pilot-su-c r1 D4 (H3): "No lesson data for this skill yet" - the lesson page falls back to earlierSkills',
     'OPTION-HELP': 'critic pilot-su-c r2 N3 (OC3 family): the option help names only values the panel offers',
     'WRONG-FITS': 'SKILL_CELL_CONTRACT wrongAnswer (SCC 3.8); PT-ERR: the error-analysis key writes the wrong answer in the item slot',
+    'WRONG-FITS-SLOTS': 'critic lf-placevalue r1 F3 (H2): a multi-slot cell takes one wrong value per slot, each fitting its slot (SCC 3.8 wrongAnswer slots)',
+    'WRONG-FILL': 'critic lf-placevalue r1 F3 (H2): True or False? / Reason It write one wrong value per slot, never the whole statement in each box',
 };
 const RETRIES = 12;                 // print-sheet.js generateRun: duplicate retries per item
 
@@ -468,6 +483,51 @@ export function wrongFitsSlot(wrong, payload) {
     return { judged: true, fits: digits <= boxes, digits, boxes };
 }
 
+/**
+ * The graded WRITE-IN slots of a drawn cell (WRONG-FITS-SLOTS / WRONG-FILL): every element with data-ws-slot whose shape is
+ * written in (not choice / ring / check / mark / draw / tick) and not data-ws-graded="0", with its printed text (tags out,
+ * entities decoded), its digit segments ([data-ws-seg] children) and its declared width in mm (`--w:Xmm` or width:Xmm).
+ * A slot nested in another slot is its own entry; the outer one is not written in when it holds slots.
+ */
+const NOT_WRITTEN = new Set(['choice', 'ring', 'check', 'mark', 'draw', 'tick', 'circle']);
+export function writeSlots(html) {
+    const s = String(html || '');
+    const out = [];
+    const re = /<([a-z][a-z0-9]*)\b([^>]*\bdata-ws-slot="([^"]*)"[^>]*)>/gi;
+    let m;
+    while ((m = re.exec(s))) {
+        const [open, tag, attrs, id] = m;
+        const shape = (/\bdata-ws-shape="([^"]*)"/.exec(attrs) || [])[1] || '';
+        if (NOT_WRITTEN.has(shape) || /\bdata-ws-graded="0"/.test(attrs)) continue;
+        // the element's inner html: balanced on its own tag name
+        let depth = 1, i = m.index + open.length, end = s.length;
+        const tre = new RegExp(`<(/?)${tag}\\b[^>]*?(/?)>`, 'gi');
+        tre.lastIndex = i;
+        let t;
+        while ((t = tre.exec(s))) { if (t[2]) continue; depth += t[1] ? -1 : 1; if (!depth) { end = t.index; break; } }
+        const inner = s.slice(i, end);
+        if (/\bdata-ws-slot="/.test(inner)) continue;
+        const wm = /--w:\s*([\d.]+)mm/.exec(attrs) || /(?:^|[;"\s])width:\s*([\d.]+)mm/.exec(attrs);
+        out.push({ id, shape, widthMm: wm ? Number(wm[1]) : null, segs: (inner.match(/data-ws-seg/g) || []).length, text: decodeEntities(inner.replace(/<[^>]*>/g, '')).replace(/\s+/g, ' ').trim() });
+    }
+    return out;
+}
+/** A node estimate of a value's printed width in mm at `pt` (Andika: digits 0.55 em, letters 0.5, space 0.28, signs 0.6). */
+export function textWidthMm(text, pt) {
+    let em = 0;
+    for (const ch of String(text || '')) em += /\d/.test(ch) ? 0.55 : /\s/.test(ch) ? 0.28 : /[a-z]/i.test(ch) ? 0.5 : /[,.]/.test(ch) ? 0.28 : 0.6;
+    return em * pt * 0.3528;
+}
+/** Does `value` fit slot `sl` ({widthMm, segs}) at digit size `pt`? {judged, fits, why} */
+export function fitsWriteSlot(value, sl, pt) {
+    const v = String(value == null ? '' : value).trim();
+    if (!v) return { judged: false };
+    if (sl.segs > 0) { const d = v.replace(/[^0-9]/g, '').length; return { judged: true, fits: d <= sl.segs && !/[^0-9,\s]/.test(v), why: `${d} digit(s) in ${sl.segs} segment(s)` }; }
+    if (!sl.widthMm) return { judged: false };
+    const w = textWidthMm(v, pt);
+    return { judged: true, fits: w <= sl.widthMm * 1.1, why: `${Math.round(w * 10) / 10} mm of text in a ${sl.widthMm} mm ${sl.shape || 'slot'}` };
+}
+
 function selfTest() {
     const fails = [];
     const eq = (got, want, what) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${what}: expected ${w}, got ${g}`); };
@@ -571,6 +631,16 @@ function selfTest() {
     eq(wrongFitsSlot('1,234', { ansDigits: 4 }).fits, true, 'S1: a comma takes no box');
     eq(wrongFitsSlot('12', {}).judged, false, 'S1: no declared boxes is not judged');
     eq(wrongFitsSlot('8 R 5', { ansDigits: 2 }).judged, false, 'S1: a non-number is not judged');
+    // WRONG-FITS-SLOTS / WRONG-FILL (lf-placevalue critic r1 F3)
+    const three = '<span class="ws-box" style="--w:20mm" data-ws-slot="part0" data-ws-shape="box">5 + 0 + 3</span> + <span class="ws-box" style="--w:20mm" data-ws-slot="part1" data-ws-shape="box">5 + 0 + 3</span>'
+        + '<span data-ws-slot="choice" data-ws-shape="ring">A</span><span data-ws-slot="x" data-ws-shape="box" data-ws-graded="0">9</span>';
+    eq(writeSlots(three).map((x) => [x.id, x.widthMm, x.text]), [['part0', 20, '5 + 0 + 3'], ['part1', 20, '5 + 0 + 3']], 'F3: two write-in boxes read, ring and ungraded slot out');
+    eq(writeSlots('<div data-ws-slot="answer" data-ws-shape="open"><i data-ws-seg></i><i data-ws-seg></i></div>').map((x) => x.segs), [2], 'F3: digit segments counted');
+    eq(writeSlots('<div data-ws-slot="outer" data-ws-shape="open"><span data-ws-slot="b0" data-ws-shape="box" style="width:12mm">7</span></div>').map((x) => x.id), ['b0'], 'F3: an outer slot holding slots is not written in');
+    eq(fitsWriteSlot('5 + 0 + 3', { widthMm: 20, segs: 0, shape: 'box' }, 22).fits, false, 'F3: a whole expression does not fit a 20 mm box at 22 pt');
+    eq(fitsWriteSlot('500', { widthMm: 20, segs: 0, shape: 'box' }, 22).fits, true, 'F3: one part fits a 20 mm box');
+    eq(fitsWriteSlot('145', { widthMm: null, segs: 2 }, 22).fits, false, 'F3: 3 digits in 2 segments');
+    eq(fitsWriteSlot('', { widthMm: 20 }, 22).judged, false, 'F3: an empty value is not judged');
     if (fails.length) {
         for (const f of fails) console.log('  ' + f);
         console.log(`ws-node-lint --self-test: FAIL (${fails.length})`);
@@ -1127,6 +1197,82 @@ function ruleWrongFits(key, cat, skill, cells) {
     if (judged) tick('WRONG-FITS', judged); else skip('WRONG-FITS', 'no item with a declared box count and a number wrong answer (skills)');
 }
 
+/** The graded write-in slots an item's pupil cell draws, and the digit size they print at (M, as `cells[i].html`). */
+const slotsOf = (c) => writeSlots(c.html);
+const PT_M = () => ctxFor('M').metrics.digitPt;
+
+/**
+ * WRONG-FITS-SLOTS (lf-placevalue critic r1 F3): a multi-slot cell's wrongAnswer gives one value per graded write-in slot,
+ * and each value fits its slot.
+ */
+function ruleWrongFitsSlots(key, cat, skill, cells) {
+    let p = null;
+    try { p = kit.getProvider(cat, skill); } catch (e) { p = null; }
+    if (!p || typeof p.wrongAnswer !== 'function') { skip('WRONG-FITS-SLOTS', 'no provider wrongAnswer (skills)'); return; }
+    let judged = 0;
+    cells.forEach((c, i) => {
+        const sl = slotsOf(c);
+        if (sl.length < 2) return;
+        let w = null;
+        mute();
+        try { w = p.wrongAnswer(c.q); } catch (e) { w = null; } finally { unmute(); }
+        if (!w || w.value === undefined || w.value === null) return;
+        judged++;
+        const slots = (w.slots && typeof w.slots === 'object') ? w.slots : {};
+        const missing = sl.filter((x) => slots[x.id] === undefined || slots[x.id] === null || String(slots[x.id]) === '');
+        if (missing.length) { find(key, 'WRONG-FITS-SLOTS', i, 'no-slot-value', `wrongAnswer "${clip(String(w.display !== undefined ? w.display : w.value), 40)}" gives no value for slot(s) ${missing.map((x) => x.id).join(', ')} of ${sl.length}: the role writes the whole value into each (answer ${c.q.ans})`, `${missing.map((x) => x.id).join(',')}`); return; }
+        for (const x of sl) {
+            const r = fitsWriteSlot(slots[x.id], x, PT_M());
+            if (r.judged && !r.fits) { find(key, 'WRONG-FITS-SLOTS', i, 'slot-too-long', `wrongAnswer slot ${x.id} "${clip(String(slots[x.id]), 30)}" does not fit: ${r.why} (answer ${c.q.ans})`, `${x.id}`); break; }
+        }
+    });
+    if (judged) tick('WRONG-FITS-SLOTS', judged); else skip('WRONG-FITS-SLOTS', 'no item with two or more write-in slots and a wrong answer (skills)');
+}
+
+/**
+ * WRONG-FILL (lf-placevalue critic r1 F3): what the True or False? and Reason It roles PRINT in each write-in slot of a
+ * false statement - each role's own prepare(), its draw call captured, the cell drawn as print-sheet's `draw` does.
+ */
+const ROLE_FILL = {};
+async function loadRoleFill() {
+    if (ROLE_FILL.loaded) return;
+    ROLE_FILL.loaded = true;
+    for (const r of ['true-false', 'reason-it']) { try { ROLE_FILL[r] = await import(M(`sheet/roles/${r}.js`)); } catch (e) { ROLE_FILL[r] = null; } }
+}
+function ruleWrongFill(key, cells) {
+    const roles = ['true-false', 'reason-it'].filter((r) => ROLE_FILL[r] && typeof ROLE_FILL[r].prepare === 'function');
+    if (!roles.length) { skip('WRONG-FILL', 'no true-false / reason-it role in this tree (skills)'); return; }
+    let judged = 0;
+    cells.forEach((c, i) => {
+        if (!c.kit) return;
+        const sl = slotsOf(c);
+        if (!sl.length) return;
+        for (const role of roles) {
+            const calls = [];
+            const it = { q: c.q, template: c.template, footprint: {}, key: {}, render: (cx, o) => { calls.push(o || {}); return ''; } };
+            let prep = null;
+            mute();
+            try { prep = ROLE_FILL[role].prepare(it, { wrong: role === 'true-false', seed: 1, index: i }); if (prep) prep.render(ctxFor('M')); } catch (e) { prep = null; } finally { unmute(); }
+            if (!prep) continue;
+            const ans = String(c.q.ans);
+            const wrongCalls = calls.filter((o) => o.shown !== undefined && o.shown !== null && String(o.shown) !== '' && String(o.shown) !== ans);
+            for (const o of wrongCalls) {
+                let html = '';
+                mute();
+                try { html = kit.renderCell(c.q, Object.assign({}, ctxFor('M'), { state: 'wrong', wrong: { value: String(o.shown), slots: Object.assign({}, o.shownSlots || {}) } })); } catch (e) { html = ''; } finally { unmute(); }
+                const printed = writeSlots(html);
+                if (!printed.length) continue;
+                judged++;
+                const whole = String(o.shown).replace(/\s+/g, ' ').trim();
+                if (printed.length >= 2 && printed.every((x) => x.text === whole)) { find(key, 'WRONG-FILL', i, 'whole-in-every-slot', `${role}: the false statement "${clip(whole, 30)}" is printed whole in each of the cell's ${printed.length} slots (${printed.map((x) => x.id).join(', ')}); write one value per slot (answer ${ans})`, role); continue; }
+                const bad = printed.map((x) => ({ x, r: fitsWriteSlot(x.text, x, PT_M()) })).find((y) => y.r.judged && !y.r.fits);
+                if (bad) find(key, 'WRONG-FILL', i, 'role-too-long', `${role}: slot ${bad.x.id} prints "${clip(bad.x.text, 30)}": ${bad.r.why} (answer ${ans})`, `${role}|${bad.x.id}`);
+            }
+        }
+    });
+    if (judged) tick('WRONG-FILL', judged); else skip('WRONG-FILL', 'no item the True or False? / Reason It roles print a false statement into (skills)');
+}
+
 function ruleRepeats(key, cells) {
     const page = cells.slice(0, PAGE).map((c) => c.q);
     if (page.length < 2) { skip('REPEATS', 'fewer than 2 items dealt'); return; }
@@ -1144,6 +1290,8 @@ function ruleRepeats(key, cells) {
 /* ============================================================================== run */
 
 const T1 = Date.now();
+const RULE_SKILLS = argAll('--rule-skills');
+if (rules.includes('WRONG-FILL')) await loadRoleFill();
 for (const subject of subjects) {
     const items = deal(subject);
     if (!items.length) { for (const r of rules) skip(r, 'skill dealt no items (skills)'); continue; }
@@ -1159,6 +1307,10 @@ for (const subject of subjects) {
     if (rules.includes('LESSON-DATA')) { if (subject.fixture) skip('LESSON-DATA', 'fixture (skills)'); else ruleLessonData(subject.key, cat, skill); }
     if (rules.includes('OPTION-HELP')) { if (subject.fixture) skip('OPTION-HELP', 'fixture (skills)'); else ruleOptionHelp(subject.key, cat, skill); }
     if (rules.includes('WRONG-FITS')) ruleWrongFits(subject.key, cat, skill, cells);
+    // --rule-skills a:b,c:d: the lf-placevalue opt-in rules judge only these skills (ws-precritic passes the lane's own)
+    const ruleSkillOk = !RULE_SKILLS.length || RULE_SKILLS.includes(subject.key);
+    if (rules.includes('WRONG-FITS-SLOTS')) { if (ruleSkillOk) ruleWrongFitsSlots(subject.key, cat, skill, cells); else skip('WRONG-FITS-SLOTS', 'not in --rule-skills (skills)'); }
+    if (rules.includes('WRONG-FILL')) { if (ruleSkillOk) ruleWrongFill(subject.key, cells); else skip('WRONG-FILL', 'not in --rule-skills (skills)'); }
 }
 const RUN_MS = Date.now() - T1;
 

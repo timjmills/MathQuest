@@ -831,6 +831,46 @@ Details and the reflection: design/status/s1-checks.md.
 | critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
 | simple-print-2 critic r1 FAIL (C2 6, C3 7) | Aim = Exactly; Tables-to band shown as Highest number; × 6–8 column cycle; footer label; "Facts" for column work; key PNG captured the app | EXACT (differs), WITHIN 12-admitted, FACTPATTERN (backtest: old gen FAILs whole columns at M), FOOTER options, SUMMARY Facts naming, evidence asserts Answer Key | the builder's own render pass looked at page 1 only: read every PNG incl. the key, and run each mode pair through a "plans differ" check before the critic |
 
+### lf-placevalue critic r1 (2026-11-07): FAIL on all five pv skills (lesson #1)
+**Automatic checks** (critic findings a machine could have measured; owner of each below):
+- F1 H13 absolute band: print-lint H13 compares a cell with its row only; proposed H13-ABS (band under the lowest ink ≥ 30 % of the cell, less Hw) — backtest value independent L 34 %. Owner: checks lane (shared print-lint).
+- F2 / F18 opener and lesson overflow / fill: ws-grade-render --gate and print-lint PAGEFILL run only on lesson / test / independent in precritic --skill; extend to every §7a-offered role. Owner: precritic --skill rows (lf-placevalue holds the R2 parser; extension asked of the lead).
+- F3 wrongAnswer one string in every slot: node-lint WRONG-FITS checks one slot; make it per slot. Owner: checks lane.
+- F4 owner ruling with no assert (identify writeValue): card rulings todo T-5.1 → a ws-card-rulings assert (graded value slot). Owner: lf-placevalue (reader is ours).
+- F5 / F6 paper ≠ screen heads / answer kind: proposed host-parity check. Owner: checks lane.
+- F7 screen numeral size: proposed SCREEN-DIGIT in ws-screen-slots. Owner: checks lane.
+- F8 Size S ignored: ws-columns --sizes exists but is not on precritic's --skill path. Owner: precritic --skill rows.
+- F9 two cell geometries in one section: GRID-EVEN scoped to fact grids; widen to every kit section. Owner: checks lane.
+- F10 slot width tells the answer: proposed SLOT-W-EQUAL in ws-slot-clip. Owner: checks lane.
+- F11 "1 hundreds": proposed providers-unit PLURAL rule. Owner: lf-placevalue (pv provider tests).
+- F12 × on grade-2 steps; F13 model item on the ones place; F14 step k draws the first k answers: providers-unit rules. Owner: lf-placevalue.
+- F15 draw zone too small: proposed DRAW-CAP in ws-slot-clip. Owner: checks lane.
+- F16 offered role that cannot render (stretch): ws-card-rulings --check offered should render each offered role. Owner: lead ruling first.
+- F19 / F20 band values and wraps on option renders: options-verify --render covers appearance values only; add band + WRAP. Owner: checks lane.
+- F22 dealer per page: ws-dealer-uniform per page for case mix. Owner: checks lane.
+
+**Speed-ups:**
+- The pv card's §7a offered every role and host, but the precritic --skill path renders only 3 roles: 12 of 23 findings were on roles no gate rendered. Fix: precritic --skill renders every §7a-offered role (one change, saves a critic round per family).
+- First family on a template had no siblings: 90 rows went to the critic by hand (lead R1); the critic ran 47 min. Fix: the first family's critic gets the rows sampled by the brief (done) — keep.
+- Builder strength right (medium); waits: browser slots shared with precritic (~2 min a gate). No owner-question delays (lead answered within 10-20 min).
+
+### lf-placevalue critic r2 (2026-11-07): FAIL on all five pv skills; rule 7 stop (N7, N8 survived two medium rounds)
+**Which earlier check would have caught each finding, or why none did:**
+- N1 (identify T/F key wrong): node-lint WRONG-FILL ran the real roles but only for multi-slot WRITE-IN cells; identify's ring + value line was
+  not in its set, and providers-unit's distractor test compared joined strings. Now WRONG-DIFFERS per slot (L27).
+- N2 (instruction): no check read the item-less print path; providers-unit tested q.printText only. Now PRINTED-INSTRUCTION (L28).
+- N3 (combine band 99 one-part): ws-dealer-uniform and content-audit ran the default band only. Now COMBINE-PARTS on every band (L29).
+- N4 ("hundreds" on 2-digit): VQ-LIVE ran at the default band 999 only — proposed at every band.
+- N5 / N6 (band pages with 43–57 % bands): H13-ABS ran on default pages; options-render --bands judged rises against the default page,
+  which shared the finding — proposed per page, absolute.
+- N7 (two layouts in review): GRID-EVEN-ALL was wired to independent pages only — proposed on every offered role.
+- N8 (2 columns ignored): the matrix more-cols2 rows were PENDING(no-baseline), so nothing judged them — proposed judged rows.
+**Speed-ups:**
+- The single biggest loss of the lane: cells were tuned on default pages for two rounds before the plan-from-card gate showed 548 option
+  OVERFLOWs (L26). Next family: run `ws-cell-checks --card --card-opts` on every skill BEFORE the first critic.
+- A 2-round loss on N7 / N8 because the gates that would show them (GRID-EVEN-ALL on review, more-cols2 rows) were opt-in on the wrong roles
+  or PENDING: wire a lane's opt-in rules on EVERY §7a-offered role, not the three default ones.
+- Builder / critic strength right (medium); critic r2 35 min; one builder round 63 min; precritic 50 min (the plan-from-card gates add ~20).
 ### lf-checks · critic r1 (2026-11-07, FAIL 7 / 7 / 8 / 8: the lesson precritic checks)
 
 Full report: design/status/lf-checks/critic-r1.md.
@@ -867,3 +907,20 @@ ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or ta
 
 **Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
 re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.
+
+### lf-placevalue critic r3 / r3b (2026-11-08): expand PASS; identify, value, combine, unit_form FAIL (one or two pv findings each)
+**Which earlier check missed each finding, or why none did:** F3 / G1 (lesson vocabulary data) — LESSON-DATA checks only that the
+entry exists and its refs are live, never the pictures or meanings: proposed rules in LESSONS_LEARNED. F4 — the N2 instruction check
+covered pages, not lesson section headings. F1 / F2 — ws-empty-band EB-SIDE caught them in precritic r5 but the lane sent the red
+[pv] rows to the critic as "owned elsewhere": process fix, a [pv] row is never owned elsewhere. G2 — option variants rendered at L only.
+**Speed-ups:** the first r3 critic timed out (50 min) on the full matrix; splitting the batch by skill across two critics finished it.
+Next family: one critic per 2-3 skills, rendered in parallel slots. The detailed lessons are not deterministic across runs of the same
+code (hash check impossible): give buildDetailedLesson a seeded, deterministic path (lf-engine).
+
+### lf-placevalue deploy hold (2026-11-08): lesson 1 regressed on the lane's pv changes
+**Which check missed it:** none on the lane's path built a detailed lesson; the lead's deploy gate (`ws-detailed-lesson --check`)
+was the first. **Lost:** one deploy cycle and a stopped targeted critic (r3c, killed when the hold arrived). **Fix:** the five passed
+detailed lessons that deal a pv skill are opt-in precritic rows (opt-in-rules.json), backtest `pv-detailed-lesson-1`.
+**Speed-ups:** bisect by copying one changed file at a time into a clean master worktree with a 40 s probe (the lesson sheet's item
+count) instead of the 2 min full gate: the CSS file was found in four probes. A probe that `git stash`es while a background gate runs
+is unsafe: use a second worktree.

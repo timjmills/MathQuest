@@ -13,6 +13,8 @@
 //                                          (option values on --opt-roles, default lesson,independent,guided,test,review)
 //   node tests/scripts/ws-cell-checks.cjs --skills k --roles reason-it,test --size S,L --opts '{"forms":[1]}'
 //   node tests/scripts/ws-cell-checks.cjs --rules BAND,SLOT        # only these rules count
+//   node tests/scripts/ws-cell-checks.cjs --rules OVERFLOW,TAGINK   # only these rules count
+//   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --h13-abs [--rule-skills k]   # + H13-ABS on option pages (opt-in, N6)
 //   node tests/scripts/ws-cell-checks.cjs --self-test              # planted pages, each rule must fire / stay quiet
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows); the card plan is read from that tree.
 // Last line `ws-cell-checks: OK (...)` / `FAIL - n finding(s) ...`; exit 1 on FAIL (--report-only: 0).
@@ -33,6 +35,12 @@ const RULES = list(arg('rules', has('interim') ? 'OVERFLOW,BAND,SLOT,TAGINK,KEYJ
 const SIZES = list(arg('size', 'S,M,L'));
 // the titles a signed card decided ({skill, opts, iCan, source}); the TITLE rule holds the page to them
 const DECIDED = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e) { try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e2) { return []; } } })();
+// --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
+// (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
+const H13ABS = has('h13-abs') || has('h13-abs-all');
+if (H13ABS && !RULES.includes('H13-ABS')) RULES.push('H13-ABS');
+const RULE_SKILLS = list(arg('rule-skills', ''));
+const h13On = (j) => H13ABS && (has('h13-abs-all') || !!j.variant) && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const optsKey = (o) => (o ? JSON.stringify(o) : '');
@@ -61,6 +69,10 @@ function selfTest() {
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         { name: 'row of 2 then a full-width cell (GRIDEVEN)', html: page(cell({ h: 36, width: 90 }) + cell({ h: 36, width: 90 }) + cell({ h: 36, width: 186 })), want: 'GRIDEVEN', role: 'independent' },
         { name: 'one cell width (GRIDEVEN control)', html: page(cell({ h: 36, width: 90 }) + cell({ h: 36, width: 90 })), want: null, role: 'independent', rules: ['GRIDEVEN'] },
+        // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
+        { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
+        { name: 'a row sized to its ink (H13-ABS control)', html: page(cell({ h: 36, val: '7' })), want: null, h13abs: true, rules: ['H13-ABS'] },
+        { name: 'the 60 mm cell with the rule off (H13-ABS opt-in control)', html: page(cell({ h: 60, val: '7' })), want: null, rules: ['H13-ABS'] },
         { name: 'off the page (OVERFLOW)', html: page(`<div class="c" data-ws-cell="arrays" style="height:30mm;width:90mm;margin-left:-20mm">${dots}</div>`), want: 'OVERFLOW' },
     ];
 }
@@ -73,7 +85,7 @@ function selfTest() {
         let bad = 0;
         for (const t of selfTest()) {
             await sheet.setContent(t.html, { waitUntil: 'load' });
-            const r = await sheet.evaluate(cellChecksInPage, { role: t.role || '', key: !!t.key });
+            const r = await sheet.evaluate(cellChecksInPage, { role: t.role || '', key: !!t.key, h13abs: !!t.h13abs });
             const got = [...new Set([...(r.problems.length ? ['OVERFLOW'] : []), ...r.findings.map((f) => f.rule)])];
             const scoped = t.rules ? got.filter((g) => t.rules.includes(g)) : got;
             const ok = t.want ? got.includes(t.want) : scoped.length === 0;
@@ -105,7 +117,7 @@ function selfTest() {
         if (has('card') && (!plan || !plan.cards.length)) { notes.push(`${k}: no signed card lists it (--card): roles from --roles`); }
         const roles = plan && plan.cards.length ? plan.roles : list(arg('roles', 'independent'));
         for (const role of roles) for (const size of SIZES) jobs.push({ k, role, size, opts: baseOpts });
-        if (plan && has('card-opts')) for (const v of plan.variants) for (const role of OPT_ROLES.filter((r) => roles.includes(r))) for (const size of SIZES) jobs.push({ k, role, size, opts: Object.assign({}, baseOpts || {}, v.opts) });
+        if (plan && has('card-opts')) for (const v of plan.variants) for (const role of OPT_ROLES.filter((r) => roles.includes(r))) for (const size of SIZES) jobs.push({ k, role, size, opts: Object.assign({}, baseOpts || {}, v.opts), variant: true });
     }
     console.log(`ws-cell-checks: ${jobs.length} page(s) - ${skills.join(', ')}${has('card') ? ' (card plan' + (has('card-opts') ? ' + option values' : '') + ')' : ''}`);
     for (const n of notes) console.log(`  note ${n}`);
@@ -145,7 +157,7 @@ function selfTest() {
             if (/\(\d+ jumps\)|\(\w+=/.test(got)) findings.push({ rule: 'TITLE', msg: `${tag}: an option value in the title "${built.title}" (H17)` });
         }
         if (j.role === 'lesson') lessons.push({ k: j.k, size: j.size, opts: j.opts, want: built.want, rule: built.rule });
-        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false });
+        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j) });
         const kk = await checkDoc(sheet, built.key, { role: j.role, key: true });
         const here = [
             ...p.problems.map((m) => ({ rule: 'OVERFLOW', msg: `pupil ${m}` })), ...kk.problems.map((m) => ({ rule: 'OVERFLOW', msg: `key ${m}` })),

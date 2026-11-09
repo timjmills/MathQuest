@@ -614,6 +614,12 @@ const _pvRepeatDigit = () => ({
     id: 'repeatDigit', label: 'A repeated digit (747: which 7?)', type: 'bool', default: false, group: 'difficulty',
     help: 'On gives numbers with the same digit twice, so the pupil must read the underlined one.',
 });
+// lf-placevalue r1 F4 (owner ruling 2026-10-10, design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md): the pupil also
+// writes the value of the underlined digit on a "Value ____" line under the place. Appended last (share codes).
+const _pvWriteValue = () => ({
+    id: 'writeValue', label: 'Also write the value of the underlined digit', type: 'bool', default: true, group: 'layout',
+    help: 'On adds a "Value ____" line under the place words (132, the 3: tens, 30). Off asks for the place only.',
+});
 const _pvValueForm = () => ({
     id: 'form', label: 'How the value is written', type: 'enum', default: 'value', group: 'layout',
     values: [
@@ -749,7 +755,7 @@ function _pvRoundNl(id) {
     ];
 }
 const P9_PV_OPTIONS = {
-    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit()],
+    'placevalue:identify': [_pvBand(_PV_PLACE_BANDS, 999), _pvPlaceSet(100000), _pvDigitSupport(), _pvIdentifyResponse(), _pvRepeatDigit(), _pvWriteValue()],
     'placevalue:value': [_pvBand(_PV_PLACE_BANDS, 999), _pvDigitSupport(), _pvValueForm(), _pvZeroDigit(), ..._pvTenOptions()],
     'placevalue:expand': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), _pvExpandFrame(), _pvExpandForm()],
     'placevalue:combine': [_pvBand(_PV_PLACE_BANDS, 999), _pvZeroPlace(true), {

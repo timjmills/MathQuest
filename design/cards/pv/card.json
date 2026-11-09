@@ -1,0 +1,821 @@
+{
+  "id": "pv",
+  "kind": "family",
+  "title": "Place value: read, write, value and ten times (the pv kit)",
+  "template": {
+    "id": "pv",
+    "source": "js/modules/sheet/cells/pv.js",
+    "also": "`pv-support` (`js/modules/pv-support-cell.js`: chart / hundreds-chart / strip pictures beside the frame) and `pv-times` (the same digit one place apart); the generator is `js/modules/gen-pv.js`, the provider `js/modules/sheet/providers/pv.js`; `screen-cell.js` draws the same cell on the practice card, online worksheet and quiz"
+  },
+  "families": [
+    "placevalue"
+  ],
+  "findingsMatch": {
+    "templates": [
+      "pv",
+      "pv-support",
+      "pv-times"
+    ],
+    "families": [
+      "composing"
+    ]
+  },
+  "skills": {
+    "include": [
+      "placevalue:identify",
+      "placevalue:value",
+      "placevalue:expand",
+      "placevalue:combine",
+      "placevalue:unit_form",
+      "placevalue:place_value_10x",
+      "placevalue:ten_times_value",
+      "placevalue:one_tenth_value",
+      "placevalue:ten_times_story"
+    ]
+  },
+  "excerptChars": 140,
+  "summary": "One numeral per boxed cell at digit size, the asked digit underlined (never highlighted in a filled box), one answer place per item: a write line for a value, a ring for a place, the expanded or unit-form frame with one blank per place (zero places kept), and, for ten times, the same digit drawn one place apart with the relation written as a sentence frame. Paper, key and the three screen hosts are one drawing.",
+  "teaches": "Reading and writing whole numbers in standard, expanded and unit form; naming the place and the value of a digit; and, from Grade 4, that a digit is worth ten times as much one place to the left and one tenth as much one place to the right. Grades 2-5 (CCSS 2.NBT.A.1, 2.NBT.A.3, 4.NBT.A.1, 4.NBT.A.2, 5.NBT.A.1; WRM Y3.B1, Y5.B1-B2, Y6.B2).",
+  "research": "From repo sources: design/research/place-value-rounding.md (P9), design/PROBLEM_TYPES.md PV-04..PV-15, design/catalogue/k2-number-sense-place-value.md (PV ladder, pre-P9), the passed long lessons g2-nbt3-read-write-1000 and g4-nbt1-ten-times-value. MW4K / IXL logins not available in this container (credentials file absent): research rows to be confirmed.",
+  "problemTypes": [
+    "PV-09 place and value of a marked digit: ring the place name (identify) or write the value (value)",
+    "PV-06 expanded / standard form: write the expanded form with one blank per place, zero place kept (expand); combine the parts into a numeral (combine)",
+    "PV-07 unit form and renaming: '__ hundreds __ tens __ ones'; '34 tens = __' (unit_form)",
+    "PV-14 / PV-15 x10 / ÷10: the same digit one place apart, '700 is 10 times 70', 'one tenth of 700 is __' (place_value_10x and the ten-times presets)"
+  ],
+  "progression": [
+    "2-digit, then 3-digit numbers with no zero; the place letters H T O over the digits",
+    "a zero place dealt on purpose (405, 350): the zero is written, never dropped",
+    "4-digit and larger with the comma; the letters fade, the digit boxes stay",
+    "ten times: the same digit one place left; then one tenth one place right; then 'how many times as many' (700 ÷ 70 = 10)"
+  ],
+  "drawing": {
+    "sizes": "digits 16 / 22 / 28 pt (tokens.js SIZES); write lines and blanks sized from the widest possible answer (L3); default size L.",
+    "notes": [
+      "Payload (`q.cell = {template: 'pv', v: 1, payload}`): `kind` (place, place-bank, value, blanks, expand, expand-line, frame), `n`, `place`, `frame`, `keys`, `keyValue`, `words`, `bigNumerals`.",
+      "The marked digit is underlined, never filled (catalogue: a filled box prints black). The key writes every answer in place in the key ink."
+    ]
+  },
+  "ruleGroups": [
+    {
+      "title": "Place value problem types (quoted)",
+      "core": true,
+      "chars": 300,
+      "rules": [
+        "PV-06",
+        "PV-07",
+        "PV-09",
+        "PV-14",
+        "PV-15",
+        "RP-40"
+      ]
+    },
+    {
+      "title": "Labels, heads and vocabulary",
+      "chars": 120,
+      "rules": [
+        "VA-30",
+        "VA-31",
+        "P-SC-7",
+        "P-LG-10",
+        "SF-42"
+      ]
+    },
+    {
+      "title": "Keys, screen and the quality bar",
+      "chars": 100,
+      "rules": [
+        "H13",
+        "L1",
+        "L2",
+        "L3",
+        "L6",
+        "L10"
+      ]
+    },
+    {
+      "title": "Cited by critics on this family's findings (ids only)",
+      "chars": 80,
+      "rules": [
+        "CL-5",
+        "DN-1",
+        "DN-1a",
+        "H1",
+        "H2",
+        "H4",
+        "H5",
+        "H6",
+        "H7",
+        "H8",
+        "H9",
+        "H11",
+        "INK-5",
+        "L5",
+        "OC4",
+        "OC14",
+        "PT-GDP-1",
+        "PT-REV-3",
+        "SP-11a"
+      ]
+    }
+  ],
+  "ownerRulings": [
+    {
+      "date": "2026-10-10",
+      "ruling": "placevalue:identify: pupils also WRITE the value of the underlined digit on a line at the bottom of the cell (132 → 30); option `writeValue`, default on.",
+      "source": "design/STATUS.md:49, design/audit/runs/next-session/PV-IDENTIFY-WRITE-VALUE-SPEC.md"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Grade map K = Y1 … G5 = Y6.",
+      "source": "lead launch message"
+    },
+    {
+      "date": "2026-11-07",
+      "ruling": "Stretch is out of scope for the pv card for now: no pv challenge item yet (one will be designed later).",
+      "source": "owner via the lead (D2)"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "M1",
+      "error": "answers with the digit instead of its value",
+      "wrong": "the 7 in 742 is worth 7"
+    },
+    {
+      "id": "M2",
+      "error": "drops the zero place in expanded form",
+      "wrong": "405 = 40 + 5"
+    },
+    {
+      "id": "M3",
+      "error": "combines parts by writing the digits side by side",
+      "wrong": "300 + 5 = 3005"
+    },
+    {
+      "id": "M4",
+      "error": "counts places from the left",
+      "wrong": "the 4 in 4,215 is in the ones place"
+    },
+    {
+      "id": "M5",
+      "error": "ten times moves the digit the wrong way",
+      "wrong": "10 times 70 is 7"
+    }
+  ],
+  "options": [
+    "Declared per skill in skill-options.js (listed after the Signed line). Size ladder = band; complexity = zero place / place set / form; fading support = digit support (chart, letters, none); appearance = response (ring, bank, write)."
+  ],
+  "gates": [
+    {
+      "cmd": "node tests/scripts/ws-precritic.cjs --skill placevalue:identify,placevalue:value,placevalue:expand,placevalue:combine,placevalue:unit_form,placevalue:place_value_10x --strict"
+    },
+    {
+      "cmd": "node tests/scripts/ws-spec-card.mjs --check-signed design/cards/pv/pv.md",
+      "note": "build-start gate"
+    },
+    {
+      "cmd": "node tests/scripts/ws-content-audit.cjs --category placevalue"
+    },
+    {
+      "cmd": "node tests/scripts/ws-visual-quality.mjs --skill <each>"
+    }
+  ],
+  "openQuestions": [
+    {
+      "q": "Accept every option value, role and host decision marked PROPOSED in §7a (all options offered; word-problems and fact-rows out of scope; boss / race graded as the practice card)?",
+      "recommended": "Yes, all as proposed."
+    },
+    {
+      "q": "identify writeValue (owner 2026-10-10): is the write-the-value line still wanted on identify, given value is its own skill?",
+      "recommended": "Yes, default on, as ruled; it is the bridge from place to value."
+    },
+    {
+      "q": "Does this card also cover the decimals place value builds (thousandths_pv, pv10_exponents), or do they get a decimals card?",
+      "recommended": "This card covers them: the same pv cell with a decimal point track; a decimals card only for x / ÷ of decimals by decimals (5.NBT.B.7)."
+    }
+  ],
+  "decisions": {
+    "options": [
+      {
+        "option": "band",
+        "values": [
+          "99",
+          "999",
+          "9999",
+          "99999",
+          "999999"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "the size ladder: 2-digit (2.NBT.A.1) to 6-digit (4.NBT.A.2); within N bounds the number itself",
+        "proposed": true
+      },
+      {
+        "option": "zeroPlace",
+        "values": [
+          "none",
+          "some",
+          "always"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "a zero place dealt on purpose (305, 340): the case that matters (catalogue M2)",
+        "proposed": true
+      },
+      {
+        "option": "order",
+        "values": [
+          "largest",
+          "scrambled"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "combine: parts largest first, then scrambled (PV-06 progression)",
+        "proposed": true
+      },
+      {
+        "option": "calculator",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js common",
+        "why": "play setting shared by every skill",
+        "proposed": true
+      },
+      {
+        "option": "skipAfter",
+        "values": [
+          "*"
+        ],
+        "d": "offered",
+        "source": "skill-options.js common",
+        "why": "play setting shared by every skill",
+        "proposed": true
+      },
+      {
+        "option": "frame",
+        "values": [
+          "boxes",
+          "line"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "expand: one box per place (structural), or one line once the boxes fade",
+        "proposed": true
+      },
+      {
+        "option": "form",
+        "values": [
+          "sum",
+          "notation"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "expand: 400 + 5 or 4 × 100 + 5 × 1 (preset expanded_notation)",
+        "proposed": true,
+        "skills": [
+          "placevalue:expand"
+        ]
+      },
+      {
+        "option": "places",
+        "values": [
+          "1",
+          "10",
+          "100",
+          "1000",
+          "10000",
+          "100000"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "identify: which places are asked",
+        "proposed": true
+      },
+      {
+        "option": "support",
+        "values": [
+          "chart",
+          "labels",
+          "none"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "the fading support: chart, then letters, then none (P-SC-7)",
+        "proposed": true
+      },
+      {
+        "option": "response",
+        "values": [
+          "circle",
+          "bank"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "identify: ring the place on the chart, or write a word from a bank",
+        "proposed": true
+      },
+      {
+        "option": "repeatDigit",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "identify: a repeated digit (747) as its own step",
+        "proposed": true
+      },
+      {
+        "option": "form",
+        "values": [
+          "value",
+          "unit",
+          "notation",
+          "times"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "value: 700, 7 hundreds, 7 × 100, or ten times (presets)",
+        "proposed": true,
+        "skills": [
+          "placevalue:value",
+          "placevalue:ten_times_value",
+          "placevalue:one_tenth_value",
+          "placevalue:ten_times_story"
+        ]
+      },
+      {
+        "option": "zeroDigit",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "value: ask the value of a 0 as its own step",
+        "proposed": true
+      },
+      {
+        "option": "tenDir",
+        "values": [
+          "times",
+          "tenth",
+          "both"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: 10 times one place left, one tenth one place right, both",
+        "proposed": true
+      },
+      {
+        "option": "tenValues",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: write both values first (hint, fades)",
+        "proposed": true
+      },
+      {
+        "option": "tenPlain",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: digit and zeros only (700 and 70), then whole numbers",
+        "proposed": true
+      },
+      {
+        "option": "tenWrite",
+        "values": [
+          "both",
+          "top"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: values written for both rows, then only the top row",
+        "proposed": true
+      },
+      {
+        "option": "tenTask",
+        "values": [
+          "compare",
+          "story"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: the compare frame, or the \"how many times as many\" story (preset ten_times_story)",
+        "proposed": true
+      },
+      {
+        "option": "tenChoice",
+        "values": [
+          "two",
+          "four"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "ten times: two words to choose from, then four",
+        "proposed": true
+      },
+      {
+        "option": "op",
+        "values": [
+          "x",
+          "/",
+          "both"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "place_value_10x: multiply, divide, or both",
+        "proposed": true
+      },
+      {
+        "option": "power",
+        "values": [
+          "10",
+          "100",
+          "1000"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "place_value_10x: by 10, 100 or 1,000",
+        "proposed": true
+      },
+      {
+        "option": "band",
+        "values": [
+          "1000",
+          "10000",
+          "100000",
+          "1000000"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "place_value_10x: the largest number",
+        "proposed": true,
+        "skills": [
+          "placevalue:place_value_10x"
+        ]
+      },
+      {
+        "option": "decimals",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "place_value_10x: decimals (grade 5) as its own step",
+        "proposed": true
+      },
+      {
+        "option": "support",
+        "values": [
+          "shift",
+          "none"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "place_value_10x: the shift chart (hint, fades)",
+        "proposed": true,
+        "skills": [
+          "placevalue:place_value_10x"
+        ]
+      },
+      {
+        "option": "rename",
+        "values": [
+          "standard",
+          "more"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "unit_form: standard unit form, then more than 9 of one place (34 tens)",
+        "proposed": true
+      },
+      {
+        "option": "writeValue",
+        "values": [
+          "true",
+          "false"
+        ],
+        "d": "offered",
+        "source": "owner ruling 2026-10-10 (card §5.1); built after critic r1 F4",
+        "why": "identify: also write the value of the underlined digit on a line under the ring row (default on)",
+        "skills": [
+          "placevalue:identify"
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "key": "independent",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the plain page",
+        "proposed": true
+      },
+      {
+        "key": "more-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "More Practice A-J",
+        "proposed": true
+      },
+      {
+        "key": "opener",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "the lesson opener",
+        "proposed": true
+      },
+      {
+        "key": "scripted-model",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "worked steps: real provider workedSteps",
+        "proposed": true
+      },
+      {
+        "key": "guided",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "worked steps: real provider workedSteps",
+        "proposed": true
+      },
+      {
+        "key": "error-analysis",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider wrongAnswer and misconceptions",
+        "proposed": true
+      },
+      {
+        "key": "review",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "earlier skills in data.js order",
+        "proposed": true
+      },
+      {
+        "key": "test",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "Test A / B",
+        "proposed": true
+      },
+      {
+        "key": "pre-skill-check",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "earlier skills in data.js order",
+        "proposed": true
+      },
+      {
+        "key": "mixed-practice",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "shelves of each skill; sub_facts now on the kit fact cell like add_facts",
+        "proposed": true
+      },
+      {
+        "key": "true-false",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider wrongAnswer",
+        "proposed": true
+      },
+      {
+        "key": "reason-it",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "real provider workedSteps and wrongAnswer",
+        "proposed": true
+      },
+      {
+        "key": "stretch",
+        "d": "out of scope",
+        "source": "owner ruling 2026-11-07 (lead D2)",
+        "why": "no pv stretch item yet; owner 2026-11-07"
+      },
+      {
+        "key": "lesson",
+        "d": "offered",
+        "source": "CLAUDE.md (any skill on any page type, every page with a key)",
+        "why": "lesson data: prereqs.js covers 1 of 4 (FALLBACK warm-up for the rest; open)",
+        "proposed": true
+      },
+      {
+        "key": "fact-probe",
+        "d": "out of scope",
+        "source": "ws-empty-band 2026-11-08: role refuses pv",
+        "why": "the fact probe composes facts and one-step computations only (\"not composed\" for pv); the pv Test is the probe"
+      },
+      {
+        "key": "word-problems",
+        "d": "out of scope",
+        "source": "provider stories 0/9",
+        "why": "place value has no story items; ten_times_story is its own story skill on the independent page",
+        "proposed": true
+      },
+      {
+        "key": "fact-rows",
+        "d": "out of scope",
+        "source": "CLAUDE.md (fact and operations skills only get the fact layouts)",
+        "why": "not a fact skill",
+        "proposed": true
+      }
+    ],
+    "hosts": [
+      {
+        "key": "practice-card",
+        "d": "offered",
+        "source": "RUBRIC (every screen host); screen-cell.js",
+        "why": "the practice card",
+        "proposed": true
+      },
+      {
+        "key": "online-worksheet",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "the online worksheet",
+        "proposed": true
+      },
+      {
+        "key": "quiz",
+        "d": "offered",
+        "source": "RUBRIC (every screen host)",
+        "why": "the quiz",
+        "proposed": true
+      },
+      {
+        "key": "boss",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "a game mode around the practice card; graded by ws-chromebook-fit",
+        "proposed": true
+      },
+      {
+        "key": "race",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "a game mode around the practice card; graded by ws-chromebook-fit",
+        "proposed": true
+      },
+      {
+        "key": "map",
+        "d": "out of scope",
+        "source": "stack card precedent",
+        "why": "the skill map; graded by ws-screen-slots",
+        "proposed": true
+      },
+      {
+        "key": "mode-bigboard",
+        "d": "out of scope",
+        "source": "STATUS 2026-10-24 (dark / big board out of scope)",
+        "why": "a display mode of the screen hosts",
+        "proposed": true
+      },
+      {
+        "key": "mode-dark",
+        "d": "out of scope",
+        "source": "STATUS 2026-10-24 (dark / big board out of scope)",
+        "why": "a display mode of the screen hosts",
+        "proposed": true
+      }
+    ]
+  },
+  "rulings": {
+    "rulings": [
+      {
+        "id": "R-COMBINE-999",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:combine"
+        ],
+        "assert": "range",
+        "of": "ans",
+        "min": 101,
+        "max": 999
+      },
+      {
+        "id": "R-VALUE-999",
+        "source": "§7a band=999 (default), zeroDigit=false",
+        "skills": [
+          "placevalue:value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "ans",
+        "min": 1,
+        "max": 900
+      },
+      {
+        "id": "R-VALUE-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-IDENTIFY-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:identify"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-EXPAND-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:expand"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-UNIT-N",
+        "source": "§7a band=999 (default)",
+        "skills": [
+          "placevalue:unit_form"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 100,
+        "max": 999
+      },
+      {
+        "id": "R-PV10-BAND",
+        "source": "§7a band=100000 (default)",
+        "skills": [
+          "placevalue:place_value_10x"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "ans",
+        "min": 1,
+        "max": 100000
+      },
+      {
+        "id": "R-TEN-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:ten_times_value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
+      },
+      {
+        "id": "R-TENTH-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:one_tenth_value"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
+      },
+      {
+        "id": "R-TENSTORY-N",
+        "source": "§7a ten-times presets: band=9999",
+        "skills": [
+          "placevalue:ten_times_story"
+        ],
+        "read": "value",
+        "assert": "range",
+        "of": "n",
+        "min": 1,
+        "max": 9999
+      }
+    ],
+    "notOffered": []
+  }
+}

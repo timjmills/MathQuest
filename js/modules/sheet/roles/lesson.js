@@ -76,7 +76,10 @@ export function sources(skills, helpers = {}) {
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
     const data = helpers.lesson && helpers.lesson.data;
-    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
+    // (lesson 2 E24b / E31, lead's order 2026-11-08: a main ref with a `hardAvoid` - lesson 2 alone - gives its case pools the
+    // WHOLE main ref, its avoid keys and hard bounds too, so a case example is never a fact the pack spent; absent: as before)
+    const caseRef = (k) => (Array.isArray(main.hardAvoid) ? [Object.assign({}, main, data[k].ref)] : null);
+    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => caseRef(k) ? { id: `x${k}`, skills: caseRef(k) } : ({
         id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {}, data[k].ref)],
     }));
     return [{ id: 'main', skills: [main] }, ...pre.map((s, i) => ({ id: `w${i}`, skills: [s] })), ...extra];
@@ -609,7 +612,10 @@ export function pickWeDo(items, example, data, n, others = []) {
         // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
         const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
         const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
-        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const meets = (x, y, nm) => twin(x, y) || sameSecond(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 2 solve-first, seed 1: the set below then dropped a cell that adds the same number as another - "no two Guided
+        // cells add the same number", 5 + 7 / 8 + 7 - and refilled it with a near twin, 3 + 8; + items only, as that rule reads them)
+        const sameSecond = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a[1] === b[1]; };
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
@@ -1090,6 +1096,12 @@ export const chartLayout = (n, data = null) => (data && data.chartWide ? { cols:
  * newest marks grey, earlier ones black, P-LC-9), and the provider's words for THIS problem.
  * Host-shaped so the host measures them; `drawOnly` measures the drawing alone (for its zoom).
  */
+/** The library key every Warm-up item names itself (q.instructionKey), or '' when any item names none or they differ. */
+function warmItemKey(items) {
+    const keys = (items || []).map((it) => String((it && it.q && it.q.instructionKey) || ''));
+    return keys.length && keys[0] && keys.every((k) => k === keys[0]) ? keys[0] : '';
+}
+
 export function stateItems(example, data) {
     const ws = data && Array.isArray(data.chartSteps) && isWordBar(example) ? chartStepsOf(example, data) : workedStepsOf(example);
     // `tailLast` (lesson data; the detailed lesson maker): the closing step ("Read it with plus")
@@ -1339,8 +1351,11 @@ function vocabPicture(pic, c) {
                 for (let j = 1; j < 10; j++) parts.push(`<line x1="${x}" y1="${0.5 + u * j}" x2="${x + u}" y2="${0.5 + u * j}" stroke-width="${(0.5 * PT_MM).toFixed(3)}"/>`);
                 x += u + 2;
             }
-            for (let i = 0; i < (pic.ones || 0); i++) { parts.push(`<rect x="${x}" y="${0.5 + u * 9}" width="${u}" height="${u}"/>`); x += u + 1.5; }
-            const W = x + 0.5, H = u * 10 + 1;
+            // (`compact`, lf-placevalue critic r3c E-A1: a picture of ones only is one cube tall, not a ten-rod's height - the
+            // vocabulary cell was 43 % empty above it; opt-in, so every other picture draws as before)
+            const low = !!pic.compact && !(pic.tens > 0);
+            for (let i = 0; i < (pic.ones || 0); i++) { parts.push(`<rect x="${x}" y="${low ? 0.5 : 0.5 + u * 9}" width="${u}" height="${u}"/>`); x += u + 1.5; }
+            const W = x + 0.5, H = low ? u + 1 : u * 10 + 1;
             return `<svg viewBox="0 0 ${W} ${H}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true"><g fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}">${parts.join('')}</g></svg>`;
         }
         case 'trade': {
@@ -1763,7 +1778,11 @@ function planOnce(input = {}) {
             const short = true;
             const part = {
                 kind: 'col', cls: 'mq-lwarmcol',
-                parts: [instructionPart(instructionKeyOf(its, input.skills), its),
+                // lf-placevalue critic r3 F4 (lead ruling 2026-11-08): when every Warm-up item names its own library
+                // instruction (q.instructionKey, set by its generator from the item's options - identify with
+                // writeValue off is "Circle the place …", not the lesson skill's "… Write the value …"), the heading
+                // is that key. Items that name none keep the skill-level key, so every other lesson is unchanged.
+                parts: [instructionPart(warmItemKey(its) || instructionKeyOf(its, input.skills), its),
                     gridPart(its.map((it) => planItem(short ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: shape[id].cols })), { cols: shape[id].k, rows: rowsOf(id), cellH: (stacked ? hOwn(id) : hW) / rowsOf(id), labels, start: letter })],
             };
             letter += its.length;

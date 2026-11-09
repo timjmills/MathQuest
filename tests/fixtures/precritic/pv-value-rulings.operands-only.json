@@ -1,0 +1,117 @@
+{
+ "v": 1,
+ "card": "pv",
+ "skills": [
+  "placevalue:combine",
+  "placevalue:expand",
+  "placevalue:identify",
+  "placevalue:one_tenth_value",
+  "placevalue:place_value_10x",
+  "placevalue:ten_times_story",
+  "placevalue:ten_times_value",
+  "placevalue:unit_form",
+  "placevalue:value"
+ ],
+ "rulings": [
+  {
+   "id": "R-VALUE-999",
+   "source": "\u00a77a band=999 (default), zeroDigit=false",
+   "skills": [
+    "placevalue:value"
+   ],
+   "assert": "range",
+   "of": "ans",
+   "min": 1,
+   "max": 900
+  },
+  {
+   "id": "R-VALUE-N",
+   "source": "\u00a77a band=999 (default)",
+   "skills": [
+    "placevalue:value"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-IDENTIFY-N",
+   "source": "\u00a77a band=999 (default)",
+   "skills": [
+    "placevalue:identify"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-EXPAND-N",
+   "source": "\u00a77a band=999 (default)",
+   "skills": [
+    "placevalue:expand"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-UNIT-N",
+   "source": "\u00a77a band=999 (default)",
+   "skills": [
+    "placevalue:unit_form"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 100,
+   "max": 999
+  },
+  {
+   "id": "R-PV10-BAND",
+   "source": "\u00a77a band=100000 (default)",
+   "skills": [
+    "placevalue:place_value_10x"
+   ],
+   "assert": "range",
+   "of": "ans",
+   "min": 1,
+   "max": 100000
+  },
+  {
+   "id": "R-TEN-N",
+   "source": "\u00a77a ten-times presets: band=9999",
+   "skills": [
+    "placevalue:ten_times_value"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 1,
+   "max": 9999
+  },
+  {
+   "id": "R-TENTH-N",
+   "source": "\u00a77a ten-times presets: band=9999",
+   "skills": [
+    "placevalue:one_tenth_value"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 1,
+   "max": 9999
+  },
+  {
+   "id": "R-TENSTORY-N",
+   "source": "\u00a77a ten-times presets: band=9999",
+   "skills": [
+    "placevalue:ten_times_story"
+   ],
+   "assert": "range",
+   "of": "n",
+   "min": 1,
+   "max": 9999
+  }
+ ],
+ "notOffered": []
+}
