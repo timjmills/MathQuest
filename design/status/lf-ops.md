@@ -6,7 +6,7 @@ Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the o
 State: paused
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 5, FAIL (build #4 r1 lowest 2; div_facts r5 6, r6 5, r7 7; plain stories r1 3)
+Critic rounds: 6 (build #4 r1 FAIL 2; div_facts r5 FAIL 6, r6 FAIL 5, r7 FAIL 7, r8 narrow re-check PASS 8; plain stories r1 FAIL 3)
 
 ## Now
 - HAND-OVER 2026-11-07 ~13:50 UTC (lead: no new work after ~14:10, week at ~44-60 %). Nothing passed; nothing added to redesign-passed.js. Draft PR #38 into claude/sweet-newton-c8wrv1.
@@ -152,6 +152,14 @@ Five-lesson check (lead rule) on 17ce2fe1 vs origin/master 2fe21f2b: g3-oa5, g3-
 | R7-1 Test M 21 vs Independent 24 | NOT YET: an EB-PAGE Test-vs-Independent capacity comparison (Test count < Independent count for the same facts and size) - to build with the fix | - | - | would have saved r7 |
 | R7-2 fade L page 3 fact-to-line gap 20 mm | NOT YET: a gap-consistency check (fact-to-answer-line distance within 1 mm across a packet / role) - to build with the fix | - | - | would have saved r7 |
 
+## div_facts aids r9 (lead 2026-11-09, $20) - narrow re-check r8 PASS (lowest 8)
+- Checks: EB-TESTEQ / TEST-EQ-IND (fails on c127c3e6: 5 at defaults, 8 with constant [2,3,4]) and EB-GAP (fade L 9.04 vs 16.92 mm) in ws-empty-band (self-test 18 cases); backtest rows test-eq-ind-divfacts, eb-gap-divfacts PASS. Commits 0da2b005 (checks), a5c78f9d (R7-1: Test rows 1.1 x, Test deals the Independent capacity on every support), f471ecb2 (R7-2: 12.7 mm fact-to-line gap under the tab), b43bf8b9 (backtests).
+- Gates: ws-empty-band OK; hash add / mult / sub facts + div_facts_long 36 / 36 identical; print-lint 5 supports x Independent / Test x S/M/L 0 new; simple-print, boot-smoke OK. Counts Test = Independent: off / array default 36 / 24 / 18, touch 15 / 15 / 12, skip 21 / 15 / 12, think 24 / 15 / 12, boxsign 20 / 16 / 12, array 2-4 20 / 12 / 10.
+- Critic r8 (narrow re-check of every support's Test S/M/L + fade L, b43bf8b9): PASS, lowest 8; R7-1 and R7-2 fixed, no new defect. Report design/audit/runs/lf-ops/critic-divfacts-r8.md; renders committed in design/audit/runs/lf-ops/r8-renders/ (off-test-M, boxsign-test-M, fade-L-page-3, off-test-M-key). Minor unscored: answer-line lengths vary on fade page 3; fact 2.91 mm from the left rule.
+- Five-lesson check b43bf8b9 vs origin/master 16e0014a: g3-oa5, g3-oa9 x 2, g4-nbt1 match on --check and --repeats; g3-oa8 (not passed) worse on the branch (E9b, E12) from the stories work - excluded from the narrow deploy.
+- redesign-passed.js: NOT added. The support-aid pages passed; the shared fact roles were pinned (a separate facts-roles task) and the screen hosts were not graded in this lane - the lead decides.
+- Findings -> checks: R7-1 -> EB-TESTEQ (test-eq-ind-divfacts, would have saved r7); R7-2 -> EB-GAP (eb-gap-divfacts, would have saved r7). Both on precritic's path via ws-empty-band.
+
 ## Brief for the FRESH #4 builder (lead ruling 2026-11-07: after the Thursday 22:00 UTC reset; Opus medium, a rebuild after two failed rounds)
 Skills: multiplication:mult_properties, multiplication:arrays_groups, multiplication:count_by_tables (BUILD lesson #4, Properties of multiplication, 3.OA.B.5). Cards: design/cards/ops-tables/ops-tables.md, design/cards/count-row/count-row.md (signed). Defects: design/audit/runs/lf-ops/critic-r1.md; what fix4 already fixed: section "Fix round after critic r1" above.
 ROOT CAUSE to fix first: cell heights come from each template's TALLEST POSSIBLE item (footprint per template), not from the items actually dealt; the lesson / guided / Test roles reserve the same. So pages of small arrays or short rows carry 30-43 % empty bands (D-MP-1, D-CB-4/5) and every attempt to shrink one role broke another. Make the footprint per DEALT item in cells/arrays.js, cells/arrays-turn.js and cells/count-row.js (footprint(payload, ctx) from the payload's own rows / cols / tiles / times labels), and let layout band rows by the dealt heights (layout.js already groups in-place cells by height from 1.2x). Do not size rows by the band's maximum.
@@ -208,6 +216,7 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-09: div_facts aids r9: TEST-EQ-IND + EB-GAP, critic r8 narrow re-check PASS (lowest 8); deploy branch pending the lead.
 - 2026-11-09: L-width fix (a4c6b694, 17ce2fe1) + master merge (11720699); critic r7 FAIL lowest 7 (R7-1 Test M 21 vs 24, R7-2 fade L gap); stopped at the $35 cap.
 - 2026-11-09: resumed ($35 cap); owner ruling (a) on the L width; master 2fe21f2b merge conflicts in backtests.json, options-render.pins.json, ws-cell-checks (lib + script), ws-empty-band -> given to the builder.
 - 2026-11-08 ~20:40: div_facts aids r8 parked by the lead (budget); L-width ruling with the owner.
