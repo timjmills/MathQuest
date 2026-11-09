@@ -34,6 +34,11 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## UPDATE (lead, 2026-11-09 16:01Z): phase 0 is on master (ec61b069), so the lesson part can register on master.
+Stay parked this week. Next round:
+0. Merge master. The lesson.js / prereqs.js conflict of 2026-11-09 should be gone now that phase 0 is on master.
+Then 1-4 below, and ONE deploy: the r5 print pass plus R-1 / R-2, with the manifest (mergeOrder 70).
+
 ## PARKED (2026-11-09: the owner's week cap is reached). Next round = the Q-S2 re-check of R-1 / R-2, in this order:
 1. The Match 3 wrong line, "<Word> is picture <L>! <Word> means ...". Glow ONLY the wrongly matched pictures, each with
    its letter.
