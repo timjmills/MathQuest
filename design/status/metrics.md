@@ -493,3 +493,11 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Fast facts at S, columns | — | 10 (8 when answers > 99) |
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
 | simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
+
+### lf-engine (lesson 2 P0 drift, 2026-11-09)
+
+| Finding | Check that now catches it | Backtest row | On precritic / ws-detailed-lesson path? | Would have saved |
+|---|---|---|---|---|
+| P0 drift: lane pageLr6 lacked master's `perQuestion` pre-skill-check case (twins at 5 of 6 seeds) | `ws-lesson-unit --only p0-overlap` (wiring part, new) | p0-overlap: FAIL dcdb50d4 / PASS b1e30155 | no: ws-lesson-unit is on the lane gate list and the SHAPES.md bar-story check-first; E24b on ws-detailed-lesson caught the symptom only | 2 rounds |
+| P0 answer overlap: count 11-20 vs + facts 13-19 (also g2-nbt3, g3-oa5 P0 pairs) | `ws-lesson-unit --only p0-overlap` (ranges meet -> set wired, union holds every item) | p0-overlap (same row) | no (as above) | 1 round |
+| E9 / E35 lesson 2 | none this round: deferred by the lead until after the phase-0 landing | - | E9 / E35 are ws-detailed-lesson rows | - |
