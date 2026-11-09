@@ -82,6 +82,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    **Lead ruling 2026-10-31 (shared-roles r1):** "at or below base" never covers a page role, template or host the lane
    CHANGED: any red row there blocks the critic, even when the same row is red on main. Main-red rows may pass only on
    roles / templates / hosts the lane did not touch.
+0c. **Every engine change is proved against master before hand-over (lead, lf-engine landing, 2026-11-09).** A change to the
+   lesson engine (sheet/roles/lesson.js, sheet/lesson-pages/*, print-sheet.js buildLesson, lessons/library.js or the lesson
+   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --check
+   <master baseline>` (written with `--write` on a master worktree) before the lane hands over; every differing hash is either
+   the change's intended page on a lesson the change was made for (opt-in on that lesson's data, LR-17b) or a defect.
+   Backtest row `lesson-baseline-phase0-optin` (FAIL 3bf3ef5c / PASS the LR-17b fix).
+   *Why:* the lf-engine landing found 80 hashes of live packets changed by two critic fixes made for the sample lessons.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
@@ -390,3 +397,9 @@ One line per finding: the rule, then the check.
   change (practiceShapes / rows) outside the extracted-equivalence the lane claimed. Same check.
 - **Process:** land a lane by its hash proof at EVERY lesson master prints (28 packets + 7 detailed, L and S, 2 seeds: 1,556 hashes,
   12 min) - the lane's own baseline (3 samples + detailed at one seed) did not cover the place-value and story packets.
+- **Round 2 (2026-11-09): L1 and L2 made opt-in (lead decision A).** L2 traced to 8e285251 (P1, critic r1 D11: `roundOne`, rounding
+  cells count as one-number answers in the Independent rows - LR-17 sheets only) made unconditional by 08ee129e (P1c item 5).
+  Both are now lesson-record flags (`vocabZoom`, `roundOneNum`) set only on the three samples and on only while the lesson's
+  check is live (`phase0On`, LR-17b); with `prereqsLive: false` every packet prints as master (proof check-land-2.log).
+  **Lesson:** a critic fix made on a sample lesson goes in as a flag on that lesson's record, not as a branch keyed on a
+  property many lessons share ("has prereqs", "is a rounding cell").

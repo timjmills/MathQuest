@@ -3020,6 +3020,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-baseline-phase0-optin",
+   "check": "Every lesson master prints is byte-identical to master's packet: a lane's engine fix for the sample lessons is opt-in on their records (lf-engine landing L1 vocab zoom / L2 rounding rows; subset: the round sample and sub_100_no_regroup, L and S, seeds 4242 and 1)",
+   "kind": "commit-pair",
+   "rule": "LESSONS_LEARNED process rule 0c; LR-17b",
+   "browser": true,
+   "fail": {
+    "commit": "3bf3ef5c",
+    "state": "landing r1: 80 of 1,556 hashes differ (vocab zoom and rounding rows on live packets)"
+   },
+   "pass": {
+    "commit": "f3c25413",
+    "state": "vocabZoom / roundOneNum opt-in, live only with the check: 0 of 1,556 differ"
+   },
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --check tests/fixtures/precritic/lesson-baseline-master-1fedbb55-phase0.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

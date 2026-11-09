@@ -944,3 +944,11 @@ the detailed lessons at one seed, so drift on 20 other live packets went unseen 
 `ws-lesson-baseline --all-lessons --seeds --sizes --per-lesson` (every key of prereqs.js + samples + detailed); a lane that touches
 lesson-pages/* runs it against master before it reports. **Kept time:** node deep-compare of every prereqs.js record (master vs land)
 before any browser run caught 10 record differences (writeValue false on identify refs, 5 missing pv lessons) in seconds.
+
+### lf-engine landing round 2 (2026-11-09): L1 / L2 opt-in, proof 0 of 1,556
+**Lost:** ~12 min - the first proof run was started without `--all-lessons --sizes L,S --seeds 4242,1` (the default sample run
+compared a different set) and was stopped. **Fix (rule):** the full command is now written into LESSONS_LEARNED process rule 0c
+and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never retyped. **Kept time:** L2 traced in two commands
+(an HTML page diff of the round packet master vs land, then `git log -S roundOne`): 8e285251 -> 08ee129e. A synthetic
+`independentBand` test (18 measured rounding cells, no browser) proves flag off = 6 rows, on = 12 rows in milliseconds, and an
+84-hash subset baseline makes the commit-pair backtest 49 s instead of 2 x 12 min.

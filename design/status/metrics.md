@@ -509,3 +509,10 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom (P1b N1) changes 7 live packets | `ws-lesson-baseline --all-lessons --check <master baseline>` | none yet: a commit-pair row (lane bd0ee8e7 FAIL / master f6216420 PASS) needs a baseline file per side; proposed | no: a landing gate (LANDING_PLAN step 4), not a lesson gate | 1 (caught before deploy) |
 | L2 nearest_10 Practice 3 rows vs 2 | same | same | no | (same) |
 | record drift (writeValue, pv records) | node deep-compare of lessonFor for every master key (scratch tool; to fold into ws-lesson-unit) | none | no | 1 |
+
+### lf-engine landing round 2 (2026-11-09)
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
+| L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
+| Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
