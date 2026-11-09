@@ -607,3 +607,11 @@
 /* (at L the packet's one x stays the earlier inset plus the fade margin - the bare page prints in 2 columns of 92 mm, where the
    w2 inset alone left a 33-37 % band right of the fact, H13; S and M keep the w2 inset alone, their 3-column cells need it) */
 .ws-page.ws-L .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) { --mq-fx: calc(var(--ws-tab, 6mm) * 1.5 - 2mm); }
+/* Owner ruling 2026-11-09 (a), div_facts aids r8 (CL-8 / CL-40; additive): at L a div_facts fact too wide for its column
+   next to the number tab ("1xx ÷ 1x =", 50 mm of ink beside the w2 inset of 9.7 mm, in a 61.5 mm column) starts UNDER the
+   number tab - the cell's own 3 mm pad on the left, its top below the label keep-out (tab side + 1 mm) - a taller row, 3
+   columns kept. print-sheet.js divUnderTabSection marks the section's facts (`data-ws-undertab`); the measuring cell takes
+   the same rule, so its rows are sized with it. Only div_facts emits the attribute. */
+.ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun) {
+    padding-left: var(--fp, 3mm) !important; padding-top: calc(var(--ws-tab, 6mm) + 1.3mm) !important; --ws-koin: 0mm; --mq-fx: 0mm !important; }
+.ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }

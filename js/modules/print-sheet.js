@@ -118,6 +118,35 @@ function factKeepout(g) {
     if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact || c.payload.notation || g.q.skillId !== 'div_facts') return g;
     return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { keepout: true }) }) }) });
 }
+/**
+ * Owner ruling 2026-11-09 (a), div_facts aids r8: at L a div_facts fact too wide for its column next to the number tab
+ * ("1xx ÷ 1x =", 50 mm of ink beside the w2 tab inset of 9.7 mm and the 3 mm CL-8 pad, in a 61.5 mm column: the skip page
+ * 2.35 mm from the rule, the fade packet's bare page in 2 x 5) starts UNDER the number tab - a taller row, 3 columns kept
+ * (css/sheet-kit.css `data-ws-undertab`). Judged on the section's options (its widest fact: the largest ticked table and
+ * its largest dividend), so every cell of the section - and every page of a fade packet - keeps one x. div_facts only, on
+ * the sections that draw a support or fade one (the supports-off page keeps its own layout).
+ */
+function divUnderTabSection(sec, size) {
+    if (size !== 'L') return false;
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts') return false;
+    let o;
+    try { o = normalizeOptions('division', 'div_facts', sk.opts || {}); } catch (e) { return false; }
+    if (o.divForm !== 'standard') return false;
+    if (!sec.divFade && divFactsPlainSection(sec)) return false;
+    const top = Number(o.band) === 100 ? 10 : 12;
+    let t = o.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    if (!ticked.length) return false;
+    const b = Math.max(...ticked);
+    return String(b * top).length + String(b).length >= 5;
+}
+function factUnderTab(g) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact || c.payload.notation || g.q.skillId !== 'div_facts') return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { underTab: true }) }) }) });
+}
 /** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
 function divFactsPlainSection(sec) {
     const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
@@ -2242,6 +2271,8 @@ function divFactTooWide(it, size, innerMm) {
     const s = SIZES[size] || SIZES.L;
     const em = (s.digitPt / 72) * 25.4;
     const digits = String(p.a).length + String(p.b).length;
+    // (owner ruling 2026-11-09 (a): a fact that starts under the number tab has the cell's 3 mm pad on its left, not the inset)
+    if (p.underTab) return em * (0.58 * digits + 2 * 0.8 + 3 * 0.18) + 3 + 3 > innerMm;
     // (OPEN at L, lead question: "1xx ÷ 1x =" at 28 pt is 50 mm of ink, so beside a page past 9's w2 tab inset (9.7 mm) a
     // third of the page (61.5 mm) cannot hold it with its 3 mm pad - the guard would put every 3-digit band's L page in 2
     // columns of 92 mm cells, 31 % empty beside the fact (EB-SIDE). L keeps its 3 columns for those facts until ruled.)
@@ -3148,7 +3179,8 @@ async function buildSheetDeal(req = {}) {
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
         const gen0 = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const gen = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g));
+        const gen1 = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g));
+        const gen = divUnderTabSection(sec, n.size) ? gen1.map(factUnderTab) : gen1;
         const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
@@ -4190,7 +4222,9 @@ async function buildRoleSheet(n, metaOf) {
                 ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                 : g0;
             // (critic r5 R5-2: a Review's bare div_facts facts print over their answer line, as on the Independent page)
-            const gU = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g;
+            const gU0 = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g;
+            // (owner ruling 2026-11-09 (a): a supported div_facts fact too wide beside the tab at L starts under it, as on Independent)
+            const gU = n.sections.some((sec) => divUnderTabSection(sec, n.size)) ? factUnderTab(gU0) : gU0;
             const it = settlePrompts([hostItem(gU, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work

@@ -108,8 +108,10 @@ const acrossBelow = (p, ctx) => {
     // (div_facts critic r6 R6-2, CL-8: the sentence starts at the number tab's keep-out - about 1.66 tab sides from the cell's
     // left edge - and ends at the 3 mm right pad, so the line beside "110 ÷ 11 =" ran 0.5-0.8 mm from the right rule at M)
     // (`keepout`: the grid pages print-sheet.js marks; other pages keep the 2026-10 threshold)
-    if (!p.keepout) return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
-    return acrossBesideMm(p, ctx) > 184 / cols - 3 - divKeepOutMm(ctx);
+    if (!p.keepout && !p.underTab) return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
+    // (`underTab`, owner ruling 2026-11-09 (a): a div_facts fact at L that starts under the number tab starts at the cell's
+    // 3 mm pad, not right of the tab's keep-out)
+    return acrossBesideMm(p, ctx) > 184 / cols - 3 - (p.underTab ? 3 : divKeepOutMm(ctx));
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';
@@ -202,10 +204,10 @@ register('equation', {
             if (acrossBelow(p, ctx)) {
                 // (`under`: the supports-off div_facts page, owner 2026-11-08 - the line sits at the foot of the cell, the
                 // room above it is the writing room, so the cell holds no empty band under its last ink: RUBRIC H13)
-                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}${p.left ? ' ws-eq-left' : ''}${p.plain ? ' ws-eq-divplain' : ''}" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${p.left && p.fw ? `;--mq-fw:${p.fw}em` : ''}">`
+                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}${p.left ? ' ws-eq-left' : ''}${p.plain ? ' ws-eq-divplain' : ''}" data-ws-across="1"${p.underTab ? ' data-ws-undertab="1"' : ''} style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${p.left && p.fw ? `;--mq-fw:${p.fw}em` : ''}">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
-            return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
+            return `<div class="ws-eq" data-ws-across="1"${p.underTab ? ' data-ws-undertab="1"' : ''} style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
         // Lane D R4d: a missing-number sentence (`resultBox`: every unknown boxed, missing_add_sub /
         // missing_mult_div) takes the kit's ONE across look - the fact template's tight tracks
