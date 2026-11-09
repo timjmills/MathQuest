@@ -30,3 +30,8 @@ since the merge base against the lane's extracted copies before rendering anythi
 | 2026-11-09 | lf-vocab | "left" read as take-away | V21 (referent carries the heavy mark) | vocab-v21-referent | precritic | 1 round |
 | 2026-11-09 | lf-vocab | 8 r5 nits under the bar | none yet: proposed in LESSONS_LEARNED | — | — | 0 |
 | 2026-11-09 | lf-engine | Landing proof: lane's vocab zoom and nearest_10 practice rows silently changed 10 live lessons; the lane's refactor-guard baseline covered only 10 of 35 live packets | ws-lesson-baseline --all-lessons --check (every live packet, L+S, seeds 4242 + 1) — PROCESS RULE: runs on every engine change | landing backtest pair | landing gate | 1 round + 2 days unseen |
+| 2026-11-09 | lf-ops | div_facts Test printed fewer than Independent (R6-1, R7-1) | EB-PAGE (test), EB-TESTEQ (new) | eb-page-divfacts-test, test-eq-ind-divfacts | precritic | 1 round each |
+| 2026-11-09 | lf-ops | Pad, L denser than M, fact x moves, packet page empty (R6-2…5) | EB-PAD, EB-COLS, EB-FACTX, EB-PAGE (fade) | eb-pad-divfacts-M, eb-pad-page-divfacts-L, eb-cols-divfacts-array, eb-factx-divfacts, eb-page-divfacts-fade | precritic | ≈ 1 round |
+| 2026-11-09 | lf-ops | Fact-to-line gap 20 mm when the fact starts under the tab (R7-2) | EB-GAP (new) | eb-gap-divfacts | precritic | 1 round |
+| 2026-11-09 | lf-ops | R5-3 array gap, R5-5 think shrink, R5-7 fits-line wording | none: reasons in design/status/lf-ops.md | — | — | — |
+| 2026-11-09 | lf-vocab | R-1/R-2 screen feedback r7 (Match 3 line names word not letter; all pictures glow; ladder repeats; unequal blocks; key halo; hard words) | V22+, V24+, V25+ built; V26, V27 specified | V22–V25 rows | precritic | next round |

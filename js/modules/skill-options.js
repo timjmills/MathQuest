@@ -4100,3 +4100,48 @@ export function describeOptions(categoryId, skillId, opts) {
     }
     return parts.join(' · ');
 }
+
+// ============================ lane lf-ops (2026-11-07): div_facts' array support, facts card F2 ==================
+// The array support draws a TRUE array: the quotient rows of the divisor's dots (owner ruling F2, critic laned-restart
+// r4 R4-2). An array is countable while every dividend of the section is 50 or less, so it is offered only then: past
+// it the panel greys the Array box with the reason (`valueLock`, skill-options-ui.js) and the sheet's fits line names
+// the facts it did not draw it on (print-sheet.js). The largest dividend is read from the options: the largest ticked
+// table that is not 0, times the band's top quotient (10 on "Tables to 10 x 10", else 12) - the generator's own reach.
+export const DIV_ARRAY_MAX = 50;
+export function divFactsMaxDividend(opts = {}) {
+    const top = Number(opts && opts.band) === 100 ? 10 : 12;
+    let t = opts && opts.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    return ticked.length ? Math.max(...ticked) * top : 0;
+}
+export const divArrayWhy = (opts) => `An array is drawn while every dividend is ${DIV_ARRAY_MAX} or less; these tables go to ${divFactsMaxDividend(opts)}. Tick the 2 to 4 tables (or 2 to 5 on "to 10 x 10") for it.`;
+{
+    const sup = (SKILL_OPTIONS['division:div_facts'] || []).find((o) => o.id === 'support');
+    if (sup) sup.valueLock = (cur) => (divFactsMaxDividend(cur || {}) > DIV_ARRAY_MAX ? { array: divArrayWhy(cur || {}) } : null);
+    // (where the array IS offered - the 2 to 4 tables - ws-options-verify tries it)
+    if (sup) sup.valueBase = { array: { constant: [2, 3, 4] } };
+}
+
+// ============================ lane lf-ops (2026-11-07): the I Can line a fact drill's options give it ============
+// The same words print-sheet.js optionTitleBase prints over the page (a ticked fact set names it: "I Can divide by 6";
+// a band other than the default is said), so a provider's strings for THESE options say what the page says
+// (ws-cell-checks TITLE, VQ-9 / H17). '' keeps the skill's own line.
+export function optionICan(categoryId, skillId, opts, baseICan) {
+    let set = '', bandDef = null, band;
+    try {
+        set = factSetTitle(categoryId, skillId, opts || {});
+        if (set || optionsFor(categoryId, skillId).some((d) => d.id === 'constant')) {
+            bandDef = optionsFor(categoryId, skillId).find((d) => d.id === 'band') || null;
+            band = bandDef ? normalizeOptions(categoryId, skillId, opts || {}).band : undefined;
+        }
+    } catch (e) { return ''; }
+    const bandMoved = bandDef && band !== undefined && band !== null && band !== bandDef.default;
+    const hit = bandMoved ? (bandDef.values || []).find((x) => x.v === band) : null;
+    const bandPhrase = hit ? `${String(bandDef.label).toLowerCase()} ${hit.l}` : '';
+    if (set) return `I Can ${set.charAt(0).toLowerCase()}${set.slice(1)}${bandPhrase ? ` (${bandPhrase})` : ''}`;
+    if (!bandPhrase) return '';
+    const tok = (v) => (v === 144 ? '12' : v === 100 && bandDef.default === 144 ? '10' : String(v));
+    const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
+    return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
+}

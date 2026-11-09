@@ -96,6 +96,8 @@ const acrossBesideMm = (p, ctx) => {
     const aLen = Math.max(String(p.a).length, d + 1), bLen = Math.max(String(p.b).length, d);
     return em * (0.56 * (aLen + bLen) + 2 * ACROSS_OP_EM + 4 * ACROSS_GAP_EM) + blankWidth(d, ctx.size);
 };
+/** div_facts' across fact: the left inset of its sentence, the number tab's keep-out (mm; 8.3 at M's 5 mm tab, measured). */
+const divKeepOutMm = (ctx) => 1.66 * ((ctx && ctx.metrics && ctx.metrics.tabMm) || 5);
 /** The answer line under the sentence: on paper, in a column narrower than the line beside needs. */
 const acrossBelow = (p, ctx) => {
     if (!ctx || ctx.mode === 'screen') return false;
@@ -103,7 +105,13 @@ const acrossBelow = (p, ctx) => {
     if (p.mix) return true;
     const cols = Number(ctx.columns || (ctx.options && ctx.options.factColumns)) || 0;
     if (!cols) return false;
-    return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
+    // (div_facts critic r6 R6-2, CL-8: the sentence starts at the number tab's keep-out - about 1.66 tab sides from the cell's
+    // left edge - and ends at the 3 mm right pad, so the line beside "110 ÷ 11 =" ran 0.5-0.8 mm from the right rule at M)
+    // (`keepout`: the grid pages print-sheet.js marks; other pages keep the 2026-10 threshold)
+    if (!p.keepout && !p.underTab) return acrossBesideMm(p, ctx) > 186 / cols - 6.6 - 1;
+    // (`underTab`, owner ruling 2026-11-09 (a): a div_facts fact at L that starts under the number tab starts at the cell's
+    // 3 mm pad, not right of the tab's keep-out)
+    return acrossBesideMm(p, ctx) > 184 / cols - 3 - (p.underTab ? 3 : divKeepOutMm(ctx));
 };
 const slotShape = (p) => {
     const u = p.unknown || 'result';
@@ -194,10 +202,12 @@ register('equation', {
             const o = (g) => `<span class="o" style="width:${ACROSS_OP_EM}em">${g}</span>`;
             const sentence = `<span>${num('a')}</span>${o(opGlyph(p.op))}<span>${num('b')}</span>${o('=')}`;
             if (acrossBelow(p, ctx)) {
-                return `<div class="ws-eq ws-eq-below" data-ws-across="1" style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em">`
+                // (`under`: the supports-off div_facts page, owner 2026-11-08 - the line sits at the foot of the cell, the
+                // room above it is the writing room, so the cell holds no empty band under its last ink: RUBRIC H13)
+                return `<div class="ws-eq ws-eq-below${p.under ? ' ws-eq-under' : ''}${p.left ? ' ws-eq-left' : ''}${p.plain ? ' ws-eq-divplain' : ''}" data-ws-across="1"${p.underTab ? ' data-ws-undertab="1"' : ''} style="flex-direction:column;align-items:center;justify-content:flex-start;gap:0.12em${p.left && p.fw ? `;--mq-fw:${p.fw}em` : ''}">`
                     + `<span style="display:flex;align-items:flex-end;gap:${ACROSS_GAP_EM}em;white-space:nowrap">${sentence}</span>${slotHtml}</div>`;
             }
-            return `<div class="ws-eq" data-ws-across="1" style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
+            return `<div class="ws-eq" data-ws-across="1"${p.underTab ? ' data-ws-undertab="1"' : ''} style="gap:${ACROSS_GAP_EM}em">${sentence}${slotHtml}</div>`;
         }
         // Lane D R4d: a missing-number sentence (`resultBox`: every unknown boxed, missing_add_sub /
         // missing_mult_div) takes the kit's ONE across look - the fact template's tight tracks

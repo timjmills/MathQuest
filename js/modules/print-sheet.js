@@ -28,7 +28,7 @@ import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -62,7 +62,7 @@ import {
 } from './sheet/anchors.js';
 import {
     allocateSupports, alternativesOf, TOUCH_IDS, normCoverage, normMix, TOUCH_MIN_PT,
-    canDraw, supportNeeds, supportOpKey as opKey,
+    canDraw, supportNeeds, supportOpKey as opKey, fadeTo, fadeLevel,
 } from './sheet/index.js';
 
 /* ======================================================================== constants */
@@ -88,6 +88,89 @@ const PAGE_CAP = Object.freeze({
     'addition:number_families_add': { S: 12, M: 9, L: 6 },
     'multiplication:number_families_mult': { S: 8, M: 9, L: 6 },
 });
+/**
+ * A div_facts across fact printed over its answer line (equation.js acrossBelow reads the payload's `mix`: paper only,
+ * the screen keeps the line beside) - critic r5 R5-2 / R5-6.
+ */
+function factUnder(g, extra = { under: true }) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact) return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { mix: true }, extra) }) }) });
+}
+/**
+ * div_facts' fade packet (owner 2026-11-08, critic r5 R5-6 / facts card F4): every stage prints the fact over its line (one
+ * answer form) left-anchored at one x (`left`); the bare last stage puts the line at the cell foot (`under`) as the
+ * supports-off page does.
+ */
+function factFade(g, sec, fw) {
+    const sup = sec && sec.skills && sec.skills[0] && sec.skills[0].opts && sec.skills[0].opts.support;
+    // (critic r7 R7-2: a bare stage whose facts start under the number tab - `underTab`, L - keeps the fact-to-line gap of
+    // the packet's other pages: its line follows the fact, never pushed to the cell foot; its rows are 1.1 x the footprint)
+    return factUnder(g, Object.assign({ left: true, fw }, (Array.isArray(sup) && sup.length) || (sec && sec.divBareUnderTab) ? {} : { under: true }));
+}
+/** The em width of a stage's widest fact sentence ("a ÷ b ="), so every fact block of the stage, and its line, is one width. */
+function fadeFactEm(gen) {
+    let w = 0;
+    for (const g of gen) {
+        const p = g && g.q && g.q.cell && g.q.cell.payload;
+        if (p && p.fact) w = Math.max(w, 0.56 * (String(p.a).length + String(p.b).length) + 2 * 0.8 + 3 * 0.18);
+    }
+    return Math.round(w * 100) / 100 || null;
+}
+/**
+ * div_facts critic r6 R6-2 (CL-8): on the grid pages the critic graded, a div_facts across fact keeps its answer line beside
+ * it only when the line fits right of the number tab's keep-out (`keepout`, equation.js acrossBelow); else the line goes under.
+ * Other roles keep their geometry (the shared guided / lesson pages are pinned).
+ */
+const KEEPOUT_ROLES = new Set(['independent', 'more-practice', 'test', 'review']);
+function factKeepout(g) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact || c.payload.notation || g.q.skillId !== 'div_facts') return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { keepout: true }) }) }) });
+}
+/**
+ * Owner ruling 2026-11-09 (a), div_facts aids r8: at L a div_facts fact too wide for its column next to the number tab
+ * ("1xx ÷ 1x =", 50 mm of ink beside the w2 tab inset of 9.7 mm and the 3 mm CL-8 pad, in a 61.5 mm column: the skip page
+ * 2.35 mm from the rule, the fade packet's bare page in 2 x 5) starts UNDER the number tab - a taller row, 3 columns kept
+ * (css/sheet-kit.css `data-ws-undertab`). Judged on the section's options (its widest fact: the largest ticked table and
+ * its largest dividend), so every cell of the section - and every page of a fade packet - keeps one x. div_facts only, on
+ * the sections that draw a support or fade one (the supports-off page keeps its own layout).
+ */
+function divUnderTabSection(sec, size) {
+    if (size !== 'L') return false;
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts') return false;
+    let o;
+    try { o = normalizeOptions('division', 'div_facts', sk.opts || {}); } catch (e) { return false; }
+    if (o.divForm !== 'standard') return false;
+    if (!sec.divFade && divFactsPlainSection(sec)) return false;
+    // (a sign box alone draws a 14 mm pane under the fact, so the fact's own glyphs keep the CL-8 pad beside the tab - EB-PAD
+    // green - and the taller row would only cost the page a row: ws-print-lint --supports boxsign L H13 32 %)
+    const sup = Array.isArray(o.support) ? o.support : [];
+    if (!sec.divFade && sup.length && sup.every((v) => v === 'boxsign')) return false;
+    const top = Number(o.band) === 100 ? 10 : 12;
+    let t = o.constant;
+    if (typeof t === 'number' || typeof t === 'string') t = [t];
+    const ticked = (Array.isArray(t) && t.length ? t.map(Number) : Array.from({ length: 13 }, (_, i) => i)).filter((v) => v > 0 && v <= top);
+    if (!ticked.length) return false;
+    const b = Math.max(...ticked);
+    return String(b * top).length + String(b).length >= 5;
+}
+function factUnderTab(g) {
+    const c = g && g.q && g.q.cell;
+    if (!c || c.template !== 'equation' || !c.payload || !c.payload.fact || c.payload.notation || g.q.skillId !== 'div_facts') return g;
+    return Object.assign({}, g, { q: Object.assign({}, g.q, { cell: Object.assign({}, c, { payload: Object.assign({}, c.payload, { underTab: true }) }) }) });
+}
+/** Is this section div_facts alone, in its Standard (across) form, with no support drawn on any fact? */
+function divFactsPlainSection(sec) {
+    const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts') return false;
+    let o;
+    try { o = normalizeOptions('division', 'div_facts', sk.opts || {}); } catch (e) { return false; }
+    if (o.divForm !== 'standard') return false;
+    const sup = (Array.isArray(o.support) ? o.support : []).filter((v) => !(v === 'array' && divFactsMaxDividend(o) > DIV_ARRAY_MAX));
+    return sup.length === 0;
+}
 /** The page ceiling of a section (Infinity when its skill has none). */
 function pageCapOf(sec, size) {
     const sk = sec && Array.isArray(sec.skills) && sec.skills.length === 1 ? sec.skills[0] : null;
@@ -192,6 +275,25 @@ function normaliseRequest(req = {}) {
         sec.noCap = true;
         sec.pageCap = pageCapOf(sec, size);
         if (sec.dense) sec.dense = { S: pageCapOf(sec, 'S'), M: pageCapOf(sec, 'M'), L: pageCapOf(sec, 'L') };
+    }
+    // div_facts critic r5 R5-2 (facts card F1 / RUBRIC H13, ink-measured): a section of BARE div_facts facts (no support
+    // drawn: none ticked, or the array past 50) prints each fact over its answer line (the Test's form, DN-22), so the
+    // one-line fact no longer sits in a row of 22-28 mm with half of it empty (54 % at S). div_facts only: the passed
+    // add / sub / mult fact pages keep their layout.
+    // (a sheet with worked examples keeps its own layout: the anchors' blocks size its rows, ws-sibling-compare ex-group L)
+    if ((role === 'independent' || role === 'review' || role === 'more-practice') && (!req.anchors || req.anchors === 'off')) {
+        // (the rows then take what the page holds of the two-line cell, up to DN-1's 30 / 24 / 20: at L 15 in 42 mm rows
+        // left 34 % under the line, 18 in 37 mm rows leave 25 %)
+        for (const sec of sections) {
+            if (!divFactsPlainSection(sec)) continue;
+            sec.divUnder = true;
+            // (ws-empty-band EB-FOOT / EB-BAND, lf-checks L25: the rows are the facts' measured height and 1.1 x room, never
+            // stretched to the grid, so the drawn cell is the footprint and no band of 30 % is left under the line)
+            // (Auto columns only: a teacher's column count keeps its page fill - ws-sibling-compare more-cols2 PAGEFILL)
+            // (and on the engine's own re-lay of a pool-capped page, `freeRows` + a column count: div_facts {constant: [3]} at L)
+            if (!sec.columns || sec.columns === 'auto' || sec.freeRows) sec.noStretch = 1.1;
+            if (sec.dense === true && sec.columns === 'auto') sec.dense = { S: 36, M: 24, L: 20 };
+        }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
     // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
@@ -1366,10 +1468,20 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    let chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const p = q.cell.payload || {};
-    let worst = chosen.filter((id) => canDraw(id, p, template));
+    // Facts card F2 (owner 2026-11-07; critic laned-restart r4 R4-2): div_facts' array is a TRUE array, offered only
+    // while every dividend of the section is 50 or less (the options' reach, skill-options.js divFactsMaxDividend); past
+    // it the support is not drawn on any fact (arrayDropNote names them in the fits line). Kept, it is drawn on EVERY
+    // fact in one frame for the section: the largest divisor's columns by the band's top quotient's rows.
+    const divArr = sk.categoryId === 'division' && sk.skillId === 'div_facts' && opKey(p.op) === '/' && chosen.includes('array');
+    const arrayOff = divArr && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    // (dropped, it is no alternative either: the clashing supports are dealt as if it had not been ticked)
+    if (arrayOff) chosen = chosen.filter((x) => x !== 'array');
+    if (!chosen.length) return null;
+    const frameP = divArr && !arrayOff ? Object.assign({}, p, { arrayFrame: true }) : p;
+    let worst = chosen.filter((id) => !(arrayOff && id === 'array') && canDraw(id, frameP, template));
     if (!worst.length) return null;
     // Section by section across a page of several sections, a section only ever carries ITS
     // alternative (supports.js deals mixKey % alternatives), so that is all it keeps room for.
@@ -1386,7 +1498,10 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     const touch = worst.some((x) => TOUCH_IDS.includes(x));
     // Touch dots need 24 pt digits: a stack or a sentence at M / S is drawn at L (owner ruling); a
     // fact takes the fact ladder, capped at 6 columns (24 pt) by its footprint.
-    const forceL = touch && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
+    // (critic laned-restart r4 SCC-T10, one geometry a page: the sub-sections of a support split share the page, so when
+    // ANY of its alternatives carries touch dots every sub-section is drawn at that size - one digit size, one answer place)
+    const splitTouch = mix && Number.isFinite(mix.alt) && chosen.some((x) => TOUCH_IDS.includes(x) && canDraw(x, p, template));
+    const forceL = (touch || splitTouch) && template !== 'fact' && (SIZES[size] || SIZES.L).digitPt < TOUCH_MIN_PT;
     const extra = {};
     const op = opKey(p.op);
     if (op === '*' && Array.isArray(o.constant)) {
@@ -1395,6 +1510,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     }
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(o) / extra.tally), rows: extra.tally };
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
@@ -1413,7 +1529,9 @@ function splitBySupports(sec, gi, n) {
     if (!def) return [sec];
     const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
     if ((n.mix || o.mix || 'section') !== 'section') return [sec];
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    // (facts card F2: div_facts' array past dividends of 50 is drawn nowhere, so it makes no sub-section of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
     const alts = alternativesOf(chosen);
     // Up to four alternatives. A page-driven split is checked once its parts are measured (buildSheet
     // undoes it when one row of each does not fit a page, or when it holds fewer problems than the
@@ -1432,6 +1550,80 @@ function splitBySupports(sec, gi, n) {
         group: { id: `sup${gi}`, share: 1 / k },
         supportAlt: i,
     })).filter((x) => !counts || x.count);
+}
+
+/** Facts card F2: is div_facts' array asked for this item's section and NOT drawn (a dividend past 50)? */
+function arrayDroppedFor(sk, q) {
+    if (!sk || sk.categoryId !== 'division' || sk.skillId !== 'div_facts' || !q || !q.cell) return false;
+    const p = q.cell.payload || {};
+    if (opKey(p.op) !== '/') return false;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    return (Array.isArray(o.support) ? o.support : []).includes('array') && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+}
+/** The fits line's words for the facts that carry no array (facts card F2), each named as it prints. */
+function arrayDropNote(items) {
+    const facts = [];
+    let o = null;
+    for (const it of items || []) {
+        if (!it || !it.arrayDropped) continue;
+        const p = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const a = p.a !== undefined ? p.a : p.dividend, b = p.b !== undefined ? p.b : p.divisor;
+        if (a === undefined || b === undefined) continue;
+        const t = `${a} ÷ ${b}`;
+        if (!facts.includes(t)) facts.push(t);
+        if (!o && it.skillRef) o = normalizeOptions('division', 'div_facts', it.skillRef.opts || {});
+    }
+    if (!facts.length) return '';
+    return `Array support not drawn: every dividend must be ${DIV_ARRAY_MAX} or less (these tables go to ${divFactsMaxDividend(o || {})}). No array on ${facts.join(', ')}.`;
+}
+
+/**
+ * Facts card F4: one faded section of k >= 2 pages and one skill with supports, as k one-page sections, page j carrying
+ * the supports of fade level fadeLevel(j, k) (3 all, 2 the light part, 1 none) - every problem of a page alike, so the
+ * packet never adds help back (L-FADE-ORDER). A level whose supports clash keeps its fullest alternative. null: not a
+ * faded packet.
+ */
+function fadeStages(sec, n) {
+    if (!sec || sec.group || !sec.skills || sec.skills.length !== 1 || sec.count) return null;
+    const k = Math.floor(Number(sec.pages) || 1);
+    if (k < 2) return null;
+    const sk = sec.skills[0];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return null;
+    const o = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
+    if ((n.coverage || o.cover) !== 'fade') return null;
+    // (div_facts' array past dividends of 50 is not drawn at all: it takes no stage of its own)
+    const arrOff = sk.categoryId === 'division' && sk.skillId === 'div_facts' && divFactsMaxDividend(o) > DIV_ARRAY_MAX;
+    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v) && !(arrOff && v === 'array'));
+    if (!chosen.length) return null;
+    const stage = (level) => {
+        const alts = alternativesOf(fadeTo(chosen, level));
+        return alts.length ? alts.reduce((a, b) => (b.length > a.length ? b : a)) : [];
+    };
+    // (owner 2026-11-08, div_facts r5 R5-6: div_facts' packet prints one answer form - the fact over its line - with the fact
+    // left-anchored at one x, and its rows are never stretched past what they hold: `divFade`, `noStretch`)
+    const divFade = sk.categoryId === 'division' && sk.skillId === 'div_facts';
+    // (the bare last stage at S takes the supports-off page's 4 columns: left-anchored S facts in a third of the page left
+    // a 37-42 % band right of the line, H13)
+    // (and keeps the page's row fill - its line sits at the cell foot, so the taller row is writing room, not an H13 band;
+    // 12 unstretched S rows used 28 % of the page, PG-23, and a larger count breaks DN-2's half-of-the-fullest-page)
+    const bareCols = (j) => (divFade && n.size === 'S' && (!sec.columns || sec.columns === 'auto') && !stage(fadeLevel(j, k)).length ? { columns: 4, noStretch: false } : {});
+    const out = Array.from({ length: k }, (_, j) => Object.assign({}, sec, divFade ? { divFade: true, noStretch: true } : {}, bareCols(j), {
+        pages: 1,
+        fadeStage: fadeLevel(j, k),
+        skills: [Object.assign({}, sk, { opts: Object.assign({}, sk.opts || {}, { support: stage(fadeLevel(j, k)), cover: 'whole' }) })],
+    }));
+    // (critic r7 R7-2, ws-empty-band EB-GAP: the bare stage of a packet whose facts start under the number tab at L keeps the
+    // packet's one fact-to-line gap - the line follows the fact, factFade - and its rows are the footprint and 1.1 x room up
+    // to the supports-off page's ceiling (DN-1's 36 / 24 / 20), so page 3 holds what the Independent page of bare facts holds)
+    for (const s of out) {
+        if (!s.divFade || stage(s.fadeStage).length || !divUnderTabSection(s, n.size)) continue;
+        s.divBareUnderTab = true;
+        s.noStretch = 1.1;
+        if (s.dense === true) s.dense = { S: 36, M: 24, L: 20 };
+    }
+    return out;
 }
 
 /** The sheet-level mix, when the request sets one. */
@@ -1460,7 +1652,8 @@ function allocateHostSupports(items, n) {
     if (!list.length) return;
     // A More Practice set's letters are ONE sheet (coordinator, 2026-09-25): a skill fades down the
     // whole set, and its section is dealt across the letters, A before B.
-    const skillKey = (it) => it.skill;
+    // (facts card F4: each stage of a faded packet is a section of its own with its own supports, so it is dealt apart)
+    const skillKey = (it) => (it.supportsBox && it.supportsBox.stage ? `${it.skill}@fade${it.supportsBox.stage}` : it.skill);
     const chosen = {}, cover = {}, mix = {};
     for (const it of list) {
         const pl = it.supportsBox.plan;
@@ -1529,7 +1722,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     // S2: the supports this item may carry. Until the sheet is allocated it draws the worst case
     // (every support it could carry), which is what it is measured at; the allocation then swaps
     // what it does not draw for invisible reserve, so the geometry is the one measured.
-    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined };
+    const supportsBox = { plan: withSupports ? supportPlanFor(g.skill, q, template, size, mix) : null, cur: null, level: 3, mixKey: mix ? mix.key : undefined, stage: mix && mix.stage ? mix.stage : undefined };
     if (supportsBox.plan) supportsBox.cur = Object.assign({}, supportsBox.plan.extra, { on: supportsBox.plan.worst.slice(), reserve: [] });
     const forceL = !!(supportsBox.plan && supportsBox.plan.forceL);
     // The item's floor size (owner ruling 2026-09-26, LESSON_LIBRARY_PLAN.md 8a): the page's size
@@ -1682,6 +1875,9 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         canShow,
         // S2: the supports box (shared by every clone a role makes of this item) and what it holds.
         supportsBox,
+        // facts card F2: div_facts' array asked but past dividends of 50, so not drawn (the fits line names the fact)
+        arrayDropped: withSupports && arrayDroppedFor(g.skill, q),
+        skillRef: g.skill,
     };
     return item;
 }
@@ -2104,6 +2300,30 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
 }
 
 /** Lay out and read the cells not measured before (measureItems); `serial` measures one cell at a time. */
+/**
+ * div_facts critic r6 R6-2 / R6-3 (WDS CL-8, the fact's 3 mm side pad): the measuring cell carries a one-letter label, so it
+ * misses the page's number tab keep-out (a two-digit tab is 1.4 tab sides + 1 mm) and passed "110 ÷ 10 =" in 4 columns at M
+ * (0.7 mm from the right rule) and "48 ÷ 4 =" in 4 columns at L (1.5 mm). A div_facts fact (payload `fact`, across) is too
+ * wide for a column when its sentence's ink (Andika digits 0.58 em, the 0.8 em operator tracks, measured 5.07 em for
+ * "108 ÷ 12 =") from the two-digit tab's keep-out plus the 3 mm right pad passes the cell. div_facts only.
+ */
+function divFactTooWide(it, size, innerMm) {
+    const q = it && it.q;
+    const p = q && q.skillId === 'div_facts' && q.cell && q.cell.template === 'equation' && q.cell.payload;
+    if (!p || !p.fact || p.notation) return false;
+    const s = SIZES[size] || SIZES.L;
+    const em = (s.digitPt / 72) * 25.4;
+    const digits = String(p.a).length + String(p.b).length;
+    // (owner ruling 2026-11-09 (a): a fact that starts under the number tab has the cell's 3 mm pad on its left, not the inset)
+    if (p.underTab) return em * (0.58 * digits + 2 * 0.8 + 3 * 0.18) + 3 + 3 > innerMm;
+    // (OPEN at L, lead question: "1xx ÷ 1x =" at 28 pt is 50 mm of ink, so beside a page past 9's w2 tab inset (9.7 mm) a
+    // third of the page (61.5 mm) cannot hold it with its 3 mm pad - the guard would put every 3-digit band's L page in 2
+    // columns of 92 mm cells, 31 % empty beside the fact (EB-SIDE). L keeps its 3 columns for those facts until ruled.)
+    if (size === 'L' && digits >= 5) return false;
+    const ink = em * (0.58 * digits + 2 * 0.8 + 3 * 0.18);
+    // (the left inset of a page numbered past 9 - sheet-kit.css "grid past 9": the w2 tab's keep-out + 0.3 mm - and the 3 mm pad)
+    return ink + Math.max(s.tabMm * 1.4 + 1.3, s.tabMm + 1.3) + 3 > innerMm;
+}
 function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }) {
     // every DOM use in the measuring frame's document (measureDocument; main 2026-10-30), read with that frame's window
     const document = MDOC && MDOC.body ? MDOC : globalThis.document;
@@ -2277,7 +2497,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             for (const it of items) {
                 const b = best.get(it);
                 it.measured = it.measured || {};
-                it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits };
+                it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits && !divFactTooWide(it, size, inner) };
                 if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
@@ -2539,7 +2759,7 @@ function heightClassOf(sec, items, gridMm) {
     if (sec.heightClass) for (const it of items) if (it) it.hClass = true;
 }
 
-const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows });
+const layoutBase = (role, section, items) => ({ role, columns: section.columns, count: items.length, floor: section.floor, gridH: section.gridH, sharedPage: section.sharedPage, dense: section.dense, maxCols: section.maxCols, noCap: section.noCap, pageCap: section.pageCap, freeRows: section.freeRows, ...(section.noStretch ? { noStretch: section.noStretch } : {}) });
 
 /**
  * The column-work group a practice page splits off (practice.js fineSplit), exactly as the role
@@ -2876,6 +3096,8 @@ async function buildSheetOnce(req = {}) {
  * naming the page's own digit size alone.
  */
 function touchFitLine(line, html, size) {
+    // (critic r5 R5-7: a ÷ fact's touch support is a tally row that carries no ws-tn, and the fact prints at L's digits)
+    if (size !== 'L' && !/ws-tn/.test(html || '') && /data-ws-support-on="touch"/.test(html || '')) return line.replace(/Digits (\d+) pt\./, (m, pt) => `Digits ${pt} pt; touch-dot facts ${SIZES.L.digitPt} pt.`);
     if (size === 'L' || !/ws-tn/.test(html || '')) return line;
     const stack = /class="ws-stack/.test(html), fact = /class="ws-fact/.test(html);
     const what = stack && fact ? 'touch-dot cells 24-28 pt' : stack ? 'touch-dot cells 28 pt' : 'touch-dot facts 24 pt or more';
@@ -2926,6 +3148,13 @@ async function buildSheetDeal(req = {}) {
     // becomes one sub-section per alternative (section A touch dots, section B dot tiles). Each
     // sub-section lays out and reserves room for its OWN support only, so a page is as full as it
     // is without supports, less that support's own size.
+    // Facts card F4 (owner 2026-11-07; critic laned-restart r4 R4-5): a FADED PACKET of several pages is dealt in support
+    // order, one stage a page (all, then the light part, then none: supports.js fadeTo / fadeLevel), each page its own
+    // section, so its rows are sized to the supports THAT page carries - never to the first page's reserved room.
+    if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') {
+        const staged = fadeStages(n.sections[0], n);
+        if (staged) { n.sections = staged; n.coverage = undefined; }
+    }
     const unsplit = n.sections;
     if (n.sections.length === 1 && n.role === 'independent' && n.anchors === 'off') n.sections = n.sections.flatMap((sec, gi) => splitBySupports(sec, gi, n));
 
@@ -3000,8 +3229,10 @@ async function buildSheetDeal(req = {}) {
     const floorWith = (si, items) => floorOf(anchorMode === 'side' && anchorSets[si] ? items.concat(anchorSets[si].items) : items, n);
 
     const build = (sectionIdx, sec, count, baseSeed, extra = {}) => {
-        const gen = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
-        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt };
+        const gen0 = generateRun(sec.skills, count, baseSeed, Object.assign({ itemCount: sec.count || null }, extra));
+        const gen1 = sec.divFade ? gen0.map((g, _i, all) => factFade(g, sec, fadeFactEm(all))) : gen0.map((g) => (sec.divUnder ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g));
+        const gen = divUnderTabSection(sec, n.size) ? gen1.map(factUnderTab) : gen1;
+        const mix = { key: sectionIdx, count: n.sections.length, sheet: n.mix, alt: sec.supportAlt, stage: sec.fadeStage };
         return gen.map((g) => settlePrompts([hostItem(g, sectionIdx, n.size, { mix })], sec.instructionKey || metaOf(g.skill).instructionKey)[0]);
     };
 
@@ -3278,6 +3509,10 @@ async function buildSheetDeal(req = {}) {
             // only grows as items are added, so the capacity can only fall; the loop settles.
             const pageCount = () => (shared[si] !== null ? shared[si] : capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, probe.items), n, lctx)));
             let want = sec.count || Math.min(MAX_ITEMS, pageCount() * pagesWanted);
+            // (facts card F4: a later stage of a faded packet holds at most twice the first stage's page - every page of
+            // the packet at least half used, PG-20 / DN-2 - so the bare last page is not a crowd beside a supported first)
+            // (held to the cap, the count is the page's own: its rows are spread down the page, never half of it left bare)
+            if (sec.fadeCap && want > sec.fadeCap) { want = sec.fadeCap; sec.count = want; }
             let items = [];
             // A MIXED POOL (mixed_composing, counting_all ...) is one skill whose items come from
             // many templates, 25 to 110 mm tall. Its probe's tallest item sized every page, so a page
@@ -3292,7 +3527,7 @@ async function buildSheetDeal(req = {}) {
                 if (anchorMode === 'side' && anchorSets[si]) anchorSets[si].grow(items.length + 2);
                 sec.floor = floorWith(si, pool ? items : probe.items.concat(items));
                 if (sec.count) break;
-                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
+                const again = shared[si] !== null ? want : Math.min(MAX_ITEMS, sec.fadeCap || MAX_ITEMS, capFromL(sec, si, layoutOf(n.role, sec, withTwins(si, items), n, lctx)) * pagesWanted);
                 if (pool) {
                     if (again >= want) fitBest = Math.max(fitBest, want);
                     if (again === want) break;
@@ -3503,6 +3738,9 @@ async function buildSheetDeal(req = {}) {
                 } catch (e) { /* keep the count */ }
             }
             hostItems = hostItems.concat(markSectionWriteAbove(items));
+            // (div_facts critic r6 R6-4: its bare last stage takes its page - 12 unstretched rows of the twice-cap left 129 mm
+            // white at M, H5; each stage's rows are sized to its own supports, F4 - so div_facts' stages are not capped)
+            if (sec.fadeStage && si === 0 && !sec.divFade) for (const s2 of n.sections.slice(1)) if (s2.fadeStage) s2.fadeCap = 2 * items.length;
         }
     } else {
         // MORE PRACTICE: each letter under its own seed (PT-MPR-2). The first letter's probe fixes
@@ -3626,7 +3864,7 @@ async function buildSheetDeal(req = {}) {
         items: hostItems,
         skills,
         anchors: anchorsIn,
-        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}) })),
+        sections: n.sections.map((s) => ({ columns: s.columns, instructionKey: s.instructionKey, floor: s.floor, gridH: s.gridH, sharedPage: s.sharedPage, dense: s.dense, maxCols: s.maxCols, capH: s.capH, noCap: s.noCap, pageCap: s.pageCap, freeRows: s.freeRows, ...(s.capFillCont ? { capFillCont: true } : {}), ...(s.noStretch ? { noStretch: s.noStretch } : {}) })),
         ctx: { size: n.size, look: n.look, paper, photocopySafe: n.photocopySafe },
         header,
         form: n.form,
@@ -3676,6 +3914,7 @@ async function buildSheetDeal(req = {}) {
     const f0 = fitsList[0] || {};
     const pageCount = out.pupilPages.length;
     notes.push(...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes);
+    { const an = arrayDropNote(hostItems); if (an) notes.push(an); }
     // DN-21: the dialog's "Fits:" line (it already carries the layout's own clamp note, DN-14),
     // then any note the layout line does not already say.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -3950,7 +4189,13 @@ async function buildRoleSheet(n, metaOf) {
         header.refBand = nline.html;
     }
     const ctx = { size: n.size, look: n.look, paper: n.paper, photocopySafe: n.photocopySafe };
-    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(ctx) : [1, 2]) || [1, 2];
+    // (critic laned-restart r4 R4-2c: a role may measure one more column count for a section of supported problems -
+    // review.js - so the sheet says when any skill ticks a support)
+    const supported = n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.opts && Array.isArray(sk.opts.support) && sk.opts.support.length));
+    // (critic r7 R7-1: a div_facts Test lays out on its Independent page's grid - 5 columns of drawn arrays at S - so it says
+    // when the sheet is div_facts with a support; test.js measures the 5th column then)
+    const divSupported = supported && n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.categoryId === 'division' && sk.skillId === 'div_facts'));
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported }, divSupported ? { divSupported } : {})) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {
@@ -4058,7 +4303,11 @@ async function buildRoleSheet(n, metaOf) {
             const g = pl && Number(pl.digits) !== mixDigits
                 ? Object.assign({}, g0, { q: Object.assign({}, g0.q, { cell: Object.assign({}, g0.q.cell, { payload: Object.assign({}, pl, { digits: mixDigits }, pl.regroup === undefined ? { regroup: false } : {}) }) }) })
                 : g0;
-            const it = settlePrompts([hostItem(g, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
+            // (critic r5 R5-2: a Review's bare div_facts facts print over their answer line, as on the Independent page)
+            const gU0 = n.sections.some((sec) => sec.divUnder) && g.skill && g.skill.categoryId === 'division' && g.skill.skillId === 'div_facts' ? factUnder(g, { plain: true }) : KEEPOUT_ROLES.has(n.role) ? factKeepout(g) : g;
+            // (owner ruling 2026-11-09 (a): a supported div_facts fact too wide beside the tab at L starts under it, as on Independent)
+            const gU = n.sections.some((sec) => divUnderTabSection(sec, n.size)) ? factUnderTab(gU0) : gU0;
+            const it = settlePrompts([hostItem(gU, 0, n.size, { mix: { key: pi, count: pools.length, sheet: n.mix } })], metaOf(g.skill).instructionKey)[0];
             if (keepPrompts) it.stripPrompt = false;
             // Error analysis never falls back to an "Answer:" line under the cell: the shown work
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
@@ -4403,6 +4652,7 @@ async function buildRoleSheet(n, metaOf) {
     const f0 = fitsList[0] || {};
     const notes = [...new Set((plan.meta && plan.meta.notes) || []), ...anchorNotes, ...arrangementNotes.filter((t) => !((plan.meta && plan.meta.notes) || []).includes(t)), ...dealNotes];
     if (numberLine && numberLine.warn) notes.push(numberLine.warn);
+    { const an = arrayDropNote(items); if (an) notes.push(an); }
     // SF-34: touch numerals never print under 24 pt, so on an S / M page the stacked touch cells
     // are raised to L; the fit line says so instead of the page's own digit size alone.
     const line = touchFitLine(f0.line || '', out.pupilHtml, n.size);
@@ -4506,8 +4756,11 @@ async function buildLesson(n, metaOf) {
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
-    if (sk.opts && LESSON_OFF_OPTS.some((k) => sk.opts[k] === true)) {
-        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(LESSON_OFF_OPTS.map((k) => [k, false]))) });
+    // (lane lf-ops: lesson data may name more - `offOpts`: the x / ÷ story lessons leave the practice bar model off, whose
+    // full-width bar ran their chart off the page, ws-cell-checks OVERFLOW)
+    const offOpts = LESSON_OFF_OPTS.concat(data0 && Array.isArray(data0.offOpts) ? data0.offOpts : []);
+    if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
+        sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
     if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
@@ -6236,7 +6489,10 @@ async function buildSheetFill0(req = {}) {
                 const relay = async (pick0) => {
                     const c0 = Number(best.fits && best.fits.cols) || 1;
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
-                    for (let c = c0; c >= 1; c--) {
+                    // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
+                    // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
+                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;
                             const alt = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: n, columns: c, freeRows: true })] }));

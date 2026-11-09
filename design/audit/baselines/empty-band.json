@@ -3,7 +3,8 @@
  "written": "2026-11-08",
  "skills": [
   "addition:add_facts",
-  "multiplication:mult_facts"
+  "multiplication:mult_facts",
+  "division:div_facts"
  ],
  "counts": {
   "addition:add_facts scripted-model S|EB-SIDE": 6,
@@ -60,6 +61,31 @@
   "multiplication:mult_facts lesson L|EB-BAND": 6,
   "multiplication:mult_facts independent L {support: array}|EB-SIDE": 7,
   "multiplication:mult_facts worksheet 1280px|EB-SIDE": 2,
-  "multiplication:mult_facts quiz 1280px|EB-SIDE": 1
+  "multiplication:mult_facts quiz 1280px|EB-SIDE": 1,
+  "division:div_facts lesson S|EB-BAND": 20,
+  "division:div_facts lesson M|EB-BAND": 20,
+  "division:div_facts lesson L|EB-BAND": 4,
+  "division:div_facts opener S|EB-BAND": 14,
+  "division:div_facts opener M|EB-BAND": 5,
+  "division:div_facts opener L|EB-BAND": 2,
+  "division:div_facts guided S|EB-BAND": 2,
+  "division:div_facts guided S|EB-SIDE": 2,
+  "division:div_facts guided M|EB-BAND": 3,
+  "division:div_facts guided L|EB-BAND": 6,
+  "division:div_facts fact-probe S|EB-SIDE": 20,
+  "division:div_facts fact-probe M|EB-SIDE": 20,
+  "division:div_facts fact-probe L|EB-SIDE": 2,
+  "division:div_facts scripted-model S|EB-SIDE": 3,
+  "division:div_facts scripted-model M|EB-SIDE": 1,
+  "division:div_facts scripted-model L|EB-BAND": 2,
+  "division:div_facts scripted-model L|EB-SIDE": 1,
+  "division:div_facts mixed-practice M|EB-FOOT": 21,
+  "division:div_facts mixed-practice L|EB-FOOT": 10,
+  "division:div_facts reason-it L|EB-BAND": 2,
+  "division:div_facts stretch M|EB-BAND": 1,
+  "division:div_facts stretch L|EB-BAND": 1
+ },
+ "skillNotes": {
+  "division:div_facts": "lead ruling 2026-11-08: the lesson / opener / guided / fact-probe / scripted-model / mixed-practice rows (and reason-it L, stretch M / L, the same shared-role bands pinned on add_facts / mult_facts) are shared fact roles, graded in the facts-roles task, not the support-aid round; pinned at live master's counts (23 keys, 162 findings, identical on origin/master 5cbe360). Every other div_facts render must be clean; a rise or a new render FAILs."
  }
 }
