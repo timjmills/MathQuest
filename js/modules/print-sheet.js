@@ -96,7 +96,9 @@ function factUnder(g, extra = { under: true }) {
  */
 function factFade(g, sec, fw) {
     const sup = sec && sec.skills && sec.skills[0] && sec.skills[0].opts && sec.skills[0].opts.support;
-    return factUnder(g, Object.assign({ left: true, fw }, Array.isArray(sup) && sup.length ? {} : { under: true }));
+    // (critic r7 R7-2: a bare stage whose facts start under the number tab - `underTab`, L - keeps the fact-to-line gap of
+    // the packet's other pages: its line follows the fact, never pushed to the cell foot; its rows are 1.1 x the footprint)
+    return factUnder(g, Object.assign({ left: true, fw }, (Array.isArray(sup) && sup.length) || (sec && sec.divBareUnderTab) ? {} : { under: true }));
 }
 /** The em width of a stage's widest fact sentence ("a ÷ b ="), so every fact block of the stage, and its line, is one width. */
 function fadeFactEm(gen) {
@@ -1580,11 +1582,21 @@ function fadeStages(sec, n) {
     // (and keeps the page's row fill - its line sits at the cell foot, so the taller row is writing room, not an H13 band;
     // 12 unstretched S rows used 28 % of the page, PG-23, and a larger count breaks DN-2's half-of-the-fullest-page)
     const bareCols = (j) => (divFade && n.size === 'S' && (!sec.columns || sec.columns === 'auto') && !stage(fadeLevel(j, k)).length ? { columns: 4, noStretch: false } : {});
-    return Array.from({ length: k }, (_, j) => Object.assign({}, sec, divFade ? { divFade: true, noStretch: true } : {}, bareCols(j), {
+    const out = Array.from({ length: k }, (_, j) => Object.assign({}, sec, divFade ? { divFade: true, noStretch: true } : {}, bareCols(j), {
         pages: 1,
         fadeStage: fadeLevel(j, k),
         skills: [Object.assign({}, sk, { opts: Object.assign({}, sk.opts || {}, { support: stage(fadeLevel(j, k)), cover: 'whole' }) })],
     }));
+    // (critic r7 R7-2, ws-empty-band EB-GAP: the bare stage of a packet whose facts start under the number tab at L keeps the
+    // packet's one fact-to-line gap - the line follows the fact, factFade - and its rows are the footprint and 1.1 x room up
+    // to the supports-off page's ceiling (DN-1's 36 / 24 / 20), so page 3 holds what the Independent page of bare facts holds)
+    for (const s of out) {
+        if (!s.divFade || stage(s.fadeStage).length || !divUnderTabSection(s, n.size)) continue;
+        s.divBareUnderTab = true;
+        s.noStretch = 1.1;
+        if (s.dense === true) s.dense = { S: 36, M: 24, L: 20 };
+    }
+    return out;
 }
 
 /** The sheet-level mix, when the request sets one. */
