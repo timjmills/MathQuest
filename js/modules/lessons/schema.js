@@ -21,6 +21,7 @@
 //     cases?:   ['bigFirst', ...]                      the cases the routine teaches (LR-1, LR-2;   [library]
 //                                                      names from sheet/lesson-rules.js CASE_FAMILIES)
 //     casesPending?: 'why'                             no `cases` declared yet, and why             [library]
+//     iconsPending?: 'why'                             steps share an icon (LR-3) as ported from master, and why [library]
 //     caps?:    {case: n}                              at most n a page (LR-7)                      [library]
 //     guided?:  ['roundUp', ...]                       Guided practice's cases, in order
 //     floors:   minOperand, minTop, maxTop, maxSmall, distinctFirst, distinctAnswer (LR-2, LR-6)
@@ -121,7 +122,7 @@ export const FAMILY_IDS = Object.freeze(['early', 'placevalue', 'addsub', 'multd
 export const NEED_KINDS = Object.freeze(['skill', 'option', 'steps', 'lesson']);
 
 /** A routine's fields the library keeps for itself: lessonData() never hands them to the engine. */
-export const LIBRARY_ONLY = Object.freeze(['archetype', 'cases', 'casesPending', 'caps']);
+export const LIBRARY_ONLY = Object.freeze(['archetype', 'cases', 'casesPending', 'caps', 'iconsPending']);
 
 /** A Prerequisite Check holds 3 or 4 questions (owner ruling 2026-09-26). */
 export const PREREQ_MIN = 3;
@@ -169,7 +170,8 @@ export function validateRoutine(id, r, known = {}) {
     if (!Array.isArray(r.steps) || r.steps.length < 2 || r.steps.length > 10) e('steps: 2-10 steps');
     else {
         const icons = r.steps.map((s) => s && s.icon);
-        if (new Set(icons).size !== icons.length) e('LR-3: two steps share an icon');
+        // (`iconsPending: 'why'`: a routine ported from master as printed, whose steps share an icon until it is carded)
+        if (new Set(icons).size !== icons.length && !String(r.iconsPending || '').trim()) e('LR-3: two steps share an icon');
         if (known.stepIcons) for (const i of icons) if (!known.stepIcons.includes(i)) e(`LR-3: "${i}" is not a drawn icon`);
         for (const s of r.steps) if (!s || !String(s.text || '').trim()) e('a step without words');
     }

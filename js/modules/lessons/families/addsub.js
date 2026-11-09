@@ -268,7 +268,7 @@ const NR_STEPS_BIG = [
 // the facts a row of their own, four across, on the S and M lesson sheets: in a half-page cell a
 // one-digit column left 34 % of the width empty. At L the extra row does not fit the sheet.)
 const NR_FACTS_10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['stacked'] }, why: 'Each column is a take-away fact within 10.' };
-const NR_PV = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
+const NR_PV = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Name the tens digit and the ones digit.' };
 const NR_PENDING = 'The SU-C pilot lesson keeps its Warm-up (its rung below and the facts within 10) until its Prerequisite Check is written (LR-17).';
 const nr = (o) => Object.assign({ routine: 'sub-column-no-regroup', defaultFor: true, prereqsPending: NR_PENDING }, o);
 
@@ -313,7 +313,7 @@ export const LESSONS = Object.freeze({
         // LR-17: the Prerequisite Check, most basic first. (`check`: each stack with its Check line,
         // the lesson's step 5, and a cell its content fills, H13.)
         prereqs: [
-            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.' },
+            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.' },
             { lesson: 'Y2.B1.S5', title: 'Partition numbers to 100', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.', checks: 'Write a 2-digit number as tens + ones.' },
             { lesson: 'Y2.B2.S10', title: 'Subtract across 10', key: 'subtraction:subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9, why: 'After regrouping, the ones column is a teen fact: 13 − 5.', checks: 'Take a 1-digit number from a teen number, across 10.' },
             { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.', checks: 'Subtract two 2-digit numbers in columns, with no regrouping.' },
@@ -332,13 +332,13 @@ export const LESSONS = Object.freeze({
         practice: { skill: 'subtraction:sub_50_no_regroup' },
         warmup: [NR_FACTS_10, NR_PV],
         teach: { warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1 },
-        mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     'Y2.B2.S17': nr({
         practice: { skill: 'subtraction:sub_100_no_regroup' },
         warmup: [{ key: 'subtraction:sub_50_no_regroup', why: 'The same column steps with smaller numbers.' }, NR_FACTS_10],
         teach: { vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1 },
-        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit, so
     // `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens. It
@@ -347,7 +347,7 @@ export const LESSONS = Object.freeze({
         practice: { skill: 'subtraction:sub_2d_1d' },
         warmup: [NR_FACTS_10, NR_PV],
         teach: { warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true },
-        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     'Y3.B2.S12': nr({
         practice: { skill: 'subtraction:sub_1k_no_regroup' },

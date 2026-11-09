@@ -493,7 +493,7 @@ for (const id of Object.keys(LIB.LESSONS)) {
 }
 const yp = LIB.lessonData('Y2.B2.S18').prereqs;
 eq(yp.map((p) => Object.keys(p).sort().join(',')), ['checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why', 'checks,lesson,ref,title,why'], 'LR-17: each question {lesson, title, why, checks, ref}');
-eq(yp[0], { lesson: 'Y2.B1.S4', title: 'Use a place value chart', why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.', ref: { categoryId: 'placevalue', skillId: 'identify', opts: { band: 99, places: [1, 10] } } }, 'LR-17: question 1 of Y2.B2.S18');
+eq(yp[0], { lesson: 'Y2.B1.S4', title: 'Use a place value chart', why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.', ref: { categoryId: 'placevalue', skillId: 'identify', opts: { band: 99, places: [1, 10], writeValue: false } } }, 'LR-17: question 1 of Y2.B2.S18');
 eq(yp[2].ref, { categoryId: 'subtraction', skillId: 'subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9 }, 'LR-17: a question ref carries its floors (critic r1 D8: a kit fact, no exchange box, no Check line)');
 yp[0].ref.opts.band = 1;
 eq(LIB.lessonData('Y2.B2.S18').prereqs[0].ref.opts.band, 99, 'library: lessonData hands out fresh objects');
