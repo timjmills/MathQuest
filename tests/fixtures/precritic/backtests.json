@@ -2867,6 +2867,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-pad-page-divfacts-L",
+   "check": "division:div_facts at L: the skip page 2.35 mm from the right rule (\"1xx ÷ 1x =\" beside the w2 tab inset) and the fade packet page 3 in 2 x 5 with 53 mm white (div_facts aids r8, owner ruling 2026-11-09 (a))",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAD + EB-PAGE at L",
+   "browser": true,
+   "fail": {
+    "commit": "be028660",
+    "state": "lf-ops r8: EB-PAD 8 (skip Independent / Test L, 2.35 mm), EB-PAGE 1 (fade packet L p3, 53.3 mm white, 2 x 5)"
+   },
+   "pass": {
+    "commit": "a4c6b694",
+    "state": "a supported / faded section reaching 5-digit facts starts each fact under the number tab at L (3 mm pad, taller row, 3 columns); EB-PAD / EB-PAGE OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^((independent|test) L .support: skip|fade packet)\" --rules EB-PAD,EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
