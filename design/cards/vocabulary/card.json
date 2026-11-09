@@ -159,6 +159,11 @@
       "date": "2026-11-07",
       "ruling": "Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and 4 (Match 3) are the owner's: a value that prints fewer items than the default page for that reason is owner-ruled capacity (tests/fixtures/precritic/options-render.pins.json), not an H13 cost.",
       "source": "owner in the lead session, relayed by the lead 2026-11-07"
+    },
+    {
+      "date": "2026-11-08",
+      "ruling": "OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a larger unit; within ONE item every base-ten picture shares one scale (critic r4 OQ-1: a 2.5 mm unit made 'one' a speck in a grade 2 cell).",
+      "source": "owner (\"yes to your recommendations\", 2026-11-08), relayed by the lead"
     }
   ],
   "misconceptions": [

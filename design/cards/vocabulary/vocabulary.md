@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"9ba3eb2414109b14","format":2,"configSha":"ecfd9e8dd604"}
+{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"d021ff5acb98ea3cd6658246461e2ef5f5ed899e","bodySha":"376febcde4245b64","format":2,"configSha":"9c6a67d93776"}
 {"cited":"","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 3 901e56 6 6e19d8 BD-4 b3947b 11 29d891 RP-1 d529bd 20 8888b0 SL-2 f404d5 3 468d78 SP-2 1f2df0 3 7b7bfb","entries":"D%3AvocabTask%3Dmatch3 bcefeb D%3AvocabTask%3Dpick3 bcefeb D%3AvocabGrade%3D1 bcefeb D%3AvocabGrade%3D2 bcefeb D%3AvocabGrade%3D3 bcefeb D%3AvocabGrade%3D4 bcefeb D%3AvocabSet%3Dnull bcefeb D%3AvocabSet%3D0 bcefeb D%3AvocabSet%3D1 bcefeb D%3AvocabSet%3D2 bcefeb D%3AvocabSet%3D3 bcefeb D%3AvocabSet%3D4 bcefeb D%3AvocabSet%3D5 bcefeb D%3AvocabSet%3D6 bcefeb D%3AvocabSet%3D7 bcefeb D%3AvocabSet%3D8 bcefeb D%3AvocabSet%3D9 bcefeb D%3AvocabSet%3D10 bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson 04b8b3 D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
@@ -18,6 +18,7 @@
  {"id":"T-5.6","source":"§5.6","text":"\"All as suggested\": the card approved as the lane decided it (section 9 answered as rec..."},
  {"id":"T-5.7","source":"§5.7","text":"Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:voca..."},
  {"id":"T-5.8","source":"§5.8","text":"Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and..."},
+ {"id":"T-5.9","source":"§5.9","text":"OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a ..."},
  {"id":"T-9.1","source":"§9.1","text":"Screen response for Match 3: type the letter in each box (built), or tap A / B / C unde..."},
  {"id":"T-9.2","source":"§9.2","text":"Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in r..."}
 ]
@@ -525,7 +526,7 @@ Template `vocab-match3` — `js/modules/sheet/cells/vocab-match3.js`; also The s
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `9ad4eb57ab31`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `d021ff5acb98`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (8 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -571,6 +572,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-07** — "All as suggested": the card approved as the lane decided it (section 9 answered as recommended). (`owner in the lead session, relayed by the lead 2026-11-07`)
 - **2026-11-07** — Q1: role:lesson is OUT OF SCOPE for vocabulary:vocab_grade_pictures and vocabulary:vocab_pick3_words: their lesson is the lesson part vocab-page inside each BUILD lesson. (`owner in the lead session, relayed by the lead 2026-11-07`)
 - **2026-11-07** — Q2: the page counts 4 / 6 / 8 (1 picture, 3 words at K-1 / grades 2-3 / grades 4-5) and 4 (Match 3) are the owner's: a value that prints fewer items than the default page for that reason is owner-ruled capacity (tests/fixtures/precritic/options-render.pins.json), not an H13 cost. (`owner in the lead session, relayed by the lead 2026-11-07`)
+- **2026-11-08** — OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a larger unit; within ONE item every base-ten picture shares one scale (critic r4 OQ-1: a 2.5 mm unit made 'one' a speck in a grade 2 cell). (`owner ("yes to your recommendations", 2026-11-08), relayed by the lead`)
 
 ## 6. Misconceptions
 
@@ -649,7 +651,7 @@ Each runs as `node tests/scripts/<script> …`.
 1. **Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?** Recommended: Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)
 2. **Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?** Recommended: Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)
 
-Signed: owner, 2026-11-07
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
