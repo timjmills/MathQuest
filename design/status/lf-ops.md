@@ -6,7 +6,7 @@ Owner of files: LANES.operations (gen-operations.js, gen-mult-patterns.js, the o
 State: paused
 Updated: 2026-11-07
 Builder profile: mq-opus-medium
-Critic rounds: 4, FAIL (build #4 r1 lowest 2; div_facts r5 lowest 6, r6 lowest 5; plain stories r1 lowest 3)
+Critic rounds: 5, FAIL (build #4 r1 lowest 2; div_facts r5 6, r6 5, r7 7; plain stories r1 3)
 
 ## Now
 - HAND-OVER 2026-11-07 ~13:50 UTC (lead: no new work after ~14:10, week at ~44-60 %). Nothing passed; nothing added to redesign-passed.js. Draft PR #38 into claude/sweet-newton-c8wrv1.
@@ -129,6 +129,29 @@ Lesson regression check (lead rule 2026-11-08, before any deploy): branch vs ori
 - PARKED (lead 2026-11-08 ~20:40 UTC). Next week, in order: the owner's ruling -> a short builder -> critic r7 (keep its renders) -> a narrow deploy branch (div_facts aids commits only) on current master 198d437e9, after ws-detailed-lesson --check / --repeats on the 5 lessons, ws-empty-band and the hash check.
 - Commits: app 4a07ada1, c05a5dae, 893377fa, d943b0d4; checks / tests d2fc15ec, 15ca2e52, 9ce3c683.
 
+## Critic div_facts r7 (narrow, 17ce2fe1, 2026-11-09) - FAIL, lowest 7 (two C3 7); every other graded page >= 8
+Report design/audit/runs/lf-ops/critic-divfacts-r7.md; renders kept in the lane session's scratchpad r7-renders/ (not in the repo). R6-1..R6-5 all fixed (Test pages full; side gap at M 3.70 mm; array L 2 columns vs M 4; fade M page 3 holds 24, 91.5 % used; one fact x across the packet). Regression add / mult facts, div_facts_long byte-identical to r6 (12 / 12). Keys correct.
+- R7-1 (C3 7): supports-off and greyed-array Test M prints 21 where Independent M prints 24: Test rows 29.1 mm vs 27.8 mm (FACT_TEST_ROOM 1.15 in sheet/roles/test.js), the 8th row misses by 1.6 mm, 34.4 mm white; breaks the owner's 2026-11-08 ruling (Test count follows Independent). Fix: the Test rows take the Independent row factor (1.1) for facts. Lead question: other supports print fewer on Test than Independent but each page is full in its own rows (skip S 18 / 21, think S 21 / 24, boxsign M 12 / 16, array S 16 / 20, L 9 / 10) and scored 8 - ruling needed whether the owner's Test = Independent count applies there too.
+- R7-2 (C3 7): fade packet L page 3: 20.1 mm between the fact (started under the tab) and its answer line, against 12.7 mm everywhere else; rows 41.1 mm, 15 facts where Independent L holds 18, 42.6 mm white. Fix: the under-the-tab start keeps the 12.7 mm fact-to-line gap.
+Five-lesson check (lead rule) on 17ce2fe1 vs origin/master 2fe21f2b: g3-oa5, g3-oa9-input-output, g4-nbt1 match; g3-oa9-mult-table matches (E2 font flake on the first run, two re-runs OK); g3-oa8 (not passed) still worse on the branch (E9b, E12 on P2 from the stories work) - not in the narrow deploy.
+
+### Findings -> checks (owner / lead 2026-11-09; rounds r5-r7 of div_facts)
+| Finding | Check that now catches it (new / extended) | Backtest row (FAIL on failed state, PASS on fix) | On precritic / detailed-lesson path | Would have saved |
+|---|---|---|---|---|
+| R5-1 Test rows stretched (fillToCeiling) | H13-INK on Test pages (extended; F1) + `--h13-ink plain` | h13-ink-test-plain-lf (c41a48c / 96e1b1c) | precritic print-lint-h13-plain-S/M/L | 1 round (r5) |
+| R5-2 supports-off page stretched | H13-INK plain (extended) + ws-empty-band EB-BAND | h13-ink-test-plain-lf; eb-ops-divfacts-S (b23e418 / 35ede15a) | precritic h13-plain rows, empty-band | 1 round |
+| R5-3 no RP-81 array gap | none: drawn-array gap is visual; one-line reason: needs a per-SVG circle-row pitch probe, proposed (critic r5 check 2), not built | - | - | 0 (fixed in the same round) |
+| R5-4 S = M count on tables 2-4 | EB-COLS columns(L) <= columns(M) (partial) | eb-cols-divfacts-array | precritic empty-band | 1 round |
+| R5-5 think box shrink | none: proposed shrink-to-fit probe on support SVGs not built; reason: one finding, fixed by removing max-width | - | - | 0 |
+| R5-6 / R6-4 fade packet page 3 empty | EB-PAGE white under the grid (new) + FADE-ORDER (R4) | eb-page-divfacts-fade (49a7b12a / 893377fa) | precritic empty-band, fade-packet-M | 2 rounds (r5, r6) |
+| R5-6 / R6-5 fact x moves in the packet | EB-FACTX across all packet pages (new) | eb-factx-divfacts | precritic empty-band | 2 rounds |
+| R5-7 fits line digit size | none: one-line reason, wording; a fits-line vs measured-digit check proposed (critic r6 observation) | - | - | 0 |
+| R6-1 Test grid half the page (F1 vs 12.1 ceiling) | EB-PAGE (new) | eb-page-divfacts-test (49a7b12a / 893377fa) | precritic empty-band | 1 round (r6) |
+| R6-2 answer line 0.5-0.8 mm from the rule | EB-PAD CL-8 3 mm probed with the widest facts (new) | eb-pad-divfacts-M; eb-pad-page-divfacts-L (be028660 / a4c6b694) | precritic empty-band | 1-2 rounds (r6, r8) |
+| R6-3 array L denser than M | EB-COLS (new) | eb-cols-divfacts-array | precritic empty-band | 1 round |
+| R7-1 Test M 21 vs Independent 24 | NOT YET: an EB-PAGE Test-vs-Independent capacity comparison (Test count < Independent count for the same facts and size) - to build with the fix | - | - | would have saved r7 |
+| R7-2 fade L page 3 fact-to-line gap 20 mm | NOT YET: a gap-consistency check (fact-to-answer-line distance within 1 mm across a packet / role) - to build with the fix | - | - | would have saved r7 |
+
 ## Brief for the FRESH #4 builder (lead ruling 2026-11-07: after the Thursday 22:00 UTC reset; Opus medium, a rebuild after two failed rounds)
 Skills: multiplication:mult_properties, multiplication:arrays_groups, multiplication:count_by_tables (BUILD lesson #4, Properties of multiplication, 3.OA.B.5). Cards: design/cards/ops-tables/ops-tables.md, design/cards/count-row/count-row.md (signed). Defects: design/audit/runs/lf-ops/critic-r1.md; what fix4 already fixed: section "Fix round after critic r1" above.
 ROOT CAUSE to fix first: cell heights come from each template's TALLEST POSSIBLE item (footprint per template), not from the items actually dealt; the lesson / guided / Test roles reserve the same. So pages of small arrays or short rows carry 30-43 % empty bands (D-MP-1, D-CB-4/5) and every attempt to shrink one role broke another. Make the footprint per DEALT item in cells/arrays.js, cells/arrays-turn.js and cells/count-row.js (footprint(payload, ctx) from the payload's own rows / cols / tiles / times labels), and let layout band rows by the dealt heights (layout.js already groups in-place cells by height from 1.2x). Do not size rows by the band's maximum.
@@ -185,6 +208,7 @@ Times: builder R4 checks, start 2026-11-07T06:30Z, end 2026-11-07T07:45Z, profil
 Times: lane day-1 cards + merge, start 2026-11-07T06:25Z, end 2026-11-07T06:47Z, profile lane session
 
 ## Log
+- 2026-11-09: L-width fix (a4c6b694, 17ce2fe1) + master merge (11720699); critic r7 FAIL lowest 7 (R7-1 Test M 21 vs 24, R7-2 fade L gap); stopped at the $35 cap.
 - 2026-11-09: resumed ($35 cap); owner ruling (a) on the L width; master 2fe21f2b merge conflicts in backtests.json, options-render.pins.json, ws-cell-checks (lib + script), ws-empty-band -> given to the builder.
 - 2026-11-08 ~20:40: div_facts aids r8 parked by the lead (budget); L-width ruling with the owner.
 - 2026-11-08: div_facts aids r7 fixes + empty-band pins (master-equal) + critic r6 FAIL (lowest 5: R6-1 Test page half empty needs a ruling, R6-4 packet page 3); lesson check found the g3-oa8 P2 regression; no deploy.

@@ -493,3 +493,10 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Fast facts at S, columns | — | 10 (8 when answers > 99) |
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
 | simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
+
+| lf-ops div_facts support aids (2026-11-07..09) | before (critic r4) | after (critic r7) |
+|---|--:|--:|
+| Lowest score | 5 | 7 (two pages, C3) |
+| Graded pages >= 8 | most failing (R4-1..R4-5) | all but 2 |
+| Critic rounds this lane | — | r5 FAIL 6, r6 FAIL 5, r7 FAIL 7 |
+| Machine checks added | — | 13 (7 R4 support checks, H13-INK Test / plain, EB-PAGE, EB-PAD, EB-COLS, EB-FACTX) with backtest rows |

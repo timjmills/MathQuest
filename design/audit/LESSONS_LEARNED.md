@@ -351,3 +351,11 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - critic r4 (2026-11-08): identify and unit_form PASS (E-A1, G2 fixed). N-r4-1: G2 passes by 0.1 point (29.9 % against 30 %): a fix
   that lands within 2 points of a limit is fragile -> PROPOSED: ws-empty-band warns (not fails) on bands of 28-30 %, and a lane
   sizes its fix to clear a limit by at least 3 points. E-r4-1 (lesson.js page split: identify L p2 43 % empty) is ENGINE-ROLES.
+- lf-ops div_facts support aids, critic r5-r7 (2026-11-07..09; rows in design/status/lf-ops.md "Findings -> checks"): a ruling that
+  moves space (F1: rows to the problems) moved the white from the cells to the page, and a cell-only gate stayed green -> EB-PAGE
+  (white under the grid vs one row pitch) runs beside the cell measures; EB-PAD (CL-8 3 mm probed with the band's widest fact),
+  EB-COLS (columns(L) <= columns(M)) and EB-FACTX (one fact x across a packet) in ws-empty-band, each with a backtest row.
+  r7 left two 7s no check sees yet: a Test page dealing fewer than Independent for the same facts (the owner's 2026-11-08 ruling)
+  and an uneven fact-to-answer-line gap within one packet -> PROPOSED: EB-TESTCAP and EB-GAP, built with their fixes.
+  Process: before a deploy branch, ws-detailed-lesson --check / --repeats on every lesson using the lane's skills must match master
+  (caught a g3-oa8 regression from the same branch's story work).
