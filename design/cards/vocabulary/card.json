@@ -164,6 +164,16 @@
       "date": "2026-11-08",
       "ruling": "OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a larger unit; within ONE item every base-ten picture shares one scale (critic r4 OQ-1: a 2.5 mm unit made 'one' a speck in a grade 2 cell).",
       "source": "owner (\"yes to your recommendations\", 2026-11-08), relayed by the lead"
+    },
+    {
+      "date": "2026-11-09",
+      "ruling": "R-1 (screen feedback only): after the pupil answers on screen, the picture's focal part (the boxed ?, the Out column, the bar's whole ...) gets a thick highlight and the correct word glows yellow. The question before the answer, and the printed pupil page, stay black and white; the printed KEY shows the same highlight in the single grey.",
+      "source": "owner, through the lead's suggested-answer questions, 2026-11-09 (after the r5 screenshots)"
+    },
+    {
+      "date": "2026-11-09",
+      "ruling": "R-2 (wrong answer on screen): show a short explanation, \"The answer is <word>! <Word> means ...\", one kid-friendly reason tied to the picture, in our own words, one per bank word, never contradicting the picture; read aloud automatically through the app's TTS (hints-speech.js speak), muted by the sound toggle. Check: every bank word has an explanation and each explanation names its word.",
+      "source": "owner, through the lead's suggested-answer questions, 2026-11-09 (after the r5 screenshots)"
     }
   ],
   "misconceptions": [
