@@ -134,6 +134,10 @@ function divUnderTabSection(sec, size) {
     try { o = normalizeOptions('division', 'div_facts', sk.opts || {}); } catch (e) { return false; }
     if (o.divForm !== 'standard') return false;
     if (!sec.divFade && divFactsPlainSection(sec)) return false;
+    // (a sign box alone draws a 14 mm pane under the fact, so the fact's own glyphs keep the CL-8 pad beside the tab - EB-PAD
+    // green - and the taller row would only cost the page a row: ws-print-lint --supports boxsign L H13 32 %)
+    const sup = Array.isArray(o.support) ? o.support : [];
+    if (!sec.divFade && sup.length && sup.every((v) => v === 'boxsign')) return false;
     const top = Number(o.band) === 100 ? 10 : 12;
     let t = o.constant;
     if (typeof t === 'number' || typeof t === 'string') t = [t];
