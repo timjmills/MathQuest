@@ -250,6 +250,9 @@ function shapesMarkdown(queue, keep) {
     L.push('  facts are a teen and ones, 12 + 5); count every place that does - chart, Guided, Practice, word problem, slip, Check');
     L.push('  Question - per seed with lessons/pack-solve.js (`ws-lesson-unit --only pack-feasible`) BEFORE any render, and take Practice\'s');
     L.push('  set from that whole-pack solution.');
+    L.push('  A P0 question whose answers can meet another\'s on the page (lesson 2: count 11-20, + facts 13-19) is legal only while the');
+    L.push('  engine deals the page against ONE answer set (print-sheet.js pageLr6 on a perQuestion pre-skill-check) and the ranges hold');
+    L.push('  every item: `ws-lesson-unit --only p0-overlap` (lf-engine 2026-11-09: the lane lacked master\'s set; twins at 5 of 6 seeds).');
     L.push('- `property` (from lesson 3a, LP-FAMILY-REPEAT): size the Practice cell from the families the pack needs (owner ruling: full-width');
     L.push('  cells, one item a row, arrays up to 6 x 6), never the families from the cell; every dealt ref keeps one spare fact family');
     L.push('  (the x 2 check: 2 x 6 to 2 x 10 for four items). Note: arrays past 5 a row fail gate E27 (rows of at most 5) until lf-checks reads the ruling.');

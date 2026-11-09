@@ -1783,6 +1783,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "p0-overlap",
+   "check": "where two Prerequisite Check questions of a detailed lesson can share an answer (lesson 2: count 11-20, + facts 13-19), the engine deals the P0 page against ONE answer set (print-sheet.js pageLr6 on a perQuestion pre-skill-check) and their ranges hold every item",
+   "kind": "commit-pair",
+   "rule": "lf-engine 2026-11-09 (lesson 2 E24b on the lane: P0 twin answers at 5 of 6 seeds; master's engine had the page-wide set from lf-placevalue 2026-11-08, the lane's did not)",
+   "browser": false,
+   "fail": {
+    "commit": "dcdb50d4",
+    "state": "lane pageLr6 on mixed-practice only: each P0 question dealt against its own items (seed 1: count 16, 13 and + facts 13 + 3 ...)"
+   },
+   "pass": {
+    "commit": "b1e30155",
+    "state": "lane pageLr6 also on pre-skill-check + perQuestion (master's line)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only p0-overlap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
