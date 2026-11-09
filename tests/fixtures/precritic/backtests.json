@@ -2887,6 +2887,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "test-eq-ind-divfacts",
+   "check": "division:div_facts: every support's Test page prints the same count as its Independent page at S / M / L (lead / owner ruling 2026-11-09; critic r7 R7-1)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-TESTEQ (TEST-EQ-IND: Test count = Independent count, per support and size)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-TESTEQ 5 - off M 21 / 24, skip S 18 / 21, array (default) M 21 / 24, think S 21 / 24, boxsign M 12 / 16"
+   },
+   "pass": {
+    "commit": "a5c78f9d",
+    "state": "the div_facts Test takes its Independent page's grid when its own holds a different count, rows 1.1 x the footprint; EB-TESTEQ OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only \"^(independent|test) [SML]\" --rules EB-TESTEQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-gap-divfacts",
+   "check": "division:div_facts fade packet at L: the bare page 3 puts its line 16.9 mm under the fact (under-tab start) against 9.0 mm on pages 1-2 (critic r7 R7-2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GAP (fact-to-answer-line distance within 1 mm across a render with an under-tab fact)",
+   "browser": true,
+   "fail": {
+    "commit": "c127c3e6",
+    "state": "lf-ops r7: EB-GAP 1 (fade packet 3p L: 9.04 mm p1, 16.92 mm p3)"
+   },
+   "pass": {
+    "commit": "f471ecb2",
+    "state": "the under-tab bare stage keeps the line under the fact, rows 1.1 x footprint, page 3 holds 18; EB-GAP OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^fade packet\" --rules EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
