@@ -3,10 +3,36 @@ Title: Vocabulary redesign (Match 3 pictures, 1 picture 3 words, lesson vocabula
 Session: session_013pHDnPdbZEh2qA1Sgch4GR
 Branch: claude/sweet-newton-c8wrv1-lf-vocab
 Owner of files: sheet/graphics/vocab-pictures.js, sheet/cells/vocab-*.js, sheet/lesson-pages/vocab-*.js, sheet/providers/vocabulary.js, gen-vocabulary.js picture branch, design/cards/vocabulary/, design/lanes/lf-vocab/, tests/scripts/ws-vocab-unit.mjs
-State: PASSED (critic r5 PASS min 8, 2026-11-09); deploy waits for lessons-phase0 on master
+State: PASSED (critic r5 PASS min 8, 2026-11-09); r7 owner additions R-1 / R-2 built, awaiting the narrow critic; deploy waits for lessons-phase0 on master
 Updated: 2026-11-09
 Builder profile: mq-opus-medium
 Critic rounds: 5: r5 PASS min 8 (design/lanes/lf-vocab/critic-r5.md); r4 FAIL 6, r3 FAIL 6, r2 FAIL 7, r1 FAIL 1
+
+## Round 7 (2026-11-09, builder, Opus medium: first build of a new screen feedback state): owner R-1 and R-2
+Times (UTC): start 12:50, end 13:45. Base b7dad93a (card signed 107b64aa). Brief design/lanes/lf-vocab/r7-builder-brief.md.
+
+| # | Finding / ruling | Check | Backtest row | On precritic's path |
+|---|---|---|---|---|
+| 1 | R-1: every picture has a focal part, drawn targetable (key: grey halo; screen: hidden halo + .mq-vfocal); the pupil page and a model on a pupil page draw neither; the key leaves the drawing itself as the pupil page draws it | V22 (new, node) | vocab-v22-focal (70cdbaf9 -> df31bcb3) | y (vocab-unit) |
+| 2 | R-2: every word has `explain`, "<Word> means ...", names its word, no notWith word, <= 14 words | V24 (new, node) | vocab-v24-explain (70cdbaf9 -> df31bcb3) | y (vocab-unit) |
+| 3 | R-1 / R-2 on screen: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the RIGHT word's explanation once, not with sound off; a right answer shows none; pupil print pages byte-identical to 70cdbaf9 (60 sha256 pins: 2 skills x 5 roles x S/M/L x 2 seeds) | V23 + V25 (new, --browser; `--only V23,V25` runs them alone in ~45 s) | vocab-v23-v25-screen-feedback (70cdbaf9 -> df31bcb3) | y (vocab-unit-browser) |
+| 4 | Own render, b4a249b6: the key painted the halo and the wrapped focal marks in the key ink (orange); the screen's yellow halo, glow and explanation edge were repainted grey by monoCell's ink pass | V23 measures PAINTED colours: key halo grey, key drawing black, screen halo marks yellow, explanation edge yellow | vocab-v23-painted (b4a249b6 -> df31bcb3) | y (vocab-unit-browser) |
+
+Build: vocab-pictures.js F() focal marks / `focal: 'all'` / heavy marks; halo (6 px, currentColor) drawn hidden in the twin,
+GREY on a key page (ctx.keyPage, set by answer-key.js renderPages and passed by tokens.js resolveCtx); additive sheet-kit.css
+rule keeps the key halo grey. vocab-words.js `explain` on all 47 words and vocabExplainLine(). screen-cell.js
+markVocabFeedback(root, q, ok, {speak}) - called by answer-check.js (card), worksheet.js (one card's check, the ladder's
+judged wrong, Check all: speaks the first wrong card only) and quiz-take.js (instant feedback). hints-speech.js
+speakExplanation(): window.speak, gated by state.ttsEnabled. css/screen-cell.css additive rules (halo 10 px yellow, glow,
+explanation box).
+
+Gates (manifest applied, not committed): ws-vocab-unit OK; --browser OK; ws-screen-answer (both skills) OK; ws-phone-card OK;
+ws-chromebook-fit OK; ws-boot-smoke OK; ws-backtest --row (4 rows) OK; node --check on every changed file.
+
+Open for the critic: on the practice card a wrong answer shows the support ladder's "Here is how" under the explanation (both
+on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the brief's format); 1 picture, 3 words in a
+quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
+only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
 ## PASS (2026-11-09): critic r5 PASS min 8
 - Both skills added to js/modules/redesign-passed.js (VOC_IDS, evidence design/lanes/lf-vocab/critic-r5.md).

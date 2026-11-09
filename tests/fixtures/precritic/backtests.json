@@ -1994,8 +1994,8 @@
     "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
    },
    "pass": {
-    "commit": "b4a249b6",
-    "state": "lf-vocab r7 build, 2026-11-09"
+    "commit": "df31bcb3",
+    "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22",
    "expect": {
@@ -2034,8 +2034,28 @@
     "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
    },
    "pass": {
+    "commit": "df31bcb3",
+    "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-v23-painted",
+   "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V23",
+   "browser": true,
+   "fail": {
     "commit": "b4a249b6",
-    "state": "lf-vocab r7 build, 2026-11-09"
+    "state": "lf-vocab r7 first build (key orange, screen halo grey), 2026-11-09"
+   },
+   "pass": {
+    "commit": "df31bcb3",
+    "state": "lf-vocab r7 render fixes, 2026-11-09"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
    "expect": {
