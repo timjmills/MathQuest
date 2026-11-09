@@ -111,7 +111,11 @@ try {
                 let dir;
                 try { dir = addWorktree(s.commit, tmpBase, `${r.id}-${label}`); } catch (e) { return { result: 'ERROR(checkout)', ms: 0, line: e.message }; }
                 made.push(dir);
-                return runCheck(r.command.replaceAll('{root}', dir), { env: { MQ_ROOT: dir }, browser: !!r.browser });
+                const res = runCheck(r.command.replaceAll('{root}', dir), { env: { MQ_ROOT: dir }, browser: !!r.browser });
+                // (lf-engine landing r2: each checkout is ~600 MB; ~80 commit-pair rows kept to the end filled the disk and
+                // turned every later row into ERROR(checkout) - a checkout goes as soon as its state has run)
+                if (!has('--keep')) { git(['worktree', 'remove', '--force', dir], true); made.splice(made.indexOf(dir), 1); }
+                return res;
             };
             fail = state(r.fail, 'fail');
             pass = state(r.pass, 'pass');
