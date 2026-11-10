@@ -1,5 +1,5 @@
 <!-- spec-card
-{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"d021ff5acb98ea3cd6658246461e2ef5f5ed899e","bodySha":"51700fe6de75867e","format":2,"configSha":"963b948a1807"}
+{"card":"vocabulary","kind":"template","template":"vocab-match3","families":["vocabulary"],"match":{"templates":["vocab-match3","vocab-pick3","lesson-vocab"]},"config":"design/cards/vocabulary/card.json","indexSha":"d021ff5acb98ea3cd6658246461e2ef5f5ed899e","bodySha":"b3c88c83c1151aa8","format":2,"configSha":"12fb5d20f1a4"}
 {"cited":"","rules":"VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 AK-1 a0cc12 2 d4709f H13 36f579 VQ-4 b89965 5 1fa595 7 2253df 9 0b5532 10 2ed85c CL-40 2a6dbb SL-11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 10 256ad3 C1 66f8a9 2 a51365 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H4@RUBRIC 9ce1f3 H5@RUBRIC b3892d H6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 10 fbd802 11 bef034 L1 799b66 3 901e56 6 6e19d8 BD-4 b3947b 11 29d891 RP-1 d529bd 20 8888b0 SL-2 f404d5 3 468d78 SP-2 1f2df0 3 7b7bfb","entries":"D%3AvocabTask%3Dmatch3 bcefeb D%3AvocabTask%3Dpick3 bcefeb D%3AvocabGrade%3D1 bcefeb D%3AvocabGrade%3D2 bcefeb D%3AvocabGrade%3D3 bcefeb D%3AvocabGrade%3D4 bcefeb D%3AvocabSet%3Dnull bcefeb D%3AvocabSet%3D0 bcefeb D%3AvocabSet%3D1 bcefeb D%3AvocabSet%3D2 bcefeb D%3AvocabSet%3D3 bcefeb D%3AvocabSet%3D4 bcefeb D%3AvocabSet%3D5 bcefeb D%3AvocabSet%3D6 bcefeb D%3AvocabSet%3D7 bcefeb D%3AvocabSet%3D8 bcefeb D%3AvocabSet%3D9 bcefeb D%3AvocabSet%3D10 bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson 04b8b3 D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
@@ -21,6 +21,9 @@
  {"id":"T-5.9","source":"§5.9","text":"OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a ..."},
  {"id":"T-5.10","source":"§5.10","text":"R-1 (screen feedback only): after the pupil answers on screen, the picture's focal part..."},
  {"id":"T-5.11","source":"§5.11","text":"R-2 (wrong answer on screen): show a short explanation, \"The answer is <word>! <Word> m..."},
+ {"id":"T-5.12","source":"§5.12","text":"O-1 (every screen host: practice card, online worksheet, quiz): the NEXT answer box is ..."},
+ {"id":"T-5.13","source":"§5.13","text":"O-2: a picture must mean only its word. 'digit' (H T O underlined) and 'place' (four em..."},
+ {"id":"T-5.14","source":"§5.14","text":"O-3: a picture must not fit any of its distractors (the 1-2-3 staircase read as 'column..."},
  {"id":"T-9.1","source":"§9.1","text":"Screen response for Match 3: type the letter in each box (built), or tap A / B / C unde..."},
  {"id":"T-9.2","source":"§9.2","text":"Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in r..."}
 ]
@@ -577,6 +580,9 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - **2026-11-08** — OQ-1: when an item has no hundred, the base-ten one and ten blocks may be drawn with a larger unit; within ONE item every base-ten picture shares one scale (critic r4 OQ-1: a 2.5 mm unit made 'one' a speck in a grade 2 cell). (`owner ("yes to your recommendations", 2026-11-08), relayed by the lead`)
 - **2026-11-09** — R-1 (screen feedback only): after the pupil answers on screen, the picture's focal part (the boxed ?, the Out column, the bar's whole ...) gets a thick highlight and the correct word glows yellow. The question before the answer, and the printed pupil page, stay black and white; the printed KEY shows the same highlight in the single grey. (`owner, through the lead's suggested-answer questions, 2026-11-09 (after the r5 screenshots)`)
 - **2026-11-09** — R-2 (wrong answer on screen): show a short explanation, "The answer is <word>! <Word> means ...", one kid-friendly reason tied to the picture, in our own words, one per bank word, never contradicting the picture; read aloud automatically through the app's TTS (hints-speech.js speak), muted by the sound toggle. Check: every bank word has an explanation and each explanation names its word. (`owner, through the lead's suggested-answer questions, 2026-11-09 (after the r5 screenshots)`)
+- **2026-11-10** — O-1 (every screen host: practice card, online worksheet, quiz): the NEXT answer box is a thick BLUE outline that pulses gently (sample: inset 0 0 0 4px #1565d8 plus a pulsing inset ring rgba(21,101,216,.30), white fill). Yellow is kept ONLY for right-answer feedback (R-1). Built as ONE switch (a single custom property or body class, e.g. --mq-next-color) so going back to yellow is a one-line change. A wrong box keeps its red (R4-3); reduced motion is honoured; CSS additive. (`owner, directly to the lead after the samples, 2026-11-10`)
+- **2026-11-10** — O-2: a picture must mean only its word. 'digit' (H T O underlined) and 'place' (four empty boxes) are unclear: redraw them (digit: 472 with ONE digit circled and an arrow; place: a hundreds-tens-ones chart with one column heading shaded), and audit every picture the same way. (`owner, directly to the lead after the samples, 2026-11-10`)
+- **2026-11-10** — O-3: a picture must not fit any of its distractors (the 1-2-3 staircase read as 'column', not 'step'). Redraw 'step' as a short worked problem with Step 1 / Step 2 labels. Check V-AMBIG: each picture lists the words it could also show; an item whose bank holds one of them fails. The critic answers, for every picture, whether a pupil could defend another bank word. (`owner, directly to the lead after the samples, 2026-11-10`)
 
 ## 6. Misconceptions
 
@@ -655,7 +661,7 @@ Each runs as `node tests/scripts/<script> …`.
 1. **Screen response for Match 3: type the letter in each box (built), or tap A / B / C under each word?** Recommended: Type the letter (built): it is the paper response itself; a tap row can come later without changing paper. (Owner: as suggested, 2026-11-07.)
 2. **Grades: K's and grade 5's BUILD lessons are in rounds 5-15. Draw their words next, in round order?** Recommended: Yes, round 2's BUILD lessons next (7 lessons), the same picture rules. (Owner: as suggested, 2026-11-07.)
 
-Signed: owner, 2026-11-09
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

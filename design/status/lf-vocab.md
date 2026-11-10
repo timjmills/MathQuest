@@ -34,6 +34,21 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## Owner rulings O-1 to O-3 (2026-11-10): in the card, awaiting the lead's signature. The lane is parked (week cap)
+- O-1: the next answer box is a blue pulsing outline behind ONE switch (e.g. --mq-next-color / a body class). Yellow is
+  kept only for R-1; the red wrong box (R4-3) and reduced motion are kept. Hosts: card, worksheet, quiz. NOTE: this
+  touches every skill's screens, not only vocab (screen-cell.css). Graded by ws-phone-card and screen-answer.
+- O-2: redraw 'digit' and 'place' so each can only mean its word, and audit every picture. NOTE: the 'place' picture
+  (H T O / empty boxes) is NOT in the lf-vocab library. It is the lesson Warm-up vocabulary band
+  (sheet/lesson-pages/vocab.js), whose data is the detailed lessons (g2-nbt3, g4-nbt1) and lf-placevalue's
+  placevalue:* records. The library's own 'digit' (vocab-pictures.js) is a different drawing. Next round: confirm with
+  the lead which pictures the owner saw, and who owns the lesson-band ones.
+- O-3: 'step' is redrawn as a short worked problem labelled Step 1 / Step 2. New check V-AMBIG: each picture lists the
+  words it could also show, and an item whose bank holds one of them fails. The critic answers "could a pupil defend
+  another bank word?" for every picture.
+- Next round order: merge master; R7 (Match 3 letter line + wrong-only glow), V26, V27, the 6 minor fixes; O-1, O-2,
+  O-3 with V-AMBIG; the Q-S2 re-check; one deploy.
+
 ## UPDATE (lead, 2026-11-09 16:01Z): phase 0 is on master (ec61b069), so the lesson part can register on master.
 Stay parked this week. Next round:
 0. Merge master. The lesson.js / prereqs.js conflict of 2026-11-09 should be gone now that phase 0 is on master.
