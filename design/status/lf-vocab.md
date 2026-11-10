@@ -46,6 +46,15 @@ only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/ans
 - O-3: 'step' is redrawn as a short worked problem labelled Step 1 / Step 2. New check V-AMBIG: each picture lists the
   words it could also show, and an item whose bank holds one of them fails. The critic answers "could a pupil defend
   another bank word?" for every picture.
+- Lead, 2026-11-10: the card is SIGNED (54858274). O-1 reaching every skill is accepted: run the full ws-phone-card /
+  screen-answer sweep and the siblings check on it.
+- O-2 is confirmed as the lesson Warm-up vocabulary band (the placevalue:identify band: 472 / H T O / four boxes, for
+  ones / digit / place). lf-vocab MAY edit sheet/lesson-pages/vocab.js and the vocab data in g2-nbt3, g4-nbt1 and
+  lf-placevalue's placevalue:* records, on two conditions:
+  - ws-lesson-baseline --all-lessons runs before and after, and only the redrawn vocab cells may change;
+  - ws-detailed-lesson --check / --repeats runs on every touched lesson.
+  V-AMBIG audits the library AND the lesson-band pictures.
+- Parked until the lead says go (after the Thursday reset, unless the owner says sooner).
 - Next round order: merge master; R7 (Match 3 letter line + wrong-only glow), V26, V27, the 6 minor fixes; O-1, O-2,
   O-3 with V-AMBIG; the Q-S2 re-check; one deploy.
 
