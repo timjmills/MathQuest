@@ -237,6 +237,10 @@ for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sig, () => {
 try {
     for (const r of rows) {
         const expect = Object.assign({ fail: 'FAIL', pass: 'OK' }, r.expect || {});
+        // a commit that is a placeholder (e.g. "TBD-lf-ops-fix4", filled when a fix lands) cannot be checked out: the row is
+        // PENDING, not an ERROR after a long fail-state run (lf-engine 2026-11-12: 8 cc-* / pl-* rows)
+        const placeholder = r.kind === 'commit-pair' && [r.fail, r.pass].map((x) => x && x.commit).find((c) => c && !/^[0-9a-f]{7,40}$/i.test(c));
+        if (placeholder && !r.pending) { results.push({ r, fail: 'PENDING', pass: 'PENDING', verdict: 'PENDING' }); say(`ws-backtest row ${r.id}: PENDING (placeholder commit ${placeholder})`); continue; }
         if (r.pending || !r.command) { results.push({ r, fail: 'PENDING', pass: 'PENDING', verdict: 'PENDING' }); say(`ws-backtest row ${r.id}: PENDING${r.reason ? ` (${r.reason})` : ''}`); continue; }
         let fail, pass;
         const rowT0 = Date.now();
