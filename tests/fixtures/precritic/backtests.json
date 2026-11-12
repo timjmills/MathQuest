@@ -3200,6 +3200,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "card-not-offered-word-stories",
+  "check": "The four general + / - story hosts offer no keyword support the word-stories card hides (lead, lf-builds 2026-11-12: master FAILS 8 entries N-D-wpCues / N-D-wpBank)",
+  "kind": "commit-pair",
+  "rule": "ws-card-rulings --check offered (offeredOptionsFor vs the word-stories rulings block's notOffered)",
+  "browser": false,
+  "fail": {
+   "commit": "9f2d3ea5",
+   "state": "the word-stories card signed on the lane branch: wpCues and wpBank still offered on add_word_problems / sub_word_problems (+ _plain), 8 broken"
+  },
+  "pass": {
+   "commit": "0c985692",
+   "state": "word-stories build step 1: wpCues / wpBank hidden on the four hosts (skill-options.js, kept in the model so share codes decode)"
+  },
+  "command": "node tests/scripts/ws-card-rulings.mjs --root {root} --skill addition:add_word_problems --skill addition:add_word_problems_plain --skill subtraction:sub_word_problems --skill subtraction:sub_word_problems_plain --check offered",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
