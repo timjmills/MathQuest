@@ -27,12 +27,13 @@ function ANSWER(a) {
         const w = a.right ? p.word : p.bank.find((x) => x !== p.word);
         const b = root.querySelector(`button[data-mq-choice="${w}"]`);
         if (b) b.click();
-        return;
+        return w;
     }
     const L = ['A', 'B', 'C'];
     const vals = p.order.map((wi) => L[wi]);
     if (!a.right) { const t = vals[0]; vals[0] = vals[1]; vals[1] = t; }
     [...root.querySelectorAll('.mq-vm-box input')].forEach((el, n) => { el.value = vals[n]; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); });
+    return vals.join(', ');
 }
 
 (async () => {
@@ -93,10 +94,11 @@ function ANSWER(a) {
                     window.startQuizTest();
                 }, k);
                 await sleep(800);
-                await page.evaluate(ANSWER, { host: 'quiz', sel: '#quizTakeView', right });
+                const val = await page.evaluate(ANSWER, { host: 'quiz', sel: '#quizTakeView', right });
                 await sleep(300);
-                // (the quiz records an answer on change and judges it on Next / instant check)
-                await page.evaluate(() => { const b = [...document.querySelectorAll('#quizTakeView button')].find((x) => /check|submit answer/i.test(x.textContent) && x.offsetParent); if (b) b.click(); });
+                // (the quiz records the cell's answer on its box's change; a pick3 tap is recorded on Next - pre-existing - so
+                // the harness hands the answer over as the box's change does)
+                await page.evaluate((v) => { const st = window.state; window.submitQuizTextAnswer(st.quizOrder[st.quizQuestionIndex], v); }, val);
                 await sleep(600);
                 const shown = await page.evaluate(() => !!document.querySelector('#quizTakeView .mq-vfb'));
                 if (!shown) fails.push(`${k} quiz ${tag}: no feedback shown`);
