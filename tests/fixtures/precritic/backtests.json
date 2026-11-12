@@ -3439,6 +3439,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r8-v25plus-v26-v27",
+   "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V25+ V26 V27",
+   "browser": true,
+   "fail": {
+    "commit": "d17f8d6a",
+    "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+   },
+   "pass": {
+    "commit": "3127258f",
+    "state": "lf-vocab r8 steps B + C"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r8-v22plus-v24plus",
+   "check": "critic r6 #6, #7: the key's grey highlight never strokes a glyph or a dot (unstroked underlays); an explanation uses no hard word (figure(s), amount ...) and is at least 6 words",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V22+ V24+",
+   "browser": false,
+   "fail": {
+    "commit": "d17f8d6a",
+    "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+   },
+   "pass": {
+    "commit": "3127258f",
+    "state": "lf-vocab r8 steps B + C"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22,V24",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r8-v-ambig",
+   "check": "owner O-2 / O-3: every library picture and lesson-band picture declares alsoShows; a picture that could show another word of its bank, Match 3 cell or lesson band fails (the staircase step with column; the identify band's H T O beside ones and four cubes beside place)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-AMBIG",
+   "browser": false,
+   "fail": {
+    "commit": "d17f8d6a",
+    "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+   },
+   "pass": {
+    "commit": "3127258f",
+    "state": "lf-vocab r8 steps B + C"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
