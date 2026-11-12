@@ -9,7 +9,11 @@
     "placevalue:value",
     "placevalue:combine",
     "placevalue:expand",
-    "placevalue:unit_form"
+    "placevalue:unit_form",
+    "composing:number_word_form",
+    "placevalue:compare",
+    "placevalue:more_less_10",
+    "placevalue:more_less_100"
    ],
    "gates": {
     "print-lint-kit": {
