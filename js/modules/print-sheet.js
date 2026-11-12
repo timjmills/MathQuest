@@ -2708,6 +2708,9 @@ function skillMeta(sk, q) {
             titleOpts = { opts: no };
         } catch (e) { titleOpts = {}; }
     }
+    // word-stories card (2026-11-12): the four general + / − story hosts and their presets title the page from the kinds
+    // they deal (L6, L28) and take the number-sentence instruction when their band draws the sentence (within 20)
+    if (/^(add|sub)_word_problems(_plain)?$|^(add|sub)_wp_(change_unknown|compare_smaller)$/.test(String(sk.skillId || ''))) titleOpts = { opts: sk.opts || {} };
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;

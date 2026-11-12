@@ -294,6 +294,7 @@ export const SKILL_GRADES = {
     'div_sharing_word_problems': 3, 'div_grouping_word_problems': 3, 
     'sub_wp_compare': 1, 'sub_wp_start_unknown': 2, 'add_negative': 6, 'sub_negative': 6,
     'sub_2d_1d': 2,                                                       // 2.NBT.B.5 (2026-10-23 preset, SU-C C3)
+    'add_wp_change_unknown': 1, 'sub_wp_change_unknown': 1, 'sub_wp_compare_smaller': 1,   // 1.OA.A.1 (2026-11-12 presets, word-stories card)
     'div_facts_long': 3,                                                  // 3.OA.C.7 facts in the 4.NBT.B.6 bracket (2026-10-31 preset, facts card Q4)
     'identify_fraction_nl': 3, 'write_fraction_nl': 3, 'compare_fractions_nl': 3, 'equivalent_or_not': 4, 'simplify_with_gcf': 6,
     'unit_frac_div_whole': 5, 'whole_div_unit_frac': 5, 'div_decimal_by_whole': 5, 'div_by_decimal': 6, 'round_to_tenth': 5,
@@ -696,6 +697,8 @@ export const SKILLS = {
         { v: "add_column_multi", l: "Add Three or Four Numbers in Columns" },   // CM-3 … CM-8: the regroup box must hold a 2-digit carry
         { v: "add_missing_digit", l: "Find the Missing Digit (Addition)" },      // AC-19: a dashed digit box inside a finished column
         { v: "fact_family_sort", l: "Is It a Fact Family? (+/−)" },              // FF-6: needs NON-examples, which a fact-family skill must never emit
+        // APPENDED 2026-11-12 — PRESET (word-stories card, build list map_change_unknown_story): the change unknown, told in the past tense.
+        { v: "add_wp_change_unknown", l: "Addition Word Problems: How Many Were Added?", presetOf: "add_word_problems" },
     ],
     subtraction: [
         { v: "sub_facts", l: "Subtraction Facts (within 20)" },
@@ -761,6 +764,9 @@ export const SKILLS = {
         { v: "sub_wp_start_unknown", l: "Subtraction Word Problems: Find the Start", presetOf: "sub_word_problems" },
         // APPENDED 2026-10-23 — PRESET (SU-C pilot, catalogue C3): 2-digit − 1-digit, no regrouping.
         { v: "sub_2d_1d", l: "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)", presetOf: "sub_100_no_regroup" },
+        // APPENDED 2026-11-12 — PRESETS (word-stories card, build list map_change_unknown_story / map_compare_smaller_unknown).
+        { v: "sub_wp_change_unknown", l: "Subtraction Word Problems: How Many Went?", presetOf: "sub_word_problems" },
+        { v: "sub_wp_compare_smaller", l: "Compare Stories: Find the Smaller Amount", presetOf: "sub_word_problems" },
     ],
     multiplication: [
         { v: "mult_facts", l: "Multiplication Facts (1-12)" },
@@ -1884,6 +1890,7 @@ export const SKILL_TIME_CATEGORY = {
     f_to_d: "quick", d_to_f: "quick", f_to_p: "quick", p_to_f: "quick",
     // Word problems — all extended
     add_word_problems: "extended", sub_word_problems: "extended",
+    add_wp_change_unknown: "extended", sub_wp_change_unknown: "extended", sub_wp_compare_smaller: "extended",   // presets of the two above (word-stories card)
     mult_word_problems: "extended", div_word_problems: "extended",
     frac_word_problems: "extended", frac_mult_word: "extended",
     multi_step_word: "extended", mult_comparison: "extended",
@@ -2246,6 +2253,7 @@ export const SKILL_PRINT_SIZE = {
 
     // === SPACIOUS (1 col + work space): word problems only ===
     add_word_problems: "spacious", sub_word_problems: "spacious",
+    add_wp_change_unknown: "spacious", sub_wp_change_unknown: "spacious", sub_wp_compare_smaller: "spacious",   // presets (word-stories card)
     mult_word_problems: "spacious", div_word_problems: "spacious",
     frac_word_problems: "spacious", frac_mult_word: "spacious",
     multi_step_word: "spacious", mult_comparison: "spacious",

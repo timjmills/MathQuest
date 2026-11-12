@@ -157,6 +157,11 @@ export const SKILL_PRESETS = Object.freeze({
     // 2026-10-31 (owner, facts card Q4): the long-division bracket on division facts is its own lesson; the
     // fraction form stays an option.
     'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
+    // 2026-11-12 (owner, word-stories card Q3): a new unknown position is its own lesson step - the change unknown on
+    // each story host, and the compare story with the smaller amount unknown ("fewer than", then the "more than" trap).
+    'addition:add_wp_change_unknown': { skill: 'add_word_problems', opts: { forms: [3] } },
+    'subtraction:sub_wp_change_unknown': { skill: 'sub_word_problems', opts: { forms: [3] } },
+    'subtraction:sub_wp_compare_smaller': { skill: 'sub_word_problems', opts: { forms: [4, 5] } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

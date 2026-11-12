@@ -44,6 +44,31 @@ function workLine(st) {
     return `${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} = ${fmt(st.ans)}.`;
 }
 
+/**
+ * The structure decision of a change or compare story (word-stories card, 2026-11-12): what the story KNOWS and what it
+ * asks, read from its bar - never a key word ("more" is in the trap story, and the answer is found by subtracting).
+ * `marks` writes the known numbers in the story bar's boxes (graphics/story-bar.js ids). Null for the other kinds.
+ */
+export function structureStep(p) {
+    if (!p || !p.steps || p.steps.length !== 1) return null;
+    const st = p.steps[0];
+    const who = Array.isArray(p.who) ? p.who.map((x) => String(x).replace(/^The /, 'the ')) : null;
+    switch (p.schema) {
+        case 'add-some':
+            return step(`First ${fmt(st.bottom)}, now ${fmt(st.top)}. The change is missing. I subtract.`, [{ slot: 'bar-w', value: String(st.top) }, { slot: 'bar-a', value: String(st.bottom) }]);
+        case 'take-some':
+            return step(`First ${fmt(st.top)}, now ${fmt(st.bottom)}. What went is missing. I subtract.`, [{ slot: 'bar-w', value: String(st.top) }, { slot: 'bar-b', value: String(st.bottom) }]);
+        case 'compare-fewer':
+            return step(`${who ? who[1] : 'The second'} has ${fmt(st.bottom)} fewer. The smaller amount is missing. I subtract.`, [{ slot: 'bar-big', value: String(st.top) }, { slot: 'bar-diff', value: String(st.bottom) }]);
+        case 'compare-more-smaller':
+            return step(`${who ? who[0] : 'The first'} has ${fmt(st.bottom)} more, so ${who ? who[1] : 'the second'} has ${fmt(st.bottom)} fewer. I subtract.`, [{ slot: 'bar-big', value: String(st.top) }, { slot: 'bar-diff', value: String(st.bottom) }]);
+        case 'part-part':
+            return step(`I know the whole, ${fmt(st.top)}, and one part, ${fmt(st.bottom)}. I subtract.`);
+        default:
+            return null;
+    }
+}
+
 /** The Model problem, move by move (PEDAGOGY 8.5: read, show, decide, solve, label, say). */
 export function wordWorkSteps(q) {
     const p = payloadOf(q);
@@ -69,6 +94,15 @@ export function wordWorkSteps(q) {
         const add = st.op === '+';
         const whole = add ? st.ans : st.top, pa = add ? st.top : st.bottom, pb = add ? st.bottom : st.ans;
         const unit = Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit;
+        const sx = structureStep(p);
+        if (sx) {
+            return [
+                step(`The numbers are ${fmt(st.top)} and ${fmt(st.bottom)}.`),
+                sx,
+                step(`Write ${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} in the boxes.`, [{ slot: 'fr0-a', value: String(st.top) }, { slot: 'op0', value: GLYPH[st.op] }, { slot: 'fr0-b', value: String(st.bottom) }]),
+                step(`${workLine(st).replace(/\.$/, '')}. The answer is ${fmt(p.ans)}${unit ? ` ${unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]),
+            ];
+        }
         return [
             step(`The numbers are ${fmt(st.top)} and ${fmt(st.bottom)}.`),
             add
@@ -78,8 +112,11 @@ export function wordWorkSteps(q) {
             step(`${workLine(st).replace(/\.$/, '')}. The answer is ${fmt(p.ans)}${unit ? ` ${unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }, { slot: add ? 'bar-w' : 'bar-b', value: String(p.ans) }]),
         ];
     }
-    const cues = cuesOf(p);
+    const sx = structureStep(p);
+    // (a change or compare story is solved from its structure, never its key words: "more" is in the trap story)
+    const cues = sx ? [] : cuesOf(p);
     const out = [step('Read the story two times.')];
+    if (sx) out.push(sx);
     if (cues.length) out.push(step(`Look at the key words: ${cues.slice(0, 2).join(', ')}.`));
     p.steps.forEach((st, i) => {
         const pre = p.steps.length > 1 ? `Step ${i + 1}: ` : '';
@@ -92,10 +129,41 @@ export function wordWorkSteps(q) {
     return clampSteps(out);
 }
 
+/**
+ * The misconceptions of a change or compare story (word-stories card §6), each a value the pupil would write: M-W1 adds
+ * the two numbers, M-W2 writes the "now" number, M-W3 "more" means add, M-W4 writes the difference, M-W5 writes what is
+ * left. Null for the other kinds.
+ */
+function storyWrongs(p) {
+    if (!p || !p.steps || p.steps.length !== 1) return null;
+    const st = p.steps[0];
+    const sum = st.top + st.bottom;
+    const add = { value: sum, misconception: 'wrong-operation', slots: { answer: String(sum), op: '+' }, work: `${st.top} + ${st.bottom} = {v}`, explain: 'Added the two numbers in the story.' };
+    switch (p.schema) {
+        case 'add-some':
+            return [add, { value: st.top, misconception: 'answer-is-now', explain: 'Wrote the "now" number: the change is what was added.' }];
+        case 'take-some':
+            return [add, { value: st.bottom, misconception: 'answer-is-left', explain: 'Wrote how many are left, not how many went.' }];
+        case 'compare-fewer':
+            return [add, { value: st.bottom, misconception: 'answer-is-difference', explain: 'Wrote the difference, not the smaller amount.' }];
+        case 'compare-more-smaller':
+            return [Object.assign({}, add, { misconception: 'more-means-add', explain: '"More" made them add: the one asked about has fewer.' }),
+                { value: st.bottom, misconception: 'answer-is-difference', explain: 'Wrote the difference, not the smaller amount.' }];
+        case 'part-part':
+            return [add, { value: st.top, misconception: 'answer-is-whole', explain: 'Wrote the whole, not the missing part.' }];
+        default:
+            return null;
+    }
+}
+/** The misconceptions the four general + / − story hosts deal (wrongAnswer names one of them). */
+export const STORY_MISCONCEPTIONS = Object.freeze(['wrong-operation', 'answer-is-now', 'answer-is-left', 'answer-is-difference', 'more-means-add', 'answer-is-whole']);
+
 /** Error analysis / True or False?: the same story worked with the wrong sign. */
 export function wordWorkWrong(q) {
     const p = payloadOf(q);
     if (!p) return null;
+    const sw = storyWrongs(p);
+    if (sw) return chooseWrong(q, sw);
     const st = p.steps[p.steps.length - 1];
     const wop = WRONG_OP[st.op];
     const hi = Math.max(st.a, st.b), lo = Math.min(st.a, st.b);
@@ -137,6 +205,13 @@ export function wordWorkWrongs(q) {
     }
     if (!p || p.steps.length !== 1) return [];
     const st = p.steps[0];
+    const sw = storyWrongs(p);
+    if (sw) {
+        const seen = new Set([Number(p.ans)]);
+        return sw.filter((w) => !seen.has(w.value) && (seen.add(w.value), true))
+            .map((w) => ({ value: w.value, display: fmt(w.value), misconception: w.misconception, explain: w.explain }))
+            .concat([{ value: p.ans, display: fmt(p.ans), correct: true }]);
+    }
     if (st.op !== '+') { const w = wordWorkWrong(q); return w ? [w] : []; }
     const bar = (top, x, y) => `top ${fmt(top)} · below ${fmt(x)} and ${fmt(y)}`;
     const hi = Math.max(st.a, st.b), lo = Math.min(st.a, st.b);
@@ -177,9 +252,51 @@ export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
     }, extra);
 }
 
+/**
+ * The provider of the four general + / − story hosts (word-stories card, 2026-11-12): its strings follow the page - the
+ * number-sentence steps when the band draws the sentence (within 20), the column steps otherwise - and its I Can line
+ * follows the kinds the page deals (L6, L28): the change-unknown value "I Can find how many were added" / "... taken
+ * away", the two compare-smaller values "I Can find the smaller amount in a compare story".
+ */
+function storyHostProvider(op) {
+    const base = op === '+' ? 'I Can solve addition stories' : 'I Can solve subtraction stories';
+    const change = op === '+' ? 'I Can find how many were added' : 'I Can find how many were taken away';
+    const compare = 'I Can find the smaller amount in a compare story';
+    const cols = wordWorkProvider(base);
+    const sent = wordWorkProvider(base, {}, { sentence: true });
+    const titleOf = (ref) => {
+        const o = ref && ref.opts && typeof ref.opts === 'object' ? ref.opts : null;
+        const f = o && Array.isArray(o.forms) && o.forms.length ? o.forms.map(Number) : null;
+        if (f) {
+            if (f.every((v) => v === 3)) return change;
+            if (op === '-' && f.every((v) => v === 4 || v === 5)) return compare;
+            return base;
+        }
+        const p = ref && ref.q ? payloadOf(ref.q) : null;
+        if (p && (p.schema === 'add-some' || p.schema === 'take-some')) return change;
+        if (p && /^compare-(fewer|more-smaller)$/.test(p.schema || '')) return compare;
+        return base;
+    };
+    const isSentence = (ref) => {
+        const p = ref && ref.q ? payloadOf(ref.q) : null;
+        if (p) return p.layout === 'sentence';
+        const o = ref && ref.opts;
+        return !!(o && Number(o.band) > 0 && Number(o.band) <= 20);
+    };
+    const fn = (ref = {}) => {
+        const s = (isSentence(ref) ? sent : cols).strings(ref);
+        return Object.assign({}, s, { iCan: titleOf(ref) });
+    };
+    fn.def = cols.strings.def;
+    return Object.assign({}, cols, { strings: fn, misconceptions: STORY_MISCONCEPTIONS.slice() });
+}
+for (const [key, op] of [['addition:add_word_problems', '+'], ['subtraction:sub_word_problems', '-']]) {
+    const def = storyHostProvider(op);
+    registerSkill(key, def);
+    registerSkill(`${key}_plain`, def);
+}
+
 const OWN = {
-    'addition:add_word_problems': 'I Can solve addition stories',
-    'subtraction:sub_word_problems': 'I Can solve subtraction stories',
     'multiplication:mult_word_problems': 'I Can solve multiplication stories',
     'division:div_word_problems': 'I Can solve division stories',
     'multiplication:mult_comparison': 'I Can solve times-as-many stories',

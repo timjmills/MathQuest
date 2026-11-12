@@ -47,11 +47,13 @@ export function storyBar(ctx, o = {}) {
     // the writing box fills the segment under its label line (segment = label line + box + 1.2 mm of keep)
     const hw = Math.max(6, segH - labH - 1.2);
     const lw = Math.max(14, blankWidth(Math.max(2, Number(o.digits) || 2), size));
+    // (the digits are set to fit the writing box under the label line: working space, never smaller than 16 pt)
+    const dpt = Math.max(16, Math.min(digitPt(ctx), (hw - 1.2) / PT_MM));
     const W = Math.max(42, Number(o.wMm) || 64);
     const fmt = (n) => Number(n).toLocaleString('en-US');
     const box = (v, id) => (twin
-        ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar number" style="box-sizing:border-box;width:max(44px, ${L(ctx, lw)});height:max(44px, ${L(ctx, hw)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};${FONT}font-size:${P(ctx, digitPt(ctx))};font-weight:700;text-align:center;padding:0;margin:0;${NUM_FEATURES}">`
-        : `<span data-ws-graded="0" data-ws-slot="${esc(id)}" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;${FONT}font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${NUM_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show ? esc(fmt(v)) : ''}</span>`);
+        ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(v))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar number" style="box-sizing:border-box;width:max(44px, ${L(ctx, lw)});height:max(44px, ${L(ctx, hw)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};${FONT}font-size:${P(ctx, dpt)};font-weight:700;text-align:center;padding:0;margin:0;${NUM_FEATURES}">`
+        : `<span data-ws-graded="0" data-ws-slot="${esc(id)}" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;${FONT}font-size:${P(ctx, dpt)};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${ink === 'trace' ? GREY : INK};${NUM_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show ? esc(fmt(v)) : ''}</span>`);
     const label = (t) => `<span class="mq-sbzone" style="display:block;align-self:flex-start;${FONT}font-size:${P(ctx, zp)};font-weight:700;line-height:1.1;white-space:nowrap;color:${INK};">${esc(t)}</span>`;
     // one box of a bar: its label line on top (top-left corner), the writing box under it, right of centre
     const seg = (w, { lab = '', v = null, id = 'bar', unknown = false, left = true } = {}) => {
@@ -76,7 +78,7 @@ export function storyBar(ctx, o = {}) {
     }
     if (kind === 'compare-smaller') {
         const [big = '', small = ''] = Array.isArray(o.who) ? o.who.map((x) => String(x || '').replace(/^The /, '')) : [];
-        const nameW = Math.max(12, Math.max(big.length, small.length) * zp * 0.62 * PT_MM + 2);
+        const nameW = nameWidthMm(zp, Math.max(big.length, small.length));
         const nm = (t) => `<span style="flex:none;display:flex;align-items:center;width:${L(ctx, nameW)};${FONT}font-size:${P(ctx, zp + 1)};font-weight:700;line-height:1.1;color:${INK};">${esc(t)}</span>`;
         const ws = W * COMPARE_SHORT;
         // the long bar: the bigger amount (top); the short bar: the smaller amount (?) and the solid difference box (bottom)
@@ -91,7 +93,11 @@ export function storyBar(ctx, o = {}) {
 export function storyBarWidthMm(ctx, o = {}) {
     const W = Math.max(42, Number(o.wMm) || 64);
     if (o.kind !== 'compare-smaller') return W;
-    const zp = zonePt(ctx);
     const n = Array.isArray(o.who) ? Math.max(...o.who.map((x) => String(x || '').replace(/^The /, '').length)) : 4;
-    return W + Math.max(12, n * zp * 0.62 * PT_MM + 2);
+    return W + nameWidthMm(zonePt(ctx), n);
+}
+
+/** The name column of a compare drawing: the longest name at zone size + 1 pt (bold Andika ~0.66 em a letter) + 3 mm. */
+function nameWidthMm(zp, chars) {
+    return Math.max(14, chars * (zp + 1) * 0.66 * PT_MM + 3);
 }
