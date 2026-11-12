@@ -32,3 +32,30 @@ OK, output identical to 7e0c074b. `ws-boot-smoke`: OK. Backtest row `eb-fact-rol
 **Critic render:** `node tests/scripts/ws-empty-band.cjs --skill <cat:skill> --roles guided,scripted-model --hosts none` (measure), and
 `buildSheet({role: 'guided'|'scripted-model', sections: [{skills: [{categoryId, skillId}]}], size: 'S'|'M'|'L', paper: 'A4', seed: 7, key: true})`
 for the pages (ws-grade-render / the role render of the lane).
+
+## Lead ruling option b (2026-11-12, second round)
+
+The ruling: keep the PAGE_TYPES §12.1 ceiling (10 / 8 / 6 tries plus the Model) on Guided; fact rows grow to at most 1.42 x content
+(band under 30 %, H13) with the rest under the grid; keep div_facts_long's one-digit dividends; leave the Scripted Model as it is.
+
+**Check first (a4b8a8c2).** `ws-empty-band` rule **EB-GDPCAP**: a Guided render whose `plan.meta.scoreOutOf` exceeds 10 / 8 / 6 at
+S / M / L fails (`--self-test`: 9 cases, no browser). On 4edbe292: FAIL 15 (every fact skill at every size; S 29-31, M 11-23, L 11-15
+tries). Backtest row `guided-cap-facts` (fail 4edbe292, pass 31418ea0).
+
+**Fix (31418ea0, `sheet/roles/guided.js`, fact pages only via `factRows`).**
+- FACT_CEILING removed: the ceiling is the shared 10 / 8 / 6.
+- A fact row grows to at most FACT_STRETCH 1.42 x its content (the shortest cell's measure less CELL_PAD_MM), within the page;
+  the Model's row (and the hinted row) keeps its measured height; the rest of the page stays under the grid.
+- The tries beside the Model start under the tab's keep-out (inline `padding-top`, the Model's own), so the facts of row 1 line up
+  and each try's hint ends near the Model's (was a 31.5 % band under mult_facts L try 2).
+- `factCalm` removed: the one-digit dividends ("8 ) 0") are dealt again (div_facts_long Guided S and M seed 7 deal "8 ) 0").
+  The grid is the column count, with the pool that fits it, whose first page holds the most tries among those where no fact the
+  page holds leaves FACT_SIDE (0.29) of its column beside it; Guided measures 5 columns at S (div_facts_long S: 5 columns).
+- Tries (seed 7): S 9 on all five; M 8 (add, sub, mult, div_facts), 7 (div_facts_long); L 5 on all five.
+
+**Gates.** `ws-empty-band --roles guided,scripted-model --hosts none --no-baseline` on the five skills: OK (EB-BAND, EB-SIDE,
+EB-GDPCAP PASS; 30 renders).
+Hash (`hash2.cjs`, PNG + HTML, seed 7, A4) vs 7e0c074b: the same 52 renders identical (0 differ). `ws-detailed-lesson --lesson <id>
+--check` on g3-oa5-mult-properties, g3-oa9-mult-table-patterns, g3-oa9-input-output-rule, g4-nbt1-ten-times-value: OK, output
+identical to 7e0c074b. `ws-boot-smoke`: OK. Syntax: guided.js (`--input-type=module --check`), ws-empty-band.cjs OK.
+`ws-empty-band --self-test`: OK.
