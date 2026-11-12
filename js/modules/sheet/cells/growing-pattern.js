@@ -9,7 +9,7 @@
 //                 boxes (hint off, never graded); under Term 4 the ANSWER box (1.5 pt, the heaviest place, VQ-6) -
 //                 or, on task `far`, a working box, the answer then on its own line "Term 10 has [ ] dots".
 //   task `rule`   one more line: "Rule: + [ ]", a second graded box (the step), so two answers have two places.
-//   sizes         one unit u = 2.5 / 2.5 / 2.6 mm (S / M / L; UNIT below), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
+//   sizes         one unit u = 2.5 / 2.8 / 3.3 mm (S / M / L; UNIT below: the drawing GROWS with the size), dots 0.8 u across, squares u; strokes 0.75 pt (parts),
 //                 the box 0.75 pt, the answer 1.5 pt. S fits two cells across (82 mm), M and L one.
 //   screen twin   the same three drawings; the Term 4 box is a 7 x 7 grid of tap targets (>= 44 px on a card): a tap
 //                 puts a dot / square there, a second tap takes it away (working, never graded); the count and rule
@@ -30,7 +30,9 @@ const GRID = 7;                                   // every term fits 7 x 7 units
 // (r2: M 2.8 / L 3.3 -> 2.4 / 2.6 and the pad 0.9 -> 0.4, so two Guided rows fit under a lesson's Warm-up)
 // (r3: the unit never goes under the standard's smallest unit square, base-10 u = 2.5 mm at S (WORKSHEET_DESIGN_STANDARD
 // 11.2): the S dot was 1.6 mm across, too small to count for this pupil; S now fits fewer terms a row, it never shrinks)
-const UNIT = { S: 2.5, M: 2.5, L: 2.6 };
+// (r5, owner-signed sizes, lead ruling 2026-11-12: S 2.5 (the standard's minimum), M 2.8, L 3.3 - the drawing grows S -> M -> L;
+// a lesson's chartWide Guided is one full-width row (guidedRows: 1), so M and L no longer shrink to fit two rows)
+const UNIT = { S: 2.5, M: 2.8, L: 3.3 };
 const PAD = 0.4;                                  // units of white round the drawing inside its box
 
 /** How many objects Term t has (start + (t - 1) × step); NaN for an unknown family. */
