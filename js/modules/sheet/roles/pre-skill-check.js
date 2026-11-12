@@ -50,6 +50,17 @@ export function sources(skills, { earlier }) {
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
 export const measureCols = () => [1, 2, 4];
+/**
+ * A lesson's ROUTED check draws every item at level 0 (PAGE_TYPES 2.10, LR-17a (3); lead r2 PC-SCAFFOLD): a column
+ * subtraction dealt with its place heads and a box per answer digit (sub_100_no_regroup's kit stack) prints plain - no
+ * heads, one open answer - set on the payload at deal time, so it is measured and drawn alike. Every other check is
+ * untouched (`routed` only on a lesson's Prerequisite Check).
+ */
+export function prepare(it, { routed = false } = {}) {
+    const pl = routed && it && it.template === 'stack' && it.q && it.q.cell && it.q.cell.payload;
+    if (pl) { pl.heads = false; pl.answer = 'open'; }
+    return it;
+}
 /** A check draws its items at level 0 (PAGE_TYPES 2.10: no supports), so it measures them at level 0 too (critic r1 D8). */
 export const MEASURE_LEVEL = () => 0;
 // The detailed lesson's check grows its rows to fill the body (critic r3 R7: no bordered empty strip
@@ -91,6 +102,23 @@ export const ROUTE_GROW = 1.05;
 export const PAIR_ALIKE = 0.6;
 /** The default items a routed question deals, and its FLOOR (LESSON_RULES LR-17a (2): two, so one slip is not a route). */
 export const ROUTE_ITEMS = 2;
+/**
+ * A TWO-CHOICE item (lead ruling A, 2026-11-12): the pupil picks one of two - a compare cell's two check boxes, a
+ * yes / no or same / not the same, "ones or tens" circled, any item dealt with exactly two options. One such item is a coin
+ * flip, so its question keeps ROUTE_ITEMS; any other question may print ONE item when two do not fit the page.
+ */
+export function twoChoice(it) {
+    if (!it) return false;
+    const q = it.q || {};
+    const pay = (q.cell && q.cell.payload) || {};
+    if (it.template === 'compare') return true;
+    if (Array.isArray(q.options) && q.options.length === 2) return true;
+    if (Array.isArray(pay.labels) && pay.labels.length === 2 && pay.correct !== undefined) return true;
+    if (Array.isArray(pay.choices) && pay.choices.length === 2) return true;
+    return /\b(circle|check one box)\b/i.test(String(q.printText || q.text || '')) && /\b(ones|tens|yes|no|same)\b/i.test(String(q.printText || q.text || '') + ' ' + String(q.ans));
+}
+/** A question's item floor (ruling A): ROUTE_ITEMS for a two-choice question, else 1 - never more than its pool holds. */
+export const itemFloor = (its) => Math.max(1, Math.min((its || []).some(twoChoice) ? ROUTE_ITEMS : 1, (its || []).length || 1));
 /** When a question counts as missed (LR-17a (2), P-25; critic r2 N3): printed under the routing table. */
 export const ROUTE_MISSED_RULE = 'A question is missed when any one of its items is wrong (its score is under full marks).';
 
@@ -183,15 +211,25 @@ export function plan(input = {}) {
         const whole = (i, k) => { const its = poolItems(input, `q${i}`).slice(0, k); const c = [4, 3, 2, 1].filter((x) => x <= k).find((x) => fitsAt(its, x, ctx)) || 1; return k === 1 || k % c === 0; };
         // (critic r2 N2: a question NEVER prints one item - one item is a coin flip, LR-17a (2), P-25: the floor is
         // ROUTE_ITEMS, or the question's own pool when it holds fewer; the page holds the floor by its rows, ROUTE_GROW)
-        const floor = (i) => Math.max(1, Math.min(ROUTE_ITEMS, poolItems(input, `q${i}`).length || 1));
+        // (lead ruling A, 2026-11-12: the floor is ROUTE_ITEMS for a two-choice question only - `itemFloor`; any other
+        // question may print one item when two do not fit the ONE page: the check never runs to a second page)
+        const floor = (i) => itemFloor(poolItems(input, `q${i}`));
         const down = (i) => { for (let k = per[i] - 1; k >= floor(i); k--) if (whole(i, k)) return k; return floor(i); };
         for (let i = 0; i < n; i++) if (!whole(i, per[i])) per[i] = down(i);
         let p = planCheck(Object.assign({}, input, { perQuestion: per.slice() }), 1);
+        // (lead ruling A: the question that gives an item up is the one whose drop SAVES height - a stacked row, or a single
+        // item that then pairs two-up with its neighbour - never a side-by-side row that keeps its height and leaves one item
+        // alone across the page; ties: the last question first)
+        const usedOf = (q) => (q.pages.length > 1 ? 1e6 * q.pages.length : 0) + (q.meta.used || 0);
         for (let guard = 0; guard < 4 * n && (p.pages.length > 1 || !p.meta.fitsPage); guard++) {
-            const k = per.map((v, i) => [v, i]).filter(([v, i]) => v > floor(i)).sort((a, b) => b[0] - a[0] || b[1] - a[1]).map(([, i]) => i)[0];
-            if (k === undefined) break;
-            per[k] = down(k);
-            p = planCheck(Object.assign({}, input, { perQuestion: per.slice() }), 1);
+            const cands = per.map((v, i) => i).filter((i) => per[i] > floor(i)).map((i) => {
+                const tryPer = per.slice(); tryPer[i] = down(i);
+                return { i, tryPer, q: planCheck(Object.assign({}, input, { perQuestion: tryPer }), 1) };
+            });
+            if (!cands.length) break;
+            cands.sort((a, b) => usedOf(a.q) - usedOf(b.q) || b.i - a.i);
+            per.splice(0, n, ...cands[0].tryPer);
+            p = cands[0].q;
         }
         // (then each question, most basic first, takes back an item while the page still holds it)
         const want = per.map((v, i) => Math.min(PER_QUAD, poolItems(input, `q${i}`).length));
@@ -205,7 +243,9 @@ export function plan(input = {}) {
                 if (up > want[i]) continue;
                 tryPer[i] = up;
                 const q = planCheck(Object.assign({}, input, { perQuestion: tryPer }), 1);
-                if (q.pages.length === 1 && q.meta.fitsPage && (q.meta.foot || 0) < (p.meta.foot || 0)) { per[i] = up; p = q; changed = true; }
+                // (lead ruling A: an item taken back beside its neighbour costs no height - the foot does not shrink - and is taken
+                // all the same while the page holds it: a lone item never stays alone where its pair fits)
+                if (q.pages.length === 1 && q.meta.fitsPage && (q.meta.foot || 0) <= (p.meta.foot || 0) + 1e-9) { per[i] = up; p = q; changed = true; }
             }
         }
         return p;
@@ -278,6 +318,7 @@ function planCheck(input, cut) {
     const pages = [];
     let kept = 0;
     let routedFoot = null;
+    let routedUsed = null;
     let routedUnits = null;
     let routedFits = true;
     const quadFits = quads.length === 4 && quads.every((q) => fitsAt(q, 4, ctx));
@@ -327,6 +368,7 @@ function planCheck(input, cut) {
                 kept += u.qs.reduce((t, q) => t + q.length, 0);
             });
             routedFoot = lay.foot;
+            routedUsed = +lay.used.toFixed(1);
             routedFits = lay.fits;
             routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
         } else for (const q0 of quads) {
@@ -356,7 +398,7 @@ function planCheck(input, cut) {
     const rp = routed ? routePlan(input, routeRows) : null;
     return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p) => ({ sections: p.sections })), {
         scaffoldLevel: 0,
-        meta: Object.assign({ foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
+        meta: Object.assign({ foot: routedFoot, used: routedUsed, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
             rp ? { routePlan: rp, routes: routeRows } : {}),
     });
 }
@@ -413,4 +455,4 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
     return { units, used, foot: +(Math.max(0, m.budget - used) / m.budget).toFixed(3), fits: used <= m.budget + 0.5 };
 }
 
-export default { ROLE_ID, sources, measureCols, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };
+export default { ROLE_ID, sources, measureCols, prepare, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };

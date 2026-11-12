@@ -73,6 +73,8 @@
 //                                                      on only while the check is live
 //     roundOneNum?: true                               LR-17b phase-0 look: rounding cells count as one-number answers
 //                                                      in the Independent rows (more rows); needs `prereqs`, live only
+//     indepFrame?: true                                LR-17b phase-0 look (critic r2 N8): a column-subtraction Independent
+//                                                      cell keeps its T O heads and answer boxes; needs `prereqs`, live only
 //     mixWith:  [{key, opts?, title?, ...floors}]      Mixed practice partners (EARLIER skills, LR-9)
 //     steps?:   ['Y1.B2.S9', ...]                      further WRM steps it teaches (aliases)
 //     note?:    '...'                                  why this step / this skill (a reviewer's note)
@@ -275,7 +277,7 @@ export function validateLesson(id, l, known = {}) {
     if (l.prereqsLive !== undefined && l.prereqsLive !== false) e('prereqsLive: false or absent (live)');
     if (l.prereqsLive === false && !(l.prereqs || []).length) e('prereqsLive: false needs `prereqs`');
     if (l.prereqsLive === false && !(l.warmup || []).length) e('prereqsLive: false needs the Warm-up it prints meanwhile');
-    for (const f of ['vocabZoom', 'roundOneNum']) {
+    for (const f of ['vocabZoom', 'roundOneNum', 'indepFrame']) {
         if (l[f] !== undefined && l[f] !== true) e(`${f}: true or absent (LR-17b)`);
         if (l[f] === true && !(l.prereqs || []).length) e(`${f}: true needs \`prereqs\` (LR-17b: the phase-0 look goes live with the check)`);
     }

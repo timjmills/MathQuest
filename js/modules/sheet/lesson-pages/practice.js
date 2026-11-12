@@ -87,6 +87,7 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // ended on a 50 mm blank foot under two rows. LR-17b: only on a lesson record with `roundOneNum` whose Prerequisite
         // Check is live - phase0On; every other packet prints as master did)
         const roundRows = phase0On(data, 'roundOneNum');
+        const frameOn = phase0On(data, 'indepFrame');
         const roundOne = (it) => roundRows && it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
         const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it)));
         // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
@@ -112,7 +113,11 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             const cellH = Math.min(room / r, hTop * 1.15);
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
-                content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),
+                // (critic r2 N8, LR-17b `indepFrame`: a column-subtraction Independent cell keeps the T O heads and the box per
+                // answer digit its Guided cells draw - structural, PEDAGOGY 4 / VQ-2. The main pool is measured at level 3,
+                // where both are drawn, so the row height holds them. Only on a record with the flag whose check is live.)
+                content: gridPart(indep.map((it) => planItem(it, Object.assign({ cols: ic }, frameOn && it.template === 'stack' && typeof it.render === 'function'
+                    ? { render: (c, o) => it.render(c, Object.assign({}, o, { payload: { heads: true, answer: 'boxes' } })) } : {}))), { cols: ic, rows: r, cellH, labels, start: letter }),
             });
             cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH + safety;
         }

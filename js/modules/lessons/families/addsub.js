@@ -305,6 +305,7 @@ export const LESSONS = Object.freeze({
         routine: 'sub-column-regroup',
         prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
         vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
+        indepFrame: true,   // LR-17b (critic r2 N8): Independent cells keep the T O heads and answer boxes, live with the check
         slug: 'subtract-2-digit-regroup',
         checkTopic: 'subtracting with regrouping',   // critic r2 N7: the check title's topic (the full one wraps)
         practice: { skill: 'subtraction:sub_100_regroup' },
@@ -317,9 +318,9 @@ export const LESSONS = Object.freeze({
         // the lesson's step 5, and a cell its content fills, H13.)
         prereqs: [
             { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.' },
-            { lesson: 'Y2.B1.S5', title: 'Partition numbers to 100', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.', checks: 'Write a 2-digit number as tens + ones.' },
+            { lesson: 'Y2.B1.S5', title: 'Partition numbers to 100', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.', checks: 'Partition a 2-digit number: 63 = 60 + 3.' },
             { lesson: 'Y2.B2.S10', title: 'Subtract across 10', key: 'subtraction:subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9, why: 'After regrouping, the ones column is a teen fact: 13 − 5.', checks: 'Take a 1-digit number from a teen number, across 10.' },
-            { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.', checks: 'Subtract two 2-digit numbers in columns, with no regrouping.' },
+            { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.', checks: 'Two 2-digit numbers in columns, 63 − 21: no regrouping.' },
         ],
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
         mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10 }],

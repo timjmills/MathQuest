@@ -4333,7 +4333,7 @@ async function buildRoleSheet(n, metaOf) {
             }
             const k = out.length;
             const prepared = typeof mod.prepare === 'function'
-                ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look })
+                ? mod.prepare(it, { index: k, seed: n.seed, wrong: !!flags[k], size: n.size, look: n.look, routed: !!(n.routes && n.routes.length) })
                 : it;
             if (!prepared) return false;
             prepared.pool = pool.id;

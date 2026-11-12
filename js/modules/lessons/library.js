@@ -141,7 +141,7 @@ export function lessonData(idOrSlug) {
 }
 
 /** LR-17b: the lesson-record flags of the phase-0 look (opt-in; on only while the lesson's Prerequisite Check is live). */
-export const PHASE0_FLAGS = Object.freeze(['vocabZoom', 'roundOneNum']);
+export const PHASE0_FLAGS = Object.freeze(['vocabZoom', 'roundOneNum', 'indepFrame']);
 
 /** LR-17 switch: does this engine record (lessonData) open its packet with the Prerequisite Check? */
 export const prereqCheckLive = (data) => !!(data && Array.isArray(data.prereqs) && data.prereqs.length && data.prereqsLive !== false);

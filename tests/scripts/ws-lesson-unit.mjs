@@ -273,7 +273,14 @@ const LATE = {
         const html = R.routingTableHtml([{ letters: '1-2', checks: 'x', lesson: 'Y1', title: 't' }]);
         ok(typeof R.ROUTE_MISSED_RULE === 'string' && html.includes(R.ROUTE_MISSED_RULE), 'N3: the routing table states when a question is missed');
         const src = readSrc('js/modules/sheet/roles/pre-skill-check.js');
-        ok(/const floor = \(i\) => Math\.max\(1, Math\.min\(ROUTE_ITEMS,/.test(src) && /return floor\(i\); \};/.test(src) && /filter\(\(\[v, i\]\) => v > floor\(i\)\)/.test(src), 'N2: plan() gives items up only above the floor of 2');
+        // (lead ruling A, 2026-11-12: the floor of 2 holds for a TWO-CHOICE question; any other may print one item)
+        ok(/const floor = \(i\) => itemFloor\(poolItems\(input, `q\$\{i\}`\)\);/.test(src) && /return floor\(i\); \};/.test(src) && /filter\(\(i\) => per\[i\] > floor\(i\)\)/.test(src), 'N2/A: plan() gives items up only above itemFloor');
+        const mk = (o) => Object.assign({ q: {} }, o);
+        eq(R.itemFloor([mk({ template: 'compare' }), mk({ template: 'compare' })]), 2, 'A: a compare question keeps 2 items');
+        eq(R.itemFloor([mk({ q: { options: ['yes', 'no'] } }), mk({ q: { options: ['yes', 'no'] } })]), 2, 'A: a yes / no question keeps 2 items');
+        eq(R.itemFloor([mk({ template: 'pv', q: { printText: 'Circle the place of the underlined digit.', ans: 'tens' } }), mk({})]), 2, 'A: "circle ones or tens" is two-choice');
+        eq(R.itemFloor([mk({ template: 'bond', q: { text: '2 + ? = 10' } }), mk({ template: 'bond' })]), 1, 'A: a written-answer question may print 1 item');
+        eq(R.itemFloor([mk({ template: 'compare' })]), 1, 'A: never more than the pool holds');
         ok(/extra: input\.perQuestion && !routed \? '' : scoreTag\(its\.length\)/.test(src), 'N3: a routed band carries its __/n score');
         ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
         ok(!/10 \* em - 24\)/.test(src) && /ROUTE_TABLE_FIXED_MM/.test(src), 'D16: routePlan names its fixed margins');
@@ -486,7 +493,7 @@ for (const id of Object.keys(LIB.LESSONS)) {
     const ref = LIB.practiceRef(id);
     const d = LIB.lessonData(id);
     const f = PRE.lessonFor(ref.categoryId, ref.skillId);
-    const { prereqs, prereqsLive, vocabZoom, roundOneNum, checkTopic, ...rest } = d;   // (checkTopic: critic r2 N7, the check title short topic)
+    const { prereqs, prereqsLive, vocabZoom, roundOneNum, indepFrame, checkTopic, ...rest } = d;   // (checkTopic: critic r2 N7, the check title short topic)
     eq(rest, JSON.parse(JSON.stringify(f)), `library: lessonData(${id}) is lessonFor(${ref.categoryId}, ${ref.skillId}) plus prereqs`);
     ok(!('archetype' in d) && !('cases' in d) && !('caps' in d) && !('casesPending' in d), `library: lessonData(${id}) hands no library-only field to the engine`);
     ok(!('prereqs' in f), `prereqs.js: lessonFor(${ref.categoryId}, ${ref.skillId}) carries no prereqs (byte-identical packets)`);
@@ -514,7 +521,8 @@ for (const [id, l] of Object.entries(LIB.LESSONS)) if ((l.prereqs || []).length)
     const CM = await imp('js/modules/sheet/lesson-pages/common.js');
     const PR = await imp('js/modules/sheet/lesson-pages/practice.js');
     const { resolveCtx } = await imp('js/modules/sheet/index.js');
-    eq(LIB.PHASE0_FLAGS, ['vocabZoom', 'roundOneNum'], 'LR-17b: the phase-0 flags');
+    eq(LIB.PHASE0_FLAGS, ['vocabZoom', 'roundOneNum', 'indepFrame'], 'LR-17b: the phase-0 flags (indepFrame: critic r2 N8)');
+    eq(['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14'].map((id) => !!LIB.lessonData(id).indepFrame), [false, true, false], 'LR-17b N8: indepFrame on the sub sample only');
     eq(['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14'].map((id) => [!!LIB.lessonData(id).vocabZoom, !!LIB.lessonData(id).roundOneNum]), [[true, false], [true, false], [true, true]], 'LR-17b: vocabZoom on the three samples, roundOneNum on the round sample only');
     eq(Object.entries(LIB.LESSONS).filter(([, l]) => LIB.PHASE0_FLAGS.some((f) => l[f])).map(([id]) => id).sort(), ['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14'], 'LR-17b: no other lesson carries a phase-0 flag');
     for (const id of ['Y1.B2.S9', 'Y2.B2.S18', 'Y4.B1.S14']) eq([CM.phase0On(LIB.lessonData(id), 'vocabZoom'), CM.phase0On(LIB.lessonData(id), 'roundOneNum')], [false, false], `LR-17b: ${id}'s flags are off while its check is off (master's packet)`);
