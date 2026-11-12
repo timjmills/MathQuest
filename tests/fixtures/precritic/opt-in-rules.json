@@ -161,7 +161,8 @@
        "--lesson",
        "g2-nbt3-read-write-1000",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa5-mult-properties": {
@@ -173,7 +174,8 @@
        "--lesson",
        "g3-oa5-mult-properties",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa9-input-output-rule": {
@@ -185,7 +187,8 @@
        "--lesson",
        "g3-oa9-input-output-rule",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa9-mult-table-patterns": {
@@ -197,7 +200,8 @@
        "--lesson",
        "g3-oa9-mult-table-patterns",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g4-nbt1-ten-times-value": {
@@ -209,7 +213,8 @@
        "--lesson",
        "g4-nbt1-ten-times-value",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g2-nbt3-read-write-1000-repeats": {
@@ -221,7 +226,8 @@
        "--lesson",
        "g2-nbt3-read-write-1000",
        "--repeats"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "empty-band": {
