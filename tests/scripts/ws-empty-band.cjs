@@ -326,7 +326,7 @@ function judge(cells, where, F, role) {
         const [where2, band] = bands[0];
         if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
-        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `content pinned to one side: ${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
+        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${Math.round(c.sideMm / c.innerW * 100)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
     });
 }
 
@@ -430,7 +430,7 @@ async function main() {
                         // fits[0].cols is the lattice size N, not the cells across; the role sizes a row from measured[k])
                         const across = (c) => cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length;
                         cells.forEach((c, i) => { const k = across(c); const fp = m[i][k] != null ? m[i][k] : m[i][b.cols]; if (fp == null) return;
-                            if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${k} across (${Math.round((c.neededMm - fp) / fp * 100)} %)`); });
+                            if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${k} across (${Math.round((c.neededMm - fp) / fp * 100)} %; limit ${FOOT * 100} %)`); });
                     } else if (j.role === 'independent' && !j.opts) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
                 } finally { await sh.close(); }
             }

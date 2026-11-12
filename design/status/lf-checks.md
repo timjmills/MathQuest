@@ -158,3 +158,23 @@ Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record
   PASS: the pv-*, guided/model facts, eb-fixture-*, mc-make-a-ten-choice. optin-h13-abs is PENDING (on master too, not this lane's).
 - lf-engine (11-12): precritic's lesson-samples step gets `--force-check` on their branch (claude/sweet-newton-c8wrv1-lf-engine-pc), lead-approved.
   KEEP it when merging. Their new rule: a feature behind a switch needs a forced-on render gate in the same change.
+
+### Critic eb-r3 (602692b7): FAIL. C1 6 · C2 8 · C3 6 · C4 7 (design/status/lf-checks/critic-eb-r3.md). RULE 7 STOP.
+D2 (a blank cell is dropped) was r2's D7 and survived a second round at medium, so the loop stops. Each root cause is now a machine check,
+and the measurement work is handed over:
+- D1: the band is measured padding box → line box, under-reading by up to 18 points. Check: fixture row `eb-fixture-padding-leading`
+  (PENDING, reads OK and must FAIL). Fix: read the bands from the border box, or from the pixels as EB-GAP does (ws-ink).
+- D2: a blank cell is dropped (`if (!box) return` in measureCells). Check: fixture row `eb-fixture-blank-cell` (PENDING). Fix: push a blank
+  record and judge it EB-READ "cell N has no ink". First sweep the live roles for legitimately blank cells.
+- D3 FIXED: eb-fact-roles is scoped `--only EB-BAND,EB-SIDE`, and the row PASSES.
+- D4 OPEN (master too): ws-precritic-plan FAILs. Three rows give precritic `--role a,b` (usage error), and `--role guided|scripted-model`
+  plans no ws-empty-band.
+- D5 OPEN: EB-FOOT, EB-ROLE, EB-READ, the screen EB-SIDE split and the above/between bands have no row yet. The asked-for check: a
+  rules[] → backtest-row coverage gate.
+- D6 FIXED: EB-SIDE names its limit and the interior width it divides by, and says "pinned to one side" only on screen cells. EB-FOOT
+  names its 10 % limit.
+- Minors left: a transparent border or fill-opacity 0 counts as ink; --html ignores --report-only/--json/--only; precritic drops
+  --margin for the whole run when any one skill is pinned.
+Speed: 3 rounds on one tool. Cause: every fix was proved on the defect's own probe, not on a fixture row FIRST. Rule for the next lane:
+a critic's "Check:" line becomes a red fixture row BEFORE the fix, and the fix commit flips it.
+Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2.7 % of the weekly limit for the whole session to date.

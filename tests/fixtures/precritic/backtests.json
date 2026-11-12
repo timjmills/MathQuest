@@ -3055,11 +3055,12 @@
     "commit": "6e962016",
     "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-BAND,EB-SIDE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "note": "critic eb-r3 D3 (2026-11-12): scoped to this row's own rules; EB-EDGE / EB-GDPCAP (lf-ops, later) hold their own rows"
   },
   {
    "id": "guided-cap-facts",
@@ -3260,6 +3261,50 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-fixture-padding-leading",
+   "check": "ws-empty-band EB-BAND reads the visible band (border box or pixels), not padding box to line box",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (critic eb-r3 D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/padding-leading.fail.html",
+    "state": "60 mm cell, padding-bottom 25 mm, line-height 2: the tool reads 28.5 %, the visible band is over 65 %"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "items in 36 mm cells"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "hand-over (rule 7, critic eb-r3 2026-11-12): the tool fix is outstanding; re-arm (pending: false) in the change that makes this fixture FAIL"
+  },
+  {
+   "id": "eb-fixture-blank-cell",
+   "check": "ws-empty-band EB-READ: a kit cell with no ink fails (never dropped)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-READ (critic eb-r2 D7, eb-r3 D2)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/blank-cell.fail.html",
+    "state": "one good cell beside a blank cell: the tool reads OK"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "every cell inked"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "hand-over (rule 7, critic eb-r3 2026-11-12): the tool fix is outstanding; re-arm (pending: false) in the change that makes this fixture FAIL"
   }
  ]
 }
