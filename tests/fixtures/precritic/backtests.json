@@ -3187,14 +3187,13 @@
   "kind": "commit-pair",
   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
   "browser": true,
-  "pending": true,
   "fail": {
    "commit": "9f7983dd",
    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
   },
   "pass": {
-   "commit": "(the r4 step 2 fix)",
-   "state": "0 findings"
+   "commit": "04683166",
+   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
   },
   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
   "expect": {

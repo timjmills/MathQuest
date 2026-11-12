@@ -118,3 +118,7 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
   under the step text (was 10 mm) and 5.5 mm from the problem to its first mark (was the shared 1.5 mm). div_facts Model L, pixels:
   step-text-to-problem band 25.8-26.8 % (was 30.4-31.0 %), the problem 3.4 mm higher; state 1's band under its last mark 34.3 %
   (was 35.2 %). mult_facts ('beside' row) unchanged, 27.2 %. ws-empty-band div_facts / mult_facts Model L --model-states: OK.
+- r4 step 3 gates @ 04683166: ws-empty-band --roles guided,scripted-model, five fact skills, --model-states (pin on): OK (30 renders,
+  238 cells, every rule PASS incl. EB-GAP); --self-test OK (9 + 6 + 6); hash3 vs 7e0c074b: 54 / 54 identical (HTML + PNG);
+  ws-backtest --row model-interior-band-facts PASS (FAIL 9f7983dd, OK 04683166); ws-boot-smoke OK; syntax OK (scripted-model.js,
+  ws-empty-band.cjs). Next: independent critic r4 (div_facts Model L; mult_facts Model L unchanged).
