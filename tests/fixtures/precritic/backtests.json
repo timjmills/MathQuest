@@ -3779,6 +3779,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r9-v-ambig-plus",
+   "check": "lf-vocab r9 item 5: critic r7 #6 (O-3): alsoShows derived from each picture's drawing; every same-grade pair compatible() allows fails",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-AMBIG+",
+   "browser": false,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 base"
+   },
+   "pass": {
+    "commit": "b52eb44c",
+    "state": "lf-vocab r9 items 5 + 6"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r9-v27-minors",
+   "check": "lf-vocab r9 item 6: critic r7 #3-#5: no two key dot underlays overlap (one per group); the pick3 'Here is how' uses the screen verb (Tap); no broken comparison in an explanation",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V27",
+   "browser": false,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 base"
+   },
+   "pass": {
+    "commit": "b52eb44c",
+    "state": "lf-vocab r9 items 5 + 6"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V27",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
