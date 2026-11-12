@@ -5554,7 +5554,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Scale with range setting; the `band` option (word-stories card Q2) bounds the ANSWER and every story number.
                 const _wpBandN = state.skillOptions && Number(state.skillOptions.band) > 0 ? Number(state.skillOptions.band) : 0;
                 const maxNum = _wpBandN || Math.max(10, range);
-                const _wpLo = _wpBandN && _wpBandN <= 10 ? 5 : 10;
+                const _wpLo = _wpBandN && _wpBandN <= 20 ? 5 : 10;
                 // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
                 const roll = _wpStoryKind('sub_word_problems', 3, ['take_away', 'compare', 'start_unknown', 'change_unknown', 'compare_fewer', 'compare_more_bigger']);
                 q._variant = roll;
