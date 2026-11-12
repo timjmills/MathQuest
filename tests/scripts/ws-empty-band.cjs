@@ -320,7 +320,7 @@ function judge(cells, where, F, role) {
         const bands = [['under', c.belowMm], ['between the blocks of', c.betweenMm], ['above', c.aboveMm]].sort((a, b) => b[1] - a[1]);
         const [where2, band] = bands[0];
         if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
-        if (Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
+        if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `content pinned to one side: ${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
     });
 }
@@ -431,12 +431,15 @@ async function main() {
             }
             // screen hosts
             const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
-            for (const host of HOSTS) for (const w of widths[host] || []) {
+            // every host at the skill's defaults AND at each sampled option variant (lf-checks hosts lane 2026-11-12: unit_form's
+            // worksheet band appeared only at rename=more, an option no host run had rendered)
+            const hostOpts = [{ tag: '', opts: OPTS }, ...variants.map((v) => ({ tag: ` {${v.option}: ${v.value}}`, opts: Object.assign({}, OPTS || {}, v.opts) }))];
+            for (const ho of hostOpts) for (const host of HOSTS) for (const w of widths[host] || []) {
                 await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
                 const ok = await page.evaluate(async ({ c, k, host, SEED, OPTS }) => {
                     try {
                         const st = window.state;
-                        if (OPTS && window.setSetOptions) { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, OPTS, { silent: true }); }
+                        if (window.clearSetOptions) window.clearSetOptions({ silent: true }); if (OPTS && window.setSetOptions) window.setSetOptions(c, k, OPTS, { silent: true });
                         if (host === 'card') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: SEED }); window.renderQuestion(); return '#gameView'; }
                         if (host === 'worksheet') { st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6; window.initWorksheet(); return '#worksheetView .mq-wspaper'; }
                         if (host === 'quiz') {
@@ -449,15 +452,15 @@ async function main() {
                         }
                         return null;
                     } catch (e) { return 'ERR ' + String((e && e.message) || e).slice(0, 150); }
-                }, { c: categoryId, k: skillId, host, SEED, OPTS });
+                }, { c: categoryId, k: skillId, host, SEED, OPTS: ho.opts });
                 // a host that does not render is a failure, like a host that reads no cell (critic eb-r2 D9)
-                if (!ok || /^ERR/.test(ok)) { F('EB-READ', `${key} ${host} ${w}px`, `the host did not render (${ok})`); continue; }
+                if (!ok || /^ERR/.test(ok)) { F('EB-READ', `${key} ${host} ${w}px${ho.tag}`, `the host did not render (${ok})`); continue; }
                 await new Promise((r) => setTimeout(r, 450));
                 const cells = await page.evaluate(measureCells, ok);
                 renders++; cellsRead += cells.length;
                 // a host that reads no cell is a failure (critic eb-r1 D1: the card was silently unmeasured)
-                if (!cells.length) { F('EB-READ', `${key} ${host} ${w}px`, 'no kit cell and no screen cell (.mq-scell) read on the host'); continue; }
-                judge(cells, `${key} ${host} ${w}px`, F);
+                if (!cells.length) { F('EB-READ', `${key} ${host} ${w}px${ho.tag}`, 'no kit cell and no screen cell (.mq-scell) read on the host'); continue; }
+                judge(cells, `${key} ${host} ${w}px${ho.tag}`, F, `host:${host}`);
                 await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
             }
         }

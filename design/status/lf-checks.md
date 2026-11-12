@@ -22,6 +22,11 @@ Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect clas
 (none: tools, no owner picture sheet)
 
 ## Open questions
+- **Q-W1 (owner, hosts lane 2026-11-12):** placevalue:unit_form at rename=more draws a 31.9 % band under its worksheet tile at 1280
+  (10.4 mm in a 32.5 mm cell): the tile is stretched to its grid row (a taller tile beside it) and owner ruling CL-4b (2026-10-23,
+  css/screen-cell.css "the online worksheet's fitted cell starts at the top of the box") keeps the content at the top, so all the
+  spare room is one bottom band. Centring fixes it (tested) but overturns CL-4b. **Suggested answer:** amend CL-4b - a fitted cell
+  starts at the top unless its row stretches it by 30 % or more of its height, then it is centred. Not applied until the owner says.
 0. (lead ruling 2026-11-08, done) EB-BAND = RUBRIC H13, 30 % of the full cell, the shared rule; lf-placevalue aligns H13-ABS. The four passed
    fact skills (add_facts, mult_facts, sub_facts, div_facts_long) are pinned in design/audit/baselines/empty-band.json (99 keys).
 
