@@ -3221,6 +3221,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-check-lr6",
+  "check": "No two cells of a sample lesson's Prerequisite Check (forced on) print the same given numbers (LR-6: the sub check printed 11 - 3 twice and a place item's 39 twice)",
+  "kind": "commit-pair",
+  "rule": "LESSON_RULES LR-6; LR-17a (2)",
+  "browser": true,
+  "fail": {
+   "commit": "e6ea3e940",
+   "state": "routed check slices each pool as dealt: sub L / S print 11 - 3 twice and 39 twice"
+  },
+  "pass": {
+   "commit": "00eee8a57",
+   "state": "pre-skill-check poolItems drops a repeat of an earlier item's given numbers on a routed check"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-LR6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
