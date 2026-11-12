@@ -238,7 +238,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **WRM tag: build-list chart_120 names Y2.B1.S5, which is 'Partition numbers to 100' (1.NBT.B.2), not counting to 120. WRM has no 'to 120' step. Which tag?** Recommended: Fix the build-list entry: tag {step: Y1.B12.S1 'Count from 50 to 100', partial} and keep the lesson link G1-Y2.B1 (Count on to 120) in data/curriculum/links; drop Y2.B1.S5.
 5. **The whole chart at 120 is 12 rows. Shorter squares (16.25 mm tall, same 17.5 mm width and digit size) to keep one page, or two pages (1-60, 61-120)?** Recommended: Shorter squares on one page: the chart's point is the whole pattern in one view, and 16.25 mm stays above the 14 mm writing floor (H9).
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-12
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

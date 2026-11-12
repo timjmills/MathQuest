@@ -240,7 +240,7 @@ Each runs as `node tests/scripts/<script> …`.
 5. **Bar on the read task draws one reading (35 = 5 x 7: 5 boxes of 7). Draw both readings instead?** Recommended: One reading in the practice cell (two bars would make the cell 110 mm tall and say "two are true"); the Model / Guided worked steps draw the turned bar (7 boxes of 5) beside the first, with the Say line naming both.
 6. **facts default 5 or 10?** Recommended: 5 on the preset (the first rung; ELL / SPED pupils meet the idea on small facts), 10 the second rung.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-12
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)

@@ -236,7 +236,7 @@ Each runs as `node tests/scripts/<script> …`.
 6. **Judge items ("are these parts equal in area?", Yes / No on a grid): add a forms value here?** Recommended: No: it is build-list fraction_parts (2.G.A.3, M.EE.3.G.2 recognise). This card asks it only on True or False? and Error Analysis pages of a drawn partition.
 7. **Two ways (two copies, different-shaped equal parts): a dealt problem type of forms=2 or its own value?** Recommended: Dealt, not a value: one item in four at support=grid on Independent and More Practice, every item on Stretch and Reason It; never at support=edge (two free-hand equal-area partitions without squares cannot be checked by the pupil).
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-12
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
