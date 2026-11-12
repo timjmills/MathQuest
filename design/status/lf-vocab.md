@@ -51,6 +51,12 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
   the other". Check V27 (node): no two key dot underlays overlap; the pick3 step uses the screen verb; a grammar list.
   Gates: ws-vocab-unit OK; --browser OK after the 36 pupil pins the new deals moved were re-taken (only V23 pins changed);
   boot-smoke OK. Rows vocab-r9-v-ambig-plus, vocab-r9-v27-minors.
+- Final ws-precritic --strict on e06ba713 (manifest applied): 34 PASS (3 on the baseline), 4 N/A, 1 SKIPPED (no rulings),
+  1 FAIL = sibling-compare only (structural, allowed by the brief). Every r9 backtest row PASS (fail on its failing commit,
+  OK on the fix); the NB6 / NB7 rows run the default ws-next-box, which precritic runs as gate next-box (its vocab block).
+  Not done: no critic run (brief). Open for the lead: Match 3 Guided at L now holds the Model + ONE try (6 scored tries
+  cap / 3 a cell, and no lone continuation page) - PT "Model + three tries" and the 10 / 8 / 6 ceiling conflict for a
+  three-answer cell; the G4 set edits (pattern -> total / output, equation -> total) change those lessons' vocabulary pages.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.

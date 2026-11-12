@@ -3754,7 +3754,7 @@
     "commit": "69564628",
     "state": "lf-vocab r9 items 4 + 4b"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs --skills vocabulary:vocab_grade_pictures 2>&1 | grep -q ' - NB6 ' && echo 'nb6: FAIL' || echo 'nb6: OK')",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB6 ' && echo 'nb6: FAIL' || echo 'nb6: OK')",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3774,7 +3774,7 @@
     "commit": "69564628",
     "state": "lf-vocab r9 items 4 + 4b"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs --skills vocabulary:vocab_grade_pictures 2>&1 | grep -q ' - NB7 ' && echo 'nb7: FAIL' || echo 'nb7: OK')",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB7 ' && echo 'nb7: FAIL' || echo 'nb7: OK')",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
