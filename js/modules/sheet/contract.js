@@ -43,6 +43,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `wrongAnswers(q) -> WrongAnswer[]`: EVERY misconception's wrong answer for one item (the detailed
     // lesson's Check Question options, 2026-10-16); `wrongAnswer` stays the one a page shows.
     'wrongAnswers',
+    // `preSkills(skillRef) -> [{categoryId, skillId, opts}]`: the skills a Pre-skill check tests before this one, nearest
+    // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
+    // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
+    'preSkills',
 ]);
 
 /* ================================================== the controlled instruction library */

@@ -18,6 +18,8 @@
 //     with its halo (.mq-vhalo) in the single grey on the key and hidden on the screen until answered; the pupil page has neither
 // V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
 //     at most 14 words
+// V26 (r9) the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below
+//     (provider `preSkills`), never the Grade 6 definition-matching skills listed before it in data.js
 // --browser: V23 (R-1) card-390 and worksheet-1280 highlight after the answer and not before, the pupil print pages are
 //     byte-identical to 70cdbaf9 (sha256 per role / size / seed, tests/fixtures/precritic/vocab-pupil-hashes.json), the
 //     key's highlight is GREY only; V25 (R-2) a wrong answer shows and speaks the RIGHT word's explanation once, with
@@ -443,6 +445,36 @@ const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amo
         // V24+ (critic r6 #7, lf-vocab r8): no word above the grade's word list (ELL), and long enough to follow
         for (const h of HARD_WORDS) if (has(rest, h)) fail(`V24 "${w}": its explain uses the hard word "${h}"`);
         if (n < 6) fail(`V24 "${w}": its explain is ${n} words (at least 6)`);
+    }
+}
+
+// V26 (lf-vocab r9, precritic render-gate / cell-checks: the Pre-skill check overflowed at S, M and L): the check of a
+// picture vocabulary task tests the steps under it in its own routine - 1 or 2 picture vocabulary skills at its grade or
+// below (the provider's `preSkills`, read by roles/pre-skill-check.js sources) - never the Grade 6 definition-matching
+// skills data.js lists before it (legacy cells taller than any check band).
+{
+    let PV = null, PSC = null;
+    try { PV = await imp('js/modules/sheet/providers/vocabulary.js'); PSC = await imp('js/modules/sheet/roles/pre-skill-check.js'); } catch (e) { fail(`V26: cannot load the provider or the role (${e.message})`); }
+    if (PV && PSC) {
+        if (typeof PV.vocabPreSkills !== 'function') fail('V26: the vocabulary provider declares no preSkills');
+        const legacyEarlier = (sk, n) => Array.from({ length: n }, (_, i) => ({ categoryId: 'vocabulary', skillId: `vocab_grade_6_x${i}` }));
+        const gradeOf = (r) => { const o = r.opts || {}; const st = o.vocabSet !== null && o.vocabSet !== undefined ? W0.vocabSetAt(o.vocabSet) : null; return st ? st.grade : Number(o.vocabGrade) || 3; };
+        const cases = [];
+        for (const skillId of ['vocab_grade_pictures', 'vocab_pick3_words']) {
+            cases.push({ categoryId: 'vocabulary', skillId, opts: {} });
+            for (const g of W0.VOCAB_GRADES) cases.push({ categoryId: 'vocabulary', skillId, opts: { vocabGrade: g, vocabSet: null } });
+            W0.VOCAB_SETS.forEach((_, i) => cases.push({ categoryId: 'vocabulary', skillId, opts: { vocabSet: i } }));
+        }
+        for (const sk of cases) {
+            const tag = `${sk.skillId} ${JSON.stringify(sk.opts)}`;
+            const pools = PSC.sources([sk], { earlier: legacyEarlier });
+            const refs = pools.flatMap((p) => p.skills);
+            if (!refs.length || refs.length > 2) fail(`V26 ${tag}: the check tests ${refs.length} skill(s) (want 1 or 2, one page at S / M / L)`);
+            for (const r of refs) {
+                if (r.categoryId !== 'vocabulary' || !['vocab_grade_pictures', 'vocab_pick3_words'].includes(r.skillId)) fail(`V26 ${tag}: the check tests ${r.categoryId}:${r.skillId} (not a picture vocabulary task)`);
+                else if (gradeOf(r) > gradeOf(sk)) fail(`V26 ${tag}: the check tests grade ${gradeOf(r)} words (above the skill's grade ${gradeOf(sk)})`);
+            }
+        }
     }
 }
 

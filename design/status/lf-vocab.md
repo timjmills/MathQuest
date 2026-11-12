@@ -8,6 +8,15 @@ Updated: 2026-11-09
 Builder profile: mq-opus-medium
 Critic rounds: 5: r5 PASS min 8 (design/lanes/lf-vocab/critic-r5.md); r4 FAIL 6, r3 FAIL 6, r2 FAIL 7, r1 FAIL 1
 
+## Round 9 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL r7, plus the merge-induced precritic FAILs)
+Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per item, pushed after each.
+- Item 1 (pre-skill-check overflow S/M/L, both skills): the check tested the four skills data.js lists before the vocab skills
+  (Grade 6 definition matching, legacy cells 116 mm and clipped). New optional contract member `preSkills` (contract.js), read
+  by roles/pre-skill-check.js sources; the vocabulary provider's vocabPreSkills names 1-2 picture tasks under it (Match 3 g:
+  1 picture 3 words on the same words + Match 3 a grade down; 1 picture 3 words g: the same task 1 and 2 grades down; grade 1
+  checks itself). ws-grade-render --roles pre-skill-check --size S,M,L --gate: 72 overflow findings -> OK (1 page each).
+  Check V26 (node, ws-vocab-unit).
+
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.
 - Step A (O-1): the next answer box is a 4 px blue ring (#1565d8) pulsing an inner ring rgba(21,101,216,.30) on white, on

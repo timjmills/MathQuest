@@ -14,7 +14,7 @@
 
 import { registerSkill } from '../contract.js';
 import { strings, step, clampSteps, chooseWrong } from './util.js';
-import { VOCAB_WORDS } from '../lesson-pages/vocab-words.js';
+import { VOCAB_WORDS, VOCAB_GRADES, vocabSetAt } from '../lesson-pages/vocab-words.js';
 
 const LET = ['A', 'B', 'C'];
 const meaningOf = (w) => (VOCAB_WORDS[w] ? VOCAB_WORDS[w].meaning : '');
@@ -55,8 +55,29 @@ const isPick = (ref = {}) => templateOf(ref.q) === 'vocab-pick3' || ref.skillId 
 function vocabStrings(ref = {}) { return (isPick(ref) ? PICK : MATCH)(ref); }
 vocabStrings.def = MATCH.def;
 
+/**
+ * The Pre-skill check's skills (lf-vocab r9; contract `preSkills`), nearest first: the steps under this task in its own
+ * routine, never the skills data.js lists before it (four Grade 6 definition-matching skills, whose legacy cells overflowed
+ * every size). Two at most, so the check is one page at S, M and L (PT 2.10): Match 3 at grade g checks 1 picture, 3 words
+ * on the same words, then Match 3 a grade down; 1 picture, 3 words at grade g checks the same task one and two grades down.
+ * The lowest grade's 1 picture, 3 words checks itself.
+ */
+export function vocabPreSkills(sk = {}) {
+    const o = sk.opts || {};
+    const set = o.vocabSet !== null && o.vocabSet !== undefined ? vocabSetAt(o.vocabSet) : null;
+    const g = set ? set.grade : (VOCAB_GRADES.includes(Number(o.vocabGrade)) ? Number(o.vocabGrade) : 3);
+    const ref = (task, grade, keepSet) => ({ categoryId: 'vocabulary', skillId: task === 'pick3' ? 'vocab_pick3_words' : 'vocab_grade_pictures',
+        opts: { vocabTask: task, vocabGrade: grade, vocabSet: keepSet && set ? o.vocabSet : null } });
+    const lower = VOCAB_GRADES.filter((x) => x < g).sort((a, b) => b - a);
+    const out = [];
+    if (isPick(sk)) for (const x of lower) out.push(ref('pick3', x, false));
+    else { out.push(ref('pick3', g, true)); if (lower.length) out.push(ref('match3', lower[0], false)); }
+    return out.length ? out.slice(0, 2) : [ref('pick3', g, true)];
+}
+
 registerSkill('vocabulary:vocab_grade_pictures', {
     supports: Object.freeze([]),
+    preSkills: vocabPreSkills,
     strings: vocabStrings,
     misconceptions: ['look-alike-swap', 'sound-not-meaning'],
     workedSteps: (q) => {
