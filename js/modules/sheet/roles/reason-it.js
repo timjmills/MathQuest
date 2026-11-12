@@ -49,7 +49,10 @@ export function prepare(it, info = {}) {
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
+    // (a chart window past 100 - chart_120's band 120, three-digit squares - states its width, 90 mm at L, and ran
+    // over both panels side by side: it takes the same B-under-A form; the 1-100 window squeezes and keeps its page)
+    const chartPast100 = it.template === 'chartwindow' && Array.isArray(pl.rows) && pl.rows.some((r) => Number(r) >= 10);
+    const wide = sentence || chartPast100 || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     const render = (c, o = {}) => story(c) + `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
