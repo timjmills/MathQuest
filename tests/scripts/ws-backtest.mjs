@@ -9,7 +9,8 @@
 //   node tests/scripts/ws-backtest.mjs --keep              # keep the commit-pair worktrees (debugging)
 //   node tests/scripts/ws-backtest.mjs --timeout 600       # seconds per row (default 600; browser rows get --browser-timeout,
 //                                                          # default 1800); a row over it is killed (its whole process tree)
-//                                                          # and reported TIMEOUT with the last 20 lines of its output
+//                                                          # and reported TIMEOUT; any non-PASS row streams the last 20 lines
+//                                                          # of the state that went wrong
 //   node tests/scripts/ws-backtest.mjs --lock-warn 120     # a browser row with no browser slot after N s (default 120) prints
 //                                                          # who holds the slots / the harness lock (pid, age, command)
 //   node tests/scripts/ws-backtest.mjs --quiet             # no per-row streaming lines (the final table only)
@@ -240,8 +241,9 @@ try {
         results.push({ r, fail: fail.result, pass: pass.result, verdict, failRun: fail, passRun: pass });
         say(`ws-backtest row ${r.id}: ${verdict}  fail state ${fail.result} ${(fail.ms / 1000).toFixed(1)}s, pass state ${pass.result} ${(pass.ms / 1000).toFixed(1)}s` +
             (verdict === 'PASS' ? '' : `\n    expected ${JSON.stringify(expect)}; fail: ${fail.line}; pass: ${pass.line}`));
-        if (verdict === 'TIMEOUT') {
-            const t = fail.result === 'TIMEOUT' ? fail : pass;
+        if (verdict !== 'PASS') {
+            // the state that went wrong (a TIMEOUT first, else the one off its expectation): its last 20 lines
+            const t = fail.result === 'TIMEOUT' ? fail : pass.result === 'TIMEOUT' ? pass : fail.result !== expect.fail ? fail : pass;
             say(`    last ${t.tail.length} line(s) of the ${t === fail ? 'fail' : 'pass'} state:\n${t.tail.map((l) => `      | ${l}`).join('\n')}`);
         }
     }
