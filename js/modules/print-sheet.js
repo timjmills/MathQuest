@@ -3446,6 +3446,26 @@ async function buildSheetDeal(req = {}) {
                     left -= give;
                 }
             }
+            // (`wholeRows` on a template's footprint, opt-in so no other template's page changes - lf-vocab r9, print-lint
+            // sections L-DENSITY DN-2 / LONE at S and L: a one-column member whose share held ONE row and a half took
+            // the page's whole share as one tall cell, so a two-skill sheet printed one Match 3 alone on page 1. Such a
+            // member takes one more whole row from the others' spare room, when they keep the rows they had.)
+            members.forEach((si, k) => {
+                const its = probesOf(si) || [];
+                if (!its.length || !its.every((it) => it && it.footprint && it.footprint.wholeRows)) return;
+                const row = layouts[si].hMin;
+                if (!(row > 0)) return;
+                const rowsNow = Math.max(1, Math.floor((h[k] - 1 - band(si)) / row + 1e-6));
+                const want = (rowsNow + 1) * row + 1 + band(si) - h[k];
+                if (want <= 0) return;
+                const rowsOf = (j) => { const r = layouts[members[j]].hMin; return r > 0 ? Math.max(1, Math.floor((h[j] - 1 - band(members[j])) / r + 1e-6)) : 1; };
+                const keep = (j) => rowsOf(j) * layouts[members[j]].hMin + 1 + band(members[j]);
+                const spare = members.reduce((a, _, j) => a + (j === k ? 0 : Math.max(0, h[j] - Math.max(need[j], keep(j)))), 0);
+                if (spare + 1e-6 < want) return;
+                let left = want;
+                members.forEach((_, j) => { if (j === k || left <= 0) return; const give = Math.min(left, Math.max(0, h[j] - Math.max(need[j], keep(j)))); h[j] -= give; left -= give; });
+                h[k] += want;
+            });
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);

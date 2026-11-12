@@ -19,6 +19,11 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
 - Item 2 (guided S vocabSet 8 overflow): the Guided page split its rows by measured height (a flat-picture row measured 32 mm
   got 45 mm; the cell draws 47). vocab-match3 footprint `evenRows: true` (read only by guided.js): every row one share.
   ws-cell-checks --card --card-opts match3: 8 OVERFLOW -> OK (216 pages). Check: the render gate row vocab-r9-guided-s-set8.
+- (lead merged master d34311d5 at 7e09577a; resumed there.)
+- Item 3 (print-lint --kind sections L-DENSITY DN-2 / LONE / PAGEFILL at S and L): on a page shared by two skills, Match 3's
+  half share (99 mm at S) held one 55 mm row, drawn as one tall cell alone on page 1. print-sheet.js shareRows: a member whose
+  footprint opts in (`wholeRows`, vocab-match3 only, so no other template's page changes) takes one more whole row from the
+  others' spare room when they keep their rows. print-lint sections S and L: 4 findings each -> OK. Check: row vocab-r9-sections-density.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.
