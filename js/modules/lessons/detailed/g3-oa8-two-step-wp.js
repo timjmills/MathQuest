@@ -268,7 +268,7 @@ export default {
             ] },
         { n: '5a', name: 'I Do 1: groups first', min: 6, page: 'P2', boxes: [{ kind: 'watch', title: 'Step 1 is not the answer', text: 'Stop on the Step 1 answer and ask: “Is that the question?”' }],
             rows: [
-                { do: 'Put anchor chart 1 up. Read the story two times.' },
+                { do: 'Put anchor chart 1 up. Read the story: {chart.story}', note: 'Read it two times.' },
                 { say: 'What do I find first? The groups.', note: 'Step 1. Show {chart.g} cups of {chart.e} counters.' },
                 { say: 'Step 1: {chart.step1}.', note: 'Write it in the Step 1 box: [[{chart.s1}]].' },
                 { say: 'Is {chart.s1} the question? No. Step 2.', note: 'Read the last line again.' },
@@ -288,7 +288,7 @@ export default {
             ] },
         { n: '5b', name: 'I Do 2: share first', min: 5, page: 'P2b', boxes: [{ kind: 'language', title: '“Shares equally”', text: 'Act it out: deal the counters one at a time into the cups.' }],
             rows: [
-                { do: 'Put anchor chart 2 up. Read the story two times.' },
+                { do: 'Put anchor chart 2 up. Read the story: {b.chart.story}', note: 'Read it two times.' },
                 { say: 'What do I find first? One share.', note: 'Deal {b.chart.g} counters into {b.chart.e} cups.' },
                 { say: 'Step 1: {b.chart.step1}.', note: 'Each friend has [[{b.chart.s1}]].' },
                 { say: 'Step 2 uses my Step 1 answer: {b.chart.step2}.', note: 'The change is to ONE share, not to {b.chart.g}.' },

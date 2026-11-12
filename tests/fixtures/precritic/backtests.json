@@ -3200,6 +3200,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-support-eq-divfacts",
+  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-cue-size-divfacts",
+  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-place-divfacts",
+  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: every ÷ card under once one wraps"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }
