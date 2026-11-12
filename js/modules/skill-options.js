@@ -3240,7 +3240,7 @@ _ap1Put('composing:number_bonds', {
 _ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
     labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)', 120: '120 (91 to 120, across 100)' },
     help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50, 100 or 120 numbers, ten to a row. '
-        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20). '
+        + 'A small chart holds fewer empty boxes. '
         + 'At 120 every window is cut from 91 to 120, so it crosses 100.',
 }));
 // number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
