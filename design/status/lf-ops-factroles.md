@@ -109,3 +109,8 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
 | Finding | Check that would catch it | Backtest state | Note |
 |---|---|---|---|
 | S5 div_facts Model L: the band between the step text and the problem is 24.6-25.1 mm of 81.2 mm (30.3-30.9 %, H13 30 %) in all 8 state cells; mult_facts 27.6 % | EB-GAP interior band (an empty band BETWEEN step text and the problem, not only under the ink) >= 30 % | fail 9f7983dd div_facts Model L | fix: raise the problem ~3 mm and open its gap to the first mark (1.3 mm now) to ~4 mm; ws-empty-band missed it: its interior band test does not cover the Model's text-to-problem gap |
+- r4 step 1 (S5 check first): ws-empty-band EB-GAP (with --model-states): the band from a Scripted Model state's step text to
+  the next ink under it, read on the pixels (the DOM line boxes read 19.3 mm where the glyphs leave 24.8 mm), FAILS at >= 30 % of
+  the cell (--margin applies); PT-MOD-3 excuses it as EB-BAND (not the last state, <= 35 %, a later state inks the band).
+  --self-test: 9 + 6 + 6 EB-GAP cases OK. On 9f7983dd: div_facts Model L FAIL 8 (24.6-25.1 mm of 81 mm, 30.4-31.0 %, every state
+  cell, matches the critic); mult_facts 27.2 % PASS. Backtest row model-interior-band-facts (fail 9f7983dd, pass = step 2 fix).
