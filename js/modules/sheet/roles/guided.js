@@ -35,7 +35,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
-    providerWorkedSteps, esc, stripExtraMm,
+    providerWorkedSteps, esc, stripExtraMm, factRows,
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
@@ -122,11 +122,6 @@ const ceilFor = (ctx, items, input = null) => (factRows(input) ? FACT_CEILING[ct
  * tall as the taller of its trace and the tries' hint (not the two added), and the page holds more tries instead
  * (FACT_CEILING). Every other skill's Guided page is unchanged.
  */
-const FACT_ROW_SKILLS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts_long', 'division:div_facts']);
-function factRows(input) {
-    const s = (input && input.skills) || [];
-    return s.length > 0 && s.every((k) => k && FACT_ROW_SKILLS.has(`${k.categoryId}:${k.skillId}`));
-}
 const FACT_CEILING = { S: 31, M: 23, L: 19 };
 /** A fact page may take one more column than AUTO_COLS where its facts fit (a narrow fact centred in a wide column, H13 across). */
 const FACT_COLS = { S: 5, M: 4, L: 4 };

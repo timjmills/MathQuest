@@ -15,7 +15,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
-    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc,
+    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, factRows,
 } from './compose.js';
 import { isWideRow } from '../cells/count-row.js';
 
@@ -24,7 +24,7 @@ export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'scripted-model';
 
 export const sources = (skills) => [{ id: 'main', skills }];
-export const measureCols = () => [1, 2, 3];
+export const measureCols = () => [1, 2, 3, 4];
 export const counts = () => ({ main: 1 });
 
 /**
@@ -201,14 +201,31 @@ export function plan(input = {}) {
         }
         if (best) { steps = best.v.steps; marks = best.v.marks; H = best.Hs; deal = best.d; }
     }
+    // A FACT page (factRows; lf-ops facts-roles task, RUBRIC H13): the short fact beside its step text left 35 % of the state
+    // cell and 48-72 % of the text cell empty. Its states stand side by side instead, one column a state, each with its
+    // step text over it at one height (the facts level), so the row is as tall as one fact and the longest step's text.
+    let across = 0, textMm = 0;
+    // (a fact too wide for one column a state - div_facts' "42 ÷ 7 = ___" at L - takes two a row: 2 + 2)
+    const acrossAt = factRows(input) && !marks && !story && steps.length >= 2 && steps.length <= 4
+        ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx)) : 0;
+    if (acrossAt) {
+        across = acrossAt;
+        const colW = 186 / across - 6 - 9.5;
+        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
+        textMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
+        H = hMinAt([it], across, ctx) + textMm;
+        deal = [steps.length];
+    }
+    const acrossRows = across ? steps.length / across : 0;
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
     if (story) providerWorkedSteps(it, 6).forEach((st, g) => (st.marks || []).forEach((mk) => { if (mk && mk.slot && !writtenAt.has(mk.slot)) writtenAt.set(mk.slot, g); }));
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
     const stateItem = (i) => planItem(it, {
-        cols, level: 3, nolabel: true,
-        render: (c, o) => (cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
+        cols: across || cols, level: 3, nolabel: true,
+        render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
                     : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
@@ -224,8 +241,8 @@ export function plan(input = {}) {
         const cap = caps[pages.length];
         const take = steps.slice(i, i + cap).map((_, k) => i + k);
         const cells = [];
-        for (const k of take) { cells.push(stateItem(k)); if (cols === 2) cells.push(textItem(k)); }
-        const grid = gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        for (const k of take) { cells.push(stateItem(k)); if (cols === 2 && !across) cells.push(textItem(k)); }
+        const grid = across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
         const storyHtml = story ? `<div class="mq-wwstory mq-modelstory" style="padding:1.5mm 4mm 2mm;font-size:${m.textPt + 2}pt;line-height:1.3;">${story.map((l) => `<div>${esc(l)}</div>`).join('')}</div>` : '';
         const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), ...(story ? { contents: [{ kind: 'html', html: storyHtml }, grid] } : { content: grid }) }];
         i += take.length;

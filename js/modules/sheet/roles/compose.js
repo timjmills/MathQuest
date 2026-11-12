@@ -245,6 +245,17 @@ export function planItem(it, { cols, level = 1, render, key, model = false, nola
 }
 
 /** A grid part with fixed height (PT-ENG-6: one cell height for the section). */
+/**
+ * The fact pages (lf-ops facts-roles task, RUBRIC H13): a page whose skills are all basic-fact skills. The Guided and
+ * Scripted Model roles size their rows to these short fact cells (guided.js, scripted-model.js); every other skill's page
+ * is unchanged.
+ */
+const FACT_ROW_SKILLS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts_long', 'division:div_facts']);
+export function factRows(input) {
+    const s = (input && input.skills) || [];
+    return s.length > 0 && s.every((k) => k && FACT_ROW_SKILLS.has(`${k.categoryId}:${k.skillId}`));
+}
+
 export function gridPart(items, { cols, rows, cellH, labels = 'none', start = 1, cls = '', unlabelled, relay } = {}) {
     const r = rows || Math.max(1, Math.ceil(items.length / cols));
     return Object.assign({
