@@ -3419,6 +3419,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-o1-next-box-blue",
+   "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring",
+   "kind": "commit-pair",
+   "rule": "ws-next-box NB1-NB5",
+   "browser": true,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 start: the 2026-10-04 yellow next box, no switch"
+   },
+   "pass": {
+    "commit": "5d8fe328",
+    "state": "lf-vocab r8 step A: the O-1 switch"
+   },
+   "command": "node tests/scripts/ws-next-box.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

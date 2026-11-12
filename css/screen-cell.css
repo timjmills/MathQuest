@@ -1994,3 +1994,16 @@ html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box:is(.mq-live-wr
     html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
     html body .online-edition .problem-card.mq-wscard.mq-active-problem { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
 }
+
+/* lf-vocab r8 (critic r6 #1-#5), additive. Match 3 wrong: only the pictures of the wrongly matched words glow (.mq-vpic-on),
+   each letter beside its glow lit; a pick3 wrong word's line carries the slot's wrong outline; the vocabulary "Here is how"
+   sits inside the explanation, and the support ladder's own worked box and "Not yet" line hide while it shows. */
+.mq-vfb.mq-vfb-some svg.mq-vpic .mq-vhalo { visibility: hidden; }
+.mq-vfb.mq-vfb-some .mq-vm-pic.mq-vpic-on svg.mq-vpic .mq-vhalo { visibility: visible; }
+.mq-vfb .mq-vm-let.mq-vglow-let { background: #fff27a !important; border-radius: 50%; padding: 0.12em 0.3em;
+    box-shadow: 0 0 0 4px #fff27a, 0 0 12px 5px rgba(255, 212, 0, 0.75); }
+.mq-vfb .mq-vp-line.box-wrong { border-bottom-color: #B73838 !important; box-shadow: 0 0 0 2px #B73838 !important; border-radius: 2px; }
+.mq-vexplained .mq-ladder-worked, .mq-vexplained .mq-ladder-msg, .mq-vexplained .mq-ladder-extra { display: none !important; }
+.mq-vexplain .mq-vhow { margin-top: 8px; padding-top: 6px; border-top: 1px solid #949494; }
+.mq-vexplain .mq-vhow-title { font-weight: 700; }
+.mq-vexplain .mq-vhow ol { margin: 2px 0 0 24px; padding: 0; }

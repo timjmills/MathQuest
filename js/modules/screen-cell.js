@@ -1098,7 +1098,9 @@ function _liveBindFn(el, fn, group = [], want = null) {
  *   - shows each picture's FOCAL part with a thick highlight (its halo, drawn hidden by vocab-pictures.js, is shown by the
  *     class `mq-vfb` on the cell: css/screen-cell.css);
  *   - makes the right word glow yellow (pick3: the bank word; Match 3: each word whose box holds its right letter);
- *   - on a WRONG answer shows "The answer is <word>! <explain>" under the cell (Match 3: one line a wrongly matched word)
+ *   - on a WRONG answer shows "The answer is <word>! <explain>" under the cell (Match 3, r8: "<Word> is picture <L>!
+ *     <explain>", one line a wrongly matched word, and only those pictures glow, each with its letter), then its own
+ *     "Here is how" (the same on every wrong card; the support ladder's worked box is hidden while it shows)
  *     and hands that text once to `speak` (the host passes hints-speech.js speakExplanation, which the sound toggle mutes).
  * Before the answer the cell is unchanged. Calling it again (a second try) replaces the earlier feedback. Every mark it shows
  * carries `mq-v-feedback`, which FEEDBACK_RE keeps out of the cell's black-and-white ink pass (monoCell): feedback chrome.
@@ -1112,17 +1114,29 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
     if (!cell) return '';
     const p = q.cell.payload;
     const norm = (s) => String(s == null ? '' : s).trim().toLowerCase();
+    const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+    // (a second try replaces the earlier feedback: every mark this function adds is cleared first)
     cell.querySelectorAll('.mq-vglow').forEach((el) => el.classList.remove('mq-vglow', 'mq-v-feedback'));
+    cell.querySelectorAll('.mq-vpic-on').forEach((el) => el.classList.remove('mq-vpic-on'));
+    cell.querySelectorAll('.mq-vglow-let').forEach((el) => el.classList.remove('mq-vglow-let', 'mq-v-feedback'));
+    cell.querySelectorAll('.mq-vp-line.box-wrong').forEach((el) => el.classList.remove('box-wrong', 'mq-v-feedback'));
+    cell.classList.remove('mq-vfb-some');
+    root.classList.remove('mq-vexplained');
     const old = cell.parentElement && cell.parentElement.querySelector(':scope > .mq-vexplain');
     if (old) old.remove();
     cell.classList.add('mq-vfb');
-    let wrongWords = [];
+    const LET = ['A', 'B', 'C'];
+    let wrong = [];                     // [{word, letter}] (letter: Match 3 only)
     if (tpl === 'vocab-pick3') {
         const btn = Array.from(cell.querySelectorAll('button[data-mq-choice]')).find((b) => norm(b.getAttribute('data-mq-choice')) === norm(p.word));
         if (btn) btn.classList.add('mq-vglow', 'mq-v-feedback');
-        if (!ok) wrongWords = [String(p.word)];
+        if (!ok) {
+            wrong = [{ word: String(p.word) }];
+            // (r8, critic r6 #5: the wrong word on the line carries the slot's wrong outline)
+            const line = cell.querySelector('.mq-vp-line');
+            if (line) line.classList.add('box-wrong', 'mq-v-feedback');
+        }
     } else {
-        const LET = ['A', 'B', 'C'];
         const words = p.words || [];
         const order = Array.isArray(p.order) && p.order.length === words.length ? p.order : words.map((_, i) => i);
         const rows = Array.from(cell.querySelectorAll('.mq-vm-word'));
@@ -1134,17 +1148,52 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
             const got = norm(inp ? inp.value : box ? box.textContent : '');
             const right = got === norm(LET[wi]);
             if (right || ok) { const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback'); }
-            else wrongWords.push(String(words[wi]));
+            else wrong.push({ word: String(words[wi]), letter: LET[wi], pic: wi });
         });
+        // (r8, critic r6 #1: after a wrong answer ONLY the pictures of the wrongly matched words glow, each with its letter;
+        // a right answer lights every picture)
+        if (!ok && wrong.length) {
+            cell.classList.add('mq-vfb-some');
+            const pics = Array.from(cell.querySelectorAll('.mq-vm-pic'));
+            for (const w of wrong) {
+                const pic = pics[w.pic];
+                if (!pic) continue;
+                pic.classList.add('mq-vpic-on');
+                const let_ = pic.querySelector('.mq-vm-let');
+                if (let_) let_.classList.add('mq-vglow-let', 'mq-v-feedback');
+            }
+        }
     }
-    if (ok || !wrongWords.length) return '';
-    const lines = wrongWords.map((w) => vocabExplainLine(w) || (VOCAB_WORDS[w] ? `The answer is ${w}!` : '')).filter(Boolean);
+    if (ok || !wrong.length) return '';
+    // the line names the RESPONSE the pupil gives: pick3 writes the word ("The answer is step!"), Match 3 writes the letter
+    // ("Input is picture C!"); then the word's explanation (R-2)
+    const lines = wrong.map((w) => {
+        const ex = VOCAB_WORDS[w.word] && VOCAB_WORDS[w.word].explain;
+        if (tpl === 'vocab-match3') return VOCAB_WORDS[w.word] ? `${cap(w.word)} is picture ${w.letter}!${ex ? ' ' + ex : ''}` : '';
+        return vocabExplainLine(w.word) || (VOCAB_WORDS[w.word] ? `The answer is ${w.word}!` : '');
+    }).filter(Boolean);
     if (!lines.length) return '';
+    // "Here is how", written here so every wrong card on every host shows the same blocks (critic r6 #4): it never repeats
+    // the explanation and never hints at less than it (no first-letter rung, no blank: #2, #3); its last step names the
+    // answer. The support ladder's own worked box and "Not yet" line are hidden while the explanation shows (.mq-vexplained).
+    const how = tpl === 'vocab-pick3'
+        ? ['Read the three words in the box.', `Type ${p.word} on the line.`]
+        : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
     const box = document.createElement('div');
     box.className = 'mq-vexplain mq-v-feedback';
     box.setAttribute('role', 'status');
     for (const l of lines) { const para = document.createElement('p'); para.textContent = l; box.appendChild(para); }
+    const hw = document.createElement('div');
+    hw.className = 'mq-vhow';
+    const ht = document.createElement('div');
+    ht.className = 'mq-vhow-title';
+    ht.textContent = 'Here is how';
+    const ol = document.createElement('ol');
+    for (const h of how) { const li = document.createElement('li'); li.textContent = h; ol.appendChild(li); }
+    hw.appendChild(ht); hw.appendChild(ol);
+    box.appendChild(hw);
     cell.insertAdjacentElement('afterend', box);
+    root.classList.add('mq-vexplained');
     const text = lines.join(' ');
     if (typeof speak === 'function') { try { speak(text); } catch (_) { /* sound is optional */ } }
     return text;

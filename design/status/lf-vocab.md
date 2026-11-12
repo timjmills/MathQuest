@@ -14,6 +14,13 @@ Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per ste
   card / worksheet / quiz, every skill, behind ONE switch (css/screen-cell.css :root --mq-next-*; html.mq-next-yellow restores
   the yellow, one line in index.html). Wrong stays red (R4-3 restated), reduced motion static. Check ws-next-box (NB1-NB5,
   new, on precritic's vocab path): FAIL 32 on 3d90097d, OK after.
+- Steps B + C code (one commit: the files overlap): Match 3 wrong line "<Word> is picture <L>! ...", only the wrongly matched
+  pictures glow with their letters lit; the vocabulary "Here is how" (no definition / first-letter rung, names the answer) inside
+  the explanation on every wrong card, the support ladder's worked box / extra / "Not yet" hidden under it; pick3 wrong line
+  box-wrong; key halo = unstroked grey underlays for labels and dots (V22+); explain rewording + HARD_WORDS (V24+); step = a
+  two-step worked problem (Step 1 / Step 2 underlined heavy), digit = 472 with the 7 ringed and an arrow, lesson-band 'place'
+  = H T O chart with T shaded, identify 'ones' = a ten and four ringed ones; V-AMBIG (library 47 + lesson bands). Pupil hash
+  pin re-taken (the redraw and the step / count on / repeat / hundred notWith change the deals; owner O-2 / O-3).
 
 ## Round 7 (2026-11-09, builder, Opus medium: first build of a new screen feedback state): owner R-1 and R-2
 Times (UTC): start 12:50, end 13:45. Base b7dad93a (card signed 107b64aa). Brief design/lanes/lf-vocab/r7-builder-brief.md.

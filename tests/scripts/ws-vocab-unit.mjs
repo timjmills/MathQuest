@@ -122,6 +122,51 @@ for (const r of runs) {
         }
     }
 }
+// V-AMBIG (owner O-2 / O-3, lf-vocab r8): a picture must mean only its word. Every library picture and every lesson-band
+// picture declares `alsoShows` (the words a pupil could defend for it); a picture whose alsoShows names a word that may share
+// its bank or its Match 3 cell (compatible: not notWith), a lesson set's trio, or a lesson band's other word FAILS.
+const ambig = [];
+{
+    const also = (id) => (typeof P.vocabPictureAlsoShows === 'function' ? P.vocabPictureAlsoShows(id) : null);
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const xs = also(id);
+        if (!Array.isArray(xs)) { fail(`V-AMBIG "${id}": the picture declares no alsoShows`); continue; }
+        for (const b of xs) if (b !== id && W.VOCAB_WORDS[b] && W.compatible([id, b])) fail(`V-AMBIG "${id}": its picture could also show "${b}", and the two may share a bank (make them notWith)`);
+    }
+    // (a lesson set's Match 3 cells are clash-free trios - lesson-pages/vocab-pages.js trios() by compatible - so the pair rule
+    // above covers them, as it covers every dealt Match 3 cell and 1 picture, 3 words bank)
+    // the lesson bands (lesson Warm-up vocabulary, sheet/lesson-pages/vocab.js): every {word, picture} list of the lesson
+    // records (prereqs.js LESSONS, the families) and the detailed lessons; a band is the first three words
+    const LV = await imp('js/modules/sheet/lesson-pages/vocab.js');
+    const PR = await imp('js/modules/lessons/prereqs.js');
+    const DL = await imp('js/modules/lessons/detailed/index.js');
+    const bands = [];
+    const walk = (o, where, depth = 0) => {
+        if (!o || typeof o !== 'object' || depth > 7) return;
+        if (Array.isArray(o)) {
+            if (o.length && o.every((v) => v && typeof v === 'object' && typeof v.word === 'string' && v.picture)) { bands.push({ where, list: o.slice(0, 3) }); return; }
+            o.forEach((v, i) => walk(v, `${where}[${i}]`, depth + 1));
+            return;
+        }
+        for (const [k, v] of Object.entries(o)) walk(v, `${where}.${k}`, depth + 1);
+    };
+    walk(PR.LESSONS, 'LESSONS');
+    walk(DL.DETAILED_LESSONS, 'DETAILED');
+    const seenBand = new Set();
+    for (const b of bands) {
+        const sig = JSON.stringify(b.list);
+        if (seenBand.has(sig)) continue;
+        seenBand.add(sig);
+        if (typeof LV.lessonPictureAlsoShows !== 'function') { fail(`V-AMBIG ${b.where}: the lesson band's pictures declare no alsoShows`); continue; }
+        const words = b.list.map((v) => String(v.word).toLowerCase());
+        for (const v of b.list) {
+            const xs = LV.lessonPictureAlsoShows(v.picture, v.word);
+            ambig.push(`${b.where} ${v.word}: ${JSON.stringify(xs)}`);
+            for (const o of words) if (o !== String(v.word).toLowerCase() && xs.includes(o)) fail(`V-AMBIG ${b.where}: the "${v.word}" picture (${v.picture.kind}${v.picture.text ? ` "${v.picture.text}"` : ''}) could also show "${o}", in the same band`);
+        }
+    }
+    if (process.argv.includes('--ambig-list')) for (const x of ambig) console.log(`  ambig: ${x}`);
+}
 // ---- round 3 (rule 5): the checks of the five defects that survived critic rounds 1 and 2 ----------------------------
 const K = await imp('js/modules/sheet/index.js');
 const PG = await imp('js/modules/sheet/paginate.js');
@@ -308,7 +353,7 @@ else {
 }
 // V17 (look-alikes, critic r1-r3): every critic-found look-alike pair is never offered together (notWith on either side).
 // APPEND-ONLY: a pair leaves only by an owner ruling. If a pair breaks a set's split (V7), change the set's words.
-export const LOOKALIKES = [['term', 'sequence'], ['first term', 'sequence'], ['round up', 'quotient'], ['round up', 'remainder'], ['multiple', 'pattern'],
+export const LOOKALIKES = [['step', 'column'], ['term', 'sequence'], ['first term', 'sequence'], ['round up', 'quotient'], ['round up', 'remainder'], ['multiple', 'pattern'],
     ['grow', 'sequence'], ['grow', 'pattern'], ['number name', 'hundred']];
 for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "${b}": a critic-found look-alike pair is not notWith`);
 // V17 (extended, critic r4 #4 / M-V2): a word a picture PRINTS is a look-alike of that picture's word - no word that may share
@@ -372,9 +417,16 @@ for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "$
         const tw = P.vocabPictureSVG(twinCtx, id, { wMm: 46 });
         const twMarks = [...tw.matchAll(/<g class="mq-vfocal" data-vfocal="1">([\s\S]*?)<\/g>/g)].reduce((n, m) => n + (m[1].match(/<(rect|line|circle|path|text)\b/g) || []).length, 0);
         if (!/<g class="mq-vhalo[^"]*"[^>]*visibility="hidden"/.test(tw) || !twMarks) fail(`V22 "${id}": the screen twin has no hidden halo and targeted focal part`);
+        // V22+ (critic r6 #6, lf-vocab r8): the key's highlight never strokes a glyph or a dot (a stroke round "+2" or round each
+        // dot of an array blurred them at print scale): no <text> in the key's halo, and a filled circle's halo is unstroked
+        const kh = (/<g class="mq-vhalo"[^>]*>([\s\S]*?)<\/g>/.exec(key) || [])[1] || '';
+        if (/<text\b/.test(kh)) fail(`V22 "${id}": the key's highlight strokes a glyph (a <text> in .mq-vhalo)`);
+        for (const [c] of kh.matchAll(/<circle\b[^>]*>/g)) if (/\sfill="(?!none)[^"]*"/.test(c) && !/stroke="none"/.test(c)) { fail(`V22 "${id}": the key's highlight strokes a dot (${c.slice(0, 90)})`); break; }
     }
 }
 
+// (V24+: words above an ELL pupil's list, critic r6 #7: "figure(s)" for digit, the vague "amount" of times as many)
+const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amount', 'represent', 'represents', 'equivalent', 'corresponding', 'respectively', 'denote', 'denotes'];
 // V24 (owner R-2, lf-vocab r7): every bank word's wrong-answer explanation
 {
     const has = (txt, w) => new RegExp(`(^|[^a-z])${String(w).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`).test(txt);
@@ -388,6 +440,9 @@ for (const [a, b] of LOOKALIKES) if (W.compatible([a, b])) fail(`V17 "${a}" / "$
         if (n > 14) fail(`V24 "${w}": its explain is ${n} words (at most 14)`);
         const rest = lc.split(String(w).toLowerCase()).join(' ');
         for (const o of e.notWith || []) if (has(rest, o)) fail(`V24 "${w}": its explain names "${o}", a word of its notWith list`);
+        // V24+ (critic r6 #7, lf-vocab r8): no word above the grade's word list (ELL), and long enough to follow
+        for (const h of HARD_WORDS) if (has(rest, h)) fail(`V24 "${w}": its explain uses the hard word "${h}"`);
+        if (n < 6) fail(`V24 "${w}": its explain is ${n} words (at least 6)`);
     }
 }
 
@@ -418,7 +473,7 @@ async function browserChecks() {
     };
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
-        if (ONLY && ONLY.every((k) => ['V23', 'V25'].includes(k))) { await r7Checks(page, fail, sheet); return; }
+        if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -538,7 +593,7 @@ async function r7Checks(page, fail, sheet) {
         keyHalos += halos.length;
         for (const h of halos) if (!/style="color:#949494"/.test(h) || /visibility="hidden"/.test(h)) fail(`V23 ${id}: a key highlight is not shown in the single grey (${h})`);
         // (the marks themselves carry the grey: a key page recolours what it adds through `color` - the r7 render drew them orange)
-        for (const [, g] of r.key.matchAll(/<g [^>]*class="mq-vhalo"[^>]*>([\s\S]*?)<\/g>/g)) for (const [t] of g.matchAll(/<(?:rect|line|circle|path|text)\b[^>]*>/g)) if (!/stroke="#949494"/.test(t) || /fill="(?!none|#949494)[^"]*"/.test(t)) { fail(`V23 ${id}: a key highlight mark is not GREY (${t.slice(0, 120)})`); break; }
+        for (const [, g] of r.key.matchAll(/<g [^>]*class="mq-vhalo"[^>]*>([\s\S]*?)<\/g>/g)) for (const [t] of g.matchAll(/<(?:rect|line|circle|path|text)\b[^>]*>/g)) if (!(/stroke="#949494"/.test(t) || (/stroke="none"/.test(t) && /fill="#949494"/.test(t))) || /fill="(?!none|#949494)[^"]*"/.test(t)) { fail(`V23 ${id}: a key highlight mark is not GREY (${t.slice(0, 120)})`); break; }
     }
     if (!keyHalos) fail('V23: no key page shows the focal highlight');
     // the PRINTED key's highlight as the browser paints it: every halo mark's stroke (and solid fill) is the grey, never the
@@ -551,7 +606,7 @@ async function r7Checks(page, fail, sheet) {
         const inked = own.filter((p) => p.split('|').some((c) => c !== 'none' && c !== 'rgb(0, 0, 0)'));
         if (inked.length) fail(`V23 ${skillId} key: ${inked.length} of the picture's own mark(s) painted ${inked[0]} (the drawing stays black; only the halo is grey)`);
         if (!paint.length) fail(`V23 ${skillId} key: no focal highlight painted`);
-        const bad = paint.filter((p) => !/^rgb\(148, 148, 148\)\|(none|rgb\(148, 148, 148\))$/.test(p));
+        const bad = paint.filter((p) => !/^(rgb\(148, 148, 148\)\|(none|rgb\(148, 148, 148\))|none\|rgb\(148, 148, 148\))$/.test(p));   // (r8: an unstroked grey underlay too)
         if (bad.length) fail(`V23 ${skillId} key: ${bad.length} highlight mark(s) painted ${bad[0]} (want the single grey rgb(148, 148, 148))`);
     }
     if (process.argv.includes('--pin-pupil')) { fs.writeFileSync(PUPIL_PIN, JSON.stringify(hashes, null, 1) + '\n'); console.log(`ws-vocab-unit: pinned ${Object.keys(hashes).length} pupil hashes`); }
@@ -581,6 +636,13 @@ async function r7Checks(page, fail, sheet) {
             glow: [...root.querySelectorAll('.mq-vglow')].map((e) => e.textContent.trim()),
             glowBg: [...root.querySelectorAll('.mq-vglow')].map((e) => getComputedStyle(e).backgroundColor)[0] || '',
             explain: [...root.querySelectorAll('.mq-vexplain p')].map((e) => e.textContent.trim()),
+            // (r8) the letters of the Match 3 pictures whose highlight shows, the lit letters, the pick3 line's wrong mark, the
+            // visible "Here is how" text, and the set of feedback blocks the card shows
+            haloLetters: [...root.querySelectorAll('.mq-vm-pic')].filter((pc) => [...pc.querySelectorAll('svg.mq-vpic .mq-vhalo')].some((h) => getComputedStyle(h).visibility === 'visible')).map((pc) => (pc.querySelector('.mq-vm-let') || {}).textContent || '?').sort(),
+            litLetters: [...root.querySelectorAll('.mq-vglow-let')].map((e) => e.textContent.trim()).sort(),
+            lineWrong: [...root.querySelectorAll('.mq-vp-line')].map((e) => e.classList.contains('box-wrong')),
+            ladder: [...root.querySelectorAll('.mq-ladder-worked, .mq-vhow')].filter((e) => e.offsetParent !== null && getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden').map((e) => e.innerText.replace(/\s+/g, ' ').trim()),
+            blocks: ['.mq-vexplain', '.mq-vhow', '.mq-ladder-worked', '.mq-ladder-msg', '.mq-ladder-extra'].filter((k) => [...root.querySelectorAll(k)].some((e) => e.offsetParent !== null && getComputedStyle(e).display !== 'none')),
         };
     };
     // (in the page) answer the item right or wrong, the way the pupil does: tap a bank word / write the letters
@@ -593,7 +655,7 @@ async function r7Checks(page, fail, sheet) {
         if (q.cell.template === 'vocab-pick3') {
             const w = a.right ? p.word : p.bank.find((x) => x !== p.word);
             root.querySelector(`button[data-mq-choice="${w}"]`).click();
-            want = { right: [p.word], wrong: a.right ? [] : [p.word] };
+            want = { tpl: 'pick3', word: p.word, right: [p.word], wrong: a.right ? [] : [p.word], letters: [] };
         } else {
             const L = ['A', 'B', 'C'];
             const ins = [...root.querySelectorAll('.mq-vm-box input')];
@@ -601,17 +663,39 @@ async function r7Checks(page, fail, sheet) {
             const vals = p.order.map((wi) => L[wi]);
             if (!a.right) { const t = vals[0]; vals[0] = vals[1]; vals[1] = t; }
             ins.forEach((el, n) => { el.value = vals[n]; el.dispatchEvent(new Event('input', { bubbles: true })); });
-            want = { right: a.right ? p.order.map((wi) => p.words[wi]) : [p.words[p.order[2]]], wrong: a.right ? [] : [p.words[p.order[0]], p.words[p.order[1]]] };
+            want = { tpl: 'match3', right: a.right ? p.order.map((wi) => p.words[wi]) : [p.words[p.order[2]]], wrong: a.right ? [] : [p.words[p.order[0]], p.words[p.order[1]]], letters: a.right ? [] : [L[p.order[0]], L[p.order[1]]] };
         }
         return want;
     };
-    const EXPECT = (want) => want.wrong.map((w) => `The answer is ${w}! ${W.VOCAB_WORDS[w].explain}`);
+    // (r8, critic r6 #1: Match 3's line names the LETTER the pupil writes, "<Word> is picture <L>!"; pick3 the word)
+    const EXPECT = (want) => want.wrong.map((w, i) => (want.tpl === 'match3' ? `${w.charAt(0).toUpperCase() + w.slice(1)} is picture ${want.letters[i]}! ` : `The answer is ${w}! `) + W.VOCAB_WORDS[w].explain);
     const judge = (tag, before, after, want, spoken, tts) => {
         if (!before || !before.cell) { fail(`V23 ${tag}: no vocabulary cell`); return; }
         if (before.haloOn || before.glow.length || before.explain.length) fail(`V23 ${tag}: highlighted BEFORE the answer (${JSON.stringify(before)})`);
         if (before.focal.some((n) => !n)) fail(`V23 ${tag}: a picture with no targeted focal part (${before.focal})`);
         if (!after) { fail(`V23 ${tag}: the cell is gone after the answer`); return; }
-        if (!after.haloN || after.haloOn !== after.haloN) fail(`V23 ${tag}: the focal part is not highlighted after the answer (${after.haloOn}/${after.haloN})`);
+        if (want.tpl === 'match3' && want.wrong.length) {
+            // V25+ (critic r6 #1): only the pictures of the wrongly matched words glow, each with its letter lit
+            if (after.haloOn !== want.wrong.length) fail(`V25 ${tag}: ${after.haloOn} picture(s) glow, want ${want.wrong.length} (only the wrongly matched words' pictures)`);
+            if (JSON.stringify(after.haloLetters) !== JSON.stringify(want.letters.slice().sort())) fail(`V25 ${tag}: the glowing pictures are ${JSON.stringify(after.haloLetters)}, want ${JSON.stringify(want.letters.slice().sort())}`);
+            if (JSON.stringify(after.litLetters) !== JSON.stringify(want.letters.slice().sort())) fail(`V25 ${tag}: the lit letters are ${JSON.stringify(after.litLetters)}, want ${JSON.stringify(want.letters.slice().sort())}`);
+            for (const [i] of want.wrong.entries()) if (!(after.explain[i] || '').includes(`picture ${want.letters[i]}!`)) fail(`V25 ${tag}: the line "${after.explain[i] || ''}" does not name the letter ${want.letters[i]}`);
+        } else if (!after.haloN || after.haloOn !== after.haloN) fail(`V23 ${tag}: the focal part is not highlighted after the answer (${after.haloOn}/${after.haloN})`);
+        // V25+ (critic r6 #5): a wrong pick3 word on the line carries the slot's wrong outline
+        if (want.tpl === 'pick3' && want.wrong.length && !after.lineWrong.some(Boolean)) fail(`V25 ${tag}: the wrong word's line has no box-wrong`);
+        // V26 (critic r6 #2, #3): after the explanation, a "Here is how" never repeats it, never gives a first-letter rung or a
+        // blank, and its last step names the answer
+        if (after.explain.length) {
+            const sentences = after.explain.join(' ').split(/(?<=[.!?])\s+/).map((x) => x.trim().toLowerCase().replace(/[.!?]$/, '')).filter((x) => x.split(' ').length >= 3);
+            for (const l of after.ladder) {
+                const lc = l.toLowerCase();
+                for (const se of sentences) if (lc.includes(se)) { fail(`V26 ${tag}: "Here is how" repeats the explanation ("${se}")`); break; }
+                if (/starts with/.test(lc)) fail(`V26 ${tag}: "Here is how" gives a first-letter rung after the explanation`);
+                if (/_{2,}|"\s*"/.test(l)) fail(`V26 ${tag}: "Here is how" has a blank after the explanation (${l.slice(0, 80)})`);
+                if (want.tpl === 'pick3' && !lc.includes(String(want.word).toLowerCase())) fail(`V26 ${tag}: "Here is how" does not name the word ${want.word}`);
+            }
+            if (!after.ladder.length) fail(`V26 ${tag}: a wrong answer shows no "Here is how"`);
+        }
         if (after.haloW < 4) fail(`V23 ${tag}: the highlight is not thick (${after.haloW} px)`);
         if (after.haloGrey) fail(`V23 ${tag}: ${after.haloGrey} highlight mark(s) are not painted yellow (${after.haloColor})`);
         if (after.explain.length && !/255, 2\d\d, \d+/.test(after.exBorder)) fail(`V25 ${tag}: the explanation's yellow edge is painted ${after.exBorder}`);
@@ -649,6 +733,9 @@ async function r7Checks(page, fail, sheet) {
     // twin's verdict waits); the first wrong card's explanation is spoken, once
     await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
     for (const skillId of SK) {
+        // (r8: a fresh page - the card runs above leave state behind that kept the support ladder off the worksheet)
+        await page.reload({ waitUntil: 'networkidle2' });
+        await page.waitForFunction(() => typeof window.initWorksheet === 'function' && !!window.SKILLS, { timeout: 30000 });
         await page.evaluate((k) => {
             window.__spoken = []; window.speak = (t) => { window.__spoken.push(String(t)); };
             const st = window.state; st.ttsEnabled = true; st.category = 'vocabulary'; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3; window.initWorksheet();
@@ -660,9 +747,22 @@ async function r7Checks(page, fail, sheet) {
             before.push(await page.evaluate(READ, sel));
             want.push(await page.evaluate(ANSWER, { host: 'worksheet', sel, i, right }));
             await sleep(150);
+            // (r8, critic r6 #4: item 1 is also checked on its own while it is the current card - up to 4 tries, the support
+            // ladder climbing a rung a try to its worked "Here is how", the critic's state - and item 3 is left empty, so Check
+            // all judges both kinds of wrong card)
+            if (i === 0) {
+                await page.evaluate(async () => { for (let t = 0; t < 4 && !document.querySelector('#ws_card_0 .mq-ladder-worked'); t++) { try { window.checkWorksheetAnswer(0); } catch (e) { /* optional */ } await new Promise((r) => setTimeout(r, 250)); } });
+                await sleep(300);
+            }
         }
         await page.evaluate(() => { window.__spoken = []; window.checkAllWorksheet(); });
         await sleep(300);
+        // V27: every wrong card shows the same feedback blocks
+        {
+            const bl = [];
+            for (const i of [0, 2]) { const r = await page.evaluate(READ, `#ws_card_${i}`); bl.push(r ? r.blocks.join(',') : 'none'); }
+            if (bl[0] !== bl[1]) fail(`V27 ${skillId} worksheet-1280: wrong cards show different feedback blocks (item 1: ${bl[0]}; item 3: ${bl[1]})`);
+        }
         for (const [i, right] of [[0, false], [1, true]]) {
             const after = await page.evaluate(READ, `#ws_card_${i}`);
             judge(`${skillId} worksheet-1280 item ${i + 1} ${right ? 'right' : 'wrong'}`, before[i], after, want[i], null, true);

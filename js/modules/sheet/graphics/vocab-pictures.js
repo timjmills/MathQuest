@@ -202,10 +202,11 @@ const PICS = {
     },
     /* ---- Grade 3: two-step word problems (3.OA.D.8) */
     step: {
-        // (r3: a numbered staircase - two sheets did not read as steps, critic r2)
-        alt: 'three stairs numbered 1, 2 and 3, the first one drawn heavy',
-        draw: () => rect(4, 26, 16, 10, W.heavy) + tx(12, 31, 0, '1', { size: 9 }) + rect(20, 16, 16, 20, W.part) + tx(28, 21, 0, '2', { size: 9 })
-            + rect(36, 6, 16, 30, W.part) + tx(44, 11, 0, '3', { size: 9 }),
+        // (owner O-3, lf-vocab r8: the 1-2-3 staircase read as 'column' - now a short worked problem in two labelled steps; the
+        // Step labels, each underlined heavy, are the focal part)
+        alt: 'a sum worked in two parts, in order: the first line labelled 1, five plus three is eight, the second labelled 2, eight take away two is six',
+        draw: () => F(tx(1, 10, 0, 'Step 1', { size: 7.8, anchor: 'start' }) + ln(1, 16, 23.5, 16, W.heavy)) + tx(59, 10, 0, '5 + 3 = 8', { size: 7.8, weight: 400, anchor: 'end' })
+            + F(tx(1, 29, 0, 'Step 2', { size: 7.8, anchor: 'start' }) + ln(1, 35, 23.5, 35, W.heavy)) + tx(59, 29, 0, '8 − 2 = 6', { size: 7.8, weight: 400, anchor: 'end' }),
     },
     total: {
         alt: 'a bar of 5 and 3 with a longer bar over both marked with a question mark',
@@ -285,9 +286,11 @@ const PICS = {
         draw: () => rect(27.5, 17.5, BASE10_U, BASE10_U, W.part),
     },
     digit: {
-        focal: 'all',
-        alt: 'one large figure seven',
-        draw: () => tx(30, 21, 0, '7', { size: 26 }),
+        // (owner O-2, lf-vocab r8: one large 7 alone did not say "a digit is one figure OF a number" - 472 with ONE digit (the
+        // 7, not the ones digit: 'ones digit' is its own word) in a heavy ring, an arrow pointing at it; ring and arrow are focal)
+        alt: 'the number 472 with the middle seven in a heavy ring and an arrow pointing at it',
+        draw: () => tx(15, 25, 0, '4', { size: 16 }) + tx(30, 25, 0, '7', { size: 16 }) + tx(45, 25, 0, '2', { size: 16 })
+            + F(ring(30, 25, 9, W.heavy) + arrow(30, 1.5, 30, 14.5, W.heavy)),
     },
     'expanded form': {
         focal: 'all',
@@ -400,6 +403,63 @@ const PICS = {
 };
 
 /** The ids (words) the library draws. */
+/**
+ * V-AMBIG (owner O-2 / O-3, lf-vocab r8): the OTHER words each picture could be read as - what a pupil could defend for it,
+ * its marks included (the step staircase read as 'column'). Plain readings (e.g. 'number') are listed too. An item, a lesson
+ * set or a lesson band whose other words include one of them fails ws-vocab-unit V-AMBIG; the dealer keeps them apart through
+ * the words' notWith lists (vocab-words.js). Every picture declares a list (empty when nothing else fits).
+ */
+export const VOCAB_ALSO_SHOWS = Object.freeze({
+    even: ['pairs', 'equal groups', 'array'],
+    odd: ['pairs', 'remainder', 'left over'],
+    product: ['answer', 'multiply'],
+    factor: ['multiply', 'times'],
+    row: ['times table', 'line'],
+    column: ['times table', 'line'],
+    multiple: ['number line', 'count on', 'pattern', 'sequence', 'skip count'],
+    input: ['table', 'in'],
+    output: ['table', 'out'],
+    rule: ['add', 'machine', 'pattern'],
+    pattern: ['sequence', 'rule', 'multiple', 'count on', 'repeat'],
+    array: ['equal groups', 'rows', 'dots', 'rectangle'],
+    commutative: ['array', 'turn'],
+    identity: ['times one', 'same'],
+    distributive: ['array', 'split'],
+    step: ['total', 'left', 'add', 'take away', 'sum'],
+    total: ['unknown', 'whole', 'bar model'],
+    left: ['one less', 'take away', 'cross out'],
+    'equal groups': ['array', 'even', 'remainder', 'multiply'],
+    unknown: ['total', 'missing number', 'question'],
+    'count on': ['after', 'one more', 'sequence', 'number track'],
+    'one more': ['add', 'after', 'count on'],
+    'one less': ['left', 'before', 'take away'],
+    before: ['one less', 'number track', 'count back'],
+    after: ['one more', 'count on', 'number track'],
+    'hundred chart': ['ten more', 'number chart'],
+    hundred: ['flat', 'square', 'array'],
+    ten: ['rod', 'tens'],
+    one: ['cube', 'square'],
+    digit: ['number', 'tens digit'],
+    'expanded form': ['add', 'parts'],
+    'number name': ['words'],
+    'ones digit': ['digit', 'number'],
+    repeat: ['pattern', 'cycle', 'sequence'],
+    sequence: ['pattern', 'multiple', 'count on', 'skip count'],
+    cycle: ['repeat', 'circle'],
+    grow: ['pattern', 'sequence', 'step'],
+    term: ['first term', 'sequence', 'number'],
+    'first term': ['term', 'sequence'],
+    'times as many': ['compare', 'bar', 'equal parts'],
+    compare: ['times as many', 'difference'],
+    equation: ['number sentence', 'multiply', 'equal'],
+    remainder: ['odd', 'equal groups', 'left over', 'round up'],
+    quotient: ['answer', 'divide'],
+    divisor: ['divide'],
+    dividend: ['divide'],
+    'round up': ['remainder', 'equal groups', 'quotient'],
+});
+/** The other words a library picture could be read as ([] when it declares none: V-AMBIG fails on that). */
+export const vocabPictureAlsoShows = (id) => (Object.prototype.hasOwnProperty.call(VOCAB_ALSO_SHOWS, id) ? VOCAB_ALSO_SHOWS[id].slice() : null);
 export const VOCAB_PICTURE_IDS = Object.freeze(Object.keys(PICS));
 /** Does the library have a picture of this word? */
 export const hasVocabPicture = (id) => Object.prototype.hasOwnProperty.call(PICS, String(id));
@@ -475,8 +535,33 @@ function focalBody(id) {
 /** The focal segments of a picture (svg strings); every picture has at least one (ws-vocab-unit V22). */
 export const vocabPictureFocal = (id) => (hasVocabPicture(id) ? [...focalBody(id).matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]).filter((x) => /<(rect|line|circle|path|text)\b/.test(x)) : []);
 /** The halo copy of a focal segment: each mark stroked thick in currentColor; a filled mark (dot, text, arrow head) filled too. */
-function haloOf(seg, ink = 'currentColor') {
+// (key, r8 / critic r6 #6: a highlight never strokes glyphs or dots - stroked round a label or a small dot it blurred them at
+// print scale. On the KEY a label gets a grey box BEHIND it, sized from its font, and a filled dot a grey disc a little
+// wider than the dot, neither stroked; ws-vocab-unit V22+)
+const num = (attrs, k, d = 0) => { const v = new RegExp(`\\s${k}="([^"]*)"`).exec(attrs); return v ? parseFloat(v[1]) : d; };
+function keyUnderlay(tag, attrs, inner, ink) {
+    if (tag === 'text') {
+        const fs = num(attrs, 'font-size', 8), n = Math.max(1, String(inner || '').replace(/<[^>]*>/g, '').trim().length);
+        const w = n * 0.62 * fs + 0.5 * fs, h = 1.25 * fs;
+        const anchor = (/\stext-anchor="([^"]*)"/.exec(attrs) || [])[1] || 'start';
+        const x0 = num(attrs, 'x') - (anchor === 'middle' ? w / 2 : anchor === 'end' ? w - 0.25 * fs : 0.25 * fs);
+        const cy = /dominant-baseline="(central|middle)"/.test(attrs) ? num(attrs, 'y') : num(attrs, 'y') - 0.35 * fs;
+        const r2 = (v) => Math.round(v * 100) / 100;
+        return `<rect x="${r2(x0)}" y="${r2(cy - h / 2)}" width="${r2(w)}" height="${r2(h)}" rx="${r2(0.2 * fs)}" fill="${ink}" stroke="none"/>`;
+    }
+    const r = num(attrs, 'r');
+    return `<circle cx="${num(attrs, 'cx')}" cy="${num(attrs, 'cy')}" r="${Math.round((r + Math.min(0.7 * r, 2.5)) * 100) / 100}" fill="${ink}" stroke="none"/>`;
+}
+function haloOf(seg, ink = 'currentColor', key = false) {
+    if (key) {
+        seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => keyUnderlay('text', attrs, inner, ink))
+            .replace(/<circle\b([^>]*?)\/?>/g, (m, attrs) => {
+                const f = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
+                return f !== undefined && f !== 'none' ? keyUnderlay('circle', attrs, '', ink).replace('<circle', '<circle data-vu="1"') : m;
+            });
+    }
     return seg.replace(/<(rect|line|circle|path|text)\b([^>]*?)(\/?)>/g, (m, tag, attrs, close) => {
+        if (key && (/\sstroke="none"/.test(attrs))) return m;     // an underlay (above): no stroke
         const fillAttr = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
         const filledMark = tag === 'text' || (tag !== 'line' && fillAttr !== undefined && fillAttr !== 'none');
         const rest = attrs.replace(/\s(stroke|stroke-width|fill|stroke-linecap|stroke-linejoin|vector-effect)="[^"]*"/g, '');
@@ -494,7 +579,7 @@ function bodyFor(id, mode) {
     const segs = [...fb.matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]);
     // (screen: the class mq-v-feedback keeps the screen cell's black-and-white ink pass, screen-cell.js monoCell, off the
     // halo - it is feedback chrome, as the host's green and red are; the r7 render drew the yellow halo grey)
-    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor')).join('')}</g>`;
+    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor', mode === 'key')).join('')}</g>`;
     // (the key leaves the drawing itself exactly as the pupil page draws it: a key page paints every mark it does not share
     // with the pupil page in its key ink, so a wrapped focal part printed orange - r7 render. Its halo is the targeted mark.)
     if (mode === 'key') return halo + fb.replace(SENT, '');
@@ -548,4 +633,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

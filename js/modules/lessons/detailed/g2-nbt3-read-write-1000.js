@@ -106,8 +106,9 @@ export default {
             { id: 'zero', text: 'A 0 place still gets its part: 0.' },
         ],
         vocab: [
-            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'glyph', text: '7' } },
-            { word: 'place', meaning: 'hundreds, tens or ones', picture: { kind: 'text', text: 'H  T  O' } },
+            // (lf-vocab r8, owner O-2: the digit and place pictures the vocabulary tasks draw; ws-vocab-unit V-AMBIG)
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'vocab', id: 'digit' } },
+            { word: 'place', meaning: 'hundreds, tens or ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
             { word: 'expanded form', meaning: 'the number split by place', picture: { kind: 'text', text: '300 + 40 + 7' } },
         ],
         steps: [
