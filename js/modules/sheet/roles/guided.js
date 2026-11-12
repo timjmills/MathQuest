@@ -114,7 +114,34 @@ const mixPartialEnd = (nM, cols, n) => {
 const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? extra : 0,
     hint && r * cols < pEnd && (r + 1) * cols > nM ? hint : 0);
 /** The page ceiling with the Models it leads with: a Mix page's extra Models are not scored tries. */
-const ceilFor = (ctx, items) => ceilOf(ctx) + Math.max(0, mixModels(items || []) - 1);
+const ceilFor = (ctx, items, input = null) => (factRows(input) ? FACT_CEILING[ctx.size] + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1);
+/**
+ * The fact pages (lf-ops facts-roles task, RUBRIC H13): add / sub / mult facts, div_facts_long and div_facts. Their cells are
+ * short, so the shared ceiling (10 / 8 / 6 tries) and the row stretch (up to FILL_CAP) left 31-58 % empty bands under every
+ * fact. On a page of these skills only, rows take their measured height (at most FACT_STRETCH over it), the Model row is as
+ * tall as the taller of its trace and the tries' hint (not the two added), and the page holds more tries instead
+ * (FACT_CEILING). Every other skill's Guided page is unchanged.
+ */
+const FACT_ROW_SKILLS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts_long', 'division:div_facts']);
+function factRows(input) {
+    const s = (input && input.skills) || [];
+    return s.length > 0 && s.every((k) => k && FACT_ROW_SKILLS.has(`${k.categoryId}:${k.skillId}`));
+}
+const FACT_CEILING = { S: 31, M: 23, L: 19 };
+/** A fact page may take one more column than AUTO_COLS where its facts fit (a narrow fact centred in a wide column, H13 across). */
+const FACT_COLS = { S: 5, M: 4, L: 4 };
+const FACT_STRETCH = 1;
+/**
+ * A fact page leaves out of its Guided grid the facts far narrower than the rest (div_facts_long's one-digit dividends,
+ * "8 ) 0", "3 ) 9": centred in a column the two-digit facts need, 30-36 % of the cell empty beside them, H13): the measured
+ * slack beside the fact (print-sheet measured[c].slackMm, its nearer side) under FACT_SIDE of the column. Kept only while the
+ * Model and three tries and half the pool remain; the narrow facts stay on the Independent, Review and Test pages.
+ */
+const FACT_SIDE = 0.27;
+function factCalm(use, c) {
+    const keep = use.filter((it) => { const mm = it.measured && it.measured[c]; return !(mm && Number.isFinite(mm.slackMm)) || mm.slackMm / (186 / c) < FACT_SIDE; });
+    return keep.length < use.length && keep.length >= MIN_ITEMS && keep.length * 2 >= use.length ? keep : use;
+}
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -163,9 +190,9 @@ const kindOf = (it) => {
     return `${(it && it.template) || ''}:${p.kind || ''}:${missing}:${(own.length ? own : generalStepsOf(it)).join('|')}`;
 };
 
-export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
-    const wanted = AUTO_COLS[ctx.size];
-    const options = [wanted, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= wanted);
+export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0, facts = factRows(input)) {
+    const wanted = (facts ? FACT_COLS : AUTO_COLS)[ctx.size];
+    const options = [wanted, 4, 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= wanted);
     // Guided practice practises what the Model shows (round-4 re-grade, mixed_placevalue: a place
     // value mat modelled over an underline-the-digit try and an expanded-form try, one Steps band
     // for all three). A mixed pool keeps ONE kind of problem (the one it deals most) when it has the Model and
@@ -192,7 +219,7 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
         if (keep.length >= MIN_ITEMS && keep.length * 2 >= items.length) { cols = c; use = keep; break; }
     }
     // The plan keeps the column count counts() chose (its deal is a prefix of the probe).
-    if (fixedCols > 0 && fixedCols <= cols && fitsAt(use, fixedCols, ctx)) return { cols: fixedCols, items: use, kind: cut ? top : '' };
+    if (fixedCols > 0 && fixedCols <= cols && fitsAt(use, fixedCols, ctx)) return { cols: fixedCols, items: facts ? factCalm(use, fixedCols) : use, kind: cut ? top : '' };
     // LESSONS_LEARNED L1/L2: the widest grid is not always the fullest page. More columns under a
     // spanning Model cost a whole row to the Model, and the page ceiling then trims the rest (size
     // S: a 4-column compare page held the Model and 4 tries, 45% of it blank, where 2 columns hold
@@ -205,7 +232,14 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
         const ws = use.map((it) => it.footprint || {}).filter((fp) => !fp.measure && !fp.factLike && Number.isFinite(fp.wMm)).map((fp) => fp.wMm);
         const side = (c) => (ws.length === use.length && ws.length ? (1 - Math.max(...ws) / (186 / c)) / 2 : 0);
         const fitting = options.filter((x) => x <= cols && (x > 1 || cols === 1) && fitsAt(use, x, ctx));
-        const calm = fitting.filter((c) => side(c) < 0.28);
+        let calm = fitting.filter((c) => side(c) < 0.28);
+        // A fact page (factRows): the measured slack beside each fact (its nearest side) at each column count; the grid whose
+        // narrowest fact (a 0 or one-digit dividend) leaves the least side band, under 30 % of the cell where one does.
+        if (facts) {
+            const fSide = (c) => Math.max(0, ...use.map((it) => { const mm = it.measured && it.measured[c]; return mm && Number.isFinite(mm.slackMm) ? mm.slackMm / (186 / c) : 0; }));
+            const ok = fitting.filter((c) => fSide(c) < 0.3);
+            calm = ok.length ? ok : fitting.slice().sort((x, y) => fSide(x) - fSide(y)).slice(0, 1);
+        }
         // Never down to one full-width column when two fit (a compare row alone in a 186 mm cell).
         for (const c of (calm.length ? calm : fitting)) {
             const f = sheetFit(ordered(use, c), c, ctx, input, use.length < items0.length ? use.length : Infinity);
@@ -214,7 +248,7 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0) {
         }
         cols = bestC;
     }
-    return { cols, items: use, kind: cut ? top : '' };
+    return { cols, items: facts ? factCalm(use, cols) : use, kind: cut ? top : '' };
 }
 
 export function counts(pools, input) {
@@ -364,7 +398,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // Every cell of that row carries one, or none does: a row where one try has no hint of its
     // own would leave that cell a hint-line's height of empty band (H13).
     const nM = mixModels(items);
-    const nTot = Math.min(items.length, ceilFor(ctx, items));
+    const nTot = Math.min(items.length, ceilFor(ctx, items, input));
     const partial = items.slice(nM, nM > 1 ? mixPartialEnd(nM, cols, nTot) : partialEndOf(cols, span, nTot));
     const hints = noHint ? [] : partial.map((x) => hintOf(x));
     let hint = hints.some(Boolean) ? Math.max(HINT_MM, ...hints.filter(Boolean).map((t) => workLinesMm([t], cols, m) - 4 + 2)) : 0;
@@ -373,7 +407,7 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
     // the try under it).
     if (nM > 1 && !noHint && partial.some((x) => thinkCueOf(x))) hint = Math.max(hint, 17);
     const h = h0 + extra;
-    const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items) / cols), Math.floor(avail / Math.max(1, h))));
+    const rows = Math.max(1, Math.min(Math.floor(ceilFor(ctx, items, input) / cols), Math.floor(avail / Math.max(1, h))));
     return { rows, h, h0, avail, stepsH, steps, frame, m, span, hint, wrap, noLines: !!noLines };
 }
 
@@ -432,7 +466,8 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     };
     const pages = [];
     let total = 0;
-    const ceil = ceilFor(ctx, items);
+    const ceil = ceilFor(ctx, items, input);
+    const facts = factRows(input);
     const nM = mixModels(items);
     while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || total < MIN_ITEMS)) {
         const isFirst = pages.length === 0;
@@ -446,7 +481,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
                 const n = isFirst && first.span && rr === 0 ? 1 : cols;
                 sum += hOf(idx, n) + (isFirst && nM > 1
                     ? mixRowAdd(rr, cols, nM, mixPartialEnd(nM, cols, ceil), extra, first.hint) - (rr === 0 ? extra : 0)
-                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? first.hint : 0));
+                    : (isFirst && rr === partialRowOf(cols, first.span, nM) ? (facts && rr === 0 ? Math.max(0, first.hint - extra) : first.hint) : 0));
                 idx += n;
             }
             return sum;
@@ -895,9 +930,10 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
 
 export function plan(input = {}) {
     const ctx = ctxOf(input);
+    const facts = factRows(input);
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const set = pageSet(poolItems(input, 'main'), ctx, typeof input.guidedKind === 'string' ? input.guidedKind : null,
-        Number(input.guidedCols) > 0 ? null : input, Number(input.guidedCols) || 0);
+        Number(input.guidedCols) > 0 ? null : input, Number(input.guidedCols) || 0, factRows(input));
     const { items } = set;
     let { cols } = set;
     // div_facts Mix (critic R2 D-D): one Model per written form, all in the first row - the row
@@ -972,13 +1008,13 @@ export function plan(input = {}) {
         const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
-            : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? fit.hint : 0));
+            : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
         const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
         // Guided rows stretch at most GUIDED_STRETCH (H13); the rest of the page stays under the band.
-        const kPage = Math.max(1, Math.min(GUIDED_STRETCH, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
+        const kPage = Math.max(1, Math.min(facts ? FACT_STRETCH : GUIDED_STRETCH, (pg.avail * Math.min(1, rows / Math.max(rows, pg.rows))) / sumW));
         const Hr = w.map((x, r) => Math.max(x, Math.min(kPage * x, rowLimit(mins[r]))));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
