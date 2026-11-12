@@ -32,10 +32,35 @@ import { LESSON_ROUTE_CSS } from '../lesson-css.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
-    instructionText, assemble, poolItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
+    instructionText, assemble, poolItems as dealtItems, topicOf, labelStyleOf, rng, shuffle, deriveSeed,
 } from './compose.js';
 
 export const ROLE_ID = 'pre-skill-check';
+/**
+ * LR-6 on a lesson's routed check (lf-engine PC 2026-11-12: the sub check printed 11 - 3 twice and 39 twice - the
+ * refs' lr6 / distinctAnswer flags are read only by the Practice dealer, not by these refs). An item's GIVEN numbers:
+ * its text's, plus its payload's n / a / b / operands / values and frame (a place item's 39 lives in payload.n).
+ */
+export function itemNumberKey(it) {
+    const q = (it && it.q) || {};
+    const p = (q.cell && q.cell.payload) || {};
+    const out = [];
+    const add = (v) => { const x = Number(v); if (v !== null && v !== '' && v !== undefined && Number.isFinite(x)) out.push(x); };
+    const fromText = (t) => { for (const m of String(t || '').replace(/<[^>]+>/g, ' ').replace(/(\d),(\d{3})/g, '$1$2').matchAll(/\d+/g)) add(m[0]); };
+    fromText(q.text);
+    fromText(p.frame);
+    for (const k of ['n', 'a', 'b']) add(p[k]);
+    for (const k of ['operands', 'values']) if (Array.isArray(p[k])) p[k].forEach(add);
+    return [...new Set(out)].sort((x, y) => x - y).join(',');
+}
+/** A question's items: on a routed check, an item whose given numbers repeat an earlier item of the question is dropped
+ *  (LR-6, before any slice); every other check deals exactly as before. */
+const poolItems = (input, id) => {
+    const its = dealtItems(input, id);
+    if (!routedCheck(input)) return its;
+    const seen = new Set();
+    return its.filter((it) => { const k = itemNumberKey(it); if (!k) return true; if (seen.has(k)) return false; seen.add(k); return true; });
+};
 const PER_QUAD = 4;
 
 export function sources(skills, { earlier }) {

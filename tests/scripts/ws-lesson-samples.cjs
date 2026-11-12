@@ -20,6 +20,7 @@
 //     PC-SLOTS   (D1, D6) on the check page and its key: every writing slot filled on the key, the key no answer
 //                outside a slot, the same writing slots on pupil and key
 //     PC-SCAFFOLD (D8) no scaffold (trace, grey ink, regroup / exchange box, Say, Steps) and one response a check cell
+//     PC-LR6     (LR-6, lf-engine PC 2026-11-12) no two cells of the check page print the same given numbers (drawn text)
 //     PC-H13     (D4, D9, D11) at every size: the check page has no cell band >= 30 % and no gap > 15 mm between its
 //                cells; the check page and the lesson sheet have a blank foot <= 8 % (sheetCheck, now blocking; the sheet's
 //                cell bands stay print-lint's L-DENSITY H13 / H13-ROW)
@@ -262,6 +263,12 @@ async function checkMain() {
                 const pn = pm.findIndex((x) => x.part === 'prereq'), kn = km.findIndex((x) => x.part === 'prereq');
                 const pp = P.lp.pages[pn], kp = K.lp.pages[kn];
                 if (!pp || !kp) { F('PC-SLOTS', `${l.id} ${size}`, 'no check page / key read'); continue; }
+                // PC-LR6 (lf-engine PC 2026-11-12; LR-6): no two check cells print the same given numbers (the sub check printed
+                // 11 - 3 twice and a place item's 39 twice). Read from the drawn cell (a place item's 39 is drawn, not in q.text);
+                // a cell with no numbers (a count, a picture compare) is not compared.
+                { const seenK = new Map(); pp.cells.forEach((c, i) => { const k = [...new Set(nums(c.text))].sort((x, y) => x - y).join(',');
+                    if (!k) return; if (seenK.has(k)) F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `the same numbers (${k}) as Q${seenK.get(k)}`); else seenK.set(k, c.letter || i + 1); }); }
+                if (has('debug')) console.log(JSON.stringify(pp.cells.map((c) => [c.letter, c.text])));
                 pp.cells.forEach((c, i) => {
                     const kc = kp.cells[i]; const q = `${l.id} ${size} check Q${c.letter || i + 1}`;
                     if (!kc) { F('PC-SLOTS', q, 'no key cell'); return; }
@@ -281,7 +288,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PC-PAGES', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR6', 'PC-H13', 'PC-CLIP', 'PC-PAGES', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}` : na === LESSONS.length && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); for (const x of fs2.slice(0, 8)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > 8) console.log(`   ... ${fs2.length - 8} more`); }
     if (na < LESSONS.length && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
