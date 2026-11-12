@@ -159,9 +159,10 @@ export const SKILL_PRESETS = Object.freeze({
     'division:div_facts_long': { skill: 'div_facts', opts: { divForm: 'long' } },
     // 2026-11-12 (owner, word-stories card Q3): a new unknown position is its own lesson step - the change unknown on
     // each story host, and the compare story with the smaller amount unknown ("fewer than", then the "more than" trap).
-    'addition:add_wp_change_unknown': { skill: 'add_word_problems', opts: { forms: [3] } },
-    'subtraction:sub_wp_change_unknown': { skill: 'sub_word_problems', opts: { forms: [3] } },
-    'subtraction:sub_wp_compare_smaller': { skill: 'sub_word_problems', opts: { forms: [4, 5] } },
+    // Grade 1 skills (1.OA.A.1, within 20): band 20 draws the number sentence; the teacher may set 100 (2.OA.A.1).
+    'addition:add_wp_change_unknown': { skill: 'add_word_problems', opts: { forms: [3], band: 20 } },
+    'subtraction:sub_wp_change_unknown': { skill: 'sub_word_problems', opts: { forms: [3], band: 20 } },
+    'subtraction:sub_wp_compare_smaller': { skill: 'sub_word_problems', opts: { forms: [4, 5], band: 20 } },
     // 2026-11-12 (owner, chartwindow card §9.1): the chart to 120 (every window across 100) is its own lesson
     // (Count on to 120); band 120 stays an option of hundreds_chart_fill.
     'composing:chart_to_120': { skill: 'hundreds_chart_fill', opts: { band: 120 } },

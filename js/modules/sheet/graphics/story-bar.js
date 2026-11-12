@@ -45,7 +45,7 @@ export function storyBar(ctx, o = {}) {
     const zp = zonePt(ctx);
     const labH = zp * PT_MM * 1.1;
     // the writing box fills the segment under its label line (segment = label line + box + 1.2 mm of keep)
-    const hw = Math.max(6, segH - labH - 1.2);
+    const hw = Math.max(6, segH - labH - 1.8);
     const lw = Math.max(14, blankWidth(Math.max(2, Number(o.digits) || 2), size));
     // (the digits are set to fit the writing box under the label line: working space, never smaller than 16 pt)
     const dpt = Math.max(16, Math.min(digitPt(ctx), (hw - 1.2) / PT_MM));
@@ -63,7 +63,7 @@ export function storyBar(ctx, o = {}) {
         return `<span${unknown ? ' data-sb-unknown="1"' : ''} style="display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;width:${L(ctx, w)};min-height:${h};`
             + `border:${B(ctx, line)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;padding:${L(ctx, 0.5)} ${L(ctx, 0.8)} ${L(ctx, 0.6)};">`
             + (lab ? label(lab) : '')
-            + (v === null ? '' : `<span style="display:flex;justify-content:center;">${box(v, id)}</span>`) + '</span>';
+            + (v === null ? '' : `<span style="display:flex;justify-content:center;margin-top:${L(ctx, 0.6)};">${box(v, id)}</span>`) + '</span>';
     };
     const row = (inner, extra = '') => `<div style="display:flex;align-items:stretch;${extra}">${inner}</div>`;
     const gap = L(ctx, 1.5);

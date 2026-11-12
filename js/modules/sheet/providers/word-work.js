@@ -283,9 +283,21 @@ function storyHostProvider(op) {
         const o = ref && ref.opts;
         return !!(o && Number(o.band) > 0 && Number(o.band) <= 20);
     };
+    // the structure step of the Steps band names what the kind's bar shows (never "parts and whole" on a compare story)
+    const STRUCT = {
+        [change]: 'Find First, Then and Now.',
+        [compare]: 'Find the bigger amount and the difference.',
+    };
     const fn = (ref = {}) => {
-        const s = (isSentence(ref) ? sent : cols).strings(ref);
-        return Object.assign({}, s, { iCan: titleOf(ref) });
+        const sentence = isSentence(ref);
+        const s = (sentence ? sent : cols).strings(ref);
+        const iCan = titleOf(ref);
+        const out = Object.assign({}, s, { iCan });
+        if (sentence && STRUCT[iCan] && Array.isArray(s.steps) && s.steps.length === 4) {
+            out.steps = s.steps.slice();
+            out.steps[1] = STRUCT[iCan];
+        }
+        return out;
     };
     fn.def = cols.strings.def;
     return Object.assign({}, cols, { strings: fn, misconceptions: STORY_MISCONCEPTIONS.slice() });

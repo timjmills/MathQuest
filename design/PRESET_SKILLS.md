@@ -322,9 +322,9 @@ mix; `band` 10 / 20 / 100 stays a plain option (number size).
 
 | Preset | Label | Host + values | Code | Grade | CCSS | EE | WRM |
 |---|---|---|---|---|---|---|---|
-| addition:add_wp_change_unknown | Addition Word Problems: How Many Were Added? | add_word_problems `forms: [3]` | ZH | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
-| subtraction:sub_wp_change_unknown | Subtraction Word Problems: How Many Went? | sub_word_problems `forms: [3]` | ZJ | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
-| subtraction:sub_wp_compare_smaller | Compare Stories: Find the Smaller Amount | sub_word_problems `forms: [4, 5]` (fewer than, then the "more than" trap, one section each) | ZK | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S8, Y2.B2.S19 (partial) |
+| addition:add_wp_change_unknown | Addition Word Problems: How Many Were Added? | add_word_problems `forms: [3], band: 20` | ZH | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
+| subtraction:sub_wp_change_unknown | Subtraction Word Problems: How Many Went? | sub_word_problems `forms: [3], band: 20` | ZJ | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
+| subtraction:sub_wp_compare_smaller | Compare Stories: Find the Smaller Amount | sub_word_problems `forms: [4, 5], band: 20` (fewer than, then the "more than" trap, one section each) | ZK | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S8, Y2.B2.S19 (partial) |
 
 ### Plain options (no preset)
 
