@@ -26,6 +26,8 @@
 //     PC-CLIP    every band heading at the same place on a pupil page and its key twin (+/- 1 mm), and no heading
 //                clipped by an overflow-hiding ancestor. D10 itself (a fill painted over a heading) is NOT seen by the DOM:
 //                ws-print-lint L-OVERLAP SECTION reads it on the PDF (precritic lesson-samples-key-L / -S; critic r2 D1)
+//     PC-PAGES   (lf-engine PC, lead ruling A) the Prerequisite Check prints on ONE pupil page; --force-check renders a
+//                check whose LR-17 switch is still off (buildSheet prereqsForce)
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
@@ -232,6 +234,8 @@ async function checkMain() {
                     await sh.emulateMediaType('print');
                     return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure) }; } finally { await sh.close(); } };
                 const P = await read2(built.pupil), K = await read2(built.key);
+                // PC-PAGES (lf-engine PC 2026-11-12, lead ruling A): the Prerequisite Check is ONE pupil page (PAGE_TYPES 2.10)
+                for (const pt of built.parts) if (pt.part === 'prereq' && pt.pages !== 1) F('PC-PAGES', `${l.id} ${size}`, `the check runs to ${pt.pages} pupil pages`);
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
                 const pm = map(false), km = map(true);
@@ -277,7 +281,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PC-PAGES', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}` : na === LESSONS.length && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); for (const x of fs2.slice(0, 8)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > 8) console.log(`   ... ${fs2.length - 8} more`); }
     if (na < LESSONS.length && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });

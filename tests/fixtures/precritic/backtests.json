@@ -3201,5 +3201,26 @@
    "pass": "OK"
   }
  }
- ]
+ 
+ ,{
+  "id": "lesson-check-one-page",
+  "check": "The Prerequisite Check of every sample lesson prints on ONE pupil page with the check forced on (lead ruling A: a question that is not two-choice may print one item; the drop that saves height goes first)",
+  "kind": "commit-pair",
+  "rule": "PAGE_TYPES 2.10; LR-17a (2); LESSONS_LEARNED: a feature behind a switch needs a forced-on render gate",
+  "browser": true,
+  "fail": {
+   "commit": "e312736a",
+   "state": "floor of 2 items on every question: the check runs to 2 pupil pages at L (all three samples) and at S (add)"
+  },
+  "pass": {
+   "commit": "9bdbe89a",
+   "state": "ruling A: one pupil page at L and S for all three samples"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-PAGES",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ }
+]
 }
