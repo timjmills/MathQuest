@@ -22,6 +22,7 @@
   },
   "skills": {
     "include": [
+      "composing:number_word_form",
       "placevalue:identify",
       "placevalue:value",
       "placevalue:expand",
@@ -46,7 +47,8 @@
     "PV-07 unit form and renaming: '__ hundreds __ tens __ ones'; '34 tens = __' (unit_form)",
     "PV-14 / PV-15 x10 / ÷10: the same digit one place apart, '700 is 10 times 70', 'one tenth of 700 is __' (place_value_10x and the ten-times presets)",
     "PV-04 compare two numbers: write <, > or = in the circle between them; the first place that differs decides, a longer number is bigger (compare)",
-    "PV-05 1 / 10 / 100 more or less: write the number that is 1, 10 or 100 more or less, or the start it came from (more_less_10, more_less_100)"
+    "PV-05 1 / 10 / 100 more or less: write the number that is 1, 10 or 100 more or less, or the start it came from (more_less_10, more_less_100)",
+    "PV-03 number names: write the numeral for a number name ('three hundred five' -> 305), or the name for a numeral; the place boxes H T O keep a missing tens word's 0 (composing:number_word_form)"
   ],
   "progression": [
     "2-digit, then 3-digit numbers with no zero; the place letters H T O over the digits",
@@ -54,7 +56,8 @@
     "4-digit and larger with the comma; the letters fade, the digit boxes stay",
     "ten times: the same digit one place left; then one tenth one place right; then 'how many times as many' (700 ÷ 70 = 10)",
     "compare: far apart, same length; then close (same first digit); then different lengths; '=' dealt one item in six",
-    "1 / 10 / 100 more or less: the answer missing, with a hundreds-chart strip or a number line; then no support; then the start missing; crossing a 9 or a 0 last"
+    "1 / 10 / 100 more or less: the answer missing, with a hundreds-chart strip or a number line; then no support; then the start missing; crossing a 9 or a 0 last",
+    "number names: to 20, then to 100, then to 1,000; words to numeral first (lower writing load), numeral to words after; a missing tens / ones word (305, 340) dealt on purpose; H T O boxes before the bare line"
   ],
   "drawing": {
     "sizes": "digits 16 / 22 / 28 pt (tokens.js SIZES); write lines and blanks sized from the widest possible answer (L3); default size L.",
@@ -104,25 +107,46 @@
       "title": "Cited by critics on this family's findings (ids only)",
       "chars": 80,
       "rules": [
+        "BD-14",
+        "BD-7",
         "CL-5",
         "DN-1",
         "DN-1a",
         "H1",
+        "H10",
+        "H11",
+        "H12",
         "H2",
+        "H3",
         "H4",
         "H5",
         "H6",
         "H7",
         "H8",
         "H9",
-        "H11",
         "INK-5",
+        "L11",
         "L5",
-        "OC4",
         "OC14",
+        "OC15",
+        "OC4",
+        "OC8",
         "PT-GDP-1",
+        "PT-MOD-1",
+        "PT-REV-1",
         "PT-REV-3",
-        "SP-11a"
+        "PT-RSN-1",
+        "RP-10",
+        "RP-11",
+        "RP-30",
+        "RP-31",
+        "RP-60",
+        "SC-5",
+        "SL-1",
+        "SL-11",
+        "SP-11a",
+        "SP-4",
+        "TY-7"
       ]
     }
   ],
@@ -188,6 +212,11 @@
       "id": "M9",
       "error": "does not regroup across a 9 or a 0",
       "wrong": "10 more than 396 is 3,106; 10 less than 305 is 395 done as 3,05"
+    },
+    {
+      "id": "M10",
+      "error": "writes the number as it sounds, one chunk per word",
+      "wrong": "three hundred five -> 3005 or 35"
     }
   ],
   "options": [
@@ -808,6 +837,65 @@
         "skills": [
           "placevalue:more_less_10",
           "placevalue:more_less_100"
+        ]
+      },
+      {
+        "option": "wordform",
+        "values": [
+          "to_number",
+          "to_words"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "words to numeral (default, lower writing load), then numeral to words (spelling too); both alternate",
+        "proposed": true,
+        "skills": [
+          "composing:number_word_form"
+        ]
+      },
+      {
+        "option": "band",
+        "values": [
+          "0",
+          "20",
+          "100",
+          "1000"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "numbers to 20, 100, 1,000 (0 = the Max Number setting, saved codes)",
+        "proposed": true,
+        "skills": [
+          "composing:number_word_form"
+        ]
+      },
+      {
+        "option": "zeroPlace",
+        "values": [
+          "none",
+          "some",
+          "always"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "a missing tens / ones word (305, 340), dealt on purpose",
+        "proposed": true,
+        "skills": [
+          "composing:number_word_form"
+        ]
+      },
+      {
+        "option": "answerSlot",
+        "values": [
+          "line",
+          "hto"
+        ],
+        "d": "offered",
+        "source": "skill-options.js",
+        "why": "the numeral on a line, or in H T O boxes (one digit a box: the 0 is not dropped)",
+        "proposed": true,
+        "skills": [
+          "composing:number_word_form"
         ]
       }
     ],
