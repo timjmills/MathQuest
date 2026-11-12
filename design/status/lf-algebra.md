@@ -4,11 +4,15 @@ Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
 State: paused
-Updated: 2026-11-07 (hand-over)
+Updated: 2026-11-12 (fix r5: merge master, growing sizes, precritic r5)
 Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
 ## Now
+- 2026-11-12 fix r5: merged origin/master d34311d5 (49096d74); lesson data moved to lessons/families/algebra.js with
+  guidedRows: 1 on the 4 chartWide lessons; growing unit S 2.5 / M 2.8 / L 3.3 mm (37a7f4f5, patterns card UNSIGNED: the lead
+  re-signs from 37a7f4f5); parity / true-false answers capitalised. Precritic r5 (below): 25 PASS, 17 FAIL; master brought
+  new gates (ws-cell-checks --card-opts, ws-empty-band, render-gate on every card role) that are red on these skills.
 - HAND-OVER 2026-11-07 ~12:50 UTC (week stop at 70 % ~15:30): paused at a clean point, no critic round run. Rule 0b blocks
   the critic: precritic is red on roles these skills print, and every remaining red but one belongs to lf-ops / lf-engine.
 - Six skills built or fixed for BUILD lessons #3 #5 #19 #20 #21: algebra:function_table_easy, patterns:number_patterns_rule,
@@ -54,6 +58,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r5 (merge master + growing sizes + precritic), start 2026-11-12T21:55Z, end 2026-11-12T23:40Z, profile mq-opus-medium
 Times: fix r4, start 2026-11-07T12:13Z, end 2026-11-07T12:50Z, profile mq-opus-medium
 Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-medium
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
@@ -121,6 +126,28 @@ Remaining non-green rows, cause by cause:
   function_table_easy ftTask=make S: REPEAT (two make tables with the same rule look identical - no numbers printed) - ours,
   open.
 - spec-card INCOMPLETE: both cards unsigned by design (owner answers recorded; cards ready to sign).
+
+## Precritic r5 (37a7f4f5 + the parity fix, 6 skills, --strict; logs /tmp/mq-precritic/20261112-221334-4592, wall 4632 s)
+25 PASS: node-lint, providers-unit, content-audit, options-verify (6 pinned, 0 new), presets-unit, lessonfit, coverage-matrix,
+print-lint independent S/M/L, grade-render --gate (lesson/test/independent), render-gate other roles (function-table card),
+screen-slots, screen-answer, chromebook-fit, code-snapshot, boot-smoke, slot-clip, phone-card, card-rulings rulings + offered,
+dealer-uniform, visual-quality, and the rest of the node rows.
+| Gate | Result | Findings | Owner |
+|---|---|---|---|
+| ws-empty-band (new on master) | FAIL | 157 (EB-BAND 107, EB-SIDE 23, EB-EDGE 22, EB-FOOT 5); ft 36, npr 21, fgr 18, pf 16, notice 11, growing 11 | triage next round: ours where the cell sets the band, lf-engine for role/page bands |
+| print-lint --roles lesson L | FAIL | follow_given_rule H13 0->2; notice PAGEFILL 0->1 | lf-engine (lesson.js chartWide packing), as r3/r4 |
+| print-lint --roles lesson S | FAIL | follow_given_rule H13 2, PAGEFILL 2; notice PAGEFILL 1; pattern_features DN-2 2, PAGEFILL 1, LONE 1 | lf-engine (same) |
+| print-lint sections --pages 2 S / L | FAIL | 28 / 15 L-DENSITY on the 6-skill sheet | section engine (as r3) |
+| cell-checks --card-opts function_table_easy | FAIL | 425 (OVERFLOW 410, KEYJOIN 15): true-false / reason-it KEYJOIN; lesson ftTask rule OVERFLOW | roles true-false / reason-it (KEYJOIN); ours to triage the lesson overflow |
+| cell-checks number_patterns_rule / follow_given_rule | FAIL | 192 / 85 (reason-it OVERFLOW = count-row train wrap; true-false, pre-skill-check KEYJOIN) | lf-ops count-row (wrap fix, our 2cfeb1d7 revert still in); roles for KEYJOIN |
+| cell-checks notice_patterns | FAIL | 88 (patTask feature: lesson OVERFLOW + KEYJOIN, guided / independent KEYJOIN) | ours (notice.js feature: the sentence answer reads as a joined key) |
+| cell-checks pattern_features | FAIL | 437 (KEYJOIN 314, OVERFLOW 123) | ours (same feature-sentence KEYJOIN) |
+| cell-checks growing_shape_patterns | FAIL | 34 OVERFLOW: review L, pre-skill-check S/M/L | review L 1.3 mm body overflow is the same with the old 2.6 mm unit (not the resize): roles review; pre-skill-check: roles / lf-engine |
+| render-gate other roles npr / fgr | FAIL | 18 / 14: reason-it count-row train leaves the cell | lf-ops count-row |
+| render-gate other roles pattern_features / growing | FAIL | 27 / 20: pre-skill-check overflows the sheet (+ growing review L 1.3 mm) | roles pre-skill-check / review (lf-engine) |
+| sibling-compare | FAIL | 0 above siblings, 107 rows with no sibling measured | lead (first-family rule: no siblings) |
+| spec-card --check-signed | INCOMPLETE | patterns card unsigned (re-sign from 37a7f4f5) | lead |
+| options-verify --render | FAIL | 12 values: npr pattern add/sub/grow S 8 vs 9; shape circle/hex/mixed S 5 vs 9; fgr shape circle 8 vs 10 | lf-ops count-row (as r3) |
 
 ## Precritic r4 (head b0ca7395, 2 skills patterns:notice_patterns, patterns:pattern_features, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261107-122629-29669, wall 948 s)
 | Gate | Scope | Result | Findings vs baseline | Seconds |
@@ -264,6 +291,15 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-12 23:40: fix r5. Merge of origin/master d34311d5 (49096d74): QUEUE.md/queue.json from master, regenerated;
+  prereqs.js from master, our 6 records moved to families/algebra.js (6 ROUTINES + 6 skill: LESSONS; lessonFor equal to the old
+  records except guidedRows: 1 on npr / pf / growing / fgr and fgr's match-anything example the library requires; notice and
+  pattern_features carry iconsPending for their repeated icons); backtests.json both sides' rows; ws-card-rulings both readers.
+  count-row.js: master has no change since b19172b4, our interim revert 2cfeb1d7 kept. Gates after the merge all OK (boot-smoke,
+  code-snapshot 736 with ZW-ZZ unmoved and unique, standards, search-terms, presets-unit, redesign-passed, wrm-page-unit,
+  lessons-first-queue --check, card-rulings --self-test, spec-card function-table signed; lesson-unit, lesson-coverage).
+  Growing unit S 2.5 / M 2.8 / L 3.3 mm (37a7f4f5): print-lint kit S/M/L and lesson S/L 0 findings, card rulings OK; no owner
+  question needed. Parity / true-false q.ans and wrong values capitalised (Even / Odd, True / False; checks fold case).
 - 2026-11-07 14:32: lf-engine landed `guidedRows: 1` (commit 50c1eca6 on claude/sweet-newton-c8wrv1-lf-engine; we-do.js guidedRowsOf,
   schema validateGuidedRows). Next round: once that branch merges, set guidedRows: 1 on our chartWide lessons in families/algebra.js.
 - 2026-11-07 12:45: lead: patterns card re-sign pending (M/L shrank in b0ca7395, see Now); no further work this week.

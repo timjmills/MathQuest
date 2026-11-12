@@ -69,7 +69,8 @@ function noticeParity(q, o) {
         show: o.patShow !== false,
     };
     q.text = 'Is the product even or odd?';
-    q.ans = even ? 'even' : 'odd';
+    // (r5: the answer is written as its label - Even / Odd - so every page shows one case; the screen check folds case)
+    q.ans = even ? 'Even' : 'Odd';
     q.acceptedAnswers = even ? ['even', 'e'] : ['odd', 'o'];
     q.printAnswer = even ? 'Even' : 'Odd';
     q.printText = 'Is the product even or odd? Circle one.';
@@ -185,7 +186,7 @@ function noticeTrueFalse(q, o) {
         show: o.patShow !== false,
     };
     q.text = 'Is the sentence true or false?';
-    q.ans = st.truth ? 'true' : 'false';
+    q.ans = st.truth ? 'True' : 'False';
     q.acceptedAnswers = st.truth ? ['true', 't'] : ['false', 'f'];
     q.printAnswer = st.truth ? 'True' : 'False';
     q.printText = 'Read the sentence. Circle True or False.';

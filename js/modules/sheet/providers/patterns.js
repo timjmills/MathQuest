@@ -168,12 +168,12 @@ function noticeWrong(q) {
     if (p.task === 'parity') {
         const wrongLabel = p.product % 2 === 0 ? 'Odd' : 'Even';
         if (p.a % 2 === 1 && p.b % 2 === 1) {
-            c.push({ value: 'even', display: 'Even', slot: 'answer', slots: { answer: 'Even' }, misconception: 'odd-odd-even', explain: `Thought odd × odd is even (like odd + odd): ${p.a} × ${p.b} = ${p.product}, odd.` });
+            c.push({ value: 'Even', display: 'Even', slot: 'answer', slots: { answer: 'Even' }, misconception: 'odd-odd-even', explain: `Thought odd × odd is even (like odd + odd): ${p.a} × ${p.b} = ${p.product}, odd.` });
         }
         if (pe(p.a) !== pe(p.product)) {
-            c.push({ value: wrongLabel.toLowerCase(), display: wrongLabel, slot: 'answer', slots: { answer: wrongLabel }, misconception: 'first-factor', explain: `Looked at ${p.a} only (${pe(p.a)}); ${p.b} is ${pe(p.b)}, so the product is ${pe(p.product)}.` });
+            c.push({ value: wrongLabel, display: wrongLabel, slot: 'answer', slots: { answer: wrongLabel }, misconception: 'first-factor', explain: `Looked at ${p.a} only (${pe(p.a)}); ${p.b} is ${pe(p.b)}, so the product is ${pe(p.product)}.` });
         }
-        if (!c.length) c.push({ value: wrongLabel.toLowerCase(), display: wrongLabel, slot: 'answer', slots: { answer: wrongLabel }, misconception: 'odd-odd-even', explain: `Mixed up the rule: ${p.a} × ${p.b} = ${p.product} is ${pe(p.product)}.` });
+        if (!c.length) c.push({ value: wrongLabel, display: wrongLabel, slot: 'answer', slots: { answer: wrongLabel }, misconception: 'odd-odd-even', explain: `Mixed up the rule: ${p.a} × ${p.b} = ${p.product} is ${pe(p.product)}.` });
         return chooseWrong(q, c);
     }
     if (p.task === 'feature') {
@@ -185,7 +185,7 @@ function noticeWrong(q) {
     }
     const lab = p.isTrue ? 'False' : 'True';
     const bad = counterExample(p);
-    c.push({ value: lab.toLowerCase(), display: lab, slot: 'answer', slots: { answer: lab },
+    c.push({ value: lab, display: lab, slot: 'answer', slots: { answer: lab },
         misconception: p.kind === 'alt' || p.kind === 'all-odd' ? 'odd-odd-even' : 'some-not-all',
         explain: p.isTrue ? 'Called it false without testing every product: all of them fit.' : `Some products fit, but ${bad} does not.` });
     return chooseWrong(q, c);
