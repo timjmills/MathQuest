@@ -15,6 +15,7 @@
 //                                                          # who holds the slots / the harness lock (pid, age, command)
 //   node tests/scripts/ws-backtest.mjs --quiet             # no per-row streaming lines (the final table only)
 //   node tests/scripts/ws-backtest.mjs --self-test         # the TIMEOUT path on a sleeping fixture row (no browser, ~5 s)
+//   node tests/scripts/ws-backtest.mjs --runner-orphan R   # OK when a child outliving runner R's command holds no slot lock
 //
 // Each row's result line is printed AS SOON AS THE ROW FINISHES ("ws-backtest row <id>: PASS|FAIL|TIMEOUT|ERROR|PENDING ..."),
 // and the table follows at the end (lf-engine 2026-11-12: a full run hung 7,000 s with no output at all).
@@ -33,7 +34,7 @@
 // `ws-backtest: FAIL (n)`; exits non-zero on FAIL.
 
 import { spawnSync, spawn } from 'node:child_process';
-import { readFileSync, existsSync, mkdirSync, rmSync, readdirSync, readlinkSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync, rmSync, readdirSync, readlinkSync, statSync, copyFileSync, chmodSync, renameSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -46,6 +47,19 @@ const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args
 const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? String(args[i + 1]).split(',') : [])).map((s) => s.trim()).filter(Boolean);
 const BROWSER_RUN = '/tmp/mq-browser-run.sh';
 
+/** How many browser-slot lock fds a child that OUTLIVES `runner`'s command holds (must be 0), or null when both slots stayed
+ *  busy for 30 s. (An orphaned, detached Chrome held both slots and every later browser row waited without end: lf-engine
+ *  2026-11-12.) */
+function runnerOrphan(runner) {
+    const o = spawnSync('bash', ['-c', `timeout 30 bash ${runner} bash -c 'setsid bash -c "exec -a ws-backtest-selftest-orphan sleep 20" </dev/null >/dev/null 2>&1 &' && sleep 0.5 && p=$(pgrep -f '^ws-backtest-selftest-orphan' | head -1) && { ls -l /proc/$p/fd | grep -c mq-browser-slot; kill $p; }`], { cwd: ROOT, encoding: 'utf8' });
+    return o.status === 124 ? null : Number(String(o.stdout).trim().split('\n').pop());
+}
+if (arg('--runner-orphan', null)) {
+    // a check of its own (backtest row runner-orphan-slot): node tests/scripts/ws-backtest.mjs --runner-orphan <runner.sh>
+    const n = runnerOrphan(arg('--runner-orphan'));
+    console.log(n === null ? 'ws-backtest-runner: FAIL (both slots busy 30 s; not measured)' : n ? `ws-backtest-runner: FAIL (a child that outlives the command holds ${n} slot lock fd(s))` : 'ws-backtest-runner: OK');
+    process.exit(n === 0 ? 0 : 1);
+}
 if (has('--self-test')) {
     // The TIMEOUT path: a fixture row whose check sleeps 60 s, run with --timeout 2, must report TIMEOUT within ~10 s, show
     // its output tail, and leave no sleeping child behind.
@@ -54,10 +68,12 @@ if (has('--self-test')) {
     const out = `${r.stdout}${r.stderr}`;
     const left = spawnSync('pgrep', ['-f', '^ws-backtest-selftest-sleeper'], { encoding: 'utf8' }).stdout.trim();
     const okLine = /ws-backtest row sleeper: TIMEOUT/.test(out), okTail = /selftest tail line 3/.test(out), okTot = /1 TIMEOUT/.test(out), okOk = /ws-backtest row instant: PASS/.test(out);
+    const orphanHolds = runnerOrphan('tests/scripts/mq-browser-run.sh');
     const secs = (Date.now() - t0) / 1000;
     const fails = [!okLine && 'no streamed TIMEOUT line', !okTail && 'no output tail', !okTot && 'totals do not count the TIMEOUT', !okOk && 'the instant row did not PASS',
-        left && `sleeper still running (pids ${left})`, secs > 30 && `took ${secs.toFixed(0)} s`, r.status === 0 && 'exit 0 on a TIMEOUT'].filter(Boolean);
+        left && `sleeper still running (pids ${left})`, orphanHolds !== null && orphanHolds !== 0 && `an orphan of mq-browser-run.sh holds ${orphanHolds} slot lock fd(s)`, secs > 30 && `took ${secs.toFixed(0)} s`, r.status === 0 && 'exit 0 on a TIMEOUT'].filter(Boolean);
     if (fails.length) console.log(out);
+    if (orphanHolds === null) console.log('ws-backtest --self-test: the runner orphan case was skipped (both browser slots busy for 30 s)');
     console.log(fails.length ? `ws-backtest --self-test: FAIL (${fails.join('; ')})` : `ws-backtest --self-test: OK (${secs.toFixed(1)} s)`);
     process.exit(fails.length ? 1 : 0);
 }
@@ -192,6 +208,19 @@ function git(argv, quiet = false) {
     const r = spawnSync('git', argv, { cwd: ROOT, encoding: 'utf8' });
     if (!quiet && r.status !== 0) process.stderr.write(r.stderr || '');
     return r;
+}
+
+// The two-slot runner: installed / refreshed from the repo's copy like ws-precritic does (a stale runner let an orphaned
+// Chrome keep a slot's lock: lf-engine 2026-11-12)
+if (rows.some((r) => r.browser && !r.pending)) {
+    const src = join(ROOT, 'tests/scripts/mq-browser-run.sh');
+    try {
+        if (!existsSync(BROWSER_RUN) || readFileSync(BROWSER_RUN, 'utf8') !== readFileSync(src, 'utf8')) {
+            const tmp = `${BROWSER_RUN}.${process.pid}`;
+            copyFileSync(src, tmp); chmodSync(tmp, 0o755); renameSync(tmp, BROWSER_RUN);
+            console.log(`ws-backtest: refreshed ${BROWSER_RUN} from tests/scripts/mq-browser-run.sh`);
+        }
+    } catch (e) { console.log(`ws-backtest: could not refresh ${BROWSER_RUN}: ${e.message}`); }
 }
 
 const results = [];

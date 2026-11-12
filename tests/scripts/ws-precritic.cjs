@@ -1298,9 +1298,13 @@ async function main() {
     const browserPlanned = rows.some((g) => g.kind === 'browser' && !g.missing);
     let pre = { bad: [] };
     if (browserPlanned) {
-        if (!fs.existsSync(RUNNER)) {
-            fs.copyFileSync(RUNNER_SRC, RUNNER); fs.chmodSync(RUNNER, 0o755);
-            say(`${TOOL}: installed ${RUNNER} from ${rel(RUNNER_SRC)}`);
+        // installed when missing OR older than the repo's copy (lf-engine 2026-11-12: a stale runner kept handing its
+        // slot lock to orphaned Chromes); replaced by rename, so a runner already running keeps its own file
+        const cur = fs.existsSync(RUNNER) ? fs.readFileSync(RUNNER, 'utf8') : null;
+        if (cur !== fs.readFileSync(RUNNER_SRC, 'utf8')) {
+            const tmp = `${RUNNER}.${process.pid}`;
+            fs.copyFileSync(RUNNER_SRC, tmp); fs.chmodSync(tmp, 0o755); fs.renameSync(tmp, RUNNER);
+            say(`${TOOL}: ${cur === null ? 'installed' : 'updated'} ${RUNNER} from ${rel(RUNNER_SRC)}`);
         }
         pre = prerequisites();
         if (pre.bad.length) {
