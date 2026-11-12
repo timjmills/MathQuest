@@ -102,3 +102,10 @@ Report design/audit/runs/lf-ops/critic-factroles-r2.md; renders design/audit/run
   ws-backtest --row model-grid-facts PASS; ws-boot-smoke OK; syntax OK (scripted-model.js, ws-empty-band.cjs).
   Critic render of S4: `node tests/scripts/ws-grade-render.cjs --skills multiplication:mult_facts,division:div_facts --roles scripted-model --size L --no-screen --out <dir>` (2 pages each, 2 x 2).
   Next: independent critic r3 (mult_facts / div_facts Scripted Model L).
+
+
+## Critic factroles r3 (narrow re-check, 9f7983dd) - mult_facts Model L PASS 8 / 8 / 8 / 8; div_facts Model L FAIL 6 (C3)
+Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/runs/lf-ops/factroles-r3-renders/. S4 fixed on both (2 + 2, no empty state cell, a mark a state, 1-line steps, clear second examples 4 x 12 and 6 ÷ 3, page 2 reads as a page, keys correct).
+| Finding | Check that would catch it | Backtest state | Note |
+|---|---|---|---|
+| S5 div_facts Model L: the band between the step text and the problem is 24.6-25.1 mm of 81.2 mm (30.3-30.9 %, H13 30 %) in all 8 state cells; mult_facts 27.6 % | EB-GAP interior band (an empty band BETWEEN step text and the problem, not only under the ink) >= 30 % | fail 9f7983dd div_facts Model L | fix: raise the problem ~3 mm and open its gap to the first mark (1.3 mm now) to ~4 mm; ws-empty-band missed it: its interior band test does not cover the Model's text-to-problem gap |
