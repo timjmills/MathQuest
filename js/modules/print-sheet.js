@@ -49,7 +49,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
-import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { lessonFor, optionLesson, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
@@ -4737,7 +4737,7 @@ async function buildLesson(n, metaOf) {
     // id, or the skill's default lesson (lessons/library.js - the same record prereqs.js lessonFor reads, plus its
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
-    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId, s1.opts || null);
+    const recordOf = (s1) => n.lessonData || optionLesson(libId ? libraryLessonData(libId) : null, s1.opts || null) || lessonFor(s1.categoryId, s1.skillId, s1.opts || null);
     const data0 = recordOf(sk0);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
