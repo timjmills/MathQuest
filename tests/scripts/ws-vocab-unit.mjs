@@ -19,6 +19,8 @@
 // V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
 //     at most 14 words
 // V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails
+// V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
+//     a single-answer page still needs the Model + 3 tries (guided.js minMet)
 // V27 (r9) key dot underlays never overlap; the pick3 "Here is how" uses the screen verb; no broken comparison in an explain
 // V26 (r9) the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below
 //     (provider `preSkills`), never the Grade 6 definition-matching skills listed before it in data.js
@@ -464,6 +466,17 @@ const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amo
     }
 }
 
+// V28 (lead ruling 2026-11-12): Guided MIN_ITEMS counts scored answers per cell (footprint points, the EB-GDPCAP count)
+{
+    const G = await imp('js/modules/sheet/roles/guided.js');
+    if (typeof G.minMet !== 'function') fail('V28: guided.js has no minMet - MIN_ITEMS counts cells, so a Match 3 Guided page at L (Model + 1 try = 3 answers) is held short');
+    else {
+        const m3 = [0, 1, 2].map(() => ({ footprint: { points: 3 } })), one = [0, 1, 2, 3].map(() => ({ footprint: {} }));
+        if (!G.minMet(m3, 2)) fail('V28: Model + one Match 3 try (3 answers) does not meet MIN_ITEMS');
+        if (G.minMet(m3, 1)) fail('V28: the Model alone meets MIN_ITEMS');
+        if (G.minMet(one, 3) || !G.minMet(one, 4)) fail('V28: a single-answer page no longer needs the Model + 3 tries');
+    }
+}
 // V27 (critic r7 #3, #4, #5; lf-vocab r9):
 //   key underlays: no two dot underlays of a key picture overlap (one underlay per group, never a ring round each dot);
 //   the ladder verb is the screen task's verb (pick3 says "Tap its word": its "Here is how" says "Tap <word>.");

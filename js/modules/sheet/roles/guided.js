@@ -172,6 +172,12 @@ export const measureCols = (ctx) => (ctx && ctx.size === 'S' ? [1, 2, 3, 4, 5] :
 
 /** The Model plus at least three guided tries (round-3 re-grade: "a model and ONE practice item"). */
 export const MIN_ITEMS = 4;
+/**
+ * Whether n leading items (the Model first) meet MIN_ITEMS, counted in SCORED ANSWERS (lead ruling 2026-11-12): a cell that
+ * scores several answers (Match 3, footprint `points` 3) counts each of them, by the same pointsOf the EB-GDPCAP ceiling
+ * uses, so the Model and ONE Match 3 try (3 answers) meets "Model + 3 tries". A single-answer cell counts 1, as before.
+ */
+export const minMet = (items, n) => { const p = pointsOf(items); return n >= MIN_ITEMS || (p > 1 && (n - 1) * p >= MIN_ITEMS - 1); };
 const MAX_PAGES = 3;
 
 /**
@@ -467,9 +473,9 @@ function sheetFit(items, cols, ctx, input, limit = Infinity) {
     // Round-4 re-grade: a spanning Model that pushed the tries onto a second page (Model + 2 on
     // page 1, a quarter-empty page 2) gives way to the Model in a cell of its own when that keeps
     // the Model and three tries on page 1.
-    if (a.span && a.pages[0].cap < MIN_ITEMS) {
+    if (a.span && !minMet(items, a.pages[0].cap)) {
         const b = sheetFitWith(items, cols, ctx, input, true, !a.hint, limit);
-        if (b.pages[0].cap >= MIN_ITEMS || b.pages.length < a.pages.length) return b;
+        if (minMet(items, b.pages[0].cap) || b.pages.length < a.pages.length) return b;
     }
     // Critic pv-r2 (a rounding table of 6 places at L): the Model still alone on page 1. Its
     // work lines give way (the traced cells of a table, a chart, a clock's boxes ARE its
@@ -501,7 +507,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const ceil = ceilFor(ctx, items);
     const facts = factRows(input);
     const nM = mixModels(items);
-    while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || total < MIN_ITEMS)) {
+    while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || !minMet(items, total))) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
         const maxR = Math.max(1, Math.ceil((ceil - total) / cols));
