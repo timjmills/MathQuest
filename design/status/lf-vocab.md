@@ -71,6 +71,17 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## r9 PAUSED (2026-11-12, weekly usage limit hit mid-round; resumes after the 22:00 UTC reset)
+- Done and pushed:
+  - item 1 (6e140668): the pre-skill check tests picture vocabulary tasks; V26;
+  - item 2 (002e071f): Match 3 guided rows one share each; backtest rows for items 1-2.
+- Next on resume (brief: design/lanes/lf-vocab/r9-builder-brief.md):
+  1. Part 1 item 3: print-lint --kind sections L-DENSITY / LONE at S and L.
+  2. precritic --strict: only sibling-compare may fail.
+  3. Part 2: the quiz wrong-red (NB6); the pick3 answer line gets the blue next outline (lead default, NB check);
+     derived ambiguity V-AMBIG+; the minors.
+- Budget left in r9: about $13 minus what items 1-2 used. Then a narrow critic re-check.
+
 ## NEXT (r9, lead 2026-11-12 17:18Z; resumable from the branch): after the narrow critic r7 reports
 1. Read design/lanes/lf-vocab/critic-r7-narrow.md (once copied in). Its renders are in the scratchpad critic8.
 2. r9 fixes, in lf-vocab: these cells are vocab-owned now that master's plan-from-card offers pre-skill-check for the

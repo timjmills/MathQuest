@@ -3531,7 +3531,7 @@
     "state": "lf-vocab r8 base"
    },
    "pass": {
-    "commit": "HEAD_ITEM2",
+    "commit": "002e071f",
     "state": "lf-vocab r9 item 2"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-grade-render.cjs --skills vocabulary:vocab_grade_pictures --roles guided --size S --opts '{\"vocabSet\":8}' --gate --no-screen --out /tmp/mq-bt-guided-s8 | tail -1",
