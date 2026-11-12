@@ -127,3 +127,8 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
 ## Critic factroles r4 (one-page re-check, b606e68a) - PASS, div_facts Scripted Model L 8 / 8 / 8 / 8 on both pages and keys
 Report design/audit/runs/lf-ops/critic-factroles-r4.md; renders design/audit/runs/lf-ops/factroles-r4-renders/. S5 fixed: step-text-to-problem band 25.9-26.9 % (r3 30.3-30.9 %); state 1 bottom band 34.4 % inside PT-MOD-3; mult_facts PNGs byte-identical to r3. No defect.
 Result of the facts-roles task (r1-r4): every graded Guided (S, M, L) and Scripted Model (S, M, L) page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts scores >= 8 (r2 23 pages; r3 mult Model L; r4 div Model L).
+
+## Next week's order (lead, 2026-11-12 evening; cap $45; branch claude/sweet-newton-c8wrv1-lf-ops-divscreen from master d34311d5)
+1. division:div_facts screen hosts (practice card, online worksheet, quiz) for every support, critic >= 8 -> add div_facts to js/modules/redesign-passed.js with its evidence line.
+2. Stories / g3-oa8: E9b / E12 (the regression on the lane branch claude/sweet-newton-c8wrv1-lf-ops) and E35.
+3. MAIN ops skills of the next short lessons, in order: multiplication:mult_properties + arrays_groups + count_by_tables (Properties of multiplication; the #4 fresh-builder brief is in design/status/lf-ops.md on claude/sweet-newton-c8wrv1-lf-ops); multiplication:mult_chart; mult / div_word_problems_plain; addition:add_column_multi. Each: 8/10 critic, deploy branch with PNGs.
