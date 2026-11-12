@@ -3080,6 +3080,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-edge-facts",
+   "check": "no ink within 1.5 mm of, or across, a cell divider or the page frame on any row of the Guided / Scripted Model pages of the five fact skills, the hinted row 1 included (lf-ops facts-roles critic r1 G1: Guided S add / sub facts' dot tiles ran onto the divider and the fifth across the frame)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-EDGE (RUBRIC C1, CL-5)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "10 findings: add_facts and sub_facts Guided S, all 5 cells of row 1 (0.1 / 1.3 mm across the border)"
+   },
+   "pass": {
+    "commit": "f5b77f7a",
+    "state": "0 findings: Guided + / - S at 4 columns, the hinted row fits"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-EDGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

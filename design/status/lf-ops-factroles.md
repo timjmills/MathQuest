@@ -73,3 +73,4 @@ Pass: the fade (PT-GDP-1), nothing given away, keys 27 / 27, TY-30 digits, CL-40
 | S2 Scripted Model step text over 2 lines (mult step 2: 4-5 lines) (PT-MOD-2) | MOD-LINES (step text <= 2 line boxes) | fail 343e0b78 | lane fix |
 | S3 Scripted Model pages 23-42 % used | EB-PAGE | fail 343e0b78 | LEAD |
 Speed-up: ask the page-fill question before the build: ruling (b) fixed ceiling, stretch and leftover together, and the critic was first to measure the page used.
+- r2 step 1 done @ f5b77f7a (EB-EDGE + Guided +/- S columns from the hinted row; backtest guided-edge-facts); next: step 2 MOD-MARKS
