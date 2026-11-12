@@ -27,6 +27,8 @@ const SAMPLES = [
     { id: 'round', skill: { categoryId: 'number_sense', skillId: 'nearest_10' } },
 ];
 const ALL = process.argv.includes('--all-lessons');
+// --force-check: build the lessons with buildSheet's render-only `prereqsForce` (their Prerequisite Check on).
+const FORCE = process.argv.includes('--force-check');
 const SEEDS = (arg('seeds') || '4242,1001').split(',').map(Number);
 const SIZES = (arg('sizes') || 'L,M').split(',');
 const sha = (s) => crypto.createHash('sha1').update(String(s)).digest('hex');
@@ -99,13 +101,13 @@ async function inPage(page, fn, arg) {
             out.__lessons = lessons;
         }
         for (const l of lessons) for (const size of SIZES) for (const seed of SEEDS) {
-            const r = await inPage(app.page, async ({ skill, size, seed }) => {
+            const r = await inPage(app.page, async ({ skill, size, seed, FORCE }) => {
                 try {
-                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed, key: true, practicePages: 1, mixed: true });
+                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
                     const split = (h) => { const d = document.createElement('div'); d.innerHTML = h; return [...d.querySelectorAll('.ws-page')].map((p) => p.outerHTML); };
                     return { pupil: split(r.pupilHtml), key: split(r.keyHtml), whole: [r.pupilHtml, r.keyHtml] };
                 } catch (e) { return { error: (e && e.stack) || String(e) }; }
-            }, { skill: l.skill, size, seed });
+            }, { skill: l.skill, size, seed, FORCE });
             const k = `${l.id}/${size}/${seed}`;
             log(k);
             if (r.error) { out[k + '/error'] = r.error.split('\n')[0]; continue; }

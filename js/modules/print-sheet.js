@@ -4739,7 +4739,11 @@ async function buildLesson(n, metaOf) {
     // id, or the skill's default lesson (lessons/library.js - the same record prereqs.js lessonFor reads, plus its
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
-    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
+    // `prereqsForce: true` (render-only, lane lf-engine 2026-11-12): print a lesson whose LR-17 switch is still off
+    // (`prereqsLive: false`) WITH its Prerequisite Check, for the critic renders (ws-lesson-samples --force-check) and
+    // ws-lesson-baseline; the print screen never sets it. A shallow copy carries the override, so no shared record changes.
+    const recordOf0 = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
+    const recordOf = (s1) => { const r = recordOf0(s1); if (n.prereqsForce === true && r && r.prereqsLive === false && !n.lessonData) { const c = Object.assign({}, r); delete c.prereqsLive; return c; } return r; };
     const data0 = recordOf(sk0);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};

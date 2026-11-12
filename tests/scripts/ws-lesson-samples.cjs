@@ -42,6 +42,10 @@ const OUT = path.resolve(ROOT, arg('out', 'tests/audit-runs/lessons'));
 const DPI = parseInt(arg('dpi', '110'), 10);
 const PRACTICE = parseInt(arg('pages', '1'), 10);
 const CHECK = has('check');
+// --force-check (lane lf-engine, 2026-11-12; additive): build every packet WITH its Prerequisite Check even while the
+// lesson's LR-17 switch is off (`prereqsLive: false`): buildSheet's render-only `prereqsForce`. --seed n: the render seed.
+const FORCE = has('force-check');
+const RSEED = parseInt(arg('seed', '4242'), 10);
 const NSEEDS = Math.max(1, parseInt(arg('seeds', '8'), 10));
 const LP = require('../lib/ws-lesson-lp.cjs');
 // the route step's title and its block's name, by step id (Y1.B1.S6 -> "Count on from any number", "Place value (within 10)")
@@ -208,8 +212,8 @@ async function checkMain() {
             // content: several seeds (no layout)
             const seeds = Array.from({ length: NSEEDS }, (_, i) => (i === 0 ? 4242 : 1000 + i * 37));
             for (const seed of seeds) {
-                const b = await page.evaluate(async ({ skill, seed }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size: 'L', paper: 'A4', seed, key: true, practicePages: 1, mixed: true });
-                    return { pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed });
+                const b = await page.evaluate(async ({ skill, seed, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size: 'L', paper: 'A4', seed, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
+                    return { pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
                 if (b.error) { F('PC-BUILD', `${l.id} seed ${seed}`, b.error.slice(0, 160)); continue; }
                 if (!b.pre) { na++; break; }
                 for (const it of b.items) {
@@ -220,8 +224,8 @@ async function checkMain() {
             }
             // layout: seed 4242 at every size
             for (const size of SIZES) {
-                const built = await page.evaluate(async ({ skill, size }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size });
+                const built = await page.evaluate(async ({ skill, size, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
+                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -293,9 +297,9 @@ else (async () => {
             const dir = path.join(OUT, l.dir, size);
             fs.rmSync(dir, { recursive: true, force: true });
             fs.mkdirSync(dir, { recursive: true });
-            const built = await page.evaluate(async ({ skill, size, PRACTICE }) => {
+            const built = await page.evaluate(async ({ skill, size, PRACTICE, FORCE, RSEED }) => {
                 try {
-                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: PRACTICE, mixed: true });
+                    const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: RSEED, key: true, practicePages: PRACTICE, mixed: true, prereqsForce: FORCE });
                     return {
                         pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }),
                         key: window.sheetDocument(r.keyHtml, `${r.title} - Answer Key`, { paper: 'A4' }),
@@ -304,7 +308,7 @@ else (async () => {
                         items: r.items.map((it) => ({ part: it.part, pool: it.pool, template: it.template, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 60), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })),
                     };
                 } catch (e) { return { error: (e && e.stack) || String(e) }; }
-            }, { skill: l.skill, size, PRACTICE });
+            }, { skill: l.skill, size, PRACTICE, FORCE, RSEED });
             if (built.error) { console.log(`${l.dir} ${size}: ERROR ${built.error}`); summary.push({ lesson: l.dir, size, error: built.error }); continue; }
             const pdfP = path.join(dir, 'pupil.pdf');
             const pdfK = path.join(dir, 'key.pdf');
