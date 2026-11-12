@@ -3819,6 +3819,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-minitems-answers",
+   "check": "lead ruling 2026-11-12 (precritic vocab-unit): the Guided MIN_ITEMS counts SCORED ANSWERS per cell (footprint points, the EB-GDPCAP count), so the Match 3 Guided page at L (Model + ONE try = 3 answers) meets 'Model + 3 tries'; a single-answer page still needs the Model + 3 tries",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V28",
+   "browser": false,
+   "fail": {
+    "commit": "08d0a5ce",
+    "state": "lf-vocab r9 base: MIN_ITEMS counts cells, Match 3 Guided L = Model + 1 try held short"
+   },
+   "pass": {
+    "commit": "d7f708a0",
+    "state": "guided.js minMet counts answers"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V28",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
