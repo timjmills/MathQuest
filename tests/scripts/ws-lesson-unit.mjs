@@ -486,7 +486,7 @@ for (const id of Object.keys(LIB.LESSONS)) {
     const ref = LIB.practiceRef(id);
     const d = LIB.lessonData(id);
     const f = PRE.lessonFor(ref.categoryId, ref.skillId);
-    const { prereqs, prereqsLive, vocabZoom, roundOneNum, ...rest } = d;
+    const { prereqs, prereqsLive, vocabZoom, roundOneNum, checkTopic, ...rest } = d;   // (checkTopic: critic r2 N7, the check title short topic)
     eq(rest, JSON.parse(JSON.stringify(f)), `library: lessonData(${id}) is lessonFor(${ref.categoryId}, ${ref.skillId}) plus prereqs`);
     ok(!('archetype' in d) && !('cases' in d) && !('caps' in d) && !('casesPending' in d), `library: lessonData(${id}) hands no library-only field to the engine`);
     ok(!('prereqs' in f), `prereqs.js: lessonFor(${ref.categoryId}, ${ref.skillId}) carries no prereqs (byte-identical packets)`);
