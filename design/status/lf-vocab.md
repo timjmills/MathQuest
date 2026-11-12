@@ -59,6 +59,18 @@ on); Match 3's lines read "The answer is <word>!" per wrongly matched word (the 
 quiz never records a tap until Next (pre-existing: the quiz input saves on change), so the quiz shows the feedback for Match 3
 only. Renders: scratchpad critic7/hosts (10 screen hosts + keys) and critic7/answered (right / wrong at 390 and 1280).
 
+## NEXT (r9, lead 2026-11-12 17:18Z; resumable from the branch): after the narrow critic r7 reports
+1. Read design/lanes/lf-vocab/critic-r7-narrow.md (once copied in). Its renders are in the scratchpad critic8.
+2. r9 fixes, in lf-vocab: these cells are vocab-owned now that master's plan-from-card offers pre-skill-check for the
+   vocab skills.
+   - the pre-skill-check overflow at S/M/L on both skills (render-gate, cell-checks);
+   - guided S with vocabSet 8 overflows (cell-checks);
+   - print-lint --kind sections L-DENSITY DN-2 / LONE at S and L.
+   Each fix gets a check first and a backtest row that FAILs on 3d90097d. Then precritic --strict must be clean apart
+   from the structural sibling-compare.
+3. Cap: +$15. Deploy = the r5 print pass + R-1/R-2 + O-1..3 + r9, with the manifest (mergeOrder 70); the lead runs
+   ws-stamp-assets.
+
 ## Owner rulings O-1 to O-3 (2026-11-10): in the card, awaiting the lead's signature. The lane is parked (week cap)
 - O-1: the next answer box is a blue pulsing outline behind ONE switch (e.g. --mq-next-color / a body class). Yellow is
   kept only for R-1; the red wrong box (R4-3) and reduced motion are kept. Hosts: card, worksheet, quiz. NOTE: this
