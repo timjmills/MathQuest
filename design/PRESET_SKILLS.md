@@ -314,6 +314,18 @@ digit and zeros, `tenWrite` one worth box, `tenChoice` four words to choose from
 | placevalue:one_tenth_value | One Tenth of a Digit's Value (One Place Right) | value `form: 'times', band: 9999, tenDir: 'tenth'` | Y8 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y4.B5.S5 (partial) |
 | placevalue:ten_times_story | How Many Times as Many? (700 ÷ 70 = 10) | value `form: 'times', band: 9999, tenTask: 'story'` | Y9 | 4 | 4.NBT.A.1 | M.EE.5.NBT.1 | Y5.B1.S6 (partial) |
 
+### Presets of the + / − story kinds (2026-11-12, word-stories card Q3)
+
+Build-list `map_change_unknown_story` and `map_compare_smaller_unknown` are `preset: true`: a new unknown position is a new
+task kind with its own lesson step. The `forms` values 3 (add, sub), 4 and 5 (sub) are appended and never in the default
+mix; `band` 10 / 20 / 100 stays a plain option (number size).
+
+| Preset | Label | Host + values | Code | Grade | CCSS | EE | WRM |
+|---|---|---|---|---|---|---|---|
+| addition:add_wp_change_unknown | Addition Word Problems: How Many Were Added? | add_word_problems `forms: [3]` | ZH | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
+| subtraction:sub_wp_change_unknown | Subtraction Word Problems: How Many Went? | sub_word_problems `forms: [3]` | ZJ | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S10, Y2.B2.S21 (partial) |
+| subtraction:sub_wp_compare_smaller | Compare Stories: Find the Smaller Amount | sub_word_problems `forms: [4, 5]` (fewer than, then the "more than" trap, one section each) | ZK | 1 | 1.OA.A.1, 2.OA.A.1 | M.EE.1.OA.1 | Y1.B5.S8, Y2.B2.S19 (partial) |
+
 ### Plain options (no preset)
 
 Everything that changes size *within* a class (`band`, `range`, `decimals`, `constant`, `tables`),

@@ -3069,7 +3069,15 @@
      "opts": {}
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "subtraction:sub_wp_compare_smaller",
+     "opts": {
+      "band": 100
+     },
+     "missing": "the other mixed stories (find the total, what is left): this skill deals the compare stories with the smaller amount missing"
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -3093,6 +3101,20 @@
      "key": "subtraction:sub_wp_20",
      "why": "one-step subtraction stories within 20",
      "opts": {}
+    },
+    {
+     "key": "addition:add_wp_change_unknown",
+     "why": "Y1.B5.S10 Missing number problems (earlier, the same stories within 20)",
+     "opts": {
+      "band": 20
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_change_unknown",
+     "why": "Y1.B5.S10 Missing number problems (earlier, the same stories within 20)",
+     "opts": {
+      "band": 20
+     }
     }
    ],
    "preBuild": [],
@@ -3198,7 +3220,22 @@
      "opts": {}
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "addition:add_wp_change_unknown",
+     "opts": {
+      "band": 100
+     },
+     "missing": "the number sentence with a missing number on its own: this skill tells it as a story"
+    },
+    {
+     "key": "subtraction:sub_wp_change_unknown",
+     "opts": {
+      "band": 100
+     },
+     "missing": "the number sentence with a missing number on its own: this skill tells it as a story"
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -3273,6 +3310,13 @@
      "why": "a bar model shows the missing part",
      "opts": {
       "band": 20
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_compare_smaller",
+     "why": "a compare story in the same unit: find the smaller amount",
+     "opts": {
+      "band": 100
      }
     }
    ],

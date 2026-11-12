@@ -2773,6 +2773,27 @@
      "opts": {
       "place": 10
      }
+    },
+    {
+     "key": "addition:add_wp_change_unknown",
+     "why": "Y2.B2.S21 Missing number problems (earlier: how many were added is found by subtracting)",
+     "opts": {
+      "band": 100
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_change_unknown",
+     "why": "Y2.B2.S21 Missing number problems (earlier: how many went is found by subtracting)",
+     "opts": {
+      "band": 100
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_compare_smaller",
+     "why": "Y2.B2.S19 Mixed addition and subtraction (earlier: 6 more than Tom means Tom has 6 fewer)",
+     "opts": {
+      "band": 100
+     }
     }
    ],
    "preBuild": [

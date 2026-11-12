@@ -24,7 +24,7 @@ Sources:
 - 7 years, 97 blocks, 872 small steps (Taskmaster and Year 6 Projects folders hold no small steps and are not counted).
 - Covered 513 (59%), partial only 149 (17%), gap 210 (24%).
 - Key vocabulary (the Teaching Guides' "Pre-teach" words, `data/curriculum/wrm-vocab.json`): 872 of 872 steps, 2857 words.
-- 397 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
+- 401 skills carry WRM tags. 162 proposals (120 new skills, 42 options on existing skills) would close every gap.
 
 | Year | US grade | Blocks | Steps | Covered | Partial only | Gap |
 |---|---|---|---|---|---|---|
@@ -1274,6 +1274,7 @@ whatever happens to the WRM gaps.
   Vocabulary: subtract, count back, jump  
 - **Y1.B5.S8** Subtraction - finding the difference — PARTIAL. _K.OA.A.1, 1.OA.C.5, M.EE.K.OA.1, M.EE.1.OA.5_  
   Partial: How Many More/Fewer? (Visual) (`addition:comparison_word`), missing finding the difference by comparing two bars or a number line  
+  Partial: Compare Stories: Find the Smaller Amount (`subtraction:sub_wp_compare_smaller`), missing comparing two bars to find the smaller amount, not the difference  
   Proposal: Find the Difference  
   Vocabulary: difference, more, fewer  
 - **Y1.B5.S9** Related facts — covered. _K.OA.A.1, 1.OA.B.4, M.EE.K.OA.1_  
@@ -1281,6 +1282,8 @@ whatever happens to the WRM gaps.
   Vocabulary: whole, part, fact family  
 - **Y1.B5.S10** Missing number problems — covered. _K.OA.A.1, 1.OA.D.8, M.EE.K.OA.1_  
   Skills: Pick the Missing Addends (`addition:cloze_addition`); Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Partial: Addition Word Problems: How Many Were Added? (`addition:add_wp_change_unknown`), missing the missing change told as a story: had 8, got some, now 13  
+  Partial: Subtraction Word Problems: How Many Went? (`subtraction:sub_wp_change_unknown`), missing the missing change told as a story: had 15, some went, 9 left  
   Vocabulary: altogether, part, number sentence  
 
 #### Y1.B6 Spring Block 3: Place value (within 50)
@@ -1433,6 +1436,7 @@ whatever happens to the WRM gaps.
 
 - **Y1.B12.S1** Count from 50 to 100 — covered. _K.CC.A.1, 1.NBT.A.1, M.EE.K.CC.1, M.EE.1.NBT.1_  
   Skills: Number Sequence: Fill Missing (Grid) (`counting:number_seq_fill`) {count by 1s, to 100}; Hundreds Chart - Find the Missing Number (Visual) (`composing:hundreds_chart_fill`)  
+  Partial: Count to 120 on the Chart (`composing:chart_to_120`), missing the chart rows 91-120: counting on across 100 to 120 (WRM has no step to 120)  
   Vocabulary: after, before, forwards, backwards  
 - **Y1.B12.S2** Tens to 100 — covered. _K.CC.A.1, 1.NBT.B.2, M.EE.K.CC.1, M.EE.1.NBT.2_  
   Skills: How Many Tens? (Visual) (`composing:tens_foundation_visual`) {tens to 90}; Count by 10s (`patterns:seq_10`)  
@@ -1611,6 +1615,7 @@ whatever happens to the WRM gaps.
   Vocabulary: exchange, not enough, ones, tens columns  
 - **Y2.B2.S19** Mixed addition and subtraction — covered. _1.NBT.C.4, 1.OA.A.1, M.EE.1.NBT.4, M.EE.1.OA.1_  
   Skills: Addition Word Problems (within 100) (`addition:add_wp_100`); Subtraction Word Problems (within 100) (`subtraction:sub_wp_100`); Mixed Addition & Subtraction (`subtraction:mixed_add_sub`)  
+  Partial: Compare Stories: Find the Smaller Amount (`subtraction:sub_wp_compare_smaller`), missing compare stories with the smaller amount missing  
   Vocabulary: add (+), subtract (−), exchange  
 - **Y2.B2.S20** Compare number sentences — PARTIAL. _1.OA.D.7, M.EE.1.OA.7_  
   Partial: True/False Equations (Visual) (`addition:equal_sign`), missing comparing two number sentences with <, > or = (the skill judges true/false)  
@@ -1618,6 +1623,8 @@ whatever happens to the WRM gaps.
   Vocabulary: greater than (>), less than (<), equal to (  
 - **Y2.B2.S21** Missing number problems — covered. _1.OA.D.8_  
   Skills: Pick the Missing Addends (`addition:cloze_addition`); Missing Numbers (+/−) (`subtraction:missing_add_sub`)  
+  Partial: Addition Word Problems: How Many Were Added? (`addition:add_wp_change_unknown`), missing the missing change told as a story, within 100  
+  Partial: Subtraction Word Problems: How Many Went? (`subtraction:sub_wp_change_unknown`), missing the missing change told as a story, within 100  
   Vocabulary: is equal to, partition, missing number  
 
 #### Y2.B3 Autumn Block 3: Shape
@@ -1731,7 +1738,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 2}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {2}; Count by 2s (`multiplication:count_by_2s`)  
   Vocabulary: times, multiply, array, even  
 - **Y2.B5.S10** Divide by 2 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 2}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 2}  
   Vocabulary: divide / ÷, grouping, sharing  
 - **Y2.B5.S11** Doubling and halving — covered. _2.OA.C.3, 3.OA.A.1, 3.OA.A.2, M.EE.2.OA.3, M.EE.3.OA.1, M.EE.3.OA.2_  
   Skills: Doubling (`patterns:double`); Halving (`patterns:halve`)  
@@ -1743,13 +1750,13 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 10}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {10}; Count by 10s (`multiplication:count_by_10s`)  
   Vocabulary: groups of ten, ten times as much, altogether  
 - **Y2.B5.S14** Divide by 10 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 10}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 10}  
   Vocabulary: group, share, ten  
 - **Y2.B5.S15** The 5 times-table — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 5}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {5}; Count by 5s (`multiplication:count_by_5s`)  
   Vocabulary: lots of, groups of, multiple, times-table  
 - **Y2.B5.S16** Divide by 5 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 5}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 5}  
   Vocabulary: divide, grouping, sharing  
 - **Y2.B5.S17** The 5 and 10 times-tables — covered. _2.NBT.A.2, 3.OA.C.7, M.EE.2.NBT.2, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {tables 5 and 10}; Multiplication Chart - Fill the Missing Cells (`multiplication:mult_chart_easy`)  
@@ -2073,7 +2080,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}  
   Vocabulary: lots of, groups of, multiply by 3, altogether  
 - **Y3.B3.S7** Divide by 3 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 3}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 3}  
   Vocabulary: share, group, divide (÷)  
 - **Y3.B3.S8** The 3 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 3}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Count by 3s (`multiplication:count_by_3s`)  
@@ -2082,7 +2089,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}  
   Vocabulary: equal groups, repeated addition, product  
 - **Y3.B3.S10** Divide by 4 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 4}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 4}  
   Vocabulary: share, group, in each  
 - **Y3.B3.S11** The 4 times-table — covered. _2.OA.C.4, 3.OA.C.7, M.EE.2.OA.4, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 4}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {4}; Count by 4s (`multiplication:count_by_4s`)  
@@ -2091,7 +2098,7 @@ whatever happens to the WRM gaps.
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}  
   Vocabulary: multiple of 8, lots of, groups of, double  
 - **Y3.B3.S13** Divide by 8 — covered. _3.OA.A.2, 3.OA.C.7, M.EE.3.OA.2, M.EE.3.OA.6_  
-  Skills: Division Facts (1-12) (`division:div_facts`) {divide by 8}  
+  Skills: Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 8}  
   Vocabulary: share, group, divide  
 - **Y3.B3.S14** The 8 times-table — covered. _3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 8}; Skip counting: count by 1–12 (`multiplication:count_by_tables`) {8}; Count by 8s (`multiplication:count_by_8s`)  
@@ -2515,13 +2522,13 @@ whatever happens to the WRM gaps.
   Skills: Skip counting: count by 1–12 (`multiplication:count_by_tables`) {3}; Multiples of a Number (`number_theory:multiples`) {3}  
   Vocabulary: multiple, multiply, total  
 - **Y4.B4.S2** Multiply and divide by 6 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (1-12) (`division:div_facts`) {divide by 6}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 6}  
   Vocabulary: array, group, share, double  
 - **Y4.B4.S3** 6 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 6}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
   Vocabulary: fact family, inverse, multiple  
 - **Y4.B4.S4** Multiply and divide by 9 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Division Facts (1-12) (`division:div_facts`) {divide by 9}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 9}  
   Vocabulary: multiply, divide, array  
 - **Y4.B4.S5** 9 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 9}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
@@ -2532,16 +2539,16 @@ whatever happens to the WRM gaps.
   Proposal: Related Times-Tables  
   Vocabulary: multiple, double, treble  
 - **Y4.B4.S7** Multiply and divide by 7 — covered. _3.OA.B.5, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Division Facts (1-12) (`division:div_facts`) {divide by 7}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 7}  
   Vocabulary: groups of, altogether, partition  
 - **Y4.B4.S8** 7 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
   Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 7}; Multiplication Fact Families (`multiplication:mult_div_fact_family`)  
   Vocabulary: fact family, inverse, derive  
 - **Y4.B4.S9** 11 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 11}; Division Facts (1-12) (`division:div_facts`) {divide by 11}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 11}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 11}  
   Vocabulary: partition, multiple, reverse  
 - **Y4.B4.S10** 12 times-table and division facts — covered. _3.OA.B.6, 3.OA.C.7, M.EE.3.OA.6_  
-  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (1-12) (`division:div_facts`) {divide by 12}  
+  Skills: Multiplication Facts (1-12) (`multiplication:mult_facts`) {constant 12}; Division Facts (÷1 to ÷12) (`division:div_facts`) {divide by 12}  
   Vocabulary: partition, double, exchange  
 - **Y4.B4.S11** Multiply by 1 and 0 — covered. _3.OA.B.5_  
   Skills: Multiplication Properties (Visual) (`multiplication:mult_properties`)  

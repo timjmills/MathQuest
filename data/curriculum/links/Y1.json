@@ -3434,6 +3434,13 @@
       "range": 10
      },
      "missing": "finding the difference by comparing two bars or a number line"
+    },
+    {
+     "key": "subtraction:sub_wp_compare_smaller",
+     "opts": {
+      "band": 20
+     },
+     "missing": "finding the difference (how many more): this skill finds the smaller amount"
     }
    ],
    "verdict": "partial",
@@ -3482,6 +3489,13 @@
       "forms": [
        1
       ]
+     }
+    },
+    {
+     "key": "subtraction:sub_wp_change_unknown",
+     "why": "a story with a missing number solved by subtracting: how many went",
+     "opts": {
+      "band": 20
      }
     }
    ],
@@ -3567,7 +3581,22 @@
      }
     }
    ],
-   "partial": [],
+   "partial": [
+    {
+     "key": "addition:add_wp_change_unknown",
+     "opts": {
+      "band": 20
+     },
+     "missing": "the number sentence with a missing number on its own: this skill tells it as a story (had 8, got some, now 13)"
+    },
+    {
+     "key": "subtraction:sub_wp_change_unknown",
+     "opts": {
+      "band": 20
+     },
+     "missing": "the number sentence with a missing number on its own: this skill tells it as a story (had 15, some went, 9 left)"
+    }
+   ],
    "verdict": "full",
    "missing": "",
    "build": [],
@@ -3610,7 +3639,15 @@
     }
    ],
    "preBuild": [],
-   "related": [],
+   "related": [
+    {
+     "key": "subtraction:sub_wp_compare_smaller",
+     "why": "the next story in the unit: compare two amounts and find the smaller one",
+     "opts": {
+      "band": 20
+     }
+    }
+   ],
    "note": "Max Number 20: missing_add_sub deals 12 − __ = 7 and 7 + 9; cloze_addition deals \"make 16\". Related: none; the candidate links are missing_add_sub (a direct skill here); cloze_addition (a direct skill here); number_bonds (a pre-skill here)."
   },
   "Y1.B6.S1": {

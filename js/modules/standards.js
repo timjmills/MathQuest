@@ -814,6 +814,10 @@ export const SKILL_STANDARDS = {
     'placevalue:one_tenth_value': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // One Tenth of a Digit's Value (One Place Right)
     'placevalue:ten_times_story': { ccss: ['4.NBT.A.1'], ee: ['M.EE.5.NBT.1'] }, // How Many Times as Many? (700 ÷ 70 = 10)
     'placevalue:count_pv_disks': { ccss: ['2.NBT.A.1'], ee: ['M.EE.2.NBT.1'] }, // Count the Place-Value Disks in One Place
+    // (2026-11-12 presets, word-stories card: the change unknown and the compare story with the smaller amount unknown)
+    'addition:add_wp_change_unknown': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Addition Word Problems: How Many Were Added?
+    'subtraction:sub_wp_change_unknown': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Subtraction Word Problems: How Many Went?
+    'subtraction:sub_wp_compare_smaller': { ccss: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'] }, // Compare Stories: Find the Smaller Amount
     'composing:chart_to_120': { ccss: ['1.NBT.A.1'], ee: ['M.EE.1.NBT.1'] }, // Count to 120 on the Chart (preset 2026-11-12: hundreds_chart_fill band 120)
     'composing:write_numbers_in_words': { ccss: ['2.NBT.A.3'], ee: ['M.EE.2.NBT.3'] }, // Write Numbers in Words
     'measurement:count_notes': { ccss: ['2.MD.C.8'], ee: ['M.EE.2.MD.8'] }, // Count Notes (Bills)

@@ -1164,6 +1164,10 @@ export const SKILL_WRM = {
     'placevalue:ten_times_value': [{ step: 'Y5.B1.S6', partial: 'each place is 10 times the place to its right, read on the same digit in two numbers' }, { step: 'Y4.B5.S3', partial: 'the digit one place left is worth 10 times as much' }],
     'placevalue:one_tenth_value': [{ step: 'Y4.B5.S5', partial: 'the digit one place right is worth one tenth as much' }],
     'placevalue:ten_times_story': [{ step: 'Y5.B1.S6', partial: 'how many times as many: 700 ÷ 70 = 10' }],
+    // (2026-11-12 presets, word-stories card: the stories of the missing-number and difference steps, each a part of the step)
+    'addition:add_wp_change_unknown': [{ step: 'Y1.B5.S10', partial: 'the missing change told as a story: had 8, got some, now 13' }, { step: 'Y2.B2.S21', partial: 'the missing change told as a story, within 100' }],
+    'subtraction:sub_wp_change_unknown': [{ step: 'Y1.B5.S10', partial: 'the missing change told as a story: had 15, some went, 9 left' }, { step: 'Y2.B2.S21', partial: 'the missing change told as a story, within 100' }],
+    'subtraction:sub_wp_compare_smaller': [{ step: 'Y1.B5.S8', partial: 'comparing two bars to find the smaller amount, not the difference' }, { step: 'Y2.B2.S19', partial: 'compare stories with the smaller amount missing' }],
     'composing:chart_to_120': [{ step: 'Y1.B12.S1', partial: 'the chart rows 91-120: counting on across 100 to 120 (WRM has no step to 120)' }],
     'composing:write_numbers_in_words': [{ step: 'Y2.B1.S6', note: 'Max Number 100' }],
     'measurement:count_notes': [{ step: 'Y2.B4.S2', partial: 'counting notes' }],
