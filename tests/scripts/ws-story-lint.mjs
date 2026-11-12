@@ -79,7 +79,7 @@ for (let k = 0; k < 40; k++) {
                 const add = makeStep(x - y, '+', y);                // (x - y) + y
                 for (const sc of ['join', 'compare-more', 'start-sub']) { const s = tellStory(sc, add, k); lint(s, add, `${sc} ${add.top}+${add.bottom} k${k}`); if (s) out(sc, s); }
                 const sub = makeStep(x, '-', y);
-                for (const sc of ['separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some']) { const s = tellStory(sc, sub, k); lint(s, sub, `${sc} ${x}-${y} k${k}`); if (s) out(sc, s); }
+                for (const sc of ['separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some', 'add-some', 'part-part', 'compare-more-smaller']) { const s = tellStory(sc, sub, k); lint(s, sub, `${sc} ${x}-${y} k${k}`); if (s) out(sc, s); }
             }
         }
     }
@@ -113,4 +113,4 @@ for (let k = 0; k < 40; k++) {
 }
 if (SHOW) for (const [sc, list] of Object.entries(show)) console.log(`${sc}:\n  ${list.join('\n  ')}`);
 if (fails.length) { console.log(fails.join('\n')); console.log(`ws-story-lint: FAIL (${fails.length}${fails.length >= 60 ? '+' : ''} of ${checked} stories)`); process.exit(1); }
-console.log(`ws-story-lint: OK (${checked} stories, 17 schemas, 8 rules)`);
+console.log(`ws-story-lint: OK (${checked} stories, 20 schemas, 8 rules)`);

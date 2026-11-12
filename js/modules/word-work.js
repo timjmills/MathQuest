@@ -61,9 +61,11 @@ function skillTracks(skill, op) {
 /** The answer bound of a ranged story skill (its band, or the `band` option), else 0. */
 function sentenceBand(skill) {
     const m = /_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/.exec(String(skill || ''));
+    const o = state.skillOptions;
+    // the four general + / − story hosts carry a `band` of their own (word-stories card Q2): unset, no band (Max Number)
+    if (/^(add|sub)_word_problems(_plain)?$/.test(String(skill || ''))) return o && Number(o.band) > 0 ? Number(o.band) : 0;
     if (!m) return 0;
     const BAND = { 10: 10, 20: 20, 50: 50, 100: 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
-    const o = state.skillOptions;
     return o && Number(o.band) > 0 ? Number(o.band) : BAND[m[1]];
 }
 

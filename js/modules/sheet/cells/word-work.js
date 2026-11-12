@@ -49,6 +49,7 @@ import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
 import { divisionSteps } from './long-division.js';
 import { partWholeBar } from '../graphics/part-whole-bar.js';
+import { storyBar, STORY_BAR_KIND } from '../graphics/story-bar.js';
 import { sentenceFrame, sentenceFrameWidthMm } from '../graphics/sentence-frame.js';
 
 export const WW_TEMPLATE = 'word-work';
@@ -301,6 +302,12 @@ export const countOf = (n, noun) => `${num(n)} ${n === 1 ? noun.one : noun.many}
 /** A deterministic pick from a list by a seed. */
 const pickAt = (list, k) => list[((Math.floor(k) % list.length) + list.length) % list.length];
 
+/** The schemas a generator may tag on its item (`q.wpSchema`), each with the sign of the step that SOLVES it. */
+const TAGGED_SCHEMAS = Object.freeze({
+    'start-add': '-', 'start-sub': '+', 'part-part': '-', 'add-some': '-', 'take-some': '-',
+    'compare-fewer': '-', 'compare-more-smaller': '-',
+});
+
 /**
  * The schema of a one-step story: what KIND of story the generator told, read from its own words
  * and the solving step (never from the words alone: "more" is also in a subtraction question).
@@ -387,9 +394,22 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
         case 'change':
             return S([`${n1} has ${countOf(b, T)}.`, `${n1} wants ${countOf(a, T)}.`, `How many more ${T.many} does ${n1} need?`], T);
         case 'compare-fewer':
-            return S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${b} fewer ${b === 1 ? T.one : T.many} than ${n1}.`, `How many ${T.many} does ${n2} have?`], T);
+            return Object.assign(S([`${n1} has ${countOf(a, T)}.`, `${n2} has ${b} fewer ${b === 1 ? T.one : T.many} than ${n1}.`, `How many ${T.many} does ${n2} have?`], T), { who: [n1, n2] });
         case 'take-some':
             return S([`${n1} had ${countOf(a, T)}.`, `${n1} gave some away.`, `Now ${n1} has ${countOf(b, T)}.`, `How many ${T.many} did ${n1} give away?`], T);
+        // word-stories card (2026-11-12): the change-unknown JOIN told as the generator told it, in the past tense ("had 8,
+        // got some more, now has 13"), never retold as "wants / needs" (the step is now − first = the change)
+        case 'add-some':
+            return S([`${n1} had ${countOf(b, T)}.`, `${n1} got some more.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} get?`], T);
+        // put together, a part unknown ("13 in all, 5 are red"): the step is the whole − the known part
+        case 'part-part':
+            return (big || money)
+                ? S([`${n1} has ${countOf(a, T)} for books and games.`, `${countOf(b, T)} ${b === 1 ? 'is' : 'are'} for books.`, `How many ${T.many} are for games?`], T)
+                : S([`${n1} has ${countOf(a, T)}.`, `${b} of them ${b === 1 ? 'is' : 'are'} red.`, `The rest ${ans === 1 ? 'is' : 'are'} blue.`, `How many ${T.many} are blue?`], T);
+        // compare, the smaller amount unknown, told with "more than" about the BIGGER, known amount (the language trap,
+        // P-WP-3): "Maya has 14. Maya has 6 more than Tom. How many does Tom have?" - never retold as "how many more"
+        case 'compare-more-smaller':
+            return Object.assign(S([`${n1} has ${countOf(a, T)}.`, `${n1} has ${b} more ${b === 1 ? T.one : T.many} than ${n2}.`, `How many ${T.many} does ${n2} have?`], T), { who: [n1, n2] });
         case 'start-add':
             return S([`${n1} had some ${T.many}.`, `${n1} got ${countOf(b, T).replace(/^(\S+) /, '$1 more ')}.`, `Now ${n1} has ${countOf(a, T)}.`, `How many ${T.many} did ${n1} have at first?`], T);
         case 'groups': {
@@ -482,16 +502,21 @@ export function wordWorkPayload(q, o = {}) {
     let lines = storyLines(q.text);
     if (!lines.length) return null;
     let unit = unitOf(q, ans);
+    let who = null;
     const seed = steps.reduce((s, st) => s + st.a * 7 + st.b * 13, ans);
     // The story is RETOLD in the controlled grammar (the K picture story keeps its own words).
-    const schema = steps.length > 1 ? 'two-step' : schemaOf(q.text, last, ans);
+    // the generator's own tag (q.wpSchema, add_word_problems / sub_word_problems) wins over reading the words, so a
+    // past-tense change story or the "more than" trap is never retold as another kind (word-stories card §3)
+    const tagged = steps.length === 1 && TAGGED_SCHEMAS[q.wpSchema] === last.op ? q.wpSchema : null;
+    const schema = steps.length > 1 ? 'two-step' : tagged || schemaOf(q.text, last, ans);
     if (o.retell !== false) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
         const told = steps.length > 1 ? tellTwoStep(steps[0], steps[1], k)
-            : tellStory(schema, last, k, { variant: Number.isInteger(o.variant) ? o.variant : null, ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
+            : tellStory(schema, last, k, { variant: Number.isInteger(o.variant) ? o.variant : null, ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some', 'add-some', 'part-part', 'compare-more-smaller'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
         if (told && told.ans === ans) {
             lines = told.lines;
+            if (Array.isArray(told.who)) who = told.who;
             const u = told.unit;
             const others = [];
             for (const x of [...WW_CONTAINERS.map((c) => c.many), ...WW_THINGS.map((c) => c.many)]) if (lines.join(' ').includes(` ${x}`) && (!u || x !== u.many)) others.push(x);
@@ -511,6 +536,9 @@ export function wordWorkPayload(q, o = {}) {
         unitMany: unit.many || unit.word || '', unitOne: unit.one || (unit.many ? singular(unit.many) : unit.word || ''),
         tracks: Number(o.tracks) > 0 ? Number(o.tracks) : 0,
         hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, barKind,
+        // the labelled First / Then / Now bar or the two compare bars (graphics/story-bar.js) of the new story kinds
+        ...(steps.length === 1 && STORY_BAR_KIND[schema] && (!/^compare/.test(schema) || who) ? { storyBar: STORY_BAR_KIND[schema], ...(who ? { who } : {}) } : {}),
+        ...(q.wpLanguage === 'inconsistent' || q.wpLanguage === 'consistent' ? { language: q.wpLanguage } : {}),
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
         pic: o.pic || null,
     };
@@ -1182,7 +1210,10 @@ function sentenceLayout(p, ctx) {
     // (a K picture story's countable picture already draws the two parts on its teaching cells - the bar joins it on the
     // lesson's chart and with the option, so a Guided page of picture stories is not two pictures tall)
     const teach = !twin && Number(ctx.scaffoldLevel) >= 2 && !p.pic;
-    const bar = p.bar || teach ? partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink, equal: st.op === '-', ids: { whole: 'bar-w', a: 'bar-a', b: 'bar-b' } }) : '';
+    // (the change and compare stories of add_word_problems / sub_word_problems draw their own labelled bars, story-bar.js)
+    const bar = !(p.bar || teach) ? ''
+        : p.storyBar ? storyBar(ctx, { kind: p.storyBar, top: p.steps[0].top, bottom: p.steps[0].bottom, ans: p.steps[0].ans, who: p.who, wMm: narrow ? 52 : 64, digits, show: put, ink })
+        : partWholeBar(ctx, { whole, a: pa, b: pb, wMm: narrow ? 52 : 64, show: put, ink, equal: st.op === '-', ids: { whole: 'bar-w', a: 'bar-a', b: 'bar-b' } });
     const work = `<div class="mq-wwwork" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 3)};">${bar}${frame}</div>`;
     // the keyword bank option (wpBank): the + and − rows only, under the story
     const kb = p.kb ? `<div style="margin-top:${L(ctx, 2)};">${keywordBank(ctx, ['+', '-'])}</div>` : '';
@@ -1241,6 +1272,21 @@ function chooseLayout(p, ctx) {
         + `<div data-ws-slot="answer" data-ws-shape="check"${ink} style="display:grid;grid-template-columns:repeat(2, max-content);column-gap:${L(ctx, 14)};margin-top:${L(ctx, 2)};">${rows}</div></div>`;
 }
 
+/**
+ * The bar of a column-work cell: the labelled story bar of a change or compare story (story-bar.js) - drawn on the
+ * teaching cells (a Model, a Guided try: scaffold level 2-3) and with the `bar` option, as the sentence form draws it -
+ * else, with the `bar` option, the general bar model.
+ */
+function colBar(ctx, p, put, narrow) {
+    const twin = isTwin(ctx);
+    if (p.storyBar && p.steps.length === 1 && (p.bar || (!twin && Number(ctx.scaffoldLevel) >= 2))) {
+        const st = p.steps[0];
+        const digits = Math.max(2, ...[st.top, st.bottom, st.ans].map((v) => digitsOf(v).length));
+        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show: put && !twin, ink: put && !twin ? inkOf(ctx) : null })}</div>`;
+    }
+    return p.bar ? barModel(ctx, p) : '';
+}
+
 /** The cell body (everything but a pool caption). */
 function renderWork(p, ctx) {
     if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
@@ -1291,7 +1337,7 @@ function renderWork(p, ctx) {
     const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
     const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
     const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
-        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
+        + pictureRow(ctx, p.pic) + colBar(ctx, p, put, narrow);
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
     // under it on the left, the columns and the answer on the right. The page then holds three
     // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).

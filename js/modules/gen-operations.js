@@ -661,6 +661,24 @@ function _responseMode() {
     return typeof v === 'string' && v ? v : 'standard';
 }
 
+// The + / − story kinds of add_word_problems / sub_word_problems (word-stories card, 2026-11-12). The teacher's
+// "What is missing" ticks are positions in `all` (skill-options.js _wpAdd / _wpSub); the first `base` are the default mix.
+// Untouched (or only default kinds ticked), the variant is dealt over the default kinds exactly as before. A tick of an
+// APPENDED kind (change unknown, compare with the smaller unknown) deals over every kind so the override can name it;
+// and on a page with more than one kind ticked, one of them a new kind, the kinds come ONE SECTION AT A TIME in the
+// order of the list (PEDAGOGY P-WP-1 one schema a set, P-WP-3 the "more than" trap last), never interleaved.
+function _wpStoryKind(key, base, all) {
+    const o = state.skillOptions;
+    const forms = o && Array.isArray(o.forms) ? o.forms.map(Number).filter((v) => v >= 0 && v < all.length) : [];
+    const ticked = [...new Set(forms)].sort((x, y) => x - y);
+    const extra = ticked.some((v) => v >= base);
+    const list = extra ? all : all.slice(0, base);
+    if (extra && ticked.length > 1 && Number.isFinite(state.itemIndex)) {
+        return all[ticked[fadeRung(state.itemIndex, ticked.length, state.itemCount, true)]];
+    }
+    return (typeof window !== 'undefined' && window.pickVariant) ? window.pickVariant(key, list, list.map(() => 1)) : list[0];
+}
+
 // Apply a wrapped multi-select question onto the live `q` object.
 function _applyMscQuestion(q, wrapped) {
     if (!wrapped) return false;
@@ -5347,19 +5365,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 scenario.item = scenario.icon;
                 const [name1, name2] = pickTwoNames();
 
-                // Scale with range setting
-                const maxNum = Math.max(10, range);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('add_word_problems', ["join","start_unknown","part_part_whole"], [1,1,1])
-                    : (Math.random() < 0.5 ? 'join' : (Math.random() < 0.5 ? 'start_unknown' : 'part_part_whole'));
+                // Scale with range setting; the `band` option (word-stories card Q2) bounds the ANSWER and every story number.
+                const _wpBandN = state.skillOptions && Number(state.skillOptions.band) > 0 ? Number(state.skillOptions.band) : 0;
+                const maxNum = _wpBandN || Math.max(10, range);
+                // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
+                const roll = _wpStoryKind('add_word_problems', 3, ['join', 'start_unknown', 'part_part_whole', 'change_unknown']);
                 q._variant = roll;
                 let a, b, answer;
 
                 if (roll === 'join') {
                     // Type 1: Result-unknown / join — "X and Y, how many altogether?"
-                    a = rng(2, maxNum);
-                    b = rng(2, maxNum);
+                    a = _wpBandN ? rng(2, Math.max(2, _wpBandN - 2)) : rng(2, maxNum);
+                    b = _wpBandN ? rng(2, Math.max(2, _wpBandN - a)) : rng(2, maxNum);
                     if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
                     answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     let joinTemplates;
@@ -5403,70 +5420,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.text = pick(joinTemplates);
                     q.hint = `Add the two amounts: ${a} + ${b} = ?`;
                 } else if (roll === 'start_unknown') {
-                    // Type 2: Compare more — "Sam has X. Mia has Y more than Sam. How many does Mia have?"
-                    a = rng(2, maxNum);
-                    b = rng(1, Math.max(1, Math.floor(maxNum / 2)));
-                    if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
-                    answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
-                    let compareTemplates;
-                    if (scenario.category === 'money') {
-                        compareTemplates = [
-                            `${name1} saved ${a} ${scenario.unit}. ${name2} saved ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} save?`,
-                            `${name1} earned ${a} ${scenario.unit} this week. ${name2} earned ${b} more. How many ${scenario.unit} did ${name2} earn?`,
-                        ];
-                    } else if (scenario.category === 'distance') {
-                        compareTemplates = [
-                            `${name1} drove ${a} ${scenario.unit}. ${name2} drove ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} drive?`,
-                            `${name1} ran ${a} ${scenario.unit}. ${name2} ran ${b} more ${scenario.unit}. How many ${scenario.unit} did ${name2} run?`,
-                        ];
-                    } else if (scenario.category === 'time') {
-                        compareTemplates = [
-                            `${name1} spent ${a} ${scenario.unit} on homework. ${name2} spent ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} spend?`,
-                        ];
-                    } else if (scenario.category === 'school') {
-                        compareTemplates = [
-                            `Class A has ${a} ${scenario.unit}. Class B has ${b} more ${scenario.unit} than Class A. How many ${scenario.unit} are in Class B?`,
-                        ];
-                    } else if (scenario.category === 'food') {
-                        compareTemplates = [
-                            `${name1}'s recipe uses ${a} ${scenario.unit}. ${name2}'s recipe uses ${b} more ${scenario.unit}. How many ${scenario.unit} does ${name2}'s recipe use?`,
-                        ];
-                    } else if (scenario.category === 'science') {
-                        compareTemplates = [
-                            `${name1} grew ${a} ${scenario.unit}. ${name2} grew ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} grow?`,
-                        ];
-                    } else {
-                        compareTemplates = [
-                            `${name1} has ${a} ${scenario.unit}. ${name2} has ${b} more ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`,
-                            `${name1} collected ${a} ${scenario.unit}. ${name2} collected ${b} more than ${name1}. How many did ${name2} collect?`,
-                        ];
-                    }
-                    q.text = pick(compareTemplates);
-                    q.hint = `${name2} has more, so add: ${a} + ${b} = ?`;
-                } else if (roll < 0.72) {
-                    // Type 3: Missing addend — "Sam has X stickers. He needs Y total. How many more?"
-                    const part = rng(2, Math.max(3, maxNum - 2));
-                    const missing = rng(1, Math.max(1, maxNum - part));
-                    a = part;
-                    b = part + missing; // b is total needed
-                    if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); if (b <= a) b = parseFloat((a + 1).toFixed(state.decimalPlaces)); }
-                    answer = state.decimalPlaces > 0 ? parseFloat((b - a).toFixed(state.decimalPlaces)) : b - a;
-                    let missingTemplates;
-                    if (scenario.category === 'money') {
-                        missingTemplates = [
-                            `${name1} has ${a} ${scenario.unit}. ${name1} needs ${b} ${scenario.unit} in total. How many more ${scenario.unit} does ${name1} need?`,
-                            `${name1} saved ${a} ${scenario.unit}. ${name1} wants to save ${b} ${scenario.unit}. How many more ${scenario.unit} does ${name1} need to save?`,
-                        ];
-                    } else {
-                        missingTemplates = [
-                            `${name1} has ${a} ${scenario.unit}. ${name1} needs ${b} ${scenario.unit} in total. How many more ${scenario.unit} does ${name1} need?`,
-                            `There are ${a} ${scenario.unit} in the ${scenario.context}. ${name1} wants ${b} ${scenario.unit}. How many more are needed?`,
-                        ];
-                    }
-                    q.text = pick(missingTemplates);
-                    q.hint = `Find the missing part: ${a} + ? = ${b}. Subtract: ${b} − ${a} = ?`;
-                } else if (roll < 0.86) {
-                    // Type 4: Start unknown — "Some were in a tree. X more came. Now there are Y. How many at start?"
+                    // Type 2: Start unknown (label 'The start') — "had some, got b more, now has total; how many at first?"
                     const total = rng(5, maxNum);
                     b = rng(1, total - 1);
                     a = total - b; // a is the unknown start
@@ -5479,43 +5433,31 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     ];
                     q.text = pick(startTemplates);
                     q.hint = `Find the start: ? + ${b} = ${total}. Subtract: ${total} − ${b} = ?`;
+                    q.wpSchema = 'start-add';
+                } else if (roll === 'part_part_whole') {
+                    // Type 3: Put together, a part unknown (label 'A part') — "13 in all, 5 are red, how many are blue?"
+                    const total = rng(5, maxNum);
+                    const red = rng(2, total - 2);
+                    answer = total - red;
+                    a = red; b = answer;
+                    q.text = `${name1} has ${total} ${scenario.unit}. ${red} of them are red. The rest are blue. How many ${scenario.unit} are blue?`;
+                    q.hint = `Find the missing part: ${red} + ? = ${total}. Subtract: ${total} − ${red} = ?`;
+                    q.wpSchema = 'part-part';
                 } else {
-                    // Type 5: Change-unknown — start known, end known, change is the unknown.
-                    // Per worksheet-feedback §4.4 — explicit add change-unknown templates.
-                    a = rng(2, maxNum - 2);
-                    b = rng(1, Math.max(1, maxNum - a));
+                    // Type 4: Change unknown, told in the PAST tense (label 'How many were added?', forms value 3; build list
+                    // map_change_unknown_story) — "had 8, got some more, now has 13; how many did X get?"
+                    a = rng(2, Math.max(2, maxNum - 2));
+                    b = rng(2, Math.max(2, maxNum - a));
                     const total = a + b;
                     answer = b;
-                    let changeTemplates;
-                    if (scenario.category === 'money') {
-                        changeTemplates = [
-                            `${name1} had ${a} ${scenario.unit}. After earning more, ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} earn?`,
-                            `${name1} started with ${a} ${scenario.unit}. ${name1} now has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} get?`,
-                        ];
-                    } else if (scenario.category === 'time') {
-                        changeTemplates = [
-                            `${name1} read for ${a} ${scenario.unit}. After reading more, ${name1} has read for ${total} ${scenario.unit} in total. How many more ${scenario.unit} did ${name1} read?`,
-                        ];
-                    } else if (scenario.category === 'distance') {
-                        changeTemplates = [
-                            `${name1} had walked ${a} ${scenario.unit}. After walking more, ${name1} has walked ${total} ${scenario.unit}. How many more ${scenario.unit} did ${name1} walk?`,
-                        ];
-                    } else {
-                        changeTemplates = [
-                            `${name1} had ${a} ${scenario.unit}. After getting more, ${name1} has ${total} ${scenario.unit}. How many more ${scenario.unit} did ${name1} get?`,
-                            `${name1} started with ${a} ${scenario.unit}. ${name2} gave ${name1} some more. Now ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name2} give?`,
-                        ];
-                    }
-                    q.text = pick(changeTemplates);
+                    q.text = `${name1} had ${a} ${scenario.unit}. ${name1} got some more. Now ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} get?`;
                     q.hint = `Find the change: ${a} + ? = ${total}. Subtract: ${total} − ${a} = ?`;
-                    // Set b for the visual to show the answer change.
-                    b = answer;
+                    q.wpSchema = 'add-some';
                 }
 
                 // Create visual with pastel groups (use a and b for icon display)
-                // For start-unknown (0.72-0.86) and change-unknown (>=0.86), show the answer
-                // in the unknown slot so the visual stays meaningful.
-                const isStartUnknown = roll >= 0.72 && roll < 0.86;
+                // For start-unknown, show the answer in the unknown slot so the visual stays meaningful.
+                const isStartUnknown = roll === 'start_unknown';
                 const displayA = isStartUnknown ? answer : a;
                 const displayB = b;
                 const group1Items = Array(Math.min(Math.floor(typeof displayA === 'number' ? displayA : a), 15)).fill(scenario.item).join('');
@@ -5547,7 +5489,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // (start-unknown, change-unknown, missing-addend) fall
                 // back to the standard single-input flow because the
                 // workmat would mislead them about which slot to fill.
-                const _addUnknownIsSum = (roll === 'join' || roll === 'start_unknown');
+                const _addUnknownIsSum = (roll === 'join');
                 if (_addUnknownIsSum && answer >= 0 && Number.isFinite(a) && Number.isFinite(b)) {
                     q.answerType = 'col-arith';
                     q.colMode = 'add';
@@ -5609,18 +5551,18 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 scenario.item = scenario.icon;
                 const [name1, name2] = pickTwoNames();
 
-                // Scale with range setting
-                const maxNum = Math.max(10, range);
-                // LRU rotation across 3 sub-types (was Math.random() chain).
-                const roll = (typeof window !== 'undefined' && window.pickVariant)
-                    ? window.pickVariant('sub_word_problems', ["take_away","compare","start_unknown"], [1,1,1])
-                    : (Math.random() < 0.5 ? 'take_away' : (Math.random() < 0.5 ? 'compare' : 'start_unknown'));
+                // Scale with range setting; the `band` option (word-stories card Q2) bounds the ANSWER and every story number.
+                const _wpBandN = state.skillOptions && Number(state.skillOptions.band) > 0 ? Number(state.skillOptions.band) : 0;
+                const maxNum = _wpBandN || Math.max(10, range);
+                const _wpLo = _wpBandN && _wpBandN <= 10 ? 5 : 10;
+                // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
+                const roll = _wpStoryKind('sub_word_problems', 3, ['take_away', 'compare', 'start_unknown', 'change_unknown', 'compare_fewer', 'compare_more_bigger']);
                 q._variant = roll;
                 let total, taken, answer;
 
                 if (roll === 'take_away') {
                     // Type 1: Take away (result-unknown) — "Had X, removed Y, how many left?"
-                    total = rng(10, maxNum);
+                    total = rng(_wpLo, maxNum);
                     taken = rng(2, total - 1);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
@@ -5692,58 +5634,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(compareTemplates);
                     q.hint = `Find the difference: ${total} − ${taken} = ?`;
-                } else if (roll < 0.72) {
-                    // Type 3: Missing subtrahend (change-unknown for subtraction) —
-                    // "Had X, now has Y. How many were removed?"
-                    total = rng(10, maxNum);
-                    answer = rng(2, total - 1);
-                    taken = answer; // the unknown
-                    const remaining = total - answer;
-                    let missingTemplates;
-                    if (scenario.category === 'money') {
-                        missingTemplates = [
-                            `${name1} had ${total} ${scenario.unit}. After spending some, ${name1} has ${remaining} ${scenario.unit} left. How many ${scenario.unit} did ${name1} spend?`,
-                        ];
-                    } else if (scenario.category === 'distance') {
-                        missingTemplates = [
-                            `A trail is ${total} ${scenario.unit} long. After hiking part of it, ${name1} has ${remaining} ${scenario.unit} left. How many ${scenario.unit} did ${name1} hike?`,
-                        ];
-                    } else if (scenario.category === 'time') {
-                        missingTemplates = [
-                            `A class is ${total} ${scenario.unit} long. After working for a while, ${remaining} ${scenario.unit} are left. How many ${scenario.unit} have passed?`,
-                        ];
-                    } else {
-                        missingTemplates = [
-                            `${name1} had ${total} ${scenario.unit}. After giving some away, ${name1} has ${remaining} left. How many ${scenario.unit} did ${name1} give away?`,
-                            `There were ${total} ${scenario.unit} in the ${pick(['jar', 'box', 'bag', 'basket'])}. Now there are ${remaining}. How many were taken out?`,
-                        ];
-                    }
-                    q.text = pick(missingTemplates);
-                    q.hint = `Find what was removed: ${total} − ? = ${remaining}. Subtract: ${total} − ${remaining} = ?`;
-                } else if (roll < 0.86) {
-                    // Type 4: Compare fewer — "Sam has X. Mia has Y fewer. How many does Mia have?"
-                    total = rng(5, maxNum);
-                    const fewer = rng(1, total - 1);
-                    taken = fewer; // for visual
-                    answer = total - fewer;
-                    let fewerTemplates;
-                    if (scenario.category === 'money') {
-                        fewerTemplates = [
-                            `${name1} earned ${total} ${scenario.unit}. ${name2} earned ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} did ${name2} earn?`,
-                        ];
-                    } else if (scenario.category === 'distance') {
-                        fewerTemplates = [
-                            `${name1} drove ${total} ${scenario.unit}. ${name2} drove ${fewer} fewer ${scenario.unit}. How many ${scenario.unit} did ${name2} drive?`,
-                        ];
-                    } else {
-                        fewerTemplates = [
-                            `${name1} has ${total} ${scenario.unit}. ${name2} has ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`,
-                            `${name1} collected ${total} ${scenario.unit}. ${name2} collected ${fewer} fewer. How many did ${name2} collect?`,
-                        ];
-                    }
-                    q.text = pick(fewerTemplates);
-                    q.hint = `Fewer means subtract: ${total} − ${fewer} = ?`;
-                } else {
+                } else if (roll === 'start_unknown') {
                     // Type 5: Start-unknown for subtraction — "Some birds were on a wire.
                     // ${b} flew away. Now there are ${a-b}. How many were there at first?"
                     // Per worksheet-feedback §4.4 — explicit start-unknown templates.
@@ -5777,6 +5668,40 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     }
                     q.text = pick(startTemplates);
                     q.hint = `Find the start: ? − ${away} = ${remaining}. Add: ${remaining} + ${away} = ?`;
+                    q.wpSchema = 'start-sub';
+                } else if (roll === 'change_unknown') {
+                    // Type 4: Change unknown, told in the PAST tense (label 'How many went?', forms value 3; build list
+                    // map_change_unknown_story) - "had 15, gave some away, now has 9; how many did X give away?"
+                    total = rng(_wpLo, maxNum);
+                    answer = rng(2, total - 2);
+                    taken = answer; // the unknown
+                    const remaining = total - answer;
+                    q.text = `${name1} had ${total} ${scenario.unit}. ${name1} gave some away. Now ${name1} has ${remaining} ${scenario.unit}. How many ${scenario.unit} did ${name1} give away?`;
+                    q.hint = `Find what went: ${total} − ? = ${remaining}. Subtract: ${total} − ${remaining} = ?`;
+                    q.wpSchema = 'take-some';
+                } else if (roll === 'compare_fewer') {
+                    // Type 5: Compare, the smaller amount unknown, consistent language (forms value 4; build list
+                    // map_compare_smaller_unknown) - "Maya has 14. Tom has 6 fewer than Maya. How many does Tom have?"
+                    total = rng(5, maxNum);
+                    const fewer = rng(2, total - 2);
+                    taken = fewer;
+                    answer = total - fewer;
+                    q.text = `${name1} has ${total} ${scenario.unit}. ${name2} has ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`;
+                    q.hint = `${name2} has fewer: ${total} − ${fewer} = ?`;
+                    q.wpSchema = 'compare-fewer';
+                    q.wpLanguage = 'consistent';
+                } else {
+                    // Type 6: Compare, the smaller amount unknown, told with "more than" about the BIGGER, known amount
+                    // (forms value 5, the language trap, PEDAGOGY P-WP-3) - "Maya has 14. Maya has 6 more than Tom. How many
+                    // does Tom have?" Solved by subtracting: Tom has fewer.
+                    total = rng(5, maxNum);
+                    const more = rng(2, total - 2);
+                    taken = more;
+                    answer = total - more;
+                    q.text = `${name1} has ${total} ${scenario.unit}. ${name1} has ${more} more ${scenario.unit} than ${name2}. How many ${scenario.unit} does ${name2} have?`;
+                    q.hint = `${name1} has more, so ${name2} has fewer: ${total} − ${more} = ?`;
+                    q.wpSchema = 'compare-more-smaller';
+                    q.wpLanguage = 'inconsistent';
                 }
 
                 // Visual showing crossing out items
