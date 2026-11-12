@@ -6,7 +6,7 @@
 // basic-facts sheet. Regrouping belongs to the sub_*_regroup ladder, not here.
 
 import { registerSkill } from '../contract.js';
-import { obj, operands, countList, chooseWrong, strings, step, clampSteps, fmt } from './util.js';
+import { obj, operands, countList, chooseWrong, strings, step, drawStep, clampSteps, fmt } from './util.js';
 import { storiesFor } from './stories.js';
 import { lineSteps } from './addition.js';
 
@@ -14,19 +14,23 @@ import { lineSteps } from './addition.js';
 function takeAwaySteps(a, b, slot) {
     const d = a - b;
     const done = step(`Write ${d}.`, [{ slot, value: String(d) }]);
-    if (b === 0) return [step(`${a} − 0: take away nothing.`), step(`${a} is left.`), done];
+    // (drawStep: the Scripted Model's short text and the grey mark each step adds, PT-MOD-1 / PT-MOD-2)
+    if (b === 0) return [drawStep(`${a} − 0: take away nothing.`, 'Take away nothing.', [{ jot: '− 0' }]), drawStep(`${a} is left.`, `${a} is left.`, [{ jot: `${a} − 0 = ${a}` }]), done];
     if (b <= 3) {
-        return [step(`Start at ${a}.`), step(`Count back ${b}: ${countList(a - 1, d, -1)}.`), done];
+        return [drawStep(`Start at ${a}.`, `Start at ${a}.`, [{ jot: `${a}` }]),
+            drawStep(`Count back ${b}: ${countList(a - 1, d, -1)}.`, `Count back ${b}.`, [{ tile: b }, { more: countList(a - 1, d, -1) }]), done];
     }
     if (b >= 10) {
         const tens = Math.floor(b / 10) * 10;
         const ones = b - tens;
-        const out = [step(`Take away ${tens} first: ${a} − ${tens} = ${a - tens}.`)];
-        if (ones) out.push(step(`Take away ${ones} more: ${a - tens} − ${ones} = ${d}.`));
+        const out = [drawStep(`Take away ${tens} first: ${a} − ${tens} = ${a - tens}.`, `Take away ${tens} first.`, [{ jot: `${a} − ${tens} = ${a - tens}` }])];
+        if (ones) out.push(drawStep(`Take away ${ones} more: ${a - tens} − ${ones} = ${d}.`, `Take away ${ones} more.`, [{ jot: `${a - tens} − ${ones} = ${d}` }]));
         out.push(done);
-        return out.length >= 3 ? out : [step(`${a} − ${b}: take away ${b}.`)].concat(out);
+        return out.length >= 3 ? out : [drawStep(`${a} − ${b}: take away ${b}.`, `Take away ${b}.`, [{ jot: `− ${b}` }])].concat(out);
     }
-    return [step(`Think addition: ${b} + ? = ${a}.`), step(`${b} + ${d} = ${a}.`), step(`So ${a} − ${b} = ${d}.`), done];
+    return [drawStep(`Think addition: ${b} + ? = ${a}.`, 'Think addition.', [{ jot: `${b} + __ = ${a}` }]),
+        drawStep(`${b} + ${d} = ${a}.`, `${b} + ${d} = ${a}.`, [{ jot: `${b} + ${d} = ${a}` }]),
+        drawStep(`So ${a} − ${b} = ${d}.`, `So ${a} − ${b} = ${d}.`, [{ jot: `${a} − ${b} = ${d}` }]), done];
 }
 
 function takeAwayWrong(q, slot) {

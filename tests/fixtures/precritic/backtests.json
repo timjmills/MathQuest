@@ -3041,20 +3041,161 @@
     "pass": "OK"
    }
   },
+  {
+   "id": "eb-fact-roles",
+   "check": "add_facts, sub_facts, mult_facts, div_facts_long and div_facts on the guided and scripted-model pages at S, M and L: no cell has an empty band of 30 % or more under or beside its ink (facts-roles task: fact cells sized for a taller worked item, guided bands 31-41 %, scripted-model side bands 35-72 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND / EB-SIDE (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "7e0c074b",
+    "state": "200 findings: EB-BAND 110, EB-SIDE 90 (add_facts 51, sub_facts 72, mult_facts 44, div_facts_long 34, div_facts 20)"
+   },
+   "pass": {
+    "commit": "6e962016",
+    "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-cap-facts",
+   "check": "the Guided page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts holds at most the PAGE_TYPES §12.1 ceiling of 10 / 8 / 6 scored tries (plus the Model) at S / M / L (lead ruling 2026-11-12, option b: the facts-roles round had lifted it to 31 / 23 / 19 to fill the page)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GDPCAP (PAGE_TYPES §12.1)",
+   "browser": true,
+   "fail": {
+    "commit": "4edbe292",
+    "state": "15 findings: every fact skill at S / M / L above the ceiling (S 29-31, M 11-23, L 11-15 tries)"
+   },
+   "pass": {
+    "commit": "31418ea0",
+    "state": "0 findings: Guided fact pages at S 9 / M 7-8 / L 5 tries"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-edge-facts",
+   "check": "no ink within 1.5 mm of, or across, a cell divider or the page frame on any row of the Guided / Scripted Model pages of the five fact skills, the hinted row 1 included (lf-ops facts-roles critic r1 G1: Guided S add / sub facts' dot tiles ran onto the divider and the fifth across the frame)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-EDGE (RUBRIC C1, CL-5)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "10 findings: add_facts and sub_facts Guided S, all 5 cells of row 1 (0.1 / 1.3 mm across the border)"
+   },
+   "pass": {
+    "commit": "f5b77f7a",
+    "state": "0 findings: Guided + / - S at 4 columns, the hinted row fits"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-EDGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-marks-facts",
+   "check": "adjacent Scripted Model states of the five fact skills differ in ink: each step draws a new grey mark (PT-MOD-1; lf-ops facts-roles critic r1 S1)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-MARKS (PAGE_TYPES PT-MOD-1)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "24 findings: states 1..n-1 the blank problem on every fact Model"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: jot lines, count lists and dot tiles added step by step"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-MARKS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-lines-facts",
+   "check": "a Scripted Model step text of the five fact skills is at most 2 line boxes (PT-MOD-2; critic r1 S2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-LINES (PAGE_TYPES PT-MOD-2)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "16 findings: mult_facts step 2 3-4 lines, div steps 3-4 lines"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: the providers' short step texts (drawStep)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-LINES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-fill-facts",
+   "check": "the Scripted Model page of the five fact skills uses 70 % or more of its body (lead ruling 2026-11-12: a second worked example; critic r1 S3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE --model-states (RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "15 findings: 23-42 % used"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: two (div S: three) worked examples, rows up to 1.4 x content"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
  {
-  "id": "runner-orphan-slot",
-  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
-  "kind": "fixture",
-  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+  "id": "model-grid-facts",
+  "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+  "browser": true,
   "fail": {
-   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
-   "state": "master 7e0c074b runner: the command inherits the slot fd"
+   "commit": "f960e549",
+   "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
   },
   "pass": {
-   "fixture": "tests/scripts/mq-browser-run.sh",
-   "state": "lf-engine-bt: \"$@\" {fd}>&-"
+   "commit": "966292ff",
+   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
   },
-  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+  },
+ {
+  "id": "model-interior-band-facts",
+  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+  "browser": true,
+  "fail": {
+   "commit": "9f7983dd",
+   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+  },
+  "pass": {
+   "commit": "04683166",
+   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

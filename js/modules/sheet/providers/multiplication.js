@@ -7,7 +7,7 @@
 // groups and rows on arrays, partial products on the area model, row-meets-column on the chart.
 
 import { registerSkill } from '../contract.js';
-import { num, arr, obj, operands, countList, chooseWrong, strings, step, clampSteps } from './util.js';
+import { num, arr, obj, operands, countList, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
 
 /* =========================================================================== mult_facts */
@@ -32,12 +32,16 @@ registerSkill('multiplication:mult_facts', {
         if (!Number.isFinite(a) || !Number.isFinite(b)) return [];
         const p = a * b;
         const done = step(`Write ${p}.`, [{ slot: 'ans', value: String(p) }]);
-        if (a === 0 || b === 0) return [step(`${a} × ${b}: one number is 0.`), step('Zero groups, or groups of 0, make 0.'), done];
-        if (a === 1 || b === 1) return [step(`${a} × ${b} is ${a === 1 ? `1 group of ${b}` : `${a} groups of 1`}.`), step(`That is ${p}.`), done];
+        // (drawStep: the Scripted Model's short text and the grey mark each step adds, PT-MOD-1 / PT-MOD-2)
+        if (a === 0 || b === 0) return [drawStep(`${a} × ${b}: one number is 0.`, 'One number is 0.', [{ jot: '× 0' }]), drawStep('Zero groups, or groups of 0, make 0.', 'That makes 0.', [{ jot: `${a} × ${b} = 0` }]), done];
+        if (a === 1 || b === 1) {
+            const g = a === 1 ? `1 group of ${b}` : `${a} groups of 1`;
+            return [drawStep(`${a} × ${b} is ${g}.`, `${a} × ${b} is ${g}.`, [{ jot: g }]), drawStep(`That is ${p}.`, `That is ${p}.`, [{ jot: `${a} × ${b} = ${p}` }]), done];
+        }
         return [
-            step(`${a} × ${b} is ${a} groups of ${b}.`),
-            step(`Count by ${b}, ${a} times: ${countList(b, p, b)}.`),
-            step(`${a} groups of ${b} is ${p}.`),
+            drawStep(`${a} × ${b} is ${a} groups of ${b}.`, `${a} groups of ${b}.`, [{ jot: `${a} groups of ${b}` }]),
+            drawStep(`Count by ${b}, ${a} times: ${countList(b, p, b)}.`, `Count by ${b}, ${a} times.`, [{ jot: countList(b, p, b) }]),
+            drawStep(`${a} groups of ${b} is ${p}.`, `${a} groups of ${b} is ${p}.`, [{ jot: `${a} × ${b} = ${p}` }]),
             done,
         ];
     },
