@@ -85,3 +85,11 @@ Speed-up: ask the page-fill question before the build: ruling (b) fixed ceiling,
   hash3 (hash2 + Guided S of addition:add and placevalue:identify) vs 7e0c074b: 54 / 54 identical; ws-detailed-lesson --check on the
   4 lessons: OK, outputs (pack.html + page PNGs) identical to 7e0c074b; ws-boot-smoke OK; ws-providers-unit OK; syntax OK.
   Next: independent critic r2 (Guided S + / - at 4 columns; Scripted Model of the five).
+
+
+## Critic factroles r2 (narrow, f960e549) - FAIL, lowest 6 (C3) on 2 of 25 pages; the other 23 score 8 everywhere
+Report design/audit/runs/lf-ops/critic-factroles-r2.md; renders design/audit/runs/lf-ops/factroles-r2-renders/. All r1 defects fixed: G1 (Guided S + / - at 3 columns, nearest ink 2.4 mm), S1 (every state adds a grey mark; the sub Model is 10 - 2), S2 (no step over 2 lines), S3 (Model pages 75-94 % used). Second examples unambiguous, Say lines, fade, nothing given away, keys 26 / 26.
+| Finding | Check that would catch it | Backtest state | Note |
+|---|---|---|---|
+| S4 Scripted Model L, mult_facts and div_facts: 4 states laid 3 + 1 in 3 columns, 2 empty state cells (~62 x 102 mm each) and no second example | MOD-GRID: no empty state cell in a Model grid (EB-PAGE passed: state 4's ink carries the page to 91-93 %) | fail f960e549 mult / div Model L | fix: each example 2 + 2, example 2 on a continuation page |
+| state 1's 30-34 % bottom band (room kept for later marks) | accepted by the critic | - | RULING NEEDED: write the exception into H13 / PT-MOD |
