@@ -131,6 +131,18 @@ const FACT_COLS = { S: 5, M: 4, L: 4 };
 const FACT_STRETCH = 1.42;
 /** A fact page's column count leaves its narrowest fact (a one-digit dividend, "8 ) 0") under this share of the column beside it. */
 const FACT_SIDE = 0.29;
+/**
+ * The hinted row's width (lf-ops facts-roles critic r1 G1): row 1 of a + / − fact page draws a 9 mm dot tile 2 mm beside each
+ * fact (withCue), so a column fits the row only where the fact's measured slack, both sides, holds the tile, its gap and
+ * CUE_EDGE_MM more (the ink stays off the divider, ws-empty-band EB-EDGE's 1.5 mm). Guided S at 5 columns ran every tile onto
+ * the divider and the fifth across the frame; 4 columns hold it.
+ */
+const CUE_W_MM = 9 + 2, CUE_EDGE_MM = 2;
+const cueRowFits = (pool, c) => ordered(pool, c).slice(0, c).every((it) => {
+    if (!countCueOf(it)) return true;
+    const mm = it.measured && it.measured[c];
+    return !(mm && Number.isFinite(mm.slackMm)) || 2 * mm.slackMm >= CUE_W_MM + CUE_EDGE_MM;
+});
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
 /**
@@ -221,7 +233,7 @@ export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0, f
             const side = Math.max(0, ...ordered(pool, c).slice(0, ceilFor(ctx, pool)).map((it) => { const mm = it.measured && it.measured[c]; return mm && Number.isFinite(mm.slackMm) ? mm.slackMm / (186 / c) : 0; }));
             const f = sheetFit(ordered(pool, c), c, ctx, input, pool.length < items0.length ? pool.length : Infinity);
             const n = Math.min(f.pages[0].cap, f.total);
-            const cand = { c, pool, n, ok: side < FACT_SIDE, side };
+            const cand = { c, pool, n, ok: side < FACT_SIDE && cueRowFits(pool, c), side };
             if (!bestF || (cand.ok && !bestF.ok) || (cand.ok === bestF.ok && (cand.ok ? n > bestF.n : side < bestF.side))) bestF = cand;
         }
         if (bestF) return { cols: bestF.c, items: bestF.pool, kind: cut ? top : '' };
