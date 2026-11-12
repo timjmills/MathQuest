@@ -84,6 +84,27 @@
     "pass": "OK"
    },
    "pending": true
+  },
+  {
+   "id": "eb-lfops-props-arrays-turn",
+   "check": "multiplication:mult_properties independent / more-practice / test / lesson at S, M and L: no arrays-turn cell has an empty band of 30 % or more under the ink (lf-ops critic r1 D-MP-1: 30-47 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND",
+   "browser": true,
+   "fail": {
+    "commit": "27ceb360",
+    "state": "lf-ops fix4 head (STOPPED by rule 7); measured again on lf-ops-props 71d1109c (the port): EB-BAND 27 on independent S/L, test L, guided S/M, lesson S/M/L (31-47 %)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "not yet made: see design/status/lf-ops-props.md (rule 7 stop, root cause)"
+   },
+   "pending": true,
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_properties --roles independent,more-practice,test,guided,lesson --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
