@@ -713,6 +713,17 @@ function applyOptIn(rows, keys) {
     }
 }
 
+// lf-checks 2026-11-12 (lead: fold the lane opt-ins into the default path): ws-empty-band runs on every --skill with EB-VOCAB
+// (--vocab-ink), EB-PAGE (--page-fill) and --margin 2 (a fix must clear 30 % by 2 points); flags the tree's script lacks are left out
+function emptyBandDefaults() {
+    const f = scriptPath('ws-empty-band');
+    const out = [];
+    if (f && srcHas(f, 'vocab-ink')) out.push('--vocab-ink');
+    if (f && srcHas(f, 'page-fill')) out.push('--page-fill');
+    if (f && srcHas(f, 'margin')) out.push('--margin', '2');
+    return out;
+}
+
 function buildPlan(ctx) {
     const rows = [];
     const add = (g) => { if (!rows.some((r) => r.id === g.id)) rows.push(g); };
@@ -741,7 +752,10 @@ function buildPlan(ctx) {
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 390 / 820 / 1280, worksheet, quiz), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
-        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(',')], { missingMsg: 'ws-empty-band is not in this tree' }));
+        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults()], { missingMsg: 'ws-empty-band is not in this tree' }));
+        // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
+        // prints the frame's own words, never the answer's singular
+        add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own
