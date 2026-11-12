@@ -124,10 +124,12 @@ register(MATCH3_TEMPLATE, {
         return { value: letters.join(', '), display: letters.join(', '), slots };
     },
     // one full-width row (three pictures across); its height is measured (about 48 / 53 / 58 mm)
+    // (`evenRows`, lf-vocab r9: the Guided rows take one share each - a row of flat pictures measured 32 mm and was given
+    // 45 mm at S while its cell draws 47; precritic cell-checks guided S vocabSet 8)
     // (`points`: one point a word - owner ruling Q-C, 2026-11-07: a page of 4 cells scores /12; paginate.js scorePoints)
     // (`hMm`: the height the cell really draws - picture box + letter-box row + gaps - not a measurement: the Guided role planned
     // 4 rows at S from a 40.4 mm measurement while the cells drew ~45 mm, so rows 3-4 overflowed; lf-vocab r4, gate vocab-roles-render)
-    footprint(p, ctx) { return { wMm: 186, hMm: MATCH3_H[sizeOf(ctx)] || MATCH3_H.L, measure: false, factLike: false, maxCols: 1, points: 3 }; },
+    footprint(p, ctx) { return { wMm: 186, hMm: MATCH3_H[sizeOf(ctx)] || MATCH3_H.L, measure: false, factLike: false, maxCols: 1, points: 3, evenRows: true }; },
     inputs(p) {
         return (p && p.words ? p.words : [0, 1, 2]).map((_, n) => ({ id: `letter-${n}`, kind: 'text', shape: 'box', graded: true, order: n, maxLength: 1, scopes: ['full'] }));
     },

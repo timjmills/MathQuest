@@ -16,6 +16,9 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
   1 picture 3 words on the same words + Match 3 a grade down; 1 picture 3 words g: the same task 1 and 2 grades down; grade 1
   checks itself). ws-grade-render --roles pre-skill-check --size S,M,L --gate: 72 overflow findings -> OK (1 page each).
   Check V26 (node, ws-vocab-unit).
+- Item 2 (guided S vocabSet 8 overflow): the Guided page split its rows by measured height (a flat-picture row measured 32 mm
+  got 45 mm; the cell draws 47). vocab-match3 footprint `evenRows: true` (read only by guided.js): every row one share.
+  ws-cell-checks --card --card-opts match3: 8 OVERFLOW -> OK (216 pages). Check: the render gate row vocab-r9-guided-s-set8.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.

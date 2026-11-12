@@ -3499,6 +3499,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r9-v26-preskills",
+   "check": "lf-vocab r9 item 1 (precritic render-gate / cell-checks): the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below (provider preSkills), never the Grade 6 definition-matching skills before it in data.js (legacy cells overflowed every size)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V26",
+   "browser": false,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 base: master pre-skill-check role offered for the vocab skills"
+   },
+   "pass": {
+    "commit": "6e140668",
+    "state": "lf-vocab r9 item 1"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V26",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r9-guided-s-set8",
+   "check": "lf-vocab r9 item 2 (precritic cell-checks): the Match 3 Guided page at S with vocabSet 8 gives every row one share (footprint evenRows), so no row of flat pictures is shorter than its cell draws",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate (guided S vocabSet 8)",
+   "browser": true,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 base"
+   },
+   "pass": {
+    "commit": "HEAD_ITEM2",
+    "state": "lf-vocab r9 item 2"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-grade-render.cjs --skills vocabulary:vocab_grade_pictures --roles guided --size S --opts '{\"vocabSet\":8}' --gate --no-screen --out /tmp/mq-bt-guided-s8 | tail -1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
