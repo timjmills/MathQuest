@@ -154,3 +154,7 @@ Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record
 - EB-SIDE: print cells keep the max-gap rule (lf-placevalue's side backtests are green again). Screen cells count a gap only when
   the content is pinned to one side. The between band is skipped on scripted-model (EB-GAP / PT-MOD-3 own that band).
 - The EB-BAND message prints the live limit (30 % - margin).
+- Verified on 602692b7: the pin is green for add_facts/mult_facts/div_facts (ws-empty-band OK, 358 findings within the pin). 12 backtest rows
+  PASS: the pv-*, guided/model facts, eb-fixture-*, mc-make-a-ten-choice. optin-h13-abs is PENDING (on master too, not this lane's).
+- lf-engine (11-12): precritic's lesson-samples step gets `--force-check` on their branch (claude/sweet-newton-c8wrv1-lf-engine-pc), lead-approved.
+  KEEP it when merging. Their new rule: a feature behind a switch needs a forced-on render gate in the same change.
