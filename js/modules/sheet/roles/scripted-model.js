@@ -177,6 +177,35 @@ function drawnUpTo(steps, k) {
     return { lines, tile };
 }
 
+function exampleCells(ex, e, across, textMm, stepsOf, rowsEx, row = false) {
+    const cells = [];
+    const steps = drawnSteps(ex);
+    const texts = stepsOf(ex);
+    const ans = answerOf(ex);
+    steps.forEach((_, i) => cells.push(planItem(ex, {
+        cols: across, level: 3, nolabel: true,
+        render: (c, o) => {
+            const last = i === steps.length - 1;
+            const base = ex.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, last && ans ? { shown: ans, ink: 'trace' } : {}));
+            // (every state keeps the final state's room: a mark not drawn yet is hidden in place, so the problem
+            // stands in the same place in every state, AK-1)
+            const d = drawnUpTo(steps, i), fin = drawnUpTo(steps, steps.length - 1);
+            const hide = (on) => (on ? '' : ' style="visibility:hidden"');
+            // (the tile beside the number it pictures, as on the Guided page: row 2 one digit row down, R3)
+            const fd = Number((/--fd:([\d.]+)pt/.exec(base) || [])[1]) || 28;
+            const top = countCueRow(ex) === 2 ? `calc(${(fd * 1.15).toFixed(1)}pt + .5mm)` : '.5mm';
+            const fact = fin.tile ? `<div class="mq-mtile">${base}<span style="top:${top}${d.tile ? '' : ';visibility:hidden'}">${dotTile(fin.tile)}</span></div>` : base;
+            const jots = fin.lines.length ? `<div class="mq-mjots ws-trace" data-ws-ink="trace">${fin.lines.map((l, li) => `<div${hide(li < d.lines.length)}>${esc(li < d.lines.length ? d.lines[li] : l).replace(/__/g, '<span class="mq-mgap" aria-label="gap"></span>')}</div>`).join('')}</div>` : '';
+            return (e === 0 && i === 0 ? FACT_MODEL_CSS : '')
+                + `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm"><div class="mq-steptext"><em>${i + 1}</em><span>${esc(texts[i])}</span></div></div>`
+                + `<div class="mq-mbody" style="height:calc(100% - ${textMm.toFixed(1)}mm)${row === 'beside' ? ';flex-direction:row;gap:8mm;box-sizing:border-box;padding-top:5mm' : row ? ';box-sizing:border-box;padding-top:10mm' : ''}">${fact}${jots}</div>`;
+        },
+    })));
+    // (a short last row of an example is filled with empty places, so the next example starts its own row)
+    for (let p = steps.length; p < rowsEx * across; p++) cells.push({ render: () => '', drawsAnswer: true, nolabel: true, cls: 'mq-stepcell', skill: ex.skill });
+    return cells;
+}
+
 function factModel(input, ctx, frame, m) {
     const pool = poolItems(input, 'main');
     const cand = pool.filter((it) => drawnSteps(it) && modelOk(it));
@@ -196,7 +225,9 @@ function factModel(input, ctx, frame, m) {
     const linesIn = (t, colW) => Math.max(1, Math.ceil((String(t).length * charMm) / colW));
     const room = m.budget - m.strip - m.say;
     // the widest grid (one row an example where it can) whose state texts are 2 lines at most and whose problems fit
-    for (const across of [n, 4, 3, 2].filter((a, i, arr) => a <= n && arr.indexOf(a) === i)) {
+    // (critic r2 S4: an even state count is never laid unevenly - 4 states at 3 a row left 2 empty cells - so it takes 2 a row,
+    // 2 + 2, and an example the page cannot hold goes on a continuation page, MOD-GRID)
+    for (const across of [n, 4, 3, 2].filter((a, i, arr) => a <= n && arr.indexOf(a) === i && !(n % a && n % 2 === 0))) {
         const all = [ex1, ...more];
         const exs = all.filter((it) => fitsAt([it], across, ctx));
         if (exs[0] !== ex1) continue;
@@ -210,6 +241,26 @@ function factModel(input, ctx, frame, m) {
         // two examples (lead ruling), a third when two leave the page under FACT_FILL and three fit
         let k = Math.min(2, exs.length);
         while (k > 1 && k * rowsEx * natural(k) > room) k--;
+        // (2 + 2 states, one example a page: the second example on a continuation page; the Say band on the last page only)
+        if (k === 1 && rowsEx > 1 && exs.length >= 2 && rowsEx * natural(1) <= room) {
+            const mC = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
+            const roomC = mC.budget - m.strip - m.say;
+            // (a state half the page wide holds a narrow column fact's jots BESIDE it, so the ink spans the cell, EB-SIDE; a
+            // wide equation keeps them under it. The rows fill the page to FACT_FILL; the drawing sits a little low, so the white
+            // the later marks need is over it rather than under it)
+            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
+            const pages = exs.slice(0, 2).map((ex, e) => {
+                const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
+                const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
+                // (the Say band closes the last page and reads the example on it)
+                if (e === 1) sections.push({ kind: 'say', frame: oralFrameOf(ex, { fill: true }) });
+                return { sections };
+            });
+            return assemble(ROLE_ID, input, frame, pages, {
+                nothingToAnswer: true, scaffoldLevel: 3,
+                meta: { items: 2, scoreOutOf: 0, states: 2 * n, cols: across, examples: 2, fits: [{ cols: across, rows: rowsEx, line: `Fits: 2 worked examples of ${n} states, 2 pages.` }] },
+            });
+        }
         if (k === 2 && exs.length >= 3 && 3 * rowsEx * natural(3) <= room
             && (m.strip + m.say + Math.min(room, 2 * rowsEx * natural(2) * FACT_GROW)) / m.body < FACT_FILL + 0.05) k = 3;
         const R = k * rowsEx;
@@ -218,32 +269,7 @@ function factModel(input, ctx, frame, m) {
         const H = Math.min(room / R, H0 * FACT_GROW);
         const used = exs.slice(0, k);
         const cells = [];
-        used.forEach((ex, e) => {
-            const steps = drawnSteps(ex);
-            const texts = stepsOf(ex);
-            const ans = answerOf(ex);
-            steps.forEach((_, i) => cells.push(planItem(ex, {
-                cols: across, level: 3, nolabel: true,
-                render: (c, o) => {
-                    const last = i === steps.length - 1;
-                    const base = ex.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, last && ans ? { shown: ans, ink: 'trace' } : {}));
-                    // (every state keeps the final state's room: a mark not drawn yet is hidden in place, so the problem
-                    // stands in the same place in every state, AK-1)
-                    const d = drawnUpTo(steps, i), fin = drawnUpTo(steps, steps.length - 1);
-                    const hide = (on) => (on ? '' : ' style="visibility:hidden"');
-                    // (the tile beside the number it pictures, as on the Guided page: row 2 one digit row down, R3)
-                    const fd = Number((/--fd:([\d.]+)pt/.exec(base) || [])[1]) || 28;
-                    const top = countCueRow(ex) === 2 ? `calc(${(fd * 1.15).toFixed(1)}pt + .5mm)` : '.5mm';
-                    const fact = fin.tile ? `<div class="mq-mtile">${base}<span style="top:${top}${d.tile ? '' : ';visibility:hidden'}">${dotTile(fin.tile)}</span></div>` : base;
-                    const jots = fin.lines.length ? `<div class="mq-mjots ws-trace" data-ws-ink="trace">${fin.lines.map((l, li) => `<div${hide(li < d.lines.length)}>${esc(li < d.lines.length ? d.lines[li] : l).replace(/__/g, '<span class="mq-mgap" aria-label="gap"></span>')}</div>`).join('')}</div>` : '';
-                    return (e === 0 && i === 0 ? FACT_MODEL_CSS : '')
-                        + `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm"><div class="mq-steptext"><em>${i + 1}</em><span>${esc(texts[i])}</span></div></div>`
-                        + `<div class="mq-mbody" style="height:calc(100% - ${textMm.toFixed(1)}mm)">${fact}${jots}</div>`;
-                },
-            })));
-            // (a short last row of an example is filled with empty places, so the next example starts its own row)
-            for (let p = steps.length; p < rowsEx * across; p++) cells.push({ render: () => '', drawsAnswer: true, nolabel: true, cls: 'mq-stepcell', skill: ex.skill });
-        });
+        used.forEach((ex, e) => cells.push(...exampleCells(ex, e, across, textMm, stepsOf, rowsEx)));
         const grid = gridPart(cells, { cols: across, rows: R, cellH: H, labels: 'none' });
         const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }, { kind: 'say', frame: oralFrameOf(ex1, { fill: true }) }];
         return assemble(ROLE_ID, input, frame, [{ sections }], {
