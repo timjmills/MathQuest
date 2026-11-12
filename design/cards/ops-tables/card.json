@@ -426,11 +426,12 @@
         "option": "band",
         "values": [
           "25",
+          "36",
           "81"
         ],
         "d": "offered",
-        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
-        "why": "order facts: factors to 5 (pictured) or to 9 (facts alone)",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off); band=36 lf-ops-props 2026-11-12, measured ws-empty-band --opts {band:36} --sizes S on a46344e1",
+        "why": "order facts: factors to 5 (pictured), 6 (pictured, 6 x 6) or 9 (facts alone). band=36 offered at S, M, L: at S EB-GDPCAP PASS (Guided within the 10-try ceiling), EB-EDGE PASS, EB-BAND 17 findings vs 21 for the default band=25 on the same pages (lesson p2 / p3, Guided Model, review, error-analysis, more-practice: the lane's shared band class, fixed for every band), plus Reason It S p1 73 % (the one-row-a-page leftover, fixed for every band); re-measured after the lane's fix",
         "skills": [
           "multiplication:mult_properties"
         ]
