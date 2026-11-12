@@ -1249,6 +1249,9 @@ registerSkill('composing:number_word_form', {
             return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
                 step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }]), step(`Read it: ${f(n)}.`)]);
         }
+        // (critic nwf r1 N3: a name under 100 has no hundreds word - "thirty-five hundred: 0 in the hundreds" was false)
+        if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
+            step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
         return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
@@ -1261,6 +1264,11 @@ registerSkill('composing:number_word_form', {
         if (h && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0)) c.push({ value: Number(String(n).replace(/0/g, '')) || h, misconception: 'M-Z1', explain: 'Left out the 0 place.' });
         if (h) c.push({ value: Number(`${h * 100}${r || ''}`), misconception: 'M-V9', explain: 'Wrote the hundred and the rest side by side.' });
         const s = swapTeen(n); if (s) c.push({ value: s, misconception: 'M-L3', explain: 'Heard the teen as a ty word.' });
+        // (critic nwf r1 N1: a 2-digit name had no wrong answer, so True or False? was all True and Reason It one item a page:
+        // "forty-one" written as the parts side by side, 401 (M-V9), or with the digits swapped, 14)
+        if (!h && r >= 20 && r % 10) { c.push({ value: Number(`${Math.floor(r / 10) * 10}${r % 10}`), misconception: 'M-V9', explain: 'Wrote the ty word and the one side by side.' });
+            c.push({ value: (r % 10) * 10 + Math.floor(r / 10), misconception: 'M-L3', explain: 'Wrote the digits the other way round.' }); }
+        if (!h && r >= 20 && !(r % 10)) c.push({ value: r / 10, misconception: 'M-Z1', explain: 'Left out the 0 in the ones.' });
         return choose(q, c.filter((x) => x.value !== n));
     },
 });

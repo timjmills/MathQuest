@@ -61,8 +61,8 @@ function htoRow(p, ctx, valueOf, inkOf) {
 }
 /** The name, its hundreds part (k = 0) or the rest (k = 1) underlined (the chart's panels). */
 function nameHtml(p, under) {
-    const w = String(p.words || numberWords(p.n));
-    const i = w.indexOf(' hundred');
+    const w = String(p.words || numberWords(p.n)).replace(/ hundred/g, '\u00a0hundred');
+    const i = w.indexOf('\u00a0hundred');
     if (under === null || under === undefined || i < 0) return esc(w);
     const head = w.slice(0, i + 8), rest = w.slice(i + 8).trim();
     const u = (t) => `<span style="text-decoration:underline;text-decoration-thickness:1.5pt;text-underline-offset:1.2mm;">${esc(t)}</span>`;
@@ -77,7 +77,8 @@ function htoCell(p, ctx, valueOf, inkOf, under) {
 // (lf-placevalue w2, ws-empty-band band=1000 at L 39 %: a name of a 3-digit number may take two lines, so one cell of a row is a
 // line taller than its neighbours; every such name keeps two lines, bottom-aligned, so the answer lines of a row line up and no
 // one-line cell carries an empty band under its line. Names under 100 are one line and keep their own height.)
-const nameBox = (p, textPt) => (Number(p.n) >= 100 ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-end;justify-content:center;` : '');
+// (critic nwf r1 N4: "one hundred" is one line - only a name long enough to wrap takes the two-line box)
+const nameBox = (p, textPt) => (Number(p.n) > 100 && String(p.words || numberWords(p.n)).length >= 15 ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-end;justify-content:center;` : '');
 const keyOf = (p) => String(p.ans !== undefined ? p.ans : (toWords(p) ? (p.words || numberWords(p.n)) : p.n));
 
 register('words', {
@@ -97,7 +98,7 @@ register('words', {
         // written above its line at the digit size, and 4 mm left the L and test rows 30-33 % empty under the line)
         const gapMm = p.inPlace === false ? 4 : (({ S: 5, M: 6, L: 7 })[ctx.size] || 6);
         return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:${gapMm}mm;">`
-            + `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, textPt)}">${esc(p.words || numberWords(p.n))}</span>`
+            + `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, textPt)}">${esc(String(p.words || numberWords(p.n)).replace(/ hundred/g, '\u00a0hundred'))}</span>`
             + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${slot}</span></div>`;
     },
     answerKey(p) {

@@ -411,3 +411,21 @@ the cell; and a LATER state of the same example draws ink in that band (reserved
 ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
 never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
 white on any other role.
+
+## lf-placevalue week 2 (2026-11-12): number_word_form critic nwf r1 FAIL - findings -> checks
+| Finding (critic nwf r1) | Fixed this round | Check | Backtest | On path | Saved |
+|---|---|---|---|---|---|
+| N1 2-digit names had no named wrong answer (TF all True, Reason It 1 item) | yes: providers/pv.js wrongAnswer M-V9 401 / M-L3 swap / M-Z1 for 2-digit | ws-words-checks WORDS-WRONG-RATE (DRAFT: getProvider reads every candidate as a nudge on both commits) | pending | not wired (draft) | 1 round once wired |
+| N2 TF claim never prints with answerSlot hto | no | PROPOSED ws-cell-checks CLAIM-INK | none | - | - |
+| N3 "thirty-five hundred: 0 in the hundreds" steps under 100 | yes: workedSteps 2-digit branch | ws-words-checks WORDS-STEPS-TRUE (DRAFT, same reason) | pending | not wired | 1 round once wired |
+| N4 "one hundred" in a 2-digit row 5 mm lower | yes: two-line box only for names >= 15 chars over 100 | PROPOSED ws-cell-checks ROW-SLOT-Y | none | - | - |
+| N5 model never shows its answer (scripted-model / guided / opener) | no | PROPOSED ws-empty-band --model-states MODEL-ANSWER | none | - | - |
+| N6 chant "Three boxes" over 2-digit items; lesson role ignores practice opts | no | PROPOSED lesson-unit chant-box assertion | none | - | - |
+| N7 "one hundredthirteen" in the guided model | no (source not found this round) | PROPOSED ws-cell-checks WORDS-TEXT | none | - | - |
+| N8 "seven / hundred eight" breaks | yes: "n hundred" kept together (no-break space) | PROPOSED ws-cell-checks WORDS-BREAK | none | - | - |
+| N9 card host draws legacy q.visual (two answer places) | no: lead ruling needed (D3 names worksheet / quiz, not card) | PROPOSED ws-empty-band SCREEN-PARITY | none | - | - |
+| band=20 S 45 %, to_words capacity | no | ws-empty-band EB-BAND / options-render (exist) | none | precritic | - |
+- Lesson: a provider check through getProvider() reads the REGISTRY's wrapped answer (a near-miss nudge when the provider has no
+  named error), so it cannot see the provider's own gap; backtest a new check on the failed commit BEFORE writing the table row.
+- Lesson: a skill moved onto a new card brings its family's past critic findings into the card's scope (21 rule ids here): add them
+  in the same change, or the re-sign stalls.

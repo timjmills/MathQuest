@@ -957,3 +957,8 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
+
+### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
+**Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
+chant vs slots, word breaks). **Speed-up next time:** before the critic, render scripted-model / guided / opener / true-false for a NEW
+skill and read its provider outputs per band (the 5 earlier pv skills had been through those roles; this one never had).

@@ -70,6 +70,25 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-12 WEEK 2 (cap $45; branch claude/lf-placevalue-w2 from master d34311d5): pv card extended to number_word_form, compare,
+  more_less_10, more_less_100 and signed by the owner (lead f448883f). number_word_form: words cell in place (EB-BAND 364 -> 47; the rest
+  test.js / review.js), its lesson (lessons/families/placevalue.js), lesson 1 opted out of the new rows (cellPayload inPlace false); lesson
+  baseline 1,556 hashes identical; detailed lessons OK except the known g1-oa1 / g3-oa8 E9 / E35. Critic nwf r1: FAIL (N1-N9, critic-nwf1.md).
+  Fixed after it (not re-graded): N1, N3, N4, N8. Open: N2, N5, N6, N7, N9 (lead ruling), band=20 S, to_words capacity. Budget spent.
+
+### Week 2 findings -> checks (owner 2026-11-09)
+| Finding (critic nwf r1) | Fixed this round | Check | Backtest | On path | Saved |
+|---|---|---|---|---|---|
+| N1 2-digit names had no named wrong answer (TF all True, Reason It 1 item) | yes: providers/pv.js wrongAnswer M-V9 401 / M-L3 swap / M-Z1 for 2-digit | ws-words-checks WORDS-WRONG-RATE (DRAFT: getProvider reads every candidate as a nudge on both commits) | pending | not wired (draft) | 1 round once wired |
+| N2 TF claim never prints with answerSlot hto | no | PROPOSED ws-cell-checks CLAIM-INK | none | - | - |
+| N3 "thirty-five hundred: 0 in the hundreds" steps under 100 | yes: workedSteps 2-digit branch | ws-words-checks WORDS-STEPS-TRUE (DRAFT, same reason) | pending | not wired | 1 round once wired |
+| N4 "one hundred" in a 2-digit row 5 mm lower | yes: two-line box only for names >= 15 chars over 100 | PROPOSED ws-cell-checks ROW-SLOT-Y | none | - | - |
+| N5 model never shows its answer (scripted-model / guided / opener) | no | PROPOSED ws-empty-band --model-states MODEL-ANSWER | none | - | - |
+| N6 chant "Three boxes" over 2-digit items; lesson role ignores practice opts | no | PROPOSED lesson-unit chant-box assertion | none | - | - |
+| N7 "one hundredthirteen" in the guided model | no (source not found this round) | PROPOSED ws-cell-checks WORDS-TEXT | none | - | - |
+| N8 "seven / hundred eight" breaks | yes: "n hundred" kept together (no-break space) | PROPOSED ws-cell-checks WORDS-BREAK | none | - | - |
+| N9 card host draws legacy q.visual (two answer places) | no: lead ruling needed (D3 names worksheet / quiz, not card) | PROPOSED ws-empty-band SCREEN-PARITY | none | - | - |
+| band=20 S 45 %, to_words capacity | no | ws-empty-band EB-BAND / options-render (exist) | none | precritic | - |
 - 2026-11-09 ROUND 5 (lead, cap $20; branch claude/lf-placevalue-r5 from master 2fe21f2b): critic r5 (critic-r5.md) PASS for identify and
   unit_form on every changed page. N-r4-1 margin (rename line +3 digits after the fixed width: 27 %), G5 (Fix-it words from the pv frame),
   E-r4-1 (identify Guided two across, lesson data guidedCols: L 4 -> 3 pages) fixed. The unit_form worksheet host band (legacy cell) NOT
