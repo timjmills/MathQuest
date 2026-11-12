@@ -304,7 +304,7 @@ Each runs as `node tests/scripts/<script> …`.
 2. **identify writeValue (owner 2026-10-10): is the write-the-value line still wanted on identify, given value is its own skill?** Recommended: Yes, default on, as ruled; it is the bridge from place to value.
 3. **Does this card also cover the decimals place value builds (thousandths_pv, pv10_exponents), or do they get a decimals card?** Recommended: This card covers them: the same pv cell with a decimal point track; a decimals card only for x / ÷ of decimals by decimals (5.NBT.B.7).
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-12
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
