@@ -11,6 +11,8 @@
 // NB3  a wrong box (.mq-live-wrong) keeps its red: no blue ring, the red edge (R4-3)
 // NB4  prefers-reduced-motion: no pulse, the same static blue ring
 // NB5  yellow is kept for right-answer feedback only: the current worksheet problem's card carries no yellow ring
+// NB6  (lf-vocab r9) the quiz, Match 3 answered wrong (instant feedback): every wrong letter box red, none with the blue ring
+// NB7  (lf-vocab r9) 1 picture, 3 words: the answer LINE carries the next outline before an answer on every host, none after
 const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
@@ -114,6 +116,79 @@ const YELLOW = 'rgb(242, 194, 0)';
                     if (!/^rgb\((1[5-9]\d|2\d\d), (\d|[1-6]\d), (\d|[1-6]\d)\)$/.test(wr.border) && !/^rgb\((2[3-5]\d), 2[0-3]\d, 2[0-3]\d\)$/.test(wr.bg)) fails.push(`NB3 ${tag}: a wrong box is not red (border ${wr.border}, fill ${wr.bg})`);
                 }
                 console.log(`${tag.padEnd(44)} ring ${a.first} ${a.spread}px fill ${a.bg} anim ${a.anim}`);
+            }
+        }
+        // NB6 (critic lf-vocab r7 #1, lf-vocab r9): the quiz, Match 3 answered wrong with instant feedback - EVERY wrong letter
+        // box is red (box-wrong: .mq-live-wrong, a red edge) and none of them carries the blue next ring.
+        // NB7 (lead default for critic r7 note 2, lf-vocab r9): 1 picture, 3 words takes its answer on the LINE - before an
+        // answer the line carries the switch's next outline on every host; after a tap it carries none.
+        if (!arg('skills', null) || SKILLS.some((s) => /^vocabulary:/.test(s))) {
+            await page.reload({ waitUntil: 'networkidle2' });
+            await page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+            await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+            await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+            const want = await page.evaluate(() => {
+                const q = window.generateQuestionFor({ category: 'vocabulary', skill: 'vocab_grade_pictures', seed: 12 });
+                const test = { id: null, name: 'Next', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: [{ id: 0, skillId: 'vocab_grade_pictures', points: 1, questionData: window.quizQuestionData(q) }] }],
+                    settings: { timeLimit: null, randomOrder: false, showFeedback: 'instant', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                window.handleQuizURL(window.compressTestForURL(test));
+                const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                window.startQuizTest();
+                const p = q.cell.payload; const order = p.order || [0, 1, 2];
+                return order.map((wi) => 'ABC'[wi]);
+            });
+            await sleep(600);
+            const boxes = await page.$$('#quizTakeView .qt-question-card .mq-vm-box input');
+            if (boxes.length !== 3) fails.push(`NB6 quiz Match 3: ${boxes.length} letter box(es), want 3`);
+            else {
+                // every box wrong: the next letter round
+                const wrong = want.map((l) => 'ABC'[('ABC'.indexOf(l) + 1) % 3]);
+                for (let i = 0; i < 3; i++) { await boxes[i].click(); await page.keyboard.type(wrong[i]); }
+                await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); document.body.click(); });
+                await sleep(1500);
+                const st = await page.evaluate(() => {
+                    const sw = getComputedStyle(document.documentElement).getPropertyValue('--mq-next-color').trim();
+                    const probe = document.createElement('span'); document.body.appendChild(probe); probe.style.color = sw; const swc = getComputedStyle(probe).color; probe.remove();
+                    return [...document.querySelectorAll('#quizTakeView .qt-question-card .mq-vm-box input')].map((el) => {
+                        const cs = getComputedStyle(el);
+                        return { v: el.value, wrong: el.classList.contains('mq-live-wrong'), border: cs.borderTopColor, first: (cs.boxShadow.match(/rgba?\([^)]*\)/) || [''])[0], swc, active: el.classList.contains('mq-active-box') };
+                    });
+                });
+                st.forEach((b, i) => {
+                    if (!b.wrong) fails.push(`NB6 quiz Match 3 box ${i + 1} ("${b.v}", wrong): not marked wrong (no .mq-live-wrong)`);
+                    else if (!/^rgb\((1[5-9]\d|2\d\d), (\d|[1-6]\d), (\d|[1-6]\d)\)$/.test(b.border)) fails.push(`NB6 quiz Match 3 box ${i + 1}: its edge is ${b.border}, not red`);
+                    if (b.first && b.first === b.swc) fails.push(`NB6 quiz Match 3 box ${i + 1}${b.active ? ' (the next box)' : ''}: a wrong box carries the blue next ring`);
+                });
+                judged++;
+                console.log(`${'vocabulary:vocab_grade_pictures quiz-wrong'.padEnd(44)} ${st.map((b) => `${b.v}:${b.wrong ? 'red' : 'plain'}`).join(' ')}`);
+            }
+            const lineRead = (sel) => page.evaluate((sel) => {
+                const line = document.querySelector(`${sel} .mq-vp-line`);
+                if (!line) return { error: 'no .mq-vp-line' };
+                const sw = getComputedStyle(document.documentElement).getPropertyValue('--mq-next-color').trim();
+                const probe = document.createElement('span'); document.body.appendChild(probe); probe.style.color = sw; const swc = getComputedStyle(probe).color; probe.remove();
+                const cs = getComputedStyle(line);
+                return { first: (cs.boxShadow.match(/rgba?\([^)]*\)/) || [''])[0], swc, pills: [...document.querySelectorAll(`${sel} button[data-mq-choice]`)].map((b) => (getComputedStyle(b).boxShadow.match(/rgba?\([^)]*\)/) || [''])[0]) };
+            }, sel);
+            for (const [hn, sel, w, setup] of hosts) {
+                const tag = `vocabulary:vocab_pick3_words ${hn}`;
+                await page.reload({ waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+                await page.setViewport({ width: w, height: w > 500 ? 900 : 844, deviceScaleFactor: 1 });
+                await setup('vocabulary', 'vocab_pick3_words');
+                await sleep(900);
+                const a = await lineRead(sel);
+                if (a.error) { fails.push(`NB7 ${tag}: ${a.error}`); continue; }
+                judged++;
+                if (a.first !== a.swc) fails.push(`NB7 ${tag}: before an answer the line's outline is ${a.first || 'none'}, not the switch's ${a.swc}`);
+                if (a.pills.some((c) => c === a.swc)) fails.push(`NB7 ${tag}: a word pill carries the next outline (the pills stay plain)`);
+                // (the tapped problem is read again, not the host's next one: the worksheet moves on to the next problem)
+                await page.evaluate((sel) => { const h = document.querySelector(sel); if (h) h.setAttribute('data-nb7', '1'); }, sel);
+                const btn = await page.$(`${sel} button[data-mq-choice]`);
+                if (btn) { await btn.click(); await sleep(900); }
+                const b = await lineRead('[data-nb7="1"]');
+                if (!b.error && b.first === b.swc) fails.push(`NB7 ${tag}: after a tap the line still carries the next outline`);
+                console.log(`${tag.padEnd(44)} line before ${a.first} after ${b.first || 'none'}`);
             }
         }
     } finally { await app.close(); }

@@ -2007,3 +2007,22 @@ html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box:is(.mq-live-wr
 .mq-vexplain .mq-vhow { margin-top: 8px; padding-top: 6px; border-top: 1px solid #949494; }
 .mq-vexplain .mq-vhow-title { font-weight: 700; }
 .mq-vexplain .mq-vhow ol { margin: 2px 0 0 24px; padding: 0; }
+
+/* lf-vocab r9 (lead default for critic r7 note 2, owner may overrule): 1 picture, 3 words takes its answer on the LINE (the
+   tapped word lands there), so the line is its next answer box: before an answer it carries the O-1 next outline through the
+   same switch (--mq-next-*); the word pills stay plain. After a tap (a pill pressed) or once judged (.mq-vfb) it has none -
+   a wrong word's line keeps its red outline. Screen hosts only; additive. ws-next-box NB7. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView .problem-card.mq-active-problem, #quizTakeView .qt-question-card) .mq-vp:not(.mq-vfb):not(:has(button[data-mq-choice][aria-pressed="true"])) .mq-vp-line {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: inset 0 0 0 var(--mq-next-w) var(--mq-next-color), inset 0 0 0 var(--mq-next-ring) var(--mq-next-glow) !important;
+    border-radius: 2px;
+    animation: mq-next-switch-pulse 1.4s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView .problem-card.mq-active-problem, #quizTakeView .qt-question-card) .mq-vp:not(.mq-vfb):not(:has(button[data-mq-choice][aria-pressed="true"])) .mq-vp-line {
+        animation: none !important; --mq-next-ring: var(--mq-next-w); --mq-next-fill: var(--mq-next-fill-a);
+    }
+}
+@media print {
+    html body .mq-vp .mq-vp-line { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
+}

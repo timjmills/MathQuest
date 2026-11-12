@@ -3719,6 +3719,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r9-gdpcap",
+   "check": "lf-vocab r9 item 3b (precritic ws-empty-band EB-GDPCAP, master's rule): the Match 3 Guided page holds at most the 10 / 8 / 6 scored tries (3 a cell) plus the Model at S / M / L",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GDPCAP",
+   "browser": true,
+   "fail": {
+    "commit": "7e09577a",
+    "state": "lf-vocab r9 after the master d34311d5 merge (EB-GDPCAP arrived with it)"
+   },
+   "pass": {
+    "commit": "b28f3960",
+    "state": "lf-vocab r9 item 3b"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures | tail -1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

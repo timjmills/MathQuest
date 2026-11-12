@@ -1148,7 +1148,12 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
             const got = norm(inp ? inp.value : box ? box.textContent : '');
             const right = got === norm(LET[wi]);
             if (right || ok) { const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback'); }
-            else wrong.push({ word: String(words[wi]), letter: LET[wi], pic: wi });
+            else {
+                wrong.push({ word: String(words[wi]), letter: LET[wi], pic: wi });
+                // (critic r7 #1, lf-vocab r9: EVERY wrong letter box is marked wrong on every host - the quiz too, where the
+                // live marks are off - so its red wins over the next-box ring; ws-next-box NB6)
+                if (inp) markBoxSubmitted(inp, false);
+            }
         });
         // (r8, critic r6 #1: after a wrong answer ONLY the pictures of the wrongly matched words glow, each with its letter;
         // a right answer lights every picture)

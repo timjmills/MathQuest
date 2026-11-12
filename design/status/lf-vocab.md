@@ -31,6 +31,12 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
   S / M / L), and a one-column points template drops a continuation page that would hold one cell alone (L-LONE). Both
   empty-band modes OK; grade-render guided S/M/L OK (1 page each); the 6 Guided pupil pins re-taken (only those changed),
   ws-vocab-unit --browser OK. Check: row vocab-r9-gdpcap.
+- Items 4 + 4b (one commit: ws-next-box carries both checks). 4 (critic r7 #1): markVocabFeedback marks every wrongly
+  matched Match 3 letter box wrong (markBoxSubmitted) on every host, so the quiz shows red there and R4-3 keeps the blue ring
+  off it. 4b (lead default, critic r7 note 2): the pick3 answer LINE carries the O-1 next outline (same --mq-next-* switch,
+  additive css/screen-cell.css) before an answer on card / worksheet / quiz, none after a tap or once judged; pills plain.
+  Checks NB6 / NB7 (ws-next-box, on precritic's path): quiz-wrong C:red A:red B:red; line before = switch blue, after none.
+  ws-next-box (default, 13 hosts) OK. Rows vocab-r9-nb6-quiz-red, vocab-r9-nb7-pick3-line.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.
