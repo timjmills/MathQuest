@@ -2662,8 +2662,9 @@ const _wpSub = () => ({ ..._p12Variants('sub_word_problems', ['take_away', 'comp
 default: [0, 1, 2] });
 // `band` on the four general story hosts (word-stories card Q2): the largest ANSWER and every story number. Unset, the
 // Max Number decides as before; within 20 the cell draws the number sentence (word-work.js sentenceBand), 100 the columns.
-const _wpBand = () => _opsBand([null, 10, 20, 100], null, { label: 'Numbers to', labels: { null: 'As the Max Number sets it' },
-    help: 'The largest number in the story, the answer too (the sum, the number you take from, the bigger amount). Within 20 the pupil writes a number sentence; within 100, the columns.' });
+// (the card signs the values 10 / 20 / 100; unset - the default, null - the app's Max Number decides, as before)
+const _wpBand = () => _opsBand([10, 20, 100], null, { label: 'Numbers to',
+    help: 'The largest number in the story, the answer too (the sum, the number you take from, the bigger amount). Within 20 the pupil writes a number sentence; within 100, the columns. Unset, the Max Number setting decides.' });
 const _wpMul = () => _p12Variants('mult_word_problems', ['equal_groups', 'arrays', 'comparison'],
     ['Equal groups (4 bags of 6)', 'An array (rows and columns)', 'A comparison (3 times as many)'], { label: 'The story' });
 const _wpDiv = () => _p12Variants('div_word_problems', ['equal_share', 'grouping', 'remainder'],

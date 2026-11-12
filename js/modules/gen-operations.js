@@ -667,6 +667,12 @@ function _responseMode() {
 // APPENDED kind (change unknown, compare with the smaller unknown) deals over every kind so the override can name it;
 // and on a page with more than one kind ticked, one of them a new kind, the kinds come ONE SECTION AT A TIME in the
 // order of the list (PEDAGOGY P-WP-1 one schema a set, P-WP-3 the "more than" trap last), never interleaved.
+// One story's two numbers, dealt FRESH on the page (page-deal.js freshDeal, L10): no pair twice, and of `tagsOf(p)` -
+// [the item's first number (q.a), its answer] - the first no more than twice and the answer no more than three times
+// in a page of 20.
+function _wpFresh(key, draw, tagsOf) {
+    return freshDeal(key, draw, { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => tagsOf(p).map(String), caps: [2, 3] });
+}
 function _wpStoryKind(key, base, all) {
     const o = state.skillOptions;
     const forms = o && Array.isArray(o.forms) ? o.forms.map(Number).filter((v) => v >= 0 && v < all.length) : [];
@@ -5375,8 +5381,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (roll === 'join') {
                     // Type 1: Result-unknown / join — "X and Y, how many altogether?"
-                    a = _wpBandN ? rng(2, Math.max(2, _wpBandN - 2)) : rng(2, maxNum);
-                    b = _wpBandN ? rng(2, Math.max(2, _wpBandN - a)) : rng(2, maxNum);
+                    // (dealt fresh on the page with the other kinds, one history: no first number three times a page)
+                    [a, b] = _wpFresh(`wpk:add:${maxNum}`, () => {
+                        const x = _wpBandN ? rng(2, Math.max(2, _wpBandN - 2)) : rng(2, maxNum);
+                        return [x, _wpBandN ? rng(2, Math.max(2, _wpBandN - x)) : rng(2, maxNum)];
+                    }, (p) => [p[0], p[0] + p[1]]);
                     if (state.decimalPlaces > 0) { a = applyDecimals(a); b = applyDecimals(b); }
                     answer = state.decimalPlaces > 0 ? parseFloat((a + b).toFixed(state.decimalPlaces)) : a + b;
                     let joinTemplates;
@@ -5421,8 +5430,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Add the two amounts: ${a} + ${b} = ?`;
                 } else if (roll === 'start_unknown') {
                     // Type 2: Start unknown (label 'The start') — "had some, got b more, now has total; how many at first?"
-                    const total = rng(5, maxNum);
-                    b = rng(1, total - 1);
+                    const [total, b0] = _wpFresh(`wpk:add:${maxNum}`, () => { const t = rng(5, maxNum); return [t, rng(1, t - 1)]; }, (p) => [p[0], p[0] - p[1]]);
+                    b = b0;
                     a = total - b; // a is the unknown start
                     answer = a;
                     const places = ['tree', 'table', 'shelf', 'plate', 'desk'];
@@ -5436,8 +5445,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.wpSchema = 'start-add';
                 } else if (roll === 'part_part_whole') {
                     // Type 3: Put together, a part unknown (label 'A part') — "13 in all, 5 are red, how many are blue?"
-                    const total = rng(5, maxNum);
-                    const red = rng(2, total - 2);
+                    const [total, red] = _wpFresh(`wpk:add:${maxNum}`, () => { const t = rng(5, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
                     answer = total - red;
                     a = red; b = answer;
                     q.text = `${name1} has ${total} ${scenario.unit}. ${red} of them are red. The rest are blue. How many ${scenario.unit} are blue?`;
@@ -5446,9 +5454,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else {
                     // Type 4: Change unknown, told in the PAST tense (label 'How many were added?', forms value 3; build list
                     // map_change_unknown_story) — "had 8, got some more, now has 13; how many did X get?"
-                    a = rng(2, Math.max(2, maxNum - 2));
-                    b = rng(2, Math.max(2, maxNum - a));
-                    const total = a + b;
+                    // (the total is dealt first, then the start inside it: an answer of 2 is no likelier than any other)
+                    const [total, a0] = _wpFresh(`wpk:add:${maxNum}`, () => { const t = rng(5, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
+                    a = a0;
+                    b = total - a;
                     answer = b;
                     q.text = `${name1} had ${a} ${scenario.unit}. ${name1} got some more. Now ${name1} has ${total} ${scenario.unit}. How many ${scenario.unit} did ${name1} get?`;
                     q.hint = `Find the change: ${a} + ? = ${total}. Subtract: ${total} − ${a} = ?`;
@@ -5465,6 +5474,9 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.ans = answer;
                 q.a = a; q.b = b; q.op = '+';
+                // the kinds with a missing part keep the story's own action (a join, +) as the known part + the answer = the
+                // whole, so the cell, the key and every reader of q.a / q.b / q.op agree with the answer
+                if (roll !== 'join') { q.a = roll === 'start_unknown' ? b : a; q.b = answer; q.op = '+'; }
                 q.visual = `<div class="word-problem-visual">
                     <div class="word-problem-scene">
                         <div class="visual-group group-${scenario.color}">
@@ -5672,8 +5684,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else if (roll === 'change_unknown') {
                     // Type 4: Change unknown, told in the PAST tense (label 'How many went?', forms value 3; build list
                     // map_change_unknown_story) - "had 15, gave some away, now has 9; how many did X give away?"
-                    total = rng(_wpLo, maxNum);
-                    answer = rng(2, total - 2);
+                    [total, answer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[1]]);
                     taken = answer; // the unknown
                     const remaining = total - answer;
                     q.text = `${name1} had ${total} ${scenario.unit}. ${name1} gave some away. Now ${name1} has ${remaining} ${scenario.unit}. How many ${scenario.unit} did ${name1} give away?`;
@@ -5682,8 +5693,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else if (roll === 'compare_fewer') {
                     // Type 5: Compare, the smaller amount unknown, consistent language (forms value 4; build list
                     // map_compare_smaller_unknown) - "Maya has 14. Tom has 6 fewer than Maya. How many does Tom have?"
-                    total = rng(5, maxNum);
-                    const fewer = rng(2, total - 2);
+                    const [t4, fewer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(5, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
+                    total = t4;
                     taken = fewer;
                     answer = total - fewer;
                     q.text = `${name1} has ${total} ${scenario.unit}. ${name2} has ${fewer} fewer ${scenario.unit} than ${name1}. How many ${scenario.unit} does ${name2} have?`;
@@ -5694,8 +5705,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Type 6: Compare, the smaller amount unknown, told with "more than" about the BIGGER, known amount
                     // (forms value 5, the language trap, PEDAGOGY P-WP-3) - "Maya has 14. Maya has 6 more than Tom. How many
                     // does Tom have?" Solved by subtracting: Tom has fewer.
-                    total = rng(5, maxNum);
-                    const more = rng(2, total - 2);
+                    const [t5, more] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(5, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
+                    total = t5;
                     taken = more;
                     answer = total - more;
                     q.text = `${name1} has ${total} ${scenario.unit}. ${name1} has ${more} more ${scenario.unit} than ${name2}. How many ${scenario.unit} does ${name2} have?`;
@@ -5716,6 +5727,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 q.ans = answer;
                 q.a = total; q.b = taken; q.op = '-';
+                // the change unknown carries its SOLVING step: first − now = what went
+                if (roll === 'change_unknown') q.b = total - answer;
                 q.visual = `<div class="word-problem-visual">
                     <div style="text-align:center;margin-bottom:10px;">
                         <div style="font-size:0.9rem;color:#666;margin-bottom:8px;">Started with ${total}:</div>

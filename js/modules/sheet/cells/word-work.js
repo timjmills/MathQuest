@@ -539,6 +539,8 @@ export function wordWorkPayload(q, o = {}) {
         // the labelled First / Then / Now bar or the two compare bars (graphics/story-bar.js) of the new story kinds
         ...(steps.length === 1 && STORY_BAR_KIND[schema] && (!/^compare/.test(schema) || who) ? { storyBar: STORY_BAR_KIND[schema], ...(who ? { who } : {}) } : {}),
         ...(q.wpLanguage === 'inconsistent' || q.wpLanguage === 'consistent' ? { language: q.wpLanguage } : {}),
+        // a tagged story names its SOLVING step for every reader (the dealer and rulings checks read payload.operands)
+        ...(tagged ? { operands: [last.top, last.bottom], op: GLYPH[last.op] } : {}),
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
         pic: o.pic || null,
     };
