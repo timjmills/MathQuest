@@ -101,6 +101,11 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
         const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));
         while (rows > 1 && rows * hRows(rows) > room) rows--;
+        // (lf-partopts: the rows that fit are the part's fit - the Parts table's max; `lesson.partN.rows` caps them, 0 = none)
+        cur.indepFit = { rows: rows >= 1 && hRows(rows) <= room ? rows : 0, ic };
+        const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
+        if (rN === 0) return indep;
+        if (rN !== null && rN < rows) rows = rN;
         // (critic r2 N1: how far ONE row is short of the room - roles/lesson.js frees it before it ever drops the row)
         cur.indepShort = rows >= 1 && hRows(rows) <= room ? 0 : hRows(1) - room;
         if (rows >= 1 && hRows(rows) <= room) {

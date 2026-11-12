@@ -141,7 +141,9 @@ export function extras(input = {}) {
     // has been modelled.
     const mixFinals = ex && !ex2 && ex.q && ex.q.divMix ? sameFactForms(ex) : [];
     out.push(...finalItems(mixFinals.length ? mixFinals : [{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
-    const v = vocabItem(data && data.vocab, input.seed);
+    // (lf-partopts: `lesson.partN.vocab` - the teacher's word count, 0 = no Vocabulary band; absent: the lesson's own)
+    const vN = lesson.partN && Number.isFinite(lesson.partN.vocab) ? lesson.partN.vocab : null;
+    const v = vocabItem(data && data.vocab && vN !== null ? data.vocab.slice(0, vN) : data && data.vocab, input.seed);
     if (v) out.push(v);
     if (steps.length) { out.push(stepsItem(data, steps)); out.push(stripItem(data, steps)); }
     // The Independent rows are drawn at level 1, but the pool was measured at the Guided cells'
@@ -271,7 +273,10 @@ function planOnce(input = {}) {
         let left = spare;
         let carry = 0;   // (what a band's `maxAdd` refused, passed to the bands after it)
         for (const [gi, g] of grows.entries()) {
-            const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            const cap00 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            // (lf-partopts: with the teacher's counts a band given up leaves its height on the page's foot - the bands grow by a
+            // tenth at most, never into a 30 % empty band; ws-partopts-unit PO-2d. Absent: as before.)
+            const cap0 = lesson.partN ? Math.min(cap00, 0.1) : cap00;
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
             const share = data && data.growAll ? left / (grows.length - gi) : spare / grows.length + carry;
             const add0 = Math.min(share, g.h * cap);
@@ -289,8 +294,20 @@ function planOnce(input = {}) {
     let zoom = 0;
     let secondShown = 0;
     let chartSizing = null;
+    let chartDesigned = 0, chartMin = 0;
     if (states.length && part !== 'sheet') {
-        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel));
+        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel));
+        // (lf-partopts: `lesson.partN.chart` - n worked examples, 1 .. the chart's own design; the design is the chart laid
+        // out uncapped, so the Parts table's range never moves with the teacher's choice)
+        const cN = lesson.partN && Number.isFinite(lesson.partN.chart) ? Math.max(1, lesson.partN.chart) : null;
+        let chart = chartOf(second, finals);
+        chartDesigned = 1 + (chart.second || 0);
+        // (a count is offered only where the chart laid out with that many examples keeps its planned size - sizing.ok: the
+        // fewer examples of a grid chart can leave its panels taller than the page holds, lesson 7 D1)
+        const capped = (k) => chartOf(k >= 2 && chart.mode === 'row' ? second : [], k >= 2 ? finals.slice(0, k - 1) : []);
+        chartMin = chartDesigned;
+        for (let k = 1; k < chartDesigned; k++) { const c = capped(k); if (c.sizing && c.sizing.ok && 1 + (c.second || 0) === k) { chartMin = k; break; } }
+        if (cN !== null && cN < chartDesigned) { const c = capped(Math.max(cN, chartMin)); if (c.sizing && c.sizing.ok) chart = c; }
         zoom = chart.zoom;
         secondShown = chart.second;
         chartSizing = chart.sizing;
@@ -308,6 +325,8 @@ function planOnce(input = {}) {
             example2: secondShown && example2 ? String((example2.q && example2.q.text) || '') : '', part, chartSizing,
             example2Found: example2 ? String((example2.q && example2.q.text) || '') : '',
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
+            // (lf-partopts: each part's own fit before the teacher's counts - print-sheet.js reports it as res.lesson.partFit)
+            partFit: { chart: chartDesigned, chartMin, wedo: env.weDoFit !== undefined ? env.weDoFit : weDo.length, wedoMin: env.weDoMin, rows: cur.indepFit ? cur.indepFit.rows : 0, perRow: cur.indepFit ? cur.indepFit.ic : 0, remember: lesson.partN && lesson.partN.remember === false ? !!(data && data.concepts && data.concepts[0]) : groups.some((g) => g.sections[0] && (g.sections[0].label === 'Remember:' || g.sections[0].label === 'Rule:')) },
             // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
             exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],

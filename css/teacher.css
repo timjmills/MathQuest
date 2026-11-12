@@ -945,3 +945,56 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 
 /* Checker 2026-10-30: inset is measured from the padding box of the bordered 28 px button, so -8px gave 42 px. */
 .tv-sko .sko-tip::after { inset: -9px; }
+
+/* ---- Lesson parts table (lane lf-partopts step A, design/partopts/DESIGN.md §1.1-1.2): additive classes only ---- */
+.tv-parts { display: flex; flex-direction: column; border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface); }
+.tv-parts-head, .tv-part {
+    display: grid; grid-template-columns: 44px minmax(0, 1.3fr) minmax(150px, 1.5fr) minmax(0, 1fr) 52px;
+    align-items: center; gap: 8px; padding: 8px 10px;
+}
+.tv-parts-head { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-text-2); border-bottom: 1px solid var(--tv-rule); }
+.tv-part + .tv-part { border-top: 1px solid var(--tv-rule); }
+.tv-part-print .tv-part-tick { width: 44px; height: 44px; justify-content: center; }
+.tv-part-name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--tv-text); min-width: 0; }
+.tv-part.is-off .tv-part-name { color: var(--tv-text-2); font-weight: 500; }
+.tv-part-many { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.tv-part-pages { display: inline-flex; align-items: center; gap: 6px; }
+.tv-part-range { font-size: 12px; line-height: 16px; color: var(--tv-text-2); font-weight: 500; }
+.tv-part-none, .tv-part-fixed { font-size: 16px; line-height: 24px; font-weight: 700; color: var(--tv-text); padding-left: 4px; }
+.tv-part-none { color: var(--tv-text-2); font-weight: 500; }
+.tv-stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--tv-control-soft); border-radius: 8px; overflow: hidden; background: var(--tv-surface); }
+.tv-step-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0;
+    border: 0; background: var(--tv-subtle); color: var(--tv-text); cursor: pointer;
+}
+.tv-step-btn:hover:not([disabled]) { background: var(--tv-rule); }
+.tv-step-btn[disabled] { color: var(--tv-control); cursor: not-allowed; opacity: .55; }
+.tv-step-btn:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: -2px; }
+.tv-step-val { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0 4px; font-size: 18px; font-weight: 700; color: var(--tv-text); font-variant-numeric: tabular-nums; }
+.tv-stepper-sm .tv-step-val { min-width: 32px; font-size: 15px; }
+.tv-part-chip {
+    display: inline-flex; align-items: center; max-width: 100%; min-height: 32px; padding: 4px 12px; border: 1px solid var(--tv-control-soft);
+    border-radius: 999px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text-2); background: var(--tv-surface);
+}
+.tv-part-ref .tv-part-new { width: 44px; height: 44px; }
+.tv-part-ref .tv-part-new[disabled] { opacity: .45; cursor: not-allowed; }
+.tv-part-warn {
+    grid-column: 2 / -1; display: flex; align-items: flex-start; gap: 6px; margin: 0; padding: 6px 10px; border-radius: 8px;
+    border: 1px solid var(--tv-border); background: var(--tv-subtle-2); font-size: 13px; line-height: 18px; color: var(--tv-text);
+}
+.tv-part-warn svg { flex: none; margin-top: 2px; color: var(--tv-caption); }
+.tv-parts-reset { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; text-decoration: underline; }
+/* phone (§1.2): one card per part - tick, name and New numbers; the stepper; the Supports chip full width */
+@media (max-width: 640px) {
+    .tv-parts { border: 0; background: transparent; gap: 10px; }
+    .tv-parts-head { display: none; }
+    .tv-part {
+        grid-template-columns: 44px minmax(0, 1fr) 44px; grid-template-areas: 'print name ref' 'many many many' 'sup sup sup' 'warn warn warn';
+        gap: 8px; padding: 10px 12px; border: 1px solid var(--tv-border); border-radius: 12px; background: var(--tv-surface);
+    }
+    .tv-part + .tv-part { border-top: 1px solid var(--tv-border); }
+    .tv-part-print { grid-area: print; } .tv-part-name { grid-area: name; font-size: 16px; } .tv-part-ref { grid-area: ref; }
+    .tv-part-many { grid-area: many; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+    .tv-part-sup { grid-area: sup; } .tv-part-sup .tv-part-chip { width: 100%; min-height: 44px; }
+    .tv-part-warn { grid-area: warn; }
+}

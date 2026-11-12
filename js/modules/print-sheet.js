@@ -49,6 +49,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
+import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP } from './sheet/part-opts.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
@@ -385,6 +386,9 @@ function normaliseRequest(req = {}) {
         lessonSeeds: req.role === 'lesson' && req.lessonSeeds && typeof req.lessonSeeds === 'object'
             ? Object.fromEntries(lessonPartIds().filter((x) => req.lessonSeeds[x] !== undefined && req.lessonSeeds[x] !== null && req.lessonSeeds[x] !== '' && Number.isFinite(Number(req.lessonSeeds[x]))).map((x) => [x, Number(req.lessonSeeds[x]) >>> 0]))
             : null,
+        // lf-partopts (design/partopts/DESIGN.md): the teacher's per-part counts, only the values that differ from the
+        // standard packet (sheet/part-opts.js normalizePartOpts); null = the packet exactly as before.
+        partOpts: req.role === 'lesson' && req.partOpts && typeof req.partOpts === 'object' && !partOptsEmpty(req.partOpts) ? normalizePartOpts(req.partOpts, null) : null,
         perQuestion: Array.isArray(req.perQuestion) ? req.perQuestion.map(Number) : Number(req.perQuestion) >= 1 ? Math.floor(Number(req.perQuestion)) : undefined,
         // A Prerequisite Check's routes (pre-skill-check.js, plan §8b, lessons-phase0 D1): per question
         // {lesson, title, checks?} - its "If missed" teacher tag and the key's routing table. Absent otherwise.
@@ -4769,7 +4773,10 @@ async function buildLesson(n, metaOf) {
     // question per prerequisite, drawn by sheet/roles/pre-skill-check.js with each question's route - and its
     // lesson sheet drops the Warm-up (the check is the warm-up). Every other lesson keeps its Warm-up.
     // (the LR-17 switch: a record with `prereqsLive: false` keeps its Warm-up - library.js prereqCheckLive)
-    const prereqs = !n.lessonData && prereqCheckLive(data) ? data.prereqs : null;
+    const prereqsAll = !n.lessonData && prereqCheckLive(data) ? data.prereqs : null;
+    // (lf-partopts: `partOpts.prereq.n` - the first n questions; the routing table routes only the printed ones)
+    const po = n.partOpts || null;
+    const prereqs = prereqsAll && po && po.prereq && Number.isFinite(po.prereq.n) ? prereqsAll.slice(0, Math.max(1, Math.min(prereqsAll.length, po.prereq.n))) : prereqsAll;
     const warmSkills = prereqs ? [] : data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
@@ -4791,6 +4798,18 @@ async function buildLesson(n, metaOf) {
     const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
+    // (lf-partopts: the counts the lesson role reads - chart examples, vocabulary words, Remember, We Do cells, rows)
+    const partN = lessonPartN(po);
+    if (partN) lessonInput.partN = partN;
+    // (lf-partopts: a part given up never adds Independent rows the teacher did not ask for - the rows' range is the
+    // standard sheet's, read from the standard sheet when another band changed: rows that appear in freed space were drawn
+    // with 30 % side bands, ws-partopts-unit PO-2d)
+    let rowsStd = null;
+    if (partN && partN.rows === undefined && (partN.vocab !== undefined || partN.remember === false || partN.wedo !== undefined)) {
+        const t0 = await buildRoleSheet(Object.assign({}, nz, { role: 'lesson', header, look: 'ican', lessonInput: { data, warmSkills, tagLine, number: lessonNo, part: 'sheet' } }), metaOf);
+        const pf = t0.plan && t0.plan.meta && t0.plan.meta.partFit;
+        if (pf && Number.isFinite(pf.rows)) { rowsStd = { fit: pf.rows, perRow: pf.perRow || 1 }; partN.rows = pf.rows; }
+    }
 
     // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
     // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
@@ -4934,7 +4953,36 @@ async function buildLesson(n, metaOf) {
             if (packNums) packNums.push(...planKeys(res));
         }
     }
+    // (lf-partopts: the Practice page's fit - the problems a page holds, its columns, and the fewest whole rows whose cells,
+    // grown to fill the page, stay under PRACTICE_GROW_CAP - read from the standard page; `partOpts.practice.n` then prints
+    // that many a page, in whole rows. Block and detailed-lesson pages keep their own shapes: no fit, the row is fixed.)
+    let practiceFit = null;
+    const pCap = po && po.practice && Number.isFinite(po.practice.n) ? po.practice.n : null;
+    const fitOfPractice = (r) => {
+        const pages = Math.max(1, Number(r.pageCount) || 1);
+        const per = Math.ceil((r.items || []).length / pages);
+        const f0 = r.fits && r.fits.sections && r.fits.sections[0];
+        const cols = Math.max(1, Math.min(per || 1, Number(r.fits && r.fits.cols) || 1));
+        const rows = Math.max(1, Math.ceil(per / cols));
+        const G = f0 && Number(f0.cellH) > 0 ? rows * Number(f0.cellH) : 0;
+        const minRows = f0 && Number(f0.hMin) > 0 && G ? Math.min(rows, Math.max(1, Math.ceil(G / (Number(f0.hMin) * PRACTICE_GROW_CAP)))) : rows;
+        return per > 0 ? { perPage: per, cols, rows, minRows } : null;
+    };
     const buildPractice = async (seed, sec) => {
+        const r0 = await buildPracticeOwn(seed, sec);
+        if (blocks) return r0;
+        practiceFit = fitOfPractice(r0);
+        const f = practiceFit;
+        if (pCap === null || !f || pCap >= f.perPage) return r0;
+        const k = Math.max(f.minRows, Math.min(f.rows, Math.floor(pCap / f.cols))) * f.cols;
+        if (k >= f.perPage) return r0;
+        const withStrip = /data-mq-lesson-strip/.test(r0.pupilHtml);
+        const capSec = facts ? Object.assign({}, sec, { pageCap: k, dense: { S: k, M: k, L: k } }) : Object.assign({}, sec, { pageCap: k });
+        const r = await buildSheetInner(practiceReq(practicePages, withStrip, [k, f.cols], seed, capSec));
+        // (a capped page that would not keep the page count prints the standard page)
+        return r.pageCount === r0.pageCount ? r : r0;
+    };
+    const buildPracticeOwn = async (seed, sec) => {
         let res = null;
         for (const shape of facts || blocks ? [null] : stackShapes) {
             const r = await buildSheetInner(practiceReq(practicePages, true, shape || undefined, seed, sec));
@@ -5087,6 +5135,23 @@ async function buildLesson(n, metaOf) {
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,
             teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent } : null,
+            // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
+            // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
+            partFit: (() => {
+                const cm = (chart.plan && chart.plan.meta && chart.plan.meta.partFit) || {};
+                const tm = (teach.plan && teach.plan.meta && teach.plan.meta.partFit) || {};
+                const mixedRes = (allParts.find((p) => p.part === 'mixed') || {}).res;
+                return {
+                    prereq: prereqsAll ? { total: prereqsAll.length } : null,
+                    chart: cm.chart ? { designed: cm.chart, min: cm.chartMin || cm.chart } : null,
+                    vocab: data && Array.isArray(data.vocab) && data.vocab.length ? { words: Math.min(3, data.vocab.length) } : null,
+                    remember: { has: !!tm.remember },
+                    wedo: Number.isFinite(tm.wedo) && tm.wedo > 0 ? { fit: tm.wedo, min: Number.isFinite(tm.wedoMin) ? tm.wedoMin : tm.wedo } : null,
+                    rows: rowsStd || (Number.isFinite(tm.rows) ? { fit: tm.rows, perRow: tm.perRow || 1 } : null),
+                    practice: practiceFit,
+                    mixed: mixedRes ? { count: (mixedRes.items || []).length } : null,
+                };
+            })(),
             size,
         },
     };

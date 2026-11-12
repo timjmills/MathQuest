@@ -162,7 +162,7 @@ export function vocabItem(vocab, seed) {
  * The lesson sheet's opening bands (roles/lesson.js planOnce): the Vocabulary match and the
  * Remember strip, in order. `vocab`: the measured vocabulary item (extras), `m`: the band metrics.
  */
-export function vocabBands({ vocab, data, m }) {
+export function vocabBands({ vocab, data, m, input }) {
     const groups = [];
     if (vocab) {
         const vh = Math.max(20, hOf(vocab, 1));
@@ -170,7 +170,9 @@ export function vocabBands({ vocab, data, m }) {
         // (It takes a share of a page's spare height only when no Independent row fits, below.)
         groups.push(band(m.strip + vh, { kind: 'band', label: 'Vocabulary:', instr: instructionText('match'), content: vgrid }, { h: vh, grid: [vgrid], cap: 0, capIfEmpty: 0.3 }));
     }
-    const concept = data && data.concepts && data.concepts[0] ? data.concepts[0].text : '';
+    // (lf-partopts: `lesson.partN.remember === false` - the teacher left the Remember strip off)
+    const remOff = !!(input && input.lesson && input.lesson.partN && input.lesson.partN.remember === false);
+    const concept = !remOff && data && data.concepts && data.concepts[0] ? data.concepts[0].text : '';
     if (concept) groups.push(band(m.strip, { kind: 'band', label: 'Remember:', instr: concept, html: '' }));
     return groups;
 }

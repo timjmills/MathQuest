@@ -142,7 +142,7 @@ if (argv.includes('--self-test')) {
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-if (!SKILLS.length || SKILLS.some((s) => !s.includes(':'))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+if (require.main === module && (!SKILLS.length || SKILLS.some((s) => !s.includes(":")))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
 const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
@@ -438,4 +438,6 @@ async function main() {
     console.log(`ws-empty-band: ${bad ? `FAIL (${findings.length || 'nothing rendered'})` : 'OK'}`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-main().catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+// (lf-partopts: the measure and the judge are shared - ws-partopts-unit.cjs judges every part count by these same rules)
+if (require.main === module) main().catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+module.exports = { measureCells, judge };
