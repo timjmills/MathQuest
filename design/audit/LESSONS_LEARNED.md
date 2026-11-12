@@ -403,3 +403,11 @@ One line per finding: the rule, then the check.
   check is live (`phase0On`, LR-17b); with `prereqsLive: false` every packet prints as master (proof check-land-2.log).
   **Lesson:** a critic fix made on a sample lesson goes in as a flag on that lesson's record, not as a branch keyed on a
   property many lessons share ("has prereqs", "is a rounding cell").
+
+### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
+A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
+empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
+the cell; and a LATER state of the same example draws ink in that band (reserved, not just white). Any other white under the
+ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
+never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
+white on any other role.

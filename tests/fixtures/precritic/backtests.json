@@ -3172,8 +3172,8 @@
    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
   },
   "pass": {
-   "commit": "PENDING-step2",
-   "state": "0 findings"
+   "commit": "966292ff",
+   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
   },
   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
   "expect": {
