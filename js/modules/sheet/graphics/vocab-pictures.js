@@ -421,7 +421,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     output: ['table', 'out'],
     rule: ['add', 'machine', 'pattern'],
     pattern: ['sequence', 'rule', 'multiple', 'count on', 'repeat'],
-    array: ['equal groups', 'rows', 'dots', 'rectangle'],
+    array: ['equal groups', 'rows', 'dots', 'rectangle', 'row', 'column'],
     commutative: ['array', 'turn'],
     identity: ['times one', 'same'],
     distributive: ['array', 'split'],
@@ -458,8 +458,71 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     dividend: ['divide'],
     'round up': ['remainder', 'equal groups', 'quotient'],
 });
-/** The other words a library picture could be read as ([] when it declares none: V-AMBIG fails on that). */
-export const vocabPictureAlsoShows = (id) => (Object.prototype.hasOwnProperty.call(VOCAB_ALSO_SHOWS, id) ? VOCAB_ALSO_SHOWS[id].slice() : null);
+/*
+ * V-AMBIG+ (critic r7 #6, lf-vocab r9): the words a picture's OWN marks show, DERIVED from its drawing, never written by hand:
+ *   a number sentence with "="                                   -> equation
+ *   three or more numbers one step apart, along a line or down    -> pattern, sequence, multiple
+ *   a heavy outline round two or more numbers, taller than wide   -> column (wider than tall: row)
+ *   a crossed mark (two strokes across each other), or a ring round one lone dot -> left
+ *   three or more arrow heads round a centre (a loop of arrows)   -> pattern
+ * vocabPictureAlsoShows() is these plus the hand list (VOCAB_ALSO_SHOWS), which stays only as an extra.
+ */
+const num_ = (s) => Number(s);
+const isAP_ = (ns) => { for (let i = 0; i + 2 < ns.length; i++) { const d = ns[i + 1] - ns[i]; if (d !== 0 && ns[i + 2] - ns[i + 1] === d) return true; } return false; };
+function derivedFromBody(body) {
+    const words = new Set();
+    const attrs = (s) => Object.fromEntries([...s.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    const texts = [...body.matchAll(/<text([^>]*)>([^<]*)<\/text>/g)].map((m) => { const a = attrs(m[1]); return { x: num_(a.x), y: num_(a.y), t: m[2].replace(/&amp;/g, '&') }; });
+    // 1. "=" : a number sentence -> equation
+    if (texts.some((t) => t.t.includes('='))) words.add('equation');
+    // 2. a number run (3+ numbers, one step) along a line or down a column -> pattern, sequence, multiple
+    const runOf = (list) => list.flatMap((t) => (t.t.match(/\d+/g) || []).map(Number));
+    const byLine = new Map(), byCol = new Map();
+    for (const t of texts) {
+        const ky = Math.round(t.y / 2), kx = Math.round(t.x / 2);
+        if (!byLine.has(ky)) byLine.set(ky, []); byLine.get(ky).push(t);
+        if (!byCol.has(kx)) byCol.set(kx, []); byCol.get(kx).push(t);
+    }
+    const runs = [...[...byLine.values()].map((l) => l.sort((a, b) => a.x - b.x)), ...[...byCol.values()].map((l) => l.sort((a, b) => a.y - b.y))];
+    if (runs.some((l) => isAP_(runOf(l)))) ['pattern', 'sequence', 'multiple'].forEach((w) => words.add(w));
+    // 3. a column drawn round: a heavy outline taller than wide round two or more numbers -> column (wider: row)
+    const rects = [...body.matchAll(/<rect([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.x), y: num_(a.y), w: num_(a.width), h: num_(a.height), sw: num_(a['stroke-width']), rx: num_(a.rx || 0), fill: a.fill }));
+    const heavy = Math.max(0, ...rects.map((r) => r.sw || 0));
+    for (const r of rects) {
+        if (!(r.sw >= heavy) || r.fill !== 'none') continue;
+        const inside = texts.filter((t) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h);
+        if (inside.length < 2) continue;
+        if (r.h > 1.5 * r.w) words.add('column');
+        if (r.w > 1.5 * r.h) words.add('row');
+    }
+    // 4. a crossed or a lone mark -> left
+    const lines = [...body.matchAll(/<line([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x1: num_(a.x1), y1: num_(a.y1), x2: num_(a.x2), y2: num_(a.y2) }));
+    const crosses = (p, q) => { const d = (a, b, c) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); const A = { x: p.x1, y: p.y1 }, B = { x: p.x2, y: p.y2 }, C = { x: q.x1, y: q.y1 }, D = { x: q.x2, y: q.y2 }; return d(A, B, C) * d(A, B, D) < 0 && d(C, D, A) * d(C, D, B) < 0; };
+    const diag = lines.filter((l) => Math.abs(l.x2 - l.x1) > 0.5 && Math.abs(l.y2 - l.y1) > 0.5);
+    if (diag.some((p, i) => diag.slice(i + 1).some((q) => crosses(p, q)))) words.add('left');
+    const circles = [...body.matchAll(/<circle([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.cx), y: num_(a.cy), r: num_(a.r), fill: a.fill }));
+    const dotsC = circles.filter((c) => c.fill !== 'none');
+    for (const ring of circles.filter((c) => c.fill === 'none')) {
+        const inn = dotsC.filter((d) => Math.hypot(d.x - ring.x, d.y - ring.y) < ring.r);
+        if (inn.length === 1 && texts.every((t) => Math.hypot(t.x - ring.x, t.y - ring.y) >= ring.r)) words.add('left');
+    }
+    // 5. a loop of arrows (three or more arrow heads round a centre, not along one line) -> pattern
+    const heads = [...body.matchAll(/<path d="M([\d.-]+) ([\d.-]+) [Ll][^"]*Z" fill="#000"\/>/g)].map((m) => ({ x: num_(m[1]), y: num_(m[2]) }));
+    if (heads.length >= 3) {
+        const xs = heads.map((h) => h.x), ys = heads.map((h) => h.y);
+        const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+        if (w > 4 && h > 4 && Math.min(w, h) / Math.max(w, h) > 0.5) words.add('pattern');
+    }
+    return [...words];
+}
+/** The words a library picture's drawing shows, other than its own word (derived; [] for no picture). */
+export function vocabPictureDerived(id) {
+    if (!Object.prototype.hasOwnProperty.call(PICS, String(id))) return [];
+    return derivedFromBody(bodyFor(String(id), '')).filter((w) => w !== String(id));
+}
+/** The other words a library picture could be read as: derived from its drawing, plus the hand list (null: no list). */
+export const vocabPictureAlsoShows = (id) => (Object.prototype.hasOwnProperty.call(VOCAB_ALSO_SHOWS, id)
+    ? [...new Set([...vocabPictureDerived(id), ...VOCAB_ALSO_SHOWS[id]])] : null);
 export const VOCAB_PICTURE_IDS = Object.freeze(Object.keys(PICS));
 /** Does the library have a picture of this word? */
 export const hasVocabPicture = (id) => Object.prototype.hasOwnProperty.call(PICS, String(id));
@@ -552,6 +615,33 @@ function keyUnderlay(tag, attrs, inner, ink) {
     const r = num(attrs, 'r');
     return `<circle cx="${num(attrs, 'cx')}" cy="${num(attrs, 'cy')}" r="${Math.round((r + Math.min(0.7 * r, 2.5)) * 100) / 100}" fill="${ink}" stroke="none"/>`;
 }
+/**
+ * critic r7 #3 (lf-vocab r9): dot underlays that would overlap (the four dots of one equal group) become ONE underlay per
+ * group - a rounded box round the group's dots - so the key's grey never fuses into a blob of rings; a lone dot keeps its own.
+ */
+function mergeDotUnderlays(seg, ink) {
+    const re = /<circle data-vu="1" cx="([\d.-]+)" cy="([\d.-]+)" r="([\d.-]+)"[^>]*\/>/g;
+    const us = [...seg.matchAll(re)].map((m) => ({ src: m[0], x: +m[1], y: +m[2], r: +m[3] }));
+    if (us.length < 2) return seg;
+    const grp = us.map((_, i) => i);
+    const root = (i) => (grp[i] === i ? i : (grp[i] = root(grp[i])));
+    for (let i = 0; i < us.length; i++) for (let j = i + 1; j < us.length; j++) {
+        if (Math.hypot(us[i].x - us[j].x, us[i].y - us[j].y) < us[i].r + us[j].r) grp[root(j)] = root(i);
+    }
+    const groups = new Map();
+    us.forEach((u, i) => { const k = root(i); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(u); });
+    const r2 = (v) => Math.round(v * 100) / 100;
+    for (const g of groups.values()) {
+        if (g.length < 2) continue;
+        const x0 = Math.min(...g.map((u) => u.x - u.r)), x1 = Math.max(...g.map((u) => u.x + u.r));
+        const y0 = Math.min(...g.map((u) => u.y - u.r)), y1 = Math.max(...g.map((u) => u.y + u.r));
+        const rx = Math.max(...g.map((u) => u.r));
+        const box = `<rect data-vu="1" x="${r2(x0)}" y="${r2(y0)}" width="${r2(x1 - x0)}" height="${r2(y1 - y0)}" rx="${r2(rx)}" fill="${ink}" stroke="none"/>`;
+        seg = seg.replace(g[0].src, box);
+        for (const u of g.slice(1)) seg = seg.replace(u.src, '');
+    }
+    return seg;
+}
 function haloOf(seg, ink = 'currentColor', key = false) {
     if (key) {
         seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => keyUnderlay('text', attrs, inner, ink))
@@ -559,6 +649,7 @@ function haloOf(seg, ink = 'currentColor', key = false) {
                 const f = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
                 return f !== undefined && f !== 'none' ? keyUnderlay('circle', attrs, '', ink).replace('<circle', '<circle data-vu="1"') : m;
             });
+        seg = mergeDotUnderlays(seg, ink);
     }
     return seg.replace(/<(rect|line|circle|path|text)\b([^>]*?)(\/?)>/g, (m, tag, attrs, close) => {
         if (key && (/\sstroke="none"/.test(attrs))) return m;     // an underlay (above): no stroke
@@ -633,4 +724,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

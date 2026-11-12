@@ -37,6 +37,20 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
   additive css/screen-cell.css) before an answer on card / worksheet / quiz, none after a tap or once judged; pills plain.
   Checks NB6 / NB7 (ws-next-box, on precritic's path): quiz-wrong C:red A:red B:red; line before = switch blue, after none.
   ws-next-box (default, 13 hosts) OK. Rows vocab-r9-nb6-quiz-red, vocab-r9-nb7-pick3-line.
+- Items 5 + 6 (one commit: vocab-words.js / vocab-pictures.js / ws-vocab-unit carry both).
+  5 (O-3, critic r7 #6): vocabPictureDerived(id) reads each picture's own drawing ("=" -> equation; a number run of one step
+  -> pattern, sequence, multiple; a heavy outline round 2+ numbers -> column / row; a crossed or lone ringed mark -> left; a
+  loop of 3+ arrow heads -> pattern); vocabPictureAlsoShows = derived + the hand list (an extra; array + row, column).
+  V-AMBIG+ fails every same-grade pair compatible() allows: it found exactly the critic's table (16 pairs + array). Resolved
+  by notWith: odd/left, row and column / multiple, pattern, input and output / column, array / row, column, cycle / pattern,
+  term and first term / multiple, pattern, product, factor, unknown, quotient / equation. Three sets lost their two-trio
+  split (V7) and changed one word in place: G4 growing shapes pattern -> total, G4 follow a rule pattern -> output, G4 times
+  as many equation -> total. Odd's explanation no longer names "left" ("one dot has no partner").
+  6 (minors, critic r7 #3-#5): key dot underlays that would overlap merge into one rounded underlay per group (equal groups:
+  3, not 12); pick3 "Here is how" says "Tap <word>." (vocabHowSteps, the screen verb); "4 dots in each", "3 times as long as
+  the other". Check V27 (node): no two key dot underlays overlap; the pick3 step uses the screen verb; a grammar list.
+  Gates: ws-vocab-unit OK; --browser OK after the 36 pupil pins the new deals moved were re-taken (only V23 pins changed);
+  boot-smoke OK. Rows vocab-r9-v-ambig-plus, vocab-r9-v27-minors.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.

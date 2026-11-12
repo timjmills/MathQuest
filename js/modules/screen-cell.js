@@ -35,7 +35,7 @@ import {
     withSupports, supportOpKey as opKey,
 } from './sheet/index.js';
 import { SKILLS } from './data.js';
-import { VOCAB_WORDS, vocabExplainLine } from './sheet/lesson-pages/vocab-words.js';
+import { VOCAB_WORDS, vocabExplainLine, vocabHowSteps } from './sheet/lesson-pages/vocab-words.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -1181,9 +1181,7 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
     // "Here is how", written here so every wrong card on every host shows the same blocks (critic r6 #4): it never repeats
     // the explanation and never hints at less than it (no first-letter rung, no blank: #2, #3); its last step names the
     // answer. The support ladder's own worked box and "Not yet" line are hidden while the explanation shows (.mq-vexplained).
-    const how = tpl === 'vocab-pick3'
-        ? ['Read the three words in the box.', `Type ${p.word} on the line.`]
-        : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
+    const how = vocabHowSteps(tpl, p.word, wrong);
     const box = document.createElement('div');
     box.className = 'mq-vexplain mq-v-feedback';
     box.setAttribute('role', 'status');

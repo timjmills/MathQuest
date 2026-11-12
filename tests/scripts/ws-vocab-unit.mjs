@@ -18,6 +18,8 @@
 //     with its halo (.mq-vhalo) in the single grey on the key and hidden on the screen until answered; the pupil page has neither
 // V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
 //     at most 14 words
+// V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails
+// V27 (r9) key dot underlays never overlap; the pick3 "Here is how" uses the screen verb; no broken comparison in an explain
 // V26 (r9) the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below
 //     (provider `preSkills`), never the Grade 6 definition-matching skills listed before it in data.js
 // --browser: V23 (R-1) card-390 and worksheet-1280 highlight after the answer and not before, the pupil print pages are
@@ -133,7 +135,21 @@ const ambig = [];
     for (const id of P.VOCAB_PICTURE_IDS) {
         const xs = also(id);
         if (!Array.isArray(xs)) { fail(`V-AMBIG "${id}": the picture declares no alsoShows`); continue; }
-        for (const b of xs) if (b !== id && W.VOCAB_WORDS[b] && W.compatible([id, b])) fail(`V-AMBIG "${id}": its picture could also show "${b}", and the two may share a bank (make them notWith)`);
+        // (the hand list - VOCAB_ALSO_SHOWS - is an extra: any pair of it that may share a bank fails, in any grade)
+        const hand = (P.VOCAB_ALSO_SHOWS || {})[id] || [];
+        for (const b of hand) if (b !== id && W.VOCAB_WORDS[b] && W.compatible([id, b])) fail(`V-AMBIG "${id}": its picture could also show "${b}", and the two may share a bank (make them notWith)`);
+    }
+    // V-AMBIG+ (critic r7 #6, lf-vocab r9): the words DERIVED from what each picture draws (vocabPictureDerived: "=" ->
+    // equation; a number run -> pattern, sequence, multiple; a column drawn round -> column; a crossed or lone mark -> left;
+    // a loop of arrows -> pattern). Every same-grade pair that compatible() lets share a bank FAILS: add it to notWith, or
+    // redraw the picture.
+    if (typeof P.vocabPictureDerived !== 'function') fail('V-AMBIG+: the library derives no alsoShows from its drawings (vocabPictureDerived)');
+    else for (const g of W.VOCAB_GRADES) {
+        const ws = W.gradeWords(g);
+        for (const id of ws) {
+            if (!P.hasVocabPicture(id)) continue;
+            for (const b of P.vocabPictureDerived(id)) if (b !== id && ws.includes(b) && W.compatible([id, b])) fail(`V-AMBIG+ grade ${g} "${id}": its drawing also shows "${b}" (derived), and the two may share a bank (make them notWith or redraw)`);
+        }
     }
     // (a lesson set's Match 3 cells are clash-free trios - lesson-pages/vocab-pages.js trios() by compatible - so the pair rule
     // above covers them, as it covers every dealt Match 3 cell and 1 picture, 3 words bank)
@@ -446,6 +462,29 @@ const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amo
         for (const h of HARD_WORDS) if (has(rest, h)) fail(`V24 "${w}": its explain uses the hard word "${h}"`);
         if (n < 6) fail(`V24 "${w}": its explain is ${n} words (at least 6)`);
     }
+}
+
+// V27 (critic r7 #3, #4, #5; lf-vocab r9):
+//   key underlays: no two dot underlays of a key picture overlap (one underlay per group, never a ring round each dot);
+//   the ladder verb is the screen task's verb (pick3 says "Tap its word": its "Here is how" says "Tap <word>.");
+//   no explanation uses a broken comparison ("is 3 of the other") or ends on a bare "like 4 dots."
+{
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const svg = P.vocabPictureSVG({ keyPage: true, state: 'answered', size: 'L' }, id);
+        const cs = [...svg.matchAll(/<circle data-vu="1" cx="([\d.-]+)" cy="([\d.-]+)" r="([\d.-]+)"/g)].map((m) => ({ x: +m[1], y: +m[2], r: +m[3] }));
+        for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
+            if (Math.hypot(cs[i].x - cs[j].x, cs[i].y - cs[j].y) < cs[i].r + cs[j].r - 0.01) { fail(`V27 "${id}": two key dot underlays overlap (one underlay per group)`); i = cs.length; break; }
+        }
+    }
+    if (typeof W0.vocabHowSteps !== 'function') fail('V27: no vocabHowSteps (the "Here is how" steps)');
+    else {
+        const q = deal('vocab_pick3_words', {}, 1, 4242)[0];
+        const verb = String(q.screenInstr || q.text || '').split('.').map((x) => x.trim()).filter(Boolean).pop().split(/\s+/)[0];
+        const last = W0.vocabHowSteps('vocab-pick3', 'even').slice(-1)[0];
+        if (!last.startsWith(`${verb} `)) fail(`V27 pick3: the "Here is how" step "${last}" does not use the screen verb "${verb}"`);
+    }
+    const GRAMMAR = [/\bis \d+ of the\b/i, /\blike \d+ dots\.$/i];
+    for (const [w, e] of Object.entries(W.VOCAB_WORDS)) for (const g of GRAMMAR) if (e && e.explain && g.test(e.explain)) fail(`V27 "${w}": its explain reads ${g} ("${e.explain}")`);
 }
 
 // V26 (lf-vocab r9, precritic render-gate / cell-checks: the Pre-skill check overflowed at S, M and L): the check of a

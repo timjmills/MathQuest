@@ -3739,6 +3739,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r9-nb6-quiz-red",
+   "check": "lf-vocab r9 item 4: critic r7 #1: the quiz, Match 3 answered wrong (instant feedback) - every wrong letter box red, none with the blue next ring",
+   "kind": "commit-pair",
+   "rule": "ws-next-box NB6",
+   "browser": true,
+   "fail": {
+    "commit": "7e09577a",
+    "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+   },
+   "pass": {
+    "commit": "69564628",
+    "state": "lf-vocab r9 items 4 + 4b"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs --skills vocabulary:vocab_grade_pictures 2>&1 | grep -q ' - NB6 ' && echo 'nb6: FAIL' || echo 'nb6: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r9-nb7-pick3-line",
+   "check": "lf-vocab r9 item 4b: lead default for critic r7 note 2: the pick3 answer line carries the next outline before an answer on card / worksheet / quiz, none after a tap",
+   "kind": "commit-pair",
+   "rule": "ws-next-box NB7",
+   "browser": true,
+   "fail": {
+    "commit": "7e09577a",
+    "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+   },
+   "pass": {
+    "commit": "69564628",
+    "state": "lf-vocab r9 items 4 + 4b"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs --skills vocabulary:vocab_grade_pictures 2>&1 | grep -q ' - NB7 ' && echo 'nb7: FAIL' || echo 'nb7: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
