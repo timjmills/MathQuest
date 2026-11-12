@@ -71,7 +71,7 @@ export function vocabPicture(pic, c) {
                 parts.push(`<rect x="${ring0 - 0.2}" y="${ry.toFixed(2)}" width="${rw.toFixed(2)}" height="${rh.toFixed(2)}" rx="${(rh / 2).toFixed(2)}" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`);
                 x += 1.2;
             }
-            const W = x + 0.5, H = low ? u + 1 : u * 10 + 1;
+            const W = x + 0.5, H = (low ? u + 1 : u * 10 + 1) + (pic.ring && pic.ones > 0 ? 2.4 : 0);
             return `<svg viewBox="0 0 ${W} ${H}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true"><g fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}">${parts.join('')}</g></svg>`;
         }
         case 'trade': {

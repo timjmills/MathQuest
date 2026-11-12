@@ -21,6 +21,10 @@ Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per ste
   two-step worked problem (Step 1 / Step 2 underlined heavy), digit = 472 with the 7 ringed and an arrow, lesson-band 'place'
   = H T O chart with T shaded, identify 'ones' = a ten and four ringed ones; V-AMBIG (library 47 + lesson bands). Pupil hash
   pin re-taken (the redraw and the step / count on / repeat / hundred notWith change the deals; owner O-2 / O-3).
+- Step C gates: ws-lesson-baseline --all-lessons (base written on 3d90097d, checked on head): 161 of 1692 differ, ONLY the
+  redrawn vocab cells - placevalue:identify / value / expand / combine page 2 (the band page) pupil + key, g2-nbt3 p06/p08/p18/p29
+  (its digit / place pictures), and the two vocabulary skills' own pages (step / digit drawings, deals). ws-detailed-lesson
+  g2-nbt3 --check OK, --repeats OK (70 places, 0 findings). EB-VOCAB PASS on the four pv lessons. PNGs in design/status/lf-vocab/r8.
 
 ## Round 7 (2026-11-09, builder, Opus medium: first build of a new screen feedback state): owner R-1 and R-2
 Times (UTC): start 12:50, end 13:45. Base b7dad93a (card signed 107b64aa). Brief design/lanes/lf-vocab/r7-builder-brief.md.
