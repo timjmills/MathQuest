@@ -9,7 +9,9 @@
 // in ./index.js. Pure data (no DOM, no state). Every number a script speaks is a {placeholder} filled
 // from the DEALT items through the kit's readers and `vars` below, never typed here.
 
-const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
+// (`cellPayload.noTabSpacer`, lf-placevalue 2026-11-08: the pack's rows centre the equation clear of the number tab, so the pv
+// cell's CL-40 top spacer is left off - self-check E11 / E9c, as the pack printed before the spacer came in)
+const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999, cellPayload: { noTabSpacer: true } }, extra || {});
 const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 1000, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto' } : {}, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
 // P1's bank types (V22 §9.2, critic D11): 2-digit prior knowledge, never today's new skill.
 const NS = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 99 }, opts || {}), minNum: 10, maxNum: 99 }, extra || {});
@@ -63,7 +65,9 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // Expanded form of a 3-digit number, one box per place (a 0 place keeps its box: 400 + 0 + 6).
-    skill: PV('expand'),
+    // (`inPlace: false`, lf-placevalue 2026-11-08: the Practice rows fill the page as the pack was signed off - an in-place
+    // row stops at its ink, layout IN_PLACE_FILL, and left Practice 1 15 % blank at the foot: self-check E9b)
+    skill: PV('expand', null, { cellPayload: { noTabSpacer: true, inPlace: false } }),
     // The pool (V22 §9.5, data): every number the pack may deal, 21 to 999 (P0 reads 2-digit words).
     pool: { kind: 'range', lo: 21, hi: 999 },
     // 1,000 is shown and said on the board in §5b only (lead ruling, critic r2 R2 / r3 S1): a hard
@@ -76,10 +80,12 @@ export default {
     // top), 2 = number name to numeral (the words form).
     // (its ★★★ last row: a 0 tens and one more edge case - critic D2; never 1,000, board-only)
     practiceSheets: [{}, { skill: WORDS('to_number', { maxNum: 999 }), shape: [8, 2], chunk: 'b', edgeLast: { per: 8, cols: 2, wants: ['pvZeroTens', 'pvTeen'] } }],
-    // Mixed: the lesson skill with its other forms - expanded form back to the numeral and the
-    // number name to the numeral (H T O boxes). No number is WRITTEN in words (owner ruling, R1).
-    // (no Steps band on the mixed page - critic D18)
-    mixed: { skills: [PV('combine'), WORDS('to_number', { sectionLabel: 'Number names', maxNum: 999 }), PV('unit_form'), PV('value')], strip: false },
+    // Mixed: the lesson's two taught forms - numeral to expanded form and the number name to the
+    // numeral (H T O boxes) - with the earlier place-value skills. No number is WRITTEN in words (owner
+    // ruling, R1). (no Steps band on the mixed page - critic D18)
+    // (R9, lf-checks LP-MODELLED: expanded form BACK to the numeral (`combine`) is modelled nowhere in the
+    // lesson, so no practice page deals it - PEDAGOGY P-1)
+    mixed: { skills: [PV('expand'), WORDS('to_number', { sectionLabel: 'Number names', maxNum: 999 }), PV('unit_form'), PV('value')], strip: false },
 
     // The lesson's own placeholder names (index.js): a 3-digit number's parts.
     vars: (q, b) => {
@@ -159,13 +165,14 @@ export default {
     },
 
     // ------------------------------------------------------------------ P6 Exit slip (Q8)
-    // Four items, both chunks (critic D14, r2 R4): a-b the number's NAME to the numeral (chunk 2), c
-    // expanded form back to the numeral (chunk 1's read-back, step 4), d numeral to expanded form with
-    // a 0 place (chunk 1, the Critical Atom). The tens-word case is b.
+    // Four items, both chunks (critic D14, r2 R4): a-b the number's NAME to the numeral (chunk 2), c-d
+    // numeral to expanded form (chunk 1), c with no 0 place, d with a 0 place (the Critical Atom). The
+    // tens-word case is b. (R9, lf-checks LP-MODELLED: c was expanded form BACK to the numeral, a
+    // direction no chart or Guided cell models - PEDAGOGY P-1, the exit slip tests only what was taught.)
     exit: [
         { case: 'name, no 0 place', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: three hundred forty-seven = 30047.' },
         { case: 'name, no tens word (Critical Atom)', ref: WORDS('to_number', { maxNum: 999 }), want: 'pvZeroTens', instr: 'Write the number.', detects: 'Drops the 0: six hundred five = 65.' },
-        { case: 'expanded form to the numeral, no 0 place', ref: PV('combine'), want: 'pvNoZero', instr: 'Write the number.', detects: 'Parts side by side: 500 + 30 + 9 = 500309.' },
+        { case: 'numeral to expanded form, no 0 place', ref: PV('expand'), want: 'pvNoZero', instr: 'Write the number in expanded form.', detects: 'Writes the digits, not their worth: 539 = 5 + 3 + 9.' },
         { case: 'numeral to expanded form, a 0 place', ref: PV('expand'), want: 'pvZeroTens', instr: 'Write the number in expanded form.', detects: 'Writes 10 for the empty tens: 400 + 10 + 7.' },
     ],
     exitInstruction: 'Write the number.',

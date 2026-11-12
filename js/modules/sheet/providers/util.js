@@ -212,6 +212,13 @@ export function sayFill(def, q) {
 
 /** A worked step. `marks` is [{slot, value}] - what the cell shows once the step is done. */
 export const step = (text, marks = []) => ({ text, marks });
+/**
+ * A worked step that also draws on a Scripted Model state (lf-ops facts-roles critic r1 S1 / S2, PT-MOD-1 / PT-MOD-2):
+ * `short` is the step text for the Model's narrow state column (2 lines at most), `draw` the grey marks the step adds to the
+ * picture: {jot: 'text'} a new grey line under the problem, {more: 'text'} added to the last line, {tile: n} a dot tile.
+ * Kept apart from `marks` (the slot fills the lesson, anchor and key pages read), so those pages are unchanged.
+ */
+export const drawStep = (text, short, draw, marks = []) => ({ text, marks, short, draw });
 
 /** Clamp a worked-steps list to the contract's 3-6 (SCC-P4), keeping the last (answer) step. */
 export function clampSteps(list) {

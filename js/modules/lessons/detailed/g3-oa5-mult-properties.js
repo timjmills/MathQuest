@@ -68,9 +68,10 @@ export default {
     // row a 4 x 4 square and 5 rows; Practice 2:
     // facts only, the missing number, its last row a square and a 5.
     practiceSheets: [
-        // (products to 16: rows + in each row at most 8, so the array and its turn fit a half-width cell at L)
-        // (r2, critic D1: row 1 two non-squares, the last row the one square and a 5-row array)
-        { skill: TURN(1, { minNum: 6, maxNum: 16, allTest: 'arrP1', instructionKey: 'turn-look' }), shape: [4, 2], edgeLast: { per: 4, cols: 2, wants: ['arrBigSquare', 'arrFiveRows'] } },
+        // OWNER RULING 2026-11-07 (LP-FAMILY-REPEAT): Practice 1 is FULL-WIDTH taller cells, ONE item a row, arrays up to
+        // 6 x 6 (band 36), each with its turn; every fact family once in the pack. (`equalPages`: its two pages' cells one height - E12) (The half-width cells capped the pool at
+        // products 16-18 with no 5s: 4-5 families, so a family had to repeat.) The last row: the one square (4 x 4 to 6 x 6).
+        { skill: Object.assign(TURN(1, { minNum: 6, maxNum: 36, allTest: 'arrP1', instructionKey: 'turn-look' }), { opts: { forms: [0], task: [1], band: 36 } }), shape: [4, 1], edgeLast: { per: 4, cols: 1, wants: ['arrBigSquare'] }, equalPages: true },
         { skill: FACTS({ minNum: 12, factorCap: 4, allTest: 'arrP2' }), shape: [10, 2], edgeLast: { per: 10, cols: 2, first: true, wants: ['arrSquare', 'arrFive'] } },
     ],
     // No Mixed page: a Mixed page leads with the lesson skill (half its items), and only ten arrays up to
@@ -134,7 +135,9 @@ export default {
     prerequisites: [
         // (r2, critic D7: each atom names what its items test - a count by 5, × 2 recall, reading an array)
         { atom: 1, items: 1, ref: CB(5), lesson: { id: '2.NBT.A.2', title: 'Count by 5s' } },
-        { atom: 2, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2], notation: ['stacked'], band: 100 }, minNum: 12, maxNum: 18 }, lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
+        // (P1d, owner ruling 2026-11-07 - every family once: 2 x 6 to 2 x 10, five families for four items - 2 x 6 to 2 x 9 were
+        // exactly four, so a spaced-retrieval x 2 fact left one family twice on P0, sweep seed 3)
+        { atom: 2, items: 4, ref: { categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [2], notation: ['stacked'], band: 100 }, minNum: 12, maxNum: 20 }, lesson: { id: '3.OA.C.7', title: 'Multiply by 2' } },
         // (squares: the pack's ten pictured pairs to 5 x 5 - the six non-squares are the chart's, the Guided cells' and
         // Practice 1's; LR-5 holds a pair once in the pack, critic D6)
         { atom: 3, items: 2, ref: ARR({ minNum: 4, maxNum: 25, allTest: 'arrGridSquare', instructionKey: 'array-total' }), lesson: { id: '2.OA.C.4', title: 'Use arrays' } },

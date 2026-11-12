@@ -9,7 +9,10 @@
 // Every number a script speaks is a {placeholder} filled from the DEALT items, never typed here.
 
 const NS = (categoryId, skillId, opts, extra) => Object.assign({ categoryId, skillId, opts }, extra || {});
-const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 3, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000, lr6Names: true }, extra || {});
+// OWNER RULING 2026-11-07 (E24b): story parts 2 to 9 (was 3 to 9) - the crossing-ten stories with parts 3-9 are 15
+// facts and the chart, sheet, P5, P6 and Check Question take 9, so LR-6 (no near twins on a page, e.g. 7 + 5 and 8 + 5)
+// left no 4th Practice story. Near twins stay banned on every page.
+const WP = (extra, payload) => Object.assign({ categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'bar', wpCues: false, wpBank: false }, partMin: 2, noPart: [10], crossTen: true, crossTenExcept: [20], cellPayload: Object.assign({ layout: 'bar' }, payload || {}), instructionKey: 'story-bar', shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000, lr6Names: true }, extra || {});
 // (`fresh` / `itemSpread` - the items dealt one by one (exit slip, Check Question): first a story whose turn-around no
 // page dealt (V22: a turn-around only when the pool is spent), and every name and noun the generator has - critic r3 D3, m3)
 // (`shortQuestion`: the question in its short form - "How many books now?", "How many books in all?" -
@@ -43,10 +46,12 @@ export default {
     // put-together stories for the chart AND Guided cell 2; the whole of 20 is the Practice page's ★★★ case)
     skill: WP({ minNum: 11, maxNum: 18, crossTenExcept: [], sectionLabel: 'Stories' }),
     // The last row of every Practice page (★★★): the edge cases - equal parts and a whole of 20
-    // (RESEARCH.md §5; every other story crosses ten with parts of 3 to 9: partMin / noPart / crossTen on every story ref).
+    // (RESEARCH.md §5; every other story crosses ten with parts of 2 to 9 - owner ruling 2026-11-07: partMin / noPart / crossTen on every story ref).
     edgeTest: 'wpEdge',
     // (`first`: the last row is dealt first, so the rows above keep LR-6 against its equal parts - critic r2 D2)
-    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true } }],
+    // (`solve`, E24b attempt 2 - owner ruling 2026-11-07: the page's stories SOLVED from the facts left before it is dealt -
+    // no near twins, every first addend and whole different; the greedy deal left 7 + 4 / 8 + 5 for its last places at 4242)
+    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true }, solve: { partMin: 2, noPart: [10], sums: [20], dealPin: 'wp:add:20' } }],
     // The lesson's own placeholder names: the story's unit word and its parts.
     vars: (q, b) => {
         const p = (q && q.cell && q.cell.payload) || {};
@@ -57,9 +62,9 @@ export default {
         const lines = Array.isArray(p.lines) ? p.lines : [];
         return { unit: p.unit || '', parts: st.a !== undefined ? `${st.a} + ${st.b}` : '', whole, slip: Number.isFinite(Number(whole)) ? Number(whole) - 1 : '', question: lines.length ? lines[lines.length - 1] : '' };
     },
-    // The pool by its rule (V22 §9.5 `decl`; critic r3 m7): the stories' + facts - parts 3 or more, never 10, crossing
+    // The pool by its rule (V22 §9.5 `decl`; critic r3 m7): the stories' + facts - parts 2 or more (owner 2026-11-07), never 10, crossing
     // ten (both parts 9 or less) or a whole of 20 - and every other skill's places by list. E24 recomputes it.
-    pool: { kind: 'plus', skill: 'add_wp_20', partMin: 3, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
+    pool: { kind: 'plus', skill: 'add_wp_20', partMin: 2, noPart: [10], crossTen: true, sums: [20], maxSum: 20 },
     // (`wpClean`: no part is the difference of the parts, so option C's wrong-sign top is no story number - critic r3 D3)
     checkQuestion: { want: ['wpBridgeBigFirst', 'wpClean'], correct: 'D', reserve: true },
     practicePages: 1,
@@ -103,8 +108,10 @@ export default {
         // (the chart: a crossing-ten PUT TOGETHER story such as 6 and 7, RESEARCH §E - pinned, critic r2 D1; the
         // second example an ADD TO story, modelled on the board in I Do)
         example: { match: 'story', test: 'wpBridgePT' },
-        second: { test: 'wpAddTo', label: 'Gets more? That is a part.' },
-        third: { test: 'wpEqual', label: 'Equal parts? Still add the parts.' },
+        // (lesson 2 E24b / E31 at every seed, lead's order 2026-11-08: each from its OWN case pool - the main pool, thinned by
+        // Practice 1's solved set, held neither case at seed 2; roles/lesson.js sources gives the pool the pack's avoid keys)
+        second: { test: 'wpAddTo', label: 'Gets more? That is a part.', ref: { allTest: 'wpAddTo', tries: 600 } },
+        third: { test: 'wpEqual', label: 'Equal parts? Still add the parts.', ref: { allTest: 'wpEqual', tries: 600 } },
         mixWith: [
             { key: 'composing:number_bonds', opts: { band: 10, unknown: 'answer' } },
             { key: 'addition:add_facts', opts: { band: 20 } },
@@ -113,13 +120,20 @@ export default {
 
     // ------------------------------------------------------------------ P0 Prerequisite Check
     prerequisites: [
-        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 17, maxNum: 20 },
+        // (lesson 2 E24b at every seed, lead's order 2026-11-08: 11 to 20 - two items a question need two numbers 3 apart, and
+        // 17-20 held one such pair: seed 2 dealt 18 / 19. pack-solve.js p0Sources models it; ws-lesson-unit pack-feasible is the gate.)
+        { atom: 1, ref: { categoryId: 'counting', skillId: 'count_objects', opts: { band: 20, objects: 'frame' }, minNum: 11, maxNum: 20 },
             lesson: { id: 'K CC 5', title: 'Count to 20' } },
-        // (both parts 3 or more: "4 and 1" can be answered by "one more", with no part-whole idea - critic r2 n5; a whole of 6
-        // or more and no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2)
-        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 3, partMin: 3, minNum: 6, distinctFirst: true },
+        // (no first part twice: not 2 and 7 / 2 and 3 - critic r3 m2. Critic r2 n5's parts 3+ and r3 m2's whole 6+ are lifted by
+        // the lead's order 2026-11-08 below - they left too few wholes for two items at every seed)
+        // (lesson 2 E24b at every seed, lead's order 2026-11-08: within 10, parts 1 or more - parts 3+ and a whole of 6+ left 1-3
+        // pairs of wholes 3 apart, and seed 5 dealt 9 / 10)
+        { atom: 2, ref: { categoryId: 'composing', skillId: 'number_bonds', opts: { band: 10, unknown: 'answer', orientation: 'horizontal' }, minOperand: 1, partMin: 1, maxNum: 10, distinctFirst: true },
             lesson: { id: 'Y1 B2 S2', title: 'Part-whole model' } },
-        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'] }, minNum: 11, maxNum: 16, noPart: [10] },
+        // (OWNER RULING 2026-11-08, E24b: the Prerequisite Check's + facts are within 20 and do NOT cross ten - a teen and ones,
+        // 12 + 5 - so they never draw from the lesson's crossing-ten story pool: the 20 facts (parts 2-9) are the stories' alone,
+        // ~14 places under LR-5 / LR-6. lessons/pack-solve.js prereqPoolDraws holds it; ws-lesson-unit pack-feasible is the gate.)
+        { atom: 3, items: 4, ref: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20, notation: ['stacked'], constant: [11, 12, 13] }, minNum: 13, maxNum: 19, partMin: 2, noPart: [10] },
             lesson: { id: 'G1 OA 6', title: 'Add within 20' } },
     ],
 
@@ -136,7 +150,7 @@ export default {
     // ------------------------------------------------------------------ P5 Word problem
     // The same skill with the bar OFF: the pupil draws the bar (the fade).
     wordProblem: {
-        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 3, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000 },
+        ref: { categoryId: 'addition', skillId: 'add_wp_20', opts: { band: 20, pictures: false, support: 'none', wpCues: false, wpBank: false }, minNum: 11, maxNum: 19, partMin: 2, noPart: [10], crossTen: true, shortQuestion: true, fresh: true, itemSpread: true, pageFresh: true, dealTries: 4000 },
         want: 'wpBridgeSmallFirst',
         // The dealt story itself (its own words and numbers); the bar is OFF - the pupil draws it in the Workspace.
         answerLine: 'The answer: __ {wp.unit}.',
@@ -186,7 +200,7 @@ export default {
     atoms: [
         { type: 'Fact', prereq: true, skill: 'Count a set: the last number is how many', notes: 'Prerequisite Check {pre.0.letters}.' },
         { type: 'Conceptual', prereq: true, skill: 'Parts and whole: two parts make a whole', notes: 'Prerequisite Check {pre.1.letters}.' },
-        { type: 'Fact', prereq: true, skill: 'Add within 20: count on past 10', notes: 'Prerequisite Check {pre.2.letters}.' },
+        { type: 'Fact', prereq: true, skill: 'Add within 20: a teen and ones', notes: 'Prerequisite Check {pre.2.letters}.' },
         { type: 'Category', prereq: true, skill: 'Missing whole: then add', notes: 'Checked again at step 3.' },
         { type: 'Category', skill: 'Story numbers are parts', notes: 'Point at each number.' },
         { type: 'Conceptual', critical: true, skill: 'Bar: whole on top, parts below', notes: 'Cubes on the mat first.' },

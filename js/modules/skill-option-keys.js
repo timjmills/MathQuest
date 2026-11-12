@@ -200,6 +200,7 @@ export const MULTI_KEYS = Object.freeze({
     tenTask: '4I',       // value form times: compare / story (700 ÷ 70 = 10)
     tenChoice: '4J',     // value form times, ring only: two words / four (the Check Question's A-D: + the same as, 100 times) - lesson 6 r4 (critic r2 D2)
     familyChart: '4K',   // fact_family_sort (visual-quality lane, owner 2026-10-31): a blank number-family chart to fill in (working space)
+    writeValue: '4L',    // identify (lf-placevalue, owner ruling 2026-10-10): also write the value of the underlined digit
     // NEXT FREE IN 4E-4O: 4L.
     // Build lane algebra (sub-range 4P-4Z): multi_step_four_ops (detailed lesson 7, 2026-10-17).
     msOps: '4P',         // multi_step_word(_plain): the first step - + / − (default), ×, ÷ or × / ÷ mixed
@@ -459,6 +460,7 @@ export const SCALAR_ONLY = Object.freeze({
     simplestForm: 'bool', pictures: 'bool', familyChart: 'bool',
     // P9 step 8 (block 0)
     count: 'decimal', span: 'decimal', repeatDigit: 'bool', zeroDigit: 'bool', midLabel: 'bool',
+    writeValue: 'bool',   // lf-placevalue (identify, 2026-11-07)
     // block 2 (2026-09-25)
     missing: 'decimal', rule: 'bool', jumps: 'decimal', onePage: 'bool',
     // lane C2 (1W): the row list, "2ZR5C3R25C100D" (count-rows.js); its own grammar, letters and digits only

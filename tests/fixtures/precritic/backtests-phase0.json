@@ -1,0 +1,194 @@
+{
+ "about": "Phase-0 lesson backtests (lf-checks 2026-11-07, from the lessons-phase0 critic r1 findings via the lead). Every row FAILS on 8f12b0e85 (proven with today's scripts, see design/status/lf-checks.md); the pass state is lf-engine's fix, not yet made, so each row is pending. lf-engine: set pass.commit, delete \"pending\", move the row into backtests.json (append-only) in the same change as the fix. Run this table with: node tests/scripts/ws-backtest.mjs --table tests/fixtures/precritic/backtests-phase0.json --list",
+ "rows": [
+  {
+   "id": "pc-d1-slots",
+   "check": "PC-SLOTS: one answer place a check item (D1 add Q2: \"12 13 [ ] 15 16\" box plus an \"Answer:\" line, the key fills only the line)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-SLOTS (empty drawn box + Answer line; writing slots pupil = key; key fills every slot)",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only add --seeds 1 --rules PC-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d2-d12-checks",
+   "check": "PC-NAME: every prerequisite has a `checks` text, true by name of the item dealt (D2 add Q3 Same / Not the same under \"Step 1 starts with the bigger number\"; D12 the table prints the design why)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-NAME (checks text present; its words found in the dealt item)",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only add --seeds 2 --rules PC-NAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d3-range",
+   "check": "PC-RANGE: prerequisite items inside the route step's range (D3 add Q2 counts 12-16 routed to Y1.B1.S6, block \"within 10\")",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-RANGE",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only add --seeds 8 --rules PC-RANGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d5-name",
+   "check": "PC-NAME: the item dealt is what the route step names (D5 round Q4 \"1 more than 33\" under \"10 more, 10 less\")",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-NAME (title \"N more / N less\")",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only round --seeds 8 --rules PC-NAME",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d7-range",
+   "check": "PC-RANGE: \"Count in 10s\" deals multiples of 10 (D7 round Q1 \"67, ___, 87, 97\")",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-RANGE (Count in Ns)",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only round --seeds 8 --rules PC-RANGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d6-ak4",
+   "check": "AK-4 blocking on the lesson samples (D6 round key-p1: 7 key slots vs 6, \"Answer: 77\" on an extra line)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-KEY AK-4 with no baseline (precritic --role lesson: lesson-samples-key-L / -S)",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --lints L-KEY --skills number_sense:nearest_10",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d8-scaffold",
+   "check": "PC-SCAFFOLD: no scaffold and one response a check cell (D8 sub Q3 exchange box on 16 - 8; Q4 a Check row adds a second task)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-SCAFFOLD (data-ws-seg boxes, check-* slots)",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --only sub --seeds 1 --rules PC-SCAFFOLD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d4-d9-d11-h13",
+   "check": "PC-H13: sheetCheck blocking on the check page and the lesson sheet (D4 gaps up to 56 mm and a 25 % blank foot on add S; D9 sub Q1 / round Q2 31-41 % bands; D11 round S sheet 18 % blank foot)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples --check PC-H13",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PC-H13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  },
+  {
+   "id": "pc-d10-overlap",
+   "check": "L-OVERLAP SECTION blocking on the lesson samples (D10 sub L pupil-p3: the Guided band covers \"Independent Practice:\")",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP SECTION with no baseline (precritic --role lesson: lesson-samples-key-L / -S); NOTE: on 623fdd6d sub_100_regroup#lesson also has 30 L-OVERLAP CL40-INK findings, so the pass state needs both fixed",
+   "browser": true,
+   "fail": {
+    "commit": "8f12b0e85",
+    "state": "lessons-phase0 critic r1 FAIL (design/audit/runs/lessons-phase0-r1/REPORT.md); proven FAIL with today's scripts on 2026-11-07 (lf-checks, MQ_ROOT worktree)"
+   },
+   "pass": {
+    "commit": "TBD",
+    "state": "lf-engine's fix commit: set it, drop \"pending\", and append the row to backtests.json"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --lints L-OVERLAP --skills subtraction:sub_100_regroup",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true
+  }
+ ]
+}

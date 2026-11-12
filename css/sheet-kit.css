@@ -156,6 +156,15 @@
 :is(.ws-page, .ws-sheet) .ws-grid.fixed { flex: none; }
 :is(.ws-page, .ws-sheet) .ws-grid.open { gap: 0; background: var(--ws-paper); }   /* tests / probes: open array */
 :is(.ws-page, .ws-sheet) .ws-grid.facts { gap: var(--ws-hair); }                  /* fact grids: hairline interiors in both looks */
+/* Fact rows (owner 2026-11-05, facts-print-fix ROWRULES): the hairline interiors are DRAWN rules, not the ink background
+   showing through a 0.75 pt gap between white cells. A PDF viewer or printer rasterises a gap between two white fills
+   with conflation (each white edge partly covers the gap's pixels), so some rules vanished and others doubled ("no lines
+   between the rows", "one vertical thicker"). Each cell draws its left and top rule in ink on top of its neighbours; the
+   cell is pulled one hairline left and up, so the first column's and first row's rules sit under the heavy frame and
+   every inner rule is one hairline, closed on every row. */
+:is(.ws-page, .ws-sheet) .ws-grid.facts { gap: 0; background: var(--ws-paper); }
+:is(.ws-page, .ws-sheet) .ws-grid.facts > .ws-cell { border-left: var(--ws-hair) solid var(--ws-ink); border-top: var(--ws-hair) solid var(--ws-ink);
+    margin: calc(-1 * var(--ws-hair)) 0 0 calc(-1 * var(--ws-hair)); }
 :is(.ws-page, .ws-sheet) .ws-cell { position: relative; background: var(--ws-paper); min-width: 0; min-height: 0; padding: 3mm; display: flex; flex-direction: column; align-items: center; }
 :is(.ws-page, .ws-sheet) .ws-cell.blankrun { grid-column: var(--from) / -1; }
 :is(.ws-page, .ws-sheet) .ws-letter { position: absolute; left: 1.5mm; top: 1mm; font-size: var(--ws-letter); line-height: 1; }
@@ -534,3 +543,75 @@
    More practice and Review at M and L) put its first digit inside the tab's keep-out (L-OVERLAP CL40-INK). The same
    shrinkable spacer now stands above such a supported fact. */
 .ws-page .ws-grid > .ws-cell:has(> :is(.ws-tab, .ws-letter)):has(> .ws-supported > .ws-with-pane[data-ws-pane-place="under"] > .ws-pane-problem > .ws-eq[data-ws-across]):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: 0 1 max(0mm, calc(var(--ws-tab, 5mm) - 2mm - 0.2 * var(--ws-digit, 22pt))); min-height: 0; }
+
+/* 2026-11-07 (lf-placevalue, CL-40, ws-print-lint L-OVERLAP CL40-INK on combine L / expand S): a pv cell whose
+   first content is a one-line equation row ("800 + 40 + 5 = ____", "405 = [ ] + [ ] + [ ]") is wider than the
+   room beside the number tab and put its first digit inside the tab's keep-out. It takes the same fixed top
+   spacer as the word-work / counters cells above (tab side - 2 mm), on the page and on the measuring cell, so
+   rows are sized with it. Cells that start with the numeral (identify, value) are unchanged. Additive.
+   (2026-11-08, ws-detailed-lesson E11 / E9c: not on a cell marked pv-nospacer - a detailed lesson's refs, cellPayload
+   noTabSpacer - whose rows centre the equation clear of the tab; the spacer left lesson 1's Practice 1 rows 30 % empty
+   and, measured, cost its lesson sheet an item.) */
+.ws-page .ws-grid > .ws-cell:is([data-ws-cell="pv"], .mqt--pv, [data-ws-cell="pv-support"], .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not(:has(> :is(.pv-cell, .ws-cell-body > .pv-cell).pv-nospacer)):not([data-ws-writeabove]):not(.blankrun)::before,
+.ws-sheet > .ws-cell:is(.mqt--pv, .mqt--pv-support):has(> :is(.ws-tab, .ws-letter)):has(> :is(.pv-cell, .ws-cell-body > .pv-cell) > .ws-eq:first-child):not(:has(> :is(.pv-cell, .ws-cell-body > .pv-cell).pv-nospacer)):not([data-ws-writeabove]):not(.blankrun)::before { content: ''; display: block; flex: none; height: max(0mm, calc(var(--ws-tab, 5mm) - 2mm)); }
+
+/* 2026-11-07 (lf-placevalue r1 F8, L1; additive): the frame boxes of the five read-and-write skills (unit form, value in
+   unit form / notation, expanded notation - class pv-hw) are the WRITING HEIGHT of the size (Hw + stroke: 6 / 8 / 10 mm),
+   not a fixed 14 mm at every size, so a page at S draws smaller boxes and holds more rows than L. Other frames keep the
+   14 mm rule above. */
+:is(.ws-page, .ws-sheet) .pv-cell .pv-blanks.pv-hw .ws-box { height: calc(var(--ws-hw) + 2 * var(--ws-hair)); line-height: var(--ws-hw); min-width: 0; }
+/* 2026-11-07 (lf-placevalue r1; additive): on a screen card (.mq-kittwin) the read-and-write frame (pv-hw) wraps between
+   its "[ ] hundreds" units at any width, as the paper's 4-place frames do, so a phone never cuts the row off. */
+.mq-kittwin .pv-cell .pv-blanks.pv-hw { flex-wrap: wrap !important; white-space: normal !important; max-width: 100%; }
+/* facts-print-fix r4 (owner 2026-11-05: "Mixed ÷ forms stay mixed cell by cell, but every cell must look alike in
+   placement: each item centred, horizontally and vertically; one common baseline across the row; the answer slot in the
+   same place and visible in every cell; nothing touching a border"). A fact-rows grid that MIXES forms (stacked ÷,
+   fraction, bracket, and + − × beside them) draws every item in one frame of the stacked fact's three lines
+   (.ws-mixform: sheet/roles/fact-rows.js mixWrap): the dividend / numerator / quotient line, the divisor / denominator /
+   dividend line, the answer line. The frame clears the tab's keep-out (its margin) and is centred down the cell; each
+   drawing is centred across it. Additive: older saved sheets carry no .ws-mixform. */
+.ws-page .ws-grid.facts > .ws-cell:has(> .ws-mixform):not(.blankrun) { padding: 2mm 1mm 2mm !important; justify-content: center !important; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform { flex: none; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; line-height: 1.15; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform > div:not(.ws-fact) { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform .ws-ops { display: flex; justify-content: center; line-height: 1.15; }
+.ws-page .ws-grid.facts > .ws-cell > .ws-mixform > .ws-fact { flex: none; }
+/* facts-print-fix r4 PDFIUM-RULES: a fact-rows cell's white is painted inside its border only, so the first column's rule
+   and the frame are one solid stroke when a PDF is rasterised (two abutting anti-aliased edges left a light seam: the frame
+   read as a double line at 93 dpi). Additive. */
+.ws-page .ws-grid.facts > .ws-cell { background-clip: padding-box; }
+
+/* div_facts supports-off page (owner 2026-11-08, critic r5 R5-2): the fact prints over its answer line and the line sits at
+   the foot of the cell, so the room above the line is writing room and no empty band is left under the last ink (H13).
+   Only the div_facts bare-fact payload (`under`) emits .ws-eq-under. */
+:is(.ws-page, .ws-sheet) .ws-cell > .ws-eq-under { flex: 1 1 auto; align-self: stretch; }
+:is(.ws-page, .ws-sheet) .ws-eq-under > [data-ws-slot] { margin-top: auto; }
+
+/* div_facts' fade packet (owner 2026-11-08, critic r5 R5-6, facts card F4): the fact (over its line) is left-anchored at ONE x
+   in every cell of the packet - a fixed inset that clears a two-digit number tab - and its supports start at that x too.
+   Only div_facts' packet emits .ws-eq-left. */
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) { align-items: flex-start; --mq-fx: calc(var(--ws-tab, 6mm) * 1.5 - 2mm); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) > :is(.ws-eq-left, .ws-L, .ws-supported) { margin-left: var(--mq-fx); }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) .ws-with-pane { align-items: flex-start !important; }
+:is(.ws-page, .ws-sheet) .ws-cell:has(.ws-eq-left) .ws-with-pane > div { align-items: flex-start !important; }
+:is(.ws-page, .ws-sheet) .ws-cell > .ws-eq-under.ws-eq-left { align-self: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-eq-left { min-width: var(--mq-fw, auto); }
+:is(.ws-page, .ws-sheet) .ws-eq-left > span:first-child { align-self: flex-start; }
+:is(.ws-page, .ws-sheet) .ws-eq-left > .ws-line { align-self: stretch; width: auto; }
+
+/* div_facts' fade packet, one x across ALL its pages (critic r6 R6-5, facts card F4; additive): a page numbered past 9 gives its
+   equation cells the two-digit tab's keep-out as their left inset (the rule above, "grid past 9"), a page of 6 does not, so the
+   fact moved 5 mm between packet page 1 and pages 2-3. Every cell of the packet takes that one inset, with no extra margin.
+   Only div_facts' packet emits .ws-eq-left. */
+.ws-page .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) {
+    padding-left: max(calc(var(--ws-tab, 5mm) * 1.4 + 1.3mm), calc(var(--ws-ko, 6mm) + 0.3mm)) !important; --mq-fx: 0mm; }
+/* (at L the packet's one x stays the earlier inset plus the fade margin - the bare page prints in 2 columns of 92 mm, where the
+   w2 inset alone left a 33-37 % band right of the fact, H13; S and M keep the w2 inset alone, their 3-column cells need it) */
+.ws-page.ws-L .ws-grid > .ws-cell[data-ws-cell]:has(> .ws-tab, > .ws-letter):has(.ws-eq-left):not(.blankrun) { --mq-fx: calc(var(--ws-tab, 6mm) * 1.5 - 2mm); }
+/* Owner ruling 2026-11-09 (a), div_facts aids r8 (CL-8 / CL-40; additive): at L a div_facts fact too wide for its column
+   next to the number tab ("1xx ÷ 1x =", 50 mm of ink beside the w2 inset of 9.7 mm, in a 61.5 mm column) starts UNDER the
+   number tab - the cell's own 3 mm pad on the left, its top below the label keep-out (tab side + 1 mm) - a taller row, 3
+   columns kept. print-sheet.js divUnderTabSection marks the section's facts (`data-ws-undertab`); the measuring cell takes
+   the same rule, so its rows are sized with it. Only div_facts emits the attribute. */
+.ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun) {
+    padding-left: var(--fp, 3mm) !important; padding-top: calc(var(--ws-tab, 6mm) + 1.3mm) !important; --ws-koin: 0mm; --mq-fx: 0mm !important; }
+.ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }

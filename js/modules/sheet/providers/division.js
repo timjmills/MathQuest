@@ -7,8 +7,21 @@
 // checks them against the divisor, and long division works digit by digit.
 
 import { registerSkill } from '../contract.js';
-import { num, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, clampSteps } from './util.js';
+import { num, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
+import { optionICan } from '../../skill-options.js';
+
+/** A strings() function whose I Can line follows the options a page is built with (ref.opts), as the page title does. */
+function withOptionICan(cat, id, fn) {
+    const out = (ref = {}) => {
+        const s = fn(ref);
+        let t = '';
+        try { t = ref && ref.opts ? optionICan(cat, id, ref.opts, s.iCan) : ''; } catch (e) { t = ''; }
+        return t ? Object.assign({}, s, { iCan: t }) : s;
+    };
+    out.def = fn.def;
+    return out;
+}
 
 /* ============================================================================ div_facts */
 
@@ -18,7 +31,8 @@ const nb = (t) => String(t).replace(/ /g, '\u00a0');
 registerSkill('division:div_facts', {
     // S2: the supports this skill can draw (touch dots, cues, panes); the Support control offers these.
     supports: Object.freeze(['touch', 'skip', 'array', 'think', 'boxsign']),
-    strings: strings({
+    // (lane lf-ops: the I Can line follows the options dealt - a ticked table names the page, as print-sheet titles it)
+    strings: withOptionICan('division', 'div_facts', strings({
         iCan: 'I Can divide using times facts',
         instructionKey: 'divide',
         // Critic round 2: a missing-factor frame is easier to read than a "times what" question,
@@ -37,16 +51,17 @@ registerSkill('division:div_facts', {
                 'Find the missing factor. It is the answer.'];
         },
         say: '__ divided by __ equals __.',
-    }),
+    })),
     misconceptions: ['subtracted', 'off-by-one-group'],
     workedSteps: (q) => {
         const [a, b] = operands(q);
         if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return [];
         const quo = a / b;
+        // (drawStep: the Scripted Model's short text and the grey mark each step adds, PT-MOD-1 / PT-MOD-2)
         return [
-            step(`Read the division: ${nb(`${a} ÷ ${b}`)}.`),
-            step(`Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`),
-            step(`${nb(`${b} × ${quo} = ${a}`)}, so the missing factor is ${quo}.`),
+            drawStep(`Read the division: ${nb(`${a} ÷ ${b}`)}.`, `Read ${nb(`${a} ÷ ${b}`)}.`, [{ jot: `${a} ÷ ${b}` }]),
+            drawStep(`Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`, `Think: ${nb(`${b} × __ = ${a}`)}.`, [{ jot: `${b} × __ = ${a}` }]),
+            drawStep(`${nb(`${b} × ${quo} = ${a}`)}, so the missing factor is ${quo}.`, `${nb(`${b} × ${quo} = ${a}`)}.`, [{ jot: `${b} × ${quo} = ${a}` }]),
             step(`Write ${quo}.`, [{ slot: 'ans', value: String(quo) }]),
         ];
     },

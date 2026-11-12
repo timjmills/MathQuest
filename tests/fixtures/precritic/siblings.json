@@ -4,6 +4,7 @@
   { "row": "division:div_facts|mixed/defaults", "size": "L", "rule": "L-DENSITY PG-23", "n": 2, "proof": "lead ruling 2026-11-03 (Lane D R4): red on the main tip cd81c8e7 with the same 2 findings (ws-print-lint --source kit --kind mixed, div_facts + add_facts + tape_diagram + perimeter_intro, L: last page 2 holds 2 items); the mixed-practice role is the mixed-m2 lane's" }
  ],
  "templates": {
+  "pv": {"approved": ["placevalue:expand", "placevalue:value", "placevalue:combine", "placevalue:identify", "placevalue:unit_form"], "source": "lead ruling R1 2026-11-07 (a template's first family: its passing skills become the approved siblings, in the same change as redesign-passed.js); placevalue:expand passed lf-placevalue critic r3 / r3b 2026-11-08; placevalue:value and placevalue:combine passed critic r3c 2026-11-08; placevalue:identify and placevalue:unit_form passed critic r4 2026-11-08", "peers": ["placevalue:expand"], "peersSource": "lf-placevalue, the pv family"},
   "fact": {
    "approved": ["addition:add_facts", "subtraction:sub_facts", "multiplication:mult_facts", "division:div_facts_long"],
    "source": "lead ruling 2026-11-03 (Lane D R4 prep): the four fact skills that passed the 8/10 redesign (js/modules/redesign-passed.js) are div_facts' approved siblings and same-family peers; they print on the same fact-family roles and supports",

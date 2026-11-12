@@ -57,7 +57,7 @@ export function placeChartHTML(n, { underline = 0, size = '1.9em' } = {}) {
     const s = String(Math.floor(Math.abs(Number(n) || 0)));
     const places = Array.from({ length: s.length }, (_, i) => 10 ** (s.length - 1 - i));
     const bd = `border:${HAIR_PT}pt solid #000;`;
-    const heads = places.map(p => `<td style="${bd}padding:0.15em 0.3em;font-size:0.36em;font-weight:700;text-align:center;`
+    const heads = places.map(p => `<td style="${bd}padding:0.15em 0.3em;font-size:max(0.36em, 8.5pt);font-weight:700;text-align:center;`
         + `line-height:1.2;white-space:normal;width:3.2em;">${PLACE_NAME[p] || fmt(p)}</td>`).join('');
     const digits = places.map((p, i) => `<td style="${bd}padding:0.05em 0.2em;text-align:center;line-height:1.15;">`
         + (p === underline
@@ -238,6 +238,9 @@ register('pv-support', {
         // because `pv` only draws it under its own lettered numeral).
         if (p.picture === 'chart' || p.picture === 'plain') {
             if (p.base && p.base.kind === 'place') {
+                // lf-placevalue r1 F4: with its "Value ____" line (writeValue) the place row is the `pv` cell's own, under
+                // the support picture, so the ring, the value line and finished work read alike on every support.
+                if (p.base.writeValue) return `<div class="pv-cell">${pic}${renderCell({ template: 'pv', v: 1, payload: { ...p.base, hideNumeral: true } }, ctx)}</div>`;
                 return `<div class="pv-cell">${pic}${ringRow(ctx, p.base.words || [], p.base.keyValue)}</div>`;
             }
             // value (and its unit-form / notation frames, and the word-bank line): the `pv` cell

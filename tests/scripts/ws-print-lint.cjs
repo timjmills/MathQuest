@@ -7,6 +7,7 @@
 // from it - and fails on the rules of standard section 17.2 it can measure.
 //
 //   node tests/scripts/ws-print-lint.cjs --self-test                  # every lint proven by mutation
+//   node tests/scripts/ws-print-lint.cjs --self-test --only 'H13-ABS|GRID-EVEN-ALL'   # a subset (debugging; not the gate)
 //   node tests/scripts/ws-print-lint.cjs --source pack                # the approved mock-up pack (must be OK)
 //   node tests/scripts/ws-print-lint.cjs --source pack --files 01,11  # only pages/01-*.mjs, pages/11-*.mjs
 //   node tests/scripts/ws-print-lint.cjs --family redone              # the app, legacy print path (default source)
@@ -48,6 +49,13 @@
 //   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
 //   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
 //   --lints L-INK,L-KEY       only report these lints (the others still run)
+//   --rules H13-ABS,GRID-EVEN-ALL   OPT-IN rules (lf-placevalue critic r1, lead ruling D1 2026-11-07; default OFF, so every
+//                             pinned baseline and deploy gate reads as before). See "OPT-IN RULES" below.
+//   --rule-skills cat:skill,...   judge the --rules only on documents of these skills (ws-precritic passes the lane's
+//                             own skills, so another lane's --skill run is never judged by a rule it did not opt into)
+//   --doc-fixture file.html   lint one SAVED kit document (a --save-html file; its absolute 127.0.0.1:<port> asset URLs
+//                             are re-pointed at this run's server) - a backtest fixture. OK / FAIL on the findings kept by
+//                             --lints (all lints when not given)
 //   --json out.json           machine-readable findings for the critic loop
 //   --baseline base.json      RATCHET: fail only where a (document, lint, rule) count rose above the
 //                             baseline written by an earlier --json run (P7.5 "as a ratchet")
@@ -132,6 +140,19 @@
 //              critic r1 F1, 37 % bands that the top-cell exemption hid.)
 //   (L-DENSITY H13-ROW: a top cell whose band below exceeds its row's smallest by >= 30 % of its height: the row is
 //              sized for a taller item, critic r2 N2. Findings carry `skill` (data-ws-skill) for D1 attribution.)
+//   OPT-IN RULES (--rules; findings are L-DENSITY, so --lints L-DENSITY keeps them):
+//   H13-ABS    (critic lf-placevalue r1 F1) in every kit cell of a pupil page, the empty band under the LOWEST INK (text,
+//              a drawing, a stroked box or line; tabs and labels excluded) down to the cell's bottom pad is under 35 % of
+//              the cell height less the answer's own writing room Hw (--ws-hw: 6 / 8 / 10 mm at S / M / L):
+//              band >= 0.30 x H is a finding (lead ruling 2026-11-08: RUBRIC H13, 30 % of the FULL cell, the same measure and
+//              threshold as ws-empty-band EB-BAND, so the two checks agree; it replaced T1 2026-11-07's 35 % of (H - Hw)). Earlier T1 note: the approved stack
+//              and fact pages - sub_50 / sub_2d_1d L 27 % raw, add_facts L 30 % - pass while the pv bands of 34-55 % fail).
+//              H13 / H13-ROW judge a top cell only against its row; this judges it absolutely. Sibling rule: H13-ANY (an
+//              empty band ANYWHERE in a cell, e.g. between a picture and its slots) lives in tests/scripts/ws-cell-checks.cjs (lf-ops).
+//   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
+//              section (consecutive .ws-grid siblings with no instruction, strip or other text between them, on one
+//              pupil page) has one width within 0.2 mm - a full-width cell included (GRID-EVEN exempts it): combine L
+//              printed 2 half-width cells over 8 full-width rows under one instruction.
 //   L-INPUT    no <input>, <button>, <select>, <textarea> or contenteditable on a printed sheet.
 //   L-CCSS     SC-5 / HD-6 no CCSS code, "Grade N" or snake_case skill id outside the teacher footer.
 //   L-ANCHOR   S6 / PT-LBL-6 (kit, with --anchors side|sections): every step-by-step anchor cell carries
@@ -170,6 +191,16 @@ const has = k => curArgv().includes('--' + k);
 // --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L). Read per
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
+// OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
+const optRules = () => {
+    const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
+    if (bad.length) throw new Error(`unknown --rules ${bad.join(', ')} (opt-in rules: ${OPT_RULES_KNOWN.join(', ')})`);
+    return want;
+};
+const ruleSkills = () => { const v = arg('rule-skills', null); return v === null ? null : v.split(',').map(s => s.trim()).filter(Boolean); };
+const docSkill = id => (/^([\w-]+:[\w-]+)/.exec(String(id || '')) || [])[1] || '';
 
 // =============================================================================================
 // KIT REQUEST FLAGS (E1, IMPROVEMENT_PLAN §1.6.2 "The coverage matrix")
@@ -506,6 +537,16 @@ function wsLintPage(cfg) {
     const mm = px => Math.round((px / PX) * 10) / 10;
     const findings = [];
     const isLegacy = cfg.mode === 'legacy';
+    // OPT-IN rules (--rules): off unless named
+    const optOn = r => Array.isArray(cfg.optRules) && cfg.optRules.includes(r);
+    // Hw, the writing height (--ws-hw on the page; else the size preset of the page: 6 / 8 / 10 mm)
+    const hwPx = el => {
+        const v = getComputedStyle(el).getPropertyValue('--ws-hw').trim();
+        if (v) { const p = document.createElement('div'); p.style.cssText = `position:absolute;visibility:hidden;height:${v}`; el.appendChild(p); const h = p.getBoundingClientRect().height; p.remove(); if (h > 0) return h; }
+        const pg = el.closest('.ws-page');
+        const sz = pg && (pg.classList.contains('ws-S') ? 6 : pg.classList.contains('ws-M') ? 8 : pg.classList.contains('ws-L') ? 10 : 0);
+        return (sz || 8) * PX;
+    };
     let tagN = 0;
     const tags = [];
     const tagOf = el => {
@@ -1002,6 +1043,21 @@ function wsLintPage(cfg) {
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
                 else if (topCell) topRows.push({ c, top: cr.top, H, below: Math.max(inner.b - box.b, 0) });
+                /* H13-ABS (OPT-IN, --rules H13-ABS; critic lf-placevalue r1 F1): the band under the lowest ink of EVERY
+                   kit cell of a pupil page, judged absolutely - at least 30 % of the cell height less the answer's own
+                   writing room Hw is a row sized for more than the item draws (value L 34 % in every cell of every row,
+                   which H13-ROW cannot see). */
+                if (optOn('H13-ABS') && !ri.key && c.hasAttribute('data-ws-cell') && inkBot > -Infinity) {
+                    const hw = hwPx(c);
+                    // the answer's own room counts as content: an open slot (a fact's answer row, a stack's write-under
+                    // zone) is a box with no ink, so the lowest of the ink and every EMPTY slot box is where the item ends (a slot that holds
+                    // the drawing - an open stack - can stretch with its row, so its box is not the item's end)
+                    let low = inkBot;
+                    for (const sl of c.querySelectorAll('[data-ws-slot]')) { if (!visible(sl) || sl.closest('[data-ws-label]') || sl.textContent.trim()) continue; const r = sl.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom); }
+                    const below = Math.max(inner.b - low, 0);
+                    const lim = 0.30 * H;   // lead ruling 2026-11-08: RUBRIC H13, 30 % of the full cell, as ws-empty-band EB-BAND
+                    if (lim > 0 && below >= lim) F('L-DENSITY', 'H13-ABS', 'major', c, `an empty band ${mm(below)} mm tall under the lowest ink of a ${mm(H)} mm cell (${Math.round((below / H) * 100)}%; limit 30 % of the cell = ${mm(lim)} mm (RUBRIC H13, as ws-empty-band EB-BAND)): size the row to the item's ink plus its writing room (RUBRIC H13, H13-ABS)`, 'band under the lowest ink');
+                }
             }
             /* H13-ROW (RUBRIC H13 "a row ... sized for a taller item than it holds"; pilot-su-c critic r2 N2: a lesson
                Warm-up fact cell 43-59 % empty beside a place-value cell). Under a top cell the band below is writing
@@ -1223,6 +1279,31 @@ function wsLintPage(cfg) {
                     const odd = cs.find((c) => Math.abs(c.getBoundingClientRect().width - lo) > 0.2 * PX) || g;
                     F('L-DENSITY', 'GRID-EVEN', 'major', odd, `the cells of one fact grid are ${mm(lo)} to ${mm(hi)} mm wide: one cell width per section, a short last row keeps the lattice and leaves the rest unruled (RUBRIC C3, PT-FRW-3, PG-15)`, 'uneven grid');
                 }
+            }
+        }
+        /* L-DENSITY GRID-EVEN-ALL (OPT-IN, --rules GRID-EVEN-ALL; critic lf-placevalue r1 F9, AX-4: combine L printed 2
+           half-width cells over 8 full-width rows under one instruction - two grids, so GRID-EVEN saw two even grids). A
+           SECTION is a run of consecutive .ws-grid siblings with no visible text between them; every cell of it (a
+           full-width cell included; the blank run and model / anchor cells not) has one width within 0.2 mm. */
+        if (!isLegacy && optOn('GRID-EVEN-ALL') && !ri.key) {
+            const seen = new Set();
+            for (const g of ri.el.querySelectorAll('.ws-grid')) {
+                if (seen.has(g) || !visible(g) || g.closest('.ws-cell')) continue;
+                const run = [g]; seen.add(g);
+                for (let n = g.nextElementSibling; n; n = n.nextElementSibling) {
+                    if (n.classList.contains('ws-grid')) { seen.add(n); if (visible(n)) run.push(n); continue; }
+                    if (visible(n) && (textOf(n).trim() || n.querySelector('[data-ws-cell], svg'))) break;
+                }
+                const cs = run.flatMap(gr => [...gr.children].filter(c => c.classList.contains('ws-cell') && !c.classList.contains('blankrun') && !c.classList.contains('mq-anchorcell') && !c.querySelector('[data-ws-anchor]') && visible(c)));
+                if (cs.length < 2) continue;
+                const ws = cs.map(c => c.getBoundingClientRect().width);
+                const lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo <= 0.2 * PX) continue;
+                const tally = new Map();
+                ws.forEach(w => { const k = mm(w); tally.set(k, (tally.get(k) || 0) + 1); });
+                const common = [...tally.entries()].sort((a, b) => b[1] - a[1])[0][0];
+                const odd = cs.find((c, i) => Math.abs(mm(ws[i]) - common) > 0.2) || cs[0];
+                F('L-DENSITY', 'GRID-EVEN-ALL', 'major', odd, `one section mixes cell geometries: ${[...tally.entries()].map(([w, n]) => `${n} cell(s) ${w} mm wide`).join(', ')}${run.length > 1 ? ` in ${run.length} grids` : ''}: one cell width per section, sized for the widest item (RUBRIC C3, AX-4, GRID-EVEN-ALL)`, 'mixed cell geometry in a section');
             }
         }
         /* (Lane D port 2026-10-30: the lane's own L-OVERFLOW CL-40 keep-out check - text line boxes against a
@@ -1466,7 +1547,7 @@ function wsLintPage(cfg) {
             // no printed tab since the owner ruling of 2026-10-23: the lines travel as data-ws-tab
             const tab = tabSpans.length ? tabSpans : (pg.getAttribute('data-ws-tab') || '').split('|').filter(Boolean);
             const bands = [...pg.querySelectorAll('.ws-strip > b')].map(b => b.textContent.trim());
-            const foot = pg.querySelector('[data-ws-teacher], .ws-foot');
+            const foot = pg.querySelector('.ws-foot') || pg.querySelector('[data-ws-teacher]');   // (the page's footer, not a teacher tag in the body - a Prerequisite Check's routes)
             const footParts = foot ? [...foot.children].map(c => c.textContent.trim()) : [];
             const cells = ri.cells.map(c => {
                 tagOf(c);
@@ -1592,6 +1673,8 @@ function wsLintPage(cfg) {
                 keyOver,
                 // Wave 4.4: a SHORT key page (labels + answers) and the items it lists, "page:cell"
                 short: pg.getAttribute('data-ws-key-style') === 'short',
+                // (a teacher page in the key with no pupil twin - a Prerequisite Check's routing table, `ws-keyextra`)
+                extra: pg.classList.contains('ws-keyextra'),
                 shortItems: [...pg.querySelectorAll('[data-ws-short-page]')].map(e => `${e.getAttribute('data-ws-short-page')}:${e.getAttribute('data-ws-short-cell')}`),
                 labelled: ri.cells.filter(c => c.querySelector('[data-ws-label="letter"], [data-ws-label="tab"]')).length,
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
@@ -1609,6 +1692,13 @@ function wsLintPage(cfg) {
                     // page too (12.1: up to 16; the engine's dense packing calls them `short`)
                     || ((/^test\b/.test(role) || role === 'independent') && items.length > 0 && items.every(c => c.short)),
                 slots: cells.reduce((n, c) => n + c.slots, 0), instructions: ri.instructions,
+                // the supports-off div_facts page (owner 2026-11-08: 36 a page at S): its bare facts carry .ws-eq-divplain
+                divUnder: ri.cells.some(c => c.querySelector('.ws-eq-divplain, .ws-eq-under')),
+                // a div_facts across fact (only div_facts' equation payload `fact` emits data-ws-across): its Test follows the
+                // Independent capacity (owner 2026-11-08, critic r6 R6-1)
+                divAcross: ri.cells.some(c => c.querySelector('.ws-eq[data-ws-across]')),
+                // the supports the page's problems carry (a faded packet's stage)
+                supKey: [...new Set(ri.cells.map(c => { const e = c.querySelector('[data-ws-supports]'); return e ? e.getAttribute('data-ws-supports') : ''; }))].sort().join('|'),
             });
         }
     } else {
@@ -1863,7 +1953,7 @@ function tmpFile(name) {
     return path.join(TMP, name);
 }
 
-async function lintDocument(page, { id, mode, printBackground = false, notes = [], pool = false }) {
+async function lintDocument(page, { id, mode, printBackground = false, notes = [], pool = false, rules = null }) {
     await page.emulateMediaType('print');
     await page.evaluate(() => document.fonts && document.fonts.ready);
     const box = await page.evaluate(wsPageBox);
@@ -1873,13 +1963,14 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     await page.setViewport({ width: Math.round((mode === 'legacy' ? contentW : Math.max(box.w, 210)) * PX_PER_MM), height: 1400, deviceScaleFactor: 1 });
     await sleep(120);
     await page.evaluate(() => document.fonts && document.fonts.ready);
-    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM, arcGapMm: Number(process.env.MQ_ARC_GAP_MM) || 0 });
+    const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM, arcGapMm: Number(process.env.MQ_ARC_GAP_MM) || 0, optRules: rules || optRules() });
     const pdfPath = tmpFile(`${id.replace(/[^\w.-]+/g, '_')}.pdf`);
     await page.pdf({ path: pdfPath, format: 'A4', printBackground, preferCSSPageSize: true });
     const pdf = analysePdf(pdfPath, box);
     const sectionHits = mode !== 'legacy' ? sectionOverlap(pdfPath, await page.evaluate(SECTION_LABELS_IN_PAGE)) : [];   // L-OVERLAP SECTION
     fs.unlinkSync(pdfPath);
-    const findings = dom.findings.map(f => ({ ...f }));
+    const RS = ruleSkills();
+    const findings = dom.findings.filter(f => !(RS && OPT_RULES_KNOWN.includes(f.rule) && !RS.includes(f.skill || docSkill(id)))).map(f => ({ ...f }));
     const F = (lint, rule, sev, loc, msg, key) => findings.push({ lint, rule, sev, msg, key: key || msg, ...loc });
     const dest = t => pdf.dests[t] || null;
     const info = { id, mode, printedPages: pdf.pages.length, box, notes: [...notes], pool };
@@ -2091,6 +2182,10 @@ function lintKitGeometry(dom, pdf, info, F) {
                 // (DN-1a, LESSONS_LEARNED L1: S no longer prints L's 3 x 4).
                 else if (info.mode === 'kit') c = { n: Math.max(c.n, { S: 30, M: 20, L: 12 }[p.size] || 12), name: `${c.name} (12.3 dense capacity)` };
             }
+            // owner 2026-11-08 (div_facts r6 follow-up): the supports-off div_facts page holds up to 36 at S
+            if (c && p.divUnder && p.size === 'S' && /^(independent|more-practice|review)$/.test(p.role)) c = { n: Math.max(c.n, 36), name: `${c.name} (div_facts supports-off at S, owner 2026-11-08)` };
+            // owner 2026-11-08 (critic r6 R6-1, option a): a div_facts fact Test follows the Independent page's capacity (36 / 24 / 20)
+            if (c && p.divAcross && /^test\b/.test(p.role)) c = { n: Math.max(c.n, { S: 36, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (div_facts fact Test = the Independent capacity, owner 2026-11-08)` };
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
@@ -2099,7 +2194,10 @@ function lintKitGeometry(dom, pdf, info, F) {
             // B's. A page with no letter (any other role) is compared across its whole sheet as before.
             const dnLetter = (q) => { const m = /\bPractice ([A-J])\b/.exec((q.tab || []).join(' ')); return q.role === 'more-practice' && m ? m[1] : ''; };
             const dnL = dnLetter(p);
-            const dnGroup = dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages;
+            // (a faded packet's stages carry different supports, so their cells are not one size: a page's count is compared
+            // with the pages of its own stage only - div_facts critic r6 R6-4, the bare last stage fills its page)
+            const fadeKey = arg('fade', null) === 'packet' ? (q) => q.supKey : () => '';
+            const dnGroup = (dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages).filter(q => fadeKey(q) === fadeKey(p));
             const dnMax = Math.max(...dnGroup.map(q => q.items));
             const dnLast = dnGroup[dnGroup.length - 1] === p;
             if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
@@ -2175,7 +2273,7 @@ function lintKitGeometry(dom, pdf, info, F) {
     const pupilParts = parts.filter(p => !p.key), keyParts = parts.filter(p => p.key);
     if (info.mode === 'kit') {
         if (!keyParts.length) F('L-KEY', 'AK-1', 'critical', {}, 'no answer key pages: every generated page has a facsimile key (AK-1)', 'no key');
-        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key && !p.short), shortKey = pages.filter(p => p.key && p.short);
+        const pupil = pages.filter(p => !p.key), key = pages.filter(p => p.key && !p.short && !p.extra), shortKey = pages.filter(p => p.key && p.short);
         // A facsimile key (at the end, or each page after its pupil page) is the same pages in the same order.
         if (key.length && key.length !== pupil.length) F('L-KEY', 'AK-4', 'critical', {}, `the key has ${key.length} page(s), the pupil sheet ${pupil.length}: the key is the same pages (AK-1, AK-4)`, 'key page count');
         key.forEach((k, i) => pupil[i] && compareKey(pupil[i], k, F));
@@ -2904,6 +3002,31 @@ const SELF_TESTS = [
     { name: 'fact grid of equal cells (GRID-EVEN control)', expect: [], absent: ['L-DENSITY', 'GRID-EVEN'], fn: () => {
         document.querySelector('.ws-page .ws-grid').classList.add('facts');
     } },
+    // OPT-IN rules (--rules; lf-placevalue critic r1 F1 / F9): each fires on its planted defect only when named, and the
+    // approved page stays clean with it on
+    { name: 'clean page with the opt-in rules on (H13-ABS / GRID-EVEN-ALL control)', rules: ['H13-ABS', 'GRID-EVEN-ALL'], expect: [], absent: ['L-DENSITY', 'H13-ABS'], absentMsg: [['L-DENSITY', 'GRID-EVEN-ALL'], /./], fn: () => {} },
+    // (an empty 40 mm block under the drawing: the cell holds 40 mm of paper under its lowest ink)
+    { name: 'empty room under the lowest ink of a cell (H13-ABS)', rules: ['H13-ABS'], expect: ['L-DENSITY', 'H13-ABS'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="height:40mm;flex:none"></div>');
+    } },
+    { name: 'the same room with the rule off (H13-ABS opt-in control)', expect: [], absent: ['L-DENSITY', 'H13-ABS'], fn: () => {
+        document.querySelector('.ws-page [data-ws-cell]').insertAdjacentHTML('beforeend', '<div style="height:40mm;flex:none"></div>');
+    } },
+    { name: 'half-width cells over a full-width row in one section (GRID-EVEN-ALL)', rules: ['GRID-EVEN-ALL'], expect: ['L-DENSITY', 'GRID-EVEN-ALL'], fn: () => {
+        const g = document.querySelector('.ws-page [data-ws-cell]').closest('.ws-grid');
+        const g2 = document.createElement('div');
+        g2.className = g.className; g2.style.cssText = 'display:grid;grid-template-columns:1fr';
+        const c = g.querySelector('.ws-cell').cloneNode(true);
+        g2.appendChild(c); g.after(g2);
+    } },
+    { name: 'a second section under its own instruction (GRID-EVEN-ALL control)', rules: ['GRID-EVEN-ALL'], expect: [], absent: ['L-DENSITY', 'GRID-EVEN-ALL'], fn: () => {
+        const g = document.querySelector('.ws-page [data-ws-cell]').closest('.ws-grid');
+        const g2 = document.createElement('div');
+        g2.className = g.className; g2.style.cssText = 'display:grid;grid-template-columns:1fr';
+        g2.appendChild(g.querySelector('.ws-cell').cloneNode(true));
+        const ins = document.createElement('div'); ins.className = 'ws-instrline'; ins.textContent = 'Write the number.';
+        g.after(ins); ins.after(g2);
+    } },
     // H13-ROW (pilot-su-c critic r2 N2): a short top cell in a row sized for its taller neighbour; the control is a
     // uniform row (both cells hold the tall item), which keeps equal bands and never fires.
     { name: 'short cell in a row sized for a taller item (H13-ROW)', expect: ['L-DENSITY', 'H13'], msg: /H13-ROW/, fn: () => {
@@ -3138,11 +3261,13 @@ async function selfTest() {
             if (r.findings.length) bad.push(`clean fixture (pack 11-A + 11-I) is not clean: ${groupFindings(r.findings).map(g => `[${g.lint} ${g.rule}] ${g.msg}`).slice(0, 5).join(' | ')}`);
             else console.log('  ok   clean fixture: 0 findings');
         }
+        const ONLY_T = arg('only', null) ? new RegExp(arg('only', ''), 'i') : null;   // --self-test --only <regex>: a subset (debugging; the full run is the gate)
         for (const t of SELF_TESTS) {
+            if (ONLY_T && !ONLY_T.test(t.name)) continue;
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
-            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool });
+            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool, rules: t.rules || null });
             await page.close();
             if (t.absent) {
                 asserts++;
@@ -3164,7 +3289,7 @@ async function selfTest() {
                 else bad.push(`${t.name}: expected ${e.join(' ')}${t.msg ? ' ' + t.msg : ''}, got ${groupFindings(r.findings).map(g => `${g.lint} ${g.rule}`).join(', ') || 'nothing'}`);
             }
         }
-        for (const t of LEGACY_SELF_TESTS) {
+        for (const t of (arg('only', null) ? [] : LEGACY_SELF_TESTS)) {
             const page = await env.browser.newPage();
             await page.setViewport({ width: 794, height: 1100, deviceScaleFactor: 1 });
             await page.goto(`${env.base}/index.html`, { waitUntil: 'domcontentloaded' });
@@ -3244,7 +3369,7 @@ async function selfTest() {
     }
     if (supportCovered) lintsCovered.add('L-SUPPORT');
     const uncovered = LINTS.filter(l => !lintsCovered.has(l));
-    if (uncovered.length) bad.push(`lints with no self-test: ${uncovered.join(', ')}`);
+    if (uncovered.length && !arg('only', null)) bad.push(`lints with no self-test: ${uncovered.join(', ')}`);
     if (bad.length) { console.error(`${TOOL}: FAIL - ${bad.length} self-test(s)`); bad.forEach(b => console.error('  - ' + b)); process.exit(1); }
     console.log(`${TOOL}: OK (self-test, ${asserts} assertions, ${SELF_TESTS.length + LEGACY_SELF_TESTS.length} planted defects, every lint covered)`);
 }
@@ -3268,6 +3393,29 @@ if (require.main === module) (async () => {
             if (f.length) { console.error(`${TOOL}: FAIL - ${f.length} L-SUPPORT finding(s) in ${path.relative(process.cwd(), file)}`); process.exitCode = 1; }
             else console.log(`${TOOL}: OK (L-SUPPORT, 0 findings in ${path.relative(process.cwd(), file)})`);
         } finally { await browser.close(); }
+        return;
+    }
+    // --doc-fixture file.html: lint one SAVED kit document (a --save-html file) - a backtest fixture for the OPT-IN rules
+    // (tests/fixtures/precritic/<rule>/{fail,pass}.html). Its absolute asset URLs (http://127.0.0.1:<port>/css/...) are
+    // re-pointed at this run's server. OK / FAIL on the findings --lints keeps (every lint when not given).
+    if (arg('doc-fixture', null)) {
+        const file = path.resolve(process.cwd(), arg('doc-fixture', ''));
+        const env = await launchBare();
+        try {
+            const page = await env.browser.newPage();
+            await page.setViewport({ width: 794, height: 1100, deviceScaleFactor: 1 });
+            await page.goto(`${env.base}/index.html`, { waitUntil: 'domcontentloaded' });
+            const html = fs.readFileSync(file, 'utf8').replace(/https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//g, `${env.base}/`);
+            await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+            const id = arg('doc-id', path.basename(file).replace(/\.html$/, ''));
+            const r = await lintDocument(page, { id, mode: 'kit' });
+            const only = (arg('lints', '') || '').split(',').map(x => x.trim()).filter(Boolean);
+            const kept = r.findings.filter(f => !only.length || only.includes(f.lint));
+            groupFindings(kept).forEach(g => console.log(`  [${g.lint} ${g.rule} ${g.sev}] x${g.n || 1} ${g.msg}`));
+            const rel = path.relative(process.cwd(), file);
+            if (kept.length) { console.error(`${TOOL}: FAIL - ${kept.length} finding(s) in ${rel}${optRules().length ? ` (rules ${optRules().join(',')})` : ''}`); process.exitCode = 1; }
+            else console.log(`${TOOL}: OK (0 findings in ${rel}${only.length ? `, lints ${only.join(',')}` : ''}${optRules().length ? `, rules ${optRules().join(',')}` : ''})`);
+        } finally { await env.close(); }
         return;
     }
     if (has('capabilities')) {

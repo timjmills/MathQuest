@@ -242,6 +242,12 @@ register('division', {
         // vinculum's open space, one digit per track, with no boxes (critic R1 D13). Screen twins
         // keep their typed boxes (the input needs a target).
         const openQ = !!p.fact && !g.twin && ctx.mode !== 'screen' && !((Number(ctx.scaffoldLevel) || 1) >= 2);
+        // A fact-rows grid MIXING the ÷ forms (facts-print-fix r4, owner 2026-11-05: one baseline a row): the quotient's
+        // room is the stacked fact's top line (1.15 em, the box 1.07 em over its 0.08 em foot) and the bracket's row its
+        // second line (1.15 em), so the dividend sits on the divisor's / denominator's line of the row and the quotient is
+        // written on the vinculum, level with the dividends and numerators beside it.
+        const mixRow = !!p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowMix) > 0;
+        const qH = mixRow ? 1.07 * g.E : g.stripMm;
         // A fact-rows page past 4 columns (owner ruling 2026-10-30: the bracket reaches 10 columns)
         // hands its own narrow gutter (`factRowGutter`, mm): the arc then hugs the space between the
         // divisor's last digit and the dividend's first (bracketArc's compact path).
@@ -268,7 +274,7 @@ register('division', {
         // Row 1: the quotient strip over every dividend track (VA-61, SL-12).
         for (let i = 0; i < n; i++) {
             html += cell(box(g, `q-${i}`, {
-                wMm: trackMm, hMm: g.stripMm, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
+                wMm: trackMm, hMm: qH, value: vAt(`q-${i}`), ink: iAt(`q-${i}`), mark: 'cell', seg: openQ ? null : stripPos(i, n),
                 ...(openQ ? { shape: 'open', extra: 'border:0;background:transparent;' } : {}),
                 // A box before the quotient's first digit stays empty on the key: ungraded.
                 graded: k.slots[`q-${i}`] !== '',
@@ -325,8 +331,11 @@ register('division', {
         }
         const label = `${D} divided by ${V}`;
         // CL-4b: the quotient is written above the bracket, so the cell is centred down the box.
+        // (data-ws-rowgeo: drawn on its fact-rows section's own row geometry - track, gutter, room - never a fallback track,
+        // facts-print-fix r4 BRKTRACK)
+        const geoAttr = rowGutter && Number((ctx.metrics || {}).factRowGeo) > 0 ? ' data-ws-rowgeo="1"' : '';
         return markWriteAbove(root(g, 'division',
-            `<div role="group" aria-label="${esc(label)}" style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * 1.25)};align-items:stretch;margin:0 auto${rowGutter ? `;position:relative;left:-${(bracketLeadEm(V, trackMm / g.E) / 2).toFixed(3)}em` : ''}">${html}</div>`,
+            `<div role="group" aria-label="${esc(label)}"${geoAttr} style="display:inline-grid;${cols}grid-template-rows:auto ${g.em(g.pt * 25.4 / 72 * (mixRow ? 1.15 : 1.25))};align-items:stretch;margin:0 auto${rowGutter ? `;position:relative;left:-${(bracketLeadEm(V, trackMm / g.E) / 2).toFixed(3)}em` : ''}">${html}</div>`,
             'text-align:center;', this.footprint(p, ctx).wMm));
     },
     answerKey(p) {

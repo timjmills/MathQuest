@@ -39,26 +39,26 @@
   "parked": 26,
   "products": 1628,
   "longPassed": 6,
-  "ready": 7,
-  "skillsNotPassed": 259,
+  "ready": 15,
+  "skillsNotPassed": 251,
   "blocked": 551,
   "skills": 347,
-  "skillsPassed": 11,
+  "skillsPassed": 16,
   "buildEntries": 301,
   "buildEntriesLinksOnly": 124,
   "buildEntriesUnknown": 0,
   "shapeCount": {
-   "A5": 63,
+   "A2": 81,
    "A6": 48,
-   "A4": 80,
+   "A4": 81,
    "A3": 34,
-   "A2": 74,
+   "A5": 54,
+   "A7": 21,
    "A13": 28,
-   "A9": 83,
-   "A11": 135,
+   "A9": 82,
+   "A11": 130,
    "A1": 28,
-   "A8": 151,
-   "A7": 13,
+   "A8": 150,
    "A12": 28,
    "A10": 52
   }
@@ -127,12 +127,12 @@
    "buildLessons": 11,
    "products": 166,
    "newSkills": 63,
-   "newSkillsPassed": 3,
+   "newSkillsPassed": 8,
    "builds": 30,
    "lanes": {
     "k2": 9,
     "algebra": 17,
-    "placevalue": 19,
+    "placevalue": 14,
     "operations": 9,
     "numtheory": 6
    }
@@ -398,9 +398,9 @@
     "buildEntries": 6
    },
    "shapes": [
+    "A2",
     "A3",
     "A4",
-    "A5",
     "A6"
    ],
    "lanes": {
@@ -562,7 +562,7 @@
      "build": [
       "oral_count"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null,
      "attachedBy": "nearest same-domain block",
@@ -961,11 +961,11 @@
     "parkedNonCcss": 0,
     "productsToMake": 34,
     "longPassed": 0,
-    "ready": 0,
-    "skillsNotPassed": 7,
+    "ready": 3,
+    "skillsNotPassed": 4,
     "blockedByGaps": 10,
     "skills": 16,
-    "skillsPassed": 0,
+    "skillsPassed": 5,
     "newSkills": 15,
     "buildEntries": 9
    },
@@ -982,7 +982,7 @@
     },
     "placevalue": {
      "skills": 8,
-     "passed": 0
+     "passed": 5
     },
     "algebra": {
      "skills": 4,
@@ -1030,7 +1030,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:value",
@@ -1041,7 +1041,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:expand",
@@ -1052,7 +1052,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:unit_form",
@@ -1063,7 +1063,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "composing:number_word_form",
@@ -1089,7 +1089,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:compare",
@@ -1347,13 +1347,13 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:identify",
-      "placevalue:value"
+      "placevalue:identify [8/10]",
+      "placevalue:value [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -1371,13 +1371,13 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand",
-      "placevalue:unit_form"
+      "placevalue:expand [8/10]",
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -1445,13 +1445,13 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand",
-      "placevalue:combine"
+      "placevalue:expand [8/10]",
+      "placevalue:combine [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -1726,11 +1726,11 @@
     "parkedNonCcss": 1,
     "productsToMake": 27,
     "longPassed": 1,
-    "ready": 0,
-    "skillsNotPassed": 8,
+    "ready": 3,
+    "skillsNotPassed": 5,
     "blockedByGaps": 6,
     "skills": 13,
-    "skillsPassed": 0,
+    "skillsPassed": 5,
     "newSkills": 3,
     "buildEntries": 4
    },
@@ -1746,7 +1746,7 @@
     },
     "placevalue": {
      "skills": 10,
-     "passed": 0
+     "passed": 5
     },
     "algebra": {
      "skills": 1,
@@ -1774,7 +1774,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:expand",
@@ -1785,7 +1785,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "composing:base10_build_hundreds",
@@ -1815,7 +1815,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:value",
@@ -1826,7 +1826,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:more_less_100",
@@ -1868,7 +1868,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:order_least_to_greatest",
@@ -1949,12 +1949,12 @@
      "skillSource": "links",
      "skills": [
       "composing:base10_build",
-      "placevalue:unit_form"
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -1973,14 +1973,14 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand"
+      "placevalue:expand [8/10]"
      ],
      "partial": [],
      "build": [
       "flex_partition"
      ],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -2051,13 +2051,13 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand",
-      "placevalue:unit_form"
+      "placevalue:expand [8/10]",
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -2099,14 +2099,14 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:identify",
-      "placevalue:value",
-      "placevalue:unit_form"
+      "placevalue:identify [8/10]",
+      "placevalue:value [8/10]",
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -2177,16 +2177,16 @@
      "skillSource": "links",
      "skills": [
       "composing:number_word_form",
-      "placevalue:expand",
-      "placevalue:combine",
-      "placevalue:identify",
-      "placevalue:unit_form",
-      "placevalue:value"
+      "placevalue:expand [8/10]",
+      "placevalue:combine [8/10]",
+      "placevalue:identify [8/10]",
+      "placevalue:unit_form [8/10]",
+      "placevalue:value [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": "g2-nbt3-read-write-1000: passed",
      "attachedBy": "nearest same-domain block"
     },
@@ -2350,13 +2350,14 @@
     "skillsNotPassed": 12,
     "blockedByGaps": 5,
     "skills": 22,
-    "skillsPassed": 3,
+    "skillsPassed": 4,
     "newSkills": 18,
     "buildEntries": 4
    },
    "shapes": [
     "A2",
     "A5",
+    "A7",
     "A13"
    ],
    "lanes": {
@@ -2370,7 +2371,7 @@
     },
     "placevalue": {
      "skills": 4,
-     "passed": 0
+     "passed": 1
     }
    },
    "skills": [
@@ -2424,7 +2425,7 @@
        6
       ]
      },
-     "label": "Division Facts (1-12)",
+     "label": "Division Facts (÷1 to ÷12)",
      "live": true,
      "category": "division",
      "lane": "operations",
@@ -2589,7 +2590,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     }
    ],
    "newSkills": [
@@ -3015,7 +3016,7 @@
       "multiplication:mult_chart"
      ],
      "build": [],
-     "shape": "A5",
+     "shape": "A2",
      "short": "lesson data exists",
      "long": "g3-oa9-mult-table-patterns: passed"
     },
@@ -3071,7 +3072,7 @@
      ],
      "partial": [],
      "build": [],
-     "shape": "A5",
+     "shape": "A7",
      "short": null,
      "long": "g3-oa5-mult-properties: passed",
      "attachedBy": "nearest same-domain block"
@@ -3103,7 +3104,7 @@
       "placevalue:more_less_10",
       "placevalue:more_less_100",
       "placevalue:compare",
-      "placevalue:unit_form",
+      "placevalue:unit_form [8/10]",
       "multiplication:mult_facts [8/10]",
       "division:div_facts",
       "subtraction:sub_facts [8/10]"
@@ -3542,7 +3543,7 @@
       "patterns:number_patterns_rule"
      ],
      "build": [],
-     "shape": "A5",
+     "shape": "A2",
      "short": "lesson data exists",
      "long": null,
      "attachedBy": "nearest same-domain block"
@@ -5657,6 +5658,7 @@
    },
    "shapes": [
     "A1",
+    "A2",
     "A4",
     "A5",
     "A8",
@@ -6059,7 +6061,7 @@
      "build": [
       "add_sub_patterns"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     },
@@ -7369,7 +7371,7 @@
     "skillsNotPassed": 6,
     "blockedByGaps": 8,
     "skills": 21,
-    "skillsPassed": 0,
+    "skillsPassed": 3,
     "newSkills": 8,
     "buildEntries": 10
    },
@@ -7382,7 +7384,7 @@
    "lanes": {
     "placevalue": {
      "skills": 21,
-     "passed": 0
+     "passed": 3
     }
    },
    "skills": [
@@ -7417,7 +7419,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:expand",
@@ -7428,7 +7430,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "number_sense:nearest_10",
@@ -7499,7 +7501,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:compare",
@@ -7715,13 +7717,13 @@
      "skills": [
       "placevalue:place_value_disks",
       "placevalue:pv_digit_drag",
-      "placevalue:unit_form",
-      "placevalue:expand"
+      "placevalue:unit_form [8/10]",
+      "placevalue:expand [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -7940,8 +7942,8 @@
      "verdict": "partial",
      "skillSource": "SKILL_WRM",
      "skills": [
-      "placevalue:expand",
-      "placevalue:combine"
+      "placevalue:expand [8/10]",
+      "placevalue:combine [8/10]"
      ],
      "partial": [
       "placevalue:expand",
@@ -7951,7 +7953,7 @@
       "flex_partition"
      ],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -9493,7 +9495,7 @@
     "buildEntries": 7
    },
    "shapes": [
-    "A5",
+    "A2",
     "A11"
    ],
    "lanes": {
@@ -9903,7 +9905,7 @@
      "build": [
       "pattern_3d"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     },
@@ -10141,7 +10143,7 @@
        3
       ]
      },
-     "label": "Division Facts (1-12)",
+     "label": "Division Facts (÷1 to ÷12)",
      "live": true,
      "category": "division",
      "lane": "operations",
@@ -10629,11 +10631,11 @@
     "parkedNonCcss": 1,
     "productsToMake": 32,
     "longPassed": 0,
-    "ready": 0,
-    "skillsNotPassed": 10,
+    "ready": 2,
+    "skillsNotPassed": 8,
     "blockedByGaps": 6,
     "skills": 19,
-    "skillsPassed": 0,
+    "skillsPassed": 3,
     "newSkills": 4,
     "buildEntries": 5
    },
@@ -10649,7 +10651,7 @@
     },
     "placevalue": {
      "skills": 18,
-     "passed": 0
+     "passed": 3
     }
    },
    "skills": [
@@ -10695,7 +10697,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:unit_form",
@@ -10706,7 +10708,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:combine",
@@ -10717,7 +10719,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:more_less_100",
@@ -10943,14 +10945,14 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand",
-      "placevalue:unit_form",
-      "placevalue:combine"
+      "placevalue:expand [8/10]",
+      "placevalue:unit_form [8/10]",
+      "placevalue:combine [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -11230,12 +11232,12 @@
      "skills": [
       "placevalue:place_value_disks",
       "placevalue:pv_digit_drag",
-      "placevalue:unit_form"
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -11253,14 +11255,14 @@
      "verdict": "full",
      "skillSource": "links",
      "skills": [
-      "placevalue:expand",
-      "placevalue:combine",
-      "placevalue:unit_form"
+      "placevalue:expand [8/10]",
+      "placevalue:combine [8/10]",
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [],
      "build": [],
      "shape": "A4",
-     "short": null,
+     "short": "lesson data exists",
      "long": null
     },
     {
@@ -11369,7 +11371,7 @@
     "skillsNotPassed": 3,
     "blockedByGaps": 7,
     "skills": 21,
-    "skillsPassed": 1,
+    "skillsPassed": 4,
     "newSkills": 9,
     "buildEntries": 8
    },
@@ -11387,7 +11389,7 @@
     },
     "placevalue": {
      "skills": 10,
-     "passed": 0
+     "passed": 3
     },
     "algebra": {
      "skills": 2,
@@ -11513,7 +11515,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:value",
@@ -11521,7 +11523,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     },
     {
      "key": "placevalue:place_value_10x",
@@ -11561,7 +11563,7 @@
      "live": true,
      "category": "placevalue",
      "lane": "placevalue",
-     "passed": false
+     "passed": true
     }
    ],
    "newSkills": [
@@ -11904,13 +11906,13 @@
       "placevalue:ten_times_value",
       "placevalue:one_tenth_value",
       "placevalue:ten_times_story",
-      "placevalue:identify",
-      "placevalue:value",
+      "placevalue:identify [8/10]",
+      "placevalue:value [8/10]",
       "placevalue:place_value_10x",
       "placevalue:more_less_100",
       "placevalue:compare",
       "multiplication:mult_facts [8/10]",
-      "placevalue:unit_form"
+      "placevalue:unit_form [8/10]"
      ],
      "partial": [
       "placevalue:value",
@@ -11919,8 +11921,8 @@
      "build": [
       "value_ten_times"
      ],
-     "shape": "A8",
-     "short": null,
+     "shape": "A4",
+     "short": "lesson data exists",
      "long": "g4-nbt1-ten-times-value: passed",
      "attachedBy": "nearest same-domain block"
     }
@@ -11964,7 +11966,6 @@
    "shapes": [
     "A2",
     "A4",
-    "A5",
     "A8"
    ],
    "lanes": {
@@ -12446,7 +12447,7 @@
      "build": [
       "pv10_exponents"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null,
      "attachedBy": "nearest same-domain block"
@@ -16528,7 +16529,7 @@
     "buildEntries": 3
    },
    "shapes": [
-    "A5",
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -16644,7 +16645,7 @@
      "build": [
       "movement"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -16667,7 +16668,7 @@
      "build": [
       "turns"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -16690,7 +16691,7 @@
      "build": [
       "pattern_turns"
      ],
-     "shape": "A5",
+     "shape": "A7",
      "short": null,
      "long": null
     }
@@ -19851,6 +19852,7 @@
     "buildEntries": 4
    },
    "shapes": [
+    "A7",
     "A9",
     "A11"
    ],
@@ -20068,7 +20070,7 @@
      "build": [
       "area_split_tiles"
      ],
-     "shape": "A9",
+     "shape": "A7",
      "short": null,
      "long": null
     }
@@ -23806,7 +23808,7 @@
        2
       ]
      },
-     "label": "Division Facts (1-12)",
+     "label": "Division Facts (÷1 to ÷12)",
      "live": true,
      "category": "division",
      "lane": "operations",
@@ -26914,6 +26916,7 @@
     "buildEntries": 5
    },
    "shapes": [
+    "A7",
     "A9",
     "A11"
    ],
@@ -27083,7 +27086,7 @@
      "build": [
       "turns_angles"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -28241,6 +28244,7 @@
     "buildEntries": 2
    },
    "shapes": [
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -28303,7 +28307,7 @@
      "build": [
       "turns"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     },
@@ -30428,7 +30432,7 @@
     "buildEntries": 4
    },
    "shapes": [
-    "A5",
+    "A2",
     "A11"
    ],
    "lanes": {
@@ -30724,7 +30728,7 @@
      "build": [
       "pattern_make"
      ],
-     "shape": "A5",
+     "shape": "A2",
      "short": null,
      "long": null
     }
@@ -31473,6 +31477,7 @@
     "buildEntries": 3
    },
    "shapes": [
+    "A7",
     "A11"
    ],
    "lanes": {
@@ -31757,7 +31762,7 @@
      "build": [
       "turns_angles"
      ],
-     "shape": "A11",
+     "shape": "A7",
      "short": null,
      "long": null
     }

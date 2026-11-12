@@ -33,6 +33,7 @@ import { esc, blank } from '../cell.js';
 import { story, headerFields, strandTab, pageTitle } from '../frame.js';
 import { barMini } from '../cells/word-work.js';
 import { factGridMini } from '../cells/mult-grid.js';
+import { PREREQ_CHECK_TITLE } from './pre-skill-check.js';
 
 export const ROLE_ID = 'detailed-lesson';
 
@@ -87,7 +88,7 @@ export function teacherBands(d, V, pages) {
         // (the Practice pages the pack prints: its practiceSheets, else practicePages)
         const np = Array.isArray(d.practiceSheets) && d.practiceSheets.length ? d.practiceSheets.length : (d.practicePages || 1);
         const pr = np > 1 ? `Practice 1–${np}` : 'Practice 1';
-        return { P0: 'Prerequisite Check', P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: `${pr}${d.mixed ? ', Mixed 1' : ''}`, P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
+        return { P0: PREREQ_CHECK_TITLE, P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: `${pr}${d.mixed ? ', Mixed 1' : ''}`, P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
     };
     const flowRows = d.sections.map((s) => [String(s.n), cellText(s.name), cellText(pageOf(s)), `<span class="num">${s.min}</span>`]);
     if (d.transitionsMin) flowRows.push(['', 'Transitions', 'between pages', `<span class="num">${d.transitionsMin}</span>`]);
@@ -366,7 +367,9 @@ export function wordProblemPlan(wp, frame) {
             { kind: 'grid', cols: 1, rows: 1, items: [st], cls: 'fixed dl-wpstory', height: `${wp.topMm || 60}mm` },
             // (the story's table beside the routine panel - in the lesson's own actions: the table is printed, so no
             // "Draw it" / equation rows; a full-width table cell would be mostly empty, H13)
-            { kind: 'row', cls: 'dl-wptoprow', widths: ['55fr', '45fr'], height: `${wp.tableMm || 95}mm`, parts: [
+            // (R6, lf-checks LP-RASTER: the row overlapping the story's 1.5 pt foot rule exactly left a rule pdfium dropped at
+            // 72 dpi - its cells' paper fills snap over it; overlapping by 0.5 pt keeps 2.5 pt of ink between the two fills)
+            { kind: 'row', cls: 'dl-wptoprow', widths: ['55fr', '45fr'], height: `${wp.tableMm || 95}mm`, style: 'margin-top:-0.5pt;', parts: [
                 { kind: 'grid', cols: 1, rows: 1, items: [Object.assign({}, wp.tableItem, { cellCls: [wp.tableItem.cellCls || '', 'mq-lvcenter'].join(' ').trim() })], cls: 'dl-wptable', labels: 'none' },
                 { kind: 'grid', cols: 1, rows: 1, items: [Object.assign({}, panelItem, { q: { cell: { template: 'rcdws', payload: { rows: wp.panelRows || [] } }, text: '' } })], cls: 'dl-wppanel' },
             ] },
