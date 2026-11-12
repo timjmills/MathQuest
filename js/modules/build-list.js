@@ -773,6 +773,35 @@ export const STANDARD_PROPOSALS = {
         built: { presets: ['multiplication:mult_2by1_column', 'multiplication:mult_3by1_column', 'multiplication:mult_2by2_standard'], remaining: ['4×1', '3×2'] },
         wrmSteps: ['Y4.B5.S11', 'Y5.B5.S1'], after: [],
     }),
+
+    // ------------------------------------------------------------------ operations (appended 2026-11-12, lf-builds: MAP gaps)
+    // design/audit/runs/wrm-tagging/MAP-report.md; lessons G1-Y2.B2 / G2-Y3.B2 "Solve one-step word problems ... using bar
+    // models" (design/lessons-first/BUILD_QUEUE.md rows 2 and 16). Spec card: design/cards/word-stories (unsigned).
+    // What exists today (gen-operations.js): add Type 5 change-unknown is dealt only under the forms value labelled
+    // 'part_part_whole'; sub Type 3 (missing subtrahend) and Type 4 (compare fewer) are unreachable branches (a string
+    // variant compared with 0.72 / 0.86); the word-work retell turns a past-tense join change-unknown into "wants / needs".
+    map_change_unknown_story: P({
+        kind: 'option', preset: true, skill: 'addition:add_word_problems', also: ['addition:add_word_problems_plain', 'subtraction:sub_word_problems', 'subtraction:sub_word_problems_plain'],
+        option: 'forms value "change" (appended, never in the default set): past-tense join with the change unknown (had 8, got some, now 13) on add_word_problems; separate with the change unknown (had 15, some went, 9 left) on sub_word_problems; an answer-bounded band 10 / 20 / 100 so "within 20" is a page (also named preset skills once built: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown)',
+        name: 'How Many Were Added? How Many Went? (change unknown)', grade: '1', family: 'operations', standards: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'],
+        teaches: 'join and separate stories told in the past tense where the CHANGE is unknown: start and end are known, the pupil finds how many were added or how many went, modelled on a part-whole bar (First + Then = Now)',
+        problemTypes: ['join, change unknown: had 8, got some, now 13 - how many did she get?', 'separate, change unknown: had 15, some went, 9 left - how many went?', 'write the number sentence that solves it (13 - 8 = 5) and the answer with its unit', 'bar drawn: First and Now in the bar, "?" on the Then part'],
+        templates: ['word-work'], newTemplates: [], answer: 'write the solving number sentence and the answer with its unit (one answer place: the sentence result box)',
+        ladder: 'O2 band 10 -> 20 -> 100 · O3 bar with First / Then / Now captions and "?" on the change (structural on teaching pages; an option, default off, on practice) · join before separate, one schema a page (P-21) · O6 pictures / plain',
+        misconceptions: ['adds the two numbers (8 + 13 = 21)', 'writes the "now" number as the answer (13)', 'reads "got some" as the total'],
+        wrmSteps: ['Y1.B5.S10', 'Y2.B2.S21'], after: [],
+    }),
+    map_compare_smaller_unknown: P({
+        kind: 'option', preset: true, skill: 'subtraction:sub_word_problems', also: ['subtraction:sub_word_problems_plain'],
+        option: 'forms values "fewer" (Tom has 6 fewer than Maya, Maya 14) and "more-bigger-known" (Maya has 6 more than Tom, Maya 14: the language trap), appended, never in the default set; the two-bar compare drawing made schematic (also a named preset skill once built: subtraction:sub_wp_compare_smaller)',
+        name: 'Compare Stories: Find the Smaller Amount', grade: '1', family: 'operations', standards: ['1.OA.A.1', '2.OA.A.1'], ee: ['M.EE.1.OA.1'],
+        teaches: 'compare stories where the SMALLER quantity is unknown, told with "fewer than" and with "more than" about the bigger, known amount; solved by subtracting the difference from the bigger amount, modelled on two bars',
+        problemTypes: ['fewer than: Maya has 14, Tom has 6 fewer than Maya - how many does Tom have?', 'more than, bigger known: Maya has 14, Maya has 6 more than Tom - how many does Tom have?', 'write the number sentence that solves it (14 - 6 = 8) and the answer with its unit', 'two bars drawn: the longer bar for the bigger amount, the difference beside the shorter bar, "?" on the shorter bar'],
+        templates: ['word-work'], newTemplates: [], answer: 'write the solving number sentence and the answer with its unit (one answer place: the sentence result box)',
+        ladder: 'O2 band 20 -> 100 · O3 two-bar frame with names (structural on teaching pages; an option, default off, on practice), difference segment shaded grey (hint, fades) · "fewer than" before "more than, bigger known" (the trap is its own value) · O6 pictures / plain',
+        misconceptions: ['"more" means add: 14 + 6 = 20 for "Maya has 6 more than Tom"', '"fewer" always means subtract, with no check of who has more', 'writes the difference (6) instead of the quantity (8)'],
+        wrmSteps: ['Y1.B5.S8', 'Y2.B2.S19'], after: [],
+    }),
 };
 
 /* ================================================================ added from the visual catalogue */

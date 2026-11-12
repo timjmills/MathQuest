@@ -57,7 +57,7 @@ export const CCSS_AUDIT = {
     'K.G.B.6': F(['shapes_early:compose_shapes']),
 
     // ================================================================ Grade 1
-    '1.OA.A.1': F(['addition:add_word_problems', 'subtraction:sub_word_problems', 'addition:comparison_word', 'subtraction:unknown_start_wp', 'addition:add_wp_20', 'subtraction:sub_wp_20'], 'every situation and unknown position at range 20; bar and equation supports'),
+    '1.OA.A.1': P(['addition:add_word_problems', 'subtraction:sub_word_problems', 'addition:comparison_word', 'subtraction:unknown_start_wp', 'addition:add_wp_20', 'subtraction:sub_wp_20'], ['change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today)', 'compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)'], ['map_change_unknown_story', 'map_compare_smaller_unknown'], 'lf-builds 2026-11-12: change-unknown and compare-smaller branches unreachable (word-stories card); was full. Range 20, bar and equation supports and unknown position at range 20; bar and equation supports'),
     '1.OA.A.2': P(['addition:add_three'], ['word problems with three addends (the skill is bare sums)'], ['add_three_forms']),
     '1.OA.B.3': P(['addition:add_sub_fact_family', 'addition:fact_family_sort'], ['the associative property as a strategy: add three numbers by making a ten first (2 + 6 + 4 = 2 + 10)'], ['add_three_forms']),
     '1.OA.B.4': F(['addition:add_sub_fact_family', 'addition:number_families_add', 'subtraction:missing_add_sub']),
@@ -83,7 +83,7 @@ export const CCSS_AUDIT = {
     '1.G.A.3': P(['shapes_early:partition_shapes'], ['the words halves, fourths, quarters and "half of / quarter of" (the skill writes 1/2)', 'the whole as two or four of the shares', 'more equal shares make smaller shares'], ['half_quarter']),
 
     // ================================================================ Grade 2
-    '2.OA.A.1': F(['addition:add_word_problems', 'subtraction:sub_word_problems', 'subtraction:unknown_start_wp', 'addition:add_wp_100', 'subtraction:sub_wp_100', 'algebra:multi_step_word'], 'one step: every situation and unknown to 100; two steps: multi_step_word (+ and −)'),
+    '2.OA.A.1': P(['addition:add_word_problems', 'subtraction:sub_word_problems', 'subtraction:unknown_start_wp', 'addition:add_wp_100', 'subtraction:sub_wp_100', 'algebra:multi_step_word'], ['change-unknown join/separate stories as a choosable kind (the generator branches are unreachable today)', 'compare stories with the smaller amount unknown ("fewer than"; "more than" with the bigger known)'], ['map_change_unknown_story', 'map_compare_smaller_unknown'], 'lf-builds 2026-11-12: was full. One step every situation and unknown to 100; two steps: multi_step_word (+ and −)'),
     '2.OA.B.2': F(['addition:add_facts', 'subtraction:sub_facts']),
     '2.OA.C.3': P(['composing:odd_even', 'composing:select_even_odd', 'patterns:double'], ['decide odd or even for a group of objects (up to 20) by pairing or counting in 2s (the skills use the last digit)', 'write an even number as a sum of two equal addends'], ['odd_even_pairs']),
     '2.OA.C.4': P(['multiplication:arrays_groups', 'multiplication:dot_array_mult', 'multiplication:repeated_add_to_mult'], ['the pupil writes the total of an array (to 5 × 5) as a sum of equal addends (repeated_add_to_mult prints the sum)'], ['equal_groups_early']),
