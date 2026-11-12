@@ -1164,6 +1164,7 @@ export const SKILL_WRM = {
     'placevalue:ten_times_value': [{ step: 'Y5.B1.S6', partial: 'each place is 10 times the place to its right, read on the same digit in two numbers' }, { step: 'Y4.B5.S3', partial: 'the digit one place left is worth 10 times as much' }],
     'placevalue:one_tenth_value': [{ step: 'Y4.B5.S5', partial: 'the digit one place right is worth one tenth as much' }],
     'placevalue:ten_times_story': [{ step: 'Y5.B1.S6', partial: 'how many times as many: 700 ÷ 70 = 10' }],
+    'composing:chart_to_120': [{ step: 'Y1.B12.S1', partial: 'the chart rows 91-120: counting on across 100 to 120 (WRM has no step to 120)' }],
     'composing:write_numbers_in_words': [{ step: 'Y2.B1.S6', note: 'Max Number 100' }],
     'measurement:count_notes': [{ step: 'Y2.B4.S2', partial: 'counting notes' }],
     'measurement:count_notes_and_coins': [{ step: 'Y2.B4.S3', partial: 'counting notes and coins together' }],

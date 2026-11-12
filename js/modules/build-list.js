@@ -577,13 +577,13 @@ export const STANDARD_PROPOSALS = {
 
     // ------------------------------------------------------------------ place value
     chart_120: P({
-        kind: 'option', preset: false, skill: 'composing:hundreds_chart_fill', option: 'band 120: chart windows from 100 to 120 (crossing 100)',
+        kind: 'option', preset: true, skill: 'composing:hundreds_chart_fill', option: 'band 120: chart windows from 100 to 120 (crossing 100)',
         name: 'Count to 120 on the Chart (option)', grade: '1', family: 'counting', standards: ['1.NBT.A.1'], ee: ['M.EE.1.NBT.1'],
         teaches: 'counting, reading and writing numerals to 120 starting anywhere, across 100',
         problemTypes: ['fill the window 95-115', 'what comes after 109?', 'count on from 98', 'fill the row 111-120'],
         templates: ['chartwindow'], newTemplates: [], answer: 'write the missing numerals',
         ladder: 'O2 90-110 → 100-120 · O3 row starts given → none · O6 window / whole chart',
-        misconceptions: ['writes 1010 for 110', '109 → 200'], wrmSteps: ['Y2.B1.S5'], after: [],
+        misconceptions: ['writes 1010 for 110', '109 → 200'], wrmSteps: ['Y1.B12.S1'], after: [],
     }),
     value_ten_times: P({
         kind: 'option', preset: true, skill: 'placevalue:value', option: 'form "ten times / one tenth": compare the value of the same digit in two places (the 7 in 700 is 10 times the 7 in 70; 700 ÷ 70 = 10) (also a named preset skill once built, design/PRESET_SKILLS.md)',

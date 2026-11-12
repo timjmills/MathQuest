@@ -237,8 +237,8 @@ export const CONCEPT_RULES = [
     [/number_line|nl_|_nl|numline|rounding_visual|between_tens|double_num_line/, ['number_line']],
     // ---- counting & early number
     [/^counting:|^counting_mixed:|count_objects|classify_count/, ['counting']],
-    [/count_sequence|number_seq_fill|number_chart_fill|hundreds_chart_fill|more_less_10/, ['number_sequence']],
-    [/hundreds_chart|number_chart_fill|number_seq_fill|count_by_step|count_by_powers/, ['hundred_chart']],   // skip_count_grid draws a count row, not a chart (critic skip-count r1 N3)
+    [/count_sequence|number_seq_fill|number_chart_fill|hundreds_chart_fill|chart_to_120|more_less_10/, ['number_sequence']],
+    [/hundreds_chart|chart_to_120|number_chart_fill|number_seq_fill|count_by_step|count_by_powers/, ['hundred_chart']],   // skip_count_grid draws a count row, not a chart (critic skip-count r1 N3)
     [/^comparing:/, ['compare']],
     [/compare_objects|order_objects_length|heavier_lighter/, ['compare_attributes']],
     [/classify_count|divisibility_sort|compose_from_attributes|shape_attributes/, ['sorting']],
@@ -619,6 +619,7 @@ export const SKILL_TERMS = {
     'placevalue:one_tenth_value': ['one tenth of', 'a tenth of the value', 'one tenth as much', 'digit one place to the right', '10 times smaller value', 'one tenth of a digit'],
     'placevalue:ten_times_story': ['how many times as many', 'how many times more', '700 divided by 70', 'times as many word problem', 'ten times as many story', 'how many times bigger'],
     'placevalue:count_pv_disks': ['count place value disks', 'place value counters', 'how many hundreds disks', 'count the disks', 'place value chips', 'place value counters count'],
+    'composing:chart_to_120': ['120 chart', 'count to 120', 'hundred twenty chart', 'one hundred twenty chart', 'numbers to 120', 'count past 100', 'missing numbers to 120', '120 square'],
     'composing:write_numbers_in_words': ['write numbers in words', 'number words', 'numbers to words', 'spell numbers', 'write forty one', 'word form'],
     'measurement:count_notes': ['count notes', 'count bills', 'count dollar bills', 'counting banknotes', 'count paper money', 'count riyal notes'],
     'measurement:count_notes_and_coins': ['count notes and coins', 'count bills and coins', 'dollars and cents', 'count money notes coins', 'count mixed money', 'riyals and dirhams'],
@@ -679,6 +680,7 @@ export const PRIMARY_SKILLS = {
     'composing:number_bonds': ['number bonds', 'number bond', 'part whole', 'part whole model', 'part-whole model', 'cherry model', 'number bonds to 20', 'bonds to 20'],
     'composing:make_ten': ['bonds to 10', 'make 10', 'make ten'],
     'composing:hundreds_chart_fill': ['hundred square', '100 square', 'hundreds chart', 'hundred chart', 'number square'],
+    'composing:chart_to_120': ['120 chart', 'count to 120', 'hundred twenty chart', '120 square'],
     'composing:odd_even': ['odd and even', 'odd or even', 'even numbers', 'odd numbers'],
     'measurement:time_hour': ['telling time', 'tell the time', 'oclock', 'clock'],
     'measurement:time_half_hour': ['half past'],

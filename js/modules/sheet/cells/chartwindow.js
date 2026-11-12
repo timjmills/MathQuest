@@ -41,6 +41,9 @@ const CELL = { S: { w: 15, h: 15 }, M: { w: 16, h: 16 }, L: { w: 17, h: 17 } };
  * (the digits never shrink, TY-10), and its squares are taller than wide to use the page's height.
  */
 const WHOLE = { w: 17.5, h: 19.5 };   // 19.5: the tallest that still fits one US Letter page
+/** The whole chart's square height: 19.5 mm to 10 rows, shorter past that so 12 rows (1-120) keep the
+ * same 195 mm of page (16.25 mm, card chartwindow §3 / §9.5), never under the 14 mm writing floor (H9). */
+const wholeH = (p) => Math.max(14, Math.min(WHOLE.h, 195 / Math.max(1, (p.rows || []).length)));
 const isWhole = (p) => (p.rows || []).length >= 8 && (p.cols || []).length === 10;
 /** The widest number in the window. */
 const topOf = (p) => Math.max(0, ...(p.rows || []).map((r) => r * 10 + Math.max(0, ...(p.cols || [0])) + 1));
@@ -69,7 +72,7 @@ register('chartwindow', {
     render(p, ctx) {
         const whole = isWhole(p);
         const pt = (whole ? SIZES.L.digitPt : digitPt(ctx)) * 0.8;
-        const c = whole ? { w: WHOLE.w, h: WHOLE.h }
+        const c = whole ? { w: WHOLE.w, h: wholeH(p) }
             : { w: cellW(p, sizeOf(ctx), pt), h: (CELL[sizeOf(ctx)] || CELL.L).h };
         const blanks = (p.blanks || []).map(Number);
         const shown = shownParts(ctx, blanks);

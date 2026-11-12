@@ -9683,7 +9683,12 @@
     "block": "Y2.B1",
     "power": false
    },
-   "direct": [],
+   "direct": [
+    {
+     "key": "composing:chart_to_120",
+     "why": "the chart rows 91-120: every window crosses 100; reading and writing 101 to 120"
+    }
+   ],
    "partial": [
     {
      "key": "composing:hundreds_chart_fill",
@@ -9707,6 +9712,21 @@
     "chart_120"
    ],
    "pre": [
+    {
+     "key": "composing:hundreds_chart_fill",
+     "opts": {
+      "band": 100
+     },
+     "why": "the 1-100 chart: across is one more, down is ten more, the same window lower"
+    },
+    {
+     "key": "counting:number_seq_fill",
+     "opts": {
+      "step": 1,
+      "range": 100
+     },
+     "why": "counting on in a track to 100, the count the chart continues past 100"
+    },
     {
      "key": "counting:number_seq_fill",
      "opts": {
