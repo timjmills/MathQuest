@@ -198,7 +198,7 @@ function exampleCells(ex, e, across, textMm, stepsOf, rowsEx, row = false) {
             const jots = fin.lines.length ? `<div class="mq-mjots ws-trace" data-ws-ink="trace">${fin.lines.map((l, li) => `<div${hide(li < d.lines.length)}>${esc(li < d.lines.length ? d.lines[li] : l).replace(/__/g, '<span class="mq-mgap" aria-label="gap"></span>')}</div>`).join('')}</div>` : '';
             return (e === 0 && i === 0 ? FACT_MODEL_CSS : '')
                 + `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm"><div class="mq-steptext"><em>${i + 1}</em><span>${esc(texts[i])}</span></div></div>`
-                + `<div class="mq-mbody" style="height:calc(100% - ${textMm.toFixed(1)}mm)${row === 'beside' ? ';flex-direction:row;gap:8mm;box-sizing:border-box;padding-top:5mm' : row ? ';box-sizing:border-box;padding-top:10mm' : ''}">${fact}${jots}</div>`;
+                + `<div class="mq-mbody" style="height:calc(100% - ${textMm.toFixed(1)}mm)${row === 'beside' ? ';flex-direction:row;gap:8mm;box-sizing:border-box;padding-top:5mm' : row ? ';box-sizing:border-box;padding-top:7mm;gap:5.5mm' : ''}">${fact}${jots}</div>`;
         },
     })));
     // (a short last row of an example is filled with empty places, so the next example starts its own row)
@@ -247,7 +247,9 @@ function factModel(input, ctx, frame, m) {
             const roomC = mC.budget - m.strip - m.say;
             // (a state half the page wide holds a narrow column fact's jots BESIDE it, so the ink spans the cell, EB-SIDE; a
             // wide equation keeps them under it. The rows fill the page to FACT_FILL; the drawing sits a little low, so the white
-            // the later marks need is over it rather than under it)
+            // the later marks need is over it rather than under it - but not so low that the band over the problem reaches 30 %:
+            // critic r3 S5, div_facts L 30.4-31.0 %, so 7 mm, not 10, and 5.5 mm, not 1.5, from the problem to its first mark, EB-GAP; the more gap also keeps state 1's
+            // band under its last mark below 35 % on the pixels, PT-MOD-3)
             const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
             const pages = exs.slice(0, 2).map((ex, e) => {
                 const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });

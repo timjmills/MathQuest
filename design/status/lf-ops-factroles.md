@@ -114,3 +114,7 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
   the cell (--margin applies); PT-MOD-3 excuses it as EB-BAND (not the last state, <= 35 %, a later state inks the band).
   --self-test: 9 + 6 + 6 EB-GAP cases OK. On 9f7983dd: div_facts Model L FAIL 8 (24.6-25.1 mm of 81 mm, 30.4-31.0 %, every state
   cell, matches the critic); mult_facts 27.2 % PASS. Backtest row model-interior-band-facts (fail 9f7983dd, pass = step 2 fix).
+- r4 step 2 (S5 fix): scripted-model factModel, the continuation-page 'low' row (an equation fact: div_facts L): the drawing 7 mm
+  under the step text (was 10 mm) and 5.5 mm from the problem to its first mark (was the shared 1.5 mm). div_facts Model L, pixels:
+  step-text-to-problem band 25.8-26.8 % (was 30.4-31.0 %), the problem 3.4 mm higher; state 1's band under its last mark 34.3 %
+  (was 35.2 %). mult_facts ('beside' row) unchanged, 27.2 %. ws-empty-band div_facts / mult_facts Model L --model-states: OK.
