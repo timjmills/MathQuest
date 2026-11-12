@@ -306,6 +306,7 @@ export const LESSONS = Object.freeze({
         prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
         vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'subtract-2-digit-regroup',
+        checkTopic: 'subtracting with regrouping',   // critic r2 N7: the check title's topic (the full one wraps)
         practice: { skill: 'subtraction:sub_100_regroup' },
         defaultFor: true,
         warmup: [

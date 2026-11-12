@@ -375,6 +375,9 @@ function normaliseRequest(req = {}) {
         // prereqs.js LESSONS shape, used INSTEAD of lessonFor() when given (null otherwise, so
         // every standard lesson renders exactly as before).
         lessonData: req.lessonData && typeof req.lessonData === 'object' ? req.lessonData : null,
+        // Render-only (critic renders, ws-lesson-samples --force-check): the lesson's Prerequisite Check printed while its
+        // LR-17 switch is off (buildLesson recordOf). The print screen never sets it.
+        prereqsForce: req.role === 'lesson' && req.prereqsForce === true ? true : undefined,
         // A lesson packet by LESSON id (lessons/library.js, plan phase 0.4): the lesson's own practice skill
         // and options (buildSheet sets the section), its library record. '' = by skill (its default lesson).
         lessonId: req.role === 'lesson' && req.lessonId ? String(req.lessonId) : '',
@@ -4217,6 +4220,7 @@ async function buildRoleSheet(n, metaOf) {
         perQuestion: n.perQuestion || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
         routes: n.routes || undefined,
+        checkTopic: n.checkTopic || undefined,
         checkFor: n.checkFor || undefined,
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
@@ -4826,6 +4830,8 @@ async function buildLesson(n, metaOf) {
         // (critic r2 N4: the check holds LR-6 on its page - no answer twice, no near twins, no subtrahend or first addend twice)
         sections: [{ skills: prereqs.map((p) => avoid(Object.assign({ lr6: true, distinctAnswer: true }, p.ref))) }],
         routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
+        // (critic r2 N7: the check's title always carries a topic - the lesson's short `checkTopic` when the long one wraps)
+        checkTopic: data && data.checkTopic ? String(data.checkTopic) : undefined,
         lessonInput: undefined,
     }), metaOf);
     if (prereqs && built.includes('prereq')) parts.unshift({ part: 'prereq', role: 'pre-skill-check', res: await buildPrereq(lessonPartSeed(n.seed, 'prereq')) });

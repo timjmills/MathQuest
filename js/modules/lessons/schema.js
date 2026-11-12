@@ -62,6 +62,7 @@
 //                                                      not written) and the skill + options its question
 //                                                      is dealt from. Drawn by sheet/roles/pre-skill-check.js
 //                                                      (the one Prerequisite Check, lead decision D1).
+//     checkTopic?: 'short topic'                       critic r2 N7: the check title's topic when the lesson's own wraps
 //     prereqsPending?: 'why'                           no Prerequisite Check yet (the lesson keeps its
 //                                                      Warm-up), and why
 //     prereqsLive?: false                              LR-17 switch: the check is written but OFF the

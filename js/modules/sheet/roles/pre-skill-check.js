@@ -239,7 +239,10 @@ function planCheck(input, cut) {
     const titleOf = () => {
         if (!(routed && input.checkFor)) return `Pre-skill check: ${topicOf(target)}`;
         const t = `${PREREQ_CHECK_TITLE}: ${topicOf(target)}`;
-        return estimateTitleLines(t, ctx.size) <= 1 ? t : PREREQ_CHECK_TITLE;
+        if (estimateTitleLines(t, ctx.size) <= 1) return t;
+        // (critic r2 N7: the topic is never dropped - the lesson's short `checkTopic` when the long one would wrap)
+        const short = input.checkTopic ? `${PREREQ_CHECK_TITLE}: ${input.checkTopic}` : '';
+        return short && estimateTitleLines(short, ctx.size) <= 1 ? short : PREREQ_CHECK_TITLE;
     };
     const skillsOn = (input.skills || []).filter((s) => all.some((it) => it.q && it.q.skillId === s.skillId && (!it.q.categoryId || it.q.categoryId === s.categoryId)));
     const frame = frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
@@ -316,7 +319,10 @@ function planCheck(input, cut) {
                 const uh = u.fixed + u.rows * u.h + (cur.sections.length ? m.gap : 0);
                 if (cur.sections.length && cur.used + uh > cur.budget + 0.5) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
                 cur.used += uh;
-                if (u.qs.length === 2) cur.sections.push({ kind: 'row', widths: u.qs.map((q) => `${q.length}fr`), cls: 'mq-quadrow mq-lprerow', parts: u.qs.map((q) => band(q, q.length, 1, u.h, u.cols, u.tagLines)) });
+                // (critic r2 N6: when one of the pair's instructions wraps, BOTH strips take the taller height - `--ws-strip`
+                // is the strip's min-height - so the two grids, their number tabs and their tags start on one line)
+                if (u.qs.length === 2) cur.sections.push(Object.assign({ kind: 'row', widths: u.qs.map((q) => `${q.length}fr`), cls: 'mq-quadrow mq-lprerow', parts: u.qs.map((q) => band(q, q.length, 1, u.h, u.cols, u.tagLines)) },
+                    u.stripMm > m.strip + 0.05 ? { style: `--ws-strip:${u.stripMm.toFixed(2)}mm;` } : {}));
                 else cur.sections.push(band(u.qs[0], u.cols, u.rows, u.h, u.cols, u.tagLines));
                 kept += u.qs.reduce((t, q) => t + q.length, 0);
             });
@@ -388,7 +394,8 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         const legacy = u.qs.some((q) => q.some((it) => it.legacy));
         u.cap = legacy ? u.h0 : u.h0 * ROUTE_GROW;
         u.tagLines = Math.max(...u.qi.map((qi, x) => routeTagLines(routeOf(input, qi), two ? (x ? FULL_W_MM - w : w) : FULL_W_MM)));
-        u.fixed = m.strip + Math.max(0, ...u.qs.map((q, x) => extraLines(q, two ? (x ? FULL_W_MM - w : w) : FULL_W_MM))) * em * 1.25 + routeTagMm(u.tagLines);
+        u.stripMm = m.strip + Math.max(0, ...u.qs.map((q, x) => extraLines(q, two ? (x ? FULL_W_MM - w : w) : FULL_W_MM))) * em * 1.25;
+        u.fixed = u.stripMm + routeTagMm(u.tagLines);
         u.h = u.h0;
     }
     const gaps = Math.max(0, units.length - 1) * m.gap;

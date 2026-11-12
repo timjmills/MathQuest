@@ -127,6 +127,8 @@ export function lessonData(idOrSlug) {
     const l = lessonById(idOrSlug);
     if (Array.isArray(l.prereqs) && l.prereqs.length) {
         out.prereqs = l.prereqs.map((p) => Object.assign({ lesson: p.lesson, title: p.title || '', why: p.why || '', checks: p.checks || '', ref: refOf(p) }, p.items ? { items: p.items } : {}));
+        // (critic r2 N7: the check's short topic, printed when the lesson's own would wrap its title)
+        if (l.checkTopic) out.checkTopic = String(l.checkTopic);
         // LR-17 switch (landing, 2026-11-09): `prereqsLive: false` keeps the check OFF the printed packet (it keeps its
         // Warm-up, as master printed it) until the lesson's Prerequisite Check passes its critic; the record still
         // carries `prereqs` for the gates and prerequisiteSkillsFor.
