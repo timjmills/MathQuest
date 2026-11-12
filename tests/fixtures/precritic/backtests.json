@@ -3060,6 +3060,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "guided-cap-facts",
+   "check": "the Guided page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts holds at most the PAGE_TYPES §12.1 ceiling of 10 / 8 / 6 scored tries (plus the Model) at S / M / L (lead ruling 2026-11-12, option b: the facts-roles round had lifted it to 31 / 23 / 19 to fill the page)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GDPCAP (PAGE_TYPES §12.1)",
+   "browser": true,
+   "fail": {
+    "commit": "4edbe292",
+    "state": "15 findings: every fact skill at S / M / L above the ceiling (S 29-31, M 11-23, L 11-15 tries)"
+   },
+   "pass": {
+    "commit": "PENDING",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
