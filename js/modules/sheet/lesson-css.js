@@ -108,7 +108,7 @@ ${ICON_CSS}
  * so the engine stylesheet - and with it every other page - is unchanged.
  */
 export const LESSON_ROUTE_CSS = [
-    ':is(.ws-page,.ws-sheet) .mq-lpretag{margin:0;padding:.6mm 3mm 1.4mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;flex:none}',
+    ':is(.ws-page,.ws-sheet) .mq-lpretag{margin:0;padding:.2mm 3mm .6mm;box-sizing:border-box;font-size:9pt;line-height:1.3;color:#949494;flex:none}',
     ':is(.ws-page,.ws-sheet) .mq-lroute{font-size:var(--ws-text,14pt);line-height:1.35;padding:3mm 4mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute table{border-collapse:collapse;width:100%;margin:0 0 4mm}',
     ':is(.ws-page,.ws-sheet) .mq-lroute :is(th,td){border:1pt solid #000;padding:1.6mm 2.4mm;text-align:left;vertical-align:top}',

@@ -86,7 +86,7 @@ const PT_MM = 25.4 / 72;
 /** The teacher tag's type: 9 pt at 1.3 leading, 2 mm of padding. */
 export const ROUTE_TAG_PT = 9;
 export const ROUTE_TAG_LEADING = 1.3;
-export const ROUTE_TAG_PAD_MM = 2;
+export const ROUTE_TAG_PAD_MM = 0.8;   // (lf-engine PC: 2 mm made tag + next strip a 16 mm gap between cells, PC-H13 15 mm)
 /** One 9 pt Andika character is about 1.6 mm wide; a tag keeps 8 mm of its band for its padding. */
 export const ROUTE_CHAR_MM = 1.6;
 export const ROUTE_TAG_INSET_MM = 8;
@@ -122,6 +122,12 @@ export const itemFloor = (its) => Math.max(1, Math.min((its || []).some(twoChoic
 /** When a question counts as missed (LR-17a (2), P-25; critic r2 N3): printed under the routing table. */
 export const ROUTE_MISSED_RULE = 'A question is missed when any one of its items is wrong (its score is under full marks).';
 
+/** Three or more across, a routed item may not WRAP past this share of its one-column height (critic r2 N5: four
+ *  "10 more than 30 is __" sentences across wrapped to two lines and touched their number tabs at S): the question lies
+ *  2 x 2 instead, on one line each. */
+export const ROUTE_REFLOW = 1.15;
+/** Does a routed question's row lie at `c` columns without wrapping its items onto their tabs (N5)? */
+export const roomyAt = (its, c, ctx) => fitsAt(its, c, ctx) && (c < 3 || its.every((it) => { const m = it && it.measured; const a = m && m[1], b = m && (m[c] || m[4]); return !a || !b || !(b.hMm > a.hMm * ROUTE_REFLOW); }));
 /** The teacher tag's height (mm) at one line. */
 export const ROUTE_TAG_MM = ROUTE_TAG_PT * PT_MM * ROUTE_TAG_LEADING + ROUTE_TAG_PAD_MM;
 /** A question's route, or null: {lesson, title, checks?}. */
@@ -203,12 +209,12 @@ export function plan(input = {}) {
         const asked = (i) => (Array.isArray(input.perQuestion) ? Number(input.perQuestion[i]) || 1 : Number(input.perQuestion) || 1);
         const per = Array.from({ length: n }, (_, i) => {
             const its = poolItems(input, `q${i}`);
-            const row = [PER_QUAD, 3, 2].find((k) => its.length >= k && fitsAt(its.slice(0, k), k, ctx)) || 1;
+            const row = [PER_QUAD, 3, 2].find((k) => its.length >= k && roomyAt(its.slice(0, k), k, ctx)) || 1;
             return Math.min(its.length || 1, Math.max(asked(i), row));
         });
         // (a count is whole rows only: k items at the most columns they lie at, every row full - never a lone item
         // stretched across a row its neighbours share)
-        const whole = (i, k) => { const its = poolItems(input, `q${i}`).slice(0, k); const c = [4, 3, 2, 1].filter((x) => x <= k).find((x) => fitsAt(its, x, ctx)) || 1; return k === 1 || k % c === 0; };
+        const whole = (i, k) => { const its = poolItems(input, `q${i}`).slice(0, k); const c = [4, 3, 2, 1].filter((x) => x <= k).find((x) => roomyAt(its, x, ctx)) || 1; return k === 1 || k % c === 0; };
         // (critic r2 N2: a question NEVER prints one item - one item is a coin flip, LR-17a (2), P-25: the floor is
         // ROUTE_ITEMS, or the question's own pool when it holds fewer; the page holds the floor by its rows, ROUTE_GROW)
         // (lead ruling A, 2026-11-12: the floor is ROUTE_ITEMS for a two-choice question only - `itemFloor`; any other
@@ -302,7 +308,10 @@ function planCheck(input, cut) {
         const instr = instructionText(instructionKeyOf(its, input.skills), its);
         // (the detailed lesson's check centres each item in its grown cell, H13; a lesson's routed check keeps CL-4b's top
         // start - its rows grow only to the H13 cap, ROUTE_GROW)
-        const centre = input.perQuestion && !routed;
+        // (lf-engine PC 2026-11-12: the routed check centres its items too - a lone item, or the shorter question of a pair,
+        // in a row measured 5-15 % taller than it draws left a 31-37 % band under it (PC-H13); a check cell has no writing
+        // lines under its item, so CL-4b's top start buys nothing there)
+        const centre = !!input.perQuestion;
         const grid = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
         const r = routed ? routeOf(input, qi) : null;
         const b = {
@@ -415,7 +424,7 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
     const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
     const instrOf = (q) => String(instructionText(instructionKeyOf(q, input.skills), q) || '');
     const extraLines = (q, w) => Math.max(0, Math.ceil((instrOf(q).length * INSTR_CHAR_EM * em) / Math.max(30, w - 10)) - 1);
-    const colsOf = (q) => [4, 3, 2, 1].filter((c) => c <= q.length).find((c) => fitsAt(q, c, ctx)) || 1;
+    const colsOf = (q) => [4, 3, 2, 1].filter((c) => c <= q.length).find((c) => roomyAt(q, c, ctx)) || 1;
     const units = [];
     for (let j = 0; j < quads.length; j++) {
         const a = quads[j], b = quads[j + 1];
@@ -424,7 +433,7 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         // middle, critic r1 D9)
         const across = b ? a.length + b.length : 0;
         const alike = () => { const ha = hMinAt(a, across, ctx), hb = hMinAt(b, across, ctx); return Math.min(ha, hb) >= PAIR_ALIKE * Math.max(ha, hb); };
-        if (b && across <= 4 && fitsAt(a, across, ctx) && fitsAt(b, across, ctx) && alike()) { units.push({ qs: [a, b], qi: [qIndex[j], qIndex[j + 1]], cols: across, rows: 1 }); j++; }
+        if (b && across <= 4 && roomyAt(a, across, ctx) && roomyAt(b, across, ctx) && alike()) { units.push({ qs: [a, b], qi: [qIndex[j], qIndex[j + 1]], cols: across, rows: 1 }); j++; }
         else { const c = colsOf(a); units.push({ qs: [a], qi: [qIndex[j]], cols: c, rows: Math.ceil(a.length / c) }); }
     }
     for (const u of units) {
