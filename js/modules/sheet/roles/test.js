@@ -26,7 +26,8 @@ const CEILING = { S: 20, M: 16, L: 12 };
 const DENSE = CEILING;          // 12.1 is law: 20 / 16 / 12 (L-DENSITY holds it)
 
 export const sources = (skills) => [{ id: 'main', skills }];
-export const measureCols = () => [1, 2, 3, 4];
+// (critic r7 R7-1: a supported div_facts Test takes its Independent page's grid, up to 5 columns of drawn arrays at S)
+export const measureCols = (ctx) => (ctx && ctx.divSupported ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]);
 
 /**
  * 12.1: a Test of one-line items holds its ceiling (20 / 16 / 12) when that many rows of them fit
@@ -36,7 +37,16 @@ export const measureCols = () => [1, 2, 3, 4];
  * where the page strip under them is under a fifth (PG-14), each cell at least its measured
  * height; an explicit column count from the teacher is left alone (DN-12).
  */
-function fillToCeiling(L, size, columns) {
+/** div_facts Test rows: the measured height (pads and tab keep-out included) plus this room (critic r5 R5-1; 1.15 -> 1.1, the
+ *  Independent bare-fact rows, lead / owner 2026-11-09 on critic r7 R7-1). */
+const FACT_TEST_ROOM = 1.1;
+/** div_facts Test ceiling: the Independent page's capacity (DN-1's 36 / 24 / 20; owner 2026-11-08 on critic r6 R6-1). */
+const FACT_TEST_PAGE = { S: 36, M: 24, L: 20 };
+/** div_facts Test rows under the 2026-11-09 ruling (every support's Test = its Independent count): 1.1 x the measured height. */
+const FACT_TEST_ROOM_EQ = FACT_TEST_ROOM;
+/** Does a planned item draw a support (print-sheet hostItem's supportsBox: a support pane, row or cue in its cell)? */
+const itemSupported = (it) => !!(it && it.supportsBox && it.supportsBox.plan);
+function fillToCeiling(L, size, columns, opts = {}) {
     const ceil = CEILING[size] || CEILING.L;
     if (!L || (columns && columns !== 'auto') || !(L.hMin > 0) || L.cols < 2) return L;
     const G = L.gridH;
@@ -54,6 +64,25 @@ function fillToCeiling(L, size, columns) {
     // share, and never shorter than the layout made them.
     const even = (G - SAFETY_H_MM) / rows;
     // (an in-place cell - layout.js IN_PLACE_FILL - keeps its capped height: it holds no working space)
+    // div_facts critic r5 R5-1 (facts card F1: H13 wins over the PT-TST fixed cells): a Test of div_facts facts sizes its
+    // rows to the problems' footprint (FACT_TEST_ROOM x the measured height), never to the grid; the rest of the page stays
+    // under the rows. Only div_facts (`opts.footprintRows`): the passed + - x fact Tests keep their geometry.
+    if (opts.footprintRows) {
+        // Owner ruling 2026-11-08 (critic r6 R6-1, option a): a div_facts fact Test's count follows the Independent page's
+        // capacity, so the Test page is full - whole rows of the facts' footprint down the grid, up to the Independent
+        // ceiling (FACT_TEST_PAGE), lifting 12.1's 20 / 16 / 12 for these pages only. Rows stay sized to the problems (F1).
+        const rowH = L.hMin * FACT_TEST_ROOM;
+        const fitRows = Math.floor((G - SAFETY_H_MM - GRID_BORDERS_MM) / rowH + 1e-9);
+        const cap = Math.floor((FACT_TEST_PAGE[size] || FACT_TEST_PAGE.L) / L.cols) * L.cols;
+        const fitAll = Math.min(cap, fitRows * L.cols);
+        if (opts.fullPage && fitAll > perPage) {
+            rows = fitAll / L.cols;
+            perPage = fitAll;
+            note = `Test: ${fitAll} problems, ${L.cols} x ${rows} (the Independent capacity, owner 2026-11-08).`;
+        }
+        const capH = Math.round(Math.min(even, Math.max(L.hMin, Math.min(L.cellH, L.hMin * FACT_TEST_ROOM))) * 1000) / 1000;
+        return Object.assign({}, L, { rows, perPage, cellH: capH, fill: capH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
+    }
     const cellH = Math.round(Math.min(even, L.inPlace ? Math.max(L.cellH, L.hMin) : Math.max(L.cellH, L.hMin * FILL_CAP, 0.85 * G / rows)) * 1000) / 1000;
     if (rows === L.rows && cellH <= L.cellH + 0.01) return L;
     return Object.assign({}, L, { rows, perPage, cellH, fill: cellH >= even - 0.01, note: [L.note, note].filter(Boolean).join(' '), filledTest: true });
@@ -71,12 +100,37 @@ function layout(items, input, count) {
     const oneLine = items.length && items.every((it) => it.fclass === 'short' || it.template === 'fact' || it.template === 'equation'
         || (it.footprint && it.footprint.factLike));
     if (oneLine && !long) {
-        return fillToCeiling(resolveSectionLayout({
+        const divFact = items.every((it) => (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
+        const acrossFact = items.every((it) => { const pl = it.q && it.q.cell && it.q.cell.payload; return !!(pl && pl.fact && it.q.cell.template === 'equation' && !pl.notation); });
+        // Lead / owner ruling 2026-11-09 (critic r7 R7-1, ws-empty-band EB-TESTEQ): every support's div_facts Test prints the SAME
+        // count as its Independent page at each size - the Independent page's grid (its columns, rows and count: the
+        // practice layout of these facts) with rows of the facts' footprint and FACT_TEST_ROOM_EQ room (1.1, the Independent
+        // bare-fact rows), never past the even share. div_facts across facts only, Auto columns only.
+        const Lt = fillToCeiling(resolveSectionLayout({
             role: 'test', columns: input.columns || 'auto', count: count || items.length,
             target: { cols: 4, rows: { S: 5, M: 4, L: 4 }, rowsByCols: { 3: 4, 2: 4, 1: 4 } },
             ceiling: CEILING, floor: (input.floors || {}).main,
             dense: { S: 20, M: 20, L: 20 }, denseRoom: 1.05, denseMaxCols: 5,
-        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns);
+        }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) }), ctx.size, input.columns,
+        { footprintRows: divFact,
+            // (R6-1's full page: the one-line across fact only - div_facts' Long division and Fraction forms keep 12.1's ceiling)
+            fullPage: acrossFact });
+        if (divFact && acrossFact && (!input.columns || input.columns === 'auto')) {
+            const Li = resolveSectionLayout({ role: 'independent', columns: 'auto', count: FACT_TEST_PAGE[ctx.size] || FACT_TEST_PAGE.L, floor: (input.floors || {}).main,
+                dense: items.some((it) => itemSupported(it)) ? true : FACT_TEST_PAGE },
+            items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
+            if (Li && Li.cols >= 1 && Li.perPage > 0 && Li.hMin > 0) {
+                const n = Math.min(Li.perPage, count || Li.perPage);
+                // (the Test's own grid already holds that count: it keeps its grid - the critic-passed off S 4 x 9, L 3 x 6)
+                if (Lt.perPage === n) return Lt;
+                const rows = Math.max(1, Math.ceil(n / Li.cols));
+                const even = (Li.gridH - SAFETY_H_MM - GRID_BORDERS_MM) / rows;
+                const cellH = Math.round(Math.min(even, Li.hMin * FACT_TEST_ROOM_EQ) * 1000) / 1000;
+                const note = `Test: ${n} problems, ${Li.cols} x ${rows} (the Independent page's count, owner 2026-11-09).`;
+                return Object.assign({}, Li, { role: 'test', rows, perPage: n, cellH, fill: cellH >= even - 0.01, note: [Li.note, note].filter(Boolean).join(' '), filledTest: true });
+            }
+        }
+        return Lt;
     }
     const sec = (columns) => ({
         role: 'test', columns, count: count || items.length,

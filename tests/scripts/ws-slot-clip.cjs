@@ -34,6 +34,18 @@
 //          SLOT-W and HEADS are tests/lib/ws-geom-probe.cjs, the definition print-lint's L-ANSAREA TY-21 and L-OVERLAP
 //          read (one rule, two readers). D1 (W0-A critic r7): on a multi-skill row an item, or a SLOT / CLIP count,
 //          on a partner skill's cell is listed as "partner skill (non-blocking)", never a lane FAIL.
+//   OPT-IN (lf-placevalue critic r1, lead ruling D1 2026-11-07; default off, so pinned runs read as before; zero
+//   tolerance on the lane skill's cells, never sibling-judged; --rule-skills a:b,c:d judges them only on rows of those
+//   skills, which ws-precritic passes so another lane's run is never judged by them):
+//   SLOT-W-EQUAL (--slot-w-equal; F10, L3) on each pupil page, the graded write-in slots of ONE KIND in one section (same
+//          template, slot id and shape, in the cells under one instruction line) have one width within 0.5 mm: a slot
+//          whose width tracks its answer gives the answer away (value form=unit: the word box 26 mm for "tens", 50 mm
+//          for "hundreds").
+//   DRAW-CAP (--draw-cap; F15, H12) a draw zone (data-ws-shape="draw") with place zones ([data-pv-zone="100"] ...) holds
+//          the item's count: each place zone's area >= that digit of the item's number x (8 mm)^2 (an 8 mm disk a
+//          counter). The number is the cell's largest numeral outside the zone. A draw zone with no place zones is N/A.
+//   --doc-fixture file.html [--slot-w-equal] [--draw-cap]: the opt-in probe on one saved document (a backtest fixture),
+//          `ws-slot-clip: OK` / `FAIL`.
 //   Each line names what the two probes measured per template (N5): SLOT-W reads only digit strips (the stack's answer
 //   boxes) and HEADS only stack heads, so a document without them says "SLOT-W N/A (equation ×6: no box segment(s))"
 //   and the JSON row carries slotW / headsProbe "measured" or "N/A": never a silent 0.
@@ -106,6 +118,81 @@ function measuredLine(p) {
     return `${part('SLOT-W', 'segs', 'box segment(s)')}; ${part('HEADS', 'heads', 'place head(s)')}`;
 }
 
+/* ------------------------------------------------------------- the OPT-IN probe (SLOT-W-EQUAL, DRAW-CAP), in the page */
+// Serialised into the page (page.evaluate): self-contained. cfg {slotWEqual, drawCap}. Pupil pages only (not
+// data-ws-mode="key"). Returns {slotW: [...], draw: [...], judged: {slotW, draw}}; each item {page, cell, skill, msg}.
+function OPT_PROBE(cfg) {
+    const PX = 96 / 25.4, mm = (px) => Math.round((px / PX) * 10) / 10;
+    const vis = (el) => (typeof el.checkVisibility === 'function' ? el.checkVisibility({ checkVisibilityCSS: true }) : true);
+    const out = { slotW: [], draw: [], judged: { slotW: 0, draw: 0 } };
+    const pages = [...document.querySelectorAll('[data-ws-page]')].filter((pg) => vis(pg) && pg.getAttribute('data-ws-mode') !== 'key' && !pg.closest('[data-ws-mode="key"]'));
+    const NOT_WRITTEN = ['choice', 'ring', 'check', 'mark', 'draw', 'tick', 'circle'];
+    pages.forEach((pg, pi) => {
+        const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => vis(c) && !c.parentElement.closest('[data-ws-cell]'));
+        const instr = [...pg.querySelectorAll('.ws-instrline, [data-ws-instruction]')];
+        const sectionOf = (c) => instr.filter((i) => i.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING).length;
+        const at = (c) => ({ page: pi + 1, cell: cells.indexOf(c) + 1, skill: (c.closest('[data-ws-skill]') || { getAttribute: () => null }).getAttribute('data-ws-skill') || undefined });
+        if (cfg.slotWEqual) {
+            const groups = new Map();
+            for (const c of cells) {
+                const tpl = c.getAttribute('data-ws-cell') || '?';
+                for (const sl of c.querySelectorAll('[data-ws-slot]')) {
+                    const shape = sl.getAttribute('data-ws-shape') || '';
+                    if (NOT_WRITTEN.includes(shape) || sl.getAttribute('data-ws-graded') === '0' || sl.querySelector('[data-ws-slot]') || !vis(sl)) continue;
+                    const w = sl.getBoundingClientRect().width;
+                    if (!w) continue;
+                    const k = `${sectionOf(c)}|${tpl}|${sl.getAttribute('data-ws-slot')}|${shape}`;
+                    if (!groups.has(k)) groups.set(k, []);
+                    groups.get(k).push({ c, w });
+                }
+            }
+            for (const [k, g] of groups) {
+                if (g.length < 2) continue;
+                out.judged.slotW++;
+                const ws = g.map((x) => x.w), lo = Math.min(...ws), hi = Math.max(...ws);
+                if (hi - lo <= 0.5 * PX) continue;
+                const [, tpl, id, shape] = k.split('|');
+                const tally = [...new Set(ws.map(mm))].sort((a, b) => a - b);
+                const odd = g.find((x) => Math.abs(x.w - hi) < 0.1 * PX) || g[0];
+                out.slotW.push(Object.assign(at(odd.c), { rule: 'SLOT-W-EQUAL', msg: `slot "${id}" (${shape}, ${tpl}) is ${tally.join(' / ')} mm wide across the ${g.length} cells of one section: graded slots of one kind take one width, or the width gives the answer away (L3, H16)` }));
+            }
+        }
+        if (cfg.drawCap) {
+            for (const c of cells) {
+                for (const z of c.querySelectorAll('[data-ws-shape="draw"]')) {
+                    const zones = [...z.querySelectorAll('[data-pv-zone]')];
+                    if (!zones.length) continue;
+                    // the item's number: the largest-type numeral of the cell outside the draw zone
+                    let n = null, best = 0;
+                    const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+                    for (let t = tw.nextNode(); t; t = tw.nextNode()) {
+                        if (z.contains(t.parentElement)) continue;
+                        const v = t.nodeValue.trim();
+                        if (!/^\d{1,3}(,\d{3})*$|^\d+$/.test(v)) continue;
+                        const fs = parseFloat(getComputedStyle(t.parentElement).fontSize) || 0;
+                        if (fs > best) { best = fs; n = Number(v.replace(/,/g, '')); }
+                    }
+                    if (n === null) continue;
+                    out.judged.draw++;
+                    for (const zr of zones) {
+                        const place = Number(zr.getAttribute('data-pv-zone'));
+                        if (!(place >= 1)) continue;
+                        const digit = Math.floor(n / place) % 10;
+                        if (!digit) continue;
+                        const r = zr.getBoundingClientRect();
+                        const area = (r.width / PX) * (r.height / PX);
+                        const need = digit * 64;
+                        if (area < need) out.draw.push(Object.assign(at(c), { rule: 'DRAW-CAP', msg: `draw zone for the ${place}s of ${n} is ${mm(r.width)} x ${mm(r.height)} mm (${Math.round(area)} mm2): ${digit} disk(s) of 8 mm need ${need} mm2 (H12, DRAW-CAP)` }));
+                    }
+                }
+            }
+        }
+    });
+    return out;
+}
+const optCfg = () => ({ slotWEqual: has('slot-w-equal'), drawCap: has('draw-cap') });
+const optOn = (cfg) => !!(cfg && (cfg.slotWEqual || cfg.drawCap));
+
 /* ------------------------------------------------------------- probe phase (a browser, through the runner) */
 async function probePhase(manifestFile) {
     const { startServer, chromePath } = require('../lib/ws-harness.cjs');
@@ -136,6 +223,7 @@ async function probePhase(manifestFile) {
                     if (failed.length) throw new Error(`${f}: stylesheet / font requests failed: ${failed.slice(0, 3).join(', ')}`);
                     try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                     const p = await page.evaluate(PROBE, PROBE_CFG);
+                    if (optOn(man.opt)) { const o = await page.evaluate(OPT_PROBE, man.opt); (agg.opt = agg.opt || []).push(...o.slotW, ...o.draw); agg.optJudged = agg.optJudged || { slotW: 0, draw: 0 }; agg.optJudged.slotW += o.judged.slotW; agg.optJudged.draw += o.judged.draw; }
                     agg.segs += p.segs; agg.heads += p.heads; agg.narrow.push(...p.narrow); agg.overlaps.push(...p.overlaps);
                     for (const [t, v] of Object.entries(p.tpl || {})) { const a = (agg.tpl[t] = agg.tpl[t] || { cells: 0, segs: 0, heads: 0 }); a.cells += v.cells; a.segs += v.segs; a.heads += v.heads; }
                 } finally { await page.close(); }
@@ -296,18 +384,66 @@ async function selfTest() {
         const eq = await p.evaluate(PROBE, PROBE_CFG);
         const eqLine = measuredLine(eq);
         if (eq.segs !== 0 || !/^SLOT-W N\/A \(equation ×2: no box segment\(s\)\); HEADS N\/A \(equation ×2/.test(eqLine)) fails.push(`equation page: SLOT-W N/A named (${eqLine})`);
+        // OPT-IN SLOT-W-EQUAL (critic lf-placevalue r1 F10) and DRAW-CAP (F15)
+        const unitPage = (w2, split) => `<!doctype html><meta charset="utf-8"><style>.ws-box{display:inline-block;height:9mm;border:1px solid #000}</style><div data-ws-page="1" data-ws-mode="print"><div class="ws-instrline">Write the value.</div>`
+            + `<div data-ws-cell="pv">worth <span class="ws-box" data-ws-slot="b0" data-ws-shape="box" style="width:20mm"></span><span class="ws-box" data-ws-slot="b1" data-ws-shape="box" style="width:26mm"></span></div>`
+            + (split ? '<div class="ws-instrline">Write the value in words.</div>' : '')
+            + `<div data-ws-cell="pv">worth <span class="ws-box" data-ws-slot="b0" data-ws-shape="box" style="width:20mm"></span><span class="ws-box" data-ws-slot="b1" data-ws-shape="box" style="width:${w2}mm"></span></div></div>`;
+        const opt = async (html, cfg) => { await p.setContent(html); return p.evaluate(OPT_PROBE, cfg); };
+        let o = await opt(unitPage(50, false), { slotWEqual: true });
+        if (!o.slotW.some((x) => /"b1".*26(\.5)? \/ 50(\.5)? mm/.test(x.msg))) fails.push(`SLOT-W-EQUAL: a 26 / 50 mm word box in one section (${JSON.stringify(o.slotW)})`);
+        o = await opt(unitPage(26, false), { slotWEqual: true });
+        if (o.slotW.length || !o.judged.slotW) fails.push(`SLOT-W-EQUAL: equal boxes judged and clean (${JSON.stringify(o)})`);
+        o = await opt(unitPage(50, true), { slotWEqual: true });
+        if (o.slotW.length) fails.push('SLOT-W-EQUAL: two sections are judged apart');
+        o = await opt(unitPage(50, false), { drawCap: true });
+        if (o.slotW.length) fails.push('SLOT-W-EQUAL is off unless asked');
+        const matPage = (side) => `<!doctype html><meta charset="utf-8"><div data-ws-page="1"><div data-ws-cell="pv"><span style="font-size:28pt">559</span><span style="font-size:9pt">4</span><div data-ws-slot="answer" data-ws-shape="draw">`
+            + `<svg width="${3 * side}mm" height="${side}mm" viewBox="0 0 ${3 * side} ${side}">${[100, 10, 1].map((z, i) => `<rect x="${i * side}" y="0" width="${side}" height="${side}" fill="none" stroke="#000" data-pv-zone="${z}"/>`).join('')}</svg></div></div></div>`;
+        o = await opt(matPage(19), { drawCap: true });
+        if (!o.draw.some((x) => /ones|1s of 559/.test(x.msg) && /9 disk/.test(x.msg))) fails.push(`DRAW-CAP: nine disks in a 19 mm ones zone (${JSON.stringify(o.draw)})`);
+        o = await opt(matPage(38), { drawCap: true });
+        if (o.draw.length || !o.judged.draw) fails.push(`DRAW-CAP: 38 mm zones hold 5 / 5 / 9 disks (${JSON.stringify(o)})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 13 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
+}
+
+/* ------------------------------------------------------------- --doc-fixture: the opt-in probe on one saved document */
+async function docFixture(file) {
+    const cfg = optCfg();
+    if (!optOn(cfg)) { say(`${TOOL}: --doc-fixture needs --slot-w-equal and / or --draw-cap`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
+    const { startServer, chromePath } = require('../lib/ws-harness.cjs');
+    const puppeteer = require('puppeteer');
+    const srv = await startServer();
+    const browser = await puppeteer.launch({ headless: 'new', executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    let o;
+    try {
+        const page = await browser.newPage();
+        await page.setViewport({ width: 794, height: 1100, deviceScaleFactor: 1 });
+        await page.goto(`${srv.base}/index.html`, { waitUntil: 'domcontentloaded' });
+        await page.emulateMediaType('print');
+        const html = fs.readFileSync(path.resolve(file), 'utf8').replace(/https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//g, `${srv.base}/`);
+        await page.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
+        try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
+        o = await page.evaluate(OPT_PROBE, cfg);
+    } finally { await browser.close(); srv.server.close(); }
+    const f = [...o.slotW, ...o.draw];
+    for (const x of f) say(`  ${x.rule} p${x.page} cell ${x.cell}: ${x.msg}`);
+    const what = `${cfg.slotWEqual ? `SLOT-W-EQUAL ${o.judged.slotW} slot group(s)` : ''}${cfg.slotWEqual && cfg.drawCap ? ', ' : ''}${cfg.drawCap ? `DRAW-CAP ${o.judged.draw} draw zone(s)` : ''}`;
+    if (!o.judged.slotW && !o.judged.draw) { say(`${TOOL}: FAIL - nothing judged in ${path.relative(process.cwd(), path.resolve(file))} (${what})`); process.exit(1); }
+    say(f.length ? `${TOOL}: FAIL - ${f.length} finding(s) in ${path.relative(process.cwd(), path.resolve(file))} (${what})` : `${TOOL}: OK (${what} in ${path.relative(process.cwd(), path.resolve(file))}: 0 findings)`);
+    process.exit(f.length ? 1 : 0);
 }
 
 /* ------------------------------------------------------------- main */
 async function main() {
     if (arg('probe', null)) return probePhase(arg('probe'));
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'run', 'rows', 'sizes', 'slots', 'json', 'root', 'siblings-file', 'sibling-run', 'matrix-baseline', 'probe']);
-    const BOOL = new Set(['run-siblings', 'report-only', 'keep', 'self-test', 'paired', 'all-siblings', 'no-extra']);
+    if (arg('doc-fixture', null)) return docFixture(arg('doc-fixture'));
+    const VALUE = new Set(['skills', 'run', 'rows', 'sizes', 'slots', 'json', 'root', 'siblings-file', 'sibling-run', 'matrix-baseline', 'probe', 'rule-skills']);
+    const BOOL = new Set(['run-siblings', 'report-only', 'keep', 'self-test', 'paired', 'all-siblings', 'no-extra', 'slot-w-equal', 'draw-cap']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -350,7 +486,7 @@ async function main() {
     const lintSecs = (Date.now() - t1) / 1000;
     // ---- the geometry probe over the saved documents (one browser, through the runner)
     const man = path.join(tmp, 'probe.json'), pout = path.join(tmp, 'probe-out.json');
-    fs.writeFileSync(man, JSON.stringify({ out: pout, jobs: jobs.filter((j) => docs.has(j.id)).map((j) => ({ id: j.id, dir: j.dir })) }));
+    fs.writeFileSync(man, JSON.stringify({ out: pout, opt: optCfg(), jobs: jobs.filter((j) => docs.has(j.id)).map((j) => ({ id: j.id, dir: j.dir })) }));
     const t2 = Date.now();
     const pr = spawnSync(RUNNER, ['node', __filename, '--probe', man], { cwd: HERE, env: Object.assign({}, process.env, { MQ_ROOT: ROOT }), encoding: 'utf8', maxBuffer: 64 << 20 });
     const probeSecs = (Date.now() - t2) / 1000;
@@ -422,6 +558,10 @@ async function main() {
         for (const x of above) msgs.push(`${x.rule} ${x.n} above the siblings' ${x.max}`);
         for (const x of noSib) msgs.push(`${x.rule} ${x.n}: no sibling measured this row`);
         for (const g of geo) msgs.push(g.msg);
+        // OPT-IN SLOT-W-EQUAL / DRAW-CAP: zero tolerance on the lane skill's cells (a partner's are not judged), and only
+        // on rows of --rule-skills when it is given
+        const RS = argAll('rule-skills');
+        if (!RS.length || RS.includes(j.row.skill)) for (const x of ((probe[j.id] || {}).opt || [])) if (!x.skill || x.skill === j.row.skill) msgs.push(`${x.rule} p${x.page} cell ${x.cell}: ${x.msg}`);
         if (attrGap) msgs.push(attrGap);
         for (const e of cmp.errors.filter((x) => x.id === j.row.id && String(x.msg).startsWith(`${j.size}:`))) msgs.push(e.msg);
         const notes = geoPartner.map((g) => `partner skill (non-blocking, D1): ${g.msg}`).concat(cmp.partner.filter((x) => x.id === j.row.id && x.size === j.size).map((x) => `partner skill (non-blocking, D1): ${x.rule} ${x.n}`));

@@ -36,6 +36,9 @@
 //             LONGEST blank run of rows between the cell's rules (padding included, above, between or under the ink), as
 //             the critic's per-cell scan does. A `legacy` cell (another skill's old print HTML) is printed as a note, not
 //             judged. The default stays on.
+//   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
+//   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
+//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
 // PIN (--baseline <file>, default design/audit/baselines/empty-band.json when it exists; --no-baseline for raw): the counts of
@@ -64,7 +67,10 @@ const OPTS = arg('opts', null) ? JSON.parse(arg('opts')) : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
 const SLOT_INK = arg('slot-ink', 'on') !== 'off';
 const LEGACY_NOTES = [];
-const BAND = 0.30, SIDE = 0.30, FOOT = 0.10, MIN_MM = 10;
+// (`--margin N`, lf-placevalue critic r4 N-r4-1, owner 2026-11-09 "every finding a check": a fix that clears the 30 % limit by under
+// N points is fragile - G2 passed at 29.9 % - so the band and side limits are judged at 30 - N %; absent, 30 % as before)
+const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
+const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10;
 // the roles that lay their grid out from the items' measured footprints (buildSheet items[i].measured[cols].hMm)
 const GRID_ROLES = new Set(['independent', 'more-practice', 'test', 'review', 'mixed-practice']);
 
@@ -138,6 +144,30 @@ function measureCells(scope, slotInk = true) {
     return out;
 }
 
+// EB-VOCAB (opt-in --vocab-ink; lf-placevalue critic r3c E-A1, lead 2026-11-08): a lesson's vocabulary picture whose drawing fills
+// less than 70 % of its own picture box, up and down or across (a picture of 4 ones drawn in a ten-rod's height left the
+// vocabulary cell 43 % empty above it). Reads every `.mq-lvpic-in svg` on the page: its drawn content (getBBox of its
+// children, scaled from the viewBox) against the svg's own box. Additive: absent the flag nothing is read.
+function measureVocab(scope) {
+    const out = [];
+    [...document.querySelectorAll(scope)].forEach((rt, pi) => {
+        [...rt.querySelectorAll('.mq-lvpic-in svg')].forEach((svg, i) => {
+            const r = svg.getBoundingClientRect(); if (!r.width || !r.height) return;
+            let bb = null;
+            for (const ch of svg.querySelectorAll('rect, line, path, circle, ellipse, polygon, polyline, text')) {
+                let b; try { b = ch.getBBox(); } catch (e) { continue; }
+                if (!b.width && !b.height) continue;
+                bb = bb ? { x0: Math.min(bb.x0, b.x), y0: Math.min(bb.y0, b.y), x1: Math.max(bb.x1, b.x + b.width), y1: Math.max(bb.y1, b.y + b.height) } : { x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height };
+            }
+            if (!bb) return;
+            const vb = svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.height ? svg.viewBox.baseVal : { width: r.width, height: r.height };
+            const word = ((svg.closest('.mq-lvpic') || {}).textContent || '').trim().slice(0, 20);
+            out.push({ page: pi + 1, pic: i + 1, word, fillH: +((bb.y1 - bb.y0) / vb.height).toFixed(3), fillW: +((bb.x1 - bb.x0) / vb.width).toFixed(3), hMm: +(r.height / (96 / 25.4)).toFixed(1) });
+        });
+    });
+    return out;
+}
+
 function judge(cells, where, F) {
     for (const c of cells) {
         // (--slot-ink off judges the lane's KIT cells: a `legacy` cell - another skill's old print HTML, e.g. a pre-skill check's
@@ -151,7 +181,9 @@ function judge(cells, where, F) {
 
 async function main() {
     const findings = []; const notes = []; let renders = 0, cellsRead = 0;
-    const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    // (`--only R1,R2`: judge only these rules - a backtest row proves one rule alone)
+    const ONLY = arg('only', null) ? arg('only').split(',') : null;
+    const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     const app = await open({ seed: 1 });
     const { page } = app;
     const T0 = Date.now();
@@ -187,6 +219,21 @@ async function main() {
                     renders++; cellsRead += cells.length;
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
                     judge(cells, `${key} ${j.tag}`, F);
+                    // EB-PAGE (opt-in --page-fill; lf-placevalue critic r4 E-r4-1): a page that is not the role's last leaves 30 % or more
+                    // of its body empty under its last block (identify lesson L p2: 43 %, page 3 never moved up). The last page may end short.
+                    if (has('page-fill')) {
+                        const pf = await sh.evaluate((scope) => [...document.querySelectorAll(scope)].map((pg) => {
+                            const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
+                            const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
+                            const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
+                            return Math.round(Math.max(0, br.bottom - last) / br.height * 100);
+                        }), 'body > section.ws-page, body > .ws-page');
+                        pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
+                    }
+                    // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
+                    if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
+                        if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
+                    }
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
                     if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
@@ -241,7 +288,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-READ'];
+    const rules = ['EB-BAND', 'EB-SIDE', 'EB-FOOT', 'EB-READ', 'EB-VOCAB', 'EB-PAGE'];
     for (const n of notes.concat(LEGACY_NOTES)) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);

@@ -836,6 +836,46 @@ that are not blocking on the lesson path. Lane paused by the owner after r1; fix
 | r5 fresh builder + critic r4 FAIL (min 6) | All 10 r3 defects were checked first. 8 of 10 are fixed (r3 #3 partly, #6 persists). ws-empty-band and precritic --strict were green (only sibling-compare), yet the critic found an H13 hit of 30.1 % on pick3 error analysis at S and pick3 guided rows unequal at L (4th round), plus 3 new findings (EA S height, a number-name/hundred look-alike, the left picture) | ws-empty-band and V18 must measure what the critic measures (the same ink set, rendered row boxes at every size); S <= 0.9 x L height; a bank word never in the picture's text; picture referent marks | **Check first:** (1) align ws-empty-band's ink set with the critic's scan, and backtest it on 31bee0fb pick3 EA S; (2) V18 on rendered rows at S/M/L; (3) OQ-1 (base-ten unit size) answered BEFORE the rebuild. Rule 5: pick3 guided row equality survived 4 rounds, so stop |
 | r6 fresh builder + critic r5 PASS (min 8) | Every critic r4 finding got a check first (it FAILed on 90e2eee4). ws-empty-band was aligned to the critic's scan (--slot-ink off) and V18 to the rendered rows. The critic then found only 8 nits | row-spread 10 % on every guided template; VQ-7 answer-place height; letter anchor; 390 box alignment; distinct names; caption size; provider-comment lint | **Check first, for the next lesson's vocabulary page:** ws-vocab-unit (V1-V21) and --browser on its set; ws-empty-band with and without --slot-ink off on every offered role and host; render each set inside its own lesson. Speed-up: a check passes only once it measures what the critic measures, so backtest each new check on the last critic-failed render |
 | r7 owner R-1 / R-2 + narrow critic FAIL (min 7, near-miss) | Built with 4 checks (V22-V25) and 4 backtests, gates green; the critic failed Match 3 C2: the wrong line names the word, not the letter the pupil writes. 6 minor findings | V25+ (letter in the Match 3 line, glow count); V26 ladder vs explanation; V27 equal blocks; V22+ no halo on glyphs; V24+ word list | **Check first:** the feedback names the pupil's own response kind (a letter on Match 3, a word on pick3); render answered states full-page on every host, the quiz included |
+### lf-placevalue critic r1 (2026-11-07): FAIL on all five pv skills (lesson #1)
+**Automatic checks** (critic findings a machine could have measured; owner of each below):
+- F1 H13 absolute band: print-lint H13 compares a cell with its row only; proposed H13-ABS (band under the lowest ink ≥ 30 % of the cell, less Hw) — backtest value independent L 34 %. Owner: checks lane (shared print-lint).
+- F2 / F18 opener and lesson overflow / fill: ws-grade-render --gate and print-lint PAGEFILL run only on lesson / test / independent in precritic --skill; extend to every §7a-offered role. Owner: precritic --skill rows (lf-placevalue holds the R2 parser; extension asked of the lead).
+- F3 wrongAnswer one string in every slot: node-lint WRONG-FITS checks one slot; make it per slot. Owner: checks lane.
+- F4 owner ruling with no assert (identify writeValue): card rulings todo T-5.1 → a ws-card-rulings assert (graded value slot). Owner: lf-placevalue (reader is ours).
+- F5 / F6 paper ≠ screen heads / answer kind: proposed host-parity check. Owner: checks lane.
+- F7 screen numeral size: proposed SCREEN-DIGIT in ws-screen-slots. Owner: checks lane.
+- F8 Size S ignored: ws-columns --sizes exists but is not on precritic's --skill path. Owner: precritic --skill rows.
+- F9 two cell geometries in one section: GRID-EVEN scoped to fact grids; widen to every kit section. Owner: checks lane.
+- F10 slot width tells the answer: proposed SLOT-W-EQUAL in ws-slot-clip. Owner: checks lane.
+- F11 "1 hundreds": proposed providers-unit PLURAL rule. Owner: lf-placevalue (pv provider tests).
+- F12 × on grade-2 steps; F13 model item on the ones place; F14 step k draws the first k answers: providers-unit rules. Owner: lf-placevalue.
+- F15 draw zone too small: proposed DRAW-CAP in ws-slot-clip. Owner: checks lane.
+- F16 offered role that cannot render (stretch): ws-card-rulings --check offered should render each offered role. Owner: lead ruling first.
+- F19 / F20 band values and wraps on option renders: options-verify --render covers appearance values only; add band + WRAP. Owner: checks lane.
+- F22 dealer per page: ws-dealer-uniform per page for case mix. Owner: checks lane.
+
+**Speed-ups:**
+- The pv card's §7a offered every role and host, but the precritic --skill path renders only 3 roles: 12 of 23 findings were on roles no gate rendered. Fix: precritic --skill renders every §7a-offered role (one change, saves a critic round per family).
+- First family on a template had no siblings: 90 rows went to the critic by hand (lead R1); the critic ran 47 min. Fix: the first family's critic gets the rows sampled by the brief (done) — keep.
+- Builder strength right (medium); waits: browser slots shared with precritic (~2 min a gate). No owner-question delays (lead answered within 10-20 min).
+
+### lf-placevalue critic r2 (2026-11-07): FAIL on all five pv skills; rule 7 stop (N7, N8 survived two medium rounds)
+**Which earlier check would have caught each finding, or why none did:**
+- N1 (identify T/F key wrong): node-lint WRONG-FILL ran the real roles but only for multi-slot WRITE-IN cells; identify's ring + value line was
+  not in its set, and providers-unit's distractor test compared joined strings. Now WRONG-DIFFERS per slot (L27).
+- N2 (instruction): no check read the item-less print path; providers-unit tested q.printText only. Now PRINTED-INSTRUCTION (L28).
+- N3 (combine band 99 one-part): ws-dealer-uniform and content-audit ran the default band only. Now COMBINE-PARTS on every band (L29).
+- N4 ("hundreds" on 2-digit): VQ-LIVE ran at the default band 999 only — proposed at every band.
+- N5 / N6 (band pages with 43–57 % bands): H13-ABS ran on default pages; options-render --bands judged rises against the default page,
+  which shared the finding — proposed per page, absolute.
+- N7 (two layouts in review): GRID-EVEN-ALL was wired to independent pages only — proposed on every offered role.
+- N8 (2 columns ignored): the matrix more-cols2 rows were PENDING(no-baseline), so nothing judged them — proposed judged rows.
+**Speed-ups:**
+- The single biggest loss of the lane: cells were tuned on default pages for two rounds before the plan-from-card gate showed 548 option
+  OVERFLOWs (L26). Next family: run `ws-cell-checks --card --card-opts` on every skill BEFORE the first critic.
+- A 2-round loss on N7 / N8 because the gates that would show them (GRID-EVEN-ALL on review, more-cols2 rows) were opt-in on the wrong roles
+  or PENDING: wire a lane's opt-in rules on EVERY §7a-offered role, not the three default ones.
+- Builder / critic strength right (medium); critic r2 35 min; one builder round 63 min; precritic 50 min (the plan-from-card gates add ~20).
 ### lf-checks · critic r1 (2026-11-07, FAIL 7 / 7 / 8 / 8: the lesson precritic checks)
 
 Full report: design/status/lf-checks/critic-r1.md.
@@ -872,3 +912,60 @@ ws-lesson-samples --check in parallel pages (about 1 min, not 3.5); freeze or ta
 
 **Root cause of the stop:** hand-edited pass fixtures. Rule for every checks lane: a pass state is a commit (or a fixture
 re-rendered from a commit), never a packet edited by hand; where no fix commit exists yet, the row's pass side is pending.
+
+### lf-placevalue critic r3 / r3b (2026-11-08): expand PASS; identify, value, combine, unit_form FAIL (one or two pv findings each)
+**Which earlier check missed each finding, or why none did:** F3 / G1 (lesson vocabulary data) — LESSON-DATA checks only that the
+entry exists and its refs are live, never the pictures or meanings: proposed rules in LESSONS_LEARNED. F4 — the N2 instruction check
+covered pages, not lesson section headings. F1 / F2 — ws-empty-band EB-SIDE caught them in precritic r5 but the lane sent the red
+[pv] rows to the critic as "owned elsewhere": process fix, a [pv] row is never owned elsewhere. G2 — option variants rendered at L only.
+**Speed-ups:** the first r3 critic timed out (50 min) on the full matrix; splitting the batch by skill across two critics finished it.
+Next family: one critic per 2-3 skills, rendered in parallel slots. The detailed lessons are not deterministic across runs of the same
+code (hash check impossible): give buildDetailedLesson a seeded, deterministic path (lf-engine).
+
+### lf-placevalue deploy hold (2026-11-08): lesson 1 regressed on the lane's pv changes
+**Which check missed it:** none on the lane's path built a detailed lesson; the lead's deploy gate (`ws-detailed-lesson --check`)
+was the first. **Lost:** one deploy cycle and a stopped targeted critic (r3c, killed when the hold arrived). **Fix:** the five passed
+detailed lessons that deal a pv skill are opt-in precritic rows (opt-in-rules.json), backtest `pv-detailed-lesson-1`.
+**Speed-ups:** bisect by copying one changed file at a time into a clean master worktree with a 40 s probe (the lesson sheet's item
+count) instead of the 2 min full gate: the CSS file was found in four probes. A probe that `git stash`es while a background gate runs
+is unsafe: use a second worktree.
+### Lane lf-engine (lessons phase 0 fix round, compiler E4) — 2026-11-07
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| P1 fix round (06:41-08:18) | D1-D18, D20, L7 D1 fixed; 8 backtests; precritic red only on other families' pins + lesson 2 (master too) | check-page H13 blocking in precritic; measured-vs-drawn height probe; LR-5 keyed by picture; precritic lesson scope runs ws-lesson-unit / coverage (lf-checks did it, 84bcf080) | single-part render harness (~45 s a layout loop); deal every prereq ref before choosing; maximum timeout on background gates |
+| P2 compiler (06:33-06:58, parallel, node only) | 7 proof cards compile; node gates green | script-vs-page "no X" refusal built; reseed drift check; NEEDS per lane; wrongAnswers ids declared | seed cards from passed lessons; readers per template |
+| critic r2 (≈14 min, PNG + code, no browser) | FAIL min 6: N1 sub L sheet lost its Independent row (the D10 fix regressed it); N2 one-item check questions; N3 no miss threshold; add / round sheets PASS | lesson sheet ≥ 1 Independent row + Score, foot ≤ 20 %; plan() item floor unit test; routing threshold; LR-6 on the check | r1/r2 side by side per "fixed" finding; scoped fixes list every changed sheet before/after; critic grades PNGs while the builder holds the browser |
+
+| P1d live round (17:22-18:52, owner rulings) | 3a ruling DONE (Practice 1 full width, arrays to 6 × 6, every family once: LP-FAMILY-REPEAT 25/25, was 7 FAIL); lesson 2 E24b only part (P0 twins gone; Practice 1 7+4 / 8+5 left - rule 7 stop) | pool-capacity in ws-lesson-unit (built, backtest pool-capacity-3a); a dealer unit test that Practice's non-edge places are dealt first under `reserve`; E27 / E12 read the 6 × 6 ruling (lf-checks); --sweep needs protocolTimeout 0 to sweep lesson 2; every dealt ref keeps ≥ 1 spare family (from minNum / maxNum) | a 30-line solver over the pool says feasible / infeasible in seconds, before any render - run it before every pool change; root cause of lesson 2 is the greedy deal ORDER (a valid whole-pack assignment exists over parts 2-9), so a capacity check alone does not catch it; pre-change hash baseline on the -live tree first makes "only the two lessons changed" one check; sweep with --jobs 1 (3 jobs ran out of memory) |
+| 3a live narrow critic r1 → fix → r2 (19:00-19:50) | r1 FAIL min 6 (T5 named a non-existent Practice 3: {p4.last} counted pages not sheets; P4-2 41 % band from top-anchored content in stretched cells); r2 PASS min 8 | {p4.last} truth (built: ws-lesson-unit practice-units + backtest); H13 band re-run on equalPages-stretched cells; star ramp per sheet; pack-wide family census as hard LR-5 | a multi-page Practice-sheet fixture would have caught every one-page assumption ({p4.last}, edgeLast, stars) at unit time; a pixel-band probe in ws-detailed-lesson --check; a narrow critic on changed pages only costs ≈ 5 min a round — use it for every post-pass fix |
+| Lesson 2 E24b attempt 2 (2026-11-07, ≈ 1 h 40) | PASS on E24b: Practice 1 at 4242 deals 4 + 9, 8 + 6 / 9 + 3, 5 + 6 / 9 + 9, 8 + 12 (was 7 + 4 / 8 + 5); E9 / E35 as on live; lessons 1, 3a, 4, 5, 6, 7 and the 3 samples byte-identical; NOT done for every seed: at seeds 1-3 NO valid Practice 1 exists once the chart, Guided, the slip and the Check Question have dealt (exhaustive search: 0 sets), so the solver returns null and those seeds deal as before (E24b fails there, as on master) | solve-story in ws-lesson-unit (built, backtest solve-story-e24b); a timing guard in the dealer (a place that spends all its tries on a hard filter names itself, instead of a 180 s protocol timeout); a hash-before/after script in tests/scripts (built ad hoc in the scratchpad this round) | attempt 1 lost its round to filtering a random generator to exact facts (≈ 0.5 % a try) - pin the generator instead; a probe of the generator's distribution (one evaluate, 720 draws, 30 s) found it at once; a pin limited to the page the set was solved for (a probe deals past it) took the build from 378 s to 98 s; the pre-change hash baseline made byte-identity one diff; the next step is option (b), solve Practice FIRST - before the reserve and the chart - and reserve its set in `used`; a node feasibility count over each seed's pre-Practice keys (30 lines, seconds) proves it before any render |
+| Lesson 2 E24b solve-first (2026-11-08, ≈ 1 h 10, STOPPED rule 7) | FAIL: Practice 1 solved first (before the reserve and the chart, its set in `used` and a hard bound on every other ref) clears Practice 1 at seeds 1, 2, 5, 4242 (node: 22 valid pages at every seed 1-25 + 4242), but the shortage moved: P0 near twins at 1, 2, 5; Guided repeat / twin at 4242 (and a Guided fit broken by "no two cells add the same number" - fixed in the patch); seeds 3-4 timed out (180 s protocol). Nothing committed to code; patches in design/lessons/proof/live-2026-11-08/ | a WHOLE-PACK node feasibility count (every place of the pack, its case wants and page rules, per seed) - not built; ws-detailed-lesson with protocolTimeout 0 (seeds 3-4 lost to the 180 s timeout) | the node count checked Practice 1 alone, so it passed while the pack was infeasible: count every place that draws from the pool, not the page being fixed; one seed's build (3.5 min) per probe - a console probe of pickWeDo found the Guided cause in one build |
+| Lesson 2 E24b P0 ruling (2026-11-08 evening, ≈ 1 h 10, STOPPED at budget) | PART: owner ruling applied (P0 + facts a teen and ones, 12 + 5; never the crossing-ten pool) and the whole-pack check built (`ws-lesson-unit --only pack-feasible`, lessons/pack-solve.js: 14 places, a solution at seeds 1-25 + 4242). With solve-first + Practice 1 taken from the whole-pack solution (-live, not committed): E24b PASS at seeds 1, 3, 4, 4242 (was FAIL at 1 on master: P0 4 + 8 / 5 + 8, P4-1 7 + 9 / 6 + 8); FAIL at 2 (P0 count 18 / 19; E31: the chart's add-to and equal-parts examples missing) and 5 (P0 bonds 9 / 10) | pack-feasible (built; backtest pack-feasible-p0); P0's OTHER questions as a pool: count 17-20 and bonds 6-10 for 2 items each hold 1-3 non-near pairs - a capacity check per P0 ref (proposed); E31 at seed 2: the chart's other examples are picked from the lesson's dealt main pool, which the solve-first hard bound thins - give `second` / `third` their own case pools (`ref`) carrying the pack's avoid keys, or pin them from the whole-pack solution (proposed) | the whole-pack count said the pack was feasible even BEFORE the ruling (18 places, 26/26 seeds with restarts): the shortage was never capacity but the deal ORDER and each place's own generator pool; a check-first count must model each place's own candidate source (the chart's main-pool examples, P0's tiny ranges), not only the fact pool |
+| Lesson 2 E24b at every seed (2026-11-08 night, ≈ 1 h 30, STOPPED at budget) | PART: -live PASS on E24b + E31 at seeds 1-5 and 4242 (E9 / E35 as on master; 22 of 334 hashes differ, all lesson 2); lane E31 PASS everywhere but E24b FAIL at 1, 2, 4, 5, 4242 (P0 twin answers: the widened count range 11-20 meets the + facts' 13-19, and the lane engine's P0 deal does not dodge them) | pack-feasible models each place's OWN source (pack-solve.js placeSources; backtest pack-feasible-sources FAIL 00ca4b10 / PASS ceb557b5); proposed: a P0 answer-overlap check (a one-number range sharing answers with a + question) and a lane-vs-master P0 deal diff in node | lost time: ws-backtest started by `--help` (no such flag; stopped), one seed loop without `--check`, edits made while a lane gate was running (restarted twice), and a guessed cause (spare deals) built and gated before it was shown in a dump. Rules: read a script's usage header before a flag; a seed loop passes `--check --debug`; never edit a tree a gate is running on; dump the deal before building a fix for it |
+| Lesson 2 P0 drift lane vs master (2026-11-09, ≈ 1 h 0) | PASS on the lane: lane P0 == master P0 at seeds 1, 2, 4242 (ws-lesson-deal-diff); E24b + E31 PASS at seeds 1-5 + 4242; E9 / E35 unchanged (deferred by the lead); g3-oa8 E35 pre-existing (same on dcdb50d4); 12 of 378 baseline hashes changed, lesson 2 and g3-oa8 only | Findings and checks: (1) P0 drift - the lane's print-sheet.js pageLr6 covered Mixed pages only, master's (lf-placevalue 2026-11-08) also a perQuestion pre-skill-check -> `ws-lesson-unit --only p0-overlap` (backtest p0-overlap FAIL dcdb50d4 / PASS b1e30155), would have saved 2 rounds (11-08 night + the guessed spare-deals fix); (2) P0 answer overlap (count 11-20 meets + facts 13-19; also g2-nbt3 unit_form / value and g3-oa5 mult_facts / arrays on the lane) -> same check, saved 1 round; deal dump `ws-lesson-deal-diff.cjs` (P0 per seed, twins, first difference vs another tree) | lost time: monitors stacked while one browser build ran (use one `tail --pid` wait); the first dump read `q.ans` the pool JSON does not keep (answers are read from the item keys now). Rules: diff the engine hunks since the merge base BEFORE building a dump; a dump script reads one known page first |
+
+### lf-placevalue round 5 (2026-11-09): 3 fixes + 3 new checks in one critic round
+**Rounds saved by the new checks:** G5 (open r3b -> r4) and E-r4-1 (r4 -> r5) would each have been caught before a critic by
+ws-fixit-words / --page-fill; N-r4-1 by --margin. **Speed-ups:** the r4 fix of G2 was invisible to its own measure because the bonus was
+added BEFORE a max() with the skill's fixed width (0.8 mm moved): measure the change's effect right after the edit (lowered-threshold probe).
+**Lost:** none; one backtest caught a tool bug (detached-DOM innerText) before commit.
+
+### lf-engine landing (2026-11-09)
+**Lost:** the landing stops at the proof (findings L1, L2 in LESSONS_LEARNED): the lane's refactor-guard baseline covered 3 samples +
+the detailed lessons at one seed, so drift on 20 other live packets went unseen for a week of lane rounds. **Fix (tool):**
+`ws-lesson-baseline --all-lessons --seeds --sizes --per-lesson` (every key of prereqs.js + samples + detailed); a lane that touches
+lesson-pages/* runs it against master before it reports. **Kept time:** node deep-compare of every prereqs.js record (master vs land)
+before any browser run caught 10 record differences (writeValue false on identify refs, 5 missing pv lessons) in seconds.
+
+### lf-engine landing round 2 (2026-11-09): L1 / L2 opt-in, proof 0 of 1,556
+**Lost:** ~12 min - the first proof run was started without `--all-lessons --sizes L,S --seeds 4242,1` (the default sample run
+compared a different set) and was stopped. **Fix (rule):** the full command is now written into LESSONS_LEARNED process rule 0c
+and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never retyped. **Kept time:** L2 traced in two commands
+(an HTML page diff of the round packet master vs land, then `git log -S roundOne`): 8e285251 -> 08ee129e. A synthetic
+`independentBand` test (18 measured rounding cells, no browser) proves flag off = 6 rows, on = 12 rows in milliseconds, and an
+84-hash subset baseline makes the commit-pair backtest 49 s instead of 2 x 12 min.
+**Lost (round 2, cont.):** ~2 h 30 on ws-backtest: the full run kept every commit-pair checkout (~600 MB) to the end, filled the disk, and
+79 rows read ERROR(checkout); the rerun was too slow to finish in budget (10 of the 79 rows re-run, all PASS). **Fix (tool):**
+ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
+start it first, alone, detached, and re-run only the failed rows by `--row`.

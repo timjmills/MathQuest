@@ -21,6 +21,9 @@ import { winShare } from '../lesson-arch/grid.js';
 import { sigOf, digitsOfOps, kindOf, opKindOf, namedSteps, stepMarker, band, hAt, fitsWidth, hOf } from './common.js';
 import { stripHtml } from './practice.js';
 
+/** The full-width Guided rows of a `chartWide` lesson: `guidedRows` 1-4 (1 only when asked), 2 when absent. */
+export const guidedRowsOf = (data) => (data && Number(data.guidedRows) === 1 ? 1 : Math.max(2, Math.min(4, Number(data && data.guidedRows) || 2)));
+
 /** The Guided ("we do") items: the example's kind first (same strategy, same digit shape). */
 export function pickWeDo(items, example, data, n, others = []) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
@@ -47,7 +50,8 @@ export function pickWeDo(items, example, data, n, others = []) {
         // nor the same answer; a + item only, so other lessons' wants pick as before)
         const plus = (x) => { const q = (x && x.q) || {}; const st = q.cell && q.cell.payload && (q.cell.payload.steps || [])[0]; const o = operandsOf(q).map(Number); return (q.op === '+' || (st && st.op === '+')) && o.length >= 2 ? o : null; };
         const twin = (x, y) => { const a = plus(x), b = plus(y); if (!a || !b) return false; const da = Math.abs(a[0] - b[0]), db = Math.abs(a[1] - b[1]); return a[0] + a[1] === b[0] + b[1] || (da <= 2 && db <= 2); };
-        // (the chart's own fact or its turn-around - LR-5, critic r3 D1)
+        // (the chart's own fact or its turn-around - LR-5, critic r3 D1; `others`: the chart's other examples too - P1c item 4,
+        // lesson 2's E24: the second example 7 + 5 came back as Guided cell 2)
         const sameFact = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && (a.join() === b.join() || a.join() === [b[1], b[0]].join()); };
         // (the first set of cells, in order, that meets every want with no twins and not the chart's own fact)
         // (lesson 2 r5, critic r3 m3: no story person twice on the sheet while the deal can - "Lena has 7 cards" and "Lena has 6")
@@ -55,7 +59,10 @@ export function pickWeDo(items, example, data, n, others = []) {
         // (lesson 7 r2: two two-step stories never share a Step 1 number or a Step 1 answer - "30 shared by 6", "30 shared by 5")
         const ms1 = (x) => { const s = x && x.q && x.q.cell && x.q.cell.payload && x.q.cell.payload.steps; return Array.isArray(s) && s.length === 2 && s[0] ? [s[0].a, s[0].b, s[0].ans] : null; };
         const msTwin = (x, y) => { const a = ms1(x), b = ms1(y); return !!a && !!b && (a[0] === b[0] || a[2] === b[2] || (a[0] === b[1] && a[1] === b[0])); };
-        const meets = (x, y, nm) => twin(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        const meets = (x, y, nm) => twin(x, y) || sameSecond(x, y) || msTwin(x, y) || winShare(x, y) || (nm && people(x).some((p) => people(y).includes(p)));
+        // (lesson 2 solve-first, seed 1: the set below then dropped a cell that adds the same number as another - "no two Guided
+        // cells add the same number", 5 + 7 / 8 + 7 - and refilled it with a near twin, 3 + 8; + items only, as that rule reads them)
+        const sameSecond = (x, y) => { const a = plus(x), b = plus(y); return !!a && !!b && a[1] === b[1]; };
         const pickLead = (k, chosen, nm) => {
             if (k === data.guidedWants.length) return chosen;
             const t = CASE_TESTS[data.guidedWants[k]];
@@ -137,6 +144,9 @@ export const WEDO_W_MM = 62;       // the Steps zone beside the Guided cells: on
 export function weDoBand(env) {
     const { input, ctx, m, data, main, example, example2, example3, example4, exSteps, extrasList, stepsZone, groups } = env;
     const rest = main.filter((it) => it !== example && it !== example2 && it !== example3 && it !== example4);
+    // (critic lessons-phase0 r1 D10 / D11: a lesson whose Prerequisite Check replaced its Warm-up - LR-17, `prereqs` - grows
+    // its Guided cells by a tenth at most when no Independent row fits: a third more left the Guided cells 40 % empty under
+    // their stacks (H13); every other lesson keeps its third)
     // The width left of the Steps zone is two thirds of the page: 2 cells are a 3-column page's
     // cells, 3 cells are narrower (a 4-column page's measurement, plus the fact's cue beside it).
     const colsFor = (k) => (k >= 3 ? 4 : k === 2 ? 3 : 2);
@@ -170,7 +180,7 @@ export function weDoBand(env) {
     const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
     const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
-    const exOthers = [example2, example3, example4].filter(Boolean);   // (lesson 2 E24: the chart's other examples' facts too)
+    const exOthers = [example2, example3, example4].filter(Boolean);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
@@ -184,11 +194,17 @@ export function weDoBand(env) {
     let top = null;
     // `chartWide` (the detailed lesson maker): a Guided problem too wide to stand beside the Steps
     // takes the strip over the cells and two full-width rows (cell 1 the Model's case).
+    // (`guidedRows: 1` - lf-algebra: ONE full-width row when the lesson asks for it; 2-4 as before, 2 when absent)
     const wideG = !!(data && data.chartWide);
     if (wideG && stepsZone && stripX && example) {
-        const gw = Math.max(2, Math.min(4, Number(data.guidedRows) || 2));
+        const gw = guidedRowsOf(data);
         const set = pickWeDo(weDoPool, example, data, gw, exOthers).slice(0, gw);
-        if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
+        // (`guidedCols` n, lf-placevalue critic r4 E-r4-1: a chart that needs the width over Guided cells that do NOT - identify's
+        // numeral and its place words - stands its cells n across where they fit, so the Guided block is one row, not two full-width
+        // rows that left the page before it 43 % empty; opt-in, every other wide lesson keeps its rows)
+        const gc = Math.max(0, Math.min(3, Number(data.guidedCols) || 0));
+        if (set.length && gc >= 2 && set.length <= gc && fitsWidth(set, gc)) top = { set, cols: gc, h: Math.max(20, hAt(set, gc)) };
+        else if (set.length) top = { set, cols: 1, rows: set.length, h: Math.max(20, hAt(set, 1)) };
     } else if (stepsZone && stripX && weDo.length && !stackRows && (gH < 0.72 * zH || wantN > weDo.length)) {
         const w3 = example ? pickWeDo(weDoPool, example, data, 3, exOthers) : rest.slice(0, 3);
         const k = w3.length >= 3 && fitsWidth(w3.slice(0, 3), 3) ? 3 : Math.min(2, w3.length);

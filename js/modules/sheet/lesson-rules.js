@@ -163,4 +163,52 @@ export function packetViolations({ lesson, placed, chartCases = [], sizePrinted,
     return out;
 }
 
-export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations };
+/**
+ * Lesson 7 D2 (`repeatKey: 'family+frame'` on a compiled description's refs - lessons/compile.js ruling family-repeats): the
+ * keys an item may hold ONCE in a pack - its unordered x / ÷ family (`rk:fam:4,6,24`; a two-step story's x / ÷ step) and each
+ * story frame of its text, a total and its object (`rk:frame:20 marble`, as tests/lib/ws-lesson-lp.cjs LP-FAMILY-REPEAT reads
+ * them). print-sheet.js refAccepts / dealOne1 read it only on a ref that carries `repeatKey`.
+ */
+export function repeatKeysOf(q) {
+    if (!q) return [];
+    const out = [];
+    const p = (q.cell && q.cell.payload) || {};
+    const glyph = (o) => (o === '*' || o === 'x' || o === '×' ? '*' : o === '/' || o === '÷' ? '/' : '');
+    const fam = (op, a, b) => {
+        a = Number(String(a).replace(/,/g, '')); b = Number(String(b).replace(/,/g, ''));
+        if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+        if (op === '*') { const [x, y] = [a, b].sort((m, n) => m - n); return `${x},${y},${a * b}`; }
+        if (op !== '/' || !b || a % b) return null;
+        const [x, y] = [b, a / b].sort((m, n) => m - n); return `${x},${y},${a}`;
+    };
+    const st = Array.isArray(p.steps) ? p.steps.find((x) => x && glyph(x.op)) : null;
+    // (an ARRAY - rows by cols, an array and its turn - is the x family of its two sides: lesson 3a, owner ruling 2026-11-07)
+    const arr = !Array.isArray(p.rows) && !Array.isArray(p.cols) && Number(p.rows) > 0 && Number(p.cols) > 0 && !st && !glyph(p.op || q.op);
+    const f = st ? fam(glyph(st.op), st.a !== undefined ? st.a : st.top, st.b !== undefined ? st.b : st.bottom)
+        : arr ? fam('*', p.rows, p.cols)
+        : fam(glyph(p.op || q.op), p.a !== undefined ? p.a : q.a, p.b !== undefined ? p.b : q.b);
+    if (f) out.push(`rk:fam:${f}`);
+    const sing = (w) => String(w).replace(/ies$/, 'y').replace(/(ch|sh|x|ss)es$/, '$1').replace(/([^s])s$/, '$1');
+    const text = String((Array.isArray(p.lines) && p.lines.length ? p.lines.join(' ') : q.storyText || q.text) || '').replace(/<[^>]+>/g, ' ');
+    for (const m of text.matchAll(/\b(?:has|have|had|buys|bakes|makes|picks|collects|gets|finds|sees|sells|packs|puts|takes) (\d+) ([a-z]+)/g)) {
+        if (['more', 'fewer', 'less', 'each', 'groups', 'group', 'equal', 'of'].includes(m[2])) continue;
+        out.push(`rk:frame:${m[1]} ${sing(m[2])}`);
+    }
+    return [...new Set(out)];
+}
+
+/**
+ * The Practice units {p4.last} names (lesson 3a P1d r3, critic: "Practice 3" named Practice 1's second page): a
+ * `practiceSheets` sheet (`sheet` set) is ONE unit however many pages it prints, its cells those of its LAST page; any other
+ * practice plan is one unit a page, as before. `entries`: the lesson's partPlans of part 'practice'; `cellsOf(plan)` the
+ * plan's cells, each with `page`. Returns arrays of cells, one a unit, in order. Pure.
+ */
+export function practiceUnits(entries, cellsOf) {
+    return (entries || []).flatMap((x) => (x.plans || []).flatMap((pl) => {
+        const cs = cellsOf(pl);
+        const pgs = [...new Set(cs.map((c) => c.page))];
+        return x.sheet !== undefined ? [cs.filter((c) => c.page === pgs[pgs.length - 1])] : pgs.map((pg) => cs.filter((c) => c.page === pg));
+    }));
+}
+
+export default { itemKey, opOfItem, nearTwins, CASE_FAMILIES, casesOf, packetViolations, repeatKeysOf, practiceUnits };

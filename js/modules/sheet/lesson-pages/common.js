@@ -29,6 +29,13 @@ export const reflowsAt = (it, cols) => {
 /** CL-8: the least space (mm) a problem keeps from its cell's side borders. */
 export const CL8_MM = 3;
 
+/**
+ * LR-17b (landing, 2026-11-09): a PHASE-0 LOOK flag of a lesson record (`vocabZoom`, `roundOneNum` - lessons/schema.js) is
+ * on only while the lesson's Prerequisite Check is live (the same test as lessons/library.js prereqCheckLive: `prereqs`
+ * present and `prereqsLive` not false). A packet whose check is off prints exactly as master did.
+ */
+export const phase0On = (data, flag) => !!(data && data[flag] === true && Array.isArray(data.prereqs) && data.prereqs.length && data.prereqsLive !== false);
+
 export const warmPools = (input) => ((input.pools || []).map((p) => p.id)).filter((id) => /^w\d$/.test(id));
 
 export const sigOf = (it) => {

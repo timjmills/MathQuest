@@ -33,6 +33,7 @@ import { esc, blank } from '../cell.js';
 import { story, headerFields, strandTab, pageTitle } from '../frame.js';
 import { barMini } from '../cells/word-work.js';
 import { factGridMini } from '../cells/mult-grid.js';
+import { PREREQ_CHECK_TITLE } from './pre-skill-check.js';
 
 export const ROLE_ID = 'detailed-lesson';
 
@@ -87,7 +88,7 @@ export function teacherBands(d, V, pages) {
         // (the Practice pages the pack prints: its practiceSheets, else practicePages)
         const np = Array.isArray(d.practiceSheets) && d.practiceSheets.length ? d.practiceSheets.length : (d.practicePages || 1);
         const pr = np > 1 ? `Practice 1–${np}` : 'Practice 1';
-        return { P0: 'Prerequisite Check', P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: `${pr}${d.mixed ? ', Mixed 1' : ''}`, P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
+        return { P0: PREREQ_CHECK_TITLE, P1: 'Number sense', P2: chunked ? 'Anchor chart 1' : 'Anchor chart', P3: chunked ? 'Lesson sheet 1' : 'Lesson sheet', P4: `${pr}${d.mixed ? ', Mixed 1' : ''}`, P5: 'Word problem', P6: 'Exit slip' }[s.page] || 'Mini whiteboards';
     };
     const flowRows = d.sections.map((s) => [String(s.n), cellText(s.name), cellText(pageOf(s)), `<span class="num">${s.min}</span>`]);
     if (d.transitionsMin) flowRows.push(['', 'Transitions', 'between pages', `<span class="num">${d.transitionsMin}</span>`]);

@@ -57,7 +57,7 @@ import { hopsSvg } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad } from '../lesson-arch/line.js';
 import { isWordBar, chartStepsOf } from '../lesson-arch/story.js';
 import { winShare } from '../lesson-arch/grid.js';
-import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker } from '../lesson-pages/common.js';
+import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker, phase0On } from '../lesson-pages/common.js';
 import { pickExample, pickSecond, otherExamples, chartLayout, stateItems, finalItems, secondItems, sameFactForms, chartPage } from '../lesson-pages/chart.js';
 import { vocabItem, vocabOrder } from '../lesson-pages/vocab.js';
 import { warmShape } from '../lesson-pages/warm-up.js';
@@ -87,7 +87,10 @@ export function sources(skills, helpers = {}) {
     // bottom number; a number in the 90s) gets a pool of its own, dealt to the case's `ref`
     // floors (print-sheet.js refAccepts) - the chart's other examples come from it.
     const data = helpers.lesson && helpers.lesson.data;
-    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => ({
+    // (lesson 2 E24b / E31, lead's order 2026-11-08: a main ref with a `hardAvoid` - lesson 2 alone - gives its case pools the
+    // WHOLE main ref, its avoid keys and hard bounds too, so a case example is never a fact the pack spent; absent: as before)
+    const caseRef = (k) => (Array.isArray(main.hardAvoid) ? [Object.assign({}, main, data[k].ref)] : null);
+    const extra = EXAMPLE_KEYS.filter((k) => data && data[k] && data[k].ref).map((k) => caseRef(k) ? { id: `x${k}`, skills: caseRef(k) } : ({
         id: `x${k}`, skills: [Object.assign({ categoryId: main.categoryId, skillId: main.skillId }, main.opts ? { opts: main.opts } : {}, main.minTop !== undefined ? { minTop: main.minTop } : {}, main.maxTop !== undefined ? { maxTop: main.maxTop } : {},
             // (a refreshed part avoids every other part's problems, its case pools too: LR-18)
             Array.isArray(main.avoidTexts) ? { avoidTexts: main.avoidTexts } : {}, data[k].ref)],
@@ -221,6 +224,7 @@ function planOnce(input = {}) {
     /* ---- pack the bands onto pages (PG-21: a band is never split) */
     const pages = [];
     let cur = { sections: [], used: 0, budget: m.budget, grows: [] };
+    const VOCAB_PAD_MM = 6, VOCAB_ZOOM_MIN = 0.75;
     pages.push(cur);
     for (const g of groups) {
         if (cur.used && cur.used + g.h > cur.budget) { cur = { sections: [], used: 0, budget: mCont.budget, grows: [] }; pages.push(cur); }
@@ -230,7 +234,26 @@ function planOnce(input = {}) {
     }
 
     /* ---- Independent Practice: whole rows filling the last page (PT-OPN-7, H5; lesson-pages/practice.js) */
-    const indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+    if (vocab) vocab.zoom = 0;   // (a plan starts at full size: N1 below)
+    let indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+    // (critic r2 N1: a lesson sheet never drops its Independent Practice row - the Score and the pupil's own work - for a
+    // few millimetres: the Vocabulary match on that page is drawn smaller, down to VOCAB_ZOOM_MIN, to make room for one
+    // row; only when that is not enough does the row go. A sheet whose row fits is unchanged. LR-17b: only on a lesson
+    // record with `vocabZoom` whose Prerequisite Check is live - phase0On; every other packet prints as master did.)
+    const vocabG = vocab && phase0On(data, 'vocabZoom') ? groups.find((g) => g.sections[0] && g.sections[0].label === 'Vocabulary:' && cur.sections.includes(g.sections[0])) : null;
+    if (!indep.length && cur.indepShort > 0 && vocabG && vocabG.grow) {
+        const content = Math.max(1, vocabG.grow.h - VOCAB_PAD_MM);
+        const z = Math.floor((1 - (cur.indepShort + 1) / content) * 20) / 20;
+        if (z >= VOCAB_ZOOM_MIN) {
+            const save = vocabG.grow.h - (content * z + VOCAB_PAD_MM);
+            const vg = vocabG.grow.grid[0];
+            vg.height = `${Math.round((vocabG.grow.h - save) * 100) / 100}mm`;
+            vocab.zoom = z;
+            vocabG.grow.h -= save;
+            cur.used -= save;
+            indep = independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter });
+        }
+    }
 
     /* ---- the spare height of a page goes back into its grids (at most a quarter of a cell) */
     // Lessons r1: a page with no Independent rows (they did not fit) shares its spare height more

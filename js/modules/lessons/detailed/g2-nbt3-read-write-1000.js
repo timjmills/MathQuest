@@ -9,7 +9,9 @@
 // in ./index.js. Pure data (no DOM, no state). Every number a script speaks is a {placeholder} filled
 // from the DEALT items through the kit's readers and `vars` below, never typed here.
 
-const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
+// (`cellPayload.noTabSpacer`, lf-placevalue 2026-11-08: the pack's rows centre the equation clear of the number tab, so the pv
+// cell's CL-40 top spacer is left off - self-check E11 / E9c, as the pack printed before the spacer came in)
+const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999, cellPayload: { noTabSpacer: true } }, extra || {});
 const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 1000, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto' } : {}, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
 // P1's bank types (V22 §9.2, critic D11): 2-digit prior knowledge, never today's new skill.
 const NS = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 99 }, opts || {}), minNum: 10, maxNum: 99 }, extra || {});
@@ -63,7 +65,9 @@ export default {
 
     // ------------------------------------------------------------------ the practice skill
     // Expanded form of a 3-digit number, one box per place (a 0 place keeps its box: 400 + 0 + 6).
-    skill: PV('expand'),
+    // (`inPlace: false`, lf-placevalue 2026-11-08: the Practice rows fill the page as the pack was signed off - an in-place
+    // row stops at its ink, layout IN_PLACE_FILL, and left Practice 1 15 % blank at the foot: self-check E9b)
+    skill: PV('expand', null, { cellPayload: { noTabSpacer: true, inPlace: false } }),
     // The pool (V22 §9.5, data): every number the pack may deal, 21 to 999 (P0 reads 2-digit words).
     pool: { kind: 'range', lo: 21, hi: 999 },
     // 1,000 is shown and said on the board in §5b only (lead ruling, critic r2 R2 / r3 S1): a hard

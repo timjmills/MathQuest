@@ -10,6 +10,12 @@
 import { ctxOf, planItem, gridPart, instructionKeyOf, instructionPart, poolItems } from '../roles/compose.js';
 import { reflowsAt, CL8_MM, warmPools, band, hAt, hOf } from './common.js';
 
+/** The library key every Warm-up item names itself (q.instructionKey), or '' when any item names none or they differ. */
+function warmItemKey(items) {
+    const keys = (items || []).map((it) => String((it && it.q && it.q.instructionKey) || ''));
+    return keys.length && keys[0] && keys.every((k) => k === keys[0]) ? keys[0] : '';
+}
+
 /** How many cells each prerequisite gets in its share of the width. */
 export function warmShape(pools, input) {
     const ctx = ctxOf(input);
@@ -165,7 +171,11 @@ export function warmUpBand(env) {
             const short = true;
             const part = {
                 kind: 'col', cls: 'mq-lwarmcol',
-                parts: [instructionPart(instructionKeyOf(its, input.skills), its),
+                // lf-placevalue critic r3 F4 (lead ruling 2026-11-08): when every Warm-up item names its own library
+                // instruction (q.instructionKey, set by its generator from the item's options - identify with
+                // writeValue off is "Circle the place …", not the lesson skill's "… Write the value …"), the heading
+                // is that key. Items that name none keep the skill-level key, so every other lesson is unchanged.
+                parts: [instructionPart(warmItemKey(its) || instructionKeyOf(its, input.skills), its),
                     gridPart(its.map((it) => planItem(short ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: shape[id].cols })), { cols: shape[id].k, rows: rowsOf(id), cellH: (stacked ? hOwn(id) : hW) / rowsOf(id), labels, start: letter })],
             };
             letter += its.length;

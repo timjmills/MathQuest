@@ -22,6 +22,8 @@ import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } fro
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
 const rowLimit = (m) => fillLimit(m);
+/** div_facts Review rows: their measured height plus this room at most (critic r5 R5-2). */
+const FACT_ROOM = 1.15;
 
 export const ROLE_ID = 'review';
 const CEILING = { S: 16, M: 12, L: 12 };
@@ -35,14 +37,26 @@ export const sources = (skills, { earlier }) => {
     if (prev.length) out.push({ id: 'earlier', skills: prev });
     return out;
 };
-export const measureCols = () => [1, 2, 3, 4];
+// (a section of supported problems at S is also measured at 5 columns: a narrow fact with its support under it may need
+// the fifth column to keep its side bands under 30 %, critic laned-restart r4 R4-2c, sectionFit)
+export const measureCols = (ctx) => (ctx && ctx.supported && ctx.size === 'S' ? [1, 2, 3, 4, 5] : [1, 2, 3, 4]);
 
 /** A section's columns and the height one of its rows needs (its own items, measured). */
 function sectionFit(items, ctx) {
     if (!items.length) return { cols: 1, h: 0 };
     const opts = [AUTO_COLS[ctx.size], 3, 2, 1].filter((c, i, a) => a.indexOf(c) === i && c <= AUTO_COLS[ctx.size]);
-    const cols = bestCols(items, opts, ctx);
-    const h = hMinAt(items, cols, ctx);
+    let cols = bestCols(items, opts, ctx);
+    let h = hMinAt(items, cols, ctx);
+    // Critic laned-restart r4 R4-2c (div_facts array Review S printed 7, PT-REV-1): a supported problem stands its support
+    // BESIDE it in a wide cell and UNDER it in a narrow one, so more columns can hold FEWER problems a page. A section of
+    // supported problems takes the column count that holds the most problems per mm of height (cols / row height).
+    if (items.some((it) => it && it.supportsBox && it.supportsBox.plan)) {
+        for (const c of (ctx.size === 'S' ? [5, ...opts] : opts)) {
+            if (c === cols || !fitsAt(items, c, ctx) || (c > cols && !items.every((it) => it.measured && it.measured[c]))) continue;
+            const hc = hMinAt(items, c, ctx);
+            if (Number.isFinite(hc) && hc > 0 && Number.isFinite(h) && h > 0 && c / hc > cols / h + 1e-9) { cols = c; h = hc; }
+        }
+    }
     return { cols, h: Number.isFinite(h) ? h : 0 };
 }
 
@@ -276,7 +290,11 @@ export function plan(input = {}) {
         const x = sum(hs) / hs.length;
         return Math.max(x, Math.min(x * k, rowLimit(Math.min(...hs))));
     };
-    const cellsM = hsM.map((hs) => cellOf(hs, hM));
+    // div_facts critic r5 R5-2 (RUBRIC H13 on ink): a band of div_facts facts grows to at most FACT_ROOM x its rows' own
+    // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
+    // div_facts only: the passed fact Reviews keep their rows.
+    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
+    const cellsM = hsM.map((hs, gi) => (factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
     const cellM = cellsM[0] || hM;
     const cellE = cellOf(hsE, hE);
     const cellEW = cellOf(hsEW, g.ehw || hE);

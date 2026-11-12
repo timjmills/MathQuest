@@ -148,7 +148,19 @@ const SHAPES = {
     A5: 'partwhole (bonds, bar, missing number)', A6: 'count (early number)', A7: 'groups (equal groups, arrays)',
     A8: 'fraction', A9: 'measure', A10: 'timemoney', A11: 'shape', A12: 'data', A13: 'story (word problems)',
 };
-function shapeOf(title, lanes, ccss) {
+// E4: design/lessons/SHAPES.md decides each lesson's archetype (its Archetype column, written and kept by
+// `ws-lesson-card.mjs --shapes`); the title heuristic below proposes one only for a lesson SHAPES.md does not list yet.
+function shapeOf(title, lanes, ccss, id) {
+    if (!shapeOf.table) {
+        shapeOf.table = new Map();
+        const f = path.join(ROOT, 'design/lessons/SHAPES.md');
+        if (fs.existsSync(f)) for (const line of fs.readFileSync(f, 'utf8').split('\n')) {
+            const m = line.match(/^\| `([^`]+)` \| [^|]+ \| .* \| (A\d+) \| [^|]+ \| [^|]* \|$/);
+            const key = m && m[1].replace(/\\\|/g, '|');
+            if (m && !shapeOf.table.has(key)) shapeOf.table.set(key, m[2]);
+        }
+    }
+    if (id && shapeOf.table.has(id)) return shapeOf.table.get(id);
     const t = String(title || '').toLowerCase();
     const dom = uniq(ccss.map(ccssDomain));
     if (/word problem|problems|solve problems|story|two-step|multi-step/.test(t)) return 'A13';
@@ -312,7 +324,7 @@ async function main() {
             }
             lesson.short = lesson.skills.some((s) => SHORT_PASSED.has(s.key)) ? 'sample passed (lessons-r4)'
                 : lesson.skills.some((s) => SHORT_DATA.has(s.key)) ? 'lesson data exists' : null;
-            lesson.shape = shapeOf(lesson.title, uniq(lesson.skills.map((s) => s.lane)), ccss);
+            lesson.shape = shapeOf(lesson.title, uniq(lesson.skills.map((s) => s.lane)), ccss, lesson.id);
         }
         mapEvidence.push(ev);
         // A BUILD lesson with no site block joins the block of the same grade and CCSS domain taught nearest in time.

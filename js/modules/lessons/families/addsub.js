@@ -268,7 +268,7 @@ const NR_STEPS_BIG = [
 // the facts a row of their own, four across, on the S and M lesson sheets: in a half-page cell a
 // one-digit column left 34 % of the width empty. At L the extra row does not fit the sheet.)
 const NR_FACTS_10 = { key: 'subtraction:subtract', opts: { band: 10, notation: ['stacked'] }, why: 'Each column is a take-away fact within 10.' };
-const NR_PV = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Name the tens digit and the ones digit.' };
+const NR_PV = { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Name the tens digit and the ones digit.' };
 const NR_PENDING = 'The SU-C pilot lesson keeps its Warm-up (its rung below and the facts within 10) until its Prerequisite Check is written (LR-17).';
 const nr = (o) => Object.assign({ routine: 'sub-column-no-regroup', defaultFor: true, prereqsPending: NR_PENDING }, o);
 
@@ -279,6 +279,8 @@ export const LESSONS = Object.freeze({
     // addend 1-3.
     'Y1.B2.S9': {
         routine: 'add-count-on',
+        prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
+        vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'add-within-10',
         practice: { skill: 'addition:add_facts', opts: { band: 10, constant: [1, 2, 3] } },
         defaultFor: true,
@@ -289,10 +291,10 @@ export const LESSONS = Object.freeze({
         // LR-17 (owner ruling 2026-09-26): the Prerequisite Check, most basic first; a question
         // missed sends the pupil to that lesson first, then back. (It replaces the Warm-up.)
         prereqs: [
-            { lesson: 'Y1.B1.S2', title: 'Count objects', key: 'counting:count_objects', opts: { band: 10 }, why: 'Counting a set is how a sum is found.' },
-            { lesson: 'Y1.B1.S6', title: 'Count on from any number', key: 'counting:count_sequence', why: 'Counting on says the next numbers from any number.' },
-            { lesson: 'Y1.B1.S11', title: 'Fewer, more, same', key: 'comparing:compare_groups', why: 'Step 1 starts with the bigger number.' },
-            { lesson: 'Y1.B2.S5', title: 'Number bonds within 10', key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole: the idea of adding.' },
+            { lesson: 'Y1.B1.S2', title: 'Count objects', key: 'counting:count_objects', opts: { band: 10 }, why: 'Counting a set is how a sum is found.', checks: 'Count the objects in a picture.' },
+            { lesson: 'Y1.B1.S6', title: 'Count on from any number', key: 'counting:number_seq_fill', opts: { step: 1, dir: 'forward' }, range: 10, why: 'Counting on says the next numbers from any number.', checks: 'Fill the missing numbers in a number track to 10.' },
+            { lesson: 'Y1.B1.S11', title: 'Fewer, more, same', key: 'comparing:compare_groups', opts: { dir: 'more', band: 10, objects: 'shapes' }, why: 'Step 1 starts with the bigger number.', checks: 'Find the group that has more.' },
+            { lesson: 'Y1.B2.S5', title: 'Number bonds within 10', key: 'composing:number_bonds', opts: { band: 10 }, why: 'Two parts make a whole: the idea of adding.', checks: 'Find the missing part or whole of a number bond to 10.' },
         ],
         mixWith: [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'counting:count_objects', opts: { band: 10 } }],
         note: 'Counting on from the bigger number is WRM Y1 "Addition - add more"; the add 1-3 constant keeps each hop countable.',
@@ -301,6 +303,8 @@ export const LESSONS = Object.freeze({
     // ---------------------------------------------- 2-digit subtraction with regrouping (2)
     'Y2.B2.S18': {
         routine: 'sub-column-regroup',
+        prereqsLive: false,   // LR-17 switch: live when this lesson's Prerequisite Check passes its critic
+        vocabZoom: true,   // LR-17b: the phase-0 look critic r2 graded, live with the check
         slug: 'subtract-2-digit-regroup',
         practice: { skill: 'subtraction:sub_100_regroup' },
         defaultFor: true,
@@ -311,10 +315,10 @@ export const LESSONS = Object.freeze({
         // LR-17: the Prerequisite Check, most basic first. (`check`: each stack with its Check line,
         // the lesson's step 5, and a cell its content fills, H13.)
         prereqs: [
-            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10] }, why: 'Regrouping reads the tens digit and the ones digit.' },
-            { lesson: 'Y2.B1.S5', title: 'Partition numbers to 100', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.' },
-            { lesson: 'Y2.B2.S10', title: 'Subtract across 10', key: 'subtraction:sub_10_regroup', check: true, why: 'After regrouping, the ones column is a teen fact: 13 − 5.' },
-            { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)', key: 'subtraction:sub_100_no_regroup', check: true, why: 'The column steps without the new part.' },
+            { lesson: 'Y2.B1.S4', title: 'Use a place value chart', key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false }, why: 'Regrouping reads the tens digit and the ones digit.', checks: 'Name the place of a digit: tens or ones.' },
+            { lesson: 'Y2.B1.S5', title: 'Partition numbers to 100', key: 'placevalue:expand', opts: { band: 99, zeroPlace: 'none' }, why: 'A 2-digit number is its tens and its ones: 63 = 60 + 3.', checks: 'Write a 2-digit number as tens + ones.' },
+            { lesson: 'Y2.B2.S10', title: 'Subtract across 10', key: 'subtraction:subtract', opts: { band: 20, regroup: 'always', notation: ['stacked'] }, minTop: 11, maxTop: 18, maxBottom: 9, why: 'After regrouping, the ones column is a teen fact: 13 − 5.', checks: 'Take a 1-digit number from a teen number, across 10.' },
+            { lesson: 'Y2.B2.S17', title: 'Subtract two 2-digit numbers (not across a 10)', key: 'subtraction:sub_100_no_regroup', why: 'The column steps without the new part.', checks: 'Subtract two 2-digit numbers in columns, with no regrouping.' },
         ],
         // Lessons r2: the partner is 2-digit addition (never 2 + 8 in a carry scaffold).
         mixWith: [{ key: 'addition:add_100_regroup', minOperand: 10 }],
@@ -330,13 +334,13 @@ export const LESSONS = Object.freeze({
         practice: { skill: 'subtraction:sub_50_no_regroup' },
         warmup: [NR_FACTS_10, NR_PV],
         teach: { warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1 },
-        mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_50_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     'Y2.B2.S17': nr({
         practice: { skill: 'subtraction:sub_100_no_regroup' },
         warmup: [{ key: 'subtraction:sub_50_no_regroup', why: 'The same column steps with smaller numbers.' }, NR_FACTS_10],
         teach: { vocab: NR_VOCAB_2, steps: NR_STEPS_2(), checkRow: true, maxSmall: 1 },
-        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     // The preset (host sub_100_no_regroup, lengths: shorter): every bottom number is one digit, so
     // `maxSmall` (one one-place take-away a page) does not apply; its tens step writes the tens. It
@@ -345,7 +349,7 @@ export const LESSONS = Object.freeze({
         practice: { skill: 'subtraction:sub_2d_1d' },
         warmup: [NR_FACTS_10, NR_PV],
         teach: { warmRows: ['S', 'M'], vocab: NR_VOCAB_2, steps: NR_STEPS_2('Write the tens.'), checkRow: true },
-        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10] } }],
+        mixWith: [{ key: 'addition:add_100_no_regroup' }, { key: 'placevalue:identify', opts: { band: 99, places: [1, 10], writeValue: false } }],
     }),
     'Y3.B2.S12': nr({
         practice: { skill: 'subtraction:sub_1k_no_regroup' },

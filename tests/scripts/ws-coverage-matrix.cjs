@@ -207,6 +207,9 @@ const { pathToFileURL } = require('url');
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
+// --red-no-baseline PAGEFILL,H5 [--rule-skills a:b,...] (OPT-IN; critic lf-placevalue r2 N8): see verdict()
+const RED_NB = String(arg('red-no-baseline', '') || '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => x.replace(/[^\w-]/g, ''));
+const RULE_SKILLS_NB = String(arg('rule-skills', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 const TOOL = 'ws-coverage-matrix';
 const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
 const PRINT_LINT = path.join(__dirname, 'ws-print-lint.cjs');
@@ -727,6 +730,16 @@ function verdict(row, base) {
     // there is nothing to rise above yet (the 28-night first baseline, or --pin-new, pins it). Without --baseline
     // at all (a builder's own check) every finding is still red.
     if (row.rises.length && base && !hasBaselineEntry(row, base)) {
+        // --red-no-baseline PAGEFILL,H5 (OPT-IN; critic lf-placevalue r2 N8, lead ruling D1): a row of the lane's own skills
+        // (--rule-skills) whose finding is one of these rules is RED, not PENDING(no-baseline), until a critic rules it
+        // (expand / unit_form more-cols2: a 2-column request printed 1 column, 55-65 % of the page empty, judged by nobody)
+        const hot = RED_NB.length && (!RULE_SKILLS_NB.length || (row.skills || [String(row.id).split('|')[0]]).every((k) => RULE_SKILLS_NB.includes(k)))
+            ? row.rises.filter((x) => RED_NB.some((rl) => new RegExp(`^\\S+ \\S+ ${rl}:`).test(x))) : [];
+        if (hot.length) {
+            row.noBaseline = true; row.redNoBaseline = true; row.status = 'RED';
+            row.reason = `no per-row baseline entry, and ${hot.length} finding group(s) of ${RED_NB.join(' / ')} on the lane's own skill (--red-no-baseline): ${hot.slice(0, 3).join('; ')}`;
+            return;
+        }
         row.status = 'PENDING'; row.step = 'no-baseline'; row.noBaseline = true;
         row.reason = `no per-row baseline entry yet (${row.rises.length} finding group(s) not judged; pinned by the first full baseline or --pin-new)`;
         return;

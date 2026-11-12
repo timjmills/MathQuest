@@ -95,7 +95,7 @@ function refOf(entry) {
     const [categoryId, skillId] = String(entry.key || '').split(':');
     const ref = { categoryId, skillId };
     if (entry.opts) ref.opts = clone(entry.opts);
-    for (const [k, v] of Object.entries(entry)) if (!['key', 'opts', 'why', 'lesson', 'title', 'items'].includes(k)) ref[k] = clone(v);
+    for (const [k, v] of Object.entries(entry)) if (!['key', 'opts', 'why', 'checks', 'lesson', 'title', 'items'].includes(k)) ref[k] = clone(v);
     return ref;
 }
 
@@ -109,6 +109,8 @@ export function engineRecord(idOrSlug) {
     const r = l && routineOf(l);
     if (!l || !r) return null;
     const out = Object.assign({}, r, { skills: (l.warmup || []).slice() }, l.teach || {}, { mixWith: (l.mixWith || []).slice() });
+    // (`practiceBlocks` on the lesson record: the Practice page's blocks - schema.js; the lesson's own wins)
+    if (Array.isArray(l.practiceBlocks)) out.practiceBlocks = clone(l.practiceBlocks);
     for (const k of LIBRARY_ONLY) delete out[k];
     return out;
 }
@@ -124,10 +126,23 @@ export function lessonData(idOrSlug) {
     if (!out) return null;
     const l = lessonById(idOrSlug);
     if (Array.isArray(l.prereqs) && l.prereqs.length) {
-        out.prereqs = l.prereqs.map((p) => Object.assign({ lesson: p.lesson, title: p.title || '', why: p.why || '', ref: refOf(p) }, p.items ? { items: p.items } : {}));
+        out.prereqs = l.prereqs.map((p) => Object.assign({ lesson: p.lesson, title: p.title || '', why: p.why || '', checks: p.checks || '', ref: refOf(p) }, p.items ? { items: p.items } : {}));
+        // LR-17 switch (landing, 2026-11-09): `prereqsLive: false` keeps the check OFF the printed packet (it keeps its
+        // Warm-up, as master printed it) until the lesson's Prerequisite Check passes its critic; the record still
+        // carries `prereqs` for the gates and prerequisiteSkillsFor.
+        if (l.prereqsLive === false) out.prereqsLive = false;
+        // LR-17b: the phase-0 look flags (schema.js) travel with the check; the engine reads them only while it is live
+        // (sheet/lesson-pages/common.js phase0On).
+        for (const f of PHASE0_FLAGS) if (l[f] === true) out[f] = true;
     }
     return out;
 }
+
+/** LR-17b: the lesson-record flags of the phase-0 look (opt-in; on only while the lesson's Prerequisite Check is live). */
+export const PHASE0_FLAGS = Object.freeze(['vocabZoom', 'roundOneNum']);
+
+/** LR-17 switch: does this engine record (lessonData) open its packet with the Prerequisite Check? */
+export const prereqCheckLive = (data) => !!(data && Array.isArray(data.prereqs) && data.prereqs.length && data.prereqsLive !== false);
 
 /** The library's own fields of a lesson's teaching (the gates read them; the engine never does). */
 export function lessonRules(idOrSlug) {

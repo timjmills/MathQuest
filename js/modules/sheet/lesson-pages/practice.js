@@ -11,7 +11,7 @@ import { resolveCtx } from '../index.js';
 import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { winShare } from '../lesson-arch/grid.js';
-import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt } from './common.js';
+import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt, phase0On } from './common.js';
 
 export const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
@@ -83,7 +83,12 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             const m = /^\s*(\d+)\s*÷\s*(\d+)\s*=\s*\?\s*$/.exec(String(it.q.text || ''));
             return !!m && Number(m[1]) <= 144 && Number(m[2]) <= 12 && /^\d+$/.test(String(answerOf(it)));
         };
-        const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it)));
+        // (a rounding cell "27 -> ___" is a one-number answer too - critic lessons-phase0 r1 D11: the round lesson's S sheet
+        // ended on a 50 mm blank foot under two rows. LR-17b: only on a lesson record with `roundOneNum` whose Prerequisite
+        // Check is live - phase0On; every other packet prints as master did)
+        const roundRows = phase0On(data, 'roundOneNum');
+        const roundOne = (it) => roundRows && it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
+        const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it)));
         // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
         // six rows of bracket facts ran 2 mm past at S; taller problems keep the room they had.
         const safety = oneNum ? 3 : 0;
@@ -96,6 +101,8 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
         const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));
         while (rows > 1 && rows * hRows(rows) > room) rows--;
+        // (critic r2 N1: how far ONE row is short of the room - roles/lesson.js frees it before it ever drops the row)
+        cur.indepShort = rows >= 1 && hRows(rows) <= room ? 0 : hRows(1) - room;
         if (rows >= 1 && hRows(rows) <= room) {
             indep = indepPool.slice(0, rows * ic);
             const r = Math.ceil(indep.length / ic);
@@ -141,14 +148,40 @@ export const practiceStackShapes = (data) => (data && Array.isArray(data.practic
     : data && Array.isArray(data.practiceShape) ? [data.practiceShape] : [[6, 2]]);
 
 /**
+ * `practiceBlocks` (lesson data): 1-3 blocks [{shape: [count, cols], opts?}] - the Practice page prints one section per
+ * block, in order. The well-formed blocks of `data`, or null (absent, empty or malformed: the page prints as before).
+ */
+export function practiceBlocksOf(data) {
+    const list = data && Array.isArray(data.practiceBlocks) ? data.practiceBlocks : null;
+    if (!list || !list.length) return null;
+    const ok = list.slice(0, 3).filter((b) => b && Array.isArray(b.shape) && b.shape.length === 2 && b.shape.every((v) => Number.isInteger(v) && v > 0));
+    return ok.length ? ok : null;
+}
+
+/**
+ * The sections of a block Practice page: each the lesson's practice skill ref `sk` with the block's `opts` merged over its
+ * own, the block's grid [count, cols] as its own page ceiling, and `blockShare` (its rows) - the body under the strip is
+ * shared by rows (print-sheet.js buildSheet).
+ */
+export function practiceBlockSections(blocks, sk) {
+    return blocks.map((b) => {
+        const skill = b.opts ? Object.assign({}, sk, { opts: Object.assign({}, (sk && sk.opts) || {}, b.opts) }) : sk;
+        const [count, cols] = b.shape;
+        return Object.assign({ skills: [skill], count, columns: cols, noCap: true, pageCap: count, blockShare: Math.ceil(count / cols) },
+            skill && skill.instructionKey ? { instructionKey: skill.instructionKey } : {});
+    });
+}
+
+/**
  * The buildSheet request of a lesson practice page: the Independent role, the packet's frame (`common`), the step strip
  * when `withStrip` (at L type the strip's words are a point bigger: 2 mm more for it).
  */
-export function practiceRequest({ common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape, seed, strip, stripH, stripHtml }) {
+export function practiceRequest({ common, size, practiceSize, lessonNo, section, facts, pages, withStrip, shape, seed, strip, stripH, stripHtml, blocks }) {
     return Object.assign({}, common, {
         size: practiceSize,
         role: 'independent', tabId: `Practice ${lessonNo}`,
-        sections: [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
+        // (`blocks`: practiceBlockSections - one section per block, in order, on the one page)
+        sections: blocks ? blocks : [facts ? Object.assign({}, section, { pages }) : Object.assign({}, section, { count: shape[0] * pages, columns: shape[1] })],
         seed,
         // (At L type the strip's words are a point bigger: 2 mm more for it.)
         stepStrip: withStrip && stripHtml ? (practiceSize === size ? { html: stripHtml, hMm: stripH }
@@ -156,4 +189,4 @@ export function practiceRequest({ common, size, practiceSize, lessonNo, section,
     });
 }
 
-export default { AUTO_COLS, stripHtml, stripItem, independentBand, practiceSection, practiceStackShapes, practiceRequest };
+export default { AUTO_COLS, stripHtml, stripItem, independentBand, practiceSection, practiceStackShapes, practiceBlocksOf, practiceBlockSections, practiceRequest };

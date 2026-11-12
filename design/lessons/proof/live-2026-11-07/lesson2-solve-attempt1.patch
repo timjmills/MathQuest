@@ -1,0 +1,99 @@
+diff --git a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+index 845a9408..7d319e75 100644
+--- a/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
++++ b/js/modules/lessons/detailed/g1-oa1-bar-model-wp-20.js
+@@ -49,7 +49,9 @@ export default {
+     // (RESEARCH.md §5; every other story crosses ten with parts of 2 to 9 - owner ruling 2026-11-07: partMin / noPart / crossTen on every story ref).
+     edgeTest: 'wpEdge',
+     // (`first`: the last row is dealt first, so the rows above keep LR-6 against its equal parts - critic r2 D2)
+-    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true } }],
++    // (`solve`, P1d r2 - E24b: the page's four stories and its equal parts SOLVED from the facts left - no near twins, no first
++    // addend twice - before the page is dealt; the greedy deal left 7 + 4 / 8 + 5 for its last place)
++    practiceSheets: [{ skill: WP({ minNum: 11, maxNum: 20, edgeTest: 'wpEdge', tries: 600 }), edgeLast: { per: 6, cols: 2, wants: ['wpEqual', 'wpWhole20'], first: true }, solve: { partMin: 2, noPart: [10], sums: [20] } }],
+     // The lesson's own placeholder names: the story's unit word and its parts.
+     vars: (q, b) => {
+         const p = (q && q.cell && q.cell.payload) || {};
+diff --git a/js/modules/print-sheet.js b/js/modules/print-sheet.js
+index 320d227f..95406909 100644
+--- a/js/modules/print-sheet.js
++++ b/js/modules/print-sheet.js
+@@ -484,7 +484,7 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true)
+  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
+  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
+  */
+-export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen);
++export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys));
+ export function refHardOk(sk, cand) {
+     if (!refHasHard(sk)) return true;
+     // (`allHard`, lesson 4 r3: the ref's `allTest` is a HARD bound - a window never takes a 10 row on a relaxed try)
+@@ -502,6 +502,8 @@ export function refHardOk(sk, cand) {
+         // whole is one of `crossTenExcept` (lesson 2: a whole of exactly 20, its edge case))
+         if (sk.crossTen && !(o[0] <= 9 && o[1] <= 9 && o[0] + o[1] >= 11) && !(Array.isArray(sk.crossTenExcept) && sk.crossTenExcept.map(Number).includes(o[0] + o[1]))) return false;
+     }
++    // (`onlyKeys`, lesson 2 P1d - E24b: the facts a Practice page may deal, solved before it is dealt; absent: unchanged)
++    if (Array.isArray(sk.onlyKeys) && !sk.onlyKeys.includes(factKeyOf(cand))) return false;
+     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
+         const bo = sk.boardOnly.map(Number);
+         const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
+@@ -534,6 +536,38 @@ export function itemNumberOf(q) {
+ 
+ /** An arrays-turn item's turned fact key (4 x 3 for 3 x 4), else null: a page never prints both (LR-6 twins). */
+ /** A + fact key turned round ("7+5" -> "5+7"); null for anything else (lesson 2 r5, V22 LR-5 turn-arounds). */
++/**
++ * A Practice page's story facts SOLVED, not dealt greedily (lesson 2 P1d, owner ruling 2026-11-07 - E24b: the greedy deal
++ * spent the spread facts on its first places and left near twins for the last). `rule` {partMin, noPart, sums}: the
++ * crossing-ten + facts (both parts partMin..9, never a noPart) and the edge wholes; `avoid`: the pack's keys so far (a fact
++ * or its turn-around in it is spent); `n` the page's non-edge places, `cols` a row's places. Returns {at, edge}: `at` the n
++ * ordered facts place by place - no two near twins (both numbers within 2), no first addend twice in a row - and `edge` one
++ * equal-parts fact clear of them plus every edge whole (`sums`) in both orders; null when no such set exists. The search
++ * starts at a seeded offset, so seeds vary. Pure.
++ */
++export function solveStoryFacts(rule, avoid, n, cols, seed) {
++    const pm = Number(rule.partMin) || 1, no = (rule.noPart || []).map(Number), c = Math.max(1, Number(cols) || 1);
++    const spent = new Set(avoid || []);
++    const free = (a, b) => !spent.has(`${a}+${b}`) && !spent.has(`${b}+${a}`);
++    const facts = [], squares = [];
++    for (let a = pm; a <= 9; a++) for (let b = a; b <= 9; b++) if (a + b >= 11 && !no.includes(a) && !no.includes(b) && free(a, b)) (a === b ? squares : facts).push([a, b]);
++    const off = facts.length ? (Number(seed) >>> 0) % facts.length : 0;
++    const order = facts.slice(off).concat(facts.slice(0, off));
++    const twin = (x, y) => Math.abs(x[0] - y[0]) <= 2 && Math.abs(x[1] - y[1]) <= 2;
++    const okWith = (o, x) => o.every((y) => !twin(x, y));
++    // (the n facts laid place by place so no row holds one first addend twice)
++    const lay = (fs) => { const perm = (rest, acc) => { if (!rest.length) return acc; for (let j = 0; j < rest.length; j++) { const x = rest[j], row = acc.slice(acc.length - (acc.length % c)); if (row.some((y) => y[0] === x[0])) continue; const r = perm(rest.slice(0, j).concat(rest.slice(j + 1)), acc.concat([x])); if (r) return r; } return null; }; return perm(fs, []); };
++    let out = null;
++    const rec = (start, picked) => {
++        if (picked.length === n) { const sq = squares.find((q) => okWith(picked, q)); const at = sq ? lay(picked) : null; if (at) { out = { at, sq }; return true; } return false; }
++        for (let j = start; j < order.length; j++) for (const x of [order[j], [order[j][1], order[j][0]]]) if (okWith(picked, x) && rec(j + 1, picked.concat([x]))) return true;
++        return false;
++    };
++    if (!rec(0, [])) return null;
++    const edge = [`${out.sq[0]}+${out.sq[1]}`];
++    for (const w of (rule.sums || []).map(Number)) for (let a = pm; a <= w - pm; a++) if (!no.includes(a) && !no.includes(w - a) && free(a, w - a)) edge.push(`${a}+${w - a}`);
++    return { at: out.at.map((x) => `${x[0]}+${x[1]}`), edge };
++}
+ export const plusTurn = (k) => { const m = String(k === null || k === undefined ? '' : k).match(/^(\d+)\+(\d+)$/); return m && m[1] !== m[2] ? `${m[2]}+${m[1]}` : null; };
+ /** A x fact key's identity across the pack, the unordered pair ("2×8", "8x2" -> "2x8"); null for any other key
+  *  (lesson 3a r2, critic D6: P0 wrote "2×8", an array "2x8" - one fact. Only x keys, so no other pack deals differently). */
+@@ -829,7 +863,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
+                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
+                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
+                 const strict = soft && !(relaxLast && k === tries);
+-                if (hard && !refHardOk(sk, cand)) continue;
++                // (`onlyKeysAt`, lesson 2 P1d: each non-edge place its own solved fact; the edge places the rest)
++                const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeys.filter((x) => !sk.onlyKeysAt.includes(x)) : [sk.onlyKeysAt[i % sk.edgeLast.per]] }) : sk;
++                if (hard && !refHardOk(skH, cand)) continue;
+                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
+                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
+                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
+@@ -4466,7 +4502,10 @@ async function buildLesson(n, metaOf) {
+         let k = 0;
+         for (const ps of n.practiceSheets) {
+             k++;
+-            const own0 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
++            const own00 = ps.skill ? Object.assign({}, ps.skill, packNums ? { avoidKeys: packNums.slice(), tries: Math.max(300, Number(ps.skill.tries) || 0), lr6: true, chartKeys } : {}) : practiceSk;
++            // (`solve`, lesson 2 P1d - E24b: the page's story facts solved before it is dealt; absent: as before)
++            const solved = ps.solve && packNums && ps.edgeLast ? solveStoryFacts(ps.solve, packNums, Number(ps.edgeLast.per) - Number(ps.edgeLast.cols), Number(ps.edgeLast.cols), (n.seed + 7919 * (k + 1)) >>> 0) : null;
++            const own0 = solved ? Object.assign({}, own00, { onlyKeys: solved.at.concat(solved.edge), onlyKeysAt: solved.at }) : own00;
+             // (`gridRevisit`, lesson 4 r5: the windows as the chart and the lesson sheet DRAW them, so a revisit is drawn turned)
+             const planQs = (res) => { const out = []; for (const pl of res.keyPlans || [res.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) out.push(it.q); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
+             const own = ps.skill && ps.skill.gridRevisit ? Object.assign({}, own0, { gridShown: [...planQs(chart), ...chartQs, ...planQs(teach)].map(gridShownOf).filter(Boolean) }) : own0;

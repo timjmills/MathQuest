@@ -230,6 +230,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     // the family's providers (providers/pv.js) choose from these, never "Solve.".
     'place-circle': 'Circle the place of the underlined digit.',
     'place-write': 'Write the place of the underlined digit.',
+    // lf-placevalue (lead ruling D5, 2026-11-07): identify with writeValue on (owner ruling 2026-10-10) also writes the value
+    'place-circle-value': 'Circle the place. Write the value of the underlined digit.',
+    'place-write-value': 'Write the place. Write the value of the underlined digit.',
     'unit-form': 'Write how many of each place.',
     'standard-form': 'Write the number.',
     // detailed lesson 1 (2026-10-16): composing:number_word_form, numeral to words

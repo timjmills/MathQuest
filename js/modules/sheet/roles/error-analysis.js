@@ -514,6 +514,15 @@ export function prepare(it, info = {}) {
         sParts = null;
         redraw = '';
     }
+    // (lf-placevalue critic r3b G5: a place-value words frame - "193 = [ ] hundreds [ ] tens [ ] ones", pv `blanks` with
+    // `words` - takes its Fix-it words from the FRAME, never from the answer: "1 hundred" glued "[ ] hundred", and the singular
+    // word told the pupil the answer was 1. Every other item is fixed as before.)
+    const pvPay = it.template === 'pv' && q.cell && q.cell.payload ? q.cell.payload : null;
+    if (pvPay && pvPay.kind === 'blanks' && pvPay.words && typeof pvPay.frame === 'string' && Array.isArray(pvPay.keys)) {
+        const segs = pvPay.frame.split('____').slice(1).map((x) => x.trim());
+        // (the parts, their slot ids and the pupil's wrong work stay as dealt; only the words between them change)
+        if (P && segs.length === P.parts.length && segs.every(Boolean)) glue = [''].concat(segs.map((w) => ` ${w}`));
+    }
     // a multiple-choice item keeps its own choice even when it reads as a story (word names)
     // A one-value answer names its slot, so a template that fills slots from the key writes what
     // the pupil wrote there (critic round 4: add_three drew the right sum as the "wrong" work).
