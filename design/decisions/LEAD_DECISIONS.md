@@ -6,3 +6,4 @@ answers; every such decision is listed here so the owner can review it and ask f
 | Date | What | Answers taken | Commit |
 |---|---|---|---|
 | 2026-11-12 | (owner-approved directly, before delegation) partopts design; cards chartwindow, partition, times-as-many, word-stories | all as recommended | lf-builds 9f2d3ea5 |
+| 2026-11-12 | patterns card re-sign (growing_shape_patterns unit S 2.5 / M 2.8 / L 3.3 mm) | carries the owner's earlier ruling; no new question | lf-algebra bd6c6cc6 |
