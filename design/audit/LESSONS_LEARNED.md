@@ -423,3 +423,13 @@ white on any other role.
 - **Rule:** a switched-off part is still rendered by every lane that touches it (`--force-check`), and PC-H13 runs on it.
 - **Check:** `ws-lesson-samples --check --force-check` (PC-H13 "check page count = 1" is the row to add: today it reports
   the blank feet of p1 and p2).
+- **Rule (lead, 2026-11-12): a feature behind a switch needs a forced-on render gate in the same change.** The lane fixed
+  N2's floor while every check was off; the check then ran to two pages and no gate saw it. Now: buildSheet `prereqsForce`,
+  `ws-lesson-samples --force-check`, ws-precritic runs the lesson-samples step with `--force-check`, and PC-PAGES fails a
+  check longer than one page (backtest `lesson-check-one-page`: FAIL e312736a / PASS 9bdbe89a).
+- Ruling A built (LR-17a (2)): one item allowed unless two-choice; the drop that saves height first; the second item taken
+  back when it costs no height. N5: no 3+-across wrap (`ROUTE_REFLOW` 1.15). PC-SCAFFOLD + N8 had one root (one scaffold
+  level measured, another drawn): the check's stacks are set plain on the payload at deal time (`prepare`, routed only);
+  the sub sheet's Independent stacks draw heads + boxes from a payload override, safe because the main pool is measured at
+  level 3 (LR-17b `indepFrame`).
+

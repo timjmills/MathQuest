@@ -126,3 +126,10 @@ Speed-ups: lf-checks `--lp` / `--sweep` with MQ_ROOT on any tree gives a 1-5 min
 - 19:50 UTC (3a live fix PASS, narrow critic r2 min 8; deploy list a0cca381 to the lead): session cost_usd $174.23 ≈ 8.7 %.
 - 18:52 UTC (P1d live round, lead's $60 cap): session cost_usd $156.04 ≈ 7.8 % (round ≈ $24).
 - 14:31 UTC (hand-over): session cost_usd $132.31 ≈ 6.6 % of the weekly limit ($20 ≈ 1 %), sub-agents included. P1 ≈ $85, P2 ≈ $25, coordination ≈ $20 (estimates from the running total).
+
+## 2026-11-12 PC round: build-list request (lead ruling C), not yet in build-list.js
+The Prerequisite Check's NARROW item forms, for the k2 / pv lanes (LR-17a (2)): (1) `comparing:compare_groups` option
+"circle the bigger number" - two numerals within 10, no pictures (K.CC.C.7); (2) `placevalue:more_less_10` option
+"30 + 10 = [ ]" / "40 - 10 = [ ]", both ways (1.NBT.C.5; PC-NAME must then read + 10 / - 10 as 10 more / 10 less).
+Not added to js/modules/build-list.js: ws-standards requires every proposal to be named by an audit verdict in
+standards-audit.js and 3-5 problem types - the standards lane adds the verdict link with the entry.
