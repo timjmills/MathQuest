@@ -122,3 +122,8 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
   238 cells, every rule PASS incl. EB-GAP); --self-test OK (9 + 6 + 6); hash3 vs 7e0c074b: 54 / 54 identical (HTML + PNG);
   ws-backtest --row model-interior-band-facts PASS (FAIL 9f7983dd, OK 04683166); ws-boot-smoke OK; syntax OK (scripted-model.js,
   ws-empty-band.cjs). Next: independent critic r4 (div_facts Model L; mult_facts Model L unchanged).
+
+
+## Critic factroles r4 (one-page re-check, b606e68a) - PASS, div_facts Scripted Model L 8 / 8 / 8 / 8 on both pages and keys
+Report design/audit/runs/lf-ops/critic-factroles-r4.md; renders design/audit/runs/lf-ops/factroles-r4-renders/. S5 fixed: step-text-to-problem band 25.9-26.9 % (r3 30.3-30.9 %); state 1 bottom band 34.4 % inside PT-MOD-3; mult_facts PNGs byte-identical to r3. No defect.
+Result of the facts-roles task (r1-r4): every graded Guided (S, M, L) and Scripted Model (S, M, L) page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts scores >= 8 (r2 23 pages; r3 mult Model L; r4 div Model L).
