@@ -115,7 +115,10 @@ const mixPartialEnd = (nM, cols, n) => {
 const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? extra : 0,
     hint && r * cols < pEnd && (r + 1) * cols > nM ? hint : 0);
 /** The page ceiling with the Models it leads with: a Mix page's extra Models are not scored tries. */
-const ceilFor = (ctx, items) => ceilOf(ctx) + Math.max(0, mixModels(items || []) - 1);
+// (a cell that scores several tries - Match 3, footprint `points` 3, owner ruling Q-C - counts them against the ceiling:
+// 10 / 8 / 6 scored tries hold 3 / 2 / 2 such cells plus the Model; lf-vocab r9, ws-empty-band EB-GDPCAP)
+const pointsOf = (items) => { const its = (items || []).filter(Boolean); const p = its.length && its.every((it) => it.footprint && Number(it.footprint.points) > 1) ? Math.max(...its.map((it) => Number(it.footprint.points))) : 1; return p; };
+const ceilFor = (ctx, items) => { const p = pointsOf(items); return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1); };
 /**
  * The fact pages (lf-ops facts-roles task, RUBRIC H13): add / sub / mult facts, div_facts_long and div_facts. Their cells are
  * short, so the shared ceiling (10 / 8 / 6 tries) and the row stretch (up to FILL_CAP) left 31-58 % empty bands under every
@@ -550,6 +553,9 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         }
         over = total - most();
     }
+    // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
+    // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
+    if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
     return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total) });
 }
 

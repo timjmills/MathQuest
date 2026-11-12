@@ -3699,6 +3699,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r9-sections-density",
+   "check": "lf-vocab r9 item 3 (precritic print-lint-sections S / L): a two-skill Sections sheet of Match 3 + 1 picture 3 words never prints one Match 3 alone on a page (DN-2, LONE, PAGEFILL): Match 3 takes whole rows of a shared page (footprint wholeRows, print-sheet.js shareRows)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint --kind sections L-DENSITY",
+   "browser": true,
+   "fail": {
+    "commit": "3d90097d",
+    "state": "lf-vocab r8 base"
+   },
+   "pass": {
+    "commit": "bbd73b28",
+    "state": "lf-vocab r9 item 3"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words | tail -1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

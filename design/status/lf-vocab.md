@@ -24,6 +24,13 @@ Brief design/lanes/lf-vocab/r9-builder-brief.md. Base 6de6aabd. One line per ite
   half share (99 mm at S) held one 55 mm row, drawn as one tall cell alone on page 1. print-sheet.js shareRows: a member whose
   footprint opts in (`wholeRows`, vocab-match3 only, so no other template's page changes) takes one more whole row from the
   others' spare room when they keep their rows. print-lint sections S and L: 4 findings each -> OK. Check: row vocab-r9-sections-density.
+- Precritic --strict on bbd73b28 (manifest applied): 31 PASS, 4 FAIL - sibling-compare (structural, allowed), ws-empty-band and
+  --slot-ink off EB-GDPCAP (master's new rule: Match 3 Guided 15 / 15 / 12 scored tries over the 10 / 8 / 6 ceiling), and
+  vocab-unit-browser V23 (the 6 Guided pupil pins moved with item 2's evenRows, intended). Items 1-3's gates all PASS.
+- Item 3b (EB-GDPCAP): guided.js counts a cell's `points` against the ceiling (Match 3 holds 3 / 2 / 2 tries + the Model at
+  S / M / L), and a one-column points template drops a continuation page that would hold one cell alone (L-LONE). Both
+  empty-band modes OK; grade-render guided S/M/L OK (1 page each); the 6 Guided pupil pins re-taken (only those changed),
+  ws-vocab-unit --browser OK. Check: row vocab-r9-gdpcap.
 
 ## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
 Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.
