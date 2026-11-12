@@ -132,3 +132,6 @@ Result of the facts-roles task (r1-r4): every graded Guided (S, M, L) and Script
 1. division:div_facts screen hosts (practice card, online worksheet, quiz) for every support, critic >= 8 -> add div_facts to js/modules/redesign-passed.js with its evidence line.
 2. Stories / g3-oa8: E9b / E12 (the regression on the lane branch claude/sweet-newton-c8wrv1-lf-ops) and E35.
 3. MAIN ops skills of the next short lessons, in order: multiplication:mult_properties + arrays_groups + count_by_tables (Properties of multiplication; the #4 fresh-builder brief is in design/status/lf-ops.md on claude/sweet-newton-c8wrv1-lf-ops); multiplication:mult_chart; mult / div_word_problems_plain; addition:add_column_multi. Each: 8/10 critic, deploy branch with PNGs.
+
+## div_facts screen hosts, critic r1 fix round (builder, Opus medium, 2026-11-12)
+- Step 1 (checks): new tests/scripts/ws-screen-support-eq.cjs (SCREEN-SUPPORT-EQ D1/D2, SCREEN-CUE-SIZE D3, SCREEN-SUPPORT-PLACE D4; --self-test 12/12), on precritic's path (gate screen-support-eq). On 1428a84c: FAIL (68) = EQ 22 (array loose pane on every host, nothing on 0 ÷ n in the quiz), CUE 44 (skip 0.19-0.27, think 0.22-0.31 x the fact digit vs paper 0.37 / 0.46), PLACE 2 (touch worksheet 1280 / 820: beside and under mixed).
