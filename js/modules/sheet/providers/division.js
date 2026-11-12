@@ -7,7 +7,7 @@
 // checks them against the divisor, and long division works digit by digit.
 
 import { registerSkill } from '../contract.js';
-import { num, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, clampSteps } from './util.js';
+import { num, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, drawStep, clampSteps } from './util.js';
 import { storiesFor } from './stories.js';
 import { optionICan } from '../../skill-options.js';
 
@@ -57,10 +57,11 @@ registerSkill('division:div_facts', {
         const [a, b] = operands(q);
         if (!Number.isFinite(a) || !Number.isFinite(b) || !b) return [];
         const quo = a / b;
+        // (drawStep: the Scripted Model's short text and the grey mark each step adds, PT-MOD-1 / PT-MOD-2)
         return [
-            step(`Read the division: ${nb(`${a} ÷ ${b}`)}.`),
-            step(`Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`),
-            step(`${nb(`${b} × ${quo} = ${a}`)}, so the missing factor is ${quo}.`),
+            drawStep(`Read the division: ${nb(`${a} ÷ ${b}`)}.`, `Read ${nb(`${a} ÷ ${b}`)}.`, [{ jot: `${a} ÷ ${b}` }]),
+            drawStep(`Write the times fact with a gap: ${nb(`${b} × __ = ${a}`)}.`, `Think: ${nb(`${b} × __ = ${a}`)}.`, [{ jot: `${b} × __ = ${a}` }]),
+            drawStep(`${nb(`${b} × ${quo} = ${a}`)}, so the missing factor is ${quo}.`, `${nb(`${b} × ${quo} = ${a}`)}.`, [{ jot: `${b} × ${quo} = ${a}` }]),
             step(`Write ${quo}.`, [{ slot: 'ans', value: String(quo) }]),
         ];
     },

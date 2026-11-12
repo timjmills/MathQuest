@@ -486,3 +486,10 @@ One line per finding: the rule, then the check.
 | Key dot halos fuse into a blob | A group of marks gets one underlay, never overlapping rings | V22++: no two halos overlap | y |
 | "Type even" when the instruction says "Tap its word" | A hint uses the instruction's verb | V26+: verb match | y |
 | "like 4 dots", "one bar is 3 of the other bar" | An explanation is grammatical and concrete | V24++: a bad-phrasing list | y |
+### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
+A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
+empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
+the cell; and a LATER state of the same example draws ink in that band (reserved, not just white). Any other white under the
+ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
+never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
+white on any other role.

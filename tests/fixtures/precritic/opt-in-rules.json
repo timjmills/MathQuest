@@ -235,6 +235,24 @@
      }
     }
    }
+  },
+  {
+   "lane": "lf-ops",
+   "why": "facts-roles critic r1 (design/audit/runs/lf-ops/critic-factroles-r1.md): S1 MOD-MARKS (adjacent Scripted Model states draw the same picture), S2 MOD-LINES (a step text over 2 lines), S3 EB-PAGE on the Scripted Model page (under 70 % used; lead ruling 2026-11-12: a second worked example). ws-empty-band --model-states judges the three on the scripted-model render of these skills only.",
+   "skills": [
+    "addition:add_facts",
+    "subtraction:sub_facts",
+    "multiplication:mult_facts",
+    "division:div_facts_long",
+    "division:div_facts"
+   ],
+   "gates": {
+    "empty-band": {
+     "args": [
+      "--model-states"
+     ]
+    }
+   }
   }
  ]
 }
