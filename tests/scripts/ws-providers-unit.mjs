@@ -37,6 +37,8 @@ import { sameAnswer, chooseWrong } from '../../js/modules/sheet/providers/util.j
 import { applyRule, ftSlots } from '../../js/modules/sheet/index.js';
 import { hintOf, hintGivesAnswer } from '../../js/modules/sheet/roles/guided.js';
 import { topicOf } from '../../js/modules/sheet/roles/compose.js';
+// (read, not imported: a tree without the predicate fails its check below instead of failing to load)
+const { modelOk = () => true } = await import('../../js/modules/sheet/roles/scripted-model.js');
 // lf-placevalue r1 (2026-11-07): the real generator's items for the pv rules below (F3, F11-F13)
 import { state as APP_STATE } from '../../js/modules/state.js';
 import { generatePvPlaceValue } from '../../js/modules/gen-pv.js';
@@ -464,6 +466,7 @@ const registered = new Set(listProviders());
 const wordsOf = (s) => String(s).replace(/[.?!]/g, '').trim().split(/\s+/).filter(Boolean).length;
 const pluralNouns = new Set(STORY_NOUNS.map((n) => n.many));
 
+const MODEL_DRAWS = new Set(['addition:add_facts', 'subtraction:sub_facts', 'multiplication:mult_facts', 'division:div_facts']);
 function checkSkill(key, { requireStories = false } = {}) {
     if (ONLY_SKILLS.length) { const o = onlyHit(key); if (!o) return; CHECKED_ONLY.add(o); }
     const [cat, skill] = key.split(':');
@@ -523,6 +526,13 @@ function checkSkill(key, { requireStories = false } = {}) {
             for (const re of GLOBAL_FORBIDDEN.concat(FORBIDDEN[key] || [])) ok(!re.test(s.text), `${tag}: worked step "${s.text}" (matches ${re})`);
         }
         ok(ws.length && ws[ws.length - 1].marks.length > 0, `${tag}: the last worked step marks no slot`);
+        // (lf-ops facts-roles critic r1 S1 / S2: a fact's Scripted Model draws a new grey mark every step but the last, which
+        // writes the answer (PT-MOD-1), and each step has a short text for the Model's narrow state column (PT-MOD-2);
+        // division:div_facts_long is a preset of div_facts and draws with its provider)
+        if (MODEL_DRAWS.has(key)) ws.slice(0, -1).forEach((s, i) => {
+            ok(Array.isArray(s.draw) && s.draw.length > 0, `${tag}: Scripted Model step ${i + 1} "${s.text}" draws no grey mark (PT-MOD-1)`);
+            ok(typeof s.short === 'string' && s.short.length > 0 && s.short.length <= 26, `${tag}: step ${i + 1} short text "${s.short}" is missing or over 26 characters (PT-MOD-2)`);
+        });
 
         const itemStrings = typeof p.strings === 'function' ? p.strings({ categoryId: cat, skillId: skill, q }) : p.strings;
         const said = typeof itemStrings.sayFill === 'function' ? itemStrings.sayFill(q) : '';
@@ -561,6 +571,9 @@ function checkSkill(key, { requireStories = false } = {}) {
         `${key}: only one misconception across 20 items (${[...seen].join(', ')})`);
 }
 
+// the Scripted Model's ambiguity predicate (critic r1 S1: sub_facts 10 − 5 = 5 cannot show which 5 is the answer)
+ok(!modelOk({ q: { a: 10, b: 5, ans: 5 } }) && !modelOk({ q: { a: 7, b: 0, ans: 7 } }) && !modelOk({ q: { a: 1, b: 6, ans: 6 } }), 'modelOk: a Model whose answer is a given number must be ruled out');
+ok(modelOk({ q: { a: 10, b: 4, ans: 6 } }) && modelOk({ q: { a: 42, b: 7, ans: 6 } }), 'modelOk: an unambiguous Model must pass');
 for (const key of REGRADED_SKILLS) checkSkill(key, { requireStories: key === 'addition:add_wp_10' });
 for (const key of Object.keys(SIBLINGS)) checkSkill(key, { requireStories: /_wp_/.test(key) });
 // P10 time + money: every provider, both of its item shapes.

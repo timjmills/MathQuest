@@ -468,7 +468,9 @@ export function providerWorkedSteps(it, max = 6) {
         const p = getProvider(q.categoryId || '', q.skillId || '');
         if (!p || !Array.isArray(p.real) || !p.real.includes('workedSteps') || typeof p.workedSteps !== 'function') return [];
         const st = p.workedSteps(q);
-        return (Array.isArray(st) ? st : []).map((s) => ({ text: String((s && s.text) || '').trim(), marks: (s && s.marks) || [] })).filter((s) => s.text).slice(0, max);
+        // (`short` / `draw`: a Scripted Model state's short step text and the grey marks the step draws, providers' drawStep)
+        return (Array.isArray(st) ? st : []).map((s) => Object.assign({ text: String((s && s.text) || '').trim(), marks: (s && s.marks) || [] },
+            s && s.short ? { short: String(s.short) } : {}, s && Array.isArray(s.draw) ? { draw: s.draw } : {})).filter((s) => s.text).slice(0, max);
     } catch (e) { return []; }
 }
 

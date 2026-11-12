@@ -15,9 +15,10 @@
 
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, providerWorkedSteps,
-    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, factRows,
+    generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, factRows, operandsOf,
 } from './compose.js';
 import { isWideRow } from '../cells/count-row.js';
+import { dotTile, countCueRow } from './guided.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -25,7 +26,8 @@ export const ROLE_ID = 'scripted-model';
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
-export const counts = () => ({ main: 1 });
+// (a fact page deals a few, so its Model can be chosen unambiguous and a second worked example found: factModel)
+export const counts = (pools, input) => ({ main: factRows(input) ? FACT_DEAL : 1 });
 
 /**
  * The steps of the example (SCC 3.8): the provider's own `workedSteps(q)` for THIS problem when
@@ -130,6 +132,128 @@ function dealOf(n, perFirst, perCont) {
 }
 const hasLone = (deal, n) => n > 1 && deal.some((c) => c === 1);
 
+/* ======================================================================= the fact Model */
+/**
+ * THE FACT MODEL (lf-ops facts-roles round 2; critic r1 S1-S3, lead ruling 2026-11-12). On a fact page (factRows) whose
+ * provider draws its steps (providers' drawStep: a short text and the grey marks each step adds):
+ *  - each state carries the marks of steps 1..k in trace grey under (or, a dot tile, beside) the problem - a new grey mark
+ *    every step (PT-MOD-1; ws-empty-band MOD-MARKS) - and its short text, 2 lines at most (PT-MOD-2; MOD-LINES);
+ *  - the worked example is never ambiguous: its answer is none of its given numbers (10 − 5 = 5 cannot show which 5 is the
+ *    answer; `modelOk`);
+ *  - a SECOND worked example follows the first, the same layout with another fact of the same number of steps (lead ruling
+ *    2026-11-12, so the page fills with teaching); a third when two would leave the page under FACT_FILL used (judged
+ *    with 5 points to spare: the estimate is the role's, the page is measured) and three fit;
+ *  - the rows grow to at most FACT_GROW x their content to fill the page, the drawing centred up and down in its state.
+ * Any other page (or a fact without drawn steps) keeps the plan below unchanged.
+ */
+const FACT_DEAL = 16, FACT_GROW = 1.4, FACT_FILL = 0.7;
+const drawnSteps = (it) => {
+    const w = providerWorkedSteps(it, 6);
+    return w.length >= 2 && w.slice(0, -1).every((s) => Array.isArray(s.draw) && s.draw.length) ? w : null;
+};
+/** A worked example whose answer is one of its given numbers is ambiguous (sub_facts 10 − 5 = 5: b = a − b). */
+export function modelOk(it) {
+    const a = String(answerOf(it) || '').trim();
+    const o = operandsOf((it && it.q) || {});
+    return a !== '' && o.length >= 2 && !o.some((v) => String(v) === a);
+}
+const FACT_MODEL_CSS = `<style data-mq-factmodel>
+:is(.ws-page,.ws-sheet) .mq-mbody{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5mm}
+:is(.ws-page,.ws-sheet) .mq-mtile{position:relative}
+:is(.ws-page,.ws-sheet) .mq-mtile>span{position:absolute;left:100%;margin-left:2mm}
+:is(.ws-page,.ws-sheet) .mq-mtile svg{display:block}
+:is(.ws-page,.ws-sheet) .mq-mjots{font-size:var(--ws-text);line-height:1.25;text-align:center;color:#949494}
+:is(.ws-page,.ws-sheet) .mq-mgap{display:inline-block;width:2.4em;height:.9em;border-bottom:1pt solid #949494;vertical-align:baseline}
+</style>`;
+/** The grey lines and the dot tile the steps 0..k have drawn. */
+function drawnUpTo(steps, k) {
+    const lines = [];
+    let tile = 0;
+    steps.slice(0, k + 1).forEach((s) => (s.draw || []).forEach((d) => {
+        if (d.jot !== undefined) lines.push(String(d.jot));
+        else if (d.more !== undefined) { if (lines.length) lines[lines.length - 1] += `, ${d.more}`; else lines.push(String(d.more)); }
+        if (d.tile) tile = d.tile;
+    }));
+    return { lines, tile };
+}
+
+function factModel(input, ctx, frame, m) {
+    const pool = poolItems(input, 'main');
+    const cand = pool.filter((it) => drawnSteps(it) && modelOk(it));
+    if (!cand.length) return null;
+    const ex1 = cand[0];
+    const n = drawnSteps(ex1).length;
+    const sig = (it) => operandsOf(it.q || {}).join(',');
+    const seen = new Set([sig(ex1)]);
+    const more = [];
+    // (the same strategy first - the same short steps with the numbers left out - then any fact of as many steps)
+    const kind = (it) => drawnSteps(it).map((s) => String(s.short || s.text).replace(/\d+/g, '#')).join('|');
+    for (const it of [...cand.filter((x) => kind(x) === kind(ex1)), ...cand]) {
+        if (seen.has(sig(it)) || it.template !== ex1.template || drawnSteps(it).length !== n) continue;
+        seen.add(sig(it)); more.push(it);
+    }
+    const charMm = 0.5 * m.textPt * (25.4 / 72), lineMm = m.textPt * 1.25 * (25.4 / 72);
+    const linesIn = (t, colW) => Math.max(1, Math.ceil((String(t).length * charMm) / colW));
+    const room = m.budget - m.strip - m.say;
+    // the widest grid (one row an example where it can) whose state texts are 2 lines at most and whose problems fit
+    for (const across of [n, 4, 3, 2].filter((a, i, arr) => a <= n && arr.indexOf(a) === i)) {
+        const all = [ex1, ...more];
+        const exs = all.filter((it) => fitsAt([it], across, ctx));
+        if (exs[0] !== ex1) continue;
+        const colW = 186 / across - 6 - 9.5;
+        const stepsOf = (it) => drawnSteps(it).map((s) => s.short || s.text);
+        if (exs.some((it) => stepsOf(it).some((t) => linesIn(t, colW * 0.92) > 2))) continue;
+        const rowsEx = Math.ceil(n / across);
+        const textMm = Math.max(...exs.map((it) => Math.max(...stepsOf(it).map((t) => linesIn(t, colW * 0.92))))) * m.textPt * 1.3 * (25.4 / 72) + 4;
+        const jotMm = (it) => { const d = drawnUpTo(drawnSteps(it), n - 1); return d.lines.reduce((a, l) => a + linesIn(l, colW), 0) * lineMm + 3; };
+        const natural = (k) => hMinAt(exs.slice(0, k), across, ctx) + textMm + Math.max(...exs.slice(0, k).map(jotMm));
+        // two examples (lead ruling), a third when two leave the page under FACT_FILL and three fit
+        let k = Math.min(2, exs.length);
+        while (k > 1 && k * rowsEx * natural(k) > room) k--;
+        if (k === 2 && exs.length >= 3 && 3 * rowsEx * natural(3) <= room
+            && (m.strip + m.say + Math.min(room, 2 * rowsEx * natural(2) * FACT_GROW)) / m.body < FACT_FILL + 0.05) k = 3;
+        const R = k * rowsEx;
+        const H0 = natural(k);
+        if (R * H0 > room) continue;
+        const H = Math.min(room / R, H0 * FACT_GROW);
+        const used = exs.slice(0, k);
+        const cells = [];
+        used.forEach((ex, e) => {
+            const steps = drawnSteps(ex);
+            const texts = stepsOf(ex);
+            const ans = answerOf(ex);
+            steps.forEach((_, i) => cells.push(planItem(ex, {
+                cols: across, level: 3, nolabel: true,
+                render: (c, o) => {
+                    const last = i === steps.length - 1;
+                    const base = ex.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, last && ans ? { shown: ans, ink: 'trace' } : {}));
+                    // (every state keeps the final state's room: a mark not drawn yet is hidden in place, so the problem
+                    // stands in the same place in every state, AK-1)
+                    const d = drawnUpTo(steps, i), fin = drawnUpTo(steps, steps.length - 1);
+                    const hide = (on) => (on ? '' : ' style="visibility:hidden"');
+                    // (the tile beside the number it pictures, as on the Guided page: row 2 one digit row down, R3)
+                    const fd = Number((/--fd:([\d.]+)pt/.exec(base) || [])[1]) || 28;
+                    const top = countCueRow(ex) === 2 ? `calc(${(fd * 1.15).toFixed(1)}pt + .5mm)` : '.5mm';
+                    const fact = fin.tile ? `<div class="mq-mtile">${base}<span style="top:${top}${d.tile ? '' : ';visibility:hidden'}">${dotTile(fin.tile)}</span></div>` : base;
+                    const jots = fin.lines.length ? `<div class="mq-mjots ws-trace" data-ws-ink="trace">${fin.lines.map((l, li) => `<div${hide(li < d.lines.length)}>${esc(li < d.lines.length ? d.lines[li] : l).replace(/__/g, '<span class="mq-mgap" aria-label="gap"></span>')}</div>`).join('')}</div>` : '';
+                    return (e === 0 && i === 0 ? FACT_MODEL_CSS : '')
+                        + `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm"><div class="mq-steptext"><em>${i + 1}</em><span>${esc(texts[i])}</span></div></div>`
+                        + `<div class="mq-mbody" style="height:calc(100% - ${textMm.toFixed(1)}mm)">${fact}${jots}</div>`;
+                },
+            })));
+            // (a short last row of an example is filled with empty places, so the next example starts its own row)
+            for (let p = steps.length; p < rowsEx * across; p++) cells.push({ render: () => '', drawsAnswer: true, nolabel: true, cls: 'mq-stepcell', skill: ex.skill });
+        });
+        const grid = gridPart(cells, { cols: across, rows: R, cellH: H, labels: 'none' });
+        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }, { kind: 'say', frame: oralFrameOf(ex1, { fill: true }) }];
+        return assemble(ROLE_ID, input, frame, [{ sections }], {
+            nothingToAnswer: true, scaffoldLevel: 3,
+            meta: { items: k, scoreOutOf: 0, states: k * n, cols: across, examples: k, fits: [{ cols: across, rows: R, line: `Fits: ${k} worked examples of ${n} states, 1 page.` }] },
+        });
+    }
+    return null;
+}
+
 /** PAGE_TYPES 2.2: the page IS the steps; a skill that supplies none cannot be modelled yet. */
 export function supports(items) {
     if (!items.length) return 'no items were generated';
@@ -143,6 +267,7 @@ export function plan(input = {}) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Model', score: 0 });
     if (!it) return assemble(ROLE_ID, input, frame, [{ sections: [] }], { nothingToAnswer: true });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
+    if (factRows(input)) { const fm = factModel(input, ctx, frame, m); if (fm) return fm; }
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     let steps = stepsFor(it);
     let marks = marksFor(it, steps);
