@@ -4160,3 +4160,10 @@ export function optionICan(categoryId, skillId, opts, baseICan) {
     const _mpTask = _mp.find((o) => o.id === 'task');
     if (_mpTask) _mpTask.help = 'Order items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.';
 }
+// lf-ops-props (2026-11-12, lead ruling (b) on the ops-tables card): mult_properties band=36 is offered at size S only,
+// pending the post-fix re-measure. The panel has no per-size gate, so the value's label says so.
+{
+    const _mpBand = (SKILL_OPTIONS['multiplication:mult_properties'] || []).find((o) => o.id === 'band');
+    const _v36 = _mpBand && (_mpBand.values || []).find((v) => v.v === 36);
+    if (_v36) _v36.l = '6 (6 × 6, size S)';
+}
