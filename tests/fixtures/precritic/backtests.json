@@ -3072,8 +3072,8 @@
     "state": "15 findings: every fact skill at S / M / L above the ceiling (S 29-31, M 11-23, L 11-15 tries)"
    },
    "pass": {
-    "commit": "PENDING",
-    "state": "0 findings"
+    "commit": "31418ea0",
+    "state": "0 findings: Guided fact pages at S 9 / M 7-8 / L 5 tries"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP",
    "expect": {
