@@ -243,6 +243,14 @@
       "kind": "browser",
       "args": []
      }
+    },
+    "words-checks": {
+     "newRow": {
+      "name": "ws-words-checks (opt-in lf-placevalue critic nwf r1 N1 / N3: named wrong answers on every band, true worked steps)",
+      "script": "ws-words-checks",
+      "kind": "node",
+      "args": []
+     }
     }
    }
   },

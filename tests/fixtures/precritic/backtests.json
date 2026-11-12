@@ -3161,45 +3161,65 @@
     "pass": "OK"
    }
   },
- {
-  "id": "model-grid-facts",
-  "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
-  "browser": true,
-  "fail": {
-   "commit": "f960e549",
-   "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
+  {
+   "id": "model-grid-facts",
+   "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "f960e549",
+    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
+   },
+   "pass": {
+    "commit": "966292ff",
+    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "966292ff",
-   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
+  {
+   "id": "model-interior-band-facts",
+   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+   "browser": true,
+   "fail": {
+    "commit": "9f7983dd",
+    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+   },
+   "pass": {
+    "commit": "04683166",
+    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "pv-words-provider",
+   "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
+   "browser": false,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
+   },
+   "pass": {
+    "commit": "1e3b128e",
+    "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
-  },
- {
-  "id": "model-interior-band-facts",
-  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
-  "browser": true,
-  "fail": {
-   "commit": "9f7983dd",
-   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
-  },
-  "pass": {
-   "commit": "04683166",
-   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- }
  ]
 }

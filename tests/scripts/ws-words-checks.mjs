@@ -9,9 +9,6 @@
 //   is a NAMED error (not the registry's near-miss nudge) - a band with none prints a True or False? page that is all True and a Reason It page of one item.
 // WORDS-STEPS-TRUE (N3): every quoted phrase of a worked step ("...") is part of the item's own name - "thirty-five hundred" for
 //   35 was a false step on the model, the Guided hints and the lesson's Steps strip.
-// DRAFT (2026-11-12, NOT on any gate path): through getProvider() every candidate reads as the registry's near-miss nudge
-// (misconceptionBased false), at the old commit AND the fix, so the check cannot yet tell them apart. Next: read the role's own
-// wrong-answer path (true-false.js / reason-it.js), or the raw provider, and backtest 2ccd5b21 FAIL -> fix OK before wiring it.
 // Prints `ws-words-checks: OK` / `FAIL (n)`; exits 1 on FAIL.
 import { loadApp, fnv } from './ws-card-rulings.mjs';
 import { fileURLToPath } from 'url';
@@ -26,9 +23,9 @@ const ROOT = resolve(arg('root', resolve(dirname(fileURLToPath(import.meta.url))
 const app = await loadApp(ROOT);
 // (the kit registry of the SAME tree loadApp read - the providers register on its module graph)
 const { getProvider } = await import(new URL(`file://${ROOT}/js/modules/sheet/index.js`).href);
-const prov = getProvider(KEY);
+const prov = getProvider('composing', 'number_word_form');   // (category and skill: one string matched no provider and read the defaults)
 const bad = [];
-if (!prov) bad.push(`no provider registered for ${KEY}`);
+if (!prov || !(prov.real || []).includes('wrongAnswer')) bad.push(`no REAL provider wrongAnswer registered for ${KEY} (the defaults would be read)`);
 for (const band of [20, 100, 1000]) {
     let withWrong = 0, judged = 0;
     for (let i = 0; i < N && prov; i++) {
