@@ -1,6 +1,6 @@
 # Part options — "which supports, and how many", per lesson part and per paper (lane lf-partopts)
 
-Status: **DESIGN, step 1, for owner approval. No code yet.**
+Status: **APPROVED 2026-11-12 (owner, via the lead). Building step A.**
 Owner request (2026-11-12): "on the lesson pages can these too be customizable so for each part we can decide which
 types of supports are included or not? Like in the practice/quiz pages as well? ... and for how many of the problems as
 well." Approved to build: "OK lets build this" (after this design is signed).
@@ -212,9 +212,11 @@ everywhere) before B starts.
 pack declares the part's range (a `partLimits` entry in the lesson file); until then their rows show the standard and
 "Fixed in this lesson". This keeps every passed lesson's `ws-detailed-lesson --check` green.
 
-## 7. Open questions for the owner
+## 7. Owner answers (2026-11-12, via the lead)
 
-1. Prerequisite Check below 3 questions: allow with a warning (proposed), or keep 3–4 fixed?
-2. Should a teacher's per-part choices become their **default for every lesson** (a "Remember my choices" tick), or
-   stay per lesson (proposed: per lesson; saved sets carry them)?
-3. Quiz: offer hints at all (proposed: yes, under "Hints", off by default — the existing "hints on tests")?
+1. The Prerequisite Check may print fewer than 3 questions, with a warning (min 1).
+2. Choices are per lesson only; there is no "remember my choices" default.
+3. Quiz hints are offered under "Hints", off by default.
+
+Build order approved: A (How many everywhere, Parts UI, PO-1/2/4) → one critic round → B (supports, `off`, panel,
+PO-3/5). Caps: $70 for A and its critic; $55 for B after A passes.
