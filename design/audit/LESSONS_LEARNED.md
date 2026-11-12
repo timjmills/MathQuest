@@ -35,6 +35,10 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 | L23 | **A check with an exemption hides the case it exempts** — facts print r7 (critic 2026-11-07): DIVORDER skipped lists that start with ÷, and every gate list put ÷ last, so ÷ printed last whatever the teacher's order (a regression against master) on 1,447 prints | A rule about order compares the print with the LIST, never with a fixed order, and the gate's inputs include the unusual orders (÷ first, ÷ between). A check never exempts a whole class of input; where a rule truly does not apply, the exemption names the reason and the print says it | `ws-simple-print --sweep` ORDER (lists ÷ +, ÷Mix −, ÷Mix × − +, − ÷Mix +), COLNOTE, BRKCLEAR, NOTEPLAIN; backtest row `facts-print-fix-r7` |
 | L24 | **A copy of a plan must reuse the plan, not re-run the planner; and clearance is measured on the printed raster** — facts print r8 (critic 2026-11-07): Sets 2+ rebuilt from set 1's counts re-decided the ÷-form merge and the remainder (÷ 15 against set 1's 20), and the DOM said 2.2 mm where the printed answer line ended 1.78 mm from the rule | Repeats (sets, versions) carry the first plan and change only the numbers; checks compare every repeat with the first (per-skill counts, sections a page). A clearance rule is checked on the raster of the printed page, where strokes, line caps and neighbouring rules really are | `ws-simple-print --sweep` SETSKILLDIFF, SETSHAPE, SHARES per set, BRKINK (tests/lib/ws-inkclear.py); backtest row `facts-print-fix-r8` |
 | L25 | **Render and measure every offered role and host before a critic** — lf-vocab critic r3, lf-placevalue critic r1–r2 (N5 / N6) and lf-ops div_facts r5 (2026-11-07) all failed on the SAME class: an empty band (H13) on a page role or screen host no machine check rendered, and cell footprints that did not match the drawn height; each critic was the first to measure it. Rule (lead, 2026-11-08, cross-lane): before ANY critic, a lane renders every role its signed card offers at S / M / L, the card's option values, and the screen hosts (card 390 / 820 / 1280, worksheet, quiz), and measures every cell. | `node tests/scripts/ws-empty-band.cjs --skill <cat:skill>` (on `ws-precritic --skill`, so `--strict` for every lane): EB-BAND empty band under the ink ≥ 30 % of the cell (empty answer slots are content, as H13-ABS), EB-SIDE ≥ 30 % of the width beside the ink, EB-FOOT drawn height vs footprint hMm ± 10 % on the grid roles; roles and variants from the signed card (tests/lib/ws-card-plan.mjs); pinned counts for the passed fact skills in design/audit/baselines/empty-band.json (a rise or a new render FAILs). Backtests: tests/fixtures/precritic/backtests-empty-band.json (FAIL on bebf5b36, b28a0867, b23e418d; pass = each lane's fix). |
+| L26 | **A cell must fit EVERY offered option value, not the default** — lf-placevalue (pv family, precritic r3, 2026-11-07): the pv cells passed every default-page gate, then plan-from-card rendered each §7a option value on lesson / test / review and found 548 OVERFLOWs (value form=unit, identify / expand / combine at 5–6-digit bands, unit_form opener) | Size the cell from the widest thing ANY offered value can print (the band's widest number, the longest form, every part count), and judge the band and form options as pages of their own; the default page proves nothing about the options. THE FIRST THING THE NEXT FAMILY CHECKS: run `ws-cell-checks --card --card-opts` on every skill before the first critic | `ws-precritic --skill` plan-from-card (render-gate-<id>, cell-checks-<id>, lf-ops); `ws-options-verify --render --bands`; backtest `pv-r2-option-fit` |
+| L27 | **A wrong answer is compared slot by slot** — lf-placevalue critic r2 N1: identify with writeValue built wrong candidates "tens, 60" against `q.ans` "tens"; the joined strings never matched, so the "counted from the left" candidate — the RIGHT answer for a middle digit — was printed as the error (True or False? key wrong, C2 3) | When an answer has more than one slot, every distractor and every "is it the same?" test compares the per-slot values, never a joined string; a new answer slot (an option that adds a line) re-runs the distractor tests | `ws-providers-unit --pv-r2 N1` WRONG-DIFFERS per slot over every offered option set; `ws-node-lint WRONG-FILL` |
+| L28 | **What the print pipeline reads with NO item must follow the options too** — lf-placevalue critic r2 N2: the two-task instruction ("Circle the place. Write the value…") was chosen per item, but the page header asks the provider with no item and got the default wording on every page | A provider string that depends on an option is chosen from the options when there is no item (or the page passes one); test the item-less path, not only `q.printText` | `ws-providers-unit --pv-r2 N2` PRINTED-INSTRUCTION; proposed ws-card-rulings assert per option set |
+| L29 | **Every band is its own skill page: deal and judge each** — lf-placevalue critic r2 N3 / N5: at band 99 half of combine's items were one-part "60 = ___" (the answer given); at band 9999 value's cells kept 43 % empty bands; both passed because the dealer and H13 gates ran on the default band, and options-render excused a rise the default page shared | Run the dealer / content predicates and H13-ABS on EVERY offered band, each judged absolutely, never only relative to the default page | `ws-providers-unit --pv-r2 N3` COMBINE-PARTS on every band; proposed: H13-ABS per band page in options-render, inside ws-cell-checks |
 
 > **2026-10-23:** the checks marked NEW above (L1 sizes, L3 key-in-drawing, L6 instruction-follows-item, L10 answer cycles) plus
 > lone item / lone state, repeats, text ≠ generator and the Chromebook viewport are built in Wave 0 (`design/IMPROVEMENT_PLAN.md`
@@ -78,6 +82,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    **Lead ruling 2026-10-31 (shared-roles r1):** "at or below base" never covers a page role, template or host the lane
    CHANGED: any red row there blocks the critic, even when the same row is red on main. Main-red rows may pass only on
    roles / templates / hosts the lane did not touch.
+0c. **Every engine change is proved against master before hand-over (lead, lf-engine landing, 2026-11-09).** A change to the
+   lesson engine (sheet/roles/lesson.js, sheet/lesson-pages/*, print-sheet.js buildLesson, lessons/library.js or the lesson
+   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --check
+   <master baseline>` (written with `--write` on a master worktree) before the lane hands over; every differing hash is either
+   the change's intended page on a lesson the change was made for (opt-in on that lesson's data, LR-17b) or a defect.
+   Backtest row `lesson-baseline-phase0-optin` (FAIL 3bf3ef5c / PASS the LR-17b fix).
+   *Why:* the lf-engine landing found 80 hashes of live packets changed by two critic fixes made for the sample lessons.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
@@ -283,3 +294,120 @@ every common width including 1024x768 and 360x740.
 grades them by eye; when the critic passes the family, its skills are added to `siblings.json` as approved siblings, so the
 second family on the template is machine-compared. Applied to pv (lf-placevalue) and arrays / arrays-turn (lf-ops).
 A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.
+
+## lf-placevalue critic r2 (2026-11-07): one line per finding, the check that now catches it (or PROPOSED)
+- N1 identify True or False? key marks the right answer False (writeValue joined string) -> `ws-providers-unit --pv-r2 N1` WRONG-DIFFERS per slot (L27).
+- N2 identify instruction misses the value task on paper -> `ws-providers-unit --pv-r2 N2` PRINTED-INSTRUCTION (L28).
+- N3 combine band 99 one-part items -> `ws-providers-unit --pv-r2 N3` COMBINE-PARTS on every band (L29).
+- N4 "hundreds" offered on 2-digit identify items (r1 H15, survived) -> PROPOSED VQ-LIVE at every band (ws-visual-quality).
+- N5 value band 9999 L 43 % bands; N6 unit_form rename=more S 57 % -> PROPOSED H13-ABS judged per option page (options-render) and inside ws-cell-checks.
+- N7 unit_form review mixes two combine layouts (r1 F9, survived 2 rounds) -> PROPOSED GRID-EVEN-ALL on every offered role, not only independent.
+- N8 a 2-column request ignored on expand / unit_form, page 55–65 % empty (r1 F21 half, survived 2 rounds) -> PROPOSED: matrix more-cols2 rows judged (red until a critic rules), not PENDING(no-baseline).
+- Rule 7 applied: N7 and N8 survived two medium rounds -> the lane stopped its build loop; root causes above, next builder briefed fresh.
+
+## lf-placevalue critic r3 / r3b (2026-11-08): one line per finding, the check that catches it (or PROPOSED)
+- F3 identify lesson vocab: the "underlined" picture drew no underline (the H T O picture carried the rule) -> PROPOSED LESSON-DATA
+  rule: a vocabulary picture for a word that names a mark (underlined, circled) draws that mark, and no other picture carries it.
+- G1 value lesson vocab: "worth" and "value" meant the same (two right matches) -> PROPOSED LESSON-DATA rule: no vocab meaning uses
+  another vocab word of the same lesson, and no picture's text sits inside another's.
+- F4 identify lesson Warm-up heading asked for the value its cells do not have -> lesson.js now takes the items' own instructionKey
+  (lead 2026-11-08); PROPOSED: the N2 printed-instruction check over every lesson section's heading.
+- F1 / F2 combine side bands (a right-aligned frame in a full-width cell; band 99 held to 3 across) -> ws-empty-band EB-SIDE was
+  ALREADY red in precritic r5 ([pv]) and went to the critic anyway: an EB-SIDE [pv] row on independent / more-practice must block
+  (process: a [pv]-tagged red row is never "owned elsewhere"); backtest `pv-combine-side-band`.
+- G2 unit_form rename=more S side bands -> ws-empty-band option variants run at L only; PROPOSED: every §7a option value at S / M / L.
+- First PASS of the family: placevalue:expand. What made it pass: the cell fits every offered value (L26), per-slot answers (L27),
+  the option-aware instruction (L28), every band judged (L29), and two critics splitting the render load (r3 timed out at 50 min).
+
+## lf-placevalue deploy hold (lead, 2026-11-08): a skill change regressed a LIVE detailed lesson; the check that now catches it
+- Lesson 1 (g2-nbt3) failed `ws-detailed-lesson --check` on the lane branch (E9c T4 90 %, E11 P4-1 cells 30 % empty, E24 a chart
+  example dealt again, E24b twin answer 80 on P0); every lane gate was green, because none built a detailed lesson. Causes, each
+  bisected by swapping one file at a time into a master worktree:
+  - E24: a page-dealer choice fixed by the item index (dealIndex for the zero position) — the lesson dealer retries ONE index under
+    new seeds, so it could never reach the other zero position. Rule: a dealt choice that a lesson ref may constrain (a case, a zero
+    place) is drawn inside freshDeal with a cap, never pinned to the index. A cap is sized to the window's real share (about half the
+    window holds a zero, so cap 6 of 19): a too-tight cap relaxes EVERY cap of the deal (ws-dealer-uniform PAGE caught 560 / 565).
+  - E24b: the Prerequisite Check dealt each question's skill against its own seen set, so a value item and a number name could both
+    answer 80 (master was lucky). print-sheet `pageLr6` now covers `pre-skill-check` with `perQuestion` too.
+  - E11 / E9c / E9b: the CL-40 top spacer and the in-place row cap (both lane changes for the skill pages) also reached the pack's
+    rows; the measured cell (spacer) cost the lesson sheet an item, and the in-place cap left Practice 1 15 % blank. The pack's refs
+    now carry `cellPayload {noTabSpacer, inPlace: false}`, so measured and printed cells agree and the pack prints as signed off.
+- CHECK (precritic path, opt-in-rules.json): `ws-detailed-lesson --check` on every passed detailed lesson that deals a pv skill
+  (lessons 1, 3, 5a, 5b, 6) plus lesson 1 `--repeats`; backtest `pv-detailed-lesson-1` (9b0972f7 FAIL -> 8d80d13b OK).
+- RULE for every lane: a change to a generator, cell template, provider or kit CSS runs `ws-detailed-lesson --check` on each passed
+  detailed lesson that deals one of its skills BEFORE commit; a lesson failing on master too (g1-oa1, g3-oa8 on 2026-11-08) is
+  recorded, not counted.
+
+## lf-placevalue critic r3c (2026-11-08): expand (re-check on the new deal), value, combine PASS; identify PASS pending E-A1
+- E-A1 identify lesson p2: the "ones" vocabulary picture (unit blocks, no tens) is drawn at a ten-rod's height by lesson.js `blocks`,
+  leaving 43-44 % of the vocabulary cell empty -> PROPOSED VOCAB-INK: each vocabulary picture's ink box against its SVG box (ws-empty-band
+  does not read the vocabulary row today). Lead to rule engine (D3) or pv (the picture was chosen in pv's prereqs.js data).
+- E-B2 error-analysis combine M: 37 % empty under the correct-answer line, which ws-empty-band passes -> PROPOSED: EB-BAND reads the
+  error-analysis cell's own rows (the box under the answer line is in the measured ink today).
+- Speed: a page-hash diff (graded commit vs head) limited the re-grade to the changed pages; one critic did four skills in 18 min.
+
+## lf-placevalue round 4 (2026-11-08): identify E-A1 and unit_form G2, the checks first
+- E-A1 -> ws-empty-band `--vocab-ink` (EB-VOCAB: each lesson vocabulary picture's drawing against its own box, 70 %), opt-in for
+  the lane on precritic's path; backtest `pv-identify-vocab-ink` (8573c66a FAIL 3 -> 64f70063 OK). Fix: the `blocks` picture's
+  opt-in `compact` (ones only: one cube tall), set only where the lane's data asks, so no other lesson's picture moved.
+- G2 -> the existing EB-SIDE on every §7a option value at S (the default plan ran variants at L only: r3 F2's lesson); backtest
+  `pv-unit-form-rename-side` (EB-SIDE 27 -> 0). Fix: unit form's full-width rename frames take a write line two digits longer at S
+  (one width for every item: the line never tells the answer).
+- Tool: ws-empty-band `--only R1,R2` so a backtest row proves one rule even where another rule is red on both commits.
+- Process: a merged lane branch is never force-pushed; the follow-up round takes a new branch from master (claude/lf-placevalue-r4).
+- critic r4 (2026-11-08): identify and unit_form PASS (E-A1, G2 fixed). N-r4-1: G2 passes by 0.1 point (29.9 % against 30 %): a fix
+  that lands within 2 points of a limit is fragile -> PROPOSED: ws-empty-band warns (not fails) on bands of 28-30 %, and a lane
+  sizes its fix to clear a limit by at least 3 points. E-r4-1 (lesson.js page split: identify L p2 43 % empty) is ENGINE-ROLES.
+
+### Detailed lessons: pool capacity (lf-engine P1d, owner rulings 2026-11-07)
+One line per finding: the rule, then the check.
+- **E24b, lesson 2 (near twins on Practice 1 at the last try).** Rule: before building, count the distinct facts the pack's rule holds against the places that deal them (LR-5 once a pack, LR-6 no near twins on a page, either order); a pack that needs every fact has no room for the greedy deal. Check: `ws-lesson-unit --only pool-capacity` (necessary condition, + pools); the deal itself only by the 25-seed `ws-detailed-lesson --sweep` (E24b on every seed).
+- **E24b, lesson 2 P0 (6 + 6 / 7 + 8).** Rule: a Prerequisite Check deals from the SAME fact pool as the stories, so its items count against the pool; narrowing its sums concentrates near twins on its own page (sums 11-13 made P0 worse: twin answers and four near twins). Check: E24b on P0, per seed.
+- **LP-FAMILY-REPEAT, lesson 3a (Practice 1 vs Guided).** Rule: a half-width cell caps an array's size, and the size cap caps the families; size the Practice cell from the families the pack needs (full width, one a row, arrays to 6 x 6), never the families from the cell. Check: `ws-lesson-unit --only pool-capacity` (arrays: families the allTest admits >= Practice places + chart + Guided); backtest row `pool-capacity-3a`.
+- **LP-FAMILY-REPEAT, lesson 3a P0 (2 x 7 twice).** Rule: a check question with exactly as many facts as items (x 2: 2 x 6 to 2 x 9 for four items) repeats as soon as any other place (spaced retrieval) takes one; give every dealt ref at least one spare fact. Check: the sweep (seed 3).
+- **E27, lesson 3a (6-wide arrays).** Rule: a counter row past 5 is legal only with RP-21's 5-group gap drawn; a gate reads the drawn positions, never the count alone. Check: E27 reads each row's dot x (`--e27-fixture`, backtest row `e27-five-gap`).
+- **E12, lesson 3a (Practice 1 over two pages, 1.6 mm apart).** Rule: a sheet over two pages fixes ONE grid height for every page (the continuation page's shorter header must not change the cells). Check: E12 across P4 pages; backtest row `e12-practice-pages`.
+- **T5 Watch "Practice 3", lesson 3a live critic.** Rule: a script names Practice SHEETS, never pages; a sheet over two pages is one Practice k whose last row is on its last page. Check: `ws-lesson-unit --only practice-units` (backtest `practice-units`).
+- **E24b, lesson 2 Practice 1 (7 + 4 / 8 + 5 at 4242, attempt 2).** Rule: when a valid set exists but the greedy deal misses it, SOLVE the page's facts first (pairwise no near twins, every first addend and whole different, so any deal order keeps LR-6) and PIN the generator to the solved pairs - never filter a random generator down to exact facts (a fact it deals 0.5 % of tries times out the build: attempt 1). A solve AFTER the earlier pages is too late at some seeds (1-3: no valid page left): solve the scarcest page first and reserve its facts. Check: `ws-lesson-unit --only solve-story` (backtest `solve-story-e24b`); E24b per seed by the sweep.
+- **E24b, lesson 2 at every seed (solve-first, 2026-11-08 - stopped, rule 7).** Rule: when a pack needs nearly every fact of its pool (lesson 2: about 18 of 20 crossing-ten facts - Practice 4 + an equal-parts fact, chart 3, Guided 2, P0 4, P5 1, slip 2, Check Question 1 - under LR-5 and LR-6), solving ONE page first only moves the shortage to the next greedy page (Practice cleared at seeds 1-5 and 4242, then P0 and Guided dealt near twins and repeats, and seeds 3-4 timed out). Solve the WHOLE pack's places jointly, or change the data (owner), before any render. Check: a node whole-pack feasibility count (every place's case and page rule, seeds 1-25 + 4242) - not built yet; attempt patch `design/lessons/proof/live-2026-11-08/`.
+- **E24b, lesson 2 P0 (owner ruling 2026-11-08).** Rule: a Prerequisite Check never draws from the lesson's own pool - its items test the prerequisite with facts outside the story rule (lesson 2: a teen and ones, 12 + 5, never a crossing-ten fact), so the pool is the stories' alone; and count the WHOLE pack (every place that draws from the pool, LR-5 + LR-6, per seed) in node before any render, then deal Practice from that whole-pack solution. Check: `ws-lesson-unit --only pack-feasible` (lessons/pack-solve.js: no prerequisite ref can deal a pool fact; a whole-pack assignment at seeds 1-25 + 4242); backtest row `pack-feasible-p0`.
+- **E24b / E31, lesson 2 at seeds 2 and 5 (attempt 4, 2026-11-08).** Rule: the 'pool capacity' diagnosis was wrong: the pack was feasible at every seed; a whole-pack count must model each place's OWN item source (P0's small ranges, the chart's pool), or it is green while the deal fails. P0's count (17-20) and bond (6-10, parts 3+) questions each dealt 2 items from 1-3 pairs 3 apart, so a greedy first choice (18) left none; the chart's add-to and equal-parts examples came from the main pool the Practice hard bound thinned. Model a range by GREEDY safety (every first choice still completes the question), and give a narrow chart case its own case pool carrying the pack's avoid keys. Check: `ws-lesson-unit --only pack-feasible` (pack-solve.js placeSources; backtest `pack-feasible-sources`).
+- **P4-2 41 % band, lesson 3a live critic.** Rule: when a ruling stretches cells to a shared height, the content sits in the MIDDLE of the stretched cell, never top-anchored. Check: the critic's pixel band probe (longest ink-free run / cell height <= 33 %) - proposed for ws-detailed-lesson --check.
+- **E24b, lesson 2 P0 on the lane (twin answers at 5 of 6 seeds; lf-engine 2026-11-09).** Rule: when one tree passes and another with the same data fails, DIFF THE ENGINE HUNKS since the merge base before guessing (`git diff <merge-base> origin/master -- <engine files>` against the lane's extracted copies): master's `pageLr6` (lf-placevalue 2026-11-08) dealt a `perQuestion` Prerequisite Check against ONE page answer set, the lane's covered Mixed pages only - one line, found in minutes once diffed, after a round lost to a guessed cause. And a P0 question whose answers can meet another's (lesson 2: count 11-20, + facts 13-19) is legal only with that set wired and ranges that hold every item. Check: `ws-lesson-unit --only p0-overlap` (backtest `p0-overlap`, FAIL dcdb50d4 / PASS b1e30155); deal dump: `tests/scripts/ws-lesson-deal-diff.cjs` (P0 per seed, twins, first difference vs another tree's dump).
+## lf-placevalue round 5 (2026-11-09): every finding a check (owner)
+| Finding | Check that now catches it | Backtest row (FAIL old -> PASS fix) | On precritic / detailed-lesson path | Would have saved |
+|---|---|---|---|---|
+| N-r4-1 unit_form rename=more S side band passed at 29.9 % (fragile) | ws-empty-band `--margin N` (EB-SIDE / EB-BAND at 30 - N %) | pv-unit-form-rename-margin (2fe21f2b FAIL -> a1c8d595 OK) | backtest only: `--margin` not default on precritic (it would flag every near-limit cell of every lane; proposed as a lane opt-in once pinned) | 1 round (r5) |
+| G5 error-analysis Fix-it singular word gives the answer | ws-fixit-words FIX-WORDS (new) | pv-unit-form-fixit-words (2fe21f2b FAIL -> a1c8d595 OK) | precritic (opt-in lf-placevalue newRow) | 2 rounds (r3b found it, open through r4) |
+| E-r4-1 identify lesson L page 2 43 % empty (page 3 never moved up) | ws-empty-band `--page-fill` EB-PAGE (new) | pv-identify-lesson-page-fill (2fe21f2b FAIL -> 07634a75 OK) | precritic (opt-in lf-placevalue empty-band args) | 1 round (r4 -> r5) |
+| unit_form worksheet host 32 % bottom band (legacy cell, rename=more) | ws-empty-band EB-BAND (exists; run with `--opts {"rename":"more"} --hosts worksheet`) | none yet: NOT FIXED (the cell is drawn by the legacy screen path, hosts lane) | precritic runs hosts with default opts only: option variants on hosts are not rendered | 0 (unfixed) - reason: hosts-lane code |
+| N-r5-1 identify lesson L warm-up cells EB-SIDE 31 % (lesson.js two across) | ws-empty-band EB-SIDE `--roles lesson` (exists) | none: ENGINE-ROLES (lead D3), not fixed by pv | precritic empty-band row renders lesson for the lane skills | 0 - reason: engine finding, lf-engine |
+| N-r5-2 S/M vocabulary cell grew into freed height (capIfEmpty 0.3), ~43 % empty split above and below | PROPOSED: EB-BAND on the vocab band (`.mq-lvocabcell` is not a kit cell today) | none | not on path | 0 - reason: grade unchanged (24 % by EB rule); engine |
+- Lesson: a check's text reader on a DETACHED page must join text nodes with spaces (innerText has no layout there) - ws-fixit-words
+  first ran words together and failed the fixed state; its backtest caught it before commit.
+
+## lf-engine landing (2026-11-09): the hash proof found engine drift beyond lesson 2 / g3-oa8 P0 (STOPPED, lead's rule)
+- **Finding L1 - a lane critic fix changes live packets.** The lane's P1b N1 (Vocabulary drawn smaller, `vocab.zoom` in
+  roles/lesson.js planOnce, so one Independent row fits) fires on lessons master prints without it: nearest_10 (L), placevalue
+  value (L), identify (S), sub_100_no_regroup (S), add/sub_wp_10/20(_plain) (S) - the lesson sheet's score goes /3 -> /4,
+  /4 -> /7, /9 -> /12. **Rule:** a lane fix to a shared engine page is opt-in (a lesson-data field) until the lesson it was made
+  for passes, or it lands with a re-graded critic. **Check:** `ws-lesson-baseline --all-lessons --check` against master
+  BEFORE a landing (it caught it; 0 critic rounds lost).
+- **Finding L2 - nearest_10's Practice page deals 3 rows on the lane, 2 on master** (L, seeds 4242 and 1): a lane practice-page
+  change (practiceShapes / rows) outside the extracted-equivalence the lane claimed. Same check.
+- **Process:** land a lane by its hash proof at EVERY lesson master prints (28 packets + 7 detailed, L and S, 2 seeds: 1,556 hashes,
+  12 min) - the lane's own baseline (3 samples + detailed at one seed) did not cover the place-value and story packets.
+- **Round 2 (2026-11-09): L1 and L2 made opt-in (lead decision A).** L2 traced to 8e285251 (P1, critic r1 D11: `roundOne`, rounding
+  cells count as one-number answers in the Independent rows - LR-17 sheets only) made unconditional by 08ee129e (P1c item 5).
+  Both are now lesson-record flags (`vocabZoom`, `roundOneNum`) set only on the three samples and on only while the lesson's
+  check is live (`phase0On`, LR-17b); with `prereqsLive: false` every packet prints as master (proof check-land-2.log).
+  **Lesson:** a critic fix made on a sample lesson goes in as a flag on that lesson's record, not as a branch keyed on a
+  property many lessons share ("has prereqs", "is a rounding cell").
+
+### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
+A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
+empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
+the cell; and a LATER state of the same example draws ink in that band (reserved, not just white). Any other white under the
+ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
+never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
+white on any other role.

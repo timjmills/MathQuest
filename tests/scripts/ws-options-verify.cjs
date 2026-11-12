@@ -53,6 +53,12 @@
 // --source kit, and FAILS where a value's page has more findings of a (lint, rule) than the skill's default page at the
 // same size and seed (tests/lib/options-render.cjs). Node; print-lint takes one browser slot (/tmp/mq-browser-run.sh,
 // or the slot it is already in). Verdict `ws-options-verify --render: OK|FAIL (...)`.
+//   --bands (OPT-IN; lf-placevalue critic r1 F19 / F20): also render the number-size values of `band` and FAIL on an
+//   L-OVERFLOW / L-WRAP rise against the default page (other rises and capacity listed, not failed); --rule-skills a:b,c:d
+//   renders the band pages only for those skills (ws-precritic passes the lane's); --options band,notation renders only
+//   those option ids (a short run, e.g. a backtest).
+//   --band-h13 (OPT-IN; lf-placevalue critic r2 N5, with --bands): print-lint runs --rules H13-ABS, and on a band page an
+//   L-DENSITY H13-ABS finding FAILS on its own (absolute, not against the default page); H13 / H13-ROW rises fail too.
 const fs = require('fs');
 const path = require('path');
 
@@ -77,7 +83,8 @@ if (has('render')) {
     const keys = (arg('skill', '') || '').split(',').map(s => s.trim()).filter(Boolean);
     const sizes = (arg('sizes', 'S,L') || 'S,L').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const root = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(__dirname, '..', '..');
-    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m) })
+    const list = (k) => (arg(k, '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+    require('../lib/options-render.cjs').main({ root, here: __dirname, keys, sizes, json: arg('json', null), verbose: has('verbose'), say: (m) => console.log(m), bands: has('bands'), bandH13: has('band-h13'), ruleSkills: list('rule-skills'), onlyOptions: list('options') })
         .then((code) => process.exit(has('report-only') ? 0 : code), (e) => { console.log(e && e.stack || e); console.log('ws-options-verify --render: FAIL (crashed)'); process.exit(1); });
     return;
 }
@@ -488,6 +495,14 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
     // CONDITIONAL CONTROLS (lesson 6 r4): a def with `appliesBase` only works in that context (the ten* controls of value
     // form "times"); it is tried on top of it, and the default it is compared with is that same base.
     for (const t of tries) if (t.def.appliesBase && typeof t.def.appliesBase === 'object') t.base = Object.assign({}, t.def.appliesBase, t.base || {});
+    // LOCKED VALUES (lane lf-ops, facts card F2, 2026-11-07): a set value the panel greys in the default context
+    // (`valueLock`: div_facts' array past dividends of 50) is tried where it IS offered (`valueBase[v]`, e.g. the 2-4
+    // tables), against that base's own default - it must still change the page there. The locked context itself is
+    // checked by print-lint (L-SUPPORT COVER: the fits line names every fact it is not drawn on).
+    for (const t of tries) {
+        const vb = t.def.valueBase, one = Array.isArray(t.value) && t.value.length === 1 ? t.value[0] : undefined;
+        if (vb && one !== undefined && vb[one] && typeof vb[one] === 'object') t.base = Object.assign({}, vb[one], t.base || {});
+    }
 
     // ---------- static (definition) checks ----------
     const statics = [];

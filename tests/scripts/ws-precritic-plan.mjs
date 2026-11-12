@@ -13,6 +13,8 @@
 // only in the deploy gates (tests/scripts/ws-deploy-gates.sh names it) passes as "deploy path". Skills that are not live
 // in this tree (a lane's new skill backtested on its own branch) are dropped from the plan, with a note; a row left with
 // none is not applicable here. Rows with no skill (fixtures of a tool's own data, card files) are not applicable.
+// OPT-IN lane rules (tests/fixtures/precritic/opt-in-rules.json): each lane's flags are on its --skill plan (with
+// --rule-skills) and on no other skill's plan (one addition skill's plan is checked).
 // A LESSON row (lane lf-checks, 2026-11-07): a command that runs tests/scripts/ws-detailed-lesson on `--lesson <id>` (a
 // detailed lesson) is checked against `ws-precritic --lesson <id> --dry-run`: the plan must run ws-detailed-lesson on that
 // lesson in the row's mode (--repeats, --check, --lp, --sweep; a row on a saved packet `--packet` or a PDF `--raster` is
@@ -136,6 +138,31 @@ else {
         if (!hit.length) fails.push(`${row.id}: ${via} plans no ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} gate on it (the check is backtested but not on the lane's path)`);
     }
     console.log(`  not applicable (no skill in the command): ${na.join(', ')}`);
+    // OPT-IN lane rules (lead ruling D1 2026-11-07; tests/fixtures/precritic/opt-in-rules.json): each opted-in lane's flags
+    // are on ITS --skill plan (with --rule-skills naming its skills), and on no other skill's plan. Their backtests are
+    // fixture rows (no skill in the command), so this is how they are shown to be wired.
+    let optIn = null;
+    try { optIn = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/precritic/opt-in-rules.json'), 'utf8')); } catch (e) { optIn = null; }
+    for (const lane of (optIn && optIn.lanes) || []) {
+        const ks = (lane.skills || []).filter((k) => live.has(k));
+        if (!ks.length) { console.log(`  n/a  opt-in ${lane.lane}: no live skill here`); continue; }
+        const p = plan(ks, null);
+        for (const [id, g] of Object.entries(lane.gates || {})) {
+            checked++;
+            const want = [...(g.addRules || []), ...(g.args || [])];
+            const line = p.text.split('\n').find((l) => l.includes('--rule-skills') && want.every((w) => l.includes(w)) && ks.every((k) => l.includes(k)));
+            console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
+            if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
+        }
+        const other = [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
+        if (other) {
+            checked++;
+            const q = plan([other], null);
+            const leak = q.text.split('\n').some((l) => l.includes('--rule-skills'));
+            console.log(`  ${leak ? 'FAIL' : 'OK  '} opt-in ${lane.lane}: not on another skill's plan (${other})`);
+            if (leak) fails.push(`opt-in ${lane.lane}: ws-precritic --skill ${other} --dry-run carries --rule-skills (the lane's rules leak onto another skill)`);
+        }
+    }
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
     if (fails.length) { console.log(`${fails.map((f) => `  ${f}`).join('\n')}\n${TOOL}: FAIL (${fails.length} of ${checked} rows not on the lane's path)`); process.exit(1); }
     console.log(`${TOOL}: OK (${checked} rows on the lane's path, ${na.length} not applicable)`);

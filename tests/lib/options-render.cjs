@@ -26,6 +26,12 @@
 //   - the number-line sub-controls (group 'nline' other than nlOn): rendered only through nlOn = true, listed as skipped.
 // A set-type value is rendered alone ({id: [value]}); an enum value as {id: value}; a bool as {id: !default}.
 //
+// OPT-IN BANDS (`--bands`; lf-placevalue critic r1 F19 / F20, lead ruling D1 2026-11-07; default off): the DIFFICULTY values
+// of `band` (the number size: 99, 9,999, 99,999 ...) are rendered too, and judged only on what a bigger number can break:
+// a rise of L-OVERFLOW (a frame out of its cell or the page: expand / unit_form band=9999 at L ran 13-16 mm out) or L-WRAP
+// (a wrapped operator, a unit word wrapped from its box) against the default page is a FAIL; every other rise and the
+// capacity comparison are listed as debt (a longer number may print fewer a page). `ruleSkills` (--rule-skills) limits the
+// band pages to those skills. `onlyOptions` (--options a,b) renders only those option ids (a backtest's short run).
 // Exit / verdict (printed by ws-options-verify): `ws-options-verify --render: OK (...)` or `... FAIL (...)`; a scope with
 // no appearance value prints OK "nothing to render" naming the skills (precritic shows N/A).
 'use strict';
@@ -66,10 +72,18 @@ function cellsOf(file) {
 }
 
 /** The appearance values of one skill: [{option, label, value, opts}] plus the skipped ones with a reason. */
-function appearanceValues(defs) {
+function appearanceValues(defs, { bands = false } = {}) {
     const out = [], skipped = [];
     for (const def of defs) {
         const id = def.id;
+        // --bands: the number-size values of `band`, judged on overflow / wrap only (OPT-IN BANDS above)
+        if (bands && id === 'band' && Array.isArray(def.values)) {
+            for (const v of def.values.map((x) => (x && typeof x === 'object' ? x.v : x))) {
+                if (String(def.default) === String(v)) continue;
+                out.push({ option: id, label: def.label || id, value: v, opts: { [id]: v }, adds: true, difficulty: true });
+            }
+            continue;
+        }
         const vals = def.type === 'bool' ? [true, false]
             : Array.isArray(def.values) ? def.values.map((v) => (v && typeof v === 'object' ? v.v : v)) : null;
         const why = def.group === 'play' ? 'play control'
@@ -91,7 +105,7 @@ function appearanceValues(defs) {
     return { values: out, skipped };
 }
 
-async function readOffered(root, keys) {
+async function readOffered(root, keys, { bands = false, ruleSkills = null, onlyOptions = null } = {}) {
     const M = (f) => pathToFileURL(path.join(root, 'js/modules', f)).href;
     const so = await import(M('skill-options.js'));
     for (const side of ['skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js']) {
@@ -109,7 +123,10 @@ async function readOffered(root, keys) {
             if (!cat) throw new Error(`skill "${k}": no category found (give cat:skill)`);
         }
         const defs = so.offeredOptionsFor(cat, id) || [];
-        out.push({ key: `${cat}:${id}`, ...appearanceValues(defs) });
+        const key = `${cat}:${id}`;
+        const av = appearanceValues(defs, { bands: bands && (!ruleSkills || !ruleSkills.length || ruleSkills.includes(key)) });
+        if (onlyOptions && onlyOptions.length) av.values = av.values.filter((v) => onlyOptions.includes(v.option));
+        out.push({ key, ...av });
     }
     return out;
 }
@@ -121,9 +138,9 @@ function countsOf(doc) {
     return m;
 }
 
-async function main({ root, here, keys, sizes, json, verbose, say }) {
+async function main({ root, here, keys, sizes, json, verbose, say, bands = false, ruleSkills = null, onlyOptions = null, bandH13 = false }) {
     if (!keys.length) { say('ws-options-verify --render: FAIL (usage: --render needs --skill cat:skill[,...]: the touched skills)'); return 2; }
-    const skills = await readOffered(root, keys);
+    const skills = await readOffered(root, keys, { bands, ruleSkills, onlyOptions });
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mq-options-render-'));
     const HTML = path.join(tmp, 'html');
     const htmlOf = (id) => path.join(HTML, `${id.replace(/[^\w.-]+/g, '_')}.html`);
@@ -137,7 +154,7 @@ async function main({ root, here, keys, sizes, json, verbose, say }) {
             for (const v of s.values) {
                 const id = `${s.key}@${sz}@${v.option}=${JSON.stringify(v.value)}`;
                 jobs.push({ id, args: ['--skills', s.key, '--size', sz, '--opts', JSON.stringify(v.opts), '--save-html', HTML] });
-                plan.push({ skill: s.key, size: sz, option: v.option, value: v.value, adds: v.adds, id, base });
+                plan.push({ skill: s.key, size: sz, option: v.option, value: v.value, adds: v.adds, difficulty: !!v.difficulty, id, base });
             }
         }
     }
@@ -146,6 +163,9 @@ async function main({ root, here, keys, sizes, json, verbose, say }) {
     }
     if (!jobs.length) { say(`ws-options-verify --render: OK (nothing to render: no appearance value offered on ${keys.join(', ')})`); return 0; }
     const jobsFile = path.join(tmp, 'jobs.json'), outFile = path.join(tmp, 'print-lint.json');
+    // --band-h13 (OPT-IN, critic lf-placevalue r2 N5): print-lint measures H13-ABS on every page (default and value);
+    // a job's flags replace the command line's (print-lint --jobs), so the rule goes on each job
+    if (bandH13) for (const j of jobs) j.args.push('--rules', 'H13-ABS');
     fs.writeFileSync(jobsFile, JSON.stringify(jobs, null, 1));
     const lint = path.join(here, 'ws-print-lint.cjs');
     const cmd = [process.execPath, lint, '--source', 'kit', '--jobs', jobsFile, '--json', outFile, '--report-only'];
@@ -180,6 +200,16 @@ async function main({ root, here, keys, sizes, json, verbose, say }) {
         for (const [k, n] of cv) {
             const was = cb.get(k) || 0;
             const sameRate = was > 0 && iv && ib && n / iv <= (was / ib) * 1.0001;
+            // a band (difficulty) page is judged on overflow and wrap only: a longer number may raise other counts
+            // --band-h13 (OPT-IN, critic lf-placevalue r2 N5: value band=9999 L kept 43 % empty bands and passed as "the
+            // default page has it too"): on a band page H13-ABS is judged ABSOLUTELY (any finding fails: the lead's T1
+            // limit, never the default page's count), and H13 / H13-ROW lose the band exemption (judged as any value's rise)
+            if (bandH13 && p.difficulty && k === 'L-DENSITY H13-ABS' && n > 0) {
+                const ex = d.findings.filter((f) => !f.waived && `${f.lint} ${f.rule}` === k).slice(0, 1).map((f) => f.msg)[0] || '';
+                row.rises.push(`${k}: ${n} on a band page (judged absolutely, --band-h13)${ex ? ` (${String(ex).slice(0, 140)})` : ''}`);
+                continue;
+            }
+            if (p.difficulty && !/^L-(OVERFLOW|WRAP) /.test(k) && !(bandH13 && /^L-DENSITY H13(-ROW)?$/.test(k))) { row.debt.push(`${k} ${n}${n > was ? ` (${was} on the default page; a band page is judged on L-OVERFLOW / L-WRAP only)` : ''}`); continue; }
             if (n > was && !sameRate) {
                 const ex = d.findings.filter((f) => !f.waived && `${f.lint} ${f.rule}` === k).slice(0, 1).map((f) => f.msg)[0] || '';
                 row.rises.push(`${k}: ${was} -> ${n}${ex ? ` (${String(ex).slice(0, 140)})` : ''}`);
@@ -190,7 +220,8 @@ async function main({ root, here, keys, sizes, json, verbose, say }) {
         const mv = kv && kv.pupil.length ? Math.max(...kv.pupil) : null, mb = kb && kb.pupil.length ? Math.max(...kb.pupil) : null;
         if (mv !== null && mb !== null && mv < mb) {
             const pin = capacityPin(p);
-            if (p.adds) row.debt.push(`capacity ${mv} items a page vs ${mb} (a value that adds a drawing: allowed)`);
+            if (p.difficulty) row.debt.push(`capacity ${mv} items a page vs ${mb} (a number size: not judged)`);
+            else if (p.adds) row.debt.push(`capacity ${mv} items a page vs ${mb} (a value that adds a drawing: allowed)`);
             else if (pin) row.debt.push(`capacity ${mv} items a page vs ${mb} (PINNED, owner-ruled: ${pin})`);
             else row.rises.push(`capacity: ${mv} items on its fullest page where the default page prints ${mb} (the value costs the page items without adding a drawing; RUBRIC H13)`);
         }

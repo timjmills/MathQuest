@@ -1492,6 +1492,730 @@
    }
   },
   {
+   "id": "pv-combine-dealer",
+   "check": "placevalue:combine, 120 seeded items: the zero place is never pinned to odd positions (itemIndex % 2) and no item or leading pair repeats on a page of 20",
+   "kind": "commit-pair",
+   "rule": "ws-dealer-uniform PERIOD / PAGE",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: zeroCase 60 of 60 at position 1 mod 2; 7 PAGE repeats"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "wantZero by dealIndex, the number by freshDeal (leading part cap 3, leading pair cap 1)"
+   },
+   "command": "node tests/scripts/ws-dealer-uniform.mjs --skill placevalue:combine",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-equation-row-cl40",
+   "check": "placevalue:expand at S and combine at L: the one-line equation row's ink stays out of the number tab's keep-out",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK",
+   "browser": true,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: combine L 8, expand S 40 CL40-INK"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "sheet-kit.css: pv equation-row cells take the tab spacer on the page and the measuring cell"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size S --skills placevalue:expand,placevalue:combine --baseline design/audit/baselines/print-lint.S.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-lesson-data",
+   "check": "the lesson page of placevalue identify / value / expand / combine / unit_form has lesson data (no fallback warm-up)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint LESSON-DATA",
+   "browser": false,
+   "fail": {
+    "commit": "9398c3aa",
+    "state": "precritic r0: 5 pv skills no-lesson-data"
+   },
+   "pass": {
+    "commit": "4193f4b",
+    "state": "lessons/prereqs.js lf-placevalue block"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --skill placevalue:expand,placevalue:combine,placevalue:identify,placevalue:unit_form,placevalue:value --rules LESSON-DATA",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "card-rulings-value-reader",
+   "check": "ws-card-rulings reads place value items (no 'a op b') for a range ruling that opts in with read: value, so the pv card's band rulings are checked instead of unreadable",
+   "kind": "fixture",
+   "rule": "ws-card-rulings read: value",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.operands-only.json",
+    "state": "the pv band rulings read as operand items: every pv item unreadable (no operands), the ruling cannot be checked"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/pv-value-rulings.json",
+    "state": "the same rulings with read: value: q.ans and q.pv.{n, digit, place} read"
+   },
+   "command": "node tests/scripts/ws-card-rulings.mjs --rulings {fixture} --check rulings",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-kit",
+   "check": "placevalue:expand on the practice card / boss / race: the kit cell's boxes are the inputs and a Check / Next button is found (not the legacy expanded interactive)",
+   "kind": "commit-pair",
+   "rule": "ws-chromebook-fit (L5 paper = screen)",
+   "browser": true,
+   "fail": {
+    "commit": "4a137b93",
+    "state": "precritic r1: card / boss / race 'no Check / Next found' at 1366x650 and 1280x600"
+   },
+   "pass": {
+    "commit": "66c23cb5",
+    "state": "expand default form on inlineBlanks + the kit cell"
+   },
+   "command": "node tests/scripts/ws-chromebook-fit.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-offered-na",
+   "check": "ws-precritic: a card with a rulings block and no notOffered entry reads card-not-offered N/A (every option offered), not SKIPPED; a card with no block stays SKIPPED",
+   "kind": "commit-pair",
+   "rule": "ws-precritic PARSE.cardRulings (lead ruling R2)",
+   "browser": false,
+   "fail": {
+    "commit": "98351c32",
+    "state": "card-not-offered SKIPPED (no rulings) on the pv card, which offers every §7a option"
+   },
+   "pass": {
+    "commit": "809c55b7",
+    "state": "N/A 'every §7a option offered; no notOffered entry'"
+   },
+   "command": "node tests/scripts/ws-precritic-parse.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-wrong-per-slot",
+   "check": "a True or False? / Reason It statement given as one string is written slot by slot in a multi-slot pv frame (expand boxes, unit-form, value unit / notation)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F3 (critic lf-placevalue r1 F3)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: expand / unit_form true-false: the whole statement in each box"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F3",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-plural",
+   "check": "no \"1 ones\" / \"1 tens\" / \"1 hundreds\" in any pv worked step, step band, Say line or wrong work",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F11 (critic lf-placevalue r1 F11)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"1 hundreds is 1 × 100\", \"1 ones.\""
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F11",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-grade2-times",
+   "check": "a placevalue:value item outside form=notation has no × in its steps or Say line",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F12 (critic lf-placevalue r1 F12)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: \"Multiply the digit by its place: 3 tens is 3 × 10 = 30\" on a 2.NBT.1 page"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r1-model-not-ones",
+   "check": "item 0 of an identify / value page (the Model item) never asks the ones place",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit pv-r1 F13 (critic lf-placevalue r1 F13)",
+   "browser": false,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "critic r1: scripted model 559 with the ones digit underlined"
+   },
+   "pass": {
+    "commit": "1985630e",
+    "state": "lf-placevalue r1 builder fix"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r1 F13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-h13-abs",
+   "check": "ws-print-lint --rules H13-ABS (opt-in): the empty band under the lowest ink of every kit cell is under 30 % of the cell less Hw; H13 / H13-ROW judged only against the row",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY H13-ABS (critic lf-placevalue r1 F1; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/h13-abs/fail.html",
+    "state": "placevalue:value independent L at 24b0c88a (critic r1 state): 12 cells of 51.5 mm, 14.6 mm empty under the 'worth ___' line in each (critic: 34 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/h13-abs/pass.html",
+    "state": "the same page with rows sized to the item: 15 cells of 41.6 mm (F1 fix: value L 12 -> >= 15)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules H13-ABS --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "lead ruling 2026-11-08: H13-ABS now uses RUBRIC H13 (30 % of the full cell, as ws-empty-band EB-BAND); this fail fixture (14.6 mm under the ink of a 51.5 mm cell, 28.3 %) is below the shared threshold. The live cases are covered by ws-empty-band rows eb-pv-value-band9999-L and eb-pv-unitform-more-S (lf-checks); re-arm with a fixture above 30 % when one is captured, never by editing this one."
+  },
+  {
+   "id": "optin-grid-even-all",
+   "check": "ws-print-lint --rules GRID-EVEN-ALL (opt-in): one cell geometry per section, a full-width cell included, across consecutive grids under one instruction",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY GRID-EVEN-ALL (critic lf-placevalue r1 F9; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/fail.html",
+    "state": "placevalue:combine independent L at 24b0c88a: 4 half-width cells (92.3 mm) over 7 full-width rows (184.9 mm) under one instruction"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/grid-even-all/pass.html",
+    "state": "the same items, every cell full width (one geometry per section)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --rules GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-wrong-fits-slots",
+   "check": "ws-node-lint --rules WRONG-FITS-SLOTS (opt-in): a multi-slot cell's wrongAnswer gives one value per graded write-in slot, each fitting its slot",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FITS-SLOTS (critic lf-placevalue r1 F3; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.fail.mjs",
+    "state": "a three-box expanded-form item whose wrongAnswer is one string ('4 + 0 + 3') with no per-slot values"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-slots.pass.mjs",
+    "state": "the same item; wrongAnswer gives slots {part0: '4', part1: '0', part2: '3'}"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-wrong-fill",
+   "check": "ws-node-lint --rules WRONG-FILL (opt-in): what the True or False? and Reason It roles PRINT in each write-in slot of a false statement (their real prepare(), print-sheet's draw), never the whole statement in every box",
+   "kind": "fixture",
+   "rule": "ws-node-lint WRONG-FILL (critic lf-placevalue r1 F3: expand true-false '5 + 0 + 3' in each box; lead ruling D1)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.fail.mjs",
+    "state": "a three-box cell that writes the role's one false value into every box (the r1 defect: the whole statement three times)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/wrong-fill.pass.mjs",
+    "state": "the same cell writing its own part of the false statement into each box (as cells/pv.js does at b1094401)"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-slot-w-equal",
+   "check": "ws-slot-clip --slot-w-equal (opt-in): graded write-in slots of one kind in one section have one width (a width that tracks the answer gives it away)",
+   "kind": "fixture",
+   "rule": "ws-slot-clip SLOT-W-EQUAL (critic lf-placevalue r1 F10, L3; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/fail.html",
+    "state": "placevalue:value form=unit independent L at 53dd45c9: the place-word box 32 mm for tens / ones, 62 mm for hundreds"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/slot-w-equal/pass.html",
+    "state": "the same page at b1094401 (the pv builder's fix): every word box 44 mm"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --slot-w-equal",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-draw-cap",
+   "check": "ws-slot-clip --draw-cap (opt-in): each place zone of a draw zone holds the item's digit x (8 mm)^2",
+   "kind": "fixture",
+   "rule": "ws-slot-clip DRAW-CAP (critic lf-placevalue r1 F15, H12; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/draw-cap/fail.html",
+    "state": "placevalue:identify review L at 53dd45c9 with the 691 mat at the critic's measured 19 x 19 mm zones: 9 tens disks need 576 mm2, the zone holds 361"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/draw-cap/pass.html",
+    "state": "the same page as printed at 53dd45c9: 38 mm place zones"
+   },
+   "command": "node tests/scripts/ws-slot-clip.cjs --doc-fixture {fixture} --draw-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-screen-digit",
+   "check": "ws-screen-slots --screen-digit (opt-in): the item's numeral on the card / worksheet / quiz is >= 56 / 48 / 40 px at 1280 / 820 / 390, Andika at weight >= 700",
+   "kind": "fixture",
+   "rule": "ws-screen-slots SCREEN-DIGIT (critic lf-placevalue r1 F7; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/fail.html",
+    "state": "placevalue:expand practice card at 1280, commit 53dd45c9: the number 24 px, weight 400"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/pass.html",
+    "state": "placevalue:value practice card at 1280, commit b1094401: 56 px Andika 700"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "optin-options-render-bands",
+   "check": "ws-options-verify --render --bands (opt-in): the number-size values of band are printed and judged on L-OVERFLOW / L-WRAP against the default page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --render --bands (critic lf-placevalue r1 F19 / F20; lead ruling D1)",
+   "browser": true,
+   "fail": {
+    "commit": "53dd45c9",
+    "state": "expand band=9999 / 99999 / 999999 and unit_form band=9999 at L: frames 12.7-114 mm out of their cells (critic r1: 13-16 mm at 9,999)"
+   },
+   "pass": {
+    "commit": "b1094401",
+    "state": "the pv builder's r1 fix: every band page at L inside its cells"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:expand,placevalue:unit_form --sizes L --bands --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-card-overflow",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-card-overflow-cbt",
+   "check": "Every page role and option value the signed card offers is rendered and checked for overflow (critic lf-ops r1 check 2: Reason It arrays / count rows out of the A / B boxes and off the page; forms 1 lesson model overflow)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --card --card-opts OVERFLOW",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-tagink",
+   "check": "An error-analysis tag never prints over the grey made-up answer in its box (critic lf-ops r1 check 9, D-MP-5 / D-AG-3)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TAGINK",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-keyjoin",
+   "check": "A key writes one answer into one slot, never a joined '15, 15' (critic lf-ops r1 check 8, D-MP-6)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks KEYJOIN",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-size-s",
+   "check": "Size S is not M's layout with smaller drawings (critic lf-ops r1 check 4, D-AG-2, L1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SIZE-S",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-title-cbt",
+   "check": "The title, Rule and vocabulary follow the options dealt; a card-decided title is printed exactly (critic lf-ops r1 check 7: forms 1-3 kept the order title; count-row Q6 'I Can count by 2s to 12s'; no '(15 jumps)')",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks TITLE, LESSON-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-sections-pagefill",
+   "check": "A two-skill sections sheet fills its pages and its last page to half (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: page 1 held 2 items, 64 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL / PG-23 (sections)",
+   "browser": true,
+   "fail": {
+    "commit": "c37053c",
+    "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
+   },
+   "pass": {
+    "commit": "TBD-lf-ops-fix4",
+    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills multiplication:mult_properties,multiplication:arrays_groups",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-option-fit",
+   "check": "Every pv cell fits every option value the signed card offers on every role (lf-placevalue precritic r3: combine band=999999 ran 13 mm past the page at L on test / review / guided / independent and on every lesson page; expand / unit_form opener Model and combine Reason It panels ran out of their cells)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (--card --card-opts); SCC-T4 content never shrinks, wrap only between units / before =",
+   "browser": true,
+   "fail": {
+    "commit": "b7962be0",
+    "state": "lf-placevalue critic r1 fix-round tree merged with the integration branch: combine 196 OVERFLOW findings"
+   },
+   "pass": {
+    "commit": "9f483f78",
+    "state": "lf-placevalue r2: two fixed lines for six-part expressions, Model and Reason It rows wrap between units"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:combine --card --card-opts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-wrong-differs",
+   "check": "the wrong work of a placevalue:identify True or False? / Reason It item is wrong in at least one graded slot (slot by slot, not the joined string) and never equals the key, over every offered band x writeValue x response x repeatDigit, 60 seeds each",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N1 WRONG-DIFFERS (critic lf-placevalue r2 N1)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: 564, the 6 underlined: wrong work 'tens, 60' is the key (M-V1 counted from the left lands on the middle digit); 23 of 2400 on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "identify writeValue wrong work drops every candidate naming the right place (providers/pv.js); 0 of 2400"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-printed-instruction",
+   "check": "a printed placevalue:identify page's instruction is the item's own library key (place-circle-value / place-write-value with writeValue on; place-write with response=bank), read the way print-sheet.js skillMeta reads it",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N2 PRINTED-INSTRUCTION (critic lf-placevalue r2 N2)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: every identify page prints 'Circle the place of the underlined digit.' (skillWords calls strings() with no item: PLACE_CIRCLE_3); 120 of 160 pages on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "the item names its library key (gen-pv q.instructionKey) and stringsBy's item-less pick reads the options; 0 of 160"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-combine-parts",
+   "check": "every placevalue:combine item shows 2 or more parts at every offered band x zeroPlace x order",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N3 COMBINE-PARTS (critic lf-placevalue r2 N3)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: band 99 zeroPlace=some deals '60 = ___' (one part, its own answer); 180 of 1800 on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "combine's zero place starts at 3 digits, a combine draw has >= 2 non-zero parts (gen-pv); 0 of 1800"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N3",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-place-word-live",
+   "check": "a placevalue:identify cell (print, size L, as the kit renders it) offers no place word above the number's highest place, every band x response x writeValue",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit --pv-r2 N4 PLACE-WORD-LIVE (VQ-LIVE for pv; critic lf-placevalue r2 N4, r1 band=99)",
+   "browser": false,
+   "fail": {
+    "commit": "528707e8",
+    "state": "critic r2: 'ones tens hundreds' printed on 48 at band 99; 96 of 480 cells on HEAD"
+   },
+   "pass": {
+    "commit": "4a57b5c2",
+    "state": "identify offers one word per place the number has (gen-pv words = its places); 0 of 480"
+   },
+   "command": "cp tests/scripts/ws-providers-unit.mjs {root}/tests/scripts/ws-providers-unit.today.mjs && node {root}/tests/scripts/ws-providers-unit.today.mjs --pv-r2 N4",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-band-h13",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in): on a band page an H13-ABS finding fails on its own (30 % of the full cell), never excused as 'the default page has it too'",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (critic lf-placevalue r2 N5)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "value band=9999 L: 12 items 3x4, every cell 36-38 % empty under the worth line (the comma track on the table line height made each row 1.7 mm taller, so the page fill stopped at 4 rows)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "the comma track takes the digits line height: value band=9999 L 18 items 3x6, no H13-ABS"
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:value --sizes L --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r3-band99-s",
+   "check": "ws-options-verify --render --bands --band-h13 (opt-in) on combine and expand band=99 at S: H13-ABS / H13 side bands on the 2-digit band page",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify --band-h13 (lf-placevalue r3 small fix pass; brief items 2 and 3)",
+   "browser": true,
+   "fail": {
+    "commit": "ce2d4c96",
+    "state": "combine band=99 S: 3x10 one-line \"30 + 6 = ____\" cells, 7.9 mm (35 %) under the ink of a 22.4 mm cell; expand band=99 S: one 2-place row in a 184.9 mm cell, 63.3 mm (34 %) side band"
+   },
+   "pass": {
+    "commit": "064e243e",
+    "state": "combine: two-part frames held to 3 across at S, \"= ____\" on its own line, 3x9 cells as tall as their ink; expand: the 2-place row stands 3 across at S, the number over \"= [ ] + [ ]\""
+   },
+   "command": "node tests/scripts/ws-options-verify.cjs --render --skill placevalue:combine,placevalue:expand --sizes S --bands --band-h13 --options band",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-cell-h13-abs",
+   "check": "ws-cell-checks --h13-abs (opt-in): H13-ABS on every --card-opts option page (30 % of the full cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks H13-ABS (critic lf-placevalue r2 N6)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form rename=more S / M: 16 one-line items in 2 x 8 half-width cells of 23-26 mm, 36-44 % bands"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "rename frames are one full-width row a line (rowOnly): S 1 x 15, no band"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:unit_form --card --card-opts --h13-abs --opt-roles independent --rules H13-ABS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-review-one-layout",
+   "check": "ws-print-lint --roles review with the lane's opt-in H13-ABS / GRID-EVEN-ALL (the precritic review rows opt-in-rules.json adds): one layout in a mixed review section",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 / H13-ROW / H13-ABS on the review role (critic lf-placevalue r2 N7)",
+   "browser": true,
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "unit_form review S: the mixed combine cells 3 across, '700 + 1 = ___' one line beside '600 + 10 + 1 / = ___' two (H13-ROW x6, cells 11 / 12 / 15)"
+   },
+   "pass": {
+    "commit": "dca16b12",
+    "state": "3-across combine frames wrap inside a ghost-wide box: every cell one geometry, 0 findings"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills placevalue:unit_form --roles review --size S --rules H13-ABS,GRID-EVEN-ALL --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-r2-red-no-baseline",
+   "check": "ws-coverage-matrix --red-no-baseline PAGEFILL,H5 --rule-skills (opt-in): a lane's own row with a PAGEFILL / H5 finding and no baseline entry is RED, not PENDING(no-baseline)",
+   "kind": "commit-pair",
+   "rule": "ws-coverage-matrix --red-no-baseline (critic lf-placevalue r2 N8)",
+   "browser": true,
+   "pending": true,
+   "pendingReason": "the fix is in sheet/layout.js resolveSectionLayout (not a lane file): a footprint cannot say '1 column on Auto, 2 when asked'; set pass.commit when the engine change lands (the fail state runs today: RED on 5aadc52d and on dca16b12)",
+   "fail": {
+    "commit": "5aadc52d",
+    "state": "expand / unit_form more-cols2: 1 column, 4 items, PAGEFILL at S / M / L"
+   },
+   "pass": {
+    "commit": null,
+    "state": "engine change not built (layout.js)"
+   },
+   "command": "node tests/scripts/ws-coverage-matrix.cjs --skills placevalue:expand,placevalue:unit_form --rows 'placevalue:expand|single/more-cols2+short,placevalue:unit_form|single/more-cols2+short' --baseline design/audit/matrix/baseline.json --red-no-baseline PAGEFILL,H5 --rule-skills placevalue:expand,placevalue:unit_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "e24-family",
    "check": "LP-FAMILY-REPEAT: repeats are × / ÷ families and story frames, not strings (lesson 7 critic r1 D2: chart 2 \"20 marbles shared\" 20 ÷ 4 back on P4-2 as 20 ÷ 5; 6 × 4 / 24 ÷ 6; 30 ÷ 6 / 30 ÷ 5; spaced retrieval 4 × 5)",
    "kind": "fixture",
@@ -1679,6 +2403,799 @@
     "state": "the same lesson and commit, seeds 1 and 2: clean"
    },
    "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --sweep-packets {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-combine-side-band",
+   "check": "placevalue:combine independent / more-practice / test / review at S, M and L: no cell has an empty band of 30 % or more of its width beside the ink (critic r3 F1: two-part rows right-aligned on a 3-part ghost left 54-60 mm on the left of a 185 mm cell; test M wrapped '= ____' under a centred expression)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "aacae5ea",
+    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+   },
+   "pass": {
+    "commit": "deb9e426",
+    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-detailed-lesson-1",
+   "check": "the live detailed lesson 1 (g2-nbt3-read-write-1000) self-check stays green on the lane's pv changes (lead 2026-11-08: E9c T4 90 %, E11 P4-1 cells 30 % empty, E24 606 repeat of a chart example, E24b twin answer 80 on P0)",
+   "kind": "commit-pair",
+   "rule": "ws-detailed-lesson --check E9c / E11 / E24 / E24b",
+   "browser": true,
+   "fail": {
+    "commit": "9b0972f7",
+    "state": "lead deploy hold: E9c, E11, E24, E24b FAIL"
+   },
+   "pass": {
+    "commit": "8d80d13b",
+    "state": "zero place drawn in the fresh deal, P0 dealt as one page, lesson refs noTabSpacer / inPlace false"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g2-nbt3-read-write-1000 --check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-vocab-ink",
+   "check": "placevalue:identify lesson: every vocabulary picture's drawing fills at least 70 % of its own box (critic r3c E-A1: 4 ones drawn in a ten-rod's height left the vocabulary cell 43 % empty)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-VOCAB (--vocab-ink)",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "critic r3c: EB-VOCAB 3 (lesson S / M / L)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "blocks picture `compact`: a ones-only picture one cube tall"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --vocab-ink --no-baseline --only EB-VOCAB",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-rename-side",
+   "check": "placevalue:unit_form rename=more at S: no cell has an empty band of 30 % or more beside its ink (critic r3b G2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "8573c66a",
+    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+   },
+   "pass": {
+    "commit": "64f70063",
+    "state": "rename frames' write line two digits longer at S"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-title-constant",
+   "check": "D13: the Prerequisite Check title is one constant (PREREQ_CHECK_TITLE), no 'Prerequisite check' spelling, no second literal in the lesson modules",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only title (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 'Prerequisite check' on the page, 'Prerequisite Check' in the registry and the part names"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "one exported constant used by the role, the registry, print-sheet and the detailed T-pages"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only title",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routing-one-builder",
+   "check": "D14: one routing-table builder (routingTableHtml), no second table, no claim that the detailed T6 prints it",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routing-export (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the role's comment claims T6 prints the same table"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "T6 kept (passed lessons byte-identical), the claim corrected; one builder"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routing-export",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-no-literal-styles",
+   "check": "D15: routeTagHtml / routingTableHtml carry classes (LESSON_ROUTE_CSS travels only with a routed page), no literal pt / #949494 / border / padding",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-styles (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 9pt, #949494, borders and paddings inline"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "classes + a routed-page-only stylesheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-styles",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-routed-plan-units",
+   "check": "D16: the routed plan's numbers are named constants; routeTagMm / routeTagLines / routePlan / routedLayout unit-tested",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only routed-plan (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: 1.6 mm/char, 0.7 / 0.75, 40 mm gaps as literals, no unit tests"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "named constants, routedLayout exported and tested"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only routed-plan",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-prereq-checks-field",
+   "check": "D12: every library prerequisite carries `checks` (what the question asks) distinct from its design `why`; the schema refuses one without",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only checks-field (lf-engine P1, critic lessons-phase0 r1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the routing table printed the design why"
+   },
+   "pass": {
+    "commit": "b79cb08f",
+    "state": "checks on every prerequisite, validated, printed"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only checks-field",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-bind-stamps-refuses",
+   "check": "D17: ws-lesson-coverage --bind-stamps refuses to bind a pass to a render that changed since the grade (or whose graded render is unknown)",
+   "kind": "fixture",
+   "rule": "ws-lesson-coverage --bind-stamps (lf-engine P1, critic lessons-phase0 r1 D17)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/fail",
+    "state": "an unstamped pass graded on render aaaa.bbbb, the current render cccc.dddd (the phase 0 re-bind of the samples to their LR-17 renders)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/bind-stamps/pass",
+    "state": "an unstamped pass graded on the current render"
+   },
+   "command": "node tests/scripts/ws-lesson-coverage.cjs --bind-stamps --dry-run --data-root {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-parts-plugin",
+   "check": "D18: a dummy lesson part with its own build hook registers and is built through the registry dispatch; buildLesson names no core part list",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only parts-plugin (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: buildLesson skips a hard-coded list of the five core ids; only lesson-role parts plug in"
+   },
+   "pass": {
+    "commit": "88235078",
+    "state": "core flag + build hooks + buildPluggedParts; parts in registry order (orderParts, lf-vocab PR #36)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only parts-plugin",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-chart-sizing-fails",
+   "check": "Lesson 7 D1: chartPage reports sizing.mode / zoom / fallback / ok; a fallback zoom under 1 is a failure the build result carries (chartSizing, chartsOk)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only chart-sizing (lf-engine P1)",
+   "browser": false,
+   "fail": {
+    "commit": "8f12b0e8",
+    "state": "phase 0 head: the 0.7 fallback zoom is silent"
+   },
+   "pass": {
+    "commit": "9d1b793f",
+    "state": "sizing.ok false on a fallback under 1, surfaced by buildLesson / buildDetailedLesson"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chart-sizing",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson2-page-fresh",
+   "check": "R1: lesson 2 (g1-oa1-bar-model-wp-20) builds - a story ref re-opens its page per try (pageFresh, both dealers) and reserves its rare late items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r1-page-fresh (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "no add_wp_20 item for the exit slip's put-together case: the story schema held for every try"
+   },
+   "pass": {
+    "commit": "4ab65c7b",
+    "state": "pageFresh + reserve: the lesson builds at seed 4242"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r1-page-fresh",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-practice-cap",
+   "check": "R2: a detailed Practice sheet holds its shape count (pageCap): the near-height pack does not lay 5 rows for 4 items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r2-practice-cap (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 1 and 6 Practice 17-19 % blank foot"
+   },
+   "pass": {
+    "commit": "f81be943",
+    "state": "pageCap = shape count"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r2-practice-cap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-dealer-seeds",
+   "check": "R4 / R5: a detailed pack builds at every seed (late item reserved and rebuilt); a spent pool keeps chart examples off Practice",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only r4-r5-dealer (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "lessons 4 / 6 fail at 9 of 25 seeds; lesson 3a re-deals 2 x 3"
+   },
+   "pass": {
+    "commit": "8f2c89b6",
+    "state": "rebuild with the late item reserved; chartKeys last"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only r4-r5-dealer",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-repeat-key",
+   "check": "Lesson 7 D2: repeatKey family+frame read by both dealers",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only d2-repeat-key (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "repeatKey compiled but unread"
+   },
+   "pass": {
+    "commit": "abcd6ab1",
+    "state": "refAccepts / dealOne1 / pack record read it"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only d2-repeat-key",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-route-floor",
+   "check": "critic r2 N2 / N3 / N4: a routed check question keeps 2 items, the table states the miss rule, bands print __/n, LR-6 on the check",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit --only route-floor (lf-engine P1b)",
+   "browser": false,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "1-item questions, no miss rule, no __/n"
+   },
+   "pass": {
+    "commit": "eddc51fd",
+    "state": "floor 2, ROUTE_MISSED_RULE, scoreTag, lr6"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only route-floor",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-sheet-indep",
+   "check": "Every lesson sheet holds an Independent row, a Score and a blank foot <= 20 %",
+   "kind": "commit-pair",
+   "rule": "critic lf-engine r2 N1 (LR-18, LR-13, H13)",
+   "browser": true,
+   "fail": {
+    "commit": "ec654c84",
+    "state": "sub L sheet lost its Independent row (critic r2 N1)"
+   },
+   "pass": {
+    "commit": "08ee129e",
+    "state": "fixed (P1b N1, checked P1c)"
+   },
+   "command": "node tests/scripts/ws-lesson-hash.cjs --sheets --only subtract-2-digit-regroup --sizes L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pool-capacity-3a",
+   "check": "An arrays-turn Practice sheet's allTest admits at least as many x families as its places plus the chart and Guided arrays (LR-5 one family a pack)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a LP-FAMILY-REPEAT (lf-engine P1d)",
+   "browser": false,
+   "fail": {
+    "commit": "96f0728f",
+    "state": "arrP1 (half-width cells, no 5s) admits 6 families for 4 places + 3 chart/Guided"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "full-width cells, arrays to 6 x 6: 12 families"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pool-capacity",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e24b-lesson2-near-twins",
+   "check": "E24b: no near twins on a page (lesson 2 P0 6+6 / 7+8, P4-1 7+4 / 8+5) on every seed",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 2 E24b (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson (E24b, --sweep); --sweep on lesson 2 times out (Runtime.callFunctionOn protocolTimeout) so no command yet. P0 passes at e13ef858; P4-1 still fails (greedy deal order).",
+   "fail": {
+    "commit": "96f0728f",
+    "state": "P0 6+6 / 7+8 and P4-1 7+4 / 8+5 near twins"
+   },
+   "pass": {
+    "commit": "",
+    "state": "not yet: P4-1 open"
+   }
+  },
+  {
+   "id": "lp-family-repeat-3a-p0",
+   "check": "LP-FAMILY-REPEAT on the 25-seed sweep: the x 2 Prerequisite Check facts once each (seed 3: 2 x 7 twice)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-07, lesson 3a (lf-engine P1d)",
+   "browser": true,
+   "pending": true,
+   "note": "The check lives in lf-checks' ws-detailed-lesson --sweep (LP-FAMILY-REPEAT); fail = the 2 x 6 exclusion state before P0 went to 2 x 10 (live tree, sweep seed 3), pass = e13ef858 (sweep 25/25 OK on the live tree 538c2b58).",
+   "fail": {
+    "commit": "",
+    "state": "P0 2 x 6 to 2 x 9 for four items: seed 3 2 x 7 twice"
+   },
+   "pass": {
+    "commit": "e13ef858",
+    "state": "P0 2 x 6 to 2 x 10"
+   }
+  },
+  {
+   "id": "e27-five-gap",
+   "check": "E27: counters in rows of at most 5, or 6 to 10 with the 5-group gap drawn",
+   "kind": "fixture",
+   "rule": "owner ruling 2026-11-07 lesson 3a arrays to 6 x 6; RP-21 (lf-engine P1d r2, lead-approved gate edit)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.fail.json",
+    "state": "a row of 6 evenly spaced (no gap)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/e27-five-gap.pass.json",
+    "state": "a row of 6 with 1.5 mm after the 5th"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --e27-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "e12-practice-pages",
+   "check": "E12: Practice cells one height across Practice 1's two pages (lesson 3a)",
+   "kind": "commit-pair",
+   "rule": "lf-engine P1d r2 (owner ruling 2026-11-07, full-width Practice 1 over two pages)",
+   "browser": true,
+   "fail": {
+    "commit": "e13ef858",
+    "state": "P4-2 cells 1.6 mm shorter than P4-1 (continuation page flex height)"
+   },
+   "pass": {
+    "commit": "57d53341",
+    "state": "equalPages: every page of the sheet the first page's grid height"
+   },
+   "command": "node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa5-mult-properties --check --out /tmp/mq-bt-e12",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "practice-units",
+   "check": "{p4.last} names Practice SHEETS: a sheet over two pages is one Practice k, its last row on its last page",
+   "kind": "commit-pair",
+   "rule": "lesson 3a live critic (T5 Watch 'Practice 3'), lf-engine P1d r3",
+   "browser": false,
+   "fail": {
+    "commit": "8f51b557",
+    "state": "one Practice k a page: Practice 1's second page named Practice 3"
+   },
+   "pass": {
+    "commit": "30e2825b",
+    "state": "practiceUnits: one unit a sheet"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only practice-units",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "solve-story-e24b",
+   "check": "a Practice sheet with `solve` deals stories SOLVED before the page (no near twins, first addends and wholes all different) through a generator deal pin; only lesson 2 sets it",
+   "kind": "commit-pair",
+   "rule": "lesson 2 E24b (Practice 1 near twins 7 + 4 / 8 + 5 at 4242: greedy deal order), lf-engine P1d attempt 2",
+   "browser": false,
+   "fail": {
+    "commit": "33d91021",
+    "state": "greedy deal: Practice 1 dealt 7 + 4 / 8 + 5 (no solver)"
+   },
+   "pass": {
+    "commit": "7ca55459",
+    "state": "solveStoryFacts + setDealPin: Practice 1 deals 4 + 9, 8 + 6 / 9 + 3, 5 + 6 / 9 + 9, 8 + 12"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only solve-story",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pack-feasible-p0",
+   "check": "lesson 2's Prerequisite Check draws no fact of the lesson's crossing-ten story pool, and a whole-pack assignment (every place that draws from the pool, LR-5 + LR-6) exists at seeds 1-25 + 4242 (lessons/pack-solve.js)",
+   "kind": "commit-pair",
+   "rule": "owner ruling 2026-11-08 (lesson 2 E24b): a Prerequisite Check never draws from the lesson's own pool; check the whole pack first",
+   "browser": false,
+   "fail": {
+    "commit": "24e55369",
+    "state": "P0 add_facts sums 11-16, parts to 9: 18 crossing-ten facts of the pool"
+   },
+   "pass": {
+    "commit": "ceb557b5",
+    "state": "P0 add_facts a teen and ones (constant 11-13, sums 13-19): no pool fact; 14 places solved at 26/26 seeds (was bed7067a; the check grew each place's own source on 2026-11-08, so the pass state is the first commit that holds both)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pack-feasible-sources",
+   "check": "each place of lesson 2's pack keeps its OWN item source at seeds 1-25 + 4242: P0's count / bond ranges survive any greedy first choice (two items 3 apart), the chart's add-to / equal-parts examples come from case pools of their own (with the pack's avoid keys) holding a fact outside Practice 1's solved set, Practice 1 has a whole-pack solution (lessons/pack-solve.js placeSources)",
+   "kind": "commit-pair",
+   "rule": "lead's order 2026-11-08 (lesson 2 E24b attempt 4 failed at seeds 2 and 5 while the whole-pack count was green): model each place's own item source",
+   "browser": false,
+   "fail": {
+    "commit": "00ca4b10",
+    "state": "attempt 4: P0 count 17-20, bonds 6-10 parts 3+; chart second / third from the main pool"
+   },
+   "pass": {
+    "commit": "ceb557b5",
+    "state": "P0 count 11-20, bonds within 10 parts 1+; second / third from case pools with the pack's avoid keys"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only pack-feasible",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "p0-overlap",
+   "check": "where two Prerequisite Check questions of a detailed lesson can share an answer (lesson 2: count 11-20, + facts 13-19), the engine deals the P0 page against ONE answer set (print-sheet.js pageLr6 on a perQuestion pre-skill-check) and their ranges hold every item",
+   "kind": "commit-pair",
+   "rule": "lf-engine 2026-11-09 (lesson 2 E24b on the lane: P0 twin answers at 5 of 6 seeds; master's engine had the page-wide set from lf-placevalue 2026-11-08, the lane's did not)",
+   "browser": false,
+   "fail": {
+    "commit": "dcdb50d4",
+    "state": "lane pageLr6 on mixed-practice only: each P0 question dealt against its own items (seed 1: count 16, 13 and + facts 13 + 3 ...)"
+   },
+   "pass": {
+    "commit": "b1e30155",
+    "state": "lane pageLr6 also on pre-skill-check + perQuestion (master's line)"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only p0-overlap",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-rename-margin",
+   "check": "placevalue:unit_form rename=more at S: every side band clears the 30 % limit by at least 2 points (critic r4 N-r4-1: G2 passed at 29.9 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE --margin 2",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "r4 head on master: worst side band 29.9 %"
+   },
+   "pass": {
+    "commit": "a1c8d595",
+    "state": "write line +3 digits after the fixed slot width: worst 27 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --sizes S --hosts none --no-baseline --margin 2 --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-unit-form-fixit-words",
+   "check": "placevalue:unit_form error-analysis: the Fix-it frame prints the words of the frame the pupil wrote in, never a singular taken from the answer (critic r3b G5)",
+   "kind": "commit-pair",
+   "rule": "ws-fixit-words FIX-WORDS",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "\"[ ] hundred\" under a \"hundreds\" frame (item 193)"
+   },
+   "pass": {
+    "commit": "a1c8d595",
+    "state": "Fix-it words from the pv frame"
+   },
+   "command": "node tests/scripts/ws-fixit-words.cjs --skills placevalue:unit_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-lesson-page-fill",
+   "check": "placevalue:identify lesson: no page before the last leaves 30 % or more of its body empty (critic r4 E-r4-1: L page 2 43 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE --page-fill",
+   "browser": true,
+   "fail": {
+    "commit": "2fe21f2b",
+    "state": "L page 2 43 % empty, 4 pages"
+   },
+   "pass": {
+    "commit": "07634a75",
+    "state": "Guided two across (guidedCols): 3 pages"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --sizes L --hosts none --no-baseline --page-fill --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-baseline-phase0-optin",
+   "check": "Every lesson master prints is byte-identical to master's packet: a lane's engine fix for the sample lessons is opt-in on their records (lf-engine landing L1 vocab zoom / L2 rounding rows; subset: the round sample and sub_100_no_regroup, L and S, seeds 4242 and 1)",
+   "kind": "commit-pair",
+   "rule": "LESSONS_LEARNED process rule 0c; LR-17b",
+   "browser": true,
+   "fail": {
+    "commit": "3bf3ef5c",
+    "state": "landing r1: 80 of 1,556 hashes differ (vocab zoom and rounding rows on live packets)"
+   },
+   "pass": {
+    "commit": "f3c25413",
+    "state": "vocabZoom / roundOneNum opt-in, live only with the check: 0 of 1,556 differ"
+   },
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --check tests/fixtures/precritic/lesson-baseline-master-1fedbb55-phase0.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-fact-roles",
+   "check": "add_facts, sub_facts, mult_facts, div_facts_long and div_facts on the guided and scripted-model pages at S, M and L: no cell has an empty band of 30 % or more under or beside its ink (facts-roles task: fact cells sized for a taller worked item, guided bands 31-41 %, scripted-model side bands 35-72 %)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND / EB-SIDE (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "7e0c074b",
+    "state": "200 findings: EB-BAND 110, EB-SIDE 90 (add_facts 51, sub_facts 72, mult_facts 44, div_facts_long 34, div_facts 20)"
+   },
+   "pass": {
+    "commit": "6e962016",
+    "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-cap-facts",
+   "check": "the Guided page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts holds at most the PAGE_TYPES §12.1 ceiling of 10 / 8 / 6 scored tries (plus the Model) at S / M / L (lead ruling 2026-11-12, option b: the facts-roles round had lifted it to 31 / 23 / 19 to fill the page)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GDPCAP (PAGE_TYPES §12.1)",
+   "browser": true,
+   "fail": {
+    "commit": "4edbe292",
+    "state": "15 findings: every fact skill at S / M / L above the ceiling (S 29-31, M 11-23, L 11-15 tries)"
+   },
+   "pass": {
+    "commit": "31418ea0",
+    "state": "0 findings: Guided fact pages at S 9 / M 7-8 / L 5 tries"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-edge-facts",
+   "check": "no ink within 1.5 mm of, or across, a cell divider or the page frame on any row of the Guided / Scripted Model pages of the five fact skills, the hinted row 1 included (lf-ops facts-roles critic r1 G1: Guided S add / sub facts' dot tiles ran onto the divider and the fifth across the frame)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-EDGE (RUBRIC C1, CL-5)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "10 findings: add_facts and sub_facts Guided S, all 5 cells of row 1 (0.1 / 1.3 mm across the border)"
+   },
+   "pass": {
+    "commit": "f5b77f7a",
+    "state": "0 findings: Guided + / - S at 4 columns, the hinted row fits"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-EDGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-marks-facts",
+   "check": "adjacent Scripted Model states of the five fact skills differ in ink: each step draws a new grey mark (PT-MOD-1; lf-ops facts-roles critic r1 S1)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-MARKS (PAGE_TYPES PT-MOD-1)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "24 findings: states 1..n-1 the blank problem on every fact Model"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: jot lines, count lists and dot tiles added step by step"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-MARKS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-lines-facts",
+   "check": "a Scripted Model step text of the five fact skills is at most 2 line boxes (PT-MOD-2; critic r1 S2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-LINES (PAGE_TYPES PT-MOD-2)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "16 findings: mult_facts step 2 3-4 lines, div steps 3-4 lines"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: the providers' short step texts (drawStep)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-LINES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-fill-facts",
+   "check": "the Scripted Model page of the five fact skills uses 70 % or more of its body (lead ruling 2026-11-12: a second worked example; critic r1 S3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE --model-states (RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "15 findings: 23-42 % used"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: two (div S: three) worked examples, rows up to 1.4 x content"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-grid-facts",
+   "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "f960e549",
+    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
+   },
+   "pass": {
+    "commit": "966292ff",
+    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-interior-band-facts",
+   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+   "browser": true,
+   "fail": {
+    "commit": "9f7983dd",
+    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+   },
+   "pass": {
+    "commit": "04683166",
+    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

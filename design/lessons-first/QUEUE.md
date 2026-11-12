@@ -11,9 +11,9 @@ school places in it. **CCSS lesson:** a lesson with a CCSS code and no "non-ccss
 
 | Units | Lessons in the sequence | CCSS lessons | of them CCSS BUILD | Parked (non-CCSS) | Products to make (short + long) | Long lessons passed | CCSS lessons ready (every skill 8/10) | Skills exist, not yet 8/10 | Blocked by a gap | Skills | Skills at 8/10 | Build-list entries |
 |--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
-| 80 | 843 | 817 | 64 | 26 | 1628 | 6 | 7 | 259 | 551 | 343 | 11 | 303 (125 only in the links files' proposals, 0 unknown) |
+| 80 | 843 | 817 | 64 | 26 | 1628 | 6 | 15 | 251 | 551 | 343 | 16 | 303 (125 only in the links files' proposals, 0 unknown) |
 
-Proposed shapes over all CCSS lessons: A1 column 28 · A2 fact 74 · A3 line 34 · A4 pv 80 · A5 partwhole 63 · A6 count 48 · A7 groups 13 · A8 fraction 151 · A9 measure 83 · A10 timemoney 52 · A11 shape 135 · A12 data 28 · A13 story 28.
+Proposed shapes over all CCSS lessons: A1 column 28 · A2 fact 81 · A3 line 34 · A4 pv 81 · A5 partwhole 54 · A6 count 48 · A7 groups 21 · A8 fraction 150 · A9 measure 82 · A10 timemoney 52 · A11 shape 130 · A12 data 28 · A13 story 28.
 
 ## Grade-mapping evidence (owner question Q1)
 
@@ -34,7 +34,7 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 
 | Round | Units | CCSS lessons | of them BUILD | Products | New skills | of them at 8/10 | New build entries | New skills to bring to 8/10, by lane |
 |--:|--:|--:|--:|--:|--:|--:|--:|---|
-| 1 | 6 | 85 | 11 | 166 | 59 | 3 | 32 | placevalue 19, algebra 13, k2 9, operations 9, numtheory 6 |
+| 1 | 6 | 85 | 11 | 166 | 59 | 8 | 32 | placevalue 14, algebra 13, k2 9, operations 9, numtheory 6 |
 | 2 | 6 | 112 | 8 | 223 | 75 | 4 | 44 | operations 36, fractions 13, placevalue 10, algebra 6, k2 3, numtheory 3 |
 | 3 | 6 | 80 | 7 | 159 | 36 | 0 | 28 | operations 10, placevalue 8, fractions 7, geometry 7, algebra 2, k2 2 |
 | 4 | 6 | 72 | 12 | 144 | 26 | 1 | 25 | operations 7, algebra 6, fractions 5, measurement 4, geometry 3 |
@@ -54,24 +54,24 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 
 | # | Round | Unit | Grade | Block | Starts | CCSS lessons (build) | Ready / skills not 8/10 / gaps | Skills (8/10) | New skills | Build entries | Shapes |
 |--:|--:|---|---|---|---|--:|---|--:|--:|--:|---|
-| 1 | 1 | [GK-Y1.B1](#gk-y1-b1) | K | Y1.B1 Place value (within 10) (Autumn) | W03 (20–24 Sep) | 16 (0) | 0 / 8 / 8 | 6 (0) | 6 | 6 | A3 A4 A5 A6 |
-| 2 | 1 | [G1-Y2.B1](#g1-y2-b1) | 1 | Y2.B1 Place value (Autumn) | W03 (20–24 Sep) | 17 (1) | 0 / 7 / 10 | 16 (0) | 15 | 9 | A2 A3 A4 A6 |
-| 3 | 1 | [G2-Y3.B1](#g2-y3-b1) | 2 | Y3.B1 Place value (Autumn) | W02 (13–17 Sep) | 14 (1) | 0 / 8 / 6 | 13 (0) | 3 | 4 | A3 A4 A6 |
-| 4 | 1 | [G3-Y4.B4](#g3-y4-b4) | 3 | Y4.B4 Multiplication and division (Autumn) | W03 (20–24 Sep) | 17 (4) | 0 / 12 / 5 | 21 (3) | 17 | 5 | A2 A5 A13 |
+| 1 | 1 | [GK-Y1.B1](#gk-y1-b1) | K | Y1.B1 Place value (within 10) (Autumn) | W03 (20–24 Sep) | 16 (0) | 0 / 8 / 8 | 6 (0) | 6 | 6 | A2 A3 A4 A6 |
+| 2 | 1 | [G1-Y2.B1](#g1-y2-b1) | 1 | Y2.B1 Place value (Autumn) | W03 (20–24 Sep) | 17 (1) | 3 / 4 / 10 | 16 (5) | 15 | 9 | A2 A3 A4 A6 |
+| 3 | 1 | [G2-Y3.B1](#g2-y3-b1) | 2 | Y3.B1 Place value (Autumn) | W02 (13–17 Sep) | 14 (1) | 3 / 5 / 6 | 13 (5) | 3 | 4 | A3 A4 A6 |
+| 4 | 1 | [G3-Y4.B4](#g3-y4-b4) | 3 | Y4.B4 Multiplication and division (Autumn) | W03 (20–24 Sep) | 17 (4) | 0 / 12 / 5 | 21 (4) | 17 | 5 | A2 A5 A7 A13 |
 | 5 | 1 | [G4-Y5.B3](#g4-y5-b3) | 4 | Y5.B3 Multiplication and division A (Autumn) | W02 (13–17 Sep) | 13 (5) | 0 / 3 / 10 | 7 (0) | 7 | 8 | A2 A5 A9 A11 A13 |
 | 6 | 1 | [G5-Y6.B1](#g5-y6-b1) | 5 | Y6.B1 Place value (Autumn) | W01 (6–10 Sep) | 8 (0) | 0 / 1 / 7 | 13 (0) | 11 | 7 | A3 A4 A6 |
 | 7 | 2 | [GK-Y1.B4](#gk-y1-b4) | K | Y1.B4 Place value (within 20) (Spring) | W06 (11–15 Oct) | 14 (0) | 0 / 4 / 10 | 5 (0) | 1 | 4 | A3 A4 A6 |
 | 8 | 2 | [G1-Y2.B2](#g1-y2-b2) | 1 | Y2.B2 Addition and subtraction (Autumn) | W08 (1–5 Nov) | 22 (1) | 1 / 12 / 9 | 26 (4) | 23 | 8 | A1 A4 A5 A6 A11 A13 |
-| 9 | 2 | [G2-Y3.B2](#g2-y3-b2) | 2 | Y3.B2 Addition and subtraction (Autumn) | W06 (11–15 Oct) | 25 (3) | 1 / 3 / 21 | 17 (3) | 13 | 14 | A1 A4 A5 A8 A11 A13 |
+| 9 | 2 | [G2-Y3.B2](#g2-y3-b2) | 2 | Y3.B2 Addition and subtraction (Autumn) | W06 (11–15 Oct) | 25 (3) | 1 / 3 / 21 | 17 (3) | 13 | 14 | A1 A2 A4 A5 A8 A11 A13 |
 | 10 | 2 | [G3-Y4.B7](#g3-y4-b7) | 3 | Y4.B7 Fractions (Spring) | W09 (8–12 Nov) | 17 (1) | 0 / 3 / 14 | 13 (0) | 13 | 11 | A3 A4 A6 A8 A11 |
-| 11 | 2 | [G4-Y5.B1](#g4-y5-b1) | 4 | Y5.B1 Place value (Autumn) | W06 (11–15 Oct) | 14 (1) | 0 / 6 / 8 | 21 (0) | 8 | 10 | A2 A3 A4 A6 |
+| 11 | 2 | [G4-Y5.B1](#g4-y5-b1) | 4 | Y5.B1 Place value (Autumn) | W06 (11–15 Oct) | 14 (1) | 0 / 6 / 8 | 21 (3) | 8 | 10 | A2 A3 A4 A6 |
 | 12 | 2 | [G5-Y6.B2](#g5-y6-b2) | 5 | Y6.B2 Addition, subtraction, multiplication and division (Autumn) | W05 (4–8 Oct) | 20 (2) | 0 / 5 / 15 | 20 (0) | 17 | 16 | A1 A2 A4 A5 A8 A11 A13 |
 | 13 | 3 | [GK-Y1.B6](#gk-y1-b6) | K | Y1.B6 Place value (within 50) (Spring) | W09 (8–12 Nov) | 10 (0) | 0 / 5 / 5 | 6 (0) | 1 | 4 | A3 A4 A6 A7 |
-| 14 | 3 | [G1-Y2.B3](#g1-y2-b3) | 1 | Y2.B3 Shape (Autumn) | W14 (13–17 Dec) | 13 (1) | 0 / 6 / 7 | 8 (0) | 8 | 7 | A5 A11 |
+| 14 | 3 | [G1-Y2.B3](#g1-y2-b3) | 1 | Y2.B3 Shape (Autumn) | W14 (13–17 Dec) | 13 (1) | 0 / 6 / 7 | 8 (0) | 8 | 7 | A2 A11 |
 | 15 | 3 | [G2-Y3.B3](#g2-y3-b3) | 2 | Y3.B3 Multiplication and division (Autumn) | W11 (22–26 Nov) | 16 (1) | 3 / 8 / 5 | 10 (1) | 6 | 4 | A2 A5 A7 A11 |
-| 16 | 3 | [G3-Y4.B1](#g3-y4-b1) | 3 | Y4.B1 Place value (Autumn) | W13 (6–10 Dec) | 16 (0) | 0 / 10 / 6 | 19 (0) | 4 | 5 | A3 A4 A6 |
-| 17 | 3 | [G4-Y5.B2](#g4-y5-b2) | 4 | Y5.B2 Addition and subtraction (Autumn) | W09 (8–12 Nov) | 10 (2) | 0 / 3 / 7 | 21 (1) | 9 | 8 | A3 A4 A5 A8 A13 |
-| 18 | 3 | [G5-Y6.B8](#g5-y6-b8) | 5 | Y6.B8 Decimals (Spring) | W07 (18–22 Oct) | 15 (3) | 0 / 2 / 13 | 12 (0) | 8 | 10 | A2 A4 A5 A8 |
+| 16 | 3 | [G3-Y4.B1](#g3-y4-b1) | 3 | Y4.B1 Place value (Autumn) | W13 (6–10 Dec) | 16 (0) | 2 / 8 / 6 | 19 (3) | 4 | 5 | A3 A4 A6 |
+| 17 | 3 | [G4-Y5.B2](#g4-y5-b2) | 4 | Y5.B2 Addition and subtraction (Autumn) | W09 (8–12 Nov) | 10 (2) | 0 / 3 / 7 | 21 (4) | 9 | 8 | A3 A4 A5 A8 A13 |
+| 18 | 3 | [G5-Y6.B8](#g5-y6-b8) | 5 | Y6.B8 Decimals (Spring) | W07 (18–22 Oct) | 15 (3) | 0 / 2 / 13 | 12 (0) | 8 | 10 | A2 A4 A8 |
 | 19 | 4 | [GK-Y1.B12](#gk-y1-b12) | K | Y1.B12 Place value (within 100) (Summer) | W10 (15–19 Nov) | 5 (0) | 0 / 1 / 4 | 5 (0) | 0 | 4 | A3 A4 A6 |
 | 20 | 4 | [G1-Y2.B8](#g1-y2-b8) | 1 | Y2.B8 Fractions (Summer) | W18 (24–28 Jan) | 15 (0) | 0 / 1 / 14 | 7 (0) | 7 | 4 | A8 A11 |
 | 21 | 4 | [G2-Y3.B5](#g2-y3-b5) | 2 | Y3.B5 Length and perimeter (Spring) | W15 (3–7 Jan) | 20 (8) | 0 / 2 / 18 | 6 (0) | 6 | 11 | A3 A9 A12 A13 |
@@ -79,7 +79,7 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 | 23 | 4 | [G4-Y5.B5](#g4-y5-b5) | 4 | Y5.B5 Multiplication and division B (Spring) | W11 (22–26 Nov) | 11 (0) | 0 / 4 / 7 | 10 (0) | 4 | 6 | A1 A2 A4 A11 A13 |
 | 24 | 4 | [G5-Y6.B7](#g5-y6-b7) | 5 | Y6.B7 Algebra (Spring) | W12 (29 Nov – 3 Dec) | 10 (4) | 0 / 3 / 7 | 5 (0) | 4 | 5 | A4 A5 A13 |
 | 25 | 5 | [GK-Y1.B2](#gk-y1-b2) | K | Y1.B2 Addition and subtraction (within 10) (Autumn) | W14 (13–17 Dec) | 18 (1) | 1 / 7 / 10 | 16 (5) | 8 | 8 | A1 A3 A5 A6 A13 |
-| 26 | 5 | [G1-Y2.B11](#g1-y2-b11) | 1 | Y2.B11 Position and direction (Summer) | W19 (31 Jan – 4 Feb) | 5 (0) | 0 / 1 / 4 | 1 (0) | 1 | 3 | A5 A11 |
+| 26 | 5 | [G1-Y2.B11](#g1-y2-b11) | 1 | Y2.B11 Position and direction (Summer) | W19 (31 Jan – 4 Feb) | 5 (0) | 0 / 1 / 4 | 1 (0) | 1 | 3 | A7 A11 |
 | 27 | 5 | [G2-Y3.B9](#g2-y3-b9) | 2 | Y3.B9 Money (Summer) | W19 (31 Jan – 4 Feb) | 5 (0) | 0 / 3 / 2 | 4 (0) | 4 | 3 | A10 |
 | 28 | 5 | [G3-Y4.B5](#g3-y4-b5) | 3 | Y4.B5 Multiplication and division B (Spring) | W16 (10–14 Jan) | 16 (1) | 0 / 9 / 7 | 16 (0) | 11 | 8 | A1 A2 A5 A11 A13 |
 | 29 | 5 | [G4-Y5.B12](#g4-y5-b12) | 4 | Y5.B12 Decimals (Summer) | W13 (6–10 Dec) | 14 (0) | 0 / 2 / 12 | 3 (0) | 0 | 7 | A2 A4 A5 A8 |
@@ -87,7 +87,7 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 | 31 | 6 | [GK-Y1.B5](#gk-y1-b5) | K | Y1.B5 Addition and subtraction (within 20) (Spring) | W17 (17–21 Jan) | 10 (0) | 0 / 6 / 4 | 11 (0) | 2 | 3 | A2 A5 A6 A13 |
 | 32 | 6 | [G1-Y2.B6](#g1-y2-b6) | 1 | Y2.B6 Length and height (Spring) | W22 (21–25 Feb) | 5 (0) | 0 / 0 / 5 | 2 (0) | 2 | 4 | A8 A9 |
 | 33 | 6 | [G2-Y3.B10](#g2-y3-b10) | 2 | Y3.B10 Time (Summer) | W21 (14–18 Feb) | 11 (0) | 0 / 6 / 5 | 7 (0) | 7 | 2 | A9 A10 A13 |
-| 34 | 6 | [G3-Y4.B3](#g3-y4-b3) | 3 | Y4.B3 Area (Autumn) | W18 (24–28 Jan) | 6 (2) | 0 / 0 / 6 | 1 (0) | 1 | 4 | A9 A11 |
+| 34 | 6 | [G3-Y4.B3](#g3-y4-b3) | 3 | Y4.B3 Area (Autumn) | W18 (24–28 Jan) | 6 (2) | 0 / 0 / 6 | 1 (0) | 1 | 4 | A7 A9 A11 |
 | 35 | 6 | [G4-Y5.B4](#g4-y5-b4) | 4 | Y5.B4 Fractions A (Autumn) | W17 (17–21 Jan) | 20 (2) | 0 / 7 / 13 | 20 (0) | 4 | 10 | A1 A8 |
 | 36 | 6 | [G5-Y6.B4](#g5-y6-b4) | 5 | Y6.B4 Fractions B (Autumn) | W18 (24–28 Jan) | 9 (2) | 0 / 2 / 7 | 9 (0) | 9 | 6 | A8 |
 | 37 | 7 | [GK-Y1.B9](#gk-y1-b9) | K | Y1.B9 Multiplication and division (Summer) | W20 (7–11 Feb) | 9 (0) | 0 / 4 / 5 | 9 (0) | 3 | 3 | A2 A7 A11 |
@@ -104,20 +104,20 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 | 48 | 8 | [G5-Y6.B10](#g5-y6-b10) | 5 | Y6.B10 Area, perimeter and volume (Spring) | W23 (28 Feb – 4 Mar) | 9 (1) | 0 / 1 / 8 | 3 (0) | 3 | 5 | A9 A11 |
 | 49 | 9 | [GK-Y1.B8](#gk-y1-b8) | K | Y1.B8 Mass and volume (Spring) | W26 (21–25 Mar) | 7 (0) | 0 / 1 / 6 | 1 (0) | 1 | 3 | A9 |
 | 50 | 9 | [G1-Y2.B4](#g1-y2-b4) | 1 | Y2.B4 Money (Spring) | W32 (2–6 May) | 13 (0) | 0 / 6 / 7 | 8 (0) | 4 | 4 | A10 A13 |
-| 51 | 9 | [G2-Y3.B11](#g2-y3-b11) | 2 | Y3.B11 Shape (Summer) | W28 (4–8 Apr) | 10 (0) | 0 / 3 / 7 | 5 (0) | 1 | 5 | A9 A11 |
+| 51 | 9 | [G2-Y3.B11](#g2-y3-b11) | 2 | Y3.B11 Shape (Summer) | W28 (4–8 Apr) | 10 (0) | 0 / 3 / 7 | 5 (0) | 1 | 5 | A7 A9 A11 |
 | 52 | 9 | [G3-Y4.B11](#g3-y4-b11) | 3 | Y4.B11 Time (Summer) | W23 (28 Feb – 4 Mar) | 6 (0) | 0 / 1 / 5 | 3 (0) | 0 | 3 | A9 A10 A13 |
 | 53 | 9 | [G4-Y5.B10](#g4-y5-b10) | 4 | Y5.B10 Shape (Summer) | W26 (21–25 Mar) | 11 (1) | 0 / 0 / 11 | 2 (0) | 2 | 10 | A3 A11 |
 | 54 | 9 | [G5-Y6.B11](#g5-y6-b11) | 5 | Y6.B11 Statistics (Spring) | W27 (28 Mar – 1 Apr) | 6 (1) | 0 / 0 / 6 | 0 (0) | 0 | 4 | A6 A8 A9 A12 |
-| 55 | 10 | [GK-Y1.B11](#gk-y1-b11) | K | Y1.B11 Position and direction (Summer) | W30 (18–22 Apr) | 4 (0) | 0 / 1 / 3 | 1 (0) | 0 | 2 | A11 |
+| 55 | 10 | [GK-Y1.B11](#gk-y1-b11) | K | Y1.B11 Position and direction (Summer) | W30 (18–22 Apr) | 4 (0) | 0 / 1 / 3 | 1 (0) | 0 | 2 | A7 A11 |
 | 56 | 10 | [G1-Y2.B7](#g1-y2-b7) | 1 | Y2.B7 Mass, capacity and temperature (Spring) | W35 (30 May – 3 Jun) | 8 (0) | 0 / 0 / 8 | 2 (0) | 0 | 5 | A8 A9 |
 | 57 | 10 | [G2-Y3.B4](#g2-y3-b4) | 2 | Y3.B4 Multiplication and division B (Spring) | W32 (2–6 May) | 11 (0) | 0 / 3 / 8 | 15 (0) | 5 | 6 | A2 A5 A6 A11 |
 | 58 | 10 | [G3-Y4.B13](#g3-y4-b13) | 3 | Y4.B13 Statistics (Summer) | W26 (21–25 Mar) | 9 (2) | 0 / 4 / 5 | 4 (0) | 0 | 4 | A8 A9 A12 |
 | 59 | 10 | [G4-Y5.B11](#g4-y5-b11) | 4 | Y5.B11 Position and direction (Summer) | W27 (28 Mar – 1 Apr) | 6 (0) | 0 / 2 / 4 | 8 (0) | 6 | 3 | A11 |
 | 60 | 10 | [G5-Y6.B12](#g5-y6-b12) | 5 | Y6.B12 Shape (Summer) | W28 (4–8 Apr) | 11 (1) | 0 / 0 / 11 | 4 (0) | 2 | 7 | A11 |
-| 61 | 11 | [GK-Y1.B3](#gk-y1-b3) | K | Y1.B3 Shape (Autumn) | W31 (25–29 Apr) | 7 (2) | 0 / 3 / 4 | 7 (0) | 4 | 4 | A5 A11 |
+| 61 | 11 | [GK-Y1.B3](#gk-y1-b3) | K | Y1.B3 Shape (Autumn) | W31 (25–29 Apr) | 7 (2) | 0 / 3 / 4 | 7 (0) | 4 | 4 | A2 A11 |
 | 62 | 11 | [G1-Y2.B9](#g1-y2-b9) | 1 | Y2.B9 Time (Summer) | W36 (6–10 Jun) | 8 (0) | 0 / 4 / 4 | 8 (0) | 4 | 2 | A8 A10 |
 | 63 | 11 | [G2-Y3.B7](#g2-y3-b7) | 2 | Y3.B7 Mass and capacity (Spring) | W35 (30 May – 3 Jun) | 11 (0) | 0 / 1 / 10 | 2 (0) | 0 | 4 | A9 |
-| 64 | 11 | [G3-Y4.B12](#g3-y4-b12) | 3 | Y4.B12 Shape (Summer) | W28 (4–8 Apr) | 8 (0) | 0 / 4 / 4 | 6 (0) | 3 | 3 | A11 |
+| 64 | 11 | [G3-Y4.B12](#g3-y4-b12) | 3 | Y4.B12 Shape (Summer) | W28 (4–8 Apr) | 8 (0) | 0 / 4 / 4 | 6 (0) | 3 | 3 | A7 A11 |
 | 65 | 11 | [G4-Y5.B8](#g4-y5-b8) | 4 | Y5.B8 Perimeter and area (Spring) | W29 (11–15 Apr) | 7 (1) | 0 / 3 / 4 | 6 (0) | 3 | 4 | A9 A11 |
 | 66 | 11 | [G5-Y6.B13](#g5-y6-b13) | 5 | Y6.B13 Position and direction (Summer) | W31 (25–29 Apr) | 5 (0) | 0 / 2 / 3 | 6 (0) | 4 | 3 | A11 A13 |
 | 67 | 12 | [GK-Y1.B13](#gk-y1-b13) | K | Y1.B13 Money (Summer) | W34 (23–27 May) | 4 (0) | 0 / 2 / 2 | 2 (0) | 0 | 2 | A9 A10 |
@@ -140,12 +140,12 @@ A round is every grade's next unit. "New skills" are skills no earlier unit need
 ### GK-Y1.B1
 
 **#1, round 1.** Grade K · Y1 Autumn block Y1.B1: Place value (within 10). Taught W01-W23 (start W03, week of 20–24 Sep).
-CCSS: 2.NBT.A.3, K.CC.A.1, K.CC.A.2, K.CC.A.3, K.CC.B.4, K.CC.B.5, K.CC.C.6, K.CC.C.7, K.MD.B.3. Shapes: A3 line, A4 pv, A5 partwhole, A6 count.
+CCSS: 2.NBT.A.3, K.CC.A.1, K.CC.A.2, K.CC.A.3, K.CC.B.4, K.CC.B.5, K.CC.C.6, K.CC.C.7, K.MD.B.3. Shapes: A2 fact, A3 line, A4 pv, A6 count.
 Lanes: k2 0/5 at 8/10 · algebra 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
-| `R.B13.S6` (R step, review) (nearest same-domain block) | Verbal counting patterns | K.CC.B.4 | W01 | partial | `counting:number_seq_fill`, `patterns:seq_10`; partial: `counting:number_seq_fill` | oral_count | A5 | - | - |
+| `R.B13.S6` (R step, review) (nearest same-domain block) | Verbal counting patterns | K.CC.B.4 | W01 | partial | `counting:number_seq_fill`, `patterns:seq_10`; partial: `counting:number_seq_fill` | oral_count | A2 | - | - |
 | `Y1.B1.S2` | Count objects | K.CC.B.5 | W01 | full | `counting:count_objects` | - | A6 | - | - |
 | `Y1.B1.S3` | Count objects from a larger group | K.CC.B.5 | W01 | partial | -; partial: `counting:count_objects` | ten_count_out | A6 | - | - |
 | `Y1.B1.S4` | Represent objects | K.CC.A.3, K.CC.B.4 | W01 W02 | full | `composing:ten_frame_build` | - | A6 | - | - |
@@ -168,18 +168,18 @@ Build entries: `oral_count` (option counting:number_seq_fill, k2, links proposal
 
 **#2, round 1.** Grade 1 · Y2 Autumn block Y2.B1: Place value. Taught W01-W06 (start W03, week of 20–24 Sep).
 CCSS: 1.NBT.A.1, 1.NBT.B.2, 1.NBT.B.3, 2.MD.B.6, 2.NBT.A.2, 2.NBT.A.3. Shapes: A2 fact, A3 line, A4 pv, A6 count.
-Lanes: k2 0/3 at 8/10 · placevalue 0/8 at 8/10 · algebra 0/4 at 8/10 · operations 0/1 at 8/10.
+Lanes: k2 0/3 at 8/10 · placevalue 5/8 at 8/10 · algebra 0/4 at 8/10 · operations 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
 | `Y2.B1.S1` | Numbers to 20 | 1.NBT.B.2 | W01 | partial | `composing:teen_compose`, `composing:base10_build`; partial: `composing:teen_compose`, `composing:base10_build` | teen_structure | A4 | - | - |
 | `Y2.B1.S2` | Count objects to 100 by making 10s | 1.NBT.A.1, 1.NBT.B.2 | W01 | partial | -; partial: `composing:base10_build` | tens_ones_group | A6 | - | - |
 | `Y2.B1.S3` | Recognise tens and ones | 1.NBT.B.2 | W01 | full | `composing:tens_foundation_visual`, `composing:base10_build` | - | A4 | - | - |
-| `Y2.B1.S4` | Use a place value chart | 1.NBT.B.2 | W01 W02 | full | `placevalue:identify`, `placevalue:value` | - | A4 | - | - |
-| `Y2.B1.S5` | Partition numbers to 100 | 1.NBT.B.2 | W02 | full | `placevalue:expand`, `placevalue:unit_form` | - | A4 | - | - |
+| `Y2.B1.S4` | Use a place value chart | 1.NBT.B.2 | W01 W02 | full | `placevalue:identify` **8/10**, `placevalue:value` **8/10** | - | A4 | lesson data exists | - |
+| `Y2.B1.S5` | Partition numbers to 100 | 1.NBT.B.2 | W02 | full | `placevalue:expand` **8/10**, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
 | `Y2.B1.S6` | Write numbers to 100 in words | 1.NBT.A.1, 2.NBT.A.3 | W02 | full | `composing:number_word_form` | - | A4 | - | - |
 | `Y2.B1.S7` | Flexibly partition numbers to 100 | 1.NBT.B.2 | W02 W03 | gap | - | flex_partition | A4 | - | - |
-| `Y2.B1.S8` | Write numbers to 100 in expanded form | 1.NBT.B.2, 2.NBT.A.3 | W02 W03 | full | `placevalue:expand`, `placevalue:combine` | - | A4 | - | - |
+| `Y2.B1.S8` | Write numbers to 100 in expanded form | 1.NBT.B.2, 2.NBT.A.3 | W02 W03 | full | `placevalue:expand` **8/10**, `placevalue:combine` **8/10** | - | A4 | lesson data exists | - |
 | `Y2.B1.S9` | 10s on the number line to 100 | 1.NBT.A.1, 2.MD.B.6 | W03 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
 | `Y2.B1.S10` | 10s and 1s on the number line to 100 | 1.NBT.A.1, 2.MD.B.6 | W03 W04 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
 | `Y2.B1.S11` | Estimate numbers on a number line | 1.NBT.A.1, 2.MD.B.6 | W03 W04 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
@@ -196,20 +196,20 @@ Build entries: `teen_structure` (option composing:teen_compose, k2); `tens_ones_
 
 **#3, round 1.** Grade 2 · Y3 Autumn block Y3.B1: Place value. Taught W01-W13 (start W02, week of 13–17 Sep).
 CCSS: 1.NBT.B.2, 2.MD.B.6, 2.NBT.A.1, 2.NBT.A.3, 2.NBT.A.4, 2.NBT.B.8. Shapes: A3 line, A4 pv, A6 count.
-Lanes: k2 0/2 at 8/10 · placevalue 0/10 at 8/10 · algebra 0/1 at 8/10.
+Lanes: k2 0/2 at 8/10 · placevalue 5/10 at 8/10 · algebra 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
-| `Y3.B1.S1` | Represent numbers to 100 | 2.NBT.A.1 | W01 | full | `composing:base10_build`, `placevalue:unit_form` | - | A4 | - | - |
-| `Y3.B1.S2` | Partition numbers to 100 | 2.NBT.A.1, 1.NBT.B.2 | W01 | full | `placevalue:expand` | flex_partition | A4 | - | - |
+| `Y3.B1.S1` | Represent numbers to 100 | 2.NBT.A.1 | W01 | full | `composing:base10_build`, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
+| `Y3.B1.S2` | Partition numbers to 100 | 2.NBT.A.1, 1.NBT.B.2 | W01 | full | `placevalue:expand` **8/10** | flex_partition | A4 | lesson data exists | - |
 | `Y3.B1.S4` | Hundreds | 2.NBT.A.1 | W01 | partial | -; partial: `composing:base10_build_hundreds`, `multiplication:count_by_tables` | count_50s | A4 | - | - |
 | `Y3.B1.S5` | Represent numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W01 W02 | full | `composing:base10_build_hundreds`, `placevalue:place_value_disks` | - | A4 | - | - |
-| `Y3.B1.S6` | Partition numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W02 | full | `placevalue:expand`, `placevalue:unit_form` | - | A4 | - | - |
+| `Y3.B1.S6` | Partition numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W02 | full | `placevalue:expand` **8/10**, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
 | `Y3.B1.S7` | Flexible partitioning of numbers to 1,000 | 2.NBT.A.3 | W02 | gap | - | flex_partition | A4 | - | - |
-| `Y3.B1.S8` | Hundreds, tens and ones | 2.NBT.A.1 | W02 W03 | full | `placevalue:identify`, `placevalue:value`, `placevalue:unit_form` | - | A4 | - | - |
+| `Y3.B1.S8` | Hundreds, tens and ones | 2.NBT.A.1 | W02 W03 | full | `placevalue:identify` **8/10**, `placevalue:value` **8/10**, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
 | `Y3.B1.S9` | Find 1, 10 or 100 more or less | 2.NBT.B.8 | W02 W03 | partial | `placevalue:more_less_100`; partial: `placevalue:more_less_100` | more_less_1_3digit | A6 | - | - |
 | `Y3.B1.S12` | Compare numbers to 1,000 | 2.NBT.A.4 | W02 W03 | full | `placevalue:compare` | - | A4 | - | - |
-| `G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform` BUILD (nearest same-domain block) | Read and write numbers to 1,000 in words, numerals and expanded form | 2.NBT.A.3 | W02 | full | `composing:number_word_form`, `placevalue:expand`, `placevalue:combine`, `placevalue:identify`, `placevalue:unit_form`, `placevalue:value` | - | A4 | - | g2-nbt3-read-write-1000: passed |
+| `G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform` BUILD (nearest same-domain block) | Read and write numbers to 1,000 in words, numerals and expanded form | 2.NBT.A.3 | W02 | full | `composing:number_word_form`, `placevalue:expand` **8/10**, `placevalue:combine` **8/10**, `placevalue:identify` **8/10**, `placevalue:unit_form` **8/10**, `placevalue:value` **8/10** | - | A4 | lesson data exists | g2-nbt3-read-write-1000: passed |
 | `Y3.B1.S13` | Order numbers to 1,000 | 2.NBT.A.4 | W03 | full | `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least` | - | A4 | - | - |
 | ~~Y3.B1.S14~~ (parked: non-ccss) | Count in 50s | 2.NBT.A.2 | W03 | full | `multiplication:count_by_tables` | count_50s | A2 | - | - |
 | `Y3.B1.S3` | Number line to 100 | 2.MD.B.6, 2.NBT.A.1 | W13 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
@@ -221,8 +221,8 @@ Build entries: `flex_partition` (new placevalue:flexible_partition, placevalue);
 ### G3-Y4.B4
 
 **#4, round 1.** Grade 3 · Y4 Autumn block Y4.B4: Multiplication and division. Taught W01-W07 (start W03, week of 20–24 Sep).
-CCSS: 3.OA.B.5, 3.OA.B.6, 3.OA.C.7, 3.OA.D.8, 3.OA.D.9, 4.OA.B.4. Shapes: A2 fact, A5 partwhole, A13 story.
-Lanes: operations 3/10 at 8/10 · algebra 0/7 at 8/10 · placevalue 0/4 at 8/10.
+CCSS: 3.OA.B.5, 3.OA.B.6, 3.OA.C.7, 3.OA.D.8, 3.OA.D.9, 4.OA.B.4. Shapes: A2 fact, A5 partwhole, A7 groups, A13 story.
+Lanes: operations 3/10 at 8/10 · algebra 0/7 at 8/10 · placevalue 1/4 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
@@ -239,10 +239,10 @@ Lanes: operations 3/10 at 8/10 · algebra 0/7 at 8/10 · placevalue 0/4 at 8/10.
 | `Y4.B4.S11` | Multiply by 1 and 0 | 3.OA.B.5 | W03 W04 | full | `multiplication:mult_properties`, `multiplication:mult_facts` **8/10** | - | A2 | - | - |
 | `Y4.B4.S12` | Divide a number by 1 and itself | 3.OA.B.5, 3.OA.B.6 | W04 | partial | -; partial: `multiplication:mult_properties`, `division:div_facts` | div_by_itself, mult_three | A2 | - | - |
 | `Y4.B4.S13` | Multiply three numbers | 3.OA.B.5 | W04 | gap | - | mult_three | A2 | - | - |
-| `G3|-|patternsonthemultiplicationtable` BUILD | Patterns on the multiplication table | 3.OA.D.9, 3.OA.C.7 | W04 W05 | partial | `multiplication:mult_chart`, `multiplication:count_by_tables`, `multiplication:mult_facts` **8/10**; partial: `multiplication:mult_chart` | patterns_notice | A5 | - | g3-oa9-mult-table-patterns: passed |
+| `G3|-|patternsonthemultiplicationtable` BUILD | Patterns on the multiplication table | 3.OA.D.9, 3.OA.C.7 | W04 W05 | partial | `multiplication:mult_chart`, `multiplication:count_by_tables`, `multiplication:mult_facts` **8/10**; partial: `multiplication:mult_chart` | patterns_notice | A2 | - | g3-oa9-mult-table-patterns: passed |
 | `G3|-|findtheruleinaninputoutputtable` BUILD (nearest same-domain block) | Find the rule in an input-output table | 3.OA.D.9 | W05 W06 W07 | full | `algebra:function_table_easy`, `addition:add_facts` **8/10**, `subtraction:sub_facts` **8/10**, `multiplication:mult_facts` **8/10** | - | A5 | sample passed (lessons-r4) | g3-oa9-input-output-rule: passed |
-| `G3|-|propertiesofmultiplicationcommutativeidentityanddistributive` BUILD (nearest same-domain block) | Properties of multiplication: commutative, identity and distributive | 3.OA.B.5 | W05 W06 | full | `multiplication:mult_properties`, `multiplication:arrays_groups`, `multiplication:count_by_tables`, `multiplication:mult_facts` **8/10** | - | A5 | - | g3-oa5-mult-properties: passed |
-| `G3|-|twostepwordproblemswiththefouroperations` BUILD | Two-step word problems with the four operations | 3.OA.D.8 | W05 W06 | direct | `algebra:two_step_mult_div_first`, `algebra:two_step_add_then_mult`, `algebra:two_step_add_then_div`, `algebra:two_step_letter_equation`, `algebra:two_step_estimate_check`, `algebra:multi_step_word_plain`, `multiplication:mult_word_problems_plain`, `division:div_word_problems_plain`, `placevalue:more_less_10`, `placevalue:more_less_100`, `placevalue:compare`, `placevalue:unit_form`, `multiplication:mult_facts` **8/10**, `division:div_facts`, `subtraction:sub_facts` **8/10**; partial: `algebra:multi_step_word`, `number_ops_mixed:word_problems_mixed` | multi_step_four_ops | A13 | lesson data exists | g3-oa8-two-step-wp: critic r1 FAIL |
+| `G3|-|propertiesofmultiplicationcommutativeidentityanddistributive` BUILD (nearest same-domain block) | Properties of multiplication: commutative, identity and distributive | 3.OA.B.5 | W05 W06 | full | `multiplication:mult_properties`, `multiplication:arrays_groups`, `multiplication:count_by_tables`, `multiplication:mult_facts` **8/10** | - | A7 | - | g3-oa5-mult-properties: passed |
+| `G3|-|twostepwordproblemswiththefouroperations` BUILD | Two-step word problems with the four operations | 3.OA.D.8 | W05 W06 | direct | `algebra:two_step_mult_div_first`, `algebra:two_step_add_then_mult`, `algebra:two_step_add_then_div`, `algebra:two_step_letter_equation`, `algebra:two_step_estimate_check`, `algebra:multi_step_word_plain`, `multiplication:mult_word_problems_plain`, `division:div_word_problems_plain`, `placevalue:more_less_10`, `placevalue:more_less_100`, `placevalue:compare`, `placevalue:unit_form` **8/10**, `multiplication:mult_facts` **8/10**, `division:div_facts`, `subtraction:sub_facts` **8/10**; partial: `algebra:multi_step_word`, `number_ops_mixed:word_problems_mixed` | multi_step_four_ops | A13 | lesson data exists | g3-oa8-two-step-wp: critic r1 FAIL |
 
 Build entries: `tables_links` (new multiplication:related_tables, operations); `div_by_itself` (option division:div_facts, operations, links proposal only); `mult_three` (new multiplication:multiply_three_numbers, operations); `patterns_notice` (new patterns:notice_patterns, algebra); `multi_step_four_ops` (option algebra:multi_step_word, algebra).
 
@@ -261,7 +261,7 @@ Lanes: numtheory 0/6 at 8/10 · algebra 0/1 at 8/10.
 | `Y5.B3.S5` | Prime numbers | 4.OA.B.4 | W02 | full | `number_theory:prime_composite` | - | A2 | - | - |
 | `Y5.B3.S10` | Multiples of 10, 100 and 1,000 | 4.OA.B.4 | W02 | partial | -; partial: `multiplication:mult_zeros` | mult_multiples | A2 | - | - |
 | `G4|-|findemergentfeaturesegunitsdigitcycle` BUILD | Find emergent features (e.g., units digit cycle) | 4.OA.C.5 | W02 W03 | partial | -; partial: `patterns:number_patterns_rule` | patterns_notice | A9 | - | - |
-| `G4|-|extendgrowingshapepatterns` BUILD (nearest same-domain block) | Extend growing shape patterns | 4.OA.C.5 | W03 W04 | partial | -; partial: `patterns:number_patterns_rule` | growing_shape_patterns | A5 | - | - |
+| `G4|-|extendgrowingshapepatterns` BUILD (nearest same-domain block) | Extend growing shape patterns | 4.OA.C.5 | W03 W04 | partial | -; partial: `patterns:number_patterns_rule` | growing_shape_patterns | A2 | - | - |
 | `G4|-|followagivenruletoextendanumberpattern` BUILD | Follow a given rule to extend a number pattern | 4.OA.C.5 | W03 | full | `patterns:number_patterns_rule` | - | A5 | - | - |
 | `G4|-|multiplicativecomparisontimesasmany` BUILD | Multiplicative comparison: times as many | 4.OA.A.1 | W03 W04 | partial | -; partial: `multiplication:mult_comparison` | comparison_statements | A5 | - | - |
 | `G4|-|multistepwordproblemsdivideandinterprettheremainder` BUILD (nearest same-domain block) | Multi-step word problems: divide and interpret the remainder | 4.OA.A.3, 5.NBT.B.6 | W04 W05 | partial | -; partial: `division:remainder_interpret`, `algebra:multi_step_word` | multi_step_four_ops | A13 | - | - |
@@ -350,7 +350,7 @@ Build entries: `map_change_unknown_story` (option addition:add_word_problems, op
 ### G2-Y3.B2
 
 **#9, round 2.** Grade 2 · Y3 Autumn block Y3.B2: Addition and subtraction. Taught W03-W10 (start W06, week of 11–15 Oct).
-CCSS: 2.NBT.B.5, 2.NBT.B.6, 2.NBT.B.7, 2.NBT.B.8, 2.NBT.B.9, 2.OA.A.1, 2.OA.B.2, 3.NBT.A.1, 3.NBT.A.2. Shapes: A1 column, A4 pv, A5 partwhole, A8 fraction, A11 shape, A13 story.
+CCSS: 2.NBT.B.5, 2.NBT.B.6, 2.NBT.B.7, 2.NBT.B.8, 2.NBT.B.9, 2.OA.A.1, 2.OA.B.2, 3.NBT.A.1, 3.NBT.A.2. Shapes: A1 column, A2 fact, A4 pv, A5 partwhole, A8 fraction, A11 shape, A13 story.
 Lanes: operations 3/13 at 8/10 · placevalue 0/3 at 8/10 · algebra 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -358,7 +358,7 @@ Lanes: operations 3/13 at 8/10 · placevalue 0/3 at 8/10 · algebra 0/1 at 8/10.
 | `Y3.B2.S2` | Add and subtract 1s | 2.NBT.B.5 | W03 W04 | gap | - | more_less_1_3digit, add_sub_patterns | A4 | - | - |
 | `Y3.B2.S3` | Add and subtract 10s | 2.NBT.B.5, 2.NBT.B.8 | W03 W04 | partial | `addition:add_sub_10s`, `placevalue:more_less_100`; partial: `addition:add_sub_10s`, `placevalue:more_less_100` | tens_any | A4 | - | - |
 | `Y3.B2.S4` | Add and subtract 100s | 2.NBT.B.7, 2.NBT.B.8 | W04 W05 | partial | `addition:add_sub_100s`; partial: `addition:add_sub_100s`, `placevalue:more_less_100` | hundreds_any | A4 | - | - |
-| `Y3.B2.S5` | Spot the pattern | 2.NBT.B.5, 2.NBT.B.8 | W04 W05 | gap | - | add_sub_patterns | A5 | - | - |
+| `Y3.B2.S5` | Spot the pattern | 2.NBT.B.5, 2.NBT.B.8 | W04 W05 | gap | - | add_sub_patterns | A2 | - | - |
 | `Y3.B2.S6` | Add 1s across a 10 | 2.NBT.B.5 | W04 W05 | partial | -; partial: `number_sense:make_a_ten` | add_next_10 | A1 | - | - |
 | `Y3.B2.S7` | Add 10s across a 100 | 2.NBT.B.7 | W05 | gap | - | cross_100 | A1 | - | - |
 | `Y3.B2.S8` | Subtract 1s across a 10 | 2.NBT.B.5 | W05 W06 | partial | -; partial: `subtraction:sub_50_regroup` | add_next_10 | A1 | - | - |
@@ -415,12 +415,12 @@ Build entries: `whole_nn_only` (option composing:whole_as_fraction, fractions, l
 
 **#11, round 2.** Grade 4 · Y5 Autumn block Y5.B1: Place value. Taught W01-W08 (start W06, week of 11–15 Oct).
 CCSS: 4.NBT.A.1, 4.NBT.A.2, 4.NBT.A.3, 4.NBT.B.5, 4.NBT.B.6, 5.NBT.A.2. Shapes: A2 fact, A3 line, A4 pv, A6 count.
-Lanes: placevalue 0/21 at 8/10.
+Lanes: placevalue 3/21 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
 | ~~Y5.B1.S1~~ (parked: non-ccss) | Roman numerals to 1,000 | - | W01 | gap | - | roman_100, roman_1000 | A4 | - | - |
-| `Y5.B1.S2` | Numbers to 10,000 | 4.NBT.A.2 | W05 | full | `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:unit_form`, `placevalue:expand` | - | A4 | - | - |
+| `Y5.B1.S2` | Numbers to 10,000 | 4.NBT.A.2 | W05 | full | `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:unit_form` **8/10**, `placevalue:expand` **8/10** | - | A4 | lesson data exists | - |
 | `Y5.B1.S3` | Numbers to 100,000 | 4.NBT.A.2 | W05 | partial | `placevalue:pv_digit_drag`; partial: `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:value`, `placevalue:identify` | vis_pv_bands_millions | A4 | - | - |
 | `Y5.B1.S12` | Round to the nearest 10, 100 or 1,000 | 4.NBT.A.3 | W05 W06 | full | `number_sense:nearest_10`, `number_sense:nearest_100`, `number_sense:nearest_1000`, `number_sense:rounding_table`, `number_sense:round_nl_thousands` | - | A3 | sample passed (lessons-r4) | - |
 | `Y5.B1.S4` | Numbers to 1,000,000 | 4.NBT.A.2 | W06 | partial | `placevalue:pv_digit_drag`; partial: `placevalue:pv_digit_drag`, `placevalue:value`, `placevalue:identify` | vis_pv_bands_millions | A4 | - | - |
@@ -428,7 +428,7 @@ Lanes: placevalue 0/21 at 8/10.
 | `Y5.B1.S6` | Powers of 10 | 4.NBT.A.1, 5.NBT.A.2 | W06 | partial | `placevalue:place_value_10x`; partial: `placevalue:place_value_10x` | pv10_exponents, value_ten_times, vis_gattegno | A4 | - | - |
 | `Y5.B1.S7` | 10 / 100 / 1,000 / 10,000 / 100,000 more or less | 4.NBT.A.1 | W06 W07 | partial | -; partial: `placevalue:more_less_100` | pv_more_less_big, vis_more_less_table | A6 | - | - |
 | `G4|-|multiplyanddividemultiplesof10usingbasicfactseg90x5030030` BUILD (nearest same-domain block) | Multiply and divide multiples of 10 using basic facts (e.g., 90 x 50, 300 ÷ 30) | 4.NBT.A.1, 4.NBT.B.5, 4.NBT.B.6 | W06 W07 | partial | -; partial: `multiplication:mult_zeros` | facts_times_tens | A2 | - | - |
-| `Y5.B1.S8` | Partition numbers to 1,000,000 | 4.NBT.A.2 | W07 | partial | `placevalue:expand`, `placevalue:combine`; partial: `placevalue:expand`, `placevalue:combine` | flex_partition | A4 | - | - |
+| `Y5.B1.S8` | Partition numbers to 1,000,000 | 4.NBT.A.2 | W07 | partial | `placevalue:expand` **8/10**, `placevalue:combine` **8/10**; partial: `placevalue:expand`, `placevalue:combine` | flex_partition | A4 | lesson data exists | - |
 | `Y5.B1.S9` | Number line to 1,000,000 | 4.NBT.A.2 | W07 | partial | -; partial: `number_sense:round_nl_hundred_thousands`, `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
 | `Y5.B1.S10` | Compare and order numbers to 100,000 | 4.NBT.A.2 | W07 | full | `placevalue:compare`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least` | - | A4 | - | - |
 | `Y5.B1.S11` | Compare and order numbers to 1,000,000 | 4.NBT.A.2 | W07 W08 | full | `placevalue:compare`, `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least` | - | A4 | - | - |
@@ -492,7 +492,7 @@ Build entries: `number_focus` (option counting:count_objects, k2, links proposal
 ### G1-Y2.B3
 
 **#14, round 3.** Grade 1 · Y2 Autumn block Y2.B3: Shape. Taught W13-W16 (start W14, week of 13–17 Dec).
-CCSS: 1.G.A.1, 1.G.A.2, 2.G.A.1, 4.G.A.3, K.G.A.2, K.G.B.4, K.G.B.5. Shapes: A5 partwhole, A11 shape.
+CCSS: 1.G.A.1, 1.G.A.2, 2.G.A.1, 4.G.A.3, K.G.A.2, K.G.B.4, K.G.B.5. Shapes: A2 fact, A11 shape.
 Lanes: geometry 0/7 at 8/10 · algebra 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -506,7 +506,7 @@ Lanes: geometry 0/7 at 8/10 · algebra 0/1 at 8/10.
 | `Y2.B3.S9` | Count edges on 3D shapes | 1.G.A.1, 2.G.A.1 | W14 | full | `shapes_early:count_edges_faces_vertices` | - | A11 | - | - |
 | `Y2.B3.S10` | Count vertices on 3D shapes | 1.G.A.1, 2.G.A.1 | W14 | full | `shapes_early:count_edges_faces_vertices` | - | A11 | - | - |
 | `Y2.B3.S11` | Sort 3D shapes | 1.G.A.1, K.G.B.4 | W14 W15 | gap | - | shape_sort | A11 | - | - |
-| `Y2.B3.S12` | Make patterns with 2D and 3D shapes | K.G.A.2 | W14 W15 | partial | `patterns:shape_pattern`; partial: `patterns:shape_pattern` | pattern_3d | A5 | - | - |
+| `Y2.B3.S12` | Make patterns with 2D and 3D shapes | K.G.A.2 | W14 W15 | partial | `patterns:shape_pattern`; partial: `patterns:shape_pattern` | pattern_3d | A2 | - | - |
 | `Y2.B3.S1` | Recognise 2D and 3D shapes | 1.G.A.1 | W15 | full | `shapes_early:name_2d_shapes`, `shapes_early:name_3d_shapes` | - | A11 | - | - |
 | `G1|-|composeandrecomposeshapes` BUILD | Compose and recompose shapes | 1.G.A.2 | W15 W16 | partial | -; partial: `shapes_early:compose_shapes`, `shapes_early:compose_hexagon` | map_compose_solids | A11 | - | - |
 | `Y2.B3.S6` | Use lines of symmetry to complete shapes | 1.G.A.1, 4.G.A.3 | W16 | gap | - | symmetry_complete | A11 | - | - |
@@ -544,12 +544,12 @@ Build entries: `multiples_2_5_10` (option number_theory:multiples, numtheory); `
 
 **#16, round 3.** Grade 3 · Y4 Autumn block Y4.B1: Place value. Taught W11-W35 (start W13, week of 6–10 Dec).
 CCSS: 2.MD.B.6, 2.NBT.A.1, 2.NBT.A.3, 2.NBT.B.8, 3.NBT.A.1, 4.NBT.A.1, 4.NBT.A.2, 4.NBT.A.3. Shapes: A3 line, A4 pv, A6 count.
-Lanes: k2 0/1 at 8/10 · placevalue 0/18 at 8/10.
+Lanes: k2 0/1 at 8/10 · placevalue 3/18 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
 | `Y4.B1.S1` | Represent numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W11 | full | `composing:base10_build_hundreds`, `placevalue:place_value_disks`, `placevalue:pv_disks_build` | - | A4 | - | - |
-| `Y4.B1.S2` | Partition numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W11 W12 | full | `placevalue:expand`, `placevalue:unit_form`, `placevalue:combine` | - | A4 | - | - |
+| `Y4.B1.S2` | Partition numbers to 1,000 | 2.NBT.A.1, 2.NBT.A.3 | W11 W12 | full | `placevalue:expand` **8/10**, `placevalue:unit_form` **8/10**, `placevalue:combine` **8/10** | - | A4 | lesson data exists | - |
 | `Y4.B1.S8` | Find 1, 10, 100, 1,000 more or less | 2.NBT.B.8, 4.NBT.A.1 | W11 W12 | partial | `placevalue:more_less_100`; partial: `placevalue:more_less_10`, `placevalue:more_less_100` | more_less_all | A6 | - | - |
 | `Y4.B1.S9` | Number line to 10,000 | 3.NBT.A.1 | W12 W13 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
 | ~~Y4.B1.S13~~ (parked: non-ccss) | Roman numerals | - | W12 | gap | - | roman_100, roman_100 | A4 | - | - |
@@ -560,8 +560,8 @@ Lanes: k2 0/1 at 8/10 · placevalue 0/18 at 8/10.
 | `Y4.B1.S17` | Round to the nearest 10, 100 or 1,000 | 3.NBT.A.1, 4.NBT.A.3 | W13 W14 | full | `number_sense:rounding_table` | - | A3 | - | - |
 | `Y4.B1.S3` | Number line to 1,000 | 2.MD.B.6, 2.NBT.A.1 | W18 | partial | -; partial: `number_sense:place_on_number_line` | nl_20 | A3 | - | - |
 | `Y4.B1.S4` | Thousands | 4.NBT.A.1, 4.NBT.A.2 | W33 W34 | partial | -; partial: `placevalue:place_value_disks`, `patterns:count_by_powers_of_10` | regroup_thousands, count_50s | A4 | - | - |
-| `Y4.B1.S5` | Represent numbers to 10,000 | 4.NBT.A.2 | W33 W34 | full | `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:unit_form` | - | A4 | - | - |
-| `Y4.B1.S6` | Partition numbers to 10,000 | 4.NBT.A.2 | W34 | full | `placevalue:expand`, `placevalue:combine`, `placevalue:unit_form` | - | A4 | - | - |
+| `Y4.B1.S5` | Represent numbers to 10,000 | 4.NBT.A.2 | W33 W34 | full | `placevalue:place_value_disks`, `placevalue:pv_digit_drag`, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
+| `Y4.B1.S6` | Partition numbers to 10,000 | 4.NBT.A.2 | W34 | full | `placevalue:expand` **8/10**, `placevalue:combine` **8/10**, `placevalue:unit_form` **8/10** | - | A4 | lesson data exists | - |
 | `Y4.B1.S7` | Flexible partitioning of numbers to 10,000 | 4.NBT.A.2 | W34 | partial | -; partial: `placevalue:unit_form` | flex_partition | A4 | - | - |
 | `Y4.B1.S11` | Compare numbers to 10,000 | 4.NBT.A.2 | W34 W35 | full | `placevalue:compare` | - | A4 | - | - |
 | `Y4.B1.S12` | Order numbers to 10,000 | 4.NBT.A.2 | W35 | full | `placevalue:order_least_to_greatest`, `placevalue:order_greatest_to_least` | - | A4 | - | - |
@@ -572,7 +572,7 @@ Build entries: `more_less_all` (option placevalue:more_less_100, placevalue, lin
 
 **#17, round 3.** Grade 4 · Y5 Autumn block Y5.B2: Addition and subtraction. Taught W01-W10 (start W09, week of 8–12 Nov).
 CCSS: 4.NBT.A.1, 4.NBT.A.3, 4.NBT.B.4, 4.OA.A.2, 4.OA.A.3, 5.NBT.A.1. Shapes: A3 line, A4 pv, A5 partwhole, A8 fraction, A13 story.
-Lanes: operations 1/9 at 8/10 · placevalue 0/10 at 8/10 · algebra 0/2 at 8/10.
+Lanes: operations 1/9 at 8/10 · placevalue 3/10 at 8/10 · algebra 0/2 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
@@ -585,14 +585,14 @@ Lanes: operations 1/9 at 8/10 · placevalue 0/10 at 8/10 · algebra 0/2 at 8/10.
 | `Y5.B2.S6` | Multi-step addition and subtraction problems | 4.NBT.B.4, 4.OA.A.3 | W09 | partial | `algebra:tape_diagram`, `algebra:multi_step_word`; partial: `algebra:multi_step_word`, `algebra:tape_diagram` | multi_step_four_ops, vis_bar_family | A13 | - | - |
 | `Y5.B2.S7` | Compare calculations | 4.NBT.B.4 | W09 W10 | partial | -; partial: `order_of_operations:compare_expressions` | compare_calcs | A4 | - | - |
 | `G4|-|multiplicativecomparisonwordproblemshowmanytimesasmanyunknownmultiplier` BUILD (nearest same-domain block) | Multiplicative comparison word problems: how many times as many? (unknown multiplier) | 4.OA.A.2 | W10 | partial | -; partial: `multiplication:mult_comparison` | comparison_unknown | A13 | - | - |
-| `G4|-|placevalue10timesandonetenthofadigitsvalue` BUILD (nearest same-domain block) | Place value: 10 times and one tenth of a digit's value | 4.NBT.A.1, 5.NBT.A.1 | W10 | full | `placevalue:ten_times_value`, `placevalue:one_tenth_value`, `placevalue:ten_times_story`, `placevalue:identify`, `placevalue:value`, `placevalue:place_value_10x`, `placevalue:more_less_100`, `placevalue:compare`, `multiplication:mult_facts` **8/10**, `placevalue:unit_form`; partial: `placevalue:value`, `placevalue:place_value_10x` | value_ten_times | A8 | - | g4-nbt1-ten-times-value: passed |
+| `G4|-|placevalue10timesandonetenthofadigitsvalue` BUILD (nearest same-domain block) | Place value: 10 times and one tenth of a digit's value | 4.NBT.A.1, 5.NBT.A.1 | W10 | full | `placevalue:ten_times_value`, `placevalue:one_tenth_value`, `placevalue:ten_times_story`, `placevalue:identify` **8/10**, `placevalue:value` **8/10**, `placevalue:place_value_10x`, `placevalue:more_less_100`, `placevalue:compare`, `multiplication:mult_facts` **8/10**, `placevalue:unit_form` **8/10**; partial: `placevalue:value`, `placevalue:place_value_10x` | value_ten_times | A4 | lesson data exists | g4-nbt1-ten-times-value: passed |
 
 Build entries: `inverse_check` (option subtraction:sub_check_by_adding, operations); `vis_bar_family` (template division:share_into_groups, operations); `mental_add_sub` (new addition:mental_strategies, operations); `estimate_big_place` (option number_sense:estimate_sums_diffs, placevalue, links proposal only); `multi_step_four_ops` (option algebra:multi_step_word, algebra); `compare_calcs` (new algebra:compare_calculations, algebra); `comparison_unknown` (option multiplication:mult_comparison, operations, links proposal only); `value_ten_times` (option placevalue:value, placevalue).
 
 ### G5-Y6.B8
 
 **#18, round 3.** Grade 5 · Y6 Spring block Y6.B8: Decimals. Taught W05-W09 (start W07, week of 18–22 Oct).
-CCSS: 4.OA.B.4, 5.NBT.A.1, 5.NBT.A.2, 5.NBT.A.3, 5.NBT.A.4, 5.NBT.B.7. Shapes: A2 fact, A4 pv, A5 partwhole, A8 fraction.
+CCSS: 4.OA.B.4, 5.NBT.A.1, 5.NBT.A.2, 5.NBT.A.3, 5.NBT.A.4, 5.NBT.B.7. Shapes: A2 fact, A4 pv, A8 fraction.
 Lanes: placevalue 0/2 at 8/10 · fractions 0/7 at 8/10 · numtheory 0/3 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -606,7 +606,7 @@ Lanes: placevalue 0/2 at 8/10 · fractions 0/7 at 8/10 · numtheory 0/3 at 8/10.
 | `Y6.B8.S6` | Divide by 10, 100 and 1,000 | 5.NBT.A.2, 5.NBT.B.7 | W07 W08 W09 | partial | `placevalue:place_value_10x`; partial: `placevalue:place_value_10x` | pv10x_dp | A2 | - | - |
 | `Y6.B8.S6` | Divide by 10, 100 and 1,000 | 5.NBT.A.2, 5.NBT.B.7 | W07 W08 W09 | partial | `placevalue:place_value_10x`; partial: `placevalue:place_value_10x` | pv10x_dp | A2 | - | - |
 | `Y6.B8.S7` | Multiply decimals by integers | 5.NBT.B.7 | W07 W08 | full | `decimals:mult_decimal` | - | A8 | - | - |
-| `G5|-|multiplyanddividedecimalsbypowersof10writtenwithexponents101102103andexplainthepattern` BUILD (nearest same-domain block) | Multiply and divide decimals by powers of 10 written with exponents (10^1, 10^2, 10^3) and explain the pattern | 5.NBT.A.2 | W07 W08 | partial | -; partial: `placevalue:place_value_10x` | pv10_exponents | A5 | - | - |
+| `G5|-|multiplyanddividedecimalsbypowersof10writtenwithexponents101102103andexplainthepattern` BUILD (nearest same-domain block) | Multiply and divide decimals by powers of 10 written with exponents (10^1, 10^2, 10^3) and explain the pattern | 5.NBT.A.2 | W07 W08 | partial | -; partial: `placevalue:place_value_10x` | pv10_exponents | A2 | - | - |
 | `Y6.B8.S8` | Divide decimals by integers | 5.NBT.B.7 | W08 W09 | partial | `decimals:div_decimal`, `decimals:div_decimal_by_whole`; partial: `decimals:div_decimal` | div_dec_2dp | A8 | - | - |
 | `G5|-|dividebyadecimal` BUILD (nearest same-domain block) | Divide by a decimal | 5.NBT.B.7 | W08 W09 | partial | -; partial: `decimals:div_decimal` | div_by_decimal_model | A8 | - | - |
 | `G5|-|multiplydecimalsbydecimals` BUILD (nearest same-domain block) | Multiply decimals by decimals | 5.NBT.B.7 | W08 | partial | -; partial: `decimals:mult_decimal` | mult_dec_dec, decimal_models | A8 | - | - |
@@ -789,16 +789,16 @@ Build entries: `part_whole` (new composing:part_whole_model, k2); `pictures_to_s
 ### G1-Y2.B11
 
 **#26, round 5.** Grade 1 · Y2 Summer block Y2.B11: Position and direction. Taught W19-W20 (start W19, week of 31 Jan – 4 Feb).
-CCSS: 1.G.A.1, K.G.A.1. Shapes: A5 partwhole, A11 shape.
+CCSS: 1.G.A.1, K.G.A.1. Shapes: A7 groups, A11 shape.
 Lanes: geometry 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
 | `Y2.B11.S1` | Language of position | K.G.A.1 | W19 W20 | full | `shapes_early:shape_positions` | - | A11 | - | - |
 | `Y2.B11.S2` | Describe movement | K.G.A.1 | W19 W20 | gap | - | movement | A11 | - | - |
-| `Y2.B11.S4` | Describe movement and turns | K.G.A.1 | W19 | gap | - | movement | A11 | - | - |
-| `Y2.B11.S3` | Describe turns | K.G.A.1 | W20 | gap | - | turns | A11 | - | - |
-| `Y2.B11.S5` | Shape patterns with turns | 1.G.A.1 | W20 | gap | - | pattern_turns | A5 | - | - |
+| `Y2.B11.S4` | Describe movement and turns | K.G.A.1 | W19 | gap | - | movement | A7 | - | - |
+| `Y2.B11.S3` | Describe turns | K.G.A.1 | W20 | gap | - | turns | A7 | - | - |
+| `Y2.B11.S5` | Shape patterns with turns | 1.G.A.1 | W20 | gap | - | pattern_turns | A7 | - | - |
 
 Build entries: `movement` (new coordinates:describe_movement, geometry); `turns` (new coordinates:whole_half_quarter_turns, geometry); `pattern_turns` (new patterns:patterns_with_turns, algebra).
 
@@ -954,7 +954,7 @@ Build entries: `time_calendar` (new measurement:calendar_and_units, timemoney); 
 ### G3-Y4.B3
 
 **#34, round 6.** Grade 3 · Y4 Autumn block Y4.B3: Area. Taught W18-W20 (start W18, week of 24–28 Jan).
-CCSS: 2.G.A.2, 3.MD.C.5, 3.MD.C.6, 3.MD.C.7, 3.MD.C.7.A, 3.MD.C.7.B, 3.MD.C.7.C, 3.MD.C.7.D. Shapes: A9 measure, A11 shape.
+CCSS: 2.G.A.2, 3.MD.C.5, 3.MD.C.6, 3.MD.C.7, 3.MD.C.7.A, 3.MD.C.7.B, 3.MD.C.7.C, 3.MD.C.7.D. Shapes: A7 groups, A9 measure, A11 shape.
 Lanes: geometry 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -964,7 +964,7 @@ Lanes: geometry 0/1 at 8/10.
 | `Y4.B3.S3` | Make shapes | 3.MD.C.5, 3.MD.C.6 | W18 | partial | -; partial: `shapes_early:compose_rect_from_squares` | area_compare | A11 | - | - |
 | `Y4.B3.S4` | Compare areas | 3.MD.C.6 | W19 | gap | - | area_compare | A9 | - | - |
 | `G3|-|areaasmultiplication` BUILD | Area as multiplication | 3.MD.C.7, 3.MD.C.7.A, 3.MD.C.7.B | W19 W20 | partial | -; partial: `area_perimeter:area_unit_squares`, `area_perimeter:area` | area_tile_multiply | A9 | - | - |
-| `G3|-|distributiveandadditivearea` BUILD | Distributive and additive area | 3.MD.C.7, 3.MD.C.7.C, 3.MD.C.7.D | W19 W20 | partial | -; partial: `area_perimeter:area_distributive_visual`, `area_perimeter:area_polygon_decompose` | area_split_tiles | A9 | - | - |
+| `G3|-|distributiveandadditivearea` BUILD | Distributive and additive area | 3.MD.C.7, 3.MD.C.7.C, 3.MD.C.7.D | W19 W20 | partial | -; partial: `area_perimeter:area_distributive_visual`, `area_perimeter:area_polygon_decompose` | area_split_tiles | A7 | - | - |
 
 Build entries: `area_compare` (new area_perimeter:compare_areas, geometry); `area_half_squares` (option area_perimeter:area_unit_squares, geometry, links proposal only); `area_tile_multiply` (option area_perimeter:area_unit_squares, geometry); `area_split_tiles` (option area_perimeter:area_distributive_visual, geometry, links proposal only).
 
@@ -1305,14 +1305,14 @@ Build entries: `money_difference` (option measurement:money, timemoney, links pr
 ### G2-Y3.B11
 
 **#51, round 9.** Grade 2 · Y3 Summer block Y3.B11: Shape. Taught W23-W30 (start W28, week of 4–8 Apr).
-CCSS: 1.G.A.1, 1.G.A.2, 2.G.A.1, 2.MD.A.1, 3.MD.B.4, 4.G.A.1, 4.G.A.2, K.G.A.2, K.G.B.5. Shapes: A9 measure, A11 shape.
+CCSS: 1.G.A.1, 1.G.A.2, 2.G.A.1, 2.MD.A.1, 3.MD.B.4, 4.G.A.1, 4.G.A.2, K.G.A.2, K.G.B.5. Shapes: A7 groups, A9 measure, A11 shape.
 Lanes: geometry 0/5 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
 | `Y3.B11.S4` | Measure and draw accurately | 2.MD.A.1, 3.MD.B.4 | W23 | partial | -; partial: `measurement:reading_ruler` | draw_measure | A9 | - | - |
 | `Y3.B11.S7` | Recognise and describe 2D shapes | 2.G.A.1, K.G.A.2 | W27 W28 | full | `shapes_early:name_2d_shapes`, `shapes_early:count_sides_vertices_2d` | - | A11 | - | - |
-| `Y3.B11.S1` | Turns and angles | 2.G.A.1 | W28 W29 | gap | - | turns_angles | A11 | - | - |
+| `Y3.B11.S1` | Turns and angles | 2.G.A.1 | W28 W29 | gap | - | turns_angles | A7 | - | - |
 | `Y3.B11.S2` | Right angles | 2.G.A.1, 4.G.A.2 | W28 W29 W30 | partial | -; partial: `angles_lines:identify_angles` | turns_angles | A11 | - | - |
 | `Y3.B11.S9` | Recognise and describe 3D shapes | 2.G.A.1, 1.G.A.1 | W28 W29 | full | `shapes_early:name_3d_shapes`, `shapes_early:count_edges_faces_vertices` | - | A11 | - | - |
 | `Y3.B11.S10` | Make 3D shapes | 2.G.A.1, 1.G.A.1, K.G.B.5, 1.G.A.2 | W28 | gap | - | make_3d | A11 | - | - |
@@ -1383,12 +1383,12 @@ Build entries: `dual_bar` (new graphs:dual_bar_charts, data); `pie` (new graphs:
 ### GK-Y1.B11
 
 **#55, round 10.** Grade K · Y1 Summer block Y1.B11: Position and direction. Taught W29-W31 (start W30, week of 18–22 Apr).
-CCSS: K.G.A.1. Shapes: A11 shape.
+CCSS: K.G.A.1. Shapes: A7 groups, A11 shape.
 Lanes: geometry 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
 |---|---|---|---|---|---|---|---|---|---|
-| `Y1.B11.S1` | Describe turns | K.G.A.1 | W29 | gap | - | turns | A11 | - | - |
+| `Y1.B11.S1` | Describe turns | K.G.A.1 | W29 | gap | - | turns | A7 | - | - |
 | `Y1.B11.S2` | Describe position - left and right | K.G.A.1 | W29 W30 | gap | - | position_map | A11 | - | - |
 | `Y1.B11.S3` | Describe position - forwards and backwards | K.G.A.1 | W30 W31 | gap | - | position_map | A11 | - | - |
 | `Y1.B11.S4` | Describe position - above and below | K.G.A.1 | W30 W31 | full | `shapes_early:shape_positions` | - | A11 | - | - |
@@ -1501,7 +1501,7 @@ Build entries: `protractor_read` (option angles_lines:measure_angles, geometry);
 ### GK-Y1.B3
 
 **#61, round 11.** Grade K · Y1 Autumn block Y1.B3: Shape. Taught W29-W32 (start W31, week of 25–29 Apr).
-CCSS: K.G.A.2, K.G.A.3, K.G.B.4, K.G.B.5, K.G.B.6. Shapes: A5 partwhole, A11 shape.
+CCSS: K.G.A.2, K.G.A.3, K.G.B.4, K.G.B.5, K.G.B.6. Shapes: A2 fact, A11 shape.
 Lanes: geometry 0/6 at 8/10 · algebra 0/1 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -1512,7 +1512,7 @@ Lanes: geometry 0/6 at 8/10 · algebra 0/1 at 8/10.
 | `Y1.B3.S2` | Sort 3D shapes | K.G.A.2, K.G.B.4 | W31 W32 | gap | - | shape_sort | A11 | - | - |
 | `Y1.B3.S3` | Recognise and name 2D shapes | K.G.A.2, K.G.A.3 | W31 W32 | full | `shapes_early:name_2d_shapes`, `shapes_early:shape_name_match_2d` | - | A11 | - | - |
 | `Y1.B3.S4` | Sort 2D shapes | K.G.A.2, K.G.B.4 | W32 | partial | -; partial: `shapes_early:shape_attributes` | shape_sort | A11 | - | - |
-| `Y1.B3.S5` | Patterns with 2D and 3D shapes | K.G.A.2 | W32 | partial | `patterns:shape_pattern`; partial: `patterns:shape_pattern` | pattern_make | A5 | - | - |
+| `Y1.B3.S5` | Patterns with 2D and 3D shapes | K.G.A.2 | W32 | partial | `patterns:shape_pattern`; partial: `patterns:shape_pattern` | pattern_make | A2 | - | - |
 
 Build entries: `shape_draw` (new shapes_early:draw_2d_shapes, geometry); `shape_build_kit` (option shapes_early:shape_attributes, geometry, links proposal only); `shape_sort` (new shapes_early:sort_shapes, geometry); `pattern_make` (new patterns:make_a_pattern, algebra).
 
@@ -1560,7 +1560,7 @@ Build entries: `compare_measures` (new measurement:compare_measures, measurement
 ### G3-Y4.B12
 
 **#64, round 11.** Grade 3 · Y4 Summer block Y4.B12: Shape. Taught W27-W37 (start W28, week of 4–8 Apr).
-CCSS: 3.G.A.1, 4.G.A.3, 4.MD.C.5, 5.G.B.3. Shapes: A11 shape.
+CCSS: 3.G.A.1, 4.G.A.3, 4.MD.C.5, 5.G.B.3. Shapes: A7 groups, A11 shape.
 Lanes: geometry 0/6 at 8/10.
 
 | Lesson | Title | CCSS | Weeks | Verdict | Skills (8/10 marked) | Build entries | Shape | Short | Long |
@@ -1572,7 +1572,7 @@ Lanes: geometry 0/6 at 8/10.
 | `Y4.B12.S5` | Quadrilaterals | 3.G.A.1, 5.G.B.3 | W28 W29 | full | `shapes_classify:classify_quads`, `shapes_classify:hotspot_quads` | - | A11 | - | - |
 | `Y4.B12.S7` | Lines of symmetry | 3.G.A.1, 4.G.A.3 | W28 W29 | full | `angles_lines:symmetry`, `angles_lines:place_symmetry_lines` | - | A11 | - | - |
 | `Y4.B12.S8` | Complete a symmetric figure | 3.G.A.1, 4.G.A.3 | W28 | gap | - | symmetry_complete | A11 | - | - |
-| `Y4.B12.S1` | Understand angles as turns | 4.MD.C.5 | W37 | gap | - | turns_angles | A11 | - | - |
+| `Y4.B12.S1` | Understand angles as turns | 4.MD.C.5 | W37 | gap | - | turns_angles | A7 | - | - |
 
 Build entries: `polygons` (new shapes_classify:regular_irregular_polygons, geometry); `turns_angles` (new angles_lines:turns_and_angles, geometry); `symmetry_complete` (new angles_lines:complete_symmetric_shape, geometry).
 
@@ -1867,7 +1867,7 @@ Build entries: `negative_count` (new integers:count_through_zero, operations); `
 | algebra | 32 | 0 | 1 | `patterns:seq_10` (1), `composing:number_word_form` (2), `patterns:seq_2` (2), `patterns:seq_5` (2), `algebra:function_table_easy` (4), `algebra:multi_step_word_plain` (4), `algebra:two_step_add_then_div` (4), `algebra:two_step_add_then_mult` (4), `algebra:two_step_estimate_check` (4), `algebra:two_step_letter_equation` (4), `algebra:two_step_mult_div_first` (4), `patterns:number_patterns_rule` (5), `integers:order_negatives` (6), `number_sense:make_a_ten` (8), `algebra:multi_step_word` (9), `order_of_operations:oop_medium` (12), `order_of_operations:paren_simple` (12), `order_of_operations:three_ops_no_paren` (12), `order_of_operations:two_ops_no_paren` (12), `patterns:shape_pattern` (14), `algebra:tape_diagram` (17), `patterns:halve` (20), `number_sense:compensation` (22), `algebra:function_table_hard` (24), `algebra:solve_eq_addsub` (24), `algebra:solve_eq_multdiv` (24), `algebra:solve_eq_twostep` (24), `number_sense:doubles_near_doubles` (31), `patterns:double` (37), `patterns:skip_count_line` (37), `composing:odd_even` (44), `composing:select_even_odd` (44) |
 | k2 | 18 | 1 | 1 | `comparing:compare_groups` (1), `composing:ten_frame_build` (1), `counting:count_objects` (1), `counting:count_sequence` (1), `counting:number_seq_fill` (1), `composing:base10_build` (2), `composing:teen_compose` (2), `composing:tens_foundation_visual` (2), `composing:base10_build_hundreds` (3), `composing:ten_frame_build_teen` (7), `composing:make_ten` (8), `composing:number_bonds` (8), `composing:hundreds_chart_fill` (13), `division:share_into_groups` (15), `addition:add_5_pictures` (25), `subtraction:sub_5_pictures` (25), `comparing:compare_objects` (32) |
 | operations | 94 | 10 | 2 | `multiplication:count_by_tables` (2), `division:div_facts` (4), `division:div_word_problems_plain` (4), `multiplication:arrays_groups` (4), `multiplication:mult_chart` (4), `multiplication:mult_properties` (4), `multiplication:mult_word_problems_plain` (4), `integers:compare_int` (6), `integers:number_line_int` (6), `addition:add_10_regroup` (8), `addition:add_100_no_regroup` (8), `addition:add_100_regroup` (8), `addition:add_50_regroup` (8), `addition:add_sub_10s` (8), `addition:add_sub_fact_family` (8), `addition:add_three` (8), `addition:add_wp_100` (8), `addition:cloze_addition` (8), `addition:number_families_add` (8), `addition:number_line_add` (8), `subtraction:missing_add_sub` (8), `subtraction:number_line_sub` (8), `subtraction:sub_10_regroup` (8), `subtraction:sub_100_regroup` (8), `subtraction:sub_50_regroup` (8), `subtraction:sub_wp_100` (8), `addition:add_1k_mixed` (9), `addition:add_1k_no_regroup` (9), `addition:add_1k_regroup` (9), `addition:add_column_multi` (9), `addition:add_sub_100s` (9), `subtraction:sub_1k_mixed` (9), `subtraction:sub_1k_regroup` (9), `subtraction:sub_across_zeros` (9), `subtraction:sub_check_by_adding` (9), `addition:add_1m_mixed` (12), `division:box_division_hard` (12), `division:div_fix_estimate` (12), `division:div_zero_in_quotient` (12), `division:long_div_2digit` (12), `division:remainder_contexts` (12), `division:remainder_interpret` (12), `multiplication:area_model_mult_hard` (12), `number_ops_mixed:word_problems_mixed` (12), `subtraction:sub_1m_mixed` (12), `division:div_grouping_word_problems` (15), `division:div_sharing_word_problems` (15), `division:div_word_problems` (15), `multiplication:dot_array_mult` (15), `multiplication:repeated_add_to_mult` (15), `addition:add_100k_regroup` (17), `addition:add_1m_regroup` (17), `number_ops_mixed:missing_factor_or_addend` (17), `subtraction:sub_100k_regroup` (17), `subtraction:sub_1m_regroup` (17), `addition:add_10k_no_regroup` (22), `addition:add_10k_regroup` (22), `subtraction:sub_10k_regroup` (22), `division:divide` (23), `multiplication:mult_comparison` (23), `multiplication:mult_placeholder_zero` (23), `multiplication:multiply` (23), `addition:add_10_mixed` (25), `subtraction:nl_sub` (25), `subtraction:sub_10_mixed` (25), `addition:add_wp_1k` (28), `division:area_model_div_2by1` (28), `division:area_model_div_3by1` (28), `division:box_division_easy` (28), `division:div_2by1_long` (28), `division:div_remainders` (28), `multiplication:area_model_mult` (28), `multiplication:mult_zeros` (28), `subtraction:sub_wp_1k` (28), `addition:add_20_no_regroup` (31), `multiplication:equal_or_unequal_groups` (37), `multiplication:mult_chart_easy` (44), `multiplication:nl_mult` (44), `division:missing_mult_div` (57), `multiplication:area_model_2by1` (57), `multiplication:mult_2by1_column` (57), `multiplication:mult_div_fact_family` (57), `multiplication:mult_multiples_of_ten` (57), `integers:integer_nl_drag` (80) |
-| placevalue | 38 | 0 | 2 | `placevalue:combine` (2), `placevalue:compare` (2), `placevalue:expand` (2), `placevalue:identify` (2), `placevalue:order_greatest_to_least` (2), `placevalue:order_least_to_greatest` (2), `placevalue:unit_form` (2), `placevalue:value` (2), `placevalue:more_less_100` (3), `placevalue:place_value_disks` (3), `placevalue:more_less_10` (4), `number_sense:nearest_1000` (6), `number_sense:nearest_10000` (6), `number_sense:nearest_100000` (6), `number_sense:nearest_million` (6), `number_sense:round_sort_million` (6), `placevalue:number_word_names` (6), `placevalue:place_value_10x` (6), `placevalue:pv_digit_drag` (6), `number_sense:estimate_sum` (9), `number_sense:estimate_sums_diffs` (9), `number_sense:nearest_10` (11), `number_sense:nearest_100` (11), `number_sense:round_nl_hundred_thousands` (11), `number_sense:round_nl_ten_thousands` (11), `number_sense:round_nl_thousands` (11), `number_sense:round_sort_10000` (11), `number_sense:round_sort_100000` (11), `number_sense:rounding_table` (11), `number_sense:round_sort_100` (16), `number_sense:round_sort_1000` (16), `number_sense:rounding_visual` (16), `placevalue:pv_disks_build` (16), `placevalue:one_tenth_value` (17), `placevalue:ten_times_story` (17), `placevalue:ten_times_value` (17), `decimals:round_decimals` (18), `number_sense:round_sort_tenths` (47) |
+| placevalue | 38 | 5 | 2 | `placevalue:compare` (2), `placevalue:order_greatest_to_least` (2), `placevalue:order_least_to_greatest` (2), `placevalue:more_less_100` (3), `placevalue:place_value_disks` (3), `placevalue:more_less_10` (4), `number_sense:nearest_1000` (6), `number_sense:nearest_10000` (6), `number_sense:nearest_100000` (6), `number_sense:nearest_million` (6), `number_sense:round_sort_million` (6), `placevalue:number_word_names` (6), `placevalue:place_value_10x` (6), `placevalue:pv_digit_drag` (6), `number_sense:estimate_sum` (9), `number_sense:estimate_sums_diffs` (9), `number_sense:nearest_10` (11), `number_sense:nearest_100` (11), `number_sense:round_nl_hundred_thousands` (11), `number_sense:round_nl_ten_thousands` (11), `number_sense:round_nl_thousands` (11), `number_sense:round_sort_10000` (11), `number_sense:round_sort_100000` (11), `number_sense:rounding_table` (11), `number_sense:round_sort_100` (16), `number_sense:round_sort_1000` (16), `number_sense:rounding_visual` (16), `placevalue:pv_disks_build` (16), `placevalue:one_tenth_value` (17), `placevalue:ten_times_story` (17), `placevalue:ten_times_value` (17), `decimals:round_decimals` (18), `number_sense:round_sort_tenths` (47) |
 | numtheory | 11 | 0 | 5 | `number_theory:factor_links_medium` (5), `number_theory:factor_tchart_medium` (5), `number_theory:factors_identify` (5), `number_theory:list_multiples` (5), `number_theory:multiples` (5), `number_theory:prime_composite` (5), `number_theory:gcf_easy` (12), `number_theory:gcf_hard` (12), `number_theory:lcm` (12), `number_theory:factor_links_easy` (28), `number_theory:factor_tchart_easy` (28) |
 | fractions | 67 | 0 | 10 | `composing:compose_whole` (10), `composing:fraction_number_line` (10), `composing:whole_as_fraction` (10), `fraction_operations:add_mixed_like` (10), `fraction_operations:sub_frac_like_nv` (10), `fraction_operations:sub_fractions_like` (10), `fraction_operations:sub_mixed_like` (10), `fractions:equiv_frac_nv` (10), `fractions:equivalent` (10), `fractions:graph_fractions` (10), `fractions:improper_mixed` (10), `fractions:mixed_improper_visual` (10), `fractions:select_equiv_frac` (10), `decimals:add_decimal` (18), `decimals:div_decimal` (18), `decimals:div_decimal_by_whole` (18), `decimals:mult_decimal` (18), `decimals:round_thousandths` (18), `decimals:round_to_hundredth` (18), `decimals:sub_decimal` (18), `fractions:equiv_frac_visual` (20), `fractions:fraction_of_set` (20), `fractions:identify` (20), `fractions:shade_fraction` (20), `fractions:write_fraction` (20), `fraction_operations:add_frac_unlike` (30), `fraction_operations:add_frac_unlike_nv` (30), `fraction_operations:add_mixed_unlike` (30), `fraction_operations:add_mixed_unlike_nv` (30), `fraction_operations:sub_frac_unlike` (30), `fraction_operations:sub_frac_unlike_nv` (30), `fraction_operations:sub_mixed_unlike` (30), `fraction_operations:sub_mixed_unlike_nv` (30), `fractions:compare_frac_lcd` (30), `fractions:order_fractions` (30), `fractions:simplify` (30), `fraction_operations:add_frac_like_nv` (35), `fraction_operations:add_fractions_like` (35), `fraction_operations:decompose_fractions` (35), `fractions:compare` (35), `fraction_operations:div_unit_frac_nv` (36), `fraction_operations:div_unit_fraction` (36), `fraction_operations:mult_frac_frac` (36), `fraction_operations:mult_frac_frac_nv` (36), `fraction_operations:mult_frac_whole` (36), `fraction_operations:mult_frac_whole_nv` (36), `fraction_operations:unit_frac_div_whole` (36), `fractions:fraction_of_set_hard` (36), `fractions:fraction_of_set_hard_nv` (36), `fractions:fraction_of_set_nv` (41), `conversions:d_to_f` (47), `conversions:d_to_p` (47), `conversions:f_to_d` (47), `conversions:f_to_p` (47), `conversions:order_fdp` (47), `conversions:p_to_d` (47), `conversions:p_to_f` (47), `conversions:percent_visual` (47), `decimals:compare_decimal` (47), `decimals:compare_thousandths` (47), `decimals:decimal_nl_drag` (47), `decimals:order_decimals` (47), `fraction_operations:frac_10_100` (47), `conversions:find_whole_from_pct` (75), `conversions:percent_of_number` (75), `fraction_operations:frac_as_div_nv` (75), `fraction_operations:frac_as_division` (75) |
 | geometry | 42 | 0 | 14 | `angles_lines:place_symmetry_lines` (14), `angles_lines:symmetry` (14), `shapes_early:count_edges_faces_vertices` (14), `shapes_early:count_sides_vertices_2d` (14), `shapes_early:name_2d_shapes` (14), `shapes_early:name_3d_shapes` (14), `shapes_early:shape_corners_count` (14), `shapes_early:partition_shapes` (20), `area_perimeter:perimeter` (21), `area_perimeter:perimeter_grid` (21), `shapes_early:shape_positions` (26), `area_perimeter:area_unit_squares` (34), `area_perimeter:area_perimeter` (48), `area_perimeter:area_triangle` (48), `area_perimeter:volume` (48), `angles_lines:identify_lines` (51), `angles_lines:identify_angles` (53), `angles_lines:measure_angles` (53), `coordinates:coordinate_q1` (59), `coordinates:geo_translate` (59), `coordinates:translate_left_down` (59), `coordinates:translate_left_up` (59), `coordinates:translate_right_down` (59), `coordinates:translate_right_up` (59), `angles_lines:additive_angles` (60), `shapes_classify:net_identify` (60), `shapes_early:compose_hexagon` (61), `shapes_early:compose_shapes` (61), `shapes_early:shape_name_match_2d` (61), `shapes_early:shape_name_match_3d` (61), `shapes_classify:classify_quads` (64), `shapes_classify:classify_triangles` (64), `shapes_classify:hotspot_quads` (64), `area_perimeter:area` (65), `area_perimeter:area_polygon_decompose` (65), `area_perimeter:composite_shapes` (65), `coordinates:coordinate_all` (66), `coordinates:geo_reflect` (66), `coordinates:reflect_x_axis` (66), `coordinates:reflect_y_axis` (66), `coordinates:coordinates_plot_q1` (77), `coordinates:coordinates_read_q1` (77) |

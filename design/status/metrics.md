@@ -493,3 +493,26 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Fast facts at S, columns | — | 10 (8 when answers > 99) |
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
 | simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
+
+### lf-engine (lesson 2 P0 drift, 2026-11-09)
+
+| Finding | Check that now catches it | Backtest row | On precritic / ws-detailed-lesson path? | Would have saved |
+|---|---|---|---|---|
+| P0 drift: lane pageLr6 lacked master's `perQuestion` pre-skill-check case (twins at 5 of 6 seeds) | `ws-lesson-unit --only p0-overlap` (wiring part, new) | p0-overlap: FAIL dcdb50d4 / PASS b1e30155 | no: ws-lesson-unit is on the lane gate list and the SHAPES.md bar-story check-first; E24b on ws-detailed-lesson caught the symptom only | 2 rounds |
+| P0 answer overlap: count 11-20 vs + facts 13-19 (also g2-nbt3, g3-oa5 P0 pairs) | `ws-lesson-unit --only p0-overlap` (ranges meet -> set wired, union holds every item) | p0-overlap (same row) | no (as above) | 1 round |
+| E9 / E35 lesson 2 | none this round: deferred by the lead until after the phase-0 landing | - | E9 / E35 are ws-detailed-lesson rows | - |
+| lf-placevalue critic rounds to pass all 5 lesson #1 skills | — | r1-r5 (expand r3; value, combine r3c; identify, unit_form r4; r5 margin / G5 / page split) - 6 r4-r5 findings: 3 new checks with backtests, 1 caught by an existing check (unfixed, hosts), 2 engine with reasons |
+
+### lf-engine landing (2026-11-09)
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| L1 vocab zoom (P1b N1) changes 7 live packets | `ws-lesson-baseline --all-lessons --check <master baseline>` | none yet: a commit-pair row (lane bd0ee8e7 FAIL / master f6216420 PASS) needs a baseline file per side; proposed | no: a landing gate (LANDING_PLAN step 4), not a lesson gate | 1 (caught before deploy) |
+| L2 nearest_10 Practice 3 rows vs 2 | same | same | no | (same) |
+| record drift (writeValue, pv records) | node deep-compare of lessonFor for every master key (scratch tool; to fold into ws-lesson-unit) | none | no | 1 |
+
+### lf-engine landing round 2 (2026-11-09)
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
+| L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
+| Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |

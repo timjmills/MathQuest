@@ -263,7 +263,19 @@ export function optionControlHTML(def, cur, color, h) {
         const dense = vals.length > 8 && vals.every(x => String(x.l).length <= 3);
         const pad = dense ? '5px 7px' : '6px 9px';
         const offBorder = dense ? color + '55' : 'var(--border)';
+        // A value another option rules out (div_facts' array past dividends of 50, facts card F2): its box is greyed and
+        // disabled, its reason on mouse-over and in a line under the list (`valueLock(cur)` -> {value: why}).
+        const vlock = typeof def.valueLock === 'function' ? (def.valueLock(cur || {}) || {}) : {};
         const rows = vals.map((x, i) => {
+            const why = vlock[x.v];
+            if (why) {
+                return `<label class="sko-set-row sko-set-locked" title="${escHTML(why)}" style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
+                        padding:${pad};border:1px dashed ${offBorder};border-radius:7px;background:transparent;cursor:not-allowed;min-width:0;
+                        font-size:0.8rem;color:var(--text-dim);font-weight:400;opacity:0.55;">
+                <span style="min-width:0;overflow-wrap:anywhere;">${escHTML(x.l)}</span>
+                <input type="checkbox" disabled aria-disabled="true" style="width:16px;height:16px;flex:none;margin:0;">
+            </label>`;
+            }
             const on = chosen.includes(x.v);
             // Checked is shown by the box alone (owner 2026-11-02): every row has the same edge and no fill.
             return `<label class="sko-set-row" style="display:flex;align-items:center;justify-content:space-between;gap:${dense ? '6px' : '10px'};
@@ -283,6 +295,10 @@ export function optionControlHTML(def, cur, color, h) {
         const none = !chosen.length
             ? `<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">None ticked — any of them may appear.</div>`
             : '';
+        const lockNote = Object.entries(vlock).map(([v, why]) => {
+            const x = vals.find((y) => String(y.v) === String(v));
+            return x ? `<div class="sko-set-locknote" style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">${escHTML(x.l)}: ${escHTML(why)}</div>` : '';
+        }).join('');
         return `<div${tip} style="font-size:0.82rem;color:var(--text);">
             <div class="sko-set-head" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px;">
                 <span style="flex:1 1 8em;min-width:0;font-weight:600;overflow-wrap:anywhere;">${escHTML(def.label)}</span>
@@ -293,6 +309,7 @@ export function optionControlHTML(def, cur, color, h) {
             </div>
             <div style="${rowsWrap}">${rows}</div>
             ${none}
+            ${lockNote}
             ${extra}
         </div>`;
     }

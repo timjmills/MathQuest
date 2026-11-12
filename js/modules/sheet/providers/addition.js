@@ -14,7 +14,7 @@
 
 import { registerSkill } from '../contract.js';
 import {
-    num, arr, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, clampSteps,
+    num, arr, obj, fmt, operands, countList, digitsOf, chooseWrong, strings, step, drawStep, clampSteps,
 } from './util.js';
 import { storiesFor } from './stories.js';
 import { wordWorkProvider } from './word-work.js';
@@ -77,23 +77,27 @@ function factSteps(a, b) {
     const small = Math.min(a, b);
     const sum = a + b;
     const done = step(`Write ${sum}.`, [{ slot: 'ans', value: String(sum) }]);
+    // (drawStep: the Scripted Model's short text and the grey mark each step adds, PT-MOD-1 / PT-MOD-2)
     if (small === 0) {
-        return [step(`${a} + ${b}: one number is 0.`), step('Adding 0 does not change the number.'), done];
+        return [drawStep(`${a} + ${b}: one number is 0.`, 'One number is 0.', [{ jot: '+ 0' }]),
+            drawStep('Adding 0 does not change the number.', 'Adding 0 changes nothing.', [{ jot: `${big} + 0 = ${big}` }]), done];
     }
     if (a === b) {
-        return [step(`${a} + ${b} is a double.`), step(`Double ${a} is ${sum}.`), done];
+        return [drawStep(`${a} + ${b} is a double.`, `${a} + ${b} is a double.`, [{ jot: `double ${a}` }]),
+            drawStep(`Double ${a} is ${sum}.`, `Double ${a} is ${sum}.`, [{ jot: `${a} + ${a} = ${sum}` }]), done];
     }
     if (sum > 10 && big < 10 && small >= 3) {
         const need = 10 - big;
         return [
-            step(`Start with ${big}.`),
-            step(`Make 10: ${big} + ${need} = 10.`),
-            step(`${small} is ${need} and ${small - need}.`),
-            step(`10 + ${small - need} = ${sum}.`),
+            drawStep(`Start with ${big}.`, `Start with ${big}.`, [{ jot: `${big}` }]),
+            drawStep(`Make 10: ${big} + ${need} = 10.`, `Make 10: ${big} + ${need}.`, [{ jot: `${big} + ${need} = 10` }]),
+            drawStep(`${small} is ${need} and ${small - need}.`, `${small} is ${need} and ${small - need}.`, [{ jot: `${small} = ${need} + ${small - need}` }]),
+            drawStep(`10 + ${small - need} = ${sum}.`, `10 + ${small - need} = ${sum}.`, [{ jot: `10 + ${small - need} = ${sum}` }]),
             done,
         ];
     }
-    return [step(`Start with ${big}.`), step(`Count on ${small}: ${countList(big + 1, sum)}.`), done];
+    return [drawStep(`Start with ${big}.`, `Start with ${big}.`, [{ jot: `${big}` }]),
+        drawStep(`Count on ${small}: ${countList(big + 1, sum)}.`, `Count on ${small}.`, [{ tile: small }, { more: countList(big + 1, sum) }]), done];
 }
 
 function factWrong(q, slot = 'ans') {
