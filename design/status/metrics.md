@@ -516,3 +516,4 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
+| lf-engine PC (2026-11-12) | builder, one session | live baseline 1,556 hashes 10 m 48 s, 0 differ; forced baseline 334 hashes 4 m 35 s; forced samples render 53 s | N7 done, N6 done (no paired unit in the samples at the floor), N2 re-choice / N5 / N8 / fill not done: check runs to 2 pages |

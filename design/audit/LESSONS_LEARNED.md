@@ -411,3 +411,15 @@ the cell; and a LATER state of the same example draws ink in that band (reserved
 ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
 never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
 white on any other role.
+
+### lf-engine PC round (2026-11-12): the check was never rendered ON after its last fixes
+- **Finding (builder, before any critic):** with the Prerequisite Check forced on (`buildSheet({prereqsForce: true})`,
+  `ws-lesson-samples --force-check`), master's check runs to TWO pages at L for all three samples and at S for add: the
+  N2 floor (>= 2 items a question) landed while every check was switched off (`prereqsLive: false`), so no render showed it.
+  Short by 15 mm (sub L), ~23 mm (round L), ~33 mm (add L: two picture-compare and two bond cells, 64-65 mm rows).
+  The N2 narrower re-choice cannot be built from existing options: compare_groups on dice to 5 keeps the 63.6 mm compare
+  cell; a wrapped pv sentence frame at half width measures 34.8 mm and fails `fitsAt` (reflow). It needs NEW item forms
+  ("circle the bigger number" pairs; "30 + 10 = [ ]" both ways, which PC-NAME must then accept).
+- **Rule:** a switched-off part is still rendered by every lane that touches it (`--force-check`), and PC-H13 runs on it.
+- **Check:** `ws-lesson-samples --check --force-check` (PC-H13 "check page count = 1" is the row to add: today it reports
+  the blank feet of p1 and p2).

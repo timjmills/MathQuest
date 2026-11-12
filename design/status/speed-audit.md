@@ -957,3 +957,10 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
+
+### lf-engine PC round (2026-11-12, builder)
+| finding | check | backtest | on precritic path | rounds saved |
+|---|---|---|---|---|
+| check 2 pages at L once the N2 floor landed (all 3 samples) | `ws-lesson-samples --check --force-check` PC-H13 (+ a page-count row to add) | not yet a row: FAIL d34311d5 (forced) / PASS needs the new item forms | no: precritic renders the check OFF; add `--force-check` to its lesson-samples step | 1 (found before the critic) |
+| N7 sub check title dropped its topic | title carries `checkTopic` (seen at L in the forced render) | not yet a row | no | 0.5 |
+| Speed-up: `prereqsForce` render override means no record flip is needed to render a switched-off part | | | | |
