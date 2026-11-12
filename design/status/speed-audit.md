@@ -955,4 +955,5 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 **Lost (round 2, cont.):** ~2 h 30 on ws-backtest: the full run kept every commit-pair checkout (~600 MB) to the end, filled the disk, and
 79 rows read ERROR(checkout); the rerun was too slow to finish in budget (10 of the 79 rows re-run, all PASS). **Fix (tool):**
 ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
-start it first, alone, detached, and re-run only the failed rows by `--row`.
+start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
+

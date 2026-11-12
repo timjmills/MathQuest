@@ -59,3 +59,17 @@ Hash (`hash2.cjs`, PNG + HTML, seed 7, A4) vs 7e0c074b: the same 52 renders iden
 --check` on g3-oa5-mult-properties, g3-oa9-mult-table-patterns, g3-oa9-input-output-rule, g4-nbt1-ten-times-value: OK, output
 identical to 7e0c074b. `ws-boot-smoke`: OK. Syntax: guided.js (`--input-type=module --check`), ws-empty-band.cjs OK.
 `ws-empty-band --self-test`: OK.
+
+
+## Critic factroles r1 (narrow, 343e0b78, 2026-11-12) - FAIL, lowest 6 (C3); only Guided M of add / sub / mult facts passes
+Report design/audit/runs/lf-ops/critic-factroles-r1.md; 4 renders in design/audit/runs/lf-ops/factroles-r1-renders/.
+Pass: the fade (PT-GDP-1), nothing given away, keys 27 / 27, TY-30 digits, CL-40, cell bands < 30 %, reading order, Say frames.
+| Finding | Check that would catch it (to build) | Backtest state | Note |
+|---|---|---|---|
+| G1 Guided S add / sub: the hinted row 1 does not fit 5 columns (dot tile clipped, cell-5 tile across the frame) | EB-EDGE (ink within 1.5 mm of or across a divider / frame, any row) | fail 343e0b78 add / sub Guided S | lane fix: choose S columns from the hinted row, or the tile under the fact |
+| G2 Guided div_facts_long / div_facts S, M pages 38-46 % used | EB-PAGE (page used < 50 % FAIL, < 70 % WARN) | fail 343e0b78 div_facts S | from ruling (b): LEAD |
+| G3 other Guided S / L pages 56-69 % used | EB-PAGE (WARN) | - | from ruling (b): LEAD |
+| S1 every Scripted Model: states 1..n-1 the same picture, no new grey mark (PT-MOD-1); sub_facts Model 10-5=5 ambiguous | MOD-MARKS (adjacent states differ in ink) + provider unit test (workedSteps marks) + dealer predicate MODEL-UNAMBIGUOUS | fail 343e0b78 | lane fix |
+| S2 Scripted Model step text over 2 lines (mult step 2: 4-5 lines) (PT-MOD-2) | MOD-LINES (step text <= 2 line boxes) | fail 343e0b78 | lane fix |
+| S3 Scripted Model pages 23-42 % used | EB-PAGE | fail 343e0b78 | LEAD |
+Speed-up: ask the page-fill question before the build: ruling (b) fixed ceiling, stretch and leftover together, and the critic was first to measure the page used.
