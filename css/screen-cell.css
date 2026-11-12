@@ -1910,3 +1910,87 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
     background: #fff; color: #000; font-family: 'Andika', 'Open Sans', sans-serif; font-size: 20px; line-height: 1.35; text-align: left; }
 .mq-vexplain p { margin: 0; }
 .mq-vexplain p + p { margin-top: 6px; }
+
+/* ---- O-1 (owner, 2026-11-10; lane lf-vocab r8): the NEXT answer box is a thick BLUE outline that pulses gently, on a
+   white fill, on the practice card, the online worksheet and the quiz (every skill). Yellow now means only "right"
+   (R-1, the vocabulary feedback). ONE SWITCH: the --mq-next-* properties below. ADDITIVE: the 2026-10-02 / 2026-10-04
+   rules above stay; these later rules of equal or higher specificity repaint them through the switch.
+   GOING BACK TO YELLOW IS ONE LINE, in index.html:   <html lang="en" class="mq-next-yellow">
+   (the html.mq-next-yellow block restores the 2026-10-04 colours: ring #f2c200, fill #fff3a0 -> #ffe14d, card #fffbe0).
+   A wrong box keeps its red (R4-3, restated after); prefers-reduced-motion keeps a static outline. Screen only. */
+:root {
+    --mq-next-color: #1565d8;                    /* the ring */
+    --mq-next-glow: rgba(21, 101, 216, 0.30);    /* the pulsing inner ring */
+    --mq-next-w: 4px;                            /* the ring's width */
+    --mq-next-fill-a: #fff; --mq-next-fill-b: #fff;   /* the box's fill (white: the pulse is the ring only) */
+    --mq-next-card: #f3f7fe;                     /* the current worksheet problem's card */
+}
+html.mq-next-yellow {
+    --mq-next-color: #f2c200; --mq-next-glow: rgba(242, 194, 0, 0.45); --mq-next-w: 3px;
+    --mq-next-fill-a: #fff3a0; --mq-next-fill-b: #ffe14d; --mq-next-card: #fffbe0;
+}
+@keyframes mq-next-switch-pulse {
+    0%, 100% { --mq-next-ring: 4px; --mq-next-fill: var(--mq-next-fill-a); }
+    50%      { --mq-next-ring: 10px; --mq-next-fill: var(--mq-next-fill-b); }
+}
+@keyframes mq-next-switch-card {
+    0%, 100% { box-shadow: 0 0 0 3px var(--mq-next-color); }
+    50%      { box-shadow: 0 0 0 3px var(--mq-next-color), 0 0 0 8px var(--mq-next-glow); }
+}
+html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+html body .mq-active-box,
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus),
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: inset 0 0 0 var(--mq-next-w) var(--mq-next-color), inset 0 0 0 var(--mq-next-ring) var(--mq-next-glow) !important;
+    animation: mq-next-switch-pulse 1.4s ease-in-out infinite !important;
+}
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within {
+    background-color: var(--mq-next-fill) !important;
+}
+html body .online-edition .problem-card.mq-wscard.mq-active-problem {
+    background-color: var(--mq-next-card);
+    box-shadow: 0 0 0 3px var(--mq-next-color);
+    animation: mq-next-switch-card 1.6s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+    html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+    html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+    html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+    html body .mq-active-box,
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus),
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem {
+        animation: none !important; --mq-next-ring: var(--mq-next-w); --mq-next-fill: var(--mq-next-fill-a);
+    }
+}
+/* R4-3 restated after the switch: a box judged wrong or missing keeps its red, with no ring and no pulse */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit)) {
+    animation: none !important;
+    box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
+    border-color: var(--mq-box-bad, #B3261E) !important;
+}
+@media print {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView) .mq-active-box.mq-active-box.mq-active-box,
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
+}

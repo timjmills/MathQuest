@@ -8,6 +8,13 @@ Updated: 2026-11-09
 Builder profile: mq-opus-medium
 Critic rounds: 5: r5 PASS min 8 (design/lanes/lf-vocab/critic-r5.md); r4 FAIL 6, r3 FAIL 6, r2 FAIL 7, r1 FAIL 1
 
+## Round 8 (2026-11-12, builder, Opus medium: rebuild after the narrow critic FAIL min 7, plus owner O-1 / O-2 / O-3)
+Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per step, pushed after each.
+- Step A (O-1): the next answer box is a 4 px blue ring (#1565d8) pulsing an inner ring rgba(21,101,216,.30) on white, on
+  card / worksheet / quiz, every skill, behind ONE switch (css/screen-cell.css :root --mq-next-*; html.mq-next-yellow restores
+  the yellow, one line in index.html). Wrong stays red (R4-3 restated), reduced motion static. Check ws-next-box (NB1-NB5,
+  new, on precritic's vocab path): FAIL 32 on 3d90097d, OK after.
+
 ## Round 7 (2026-11-09, builder, Opus medium: first build of a new screen feedback state): owner R-1 and R-2
 Times (UTC): start 12:50, end 13:45. Base b7dad93a (card signed 107b64aa). Brief design/lanes/lf-vocab/r7-builder-brief.md.
 

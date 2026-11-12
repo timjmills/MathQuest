@@ -915,6 +915,9 @@ function buildPlan(ctx) {
             // (lf-vocab r5, critic r3: the checks only a browser measures - the per-word Score on every offered role (V11R), the
             // 1 picture, 3 words Guided rows equal at S, M and L (V18), and one fixed worksheet-1280 tile layout per template (V19))
             add(gate('vocab-unit-browser', 'ws-vocab-unit --browser (Score per word on every role, Guided rows equal at S/M/L, worksheet tiles one layout, EA cell at S <= 0.9 x L)', scope, 'browser', 'ws-vocab-unit', ['--browser']));
+            // (lf-vocab r8, owner O-1: the next answer box is the switch's blue ring on the card, the worksheet and the quiz; the
+            // switch flips it back to yellow; a wrong box stays red; reduced motion is static)
+            add(gate('next-box', 'ws-next-box (O-1: the next box is the --mq-next-color ring on card / worksheet / quiz, one switch, wrong stays red)', 'card-390, worksheet-1280, quiz-1280', 'browser', 'ws-next-box', [], { missingMsg: 'ws-next-box is not in this tree' }));
             // (lf-vocab r6, critic r4 #1: the empty band measured AS THE CRITIC DOES - an empty answer slot is not ink, the longest
             // blank run between the cell's rules - for the two picture vocabulary skills only; other lanes keep the default)
             {
