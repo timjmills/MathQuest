@@ -93,3 +93,4 @@ Report design/audit/runs/lf-ops/critic-factroles-r2.md; renders design/audit/run
 |---|---|---|---|
 | S4 Scripted Model L, mult_facts and div_facts: 4 states laid 3 + 1 in 3 columns, 2 empty state cells (~62 x 102 mm each) and no second example | MOD-GRID: no empty state cell in a Model grid (EB-PAGE passed: state 4's ink carries the page to 91-93 %) | fail f960e549 mult / div Model L | fix: each example 2 + 2, example 2 on a continuation page |
 | state 1's 30-34 % bottom band (room kept for later marks) | accepted by the critic | - | RULING NEEDED: write the exception into H13 / PT-MOD |
+- r3 step 1 done: MOD-GRID in ws-empty-band (--model-states): a Model grid cell with no text and no drawing FAILS; on f960e549 4 findings (mult_facts / div_facts Model L, cells 5-6 empty, 61 x 101-104 mm), the other 13 Model renders clean. Backtest row model-grid-facts (fail f960e549, pass = the step 2 fix). Next: step 2 the 2 + 2 fix
