@@ -25,6 +25,13 @@ Brief design/lanes/lf-vocab/r8-builder-brief.md. Base 3d90097d. One line per ste
   redrawn vocab cells - placevalue:identify / value / expand / combine page 2 (the band page) pupil + key, g2-nbt3 p06/p08/p18/p29
   (its digit / place pictures), and the two vocabulary skills' own pages (step / digit drawings, deals). ws-detailed-lesson
   g2-nbt3 --check OK, --repeats OK (70 places, 0 findings). EB-VOCAB PASS on the four pv lessons. PNGs in design/status/lf-vocab/r8.
+- Final gates (manifest applied): ws-vocab-unit OK, --browser OK; ws-next-box OK; ws-empty-band and --slot-ink off PASS (precritic);
+  ws-phone-card sweep (screen-answer default + pv + 2 vocab, 53 live skills x 2 sizes x 3 items) 452 findings on 3d90097d and 452
+  on head, verdicts line-identical; ws-screen-answer default and --family pv OK on base and head; ws-boot-smoke PASS; ws-backtest
+  on the 4 r8 rows OK. ws-precritic --strict: 28 PASS, 7 FAIL - sibling-compare, print-lint sections S/L L-DENSITY, render-gate
+  and cell-checks (pre-skill-check overflow S/M/L both skills; guided S vocabSet 8 overflow) - EVERY ONE also FAILs identically on
+  3d90097d (the master merge's pre-skill-check role and the sections deal): pre-existing, not this round's change; needs a lead
+  decision (fix in r9 or own elsewhere) before the critic. Renders: scratchpad critic8/{hosts,answered,pictures,lesson}.
 
 ## Round 7 (2026-11-09, builder, Opus medium: first build of a new screen feedback state): owner R-1 and R-2
 Times (UTC): start 12:50, end 13:45. Base b7dad93a (card signed 107b64aa). Brief design/lanes/lf-vocab/r7-builder-brief.md.

@@ -353,6 +353,21 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | Hard words in explanations ("figure(s)", vague "times as many", the too-short "equal groups") | An explanation uses the grade's word list, no word above it, and is at least 6 words | V24 extended: a banned-hard-word list and a minimum length | y |
 | Evidence gaps: the answered-wrong-1280 shot cut off at 900 px; no quiz answered render | Answered states are rendered full-page, on every host incl. the quiz | the render harness: full-page answered shots + a quiz answered state | n (harness) |
 | Owner question: yellow means both "your active box" (the 2026-10-04 pulse) and "correct" (R-1) | - | none: an owner decision | n |
+### lf-vocab round 8 (builder, 2026-11-12): critic r6 findings and owner O-1 / O-2 / O-3, each a check that FAILs on d17f8d6a
+| Finding / ruling | Check | Backtest row | On precritic? |
+|---|---|---|---|
+| O-1: the next answer box blue, one switch, wrong stays red, reduced motion static (every skill) | ws-next-box NB1-NB5 (new, browser) | vocab-o1-next-box-blue | y (next-box, vocab scope) |
+| r6 #1 Match 3 line names the word, all pictures glow | V25+ (letter in the line; glow count = wrong words; letters lit) | vocab-r8-v25plus-v26-v27 | y (vocab-unit-browser) |
+| r6 #2 / #3 ladder repeats the explanation / weaker hint after it | V26 | vocab-r8-v25plus-v26-v27 | y |
+| r6 #4 wrong cards show different blocks (only reproduces on a fresh page with the per-card ladder climbed while current) | V27 | vocab-r8-v25plus-v26-v27 | y |
+| r6 #5 pick3 wrong word unmarked | V25+ (box-wrong on the line) | vocab-r8-v25plus-v26-v27 | y |
+| r6 #6 key halo strokes glyphs and dots | V22+ (no text in the key halo; filled dots unstroked) | vocab-r8-v22plus-v24plus | y (vocab-unit) |
+| r6 #7 hard words / vague explanations | V24+ (HARD_WORDS list, >= 6 words) | vocab-r8-v22plus-v24plus | y |
+| O-2 / O-3 a picture fits another bank / band word (staircase = column; H T O beside ones; four cubes beside place) | V-AMBIG (alsoShows declared for the 47 pictures and every lesson-band picture) | vocab-r8-v-ambig | y (vocab-unit) |
+| r6 evidence gaps (cut-off shots, no quiz answered render) | ws-vocab-answered (full page, card / worksheet / quiz) | - | n (harness) |
+- Speed: a check that needs a reproduced UI state (V27) must start from a fresh page; a state left by earlier cases in the same page
+  hid the defect on the base commit and the first version of the check passed there.
+
 ## lf-placevalue critic r2 (2026-11-07): one line per finding, the check that now catches it (or PROPOSED)
 - N1 identify True or False? key marks the right answer False (writeValue joined string) -> `ws-providers-unit --pv-r2 N1` WRONG-DIFFERS per slot (L27).
 - N2 identify instruction misses the value task on paper -> `ws-providers-unit --pv-r2 N2` PRINTED-INSTRUCTION (L28).
