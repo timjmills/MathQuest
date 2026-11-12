@@ -476,3 +476,13 @@ One line per finding: the rule, then the check.
   check is live (`phase0On`, LR-17b); with `prereqsLive: false` every packet prints as master (proof check-land-2.log).
   **Lesson:** a critic fix made on a sample lesson goes in as a flag on that lesson's record, not as a branch keyed on a
   property many lessons share ("has prereqs", "is a rounding cell").
+
+### lf-vocab round 8, narrow critic r7 (2026-11-12): FAIL min 6. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| O-3 not met: row/column/input/output/array/odd/cycle/factor/product/quotient/unknown/term each fit another same-grade bank word; the hand-written `alsoShows` lists missed them | The ambiguity list is DERIVED from what a picture draws, never written by hand: "=" adds equation; a number run adds pattern, sequence and multiple; a column drawn round adds column; a crossed or lone mark adds left; a loop of arrows adds pattern. Every derived pair in the same grade becomes notWith, or the picture is redrawn. | V-AMBIG+: derive the marks from the SVG; FAIL any same-grade pair compatible() allows | y |
+| Quiz: wrong Match 3 slots not red; the blue next ring on a wrong box | Red (wrong) always wins over the next ring, on every host incl. the quiz | ws-next-box NB6: quiz answered-wrong, every wrong slot red, none ringed | y |
+| pick3 has no next-answer cue on any host | Owner question: is the pick3 line or word row the O-1 "box"? | none until ruled | n |
+| Key dot halos fuse into a blob | A group of marks gets one underlay, never overlapping rings | V22++: no two halos overlap | y |
+| "Type even" when the instruction says "Tap its word" | A hint uses the instruction's verb | V26+: verb match | y |
+| "like 4 dots", "one bar is 3 of the other bar" | An explanation is grammatical and concrete | V24++: a bad-phrasing list | y |
