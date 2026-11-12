@@ -3052,8 +3052,8 @@
     "state": "200 findings: EB-BAND 110, EB-SIDE 90 (add_facts 51, sub_facts 72, mult_facts 44, div_facts_long 34, div_facts 20)"
    },
    "pass": {
-    "commit": "TBD",
-    "state": "TBD: fact cells sized to their real footprint on guided / scripted-model"
+    "commit": "6e962016",
+    "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
    "expect": {
