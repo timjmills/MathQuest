@@ -912,8 +912,12 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             const lo = { 200: 101, 500: 201, 1000: 501, 5000: 1001, 10000: 5001 }[band] || 101;
             rowLo = (lo - 1) / 10; rowHi = (lo === 101 ? 200 : band) / 10 - 1;   // an unknown band falls back to 101-200
         } else {
-            rowLo = 0; rowHi = [10, 20, 30, 40, 50].includes(band) ? band / 10 - 1 : 9;
+            rowLo = 0; rowHi = [10, 20, 30, 40, 50, 120].includes(band) ? band / 10 - 1 : 9;
         }
+        // chart_120 (card chartwindow §3, §9.2): at band 120 a window or three rows is always chart
+        // rows 9-11 (91-120), so every item crosses 100. One item in three must put a gap on a
+        // crossing square (100, 101, 110, 111).
+        const _to120 = !big && band === 120;
         // Wave 1 lane C: grid size (a small piece / three whole rows of ten / the whole chart) and
         // which squares are empty. The defaults draw exactly the random numbers they drew before.
         const _grid = big ? 'window' : (_kOpt('grid') || 'window');
@@ -922,8 +926,9 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // The big chart's numbers need wider boxes (three to five digits at the working size), so
         // its window is four columns wide: two windows still share a row at size L.
         const C = big ? 4 : (band === 10 || _grid !== 'window') ? 10 : 5;
-        const r0 = big ? rng(rowLo, rowHi - (R - 1)) : rng(0, rowHi - (R - 1));
-        const c0 = C === 10 ? 0 : rng(0, 10 - C);
+        const r0 = big ? rng(rowLo, rowHi - (R - 1)) : (_to120 && R === 3) ? 9 : rng(0, rowHi - (R - 1));
+        const _cross = _to120 && _grid === 'window' && _gaps === 'scatter' && _kAt % 3 === 0;
+        const c0 = C === 10 ? 0 : _cross ? [0, 10 - C][rng(0, 1)] : rng(0, 10 - C);
         const rows = Array.from({ length: R }, (_, k) => r0 + k);
         const cols = Array.from({ length: C }, (_, k) => c0 + k);
         const N = R * C;
@@ -947,6 +952,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
             // every gap keeps a printed neighbour, and no two gaps sit side by side in a row
             if (!cand.every(i => neighbours(i).some(j => !set.has(j)))) continue;
             if (cand.some(i => i % C < C - 1 && set.has(i + 1))) continue;
+            if (_cross && t < 300 && !cand.some(i => [100, 101, 110, 111].includes(at(i)))) continue;
             pickIdx = cand;
             break;
         }
@@ -970,7 +976,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         const wrongFirst = blanks[0] + 10 <= top ? blanks[0] + 10 : blanks[0] - 10;
         q.distractorTags = { [[wrongFirst, ...blanks.slice(1)].join(', ')]: 'moved ten instead of one along the row' };
         _kSetCell(q, 'chartwindow', { rows, cols, blanks });
-        q.skillLabel = big ? "Number Chart Fill" : "100-Chart Fill";
+        q.skillLabel = big ? "Number Chart Fill" : _to120 ? "120-Chart Fill" : "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
         return;
     }

@@ -369,8 +369,8 @@ function chartSteps(q) {
     return out;
 }
 
-registerSkill('composing:hundreds_chart_fill', {
-    strings: strings({
+/** The 1-100 chart's strings; band 120 (chart_120) names the chart to 120 (L6, L28). */
+const HC_DEF = {
         iCan: 'I Can find missing numbers on a hundreds chart',
         // A window has one to three empty cells (payload `blanks`), so the page asks for numbers.
         instructionKey: 'missing-many',
@@ -383,8 +383,20 @@ registerSkill('composing:hundreds_chart_fill', {
             'Write the missing number.',
         ],
         say: 'The missing number is __.',
-    }),
-    misconceptions: ['wrong-row', 'reversed-digits', 'one-less'],
+    };
+const HC_DEF_120 = { ...HC_DEF, iCan: 'I Can find missing numbers on a chart to 120' };
+/** Band 120: from the option (an item-less page, L28), the item's window (rows past 9) or its label. */
+function chartTo120(ref = {}) {
+    if (Number(ref && ref.opts && ref.opts.band) === 120) return true;
+    const q = ref && ref.q;
+    const w = q && obj(q.chartWindow);
+    if (w && Array.isArray(w.rows) && w.rows.some((r) => Number(r) >= 10)) return true;
+    return /120/.test(String((ref && ref.label) || ''));
+}
+
+registerSkill('composing:hundreds_chart_fill', {
+    strings: stringsBy((t, ref) => (chartTo120(ref) ? HC_DEF_120 : null), HC_DEF),
+    misconceptions: ['wrong-row', 'reversed-digits', 'one-less', 'writes-ten-ten'],
     workedSteps: chartSteps,
     wrongAnswer: (q) => {
         const t = num(q.ans);
@@ -392,6 +404,9 @@ registerSkill('composing:hundreds_chart_fill', {
         const c = [{ value: t <= 90 ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const rev = num(String(t).split('').reverse().join(''));
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
+        // chart_120 (card M-C1): a number past 100 written as it is said, ten by ten: 110 as 1010,
+        // 101 as 1001, 100 as 1000.
+        if (t >= 100 && t <= 120) c.push({ value: num('10' + String(t - 100).padStart(2, '0')), misconception: 'writes-ten-ten', explain: `Wrote ${t} as it is said, 100 then ${String(t - 100).padStart(2, '0')}: four digits, not three.` });
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
         return chooseWrong(q, c);
     },

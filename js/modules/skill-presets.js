@@ -162,6 +162,9 @@ export const SKILL_PRESETS = Object.freeze({
     'addition:add_wp_change_unknown': { skill: 'add_word_problems', opts: { forms: [3] } },
     'subtraction:sub_wp_change_unknown': { skill: 'sub_word_problems', opts: { forms: [3] } },
     'subtraction:sub_wp_compare_smaller': { skill: 'sub_word_problems', opts: { forms: [4, 5] } },
+    // 2026-11-12 (owner, chartwindow card §9.1): the chart to 120 (every window across 100) is its own lesson
+    // (Count on to 120); band 120 stays an option of hundreds_chart_fill.
+    'composing:chart_to_120': { skill: 'hundreds_chart_fill', opts: { band: 120 } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

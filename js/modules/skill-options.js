@@ -3248,10 +3248,13 @@ _ap1Put('composing:number_bonds', {
 // hundreds_chart_fill (owner, 2026-09-25): "Numbers to" 10, 20, 30, 40, 50 and 100. Each chart
 // is the first N numbers in rows of ten; the window is cut from inside it (1 to 10 is its one
 // row, drawn whole). 100 stays the default, so every old page and code is unchanged.
-_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100], 100, {
-    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)' },
-    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50 or 100 numbers, ten to a row. '
-        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20).',
+// chart_120 (card chartwindow, signed 2026-11-12): band 120 cuts every window from rows 91-120,
+// so every window crosses 100; the whole chart is 12 rows on one page.
+_ap1Put('composing:hundreds_chart_fill', _opsBand([10, 20, 30, 40, 50, 100, 120], 100, {
+    labels: { 10: '10 (the row 1 to 10)', 20: '20 (two rows)', 30: '30 (three rows)', 100: '100 (the whole chart)', 120: '120 (91 to 120, across 100)' },
+    help: 'The chart the window is cut from: the first 10, 20, 30, 40, 50, 100 or 120 numbers, ten to a row. '
+        + 'A small chart holds fewer empty boxes (at most 5 in the row to 10, 6 in the chart to 20). '
+        + 'At 120 every window is cut from 91 to 120, so it crosses 100.',
 }));
 // number_chart_fill: the same window cut from a chart of bigger numbers (the hundreds, then the
 // thousands). "Numbers in" names the stretch of the chart; every number in the window is in it.
