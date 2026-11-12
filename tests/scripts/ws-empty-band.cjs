@@ -29,8 +29,9 @@
 //             PT-MOD-3 (lead ruling 2026-11-12): on a Scripted Model, a state that is not its example's last is excused when its
 //             band is <= 35 % AND a later state of the same example draws ink in that band (the room kept for a later mark).
 //             --self-test checks it (the ink appears later: excused; it never appears: FAIL).
-//   EB-SIDE   the content PINNED to one side (RUBRIC H13 "pinned to one side"): an empty band >= 30 % of the cell width on one
-//             side of the ink box while the other side has <= 10 %. A centred item (a fact in a wide screen card) is not a band.
+//   EB-SIDE   the empty band BESIDE the ink (left or right of the ink box): FAIL at >= 30 % of the cell width (RUBRIC H13). On a
+//             SCREEN cell only when the content is pinned to one side (>= 30 % one side, <= 10 % the other): a centred fact in a
+//             wide card is not a band.
 //   EB-ROLE   a role the signed card offers that buildSheet cannot compose for the skill (critic eb-r1 D3).
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
@@ -213,8 +214,10 @@ function measureCells(scope) {
             const H = inner.b - inner.t, W = inner.r - inner.l;
             const below = Math.max(inner.b - box.b, 0), above = Math.max(box.t - inner.t, 0);
             const gl = Math.max(box.l - inner.l, 0), gr = Math.max(inner.r - box.r, 0);
-            // pinned to one side: the wide gap on one side, (almost) none on the other - a centred item is not a band
-            const side = Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
+            // print cells: the wider gap beside the ink (RUBRIC H13, as before); a SCREEN cell (a fact centred in a wide card)
+            // counts only when the content is pinned to one side - a wide gap on one side and (almost) none on the other
+            const screen = !c.hasAttribute('data-ws-cell') || !!c.closest('#gameView, #worksheetView, #quizTakeView');
+            const side = !screen || Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
@@ -317,9 +320,11 @@ function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
         const lim = BAND * c.hRaw;
-        const bands = [['under', c.belowMm], ['between the blocks of', c.betweenMm], ['above', c.aboveMm]].sort((a, b) => b[1] - a[1]);
+        // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
+        // pixels with PT-MOD-3; here a model state is judged under and above its ink only)
+        const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', c.aboveMm]].sort((a, b) => b[1] - a[1]);
         const [where2, band] = bands[0];
-        if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
+        if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `content pinned to one side: ${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
     });

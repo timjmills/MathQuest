@@ -138,3 +138,19 @@ Lane session cost_usd $20.33 at 07:56Z (the lead's reading of the session record
 - 2026-11-07 — critic r2 FAIL; small fixes after it (not re-graded); stopped per rule 7; hand-over to the lead.
 - 2026-11-07 — lead's asks: --build-only BUILD_QUEUE.md (owner order), phase-0 checks D1-D10 (ws-lesson-samples --check, print-lint blocking rows, backtests-phase0.json), lf-engine's (a) ws-lesson-unit / ws-lesson-coverage on the lesson scope, chartSizing[] read by LP-FALLBACK.
 - 2026-11-07 — build: LP checks, --lp / --sweep / --packet / --raster, precritic --lesson / --unit, 10 backtests, deploy-gate rows, units template, lf-engine patch; bisected R1 / R2; critic r1 launched.
+
+### 2026-11-12 - task 4 (defaults on precritic's path) and the empty-band pin
+- precritic `--skill` now runs ws-empty-band with `--vocab-ink --page-fill` on every skill, plus `--margin 2` on every skill NOT in
+  the pin. The pin was written at margin 0, so a run that touches a pinned fact skill keeps margin 0. FIX-WORDS (ws-fixit-words)
+  is a default gate. lf-placevalue's opt-in rows for both were removed.
+- V-AMBIG is NOT folded: it lives in ws-vocab-unit.mjs, which is only on lf-vocab's branch. It is folded when that branch merges.
+- RE-PIN (facts lane debt, the 11-08 ruling): add_facts, mult_facts, div_facts re-pinned with --vocab-ink --page-fill. 44 keys
+  rose, 7 fell. The new rule findings on these three skills:
+  - screen-cell EB-SIDE (card content pinned to one side, 35-41 %);
+  - add_facts lesson between-blocks band 31 %;
+  - EB-PAGE: mult_facts lesson p2 32 %, div_facts lesson p1 49 %;
+  - div_facts mixed-practice cell 19 EB-EDGE 0.6 mm.
+  All of these go to the facts-lane task. The old pin is in git history.
+- EB-SIDE: print cells keep the max-gap rule (lf-placevalue's side backtests are green again). Screen cells count a gap only when
+  the content is pinned to one side. The between band is skipped on scripted-model (EB-GAP / PT-MOD-3 own that band).
+- The EB-BAND message prints the live limit (30 % - margin).
