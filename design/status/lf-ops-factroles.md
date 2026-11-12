@@ -74,3 +74,14 @@ Pass: the fade (PT-GDP-1), nothing given away, keys 27 / 27, TY-30 digits, CL-40
 | S3 Scripted Model pages 23-42 % used | EB-PAGE | fail 343e0b78 | LEAD |
 Speed-up: ask the page-fill question before the build: ruling (b) fixed ceiling, stretch and leftover together, and the critic was first to measure the page used.
 - r2 step 1 done @ f5b77f7a (EB-EDGE + Guided +/- S columns from the hinted row; backtest guided-edge-facts); next: step 2 MOD-MARKS
+- r2 steps 2-4 done @ fcf13401 (one commit: the three share the Model code). Checks first, each FAIL on 343e0b78: ws-empty-band
+  `--model-states` (opt-in, lf-ops entry in opt-in-rules.json) MOD-MARKS 24, MOD-LINES 16, EB-PAGE (Scripted Model page < 70 % used) 15;
+  ws-providers-unit MODEL_DRAWS + modelOk (FAIL on 343e0b78: 418 + predicate missing). Fix: providers' `drawStep` (short text +
+  grey draw marks, kept apart from `marks` so lesson / key pages are unchanged); scripted-model `factModel`: cumulative jots / count
+  list / dot tile each step (not-yet marks hidden in place, the problem stands still), unambiguous Model (`modelOk`), a second worked
+  example of the same strategy (a third at div S), rows <= 1.4 x content. Guided exempt from EB-PAGE (lead ruling, PT-GDP / §12.1),
+  noted in ws-empty-band. Backtest rows model-marks-facts, model-lines-facts, model-fill-facts (fail 343e0b78 / pass fcf13401).
+- r2 step 5 gates: ws-empty-band guided + scripted-model, five skills, --model-states: OK (EB-EDGE, MOD-*, EB-PAGE, EB-GDPCAP PASS);
+  hash3 (hash2 + Guided S of addition:add and placevalue:identify) vs 7e0c074b: 54 / 54 identical; ws-detailed-lesson --check on the
+  4 lessons: OK, outputs (pack.html + page PNGs) identical to 7e0c074b; ws-boot-smoke OK; ws-providers-unit OK; syntax OK.
+  Next: independent critic r2 (Guided S + / - at 4 columns; Scripted Model of the five).

@@ -3100,6 +3100,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "model-marks-facts",
+   "check": "adjacent Scripted Model states of the five fact skills differ in ink: each step draws a new grey mark (PT-MOD-1; lf-ops facts-roles critic r1 S1)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-MARKS (PAGE_TYPES PT-MOD-1)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "24 findings: states 1..n-1 the blank problem on every fact Model"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: jot lines, count lists and dot tiles added step by step"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-MARKS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-lines-facts",
+   "check": "a Scripted Model step text of the five fact skills is at most 2 line boxes (PT-MOD-2; critic r1 S2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-LINES (PAGE_TYPES PT-MOD-2)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "16 findings: mult_facts step 2 3-4 lines, div steps 3-4 lines"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: the providers' short step texts (drawStep)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-LINES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-fill-facts",
+   "check": "the Scripted Model page of the five fact skills uses 70 % or more of its body (lead ruling 2026-11-12: a second worked example; critic r1 S3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-PAGE --model-states (RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "343e0b78",
+    "state": "15 findings: 23-42 % used"
+   },
+   "pass": {
+    "commit": "fcf13401",
+    "state": "0 findings: two (div S: three) worked examples, rows up to 1.4 x content"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-PAGE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
