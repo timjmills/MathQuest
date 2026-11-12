@@ -89,7 +89,10 @@ register('words', {
         }
         if (p.slot === 'hto') return htoCell(p, ctx, (i) => (key === null ? '' : htoDigits(p)[i]), () => null, p.under === 0 || p.under === 1 ? p.under : null);
         const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits: 4, graded: true }, ctx, key);
-        return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:4mm;">`
+        // (lf-placevalue w2: the room over the answer line grows with the size - 5 / 6 / 7 mm, was 4 at every size - the numeral is
+        // written above its line at the digit size, and 4 mm left the L and test rows 30-33 % empty under the line)
+        const gapMm = p.inPlace === false ? 4 : (({ S: 5, M: 6, L: 7 })[ctx.size] || 6);
+        return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:${gapMm}mm;">`
             + `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;">${esc(p.words || numberWords(p.n))}</span>`
             + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${slot}</span></div>`;
     },
@@ -115,9 +118,16 @@ register('words', {
         const words = String(p.words || numberWords(p.n));
         const textPt = (ctx && ctx.metrics && ctx.metrics.textPt) || 15;
         // (A long name wraps to two balanced lines, so a words-to-numeral cell takes two columns.)
-        if (p.slot === 'hto' && !toWords(p)) return { wMm: Math.min(84, Math.max(62, words.length * (textPt + 2) * 0.52 * 0.3528 + 10)), hMm: null, measure: true, factLike: false, maxCols: 2 };
+        // (lf-placevalue w2, ws-empty-band EB-BAND 364: a number name is answered IN PLACE - one line or three boxes, no working
+        // space - so its rows pack to the measured ink (layout IN_PLACE_FILL, as the pv read-and-write cells) and the page takes
+        // more rows instead of a 31-40 % band under every cell. A lesson ref may keep the old fill: cellPayload {inPlace: false}.)
+        // (and its columns are capped by size - 4 / 3 / 3 at S / M / L: five across a 30-item S page left six rows for thirty
+        // short cells, each stretched 31-37 % past its ink; more rows at the item's own height fill the page instead)
+        const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true };
+        const capCols = ({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3;
+        if (p.slot === 'hto' && !toWords(p)) return { wMm: Math.min(84, Math.max(62, words.length * (textPt + 2) * 0.52 * 0.3528 + 10)), hMm: null, measure: true, factLike: false, maxCols: p.inPlace === false ? 2 : Math.max(2, capCols), ...ip };
         const wMm = toWords(p) ? 110 : Math.min(84, Math.max(60, words.length * (textPt + 2) * 0.52 * 0.3528 + 10));
-        return { wMm, hMm: null, measure: true, factLike: false, maxCols: toWords(p) ? 1 : 2 };
+        return { wMm, hMm: null, measure: true, factLike: false, maxCols: toWords(p) ? 1 : p.inPlace === false ? 2 : capCols, ...ip };
     },
     inputs(p) {
         if (p && p.slot === 'hto' && !toWords(p)) return htoDigits(p).map((d, i) => ({ id: `pv-${i}`, kind: 'number', shape: 'box', graded: true, order: i, maxLength: 1, inputmode: 'numeric', scopes: ['full'] }));
