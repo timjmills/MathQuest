@@ -557,3 +557,31 @@ deals its own items (seed 4242), but the paper reference (Independent M seed 7) 
 paper mark to compare. Same-word proof: `ws-screen-ink-size --skill vocabulary:<skill> --opts '{"vocabSet": n}' --no-baseline
 --only SIZE-INK` is OK for both skills × sets 1-4. Log: design/lanes/lf-vocab/size-proof-r14.txt. Gate fix (build the reference for
 the same word) routed to lf-checks by the lead.
+
+## r15 builder (Opus medium, follow-on fixes on the deployed model; brief design/lanes/lf-vocab/r15-builder-brief.md), 2026-11-13
+The three critic r14 minors, each its own commit + push, with a check and a backtest row (FAIL on deploy a3eb9d25, PASS on the fix).
+A container restart stopped the first builder after items 1-2; this builder finished item 3 and ran every gate.
+| item | check id | backtest row (fail a3eb9d25 -> pass) | on precritic's path | rounds saved |
+|---|---|---|---|---|
+| 1 a run whose visible ones digits repeat (5,10,15 -> 5,0,5) or whose step divides 10 reads as `ones-cycle`, which satisfies "cycle"; sequence redrawn 4,7,10 (set 6 split kept), grade-4 first term redrawn [30],26,22 (step 4) | ws-vocab-unit V-ONES | vocab-r15-vones -> 1758caca | y (vocab-unit) | 1 |
+| 2 every key underlay lies inside the cell/box/ring its mark sits in (+0.5 mm); a whole-drawing focal part on a structure greys <= 60 %; the hundred chart key's per-text underlays became the cell rect, focal part = the middle row (pupil drawing byte-identical) | ws-vocab-unit V-KEY (--browser) | vocab-r15-vkey -> 61c136c1 | y (vocab-unit-browser) | 1 |
+| 3 no two Match 3 cells of one printed page put the same pictures in the same A/B/C places; a repeated trio takes a picture order the 3 slots before it do not hold (kept per page SLOT, so a More Practice run's one reset is covered) | ws-vocab-unit V-PAGE (--browser) | vocab-r15-vpage -> 567bf064 | y (vocab-unit-browser) | 1 |
+
+V23: all 60 pupil pages re-pinned (ade0824c8). Cause: the r14 pin (551c4e64) failed all 60 on the deploy base a3eb9d25 ITSELF -
+cell.js/grid.js stamp `data-eb-item` on every kit cell since the master EB-FOOT-pairing merge (markup only, no drawing change).
+Re-taken on a3eb9d25; the same pin then holds on 1758caca, 61c136c1 and 567bf064, so no r15 item moves a pinned pupil page.
+
+EB-FOOT review-L pin (97a5962dc): on the pre-merge pin commit (551c4e64, no data-eb-item) the Match3 review-L cells were an
+unpaired NOTE (EB-FOOT PASS). The master EB-FOOT-pairing merge (data-eb-item) enabled index pairing in deploy a3eb9d25, surfacing
+the real Match3 review-L footprint gap (drawn 57.7 mm vs 50 mm footprint, 15 %) as 3 findings - identical on a3eb9d25, not an r15
+change. Pinned (design/audit/baselines/empty-band.json counts + skillNote); the real match3 review-L footprint fix is routed to the
+EB-FOOT/match3 owner.
+
+Gates (one at a time, after the last fix): ws-vocab-unit OK; --browser OK (V-ONES/V-KEY/V-PAGE/V11R/V18/V19/V23/V25/V26/V27 green,
+after the 60-page V23 re-pin); ws-next-box OK (19 hosts); ws-empty-band both skills OK (3 findings within the pin) and --slot-ink
+off OK; ws-boot-smoke OK; ws-backtest --row each new row PASS (vones, vkey, vpage: FAIL on a3eb9d25, PASS on the fix).
+precritic --strict, both skills: PASS all but sibling-compare (known: no approved sibling) and ws-screen-ink-size (the 4 ruled
+SIZE-REF coverage findings, Known findings above). empty-band and next-box green after the pin (next-box FAILed once inside the
+first precritic on a browser-queue flake - "Cannot set properties of null" at host 10 - and is reliably green standalone, 19 hosts).
+Renders: scratchpad r15/sets (ws-vocab-set-renders --since a3eb9d25: the sets changed by item 1's redraws - set 6 sequence and the
+grade-4 pool); hundred chart key rendered separately (set 4 pick3 item 1).
