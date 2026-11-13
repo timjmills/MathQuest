@@ -17,6 +17,15 @@ Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
 
+## Round 6 (2026-11-13, +$35) - after the deploy branch (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy @ 8823e9a9)
+- D6: the "<Name> wrote:" label's foot 2 mm over its work at every size; PUPILTAG asks 1.5-8 mm (fired 144x on the fixed offset).
+- N2: True or False? one-column S takes a 5th row (unit_form / expand S 4 -> 5); ws-capacity-pin SIZE-ORDER (S >= M >= L) added.
+- D7: True / False boxes 10 mm off the statement's own tick column (pattern_features L, still 4 items).
+- mult_facts Review with supports (print-lint supports S, 12 x 32 % side band on Mixed Review stacks): looks like the supports
+  engine's reserved support room inside the earlier skill's stacks, not the Review grid - to verify with the S2 supports owner.
+- Open: R4 (fte TF L 2 items: tall table, likely a capacity ruling), R13 (Pre-skill Check strips / page 2), R15 (EA judgement x per
+  item), N4 (Review totals < 8 on tall items: ruling), N9 (fix-minimal: design), npr TF M 4 -> 3. These pages need critic r4.
+
 ## Round 5 (2026-11-13, +$40)
 - N3 (435052b9): Error Analysis item + judgement centred in a stretched cell; "<Name> wrote:" rides on its work. EB-BAND 16 -> 0 on
   the passed skills' EA; PUPILTAG extended (label <= 8 mm over its work: fires 28x on the unanchored state).
@@ -112,6 +121,7 @@ Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4
   the answer; on Reason It "__ is correct" names it); a list answer writes one line a part. Suggested: accept.
 
 ## Times
+Times: r6 (deploy branch, D6, N2, D7), start 2026-11-13T09:45Z, end 2026-11-13T10:50Z, profile lane session
 Times: r5 (N3, critic r3, D1-D5), start 2026-11-13T08:15Z, end 2026-11-13T09:40Z, profile lane session
 Times: critic r3, start 2026-11-13T09:05Z, end 2026-11-13T09:13Z, profile mq-opus-medium
 Times: r4 (N10, N1, R2, R5, N5, R10, R11), start 2026-11-13T06:45Z, end 2026-11-13T08:10Z, profile lane session
