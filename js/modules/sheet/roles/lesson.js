@@ -227,7 +227,7 @@ function planOnce(input = {}) {
     const VOCAB_PAD_MM = 6, VOCAB_ZOOM_MIN = 0.75;
     pages.push(cur);
     for (const g of groups) {
-        if (cur.used && cur.used + g.h > cur.budget) { cur = { sections: [], used: 0, budget: mCont.budget, grows: [] }; pages.push(cur); }
+        if (cur.used && cur.used + g.h > cur.budget) { cur = { sections: [], used: 0, budget: mCont.budget, grows: [], cont: true }; pages.push(cur); }
         cur.sections.push(...g.sections);
         cur.used += g.h;
         if (g.grow) cur.grows.push(g.grow);

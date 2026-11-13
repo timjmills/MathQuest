@@ -86,7 +86,9 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (a rounding cell "27 -> ___" is a one-number answer too - critic lessons-phase0 r1 D11: the round lesson's S sheet
         // ended on a 50 mm blank foot under two rows. LR-17b: only on a lesson record with `roundOneNum` whose Prerequisite
         // Check is live - phase0On; every other packet prints as master did)
-        const roundRows = phase0On(data, 'roundOneNum');
+        // (lead, live-pm r2 item 6 SHEET-2PG: a lesson sheet that runs onto a second page - Y4.B1.S14 L, two pages each ~38 %
+        // empty under ONE row of six - takes the one-number rows there too: the page is the room's own, never a blank foot)
+        const roundRows = phase0On(data, 'roundOneNum') || !!(data && data.roundOneNum === true && cur && cur.cont);
         const roundOne = (it) => roundRows && it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
         const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it)));
         // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
