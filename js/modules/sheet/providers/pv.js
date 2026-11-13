@@ -1320,15 +1320,15 @@ registerSkill('composing:number_word_form', {
             if (!h) return clampSteps([step(n >= 10 ? `"${p.words}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.` : `"${p.words}": ${o} one${o === 1 ? '' : 's'}.`, n >= 10 ? [{ slot: 'pv-0', value: String(t) }, { slot: 'pv-1', value: String(o) }] : [{ slot: 'pv-0', value: String(o) }])]);
             const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
             const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
-                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`
-                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} ones.`;
+                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} one${o === 1 ? '' : 's'}.`
+                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.`;
             return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
                 step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }])]);
         }
         // (critic nwf r1 N3: a name under 100 has no hundreds word - "thirty-five hundred: 0 in the hundreds" was false)
         if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
-        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
+        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'} ${r % 10} one${r % 10 === 1 ? '' : 's'}.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
     wrongAnswer: (q) => {

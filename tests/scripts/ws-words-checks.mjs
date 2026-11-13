@@ -4,6 +4,7 @@
 //
 //   node tests/scripts/ws-words-checks.mjs                  # composing:number_word_form, 120 items a band, every band
 //   node tests/scripts/ws-words-checks.mjs --n 60
+//   node tests/scripts/ws-words-checks.mjs --only WORDS-STEPS-PLURAL
 //
 // WORDS-WRONG-RATE (N1): on every band (20 / 100 / 1,000) at least a third of the words-to-numeral items get a wrong answer that
 //   is a NAMED error (not the registry's near-miss nudge) - a band with none prints a True or False? page that is all True and a Reason It page of one item.
@@ -18,6 +19,8 @@ import { dirname, resolve } from 'path';
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const N = parseInt(arg('n', '120'), 10);
+// --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE,WORDS-STEPS-PLURAL: report these rules only (a backtest scoped to the defect it was built for)
+const ONLY = arg('only', '') ? String(arg('only')).split(',').map((x) => x.trim()) : null;
 const KEY = 'composing:number_word_form';
 const quiet = () => { const s = {}; for (const k of ['log', 'warn', 'info', 'debug']) { s[k] = console[k]; console[k] = () => {}; } return () => Object.assign(console, s); };
 
@@ -71,6 +74,7 @@ for (const band of [20, 100, 1000]) for (const answerSlot of ['line', 'hto']) {
     if (plural > 2) bad.push(`WORDS-STEPS-PLURAL band ${band} ${answerSlot}: ${plural} plural steps in all`);
     console.log(`band ${band} ${answerSlot}: ${seen} steps read, ${plural} with "1 ones / tens / hundreds"`);
 }
+if (ONLY) for (let i = bad.length - 1; i >= 0; i--) if (!ONLY.some((r) => bad[i].startsWith(r + ' ') || (r === 'WORDS-WRONG-RATE' && /^no REAL provider/.test(bad[i])))) bad.splice(i, 1);
 for (const b of bad.slice(0, 12)) console.log(`  FAIL ${b}`);
 console.log(`ws-words-checks: ${bad.length ? `FAIL (${bad.length})` : 'OK'}`);
 process.exit(bad.length ? 1 : 0);
