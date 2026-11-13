@@ -406,3 +406,21 @@ L-DENSITY / L-OVERLAP too); ws-precritic-plan OK.
 | Guided mixed Model rows (mult_properties S/L, arrays_groups M/L) | NOT fixed: the Model + tries row mixes classes on the Guided page | ROW-STRETCH (ink) reports them | — |
 | Lesson Practice fill (practiceShapes extended) | NOT committed (scratchpad B-multdiv.patch): untested | — | — |
 | EB-FOOT forms:3 | NOT reached; the count_by_tables review EB-FOOT 8 is the same class on legacy partner cells (= master) | EB-FOOT | — |
+
+### Round r5, count_by_tables round 2 - after the master merge (2026-11-13)
+
+- Merged origin/master at e59224ad2. ws-screen-slots ARRAY-ORIENT now runs paper sizes M / L only (no-size-s GATE-DEFAULT, 594642d49).
+  The count-row card was regenerated with --resign (f07481f7e) and signed by the lead (51866aa7b).
+- Lead ruling, round 2: measure where each EB blank comes from (seed 7). All three reds are layouts stretching a cell that asks for
+  what it draws, so all three are routed, each with a ledger row:
+  - opener EB-BAND, routed to lf-engine. At M the cell asks 31.7 mm and draws 29.5 mm of ink plus pads; the slot is 39.2 mm
+    because the opener's `grow` adds its 8 mm cap. At L: asks 35.9, draws 33.5, slot 43.4.
+  - lesson-vocab EB-BAND and EB-VOCAB, routed to lf-engine. The cell asks 39.4 mm and draws 39.3 mm; the slot is 50.7 mm from the
+    capIfEmpty spare-height share.
+  - Guided EB-REFILL, routed to lf-roles. The rows are drawn at the height they ask (31.7 mm). The fit's frame estimate reserves
+    15 mm too much:
+    - budget 232 mm against a drawn body of 239 mm;
+    - stripExtraMm reserves 5.7 mm of instruction wrap for a strip that draws on one line;
+    - the Steps band is estimated at 39.7 mm and drawn at 37.3 mm.
+- Structural, not blocking (lead): sibling-compare NO-SIBLING. The "unparsed" no-size-s-browser and copy-light rows go to lf-checks.
+- The D1 (S) and D10 (390) ledger rows now carry the owner-rule exemptions.
