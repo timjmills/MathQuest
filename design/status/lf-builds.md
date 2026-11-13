@@ -16,6 +16,9 @@ Critic rounds: 1, word-stories r1 FAIL
 - chart_120 precritic red, paused; times-as-many and partition not started.
 ## Owner go
 
+## Budget
+- Week from 2026-11-13: allocation $200 above the session cost_usd baseline $369.70 (stop new agents at $569.70; lead, design/status/usage-week-2026-11-13.md).
+
 ## Open questions
 - Lead: confirm the order above and the hand-off of patterns_notice / growing_shape_patterns / multi_step_four_ops to the algebra lane.
 
