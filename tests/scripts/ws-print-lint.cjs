@@ -152,6 +152,7 @@
 //   ROW-STRETCH (lf-ops-props r4, lead ruling 2026-11-12 (b)) a row of `noStretch` templates (arrays, arrays-turn,
 //              count-row: answered in place, top-started) is at most 1.25 x its tallest item's height (1.42 on a pageCap
 //              page, grid class mq-pagecap, PT-GDP), and its shortest item's band is at most 20 % of the row (H13).
+//   BOX-WORD   (critic cbt r1 m3) a count-row page never calls the step tab "the number in the box".
 //   CHART-WIDTH (critic cbt r1 D8) a lesson chart's count row spans >= 80 % of its full-width panel.
 //   TITLE-ROWS (critic cbt r1 m1) a count-by page's title names exactly the steps its rows print.
 //   REVIEW-LADDER (critic cbt r1 m4) the Review's Mixed Review numbers stay within the skill's own (key page).
@@ -203,7 +204,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED', 'SLOT-FIT', 'SHAPE-ONE', 'REVIEW-LADDER', 'TITLE-ROWS', 'CHART-WIDTH'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED', 'SLOT-FIT', 'SHAPE-ONE', 'REVIEW-LADDER', 'TITLE-ROWS', 'CHART-WIDTH', 'BOX-WORD'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -1402,6 +1403,15 @@ function wsLintPage(cfg) {
             if (a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-STRETCH', 'major', short.c, `the shortest item of its row needs ${mm(short.need)} mm of a ${mm(a.H)} mm row: a ${Math.round(band * 100)} % band under it (limit 20 % for a cell answered in place, RUBRIC H13; ROW-STRETCH)`, 'noStretch row band over 20 %');
         }
     }
+    /* BOX-WORD (OPT-IN, --rules BOX-WORD; critic cbt r1 m3): a count-row page never calls the step tab "the number in the box" - every
+       answer place on the row is a box; the tab is the arrow. Pupil pages holding a count row; every text the page prints. */
+    if (optOn('BOX-WORD')) {
+        for (const ri of rootInfo.filter(r => !r.key)) {
+            if (!ri.el.querySelector('[data-ws-cell="count-row"] [data-ws-steptab]')) continue;
+            const w = document.createTreeWalker(ri.el, NodeFilter.SHOW_TEXT);
+            for (let n = w.nextNode(); n; n = w.nextNode()) if (/number in the box/i.test(n.textContent)) { F('L-VERBS', 'BOX-WORD', 'minor', n.parentElement, `"${n.textContent.trim().slice(0, 60)}": the step tab is the ARROW; "the box" is every answer place (critic cbt r1 m3)`, 'box names the tab'); break; }
+        }
+    }
     /* CHART-WIDTH (OPT-IN, --rules CHART-WIDTH; critic cbt r1 D8): a lesson anchor chart's full-width panel draws its count row across
        at least 80 % of the panel's width - with the times labels or 15 jumps the row was zoomed to 13 pt in 60 % of the panel. */
     if (optOn('CHART-WIDTH')) {
@@ -1443,7 +1453,8 @@ function wsLintPage(cfg) {
     if (optOn('SHAPE-ONE')) {
         for (const ri of rootInfo.filter(r => !r.key)) {
             for (const c of ri.el.querySelectorAll('.mq-lwarmcol [data-ws-cell]')) {
-                const shapes = new Set([...c.querySelectorAll('[data-ws-shape]')].map(e => e.getAttribute('data-ws-shape')));
+                // (the drawn outline: a k2-shape-<circle|hex|...> wrapper; a plain tile is its data-ws-shape)
+                const shapes = new Set([...c.querySelectorAll('[data-ws-shape], [class*="k2-shape-"]')].map(e => { const m = /\bk2-shape-(\w+)/.exec(e.className && e.className.baseVal !== undefined ? e.className.baseVal : e.className || ''); return m ? m[1] : (e.closest('[class*="k2-shape-"]') ? null : e.getAttribute('data-ws-shape')); }).filter(Boolean));
                 if (shapes.size > 1) F('L-ANSAREA', 'SHAPE-ONE', 'minor', c, `a Warm-up cell mixes writing shapes (${[...shapes].join(', ')}): one shape per cell (critic cbt r1 m2)`, 'mixed writing shapes');
             }
         }
@@ -1452,15 +1463,19 @@ function wsLintPage(cfg) {
        ladder - on the KEY, no number in the Mixed Review band is larger than the largest number of the skill's own band (count_by_tables
        mixed in 8 x 100 and 80 x 7 = 560 beside count rows that end at 132). */
     if (optOn('REVIEW-LADDER')) {
-        const nums = (el) => (el.textContent.match(/\d[\d,]*/g) || []).map(t => Number(t.replace(/,/g, ''))).filter(Number.isFinite);
+        // (per text node, the cell's number label excluded: a cell's textContent runs its numbers together)
+        const nums = (el) => { const out = []; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); for (let n = w.nextNode(); n; n = w.nextNode()) { if (n.parentElement && n.parentElement.closest('.ws-tab, .ws-letter, [data-ws-label]')) continue; for (const t of n.textContent.match(/\d[\d,]*/g) || []) out.push(Number(t.replace(/,/g, ''))); } return out.filter(Number.isFinite); };
         for (const ri of rootInfo.filter(r => r.key)) {
-            const bands = [...ri.el.querySelectorAll('.ws-band')].filter(b => b.querySelector('[data-ws-cell]'));
+            const bands = [...ri.el.querySelectorAll('.ws-band')].filter(b => b.querySelector('.ws-cell'));
             const isMix = (b) => /mixed review/i.test(((b.querySelector('.ws-strip b') || {}).textContent) || '');
             const mix = bands.filter(isMix), own = bands.filter(b => !isMix(b));
             if (!mix.length || !own.length) continue;
-            const cellNums = (bs) => bs.flatMap(b => [...b.querySelectorAll('[data-ws-cell]')].flatMap(c => nums(c)));
+            const cellNums = (bs) => bs.flatMap(b => [...b.querySelectorAll('.ws-cell')].filter(c => !c.parentElement.closest('.ws-cell')).flatMap(c => nums(c)));
             const ownMax = Math.max(0, ...cellNums(own)), mixMax = Math.max(0, ...cellNums(mix));
-            if (ownMax > 0 && mixMax > ownMax) F('L-DENSITY', 'REVIEW-LADDER', 'major', mix[0], `the Mixed Review band reaches ${mixMax} where the skill's own items end at ${ownMax}: a review mixes in EARLIER steps, never a harder one (PT-REV-3; critic cbt r1 m4)`, 'review beyond the ladder');
+            // (the skill's band: up to the next hundred above its own largest number - an earlier count to 100 beside rows ending at 72
+            // is an earlier step; 8 x 100 or 80 x 7 = 560 beside rows ending at 132 is not)
+            const cap = Math.ceil(ownMax / 100) * 100;
+            if (ownMax > 0 && mixMax > cap) F('L-DENSITY', 'REVIEW-LADDER', 'major', mix[0], `the Mixed Review band reaches ${mixMax} where the skill's own items end at ${ownMax} (band to ${cap}): a review mixes in EARLIER steps, never a harder one (PT-REV-3; critic cbt r1 m4)`, 'review beyond the ladder');
         }
     }
     /* SLOT-FIT (OPT-IN, --rules SLOT-FIT; critic cbt r1 D6, SL-1 writing room): a count-row answer box holds its number with
@@ -1479,7 +1494,8 @@ function wsLintPage(cfg) {
                     for (const q of rg.getClientRects()) { if (q.width) { l = Math.min(l, q.left); r = Math.max(r, q.right); } }
                 }
                 if (l === Infinity) continue;
-                const room = Math.min(l - tr.left, tr.right - r);
+                const ts = getComputedStyle(t);
+                const room = Math.min(l - tr.left - (parseFloat(ts.borderLeftWidth) || 0), tr.right - (parseFloat(ts.borderRightWidth) || 0) - r);   // clear of the box's own stroke
                 if (room < PX - 0.01) F('L-ANSAREA', 'SLOT-FIT', 'major', t, `a count-row box ${mm(tr.width)} mm wide leaves its number ${mm(Math.max(0, room))} mm of room (at least 1 mm each side; SL-1, critic cbt r1 D6)`, 'count-row box too tight');
             }
         }

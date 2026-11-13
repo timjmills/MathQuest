@@ -307,7 +307,7 @@
    "gates": {
     "print-lint-rowstretch-L": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size L --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size L --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -319,17 +319,17 @@
        "--size",
        "L",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-rowstretch-S": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size S --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size S --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -341,17 +341,17 @@
        "--size",
        "S",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-rowstretch-M": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size M --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size M --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -363,42 +363,42 @@
        "--size",
        "M",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,L-DENSITY,L-OVERLAP"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-lesson-L": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-lesson-S": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-kit": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-kit-S": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "print-lint-kit-M": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,CHART-WIDTH,BOX-WORD"
      ]
     },
     "screen-slots": {

@@ -6544,8 +6544,8 @@
    "id": "cbt-r1-m3-wording",
    "check": "m3: 'the number in the box' named the step tab with the word every answer place uses; the count_by_tables steps never say it (critic cbt r1, lf-ops-props r5)",
    "kind": "commit-pair",
-   "rule": "ws-providers-unit FORBIDDEN (count_by_tables)",
-   "browser": false,
+   "rule": "ws-print-lint BOX-WORD (new, opt-in)",
+   "browser": true,
    "fail": {
     "commit": "a33ff1a5b",
     "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
@@ -6554,7 +6554,7 @@
     "commit": "a144edd8f",
     "state": "lf-ops-props cbt r2 fixes"
    },
-   "command": "node tests/scripts/ws-providers-unit.mjs --skill multiplication:count_by_tables",
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice --size M --rules BOX-WORD --lints BOX-WORD --skills multiplication:count_by_tables",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
