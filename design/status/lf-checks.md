@@ -449,3 +449,4 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   only (`raster-fit-role-R`). ws-precritic-plan carries `--raster-fit` as a required flag (GR_FLAGS). Row `rr-clip-npr-model-l`:
   FAIL 47b1f2a86 (RR-CLIP x2) -> OK 7c1e3dbb4 (master; lf-roles' Model re-plan, 2 pages; lf-algebra had no fix of its own).
   False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.
+- no-dropped-row baseline FIXED (lf-checks 11-13): it compared with origin/master's tip, so a lane branch behind master read master's newer rows as dropped (13 false drops on -r2). Now the merge base of HEAD and origin/master; a deploy tree (master merged in) is unchanged.
