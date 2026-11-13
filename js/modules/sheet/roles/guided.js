@@ -613,6 +613,11 @@ const GUIDED_STRETCH = FILL_CAP;
  */
 const rowLimit = (m) => fillLimit(m);
 
+/** An item's planned row height at `cols` (its measure + 1 mm, as the plan draws it). */
+const rowMmOf = (it, cols) => { const mm = it && it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : 0; };
+/** The share of the Model's row the tries beside it fill at least (GUIDED-MODEL-ROW: under it, the band beside the try reaches 30 %). */
+const MODEL_ROW_FILL = 0.8;
+
 /** The least a grey hint under a first try (BD-7) adds to its row, in mm. */
 const HINT_MM = 8;
 
@@ -1179,6 +1184,21 @@ export function plan(input = {}) {
         // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
         const tight = tightRows(host);
         let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        let modelRow = null;
+        // GUIDED-MODEL-ROW (lf-roles r8b (a), lead via the coordinator; lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %): the
+        // Model's row is as tall as the Model and its worked lines UNDER it, and the row stretch then grew it further, so the try beside
+        // it sat in a row a third or more empty. That row's height is held to what the TRIES beside the Model fill to MODEL_ROW_FILL
+        // (never under the Model's own height); the height it gives up stays under the grid.
+        if (pi === 0 && !spanHere && !span2Here && nModels === 1 && !facts && !tight && cols > 1 && (pg.extra || 0) > 0 && rows > 1) {
+            // (the row needs the taller of the Model with its lines and the try with its hint - not the two added, as w[0] counts them)
+            const tryC = Math.max(0, ...rowItems(0).slice(1).map((it) => rowMmOf(it, cols))) + (hintRow === 0 ? fit.hint || 0 : 0);
+            const modelC = rowMmOf(rowItems(0)[0], cols) + (pg.extra || 0);
+            // (only a row whose try would fill under 70 % of it - a band EB-BAND fails - is held; every other page is unchanged)
+            // (and only when the held row then passes: a Model whose own need leaves the try under 70 % is left as it was)
+            const held = Math.max(modelC, tryC, Math.min(Hr[0], tryC / MODEL_ROW_FILL));
+            if (tryC > 0 && tryC < 0.7 * Hr[0] && tryC >= 0.7 * held) Hr[0] = held;
+            modelRow = { modelRowMm: Math.round(modelC * 10) / 10, tryRowMm: Math.round(tryC * 10) / 10 };
+        }
         // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
         // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
         // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
@@ -1207,7 +1227,7 @@ export function plan(input = {}) {
         sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, use), content: part });
         letter += chunk.filter((p) => !p.nolabel).length;
         pages.push({ sections });
-        fitsOut.push({ cols, rows, cellH });
+        fitsOut.push(Object.assign({ cols, rows, cellH }, modelRow || {}));
     });
     const n = pages.length;
     return assemble(ROLE_ID, input, frame, pages, {

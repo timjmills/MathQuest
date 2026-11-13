@@ -30,8 +30,10 @@
 //                 the Model keeps one cell.
 //   GUIDED-STACK-SIDE a narrow column stack's Guided grid leaves under 30 % beside the stack (EB-SIDE), keeps S 11 / M 9 / L 6,
 //                 fills every row (the Model spanning the cells that complete it) and centres each cell in its row (EB-BAND; r8b).
+//   GUIDED-MODEL-ROW a Model whose worked lines run under it never makes the try beside it sit in a row it fills under 70 %
+//                 (lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %; r8b (a)).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE]
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -383,6 +385,40 @@ if (on('GUIDED-STACK-SIDE')) {
             if ((cells.length + span) % f.cols !== 0) findings.push(`GUIDED-STACK-SIDE ${size}: ${cells.length} cells + ${span} spanned in ${f.cols} columns leave a part row`);
             if (cells.some((c) => !/justify-content:center/.test(c.style || ''))) findings.push(`GUIDED-STACK-SIDE ${size}: a stack cell is not centred in its row (EB-BAND under a stretched row)`);
         } catch (e) { findings.push(`GUIDED-STACK-SIDE ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-MODEL-ROW')) {
+    // lf-roles r8b (a), via the lead: lf-builds chart_to_120 Guided M / L - the Model (a chart window, its one worked line wrapped
+    // UNDER it: no full-row Model, which would push the third try off the page) shared row 1 with a 60 mm try, and the row stretch
+    // made that row 115 mm: a 42 % / 36 % band beside the try (EB-BAND). The Model's row is held to what the tries beside it fill
+    // (at least 70 %), never under the Model's own height. Planted: 60 mm items, one 88-character worked line.
+    const line = 'Count on from 47 along the row: 48, 49, 50, then down the column.';
+    try { registerSkill('rolesunit:grow', { workedSteps: () => [{ text: line }], wrongAnswer: () => ({ value: '58', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const item = (i) => {
+        const q = { categoryId: 'rolesunit', skillId: 'grow', ans: '57', text: 'Fill in the chart.', answerType: 'number', seed: i };
+        const render = (c, o = {}) => `<div class="ws-cell-work">chart ${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '57'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 60, fits: c <= 2, slackMm: 6 }]));
+        return { q, key: { value: '57', display: '57', slots: {} }, render, template: 'planted', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 2 }, fclass: 'standard' };
+    };
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'grow', iCan: 'I Can count on a chart', grade: 1 }], items: Array.from({ length: 12 }, (_, i) => item(i)) });
+            const part = (pl.pages[0].sections || []).map((s) => s.content).find((c) => c && c.items);
+            const cols = part.cols;
+            const own = part.spanFirst || new RegExp(`grid-column:\\s*(1 / -1|span ${cols})`).test(part.items[0].style || '');
+            const fr = part.rowsTpl ? part.rowsTpl.split(/\s+/).map((t) => parseFloat(t)) : Array(part.rows).fill(1);
+            const gridH = parseFloat(part.height);
+            const row0 = (gridH * fr[0]) / fr.reduce((a, b) => a + b, 0);
+            // (the try beside the Model needs tryRowMm - 61 mm and its hint - and the Model modelRowMm; the row may be as tall as the
+            // Model needs, never stretched so the try fills under 70 % of it; a tree without these fields reads 61 mm and no Model need)
+            const f0 = pl.meta.fits[0];
+            const tryMm = Number(f0.tryRowMm) || 61;
+            const need = Math.max(Number(f0.modelRowMm) || 0, tryMm / 0.7);
+            if (cols > 1 && !own && part.items.length > 1 && tryMm < 0.7 * row0 && row0 > need + 0.5) findings.push(`GUIDED-MODEL-ROW ${size}: a ${tryMm} mm try shares the Model's ${row0.toFixed(1)} mm row, stretched past ${need.toFixed(1)} mm (${((1 - tryMm / row0) * 100).toFixed(0)} % of it empty beside the try: EB-BAND)`);
+            if (pl.meta.items < 4) findings.push(`GUIDED-MODEL-ROW ${size}: ${pl.meta.items} cells (want the Model and 3 tries at least)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-ROW ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 
