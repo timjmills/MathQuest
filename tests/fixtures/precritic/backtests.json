@@ -3279,6 +3279,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-pm-h13",
+  "check": "every Practice and Mixed page of a short lesson has no cell band >= 30 % (lf-engine-pc critic r3 F5: add L Mixed Addition row 55 %; F7: round L / S Practice 49 % in all 15 cells)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 (H13 on Practice / Mixed, blocking)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "PM-H13 FAIL 4: add L Mixed 52 %, add S Practice 30 %, round L / S Practice 49 %"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-live-carry",
+  "check": "every carry / regroup box a lesson key page draws is filled by >= 1 stack of its section (lf-engine-pc critic r3 F6: sub / round Mixed, add_100_regroup partner, a hundreds carry box no sum < 100 reaches)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples LIVE-PART (H15 dead part)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "LIVE-PART FAIL 4: sub L / S, round L / S Mixed, the hundreds box filled on none"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
