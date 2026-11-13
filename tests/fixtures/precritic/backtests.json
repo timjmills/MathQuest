@@ -4211,6 +4211,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lfhosts-focus-twostep-desktop",
+   "check": "ws-phone-card FOCUS / INVIEW / CLIP-X at the screen targets 820 x 1180, 1024 x 768 and 1280 x 900 (lead 2026-11-13: no phone width) on the 7 two-step skills: the box the pupil writes first has the focus when the card opens, in view",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS at desktop / tablet widths (lf-hosts item 4 a, scope change)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the answer slot at the foot took the focus at every width (_firstWriteBox knew only the one-step sentence layout)"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "the two-step twin's first write box takes the focus"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes 820x1180,1024x768,1280x900 --items 1 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
