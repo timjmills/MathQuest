@@ -13,7 +13,14 @@
 //              bar is drawn on the Visual twin and not on the plain one
 //   HINT-L0    (decision 6) the hidden middle question prints on the teaching cells (scaffold level >= 2: Model, Guided)
 //              and never at level 0 or 1 or on the screen twin
+//   CAP-BAND   (--print, browser; lead ruling R1 2026-11-13, card decision 9 re-signed) multi_step_word (Visual) - the bar
+//              ABOVE the column work - holds its ruled capacity on the practice pages (independent / more-practice / test):
+//              at least S 2 / M 1 / L 1 stories a page (CAP), and no cell keeps an empty band of 30 % or more of its height
+//              under its lowest ink (BAND, RUBRIC H13; a one-story page at M / L stretched its cell to the page: 41 % / 32 %).
+//              `--html F --size M` measures one saved pupil page instead (the backtest's PASS fixture).
 // Skills outside the card print OK (n/a).
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -28,6 +35,8 @@ const SCOPE = ['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'alge
 const only = String(arg('--skill', arg('--skills', ''))).split(',').map((s) => s.trim()).filter(Boolean);
 const mine = only.length ? SCOPE.filter((k) => only.includes(k) || only.includes(k.split(':')[1])) : SCOPE;
 if (!mine.length) { console.log(`${TOOL}: OK (n/a: no two-step skill in scope)`); process.exit(0); }
+
+if (args.includes('--print')) await printMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -132,3 +141,66 @@ for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
 console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0)`);
 process.exit(fails.length ? 1 : 0);
+
+/** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
+async function printMode() {
+    if (!arg('--html', null) && !mine.includes('algebra:multi_step_word')) { console.log(`${TOOL}: OK (--print n/a: multi_step_word (Visual) not in scope)`); process.exit(0); }
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    // card decision 9 (re-signed 2026-11-13, lead ruling R1 (a)): the bar above the column work, S 2 / M 1 / L 1
+    const PIN = { S: 2, M: 1, L: 1 };
+    const ROLES = ['independent', 'more-practice', 'test'];
+    const SIZES = String(arg('--sizes', 'S,M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const html = arg('--html', null);
+    const out = [];
+    const bad = (rule, msg) => out.push(`${rule} ${msg}`);
+    const measure = (pageHtml) => {
+        const d = document.createElement('div'); d.id = '__ts2'; d.innerHTML = pageHtml; document.body.appendChild(d);
+        const mm = (px) => px / 96 * 25.4;
+        const cells = [...d.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+        const res = cells.map((c) => {
+            const r = c.getBoundingClientRect();
+            const cs = getComputedStyle(c);
+            const inner = r.bottom - parseFloat(cs.paddingBottom || 0) - parseFloat(cs.borderBottomWidth || 0);
+            let low = r.top + parseFloat(cs.paddingTop || 0);
+            for (const e of c.querySelectorAll('*')) {
+                if (e.closest('[data-ws-label]') || e.children.length && !(e instanceof SVGSVGElement) && !e.textContent.trim() && !/border/.test(e.getAttribute('style') || '')) continue;
+                if (e.closest('svg') && !(e instanceof SVGSVGElement)) continue;
+                const b = e.getBoundingClientRect();
+                if (b.width < 0.5 || b.height < 0.5) continue;
+                const st = getComputedStyle(e);
+                if (st.visibility === 'hidden' || st.display === 'none') continue;
+                const inked = (e.children.length === 0 && e.textContent.trim()) || e instanceof SVGSVGElement || parseFloat(st.borderBottomWidth) > 0 || parseFloat(st.borderTopWidth) > 0;
+                if (inked) low = Math.max(low, b.bottom);
+            }
+            return { h: mm(r.height), band: mm(Math.max(0, inner - low)) };
+        });
+        d.remove();
+        return res;
+    };
+    const app = await H.open({});
+    try {
+        if (html) {
+            const size = arg('--size', 'M');
+            const r = await app.page.evaluate(async (h, f) => { await document.fonts.ready; return (0, eval)(`(${f})`)(h); }, readFileSync(resolve(html), 'utf8'), measure.toString());
+            r.forEach((c, i) => { if (c.band / c.h >= 0.3) bad('BAND', `${html} ${size} cell ${i + 1}: ${c.band.toFixed(1)} mm empty under the work in a ${c.h.toFixed(1)} mm cell (${Math.round(100 * c.band / c.h)} %, H13 >= 30 %)`); });
+            if (!r.length) bad('BAND', `${html}: no kit cell`);
+        } else {
+            for (const role of ROLES) for (const size of SIZES) {
+                const r = await app.page.evaluate(async (a, f) => {
+                    const s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: 'multi_step_word' }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: 7, form: 'A', key: true, anchors: 'off' });
+                    await document.fonts.ready;
+                    const m = s.plan && s.plan.meta;
+                    return { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (s.items || []).length, cells: (0, eval)(`(${f})`)(s.pupilHtml) };
+                }, { role, size }, measure.toString());
+                if (r.items < PIN[size]) bad('CAP', `multi_step_word (Visual) ${role} ${size}: ${r.items} stories a page, the card rules ${PIN[size]} (decision 9)`);
+                r.cells.forEach((c, i) => { if (c.band / c.h >= 0.3) bad('BAND', `multi_step_word (Visual) ${role} ${size} cell ${i + 1}: ${c.band.toFixed(1)} mm empty under the work in a ${c.h.toFixed(1)} mm cell (${Math.round(100 * c.band / c.h)} %, H13 >= 30 %)`); });
+                if (!r.cells.length) bad('BAND', `multi_step_word (Visual) ${role} ${size}: no kit cell on the page`);
+            }
+        }
+    } finally { await app.close(); }
+    for (const r of ['CAP', 'BAND']) { const n = out.filter((x) => x.startsWith(r + ' ')).length; console.log(`CAP-BAND ${r.padEnd(5)} ${n ? `FAIL ${n}` : 'PASS'}`); }
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--print: ${out.length} finding(s))` : `${TOOL}: OK (--print: CAP-BAND, multi_step_word (Visual) ${html ? 'fixture' : `${ROLES.length} roles x ${SIZES.join('/')}`})`);
+    process.exit(out.length ? 1 : 0);
+}

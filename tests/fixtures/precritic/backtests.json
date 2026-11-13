@@ -3976,6 +3976,27 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-visual-cap-band",
+   "check": "ws-two-step --print CAP-BAND: multi_step_word (Visual) - the bar above the column work - holds the card's ruled capacity S 2 / M 1 / L 1 on independent / more-practice / test, and no cell keeps a 30 % empty band under its work (H13)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step CAP-BAND (lead ruling R1 2026-11-13, (a): M holds 1, the one-row practice page must not stretch; card decision 9 re-signed)",
+   "browser": true,
+   "fail": {
+    "commit": "8438ca59d",
+    "state": "precritic two-step: the one-story page at M / L stretches its cell to the page - 41 % (M) / 32 % (L) empty under the work on independent / more-practice, 32 % on test"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/two-step/visual-M-nostretch.pass.html",
+    "command": "node tests/scripts/ws-two-step.mjs --print --html {fixture} --size M --skill algebra:multi_step_word",
+    "state": "A FIXTURE, because the fix is a role change routed to lf-roles (a one-row practice page does not stretch its row): the same independent M page as 8438ca59d with its grid row at its content height. Replace with the lf-roles commit when it lands."
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --print --skill algebra:multi_step_word",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
