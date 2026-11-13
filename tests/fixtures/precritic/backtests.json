@@ -4014,8 +4014,8 @@
     "state": "4632 findings on the 7 skills: the add missing-part kinds' finish line '19 + 3 = 16' (q.op '+' paired with the cell's [whole, part]); a column cell drew the step's own answer under a False claim ('41 - 23 = 18' keyed False) and Reason It's A and B the same work"
    },
    "pass": {
-    "commit": "453bff211",
-    "state": "0 findings: opOf takes the sign from the payload that names the operands; the column answer row writes the shown value (87462276f); money told as coins, P-WP-22 story rule (453bff211, critic r1 F12)"
+    "commit": "4707017e0",
+    "state": "0 findings: opOf takes the sign from the payload that names the operands; the column answer row writes the shown value (87462276f); money told as coins, P-WP-22 story rule (453bff211, critic r1 F12); TF draws a False claim with its slots, SIGNMATCH (4707017e0, F7: 1560 findings at c056907e3)"
    },
    "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
    "expect": {
