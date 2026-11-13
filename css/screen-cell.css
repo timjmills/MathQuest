@@ -2026,3 +2026,13 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView .problem-ca
 @media print {
     html body .mq-vp .mq-vp-line { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
 }
+
+/* lf-vocab r10 (critic r9 #1): a picture-vocabulary letter box judged wrong keeps its red dashed edge when it is focused - the
+   host's black / purple focus outline never covers it - and its box carries no next ring or pulse (the box's :focus-within).
+   Screen hosts only; additive. ws-next-box NB8. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-vm .mq-vm-box > input.mq-live-wrong.mq-live-wrong:is(:focus, :focus-visible) {
+    outline: 3px dashed var(--mq-box-bad) !important; outline-offset: -3px !important; box-shadow: none !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-vm .mq-vm-box.mq-vm-box:has(> input.mq-live-wrong) {
+    box-shadow: none !important; animation: none !important;
+}

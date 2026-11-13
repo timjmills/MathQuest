@@ -13,6 +13,9 @@
 // NB5  yellow is kept for right-answer feedback only: the current worksheet problem's card carries no yellow ring
 // NB6  (lf-vocab r9) the quiz, Match 3 answered wrong (instant feedback): every wrong letter box red, none with the blue ring
 // NB7  (lf-vocab r9) 1 picture, 3 words: the answer LINE carries the next outline before an answer on every host, none after
+// NB8  (lf-vocab r10, critic r9 #1) Match 3 answered wrong on the worksheet: a FOCUSED wrong letter box keeps the red dashed
+//      edge (no black / purple focus outline) and its box no next ring; the quiz, answered with one right box: the right box is
+//      green and carries the card's tick badge (.mq-live-badge), each wrong box its cross badge
 const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
@@ -161,6 +164,68 @@ const YELLOW = 'rgb(242, 194, 0)';
                 });
                 judged++;
                 console.log(`${'vocabulary:vocab_grade_pictures quiz-wrong'.padEnd(44)} ${st.map((b) => `${b.v}:${b.wrong ? 'red' : 'plain'}`).join(' ')}`);
+            }
+            // NB8 (critic lf-vocab r9 #1): (a) the quiz right box carries the card's green tick; (b) the worksheet's focused
+            // wrong box keeps its red dashed edge, and its box no next ring
+            {
+                const RED = /^rgb\((1[5-9]\d|2\d\d), (\d|[1-6]\d), (\d|[1-6]\d)\)$/;
+                await page.reload({ waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+                await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+                const want8 = await page.evaluate(() => {
+                    const q = window.generateQuestionFor({ category: 'vocabulary', skill: 'vocab_grade_pictures', seed: 12 });
+                    const test = { id: null, name: 'Next', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions: [{ id: 0, skillId: 'vocab_grade_pictures', points: 1, questionData: window.quizQuestionData(q) }] }],
+                        settings: { timeLimit: null, randomOrder: false, showFeedback: 'instant', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                    window.handleQuizURL(window.compressTestForURL(test));
+                    const name = document.getElementById('qtStudentName'); name.value = 'A'; name.dispatchEvent(new Event('input'));
+                    window.startQuizTest();
+                    const v = q.cell.payload.order.map((wi) => 'ABC'[wi]); const t = v[0]; v[0] = v[1]; v[1] = t;
+                    return v;
+                });
+                await sleep(600);
+                const qb = await page.$$('#quizTakeView .qt-question-card .mq-vm-box input');
+                if (qb.length !== 3) fails.push(`NB8 quiz Match 3: ${qb.length} letter box(es), want 3`);
+                else {
+                    for (let i = 0; i < 3; i++) { await qb[i].click(); await page.keyboard.type(want8[i]); }
+                    await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); document.body.click(); });
+                    await sleep(1500);
+                    const st = await page.evaluate(() => [...document.querySelectorAll('#quizTakeView .qt-question-card .mq-vm-box input')].map((el) => {
+                        const b = el.dataset.mqBadge && document.querySelector(`.mq-live-badge[data-id="${el.dataset.mqBadge}"]`);
+                        return { right: el.classList.contains('mq-live-correct'), wrong: el.classList.contains('mq-live-wrong'), bg: getComputedStyle(el).backgroundColor, badge: !!b && getComputedStyle(b).display !== 'none' };
+                    }));
+                    if (!st[2].right) fails.push('NB8 quiz Match 3 box 3 (right): not marked right (no .mq-live-correct)');
+                    else if (!/^rgb\(2[0-3]\d, 2[3-5]\d, 2[0-4]\d\)$/.test(st[2].bg)) fails.push(`NB8 quiz Match 3 box 3 (right): its fill is ${st[2].bg}, not green`);
+                    if (!st[2].badge) fails.push('NB8 quiz Match 3 box 3 (right): no tick badge (the card has one)');
+                    st.slice(0, 2).forEach((b, i) => { if (!b.badge) fails.push(`NB8 quiz Match 3 box ${i + 1} (wrong): no cross badge (the card has one)`); });
+                    judged++;
+                    console.log(`${'vocabulary:vocab_grade_pictures quiz-right-tick'.padEnd(44)} ${st.map((b) => `${b.right ? 'right' : b.wrong ? 'wrong' : 'plain'}${b.badge ? '+badge' : ''}`).join(' ')}`);
+                }
+                await page.reload({ waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+                await page.evaluate(() => { const st = window.state; st.ttsEnabled = false; st.category = 'vocabulary'; st.skill = 'vocab_grade_pictures'; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3; window.initWorksheet(); });
+                await sleep(900);
+                const fw = await page.evaluate(() => {
+                    const q = window.state.worksheetQs[0]; const v = q.cell.payload.order.map((wi) => 'ABC'[wi]); const t = v[0]; v[0] = v[1]; v[1] = t;
+                    const ins = [...document.querySelectorAll('#ws_card_0 .mq-vm-box input')];
+                    if (ins.length !== 3) return { error: `${ins.length} letter boxes` };
+                    ins.forEach((el, n) => { el.value = v[n]; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); });
+                    window.checkAllWorksheet();
+                    const el = ins[0]; el.focus();
+                    const cs = getComputedStyle(el), pcs = getComputedStyle(el.parentElement);
+                    const sw = getComputedStyle(document.documentElement).getPropertyValue('--mq-next-color').trim();
+                    const probe = document.createElement('span'); document.body.appendChild(probe); probe.style.color = sw; const swc = getComputedStyle(probe).color; probe.remove();
+                    const first = (x) => (x.match(/rgba?\([^)]*\)/) || [''])[0];
+                    return { focused: document.activeElement === el, wrong: el.classList.contains('mq-live-wrong'), style: cs.outlineStyle, color: cs.outlineColor, pfirst: first(pcs.boxShadow), first: first(cs.boxShadow), swc };
+                });
+                if (fw.error) fails.push(`NB8 worksheet Match 3: ${fw.error}`);
+                else {
+                    judged++;
+                    if (!fw.wrong) fails.push('NB8 worksheet Match 3 box 1: not marked wrong');
+                    if (!fw.focused) fails.push('NB8 worksheet Match 3 box 1: could not be focused');
+                    if (fw.style !== 'dashed' || !RED.test(fw.color)) fails.push(`NB8 worksheet Match 3 box 1 (wrong, focused): its outline is ${fw.style} ${fw.color}, not the red dashed edge`);
+                    if (fw.pfirst === fw.swc || fw.first === fw.swc) fails.push('NB8 worksheet Match 3 box 1 (wrong, focused): it carries the blue next ring');
+                    console.log(`${'vocabulary:vocab_grade_pictures ws-wrong-focus'.padEnd(44)} focused ${fw.focused} outline ${fw.style} ${fw.color} box ring ${fw.pfirst || 'none'}`);
+                }
             }
             const lineRead = (sel) => page.evaluate((sel) => {
                 const line = document.querySelector(`${sel} .mq-vp-line`);

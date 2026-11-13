@@ -796,7 +796,8 @@ function _badgeSoon() {
 }
 function _badgeTrack(el) {
     if (typeof document === 'undefined' || !document.body) return;
-    const host = el.closest('#questionCard, .problem-card');
+    // (lf-vocab r10, critic r9 #1: a picture-vocabulary box in the quiz carries the card's tick / cross badge too)
+    const host = el.closest('#questionCard, .problem-card') || (el.closest('.mq-vm') && el.closest('.qt-question-card'));
     if (!host) return;
     pruneBadges();
     if (!BADGES.has(el)) {
@@ -1161,7 +1162,12 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
             const inp = box && box.querySelector('input');
             const got = norm(inp ? inp.value : box ? box.textContent : '');
             const right = got === norm(LET[wi]);
-            if (right || ok) { const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback'); }
+            if (right || ok) {
+                const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback');
+                // (lf-vocab r10, critic r9 #1: a right letter box is marked right on every host - the quiz too, where the live
+                // marks are off - so it carries the card's green fill and tick; ws-next-box NB8)
+                if (inp && got) markBoxSubmitted(inp, true);
+            }
             else {
                 wrong.push({ word: String(words[wi]), letter: LET[wi], pic: wi });
                 // (critic r7 #1, lf-vocab r9: EVERY wrong letter box is marked wrong on every host - the quiz too, where the
