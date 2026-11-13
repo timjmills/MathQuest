@@ -893,6 +893,9 @@ export function addMultipleQuestions(skillId, count, categoryId) {
 
     for (let i = 0; i < count; i++) {
         try {
+            // (the question's place in its section, for a generator that deals by place - gen-pv's compare never opens a quiz on
+            // "=": lf-placevalue compare r4, critic r2 N7; no other generator reads it)
+            state.setPosition = section.questions.length;
             const qData = safeGenerateQuestion(catKey, skillId);
             if (qData) {
                 section.questions.push({
@@ -905,6 +908,8 @@ export function addMultipleQuestions(skillId, count, categoryId) {
             }
         } catch (e) {
             console.warn('Failed to generate question for', skillId, e);
+        } finally {
+            delete state.setPosition;
         }
     }
 
@@ -922,6 +927,7 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
     if (!catKey) return;
 
     try {
+        state.setPosition = questionIdx;
         const qData = safeGenerateQuestion(catKey, q.skillId);
         if (qData) {
             q.questionData = quizQuestionData(qData);
@@ -930,6 +936,8 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
         }
     } catch (e) {
         console.warn('Failed to regenerate question', e);
+    } finally {
+        delete state.setPosition;
     }
 }
 

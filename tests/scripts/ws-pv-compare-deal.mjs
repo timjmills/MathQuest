@@ -20,6 +20,11 @@
 //                       mixed and band 999,999 deals, and a mixed deal names M-C3 on at least a quarter of its items.
 // WORKED-STEP-DOES (F2) no worked step restates the item ("Compare 419 and 470."), and a step that names digits marks them
 //                       (a step mark the drawing shows).
+// SIGN-PARITY (r2 N3)   on every offered option value, 4 pages of 30 seeded items: the share of ">" among the unequal items
+//                       at even and at odd places is 0.25-0.75 each, and no page holds 4 consecutive items whose signs strictly
+//                       alternate (> < > <; an "=" breaks a run). r2: lengths=mixed dealt > < > < down every page.
+// EQ-SHARE (r2 N7)      the same pages: no "=" at item 1 or 2, and any n consecutive items hold at most ceil(n / 6) "="
+//                       (r2: two "=" in one set of six, Test item 1 "724 = 724").
 // Prints `ws-pv-compare-deal: OK` / `FAIL (n)` last; exits 1 on FAIL.
 import { loadApp, fnv } from './ws-card-rulings.mjs';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -133,6 +138,42 @@ if (on('WORKED-STEP-DOES')) {
                 if (/\bdigits?\b/i.test(t) && /(^|[^\d,])\d([^\d,]|$)/.test(t) && !(s.marks || []).length) { bad.push(`WORKED-STEP-DOES: "${t}" names digits and marks nothing`); n++; }
                 if (n > 8) break;
             }
+        }
+    }
+}
+
+const OPTION_DEALS = [['default', {}], ['mixed', { lengths: 'mixed' }], ['band 99', { band: 99 }], ['band 9999', { band: 9999 }],
+    ['band 99999', { band: 99999 }], ['band 999999', { band: 999999 }], ['close', { closeness: 'close' }], ['far', { closeness: 'far' }],
+    ['close 999999', { band: 999999, closeness: 'close' }]];
+if (on('SIGN-PARITY') || on('EQ-SHARE')) {
+    for (const [tag, opts] of OPTION_DEALS) {
+        const qs = deal(opts, 120, `parity${tag}`);
+        const sign = (q) => (q.pv.a > q.pv.b ? '>' : q.pv.a < q.pv.b ? '<' : '=');
+        if (on('SIGN-PARITY')) {
+            const share = (par) => { const u = qs.filter((q, i) => i % 2 === par && sign(q) !== '='); return u.length ? u.filter((q) => sign(q) === '>').length / u.length : 0.5; };
+            const [ev, od] = [share(0), share(1)];
+            let alt = 0, where = '';
+            for (let p0 = 0; p0 < qs.length; p0 += 30) {
+                const sg = qs.slice(p0, p0 + 30).map(sign);
+                for (let i = 0; i + 3 < sg.length; i++) {
+                    const w = sg.slice(i, i + 4);
+                    if (!w.includes('=') && w[0] !== w[1] && w[1] !== w[2] && w[2] !== w[3]) { alt++; if (!where) where = `page ${p0 / 30 + 1} items ${i + 1}-${i + 4} ${w.join(' ')}`; }
+                }
+            }
+            console.log(`SIGN-PARITY ${tag}: ">" at even places ${ev.toFixed(2)}, at odd ${od.toFixed(2)}, ${alt} strict 4-alternations`);
+            if (ev < 0.25 || ev > 0.75 || od < 0.25 || od > 0.75) bad.push(`SIGN-PARITY ${tag}: the share of ">" is ${ev.toFixed(2)} at even places and ${od.toFixed(2)} at odd (want 0.25-0.75 each: the sign follows the item's parity)`);
+            if (alt) bad.push(`SIGN-PARITY ${tag}: ${alt} runs of 4 strictly alternating signs, e.g. ${where}`);
+        }
+        if (on('EQ-SHARE') && opts.lengths !== 'mixed') {
+            let n = 0;
+            for (let p0 = 0; p0 < qs.length; p0 += 30) {
+                const at = qs.slice(p0, p0 + 30).map((q, i) => (sign(q) === '=' ? i : -1)).filter((i) => i >= 0);
+                n += at.length;
+                if (at.some((i) => i < 2)) bad.push(`EQ-SHARE ${tag}: page ${p0 / 30 + 1} deals "=" at item ${at[0] + 1} (never item 1 or 2)`);
+                for (let k = 1; k < at.length; k++) if (at[k] - at[k - 1] < 6) { bad.push(`EQ-SHARE ${tag}: page ${p0 / 30 + 1} deals "=" at items ${at[k - 1] + 1} and ${at[k] + 1} (any n items hold at most ceil(n/6))`); break; }
+            }
+            console.log(`EQ-SHARE ${tag}: ${n} "=" in ${qs.length} items`);
+            if (n < qs.length / 10) bad.push(`EQ-SHARE ${tag}: only ${n} "=" in ${qs.length} items (want about one in six)`);
         }
     }
 }

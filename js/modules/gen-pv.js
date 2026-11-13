@@ -38,7 +38,7 @@
 
 import { state } from './state.js';
 import { randInt, shuffle } from './utils.js';
-import { dealIndex, freshDeal } from './page-deal.js';
+import { dealIndex, freshDeal, onNewPage } from './page-deal.js';
 import { normalizeOptions, pvRefusal, pvRoundPlace, pvCap, pvBand, ROUND_NL } from './skill-options.js';
 import { diskMatSVG, numeralTracksHTML, roundingLineSVG } from './sheet/index.js';
 import { plainNumeralHTML, placeChartHTML, hundredsRowsHTML, hundredsWindow, pvLineSVG, moreLessLine, stripHTML, shiftChartHTML, roundingTableHTML } from './pv-support-cell.js';
@@ -60,7 +60,9 @@ let _liveCursor = -1;
 // once per session, so no dealt case has a fixed live position; a seeded page still reprints the same.)
 const _liveRun = randInt(0, 9972);
 let _at = 0;
-function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
+// (lf-placevalue compare r4, critic r2 N7: a host that deals a numbered set live - the quiz builder - names the item's place in
+// its set (`state.setPosition`), so its item 1 is item 1 here too; live play with no set keeps its own cursor)
+function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : Number.isFinite(state.setPosition) ? state.setPosition : ++_liveCursor; }
 const slot = (n) => ((_at % n) + n) % n;
 /**
  * The order of 0 .. L-1 for the current block of L items: each block takes every value once, the
@@ -943,17 +945,63 @@ function comparePair(cap, o, ord, close) {
     return null;
 }
 
+/*
+ * The compare page's plan (lf-placevalue compare r4, critic r2 N3 / N7), drawn once a page (page-deal onNewPage forgets it;
+ * live play keeps one a session, from _liveRun) from two seeded streams of its own, so it never moves with an item's retries:
+ *  - "=" (CP-9): the first at item 3 .. 7 (index 2 .. 6: never item 1 of a Test, a quiz or a Guided set), then every 6th or
+ *    7th item. Any run of n items holds at most ceil(n / 6) of them (r2: two "=" in one set of six - a block-of-six place
+ *    turned from block to block put two side by side across a block's edge - and Test item 1 "724 = 724").
+ *  - the sign of every unequal item: a seeded coin, but never a 4th sign in a strict > < > < run and never a 4th in a row
+ *    of one sign (r2: lengths=mixed dealt the longer number first and swapped on the item's parity, so the signs read
+ *    > < > < down every page - in a 2-column block the left column all ">", the right all "<").
+ */
+let _cmpPage = null, _cmpLive = null;
+onNewPage(() => { _cmpPage = null; });
+const _rng32 = (seed) => { let x = (seed >>> 0) || 1; return () => { x = (x + 0x6D2B79F5) >>> 0; let t = Math.imul(x ^ (x >>> 15), 1 | x); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+function comparePlan() {
+    const mk = (s) => { const rEq = _rng32(s), rSign = _rng32(s ^ 0x5bd1e995); return { rEq, rSign, eq: new Set(), nextEq: 2 + Math.floor(rEq() * 5), signs: [] }; };
+    if (!Number.isFinite(state.itemIndex)) return _cmpLive || (_cmpLive = mk(_liveRun * 7919 + 17));
+    return _cmpPage || (_cmpPage = mk(Math.floor(Math.random() * 2147483646) + 1));
+}
+function planEq(P, i) {
+    while (P.nextEq <= i) { P.eq.add(P.nextEq); P.nextEq += 6 + Math.floor(P.rEq() * 2); }
+    return P.eq.has(i);
+}
+/** 1 for ">", 0 for "<", at index i. */
+function planSign(P, i) {
+    while (P.signs.length <= i) {
+        let s = P.rSign() < 0.5 ? 1 : 0;
+        const [x, y, z] = P.signs.slice(-3);
+        if (P.signs.length >= 3 && x !== y && y !== z && s !== z) s = z;       // a 4th in > < > <
+        else if (P.signs.length >= 3 && x === y && y === z && s === z) s = 1 - z; // a 4th of one sign
+        P.signs.push(s);
+    }
+    return P.signs[i];
+}
+/** True when M6 (the last digits compared; lengths differing, also the first digits) gives a WRONG sign for a / b. */
+function m6Wrong(a, b) {
+    const sa = String(a), sb = String(b);
+    const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+    const right = cmp(a, b);
+    const last = cmp(Number(sa.slice(-1)), Number(sb.slice(-1)));
+    const first = sa.length !== sb.length ? cmp(Number(sa[0]), Number(sb[0])) : '=';
+    return (last !== '=' && last !== right) || (first !== '=' && first !== right);
+}
+
 function genCompare(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
-    const ord = blockOrder(6)[slot(6)];
+    const P = comparePlan();
+    const eq = o.lengths !== 'mixed' && planEq(P, _at);
+    // (the block-of-six place still deals the free item - ord 4 - and the two-digits-shorter mixed item - ord 0; the "=" is
+    // the plan's, so the block's own "=" place deals an ordinary item)
+    const ord0 = blockOrder(6)[slot(6)];
+    const ord = eq ? 5 : ord0 === 5 ? 3 : ord0;
     // (the closeness pattern comparableSet deals: 'some' makes every other item close, not strictly alternate)
     const close = o.closeness === 'close' || (o.closeness === 'some' && [0, 1, 1, 0, 1, 0][slot(6)] === 1);
     let [a, b] = comparePair(cap, o, ord, close) || comparableSet(2, cap, o);
-    // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
-    // (lf-placevalue compare round: at a place that turns from block to block - blockOrder - never every sixth item, where
-    // 6, 12, 18, 24 and 30 were "=" on every page and a pupil could read the answer off the item number)
-    if (ord === 5 && o.lengths !== 'mixed') b = a;
-    if (slot(2) === 1 && a !== b) [a, b] = [b, a];
+    if (eq) b = a;
+    // the sign is the plan's, never the item's parity (N3); turning the pair keeps every property it was dealt for
+    if (a !== b && (a > b) !== (planSign(P, _at) === 1)) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
     q.ans = a > b ? '>' : a < b ? '<' : '=';
@@ -968,7 +1016,9 @@ function genCompare(q, skill, o) {
         + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
     // (critic r1 F4: "=" is never a worked model - the Scripted Model and the Opener skip an item that carries `noModel` for
     // their Model; the Guided Model is the item with the most worked steps, which an "=" item never has)
-    if (a === b) q.noModel = true;
+    // (critic r2 N4: nor an item M6 gets RIGHT - a pair the ones place decides, 992,323 / 992,321 - whose worked example does
+    // not tell the rule from the error; ws-pv-compare-pages MODEL-M6)
+    if (a === b || !m6Wrong(a, b)) q.noModel = true;
     q.pv = { kind: 'compare', a, b, closeness: String(a)[0] === String(b)[0] && String(a).length === String(b).length ? 'close' : 'far', lengths: o.lengths || 'equal' };
     // (`inPlace`, lf-placevalue compare round: the sign is written in the circle - no working room - so the rows are held to the
     // ink: ws-empty-band read 35-40 % of every Independent, More practice and Test cell empty under the one line)
