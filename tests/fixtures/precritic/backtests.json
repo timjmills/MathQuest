@@ -7407,6 +7407,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-widths-plan-owner-set",
+  "check": "ws-screen-widths-plan: every screen gate on precritic's --skill plan (ws-phone-card, ws-screen-slots --screen-digit, ws-screen-ink-size per host, ws-worksheet-reflow) renders at exactly the owner set read from tests/lib/ws-screen-widths.cjs (820 / 1024 / 1280 / 1366), and no gate label names another width",
+  "kind": "commit-pair",
+  "rule": "ws-screen-widths-plan SW-MISSING / SW-SET / SW-UNREAD / SW-LABEL (lf-hosts critic r2 F2)",
+  "browser": false,
+  "fail": {
+   "commit": "d53fa104e",
+   "state": "precritic planned ws-phone-card at its 390 x 844 / 390 x 664 default with the label 'practice card at 390 px' (so TOUCH-UNIQUE, FOCUS-RING and the card CELL-READ never ran at a tablet width); the other screen gates could not state their widths"
+  },
+  "pass": {
+   "commit": "341c0dd84",
+   "state": "every screen gate at 820 / 1024 / 1280 / 1366 from the one table (ws-screen-ink-size's worksheet and quiz too), labels name the set"
+  },
+  "command": "node tests/scripts/ws-screen-widths-plan.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
