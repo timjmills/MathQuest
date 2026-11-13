@@ -10,6 +10,7 @@
 //   node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card            # card roles x S/M/L
 //   node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts # + every option value
 //                                          (option values on --opt-roles, default lesson,independent,guided,test,review)
+//   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --variant band=10   # + only that option value
 //   node tests/scripts/ws-cell-checks.cjs --skills k --roles reason-it,test --size S,L --opts '{"forms":[1]}'
 //   node tests/scripts/ws-cell-checks.cjs --rules OVERFLOW,TAGINK   # only these rules count
 //   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --h13-abs [--rule-skills k]   # + H13-ABS on option pages (opt-in, N6)
@@ -127,7 +128,10 @@ function selfTest() {
         if (has('card') && (!plan || !plan.cards.length)) { notes.push(`${k}: no signed card lists it (--card): roles from --roles`); }
         const roles = plan && plan.cards.length ? plan.roles : list(arg('roles', 'independent'));
         for (const role of roles) for (const size of SIZES) jobs.push({ k, role, size, opts: baseOpts });
-        if (plan && has('card-opts')) for (const v of plan.variants) for (const role of OPT_ROLES.filter((r) => roles.includes(r))) for (const size of SIZES) jobs.push({ k, role, size, opts: Object.assign({}, baseOpts || {}, v.opts), variant: true });
+        // (`--variant id=value`: only that card option value - a backtest row proves one value's pages on precritic's own plan)
+        const vOnly = arg('variant', null);
+        const vKeep = (v) => !vOnly || `${v.option}=${v.value}` === vOnly;
+        if (plan && has('card-opts')) for (const v of plan.variants.filter(vKeep)) for (const role of OPT_ROLES.filter((r) => roles.includes(r))) for (const size of SIZES) jobs.push({ k, role, size, opts: Object.assign({}, baseOpts || {}, v.opts), variant: true });
     }
     console.log(`ws-cell-checks: ${jobs.length} page(s) - ${skills.join(', ')}${has('card') ? ' (card plan' + (has('card-opts') ? ' + option values' : '') + ')' : ''}`);
     for (const n of notes) console.log(`  note ${n}`);

@@ -5429,6 +5429,45 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "c120-lesson-wide",
+  "check": "the fallback lesson draws a row of ten (hundreds_chart_fill band 10) in full-width chart rows, never a 92 mm anchor-chart panel or beside the Steps (OVERFLOW 54, lesson S/M/L)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW (card option value on the lesson role)",
+  "browser": true,
+  "fail": {
+   "commit": "e3733905c",
+   "state": "OVERFLOW 18 on hundreds_chart_fill lesson M {band: 10}"
+  },
+  "pass": {
+   "commit": "032e07ec6",
+   "state": "lesson.js chartDataOf: a fallback lesson takes chartWide for an example wider than half the page"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=10 --opt-roles lesson --size M --rules OVERFLOW --show 20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-centred-band",
+  "check": "a CENTRED cell (chartwindow) is judged by its white above + under as one band, and its centring is not drawn height (EB-FOOT read a 59 mm window in a 76.5 mm row as 'drawn 67.5 mm', 60 false reds; EB-BAND passed a 42 % band around a window beside the Guided Model)",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND / EB-FOOT (centred cells)",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/eb-centred/fail.json",
+   "state": "guided M p1 cell 2: 24.5 + 23.9 mm of 115.1 (42 %), passed by the under-only measure"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/eb-centred/pass.json",
+   "state": "independent M p1 cell 1: 8.7 + 8.8 mm of 76.5 (23 %), the row stretch EB-FOOT failed"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --judge-fixture {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

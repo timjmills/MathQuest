@@ -216,7 +216,7 @@ if (argv.includes('--self-test')) {
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-if (!argv.includes('--self-test') && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+if (!argv.includes('--self-test') && !arg('judge-fixture', null) && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
 const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
@@ -231,6 +231,16 @@ const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
 // the roles that lay their grid out from the items' measured footprints (buildSheet items[i].measured[cols].hMm)
 const GRID_ROLES = new Set(['independent', 'more-practice', 'test', 'review', 'mixed-practice']);
+// `--judge-fixture file.json` ({role, cells: [measured cells]}): judges measured cells as a page would (EB-BAND / EB-SIDE /
+// EB-EDGE), no browser - the backtest of a measure (lf-builds chart_120 fix: a centred cell's white above + under is one band)
+if (arg('judge-fixture', null)) {
+    const fx = JSON.parse(fs.readFileSync(path.resolve(arg('judge-fixture')), 'utf8'));
+    const got = [];
+    judge(fx.cells || [], fx.where || 'fixture', (rule, where, msg) => got.push(`${rule} ${where}: ${msg}`), fx.role || 'independent');
+    for (const g of got) console.log('   ' + g);
+    console.log(`ws-empty-band: ${got.length ? `FAIL (${got.length})` : 'OK (fixture)'}`);
+    process.exit(got.length ? 1 : 0);
+}
 if (argv.includes('--self-test')) {   // centred cells (lf-builds chart_120 fix): white above + under counts as one band; 23 % passes, 45 % fails, as top-aligned
         const cell = (centreMm, belowMm) => ({ page: 1, cell: 1, hMm: 76.5, belowMm, centreMm, sideMm: 0, innerW: 86, edgeMm: 5, tmpl: 'chartwindow' });
         const run = (c) => { const got = []; judge([c], 't', (rule) => got.push(rule), 'independent'); return got.includes('EB-BAND'); };
