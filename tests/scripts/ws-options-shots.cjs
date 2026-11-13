@@ -538,6 +538,8 @@ async function checkSkill(app, ref, vp, mode = {}) {
             if (!await nextPart()) break;
             await sleep(100);
             walk.push(await read(`${vp.label} part ${i}`));
+            // --shots with --save-panels: the whole panel of each part too (the scroll cue sits under the frame, outside its crop)
+            if (SHOTS && SAVE_PANELS) { const el = await page.$('#skillOptionsPopover'); if (el) await el.screenshot({ path: path.join(SHOTS, `${categoryId}-${skillId}-${vp.label}_panel_part_${i}.png`) }); }
         }
         walkPush(vp.label, walk);
     }

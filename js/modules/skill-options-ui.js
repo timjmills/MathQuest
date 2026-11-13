@@ -488,6 +488,27 @@ function _revealSoon() {
 }
 
 /**
+ * (critic-panel-r4 N1-cue) A sample frame that scrolls says so: a line under it names the way to scroll. Tablet and ChromeOS
+ * scrollbars are overlays that show nothing until touched, so the bar alone is no cue. Shown only past 8 px of overflow;
+ * removed whenever the frame is tidied again (ws-options-shots [scroll-cue]).
+ */
+function _sampleScrollCue(frame, overX, overY) {
+    const host = frame.parentElement;
+    if (!host) return;
+    let cue = host.querySelector(':scope > [data-sko-scroll-cue]');
+    const x = overX > 8, y = overY > 8;
+    if (!x && !y) { if (cue) cue.remove(); return; }
+    if (!cue) {
+        cue = document.createElement('div');
+        cue.className = 'tv-sko-scroll-cue';
+        cue.setAttribute('data-sko-scroll-cue', '');
+        frame.insertAdjacentElement('afterend', cue);
+    }
+    const way = x && y ? 'sideways and down' : x ? 'sideways' : 'down';
+    cue.textContent = `${x ? '\u2194' : '\u2195'} Scroll ${way} to see the whole drawing`;
+}
+
+/**
  * The live sample, tidied for a popover: a legacy printed item (a stacked sum, an expanded-form
  * row) takes the PRINT stylesheet's rules (`.print-edition`), so its column rule sits under the
  * numbers instead of the item header's rule sitting over them, and the header (the item number
@@ -510,6 +531,7 @@ function _tidySample(frame) {
     // under it puts the stage off the frame (lf-algebra F8/G11), so it never survives a tidy.
     frame.classList.remove('is-cropped');
     frame.classList.remove('is-scroll');
+    _sampleScrollCue(frame, 0, 0);
     stage.style.left = ''; stage.style.top = ''; stage.style.transformOrigin = '';
     _sampleShowAll(stage);     // each tidy starts from the whole item, at the panel's own frame height (re-runs are idempotent)
     _sampleSaidOnce(stage);    // a question line the drawn item already says is hidden (critic-panel-r2 F6)
@@ -550,6 +572,7 @@ function _tidySample(frame) {
         stage.style.top = `${Math.max(SAMPLE_PAD / 2, (ch - h * k) / 2)}px`;
         stage.style.transform = `scale(${k.toFixed(4)})`;
         frame.scrollLeft = 0; frame.scrollTop = 0;
+        _sampleScrollCue(frame, frame.scrollWidth - frame.clientWidth, frame.scrollHeight - frame.clientHeight);
         return k;
     };
     _sampleUnclip(stage);      // a box inside the item that clips its own content is opened up (critic-panel-r2 F1)
