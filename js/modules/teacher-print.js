@@ -1319,7 +1319,11 @@ async function runBuild() {
                 // again, not a re-snap of the clamped 30; a count back at its asked value loses its note.
                 const lims = sectionLimits(s);
                 const r = resnapPartOpts(s.partOpts, s.partAsk, lims);
+                // (critic-panel-r3 FU-1: a re-snap that CHANGES the counts builds again, or the packet keeps the count built at
+                // the size before - 45 at M -> L -> M said "5 pages of 9" and printed 1; an unchanged re-snap builds nothing)
+                const resnapped = JSON.stringify(r.partOpts) !== JSON.stringify(s.partOpts);
                 s.partOpts = r.partOpts;
+                if (resnapped) scheduleBuild();
                 const note = Object.assign({}, s.partNote);
                 for (const x of Object.keys(s.partAsk || {})) if (!r.notes[x]) delete note[x];
                 for (const [x, v] of Object.entries(r.notes)) {
