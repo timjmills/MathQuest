@@ -55,7 +55,7 @@ export const VOCAB_WORDS = Object.freeze({
     'expanded form': { meaning: 'the number split by place', explain: 'Expanded form means the number split by place: 300 plus 40 plus 7.', notWith: [] },
     'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, like forty-seven.', notWith: ['hundred'] },
     'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 3 in 473.', notWith: ['digit', 'factor', 'quotient'] },
-    repeat: { meaning: 'the same part comes again', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
+    repeat: { meaning: 'the part comes back', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
     sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term'] },
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round to the start again: circle, square, triangle, diamond, circle.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS

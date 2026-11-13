@@ -4234,6 +4234,82 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r13-v7all",
+   "check": "V7-ALL: every bank a set can deal is judged; set 0 deals row with even, sets 7/8 first term with rule: critic r12 root cause",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V7-ALL (lf-vocab r13)",
+   "fail": {
+    "commit": "a35dbd72",
+    "state": "lf-vocab r12 head"
+   },
+   "pass": {
+    "commit": "86c844fd",
+    "state": "pick3 deals only vetted trios"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V7-ALL 2>&1 | grep -q 'V7-ALL set \\(0\\|7\\) ' && echo 'v7-all: FAIL' || echo 'v7-all: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r13-vnum",
+   "check": "V-NUM: the row picture rings 2, 4, 6, 8 (all even) and is dealt with even: critic r12 #1",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-NUM (lf-vocab r13)",
+   "fail": {
+    "commit": "a35dbd72",
+    "state": "lf-vocab r12 head"
+   },
+   "pass": {
+    "commit": "86c844fd",
+    "state": "row rings 3, 6, 9, 12"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"row\"' && echo 'v-num: FAIL' || echo 'v-num: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r13-feat-product-row",
+   "check": "V-FEAT: a times table reads as product, row/column dealt with product: critic r12 #2",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FEAT (lf-vocab r13)",
+   "fail": {
+    "commit": "a35dbd72",
+    "state": "lf-vocab r12 head"
+   },
+   "pass": {
+    "commit": "86c844fd",
+    "state": "product notWith row, column; set 0 product -> factor"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'V-FEAT .*\"row\" picture reads as \"product\"' && echo 'v-feat: FAIL' || echo 'v-feat: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r13-vtwin",
+   "check": "V-TWIN: term and first term draw one feature class, only term notWith rule: critic r12 #3",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-TWIN (lf-vocab r13)",
+   "fail": {
+    "commit": "a35dbd72",
+    "state": "lf-vocab r12 head"
+   },
+   "pass": {
+    "commit": "86c844fd",
+    "state": "first term notWith rule"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*first term' && echo 'v-twin: FAIL' || echo 'v-twin: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
