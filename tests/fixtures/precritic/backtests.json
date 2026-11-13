@@ -343,7 +343,7 @@
     "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
     "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D5, binaryParts reads comma-formatted items, so the kit stack draws them on screen"
    },
-   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup --items 2",
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup --items 2 --sizes 390x844,390x664",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1246,7 +1246,7 @@
     "commit": "6f0c934",
     "state": "visual-quality fix r2: four-panel chart that fits, 48 px answer face"
    },
-   "command": "node tests/scripts/ws-grade-render.cjs --skills addition:add_wp_20_plain --roles lesson --size S --gate --out /tmp/mq-backtest-render-gate",
+   "command": "node tests/scripts/ws-grade-render.cjs --skills addition:add_wp_20_plain --roles lesson --size S --gate --widths 390 --out /tmp/mq-backtest-render-gate",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3236,7 +3236,7 @@
     "commit": "d377e32b",
     "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
    },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ --widths 1280,820,390",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3256,7 +3256,7 @@
     "commit": "d377e32b",
     "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
    },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE --widths 1280,820,390",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3276,7 +3276,7 @@
     "commit": "d377e32b",
     "state": "0 findings: every ÷ card under once one wraps"
    },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE --widths 1280,820,390",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3456,7 +3456,7 @@
     "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
     "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
    },
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline --widths 390,820,1280",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3596,7 +3596,7 @@
     "commit": "35bc76fe",
     "state": "the kit words cell on every host, the input in its line"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY --widths 390,820,1280",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4425,7 +4425,7 @@
   },
   {
    "id": "vocab-v23-v25-screen-feedback",
-   "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9",
+   "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9 [lf-tools r1 A4, 2026-11-13: scoped to V23 with --no-pupil-pin. Today's V25 was tightened by r8 (letter named, only wrong pictures glow) and the pupil pin was re-pinned since, so df31bcb3 could not pass them at ANY width; V25 is proven by vocab-r8-v25plus-v26-v27]",
    "kind": "commit-pair",
    "rule": "ws-vocab-unit V23 + V25",
    "browser": true,
@@ -4437,7 +4437,7 @@
     "commit": "df31bcb3",
     "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23 --no-pupil-pin",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4445,7 +4445,7 @@
   },
   {
    "id": "vocab-v23-painted",
-   "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours",
+   "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours [lf-tools r1 A4: scoped to V23 with --no-pupil-pin, as vocab-v23-v25-screen-feedback]",
    "kind": "commit-pair",
    "rule": "ws-vocab-unit V23",
    "browser": true,
@@ -4457,7 +4457,7 @@
     "commit": "df31bcb3",
     "state": "lf-vocab r7 render fixes, 2026-11-09"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23 --no-pupil-pin",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4465,7 +4465,7 @@
   },
   {
    "id": "vocab-o1-next-box-blue",
-   "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring",
+   "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring [lf-tools r1 A4: the verdict counts NB1-NB5 only (ws-next-box --rules): NB6-NB9 were built after 5d8fe328]",
    "kind": "commit-pair",
    "rule": "ws-next-box NB1-NB5",
    "browser": true,
@@ -4477,7 +4477,7 @@
     "commit": "5d8fe328",
     "state": "lf-vocab r8 step A: the O-1 switch"
    },
-   "command": "node tests/scripts/ws-next-box.cjs",
+   "command": "node tests/scripts/ws-next-box.cjs --rules NB1,NB2,NB3,NB4,NB5",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4485,7 +4485,7 @@
   },
   {
    "id": "vocab-r8-v25plus-v26-v27",
-   "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks",
+   "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks [lf-tools r1 A4: scoped to V25 with --no-pupil-pin: today's V26 / V27 are the r9 pre-skill check and key underlays, built after 3127258f]",
    "kind": "commit-pair",
    "rule": "ws-vocab-unit V25+ V26 V27",
    "browser": true,
@@ -4497,7 +4497,7 @@
     "commit": "3127258f",
     "state": "lf-vocab r8 steps B + C"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25 --no-pupil-pin",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -5166,7 +5166,7 @@
     "commit": "75b0e131",
     "state": "twin fits the paper box, printFloor"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK --widths 390,820,1280",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -5186,7 +5186,7 @@
     "commit": "75b0e131",
     "state": "worksheet picture slot 104 px"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK --widths 390,820,1280",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -5214,7 +5214,7 @@
   },
   {
    "id": "guided-tight-rows",
-   "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+   "check": "a Guided page of tightRows (in-place) items keeps each row at its ink: no 30 % band under it (RUBRIC H13; lf-placevalue compare precritic r2 via the lead; re-pointed lf-roles r8a: lf-checks' pixel read found 34-37 % bands still on 8307219c, the rows sized with the measure's label keep-out)",
    "kind": "commit-pair",
    "rule": "ws-empty-band EB-BAND on guided",
    "browser": true,
@@ -5223,8 +5223,8 @@
     "state": "EB-BAND 2 on expand / unit_form / combine guided"
    },
    "pass": {
-    "commit": "8307219c",
-    "state": "EB-BAND PASS"
+    "commit": "ae8511168",
+    "state": "EB-BAND PASS (tries at most 26.4 %: keep-out dropped, try centred in its row)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
    "expect": {
@@ -5854,7 +5854,7 @@
     "commit": "TBD-lf-ops-npr-digits",
     "state": "lf-ops' fix (pass commit to come)"
    },
-   "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit --widths 1280,820,390",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6800,6 +6800,385 @@
     "state": "the live 2 mm"
    },
    "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only BAND-BT --bt-k-file {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "capacity-roles",
+   "check": "every role that draws a grid has pinned pages, so none sits outside CAPACITY-NO-DROP / SIZE-ORDER (lead 2026-11-13: Guided was, and printed fewer items at S than M on 12 passed pages)",
+   "kind": "fixture",
+   "rule": "ws-precritic-plan capacity-roles (ws-capacity-pin --roles-check)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/capacity-roles.fail.json",
+    "state": "a pin with no guided page"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/capacity-roles.pass.json",
+    "state": "a page per grid role"
+   },
+   "command": "node tests/scripts/ws-precritic-plan.mjs --capacity-pin {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-model-span",
+   "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - a Guided page of narrow column stacks at S whose one-cell-Model grid the ceiling trims to Model + 7 lays the Model over two cells of row 1, its working beside it, and holds Model + 10 in 3 whole rows; at M the Model keeps one cell (lead ruling (e) 2026-11-13, lf-roles r8a)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-MODEL-SPAN",
+   "browser": false,
+   "fail": {
+    "commit": "a8303f6e4",
+    "state": "S page holds 8 cells, no two-cell Model"
+   },
+   "pass": {
+    "commit": "ae8511168",
+    "state": "S 11 cells, Model spans two with its working; M 9, one-cell Model"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-SPAN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-size-order-s",
+   "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - Guided SIZE-ORDER on the three subtraction stack pages: S prints at least as many items a page as M (lead 2026-11-13: S 8 < M 9 on sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d; fixed by the two-cell Model, ruling (e))",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin SIZE-ORDER (guided)",
+   "browser": true,
+   "fail": {
+    "commit": "a8303f6e4",
+    "state": "3 x S 8 < M 9 items a page"
+   },
+   "pass": {
+    "commit": "ae8511168",
+    "state": "S 11 >= M 9"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --roles guided --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-stack-side",
+   "check": "the column-stack Guided pages of the 7 no-regroup subtraction skills pass ws-empty-band at S, M and L (lf-roles r8b via the lead: EB-SIDE 32.4 % at S / 31.7 % at M - a measured stack whose every offered grid left 30 % beside it now takes one column more; EB-BAND 34.8 % at L - stack cells centred; the Model spans the cells that complete the grid)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE / EB-BAND on guided",
+   "browser": true,
+   "fail": {
+    "commit": "ae8511168",
+    "state": "EB-SIDE 57 at S/M, EB-BAND 30 at L"
+   },
+   "pass": {
+    "commit": "85c322f50",
+    "state": "ws-empty-band OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --roles guided --hosts none --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-stack-side-unit",
+   "check": "a planted narrow column stack's Guided grid leaves under 30 % beside it, keeps S 11 / M 9 / L 6, fills every row and centres its cells (lf-roles r8b)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-STACK-SIDE",
+   "browser": false,
+   "fail": {
+    "commit": "ae8511168",
+    "state": "S 4 columns 32.4 %, M 3 columns 31.7 %, cells not centred"
+   },
+   "pass": {
+    "commit": "85c322f50",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-STACK-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-model-row",
+   "check": "a Model with worked lines under it never leaves the try beside it in a row stretched past what it fills to 70 % (lf-builds chart_to_120 Guided M / L EB-BAND 42 % / 36 %, lead via lf-roles r8b (a); verified on a worktree of e1389d1f3)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit GUIDED-MODEL-ROW",
+   "browser": false,
+   "fail": {
+    "commit": "85c322f50",
+    "state": "the Model's row 124.7 / 124.9 mm beside a 61 mm try"
+   },
+   "pass": {
+    "commit": "4845f6b25",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-ROW",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-model-row-wp",
+   "check": "the word-problem Guided S pages' first try no longer sits in the Model's stretched row (EB-BAND 40-42 % on add_wp / sub_wp row 1; the GUIDED-MODEL-ROW rule, lf-roles r8b (a))",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND on guided",
+   "browser": true,
+   "fail": {
+    "commit": "85c322f50",
+    "state": "EB-BAND 40.4 % on add_wp_10 guided S cell 2"
+   },
+   "pass": {
+    "commit": "4845f6b25",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10,subtraction:sub_wp_10 --roles guided --sizes S --hosts none --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "guided-tight-refill",
+   "check": "a one-page Guided page whose next whole row of tries stays within the §12.1 ceiling never leaves a drawn try row white under its grid: the fit counts tightRows rows at their drawn height (lf-roles critic r8b D1: expand / unit_form M 6 tries with 42-54 mm under the grid, L 5; combine L 5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-REFILL (GUIDED-TIGHT-REFILL)",
+   "browser": true,
+   "fail": {
+    "commit": "e62f1da34",
+    "state": "EB-REFILL 5 (expand M/L, unit_form M/L, combine L)"
+   },
+   "pass": {
+    "commit": "6cfa329ee",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --sizes M,L --hosts none --no-baseline --only EB-REFILL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-eligibility",
+   "check": "ws-precritic --copy-light / --batch (ws-copy-light: owner rule 2026-11-13, fastest plan 2-3): a later skill on an already-passed template takes the narrow critic only when an anchor in redesign-passed.js passed every kit template it draws with every role and host its card offers; addition:add_sub_10s (fact template, anchor addition:add_facts) is ELIGIBLE and gets a page sample, measurement:time_5min (clock template, never passed) is NOT ELIGIBLE (full critic)",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ELIGIBLE / NOT ELIGIBLE + the copy-light page sample (owner rule 2026-11-13)",
+   "browser": false,
+   "fail": {
+    "commit": "f3ae7acca",
+    "state": "critic lf-tools r1 B1 / B5: f3ae7acca's tool keyed eligibility on the template id only, so placevalue:compare (pv kind=compare, a drawing no passed skill draws) read ELIGIBLE; the row's old fail state (91182e61b, no --copy-light flag) was only a usage error"
+   },
+   "pass": {
+    "commit": "27545964d",
+    "state": "eligibility per DRAWING (template + payload kind / task / layout / mode / type / form): add_sub_10s ELIGIBLE (fact via add_facts), time_5min NOT (clock never passed), placevalue:compare NOT (pv/kind=compare never passed)"
+   },
+   "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill measurement:time_5min --require > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill placevalue:compare --require > /dev/null && echo 'copy-light: OK' || echo 'copy-light: FAIL'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-phone-width-default",
+   "check": "ws-no-phone-width (owner rule 2026-11-13, CLAUDE.md Fastest-implementation plan 7: no phone width): no screen gate DEFAULT, RUBRIC practice-card host row, touch-target line or critic brief template holds 390 px; the shared widths are 1280 / 1366 / 820 / 1024 with SP digit floors 56 / 56 / 48 / 48",
+   "kind": "commit-pair",
+   "rule": "ws-no-phone-width NP-ARRAY / NP-ARGDEF / NP-VIEWPORT / NP-HOST / NP-LIB / NP-DOC",
+   "fail": {
+    "commit": "91182e61b",
+    "state": "every screen gate defaulted to card 390 (ws-empty-band, ws-screen-ink-size, ws-screen-slots, ws-grade-render, ws-phone-card 390x844, ws-next-box card-390 ...), RUBRIC listed '390 phone': 21 findings"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts (re-pointed from 29ef1eb21 by critic lf-tools r1 A2: the derived scan also reads ws-student-explorer, still 390 there) (re-pointed from 27545964d by lf-tools r3: NP-PUPIL, critic r2 D2, finds the pupil 390 steps ws-share-options and ws-simple-print still ran there)"
+   },
+   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-drawing-batch",
+   "check": "critic lf-tools r1 B1: a copy-light BATCH must not carry a skill whose drawing never passed; placevalue:compare (pv kind=compare) + more_less_10 + more_less_100 read BATCH OK at f3ae7acca (one template id pv), and FAIL now (compare is not eligible: pv/kind=compare never passed)",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light --batch, eligibility per drawing (template + payload discriminator)",
+   "browser": false,
+   "fail": {
+    "commit": "f3ae7acca",
+    "state": "f3ae7acca's tool: BATCH OK on template pv (eligibility by template id)"
+   },
+   "pass": {
+    "commit": "27545964d",
+    "state": "BATCH FAIL: placevalue:compare is not copy-light eligible (pv/kind=compare never passed)"
+   },
+   "command": "! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch placevalue:compare,placevalue:more_less_10,placevalue:more_less_100 > /dev/null && echo 'drawing-batch: OK' || echo 'drawing-batch: FAIL'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-sample-widths",
+   "check": "critic lf-tools r1 B2: the copy-light / batch page sample shows every default screen width (1280, 1366, 820, 1024); at f3ae7acca a batch sample was all 1280 and a single sample 1280 / 820 only",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light buildSample widths (tests/lib/ws-screen-widths.cjs SCREEN_WIDTHS)",
+   "browser": false,
+   "fail": {
+    "commit": "f3ae7acca",
+    "state": "f3ae7acca's tool: the pv batch sample's screen pages are all 1280"
+   },
+   "pass": {
+    "commit": "27545964d",
+    "state": "the sample's screen pages cover 1280, 1366, 820 and 1024"
+   },
+   "command": "f=$(mktemp) && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch placevalue:more_less_10,placevalue:more_less_100,placevalue:place_value_10x --sample-out $f > /dev/null && node -e \"const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const w=new Set(j.skills.flatMap(s=>s.pages.filter(p=>p.host!=='print').map(p=>p.width)));console.log([1280,1366,820,1024].every(x=>w.has(x))?'widths: OK':'widths: FAIL ('+[...w].join(',')+')')\" $f; rm -f $f",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-brief-names",
+   "check": "critic lf-tools r1 B4: the copy-light and batch critic briefs name the four criteria as RUBRIC.md does (C1 Ease of use, C2 Educational value, C3 Spacing and layout, C4 Standard fidelity); f3ae7acca's critic-copy-light.md said C1 correct maths, C2 one thing at a time, C3 design contract, C4 works for the pupil",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light --brief-lint BRIEF-NAMES",
+   "browser": false,
+   "fail": {
+    "commit": "f3ae7acca",
+    "state": "critic-copy-light.md misnames all four criteria; critic-batch.md names none"
+   },
+   "pass": {
+    "commit": "27545964d",
+    "state": "both briefs carry RUBRIC's names"
+   },
+   "command": "node tests/scripts/ws-copy-light.mjs --brief-lint --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "drawing-key-complete",
+   "check": "critic lf-tools r2 D1 (round cap, the r1 B1 class twice): ws-drawing-key mutates one payload field at a time (values from the live corpus) for every registered sheet template and FAILs when the rendered skeleton changes but ws-copy-light's drawing key does not; fac8e03a0 keyed the drawing on a hand-kept field list (kind / task / layout / mode / type / form), so stack op / unknown / regroup / operands (and 111 more fields on 38 templates) changed the drawing but not the key",
+   "kind": "commit-pair",
+   "rule": "ws-drawing-key DRAWING-KEY (tests/lib/ws-drawing-skeleton.mjs)",
+   "browser": false,
+   "fail": {
+    "commit": "fac8e03a0",
+    "state": "115 fields on 38 templates change the skeleton but not the key (stack.op '+' -> '-', stack.unknown, stack.regroup, ...)"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "the key is template + the skeleton hash: 0 findings on 46 judged templates"
+   },
+   "command": "node tests/scripts/ws-drawing-key.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-stack-batch",
+   "check": "critic lf-tools r2 D1: the batch add_column_multi + add_missing_digit + sub_missing_digit (stack: four addend rows, a carry row, the missing-digit box) read BATCH OK on stack at fac8e03a0, anchored by sub_50_no_regroup (op '-', two rows), and mult_2by1_column (stack op '*') read ELIGIBLE; both refused now, while add_sub_10s stays ELIGIBLE",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light --batch / --skill --require, eligibility per rendered drawing",
+   "browser": false,
+   "fail": {
+    "commit": "fac8e03a0",
+    "state": "BATCH OK on template stack; mult_2by1_column ELIGIBLE"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "BATCH FAIL (each of the three never-passed stack drawings); mult_2by1_column NOT ELIGIBLE; add_sub_10s ELIGIBLE"
+   },
+   "command": "! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch addition:add_column_multi,addition:add_missing_digit,subtraction:sub_missing_digit > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill multiplication:mult_2by1_column --require > /dev/null && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require > /dev/null && echo 'stack-batch: OK' || echo 'stack-batch: FAIL'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-sample-widths-per-skill",
+   "check": "critic lf-tools r2 D3: several skills in one copy-light run (precritic --skill a --skill b --copy-light) each get their own narrow critic brief, so EACH skill's sample must hold 1280, 1366, 820 and 1024; fac8e03a0 dealt the widths across the skills, so each skill missed one",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light buildSample (copy-light mode: per skill; a batch still deals across the batch)",
+   "browser": false,
+   "fail": {
+    "commit": "fac8e03a0",
+    "state": "each skill has 3 of the 4 widths"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "every skill has all four widths"
+   },
+   "command": "f=$(mktemp) && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup --sample-out $f > /dev/null && node -e \"const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const bad=j.skills.filter(s=>{const w=new Set(s.pages.filter(p=>p.host!=='print').map(p=>p.width));return ![1280,1366,820,1024].every(x=>w.has(x))}).map(s=>s.skill);console.log(j.skills.length>=2&&!bad.length?'widths-per-skill: OK':'widths-per-skill: FAIL ('+(bad.join(',')||'fewer than 2 skills')+')')\" $f; rm -f $f",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-phone-width-pupil-allow",
+   "check": "critic lf-tools r2 D2: ALLOW is per file and said 'no pupil screen host at 390', but ws-share-options played twelve pupil practice-card questions at 390 x 844 (pupil 3) and shot the pupil Quick Start grid at 390; ws-simple-print checked the pupil home at 390. NP-PUPIL: a 390 line in an allowed file with a pupil / student step within 6 lines is a finding; the pupil steps now run at 1024 x 768",
+   "kind": "commit-pair",
+   "rule": "ws-no-phone-width NP-PUPIL",
+   "browser": false,
+   "fail": {
+    "commit": "fac8e03a0",
+    "state": "NP-PUPIL ws-share-options.cjs (2), ws-simple-print.cjs (1)"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "no pupil 390 step; the teacher 390 steps stay allowed with a true reason"
+   },
+   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-phone-width-derived",
+   "check": "critic lf-tools r1 A2: ws-no-phone-width scans EVERY script precritic, the deploy gates or the opt-in rules name (derived, not a hand list), with an allow-list carrying reasons; at f3ae7acca the pupil gate ws-student-explorer (deploy session 1) still rendered 390 x 844 and 360 x 740 and the hand list never read it",
+   "kind": "commit-pair",
+   "rule": "ws-no-phone-width scanList (derived) + ALLOW",
+   "browser": false,
+   "fail": {
+    "commit": "f3ae7acca",
+    "state": "ws-student-explorer.cjs: [390, 844] / [360, 740] loops and a 390 touch viewport (3 findings)"
+   },
+   "pass": {
+    "commit": "fdc35fb99",
+    "state": "ws-student-explorer runs at 1366 / 1024 / 820; teacher phone tests allow-listed with a reason (re-pointed from 27545964d by lf-tools r3: NP-PUPIL, critic r2 D2, finds the pupil 390 steps ws-share-options and ws-simple-print still ran there)"
+   },
+   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "copy-light-advisory-mult-div",
+   "check": "lead decision COPYLIGHT-ADVISORY (2026-11-13; evidence critic lf-tools r3 E1: the skeleton key masks x and divide, so division:div_facts anchors multiplication:mult_facts on fact@2f11fa): a planted mult/div anchor pair must still route to the FULL critic; at b99cf0bde the tool printed the anchor and no critic route (a narrow critic could follow an ELIGIBLE verdict)",
+   "kind": "commit-pair",
+   "rule": "ws-copy-light ADVISORY / criticRoute(): every skill takes the FULL critic",
+   "browser": false,
+   "fail": {
+    "commit": "b99cf0bde",
+    "state": "mult_facts shows anchor division:div_facts and no 'critic: FULL' route"
+   },
+   "pass": {
+    "commit": "fd85daebf",
+    "state": "mult_facts shows anchor division:div_facts AND 'critic: FULL (COPYLIGHT-ADVISORY ...)'"
+   },
+   "command": "o=$(node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill multiplication:mult_facts 2>&1); echo \"$o\" | grep -q 'anchor: division:div_facts' && echo \"$o\" | grep -q 'critic: FULL (COPYLIGHT-ADVISORY' && echo 'advisory: OK' || echo 'advisory: FAIL'",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

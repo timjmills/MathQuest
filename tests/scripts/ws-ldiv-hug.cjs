@@ -3,7 +3,7 @@
 // worksheet because the quotient box's 64 px floor, and the >= 44 px work tracks, widened the
 // dividend's column beyond its digits).
 //
-// For every screen host - the practice card at 390 and 1280, the online worksheet at 1280 and 390,
+// For every screen host - the practice card at 820 and 1280, the online worksheet at 1280 and 820 (owner 2026-11-13: no phone width),
 // the quiz at 1280 - and every bracket drawing:
 //   fact bracket (.mq-ldiv: div_facts Long / Mix, every one-line division fact drawn as a bracket)
 //   worked bracket (.ws-ops-division: long_div_2digit, long_division ... the kit twin with work rows)
@@ -265,7 +265,7 @@ async function shot(page, sel, file) {
             if (!pr || pr.error || !pr.brackets.length) { console.log(`FAIL paper ${s.tag}: ${pr && pr.error ? pr.error : 'no bracket'}`); fails++; continue; }
             ref = { gap: Math.max(...pr.brackets.map((b) => b.gap)), over: Math.max(...pr.brackets.map((b) => b.over)), space: Math.max(...pr.brackets.map((b) => b.space)) };
             console.log(`---- ${s.tag}: paper (${pr.brackets.length} brackets) gap ${ref.gap.toFixed(2)} over ${ref.over.toFixed(2)} space ${ref.space.toFixed(2)}`);
-            for (const w of [390, 1280]) {
+            for (const w of [820, 1280]) { // owner 2026-11-13: no phone width (was 390)
                 for (const seed of [11, 12, 13, 14]) {
                     judge(`card-${w}`, s.tag, await card(page, s, w, seed));
                     if (seed === 11) await shot(page, '#gameView', `${s.tag}-card-${w}.png`);
