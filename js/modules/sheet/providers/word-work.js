@@ -258,11 +258,12 @@ const TS_KIND = {
         sayValues: (q) => { const p = payloadOf(q); return p && p.check ? [fmt(p.check.est), fmt(p.ans)] : null; } },
     muldiv: { iCan: 'I Can solve two-step stories', key: 'story-work',
         steps: ['Read it. What do I find first?', 'Step 1: groups or share. × or ÷.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] },
+    // (one fixed list that fits every add-first item - an add or a take-away first, then share or make groups - and the
+    // lesson routine's step names: a per-item stepsFor made a page's items differ, so the Guided / Model Steps band took the
+    // provider's item-less strings, which know only the HOST (q.skillId) and printed the + / − steps; ws-node-lint
+    // STEPS-FOLLOW-PRESET, critic r1 F6 / L28)
     addfirst: { iCan: 'I Can solve two-step stories', key: 'story-work',
-        steps: ['Read it. What do I find first?', 'Step 1: put them together.', 'Step 2: share or make groups.', 'Write the answer and the unit.'],
-        // (the item's own moves, L6: a take-away first step is not "put them together"; Step 2 shares OR makes groups)
-        stepsFor: (q) => { const p = payloadOf(q); if (!p || p.steps.length !== 2) return null; const [s1, s2] = p.steps;
-            return ['Read it. What do I find first?', s1.op === '+' ? 'Step 1: put them together.' : 'Step 1: take some away.', s2.op === '/' ? 'Step 2: share them.' : 'Step 2: make groups.', 'Write the answer and the unit.']; } },
+        steps: ['Read it. What do I find first?', 'Step 1: add or take away.', 'Step 2: share or make groups.', 'Write the answer and the unit.'] },
     addsub: { iCan: 'I Can solve two-step stories', key: 'story-work',
         steps: ['Read it. What happens first?', 'Step 1: circle the sign. Solve.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] },
 };

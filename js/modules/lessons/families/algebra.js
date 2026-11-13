@@ -277,7 +277,7 @@ export const ROUTINES = Object.freeze({
         archetype: 'story',
         casesPending: TWO_STEP_CASES,
         concepts: [
-            { id: 'brackets', text: 'Put them together first, then share or make groups.' },
+            { id: 'brackets', text: 'Add or take away first, then share or make groups.' },
             { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer.' },
             { id: 'unit', text: 'The answer is a number of things: say the unit.' },
         ],
@@ -288,7 +288,9 @@ export const ROUTINES = Object.freeze({
         ],
         steps: [
             { icon: 'look', text: 'Read it. What do I find first?' },
-            { icon: 'decide', text: 'Step 1: put them together.' },
+            // (both adds and take-aways come first on the add-first presets: one step name fits every item, so the page's
+            // Steps band is the preset's own, never the host's - ws-node-lint STEPS-FOLLOW-PRESET, critic r1 F6 / L28)
+            { icon: 'decide', text: 'Step 1: add or take away.' },
             { icon: 'start', text: 'Step 2: share or make groups.' },
             { icon: 'write', text: 'Write the answer and the unit.' },
         ],
