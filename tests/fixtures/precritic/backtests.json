@@ -8174,7 +8174,7 @@
     "state": "one page over its budget, the Model in the 93 mm zone"
    },
    "pass": {
-    "commit": "8d41853f1",
+    "commit": "1202510f0",
     "state": "OK"
    },
    "command": "node tests/scripts/ws-roles-unit.mjs --only OPENER-SPILL",
@@ -8221,6 +8221,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "onerow-strip-tight",
+  "check": "the ONE-ROW PAGEFILL exemption (mq-onerow) accepts a strip only while it is shorter than the row it holds; a one-row page with a strip a whole row tall (another row fits) still FAILs (critic r9, lf-roles)",
+  "kind": "fixture",
+  "rule": "ws-print-lint L-DENSITY PAGEFILL (one-row strip)",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/onerow/strip-tall.fail.json",
+   "state": "one-row page, 90 mm strip under a 60 mm row: PAGEFILL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/onerow/strip-short.pass.json",
+   "state": "one-row page, 45 mm strip under a 172 mm row: accepted"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --onerow-probe {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }

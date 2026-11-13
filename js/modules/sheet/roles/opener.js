@@ -19,6 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm,
 } from './compose.js';
+import { koMm } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -107,7 +108,8 @@ function geometry(items, input, cap = {}) {
         const p1 = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm;
         // (SPILL-FILL, critic r9 D3: page 2 is fitted from the stories it DEALS, in order - the Guided row, then each Independent row
         // at its level-1 height - never from the deal's tallest spare, which no row draws)
-        const lv1Of = (it) => { const mm = it && it.measured && it.measured[gc]; const a = mm && mm.atLevel && Number(mm.atLevel[1]); return a > 0 ? a + 1 : hMinAt([it], gc, ctx); };
+        // (an Independent row is lettered: its tab's keep-out, layout.koMm, sits over the level-1 measure - drawn 2.8 mm past it at M)
+        const lv1Of = (it) => { const mm = it && it.measured && it.measured[gc]; const a = mm && mm.atLevel && Number(mm.atLevel[1]); return a > 0 ? a + 1 + koMm(ctx.size) : hMinAt([it], gc, ctx); };
         const gRowItems = practice.slice(0, gc);
         const gHd = gRowItems.length ? Math.min(gH, hMinAt(gRowItems, gc, ctx)) : gH;
         // (the drawn page 2 ran 2-6 mm past the strip estimate - its titled continuation header and the two band rules: measured on
@@ -126,7 +128,7 @@ function geometry(items, input, cap = {}) {
             used2 += need; iH = Math.max(h, iH); iRows++;
         }
         if (!iH) iH = gH;
-        return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true, stepPairs,
+        return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true, stepPairs, spillFreeMm: Math.round((m2.budget - used2) * 10) / 10,
             overBudget: p1 > m.budget || used2 > m2.budget, used: p1, used2 };
     }
     let iRows = 0;
@@ -253,7 +255,7 @@ export function plan(input = {}) {
     if (g.spill) {
         // (PT-OPN-10: each row as tall as the stories it PLACES - g.gH / g.iH are the tallest of the deal, spares included - so no
         // cell is stretched; the white stays under page 2's last row)
-        const lv1 = (it) => { const m = it.measured && it.measured[g.gc]; const a = m && m.atLevel && Number(m.atLevel[1]); return a > 0 ? a + 1 : hMinAt([it], g.gc, ctx); };
+        const lv1 = (it) => { const m = it.measured && it.measured[g.gc]; const a = m && m.atLevel && Number(m.atLevel[1]); return a > 0 ? a + 1 + koMm(ctx.size) : hMinAt([it], g.gc, ctx); };
         const gCell = guided.length ? Math.min(g.gH, hMinAt(guided, g.gc, ctx)) : g.gH;
         const iCell = indep.length ? Math.min(g.iH, Math.max(...indep.map(lv1))) : g.iH;
         page2.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
@@ -275,7 +277,7 @@ export function plan(input = {}) {
     if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
     return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, ...(g.spill ? { spillFreeMm: g.spillFreeMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 
