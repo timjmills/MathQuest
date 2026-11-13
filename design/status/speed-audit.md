@@ -958,6 +958,16 @@ ws-backtest removes each checkout as soon as its state has run (c3245504). **Rul
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
 
+### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
+**Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
+chant vs slots, word breaks). **Speed-up next time:** before the critic, render scripted-model / guided / opener / true-false for a NEW
+skill and read its provider outputs per band (the 5 earlier pv skills had been through those roles; this one never had).
+
+### lf-placevalue number_word_form (2026-11-12/13): 3 critic rounds to pass
+**Lost:** r1 found 9 provider / cell findings no check covered (a new skill never rendered on scripted-model / guided / true-false
+before its critic); r2 found the N4 class again (N10) because the r1 fix keyed on one name's length. **Kept:** a builder (Opus medium)
+fixed 6 findings + 7 checks in one pass; the r3 narrow critic took 9 minutes. **Next skill:** run ws-cell-checks --words-rules and
+ws-words-checks style provider checks for compare / more_less BEFORE the first critic.
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
 | Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
@@ -979,3 +989,20 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+
+### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+
+Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
+touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem
+cells of the critic's spot lessons were never read; the rounding fix reached Practice and not Mixed. ws-lesson-samples
+--check now carries the four spot lessons, and precritic runs PM-CONT / SHEET-2PG over every library lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| 1 div_facts Mixed equation / missing-factor cells top-anchored: 53 % (L), 54 % and 40 % (S) bands | ws-lesson-samples PM-H13 on the spot lessons (every cell kind) | lesson-pm-h13-spot (9135190b FAIL 6 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 2 sub_wp_10 / add_wp_20 S Mixed word problem 37 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 3 fact_family_sort L Mixed: one 6-cell row alone on a continuation page 72 % blank | ws-lesson-samples PM-CONT (new: no Practice / Mixed continuation page >= 50 % blank) | lesson-pm-cont (9135190b FAIL → 709605bb OK) | precritic lesson-samples-check + lesson-samples-all | 1 round |
+| 4 nearest_10 L Mixed rounding cells not centred, item number on the "T" head | PM-H13 + ws-lesson-samples TAB-CLEAR (new: tab >= 2 mm from ink; 1 mm for an across fact, CL-40) | lesson-tab-clear (9135190b FAIL 2 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
+| 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |

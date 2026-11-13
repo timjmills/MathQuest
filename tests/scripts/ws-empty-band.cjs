@@ -59,6 +59,8 @@
 //             critic r1 S3: 23-42 % used; lead ruling 2026-11-12: a second worked example fills it). Guided is EXEMPT from
 //             EB-PAGE (lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1: the white under a Guided grid is accepted; the tries
 //             stay at the 10 / 8 / 6 ceiling, EB-GDPCAP).
+//   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
+//             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
 //   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
@@ -407,6 +409,30 @@ async function main() {
                 await new Promise((r) => setTimeout(r, 450));
                 const cells = await page.evaluate(measureCells, ok);
                 renders++; cellsRead += cells.length;
+                // EB-PARITY (opt-in --screen-parity; lf-placevalue critic nwf r1 N9, lead ruling: screen parity is a contract rule): a
+                // skill whose print cell is a kit template draws THAT cell on every screen host ([data-ws-cell="<template>"]), never a
+                // legacy cell, and its answer is written in it (the host's input or the cell's own boxes inside the cell) - one answer
+                // place: no second, empty legacy box beside the input. Judged on --rule-skills.
+                if (has('screen-parity') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
+                    const par = await page.evaluate(({ c, k, SEED, scope }) => {
+                        let tpl = null;
+                        try { const q = window.generateQuestionFor({ category: c, skill: k, seed: SEED, itemIndex: 0 }); tpl = q && q.cell && q.cell.template; } catch (e) { tpl = null; }
+                        if (!tpl || tpl === 'legacy') return { tpl: null };
+                        const root = document.querySelector(scope);
+                        const vis = (e) => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+                        const kit = root ? [...root.querySelectorAll(`[data-ws-cell="${tpl}"]`)].filter(vis) : [];
+                        const inputs = kit.flatMap((e) => [...e.querySelectorAll('input, textarea, [data-mq-cell], .mq-kblank')]).filter(vis);
+                        // a legacy empty box: a bordered block with no text and no input, outside the kit cell (the old place chart)
+                        const scr = root;
+                        const legacyBoxes = scr ? [...scr.querySelectorAll('div[style*="border"]')].filter((e) => vis(e) && !e.closest('[data-ws-cell="' + tpl + '"]') && !e.textContent.trim() && !e.querySelector('input, svg, img')).length : 0;
+                        return { tpl, kit: kit.length, inputs: inputs.length, legacyBoxes };
+                    }, { c: categoryId, k: skillId, SEED, scope: ok });
+                    if (par.tpl) {
+                        if (!par.kit) F('EB-PARITY', `${key} ${host} ${w}px`, `the print cell is the kit "${par.tpl}" template but the host draws no [data-ws-cell="${par.tpl}"] (a legacy cell)`);
+                        else if (!par.inputs) F('EB-PARITY', `${key} ${host} ${w}px`, `the kit "${par.tpl}" cell holds no answer place (the answer is written outside the cell)`);
+                        if (par.legacyBoxes) F('EB-PARITY', `${key} ${host} ${w}px`, `${par.legacyBoxes} empty legacy box(es) beside the kit cell: a second answer place`);
+                    }
+                }
                 if (!cells.length) { notes.push(`${key} ${host} ${w}: no kit cell on the host (legacy screen item?)`); continue; }
                 judge(cells, `${key} ${host} ${w}px`, F);
                 await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
