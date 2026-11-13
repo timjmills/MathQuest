@@ -663,24 +663,37 @@ function _responseMode() {
 
 // The + / − story kinds of add_word_problems / sub_word_problems (word-stories card, 2026-11-12). The teacher's
 // "What is missing" ticks are positions in `all` (skill-options.js _wpAdd / _wpSub); the first `base` are the default mix.
-// Untouched (or only default kinds ticked), the variant is dealt over the default kinds exactly as before. A tick of an
-// APPENDED kind (change unknown, compare with the smaller unknown) deals over every kind so the override can name it;
-// and on a page with more than one kind ticked, one of them a new kind, the kinds come ONE SECTION AT A TIME in the
-// order of the list (PEDAGOGY P-WP-1 one schema a set, P-WP-3 the "more than" trap last), never interleaved.
+// Untouched, the page deals the default kinds; a tick of an APPENDED kind (change unknown, compare with the smaller
+// unknown) deals over every kind so the override can name it. On a page with more than one kind the kinds come ONE
+// SECTION AT A TIME in the ladder order (PEDAGOGY P-WP-1 one schema a set, P-WP-3 the "more than" trap after "fewer"),
+// never interleaved (word-stories fix r2: the default mix too, critic r1 F15).
 // One story's two numbers, dealt FRESH on the page (page-deal.js freshDeal, L10): no pair twice, and of `tagsOf(p)` -
 // [the item's first number (q.a), its answer] - the first no more than twice and the answer no more than three times
 // in a page of 20.
 function _wpFresh(key, draw, tagsOf) {
     return freshDeal(key, draw, { sig: (p) => `${p[0]},${p[1]}`, tags: (p) => tagsOf(p).map(String), caps: [2, 3] });
 }
-function _wpStoryKind(key, base, all) {
+function _wpStoryKind(key, base, all, ladder = null) {
     const o = state.skillOptions;
     const forms = o && Array.isArray(o.forms) ? o.forms.map(Number).filter((v) => v >= 0 && v < all.length) : [];
     const ticked = [...new Set(forms)].sort((x, y) => x - y);
     const extra = ticked.some((v) => v >= base);
     const list = extra ? all : all.slice(0, base);
-    if (extra && ticked.length > 1 && Number.isFinite(state.itemIndex)) {
-        return all[ticked[fadeRung(state.itemIndex, ticked.length, state.itemCount, true)]];
+    // The ladder (word-stories critic r1 F6 / F15, P-1, P-WP-1, P-WP-3): on a page the kinds come in SECTIONS of a fixed
+    // block in the LADDER order (`ladder`: the list positions easiest first - the start, the hardest unknown, last; the
+    // card's appended kinds in their own order, 'fewer than' before the trap), never sized by the count asked for. A page
+    // is a prefix of the run, so a block of 12 / k items puts the first kind first and at least as many of it as of the
+    // next on every page of up to 12, and a Model + 3 Guided page practises only the kind its Model shows. (The old split
+    // fell back to two items a kind when the count was unset - 2 'fewer' then 9 trap items on a page of 11 - and the
+    // default mix was dealt at random, interleaved.) The screen's practice card, which deals no item index, follows the
+    // same ladder by the question number.
+    const rungs = (ticked.length ? (extra ? ticked : ticked.filter((v) => v < base)) : list.map((_, i) => i));
+    const order = Array.isArray(ladder) ? rungs.slice().sort((x, y) => ladder.indexOf(x) - ladder.indexOf(y)) : rungs;
+    let at = Number.isFinite(state.itemIndex) ? state.itemIndex : null;
+    if (at === null && order.length > 1 && state.gameMode === 'practice' && Number(state.qCount) > 0) at = Number(state.qCount) - 1;
+    if (order.length > 1 && at !== null) {
+        const block = Math.max(3, Math.floor(12 / order.length));
+        return all[order[Math.floor(at / block) % order.length]];
     }
     return (typeof window !== 'undefined' && window.pickVariant) ? window.pickVariant(key, list, list.map(() => 1)) : list[0];
 }
@@ -5378,7 +5391,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // "had 4, now 6" sits in a two-digit grid; within 20 the number sentence takes every whole from 5
                 const _wpLo = maxNum > 20 ? 21 : 5;
                 // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
-                const roll = _wpStoryKind('add_word_problems', 3, ['join', 'start_unknown', 'part_part_whole', 'change_unknown']);
+                const roll = _wpStoryKind('add_word_problems', 3, ['join', 'start_unknown', 'part_part_whole', 'change_unknown'], [0, 2, 3, 1]);
                 q._variant = roll;
                 let a, b, answer;
 
@@ -5574,7 +5587,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // (critic r1 F4, L13: past 20 the page is worked in columns, so every whole is past 20 too)
                 const _wpLo = maxNum > 20 ? 21 : 5;
                 // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
-                const roll = _wpStoryKind('sub_word_problems', 3, ['take_away', 'compare', 'start_unknown', 'change_unknown', 'compare_fewer', 'compare_more_bigger']);
+                const roll = _wpStoryKind('sub_word_problems', 3, ['take_away', 'compare', 'start_unknown', 'change_unknown', 'compare_fewer', 'compare_more_bigger'], [0, 1, 3, 4, 5, 2]);
                 q._variant = roll;
                 let total, taken, answer;
 

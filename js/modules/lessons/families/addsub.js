@@ -120,11 +120,13 @@ const STORY_STRUCT_PENDING = 'Word-stories presets (2026-11-12): the Warm-up dea
 const storyStructLessons = () => {
     const subFacts = { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'The story is solved with a take-away fact within 20.' };
     const mix = [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'addition:add_facts', opts: { band: 20 } }];
-    const lesson = (routine, skill) => ({ routine, practice: { skill }, prereqsPending: STORY_STRUCT_PENDING, warmup: [subFacts], mixWith: mix });
+    const lesson = (routine, skill, opts) => ({ routine, practice: opts ? { skill, opts } : { skill }, prereqsPending: STORY_STRUCT_PENDING, warmup: [subFacts], mixWith: mix });
     return {
         'skill:addition:add_wp_change_unknown': lesson('story-join-change-unknown', 'addition:add_wp_change_unknown'),
         'skill:subtraction:sub_wp_change_unknown': lesson('story-separate-change-unknown', 'subtraction:sub_wp_change_unknown'),
-        'skill:subtraction:sub_wp_compare_smaller': lesson('story-compare-smaller', 'subtraction:sub_wp_compare_smaller'),
+        // (critic r1 F6, P-1 / P-WP-3: the lesson teaches ONE schema - 'fewer than', consistent language - and its Model,
+        // Guided and Practice all deal it; the trap is the preset's later section, never on its first, teaching page)
+        'skill:subtraction:sub_wp_compare_smaller': lesson('story-compare-smaller', 'subtraction:sub_wp_compare_smaller', { forms: [4], band: 20 }),
     };
 };
 const storyLessons = () => {

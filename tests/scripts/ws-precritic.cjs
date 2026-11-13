@@ -915,6 +915,16 @@ function buildPlan(ctx) {
             if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].trim().slice(0, 200), detail: [], explainsExit: false };
             return { result: 'FAIL', findings: m[2].trim().slice(0, 200), detail: out.split('\n').filter((l) => /^ {6}\[/.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
         } }));
+        // word-stories critic r1 F6 (2026-11-13), LADDER: a page of several story kinds deals them in the card's ladder order
+        // (first kind first, none outnumbering the one before it), Guided practises the Model's kind, the lesson one kind.
+        // Skills that deal one story kind: N/A (exit 4).
+        add(gate('story-ladder', 'ws-story-ladder (LADDER: kinds in ladder order a page, Guided kinds = the Model\'s, lesson one kind)', scope, 'node', 'ws-story-ladder', ['--skill', keys.join(',')], { missingMsg: 'ws-story-ladder is not in this tree', parse: (g, out, code) => {
+            const m = /^ws-story-ladder: (OK|FAIL|N\/A)\b(.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-story-ladder: OK|FAIL|N/A" line', out);
+            if (m[1] === 'N/A' && code === 4) return { result: 'N/A', findings: m[2].trim().slice(0, 200), detail: [], explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].trim().slice(0, 200), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].trim().slice(0, 200), detail: out.split('\n').filter((l) => /^ {2}FAIL /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
+        } }));
         // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
         // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
         // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.
