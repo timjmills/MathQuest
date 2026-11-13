@@ -520,6 +520,14 @@ One line per finding: the rule, then the check.
 | first term ([30],25,20) still reads as "rule"; only term got the hand link | A clash fixed by hand is fixed for every picture with the same feature class in the same change | V-TWIN | y (when built) |
 | ROOT CAUSE: pick3 banks are drawn word-against-word from the WHOLE set, so the pairs a pupil can see are not the two vetted trios; every critic round samples new pairs | Every bank a skill can deal is enumerable and listed; the check and the critic judge that list, not samples | V7 over the enumerated pairs; dealt-pairs table in each set manifest | y (when built) |
 
+### lf-vocab round 13, narrow critic r13 (2026-11-13): FAIL min 7, all 234 banks graded; 8 of 11 sets clean
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| ones digit boxes the 3 in 473 and is dealt with "odd" (set 8) | A threshold check is tested at its boundary: ONE marked number is a parity feature too | V-NUM marked-even / marked-odd | y (when built) |
+| digit rings the tens digit of 4(7)2 and is dealt with "ten" (set 5) | A marked digit inside a number draws its place | V-PLACE place:<ones/tens/hundreds> | y (when built) |
+| grow (towers 1,3,5) reads as "rule" (sets 7, 8) | Every run picture, including towers, declares its run and step; a run with a constant step implies rule | V-TWIN over every run picture | y (when built) |
+| (process) the enumerated banks made the review COMPLETE: one round found every remaining clash, in 3 named sets | Enumerate what a pupil can be dealt before any critic | V7-ALL + dealt-banks table | y |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of

@@ -546,3 +546,4 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
 | r11 | fresh Opus medium builder (V-FEAT, hatch, V-REF, NB9; finished by the lead session after a container restart); narrow critic r11 FAIL min 7 (product ≈ multiple; caret) |
 | r12 | Opus low builder (finished by the lead session after a container restart); narrow critic r12 FAIL min 7 (row ≈ even, row/column ≈ product, first term ≈ rule) |
+| r13 | Opus low builder (pick3 deals only vetted trios, V7-ALL, V-NUM, V-TWIN); narrow critic r13 FAIL min 7 (3 clashes in sets 5, 7, 8; 8 of 11 sets clean, all 234 banks graded) |
