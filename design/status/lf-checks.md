@@ -558,3 +558,14 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
     fail, none lf-tools or lf-checks (10 ledger rows added). ws-boot-smoke OK.
   - Routed reds: unit_form worksheet answer boxes 50 x 46 at 820 / 1024 (lf-hosts); unit_form thumbnail NODUP in
     ws-student-explorer (pre-existing; lf-placevalue / lf-hosts); vocab-r11-nb9-blur (lf-vocab).
+
+## 2026-11-13 — lf-tools after critic r3 (round cap): COPYLIGHT-ADVISORY
+
+- Critic r3 (09cec53eb): A (no phone width) PASS 8/8/9/8; B (copy-light) FAIL 6/6/7/7, third round on drawing identity.
+- Lead decision COPYLIGHT-ADVISORY: ws-copy-light keeps its verdict, sample, batch check, `--sample` render and brief lint, but
+  `criticRoute()` sends EVERY skill to the FULL critic. Row `copy-light-advisory-mult-div` (the planted mult/div anchor pair still
+  routes FULL) FAIL b99cf0bde → OK fd85daebf. No critic round for the switch (lead: it removes the risk B failed on).
+- PARKED under FOCUS (QUEUE.md is generated, so it is listed here): template-declared drawing keys — each sheet template declares
+  its drawing key; a must-differ pair list (fact × vs ÷, clock 12 vs 4 numerals, part-whole vs comparison bar, regroup row vs none);
+  a seed-stability check (a skill's key set is stable across seeds; count_by_2s anchors count_by_3s). Then lift ADVISORY.
+- Open, routed: ws-simple-print student-view print-dialog step at 390 (→ no-size-S branch).

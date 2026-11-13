@@ -6438,6 +6438,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "copy-light-advisory-mult-div",
+  "check": "lead decision COPYLIGHT-ADVISORY (2026-11-13; evidence critic lf-tools r3 E1: the skeleton key masks x and divide, so division:div_facts anchors multiplication:mult_facts on fact@2f11fa): a planted mult/div anchor pair must still route to the FULL critic; at b99cf0bde the tool printed the anchor and no critic route (a narrow critic could follow an ELIGIBLE verdict)",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light ADVISORY / criticRoute(): every skill takes the FULL critic",
+  "browser": false,
+  "fail": {
+   "commit": "b99cf0bde",
+   "state": "mult_facts shows anchor division:div_facts and no 'critic: FULL' route"
+  },
+  "pass": {
+   "commit": "fd85daebf",
+   "state": "mult_facts shows anchor division:div_facts AND 'critic: FULL (COPYLIGHT-ADVISORY ...)'"
+  },
+  "command": "o=$(node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill multiplication:mult_facts 2>&1); echo \"$o\" | grep -q 'anchor: division:div_facts' && echo \"$o\" | grep -q 'critic: FULL (COPYLIGHT-ADVISORY' && echo 'advisory: OK' || echo 'advisory: FAIL'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
