@@ -338,7 +338,7 @@ export function answerListOf(v) {
 // (inline, not in the engine stylesheet: the stylesheet travels on every page, and a page with no list stays byte-identical)
 export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list' || place.word
     ? `mq-frame mq-framelist" style="flex-wrap:wrap;row-gap:3mm;white-space:normal${maxMm ? `;max-width:${maxMm}mm` : ''}` : 'mq-frame');
-export function answerPlace(id, correct, it = null) {
+export function answerPlace(id, correct, it = null, others = []) {
     // (a WORD answer - "hundreds", "tens" - takes the widest line, the same for every word so the line never tells which; it was 2
     // digits wide and the key's "hundreds" ran past it: lf-roles r10, identify Reason It key)
     const width = (v) => (/[0-9]/.test(String(v)) || !/[a-z]{2}/i.test(String(v)) ? Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2)) : 6);
@@ -358,7 +358,9 @@ export function answerPlace(id, correct, it = null) {
         return { kind: 'list', slots, parts: nums, digits: nums.map(width), words: glue.slice(1).map((g) => plural(g.trim())) };
     }
     // (a word answer's line may drop under "The answer is" in a narrow response column - identify Reason It at L)
-    if (!parts) return Object.assign({ kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) }, width(correct) === 6 && !/[0-9]/.test(String(correct)) ? { word: true } : {});
+    // (a number line holds the longer of the right and the wrong answer - sized to the right one, a 2-digit line ruled out a shown
+    // 141 against 29: critic r6d E1; ws-roles-unit LINE-TELL)
+    if (!parts) return Object.assign({ kind: 'one', slots: { [id]: correct }, parts: null, digits: Math.max(width(correct), ...(others || []).filter((v) => v !== undefined && v !== null && v !== '').map(width)) }, width(correct) === 6 && !/[0-9]/.test(String(correct)) ? { word: true } : {});
     const slots = {};
     parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
     // LIST-HOMOGENEOUS (lf-roles critic r2 N1): a list whose LAST part is another kind - a count row's rule after its missing

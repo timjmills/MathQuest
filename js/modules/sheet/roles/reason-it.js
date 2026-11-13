@@ -38,7 +38,7 @@ export function prepare(it, info = {}) {
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
     // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
-    const place0 = answerPlace('ri-ans', correct, it);
+    const place0 = answerPlace('ri-ans', correct, it, [wrong.value]);
     const place = place0.kind === 'list' && !place0.words ? { kind: 'none', slots: {}, parts: null } : place0;
     // (lead ruling F8, 2026-11-13: the pupil circles A or B and writes the answer ONCE - "__ is correct." asked the same choice a
     // second time; PT-RSN-4 "Circle A or B. The answer is __.")
@@ -82,17 +82,23 @@ export function prepare(it, info = {}) {
     const abStyle = under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
         : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm`
             : 'margin-top:auto;margin-bottom:auto';
-    const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:flex-start;gap:10mm'
+    const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm'
         : wide ? 'grid-column:2;grid-row:1 / 3;justify-content:flex-start' : 'justify-content:flex-start';
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="${abStyle}">`
+    // (UNDER, the response row centres under the pair - critic r6d N1. A column STORY puts the response BESIDE the story instead:
+    // the story takes two thirds of the line, and the row under the panels held a Grade 2 story to one item a page at L, critic
+    // r6d D1 - the panels then follow both)
+    const topResp = under && column;
+    const resp = (c) => `<div class="mq-abresp" style="${topResp ? 'flex:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3mm' : respStyle}">`
+        + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
+        + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
+        + `</div>`;
+    const head = (c) => (topResp ? `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6mm;margin-bottom:3mm"><div style="flex:1 1 auto;min-width:0">${story(c).replace('margin-bottom:3mm;', '')}</div>${resp(c)}</div>` : story(c));
+    const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}">`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
         // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
         // the ring in a mostly empty column); inline, so only Reason It pages change
-        + `<div class="mq-abresp" style="${respStyle}">`
-        + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
-        + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
-        + `</div>`
+        + (topResp ? '' : resp(c))
         // a unit-form answer ("[2] hundreds [9] tens [7] ones") is wider than the response column: its frame is a full-width
         // row under A and B (in the column it wrapped to three lines and cost the page an item at S: ws-capacity-pin 4 -> 3)
         // every LIST frame too (critic r3 D1 / D5: in the 56 mm column a 5-part list wrapped a blank a line and "Rule: subtract __

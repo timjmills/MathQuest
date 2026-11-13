@@ -231,6 +231,9 @@ if (on('LINE-TELL')) {
     const ws = ['no', 'yes', 'ones', 'tens', 'hundreds', 'thousands'].map((w) => CO.answerPlace('x', w).digits);
     if (new Set(ws).size !== 1) findings.push(`LINE-TELL: word answers get lines of ${ws.join(' / ')} digits (want one width)`);
     if (Math.min(...ws) < 6) findings.push(`LINE-TELL: a word answer's line is ${Math.min(...ws)} digits (want 6, the longest word)`);
+    // (critic r6d E1: a number line holds the longer of the right and the wrong answer - 29 on a 2-digit line ruled out a shown 141)
+    const nd = CO.answerPlace('x', '29', null, ['141']).digits;
+    if (nd !== 3) findings.push(`LINE-TELL: the answer 29 against a shown wrong 141 gets a ${nd}-digit line (want 3: the longer of the two)`);
 }
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
