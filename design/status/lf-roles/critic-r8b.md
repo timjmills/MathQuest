@@ -157,3 +157,90 @@ see D3, D5 or the nits.
   should stop the hand-off.
 - D1 came from changing a row's drawn height without re-running the fit. Any rule that changes a row's height after the fit
   needs a refill test (GUIDED-TIGHT-REFILL).
+
+## Re-critic r8c (lane at 0ea655fe8)
+
+Critic: independent (mq-opus-medium), 2026-11-13. I pulled the lane at 0ea655fe8 and rendered every page myself with the same
+`buildSheet` call and seed. My renders are in `<scratchpad>/critic-r8b/*-r8c.png`, and the builder's PNGs are in
+`design/status/lf-roles/r8c/`. number_word_form and chart_to_120 belong to other lanes and are not graded here, so D2 to D5
+stay open where they are.
+
+### D1 is closed
+
+| Page | Tries at r8b (e62f1da34) | Tries at r8c | Ceiling | White under the grid now |
+|---|---|---|---|---|
+| expand M | 6 | 8 | 8 | 10 mm |
+| unit_form M | 6 | 8 | 8 | 6 mm |
+| expand L | 5 | 6 | 6 | 3 mm |
+| unit_form L | 5 | 6 | 6 | 3 mm |
+| combine L | 5 | 6 | 6 | 10 mm |
+
+All five are one page each (pupil and key). Nothing shrank: row heights, digit sizes and boxes are the same as at r8b. The
+items added keep the variety (expand 645 and 980, a trailing zero; unit_form 828 and 607, a zero ten; combine 900 + 7). The key
+of each page has the same plan as its pupil page, and every answer is right: expand 645 = 600 + 40 + 5 and 980 = 900 + 80 + 0;
+unit_form 828 and 607; combine L 907.
+
+### Verdicts and scores (C1 ease / C2 teaching / C3 spacing / C4 look)
+
+| Page | C1 | C2 | C3 | C4 | Verdict |
+|---|---|---|---|---|---|
+| expand M | 9 | 8 | 9 | 9 | PASS |
+| expand L | 9 | 8 | 9 | 9 | PASS |
+| unit_form M | 9 | 8 | 9 | 8 | PASS |
+| unit_form L | 9 | 8 | 9 | 8 | PASS |
+| combine L | 9 | 8 | 9 | 9 | PASS |
+
+combine M did not change (byte-identical) and stays PASS. The nits from r8b carry over unchanged and are not counted:
+- n2: unit_form's Model lines stop at "7 tens." and leave out the ones.
+- unit_form prints "1 hundreds", the same as on master.
+
+### Re-hash of the passed subtraction pages against e62f1da34
+
+I hashed buildSheet's `pupilHtml` and `keyHtml` with SHA-1 for the 7 subtraction skills at M and L (28 documents) at both
+e62f1da34 and 0ea655fe8. **All 28 are byte-identical**, so every subtraction PASS from r8b stands. combine M is also
+identical. Only the 5 pages above changed, each with its key, which matches the builder's report. The hash lists are
+`<scratchpad>/critic-r8b/hash-e62.txt` and `hash-0ea.txt`.
+
+### Is EB-REFILL a sound check?
+
+- **Backtest:** run with `MQ_ROOT` set to the e62f1da34 checkout, the current script reports `EB-REFILL FAIL 5` on exactly
+  the five pages of D1, for the right reason ("… white under the grid holds another 15.8 / 18.2 mm row of tries, but the page
+  prints 6 of 8 / 5 of 6"). On 0ea655fe8 it passes. It fails the right pages for the right reason.
+- **ws-empty-band on 0ea655fe8** (expand, unit_form, combine, sub_50, sub_1m and number_word_form; guided; M and L): EB-REFILL
+  passes. The only failures are the 15 number_word_form EB-BAND cells, which are another lane's.
+
+It has four weak points. None blocks this round, because none of them changes a verdict above.
+
+- **R1 · Possible false positive: it counts the floor every page keeps.** `spare` is measured from the grid to the bottom of
+  `.ws-body`. Every full Guided page keeps about 11.2 mm there that rows never use: the white band under a sub_50 L or sub_1m M
+  page at its ceiling measures 11.2 mm. So a page under its ceiling with real room between 0 and 11 mm less than a row would
+  still be flagged. The reported 53.6 mm on expand M at r8b was about 42 mm of usable room.
+  *Fix:* subtract the page's own floor, using the fit's `pg.avail`, or the `.ws-band` reserve a ceiling-full page of the same
+  size leaves. Then compare with the row height.
+- **R2 · Miss: rows that are not whole.** The condition `tries + cols <= cap` exempts every multi-column page where a whole
+  extra row would pass the ceiling. number_word_form L prints 5 of 6 tries with 85.6 mm of white under a 3-column grid and is
+  not flagged. A page whose last row has an empty slot is also never flagged, though filling that slot needs no height at all.
+  Whether a lone try in a row is allowed is a design question. Even so, an empty slot in the last row while the page is below
+  its ceiling should fail.
+  *Proposed:* EB-REFILL-SLOT (an empty slot in the last row while tries < cap). A ruling is needed on whether a part row is
+  acceptable.
+- **R3 · Units mismatch.** `b.tries` is `scoreOutOf`, which counts scored answers, while `cols` counts cells. On pages whose
+  cells score several answers (Match 3, chart_to_120 with 2 blanks a try), "the next row" is really points per cell × cols, so
+  the ceiling test is wrong in both directions.
+  *Fix:* compare cells with cells, or add the next row's points (`footprint.points`) and not `cols`.
+- **R4 · Scope.** It judges only one-page sheets. A multi-page Guided sheet whose last page could take another row of tries
+  is never checked. This is minor, because the Guided page is one page by design, but the check should say it skips these
+  pages rather than pass them silently.
+
+### Findings and the check for each
+
+| Id | Finding | Severity | Check |
+|---|---|---|---|
+| D1 | Closed: tight rows are now refilled to the ceiling | — | EB-REFILL (existing; backtest guided-tight-refill PASS) |
+| R1 | EB-REFILL counts the floor under the grid, so it can give false positives | minor (tool) | ws-empty-band self-test: a fixture whose white is floor + (row − 5 mm) must PASS |
+| R2 | EB-REFILL misses part rows and empty last-row slots (number_word_form L 5/6, 86 mm) | minor (tool) | proposed EB-REFILL-SLOT, after a ruling on part rows |
+| R3 | EB-REFILL mixes answers and cells | minor (tool) | self-test with a Match 3 Guided fixture |
+| R4 | EB-REFILL skips multi-page sheets without saying so | nit (tool) | EB-REFILL should name the pages it skips |
+
+**Re-critic r8c verdict:** expand M/L, unit_form M/L and combine L PASS; combine M and the 14 subtraction pages stay PASS
+(byte-identical). Zero counted defects on this lane's pages. EB-REFILL is sound for D1, with the tool debts R1 to R4 above.
