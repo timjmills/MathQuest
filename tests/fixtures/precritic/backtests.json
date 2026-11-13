@@ -3555,7 +3555,7 @@
    "commit": "1e3b128e",
    "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
   },
-  "command": "node tests/scripts/ws-words-checks.mjs --root {root}",
+  "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5828,6 +5828,26 @@
   },
   "pending": true,
   "pendingReason": "open red, owner the hosts lane (lead D3: the worksheet host draws unit_form's legacy cell). NOT on precritic's path today: precritic's ws-empty-band renders the screen hosts with the default options only (option variants on hosts are not rendered); proposed for the hosts lane: hosts x option variants in ws-empty-band's precritic row."
+ },
+ {
+  "id": "pv-words-plural",
+  "check": "composing:number_word_form: no worked step counts ONE of a place in the plural (\"3 tens, 1 ones\", \"1 tens 8 ones\") on any band, with the answer line or the H T O boxes (critic nwf r2 / r3 N12)",
+  "kind": "commit-pair",
+  "rule": "ws-words-checks WORDS-STEPS-PLURAL",
+  "browser": false,
+  "fail": {
+   "commit": "abbfd37e",
+   "state": "band 1,000: 25 plural steps with the answer line (\"The rest is 18: 1 tens 8 ones.\"), 12 with the H T O boxes (\"5 tens, 1 ones.\")"
+  },
+  "pass": {
+   "commit": "827b394b",
+   "state": "one / ones and ten / tens follow the count"
+  },
+  "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-STEPS-PLURAL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
