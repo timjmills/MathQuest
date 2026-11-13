@@ -21,7 +21,10 @@
       "addition:add_word_problems",
       "addition:add_word_problems_plain",
       "subtraction:sub_word_problems",
-      "subtraction:sub_word_problems_plain"
+      "subtraction:sub_word_problems_plain",
+      "addition:add_wp_change_unknown",
+      "subtraction:sub_wp_change_unknown",
+      "subtraction:sub_wp_compare_smaller"
     ]
   },
   "excerptChars": 140,
@@ -183,6 +186,21 @@
       "date": "2026-10-31",
       "ruling": "The part-whole bar is drawn on teaching pages (model, guided, lesson) and is an option, default off, on practice pages; bold key words and the keyword bank are hidden on the sentence-layout story skills (P-21).",
       "source": "owner direct 2026-10-31, design/cards/family-check §5"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "band: 'No limit (the Max Number)' (null, today's behaviour) stays an offered value and is the default; 10 / 20 / 100 bound the answer.",
+      "source": "lead ruling B1 (delegated design approval, LESSONS_LEARNED 3a)"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "Capacity pin accepted: the compare preset with forms 1/2/3 prints 9 a page at S (not 11) because the 4-line change stories are taller; content never shrinks to fit.",
+      "source": "lead ruling B2 (delegated)"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "The three presets add_wp_change_unknown, sub_wp_change_unknown and sub_wp_compare_smaller are skills of this card (rulings block, roles and hosts as their hosts).",
+      "source": "lead ruling B3 (delegated)"
     }
   ],
   "misconceptions": [
@@ -332,7 +350,8 @@
         "d": "offered",
         "skills": [
           "addition:add_word_problems",
-          "addition:add_word_problems_plain"
+          "addition:add_word_problems_plain",
+          "addition:add_wp_change_unknown"
         ],
         "source": "build-list map_change_unknown_story; this card §2-3",
         "why": "NEW (to build): join with the change unknown, past tense, the part-whole bar with ? on Then; never in the default set. Not offered by the repo yet, so --check-signed NOTEs it until the build lands"
@@ -347,7 +366,9 @@
         "d": "offered",
         "skills": [
           "subtraction:sub_word_problems",
-          "subtraction:sub_word_problems_plain"
+          "subtraction:sub_word_problems_plain",
+          "subtraction:sub_wp_change_unknown",
+          "subtraction:sub_wp_compare_smaller"
         ],
         "source": "build-list map_change_unknown_story, map_compare_smaller_unknown; this card §2-3",
         "why": "NEW (to build): 3 separate change unknown; 4 compare, fewer than; 5 compare, more than with the bigger known (inconsistent language, P-WP-3); never in the default set; NOTE until built"
@@ -355,13 +376,14 @@
       {
         "option": "band",
         "values": [
+          "null",
           "10",
           "20",
           "100"
         ],
         "d": "offered",
         "source": "this card open question 2",
-        "why": "NEW (to build): answer-bounded number size on the general hosts; 20 draws the signed sentence layout, 100 the column work; default none (the Max Number, as today); NOTE until built"
+        "why": "NEW (to build): answer-bounded number size on the general hosts; 20 draws the signed sentence layout, 100 the column work; null = No limit (the Max Number, as today; lead ruling B1) is the default; NOTE until built"
       },
       {
         "option": "range",
