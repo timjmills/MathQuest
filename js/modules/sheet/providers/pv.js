@@ -99,7 +99,13 @@ const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle th
 
 // D5 (lead 2026-11-07): with writeValue on, the instruction names both tasks (the place and the value).
 const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `${set.instructionKey}-value`, steps: set.steps.concat('Write what the digit is worth.') } : set);
+// Lead ruling (PEDAGOGY 4.1a, lf-placevalue 2026-11-13): identify's answer IS the place name, so its place heads (the H T O
+// letters, or the chart's place names) give it away on the unaided roles - Review, Test (A / B) and the pre-skill check, on
+// paper and in the quiz (the online test). There the support follows the role: none. The lesson's own Practice and Mixed
+// pages (independent / mixed-practice) and every other role keep the support as taught. Check: ws-pv-identify-heads.
+export const IDENTIFY_UNAIDED_ROLES = Object.freeze(['review', 'test', 'test-b', 'pre-skill-check']);
 registerSkill('placevalue:identify', {
+    roleOpts: (role, o) => (IDENTIFY_UNAIDED_ROLES.includes(role) && o.support !== 'none' ? { ...o, support: 'none' } : o),
     strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
         : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3,

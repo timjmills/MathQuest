@@ -18,6 +18,7 @@ import { icon, cleanLabel, levelText, copyText } from './teacher-ui.js';
 import { mountSample, mountQuestion } from './teacher-preview.js';
 import { isTeacher, note, goQuizzes } from './teacher-quiz-ui.js';
 import { quizQuestionData } from './quiz-take.js';
+import { roleOptions } from './sheet/index.js';
 
 // ========= MODULE STATE =========
 const qb = {
@@ -175,11 +176,18 @@ function safeGenerateQuestion(categoryId, skillId) {
         currentQ: state.currentQ,
         qCount: state.qCount,
         selectedNumbers: [...state.selectedNumbers],
+        skillOptions: state.skillOptions,
     };
 
     try {
         state.category = categoryId;
         state.skill = skillId;
+        // a quiz is the online TEST host: a support that follows the role (provider roleOpts, e.g. identify's place heads
+        // off - lead ruling PEDAGOGY 4.1a, 2026-11-13) takes the test's values; other skills' options are untouched
+        const base = state.skillOptions != null ? state.skillOptions
+            : ((state.skillOptionsBySkill && state.skillOptionsBySkill[`${categoryId}:${skillId}`]) || {});
+        const onTest = roleOptions('test', categoryId, skillId, base);
+        if (onTest !== base) state.skillOptions = onTest;
         state.isMixedMode = false;
         state.gameMode = 'practice';
         state.fixedDifficulty = true;   // a printed/previewed set is the skill the teacher picked
@@ -761,7 +769,7 @@ export function qbAddFromPreview() {
     if (!qb.previewSkill || !builderTest) return;
     const { categoryId, skillId } = qb.previewSkill;
     const count = parseInt(document.getElementById('qbAddNum')?.value || '1');
-    addMultipleQuestions(skillId, Math.max(1, count));
+    addMultipleQuestions(skillId, Math.max(1, count), categoryId);
 }
 
 // ========= SECTION MANAGEMENT =========
@@ -872,10 +880,12 @@ export function addQuizQuestion(skillId) {
     addMultipleQuestions(skillId, 1);
 }
 
-export function addMultipleQuestions(skillId, count) {
+export function addMultipleQuestions(skillId, count, categoryId) {
     if (!builderTest) return;
 
-    const catKey = findCategoryForSkill(skillId);
+    // (the skill's own category when the caller knows it: a bare id is not unique - fractions:identify is found before
+    // placevalue:identify, so the quiz dealt fraction items for the place-value skill; lf-placevalue 2026-11-13)
+    const catKey = categoryId && (SKILLS[categoryId] || []).some((sk) => sk.v === skillId) ? categoryId : findCategoryForSkill(skillId);
     if (!catKey) return;
 
     const section = builderTest.sections[qb.activeSection];
@@ -888,6 +898,7 @@ export function addMultipleQuestions(skillId, count) {
                 section.questions.push({
                     id: section.questions.length,
                     skillId: skillId,
+                    categoryId: catKey,
                     questionData: quizQuestionData(qData),
                     points: 1
                 });
@@ -907,7 +918,7 @@ export function regenerateQuizQuestion(sectionIdx, questionIdx) {
     const q = builderTest.sections[sectionIdx].questions[questionIdx];
     if (!q) return;
 
-    const catKey = findCategoryForSkill(q.skillId);
+    const catKey = q.categoryId || (q.questionData && q.questionData.categoryId) || findCategoryForSkill(q.skillId);
     if (!catKey) return;
 
     try {
@@ -928,7 +939,7 @@ export function duplicateQuizQuestion(sectionIdx, questionIdx) {
     const q = section.questions[questionIdx];
     if (!q) return;
 
-    const catKey = findCategoryForSkill(q.skillId);
+    const catKey = q.categoryId || (q.questionData && q.questionData.categoryId) || findCategoryForSkill(q.skillId);
     if (!catKey) return;
 
     try {
@@ -937,6 +948,7 @@ export function duplicateQuizQuestion(sectionIdx, questionIdx) {
             section.questions.splice(questionIdx + 1, 0, {
                 id: section.questions.length,
                 skillId: q.skillId,
+                categoryId: catKey,
                 questionData: quizQuestionData(qData),
                 points: q.points
             });

@@ -47,6 +47,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
     // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
     'preSkills',
+    // `roleOpts(role, opts) -> opts`: the skill's option values on one page role, when a support must follow the role (lead
+    // ruling, PEDAGOGY 4.1a, lf-placevalue 2026-11-13: identify's place heads give the answer - the place name - so the
+    // unaided roles Review / Test / pre-skill check, on paper and in the quiz, drop them). Absent: the opts as chosen.
+    'roleOpts',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -508,6 +512,15 @@ const PROVIDERS = new Map();
  * Only the members a skill really implements are passed; everything else comes from the
  * defaults and is named in `provider.defaults`.
  */
+/** The option values a skill carries on page role `role` (the provider's optional `roleOpts`; the opts unchanged when it has
+ *  none or it throws). Pure: never mutates `opts`. */
+export function roleOptions(role, categoryId, skillId, opts) {
+    let p = null;
+    try { p = getProvider(categoryId, skillId); } catch (e) { p = null; }   // (a preset answers with its host's)
+    if (!p || typeof p.roleOpts !== 'function') return opts;
+    try { return p.roleOpts(String(role || ''), Object.assign({}, opts || {})) || opts; } catch (e) { return opts; }
+}
+
 export function registerSkill(key, provider) {
     if (typeof key !== 'string' || !key) throw new Error('registerSkill: key must be a non-empty string');
     if (!provider || typeof provider !== 'object') throw new Error(`registerSkill: "${key}" has no provider object`);

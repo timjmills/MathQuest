@@ -5724,6 +5724,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-guided-model-reserve",
+  "check": "a tightRows Guided page's Model row (the Model beside the hinted tries) reserves max(the Model tab's clearance, the hint line), never their sum: its fullest cell leaves at most 3 mm white under its ink (lf-roles review of the compare r3 guided.js change, item b2, 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages MODEL-RESERVE",
+  "browser": true,
+  "fail": {
+   "commit": "023cafca",
+   "state": "compare Guided Model row 41.3 / 53.7 / 60.8 mm at S / M / L, 21-28 mm white under the hint line (tab clearance + hint line + stretch)"
+  },
+  "pass": {
+   "commit": "f0d0ac7d",
+   "state": "the Model row 22.6 / 30.0 / 33.7 mm: 1-2 mm white under the hint line (max(tab, hint), rows at pads + line)"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-RESERVE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

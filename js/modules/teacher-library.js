@@ -460,7 +460,7 @@ async function copyLink(s) {
 function makeQuiz(s) {
     window.openQuizBuilder?.();
     setTimeout(() => {
-        try { addMultipleQuestions(s.skillId, 5); } catch (e) { console.warn('[teacher-library] quiz', e); }
+        try { addMultipleQuestions(s.skillId, 5, s.categoryId); } catch (e) { console.warn('[teacher-library] quiz', e); }
     }, 100);
 }
 
