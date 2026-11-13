@@ -49,6 +49,21 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   EB-BAND 2 -> 0 (9 passed pages change). Backtest guided-tight-rows PASS. compare EA S: 0 now. compare Model EB-SIDE 5 = its
   beside step-text cells, which PT-MOD-5 excuses but ws-empty-band does not yet skip (lf-checks). Opener is not this lane's.
 
+## Round 11 (2026-11-13; critic r6c FAIL -> fixes)
+- Critic r6c (design/status/lf-roles/r6c/critic-r6c.md): Guided tightRows PASS; Reason It A over B FAIL - D1 one item a page
+  (H5), D2 centred stack, D3 the stack fired on work that fits side by side. P1 (process): the pack's "before" (c8c81172)
+  already held the change - every RI pair identical. Fix to the process: "before" is the parent of the lane's earliest commit
+  in scope; a changed pair that is byte-identical stops the pack (r6d checked: 0 identical pairs).
+- r11 (df83248e): A | B side by side over a full-width response row when the work fits half the cell; stacking (top start)
+  only for wider work. F8 (lead ruling): "__ is correct." dropped, PT-RSN-4 amended. Word answers one 6-digit line (no
+  length tell; "hundreds" fits). Checks RI-ONEANSWER, RI-LAYOUT, LINE-TELL (ws-roles-unit), KEYFIT (ws-cell-checks default);
+  backtests ri-one-answer / ri-layout / line-tell / key-fit PASS. sub_1m RI M 2 (ruled; the pinned 3 overflowed), sub_100k /
+  sub_1m L back to 2.
+- F3 (lf-algebra r1, npr Model L 6 mm overrun): reproduced only in a PRINTED PDF at 47b1f2a86 (screen and emulated print media
+  lay it out clean, so ws-cell-checks / ws-grade-render pass it); gone at this head (the Model is 2 pages, PDF checked). A
+  check needs the PDF raster (as LP-RASTER does for lessons) - proposed to lf-checks via the lead.
+- Critic r6d running on the r11 pages.
+
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
 - N9 FIX-MINIMAL (25d7bf2f): compose.wrongOf keeps a list's FIRST error only (later parts follow the correct rule); 0 passed pages
