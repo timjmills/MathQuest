@@ -4202,6 +4202,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ri-stack-band",
+  "check": "a stacked Reason It pair leaves no 30 % band under its work: the A / B tag stands in a gutter at S / M (critic r6f F1, H13)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "39213c4b",
+   "state": "npr RI S: 33 % under each cell"
+  },
+  "pass": {
+   "commit": "87b0c18c",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
