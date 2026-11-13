@@ -15,6 +15,11 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
   (ws-two-step BAND-BITES, PENDING exemption removed: FAIL 17 / 300, 28 / 300) -> fix 2828fc427 (PRESET_HIDE_VALUES) OK;
   backtest two-step-band-bites-50-mdf-atm PASS; CHECKS_FROM_CRITICS row. Next: CAP-BAND (lf-roles 9e3059d18), lf-roles r9 reds
   (EB-SIDE re-measure, ÷ bar OVERFLOW guided L, RI-DISTINCT), lesson overflow, precritic r13 in shards.
+  Progress: merged master 88cc98b00 (a8d3f945a, pronoun rows master's, one copy); S dropped in lane gates (201692a31,
+  ws-no-size-s OK). CAP-BAND: ws-two-step --print OK on a scratch merge with lf-roles 693d19dbd (holds 9e3059d18) - the role
+  fix closes it, no cell change; fixture rows re-point once our branch merges lf-roles. RI-DISTINCT fixed b1da0079e (backtest
+  two-step-ri-distinct-frames PASS). In progress: EB-SIDE (the 120 are the FRAMES cells - letter / estimate / msLetter - not the
+  columns: centring the frames work) and the ÷ bar OVERFLOW (groups row grows by the `?` height so the bars stand across).
 - 2026-11-13 two-step precritic r12 (mq-opus-medium; after the merges): merged origin/master e76e0815f (ff455466d), lf-hosts-twostep
   5719fe9b6 (f457eed3b), then origin/master a6883082c (3faaf82a9, pushed: lf-roles tests two-step on it). Fixed (check first): the
   x / ÷ / add-first deals repeat on a page (ws-two-step PAGE-FRESH 33810c189 FAIL -> fix 5921196d7, backtest two-step-page-fresh).
