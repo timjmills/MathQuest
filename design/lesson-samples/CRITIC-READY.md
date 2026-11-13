@@ -32,20 +32,29 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
   12.1 / PAGE_TYPES Independent: whole rows, never a smaller cell to fill the page); round L Practice still shows a 49 %
   band inside its rounding cells - left for the critic to rule on, no page-type rule asks for more items.
 
-## This pass (lf-engine PC fix, 2026-11-13; check pages and their keys only - every other page unchanged)
-- **LR-6**: the sub check no longer prints 11 - 3 twice or 39 twice: a routed question drops an item whose given numbers
-  repeat an earlier one (`itemNumberKey`). Sub Q2 now prints one expanded form, Q3 three subtractions. Gate PC-LR6,
-  backtest `lesson-check-lr6`.
-- **H13**: routed cells are now really centred (CL-4b's top start was winning over `mq-lvcenter`) and drop CL-40's tab
-  spacer where the content clears the tab; rows grow up to 1.15 x, capped so a centred item's band stays under 29 %
-  (LR-17a (5) updated). Cleared: add L cell 2 (38 %), sub L lone expanded form (32 %), round L cell 8 (31 %), sub S check foot.
+## This pass (lf-engine PC fix 2, 2026-11-13; check pages and their keys only - every other page unchanged)
+- **sub S cells 1-5 (31-33 % wide)**: a lone question whose items leave a side band of 29 % or more in equal columns now
+  lies in a NATURAL-WIDTH grid - each cell its widest item + the tab room, at least ink / 0.6 - centred as a group in
+  its band (`ROUTE_NAT_BAND`, `mq-lprenat`): the two "circle ones / tens" items 58 mm cells (21 %), the three expanded
+  forms 105 mm cells (27 %).
+- **round S "10 more / less than N is __" (34 % tall)**: the ROW-HEIGHT TRADE (`ROUTE_TRADE_MAX`): a row the CL-40 spacer
+  pushes past the band takes the height that drops it (content + the tab clear, 19.7 mm) from the page's spare height,
+  else from other rows' growth past their measured height; all or none. The page had the height: the planner charged a
+  3 mm gap between bands the kit draws as one shared border (`ROUTE_GAP_MM` 0; drawn foot was 17-18 mm at S).
+- **LR-6 page-wide**: with the height back, round S kept a fourth "between" item, "27 is between __ and __" under
+  "27: circle the tens"; an item repeating an EARLIER question's numbers is dropped too (PC-LR6 reads the whole page).
+- Gate: `ws-lesson-samples --check --force-check` PC-H13 0 on every check page (L and S, 8 seeds), every PC-* PASS but
+  the two sheet feet below; live packets 0 differences (`ws-lesson-baseline --all-lessons`, 1,556 hashes).
 
-## Known open (`ws-lesson-samples --check --force-check`, two attempts each - rule 7)
-- round S check cell 10 (34 % tall): "10 less than 15 is __" at S under a two-digit tab: content 80.5 of a 92 mm cell
-  leaves no room beside the w2 tab, so CL-40's spacer stays, and the page has no height to grow that row to the 19.5 mm
-  that would let it drop.
-- sub S check cell 1 (31 % wide): the two "circle ones / tens" items (two-choice: floor 2) are 36 mm wide in 92 mm cells.
-- Lesson sheet feet add S 9 %, sub S 11 % (pupil-p3): as on master, not part of the check.
+## Known open (`ws-lesson-samples --check --force-check`)
+- Lesson sheet feet add S 9 %, sub S 11 % (pupil-p3; the sheet with the check on has no Warm-up). As on master; not
+  closed by a small change: the sheet's spare goes only to its Independent band (cap 10 %); letting its bands grow as on
+  a page with no Independent rows (tried, gated to a live check) cleared both feet (3.5 %) but grew the top-started
+  We Do / fact cells (growth lands under the item, CL-4b) to 29 % (add) and 33 % (sub We Do cell 2) - a new H13. Closing
+  it needs those cells centred in a grown row (the routed check's `mq-lprectr` move) - a lesson-sheet change for the
+  sheet's own lane.
+- Seen, not changed (as at a09c60f3a): sub S check Q6-8 ("15 - 6" fact cells) draw 2 mm taller than their row (ink 36.1 in
+  a 35.9 mm cell) and the band's teacher tag is not visible under them; PC-CLIP / PC-H13 do not flag it.
 
 ## r2 side by side
 `git show 7744c2b4:design/lesson-samples/<packet>/pupil-p1.png > /tmp/r2-p1.png` (same for any page / `S/`), or

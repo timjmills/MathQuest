@@ -3241,6 +3241,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-check-h13-trade",
+  "check": "The round lesson's Prerequisite Check at S (forced on) has no cell band >= 30 %: the \"10 more / less than N is __\" row keeps CL-40's spacer under a two-digit tab (34 % tall) unless it takes its spacer-free height (row-height trade) from the page's real spare height (bands join on one border, ROUTE_GAP_MM 0)",
+  "kind": "commit-pair",
+  "rule": "LR-17a (5); WORKSHEET_DESIGN_STANDARD H13",
+  "browser": true,
+  "fail": {
+   "commit": "a09c60f3a",
+   "state": "round S check cells 10-13 34 % tall: spacer kept, planner charged a 3 mm gap a band"
+  },
+  "pass": {
+   "commit": "9dd0ad530",
+   "state": "row-height trade + ROUTE_GAP_MM 0: the row drops the spacer, every check cell < 30 %"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only round --sizes S --rules PC-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

@@ -446,3 +446,16 @@ white on any other role.
 - **Rule:** before resizing a row for H13, read the computed style of the cell (justify-content, ::before height): a class
   that "centres" can be losing a specificity fight. **Check:** PC-H13 on the forced-on render (already on precritic).
 
+### lf-engine PC fix pass 2 (2026-11-13, builder): width band, height trade, the planner's phantom gap
+- **"No page height to spare" was false:** the routed planner charged bandMetrics' 3 mm gap between bands; the kit draws
+  bands and rows on ONE shared border (margin-top -1.5pt), so every S check page had 17-18 mm unplanned at its foot. Two
+  earlier attempts reasoned from the plan's `used`; the DOM dump (band heights, drawn foot) showed it in one run.
+  Fix: `ROUTE_GAP_MM` 0. **Rule:** before saying a page has no room, compare the plan's `used` with the drawn foot.
+- **Width (sub S 31-33 %):** equal columns cannot fix an item that is a third of its cell: a natural-width grid
+  (`ROUTE_NAT_BAND`). **Height (round S 34 %):** a row the CL-40 spacer pushes past the band takes its spacer-free height
+  first (`ROUTE_TRADE_MAX`) - spread growth gave each row 0.3 mm and none enough.
+- **LR-6 is page-wide:** fixing the height let a fourth item in that repeated another question's 27; poolItems now
+  drops repeats of earlier questions too.
+- **Check:** PC-H13 / PC-LR6 (existing, on precritic); backtest `lesson-check-h13-trade` (round S). **Tool:** the check's
+  layout is on `buildSheet().lesson.prereqLayout` (units, rows, h0, cap, h, natW, need) for the next dump.
+

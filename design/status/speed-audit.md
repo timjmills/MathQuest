@@ -972,3 +972,12 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | H13: routed cells top-started despite mq-lvcenter (CL-4b specificity) + CL-40 spacer | PC-H13 (existing) | not a new row: PC-H13 8 -> 4 at seed 4242 | yes | 0.5 |
 | Speed-up: dump computed style (justify-content, ::before) of a flagged cell before changing geometry; 3 of 5 sizing attempts were spent on the wrong cause | | | | |
 
+### lf-engine PC fix pass 2 (2026-11-13, builder)
+| finding | check | backtest | on precritic path | rounds saved |
+|---|---|---|---|---|
+| sub S check cells 1-5 31-33 % wide (items a third of equal cells) | PC-H13 (existing) | lesson-check-h13-trade covers the height case; width at sub S is in the same run (sub S foot keeps that lesson failing, so not a row) | yes | 1 |
+| round S "10 less than 15 is __" 34 % tall (spacer kept, no height) | PC-H13 | lesson-check-h13-trade (FAIL a09c60f3a / PASS 9dd0ad530) | yes | 1 |
+| planner charged a 3 mm band gap the kit never draws (17-18 mm hidden at the foot) | the dump: plan `used` vs drawn foot (prereqLayout + DOM) | - | no (diagnostic) | 2 (the two failed attempts) |
+| page-wide LR-6 (27 under two questions) | PC-LR6 (existing) | - | yes | 0.5 |
+| Lost time: first baseline `--write` given a directory (EISDIR after 11 min); `--seeds 4242,1` parses as 4242 content seeds (killed). Fix: both flags documented in the brief template - `--write <file>.json`, `--seeds N` is a COUNT | | | | |
+
