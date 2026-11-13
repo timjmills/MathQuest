@@ -216,7 +216,7 @@ The bar does not change: 8 or more on all four criteria, on every page and every
 read, cramped, faint or thin is a SCORED defect, filed and capped like any other. It is never an "unscored note", and a page
 carrying one does not pass (LESSONS_LEARNED process rule 10; the div_facts screen array case).
 What changes is how a page reaches that bar (`design/IMPROVEMENT_PLAN.md` §1.3, §1.6.3, §1.6.4). A page counts as
-graded in one of two ways:
+graded in one of four ways:
 
 1. **Graded directly** by an independent critic.
 2. **Inherited** from a certified (template, kind of worksheet) pair. Then all of these must hold:
@@ -224,6 +224,22 @@ graded in one of two ways:
      (batch reading, §1.6.3 step 3);
    - 1 in 5 of the instance's pages is graded in full on all four criteria;
    - every machine gate for the instance is green.
+
+3. **Copy-light route** (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" item 2). A skill whose every kit
+   template was already passed by another skill (its ANCHOR in `js/modules/redesign-passed.js`), with every page role and
+   screen host the skill's signed card offers on the anchor's own card, takes the machine gates (`ws-precritic --skill X
+   --copy-light --strict`: all of them, nothing skipped; its `ws-copy-light` row decides eligibility and names the anchor)
+   plus a NARROW critic (`design/lessons-first/briefs/critic-copy-light.md`) on the skill's OWN content only — answers,
+   ladder / one new thing, words and instruction strings, option behaviour — on the deterministic page sample that run
+   writes (every offered role, host and option value at least once). Layout and drawing are inherited from the anchor.
+4. **Batch route** (owner rule 2026-11-13, item 3). 3–6 copy-light skills on ONE passed template share one narrow critic run
+   (`design/lessons-first/briefs/critic-batch.md`; `ws-precritic --batch k1,k2,… --strict` FAILS a batch that is not on one
+   passed template): one report with a per-skill verdict table, one shared sample budget, and a skill that fails does not
+   fail the others.
+
+Routes 3 and 4 **never apply to a template's FIRST skill**: the first skill on a template (no anchor) gets the full critic
+(route 1). The bar is the same (8 or more on all four criteria on every sampled page; legibility is scored), and **any layout
+or drawing defect a narrow or batch critic finds sends that skill to a full critic**.
 
 Limits:
 - There is no inheritance across pairs. A pair nobody certified gives nothing.

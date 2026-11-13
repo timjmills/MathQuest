@@ -9,6 +9,18 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-13 (lf-tools, branch claude/sweet-newton-c8wrv1-lf-tools): COPY-LIGHT and BATCH critic routes (owner rule, fastest plan 2-3).
+  `tests/scripts/ws-copy-light.mjs` (new): eligibility = every kit template the generator draws (defaults + the card's option values,
+  q.cell via kitCellSpec) has an ANCHOR in redesign-passed.js whose signed card offers every role and host the skill's card offers
+  (no card §7a: every buildSheet role); writes a deterministic page sample {n, role, size, seed, host, width, option, value, opts}
+  (every role, host and option value once; cap 12 a skill / 24 a batch, raised to coverage, never cut). `ws-precritic --copy-light`
+  (gate + `<logs>/copy-light-sample.json`; all other gates still run) and `--batch k1,..` (3-6 eligible skills on ONE passed template,
+  else FAIL; `<logs>/copy-light-batch-sample.json`); every --skill plan carries the report row. Dry runs give the verdict.
+  Examples: addition:add_sub_10s ELIGIBLE (fact, anchor add_facts); placevalue:compare / more_less_10 / more_less_100 ELIGIBLE
+  (pv via expand, pv-support via value) and BATCH OK on pv; measurement:time_5min NOT (clock never passed);
+  placevalue:expanded_notation NOT (no card: roles word-problems, fact-rows, fact-probe, stretch not on expand's card).
+  Briefs: design/lessons-first/briefs/critic-copy-light.md, critic-batch.md; RUBRIC "How a page counts as graded" routes 3-4
+  (never a template's first skill). Backtest `copy-light-eligibility` PASS (FAIL 91182e61b → OK 3a32a8b8f); ledger row added.
 - 2026-11-08 (lead, resumed, cap $60): ws-empty-band.cjs - the ONE shared empty-band / footprint check (L25) - built, on `ws-precritic --skill`;
   FAILs on the three critic-failed heads (lf-vocab bebf5b36, lf-placevalue b28a0867 N5 / N6, lf-ops b23e418d div_facts S); add_facts OK against its pin.
   Not independently critiqued yet.

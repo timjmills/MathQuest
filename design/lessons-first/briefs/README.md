@@ -64,3 +64,12 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
 | `w1-algebra-pilot.md` | `lf-algebra` | cloud |
 | `w1-vocab-lessons.md` | `lf-vocab` (only after the owner's yes to Q7) | cloud |
 | `w1-inflight.md` | the two in-flight items | in-session worktree agents |
+
+## Critic brief templates (owner rule 2026-11-13, fastest plan 2-3)
+
+| Brief | When |
+|---|---|
+| `critic-copy-light.md` | a later skill on an already-passed template (`ws-precritic --skill X --copy-light`: ELIGIBLE, anchor named) — narrow critic on its own content, on the run's page sample |
+| `critic-batch.md` | 3–6 copy-light skills on ONE passed template (`ws-precritic --batch k1,k2,…`) — one run, per-skill verdicts, one shared sample |
+
+Neither applies to a template's FIRST skill (full critic); any layout defect they find escalates to a full critic.

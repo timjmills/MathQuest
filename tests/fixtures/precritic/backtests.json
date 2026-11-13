@@ -6239,6 +6239,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "copy-light-eligibility",
+  "check": "ws-precritic --copy-light / --batch (ws-copy-light: owner rule 2026-11-13, fastest plan 2-3): a later skill on an already-passed template takes the narrow critic only when an anchor in redesign-passed.js passed every kit template it draws with every role and host its card offers; addition:add_sub_10s (fact template, anchor addition:add_facts) is ELIGIBLE and gets a page sample, measurement:time_5min (clock template, never passed) is NOT ELIGIBLE (full critic)",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light ELIGIBLE / NOT ELIGIBLE + the copy-light page sample (owner rule 2026-11-13)",
+  "browser": false,
+  "fail": {
+   "commit": "91182e61b",
+   "state": "before the route: ws-precritic has no --copy-light flag (FAIL usage), so no tool says whether a skill may skip the full critic"
+  },
+  "pass": {
+   "commit": "3a32a8b8f",
+   "state": "ws-precritic --copy-light: add_sub_10s ELIGIBLE (anchor add_facts on fact) with its sample; time_5min NOT ELIGIBLE (template clock never passed)"
+  },
+  "command": "node {root}/tests/scripts/ws-precritic.cjs --skill addition:add_sub_10s --copy-light --dry-run && ! node tests/scripts/ws-copy-light.mjs --root {root} --skill measurement:time_5min --require > /dev/null && node tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
