@@ -455,3 +455,19 @@ ws-next-box OK; ws-empty-band both skills OK, --slot-ink off OK; ws-boot-smoke O
 sibling-compare FAIL (no approved sibling; next-box once flaked on addition:add NB1 under load, OK standalone and in run 2).
 Lead decisions: V-FIT6 pins (G4 cycle set "product", growing set "equation", times-as-many "compare" - its picture is an
 additive difference arrow - and "unknown" (8 + ? = 13)); set 7 took "odd" (standard's own example word).
+
+## r11 builder (fresh, Opus medium, rule 5 root cause; brief design/lanes/lf-vocab/r11-builder-brief.md), 2026-11-13
+Merged origin/master eef75f5d first (88ccd451), manifest re-applied. One commit per item (items 3 and 4 share one: the
+V-REF fixes ARE the critic's explain fixes), pushed.
+| item | check | backtest row (fail -> pass) | on precritic's path |
+|---|---|---|---|
+| 1 V-FEAT: pictures declare features (PIC_FEAT, closed list VOCAB_FEATURES, checked against the markup by vocabReadFeatures); words declare definitions (VOCAB_DEFS); old derived rules and V-AMBIG+ deleted | ws-vocab-unit V-FEAT | vocab-r11-feat-r7-row-pattern d17f8d6a -> 718740e4; vocab-r11-feat-r9-rule-cycle 6ae462d1 -> 718740e4; vocab-r11-feat-r10-term 03eddcc2 -> 718740e4 (+ the three V-AMBIG+ rows re-pointed at V-FEAT, all PASS) | y (vocab-unit) |
+| 2 the escape hatch: set `noPicture`, pictureWords; dealer, lesson vocab page, V5 / V6 / V7 on picture words | V-HATCH, V7 | vocab-r11-hatch (fixtures) | y |
+| 3 V-REF referent lint; NB9 Check blurs vocab slots | V-REF, ws-next-box NB9 | vocab-r11-vref 03eddcc2 -> 7c8fee58; vocab-r11-nb9-blur 03eddcc2 -> 7c8fee58 | y |
+| 4 term 18, [14], 10; first term [30], 25, 20; cycle and unknown explains | V-FEAT, V-REF | as 1 / 3 | y |
+| 5 ws-vocab-set-renders: every set changed since a base commit, both skills, independent at L | render tool | none (a render) | n |
+Hatch drops: none. rule = step:3 (its own +3), a run with its step written (+2 hops), an arrow into a box or an op box -
+the critic's falling-run redraws then pass; with "any step" rule, term, first term and rule were mutually exclusive in
+sets 7 and 8 and both sets needed a drop that also broke V6 (no clash-free core trio exists).
+New notWith (no set holds both, so no V7 change): rule / row, column, multiple; row, column / commutative, distributive;
+grow / multiple; factor / divisor, quotient, ones digit; quotient / ones digit.
