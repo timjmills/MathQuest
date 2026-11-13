@@ -1027,7 +1027,7 @@ register('pv', {
                 const dg = txt.replace(/[^0-9]/g, '').length, cm = txt.replace(/[^,]/g, '').length;
                 const circle = { S: 8, M: 10, L: 12 }[ctx.size] || 10;
                 const inkWMm = Math.round((0.606 * em * dg + 0.324 * em * cm + 8 + circle + 0.5) * 10) / 10;
-                // (`inkHMm`, compare r3 CL-4d: the line is as tall as its sign circle - Chrome, S / M / L - so a row is judged stretched
+                // (`inkHMm`, compare r3, the lead's stretch ruling 2026-11-13: the line is as tall as its sign circle - Chrome, S / M / L - so a row is judged stretched
                 // against the ink, as L-TOPSTART reads it, never against a measured height that holds the tab clearance and the pads)
                 return { wMm: 62, inkWMm, inkHMm: circle, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
             }

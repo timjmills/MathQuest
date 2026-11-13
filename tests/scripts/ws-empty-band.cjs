@@ -96,6 +96,9 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
+// The opt-in flags, spelled out for ws-precritic's srcHas (it reads a flag from `'--flag'` or the first 80 lines; the master merge
+// of 2026-11-13 pushed EB-PARITY / EB-VOCAB's lines past line 80, so the lf-placevalue opt-in row silently ran without them)
+const OPT_IN_FLAGS = ['--vocab-ink', '--page-fill', '--screen-parity', '--grid-foot', '--rule-skills'];   // eslint-disable-line no-unused-vars
 
 const argv = process.argv.slice(2);
 // EB-GDPCAP: the Guided tries ceiling (PAGE_TYPES §12.1), and its verdict on one Guided render (null = within it)
