@@ -125,8 +125,19 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         const md = '### 7a. x\n\n**Option values (offeredOptionsFor)**\n\n- `forms=0 | 1` — **offered** on `a_b` — x\n- `nlOn=true | false` — **out of scope** — y\n\n**Page roles (buildSheet)**\n\n- `independent` — **offered** — p\n- `word-problems` — **hidden** on `a_b` — q\n\n## 8. Gates\n';
         const d = readDecisions(md);
         const ok = d.length === 4 && d[0].on[0] === 'a_b' && d[2].key === 'independent' && d[3].decision === 'hidden';
-        console.log(`ws-card-plan --self-test: ${ok ? 'OK' : 'FAIL'} (${d.length} lines)`);
-        process.exit(ok ? 0 : 1);
+        // a preset skill is planned from its host's card: every role it offers, the preset's own option never a variant
+        // (lf-builds chart_120 fix: composing:chart_to_120 fell back to the 9 default roles; skipped in a tree without it)
+        let okP = true, noteP = 'preset case n/a';
+        if (existsSync(join(root, 'design', 'cards', 'chartwindow', 'chartwindow.md'))) {
+            const pp = await cardPlanFor(root, 'composing:chart_to_120').catch(() => null);
+            const hp = await cardPlanFor(root, 'composing:hundreds_chart_fill').catch(() => null);
+            if (pp && hp && hp.cards.length) {
+                okP = !!pp.preset && pp.cards.join() === hp.cards.join() && pp.roles.join() === hp.roles.join() && !pp.variants.some((v) => v.option === 'band');
+                noteP = `preset case ${okP ? 'ok' : 'FAIL'} (${pp.roles.length} roles, ${pp.variants.length} variants)`;
+            }
+        }
+        console.log(`ws-card-plan --self-test: ${ok && okP ? 'OK' : 'FAIL'} (${d.length} lines; ${noteP})`);
+        process.exit(ok && okP ? 0 : 1);
     }
     const out = [];
     for (const s of skills) out.push(await cardPlanFor(root, s));

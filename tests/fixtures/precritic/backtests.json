@@ -3982,6 +3982,45 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "c120-wrong-fits",
+  "check": "a chart window's wrong answer fits its square: one value per square, no more digits than the window's widest number (chart_120 'writes-ten-ten' 1011 printed '1,011' over the next square, True or False? L)",
+  "kind": "commit-pair",
+  "rule": "ws-node-lint WRONG-FITS (chartwindow payload)",
+  "fail": {
+   "commit": "e3733905c",
+   "state": "WRONG-FITS too-long #12, #20 (4>3) on composing:chart_to_120"
+  },
+  "pass": {
+   "commit": "ac88be08e",
+   "state": "the chart square no longer deals writes-ten-ten"
+  },
+  "command": "node tests/scripts/ws-node-lint.mjs --root {root} --rules WRONG-FITS --no-baseline --skill composing:chart_to_120",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "c120-tagink",
+  "check": "a lettered chart square on Error analysis keeps its written number clear of the A / B tag (gate seed, L)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks TAGINK",
+  "browser": true,
+  "fail": {
+   "commit": "e3733905c",
+   "state": "TAGINK 8 on chart_to_120 error-analysis L"
+  },
+  "pass": {
+   "commit": "ac88be08e",
+   "state": "k2-chartwindow [data-ws-tagged] padding under the tag"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --rules TAGINK --show 20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }
