@@ -35,6 +35,17 @@
 //                by >= 2 mm (1 mm for an across fact: the kit's CL-40 contract) (finding 4: the "1" tab touched the "T" head of a rounding cell); ink, not boxes: a drawing by
 //                its shapes, text by its own run (a Range, not its element) from its glyphs' top (canvas text metrics)
 //     SHEET-2PG  a lesson sheet printed on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages ~38 % empty)
+//     LS-WARM    (lf-engine G7, lf-algebra critic r2: the growing lesson's Warm-up cells 54 % empty under the rule, passed by
+//                print-lint because CL-4b reads the band under a top cell as writing room and H13-ROW only compares a cell with
+//                its row) every Warm-up cell of the lesson sheet: the empty band under its lowest ink (text, a drawing, a
+//                stroked box; an answer slot, empty or written, counts as the item) to the cell's DRAWN bottom edge (the paper
+//                the pupil sees, the pad included) is < 30 % of the cell (RUBRIC H13)
+//     LS-FILL    (lf-engine G7 + DIV: the growing lesson's Practice 3 + 3 on two half-used pages; lf-partopts critic r3 P4: the
+//                div_facts anchor chart 49 % empty at M and L) every page of the packet - the anchor chart, the Prerequisite
+//                Check, the lesson sheet, Practice and Mixed - is >= 70 % used (the body above its blank foot), except the
+//                LAST page of a part printed on two or more pages (that one is PM-CONT's / SHEET-2PG's). 70 %: the lead's
+//                page-use floor (SHEET-2PG, live-pm r2 item 6; PT-OPN-7 / RUBRIC H5 "a page wasted" at 50 % is the hard cap,
+//                WDS PG-11 / PG-23: every page but a section's last is filled)
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
@@ -187,6 +198,32 @@ function tabMeasure() {
     });
 }
 
+/** LS-WARM (lf-engine G7): per page, every cell with the heading of its band and the empty band under its lowest ink - text,
+ *  a drawing, a stroked box, or an answer slot (empty or written: the item's own writing room) - to the cell's drawn bottom
+ *  edge, as a share of the cell height. The number tab / letter is no ink of the item. */
+function bandMeasure() {
+    const MM = 96 / 25.4;
+    return [...document.querySelectorAll('.ws-page')].map((pg) => [...pg.querySelectorAll('.ws-cell')].map((c, k) => {
+        const band = c.closest('.ws-band');
+        const head = band ? ((band.querySelector('.ws-strip > b') || {}).textContent || '').trim() : '';
+        const cr = c.getBoundingClientRect();
+        let low = -Infinity;
+        for (const d of c.querySelectorAll('*')) {
+            if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab')) continue;
+            const st = getComputedStyle(d);
+            if (st.visibility === 'hidden' || st.display === 'none' || st.position === 'absolute') continue;
+            const r = d.getBoundingClientRect();
+            if (!r.width && !r.height) continue;
+            const ink = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img|canvas)$/i.test(d.tagName) || d.hasAttribute('data-ws-slot')
+                || ['Top', 'Bottom', 'Left', 'Right'].some((s) => parseFloat(st[`border${s}Width`]) > 0 && st[`border${s}Style`] !== 'none');
+            if (ink) low = Math.max(low, r.bottom);
+        }
+        if (low === -Infinity || cr.height < 12 * MM) return null;
+        const below = Math.max(0, cr.bottom - low);
+        return { cell: k + 1, head, hMm: +(cr.height / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), pct: Math.round((below / cr.height) * 1000) / 10, tmpl: c.getAttribute('data-ws-cell') || '' };
+    }).filter(Boolean));
+}
+
 function sheetCheck(page) {
     return page.evaluate(() => {
         const out = { pages: 0, problems: [], bands: [], stats: [], fonts: {} };
@@ -319,7 +356,7 @@ async function checkMain() {
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), rg: await sh.evaluate(carryMeasure), tb: await sh.evaluate(tabMeasure) }; } finally { await sh.close(); } };
+                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), rg: await sh.evaluate(carryMeasure), tb: await sh.evaluate(tabMeasure), bm: await sh.evaluate(bandMeasure) }; } finally { await sh.close(); } };
                 const P = await read2(built.pupil), K = await read2(built.key);
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
@@ -348,6 +385,12 @@ async function checkMain() {
                 // SHEET-2PG (lead, live-pm r2 item 6): a lesson sheet of two or more pages has at least one page >= 70 % used
                 { const tp = pm.map((m, n) => ({ m, n })).filter((x) => x.m.part === 'teach'); const st = tp.map((x) => (P.sc.stats || [])[x.n]).filter(Boolean);
                     if (tp.length > 1 && st.length === tp.length && st.every((x) => x.blank > 30)) F('SHEET-2PG', where('pupil', tp[0].n), `the lesson sheet prints on ${tp.length} pages, each under 70 % used (blank at the foot ${st.map((x) => `${x.blank} %`).join(', ')})`); }
+                // LS-WARM (lf-engine G7): no Warm-up cell of the lesson sheet keeps an empty band >= 30 % under its item (to its
+                // drawn edge; RUBRIC H13) - CL-4b's "writing room under a top cell" never excuses a cell the planner grew
+                pm.forEach((m, n) => { if (m.part !== 'teach') return; for (const c of (P.bm[n] || [])) if (/^Warm-up/.test(c.head) && c.pct >= 30) F('LS-WARM', where('pupil', n), `Warm-up cell ${c.cell}: an empty band ${c.belowMm} mm under the item of a ${c.hMm} mm cell (${c.pct} %; limit 30 %) [${c.tmpl}]`); });
+                // LS-FILL (lf-engine G7 / DIV): every page >= 70 % used but the last page of a part printed on 2+ pages
+                { const np = Object.fromEntries(built.parts.map((p) => [p.part, p.pages]));
+                    pm.forEach((m, n) => { if (np[m.part] > 1 && m.i === np[m.part] - 1) return; const st = (P.sc.stats || [])[n]; if (st && 100 - st.blank < 70) F('LS-FILL', where('pupil', n), `${m.part}${np[m.part] > 1 ? ` page ${m.i + 1} of ${np[m.part]}` : ''}: ${100 - st.blank} % used (${st.blank} % of the body blank at the foot; floor 70 %)`); }); }
                 if (l.spot) continue;
                 if (has('debug')) console.log(JSON.stringify({ lesson: l.id, size, pupil: P.st.map((x) => x.strips), key: K.st.map((x) => x.strips) }));
                 // strips covered; pupil vs key twin
@@ -381,7 +424,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'LS-WARM', 'LS-FILL', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [

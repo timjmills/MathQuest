@@ -805,6 +805,12 @@ function buildPlan(ctx) {
                 const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
             }
+            // lf-engine G7 (lf-algebra critic r2: the growing lesson's Warm-up cells 54 % empty and its Practice 3 + 3 on two
+            // half-used pages PASSED precritic r9's print-lint above - CL-4b reads the band under a top cell as writing room, and
+            // no page-use rule ran on a --skill path): the lane skills' OWN lesson packets, every part, at L, M and S, through
+            // ws-lesson-samples' page rules (a skill with no library lesson prints "0 lessons" and passes)
+            add(gate('lesson-pages-own', 'ws-lesson-samples --check --all-lessons --only <lane skills> (LS-WARM, LS-FILL, PM-CONT, PM-H13 on the lane skills\' own lesson packets at L / M / S)', scope, 'browser', 'ws-lesson-samples',
+                ['--check', '--seeds', '1', '--all-lessons', '--only', keys.join(','), '--sizes', 'L,M,S', '--rules', 'LS-WARM,LS-FILL,PM-CONT,PM-H13'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
         }
         // Lane D restart critic r1 R1-15: div_facts' written forms (divForm) on every page type they print on, at S and L
         // (the fraction's numerator sat in the L tab's keep-out on the Opener, Review and Reason It; the card's own gate
@@ -1035,7 +1041,9 @@ function buildPlan(ctx) {
         if (ctx.role === 'lesson') {
             add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
-            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (lf-engine G7 / DIV, 2026-11-13: LS-WARM - no Warm-up cell >= 30 % empty under its item; LS-FILL - every page >= 70 %
+            // used but a part's last continuation, the anchor chart included; at L, M and S, every library lesson)
+            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used; LS-WARM: no Warm-up cell band >= 30 %; LS-FILL: every page but a part\'s last continuation >= 70 % used, the chart included)', 'every lessons/prereqs.js lesson × L / M / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--sizes', 'L,M,S', '--rules', 'PM-CONT,SHEET-2PG,LS-WARM,LS-FILL'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
