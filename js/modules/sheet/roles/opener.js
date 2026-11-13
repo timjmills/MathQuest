@@ -129,6 +129,8 @@ function geometry(items, input, cap = {}) {
         }
         if (!iH) iH = gH;
         return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true, stepPairs, spillFreeMm: Math.round((m2.budget - used2) * 10) / 10,
+            // (SPILL-P1, lead 2026-11-13 r9b: page 1's white and the part that would have to fit in it - the Guided band at its measure)
+            p1WhiteMm: Math.round((m.budget - p1) * 10) / 10, p1BodyMm: Math.round(m.budget * 10) / 10, p1NextMm: Math.round((m.strip + gHd) * 10) / 10,
             overBudget: p1 > m.budget || used2 > m2.budget, used: p1, used2 };
     }
     let iRows = 0;
@@ -153,6 +155,11 @@ function geometry(items, input, cap = {}) {
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used, stepPairs };
 }
 
+/**
+ * SPILL-P1 (lead 2026-11-13, r9b): page 1 of a spilled Opener may leave more than 30 % of its body white only when the next part (the
+ * Guided band at its measured height) is taller than that white - an honest leftover; white that could have held it is a defect.
+ */
+export const spillP1Ok = (whiteMm, bodyMm, nextMm) => !(Number(whiteMm) > 0.3 * Number(bodyMm) && Number(whiteMm) >= Number(nextMm));
 /** PT-OPN-10: the room a spill page keeps in hand past the strip estimate (rendered: plain M 6.2 mm over without it). */
 const SPILL_HAND_MM = 7;
 /** PT-OPN-10: the spill page's continuation header, titled with the part(s) it holds (lead ruling 2026-11-13, r9). */
@@ -277,7 +284,7 @@ export function plan(input = {}) {
     if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
     return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, ...(g.spill ? { spillFreeMm: g.spillFreeMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, ...(g.spill ? { spillFreeMm: g.spillFreeMm, p1WhiteMm: g.p1WhiteMm, p1BodyMm: g.p1BodyMm, p1NextMm: g.p1NextMm } : {}), line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 

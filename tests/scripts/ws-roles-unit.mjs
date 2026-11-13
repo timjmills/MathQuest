@@ -74,6 +74,14 @@ const OPN = await mod('roles/opener.js');
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
 const on = (id) => !ONLY || ONLY.includes(id);
+// --spill-p1-fixture f.json ({whiteMm, bodyMm, nextMm}): the SPILL-P1 rule alone on a planted page 1 (backtest spill-p1)
+if (argv.includes('--spill-p1-fixture')) {
+    const f = JSON.parse((await import('fs')).readFileSync(argv[argv.indexOf('--spill-p1-fixture') + 1], 'utf8'));
+    const OP0 = await mod('roles/opener.js');
+    const ok = OP0.spillP1Ok(f.whiteMm, f.bodyMm, f.nextMm);
+    console.log(ok ? `ws-roles-unit: OK (SPILL-P1: ${f.whiteMm} mm white of ${f.bodyMm}, the next part needs ${f.nextMm})` : `  FAIL SPILL-P1: ${f.whiteMm} mm white (${Math.round(100 * f.whiteMm / f.bodyMm)} %) on page 1 could hold the ${f.nextMm} mm Guided band\nws-roles-unit: FAIL - 1 finding(s) in 1 check(s)`);
+    process.exit(ok ? 0 : 1);
+}
 const findings = [];
 let checks = 0;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -560,6 +568,9 @@ if (on('OPENER-SPILL')) {
             const pl = OPN.plan({ ctx: { size }, skills: SKS, items });
             const html = JSON.stringify(pl.pages[0].sections || []);
             if (/mq-stepszone\\" style=\\"height:/.test(html) && /mq-steps-rows/.test(html)) findings.push(`OPENER-SPILL ${size}: the two-column Steps band takes an estimated fixed height (D1: 50 mm round 27 mm of text at L)`);
+            // SPILL-P1 (lead 2026-11-13 r9b): page 1's white over 30 % only when the Guided band could not fit it
+            const f0 = (pl.meta.fits || [])[0] || {};
+            if (pl.pages.length > 1 && Number.isFinite(f0.p1WhiteMm) && !OPN.spillP1Ok(f0.p1WhiteMm, f0.p1BodyMm, f0.p1NextMm)) findings.push(`OPENER-SPILL ${size}: SPILL-P1 - page 1 leaves ${f0.p1WhiteMm} mm white of ${f0.p1BodyMm} that could hold the ${f0.p1NextMm} mm Guided band`);
             const p2 = pl.pages[1] ? pl.pages[1].sections || [] : [];
             if (pl.pages.length > 1 && !p2.some((x) => x.label === 'Independent Practice:')) findings.push(`OPENER-SPILL ${size}: SPILL-FILL - page 2 holds no Independent row though the dealt stories (60 mm at level 1) fit; it was sized by the 150 mm spares (D3)`);
         } catch (e) { findings.push(`OPENER-SPILL ${size} (D1 / D3): ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }

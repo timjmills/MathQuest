@@ -8240,6 +8240,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "spill-p1",
+  "check": "SPILL-P1 (lead 2026-11-13 r9b): page 1 of a spilled Opener may leave over 30 % white only when the next part (the Guided band at its measure) is taller than the white; white that could hold it FAILs",
+  "kind": "fixture",
+  "rule": "ws-roles-unit OPENER-SPILL SPILL-P1 (opener.js spillP1Ok)",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/spill-p1/fit-spilled.fail.json",
+   "state": "planted: 120 mm white (52 %) that could hold a 95 mm Guided band"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/spill-p1/honest.pass.json",
+   "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
