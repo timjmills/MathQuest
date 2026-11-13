@@ -407,6 +407,9 @@ function idOnPath(id) {
     if (v.status === 'OK') return { ok: true, why: '' };
     if (v.status === 'FAIL') return { ok: false, why: v.fail.replace(`${id}: `, '') };
     const tool = commandTool(row.command);
+    // a wrapper's own --self-test (ws-precritic's verdict reader, lf-ops 2026-11-13) is on the path when deploy session 1 runs it
+    const wrapSelf = /tests\/scripts\/(ws-precritic(?:-plan)?|ws-backtest)\.(?:c?js|mjs) --self-test\b/.exec(row.command);
+    if (!tool && wrapSelf && C.deploy.includes(`${wrapSelf[1]}.`) && new RegExp(`${wrapSelf[1]}\\.(?:c?js|mjs) --self-test`).test(C.deploy)) return { ok: true, why: '' };
     if (!tool) return { ok: false, why: 'its command runs no tests/scripts/ws-* check' };
     const inPre = C.precriticSrc.includes(`'${tool}'`) || C.precriticSrc.includes(`tests/scripts/${tool}.`);
     const inDeploy = C.deploy.includes(`${tool}.`);
