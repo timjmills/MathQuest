@@ -529,3 +529,20 @@ not caused by this round, and not fixable by the lane without a pin or a gate ru
 lead / lf-checks: "re-pin only with a STATUS note"). Not pinned; for the lead.
 Renders: scratchpad r14/sets (all 11 sets changed by the notWith additions; sets 5, 7, 8 included), manifest.json dealtBanks
 (180 banks; each bank and each set's pictureMarks carry the marked numbers, parity, places and runs).
+
+### r14 follow-up: ws-screen-ink-size (coordinator: clear it, no pin)
+The gate (lf-checks) has no minimum mark size: SIZE-INK compares a screen mark with the SAME item's print mark (>= 95 %), and
+SIZE-REF fails a screen mark group with NO print counterpart on the reference page (Independent at M, seed 7). The only
+exemption in its contract is [data-mq-screen-only] for a screen-only cue. The pick3 "[answer choices]" findings are NOT the pills:
+"answer choices" is the radiogroup label wireTickBoxes gives the cell, and the marks are pictures (equal groups' 3 rings, pattern's
+hop arcs and heads), so no screen-only exemption applies.
+Judged per lesson set (--opts vocabSet 0-10, every set's words on the reference page), the gate found two REAL size defects, fixed
+in 75b0e131 (backtest rows vocab-r14-sis-pick3, vocab-r14-sis-match3-tile: 9c83c24f FAIL -> 75b0e131 OK):
+- pick3 screen twin: every picture 220 px wide while paper fits a flat picture to 72 x 25 mm - equal groups at 81 % of print on
+  card 390 / 820 / 1280. The twin now fits the same item's paper box, never narrower than the paper width (printFloor).
+- Match 3 online worksheet: the 96 px slot drew the row / column table at 94 %; the slot is 104 px.
+After them: sets 0-3, 5-10 OK on both skills. Left, all SIZE-REF (coverage, not size): defaults - Match 3 distributive (21 dots),
+pick3 equal groups / pattern; set 4 pick3 hundred chart. Cause: the worksheet host deals its own 4 items (reseed 4242) from a pool
+of 20 grade-3 words, and the reference page holds only the words seed 7 dealt (6 or 8 of them). The same pictures pass SIZE-INK
+wherever the reference page holds them (sets 1-3). No change to a picture's size can clear this; it needs the gate to build the
+reference for an item paper does not hold (e.g. the same word on paper), or a lead ruling. Not pinned.
