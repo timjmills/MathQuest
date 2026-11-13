@@ -196,7 +196,15 @@ register(GROW_TEMPLATE, {
             const v = keyed ? String(p.count10) : wrong ? (wrongSlot('answer') || String(wrong.value || '')) : '';
             extra = line(`<span>Term 10 has</span>${answerArea(ctx, { id: 'answer', shown: v, expect: String(p.count10), digits: 2, ink: v ? (wrong ? 'solid' : ink) : null, unit: unitWord })}`);
         }
-        const pad = twin || ctx.gpRow ? 'padding:0;' : `padding:0 0 0 calc(var(--ws-tab, 5mm) + 1mm);box-sizing:border-box;width:100%;`;
+        // The item tab's keep-out on the left is only as wide as the cell can spare: a full-width cell keeps the whole
+        // tab + 1 mm, a half-width S cell (two across, the card's "S fits two growing cells across") keeps what is left
+        // beside the 4-term row, so the row never wraps 2 + 2 there. The 4-term row clears the tab anyway: its Term labels
+        // are centred over 19.5 mm boxes, and the boxes start under the tab's bottom edge (critic r2 G8: S printed ONE
+        // cell a row, the drawing 45 % of the row width - the half-width cell wrapped 2 + 2 behind a 6 mm pad and the
+        // bridge measured that as a reflow, ws-columns / probe measured 2 cols "reflow").
+        const rowMm = 4 * box + 3 * (ctx.gpRow ? 1.2 : sizeOf(ctx) === 'S' ? 1.6 : 2.5);
+        const pad = twin || ctx.gpRow ? 'padding:0;'
+            : `padding:0 0 0 clamp(0mm, calc(100% - ${n2(rowMm + 0.4)}mm), calc(var(--ws-tab, 5mm) + 1mm));box-sizing:border-box;width:100%;`;
         const join = ask === 'rule' ? ' data-mq-join=", "' : '';
         return root(ctx, 'mq-gp', `${row}${extra}`, { attrs: ` data-read${join}`, style: `display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};${pad}` });
     },

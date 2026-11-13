@@ -26,7 +26,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S } from './k2kit.js';
+import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S, LETTERS } from './k2kit.js';
 
 export const NOTICE_TEMPLATE = 'notice';
 
@@ -153,12 +153,20 @@ function parityCell(p, ctx) {
         { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:center;gap:${L(ctx, 3)};${pad(ctx)}` });
 }
 
+/** The feature track's tile side (mm), the patterns card §3. */
+export const FEATURE_TILE_MM = Object.freeze({ S: 10, M: 11.5, L: 13 });
+
 function trackTiles(p, ctx) {
     const terms = p.terms || [];
     const digits = Math.max(2, ...terms.map((v) => String(v).length));
     const sz = sizeOf(ctx);
-    const w = (sz === 'S' ? 9 : sz === 'M' ? 10 : 11) + (digits > 2 ? 2.5 : 0);
-    const h = sz === 'S' ? 8.5 : sz === 'M' ? 9.5 : 10.5;
+    // the card's feature tiles (§3 Sizes: 10 / 11.5 / 13 mm at S / M / L), square: on the Test the pupil WRITES five
+    // numbers in them (critic r2 G6: 9 x 8.5 mm at S measured 8.7 mm against the card's 10)
+    // (an anchor-chart state, ntTight, is a picture nobody writes in, drawn at one fixed 64 mm width: it keeps the 9 x 8.5 mm
+    // tiles its chart panels were measured with, so six still sit on one line)
+    const side = ctx.ntTight ? 9 : FEATURE_TILE_MM[sz] || FEATURE_TILE_MM.L;
+    const w = side + (digits > 2 ? 2.5 : 0);
+    const h = ctx.ntTight ? 8.5 : side;
     const pt = Math.min(digitPt(ctx) * 0.7, 18);
     const filled = !!ctx.state && ctx.state !== 'blank' && ctx.state !== 'wrong';
     return terms.map((v, i) => {
@@ -176,8 +184,21 @@ function sentenceList(ctx, choices, on) {
     const pt = textPt(ctx);
     const rows = choices.map((c, i) => {
         const box = checkBox(ctx, { id: `c${i}`, on: on === i, slot: false });
-        return `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, ctx.ntTight ? 0.4 : 1.2)} 0;">`
+        const inner = `<div style="display:flex;align-items:center;gap:${L(ctx, 3)};margin:${L(ctx, ctx.ntTight ? 0.4 : 1.2)} 0;">`
             + `<span style="flex:1 1 auto;min-width:0;white-space:normal;text-align:left;font-size:${P(ctx, pt)};font-weight:700;line-height:1.25;">${esc(c)}</span>${box}</div>`;
+        if (ctx.ntTight) return inner;
+        // Each sentence carries its letter A / B / C, on paper and on screen: Error analysis's Fix-it row offers A / B / C
+        // (roles/error-analysis.js choicesOf: "the letter the item prints beside the option"), so the item must print
+        // them (critic r2 G5, H2: "Fix it [ ] A [ ] B [ ] C" beside unlettered sentences). The letter sits OUTSIDE the
+        // [sentence][box] pair, so screen-cell.js wireTickBoxes still reads each pair as one tap row by its sentence.
+        // (not on an anchor-chart state, ntTight: a 64 mm picture whose sentences would rewrap past the chart panel)
+        // On paper the letter HANGS in the item-tab keep-out (the root's left pad, tab + 1 mm, empty below the tab), so the
+        // sentences keep their whole width and wrap as before (a letter column inside the width wrapped them and Error
+        // analysis S fell from 6 items to 4); on screen (no pad) it takes its own narrow column.
+        const lw = pt * 0.3528 * 0.75, lg = 2;
+        const hang = isTwin(ctx) ? '' : `margin-left:-${L(ctx, lw + lg)};`;
+        const letter = `<span class="mq-nt-letter" style="flex:none;width:${L(ctx, lw)};font-size:${P(ctx, pt)};font-weight:700;line-height:1.25;text-align:left;">${LETTERS[i] || ''}</span>`;
+        return `<div class="mq-nt-opt" data-ws-letter="${LETTERS[i] || ''}" style="display:flex;align-items:center;gap:${L(ctx, lg)};${hang}">${letter}<div style="flex:1 1 auto;min-width:0;">${inner}</div></div>`;
     }).join('');
     const ink = on >= 0 && ctx.state === 'answered' ? ' data-ws-ink="solid"' : '';
     // The ONE graded slot (AK-2) is the column of boxes, not the printed sentences: a sentence ("The ones digits go 4,
