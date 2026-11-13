@@ -427,8 +427,9 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // spreads).
         // (a one-step story in COLUMN work - story.js columnPanel, word-stories fix r3: each panel draws only the zones its step
         // uses, so each ROW is as tall as its own tallest panel (L2 / L25: the cell is as tall as its content) - never
-        // stretched to the body, which left 30-35 % bands under the shorter panels; the white goes under the chart)
-        const own = mode === 'one' && !tailItem && lay.variant !== 'row' && cols === 2 && !!columnPanel(example, states, 0);
+        // stretched to the body, which left 30-35 % bands under the shorter panels; the white goes under the chart. A detailed
+        // lesson (its own chart data) keeps its own sizing.)
+        const own = !data && mode === 'one' && !tailItem && lay.variant !== 'row' && cols === 2 && !!columnPanel(example, states, 0);
         if (own) {
             const hr = Array.from({ length: lay.rows }, (_, r) => Math.max(...states.slice(r * cols, r * cols + cols).map((st, j) => base[r * cols + j] + (z - 1) * dH[r * cols + j])));
             rowH = Math.max(...hr);
