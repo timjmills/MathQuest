@@ -115,20 +115,6 @@ function layout(items, input, count) {
         { footprintRows: divFact,
             // (R6-1's full page: the one-line across fact only - div_facts' Long division and Fraction forms keep 12.1's ceiling)
             fullPage: acrossFact });
-        // (lead ruling 2026-11-13, critic divarray r1 Q1: Test count = Independent count extends to mult_facts, on every support:
-        // the bridge builds the Independent page first (print-sheet.js buildSheetInner) and hands its grid in as `input.indFit` -
-        // its columns, its count, its cell height - which the Test takes)
-        const multFact = items.every((it) => (it.skillRef ? it.skillRef.skillId === 'mult_facts' : /mult_facts(?!_)/.test(String(it.skill || ''))));
-        const f = multFact && (!input.columns || input.columns === 'auto') ? input.indFit : null;
-        if (f && f.cols >= 1 && f.perPage > 0 && f.cellH > 0) {
-            const n = Math.min(f.perPage, count || f.perPage);
-            const rows = Math.max(1, Math.ceil(n / f.cols));
-            const even = (Lt.gridH - SAFETY_H_MM - GRID_BORDERS_MM) / rows;
-            const cellH = Math.round(Math.min(even, f.cellH) * 1000) / 1000;
-            const note = `Test: ${n} problems, ${f.cols} x ${rows} (the Independent page's count, lead ruling 2026-11-13).`;
-            // (Lt's own note and page count described ITS grid - "Tall problems: 2 rows per page", 2 pages - so they are replaced)
-            return Object.assign({}, Lt, { cols: f.cols, rows, perPage: n, pages: 1, cellH, hMin: f.hMin || Lt.hMin, fill: cellH >= even - 0.01, note, filledTest: true });
-        }
         if (divFact && acrossFact && (!input.columns || input.columns === 'auto')) {
             const Li = resolveSectionLayout({ role: 'independent', columns: 'auto', count: FACT_TEST_PAGE[ctx.size] || FACT_TEST_PAGE.L, floor: (input.floors || {}).main,
                 dense: items.some((it) => itemSupported(it)) ? true : FACT_TEST_PAGE },

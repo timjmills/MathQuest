@@ -1015,21 +1015,20 @@ export function layoutWorksheetGrid(grid) {
     _wsEvenRows(cards);
 }
 
+
 /**
  * One support place per worksheet (lf-ops div_facts screen critic r1 D4: the touch tally stood under "22 ÷ 11" and
  * "110 ÷ 10", where the screen pane wrapped, and beside the narrower facts). A ÷ fact's support drawn beside it on
  * screen wraps under it when the card is too narrow; when any card of the sheet wraps, every ÷ card puts it under.
  * `reset` clears the choice before the columns are measured again.
  */
-/** A card's ÷ or × fact (the ÷ sentence's .ws-eq "divided by"; a × fact's .ws-fact / .ws-eq naming "times" or ×). */
+/** A card's ÷ fact (the ÷ sentence's .ws-eq "divided by"). (The × landscape array's wrap is parked with the mult_facts arrays,
+ *  lead 2026-11-13 / lf-ops divship: × cards keep master's layout.) */
 function _wsDivOrTimes(c) {
-    const d = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
-    if (d) return d;
-    return [...c.querySelectorAll('.ws-card-visual .ws-fact, .ws-card-visual .ws-eq')].find((e) => /times/.test(e.getAttribute('aria-label') || '') || /×/.test(e.textContent || '')) || null;
+    return c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
 }
 function _wsOneSupportPlace(cards, reset = false) {
     const wps = cards.map((c) => {
-        // (facts card §5.10: the × array, landscape, wraps too - one place for × cards as for ÷)
         const eq = _wsDivOrTimes(c);
         return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="beside"]') : null;
     }).filter(Boolean);

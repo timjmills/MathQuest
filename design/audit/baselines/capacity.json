@@ -2615,44 +2615,9 @@
   "patterns:growing_shape_patterns review L": {
    "items": 5,
    "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
-  },
-  "multiplication:mult_facts review S {\"support\":[\"touch\"]}": {
-   "items": 16,
-   "reason": "master's 16, restored (lead ruling 2026-11-13, critic divarray r1 D2: the 16 -> 15 re-pin is withdrawn; the Review lays 4 x 3 facts + 4 stacks band-free, review.js geometry)"
-  },
-  "multiplication:mult_facts review S {\"support\":[\"array\"]}": {
-   "items": 13,
-   "reason": "GAIN 12 -> 13 (lf-ops-divarray: landscape arrays; 8 facts + 5 stacks), pinned so it never falls (lead ruling 2026-11-13)"
   }
  },
  "sizeOrderOpts": [
-  {
-   "skill": "multiplication:mult_facts",
-   "role": "independent",
-   "opts": {
-    "support": [
-     "array"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "role": "test",
-   "opts": {
-    "support": [
-     "array"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "role": "more-practice",
-   "opts": {
-    "support": [
-     "array"
-    ]
-   }
-  },
   {
    "skill": "division:div_facts",
    "role": "independent",
@@ -2664,42 +2629,6 @@
   }
  ],
  "testEqOpts": [
-  {
-   "skill": "multiplication:mult_facts",
-   "opts": {
-    "support": [
-     "array"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "opts": {
-    "support": [
-     "touch"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "opts": {
-    "support": [
-     "skip"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "opts": {
-    "support": [
-     "boxsign"
-    ]
-   }
-  },
-  {
-   "skill": "multiplication:mult_facts",
-   "opts": {}
-  },
   {
    "skill": "division:div_facts",
    "opts": {

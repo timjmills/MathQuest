@@ -6846,6 +6846,8 @@
  },
  {
   "id": "array-caption-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
   "kind": "commit-pair",
   "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
@@ -6866,6 +6868,8 @@
  },
  {
   "id": "array-orient-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
   "kind": "commit-pair",
   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
@@ -6886,6 +6890,8 @@
  },
  {
   "id": "review-stack-side-multfacts-array",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
   "kind": "commit-pair",
   "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
@@ -6906,6 +6912,8 @@
  },
  {
   "id": "review-zero-row-multfacts-array",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
   "kind": "commit-pair",
   "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
@@ -6926,6 +6934,8 @@
  },
  {
   "id": "array-frame-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
   "kind": "commit-pair",
   "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
@@ -6946,6 +6956,8 @@
  },
  {
   "id": "support-not-slot-multfacts-array",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "on an array-support band no support draws an empty closed box the size/shape of the answer slot, and a frame on only some cells (the x 0 frame, the lone framed support in a band of unframed arrays) is a finding - on paper and every screen host (critic divarray r1 D1)",
   "kind": "commit-pair",
   "rule": "ws-screen-support-eq SUPPORT-NOT-SLOT; ws-print-lint SUPPORT-NOT-SLOT",
@@ -6966,6 +6978,8 @@
  },
  {
   "id": "array-caption-grammar-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a one-row array caption reads \"1 row of n\", never \"1 rows of n\" (it is spoken aloud) (critic divarray r1 N1, fact.js:242)",
   "kind": "commit-pair",
   "rule": "ws-screen-support-eq ARRAY-CAPTION (row/rows grammar)",
@@ -6986,6 +7000,8 @@
  },
  {
   "id": "size-order-opt-multfacts-array",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "the ruled option pages are judged by SIZE-ORDER: an option page whose cells measure smaller at S must fit more at S (strict S > L), never the same page at every size (critic divarray r1 D3; mult_facts {support:array} printed 10/10/10 and 12/12/12 at S/M/L)",
   "kind": "commit-pair",
   "rule": "ws-capacity-pin SIZE-ORDER-OPT",
@@ -7006,6 +7022,8 @@
  },
  {
   "id": "test-eq-ind-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1; lead ruling 2026-11-13: the div_facts rule of 2026-11-09 extends to mult_facts - TEST-EQ-IND runs by default)",
   "kind": "commit-pair",
   "rule": "ws-capacity-pin TEST-EQ-IND (on by default)",
@@ -7026,6 +7044,8 @@
  },
  {
   "id": "pagefill-review-multfacts-touch",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "print-lint's PAGEFILL (and the PG-23 orphan) run on the Review / Test roles for fact skills with supports (--fill-roles), so a support page that leaves a 30% blank strip under the grid is caught (critic divarray r1 D2: mult_facts Review S touch at the ruled 15 left a 71 mm, 30% strip)",
   "kind": "commit-pair",
   "rule": "ws-print-lint L-DENSITY PAGEFILL on review/test (--fill-roles)",
@@ -7046,6 +7066,8 @@
  },
  {
   "id": "supband-below-support-multfacts-array",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item - an unframed x array in a Test cell sized for a 10-12-row one left 36-44 % empty below it (critic divarray r1 D4). A support BESIDE taller ink (the fact beside the x band frame) has no band under it. Run on the Test role, where D4 was graded (on precritic's path via --role test)",
   "kind": "commit-pair",
   "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
@@ -7066,6 +7088,8 @@
  },
  {
   "id": "capacity-ruled-review-touch-multfacts",
+  "pending": true,
+  "pendingReason": "parked: mult_facts arrays (lead 2026-11-13) - lf-ops divship ships the div_facts / add_facts work with mult_facts hash-equal to master; the mult_facts landscape arrays, band frame, Test = Independent and supported-fact Review are not on this branch. Re-arm (drop pending) when the mult_facts array work lands.",
   "check": "a RULED option page prints at least its ruled count: mult_facts Review S with touch is ruled 16 (master's count; lead ruling 2026-11-13 withdrew the 16 -> 15 re-pin that left a 30 % blank strip, critic divarray r1 D2)",
   "kind": "commit-pair",
   "rule": "ws-capacity-pin ruled page (CAPACITY-NO-DROP)",

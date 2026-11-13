@@ -285,14 +285,13 @@ function pieceOf(id, p, template, ctx) {
         // (facts card F2: a ÷ fact whose section offers the array - every dividend 50 or less, print-sheet.js - draws the
         // TRUE array, landscape since the owner's 2026-11-13 ruling - the divisor's rows of the quotient's dots - in the
         // section's one frame `supports.arrayFrame`)
-        // (lead ruling 2026-11-13: a mult_facts × array is drawn in its section's one frame too)
-        const af = (pp.op === '/' || pp.op === '*') && id === 'array' && p.supports && p.supports.arrayFrame;
+        // (the mult_facts × band frame is parked, lead 2026-11-13 / lf-ops divship: a × array draws as master does)
+        const af = pp.op === '/' && id === 'array' && p.supports && p.supports.arrayFrame;
         if (af) {
             // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M;
             // facts card §5.9, landscape: at M and L the dots grow into the cell's width - ARRAY_PITCH_MM; a screen host
             // draws paper M's frame, scaled to its digit)
-            const PITCH = pp.op === '*' ? X_ARRAY_PITCH_MM : ARRAY_PITCH_MM;
-            const pitch = PITCH[twin ? 'M' : (ctx && ctx.size) || 'M'] || PITCH.M;
+            const pitch = ARRAY_PITCH_MM[twin ? 'M' : (ctx && ctx.size) || 'M'] || ARRAY_PITCH_MM.M;
             const cp = { a: pp.a, b: pp.b, op: pp.op, cue: 'array', frame: Object.assign({}, af, { pitch }) };
             // (facts card §5.9, owner 2026-11-13: on screen the landscape array follows the cell's digit, its dots
             // SCREEN_ARRAY_SCALE x paper's dot-to-digit ratio - bigger, never smaller than the print dot - capped by the cell)
@@ -310,10 +309,10 @@ function pieceOf(id, p, template, ctx) {
         }
         // (facts card F3: a ÷ skip strip runs to the section's top multiple, the tally length - 10 or 12 - never the quotient)
         const cp = { a: pp.a, b: pp.b, op: pp.op, cue: id, ...(id === 'skip' && pp.op === '/' ? { n: Number(p.supports && p.supports.tally) || 12 } : {}) };
-        // (a × array on screen follows the cell's digit like the ÷ array, facts card §5.10)
-        // (SCREEN-CUE-SIZE: a × skip strip follows the digit at paper's ratio as the ÷ one does)
-        const cue = factCueOf(cp, twin, twin && (pp.op === '/' || pp.op === '*') && (id === 'skip' || id === 'think') ? SCREEN_CUE_DIGIT_MM
-            : twin && id === 'array' ? SCREEN_CUE_DIGIT_MM / SCREEN_ARRAY_SCALE : 0);
+        // (a × cue on screen draws as master does - the × array / skip-strip screen sizing is parked with the mult_facts arrays,
+        // lead 2026-11-13 / lf-ops divship)
+        const cue = factCueOf(cp, twin, twin && pp.op === '/' && (id === 'skip' || id === 'think') ? SCREEN_CUE_DIGIT_MM
+            : twin && pp.op === '/' && id === 'array' ? SCREEN_CUE_DIGIT_MM / SCREEN_ARRAY_SCALE : 0);
         if (!cue) return null;
         const m = MM_RE.exec(factCueOf(cp, false)) || [];
         const foot = { wMm: Number(m[1]) || 40, hMm: Number(m[2]) || 12, placements: ['beside', 'under'] };
@@ -328,7 +327,8 @@ let factCueOf = () => '';
 const twin0 = (ctx) => !!ctx && ctx.mode === 'screen';
 // (SIZE-INK, facts card §5.10: a screen cue is never under its print size - one CSS mm per paper mm, 96 / 25.4 px - where the
 // old 3.4 px / mm drew tiles, frames, skip strips and arrays at 90 % of paper)
-export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin, digitMm = 0) => fn(p, twin ? { px: SCREEN_PX_PER_MM, digitMm } : {}); }
+// (a × cue keeps master's 3.4 px / mm: the mult_facts screen cue work is parked, lead 2026-11-13 / lf-ops divship)
+export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin, digitMm = 0) => fn(p, twin ? { px: p && opKey(p.op) === '*' ? 3.4 : SCREEN_PX_PER_MM, digitMm } : {}); }
 const SCREEN_PX_PER_MM = 96 / 25.4;
 // A ÷ fact's skip strip and think box on screen follow the cell's digit at paper's ratio (lf-ops div_facts screen critic
 // r1 D3): paper draws them beside a 24 pt (8.47 mm) fact digit.
@@ -338,10 +338,6 @@ const SCREEN_ARRAY_SCALE = 1.7;
 // The ÷ landscape array's dot pitch on paper by size (mm; facts card §5.9: "as large as the cell width allows", and never
 // under the old 2.6 mm print dot): its frame is 12 columns wide at most (the 12s band) - 35.8 / 43.0 / 57.4 mm at S / M / L.
 const ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 4.4 });
-// The × band frame's dot pitch (lead ruling 2026-11-13): never under the 2.6 mm print dot, and as large as the cell's width
-// allows with the frame BESIDE the fact (one place on every page, critic divarray r1 N2). A 12 x 12 frame is then 35.8 / 43.0 /
-// 44.2 mm at S / M / L, beside the fact in a two-column cell (at L a 4.4 mm pitch pushed it under the fact: 4 facts a page).
-const X_ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 3.3 });
 // ... and the columns that give that frame its width (a 3-column cell holds ~49 mm inside its pads, a 2-column L cell ~79 mm):
 // the frame is never shrunk to fit the cell (max-width), it is given the cell it needs.
 const ARRAY_MAX_COLS = Object.freeze({ S: 3, M: 3, L: 2 });
@@ -440,7 +436,8 @@ export function withSupports(problemHtml, p, template, ctx = {}, { problemWMm = 
         : '';
     let html = ghost || problemHtml;
     if (groups['over-ones'].length) html = attachPane(html, groups['over-ones'].join(''), 'over-ones', { twin });
-    if (groups.before.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:2mm">${groups.before.join('')}</div>`, 'before', { twin });
+    // (the screen sign box's wrap - SUPPORT-LABEL - holds for every fact but ×: mult_facts is parked hash-equal to master, lf-ops divship)
+    if (groups.before.length) html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:2mm">${groups.before.join('')}</div>`, 'before', { twin, wrapBefore: opKey(p.op) !== '*' });
     if (fixedZone && groups.before.length) html = html.replace(/(data-ws-pane-place="before" style="[^"]*?)justify-content:center;/, '$1justify-content:flex-start;');
     if (groups.beside.length) {
         html = attachPane(html, `<div style="display:flex;flex-direction:column;gap:${PANE_GAP_MM}mm">${groups.beside.join('')}</div>`, 'beside', { twin });
@@ -506,7 +503,7 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     // practice 1.2 - touch S / M prints 3 x 5 = 15, as the Test of the same support does.
     const room = pp && pp.op === '/' ? { denseRoom: 1.05 } : {};
     // (facts card §5.9: the landscape ÷ array takes the columns its frame needs at this size, ARRAY_MAX_COLS)
-    const arrCap = pp && (pp.op === '/' || pp.op === '*') && s && s.on.includes('array') && s.arrayFrame ? ARRAY_MAX_COLS[ctx.size] || ARRAY_MAX_COLS.L : 10;
+    const arrCap = pp && pp.op === '/' && s && s.on.includes('array') && s.arrayFrame ? ARRAY_MAX_COLS[ctx.size] || ARRAY_MAX_COLS.L : 10;
     return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4, arrCap), ...(arrCap < 10 ? { hardCap: true } : {}) }, room);
 }
 

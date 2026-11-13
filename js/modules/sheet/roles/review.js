@@ -137,6 +137,11 @@ function reviewTitle(input, topic) {
     return fits(`Review: ${tp}`) ? `Review: ${tp}` : 'Review';
 }
 
+// lf-ops divship (lead 2026-11-13): the mult_facts array / Review work is PARKED - a Review whose main band is mult_facts keeps
+// master's geometry and row heights exactly; the Review changes below hold for every other skill.
+const isMultFacts = (it) => !!it && (it.skillRef ? it.skillRef.skillId === 'mult_facts' : /mult_facts(?!_)/.test(String(it.skill || '')));
+const multMain = (pools) => (pools.main || []).some(isMultFacts);
+
 function geometryAt(pools, input, mainCols = 0) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
@@ -182,7 +187,7 @@ function geometryAt(pools, input, mainCols = 0) {
     // when fewer would only widen the cell round the same ink - mult_facts array Review S took the mixed band from 4 to 3
     // columns to fit a second row under the 45 % share, and every "47 - 6" stack sat in a 61.5 mm cell with a 19.7 mm
     // empty band (32 %). A narrower column count stays open while the widest problem still fills 70 % of the cell.
-    const eStatic = earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
+    const eStatic = !multMain(pools) && earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
     const eWMax = eStatic ? Math.max(...earlier.map((it) => it.footprint.wMm)) : 0;
     const widens = (c) => eStatic && c < E.cols && eWMax < 0.7 * cellWidthMm(c, LIVE_W_MM, ctx.look).inner;
     if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) if (!widens(c)) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
@@ -271,7 +276,7 @@ function geometry(pools, input) {
     const g = geometryAt(pools, input);
     const ctx = g.ctx;
     const main = pools.main || [];
-    const xFacts = ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
+    const xFacts = !multMain(pools) && ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
         && main.every((it) => it && it.template === 'fact' && it.supportsBox && it.supportsBox.plan && /^(\*|×|x)$/.test(String(((it.q && it.q.cell && it.q.cell.payload) || {}).op || '')));
     if (!xFacts) return g;
     let best = g;
@@ -367,7 +372,7 @@ export function plan(input = {}) {
     // div_facts only: the passed fact Reviews keep their rows.
     // lf-ops r-review: a band of SUPPORTED facts (a mult_facts array / touch / skip page) is held the same way - its rows are
     // as tall as their pictures, and a page's spare height stretched a 9 x 7 array's row round a 2 x 5 one (32 % under it).
-    const supportedFact = (it) => it.template === 'fact' && !!(it.supportsBox && it.supportsBox.plan);
+    const supportedFact = (it) => it.template === 'fact' && !!(it.supportsBox && it.supportsBox.plan) && !isMultFacts(it);
     const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && ((it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))) || supportedFact(it)));
     // (lf-placevalue pv debt: a band of `tightRows` in-place cells - layout.tightRows - keeps its rows' own height, never the
     // page's share: combine's two-line frames in 32-41 mm rows were 37-40 % empty under the answer line, read on the pixels, and

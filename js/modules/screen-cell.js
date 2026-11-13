@@ -28,7 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
-import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX, multFactsArrayFrame } from './skill-options.js';
+import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -502,12 +502,6 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     if (arrayFrame) {
         out.tally = Number(no.band) >= 144 ? 12 : 10;
         out.arrayFrame = { cols: out.tally, rows: Math.max(1, divFactsMaxDividend(no) / out.tally) };   // (facts card §5.9: landscape)
-    }
-    // (lead ruling 2026-11-13: mult_facts' × array in the section's one frame, as paper draws it - print-sheet.js supportPlanFor)
-    if (cat0 === 'multiplication' && sk0 === 'mult_facts' && opKey(k.op) === '*' && r.on.includes('array')) {
-        let mo = o;
-        try { mo = normalizeOptions(cat0, sk0, o); } catch (e) { mo = o; }
-        out.arrayFrame = multFactsArrayFrame(mo);
     }
     if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
         const cs = o.constant;

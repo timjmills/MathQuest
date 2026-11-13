@@ -28,7 +28,7 @@ import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, multFactsArrayFrame } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -354,8 +354,6 @@ function normaliseRequest(req = {}) {
         coverage: req.coverage ? normCoverage(req.coverage) : null,
         mix: req.mix ? normMix(req.mix) : null,
         testHints: req.testHints === true,
-        // (lead ruling 2026-11-13: a mult_facts Test lays out on its Independent page's grid - buildSheetInner measures it)
-        indFit: req._indFit && Number(req._indFit.cols) > 0 && Number(req._indFit.perPage) > 0 ? req._indFit : null,
         // The lesson packet (role 'lesson'): Independent pages after the teaching sheet, and the
         // optional Mixed practice page.
         practicePages: req.practicePages !== undefined && req.practicePages !== null ? clampInt(req.practicePages, 0, 10, 1) : 1,
@@ -1520,9 +1518,6 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
     if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: extra.tally, rows: Math.max(1, divFactsMaxDividend(o) / extra.tally) };   // (facts card §5.9: landscape, the divisor's rows)
-    // (lead ruling 2026-11-13: mult_facts' × array is drawn in ONE frame for the section too - the band's largest smaller factor's
-    // rows by its largest larger factor's columns; a × 0 fact draws that frame empty)
-    if (sk.categoryId === 'multiplication' && sk.skillId === 'mult_facts' && op === '*' && worst.includes('array')) extra.arrayFrame = multFactsArrayFrame(o);
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',
@@ -4317,7 +4312,6 @@ async function buildRoleSheet(n, metaOf) {
         titleLinesOf: (text, size) => measureTitleLines(text, size || n.size),
         columns: (n.sections[0] && n.sections[0].columns) || 'auto',
         count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
-        indFit: n.indFit || undefined,
         targetSkill: metaOf(reqSkills[0]),
         floors: {},
         lesson: n.lessonInput,
@@ -6268,16 +6262,6 @@ async function buildSheetCounted(req) {
 async function buildSheetInner(req = {}) {
     if (morePracticeByLetter(req)) return buildMorePracticeLetters(req);
     if (autoPoolPage(req)) return poolPage(req);
-    // Lead ruling 2026-11-13 (critic divarray r1 Q1): Test count = Independent count extends from div_facts to mult_facts, on
-    // every support. A one-skill mult_facts Test on Auto columns and count is laid out on the grid its Independent page prints
-    // (same options, size and seed): that page's columns, count and cell height (test.js layout, `input.indFit`).
-    if (!req._indFit && multFactsTestAuto(req)) {
-        try {
-            const ind = await buildSheetInner(Object.assign({}, req, { role: 'independent', key: false }));
-            const f = ind && ind.plan && ind.plan.meta && Array.isArray(ind.plan.meta.fits) ? ind.plan.meta.fits[0] : null;
-            if (f && f.cols > 0 && f.perPage > 0) req = Object.assign({}, req, { _indFit: { cols: f.cols, rows: f.rows, perPage: Math.min(f.perPage, (ind.items || []).length || f.perPage), cellH: f.cellH, hMin: f.hMin } });
-        } catch (e) { /* the Test keeps its own grid */ }
-    }
     const r = await buildSheetFill0(req);
     // (round 6, critic r5 D5-5) PG-15: a short last row is never left as an empty area. grid.js
     // re-lays it (class `relaid`) when nothing better exists; before that, an auto single-skill
@@ -6308,16 +6292,6 @@ async function buildSheetInner(req = {}) {
         }
     } catch (e) { /* keep the page as built */ }
     return r;
-}
-
-/** A one-skill mult_facts Test on Auto columns and an Auto count (lead ruling 2026-11-13: Test = Independent). */
-function multFactsTestAuto(req) {
-    if ((ROLE_ALIASES[req.role] || req.role) !== 'test') return false;
-    const secs = Array.isArray(req.sections) ? req.sections : [];
-    if (secs.length !== 1) return false;
-    const s = secs[0], sk = (s.skills || [])[0];
-    const auto = (v) => v === undefined || v === null || v === 'auto' || v === '';
-    return (s.skills || []).length === 1 && sk && sk.categoryId === 'multiplication' && sk.skillId === 'mult_facts' && auto(s.count) && auto(s.columns);
 }
 
 /**

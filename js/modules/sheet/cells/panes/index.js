@@ -123,7 +123,7 @@ export function addedHeight(foot, placement, problemHMm = 0, gapMm = PANE_GAP_MM
  * = above it, right-aligned over the ones column (half a digit track in from the right);
  * before = to the LEFT of the problem.
  */
-export function attachPane(problemHtml, paneHtml, placement = 'under', { gapMm = PANE_GAP_MM, twin = false } = {}) {
+export function attachPane(problemHtml, paneHtml, placement = 'under', { gapMm = PANE_GAP_MM, twin = false, wrapBefore = true } = {}) {
     const gap = twin ? `calc(var(--mq-k2, 3.4px) * ${gapMm})` : `${gapMm}mm`;
     if (placement === 'beside') {
         return `<div class="ws-with-pane" data-ws-pane-place="beside" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};align-items:flex-start;justify-content:center;gap:${gap};">`
@@ -133,7 +133,7 @@ export function attachPane(problemHtml, paneHtml, placement = 'under', { gapMm =
         // (lf-ops divarray r2, SUPPORT-LABEL / lf-checks TEXT-SIZE: on a narrow screen the sign box shrank to fit beside the fact -
         // "divide" at 8.9 pt where paper prints 10 pt. On screen the pane never shrinks; when the row is too narrow it wraps
         // above the problem. Paper is unchanged.)
-        if (twin) {
+        if (twin && wrapBefore) {
             return `<div class="ws-with-pane" data-ws-pane-place="before" style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:${gap};">`
                 + `<div style="flex:none;">${paneHtml}</div><div class="ws-pane-problem" style="flex:none;">${problemHtml}</div></div>`;
         }
