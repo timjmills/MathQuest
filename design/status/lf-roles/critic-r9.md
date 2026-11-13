@@ -132,3 +132,69 @@ Opener C4 7 is D2 (header). Opener L C3 6 is D1. Opener M C3 7 is D3. The letter
   cell-checks, which shows the gate works.
 - **P1.** Critics must grade a private worktree at a named commit, never a shared scratch tree that a builder may be editing.
   The lead's brief should name a commit, not a directory.
+
+## Re-critic r9b (narrow; lane 52abf7e79)
+
+Test tree: a private worktree of lf-algebra 201692a31 merged with lane 52abf7e79 (critic merge b0b5216cc; the only conflict
+was `tests/fixtures/precritic/backtests.json`). The lane contains origin/master 88cc98b00. I did not use `alg2`.
+
+Graded: the 13 spilled Opener pages (7 two-step skills × M/L; letter_equation M does not spill), each pupil page with its key.
+
+### Verdict: FAIL on 2 pages (page-1 white under the Say band); D1, D2 and D3 PASS
+
+| Item | Verdict | Evidence |
+|---|---|---|
+| D1 Steps band sized to its printed text | **PASS** | Steps band against ink, page 1: M 25.0 / 24.1 mm (4 %), estimate M 29.9 / 29.0 mm (3 %); L 27.0 / 27.2 mm, and 33.8 / 33.9 mm on mult_div_first and estimate. No empty band. |
+| D2 continuation header names the part | **PASS** | Page 2 title is "Guided Practice" (plain, Visual, mult_div_first, add_then_mult, add_then_div, estimate L), or "Guided Practice and Your turn" where an Independent row follows (estimate M, letter L). Pupil and key match. `ws-cell-checks --roles opener` on M/L: 14 pages, no finding. The overflow from the first attempt is gone. |
+| D3 page 2 fitted from the dealt stories | **PASS; r9's D3 withdrawn** | The builder's measure is confirmed (table below). My r9 D3 compared plan heights without the band strip, the tab and the in-hand margin. Rendered with them, no Independent row fits on those pages. |
+| Page 1 white under the Say band, spilled M Openers (lead bar ≤ 30 %, C3 ≥ 8) | **5 of 6 pass; estimate M over** | Body 239 mm. Plain 60.3 mm (25.2 %), Visual 60.3 (25.2 %), add_then_div 62.3 (26.1 %), add_then_mult 67.2 (28.1 %), mult_div_first 68.6 (28.7 %). **estimate_check M: 74.4 mm (31.1 %).** |
+| Page 1 white, spilled L Openers (same bar) | **5 of 6 pass; letter L over** | Plain / Visual 35.5 mm (14.9 %), mult_div_first and add_then_div 37.8 (15.8 %), add_then_mult 43.3 (18.1 %), estimate 50.9 (21.3 %). **two_step_letter_equation L: 93.7 mm (39.2 %)**, the bottom 40 % of the Model page blank. I under-reported this in r9: D1 was the reason I gave there. |
+| Tightened PAGEFILL / EB-PAGE one-row exemption | **PASS** | Both tools now accept the strip only while it is shorter than the held row: `oneRowStripOk` in ws-print-lint, and in ws-empty-band 903-906 `b0.bottom - gr.bottom < gr.height`. `--onerow-probe` gives 60 mm under a 160 mm row = OK and 170 mm = FAIL. Nit: it compares with the held row (ink / 0.72); ink + pads would be stricter by about 25 %. The planner places rows at held height, so this is consistent. |
+| Spot hash: 5 passed skills × opener / review × M/L, pupil + key, against origin/master 88cc98b00 | **PASS** | Skills: div_facts_long, sub_2d_1d, add_wp_10, combine, mult_facts. 20 pages, 18 identical. Only **div_facts_long review M** and **sub_2d_1d review L** differ, as expected. |
+
+### D3 measurement check (M, page 2)
+
+Free = body bottom (274.0 mm) minus the bottom of the Guided band. Needed = the shortest undrawn dealt story's level-1 height
++ 1 mm + 3 mm tab + 7.5 mm band strip.
+
+| Skill M | Guided band bottom | Free | Shortest undrawn level-1 | Needed | Independent row? |
+|---|---|---|---|---|---|
+| multi_step_word_plain | 179.2 | 94.8 | 93.2 | 104.7 | no (correct) |
+| multi_step_word (Visual) | 179.2 | 94.8 | 124.9 | 136.4 | no (correct) |
+| two_step_mult_div_first | 177.2 | 96.8 | 91.2 | 102.7 | no (correct) |
+| two_step_add_then_mult | 172.9 | 101.1 | 93.2 | 104.7 | no (correct) |
+| two_step_add_then_div | 177.2 | 96.8 | 91.2 | 102.7 | no (correct) |
+| two_step_estimate_check | 160.2 | 113.8 | - | - | yes, 1 row (band 159.7-244.0) |
+| two_step_letter_equation (L) | 141.7 | 132.3 | - | - | yes, 1 row (band 141.2-214.1) |
+
+The builder's "95-101 mm free against 102-105 needed" holds. Spill page 2 at M is 40-42 % white under one Guided story. It is
+top-aligned and the cell is held, so it reads as an intentional spill page (your ruling 4): C3 8.
+
+### New findings
+
+| Id | Page | Sev | Crit | Owner | Finding | Automatic check |
+|---|---|---|---|---|---|---|
+| **W1** | two_step_letter_equation Opener **L** p1 (pupil + key) | major | C3 7 | lf-roles (opener spill) | 93.7 mm (39.2 %) white under the Say band. The next part, the Guided band, needs 105 mm, so nothing fits. The remainder is honest, but a teacher sees a page 40 % empty. | **SPILL-P1** (ws-empty-band EB-PAGE, opener): on a spill page 1, white under the last band > 30 % of the body = FAIL unless a lead-ruled remainder applies. |
+| **W2** | two_step_estimate_check Opener **M** p1 (pupil + key) | minor, over the bar | C3 7 (by the 30 % bar) | lf-roles | 74.4 mm (31.1 %) white under the Say band. The Guided band needs 123.7 mm. | Same SPILL-P1. |
+| N2 (open) | mult_div_first Opener L Steps | nit | C1 8 | lf-algebra string | "÷." still wraps alone onto its own line. | ORPHAN (as r9). |
+
+**Remedy or ruling.** W1 and W2 are leftover space: the next band, measured, does not fit. Two ways out:
+1. A lead ruling: "a spill page 1 may leave more than 30 % white when the next part's MEASURED height exceeds that white". SPILL-P1
+   would then check that clause. That would turn both pages to C3 8 and the round to PASS.
+2. A layout change that brings the white under 30 %.
+
+My view: option 1 matches ruling 4, which already accepts the 40-42 % white on spill page 2.
+
+### Scores (C1 / C2 / C3 / C4; pupil + key)
+
+| Skill | Opener M | Opener L |
+|---|---|---|
+| multi_step_word_plain | 8 8 8 8 | 8 8 8 8 |
+| multi_step_word (Visual) | 8 8 8 8 | 8 8 8 8 |
+| two_step_mult_div_first | 8 8 8 8 | 8 8 8 8 (N2 nit) |
+| two_step_add_then_mult | 8 8 8 8 | 8 8 8 8 |
+| two_step_add_then_div | 8 8 8 8 | 8 8 8 8 |
+| two_step_estimate_check | 8 8 **7** 8 (W2) | 8 8 8 8 |
+| two_step_letter_equation | not spilled (r9: 8 8 8 8) | 8 8 **7** 8 (W1) |
+
+All keys checked; every answer is correct (estimate M: 39 / 8 / 10 Yes; 71 / 99 / 100 Yes; 87 / 30 / 30 Yes. letter L: n = 11, 31, 17).
