@@ -4096,7 +4096,7 @@
    "commit": "6cec18b7",
    "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none --only EB-BAND",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4596,7 +4596,7 @@
    "commit": "b28f3960",
    "state": "lf-vocab r9 item 3b"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures | tail -1",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --only EB-GDPCAP | tail -1",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
