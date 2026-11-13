@@ -34,7 +34,7 @@ import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { applySheetTags, ebItemOf } from './sheet/index.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
@@ -216,6 +216,13 @@ export function normaliseFamilies(v) {
     return v === true || /^(allow|on|true|yes|1)$/i.test(String(v === undefined || v === null ? '' : v).trim()) ? 'allow' : 'off';
 }
 
+/** True when a list of skill refs prints the count_by_tables "All rows on one page" sheet, which buildSheet draws in the
+ *  compact layout (COMPACT_LABEL) whatever size is asked: every size control shows that one label instead of M / L. */
+export function printsCompactOnePage(skills) {
+    return (skills || []).some((k) => {
+        try { return !!k && !k.leftOut && k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+    });
+}
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
@@ -231,7 +238,10 @@ function normaliseRequest(req = {}) {
         .map((s) => ({
             // (`twoAcross`, lf-ops-props D-MP-1 / D-MP-3: the page's size and look travel on each ref, so the dealer can keep an
             // array and its turn to a pair two of which stand across a row - turnFitsTwo)
-            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId).map((k) => Object.assign({}, k, { twoAcross: { size, look } })),
+            // (a support that follows the role - provider `roleOpts`: identify's place heads off on Review / Test / the
+            // pre-skill check, lead ruling PEDAGOGY 4.1a 2026-11-13; every other skill's opts pass through unchanged)
+            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId)
+                .map((k) => { const o = roleOptions(role, k.categoryId, k.skillId, k.opts); return Object.assign({}, k, o === k.opts ? {} : { opts: o }, { twoAcross: { size, look } }); }),
             count: s && s.count !== undefined && s.count !== null && s.count !== 'auto' ? clampInt(s.count, 1, MAX_ITEMS, null) : null,
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
@@ -300,7 +310,7 @@ function normaliseRequest(req = {}) {
         }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
-    // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
+    // page in one column, drawn at the compact S token (COMPACT_LABEL; lead ruling 2026-11-13: at M, Letter holds 11 rows).
     let onePage = false;
     for (const sec of sections) {
         let rowCount = ONE_PAGE_ITEMS;
@@ -4205,6 +4215,8 @@ async function buildSheetDeal(req = {}) {
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q), ...(it.footprint && it.footprint.noStretch ? { noStretch: true } : {}),
+            // (`keepCols`, additive: the re-seat below reads it - a pv compare page keeps its columns)
+            ...(it.footprint && it.footprint.keepCols ? { keepCols: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -4451,6 +4463,12 @@ async function buildRoleSheet(n, metaOf) {
     const reqSkills = n.sections.flatMap((s) => s.skills);
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
+    // (the skills a role sources for itself - a pre-skill check's earlier skills, a review's - take the role's option values
+    // too: provider roleOpts, identify's place heads off on the unaided roles, lead ruling PEDAGOGY 4.1a 2026-11-13)
+    for (let i = 0; i < pools.length; i++) {
+        const sk2 = pools[i].skills.map((k) => { const o = roleOptions(n.role, k.categoryId, k.skillId, k.opts); return o === k.opts ? k : Object.assign({}, k, { opts: o }); });
+        if (sk2.some((k, j) => k !== pools[i].skills[j])) pools[i] = Object.assign({}, pools[i], { skills: sk2 });
+    }
     const allSkills = [];
     const seenSkill = new Set();
     for (const p of pools) for (const sk of p.skills) {
@@ -6907,7 +6925,10 @@ async function buildSheetFill0(req = {}) {
                     // 2026-11-12 (b) keeps its rows to what they hold and the spare height under the grid, so its fill is not
                     // short; lf-ops-props r4b: arrays_groups independent L fell from 4 problems in 2 columns to 3 in 1, a 31 %
                     // band beside each array)
-                    const cMin = divFactsPlainSection(s) || noStretchPage(best) ? c0 : 1;
+                    // (nor a section whose footprints say `keepCols` - pv compare, lf-placevalue compare round: rows held to their ink; the spare
+                    // height stays under the grid)
+                    const keepCols = (best.items || []).length > 0 && best.items.every((it) => !!(it && it.keepCols));
+                    const cMin = divFactsPlainSection(s) || noStretchPage(best) || keepCols ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;

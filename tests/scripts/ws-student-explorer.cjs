@@ -21,14 +21,14 @@
 //   SEND     the Send link, opened in a fresh page, lands on "Practice set: 3 skills" with exactly those 3 (check D6)
 //   QUICKSTART  Add to Quick Start: every card shows the skill's full name (3 long names + both "Add within 20"),
 //            all card names distinct, title = full name; the selection chips carry the full name     (check D1)
-//   ROOM     at 390 x 844, 1366 x 768 and 820 x 1180 the chip rows (and a grade's area row) are one line and the list
+//   ROOM     at 820 x 1180 (the narrowest screen; owner 2026-11-13: no phone width) the chip rows (and a grade's area row) are one line and the list
 //            keeps >= 60 % of the height                                                     (check D4, r2 D3)
 //   PUPILNAME  pick "Subtract Within 5 with Pictures (Visual)" in the explorer: the selection chip, "Your skill:", the
 //            Quick Start card, a card saved earlier with the raw label, and the Print list all show the pupil name
 //            the explorer shows, and none says "(Visual)"                                       (check r2 D1)
 //   QSVISIBLE  the Quick Start hard set (both Add Fractions like-denominator variants, both Two-Step Then Multiply /
 //            Divide, the 10 longest pupil names, every pupil-name pair sharing a >= 20-character prefix): at 1366x768,
-//            820x1180 and 390x844 no two cards SHOW the same text inside their clamp; names >= 13 px; no sideways overflow
+//            1024x768 and 820x1180 no two cards SHOW the same text inside their clamp; names >= 13 px; no sideways overflow
 //                                                                                                (check r3 R1)
 //   SEARCHNAME every pupil name finds its own skill in the top 3; "numbers only" / "with pictures" / "like denominators"
 //            find every skill whose pupil name carries them                                     (check r3 R2)
@@ -41,15 +41,15 @@
 //            off the pointer and off the card (its tick), no sideways scroll, aria-describedby on the card; 340-480 px wide (r1 D1); mouse leave,
 //            Esc (the dialog stays; the next Esc closes it), a scroll of the list and a re-render each hide it.
 //            Keyboard: Tab onto a card shows it without moving focus; the first Esc hides it, blur hides it.
-//            Touch (390x844, hasTouch): a tap picks and no thumbnail appears, even on a mouse event.
+//            Touch (820x1180 tablet, hasTouch): a tap picks and no thumbnail appears, even on a mouse event.
 //            Sweep: every live skill (716) draws a cell or the text fallback, no throw, no console error, no answer.
 //            Legible (critic r1): TEXTSIZE (question line >= 14 px, no text < 10 px), SCALE (a drawn cell >= 0.6), INFRAME
 //            (nothing painted outside the frame), NODUP (the question once, normalised compare), NOTEACHER (no CCSS code, no
 //            Hint / Check control), NOEXTRA (no second answer line under an item's own blank): by real hover on the 13 skills
 //            the critic found worst (1366x768, 820x1180), then every live skill at the L and S plates (studentExplorerThumbBatch).
 //   KEYS     Esc closes; arrow keys move between the tabs
-//   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 820 / 390
-//   NOSCROLL no horizontal scroll at 390 (the page and the explorer panel)
+//   TARGETS  every control in the explorer and the Explore button >= 44 x 44 at 1366 / 1024 / 820
+//   NOSCROLL no horizontal scroll at 1366 / 1024 / 820 (the page and the explorer panel)
 //   CONSOLE  no console errors or page errors
 //
 //   node tests/scripts/ws-student-explorer.cjs          prints ws-student-explorer: OK / FAIL
@@ -429,7 +429,7 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
         // QSVISIBLE (check r3 R1, root cause: the gate compared the FULL text, a clamp showed the same text for two
         // skills). The hard set goes onto Quick Start: both "Add Fractions (like denominators …)" variants, both Two-Step
         // "Then Multiply" / "Then Divide", the 10 longest pupil names, and every pupil-name pair that shares a long prefix
-        // (>= 20 characters), 16 cards to a grid. At 1366x768, 820x1180 and 390x844 it reads the text each card SHOWS
+        // (>= 20 characters), 16 cards to a grid. At 1366x768, 1024x768 and 820x1180 it reads the text each card SHOWS
         // (a character counts only when its box sits inside the box that clips it) and fails when two cards show the
         // same text. Names are >= 13 px and no card name overflows sideways.
         const QS_PREFIX = 20;
@@ -465,7 +465,7 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
         }, QS_PREFIX);
         if (hard.named.length !== 4) F(`QSVISIBLE the hard set found ${hard.named.length} of the 4 named skills (Add Fractions like denominators x2, Two-Step Then Multiply / Divide)`);
         const qsSaved = await page.evaluate(() => JSON.stringify(window.customQuickSkills || []));
-        for (const [w, h] of [[1366, 768], [1024, 768], [820, 1180], [390, 844], [360, 740]]) {
+        for (const [w, h] of [[1366, 768], [1024, 768], [820, 1180]]) {   // owner 2026-11-13: no phone width (was + 390, 360)
             await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
             await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
             await sleep(200);
@@ -1047,7 +1047,7 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
 
         if (process.env.MQX_TRACE) console.log('step', '// KEYS + TARGETS');
         // KEYS + TARGETS + NOSCROLL at each width
-        for (const [w, h] of [[1366, 900], [820, 1180], [390, 844]]) {
+        for (const [w, h] of [[1366, 900], [1024, 768], [820, 1180]]) {   // owner 2026-11-13: no phone width (was 390 x 844)
             await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
             await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.showView) window.showView('homeView'); });
             await sleep(250);
@@ -1070,8 +1070,8 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
                     panelW: panel.getBoundingClientRect().width };
             });
             if (t.small.length) F(`TARGETS @${w} ${t.small.length} controls under 44 px: ${t.small.slice(0, 4).join('; ')}`);
-            if (w === 390) {
-                // ROOM (check D4): on a phone the chips are one sideways-scrolling line and the list keeps >= 60 % of the height
+            if (w === 820) {
+                // ROOM (check D4; owner 2026-11-13: judged on the narrowest screen, the 820 tablet, not a phone) the chips are one sideways-scrolling line and the list keeps >= 60 % of the height
                 for (const view of [{ tab: 'area', domain: 'number_operations' }, { tab: 'area', domain: 'vocabulary' }, { tab: 'grade', grade: '3' }, { tab: 'grade', grade: 'M' }]) {
                     await page.evaluate((v) => window.openStudentExplorer(v), view);
                     await sleep(200);
@@ -1082,15 +1082,15 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
                         return { rowH: Math.round(row.getBoundingClientRect().height), lines: new Set(chips).size, body: Math.round(body.getBoundingClientRect().height), vh: window.innerHeight, onSeen: (() => { const on = row.querySelector('[aria-checked="true"]'); const a = on.getBoundingClientRect(), b = row.getBoundingClientRect(); return a.left >= b.left - 1 && a.right <= b.right + 1; })() };
                     });
                     const what = view.tab === 'area' ? `By area ${view.domain}` : `By grade ${view.grade}`;
-                    if (room.lines > 1) F(`ROOM @390 ${what}: the chips wrap onto ${room.lines} lines (${room.rowH} px)`);
-                    if (!room.onSeen) F(`ROOM @390 ${what}: the chosen chip is scrolled out of sight`);
-                    if (room.body < 0.6 * room.vh) F(`ROOM @390 ${what}: the list gets ${room.body} of ${room.vh} px (${Math.round(100 * room.body / room.vh)} %, want >= 60 %)`);
+                    if (room.lines > 1) F(`ROOM @${w} ${what}: the chips wrap onto ${room.lines} lines (${room.rowH} px)`);
+                    if (!room.onSeen) F(`ROOM @${w} ${what}: the chosen chip is scrolled out of sight`);
+                    if (room.body < 0.6 * room.vh) F(`ROOM @${w} ${what}: the list gets ${room.body} of ${room.vh} px (${Math.round(100 * room.body / room.vh)} %, want >= 60 %)`);
                 }
                 await page.evaluate(() => window.openStudentExplorer({ tab: 'grade', grade: '2' }));
                 await sleep(200);
             }
             if (t.docX > 0 || t.panelX > 0 || t.bodyX > 0) F(`NOSCROLL @${w} horizontal overflow (page ${t.docX}, panel ${t.panelX}, list ${t.bodyX})`);
-            if (SHOTS && (w === 1366 || w === 390)) {
+            if (SHOTS && (w === 1366 || w === 820)) {
                 await sleep(900);
                 await page.screenshot({ path: path.join(SHOTS, `explorer-by-grade-${w}.png`) });
                 await page.evaluate(() => window.openStudentExplorer({ tab: 'area', domain: 'number_operations' }));
@@ -1113,19 +1113,19 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
             });
             if (k.sel !== 'area' || k.foc !== 'area') F(`KEYS @${w} ArrowRight on "By grade" gives ${k.sel} (focus ${k.foc})`);
             if (!k.closed) F(`KEYS @${w} Esc does not close the explorer`);
-            if (SHOTS && (w === 1366 || w === 390)) {
+            if (SHOTS && (w === 1366 || w === 820)) {
                 await page.evaluate(() => { const r = document.getElementById('studentSelActions'); r.scrollIntoView({ block: 'center' }); });
                 await sleep(300);
                 await page.screenshot({ path: path.join(SHOTS, `home-bottom-row-${w}.png`) });
             }
         }
         const homeX = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        if (homeX > 0) F(`NOSCROLL @390 the pupil home scrolls sideways by ${homeX}px`);
+        if (homeX > 0) F(`NOSCROLL @820 the pupil home scrolls sideways by ${homeX}px`);
 
         if (process.env.MQX_TRACE) console.log('step', '// THUMB touch');
-        // THUMB touch: at 390x844 with touch emulation (hover: none), no hover thumbnail ever appears; a tap still picks
+        // THUMB touch: at 820x1180 (the tablet; owner 2026-11-13, no phone width) with touch emulation (hover: none), no hover thumbnail ever appears; a tap still picks
         {
-            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true });   // reloads the page
+            await page.setViewport({ width: 820, height: 1180, deviceScaleFactor: 1, isMobile: true, hasTouch: true });   // reloads the page
             await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS && !!window.openStudentExplorer, { timeout: 30000 });
             await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); if (window.state) { window.state.isPlaying = false; window.state.isMixedMode = false; } if (window.showView) window.showView('homeView'); window.UnifiedSkills.clear(); });
             await sleep(300);
@@ -1133,20 +1133,20 @@ const { installThumbMeasure, thumbFaults, POINTING } = require('../lib/ws-thumb-
             await page.waitForFunction(() => { const r = document.getElementById('studentExplorer'); return r && !r.hidden && r.querySelectorAll('.mqx-card').length > 0; }, { timeout: 20000 });
             await sleep(400);
             const media = await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-hover: hover)').matches);
-            if (!media) F('THUMB @390 touch emulation does not report (pointer: coarse) without hover: the touch check cannot judge');
+            if (!media) F('THUMB @820 touch emulation does not report (pointer: coarse) without hover: the touch check cannot judge');
             const pt = await page.evaluate(() => { const c = document.querySelector('#mqxBody .mqx-card'); const b = c.getBoundingClientRect(); return { x: Math.round(b.left + b.width * 0.4), y: Math.round(b.top + b.height / 2), key: c.dataset.key }; });
             await page.touchscreen.tap(pt.x, pt.y);
             await sleep(1100);
             const t1 = await page.evaluate((k) => ({ st: window.studentExplorerState().thumb, picked: document.querySelector(`#mqxBody .mqx-card[data-key="${k}"]`).getAttribute('aria-pressed') }), pt.key);
-            if (t1.st.open || t1.st.pending) F('THUMB @390 touch: a tap on a card opens a hover thumbnail');
-            if (t1.picked !== 'true') F('THUMB @390 touch: a tap no longer picks the skill');
+            if (t1.st.open || t1.st.pending) F('THUMB @820 touch: a tap on a card opens a hover thumbnail');
+            if (t1.picked !== 'true') F('THUMB @820 touch: a tap no longer picks the skill');
             await page.mouse.move(pt.x + 5, pt.y + 5);   // even a mouse event on a hover-less screen shows none
             await sleep(1100);
             const t2 = await page.evaluate(() => window.studentExplorerState().thumb);
-            if (t2.open || t2.pending) F('THUMB @390 touch: a hover thumbnail appears on a hover-less screen');
+            if (t2.open || t2.pending) F('THUMB @820 touch: a hover thumbnail appears on a hover-less screen');
             const tx = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            if (tx > 0) F(`THUMB @390 touch: the page scrolls sideways by ${tx}px`);
-            if (SHOTS) await page.screenshot({ path: path.join(SHOTS, 'explorer-thumb-none-390.png') });
+            if (tx > 0) F(`THUMB @820 touch: the page scrolls sideways by ${tx}px`);
+            if (SHOTS) await page.screenshot({ path: path.join(SHOTS, 'explorer-thumb-none-820.png') });
             await page.evaluate(() => { window.closeStudentExplorer && window.closeStudentExplorer(); window.UnifiedSkills.clear(); });
         }
 

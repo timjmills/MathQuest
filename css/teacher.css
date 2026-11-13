@@ -946,6 +946,11 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 /* Checker 2026-10-30: inset is measured from the padding box of the bordered 28 px button, so -8px gave 42 px. */
 .tv-sko .sko-tip::after { inset: -9px; }
 
+/* critic-panel-r3 P1 (additive): `.sko-has-tip > .sko-tip { position: static !important }` (ui-components.css) left the
+   "?" button's 44 px ::after hit area above with the whole option row as its containing block, so every click or tap on
+   a tick box, All / None or a select in that row opened the tip. The button is its own containing block again. */
+.tv-sko .sko-has-tip > .sko-tip { position: relative !important; }
+
 /* ---- Lesson parts table (lane lf-partopts step A, design/partopts/DESIGN.md §1.1-1.2; fix round A2): additive classes only ----
    In a section column (phone, tablet) each part is one compact row - tick, name, New numbers; the stepper and its range
    under the name - separated by rules, no nested card (critic A r1 F5). At 1000 px and wider the Lesson sections' Parts sit

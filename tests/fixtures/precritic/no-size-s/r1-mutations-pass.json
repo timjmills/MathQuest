@@ -1,0 +1,5 @@
+[
+ {"kind": "app", "file": "js/modules/simple-print.js", "line": "const SIZES = [['L', 'Big'], ['M', 'Medium']];", "why": "the live picker list"},
+ {"kind": "app", "file": "js/modules/teacher-ui.js", "line": "        size: offeredSize(d.size, 'L'),", "why": "the live restore"},
+ {"kind": "doc", "file": "design/audit/LESSONS_LEARNED.md", "line": "1. Rendered at **M and L** (owner 2026-11-13: size S is dropped): independent, guided, test, error-analysis + keys; card at", "why": "the live PRE-FLIGHT line"}
+]

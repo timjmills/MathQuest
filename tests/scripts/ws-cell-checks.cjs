@@ -44,7 +44,7 @@ const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', '
 // (an explicit --rules list stays the list: a backtest row proves one rule alone)
 if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
 const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
-const SIZES = list(arg('size', 'S,M,L'));
+const SIZES = list(arg('size', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 // the titles a signed card decided ({skill, opts, iCan, source}); the TITLE rule holds the page to them
 const DECIDED = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e) { try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e2) { return []; } } })();
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));

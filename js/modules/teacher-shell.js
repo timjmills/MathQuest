@@ -1012,7 +1012,7 @@ function renderSettings(el) {
     <section class="tv-card" aria-labelledby="tvPrintDefH">
       <h2 class="tv-h2" id="tvPrintDefH">Printing defaults</h2>
       <div class="tv-fields-2">
-        <div><span class="tv-label">Size</span>${segBtns('Size', pd.size, [['S', 'S'], ['M', 'M'], ['L', 'L']])}</div>
+        <div><span class="tv-label">Size</span>${segBtns('Size', pd.size, [['M', 'M'], ['L', 'L']])}</div>
         <div><span class="tv-label">Paper</span>${segBtns('Paper', pd.paper, [['A4', 'A4'], ['Letter', 'Letter']])}</div>
       </div>
       <div class="tv-setting"><div><div class="tv-h3" id="tvPcL">Photocopy-safe shading</div><p class="tv-cap">Swaps grey for hatching so pages copy cleanly.</p></div>${sw('tvPhotocopy', pd.photocopySafe, 'tvPcL')}</div>

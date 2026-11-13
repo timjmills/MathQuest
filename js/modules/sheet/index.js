@@ -14,7 +14,7 @@
 export {
     INK, LESSON_ACCENT, STROKE, STROKE_WIDTHS, DASH, HATCH,
     PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, OFFERED_SIZES, offeredSize, COMPACT_LABEL,
     LOOKS, LOOK_IDS, DEFAULT_LOOK,
     FACT_TRACK_EM, FACT_TRACKS,
     MINUS, TIMES, DIV, opGlyph,
@@ -66,7 +66,7 @@ export {
     CONTRACT_MEMBERS, OPTIONAL_MEMBERS,
     INSTRUCTION_LIBRARY, JUDGE_LABELS, PRINT_VERBS, BANNED_INSTRUCTION_WORDS,
     instructionFor, instructionKeyOf, isLibraryInstruction, toScreenInstruction, lintInstruction,
-    registerSkill, getProvider, hasProvider, listProviders,
+    registerSkill, getProvider, hasProvider, listProviders, roleOptions,
     installDefaultAdapters, defaultAdapters, adaptersInstalled,
     QUALITY, coverageFor, summariseCoverage, worstOffenders,
 } from './contract.js';
