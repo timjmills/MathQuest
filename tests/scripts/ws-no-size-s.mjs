@@ -16,7 +16,7 @@
 //                or arg('sizes') || '<list>' default with S in it, a literal size list (['S', 'M', 'L'], ['L', 'S'], ...) that
 //                is not a validator (.includes / .indexOf right after it), a '--size(s)', '<list with S>' argument pair, or a
 //                shell line passing --size(s) with S.
-//   DOC          a LIVE instruction names S as a size to render or grade at: RUBRIC.md, the PRE-FLIGHT checklist of
+//   DOC          (with --docs: ws-precritic and deploy session 1 pass it) a LIVE instruction names S as a size to render or grade at: RUBRIC.md, the PRE-FLIGHT checklist of
 //                LESSONS_LEARNED.md, PAGE_TYPES.md's dialog rows (PT-DLG) and .claude/agents/*.md say "S and L", "S / M / L",
 //                "S, M and L" with no note that S was dropped (critic nos r1 F4; dated history rows elsewhere are records).
 // --browser (critic nos r1 F1): the behavioural gate - S seeded in every restore path reads M; every Size control offers
@@ -26,6 +26,7 @@
 // matches nothing FAILS too (a stale exemption).
 //
 //   node tests/scripts/ws-no-size-s.mjs                 # this tree
+//   node tests/scripts/ws-no-size-s.mjs --docs          # ... and the live instruction docs (DOC); precritic / deploy run this
 //   node tests/scripts/ws-no-size-s.mjs --root <dir>    # another checkout (ws-backtest commit-pair rows); MQ_ROOT works too
 //   node tests/scripts/ws-no-size-s.mjs --self-test     # the line rules on planted text
 //   /tmp/mq-browser-run.sh node tests/scripts/ws-no-size-s.mjs --browser [--root <dir>]   # the behavioural gate
@@ -269,7 +270,7 @@ async function main() {
     if (existsSync(join(ROOT, 'index.html'))) scan(join(ROOT, 'index.html'), appLineFindings);
     const gateFiles = [...walk(join(ROOT, 'tests/scripts'), (n) => /\.(cjs|mjs|js|sh)$/.test(n) && n !== 'ws-no-size-s.mjs'), ...walk(join(ROOT, 'tests/lib'), (n) => /\.(cjs|mjs|js)$/.test(n))];
     for (const f of gateFiles) scan(f, gateLineFindings);
-    for (const d of docTexts()) for (const [n, t] of d.lines) for (const f of docLineFindings(t)) {
+    if (args.includes('--docs')) for (const d of docTexts()) for (const [n, t] of d.lines) for (const f of docLineFindings(t)) {
         const a = ALLOW.findIndex((x) => x.file === d.file && (x.has === '*' || t.includes(x.has)));
         if (a >= 0) { used.add(a); continue; }
         findings.push({ file: d.file, line: n, rule: f.rule, msg: f.msg });

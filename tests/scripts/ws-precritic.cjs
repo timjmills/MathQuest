@@ -1207,7 +1207,7 @@ function buildPlan(ctx) {
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
     // owner 2026-11-13 (CLAUDE.md plan item 9: two print sizes, M and L; S dropped): no size picker offers S, no gate's default
     // run includes S, and the kit reads a stored S as M (node, < 1 s)
-    add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib', 'node', 'ws-no-size-s', []));
+    add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib, live instruction docs', 'node', 'ws-no-size-s', ['--docs'], { needFlags: ['docs'] }));
     // critic nos r1 F1/F2: the pattern guard missed a saved set / &set= link restoring S; the behavioural gate seeds S in every
     // restore path (stored defaults, sheet, simple print, saved set, &set= link, tray snapshot, quick print), opens every Size
     // control and asserts M, and checks the one compact layout's single label (browser, ~15 s)

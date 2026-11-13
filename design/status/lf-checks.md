@@ -480,3 +480,40 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   add_facts + combine at M and L OK; ws-backtest no-size-s-76bc and fact-cols-m-fixture PASS.
 - Open (not caused here): add_facts#lesson L-TOPSTART CL-4b 0 -> 32 against the M pin, identical on 76bc11c6 at S with the
   S pin (a lesson at S is the M page) - the precritic lesson-M row will show it until lf-ops / lf-engine fixes or re-pins it.
+
+### lf-tools-nos r2 (2026-11-13, Opus medium rebuild after critic r1 FAIL: C1 6, C2 6, C3 9, C4 7)
+Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
+- F1 (blocker) fixed: `applyPrintSettings` (saved set from the Library, tray snapshot / Undo, `&set=` link opened),
+  `decodeSetParam` (the link's imported set), the worksheet sheet's build request and the Library's set words all read the
+  size through `offeredSize`. Recent printouts (`buildAll`), the simple print / quick prints (`cleanPrint`), the stores and
+  Settings already did. Grep found no URL size parameter, no cookie size and no size in saved quizzes.
+- F2: `ws-no-size-s --browser` (new; ~15 s). It seeds S in 3 localStorage keys, a saved set, a `&set=` link and a quick
+  print, then calls `tvSheetPrint.set`. It then opens Settings, Library > My sets, the worksheet sheet, the Print screen and
+  the simple print (stored, and from a quick print). Each must read M, with no S option, M checked and no preview page at S.
+  On every ws-precritic run and in deploy session 1. Row `no-size-s-browser-c81` (FAIL 17, then OK).
+  The static guard now flags any S tuple list, a regex restore (`/^[SML]$/`, `/^(S|M|L)$/`) and a forced `'S'` (APP-FORCE).
+  Self-test: 30 lines, including the critic's mutations, which I also re-ran on a mutated copy (both FAIL now). Row
+  `no-size-s-r1-mutations` (fixture, via the new `--lines` mode).
+- F3, measured (buildSheet, count_by_tables onePage, forced to M on a scratch copy): A4 fits 12 rows on 1 page at 22 pt
+  with no slack. Letter fits 11 rows, so 2 pages plus a 2-page key. The rows do not fit at M on every paper, so per the
+  lead's ruling the layout stays compact for this ONE layout. The allow-list reason is "ruled exception (lead, owner
+  informed)".
+  - One label everywhere: `COMPACT_LABEL` = "Compact (12 tables on one page)" (sheet/tokens.js). It is used on the Print
+    screen Setup, in the section note, in the worksheet sheet's Size row and in the simple print.
+  - No M/L control is drawn for this layout. The option help says "compact layout", and `ONE_PAGE_WHY` now names the
+    option's real label ("All rows on one page").
+  - The browser gate's COMPACT checks: one label, no Size control, every radiogroup has exactly one checked, no "Small"
+    caption.
+  - For the lead: the owner may prefer M on A4 only (it fits), with compact on Letter.
+- F4: LESSONS_LEARNED PRE-FLIGHT 1-2 (M and L; card hosts 1280/820), the L1/L2/L25 rules, the template-first rule and the
+  family-round rule now say M and L. The same change was made in RUBRIC scope, PAGE_TYPES PT-DLG-5 / PT-CMP-4, EXTENSION_PLAYBOOK #27
+  and TEACHER_SCREENS. Dated history rows and the signed cards are kept as records. `ws-no-size-s --docs` (DOC) scans RUBRIC,
+  the PRE-FLIGHT section, the PT-DLG rows and .claude/agents; precritic and deploy pass `--docs`, so the old row
+  `no-size-s-76bc` stays valid. Row `no-size-s-docs-c81` (FAIL 4, then OK).
+- Verified:
+  - ws-no-size-s --docs OK, plus --self-test OK and --browser OK (41 checks).
+  - ws-backtest rows no-size-s-browser-c81 / -r1-mutations / -docs-c81 / -76bc all PASS (347 rows, none deleted).
+  - ws-precritic-plan OK; --checks-from-critics 104 pass / 24 exempt / 15 fail (the 15 are the same old rows, none dropped).
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK.
+  - node --check on every edited module.
+  - ws-node-lint FAIL 50, identical on the base.

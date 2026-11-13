@@ -6844,6 +6844,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "no-size-s-browser-c81",
+  "check": "ws-no-size-s --browser (critic nos r1 F1, blocker): S seeded in every restore path (stored print defaults, the worksheet sheet, the simple print, a saved set, a &set= share link, applyPrintSettings / a tray snapshot, a quick print) reads M; every drawn Size control offers M / L only with M checked; the Library labels a set saved at S as Size M; the one-page count-by sheet shows one label, Compact (12 tables on one page), with no unchecked M / L control; on every ws-precritic run and in deploy session 1",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s --browser STORE-* / SAVED-SET / SET-LINK / APPLY / PICKERS / PAGES / COMPACT",
+  "browser": true,
+  "fail": {
+   "commit": "c81e70178",
+   "state": "lf-tools-nos r1 head: applyPrintSettings copies a stored S raw (saved set, &set= link, tray), decodeSetParam keeps S, the Library says Size S, the worksheet sheet shows M / L with neither checked, and the one-page option draws an unchecked M / L radiogroup under \"Size fixed ... smaller digits\" and \"Small\" (17 findings)"
+  },
+  "pass": {
+   "commit": "6b59329af",
+   "state": "lf-tools-nos r2: offeredSize on every restore and display path; the compact one-page label everywhere"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-size-s-r1-mutations",
+  "check": "ws-no-size-s line rules (critic nos r1 F2 / F4): an S option list moved to its own const, a restore written as /^[SML]$/.test(...), and a live instruction (PRE-FLIGHT) that says \"S and L\" each FAIL the static guard",
+  "kind": "fixture",
+  "rule": "ws-no-size-s APP-PICKER (any S tuple list) / APP-RESTORE (regex) / DOC",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-fail.json",
+   "state": "the critic's two mutations that passed the r1 guard, and the PRE-FLIGHT line as it stood on c81e70178"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-pass.json",
+   "state": "the same three lines as they stand on lf-tools-nos r2"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-size-s-docs-c81",
+  "check": "ws-no-size-s DOC (critic nos r1 F4): RUBRIC, the LESSONS_LEARNED PRE-FLIGHT checklist, PAGE_TYPES PT-DLG rows and .claude/agents name no S size to render or grade at",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s DOC",
+  "browser": false,
+  "fail": {
+   "commit": "c81e70178",
+   "state": "PRE-FLIGHT items 1-2 \"at S and L\", RUBRIC scope \"S and L\", PT-DLG-5 \"S, M, L\" (4 findings)"
+  },
+  "pass": {
+   "commit": "6b59329af",
+   "state": "M and L, with the date S was dropped"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
