@@ -48,3 +48,20 @@ approved sibling:
 Lesson gates: `ws-lesson-baseline --all-lessons --check` against master's 1556 hashes: OK, every live packet identical.
 g1-oa1-bar-model-wp-20 `--check` FAIL E9 / E35, identical on master (`logs/detailed-…-check-MASTER.log`); `--repeats` OK;
 g3-oa8-two-step-wp `--check` and `--repeats` OK.
+
+## Fix round 2 (2026-11-13, after critic r1 FAIL)
+
+Correction to e41d271a6: its message called the g3-oa8 lesson-baseline difference a "possible flake". It was not a flake:
+lf-engine traced it to this branch (the step-wise bar-big / bar-diff slots and `columnPanel` in lesson-arch/story.js, through
+which g3-oa8's chart panels draw).
+
+**g3-oa8 decision (lead ruling).** On the r2 head merged with master the pages no longer differ, so neither an intended-change
+re-pin nor a gate is needed:
+- `detailed/g3-oa8-two-step-wp` p06, p09 and the pack html at seeds 4242 and 1: byte-identical page bodies, master
+  1db0e3309 vs branch 4ca9dfd47 (`ws-detailed-lesson --seed 4242 / 1`, every `.ws-page` compared; scratchpad g3m-* / g3b-*).
+- `ws-lesson-baseline --all-lessons --check` against a fresh master baseline (114ee8e0b, `logs/r2/lesson-baseline-master.json`):
+  1596 of 1596 hashes identical on the branch merged with master (`logs/r2/lesson-baseline-check.log`). The unmerged branch
+  differed in 756 hashes, all master drift since the merge base; no g3-oa8 page among them (`logs/r2/lesson-baseline-check-unmerged.log`).
+- No re-pin; nothing for critic r2's g3-oa8 scope.
+
+**r2 gate logs:** `logs/r2/` (pc-final.log = precritic --strict on the 7 skills; its bulky pc/ output stays in the scratchpad).
