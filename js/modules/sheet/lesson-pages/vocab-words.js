@@ -106,7 +106,9 @@ export const VOCAB_SETS = Object.freeze([
         words: ['rule', 'first term', 'ones digit', 'term', 'repeat', 'output'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],
         // (r9, critic r7 #6: equation gave way to total: factor, product and unknown each draw a number sentence ("=", V-AMBIG+); edited in place, the set keeps its position - V7)
-        words: ['times as many', 'total', 'factor', 'compare', 'product', 'unknown'] },
+        // (r10, critic r9 #4: total's 5 + 3 bar is ADDITIVE part-whole, wrong for a 4.OA.A.1 core trio - total gave way to multiple;
+        // trios {times as many, factor, product} / {compare, multiple, unknown}; edited in place, the set keeps its position - V7, V-FIT)
+        words: ['times as many', 'factor', 'product', 'compare', 'multiple', 'unknown'] },
     { lesson: 'G4|-|multistepwordproblemsdivideandinterprettheremainder', title: 'Multi-step word problems: divide and interpret the remainder', grade: 4, round: 1, ccss: ['4.OA.A.3', '5.NBT.B.6'],
         words: ['remainder', 'quotient', 'divisor', 'dividend', 'round up', 'equation'] },
 ]);
