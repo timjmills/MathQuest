@@ -202,7 +202,10 @@ export function stateItems(example, data) {
     // `chartWide` chart draws it - is measured too, so chartPage can lay the four steps one under the other, the drawing
     // enlarged to the full width (PT-ANC-1's poster exception, 1.6 x at most as on the 2 x 2), when the 2 x 2 leaves the
     // page under its floor: never a smaller drawing and never a panel stretched past a quarter.)
-    const rowTwins = variant === 'col' && groups.length >= 4 && !(data && data.chartWide)
+    // only a ONE-LINE drawing (a fact / div form) gets row twins (lf-partopts critic r3 P4); a multi-line drawing fills its
+    // 2 x 2 panel and keeps it, so no twin is measured and its lesson prints byte-identical.
+    const factLine = !!(example && example.q && (example.q.divForm || (example.q.cell && example.q.cell.payload && example.q.cell.payload.fact)));
+    const rowTwins = factLine && variant === 'col' && groups.length >= 4 && !(data && data.chartWide)
         ? groups.map((g, k) => Object.assign({}, base, { lessonStateRow: k, cellCls: 'mq-cstatecell mq-cstate-colcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 } }, panelOf(g, k, 'col'))) : [];
     const draws = groups.map((g, k) => Object.assign({}, base, {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
@@ -429,7 +432,11 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     // row's width - provided the rows hold the drawing at least as large as the 2 x 2 did and fill the page better. Rows are
     // measured (`rowTwins`), grown a quarter at most like the panels, never stretched.
     let rowsMode = null;
-    if (mode === 'one' && !fallback && !tailItem && rowTwins.length === n && n >= 4) {
+    // (lf-partopts critic r3 P4 is a ONE-LINE drawing: div_facts' "120 / 12 = __". Rows mode is for that class only - a
+    // chart whose step drawing is a single short line (a fact or a div form). A multi-line drawing (a regroup stack, a bar
+    // model, a place-value chart) fills its 2 x 2 panel, so it keeps the 2 x 2 and every such lesson prints byte-identical.)
+    const factLine = !!(example && example.q && (example.q.divForm || (example.q.cell && example.q.cell.payload && example.q.cell.payload.fact)));
+    if (factLine && mode === 'one' && !fallback && !tailItem && rowTwins.length === n && n >= 4) {
         const fixedH = m.say + chantH + 2;
         const rowH2 = Math.max(H(z), Math.min(availP / lay.rows, H(z) * 1.25));
         const fill2 = (lay.rows * rowH2 + fixedH) / m.body;
