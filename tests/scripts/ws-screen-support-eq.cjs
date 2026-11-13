@@ -18,6 +18,9 @@
 //   ARRAY-CAPTION        (facts card §5.10, lead ruling C) an array's caption (its aria-label, what is read out) names the
 //                        rows x columns DRAWN (the dots' distinct rows and columns); a × array is drawn the smaller factor's
 //                        rows of the larger and its caption names the fact it supports ("3 rows of 7, for 7 × 3").
+//   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
+//                        with a zero factor (4 × 0, 0 × n) the short empty landscape frame, as 0 ÷ n does (no dots, at
+//                        most half as tall as wide) - never nothing, so no row is sized round an absent array.
 // ARRAY-ORIENT, ARRAY-DOT-MIN and ARRAY-CAPTION judge every dot array a support draws: the ÷ framed array and the × array.
 //
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
@@ -87,6 +90,17 @@ function captionFinding(id, arr, item) {
     }
     return null;
 }
+/** FRAME: an array-support fact cell draws an array or frame; a × zero fact the short empty frame. */
+function frameFinding(id, sup, item) {
+    if (id !== 'array' || !item) return null;
+    const arr = sup && sup.arr;
+    if (!arr) return `${id}: ${item.a} ${item.op} ${item.b} draws no array or frame`;
+    if (item.op === '×' && (item.a === 0 || item.b === 0)) {
+        if (arr.dots) return `${id}: ${item.a} × ${item.b} frame holds ${arr.dots} dots (want the empty frame)`;
+        if (!(arr.hPx > 0 && arr.hPx <= arr.wPx / 2 + 0.5)) return `${id}: ${item.a} × ${item.b} frame ${arr.wPx.toFixed(0)} x ${arr.hPx.toFixed(0)} px is not a short landscape frame`;
+    }
+    return null;
+}
 /** PLACE: one place across a worksheet's cards. */
 function placeFinding(id, places) {
     const set = [...new Set(places.filter(Boolean))];
@@ -118,6 +132,10 @@ function selfTest() {
     eq('cue small (D3)', !!cueFinding('skip', 0.38, 0.20), true);
     eq('cue ok', cueFinding('skip', 0.38, 0.36), null);
     eq('place mixed (D4)', !!placeFinding('touch', ['under', 'beside', 'beside']), true);
+    eq('frame missing × 0', !!frameFinding('array', {}, { a: 4, b: 0, op: '×' }), true);
+    eq('frame empty short × 0', frameFinding('array', { arr: { dots: 0, wPx: 60, hPx: 12 } }, { a: 4, b: 0, op: '×' }), null);
+    eq('frame tall × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('frame other support', frameFinding('touch', {}, { a: 4, b: 0, op: '×' }), null);
     eq('place one', placeFinding('touch', ['beside', 'beside', null]), null);
     for (const b of bad) console.log('  ' + b);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
@@ -202,7 +220,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -241,9 +259,13 @@ function readCellsInPage({ sel, cellSel }) {
                 };
                 const paper = await paperAt('M');
                 // ARRAY-ORIENT on paper: the Independent page at S, M and L
-                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION')) && sup === 'array') {
+                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME')) && sup === 'array') {
                     for (const size of ['S', 'M', 'L']) {
                         const pr = size === 'M' ? paper : await paperAt(size);
+                        if (ONLY.includes('FRAME')) for (const c of (pr.cells || []).filter((x) => x.item)) {
+                            const f = frameFinding(sup, c.sups[sup], c.item);
+                            if (f) findings.push(`ARRAY-FRAME ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
                         for (const c of (pr.cells || []).filter((x) => x.item && x.sups[sup])) {
                             const f = ONLY.includes('ORIENT') ? orientFinding(sup, c.sups[sup].arr, c.item) : null;
                             if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
@@ -263,9 +285,13 @@ function readCellsInPage({ sel, cellSel }) {
                 // the card: the zero item (0 ÷ n) first when the set deals one, then two more
                 const cardItems = await page.evaluate(({ cat, skill, opts }) => {
                     const qs = []; let zero = null;
+                    // (the dealt question is kept and rendered as dealt: a dealer that avoids repeats does not deal the same
+                    // item twice for one seed, so re-generating seed 10 drew 11 x 10 where the scan had found 0 - ARRAY-FRAME)
+                    window.__sseqQs = {};
                     for (let s = 1; s <= 200 && (!zero || qs.length < 2); s++) {
                         const q = window.generateQuestionFor({ category: cat, skill, opts, seed: s });
                         if (!q) continue;
+                        window.__sseqQs[s] = q;
                         if (Number(q.ans) === 0 && !zero) zero = s; else if (qs.length < 2) qs.push(s);
                     }
                     return [zero, ...qs].filter(Boolean);
@@ -276,7 +302,7 @@ function readCellsInPage({ sel, cellSel }) {
                         const ok = await page.evaluate(({ cat, skill, opts, seed }) => {
                             const st = window.state; st.category = cat; st.skill = skill; st.gameMode = 'practice'; st.isMixedMode = false;
                             window.showView('gameView');
-                            const q = window.generateQuestionFor({ category: cat, skill, opts, seed });
+                            const q = (window.__sseqQs && window.__sseqQs[seed]) || window.generateQuestionFor({ category: cat, skill, opts, seed });
                             st.currentQ = q; window.renderQuestion(); return !!q;
                         }, { cat, skill, opts, seed });
                         if (!ok) continue;
@@ -295,7 +321,7 @@ function readCellsInPage({ sel, cellSel }) {
                 const quizOk = await page.evaluate(({ cat, skill, opts, seeds }) => {
                     try {
                         const questions = seeds.map((seed, i) => {
-                            const q = window.generateQuestionFor({ category: cat, skill, opts, seed });
+                            const q = (window.__sseqQs && window.__sseqQs[seed]) || window.generateQuestionFor({ category: cat, skill, opts, seed });
                             const qd = window.quizQuestionData(q);
                             return { id: i, skillId: skill, points: 1, questionData: qd };
                         });
@@ -323,6 +349,10 @@ function readCellsInPage({ sel, cellSel }) {
                         if (ONLY.includes('EQ')) {
                             const f = eqFinding(sup, pSig, s ? s.sig : null, c.item);
                             if (f) findings.push(`SCREEN-SUPPORT-EQ ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
+                        if (ONLY.includes('FRAME')) {
+                            const f = frameFinding(sup, s, c.item);
+                            if (f) findings.push(`ARRAY-FRAME ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                         if (ONLY.includes('ORIENT') && s) {
                             const f = orientFinding(sup, s.arr, c.item);
@@ -361,4 +391,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding };
