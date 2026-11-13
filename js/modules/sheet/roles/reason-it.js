@@ -27,6 +27,8 @@ const ROWS = { S: 4, M: 3, L: 2 };
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
 
+const TRUE_W = new Set(['equation', 'stack', 'word-work']);
+
 export function prepare(it, info = {}) {
     const correct = answerOf(it);
     const wrong = correct ? wrongOf(it) : null;
@@ -44,17 +46,26 @@ export function prepare(it, info = {}) {
     // below, B under A, drawn as a half-page column so its unit word still sits beside the box; the story once on top)
     const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
     const sentence = it.template === 'word-work' && pl.layout === 'sentence';
+    // (a column story - word-work's default layout - prints its story once too: twice, in two half-width panels, the work
+    // ran out of the cell; word-stories critic r1 F2)
+    const column = it.template === 'word-work' && !pl.layout && !pl.pic;
     // (a sentence story prints ONCE, over both panels; each panel holds its number sentence only - critic r3 N12: a
     // panel that repeated the story held one item a page at L. `noFrame` + `bar: false`: the story with no work zone)
     // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
     // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
     const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
-    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence ? { payload: { noStory: true } } : {}));
-    const story = (c) => (sentence ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: { noFrame: true, bar: false } })}</div>` : '');
+    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
+    const story = (c) => (sentence || column ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: column ? { storyOnly: true } : { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
+    // (any template, lead ruling 2026-11-13: work wider than half the room stacks A over B, never shrinks - a word story's
+    // column work, 6-digit compare numbers; the skill's footprint carries its true width)
+    // `footprint.inkWMm` is a template's true work width (pv supplies it); equation / stack / word-work footprints are their
+    // true width already, other templates' wMm carries slack (a pv item at 70 mm fits a 62 mm panel)
+    const fp = it.footprint || {};
+    const workW = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : 0);
+    const wide = sentence || column || workW > (LIVE_W_MM - 52 - 10) / 2;
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)

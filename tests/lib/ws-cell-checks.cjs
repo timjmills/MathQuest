@@ -168,6 +168,15 @@ function cellChecksInPage(opts) {
                     }
                 });
             }
+            // ---- RI-DISTINCT (word-stories critic r1 F2, lead 2026-11-13): Reason It's A and B panels show DIFFERENT work - the
+            // same drawing in both (the template ignored the shown answer) asks the pupil to pick between two identical solutions
+            if (role === 'reason-it') {
+                var boxes = c.querySelectorAll('.mq-abbox');
+                if (boxes.length === 2) {
+                    var sig = function (b) { var k = b.cloneNode(true); [].forEach.call(k.querySelectorAll('.mq-abtag'), function (t) { t.remove(); }); return k.innerHTML.replace(/\s+/g, ' ').trim(); };
+                    if (sig(boxes[0]) === sig(boxes[1])) out.findings.push({ rule: 'RI-DISTINCT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': panels A and B show the same work (PT-RSN-4: two different worked solutions)' });
+                }
+            }
             // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
             // so the single grey never reads as "trace me"
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {

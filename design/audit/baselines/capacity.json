@@ -2594,5 +2594,35 @@
    "items": 18,
    "pages": 1
   }
+ },
+ "ruled": {
+  "subtraction:sub_100k_no_regroup reason-it L": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
+  },
+  "subtraction:sub_1m_no_regroup reason-it M": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 3 overflowed the cell)"
+  },
+  "subtraction:sub_1m_no_regroup reason-it L": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
+  },
+  "algebra:function_table_easy true-false L": {
+   "items": 2,
+   "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
+  },
+  "patterns:growing_shape_patterns review S": {
+   "items": 7,
+   "reason": "items taller than the page allows: Term 1-4 drawings (lead ruling 2026-11-13, critic r2/r3 N4: PT-REV-1's 8 cannot fit)"
+  },
+  "patterns:growing_shape_patterns review M": {
+   "items": 5,
+   "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
+  },
+  "patterns:growing_shape_patterns review L": {
+   "items": 5,
+   "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
+  }
  }
 }

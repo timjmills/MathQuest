@@ -147,6 +147,24 @@ const RUNNER_SRC = path.join(ROOT, 'tests', 'scripts', 'mq-browser-run.sh');
 const ROLE_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'role-sample.json');
 const PRINT_BASE = path.resolve(ROOT, arg('print-lint-baseline', 'design/audit/baselines/print-lint.json'));
 const sizeBase = (sz) => PRINT_BASE.replace(/\.json$/, `.${sz}.json`);
+// (an overflow finding in a gate's output: ws-cell-checks / ws-grade-render "leaves the cell", print-lint OVERFLOW, a ws-cell-checks
+// OVERFLOW count; a rule list that only names OVERFLOW as PASS / 0 is not one)
+function overflowOf(text) {
+    const lines = String(text || '').split('\n');
+    for (const l of lines) {
+        if (/leaves the (cell|page|frame)/i.test(l)) return l.trim().slice(0, 160);
+        if (/\bOVERFLOW\b/.test(l) && !/\bOVERFLOW\b[^\n]*\b(PASS|OK)\b|\bOVERFLOW\s*(:\s*)?0\b|OVERFLOW 0/.test(l) && /FAIL|\bOVERFLOW\s*[x(:]?\s*[1-9]|[1-9]\d*\s*OVERFLOW/.test(l)) return l.trim().slice(0, 160);
+    }
+    return '';
+}
+if (process.argv.includes('--overflow-self-test')) {
+    const cases = [['  FAIL OVERFLOW a:b reason-it L: page 1 cell 1: <div> leaves the cell', true], ['meta: mq-ww leaves the cell x2', true],
+        ['ws-cell-checks: FAIL - 14 finding(s) (OVERFLOW 14) on 24 page(s)', true], ['OVERFLOW  PASS', false], ['rules OVERFLOW,TAGINK: OK', false],
+        ['3 found, all pinned, 0 new', false], ['print-lint: OVERFLOW x2, OVERLAP x2', true]];
+    const bad = cases.filter(([t, want]) => !!overflowOf(t) !== want);
+    process.stdout.write(bad.length ? `ws-precritic --overflow-self-test: FAIL ${JSON.stringify(bad)}\n` : 'ws-precritic --overflow-self-test: OK\n');
+    process.exit(bad.length ? 1 : 0);
+}
 const pinnedIds = (file) => { try { return new Set(JSON.parse(fs.readFileSync(file, 'utf8')).documents.map((d) => d.id)); } catch (e) { return new Set(); } };
 // ws-options-verify's per-skill deadline (its default 60 s times out on add_facts, sub_facts and f_to_d in a cloud container,
 // 210 s together; lead 2026-10-23): 10 min a skill, overridable with MQ_OV_DEADLINE (ms).
@@ -1383,6 +1401,16 @@ async function main() {
         cmR.findings += `; ENGINE RED: every count of the ${cmR.meta.red} red row(s) is at or below the approved siblings (ws-sibling-compare, rule 0b), so non-blocking`;
     } else if (cmR && scR && cmR.result === 'FAIL' && cmR.meta && cmR.meta.red > 0 && scR.result === 'FAIL') {
         cmR.findings += '; the sibling comparison found counts above the approved siblings: NOT engine red (rule 0b)';
+    }
+
+    // OVERFLOW is never pinnable (lead 2026-11-13, word-stories critic r1 F2 / compare F1): ink that leaves its cell or page on
+    // a role the skill offers is a FAIL even when a baseline or an approved sibling carries it - "pre-existing" hid the Reason It
+    // column overflow for two rounds. A PASS (baseline) row whose output names an overflow turns FAIL.
+    for (const [id, r] of results) {
+        if (!r || r.result !== 'PASS (baseline)') continue;
+        const hit = overflowOf(`${r.findings || ''}\n${(r.detail || []).join('\n')}\n${r.out || ''}`);
+        if (hit) { r.result = 'FAIL'; r.findings = `${r.findings}; OVERFLOW IS NOT PINNABLE (lead 2026-11-13): ${hit}`; r.explainsExit = true; }
+        void id;
     }
 
     // ---- table
