@@ -367,7 +367,9 @@ function readCellsInPage({ sel, cellSel }) {
                     await sleep(400);
                     await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
                     await sleep(150);
-                    const cards = await page.evaluate(readAnswerPlaces);
+                    // (the ÷ sentence's rule, critic D7; + / − / × worksheets are the other lanes' and are not judged here)
+                    const cards = (await page.evaluate(readAnswerPlaces)).filter((c) => /divided by/.test(c.t || ''));
+                    if (!cards.length) continue;
                     renders++;
                     const f = answerPlaceFinding(sup || 'default', cards);
                     if (f) findings.push(`SCREEN-ANSWER-PLACE ${key} worksheet@${w}: ${f}`);

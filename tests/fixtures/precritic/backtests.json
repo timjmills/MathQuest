@@ -7327,6 +7327,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-answer-place-divfacts",
+  "check": "on one div_facts online worksheet every ÷ card puts its answer line in ONE place relative to its sentence (beside \"=\" or under it) and the kit cells are one height within 5 %, at 1366 / 1280 / 1024 / 820, the defaults and each support (critic divarray r2 D7: at 820 with the 48 px floor 1-digit dividends kept the line beside \"=\", 2-digit ones wrapped under, cells 212 / 255 / 269 px)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-ANSWER-PLACE",
+  "browser": true,
+  "fail": {
+   "commit": "62f5bec01",
+   "state": "lf-ops-divarray r2: 820 default places mixed (103 / 150 px), 820 array mixed (212 / 255 / 269 px), boxsign sign box wrapped above 108 ÷ 12 only (110 / 204 px)"
+  },
+  "pass": {
+   "commit": "441e10189",
+   "state": "one answer place and one sign-box place per sheet; one cell height per sheet"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sm-array-overflow-divfacts",
+  "check": "the div_facts Scripted Model with the array support on the 10s band (tables 2-5) overflows no cell at M or L, pupil page and key (critic divarray r2 D6: at L the third trace jot ran onto the cell rule, 16 overflow problems, with 25 % of the page free)",
+  "kind": "commit-pair",
+  "rule": "ws-grade-render --gate OVERFLOW (precritic render-gate-div_facts-sm-array)",
+  "browser": true,
+  "fail": {
+   "commit": "62f5bec01",
+   "state": "lf-ops-divarray r2: scripted-model L 32 overflow findings (mq-mjots ws-trace leaves the cell)"
+  },
+  "pass": {
+   "commit": "7bb99d3c1",
+   "state": "no overflow at M or L"
+  },
+  "command": "node tests/scripts/ws-grade-render.cjs --skills division:div_facts --roles scripted-model --size M,L --supports array --opts '{\"band\":100,\"constant\":[2,3,4,5]}' --gate --no-screen --out /tmp/mq-bt-sm-array",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
