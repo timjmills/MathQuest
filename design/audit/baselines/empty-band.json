@@ -25,7 +25,6 @@
   "addition:add_facts review S|EB-FOOT": 4,
   "addition:add_facts review M|EB-FOOT": 4,
   "addition:add_facts review L|EB-FOOT": 4,
-  "vocabulary:vocab_grade_pictures review L|EB-FOOT": 3,
   "addition:add_facts test M|EB-BAND": 16,
   "addition:add_facts test L|EB-BAND": 12,
   "addition:add_facts fact-probe S|EB-SIDE": 5,
@@ -92,7 +91,6 @@
  "skillNotes": {
   "division:div_facts": "lead ruling 2026-11-08: the lesson / opener / guided / fact-probe / scripted-model / mixed-practice rows (and reason-it L, stretch M / L, the same shared-role bands pinned on add_facts / mult_facts) are shared fact roles, graded in the facts-roles task, not the support-aid round; pinned at live master's counts (23 keys, 162 findings, identical on origin/master 5cbe360). Every other div_facts render must be clean; a rise or a new render FAILs. lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
   "addition:add_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
-  "multiplication:mult_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
-  "vocabulary:vocab_grade_pictures review L|EB-FOOT": "lf-vocab r15: deploy-base drift. The match3 cell at review L draws 57.7 mm of ink+pad against a 50 mm footprint (15 %). Identical on deployed master a3eb9d25; it was an unpaired NOTE (PASS) before the master EB-FOOT-pairing merge (data-eb-item, cell.js/grid.js) enabled index pairing and surfaced it. Not an r15 change (r15 touched the Match3 picture-order shuffle, the key underlay and the V23 pin only). Real match3 review-L footprint fix routed to the EB-FOOT/match3 owner."
+  "multiplication:mult_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles."
  }
 }

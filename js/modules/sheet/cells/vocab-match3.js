@@ -37,7 +37,9 @@ export const MATCH3_PIC_W = Object.freeze({ S: 38, M: 40, L: 40 });
 export const MATCH3_PIC_BOX = Object.freeze({ S: [43, 25.4], M: [45, 26.7], L: [45, 26.7] });   // (46 / 48 stuck out of the cell by 2.4-2.6 mm: precritic r4 slot-clip)
 
 /** The height a cell draws (mm) by size: the picture box, the letter-box row, the gaps and padding. */
-export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 46 });
+// (L 48, lf-vocab r16 item 7: the L work may grow to 50 mm in a taller row - review - so its footprint says 48 + pads, and the drawing
+// stays within 10 % of it with room to spare: EB-FOOT 15 % at the old 46 and the 52.7 mm cell)
+export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 48 });
 
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
@@ -106,7 +108,11 @@ register(MATCH3_TEMPLATE, {
         // (a practice page's cell: at least 44 mm and at most 48 mm, so a row a page stretches (mixed practice, review) keeps the
         // drawing within 10 % of its footprint and leaves under 30 % below it - ws-empty-band EB-FOOT / EB-BAND, r5; 48 mm
         // as a minimum pushed the lesson Warm-up 3.4 mm off its page)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:calc(48mm + max(0mm, (100% - 48mm) / 4));';
+        // (lf-vocab r16, item 7: a review row is 73 mm at L, and the work took a quarter of the extra - 52.7 mm of cell, 57.7 mm
+        // from the cell's top to its ink's bottom with the pad, against a 50 mm footprint, EB-FOOT 15 %. The work now stays at most
+        // 50 mm, at the top of a taller row - footprint L 48 + pads, so EB-FOOT holds with room, and the band under it stays under
+        // 30 % (28.5 % at review L); ws-empty-band EB-FOOT / EB-BAND)
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:50mm;';
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
