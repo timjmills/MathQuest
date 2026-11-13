@@ -3919,6 +3919,44 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "patterns-cells-g5-g6-g8",
+   "check": "ws-patterns-cells: the patterns cells against the page - LABEL-REF (Fix-it letters printed in the item), TILE-CARD (feature tiles at the card's 10 / 11.5 / 13 mm), ROW2-S (the growing 4-term row fits a two-across cell at S)",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells LABEL-REF / TILE-CARD / ROW2-S (lf-algebra critic r2 G5, G6, G8)",
+   "fail": {
+    "commit": "d20c8a003",
+    "state": "r9: pattern_features EA Fix-it offers A / B / C beside unlettered sentences; working tiles 9 x 8.5 mm at S; growing S one cell a row (2 + 2 wrap behind a fixed 6 mm keep-out)"
+   },
+   "pass": {
+    "commit": "5eb41b2a1",
+    "state": "r10: sentences lettered A / B / C (paper and screen), tiles 10 / 11.5 / 13 mm, keep-out clamped so S prints two across (10 a page)"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --skill patterns:pattern_features,patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "precritic-clean-list",
+   "check": "ws-precritic-clean: a lane's \"Clean for the critic\" list may name only pages with no open finding of the latest critic round and only print roles a print-lint row of that precritic run linted",
+   "kind": "fixture",
+   "rule": "ws-precritic-clean OPEN / LINT (lf-algebra critic r2 speed reflection, lead rule): precritic r9 listed npr card / worksheet clean while critic r1 F2 was open",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/precritic-clean.fail.md",
+    "state": "a clean list names the card and worksheet while the latest critic's F2 (screen train) is open and no Fixes section closes it"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/precritic-clean.pass.md",
+    "state": "F2 listed \"- F2 fixed\" under Fixes after critic r2, and every claimed print role has a print-lint row"
+   },
+   "command": "node tests/scripts/ws-precritic-clean.mjs --status {fixture} --skill patterns:number_patterns_rule",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
