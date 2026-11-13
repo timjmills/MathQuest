@@ -1744,7 +1744,16 @@ function _applyScreenCell() {
     // (.ws-card-visual) and the quiz's (.qt-cell) do - the kit template's kind, else 'legacy' - so every host check reads the
     // card (the mult_facts card drew none, and the card-host checks read nothing there). A kit twin that already draws its own
     // [data-ws-cell] cell (the words twin) keeps it as the card's cell.
-    if (!paper.querySelector('[data-ws-cell]')) paper.setAttribute('data-ws-cell', kind ? kind.kind : 'legacy');
+    // lf-hosts critic r2 F3: the label is the kind the quiz stamps on the same item (quiz-take.js: 'msc' for a "Click ALL" item,
+    // else the kit template's kind for ANY answer type), so the card and the quiz agree; 'legacy' only where no template exists.
+    if (!paper.querySelector('[data-ws-cell]')) {
+        let label = kind ? kind.kind : null;
+        if (!label && q) {
+            if (q.answerType === 'multi-select-check' && Array.isArray(q.options) && q.options.length) label = 'msc';
+            else { try { const k2 = cellKindFor({ ...q, options: [] }); label = k2 && k2.kind ? k2.kind : null; } catch (e) { label = null; } }
+        }
+        paper.setAttribute('data-ws-cell', label || 'legacy');
+    }
     monoCell(paper, {
         afterInk: () => {
             const va = document.getElementById('visualAid');

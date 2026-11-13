@@ -20,9 +20,11 @@
 // card, the largest typed answer place, and the worst card's largest numeral. Against design/audit/baselines/worksheet-reflow.json:
 //   WS-REFLOW  the column count does not fall; the tallest card grows no more than 6 px; the largest answer place grows no
 //              more than 6 px in either direction (a layout change that should land is re-pinned with --pin, in the same change).
+//              (lf-hosts critic r2 F5) Nor does the tallest card or the largest answer place SHRINK by more than 6 px, the card
+//              width change by more than 6 px either way, or any card's height move by more than 6 px (card by card).
 //   WS-DIGIT   the worst card's numeral is not smaller than master's (0.5 px): a worksheet digit never falls below what master
 //              prints (the ruling's no-regression floor; the 29 px contract floor itself is ws-screen-ink-size TEXT-SIZE's and
-//              ws-screen-slots --screen-digit's).
+//              ws-screen-slots --screen-digit's). (r2 F5) Nor is ANY card's numeral smaller than that card's on master.
 // Prints one line per (skill, width) and `ws-worksheet-reflow: OK` / `FAIL - ...`; exit 1 on FAIL, 2 on a usage error.
 // A render that measured nothing (no grid, 0 cards) or a key missing from the baseline is a FAIL, never a pass.
 'use strict';
@@ -50,6 +52,20 @@ function judge(m, b) {
     if (m.cardH > b.cardH + TOL_H) out.push(`WS-REFLOW tallest card ${b.cardH} -> ${m.cardH} px (+${Math.round(m.cardH - b.cardH)}, want <= +${TOL_H})`);
     if (b.boxW && (m.boxW > b.boxW + TOL_H || m.boxH > b.boxH + TOL_H)) out.push(`WS-REFLOW largest answer place ${b.boxW} x ${b.boxH} -> ${m.boxW} x ${m.boxH} px (want <= +${TOL_H})`);
     if (b.digit && !(m.digit >= b.digit - TOL_D)) out.push(`WS-DIGIT worst card's numeral ${b.digit} -> ${m.digit} px (a worksheet digit never falls below master's)`);
+    // lf-hosts critic r2 F5: the ratchet caught growth only. A sheet that SHRINKS (a card or an answer place smaller than
+    // master's by more than the tolerance), a card WIDTH that changes either way, and a numeral that drops on ANY card (not
+    // only the worst card's) are findings too.
+    if (m.cardH < b.cardH - TOL_H) out.push(`WS-REFLOW tallest card ${b.cardH} -> ${m.cardH} px (${Math.round(m.cardH - b.cardH)}, want >= -${TOL_H}: the sheet shrank)`);
+    if (b.boxW && (m.boxW < b.boxW - TOL_H || m.boxH < b.boxH - TOL_H)) out.push(`WS-REFLOW largest answer place ${b.boxW} x ${b.boxH} -> ${m.boxW} x ${m.boxH} px (shrank; want >= -${TOL_H})`);
+    if (b.cardW && Math.abs(m.cardW - b.cardW) > TOL_H) out.push(`WS-REFLOW card width ${b.cardW} -> ${m.cardW} px (${m.cardW > b.cardW ? '+' : ''}${Math.round(m.cardW - b.cardW)}, want within ${TOL_H})`);
+    if (Array.isArray(b.cardHs) && Array.isArray(m.cardHs) && b.cardHs.length === m.cardHs.length) {
+        const moved = b.cardHs.map((h, i) => [i, h, m.cardHs[i]]).filter(([, h, x]) => Math.abs(x - h) > TOL_H);
+        if (moved.length) out.push(`WS-REFLOW ${moved.length} card(s) changed height by more than ${TOL_H} px: ${moved.slice(0, 3).map(([i, h, x]) => `card ${i + 1} ${h} -> ${x}`).join(', ')}`);
+    } else if (Array.isArray(b.cardHs) && m.cardHs && b.cardHs.length !== m.cardHs.length) out.push(`WS-REFLOW card count ${b.cardHs.length} -> ${m.cardHs.length}`);
+    if (Array.isArray(b.digits) && Array.isArray(m.digits) && b.digits.length === m.digits.length) {
+        const drop = b.digits.map((d, i) => [i, d, m.digits[i]]).filter(([, d, x]) => d > 0 && !(x >= d - TOL_D));
+        if (drop.length) out.push(`WS-DIGIT ${drop.length} card(s) print a smaller numeral than master's: ${drop.slice(0, 3).map(([i, d, x]) => `card ${i + 1} ${d} -> ${x} px`).join(', ')}`);
+    }
     return out;
 }
 
@@ -83,22 +99,30 @@ function MEASURE() {
         }
         return px;
     };
-    const ds = cards.map(digitOf).filter((x) => x > 0);
+    const perCard = cards.map(digitOf);
+    const ds = perCard.filter((x) => x > 0);
     const r1 = (x) => Math.round(x * 10) / 10;
-    return { cards: cards.length, cols, cardH: r1(cardH), cardW: r1(cardW), boxW: r1(boxW), boxH: r1(boxH), digit: ds.length ? r1(Math.min(...ds)) : 0 };
+    return { cards: cards.length, cols, cardH: r1(cardH), cardW: r1(cardW), boxW: r1(boxW), boxH: r1(boxH), digit: ds.length ? r1(Math.min(...ds)) : 0,
+        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1) };
 }
 
 function selfTest() {
-    const b = { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29 };
+    const b = { cols: 2, cardH: 300, cardW: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 290], digits: [29, 40] };
     const cases = [
         ['same layout', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29 }, []],
         ['r1 expand at 1280: 2 -> 1 column', { cols: 1, cardH: 300, boxW: 144, boxH: 192, digit: 29 }, [/columns 2 -> 1/]],
         ['r1 sub_100 answer box 144 x 192 -> 160 x 252', { cols: 2, cardH: 300, boxW: 160, boxH: 252, digit: 29 }, [/answer place/]],
         ['r1 fact card +28 px', { cols: 2, cardH: 328, boxW: 144, boxH: 192, digit: 29 }, [/tallest card/]],
         ['a card 4 px taller holds', { cols: 2, cardH: 304, boxW: 144, boxH: 192, digit: 29 }, []],
-        ['more columns hold', { cols: 3, cardH: 280, boxW: 144, boxH: 192, digit: 29 }, []],
+        ['more columns hold', { cols: 3, cardH: 300, boxW: 144, boxH: 192, digit: 29 }, []],
         ['a numeral under master\'s', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 24 }, [/WS-DIGIT/]],
         ['nothing measured', { error: '0 worksheet cards' }, [/nothing measured/]],
+        // lf-hosts critic r2 F5: shrinking, a card width change, a numeral drop on a card that is not the worst one
+        ['r2 F5 the tallest card shrinks 20 px', { cols: 2, cardH: 280, boxW: 144, boxH: 192, digit: 29 }, [/shrank/]],
+        ['r2 F5 the answer place shrinks to 120 x 150', { cols: 2, cardH: 300, boxW: 120, boxH: 150, digit: 29 }, [/answer place.*shrank/]],
+        ['r2 F5 the card width changes 300 -> 340', { cols: 2, cardH: 300, cardW: 340, boxW: 144, boxH: 192, digit: 29 }, [/card width 300 -> 340/]],
+        ['r2 F5 card 2 numeral 40 -> 32 (the worst card holds 29)', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 290], digits: [29, 32] }, [/WS-DIGIT 1 card\(s\).*card 2 40 -> 32/]],
+        ['r2 F5 card 2 shrinks 290 -> 250 (the tallest holds)', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 250], digits: [29, 40] }, [/card 2 290 -> 250/]],
     ];
     let bad = 0;
     for (const [name, m, want] of cases) {

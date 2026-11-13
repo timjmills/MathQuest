@@ -2142,3 +2142,22 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwcols:has(> * > .mq-wwans[data-mq-cell]) {
     column-gap: max(4px, var(--mq-wwgap, 0px)) !important;
 }
+
+/* lf-hosts critic r2 F1: the answer box's touch padding above (the input grows past the drawn box by --mq-tp on every side) sat
+   UNDER later boxes in paint order - a later grid / flex item (div.mq-wwstep, div.mq-wwcols.mq-wwdiv) painted over the padding
+   ring, so a real tap 1 px inside the touch area's top edge hit that container and the cell's click handler focused the ACTIVE
+   box instead (division box 1 -> box 0; add_wp_20 answer box bottom edge -> the working box). The input is lifted above its
+   neighbours in hit-testing order with position:relative + z-index (no offsets: the drawn box does not move). ADDITIVE.
+   The column work also sits in a sideways scroll wrapper (word-work.js: max-width:100%; overflow-x:auto, which makes
+   overflow-y auto too), whose edge is the drawn boxes' edge - so it CLIPPED the padding ring and its hit area: a tap 1 px
+   inside the touch area's top edge hit div.mq-wwstep and the cell's click handler focused the active box (division box 1 ->
+   box 0 at 820 and 1280). On a screen host that wrapper gets room for the ring as padding cancelled by an equal negative
+   margin (nothing drawn moves), and the input is lifted above later neighbours in hit-testing order (position:relative +
+   z-index, no offsets). ADDITIVE. ws-phone-card TOUCH-HIT (real page.mouse.click 1 px inside the edge midpoints and corners of
+   every typed box's touch area) is the check. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot {
+    position: relative !important; z-index: 2 !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
+    padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
+}

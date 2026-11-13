@@ -34,6 +34,14 @@
 //   FOCUS-RING in each [data-ws-cell] cell every focused answer place draws ONE ring, and every focused working box one ring
 //             (outline, else the first inset shadow; same colour and width), with contrast >= 3:1 against its fill (AX-6) (lf-hosts critic r1 F3: the focused answer box
 //             outlined in yellow #f2c200, 1.6:1, beside blue-ringed working boxes). Card and quiz.
+//   TOUCH-HIT  REAL taps (page.mouse.click, so the app's own click handlers run): for every visible typed box (answer places and
+//             working boxes) a tap 1 px inside each of its touch area's 4 edge midpoints and 4 corners must leave
+//             document.activeElement on THAT box (lf-hosts critic r2 F1: the word-work answer box's 48 px padding ring sat under a
+//             later div.mq-wwstep / div.mq-wwcols in paint order, so a tap 1 px inside its top edge hit the container and the
+//             cell's click handler focused the active box - division box 1 -> box 0 at 820 and 1280. TOUCH-UNIQUE missed it: it
+//             used elementFromPoint and skipped hits on elements that are not typed boxes). A rounded corner is probed 1 px
+//             inside the rounded edge on its diagonal (the box's own hit shape). Card, worksheet and quiz.
+//   --fixture FILE  the card checks (PROBE + the CELL-READ kind match) on a saved card page (backtest rows; lf-hosts r2 F3)
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
 //   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
 //             once per skill and width as well, and judged on CELL-READ and TOUCH-TARGET (CLIP-X / FOCUS are the card's).
@@ -193,11 +201,40 @@ function PROBE() {
     // card-host check reads nothing there (the r1 mult_facts card)
     const cellN = paper ? [paper, ...paper.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length : 0;
     if (!cellN) findings.push({ rule: 'CELL-READ', msg: paper ? '0 [data-ws-cell] cells on the card (#questionPaper): the card-host checks read nothing (screen parity with the worksheet and quiz)' : 'no #questionPaper on the card (0 cells read)' });
+    // CELL-READ (lf-hosts critic r2 F3): the host stamps a kind on any paper, so a cell must also hold something - a drawn mark
+    // (visible text, svg, img, canvas) or an answer slot - or it is read as empty, never a pass
+    if (cellN && window.CELL_EMPTY && window.CELL_EMPTY(paper)) findings.push({ rule: 'CELL-READ', msg: 'the card cell (#questionPaper [data-ws-cell]) holds no drawn mark and no answer slot (an empty cell that carries a kind)' });
     // TOUCH-TARGET (lf-checks queue 10)
     for (const t of TARGETS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
     // TOUCH-UNIQUE (lf-hosts critic r1 F4); FOCUS-RING (F3) moves the focus, so main() runs it after this probe
     if (window.UNIQUE) for (const t of window.UNIQUE('#questionCard')) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
+}
+
+/* In the page: CELL-READ's empty-cell test (lf-hosts critic r2 F3). A cell is empty when it holds no visible answer slot (input,
+   textarea, select, contenteditable, [data-ws-slot], [data-mq-cell]), no visible drawing (svg, img, canvas) and no visible text. */
+function CELL_EMPTY(cell) {
+    if (!cell) return true;
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    if (Array.from(cell.querySelectorAll('input:not([type=hidden]), textarea, select, [contenteditable="true"], [data-ws-slot], [data-mq-cell], svg, img, canvas')).some(vis)) return false;
+    return !String(cell.innerText || '').trim();
+}
+
+/* In the page (async): CELL-READ's kind match (lf-hosts critic r2 F3). The kind the QUIZ host stamps on this same item - its
+   own rule, quiz-take.js: 'msc' for a "Click ALL" item, else the kit template's kind (cellKindFor({...q, options: []})) - must
+   be a [data-ws-cell] kind of the card's cell. Uses the app's own screen-cell.js module instance (the URL it loaded). */
+async function CELL_KIND(modUrl) {
+    const q = window.state && window.state.currentQ;
+    const paper = document.getElementById('questionPaper');
+    if (!q || !paper) return null;
+    const url = modUrl || performance.getEntriesByType('resource').map((e) => e.name).find((n) => /\/js\/modules\/screen-cell\.js(\?|$)/.test(n));
+    if (!url) return 'screen-cell.js was not loaded: the kind match cannot be read';
+    const mod = await import(url);
+    const msc = q.answerType === 'multi-select-check' && Array.isArray(q.options) && q.options.length > 0;
+    const k = msc ? { kind: 'msc' } : mod.cellKindFor({ ...q, options: [] });
+    if (!k || !k.kind) return null;
+    const kinds = [paper, ...paper.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell')).map((e) => e.getAttribute('data-ws-cell'));
+    return kinds.includes(k.kind) ? null : `the card cell is labelled ${kinds.map((x) => `"${x}"`).join(', ') || 'nothing'}, the quiz labels this same item "${k.kind}" (the kit template's kind; screen parity)`;
 }
 
 /* In the page: TOUCH-TARGET (lf-checks queue 10; lf-builds word-stories critic F3, lead 2026-11-13: the practice card's
@@ -258,6 +295,59 @@ function UNIQUE(rootSel) {
     }
     scrollTo(sx, sy);
     return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
+}
+
+/* Node side: TOUCH-HIT (lf-hosts critic r2 F1). Real taps with page.mouse.click 1 px inside the 4 edge midpoints and 4 corners
+   of every visible typed box's touch area (its border box) under `rootSel`; each tap must leave document.activeElement on that
+   box. A box out of view is scrolled to the centre first; the focus is cleared before each tap. Returns one message per
+   (class, point, landed-on) group. */
+async function touchHit(page, rootSel) {
+    const n = await page.evaluate((sel) => {
+        const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
+        const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
+        const list = [];
+        for (const rt of document.querySelectorAll(sel)) for (const el of rt.querySelectorAll('input, textarea, [contenteditable="true"]')) {
+            if (el.tagName === 'INPUT' && SKIP.has((el.type || '').toLowerCase())) continue;
+            if (el.disabled || el.readOnly || !vis(el) || el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup')) continue;
+            if (!list.includes(el)) list.push(el);
+        }
+        window.__mqTouchHit = list;
+        return list.length;
+    }, rootSel);
+    const groups = new Map();
+    for (let i = 0; i < n; i++) {
+        for (const pt of ['top', 'bottom', 'left', 'right', 'top-left', 'top-right', 'bottom-left', 'bottom-right']) {
+            const xy = await page.evaluate((i, pt) => {
+                const el = window.__mqTouchHit[i];
+                if (!el || !el.isConnected) return null;
+                let r = el.getBoundingClientRect();
+                if (r.top < 2 || r.left < 2 || r.bottom > innerHeight - 2 || r.right > innerWidth - 2) { el.scrollIntoView({ block: 'center', inline: 'center' }); r = el.getBoundingClientRect(); }
+                if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+                // a corner of a rounded box is probed on its 45-degree diagonal 1 px inside the rounded edge (the box's own
+                // shape: the browser hit-tests the rounded border box), i.e. inset 1 + r(1 - 1/sqrt 2); a square corner at 1 px
+                let ci = 1;
+                if (pt.includes('-')) { const cs = getComputedStyle(el); const rad = parseFloat(cs[{ 'top-left': 'borderTopLeftRadius', 'top-right': 'borderTopRightRadius', 'bottom-left': 'borderBottomLeftRadius', 'bottom-right': 'borderBottomRightRadius' }[pt]]) || 0; const rr = /%/.test(cs.borderTopLeftRadius) ? Math.min(r.width, r.height) * rad / 100 : Math.min(rad, r.width / 2, r.height / 2); ci = 1 + Math.ceil(rr * (1 - Math.SQRT1_2)); }
+                const x = /left/.test(pt) ? r.left + ci : /right/.test(pt) ? r.right - ci : r.left + r.width / 2;
+                const y = /top/.test(pt) ? r.top + ci : /bottom/.test(pt) ? r.bottom - ci : r.top + r.height / 2;
+                return [x, y];
+            }, i, pt);
+            if (!xy) continue;
+            await page.mouse.click(xy[0], xy[1]);
+            const got = await page.evaluate((i) => {
+                const el = window.__mqTouchHit[i], a = document.activeElement, all = window.__mqTouchHit;
+                const cls = (e) => (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '');
+                if (a === el) return null;
+                const r = el.getBoundingClientRect();
+                const who = !a || a === document.body ? 'nothing (body)' : all.includes(a) ? `typed box ${all.indexOf(a)} (${a.tagName.toLowerCase()}${cls(a)})` : `${a.tagName.toLowerCase()}${cls(a)}`;
+                return [`${el.tagName.toLowerCase()}${cls(el)} ${Math.round(r.width)} x ${Math.round(r.height)} px (typed box ${i})`, who];
+            }, i);
+            if (!got) continue;
+            const k = `${got[0]}: a real tap 1 px inside its touch area's ${pt} ${pt.includes('-') ? 'corner' : 'edge'} focuses ${got[1]} (want that box)`;
+            groups.set(k, (groups.get(k) || 0) + 1);
+        }
+    }
+    await page.evaluate(() => { delete window.__mqTouchHit; });
+    return [...groups.entries()].map(([k, n]) => (n > 1 ? `${n} x ${k}` : k));
 }
 
 /* In the page: FOCUS-RING (lf-hosts critic r1 F3: the focused word-work answer box drew a yellow #f2c200 outline, about
@@ -329,6 +419,8 @@ function HOST_PROBE(host) {
     if (!cards.length) findings.push({ rule: 'CELL-READ', msg: `no ${sel} on the ${host} host (0 cells read)` });
     const bare = cards.filter((c) => ![c, ...c.querySelectorAll('[data-ws-cell]')].some((e) => e.hasAttribute('data-ws-cell') && vis(e)));
     if (bare.length) findings.push({ rule: 'CELL-READ', msg: `${bare.length} of ${cards.length} ${host} cell(s) carry no [data-ws-cell] (0 cells read there)` });
+    const empty = window.CELL_EMPTY ? cards.filter((c) => window.CELL_EMPTY(c)) : [];
+    if (empty.length) findings.push({ rule: 'CELL-READ', msg: `${empty.length} of ${cards.length} ${host} cell(s) hold no drawn mark and no answer slot (an empty cell that carries a kind)` });
     for (const t of TARGETS(sel)) findings.push({ rule: 'TOUCH-TARGET', msg: t });
     if (window.UNIQUE) for (const t of window.UNIQUE(sel)) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     return { cards: cards.length, findings };
@@ -337,11 +429,11 @@ function HOST_PROBE(host) {
 const FIXTURE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px;overflow:hidden}
 .ws-stack{display:grid;grid-template-columns:repeat(4,${variant === 'clip' ? '120px' : '48px'})}input.mq-digit{width:48px;height:48px;box-sizing:border-box}
 ${variant === 'small' ? 'input.mq-digit{width:40px;height:44px}' : ''}${variant === 'padded' ? 'input.mq-digit{width:48px;height:48px;padding:4px;margin:-4px;background-clip:content-box;border:0;box-shadow:inset 0 0 0 1px #000}' : ''}</style>
-<div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"${variant === 'nocell' ? '' : ' data-ws-cell="stack"'}><div class="ws-stack">
+<div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"${variant === 'nocell' ? '' : variant === 'empty' ? ' data-ws-cell="legacy" style="min-height:80px"' : ' data-ws-cell="stack"'}>${variant === 'empty' ? '<div class="ws-stack"></div>' : `<div class="ws-stack">
 <span>4</span><span>3</span><span>6</span><span>7</span>
 <input class="mq-digit" data-ws-slot="ans-3"><input class="mq-digit" data-ws-slot="ans-2"><input class="mq-digit" data-ws-slot="ans-1"><input class="mq-digit" data-ws-slot="ans-0">
-</div></div><button id="qcCheckBtn">Check</button></div>
-<script>document.querySelectorAll('input.mq-digit')[${variant === 'focus' ? 0 : 3}].focus()</script>`;
+</div>`}</div><button id="qcCheckBtn">Check</button></div>
+<script>{ const b = document.querySelectorAll('input.mq-digit')[${variant === 'focus' ? 0 : 3}]; if (b) b.focus(); }</script>`;
 // critic r6 D2: the legacy column twin (add_10k_regroup, sub_1m_regroup): data-col "<id>-ans-<i>" boxes left to right,
 // the focused one lifted 4 px by .mq-active-box. 'lifted' focuses the ones box (ok); 'lifted-tens' the tens box (FAIL).
 // pilot r1 D5: the r1 screen twin's boxes (input.mq-cellslot) carry no place, no data-col and no digit class; the
@@ -365,7 +457,7 @@ async function selfTest() {
     try {
         const page = await browser.newPage();
         await page.setViewport({ width: 390, height: 844 });
-        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
+        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
         const good = await run('good');
         if (good.findings.length || good.focus !== 'ok') fails.push(`good fixture: ${JSON.stringify(good)}`);
         const f = await run('focus');
@@ -375,6 +467,17 @@ async function selfTest() {
         // CELL-READ (lf-checks queue 20): the card's paper with no [data-ws-cell] is a finding
         const nc = await run('nocell');
         if (!nc.findings.some((x) => x.rule === 'CELL-READ')) fails.push(`card paper with no [data-ws-cell]: no CELL-READ finding (${JSON.stringify(nc.findings)})`);
+        // CELL-READ (lf-hosts critic r2 F3): a paper stamped with a kind but holding nothing is a finding (the host stamps
+        // 'legacy' on any paper, so the r1 check passed by construction); the same item labelled "legacy" on the card while the
+        // quiz labels it "fact" is a finding; labelled "fact" it is not
+        const em = await run('empty');
+        if (!em.findings.some((x) => x.rule === 'CELL-READ' && /no drawn mark and no answer slot/.test(x.msg))) fails.push(`card paper with a kind but nothing in it: a CELL-READ empty finding (${JSON.stringify(em.findings)})`);
+        const kmod = 'data:text/javascript,' + encodeURIComponent("export function cellKindFor(q) { return { kind: 'fact' }; }");
+        const kindOn = async (label) => { await page.setContent(`<div id="questionPaper" data-ws-cell="${label}"><span>3 x 4 =</span><input></div><script>window.state = { currentQ: { answerType: 'text', text: '3 x 4' } };</script>`); return page.evaluate(`(${CELL_KIND})(${JSON.stringify(kmod)})`); };
+        const kl = await kindOn('legacy');
+        if (!kl || !/labels this same item "fact"/.test(kl)) fails.push(`card "legacy", quiz "fact": a CELL-READ kind finding (${JSON.stringify(kl)})`);
+        const kf = await kindOn('fact');
+        if (kf) fails.push(`card "fact", quiz "fact": no CELL-READ kind finding (${JSON.stringify(kf)})`);
         // TOUCH-TARGET (lf-checks queue 10): 40 x 44 px answer boxes (word-stories F3) fail; a 40 px drawn box inside 48 px of
         // transparent padding passes
         const sm = await run('small');
@@ -385,13 +488,13 @@ async function selfTest() {
         await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
         const ht = await page.evaluate(TARGETS, '#h');
         if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
@@ -418,7 +521,7 @@ async function selfTest() {
         if (rb.length) fails.push(`one blue 4 px ring (inset shadow and outline): no FOCUS-RING finding (${JSON.stringify(rb)})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 15 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 18 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -442,8 +545,33 @@ const hostReady = (page, sel) => waitCells(page, sel);
 /** Two animation frames: layout and the late re-ink pass settle before the probe reads. */
 const settle = (page) => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 50)))));
 
+/* --fixture FILE (a backtest row's state, lf-hosts critic r2 F3): the card checks (PROBE, CELL-READ's kind match) on a saved
+   card page. The page sets window.__MQ_KIND_MOD to the module URL whose cellKindFor stands in for the app's (the quiz's rule). */
+async function fixtureRun(file) {
+    const puppeteer = require('puppeteer');
+    const { chromePath } = require('../lib/ws-harness.cjs');
+    const browser = await puppeteer.launch({ headless: 'new', executablePath: chromePath(), args: ['--no-sandbox'] });
+    let findings = [];
+    try {
+        const page = await browser.newPage();
+        await page.setViewport({ width: 820, height: 1180 });
+        await page.setContent(fs.readFileSync(path.resolve(file), 'utf8'));
+        await page.waitForFunction(() => document.readyState === 'complete');
+        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
+        const m = await page.evaluate(PROBE);
+        findings = m.findings;
+        const ck = await page.evaluate(`(${CELL_KIND})(window.__MQ_KIND_MOD)`);
+        if (ck) findings.push({ rule: 'CELL-READ', msg: ck });
+        if (ONLY.length) findings = findings.filter((f) => ONLY.includes(f.rule));
+    } finally { await browser.close(); }
+    for (const f of findings) say(`  ${path.basename(file)}: ${f.rule} ${f.msg}`);
+    say(findings.length ? `${TOOL}: FAIL - ${findings.length} finding(s) on fixture ${path.basename(file)}` : `${TOOL}: OK (fixture ${path.basename(file)})`);
+    process.exit(findings.length ? 1 : 0);
+}
+
 async function main() {
     if (has('self-test')) return selfTest();
+    if (has('fixture')) { ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean); return fixtureRun(arg('fixture')); }
     const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
     const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check']);
     for (let i = 0; i < argv.length; i++) {
@@ -501,10 +629,14 @@ async function main() {
                         await cardReady(page);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
                         m = await page.evaluate(PROBE);
                         // FOCUS-RING moves the focus, so it runs after PROBE (and puts it back)
                         if (!m.error) for (const t of await page.evaluate(() => window.RINGS('#questionCard'))) m.findings.push({ rule: 'FOCUS-RING', msg: t });
+                        // CELL-READ kind match (lf-hosts critic r2 F3)
+                        if (!m.error) { const ck = await page.evaluate(`(${CELL_KIND})()`); if (ck) m.findings.push({ rule: 'CELL-READ', msg: ck }); }
+                        // TOUCH-HIT (lf-hosts critic r2 F1): real taps; skipped when --only names other rules
+                        if (!m.error && (!ONLY.length || ONLY.includes('TOUCH-HIT'))) for (const t of await touchHit(page, '#questionCard')) m.findings.push({ rule: 'TOUCH-HIT', msg: t });
                         m = keep(m);
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
@@ -520,6 +652,9 @@ async function main() {
                 for (const host of HOSTS.filter((h) => h !== 'card')) {
                     const tag = `${label}${s} ${size.w}x${size.h} ${host}`;
                     let m;
+                    // lf-hosts critic r2 F4: a host that fails to render is retried ONCE (logged); a second failure is the finding
+                    for (let attempt = 1; attempt <= 2; attempt++) {
+                    m = undefined;
                     try {
                         await page.reload({ waitUntil: 'networkidle2' });
                         await page.waitForFunction(() => typeof window.initWorksheet === 'function' && !!window.SKILLS, { timeout: 30000 });
@@ -532,20 +667,35 @@ async function main() {
                                 const questions = [0, 1].map((i) => ({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i }))) }));
                                 const test = { id: null, name: 'Phone', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }], settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
                                 window.handleQuizURL(window.compressTestForURL(test));
-                                const nm = document.getElementById('qtStudentName'); nm.value = 'A'; nm.dispatchEvent(new Event('input'));
-                                window.startQuizTest(); return true;
+                                return true;
                             } catch (e) { return String((e && e.message) || e).slice(0, 160); }
                         }, c, k, host, hash(`${s}:phone:${host}`));
                         if (ok !== true) throw new Error(`the ${host} host did not render (${ok})`);
+                        // lf-hosts critic r2 F4: the quiz's start screen (#qtStudentName) mounts after handleQuizURL; starting before
+                        // it existed threw "Cannot set properties of null" (placevalue:expand quiz at 1366). Wait for it, then start.
+                        if (host === 'quiz') {
+                            await page.waitForFunction(() => !!document.getElementById('qtStudentName') && typeof window.startQuizTest === 'function', { timeout: 15000 });
+                            const st = await page.evaluate(() => { try { const nm = document.getElementById('qtStudentName'); nm.value = 'A'; nm.dispatchEvent(new Event('input')); window.startQuizTest(); return true; } catch (e) { return String((e && e.message) || e).slice(0, 160); } });
+                            if (st !== true) throw new Error(`the quiz did not start (${st})`);
+                            await page.waitForFunction(() => document.querySelectorAll('#quizTakeView .mq-qtpaper').length > 0, { timeout: 15000 });
+                        }
                         if (host === 'worksheet') await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 15000 }).catch(() => {});
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await hostReady(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper');
                         await settle(page);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`);
                         m = await page.evaluate(HOST_PROBE, host);
                         if (host === 'quiz') for (const t of await page.evaluate((sel) => window.RINGS(sel), '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'FOCUS-RING', msg: t });
+                        if (!ONLY.length || ONLY.includes('TOUCH-HIT')) for (const t of await touchHit(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'TOUCH-HIT', msg: t });
                         m = keep(m);
-                    } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
+                    } catch (e) {
+                        const errs = take();
+                        if (attempt === 1) { say(`${tag}: RETRY after a failed render (${e.message}; ${errs.length} page error(s) dropped with it)`); continue; }
+                        outFails.push(`${tag}: ERR ${e.message} (after 1 retry)`); say(`${tag}: ERR ${e.message} (after 1 retry)`); m = null;
+                    }
+                    break;
+                    }
+                    if (!m) continue;
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
                     hostRows.push({ skill: s, size: `${size.w}x${size.h}`, host, cards: m.cards, findings: m.findings });
