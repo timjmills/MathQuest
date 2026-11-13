@@ -7611,6 +7611,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-eb-side-plain",
+   "check": "ws-empty-band EB-SIDE: no full-width two-step cell keeps 30 % or more of its width empty beside its ink (multi_step_word_plain, independent / more-practice / test at M and L)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (lf-algebra precritic two-step r12: practice EB-SIDE 31-38 % on multi_step_word_plain M / L)",
+   "browser": true,
+   "fail": {
+    "commit": "dc4e6a990",
+    "state": "the two step columns (107-126 mm) left-packed in the 185 mm full-width cell: 57-70 mm empty on the right (31-38 %), 9 cells"
+   },
+   "pass": {
+    "commit": "344435351",
+    "state": "the two step columns centred under the story: two margins of 30-39 mm, each under 30 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:multi_step_word_plain --sizes M,L --roles independent,more-practice,test --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
