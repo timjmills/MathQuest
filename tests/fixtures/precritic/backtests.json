@@ -3300,6 +3300,127 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-ink-size-inkbox",
+  "check": "SIZE-WIDTH measures the drawing's INK (the union of its painted shapes), not its svg box (critic sis-r1 D1: a tall viewBox in a width:100% svg drew a centred strip and passed)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/strip-in-box.fail.html",
+   "state": "a 6 rows of 2 viewBox in a full-width svg 30 mm tall: the box is 182 mm wide, the ink a 10 x 30 mm strip"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "3 rows of 4 laid across, 24 x 18 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-sameitem",
+  "check": "SIZE-INK compares a screen item with ITS OWN print item (the same fact), never a median over the page (critic sis-r1 D2: a miss and a false alarm by construction)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/same-item-miss.fail.html",
+   "state": "print 2 x 3 at 4 mm and 10 x 10 at 1 mm dots; the screen 2 x 3 at 2.6 mm (65 % of its own item; the old page median 2.5 mm passed it)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/same-item-ok.pass.html",
+   "state": "the same print page; the screen 10 x 10 at 1 mm and the 2 x 3 at 4 mm, each at its own print size (the old median raised \"40 %\" on the 10 x 10)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-relabel",
+  "check": "a screen picture labelled differently from print is still judged, by geometry (the same marks, the same count) (critic sis-r1 D3: \"dots for 12\" at 50 % passed with a note)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.fail.html",
+   "state": "the screen \"dots for 12\" (print \"array, 3 rows of 4\"), 1 mm dots against 2 mm, no fact text to match the item"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.pass.html",
+   "state": "the same relabelled picture at 2 mm dots"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-noref",
+  "check": "a screen mark group with NO print counterpart FAILS as SIZE-REF, never a note only (critic sis-r1 D3)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/no-print-ref.fail.html",
+   "state": "the screen draws 5 tiles; paper holds only a 12-dot array"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array matches its print item"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-spacer",
+  "check": "an empty block (no ink) beside a drawing does not cut its cell's free width (critic sis-r1 D4: a flex:1 spacer read the free width as 20 mm of 181.5 mm)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.fail.html",
+   "state": "a 19 x 57 mm strip beside the fact and an empty flex:1 spacer (free width 141 mm, 12 %; the old reading 31 mm passed it at 61 %)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.pass.html",
+   "state": "the same cell and spacer, the array laid across 40 x 30 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-divfacts",
+  "check": "the owner's case on the real tree: division:div_facts screen arrays of small dots in tall strips (critic sis-r1 D6)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK + SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "commit": "73e96fc1",
+   "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
+   "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

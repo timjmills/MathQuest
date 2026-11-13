@@ -14,6 +14,9 @@
 //                dir; removed afterwards); the command runs from the CURRENT tree with {root} = that checkout and
 //                MQ_ROOT set to it, so the check under test is always today's script. A row with browser: true runs
 //                through /tmp/mq-browser-run.sh (the two-slot browser runner).
+//                A state of a commit-pair row may instead name a `fixture` (and its own `command`, default the row's):
+//                it runs on the current tree with {fixture} filled, for a real fail commit whose fix has not landed
+//                (the row's state text says why; ws-screen-ink-size D6).
 // A row with pending: true has no command yet; it is reported PENDING (never OK) and makes the run FAIL.
 // A state's result is the check's own last "name: OK" / "name: FAIL" line (else its exit code); a row PASSes when
 // its fail state gives the expected FAIL and its pass state the expected OK.
@@ -108,6 +111,7 @@ try {
         } else if (r.kind === 'commit-pair') {
             mkdirSync(tmpBase, { recursive: true });
             const state = (s, label) => {
+                if (!s.commit && s.fixture) return runCheck((s.command || r.command).replaceAll('{fixture}', isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture)), { browser: !!r.browser });
                 let dir;
                 try { dir = addWorktree(s.commit, tmpBase, `${r.id}-${label}`); } catch (e) { return { result: 'ERROR(checkout)', ms: 0, line: e.message }; }
                 made.push(dir);
