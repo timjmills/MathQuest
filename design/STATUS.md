@@ -834,3 +834,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - placevalue:compare passes the 8/10 redesign on every page type and screen host; also number_word_form (earlier pass), the pv debt fixes, the CL-2c / CL-4d / PT-ENG-6 rulings with their checks, identify-heads off on the Prerequisite Check, screen text sizes.
 - Lead fixes at the deploy merge: ws-pv-identify-heads defaults to M,L (no size S); ws-screen-ink-size kept as master's copy (w2 had carried an unchecked WIP copy with 390 lines); backtest row pv-screen-text-size set PENDING until lf-hosts lands TEXT-SIZE.
 - Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, roles-unit, empty-band self-test, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan (234) + checks-from-critics, capacity-pin (0 drops), lesson baseline M,L 4242,1 (1772 identical).
+
+## 2026-11-13 — Content hotfix P-WP-19: story pronouns agree with the name (lf-algebra)
+- Six story templates (tape_diagram, tape_diagram_plain, write_equation, write_equation_story, multi_step_word +/- path) now repeat the name instead of a fixed he / she. ws-story-pronouns on precritic (727 skills, 21,810 items OK); backtest story-pronouns-p-wp-19 PASS; lesson baseline 1772 identical.
+- ws-tape-diagram.mjs (unwired, defaulted to size S) left out of this deploy; lf-algebra brings it with M,L.
