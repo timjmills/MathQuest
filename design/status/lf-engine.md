@@ -9,6 +9,7 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+- QUEUED low priority after G7 (lead 16:58, lf-partopts sweep): placevalue:identify L lesson sheet (We Do off, rows 0) foot would hold another row at a 12.4 mm gap (> partopts' 12 mm margin) - fill the row or confirm the foot is under H13 / PAGEFILL. Same class as ROWFIT (queued for the live round): fold together.
 - BUDGET (lead 16:58, owner cap 70 % ≈ $1,960 this week): lf-engine allocation $280 above the session cost_usd baseline $777.61 → stop starting agents at $1,057.61. Checkpoint 16:58 UTC: $784.45 (+$6.84). Report spend each report; high effort on lesson design only.
 - 2026-11-13 ~16:00 UTC STOPPED: weekly usage limit hit (resets 2026-11-19 22:00 UTC). All work pushed. Resume points:
   - -pc @ 79ea333b8: round 6 (critic r5 R1-R5 + P1). Step 0 master merge done (dd2a4aff7); then a WIP mixed-practice.js commit (UNGATED, do not deploy). Next: checks first (PC-PV pattern on/off, PG-LR6/LR67 check-off all lessons, live PC-PVHEADS + value-slot instruction, part page-count vs pin, Mixed foot <= 15 %), fixes, live diff + re-pin, spread proof PNGs (Practice + Mixed per family, S and L - lead condition), then critic r6.
