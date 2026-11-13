@@ -6326,7 +6326,7 @@
   },
   {
    "id": "partopts-rowfit-bt-low",
-   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers placevalue:expand L Remember off, whose printed foot (31.1 mm) holds a whole row and its head (29.4 mm) at a plan gap of 10.2 mm (DESIGN §8d)",
+   "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers placevalue:value M We Do 1, whose printed foot (35.0 mm) holds a whole row and its head (33.7 mm) at a plan gap of 11.4 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from expand L Remember off, which master moved to 15.9 mm)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
@@ -6346,7 +6346,7 @@
   },
   {
    "id": "partopts-rowfit-bt-high",
-   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:value L rows 0, whose printed foot (33.2 mm) holds no row (47.1 mm needed) at a plan gap of 13.2 mm (DESIGN §8d)",
+   "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:combine L rows 0, whose printed foot (28.5 mm) holds no row (29.4 mm needed) at a plan gap of 13.5 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from value L rows 0, which master moved to 26.4 mm)",
    "kind": "fixture",
    "rule": "ws-partopts-unit ROWFIT-BT",
    "browser": true,
