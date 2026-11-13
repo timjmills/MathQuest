@@ -705,7 +705,27 @@ function pvRender(p, ctx0) {
     const h = pvRenderBody(p, ctx0);
     // (`noTabSpacer`, a detailed lesson's ref - cellPayload, 2026-11-08 ws-detailed-lesson E11 / E9c: its rows centre the equation
     // clear of the number tab, so the CL-40 top spacer of sheet-kit.css is left off - on the page and on the measuring cell alike)
-    return p.noTabSpacer ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
+    return p.noTabSpacer || compareClearOfTab(p, ctx0) ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
+}
+
+/**
+ * lf-placevalue compare r2 (pixel EB-BAND on the Guided rows; lead 2026-11-13: "the compare cell's measured height carries
+ * 6-7 mm of pad around a one-line compare"): the CL-40 top spacer keeps a cell's first line clear of its number tab. On a
+ * scaffolded page (Guided, Opener, Model: level 2-3) a compare line centred across a cell whose white each side is wider
+ * than the tab (9 mm: a two-digit tab and its keep-out) cannot meet the tab, so the spacer is left off - on the page and the
+ * measuring cell alike. The practice pages keep it (their rows are laid to the page fill, and the spacer is part of it).
+ */
+function compareClearOfTab(p, ctx) {
+    if (!p || p.kind !== 'compare' || p._marks || !ctx || ctx.mode === 'screen' || (Number(ctx.scaffoldLevel) || 0) < 2) return false;
+    const cols = Number(ctx.columns) || 0;
+    if (!cols) return false;
+    const size = ctx.size || 'M';
+    const em = (Number(ctx.metrics && ctx.metrics.digitPt) || { S: 16, M: 22, L: 28 }[size] || 22) * 25.4 / 72;
+    const txt = fmt(p.a) + fmt(p.b);
+    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + ({ S: 8, M: 10, L: 12 }[size] || 10);
+    const cell = 186 / cols - 1;
+    const gap = size === 'L' && cols >= 3 ? 3 : cols <= 2 ? Math.max(4, Math.min(10, (0.46 * cell - bare) / 2)) : 4;
+    return (cell - bare - 2 * gap) / 2 >= 9;
 }
 
 function pvRenderBody(p, ctx0) {
@@ -802,10 +822,17 @@ function pvRenderBody(p, ctx0) {
             }
             case 'compare': {
                 // (the gap between each number and the circle: 4 mm; lf-placevalue compare r2 - F9: three across at L the digits
-                // stood 4 mm from the cell rules, so 3 mm there; pixel EB-SIDE: a full-width row at L - band 9,999, one column -
-                // left 30.6 % each side of the ink, so 10 mm there, the problem spread over its row, never enlarged)
+                // stood 4 mm from the cell rules, so 3 mm there; pixel EB-SIDE: a row wider than its line - band 9,999 at L in one
+                // column, 30.6 % each side; the Guided page's two columns at S, 30.6 % - so on paper the gaps widen, up to 10 mm,
+                // until the line spans 46 % of its cell: the problem spread over its row, never enlarged)
                 const cols = Number(ctx.columns) || 0;
-                const gapMm = ctx.mode !== 'screen' && cols === 1 ? 10 : ctx.size === 'L' && cols >= 3 ? 3 : 4;
+                let gapMm = ctx.size === 'L' && cols >= 3 ? 3 : 4;
+                if (ctx.mode !== 'screen' && cols > 0 && cols <= 2) {
+                    const em = m.digitPt * 25.4 / 72;
+                    const txt = fmt(p.a) + fmt(p.b);
+                    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + ({ S: 8, M: 10, L: 12 }[ctx.size] || 10);
+                    gapMm = Math.max(gapMm, Math.min(10, Math.round(((0.46 * (186 / cols - 1) - bare) / 2) * 10) / 10));
+                }
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 // (lf-placevalue compare r2, critic r1 F2: a step state - stepState below, `_marks` - draws each step's own mark: the
                 // digit count over each number, the two deciding digits boxed, the bigger number underlined; the newest mark grey,
