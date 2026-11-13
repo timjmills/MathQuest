@@ -3359,6 +3359,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "roles-ri-band-passed",
+  "check": "Reason It cells on passed skills leave no empty band under short work (critic r1/r2 R11): the A/B block centres in the stretched cell",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND (RUBRIC H13)",
+  "browser": true,
+  "fail": {
+   "commit": "5947159d",
+   "state": "4 EB-BAND findings (value / unit_form Reason It)"
+  },
+  "pass": {
+   "commit": "ce4c3eed",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-list-rule-named",
+  "check": "a count row's rule part in a role's list frame is named ('Rule: add [ ] each time'), never a sixth unlabelled blank (critic r2 N1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LIST-HOMOGENEOUS",
+  "browser": false,
+  "fail": {
+   "commit": "c93de259",
+   "state": "6 findings"
+  },
+  "pass": {
+   "commit": "3df2b556",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-key-true-blank",
+  "check": "a True statement's key leaves the True or False? frame empty (PT-TOF-2; critic r1/r2 R5)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit KEY-TRUE-BLANK",
+  "browser": false,
+  "fail": {
+   "commit": "c93de259",
+   "state": "the key fills the frame"
+  },
+  "pass": {
+   "commit": "3df2b556",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEY-TRUE-BLANK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
