@@ -3,13 +3,17 @@
  "lanes": [
   {
    "lane": "lf-placevalue",
-   "why": "critic r1 (design/audit/runs/lf-placevalue/critic-r1.md section 5): F1 H13-ABS, F3 WRONG-FITS per slot, F7 SCREEN-DIGIT, F9 GRID-EVEN-ALL, F10 SLOT-W-EQUAL, F15 DRAW-CAP, F19 / F20 options-render bands; critic r2 (critic-r2.md): N1 WRONG-DIFFERS, N2 PRINTED-INSTRUCTION, N3 COMBINE-PARTS, N4 PLACE-WORD-LIVE (ws-providers-unit --pv-r2); critic r2 N5 options-render --band-h13 (H13-ABS judged absolutely on band pages), N6 ws-cell-checks --h13-abs (option pages), N7 H13-ABS / GRID-EVEN-ALL on the lesson and review rows (review rows added for the lane's skills: newRow), N8 ws-coverage-matrix --red-no-baseline PAGEFILL,H5; lead 2026-11-08: ws-detailed-lesson --check on every passed detailed lesson dealing a pv skill (lesson 1 --check and --repeats, lessons 3 / 5a / 5b / 6 --check); critic r3c E-A1: ws-empty-band --vocab-ink (EB-VOCAB, a lesson vocabulary picture drawn in under 70 % of its box); critic r4 E-r4-1: ws-empty-band --page-fill (EB-PAGE); critic r3b G5: ws-fixit-words (FIX-WORDS)",
+   "why": "critic r1 (design/audit/runs/lf-placevalue/critic-r1.md section 5): F1 H13-ABS, F3 WRONG-FITS per slot, F7 SCREEN-DIGIT, F9 GRID-EVEN-ALL, F10 SLOT-W-EQUAL, F15 DRAW-CAP, F19 / F20 options-render bands; critic r2 (critic-r2.md): N1 WRONG-DIFFERS, N2 PRINTED-INSTRUCTION, N3 COMBINE-PARTS, N4 PLACE-WORD-LIVE (ws-providers-unit --pv-r2); critic r2 N5 options-render --band-h13 (H13-ABS judged absolutely on band pages), N6 ws-cell-checks --h13-abs (option pages), N7 H13-ABS / GRID-EVEN-ALL on the lesson and review rows (review rows added for the lane's skills: newRow), N8 ws-coverage-matrix --red-no-baseline PAGEFILL,H5; lead 2026-11-08: ws-detailed-lesson --check on every passed detailed lesson dealing a pv skill (lesson 1 --check and --repeats, lessons 3 / 5a / 5b / 6 --check); critic r3c E-A1: ws-empty-band --vocab-ink (EB-VOCAB, a lesson vocabulary picture drawn in under 70 % of its box); critic r4 E-r4-1: ws-empty-band --page-fill (EB-PAGE); critic r3b G5: ws-fixit-words (FIX-WORDS); critic nwf r1 (critic-nwf1.md): N9 ws-empty-band --screen-parity (EB-PARITY), N2 / N4 / N5 / N7 / N8 ws-cell-checks --words-rules (CLAIM-INK, ROW-SLOT-Y, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK); N6 is ws-lesson-unit chant-box (always on)",
    "skills": [
     "placevalue:identify",
     "placevalue:value",
     "placevalue:combine",
     "placevalue:expand",
-    "placevalue:unit_form"
+    "placevalue:unit_form",
+    "composing:number_word_form",
+    "placevalue:compare",
+    "placevalue:more_less_10",
+    "placevalue:more_less_100"
    ],
    "gates": {
     "print-lint-kit": {
@@ -157,7 +161,8 @@
        "--lesson",
        "g2-nbt3-read-write-1000",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa5-mult-properties": {
@@ -169,7 +174,8 @@
        "--lesson",
        "g3-oa5-mult-properties",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa9-input-output-rule": {
@@ -181,7 +187,8 @@
        "--lesson",
        "g3-oa9-input-output-rule",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g3-oa9-mult-table-patterns": {
@@ -193,7 +200,8 @@
        "--lesson",
        "g3-oa9-mult-table-patterns",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g4-nbt1-ten-times-value": {
@@ -205,7 +213,8 @@
        "--lesson",
        "g4-nbt1-ten-times-value",
        "--check"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "detailed-g2-nbt3-read-write-1000-repeats": {
@@ -217,13 +226,15 @@
        "--lesson",
        "g2-nbt3-read-write-1000",
        "--repeats"
-      ]
+      ],
+      "parse": "detailedLesson"
      }
     },
     "empty-band": {
      "args": [
       "--vocab-ink",
-      "--page-fill"
+      "--page-fill",
+      "--screen-parity"
      ]
     },
     "fixit-words": {
@@ -232,6 +243,44 @@
       "script": "ws-fixit-words",
       "kind": "browser",
       "args": []
+     }
+    },
+    "words-checks": {
+     "newRow": {
+      "name": "ws-words-checks (opt-in lf-placevalue critic nwf r1 N1 / N3: named wrong answers on every band, true worked steps)",
+      "script": "ws-words-checks",
+      "kind": "node",
+      "args": []
+     }
+    },
+    "words-cells": {
+     "newRow": {
+      "name": "ws-cell-checks --words-rules (opt-in lf-placevalue critic nwf r1 N2 / N4 / N5 / N7 / N8: CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y on every card role and option value)",
+      "script": "ws-cell-checks",
+      "kind": "browser",
+      "args": [
+       "--card",
+       "--card-opts",
+       "--opt-roles",
+       "independent,true-false,guided,lesson,test,reason-it,error-analysis",
+       "--words-rules",
+       "--rules",
+       "CLAIM-INK,MODEL-ANSWER,WORDS-TEXT,WORDS-BREAK,ROW-SLOT-Y"
+      ]
+     }
+    },
+    "words-rowy-1000": {
+     "newRow": {
+      "name": "ws-cell-checks --words-rules at band 1,000 + zeroPlace always (opt-in lf-placevalue critic nwf r2 N10: 'one thousand' dealt, lesson rows judged)",
+      "script": "ws-cell-checks",
+      "kind": "browser",
+      "args": [
+       "--opts",
+       "{\"band\":1000,\"zeroPlace\":\"always\"}",
+       "--roles",
+       "independent,lesson,guided",
+       "--words-rules"
+      ]
      }
     }
    }
