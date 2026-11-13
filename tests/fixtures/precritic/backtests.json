@@ -3900,6 +3900,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "roles-fix-minimal",
+  "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit FIX-MINIMAL",
+  "browser": false,
+  "fail": {
+   "commit": "0e37c854",
+   "state": "'12, 15, 19, 22' kept (2 errors)"
+  },
+  "pass": {
+   "commit": "020cdba3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only FIX-MINIMAL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
