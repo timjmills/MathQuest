@@ -4975,7 +4975,7 @@ async function buildLesson(n, metaOf) {
         if (!sp || (sp.per === f.perPage && sp.pages === practicePages)) return r0;
         const withStrip = /data-mq-lesson-strip/.test(r0.pupilHtml);
         const k = sp.per;
-        const capSec = k >= f.perPage ? sec : facts ? Object.assign({}, sec, { pageCap: k, dense: { S: k, M: k, L: k } }) : Object.assign({}, sec, { pageCap: k });
+        const capSec = facts ? (k >= f.perPage ? sec : Object.assign({}, sec, { pageCap: k, dense: { S: k, M: k, L: k } })) : Object.assign({}, sec, { pageCap: k });
         const r = await buildSheetInner(practiceReq(sp.pages, withStrip, [k, f.cols], seed, capSec));
         // (a total that would not print as asked prints the standard pages)
         return r && r.pageCount === sp.pages && (r.items || []).length === pCap ? r : r0;
@@ -5022,7 +5022,7 @@ async function buildLesson(n, metaOf) {
         // each dealt avoiding the pages before it)
         const mN = po && po.mixed && Number.isFinite(po.mixed.n) ? po.mixed.n : null;
         const per = (res.items || []).length;
-        const mPages = mN && per ? Math.max(1, Math.min(3, Math.round(mN / per))) : 1;
+        const mPages = mN && per ? Math.max(1, Math.min(2, Math.round(mN / per))) : 1;
         const seen = (preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts).concat((res.items || []).map(refText));
         for (let k = 2; k <= mPages; k++) {
             const rk = await buildMixed((lessonPartSeed(n.seed, 'mixed') + 7919 * (k - 1)) >>> 0, (r) => Object.assign({}, r, { avoidTexts: seen.concat(Array.isArray(r.avoidTexts) ? r.avoidTexts : []) }), seen);
@@ -5143,7 +5143,7 @@ async function buildLesson(n, metaOf) {
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,
-            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk, weDoInk: teach.plan.meta.weDoInk } : null,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk } : null,
             // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
             // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
             partFit: (() => {
@@ -5161,7 +5161,7 @@ async function buildLesson(n, metaOf) {
                     wedo: of.wedo ? { fit: of.wedo.dflt, values: of.wedo.values, canOff: of.wedo.canOff } : null,
                     rows: of.rows ? { fit: of.rows.dflt, perRow: of.rows.perRow || 1, values: of.rows.values, canOff: of.rows.canOff } : null,
                     practice: practiceFit,
-                    mixed: mixedRes ? { count: (mixedRes.items || []).length } : null,
+                    mixed: mixedRes ? { count: (mixedRes.items || []).length, pages: Number(mixedRes.pageCount) || 1 } : null,
                 };
             })(),
             size,

@@ -62,18 +62,16 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
     // border in 3 columns) - fewer columns, never a cramped or shrunk problem.
     const cramped = (it, c) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm < CL8_MM; };
     const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)));
-    let ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
+    const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
     // (lf-partopts §8b: rows that appear in height the teacher freed keep each cell's ink at half its width or more - a 26 mm
-    // stack in a 62 mm cell left a 30 % side, EB-SIDE; more, narrower columns where they fit, else no extra row)
+    // stack in a 62 mm cell left a 30 % side, EB-SIDE; else no row - more, narrower columns put a fact 0.7 mm from its border)
     const pn0 = input.lesson && input.lesson.partN;
     const freed0 = !!pn0 && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn0[k] !== undefined);
     let inkShort = false;
     if (freed0) {
-        const inkOk = (c) => indepPool.slice(0, 6).every((it) => { const mm = it.measured && it.measured[c]; return !mm || !(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4); });
-        if (!inkOk(ic)) {
-            const c2 = [ic + 1, ic + 2, ic + 3].find((c) => c <= 4 && indepPool.slice(0, 6).every((it) => it.measured && it.measured[c] && it.measured[c].fits !== false) && !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)) && inkOk(c));
-            if (c2) ic = c2; else inkShort = true;
-        }
+        // (and 1.5 mm more than CL-8 from its sides: a fact the We Do band used to hold came 0.7 mm from its border, EB-EDGE)
+        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + 1.5)); });
+        if (!inkOk(ic)) inkShort = true;
     }
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
@@ -131,7 +129,9 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             const hTop = hRows(r);
             // The rows take the page's spare height (an Independent page's cells fill the grid,
             // PG-11), never more than half a cell again (H13: no cell mostly empty).
-            const cellH = Math.min(room / r, hTop * 1.15);
+            // (lf-partopts: on a sheet the teacher changed, the rows fill with whole rows, not taller cells - a grown one-number cell
+            // passed a 30 % band, div_facts; the standard sheet keeps its fill)
+            const cellH = Math.min(room / r, hTop * (freed ? 1.0 : 1.15));
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
                 content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),

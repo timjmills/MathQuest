@@ -64,7 +64,7 @@ async function unit() {
         for (const v of pl.values) { const sp = po.practiceSplit(v, pf); if (!sp || sp.pages * sp.per !== v || sp.per > 15 || sp.per < 12) F('PO-4', `practice ${v} splits as ${JSON.stringify(sp)}`); }
         if (JSON.stringify(po.normalizePartOpts({ practice: { n: 27 } }, { practice: pl })) !== JSON.stringify({ practice: { n: 24 } })) F('PO-4', 'practice 27 does not round to 24 (no page under half full)');
         const ml = po.partLimits('mixed', { fit: { mixed: { count: 12 } } });
-        if (JSON.stringify(ml.values) !== '[12,24,36]') F('PO-4', `mixed totals ${ml.values}`);
+        if (JSON.stringify(ml.values) !== '[12,24]') F('PO-4', `mixed totals ${ml.values}`);
         // a probed part: only its values; a tick that may not be cleared (the page would not fill) is dropped
         const wl = po.partLimits('wedo', { fit: { wedo: { fit: 3, values: [2, 3], canOff: false } } });
         if (JSON.stringify(po.offeredValues(wl)) !== '[2,3]' || Object.keys(po.normalizePartOpts({ wedo: { on: false } }, { wedo: wl })).length) F('PO-4', 'We Do values / canOff not honoured');

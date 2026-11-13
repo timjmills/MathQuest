@@ -188,7 +188,11 @@ export const sheetChanged = (partN) => !!partN && SHEET_PARTS.some((k) => partN[
 /** The fewest share of a sheet page its blocks must use (EB-PAGE: 30 % empty fails; the last of 2+ pages: H5, half used). */
 export const SHEET_FILL_MIN = 0.72;
 export const SHEET_LAST_FILL_MIN = 0.55;
+/** The most a changed sheet's We Do band may stand over its cells' content height (EB-BAND, div_facts at M and L). */
+export const WEDO_STRETCH_MAX = 1.3;
 const fillOk = (pl) => {
+    // (a We Do band stretched far past its cells' content - by the Steps beside it - leaves a 30 % band in its cells, H13)
+    if (pl && pl.meta && pl.meta.weDoStretch > WEDO_STRETCH_MAX) return false;
     const f = (pl && pl.meta && pl.meta.sheetFill) || [];
     return f.length > 0 && f.every((v, i) => v >= (f.length > 1 && i === f.length - 1 ? SHEET_LAST_FILL_MIN : SHEET_FILL_MIN));
 };
@@ -250,8 +254,9 @@ function sheetOffers(input) {
 
 /** The parts this role plans itself ('all' draws the chart and the sheet, as before). */
 const OWN_PARTS = new Set(['all', 'chart', 'sheet']);
-/** How far a band may grow (a share of its height) on a sheet whose parts the teacher changed (lf-partopts §8b). */
-export const SHEET_GROW_CAP = 0.2;
+/** How far a band may grow (a share of its height) on a sheet whose parts the teacher changed (lf-partopts §8b): not at all -
+ * the cells' own measured room is their room; the page fills with whole rows or the value is not offered. */
+export const SHEET_GROW_CAP = 0.1;
 
 /** A registered lesson part's plan: its pages in the lesson's frame (title, tab = the part's name, tags). */
 function partPlan(def, input) {
@@ -360,7 +365,7 @@ function planOnce(input = {}) {
         for (const [gi, g] of grows.entries()) {
             const cap00 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
             // (lf-partopts §8b: with the teacher's counts the height a band gave up goes first to more Independent rows
-            // (practice.js), then to roomier cells - by SHEET_GROW_CAP of a band at most, never into a 30 % empty band (H13);
+            // (practice.js), not to taller bands (SHEET_GROW_CAP 0: a band grown a tenth passed a 30 % empty band in div_facts' cells, H13);
             // a value whose sheet still cannot fill its page is not offered, sheetOffers. Absent: as before.)
             const cap0 = sheetChanged(lesson.partN) ? Math.min(cap00, SHEET_GROW_CAP) : cap00;
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
@@ -414,7 +419,7 @@ function planOnce(input = {}) {
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
             // (lf-partopts: each part's own fit before the teacher's counts - print-sheet.js reports it as res.lesson.partFit)
             // (lf-partopts: each sheet page's used share after the bands grew - sheetOffers reads it; We Do's ink check)
-            sheetFill: part === 'chart' ? [] : pages.map((pg) => +((pg.used + (pg.grown || 0)) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoInk: env.weDoInk,
+            sheetFill: part === 'chart' ? [] : pages.map((pg) => +((pg.used + (pg.grown || 0)) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoStretch: env.weDoStretch,
             partFit: { chart: chartDesigned, chartMin, wedo: env.weDoFit !== undefined ? env.weDoFit : weDo.length, wedoMin: env.weDoMin, rows: cur.indepFit ? cur.indepFit.rows : 0, perRow: cur.indepFit ? cur.indepFit.ic : 0, remember: lesson.partN && lesson.partN.remember === false ? !!(data && data.concepts && data.concepts[0]) : groups.some((g) => g.sections[0] && (g.sections[0].label === 'Remember:' || g.sections[0].label === 'Rule:')) },
             // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
             exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),

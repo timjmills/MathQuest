@@ -55,7 +55,7 @@ const int = (v) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : NaN);
 
 /** The most Practice pages (and Mixed pages) a total may take. */
 export const PRACTICE_MAX_PAGES = 5;
-export const MIXED_MAX_PAGES = 3;
+export const MIXED_MAX_PAGES = 2;
 
 /**
  * The totals a Practice part offers (DESIGN §8a): P pages (1 .. PRACTICE_MAX_PAGES) of k problems each, k whole rows from the
@@ -150,6 +150,8 @@ export function partLimits(part, ctx = {}) {
         case 'mixed': {
             const c = int(f.count);
             if (!(c >= 1)) return null;
+            // (a Mixed sheet that already runs onto a second page is not repeated: its count stays the sheet's)
+            if (int(f.pages) > 1) return out({ min: c, max: c, dflt: c, fixed: true, canOff: true, note: `Fixed: ${c} (the Mixed sheet's own pages)` });
             const vals = Array.from({ length: MIXED_MAX_PAGES }, (_, i) => c * (i + 1));
             return out({ min: c, max: vals[vals.length - 1], dflt: c, values: vals, step: c, perPage: c, total: true, canOff: true });
         }

@@ -211,6 +211,8 @@ function weDoBandOwn(env) {
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
     const weH = Math.max(gH, zH);
+    // (lf-partopts: how far the band stands over its cells' content - roles/lesson.js offers no changed sheet past WEDO_STRETCH_MAX)
+    if (wN !== null || (input.lesson && input.lesson.partN)) env.weDoStretch = gH > 0 ? +(weH / gH).toFixed(3) : 1;
     // Lessons r2 (H13): cells much shorter than the Steps list beside them (the add lesson: the
     // Steps panel 37-46 % empty at its foot), or a lesson whose Guided set names more cases than
     // fit beside the list (rounding: up, down, ends in 5), put the steps in a STRIP over the
@@ -268,7 +270,6 @@ function weDoBandOwn(env) {
         const lineW = (it) => (isRound(it) ? Math.max(28, Math.min(62, 186 / pc - 8)) : 0);
         const inkAt = (it) => { const ms = it.measured || {}; const c = [1, 2, 3, 4].find((x) => ms[x] && ms[x].inkMm > 0 && 186 / x - 4 <= W + 0.5) || 4; return Math.max(lineW(it), ms[c] && ms[c].inkMm > 0 ? ms[c].inkMm + (cue([it]) ? 10 : 0) : 0); };
         env.weDoSideOk = weDo.every((it) => inkAt(it) >= 0.5 * W);
-        env.weDoInk = weDo.map((it) => [inkAt(it), +W.toFixed(1), it.template, JSON.stringify(Object.fromEntries(Object.entries(it.measured || {}).map(([c, v]) => [c, v.inkMm])))]);
     }
     // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
     // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
