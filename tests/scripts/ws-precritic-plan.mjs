@@ -61,11 +61,21 @@ export function planHasLesson(planText, { lesson, mode }) {
     return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
 }
 
-/** The plan lines of a dry run that run `tool` on every skill of `skills` (and with --roles R when given). Pure. */
+// tools whose gate with NO --roles flag renders every offered role of the skill (ws-empty-band: "every offered role x
+// S/M/L + hosts"), so that line plans any one role R (lf-placevalue checks pass, 2026-11-13)
+const EVERY_ROLE_TOOLS = new Set(['ws-empty-band']);
+/** The plan lines of a dry run that run `tool` on every skill of `skills` (and with --roles R when given: R, or a comma
+ *  list of roles that holds R; a role list `a,b` needs every role planned). Pure. */
 export function planHas(planText, { tool, skills, roles }) {
-    return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
-        .filter((l) => skills.every((k) => l.includes(k) || l.includes(k.split(':')[1])))
-        .filter((l) => !roles || new RegExp(`--roles? ${roles}\\b`).test(l));
+    const lines = planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
+        .filter((l) => skills.every((k) => l.includes(k) || l.includes(k.split(':')[1])));
+    if (!roles) return lines;
+    const want = String(roles).split(',').filter(Boolean);
+    const covers = (l, r) => {
+        const m = /--roles?[ =]([^\s'"]+)/.exec(l);
+        return m ? m[1].split(',').includes(r) : EVERY_ROLE_TOOLS.has(tool);
+    };
+    return want.every((r) => lines.some((l) => covers(l, r))) ? lines.filter((l) => want.some((r) => covers(l, r))) : [];
 }
 
 function selfTest() {
@@ -83,6 +93,12 @@ function selfTest() {
     const lplan = '  [browser] x — tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --lp --out /tmp/x\n  [browser] y — node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --check --repeats --out /tmp/y';
     eq('lesson lp planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'lp' }).length, 1);
     eq('lesson sweep not planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'sweep' }).length, 0);
+    const eb = '  [browser] eb — node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --grid-foot\n  [browser] gf — node tests/scripts/ws-empty-band.cjs --roles independent,more-practice --sizes S --skills placevalue:compare';
+    eq('every-role empty-band line plans a role', planHas(eb, { tool: 'ws-empty-band', skills: ['placevalue:combine'], roles: 'test' }).length, 1);
+    eq('role list held by a planned list', planHas(eb, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'more-practice' }).length, 1);
+    eq('role list: a role the list lacks', planHas(eb, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'test' }).length, 0);
+    eq('no every-role reading for print-lint', planHas('  x — node tests/scripts/ws-print-lint.cjs --source kit --skills a:b', { tool: 'ws-print-lint', skills: ['a:b'], roles: 'test' }).length, 0);
+    eq('role list: every role needed', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson,test' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
@@ -125,11 +141,17 @@ else {
         const c = { ...c0, skills: c0.skills.filter((k) => live.has(k)) };
         if (!c.skills.length) { na.push(`${row.id} (not live here: ${gone.join(',')})`); continue; }
         checked++;
-        const role = c.roles && c.roles !== 'lesson' && c.roles !== 'independent' ? c.roles : null;
-        const p = plan(c.skills, role);
+        // a role list `--roles a,b` (precritic's --role takes ONE role): each role is planned on its own --role run and
+        // must be hit there (lesson / independent are on the plain --skill run)
+        const rlist = c.roles ? c.roles.split(',').filter(Boolean) : [];
+        const prs = (rlist.length ? rlist : [null]).map((r) => r && r !== 'lesson' && r !== 'independent' ? r : null);
+        const role = [...new Set(prs.filter(Boolean))].join(',') || null;
         const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
-        if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
-        let hit = planHas(p.text, c);
+        const parts = (rlist.length ? rlist : [null]).map((r, i) => ({ r, p: plan(c.skills, prs[i]) }));
+        const bad = parts.find((x) => !x.p.ok);
+        if (bad) { fails.push(`${row.id}: ${via} --dry-run failed: ${bad.p.text.trim().split('\n').slice(-1)[0]}`); continue; }
+        const p = parts[0].p;
+        let hit = parts.every((x) => planHas(x.p.text, { ...c, roles: x.r }).length) ? planHas(p.text, { ...c, roles: parts[0].r }) : [];
         // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
         // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
         const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);
@@ -154,7 +176,8 @@ else {
             console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
             if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
         }
-        const other = [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
+        // (a skill no opted-in lane names: another lane's own opt-in flags on its own skill are not this lane's leak)
+        const other = [...live].find((k) => !((optIn && optIn.lanes) || []).some((L) => (L.skills || []).includes(k)) && k.startsWith('addition:'));
         if (other) {
             checked++;
             const q = plan([other], null);
