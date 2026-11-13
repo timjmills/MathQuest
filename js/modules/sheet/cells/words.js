@@ -158,7 +158,9 @@ register('words', {
         // more rows instead of a 31-40 % band under every cell. A lesson ref may keep the old fill: cellPayload {inPlace: false}.)
         // (and its columns are capped by size - 4 / 3 / 3 at S / M / L: five across a 30-item S page left six rows for thirty
         // short cells, each stretched 31-37 % past its ink; more rows at the item's own height fill the page instead)
-        const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true };
+        // (`guidedTight`, lf-roles critic r8b D2: on the Guided page the rows keep their measured height - 35-50 % of every cell was
+        // empty under its line at M / L - and the spare height stays under the grid; read by the Guided role only)
+        const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true, guidedTight: true };
         // (critic nwf r1 band 20: the 21 names 0-20 cannot fill the S page's 4 x 7 - its rows were stretched 45 % past their ink;
         // three across x 7 rows holds all 21 at about the item's own height)
         const capCols = p.pool === 20 && ctx && ctx.size === 'S' ? 3 : (({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3);

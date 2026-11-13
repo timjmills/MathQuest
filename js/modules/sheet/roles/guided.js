@@ -578,6 +578,14 @@ const GUIDED_STRETCH = FILL_CAP;
  */
 const rowLimit = (m) => fillLimit(m);
 
+/**
+ * `tightRows` on the Guided page only (footprint `guidedTight`, lf-placevalue live1, lf-roles critic r8b D2): an in-place cell
+ * whose Guided rows are held to their measured height - the Model row to the taller of its work lines and the tries' hint - and
+ * the spare page height stays under the grid. number_word_form's rows were stretched to 35-50 % empty under the answer line;
+ * its other roles keep their own fill (layout.tightRows is read on every role).
+ */
+const guidedTight = (xs) => tightRows(xs) || (Array.isArray(xs) && xs.length > 0 && xs.every((it) => !!(it && it.footprint && it.footprint.guidedTight)));
+
 /** The least a grey hint under a first try (BD-7) adds to its row, in mm. */
 const HINT_MM = 8;
 
@@ -700,7 +708,11 @@ export function workLinesOf(it) {
     // A fact traces only its answer, so the skip count its Steps teach ("Count by 3, 7 times:
     // 3, 6, ... 21.") is written under the Model (critic guided-r1, mult_facts: a grey 21 alone
     // over tries hinted "10 × 9 is 10 groups of 9."). Other step templates trace their working.
-    if (stepTemplateOf(it)) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    // (a number name on its answer line - `words`, not in the H T O boxes - draws no step states of its own: its Model writes the
+    // first step under it, '"fifty-three": 5 tens, 3 ones.', as the hinted tries beside it write its frame - lf-roles critic r8b D2)
+    const wordsLine = it.template === 'words' && !((it.q && it.q.cell && it.q.cell.payload) || {}).slot && ((it.q && it.q.cell && it.q.cell.payload) || {}).way !== 'to_words';
+    if (stepTemplateOf(it) && !wordsLine) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    if (wordsLine) return steps.filter((t) => !/^Write\b/i.test(t)).slice(0, 1);
     const work = steps.filter((t) => !/^Write\b/i.test(t));
     return (work.length ? work : steps).slice(0, 3);
 }
@@ -782,8 +794,14 @@ function workLinesMm(lines, cols, m) {
     return n * lineMm + 4;
 }
 
-const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+/**
+ * A number name's work and hint lines keep each count with its place word on one line (lf-roles critic r8b n3: "3" at a line's
+ * end and "ones." on the next). `html` is escaped text, a gap already a span; only the `words` template's lines are glued.
+ */
+const gluePlaces = (html, it) => (it && it.template === 'words'
+    ? html.replace(/(\d+|<span class="mq-hintgap"[^>]*><\/span>) (thousands?|hundreds?|tens?|ones?)\b/g, '<span style="white-space:nowrap">$1 $2</span>') : html);
+const workHtml = (lines, it = null) => (lines.length
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${gluePlaces(esc(t), it)}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
@@ -953,7 +971,7 @@ function withCue(html, it, stage) {
  *   'blank'    every later row: structural supports only
  */
 function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
-    const work = stage === 'model' && lines ? workHtml(workLinesOf(it)) : '';
+    const work = stage === 'model' && lines ? workHtml(workLinesOf(it), it) : '';
     const cue = (html0) => {
         const html = stage === 'model' ? modelMarks(html0, it) : html0;
         return work ? `<div class="mq-workwrap">${withCue(html, it, stage)}${work}</div>` : withCue(html, it, stage);
@@ -963,7 +981,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
     const hintLine = stage === 'partial' && hint && it.template !== 'stack' ? hintOf(it) : '';
     // A framed hint's gap ("The short hand has passed ___.") is a short grey rule, never
     // underscore characters (SL-6).
-    const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
+    const hintHtml = gluePlaces(esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>'), it);
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
     return (c, o) => {
         if (c.state !== 'blank') {
@@ -1085,7 +1103,7 @@ export function plan(input = {}) {
         // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
         // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
         // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
-        const tightAdd = tightRows(use.slice(at, at + chunk.length));
+        const tightAdd = guidedTight(use.slice(at, at + chunk.length));
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
             : tightAdd && r === 0 && r === hintRow && !spanHere ? Math.max(pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
@@ -1105,7 +1123,7 @@ export function plan(input = {}) {
         // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
         // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
         // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
-        const tight = tightRows(host);
+        const tight = guidedTight(host);
         let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
         // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
