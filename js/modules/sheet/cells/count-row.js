@@ -203,7 +203,11 @@ function geomRaw(p, ctx) {
     let perRow = n;
     const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
     const pitch = sz.w + gap;
-    const fitN = Math.max(1, Math.floor((live - tab + gap) / pitch));
+    // (lane lf-ops for lf-algebra, 2026-11-07: a 'train' row in a cell narrower than the page - the Reason It page's A and B side by
+    // side - wraps to ITS cell's width, as wrapToCell rows do; it took the full 172 mm and overflowed at S, M and L)
+    const trainCols = look === 'train' && !isTwin(ctx) && Number(ctx && ctx.columns) > 1 ? Number(ctx.columns) : 1;
+    const liveT = trainCols > 1 ? Math.min(live, 186 / trainCols - 22) : live;   // a third of the row less its panel frame and pads
+    const fitN = Math.max(1, Math.floor((liveT - tab + gap) / pitch));
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
@@ -720,8 +724,10 @@ register('count-row', {
             const val = shown[k];
             const vInk = val !== '' ? ink : null;
             const rb = twinFloor(ctx, tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true }));
+            // (lane lf-ops for lf-algebra: in a narrow cell - a Reason It panel - the rule line wraps round its box, never past the cell)
+            const narrowRule = !isTwin(ctx) && Number(ctx && ctx.columns) > 1;
             ruleFrame = `<div class="k2-rulebox" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};margin-top:${L(ctx, 3)};`
-                + `font-size:${P(ctx, textPt(ctx))};font-weight:400;white-space:nowrap;">`
+                + `font-size:${P(ctx, textPt(ctx))};font-weight:400;${narrowRule ? 'flex-wrap:wrap;row-gap:1mm;max-width:100%;' : 'white-space:nowrap;'}">`
                 + `<span>${esc(p.ruleBox.pre || 'Rule:')}</span>${rb}${p.ruleBox.post ? `<span>${esc(p.ruleBox.post)}</span>` : ''}</div>`;
         }
         // screen only (critic r2 N1): how to move on between boxes - the caret never moves by itself
@@ -746,7 +752,9 @@ register('count-row', {
         return { value: parts.join(', '), display: parts.map(fmt).join(', '), slots };
     },
     footprint(p, ctx) {
-        const g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
+        let g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
+        // (lane lf-ops for lf-algebra: a 'train' row in a narrow cell wraps to it (geom), so its height is the wrapped one)
+        if (g.look === 'train' && Number(ctx && ctx.columns) > 1 && !isTwin(ctx)) { const gn = geom(p, ctx); g = Object.assign({}, g, { rows: gn.rows }); }
         const w = g.tab + g.perRow * g.pitch - g.gap + 4 + insetOf(ctx);
         const lg = lineGapOf(ctx, g);
         const h = g.rows * (g.arcH + (g.axisH || 0) + g.h + g.lblH) + (g.rows - 1) * lg + (g.tight && g.tabAbove ? tabLineH(g, ctx) + g.lblH + lg : 0) + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
