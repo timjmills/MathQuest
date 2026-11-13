@@ -6559,6 +6559,146 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-r6-pv-pattern",
+   "check": "On every lesson page (check off) a band of name-the-place items is never all one place and never strictly alternating",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PC-PV place pattern (near-twins placeRunBad); critic lf-engine-pc r5 R1",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "round L Mixed Place Value partner T O T O T O (seeds 1148, 1259)"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "mixed-practice placePick / placeOrder on a lesson Mixed band"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 8 --only round --sizes L --rules PC-PV",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-lr6-live",
+   "check": "With the Prerequisite Check OFF, every page of the round lesson (sheet, Practice, Mixed) keeps the one-number near-twin rules",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PG-LR6 unforced; critic lf-engine-pc r5 R2",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "live round sheet 96 / 95 / 99, 100 x 3; Practice 3 in the 20s, 60 x 3; Mixed 35 / 34 / 39"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "pageRules on live Practice / Mixed, nearRules on the live sheet"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 8 --only round --sizes L --rules PG-LR6",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-lr67-live",
+   "check": "With the check OFF, a subtraction lesson's Mixed page keeps LR-6 (no near twins, no answer twice) on its own items",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PG-LR67 on --all-lessons; critic lf-engine-pc r5 R2 / R4",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "sub_50_no_regroup L Mixed 47 - 16 / 28 - 16, 44 - 23 / 46 - 24; sub_100_no_regroup L 90 - 40 / 93 - 41"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "pageRules (lessonRules caps) on the live lead"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --all-lessons --only subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup --seeds 1 --rules PG-LR67",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-pvheads-own",
+   "check": "On the identify lesson Mixed page its OWN place items keep the heads its Practice prints; no other skill prints them",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PC-PVHEADS live; lead ruling; critic lf-engine-pc r5 R3",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "identify L / S Mixed: the own partner place items lost their heads under \"Read the letter above it\""
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "noPlaceHeads skipped for the lesson's own skill"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --all-lessons --only placevalue:identify --seeds 1 --rules PC-PVHEADS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-instr-value",
+   "check": "A band that says \"Write the value\" has a slot to write a value in every cell",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PC-INSTR value slot; critic lf-engine-pc r5 R3",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "identify L / S Mixed partner: \"Circle the place. Write the value of the underlined digit.\" over 6 ring-only cells"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "twinSkills: a skill dealt twice reads its own items' instruction (mixed-practice bandKey)"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --all-lessons --only placevalue:identify --seeds 1 --rules PC-INSTR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-partpages",
+   "check": "No lesson part prints more pages than the pinned lesson baseline",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-baseline PARTPAGES (--pages-only); critic lf-engine-pc r5 R4",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "sub_2d_1d / sub_50_no_regroup / sub_100_no_regroup L Mixed 1 -> 2 pages (5 pupil pages, the pin 4)"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "mixed-practice: a start over page 1 within hMinAt's spare safety keeps to one page"
+   },
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --only subtraction:sub_2d_1d,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup --sizes L --seeds 4242 --pages-only --check design/audit/baselines/lesson-baseline.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-r6-mixed-foot",
+   "check": "A library lesson Mixed page leaves at most 15 % of its body blank at the foot",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PM-FOOT; critic lf-engine-pc r5 R4 / R5",
+   "browser": true,
+   "fail": {
+    "commit": "dd2a4aff7",
+    "state": "sub_2d_1d / sub_50_no_regroup / sub_100_no_regroup L Mixed page 1 25 % blank"
+   },
+   "pass": {
+    "commit": "73a3b7573",
+    "state": "one Mixed page, filled"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --all-lessons --only subtraction:sub_2d_1d,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup --sizes L --seeds 1 --rules PM-FOOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
