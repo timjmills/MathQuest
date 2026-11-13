@@ -5858,6 +5858,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "sa-focus-gap-fixture-below",
+  "check": "ws-screen-answer FOCUS-GAP judges the text ABOVE and BELOW the focused box's ring, to the glyph ink (critic eb-r6 m2): the word \"tens\" with its ink 1 px under the ring FAILS; the same word 10 px clear passes",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (above / below, critic eb-r6 m2)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/focus-gap/below-1px.fail.html",
+   "state": "seeded: no finding with 8dc176e6's FOCUS_GAP (it judged only words on the ring's own line; proven 2026-11-13 by running that commit's function on this fixture); FAIL 1 px now"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/focus-gap/below-clear.pass.html",
+   "state": "the word's ink 10 px under the ring"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-wrap-line",
+  "check": "ws-screen-answer FOCUS-GAP reads a wrapped text node LINE BY LINE (critic eb-r7 m1): one text node under the ring, line 1 \"wer once\" (x-height only), line 2 \"Tall\"; line 1's ink 1 px under the ring FAILS, 5 px clear passes (the whole-node metrics put \"Tall\"'s ascenders on line 1 and read 0 px)",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (per line, critic eb-r7 m1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-1px.fail.html",
+   "state": "line 1's ink 1 px under the ring: a real touch, FAIL with either read"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-clear.pass.html",
+   "state": "line 1's ink 5 px clear: FAIL 0 px at 7bd6f3d31 (the whole-node read, the old way, so the row FAILED there); OK per line now"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
