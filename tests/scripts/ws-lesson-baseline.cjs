@@ -49,6 +49,11 @@ const sha = (s) => crypto.createHash('sha1').update(String(s)).digest('hex');
 const t0 = Date.now();
 const log = (s) => { if (process.argv.includes('--verbose')) console.log(`  [${((Date.now() - t0) / 1000).toFixed(0)} s] ${s}`); };
 
+/** Exit once stdout has drained (lf-engine ledger backtest, 2026-11-13): a long CHANGED list piped to a log was cut off by
+ *  process.exit before its verdict line, so a runner reading the last "ws-lesson-baseline: OK|FAIL" line saw none and
+ *  reported ERROR. A write's callback fires after every earlier write to the pipe has been handled. */
+function exitAfterFlush(code) { process.stdout.write('', () => process.exit(code)); }
+
 /** Run `fn(arg)` in the page without one long protocol call (a detailed lesson can take minutes): start, then poll. */
 async function inPage(page, fn, arg) {
     await page.evaluate(`window.__wsLB = undefined; (${fn.toString()})(${JSON.stringify(arg)}).then((r) => { window.__wsLB = r; }, (e) => { window.__wsLB = { error: String((e && e.stack) || e) }; }); 0`);
@@ -101,7 +106,7 @@ async function inPage(page, fn, arg) {
         } finally { await app.close(); }
         for (const f of fails) console.log(`  ${f}`);
         console.log(fails.length ? `ws-lesson-baseline --parts: FAIL (${fails.length})` : `ws-lesson-baseline --parts: OK (${SAMPLES.length} lessons x every part: alone = packet page; refresh changes only its part)`);
-        process.exit(fails.length ? 1 : 0);
+        return exitAfterFlush(fails.length ? 1 : 0);
     }
     try {
         let lessons = SAMPLES.slice();
@@ -175,5 +180,5 @@ async function inPage(page, fn, arg) {
     const bad = diff.length + unpinned.length;
     if (bad && ALL) console.log(`  (on purpose? re-pin in the same commit: --all-lessons --sizes ${SIZES.join(',')} --seeds ${SEEDS.join(',')} --per-lesson --write ${CHECK}, and name the changed lessons / pages in the commit message)`);
     console.log(bad ? `ws-lesson-baseline: FAIL (${diff.length} of ${keys.length} differ${unpinned.length ? `; ${unpinned.length} lesson(s) UNPINNED` : ''})` : `ws-lesson-baseline: OK (${keys.length} hashes identical${UNPINNED && ALL ? '; every lesson the tree prints is pinned' : ''})`);
-    process.exit(bad ? 1 : 0);
+    exitAfterFlush(bad ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });
