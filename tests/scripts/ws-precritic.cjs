@@ -378,7 +378,7 @@ const PARSE = {
         const unav = (/^ {2}sample unavailable \(reported, not failed\): (.*)$/m.exec(out) || [])[1];
         const skipNote = skipped.length ? `; ${skipped.length} with no options panel, not checked: ${listShort(skipped, 4)}` : '';
         if (!checked.length) return { result: 'N/A', findings: `no skill in scope has an options panel${skipNote}`, detail: [], explainsExit: false };
-        return { result: 'PASS', findings: `${checked.length} skill(s) × ${widths.length} widths: the sample is inside its frame and holds ink${skipNote}${unav ? `; sample unavailable (its own message): ${unav}` : ''}`, detail: [], explainsExit: false };
+        return { result: 'PASS', findings: `${checked.length} skill(s) × ${widths.length} widths: the sample is inside its frame, inked and legible (text >= 9 px, every part), the panel's controls in the window${skipNote}${unav ? `; sample unavailable (its own message): ${unav}` : ''}`, detail: [], explainsExit: false };
     },
     nodeLint(g, out, code) {
         const v = lastVerdict(out, g.script);
@@ -927,7 +927,7 @@ function buildPlan(ctx) {
         // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280 and 390 px, the lane's skills
         // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by
         // name (--skip-no-panel); a scope with none is N/A. The full 725 x 2 sweep is ws-deploy-gates session 4.
-        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 390 px: inside its frame, with ink)', `${scope} × 1280, 390 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 390] } }));
+        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 390 / 1280x720 px and after an option change: inside its frame, inked, text >= 9 px, panel controls in the window, no page error)', `${scope} × 1280, 390 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 390] } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));

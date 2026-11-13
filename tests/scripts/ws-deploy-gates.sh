@@ -89,8 +89,9 @@
 #            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
 # Session 4  ws-options-shots (lf-partopts, from lf-algebra F8/G11, 2026-11-13): the Options panel's live sample of EVERY
 #            skill whose Sets row offers Options (725 on 2026-11-13), opened the teacher's way at 1280 and 390 px, must lie
-#            inside its frame and hold ink. MQ_OPTSHOTS_SHARDS parts (default 2: `--shard i/n --workers 1`, one browser
-#            each, on the two slots). ≈ 1.8 s a skill a width = ≈ 2,600 slot-s: sessions 1-3 are each predicted at 27-28 of
+#            inside its frame, hold ink, draw its text at >= 9 px (every part), keep the panel controls in the window and throw no
+#            page error (critic-panel-r1, 2026-11-13: plus 1280x720, a resize and an option change on a spot set). MQ_OPTSHOTS_SHARDS parts (default 2: `--shard i/n --workers 1`, one browser
+#            each, on the two slots). ≈ 2 s a skill a width = ≈ 2,850 slot-s (timed 1,426 + 1,418 s): sessions 1-3 are each predicted at 27-28 of
 #            30 min, so it has a session of its own (MQ_OPTSHOTS_SESSION moves it). A lane's own skills run in its
 #            precritic (`--skill ... --skip-no-panel`).
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),

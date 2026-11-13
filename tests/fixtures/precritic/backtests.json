@@ -3215,7 +3215,147 @@
    "commit": "d7847568",
    "state": "the fix: 0 findings, both samples inside the frame at a legible scale"
   },
-  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1",
+  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1 --no-spot --checks inside,ink",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-legibility",
+  "check": "critic-panel-r1 F1: the option panel's sample is legible: its smallest visible HTML word or digit is drawn at >= 9 px (computed font-size x effective scale), every part of a sample shown in parts read in turn",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [text]",
+  "browser": true,
+  "fail": {
+   "commit": "74c2519c",
+   "state": "round-1 tree: geo_translate drawn at k 0.2267 / 0.2056 (text 3.3-3.6 px), multi_step_word at 0.2571 (3.3 px)"
+  },
+  "pass": {
+   "commit": "cdf7a76d",
+   "state": "the fix: the item one whole part at a time (1 of N), every part >= 9 px"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate,algebra:multi_step_word --skip-no-panel --workers 1 --no-spot --checks text",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-controls",
+  "check": "critic-panel-r1 F2: after both tidies the option panel's footer and Done button are inside the window",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [controls]",
+  "browser": true,
+  "fail": {
+   "commit": "74c2519c",
+   "state": "add_5_pictures: footer bottom 1024 in a 1000 px window (Done cut by 24 px); classify_count 1007"
+  },
+  "pass": {
+   "commit": "cdf7a76d",
+   "state": "the panel re-clamped after the tidies and on its own size change"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_5_pictures,comparing:classify_count --widths 1280 --skip-no-panel --workers 1 --no-spot --checks controls",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-resize",
+  "check": "critic-panel-r1 F2 (resize): with the panel open, the window shrinks from 1280x1000 to 1280x720; the footer stays inside it",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [controls] @1280x1000>720",
+  "browser": true,
+  "fail": {
+   "commit": "74c2519c",
+   "state": "geo_translate: footer bottom 987 in a 720 px window (nothing re-places the panel on resize)"
+  },
+  "pass": {
+   "commit": "cdf7a76d",
+   "state": "a window resize re-places the panel and re-fits the sample"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --checks controls",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-frame-scale",
+  "check": "critic-panel-r1 F3: a grown frame draws its sample at scale >= 0.30 and is never shorter than its CSS height (border-box growth)",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [scale]",
+  "browser": true,
+  "fail": {
+   "commit": "74c2519c",
+   "state": "coord_distance_q1 at k 0.2979, mult_chart_easy at 0.2984 (want computed from clientHeight, written as a border-box height)"
+  },
+  "pass": {
+   "commit": "cdf7a76d",
+   "state": "growth computed in border-box terms"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:coord_distance_q1,multiplication:mult_chart_easy --widths 1280 --skip-no-panel --workers 1 --no-spot --checks scale",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-option-change",
+  "check": "critic-panel-r1 F4: the first option of the panel is changed and the sample is re-read at +50 ms and +1.5 s (inside, inked, legible)",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots --change --changed-only [text]",
+  "browser": true,
+  "fail": {
+   "commit": "74c2519c",
+   "state": "classify_count at 390: legible when opened (9.0 px) but 7.6 px after its first option changes; fraction_of_set 8.6 px"
+  },
+  "pass": {
+   "commit": "cdf7a76d",
+   "state": "the redrawn sample is tidied to the same floor"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill comparing:classify_count,fractions:fraction_of_set --widths 390 --skip-no-panel --workers 1 --no-spot --change --changed-only --checks text",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-clip",
+  "check": "critic-panel-r1 F4: the stage must lie inside the frame (the 'covers >= 90 %' escape is gone)",
+  "kind": "fixture",
+  "rule": "ws-options-shots [inside]",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/options-shots/oversize.fail.js",
+   "state": "an oversize regression: the stage drawn at scale 1, overflowing a frame it fully covers (the old gate: OK, covers 100 %)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+   "state": "the panel as it is"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks inside --inject {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-pageerror",
+  "check": "critic-panel-r1 F4: a page error thrown while the panel opens or redraws fails the check it was thrown in",
+  "kind": "fixture",
+  "rule": "ws-options-shots [pageerror]",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/options-shots/pageerror.fail.js",
+   "state": "the panel throws each time it draws (the old gate printed it and passed)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+   "state": "the panel as it is"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks pageerror --inject {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

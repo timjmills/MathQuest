@@ -1,0 +1,3 @@
+  sample unavailable (reported, not failed): all_mixed:custom_mixed
+  362 skills × 2 widths (1280, 390 px); spot passes on 13 skill(s): 1280x720, a resize to 720, an option change at 1280 and 390, 916 readings, 1 worker(s), 1418 s; shard 2/2 of 725
+ws-options-shots: OK (362 skills × 2 widths; shard 2/2 of 725)
