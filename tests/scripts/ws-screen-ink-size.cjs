@@ -23,17 +23,6 @@
 //               union of its painted shapes, never its svg box: D1) < 60 % of the free width AND its ink height > ink width.
 //               The free width is the cell's content-box width less every block beside the drawing that HOLDS INK, at each
 //               level from the drawing up to the cell (D4: an empty spacer is not beside it).
-//   TEXT-SIZE   (queue 16 / 17, 2026-11-13) every label and non-slot text run of a screen cell, at its RENDERED size (font-size x
-//               every transform above it), against its floor: a numeral paper prints at working-digit size (or a count row's
-//               number) is DIGIT text, held to the digit floor (card / quiz 40 / 48 / 56 px at 390 / 820 / 1280, read from
-//               ws-screen-slots SCREEN-DIGIT; the online worksheet 29 px, the SP table; a count row on a phone 29 px, TY-10b);
-//               the cell's largest numeral is SCREEN-DIGIT's and is skipped. Anything else is LABEL text, held to the same
-//               item's print size (5 % tolerance; a word may match the same word anywhere on the page) and never under 8 pt.
-//               --dump-text prints every run read. Fixtures: --width W sets the host width (default 1280).
-// Worksheet items (queue 14): the worksheet deals its own items, so each card is also matched with the print cell of the item
-// it DEALT (the kit's renderCell at --size, [data-mq-dealt]; fixtures: [data-mq-print-dealt]) before any geometric fallback.
-// Pattern terms (queue 15): a drawing labelled "Term n" (or in [data-ws-term] / .mq-gp-term) is judged by its unit (SIZE-INK,
-// with 1+ marks), never by SIZE-WIDTH: a one-dot-wide column is taller than wide by the maths.
 // Only INK marks are sizes: a white or unfilled shape with no dark stroke (the touch numeral's halo and keyline) is not a mark,
 // and a ring (no fill, a dark stroke) is its own mark beside the solid dots (lf-ops 2026-11-13): it is named "ring" and is
 // paired only with a print ring, so a screen ring paper does not draw is SIZE-REF (critic sis-r2 D1). A support drawing whose
@@ -88,7 +77,6 @@ const DIGIT_FLOORS = (() => {
         return Object.fromEntries(vs.map((v) => [v.w, v.px]));
     } catch (e) { return { 390: 40, 820: 48, 1280: 56 }; }
 })();
-const WORKSHEET_DIGIT_PX = 29;          // WORKSHEET_DESIGN_STANDARD SP table: the online worksheet grid's digit size
 const COUNT_ROW_PHONE_PX = 29;          // TY-10b (owner exception): count rows on a phone (<= 480 px) draw ~29 px digits
 const LABEL_FLOOR_PX = 8 * 96 / 72;     // RUBRIC H2 / TY-11: nothing a pupil reads under 8 pt
 const TEXT_TOL = 0.05;                  // a label >= 95 % of its print size
@@ -97,8 +85,7 @@ const WORK_DIGIT_SHARE = 0.85;          // a print run at >= 85 % of the working
 /* ------------------------------------------------------------------ pure judging */
 
 /** TEXT-SIZE: the digit floor (px) of a host width; a count row on a phone takes TY-10b's 29 px. */
-function digitFloorPx(width, { countRow = false, host = 'card' } = {}) {
-    if (host === 'worksheet') return WORKSHEET_DIGIT_PX;
+function digitFloorPx(width, { countRow = false } = {}) {
     if (countRow && width <= 480) return COUNT_ROW_PHONE_PX;
     const ws = Object.keys(DIGIT_FLOORS).map(Number).sort((a, b) => a - b);
     const w = ws.filter((x) => x <= width).pop() || ws[0];
@@ -107,10 +94,10 @@ function digitFloorPx(width, { countRow = false, host = 'card' } = {}) {
 /** TEXT-SIZE: a screen text run's role and floor (px) from its print counterpart (px; NaN when paper has no such run).
  *  A run paper prints at working-digit size is a DIGIT (the host's digit floor); anything else is a LABEL, held to its print
  *  size (5 % tolerance) and never under 8 pt. */
-function textFloor({ numeric, printPx, workPx, width, countRow = false, inSvg = false, host = 'card' }) {
+function textFloor({ numeric, printPx, workPx, width, countRow = false, inSvg = false }) {
     // (a numeral drawn INSIDE a picture - a hundred chart's square, an axis label - is the picture's label (RP-6), held to its print size)
     // (a count row's numbers ARE its working digits, TY-10a / TY-10b, whatever size paper fitted them at)
-    if (numeric && !inSvg && (countRow || printPx >= WORK_DIGIT_SHARE * workPx)) return { role: 'digit text', floor: digitFloorPx(width, { countRow, host }) };
+    if (numeric && !inSvg && (countRow || printPx >= WORK_DIGIT_SHARE * workPx)) return { role: 'digit text', floor: digitFloorPx(width, { countRow }) };
     const p = Number.isFinite(printPx) && printPx > 0 ? (1 - TEXT_TOL) * printPx : 0;
     return { role: 'label text', floor: +Math.max(LABEL_FLOOR_PX, p).toFixed(2) };
 }
@@ -399,7 +386,6 @@ function selfTest() {
     eq('digit floors from ws-screen-slots', [390, 820, 1280].map((w) => digitFloorPx(w)), [40, 48, 56]);
     eq('count row on a phone: TY-10b 29 px', digitFloorPx(390, { countRow: true }), 29);
     eq('count row at 820: the card floor', digitFloorPx(820, { countRow: true }), 48);
-    eq('the online worksheet: the SP table 29 px', digitFloorPx(1280, { host: 'worksheet' }), 29);
     const work = 22 * 96 / 72;
     eq('a working digit (print 22 pt) -> digit floor', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280 }), { role: 'digit text', floor: 56 });
     eq('a numeral inside a picture -> label', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280, inSvg: true }).role, 'label text');
@@ -619,15 +605,12 @@ const WORK_DIGIT_PT = { S: 16, M: 22, L: 28 };   // WORKSHEET_DESIGN_STANDARD ty
 
 /** TEXT-SIZE (queue 16 / 17): every label and non-slot text run of a screen cell against its floor (textFloor). One finding per
  *  cell and role (its worst run). The cell's largest numeral is ws-screen-slots SCREEN-DIGIT's and is not judged twice. */
-function judgeText({ where, detail, texts, printTexts, F, width, size = 'M', host = 'card' }) {
+function judgeText({ where, detail, texts, printTexts, F, width, size = 'M' }) {
     const workPx = WORK_DIGIT_PT[size] * 96 / 72;
-    // a run's print counterpart: the same text, in or out of a picture alike, in the SAME item; a word may also match the same
-    // word anywhere on the page, a numeral never (a "7" on a skip strip is not the fact's operand 7)
     const bySig = new Map(); const byText = new Map();
-    const pk = (t) => `${t.text}|${t.inSvg ? 'svg' : 'html'}`;
     for (const t of printTexts || []) {
-        const k1 = `${t.sig}|${pk(t)}`; (bySig.get(k1) || bySig.set(k1, []).get(k1)).push(t.px);
-        if (!t.numeric) (byText.get(pk(t)) || byText.set(pk(t), []).get(pk(t))).push(t.px);
+        const k1 = `${t.sig}|${t.text}`; (bySig.get(k1) || bySig.set(k1, []).get(k1)).push(t.px);
+        (byText.get(t.text) || byText.set(t.text, []).get(t.text)).push(t.px);
     }
     const cells = new Map();
     for (const t of texts || []) (cells.get(t.cellKey) || cells.set(t.cellKey, []).get(t.cellKey)).push(t);
@@ -637,8 +620,8 @@ function judgeText({ where, detail, texts, printTexts, F, width, size = 'M', hos
         const worst = {};
         for (const t of runs) {
             if (t === top) continue;
-            const printPx = median((t.sig && bySig.get(`${t.sig}|${pk(t)}`)) || (!t.numeric && byText.get(pk(t))) || []);
-            const { role, floor } = textFloor({ numeric: t.numeric, printPx, workPx, width, countRow: t.countRow, inSvg: t.inSvg, host });
+            const printPx = median(bySig.get(`${t.sig}|${t.text}`) || byText.get(t.text) || []);
+            const { role, floor } = textFloor({ numeric: t.numeric, printPx, workPx, width, countRow: t.countRow, inSvg: t.inSvg });
             const msg = textFinding(role, t.text, t.px, floor, printPx);
             if (msg && (!worst[role] || t.px / floor < worst[role].pct / 100)) worst[role] = { msg, floor, pct: Math.round(t.px / floor * 100), t };
         }
@@ -677,7 +660,7 @@ function sweepReport({ skills, findings, notes, renders, secs, pinFile, pin, ser
     L.push(`- **Wiring:** ${wired.join('; ')}.`);
     L.push(`- **Scope:** ${skills.length} skills, each with its defaults and every value of its supports-model \`support\` option; card 390 / 820 / 1280 (print items 0-2), worksheet 1280, quiz 1280 (print items 0-1): ${renders} renders, ${secs} s.`);
     L.push(`- **Result:** ${findings.length} findings on ${new Set(findings.map((x) => x.where.split(' ')[0])).size} skills. Nothing was fixed (report only).`, '');
-    L.push('Rules: SIZE-INK (a mark >= 95 % of the same item\'s print size; a worksheet item also matched with the print cell of the item it dealt; a pattern term by its unit), SIZE-REF (a mark with no print counterpart), SIZE-WIDTH (ink width < 60 % of the free width and taller than wide; pattern terms exempt), TEXT-SIZE (a label >= its print size and >= 8 pt; non-slot digit text >= the digit floor: card / quiz 40 / 48 / 56 px, worksheet 29 px, count row on a phone 29 px).', '');
+    L.push('Rules: SIZE-INK (a mark >= 95 % of the same item\'s print size), SIZE-REF (a mark with no print counterpart), SIZE-WIDTH (ink width < 60 % of the free width and taller than wide).', '');
     L.push('## Skills hit, per rule', '', '| Rule | Skills |', '|---|---|');
     for (const r of Object.keys(hit).sort()) L.push(`| ${r} | ${[...hit[r]].sort().join(', ')} |`);
     L.push('', '## Every pin key', '', '"n" counts the screen cells (card items 0-2, worksheet cards, quiz questions); "worst" is the lowest screen / print % (SIZE-INK) or ink / free width % (SIZE-WIDTH).', '');
@@ -828,7 +811,7 @@ async function main() {
                         if (sc.error) { notes.add(`${tag} ${host} ${w}: ${sc.error}`); continue; }
                         visited.add(`${tag} ${host} ${w}px`);
                         if (has('dump-text')) for (const t of sc.texts) console.log(`text ${host} ${w} cell ${t.cellKey}: "${t.text}" ${t.px} px${t.numeric ? ' numeric' : ''}${t.inSvg ? ' svg' : ''}${t.countRow ? ' count-row' : ''} sig ${t.sig}`);
-                        judgeText({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', texts: sc.texts, printTexts, F, width: w, size: SIZE, host });
+                        judgeText({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', texts: sc.texts, printTexts, F, width: w, size: SIZE });
                         if (!sc.drawings.length) continue;
                         judgeHost({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', drawings: sc.drawings, prints, dealt, F, notes, support: v.support || '' });
                     }
