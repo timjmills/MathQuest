@@ -4071,13 +4071,73 @@
    "browser": true,
    "fail": {
     "fixture": "tests/fixtures/precritic/sections-density/one-section.fail.html",
-    "state": "one skill over three pages, the last holds 2 of a full page's 10 (PG-23), page 2 holds 4 (DN-2)"
+    "state": "one skill over three pages, the last holds 2 of a full page's 10 (PG-23), page 2 holds 4 (DN-2) - a CONSTRUCTED sheet that fails on both trees, not the master state (critic lf-engine-roles: acceptable for a loosening, it proves real defects still fire; the fixed-count gap is closed by roles-sections-midsheet-fill)"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/sections-density/subsections.pass.html",
     "state": "the real sections sheet: compare+facts p1, tape_diagram p2, perimeter p3, each page full of its own skill"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-opener-guided-two-rows",
+   "check": "an Opener whose Guided band holds fewer than 2 cells fails unless the plan notes the second row did not fit (lf-engine-roles critic B1, PT-OPN-6: 1 column gives 2 rows)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY OPN-6",
+   "browser": true,
+   "fail": {
+    "commit": "2d7a7f158",
+    "state": "placevalue:unit_form opener S: Guided band of 1 cell, no note (page 46 % used)"
+   },
+   "pass": {
+    "commit": "03c5e762f",
+    "state": "0 (Guided 2 rows, page 53 % used)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills placevalue:unit_form --roles opener --size S --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-opener-model-rule",
+   "check": "inside a kit band, a grid of 2+ columns that ends the band carries its column rules to the band's bottom rule (lf-engine-roles critic N2: two Model cells held to their ink stopped 2.4 mm short)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP RULE",
+   "browser": true,
+   "fail": {
+    "commit": "2d7a7f158",
+    "state": "placevalue:combine opener S: the Model grid's rule stops 2.4 mm above the band's bottom rule (pupil + key)"
+   },
+   "pass": {
+    "commit": "407969639",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills placevalue:combine --roles opener --size S --lints L-OVERLAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-sections-midsheet-fill",
+   "check": "on a sections sheet DN-2 measures page fill: a page that is not the sheet's last and is under half used fails at a fixed --count (lf-engine-roles critic GUARD on the finding-3 loosening, CC1)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY DN-2 (sub-section fill)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/sections-density/midsheet-subsection.fail.html",
+    "state": "the real sections sheet with its mid-sheet tape-diagram page cut to 2 cells (one row, ~45 % of the body): passed the pre-guard lint (3917cb04e^) at --count 6, fails DN-2 fill on the guard"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/sections-density/subsections.pass.html",
+    "state": "the real sections sheet, every page full of its own skill"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-DENSITY --count 6",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
