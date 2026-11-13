@@ -190,7 +190,8 @@ export function columnPanel(it, groups, k) {
     // sign row and the columns; panels 3+ the work (write, solve)
     if (k === 0) return { pic: null, kb: false, noWork: true, noBar: true };
     // (the bar is not repeated on the second row: with it a panel of two merged steps overflowed its 114 mm row by a few mm)
-    return k === 1 ? { pic: null, kb: false, lines: [], barInk: 'trace' } : { pic: null, kb: false, lines: [], noBar: true };
+    // (`bankBeside: false`: a half panel keeps the bank over the label line - beside it, the answer row ran 11.6 mm off the panel)
+    return k === 1 ? { pic: null, kb: false, lines: [], barInk: 'trace', bankBeside: false } : { pic: null, kb: false, lines: [], noBar: true, bankBeside: false };
 }
 
 export default { CASES, wpParts, msOf, twoState, isWordSentence, sentenceState, isWordBar, barNums, chartStepsOf, inkSpan, barState, columnPanel };

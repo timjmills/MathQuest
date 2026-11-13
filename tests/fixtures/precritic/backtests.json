@@ -3329,7 +3329,7 @@
    "browser": false,
    "fail": {
     "commit": "e82499a5e",
-    "state": "41 findings: the compare preset dealt 2 'fewer' then 9 trap items on a page of 11 (count unset), Guided practised the trap under a 'fewer' Model, the hosts' default mix interleaved at random"
+    "state": "FAIL (94 findings with the r2 checker): the compare preset dealt 2 'fewer' then 9 trap items on a page of 11 (count unset), Guided practised the trap under a 'fewer' Model, the hosts' default mix interleaved at random"
    },
    "pass": {
     "commit": "6f26be25f",

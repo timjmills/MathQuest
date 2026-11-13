@@ -87,7 +87,10 @@ async function main() {
         try { defs = so.offeredOptionsFor(cat, id) || []; } catch (e) { defs = []; }
         const forms = defs.find((d) => d.id === 'forms');
         if (!forms) continue;
-        const configs = [null];
+        // (the default config is judged only when it ticks an appended kind - the presets; the hosts' default mix keeps its
+        // dealt variety, critic r1 F15 left open)
+        const appended = (forms.default || []).map(Number).some((v) => v >= 3);
+        const configs = appended ? [null] : [];
         if (/^(add|sub)_word_problems(_plain)?$/.test(id)) {
             const vals = (forms.values || []).map((v) => v.v);
             for (const t of HOST_TICKS) if (t.every((v) => vals.includes(v))) configs.push({ forms: t });

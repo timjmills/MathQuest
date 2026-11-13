@@ -666,7 +666,7 @@ function _responseMode() {
 // Untouched, the page deals the default kinds; a tick of an APPENDED kind (change unknown, compare with the smaller
 // unknown) deals over every kind so the override can name it. On a page with more than one kind the kinds come ONE
 // SECTION AT A TIME in the ladder order (PEDAGOGY P-WP-1 one schema a set, P-WP-3 the "more than" trap after "fewer"),
-// never interleaved (word-stories fix r2: the default mix too, critic r1 F15).
+// never interleaved (the default mix keeps its dealt variety: critic r1 F15 left open, see _wpStoryKind).
 // One story's two numbers, dealt FRESH on the page (page-deal.js freshDeal, L10): no pair twice, and of `tagsOf(p)` -
 // [the item's first number (q.a), its answer] - the first no more than twice and the answer no more than three times
 // in a page of 20.
@@ -687,7 +687,9 @@ function _wpStoryKind(key, base, all, ladder = null) {
     // fell back to two items a kind when the count was unset - 2 'fewer' then 9 trap items on a page of 11 - and the
     // default mix was dealt at random, interleaved.) The screen's practice card, which deals no item index, follows the
     // same ladder by the question number.
-    const rungs = (ticked.length ? (extra ? ticked : ticked.filter((v) => v < base)) : list.map((_, i) => i));
+    // (only a page with an APPENDED kind ticked is laddered: the default mix keeps its dealt variety - sectioned, the hosts'
+    // lesson practice pages split into one-item sections, L-LONE / GRID-EVEN; critic r1 F15 is left open with that reason)
+    const rungs = extra ? ticked : [];
     const order = Array.isArray(ladder) ? rungs.slice().sort((x, y) => ladder.indexOf(x) - ladder.indexOf(y)) : rungs;
     let at = Number.isFinite(state.itemIndex) ? state.itemIndex : null;
     if (at === null && order.length > 1 && state.gameMode === 'practice' && Number(state.qCount) > 0) at = Number(state.qCount) - 1;

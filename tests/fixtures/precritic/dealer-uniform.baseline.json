@@ -22,6 +22,12 @@
   "division:div_facts": [
    "PAGE 4: ans = 6 6 times",
    "PAGE 6: ans = 10 6 times"
+  ],
+  "subtraction:sub_word_problems": [
+   "PAGE 3: a = 29 3 times"
+  ],
+  "subtraction:sub_word_problems_plain": [
+   "PAGE 6: a = 28 3 times"
   ]
  }
 }
