@@ -130,6 +130,13 @@ export function attachPane(problemHtml, paneHtml, placement = 'under', { gapMm =
             + `<div class="ws-pane-problem" style="flex:none;">${problemHtml}</div>${paneHtml}</div>`;
     }
     if (placement === 'before') {
+        // (lf-ops divarray r2, SUPPORT-LABEL / lf-checks TEXT-SIZE: on a narrow screen the sign box shrank to fit beside the fact -
+        // "divide" at 8.9 pt where paper prints 10 pt. On screen the pane never shrinks; when the row is too narrow it wraps
+        // above the problem. Paper is unchanged.)
+        if (twin) {
+            return `<div class="ws-with-pane" data-ws-pane-place="before" style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;gap:${gap};">`
+                + `<div style="flex:none;">${paneHtml}</div><div class="ws-pane-problem" style="flex:none;">${problemHtml}</div></div>`;
+        }
         return `<div class="ws-with-pane" data-ws-pane-place="before" style="display:flex;align-items:flex-start;justify-content:center;gap:${gap};">`
             + `${paneHtml}<div class="ws-pane-problem" style="flex:none;">${problemHtml}</div></div>`;
     }

@@ -21,6 +21,8 @@
 //   SUPPORT-NOT-SLOT     (critic divarray r1 D1) a support draws no empty closed box the size/shape of the answer slot
 //                        (±40 %), and a frame drawn on only some cells of a band (the × zero frame, the lone framed support)
 //                        is a finding - on paper and on every screen host. ARRAY-CAPTION also fails "1 rows" for one row.
+//   SUPPORT-LABEL        (lf-checks TEXT-SIZE, lead 2026-11-13) a support's text on screen (sign word, number-line labels,
+//                        skip-strip terms) is >= 8 pt and >= 95 % of the same text on paper (Independent M).
 //   ARRAY-GAP            (critic r5 R5-3, WDS RP-81) an array of more than 5 columns / rows draws the 1.5 mm subitising gap
 //                        after every 5th (the step after the 5th is >= 1 mm longer than the first) - paper S/M/L and screen.
 //   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
@@ -136,6 +138,16 @@ function gapFinding(id, arr, item) {
     const bad = [['columns', arr.gapX], ['rows', arr.gapY]].filter(([, g]) => g !== null && g !== undefined && g < 1);
     return bad.length ? `${id}: ${item.a} ${item.op} ${item.b} array has no 5-group gap between its ${bad.map(([n]) => n).join(' and ')} 5 and 6 (extra step ${bad.map(([, g]) => g.toFixed(2)).join(' / ')} mm, want >= 1)` : null;
 }
+/** SUPPORT-LABEL (lf-checks TEXT-SIZE; lead 2026-11-13: "support labels on screen at least the screen text floor"): a support's
+ *  text on screen is never under 8 pt (10.67 px) nor under 95 % of the same text on paper (the Independent page at M; a text
+ *  paper does not print is held to the support's smallest print label). `paper` maps text -> px; `min` is the smallest. */
+const LABEL_FLOOR_PX = 8 * 96 / 72;
+function labelFinding(id, label, paper) {
+    if (!label || !(label.px > 0)) return null;
+    const ref = paper && (paper.map[label.t] || paper.min) || 0;
+    const need = Math.max(LABEL_FLOOR_PX, 0.95 * ref);
+    return label.px + 0.05 < need ? `${id}: label "${label.t}" is ${label.px.toFixed(1)} px (${(label.px * 0.75).toFixed(1)} pt; print ${ref ? (ref * 0.75).toFixed(1) + ' pt' : 'none'}), needs >= ${need.toFixed(1)} px` : null;
+}
 /** PLACE: one place across a worksheet's cards. */
 function placeFinding(id, places) {
     const set = [...new Set(places.filter(Boolean))];
@@ -172,6 +184,9 @@ function selfTest() {
     eq('frame band square × 0 (r2: the 12 x 12 band frame)', frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), null);
     eq('frame portrait × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 20, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
     eq('frame dots × 0', !!frameFinding('array', { arr: { dots: 3, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('label ok', labelFinding('boxsign', { t: 'divide', px: 13.4 }, { map: { divide: 13.3 }, min: 13.3 }), null);
+    eq('label shrunk (8.9 pt vs 10)', !!labelFinding('boxsign', { t: 'divide', px: 11.9 }, { map: { divide: 13.3 }, min: 13.3 }), true);
+    eq('label under 8 pt', !!labelFinding('line', { t: '20', px: 10.2 }, { map: {}, min: 0 }), true);
     eq('gap ok', gapFinding('array', { gapX: 1.5, gapY: null }, { a: 7, b: 12, op: '×' }), null);
     eq('gap missing (R5-3)', !!gapFinding('array', { gapX: 0, gapY: 1.5 }, { a: 7, b: 12, op: '×' }), true);
     eq('caption 1 row ok (N1)', captionFinding('array', { label: '1 row of 7, for 7 × 1', rows: 1, cols: 7, dots: 7 }, { a: 7, b: 1, op: '×' }), null);
@@ -211,7 +226,10 @@ function readCellsInPage({ sel, cellSel }) {
         const txt = eqEl ? eqEl.textContent : '';
         const m = /(\d+) divided by (\d+)/.exec(label) || /(\d+)\s*÷\s*(\d+)/.exec(txt);
         const mx = !m && (/(\d+) times (\d+)/.exec(label) || /(\d+)\s*[×x]\s*(\d+)/.exec(txt));
-        const item = m ? { a: Number(m[1]), b: Number(m[2]), op: '÷' } : mx ? { a: Number(mx[1]), b: Number(mx[2]), op: '×' } : null;
+        // (r2, SUPPORT-LABEL: + and − facts too, so add_facts / sub_facts screens are judged)
+        const mp = !m && !mx && (/(\d+) (plus|minus) (\d+)/.exec(label) || /(\d+)\s*([+−-])\s*(\d+)/.exec(txt));
+        const item = m ? { a: Number(m[1]), b: Number(m[2]), op: '÷' } : mx ? { a: Number(mx[1]), b: Number(mx[2]), op: '×' }
+            : mp ? { a: Number(mp[1]), b: Number(mp[3]), op: /plus|\+/.test(mp[2]) ? '+' : '−' } : null;
         const digitPx = eqEl ? parseFloat(getComputedStyle(eqEl.querySelector('span') || eqEl).fontSize) : 0;
         const sups = {};
         for (const s of cell.querySelectorAll('.ws-support[data-ws-support-on]')) {
@@ -264,7 +282,14 @@ function readCellsInPage({ sel, cellSel }) {
                 arr = { label: asvg.getAttribute('aria-label'), wPx: br.width, hPx: br.height, dotPx: cs.length ? 2 * Number(cs[0].getAttribute('r')) * k : 0,
                     dots: cs.length, rows: ys.size, cols: xs.size, framed, gapX: extra5(xs), gapY: extra5(ys) };
             }
-            sups[id] = { arr, sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: arr && arr.dotPx && digitPx ? arr.dotPx / digitPx : 0, place };
+            // SUPPORT-LABEL (lf-checks TEXT-SIZE, lead 2026-11-13): every text a support draws (the sign box's word, the number
+            // line's labels, the skip strip's terms) at its RENDERED size - its font-size times the svg's drawn scale
+            const labels = [...s.querySelectorAll('svg text')].map((t) => {
+                const sv = t.closest('svg'); const vb = ((sv && sv.getAttribute('viewBox')) || '').split(/\s+/).map(Number);
+                const k = sv && vb[2] ? sv.getBoundingClientRect().width / vb[2] : 1;
+                return { t: (t.textContent || '').trim(), px: (parseFloat(t.getAttribute('font-size')) || parseFloat(getComputedStyle(t).fontSize) || 0) * k };
+            }).filter((x) => x.t && x.px > 0);
+            sups[id] = { labels, arr, sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: arr && arr.dotPx && digitPx ? arr.dotPx / digitPx : 0, place };
         }
         // the cell's graded answer slot (print span or screen input), for SUPPORT-NOT-SLOT
         let slot = null;
@@ -279,7 +304,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT,GAP') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT,GAP,LABEL') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -349,6 +374,8 @@ function readCellsInPage({ sel, cellSel }) {
                 const pSig = pCells[0].sups[sup].sig;
                 const pRatio = Math.max(...pCells.map((c) => c.sups[sup].ratio || 0));
                 const pDot = Math.max(...pCells.map((c) => c.sups[sup].dotRatio || 0));
+                const pLab = { map: {}, min: 0 };
+                for (const c of pCells) for (const l of c.sups[sup].labels || []) { pLab.map[l.t] = Math.max(pLab.map[l.t] || 0, l.px); pLab.min = pLab.min ? Math.min(pLab.min, l.px) : l.px; }
                 // ---- screen hosts
                 const hosts = [];
                 await page.evaluate(({ cat, skill, opts }) => { window.clearSetOptions({ silent: true }); window.setSetOptions(cat, skill, opts, { silent: true }); }, { cat, skill, opts });
@@ -445,16 +472,21 @@ function readCellsInPage({ sel, cellSel }) {
                             const f = dotFinding(sup, pDot, s.dotRatio);
                             if (f) findings.push(`ARRAY-DOT-MIN ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
-                        if (ONLY.includes('CUE') && s && s.ratio) {
+                        // (CUE and PLACE are the ×/÷ rules of facts card F3 / §5.9; + and − facts are read for SUPPORT-LABEL only)
+                        if (ONLY.includes('CUE') && s && s.ratio && /[×÷]/.test(c.item.op)) {
                             const f = cueFinding(sup, pRatio, s.ratio);
                             if (f) findings.push(`SCREEN-CUE-SIZE ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
+                        if (ONLY.includes('LABEL') && s) for (const l of s.labels || []) {
+                            const f = labelFinding(sup, l, pLab);
+                            if (f) { findings.push(`SUPPORT-LABEL ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`); break; }
                         }
                         if (ONLY.includes('NOTSLOT') && s) {
                             const f = slotLikeFinding(sup, s.arr, c.slot);
                             if (f) findings.push(`SUPPORT-NOT-SLOT ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                     }
-                    if (ONLY.includes('PLACE') && h.worksheet) {
+                    if (ONLY.includes('PLACE') && h.worksheet && cells.some((c) => /[×÷]/.test(c.item.op))) {
                         const f = placeFinding(sup, cells.map((c) => (c.sups[sup] ? c.sups[sup].place : null)));
                         if (f) findings.push(`SCREEN-SUPPORT-PLACE ${key} ${h.host}: ${f}`);
                     }
@@ -479,4 +511,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding, labelFinding };
