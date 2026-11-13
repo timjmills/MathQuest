@@ -53,7 +53,7 @@ import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups, stackCarryTop } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -367,6 +367,8 @@ function normaliseRequest(req = {}) {
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
         // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
         leadHalf: !!req.leadHalf,
+        // (live-pm r2: a library lesson's Mixed page - band-safe fill, no lone continuation shelf; mixed-practice.js)
+        ...(req.lessonFit === true ? { lessonFit: true } : {}),
         // (the detailed lesson maker, lesson 2 r4: `leadHalf` may drop a partner's only shelf or narrow it)
         leadDrop: !!req.leadDrop,
         // The detailed lesson maker: no Steps strip on the lesson's Mixed page (critic D18).
@@ -1687,6 +1689,26 @@ function allocateHostSupports(items, n) {
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
+/** F7 (live-fix 2026-11-13): a rounding lesson's Practice cells centre their one line (print-sheet buildLesson tagSheets). */
+/** F5 (live-fix 2026-11-13): a lesson's Mixed / Practice fact and count cells centre down a row sized for a taller kind. */
+const MIXED_FACT_CSS = '<style data-mq-lmixfact>.ws-page:is([data-ws-sheet="lesson-mixed"],[data-ws-sheet="lesson-practice"]) .ws-grid>.ws-cell:is([data-ws-cell="fact"],[data-ws-cell="counters"]){justify-content:center !important}</style>';
+/** live-pm r2 (critic lf-engine-live-pm findings 1, 2, 4, 5): EVERY cell of a lesson's Practice / Mixed page centres its
+ *  content down a row sized for a taller kind - equation and missing-factor cells (53 % band), word problems at S (37 %),
+ *  rounding cells on Mixed (not reached by the Practice-only rule above), fact cells at S Practice (47 %). `safe` keeps a
+ *  full cell top-anchored; a library lesson's pages only (a detailed lesson keeps its own, byte-identical). */
+const LESSON_PM_SEL = '.ws-page:is([data-ws-sheet="lesson-mixed"],[data-ws-sheet="lesson-practice"]) .ws-grid>.ws-cell';
+// (a fact over its answer line - `.ws-eq-below`, div_facts in a tall row - takes the owner's "under" look, 2026-11-08: the
+// line at the foot of the cell, the room above it the writing room, no empty band: S Practice 47 %)
+const LESSON_PM_CENTRE_CSS = `<style data-mq-lpmcentre>${LESSON_PM_SEL}:not(.blankrun){justify-content:safe center !important}`
+    + `${LESSON_PM_SEL}>.ws-eq-below[data-ws-across]:not([data-ws-notation]){flex:1 1 auto;align-self:stretch}`
+    + `${LESSON_PM_SEL}>.ws-eq-below[data-ws-across]:not([data-ws-notation])>[data-ws-slot]{margin-top:auto}`
+    // (TAB-CLEAR, finding 4: the number tab >= 2 mm clear of the ink. A Mixed row is sized to its content, and at L the
+    // place-value cells ("T|O 78 -> __" runs the cell's width; the T O heads of an identify cell sit in the tab's corner) start
+    // under the tab - at M / S they clear it sideways, and a 22 mm row has no room to drop them. Practice rows are tall:
+    // their centred content clears the tab already.)
+    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
+const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
+
 /**
  * CL-4b per SECTION (owner ruling 2026-10-24; VA-10, AX-4): when any stack of a section regroups,
  * every stack of the section is told so (`sectionWriteAbove`), and each one that draws a regroup
@@ -1696,7 +1718,10 @@ function allocateHostSupports(items, n) {
 export function markSectionWriteAbove(items) {
     const stacks = (items || []).filter((it) => it && it.q && it.q.cell && it.q.cell.template === 'stack' && it.q.cell.payload);
     const any = stacks.some((it) => stackRegroups(it.q.cell.payload));
-    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined });
+    // F6 (live-fix 2026-11-13, H15): the section's sums carry no higher than `carryTop`, so no stack of it draws a carry
+    // box over a place none of them reaches (the hundreds box over sums < 100 was a dead part the key never filled).
+    const carryTop = Math.max(0, ...stacks.map((it) => stackCarryTop(it.q.cell.payload)));
+    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined }, carryTop > 0 && it.q.cell.payload.op === '+' ? { carryTop } : {});
     return items;
 }
 
@@ -4201,6 +4226,8 @@ async function buildRoleSheet(n, metaOf) {
     const input = {
         items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
+        // (lf-roles: the title's MEASURED lines, for a role whose title it composes itself - review.js "Review: <topic>")
+        titleLinesOf: (text, size) => measureTitleLines(text, size || n.size),
         columns: (n.sections[0] && n.sections[0].columns) || 'auto',
         count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
         targetSkill: metaOf(reqSkills[0]),
@@ -4213,6 +4240,7 @@ async function buildRoleSheet(n, metaOf) {
         latticeN: n.latticeN || 0,
         leadHalf: !!n.leadHalf,
         leadDrop: !!n.leadDrop || undefined,
+        lessonFit: n.lessonFit === true || undefined,
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
@@ -4740,10 +4768,21 @@ async function buildLesson(n, metaOf) {
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
     const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
-    const data0 = recordOf(sk0);
+    // (opt-in `dealPracticeOpts` on a library lesson, lf-placevalue critic nwf r1 N6: a lesson asked for by its skill alone - no
+    // options on the request - deals its OWN practice options (the LESSONS record's `practice.opts`), so its chant and steps
+    // describe what the pages deal. Every other lesson keeps the request's options as before.)
+    {
+        const lib = libId ? lessonById(libId) : null;
+        if (lib && lib.dealPracticeOpts && lib.practice && lib.practice.opts && !sk0.opts && lib.practice.skill === `${sk0.categoryId}:${sk0.skillId}`) {
+            const sk1 = Object.assign({}, sk0, { opts: JSON.parse(JSON.stringify(lib.practice.opts)) });
+            n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk1, ...n.sections[0].skills.slice(1)] }), ...n.sections.slice(1)] });
+        }
+    }
+    const sk0b = n.sections[0].skills[0];
+    const data0 = recordOf(sk0b);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
-    if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
+    if (data0 && data0.minOperand !== undefined && sk0b.minOperand === undefined) flags.minOperand = data0.minOperand;
     if (data0 && data0.distinctFirst) flags.distinctFirst = true;
     if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
     if (data0 && data0.maxTop !== undefined) flags.maxTop = data0.maxTop;
@@ -4752,7 +4791,7 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
     if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
     if (data0) flags.noTurnaround = true;
-    let sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    let sk = Object.keys(flags).length ? Object.assign({}, sk0b, flags) : sk0b;
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
@@ -4762,7 +4801,7 @@ async function buildLesson(n, metaOf) {
     if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
         sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
-    if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
+    if (sk !== sk0b) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = recordOf(sk);
     // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its PREREQUISITE CHECK - one
@@ -4963,7 +5002,7 @@ async function buildLesson(n, metaOf) {
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
             mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed,
-            stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab,
+            stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab, lessonFit: !n.lessonData,
         }));
     };
     if (built.includes('mixed')) {
@@ -5019,8 +5058,21 @@ async function buildLesson(n, metaOf) {
     // is a sheet apart from the lesson pages: `data-ws-sheet` says so on every page, so a page is
     // only ever compared with the pages of its own sheet.
     const tagSheets = (html, first, rest) => {
+        const out0 = tagSheets0(html, first, rest);
+        // live-pm r2 (findings 1, 2, 4, 5): a library lesson's Practice / Mixed pages centre every cell kind (additive)
+        return !n.lessonData && (first === 'lesson-mixed' || first === 'lesson-practice') && /<main class="ws-body">/.test(out0) ? out0.replace(/<main class="ws-body">/g, `<main class="ws-body">${LESSON_PM_CENTRE_CSS}`) : out0;
+    };
+    const tagSheets0 = (html, first, rest) => {
         let k = 0;
-        return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
+        const out = String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
+        // F7 (lf-engine pc critic r3, live-fix 2026-11-13): a rounding Practice cell ("27 -> ___") is one short line in a
+        // row the page's fill made tall - drawn at the top it left a 49 % band under it in all 15 cells (H13). The cells of
+        // a rounding lesson's Practice sheet centre their line down the cell (additive: only these pages carry the rule).
+        if (first === 'lesson-practice' && rounding && /pv-round1/.test(out)) return out.replace(/<main class="ws-body">/g, `<main class="ws-body">${ROUND_PRACTICE_CSS}`);
+        // F5 (same round): a Mixed row of vertical facts shares the page's row height with a taller kind (the bond row
+        // below), so its facts sat on a 55 % band; one-line facts and count rows centre down the cell instead (Mixed and
+        // Practice sheets that draw one - PM-H13 found the same 30 % band on the add S Practice and the L count row).
+        return (first === 'lesson-mixed' || first === 'lesson-practice') && /data-ws-cell="(fact|counters)"/.test(out) ? out.replace(/<main class="ws-body">/g, `<main class="ws-body">${MIXED_FACT_CSS}`) : out;
     };
     const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
     // (LR-18: every part built, each with its own pupil and key HTML; only the printed ones go on paper, in packet order)

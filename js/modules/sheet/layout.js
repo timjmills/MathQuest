@@ -147,6 +147,15 @@ export const PAGE_FILL = 0.85;
  * r1 F1: 41 mm stories in 57 mm cells, a 37 % band in every cell at S).
  */
 export const IN_PLACE_FILL = 1.12;
+/**
+ * lf-placevalue pv debt (ws-empty-band on the pixels): every item of a section declares `tightRows` in its footprint (an in-place
+ * cell whose ink is its measured height less the pads, one or two short lines). Its rows are then never stretched past
+ * IN_PLACE_FILL x their measured height on ANY role - the practice spread, a Test's fill floor and fill limit, a Review's page
+ * share all stop there - and the spare page height stays under the grid. `infos` are layout infos ({fp}) or planned items
+ * ({footprint}).
+ */
+export const tightRows = (infos) => Array.isArray(infos) && infos.length > 0
+    && infos.every((i) => !!i && !!((i.fp || i.footprint || {}).tightRows));
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
 /**
@@ -885,7 +894,10 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (inPlace && hMin > 0) {
         const own = infos.every((i) => i.measured && i.measured[cols] && Number(i.measured[cols].hMm) > 0)
             ? Math.max(...infos.map((i) => Number(i.measured[cols].hMm))) : hMin;
-        const fillFloor = (0.82 * G) / Math.max(1, rows);
+        // (`tightRows`, lf-placevalue pv debt: a cell whose footprint says so is held to IN_PLACE_FILL even under the fill floor -
+        // read on the PIXELS, the floor's rows left 37-40 % of every combine / unit form cell empty under its ink; the spare
+        // height stays under the grid instead, and the pv footprint takes the columns that fill the page where it can)
+        const fillFloor = tightRows(infos) ? 0 : (0.82 * G) / Math.max(1, rows);
         cellH = r3(Math.min(cellH, Math.max(Math.min(hMin, own) * IN_PLACE_FILL, fillFloor)));
     }
     const fillsGrid = cellH >= even - 0.01;

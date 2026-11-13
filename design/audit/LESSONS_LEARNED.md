@@ -420,3 +420,81 @@ the cell; and a LATER state of the same example draws ink in that band (reserved
 ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), with a self-test (ink appears later: excused;
 never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
 white on any other role.
+
+## lf-placevalue week 2 (2026-11-12): number_word_form critic nwf r1 FAIL - findings -> checks
+| Finding (critic nwf r1) | Fixed this round | Check | Backtest | On path | Saved |
+|---|---|---|---|---|---|
+| N1 2-digit names had no named wrong answer (TF all True, Reason It 1 item) | yes: providers/pv.js wrongAnswer M-V9 401 / M-L3 swap / M-Z1 for 2-digit | ws-words-checks WORDS-WRONG-RATE (DRAFT: getProvider reads every candidate as a nudge on both commits) | pending | not wired (draft) | 1 round once wired |
+| N2 TF claim never prints with answerSlot hto | no | PROPOSED ws-cell-checks CLAIM-INK | none | - | - |
+| N3 "thirty-five hundred: 0 in the hundreds" steps under 100 | yes: workedSteps 2-digit branch | ws-words-checks WORDS-STEPS-TRUE (DRAFT, same reason) | pending | not wired | 1 round once wired |
+| N4 "one hundred" in a 2-digit row 5 mm lower | yes: two-line box only for names >= 15 chars over 100 | PROPOSED ws-cell-checks ROW-SLOT-Y | none | - | - |
+| N5 model never shows its answer (scripted-model / guided / opener) | no | PROPOSED ws-empty-band --model-states MODEL-ANSWER | none | - | - |
+| N6 chant "Three boxes" over 2-digit items; lesson role ignores practice opts | no | PROPOSED lesson-unit chant-box assertion | none | - | - |
+| N7 "one hundredthirteen" in the guided model | no (source not found this round) | PROPOSED ws-cell-checks WORDS-TEXT | none | - | - |
+| N8 "seven / hundred eight" breaks | yes: "n hundred" kept together (no-break space) | PROPOSED ws-cell-checks WORDS-BREAK | none | - | - |
+| N9 card host draws legacy q.visual (two answer places) | no: lead ruling needed (D3 names worksheet / quiz, not card) | PROPOSED ws-empty-band SCREEN-PARITY | none | - | - |
+| band=20 S 45 %, to_words capacity | no | ws-empty-band EB-BAND / options-render (exist) | none | precritic | - |
+- Lesson: a provider check through getProvider() reads the REGISTRY's wrapped answer (a near-miss nudge when the provider has no
+  named error), so it cannot see the provider's own gap; backtest a new check on the failed commit BEFORE writing the table row.
+- Lesson: a skill moved onto a new card brings its family's past critic findings into the card's scope (21 rule ids here): add them
+  in the same change, or the re-sign stalls.
+
+## lf-placevalue number_word_form r2-r3 (2026-11-13): findings -> checks
+| Finding | Check (new / extended) | Backtest row (FAIL old -> PASS fix) | Path | Saved |
+|---|---|---|---|---|
+| N1 2-digit names: no named wrong answer | ws-words-checks WORDS-WRONG-RATE (new; reads the real provider) | pv-words-provider (2ccd5b21 -> 1e3b128e) | precritic opt-in | 1 round |
+| N3 false hundreds steps under 100 | ws-words-checks WORDS-STEPS-TRUE (new) | pv-words-provider | precritic opt-in | 1 round |
+| N2 TF claim not printed with H T O | ws-cell-checks --words-rules CLAIM-INK (new) | pv-words-claim | precritic opt-in | 1 round |
+| N4 / N10 / N10b row answer places out of line | ws-cell-checks --words-rules ROW-SLOT-Y (new; lesson + guided rows; band 1,000 + zeroPlace always row) | pv-words-rowy, pv-words-rowy-1000 (706d940a -> 5a4ca828) | precritic opt-in (2 rows) | 2 rounds (N4 class came back as N10) |
+| N5 model never shows its answer | ws-cell-checks --words-rules MODEL-ANSWER (new) | pv-words-model | precritic opt-in | 1 round |
+| N6 chant vs slots; lesson ignored its practice opts | ws-lesson-unit chant-box (new, always on) | pv-words-chant | ws-lesson-unit (gate) | 1 round |
+| N7 dropped space at the highlight split | ws-cell-checks --words-rules WORDS-TEXT (new) | pv-words-text | precritic opt-in | 1 round |
+| N8 "seven / hundred eight" breaks | ws-cell-checks --words-rules WORDS-BREAK (new) | pv-words-break | precritic opt-in | 1 round |
+| N9 card drew the legacy visual (2 answer places) | ws-empty-band --screen-parity EB-PARITY (new, lead ruling) | pv-words-parity | precritic opt-in | 1 round |
+| N11 numeral-to-words one across at S | ws-empty-band EB-SIDE on the to_words option (exists; backtest added) | pv-words-towords-side (706d940a -> 5a4ca828) | precritic options variants | 1 round |
+| band 20 S stretched rows | ws-empty-band EB-BAND (exists) | (builder r2 row) | precritic | 1 round |
+| N12 "1 ones" step plural (minor, open) | PROPOSED: step-string lint \b1 (ones|tens|hundreds)\b | none | - | - |
+| guided Model tab row 2.5-3.2 mm (guided.js, D3) | ROW-SLOT-Y records, does not judge the Model row | none | - | 0 - engine |
+| card EB-SIDE 36-42 % (host width, D3) | ws-empty-band EB-SIDE (exists) | none | - | 0 - hosts |
+- Lesson: a row-alignment fix keyed to ONE item's length (>= 15 letters) misses the item of the same row it does not cover ('one
+  thousand', 12): key it to what the PAGE deals (the band) so every cell of the row gets the same box.
+- Lesson: getProvider takes (category, skill); one string silently reads the defaults - a provider check must assert real members.
+### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| A full ws-backtest run hung 7,000 s with no output (leftover checkout pv-expand-card-kit-fail). The row itself passes in 263 s; cause: mq-browser-run.sh passed its slot flock fd to the command, so a child that outlived it (puppeteer's detached Chrome of a killed gate) held the slot for ever; with both slots held every browser row waited without end, and spawnSync with no timeout printed nothing | `ws-backtest --runner-orphan <runner>` (also in `--self-test`); ws-backtest `--timeout` / `--browser-timeout` (kills the tree, TIMEOUT + 20-line tail) and `--lock-warn` (prints the slot holders); runner now runs `"$@" {fd}>&-`; ws-precritic / ws-backtest refresh a stale /tmp runner | runner-orphan-slot (fixture: master runner FAIL / fixed runner OK) | ws-backtest (deploy gates); runner used by every browser gate | 1 full run (~2 h) per hang |
+| Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
+| 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
+| ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+
+### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+
+Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
+touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem
+cells of the critic's spot lessons were never read; the rounding fix reached Practice and not Mixed. ws-lesson-samples
+--check now carries the four spot lessons, and precritic runs PM-CONT / SHEET-2PG over every library lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| 1 div_facts Mixed equation / missing-factor cells top-anchored: 53 % (L), 54 % and 40 % (S) bands | ws-lesson-samples PM-H13 on the spot lessons (every cell kind) | lesson-pm-h13-spot (9135190b FAIL 6 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 2 sub_wp_10 / add_wp_20 S Mixed word problem 37 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 3 fact_family_sort L Mixed: one 6-cell row alone on a continuation page 72 % blank | ws-lesson-samples PM-CONT (new: no Practice / Mixed continuation page >= 50 % blank) | lesson-pm-cont (9135190b FAIL → 709605bb OK) | precritic lesson-samples-check + lesson-samples-all | 1 round |
+| 4 nearest_10 L Mixed rounding cells not centred, item number on the "T" head | PM-H13 + ws-lesson-samples TAB-CLEAR (new: tab >= 2 mm from ink; 1 mm for an across fact, CL-40) | lesson-tab-clear (9135190b FAIL 2 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
+| 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+| 6 (re-critic lf-engine-live-pm2) re-flow of a sheet fixed one measure (pages used) and broke another (tab clearance): number tab over the T head on sheet items 10-12, pages 27-35 % blank; 709605bb reverted | gate every page rule on the page you change: TAB-CLEAR on sheet Guided / Independent blocks; SHEET-2PG fails when a page >= 30 % blank while any row is below design height; pages balanced within 15 % (proposed, not yet built) | lesson-sheet-2pg PENDING (item 6 redone separately) | precritic lesson-samples-all | 1 round lost |
