@@ -150,6 +150,11 @@ const OUT = arg('out', null) ? path.resolve(ROOT, arg('out'))
 const DPI = parseInt(arg('dpi', GOLDEN_MODE ? '150' : '96'), 10);
 const NO_SCREEN = has('no-screen');
 const NO_PRINT = has('no-print');
+// --quiz-builder (opt-in, lf-placevalue compare r4 / critic r2 N8): the quiz host deals through the quiz builder - openQuizBuilder +
+// addMultipleQuestions with the skill's category, the app's own path, so a provider's roleOpts('test') (identify's heads off) and
+// the builder's set positions apply - instead of seeded generateQuestionFor calls; Math.random reseeded first, and the quiz
+// view's HTML is written beside the PNG (quiz-1280.html) for a check to read. Off: the quiz is dealt as before (golden hashes).
+const QUIZ_BUILDER = has('quiz-builder');
 // --gate: end with `ws-grade-render: OK | FAIL` on the measured overflow and phone / tablet card targets (see the run's end)
 const GATE = has('gate');
 const RESUME = has('resume');
@@ -346,10 +351,19 @@ async function renderWorksheet(page, skill, file) {
 async function renderQuiz(page, skill, file) {
     await viewport(page, 1280, 900);
     await hideOverlays(page);
-    const info = await page.evaluate(async ({ skill, seed }) => {
+    const info = await page.evaluate(async ({ skill, seed, viaBuilder }) => {
         try {
             const questions = [];
-            for (let i = 0; i < 3; i++) {
+            if (viaBuilder) {
+                if (window.__wsReseed) window.__wsReseed(seed);
+                window.openQuizBuilder();
+                window.addMultipleQuestions(skill.skillId, 3, skill.categoryId);
+                await window.saveQuiz();
+                const tests = (await window.listTests()) || [];
+                const t = tests.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0];
+                for (const q of (t ? t.sections.flatMap((x) => x.questions) : [])) questions.push(Object.assign({}, q, { id: questions.length }));
+            }
+            for (let i = 0; !viaBuilder && i < 3; i++) {
                 const q = window.generateQuestionFor({ category: skill.categoryId, skill: skill.skillId, seed: seed + i, itemIndex: i });
                 if (!q) continue;
                 // what the quiz builder stores (quiz-take.js quizQuestionData), so the quiz renders as a real one
@@ -368,13 +382,14 @@ async function renderQuiz(page, skill, file) {
             name.value = 'Audit'; name.dispatchEvent(new Event('input'));
             window.startQuizTest();
             window.scrollTo(0, 0);
-            return { questions: questions.length };
+            return { questions: questions.length, ...(viaBuilder ? { via: 'quiz-builder' } : {}) };
         } catch (e) { return { error: e.message || String(e) }; }
-    }, { skill, seed: hash(slug(skill) + ':quiz') });
+    }, { skill, seed: hash(slug(skill) + ':quiz'), viaBuilder: QUIZ_BUILDER });
     if (info.error) return { error: info.error };
     await sleep(400);
     const el = await page.$('#quizTakeView');
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
+    if (QUIZ_BUILDER) fs.writeFileSync(file.replace(/\.png$/, '.html'), await page.evaluate(() => { const v = document.getElementById('quizTakeView'); return v ? v.outerHTML : ''; }));
     const m = await measure(page, '#quizTakeView');
     const contentHash = hashOf(await page.evaluate(G.canonicalHostInPage, '#quizTakeView'), file);
     // leave quiz mode so the next host starts clean

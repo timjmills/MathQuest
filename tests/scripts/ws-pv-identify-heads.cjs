@@ -9,18 +9,29 @@
 //   ... --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ   --sizes S,L   --seeds 2
 //   MQ_ROOT=<tree> ... (ws-backtest commit-pair)
 //
-// PV-HEADS-UNAIDED  review / test / pre-skill-check at S / M / L, the default support (labels) and support=chart: every
-//                   "name the place" item (an underlined digit in a numeral) is drawn with NO heads row. FAIL per page with
-//                   one or more headed items. (The pre-skill check is built for placevalue:value, whose earlier skills deal
-//                   identify; one with no identify item is reported, not judged.)
+// PV-HEADS-UNAIDED  review / test / pre-skill-check at S / M / L, the DEFAULT support (no support chosen): every "name the
+//                   place" item (an underlined digit in a numeral) is drawn with NO heads row. FAIL per page with one or more
+//                   headed items. (The pre-skill check is built for placevalue:value, whose earlier skills deal identify; one
+//                   with no identify item is reported, not judged.)
+// PV-HEADS-CHOSEN   (lead ruling 14:24) the same roles with a support the teacher CHOSE - support=chart, a value the option
+//                   store keeps (packOptions drops the default 'labels') - keep it on review / test (a pre-skill check deals
+//                   identify with ITS own options): every item has its heads. 0d61403a dropped
+//                   the teacher's chart to none.
 // PV-HEADS-TAUGHT   the control: independent and mixed-practice at S / M / L keep the heads on every item (the support is
 //                   the role's to drop only where the ruling says).
 // PV-HEADS-QUIZ     the screen: the quiz builder deals 6 placevalue:identify questions (openQuizBuilder +
 //                   addMultipleQuestions with the category), saves the quiz, opens it as the pupil's link does and starts
 //                   it: no item on the quiz paper has heads, and the quiz draws place-value numerals at all (a builder that
 //                   deals fractions:identify for the bare id 'identify' is a FAIL too).
+// PV-HEADS-GRADE-QUIZ (critic r2 N8) the critic's quiz PNG is the real quiz: ws-grade-render --quiz-builder (the quiz host
+//                   dealt through the builder) for placevalue:identify writes a quiz view with no headed item. r2: the grade
+//                   render dealt generateQuestionFor directly and drew H T O over the quiz numerals.
 // Prints `ws-pv-identify-heads: OK` / `FAIL (n)` last; exits 1 on FAIL.
 const H = require('../lib/ws-harness.cjs');
+const fs = require('fs');
+const os = require('os');
+const pathM = require('path');
+const { spawnSync } = require('child_process');
 
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -53,6 +64,17 @@ function readHeads(scope) {
 }
 
 (async () => {
+    // (run first, before this check's own browser: one browser at a time)
+    let gradeQuiz = null;
+    if (on('PV-HEADS-GRADE-QUIZ')) {
+        const out = fs.mkdtempSync(pathM.join(os.tmpdir(), 'pv-heads-gq-'));
+        // (--grade-render <file>: another tree's tool - ws-backtest proves the tool fix with {root}'s copy)
+        const tool = arg('grade-render', pathM.join(__dirname, 'ws-grade-render.cjs'));
+        const g = spawnSync(process.execPath, [tool, '--skills', 'placevalue:identify', '--quiz-builder', '--no-print', '--out', out], { encoding: 'utf8', env: process.env, timeout: 600000, maxBuffer: 64 * 1024 * 1024 });
+        const f = pathM.join(out, 'placevalue__identify', 'quiz-1280.html');
+        gradeQuiz = fs.existsSync(f) ? { html: fs.readFileSync(f, 'utf8') } : { error: `ws-grade-render --quiz-builder wrote no quiz view (exit ${g.status}; ${String(g.stdout || '').trim().split('\n').slice(-2).join(' / ')})` };
+        try { fs.rmSync(out, { recursive: true, force: true }); } catch (e) { /* tmp */ }
+    }
     const app = await H.open({});
     const page = app.page;
     const sheet = await app.browser.newPage();
@@ -73,8 +95,8 @@ function readHeads(scope) {
         return sheet.evaluate(readHeads, null);
     };
     let pagesJudged = 0;
-    const judge = (id, roles, want) => async () => {
-        for (const role of roles) for (const size of SIZES) for (const [tag, opts] of (want ? [['labels', null]] : [['labels', null], ['chart', { support: 'chart' }]])) {
+    const judge = (id, roles, want, sets = [['default', null]]) => async () => {
+        for (const role of roles) for (const size of SIZES) for (const [tag, opts] of sets) {
             for (let k = 0; k < NSEED; k++) {
                 const seed = (hash(`placevalue__identify:${role}`) + k * 7919) % 1000000;
                 const skillId = role === 'pre-skill-check' ? 'value' : 'identify';
@@ -89,6 +111,7 @@ function readHeads(scope) {
         }
     };
     if (on('PV-HEADS-UNAIDED')) await judge('PV-HEADS-UNAIDED', UNAIDED, false)();
+    if (on('PV-HEADS-CHOSEN')) await judge('PV-HEADS-CHOSEN', ['review', 'test'], true, [['chart (chosen)', { support: 'chart' }]])();
     if (on('PV-HEADS-TAUGHT')) await judge('PV-HEADS-TAUGHT', TAUGHT, true)();
     if (on('PV-HEADS-QUIZ')) {
         // the real quiz path: the builder deals the questions (its own generation, quiz-builder safeGenerateQuestion), the quiz
@@ -119,6 +142,20 @@ function readHeads(scope) {
             const headed = q.items.filter((x) => x.heads).length;
             console.log(`  PV-HEADS-QUIZ: ${q.items.length} quiz item(s) drawn (${r.n} dealt, ${[...new Set(r.cats)].join(', ')}), ${headed} with heads`);
             if (headed) bad.push(`PV-HEADS-QUIZ: ${headed} of ${q.items.length} quiz item(s) drawn with place heads (the quiz is the online test: unaided), e.g. "${q.items.find((x) => x.heads).text}"`);
+        }
+    }
+    if (gradeQuiz) {
+        if (gradeQuiz.error) bad.push(`PV-HEADS-GRADE-QUIZ: ${gradeQuiz.error}`);
+        else {
+            await sheet.setContent(`<!doctype html><html><body>${gradeQuiz.html}</body></html>`, { waitUntil: 'load' });
+            const q = await sheet.evaluate(readHeads, null);
+            if (!q.items.length) bad.push('PV-HEADS-GRADE-QUIZ: the grade-render quiz view drew no place-value numeral');
+            else {
+                pagesJudged++;
+                const headed = q.items.filter((x) => x.heads).length;
+                console.log(`  PV-HEADS-GRADE-QUIZ: ${q.items.length} grade-render quiz item(s), ${headed} with heads`);
+                if (headed) bad.push(`PV-HEADS-GRADE-QUIZ: ${headed} of ${q.items.length} item(s) on the critic's quiz render drawn with place heads, e.g. "${q.items.find((x) => x.heads).text}"`);
+            }
         }
     }
     await app.close();

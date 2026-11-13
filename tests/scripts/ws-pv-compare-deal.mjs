@@ -24,7 +24,8 @@
 //                       at even and at odd places is 0.25-0.75 each, and no page holds 4 consecutive items whose signs strictly
 //                       alternate (> < > <; an "=" breaks a run). r2: lengths=mixed dealt > < > < down every page.
 // EQ-SHARE (r2 N7)      the same pages: no "=" at item 1 or 2, and any n consecutive items hold at most ceil(n / 6) "="
-//                       (r2: two "=" in one set of six, Test item 1 "724 = 724").
+//                       (r2: two "=" in one set of six, Test item 1 "724 = 724"), and an "=" item's Guided cue (the first
+//                       worked step naming a number) is step 2, the one that decides it (r2: "Both have three digits.").
 // Prints `ws-pv-compare-deal: OK` / `FAIL (n)` last; exits 1 on FAIL.
 import { loadApp, fnv } from './ws-card-rulings.mjs';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -171,6 +172,13 @@ if (on('SIGN-PARITY') || on('EQ-SHARE')) {
                 n += at.length;
                 if (at.some((i) => i < 2)) bad.push(`EQ-SHARE ${tag}: page ${p0 / 30 + 1} deals "=" at item ${at[0] + 1} (never item 1 or 2)`);
                 for (let k = 1; k < at.length; k++) if (at[k] - at[k - 1] < 6) { bad.push(`EQ-SHARE ${tag}: page ${p0 / 30 + 1} deals "=" at items ${at[k - 1] + 1} and ${at[k] + 1} (any n items hold at most ceil(n/6))`); break; }
+            }
+            // (the Guided cue - guided.js hintOf: the first worked step that names a number - of an "=" item is the step that
+            // decides it, step 2, never "Both have three digits.")
+            for (const q of qs.filter((x) => sign(x) === '=').slice(0, 6)) {
+                const st = (prov.workedSteps(q) || []).map((x) => String(x.text || ''));
+                const at = st.findIndex((t) => /\d/.test(t) && !/^(Write|Check|Say)\b/i.test(t));
+                if (at !== 1) { bad.push(`EQ-SHARE ${tag}: the "=" item ${q.pv.a}'s first step naming a number is step ${at + 1} ("${st[at] || st[0]}") - the Guided cue must be step 2, the one that decides "="`); break; }
             }
             console.log(`EQ-SHARE ${tag}: ${n} "=" in ${qs.length} items`);
             if (n < qs.length / 10) bad.push(`EQ-SHARE ${tag}: only ${n} "=" in ${qs.length} items (want about one in six)`);

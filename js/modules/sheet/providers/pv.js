@@ -104,8 +104,13 @@ const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `$
 // paper and in the quiz (the online test). There the support follows the role: none. The lesson's own Practice and Mixed
 // pages (independent / mixed-practice) and every other role keep the support as taught. Check: ws-pv-identify-heads.
 export const IDENTIFY_UNAIDED_ROLES = Object.freeze(['review', 'test', 'test-b', 'pre-skill-check']);
+// (lead ruling 14:24, 2026-11-13: only the DEFAULT changes on those roles - a support the teacher CHOSE for the page is kept. The
+// option store keeps a skill's choices as the values that differ from its defaults (packOptions: a share code, a saved
+// section, a stored quiz), so a chosen support is one that is not the default 'labels': the chart. A set with no support, or
+// the default, takes none. ws-pv-identify-heads PV-HEADS-UNAIDED (the default) and PV-HEADS-CHOSEN (the chart kept))
+const IDENTIFY_DEFAULT_SUPPORT = 'labels';
 registerSkill('placevalue:identify', {
-    roleOpts: (role, o) => (IDENTIFY_UNAIDED_ROLES.includes(role) && o.support !== 'none' ? { ...o, support: 'none' } : o),
+    roleOpts: (role, o) => (IDENTIFY_UNAIDED_ROLES.includes(role) && (o.support === undefined || o.support === IDENTIFY_DEFAULT_SUPPORT) ? { ...o, support: 'none' } : o),
     strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
         : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3,
