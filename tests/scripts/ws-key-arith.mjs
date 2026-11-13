@@ -20,6 +20,8 @@
 //                  are true.
 //   reason-it      A right / B right. The panel keyed right draws a true sentence, and A and B draw different work.
 //   story          P-WP-22 (critic r1 F12): a money story counts coins; it never names a currency (dollars, cents ...).
+//   signmatch      (F7) a False claim never prints the other sign's answer under the story's own sign.
+//   stretch        (F11, L6) a compare story's Stretch task keeps the story: its two people and its noun.
 // A sentence is read from the kit's slot attributes (the number-sentence boxes fr0-a / op0 / fr0-b / answer, the column
 // rows w0-top-* / w0-sign / w0-bottom-* / ans-*, the neutral row w0-a / w0-sign / w0-b / answer); a cell with none of them
 // (a two-step story, a picture) is not judged.
@@ -37,7 +39,10 @@ const argv = process.argv.slice(2);
 const has = (f) => argv.includes(f);
 const arg = (f, d) => { const i = argv.indexOf(f); return i >= 0 && i + 1 < argv.length ? argv[i + 1] : d; };
 const argAll = (f) => argv.flatMap((a, i) => (a === f && i + 1 < argv.length ? String(argv[i + 1]).split(',') : [])).map((s) => s.trim()).filter(Boolean);
-const KNOWN = new Set(['--skill', '--root', '--n', '--json', '--report-only']);
+const KNOWN = new Set(['--skill', '--root', '--n', '--json', '--report-only', '--only']);
+// --only a,b: judge only these rules (true-false, error-analysis, reason-it, story, signmatch, stretch) - one finding a backtest row
+const ONLY = argAll('--only');
+const on = (r) => !ONLY.length || ONLY.includes(r);
 for (let i = 0; i < argv.length; i++) {
     if (!argv[i].startsWith('--')) continue;
     if (!KNOWN.has(argv[i])) { console.log(`${TOOL}: unknown flag ${argv[i]}`); process.exit(2); }
@@ -102,7 +107,8 @@ async function loadApp(root) {
         const tf = await import(M('sheet/roles/true-false.js'));
         const ea = await import(M('sheet/roles/error-analysis.js'));
         const ri = await import(M('sheet/roles/reason-it.js'));
-        return { gq, so, kit, tf, ea, ri };
+        const st = await import(M('sheet/roles/stretch.js'));
+        return { gq, so, kit, tf, ea, ri, st };
     } finally { for (const k of Object.keys(quiet)) console[k] = quiet[k]; }
 }
 
@@ -126,7 +132,7 @@ function configsOf(so, cat, id) {
 
 async function main() {
     const app = await loadApp(ROOT);
-    const { gq, so, kit, tf, ea, ri } = app;
+    const { gq, so, kit, tf, ea, ri, st } = app;
     const findings = [];
     let judged = 0, sentences = 0;
     const per = {};
@@ -153,11 +159,18 @@ async function main() {
                 };
                 const it = { q, template: 'word-work', key: { value: String(q.ans) }, footprint: {}, render: draw, fclass: 'word' };
                 const where = `${key} ${tag} item ${i}`;
-                const bad = (role, msg) => { findings.push({ key, opts: tag, item: i, role, msg }); per[key].findings++; };
+                const bad = (role, msg) => { const r = /SIGNMATCH/.test(msg) ? 'signmatch' : role; if (!on(r)) return; findings.push({ key, opts: tag, item: i, role: r, msg }); per[key].findings++; };
                 const ctxB = { mode: 'print', size: 'M', state: 'blank' };
                 // ---- P-WP-22 (critic r1 F12): money is a plain number of coins, never a currency word
                 const cur = /\b(dollars?|cents?|pounds?|euros?)\b/i.exec(String(q.text || ''));
                 if (cur) bad('story', `P-WP-22: the story names a currency ("${cur[0]}"): "${String(q.text).slice(0, 70)}" (${where})`);
+                // ---- Stretch (critic r1 F11, L6): a compare story's open problem keeps its story - its two people and its noun
+                if (/^compare-(fewer|more-smaller)$/.test(payload.schema || '') && Array.isArray(payload.who)) {
+                    let t = null;
+                    try { t = st.openTask(it, 'M'); } catch (e) { t = null; }
+                    const txt = t ? t.prompt.join(' ') : '';
+                    if (!t || !payload.who.every((w) => txt.includes(String(w).replace(/^The /, ''))) || !txt.includes(payload.unitMany || '#')) bad('stretch', `L6: the Stretch task does not keep the compare story ("${txt.slice(0, 60)}") (${where})`);
+                }
                 // ---- True or False?
                 for (const wrong of [false, true]) {
                     let p = null;
