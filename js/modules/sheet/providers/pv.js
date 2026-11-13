@@ -1289,6 +1289,15 @@ const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey:
 // (critic nwf r1 opener / scripted-model C2: "Read the hundreds word." beside "eleven" - a name under 100 has no hundreds word;
 // its steps read the tens word, then the ones word)
 const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
+// (lf-roles critic r8b D4: "eleven" sat on a Guided page whose Steps read "the tens word, the ones word" - a teen, a tens word
+// alone ("forty") and a one-word name under ten are each their own kind of problem, with Steps that fit them. Their own Steps
+// also make them their own kind to the Guided page (guided.js kindOf), which keeps one kind: PT 2.3, GUIDED-ONE-KIND.)
+const WORDS_TO_NUMBER_TEEN = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Eleven to nineteen: 1 ten.', 'Find the ones in the word.', 'Write 1, then the ones.'] });
+const WORDS_TO_NUMBER_TENS = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'No ones word? Write 0 ones.', 'Write the digits.'] });
+const WORDS_TO_NUMBER_1 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the word.', 'Write its digit.'] });
+/** The kind of a words-to-numeral name: one word under ten, a teen, a tens word alone, two words (tens and ones), 100 and up. */
+export const wordsKind = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
+const WORDS_STRINGS = { 'one-word': WORDS_TO_NUMBER_1, teen: WORDS_TO_NUMBER_TEEN, decade: WORDS_TO_NUMBER_TENS, 'two-word': WORDS_TO_NUMBER_2 };
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
 /** Every named wrong answer of a words-to-numeral item (`fits`: in H T O boxes, the claim has the boxes' digit count). */
@@ -1320,7 +1329,7 @@ function wordsWrongs(q) {
 }
 
 registerSkill('composing:number_word_form', {
-    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_TO_NUMBER_2 : null), WORDS_TO_NUMBER),
+    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : null), WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
     workedSteps: (q) => {
         const p = pvOf(q);

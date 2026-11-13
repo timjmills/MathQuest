@@ -613,13 +613,32 @@ export function answerTokens(it) {
     return [...out];
 }
 
-/** Does this hint text hold the problem's answer (any of answerTokens)? */
+/** A place phrase of a hint: "2 tens", "6 ones", "3 hundreds" (its number, then the place). */
+const PLACE_RE = /\b(\d+)(\s+)(thousand|hundred|ten|one)s?\b/gi;
+const PLACE_VAL = { thousand: 1000, hundred: 100, ten: 10, one: 1 };
+/**
+ * The number a hint's place phrases build together ("2 tens, 6 ones" -> 26), or null when it names fewer than two places
+ * (lf-roles critic r8b D3: number_word_form's grey hint '"twenty-six": 2 tens, 6 ones.' holds no "26", yet it is the whole
+ * answer). GUIDED-HINT-LEAK reads the printed hint the same way.
+ */
+export function placeBuilt(text) {
+    let sum = 0, k = 0;
+    for (const m of String(text || '').replace(/,(?=\d{3}\b)/g, '').matchAll(PLACE_RE)) { sum += Number(m[1]) * PLACE_VAL[m[3].toLowerCase()]; k++; }
+    return k >= 2 ? sum : null;
+}
+/** Do the hint's place phrases build an answer number the problem does not print? */
+const placeLeak = (t, it, given) => {
+    const b = placeBuilt(t);
+    return b !== null && !given.has(String(b)) && answerTokens(it).includes(String(b));
+};
+
+/** Does this hint text hold the problem's answer (any of answerTokens, or its place phrases built together)? */
 export function hintGivesAnswer(text, it) {
     const t = String(text || '').replace(/,(?=\d{3}\b)/g, '');
     const nums = new Set((t.match(/\d+(?:\.\d+)?/g) || []).flatMap((n) => [n, String(Number(n))]));
     const words = t.toLowerCase().replace(/[.,:;!?]/g, ' ').split(/\s+/);
     const given = givenNumbers(it);
-    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a)));
+    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a))) || placeLeak(t, it, given);
 }
 
 /** The numbers the problem itself prints: naming one gives nothing away ("Circle groups of 4." on 16 ÷ 4 = 4). */
@@ -654,7 +673,10 @@ export function hintOf(it) {
     if (!all.length) return '';
     const given = givenNumbers(it);
     const toks = new Set(answerTokens(it).filter((a) => /\d/.test(a) && !given.has(a)));
-    const masked = all[0].replace(/,(?=\d{3}\b)/g, '')
+    const first = all[0].replace(/,(?=\d{3}\b)/g, '');
+    // (place phrases that build the answer - "2 tens, 6 ones" for 26 - leave their numbers as gaps: "___ tens, ___ ones",
+    // lf-roles critic r8b D3; the place word always plural, so "1 one" does not show its 1 as "___ one")
+    const masked = (placeLeak(first, it, given) ? first.replace(PLACE_RE, (m, n, sp, pl) => `___${sp}${pl}s`) : first)
         .replace(/\d+(?:\.\d+)?/g, (n) => (toks.has(n) || toks.has(String(Number(n))) ? '___' : n));
     // One sentence of it: the first with a gap ("The short hand has passed ___.").
     const frame = masked.split(/(?<=[.!?])\s+/).find((s) => s.includes('___')) || '';
