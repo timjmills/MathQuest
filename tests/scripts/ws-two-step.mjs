@@ -269,7 +269,7 @@ async function printMode() {
     // card decision 9 (re-signed 2026-11-13, lead ruling R1 (a)): the bar above the column work, S 2 / M 1 / L 1
     const PIN = { S: 2, M: 1, L: 1 };
     const ROLES = ['independent', 'more-practice', 'test'];
-    const SIZES = String(arg('--sizes', 'S,M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
     const html = arg('--html', null);
     const out = [];
     const bad = (rule, msg) => out.push(`${rule} ${msg}`);

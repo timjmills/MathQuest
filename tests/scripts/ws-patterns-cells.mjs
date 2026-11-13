@@ -43,7 +43,7 @@ if (!mine.length && !mineState.length) { console.log(`${TOOL}: OK (n/a: no patte
 
 const kit = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'sheet', 'index.js')).href);
 const fails = [];
-const SIZES = ['S', 'M', 'L'];
+const SIZES = ['M', 'L']; // S dropped (owner rule 2026-11-13); the card's tiles a / b / c are S / M / L, so M / L read b / c
 const ctxOf = (size, extra = {}) => Object.assign({ size, look: 'ican', metrics: kit.metricsFor ? kit.metricsFor(size) : undefined }, extra);
 const feature = { task: 'feature', start: 3, step: 5, terms: [3, 8, 13, 18, 23, 28], choices: ['Every number ends in 3.', 'The ones digits go 3, 8, 3, 8.', 'Every number is odd.'], correct: 1, show: false };
 
@@ -67,7 +67,7 @@ if (mine.some((k) => /notice_patterns|pattern_features/.test(k))) {
     if (!m) fails.push('TILE-CARD: the card no longer states "feature track tiles a / b / c mm"');
     else {
         SIZES.forEach((size, i) => {
-            const want = Number(m[i + 1]);
+            const want = Number(m[i + 2]);
             const html = cell.render(feature, ctxOf(size, { state: 'blank', scaffoldLevel: 0 }));
             const tiles = [...html.matchAll(/class="mq-nt-tile"[^>]*data-ws-slot="w\d"[^>]*style="[^"]*?width:([\d.]+)mm;height:([\d.]+)mm/g)];
             if (!tiles.length) { fails.push(`TILE-CARD ${size}: no working tile on the Test-state track`); return; }

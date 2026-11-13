@@ -5934,7 +5934,7 @@
     "commit": "b0efa7ee8",
     "state": "0"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size M,L --rules PUPILTAG",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -5994,7 +5994,7 @@
     "commit": "88032a8a",
     "state": "0"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size M,L --rules PUPILTAG",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

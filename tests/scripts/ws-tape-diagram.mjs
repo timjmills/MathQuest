@@ -2,7 +2,7 @@
 // lf-engine roles critic 8266326ba N4: "Leo needs 186 shells ... has 9" drew the part 9 as a sliver with its digit outside the
 // bar). Owner rule: the finding is a check before its fix lands. Browser.
 //
-//   node tests/scripts/ws-tape-diagram.mjs [--skill cat:a,...] [--root DIR] [--seeds 24] [--sizes S,M,L]
+//   node tests/scripts/ws-tape-diagram.mjs [--skill cat:a,...] [--root DIR] [--seeds 24] [--sizes M,L]
 //
 //   TAPE-LABEL-INSIDE  on the printed Independent page at S / M / L (--seeds seeds each; the tape alone and in the critic's
 //                      mixed set compare + add_facts + tape + perimeter_intro) and on the screen visual at the phone
@@ -25,7 +25,7 @@ const only = String(arg('--skill', arg('--skills', ''))).split(',').map((s) => s
 const mine = only.length ? SCOPE.filter((k) => only.includes(k) || only.includes(k.split(':')[1])) : SCOPE;
 if (!mine.length) { console.log(`${TOOL}: OK (n/a: algebra:tape_diagram not in scope)`); process.exit(0); }
 const SEEDS = Math.max(1, Number(arg('--seeds', 24)) || 24);
-const SIZES = String(arg('--sizes', 'S,M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
 if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
 const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
 
