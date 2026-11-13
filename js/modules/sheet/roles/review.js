@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows, cellWidthMm, LIVE_W_MM } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
@@ -137,7 +137,7 @@ function reviewTitle(input, topic) {
     return fits(`Review: ${tp}`) ? `Review: ${tp}` : 'Review';
 }
 
-function geometry(pools, input) {
+function geometryAt(pools, input, mainCols = 0) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
     const earlier = pools.earlier || [];
@@ -154,7 +154,7 @@ function geometry(pools, input) {
     // A wrapped instruction takes its extra line off the page too.
     const wrap = stripExtraMm(ctx, '', instructionText(instructionKeyOf(main, input.skills), main))
         + (earlier.length ? stripExtraMm(ctx, 'Mixed Review:', instructionText(instructionKeyOf(earlier, input.skills), earlier)) : 0);
-    const M = sectionFit(main, ctx);
+    const M = mainCols ? { cols: mainCols, h: hMinAt(main, mainCols, ctx) } : sectionFit(main, ctx);
     const E = sectionFit(earlier, ctx);
     const ceil = CEILING[ctx.size];
     // The earlier band may print fewer columns than it could, so a WHOLE row of it keeps the share
@@ -178,7 +178,14 @@ function geometry(pools, input) {
     // prints them one a row - "30 − 10 =" (62 mm) centred in a 185 mm cell left two 56 mm bands
     // (add_facts Review M, cells 10-12). One column stays for a pool of one problem (its only row).
     const oneColOk = E.cols < 2 || earlier.length < 2;
-    if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
+    // lf-ops r-review (RUBRIC H13 across the cell): an earlier step of STATIC-width problems (stacks) keeps its own columns
+    // when fewer would only widen the cell round the same ink - mult_facts array Review S took the mixed band from 4 to 3
+    // columns to fit a second row under the 45 % share, and every "47 - 6" stack sat in a 61.5 mm cell with a 19.7 mm
+    // empty band (32 %). A narrower column count stays open while the widest problem still fills 70 % of the cell.
+    const eStatic = earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
+    const eWMax = eStatic ? Math.max(...earlier.map((it) => it.footprint.wMm)) : 0;
+    const widens = (c) => eStatic && c < E.cols && eWMax < 0.7 * cellWidthMm(c, LIVE_W_MM, ctx.look).inner;
+    if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) if (!widens(c)) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
     // kind, whole rows), each row grouped by height and as tall as what it holds (H13). Heights
@@ -208,9 +215,9 @@ function geometry(pools, input) {
     // on mixed time): 20-45% when whole rows allow it, else any share up to 45% with one mixed
     // row, else no mixed row. The most items win; then the share nearest a third; then the
     // skill's own rows (main rows rank first).
-    const search = (lo, needE) => {
+    const search = (lo, needE, opts = eOpts) => {
         let best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: -1, d: 9 };
-        for (const eo of (bands === 2 ? eOpts : [{ c: E.cols, h: E.h, hw: 0, nMax: Infinity, wMax: 0 }])) {
+        for (const eo of (bands === 2 ? opts : [{ c: E.cols, h: E.h, hw: 0, nMax: Infinity, wMax: 0 }])) {
             for (let mr = 1; mr <= Math.min(20, maxMr); mr++) {
                 const a = mainAt(mr);
                 for (let er = 0; er <= (bands === 2 ? 10 : 0); er++) {
@@ -235,10 +242,47 @@ function geometry(pools, input) {
     if (best.n < 0 && bands === 2) best = search(0, true);
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
+    // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
+    // layout.js lets the Independent page (L1) - but only when that prints MORE problems (mult_facts touch Review S: 10 facts
+    // + 5 stacks, where its own 4 columns held one row of 4 under the ceiling and the 3 it used to narrow to left 32 % beside
+    // every stack). An equal count keeps the step's own columns.
+    if (bands === 2 && !split && eStatic && ctx.size === 'S' && E.cols === AUTO_COLS.S && fitsAt(earlier, 5, ctx)) {
+        const h5 = hMinAt(earlier, 5, ctx);
+        if (Number.isFinite(h5) && h5 > 0) {
+            const o5 = [{ c: 5, h: h5, hw: 0, nMax: Infinity, wMax: 0 }];
+            let b5 = search(0.2, true, o5);
+            if (b5.n < 0) b5 = search(0, true, o5);
+            if (b5.n > best.n) best = b5;
+        }
+    }
     const kb = mainAt(best.mRows).bands;
     const avail = availOf(kb);
-    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
+    return { n: best.n, cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
         rows: best.mRows + best.eRows + (best.eWide || 0), avail, h: M.h, eh: best.eh, ehw: best.ehw || 0, ctx, strip: m.strip, kindBands: kb };
+}
+
+/**
+ * The Review's geometry. lf-ops divarray r2 (critic r1 D2; lead ruling 2026-11-13: mult_facts Review S with touch prints 16):
+ * a band of SUPPORTED × facts at S may take another column count than its own best rate when that prints MORE problems on
+ * the page with the Mixed Review band (touch: 5 x 2 facts + 5 stacks = 15 left a 30 % strip under the grid; 4 x 3 + 4 = 16
+ * fills it). An equal count keeps the band's own columns; every other Review is as before.
+ */
+function geometry(pools, input) {
+    const g = geometryAt(pools, input);
+    const ctx = g.ctx;
+    const main = pools.main || [];
+    const xFacts = ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
+        && main.every((it) => it && it.template === 'fact' && it.supportsBox && it.supportsBox.plan && /^(\*|×|x)$/.test(String(((it.q && it.q.cell && it.q.cell.payload) || {}).op || '')));
+    if (!xFacts) return g;
+    let best = g;
+    for (const c of [5, 4, 3]) {
+        if (c === g.cols || !fitsAt(main, c, ctx)) continue;
+        const h = hMinAt(main, c, ctx);
+        if (!(Number.isFinite(h) && h > 0)) continue;
+        const alt = geometryAt(pools, input, c);
+        if (alt.n > best.n) best = alt;
+    }
+    return best;
 }
 
 /** Enough of each pool that the plan can fill its bands with whole rows of each kind. */
@@ -321,7 +365,10 @@ export function plan(input = {}) {
     // div_facts critic r5 R5-2 (RUBRIC H13 on ink): a band of div_facts facts grows to at most FACT_ROOM x its rows' own
     // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
     // div_facts only: the passed fact Reviews keep their rows.
-    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
+    // lf-ops r-review: a band of SUPPORTED facts (a mult_facts array / touch / skip page) is held the same way - its rows are
+    // as tall as their pictures, and a page's spare height stretched a 9 x 7 array's row round a 2 x 5 one (32 % under it).
+    const supportedFact = (it) => it.template === 'fact' && !!(it.supportsBox && it.supportsBox.plan);
+    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && ((it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))) || supportedFact(it)));
     // (lf-placevalue pv debt: a band of `tightRows` in-place cells - layout.tightRows - keeps its rows' own height, never the
     // page's share: combine's two-line frames in 32-41 mm rows were 37-40 % empty under the answer line, read on the pixels, and
     // a one-line expand row at IN_PLACE_FILL still 32 % - its measured height already holds the pads; the rest stays under the grid)

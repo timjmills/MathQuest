@@ -3233,8 +3233,8 @@
    "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
   },
   "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+   "commit": "fc04ba58",
+   "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
   },
   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
   "expect": {
@@ -3452,9 +3452,8 @@
    "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
   },
   "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
-   "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+   "commit": "393db090",
+   "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
   },
   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
   "expect": {
@@ -6800,6 +6799,506 @@
    "state": "the live 2 mm"
   },
   "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only BAND-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-orient-divfacts",
+  "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
+  },
+  "pass": {
+   "commit": "fc04ba58",
+   "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-dot-min-divfacts",
+  "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
+  },
+  "pass": {
+   "commit": "fc04ba58",
+   "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-caption-multfacts",
+  "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: x arrays min rows of max, the fact named, and one row reads \"1 row of n\" (re-pointed from 393db090: CAPTION now also holds the r1 N1 grammar, which 393db090 broke - \"1 rows of 1\")"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-orient-multfacts",
+  "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
+  },
+  "pass": {
+   "commit": "393db090",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "review-stack-side-multfacts-array",
+  "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
+  "browser": true,
+  "fail": {
+   "commit": "55e7d0f2f",
+   "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+  },
+  "pass": {
+   "commit": "4e2e4c988",
+   "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "review-zero-row-multfacts-array",
+  "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
+  "browser": true,
+  "fail": {
+   "commit": "05875e169",
+   "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
+  },
+  "pass": {
+   "commit": "792e5ca30",
+   "state": "0 findings: \"4 × 0\" draws the empty frame"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-frame-multfacts",
+  "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "669c41cea",
+   "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
+  },
+  "pass": {
+   "commit": "792e5ca30",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "support-not-slot-multfacts-array",
+  "check": "on an array-support band no support draws an empty closed box the size/shape of the answer slot, and a frame on only some cells (the x 0 frame, the lone framed support in a band of unframed arrays) is a finding - on paper and every screen host (critic divarray r1 D1)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SUPPORT-NOT-SLOT; ws-print-lint SUPPORT-NOT-SLOT",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "3 paper findings (S/M/L): 1 framed and 9 unframed array supports in one band - the x 0 frame reads as the lone slot-like box"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: every x array draws in the band's one frame and the x 0 fact draws that frame empty - no lone slot-like box"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only NOTSLOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-caption-grammar-multfacts",
+  "check": "a one-row array caption reads \"1 row of n\", never \"1 rows of n\" (it is spoken aloud) (critic divarray r1 N1, fact.js:242)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-CAPTION (row/rows grammar)",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "3 findings (card 1280/820/390): caption \"1 rows of 1, for 1 x 1\" says \"1 rows\""
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: the one-row caption says \"1 row of 1, for 1 x 1\""
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "size-order-opt-multfacts-array",
+  "check": "the ruled option pages are judged by SIZE-ORDER: an option page whose cells measure smaller at S must fit more at S (strict S > L), never the same page at every size (critic divarray r1 D3; mult_facts {support:array} printed 10/10/10 and 12/12/12 at S/M/L)",
+  "kind": "commit-pair",
+  "rule": "ws-capacity-pin SIZE-ORDER-OPT",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "3 findings: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12) - same page at every size. (master also fails: pre-existing, 10/10/10)"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: the x array page sizes from its measured band-frame cells - Independent / Test / More practice S 10 > M 8 >= L 8"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "test-eq-ind-multfacts",
+  "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1; lead ruling 2026-11-13: the div_facts rule of 2026-11-09 extends to mult_facts - TEST-EQ-IND runs by default)",
+  "kind": "commit-pair",
+  "rule": "ws-capacity-pin TEST-EQ-IND (on by default)",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "mult_facts array Test 12 != Independent 10 (S/M/L); touch Test 20/16 != Independent 25/20 (S/M). (master also fails touch 20!=25)"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: mult_facts Test = Independent on array, touch, skip, boxsign and no support (S/M/L), div_facts array as before"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pagefill-review-multfacts-touch",
+  "check": "print-lint's PAGEFILL (and the PG-23 orphan) run on the Review / Test roles for fact skills with supports (--fill-roles), so a support page that leaves a 30% blank strip under the grid is caught (critic divarray r1 D2: mult_facts Review S touch at the ruled 15 left a 71 mm, 30% strip)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-DENSITY PAGEFILL on review/test (--fill-roles)",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "PAGEFILL fires on mult_facts Review S touch: an empty strip ~30% of the problem area under the grid"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 PAGEFILL findings: Review S touch prints 4 x 3 facts + 4 stacks = 16 and fills the page"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports touch --size S --roles review --fill-roles review --skills multiplication:mult_facts --lints L-DENSITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "supband-below-support-multfacts-array",
+  "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item - an unframed x array in a Test cell sized for a 10-12-row one left 36-44 % empty below it (critic divarray r1 D4). A support BESIDE taller ink (the fact beside the x band frame) has no band under it. Run on the Test role, where D4 was graded (on precritic's path via --role test)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "EB-SUPBAND fires on mult_facts {support:array} Test S/M/L (e.g. Test S cell 4 ~38 %)"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "0 findings: the x array draws in the band frame beside the fact (no band under a short array)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --roles test --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "capacity-ruled-review-touch-multfacts",
+  "check": "a RULED option page prints at least its ruled count: mult_facts Review S with touch is ruled 16 (master's count; lead ruling 2026-11-13 withdrew the 16 -> 15 re-pin that left a 30 % blank strip, critic divarray r1 D2)",
+  "kind": "commit-pair",
+  "rule": "ws-capacity-pin ruled page (CAPACITY-NO-DROP)",
+  "browser": true,
+  "fail": {
+   "commit": "e3aa95d32",
+   "state": "mult_facts review S {support:[touch]}: 15 items, under its RULED 16"
+  },
+  "pass": {
+   "commit": "ecc8342e8",
+   "state": "16 items: 4 x 3 facts + 4 stacks (review.js geometry)"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --roles review --sizes S --no-test-eq-ind",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-page-divfacts-test",
+  "check": "division:div_facts fact Test pages half empty (critic r6 R6-1: Test S 117 mm white, M 116, L 91)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-PAGE (white under the grid vs one row pitch)",
+  "browser": true,
+  "fail": {
+   "commit": "49a7b12a",
+   "state": "lf-ops 49a7b12a: Test S 4 x 5, 119 mm white under the grid (pitch 23 mm); M 118 mm; L 93 mm"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "owner ruling 2026-11-08 (a): the Test takes the Independent capacity (4a07ada1), 3 columns at M for 3-digit facts (c05a5dae); EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^test [SML]$' --rules EB-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-page-divfacts-fade",
+  "check": "division:div_facts fade packet page 3 at M 40 % used (critic r6 R6-4: 129 mm white)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-PAGE on the faded packet",
+  "browser": true,
+  "fail": {
+   "commit": "49a7b12a",
+   "state": "lf-ops 49a7b12a: fade packet M p3 131.5 mm white (12 bare facts, the 2 x page-1 stage cap)"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "div_facts' stages uncapped: page 3 takes its page; EB-PAGE OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-pad-divfacts-M",
+  "check": "division:div_facts skip / think at M: the answer line 0.5-0.8 mm from the right rule on 3-digit facts (critic r6 R6-2)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-PAD (CL-8 3 mm side pad, probed with the widest facts)",
+  "browser": true,
+  "fail": {
+   "commit": "49a7b12a",
+   "state": "lf-ops 49a7b12a: skip / think Independent and Test M, ink 0.72 mm from the right rule"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "the beside line counts the tab keep-out (skip / think M print the line under the fact); EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^(independent|test) M .support: (skip|think)}$' --sizes M --rules EB-PAD",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-pad-page-divfacts-L",
+  "check": "division:div_facts at L: the skip page 2.35 mm from the right rule (\"1xx ÷ 1x =\" beside the w2 tab inset) and the fade packet page 3 in 2 x 5 with 53 mm white (div_facts aids r8, owner ruling 2026-11-09 (a))",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-PAD + EB-PAGE at L",
+  "browser": true,
+  "fail": {
+   "commit": "be028660",
+   "state": "lf-ops r8: EB-PAD 8 (skip Independent / Test L, 2.35 mm), EB-PAGE 1 (fade packet L p3, 53.3 mm white, 2 x 5)"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "a supported / faded section reaching 5-digit facts starts each fact under the number tab at L (3 mm pad, taller row, 3 columns); EB-PAD / EB-PAGE OK (re-pointed a4c6b694 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^((independent|test) L .support: skip|fade packet)\" --rules EB-PAD,EB-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-cols-divfacts-array",
+  "check": "division:div_facts array (tables 2-4) at L in 4 columns where M takes 3, the fact 1.85 mm from the rule (critic r6 R6-3)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-COLS (columns(L) <= columns(M) for no fewer problems) + EB-PAD",
+  "browser": true,
+  "fail": {
+   "commit": "49a7b12a",
+   "state": "lf-ops 49a7b12a: L 4 x 3 = 12 against M 3 x 4 = 12; EB-PAD 1.48 mm in 8 of 12 L cells"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "the measure guard (w2 tab inset + 3 mm pad) gives L 3 columns; EB-COLS / EB-PAD OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^independent [ML] .support: array, .constant' --sizes M,L --rules EB-COLS,EB-PAD",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-factx-divfacts",
+  "check": "division:div_facts fade packet: the fact's left edge moves 5.0 mm between page 1 and pages 2-3 (critic r6 R6-5)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-FACTX (fact left x spread across all packet pages <= 0.5 mm)",
+  "browser": true,
+  "fail": {
+   "commit": "49a7b12a",
+   "state": "lf-ops 49a7b12a: spread 5.30 mm (p1 8.5 mm, p2 13.8 mm in the cell)"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "every packet cell takes the one w2 left inset; EB-FACTX OK (re-pointed 893377fa -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only '^fade packet' --sizes M --rules EB-FACTX",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "test-eq-ind-divfacts",
+  "check": "division:div_facts: every support's Test page prints the same count as its Independent page at S / M / L (lead / owner ruling 2026-11-09; critic r7 R7-1)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-TESTEQ (TEST-EQ-IND: Test count = Independent count, per support and size)",
+  "browser": true,
+  "fail": {
+   "commit": "c127c3e6",
+   "state": "lf-ops r7: EB-TESTEQ 5 - off M 21 / 24, skip S 18 / 21, array (default) M 21 / 24, think S 21 / 24, boxsign M 12 / 16"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "the div_facts Test takes its Independent page's grid when its own holds a different count, rows 1.1 x the footprint; EB-TESTEQ OK (re-pointed a5c78f9d -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --only \"^(independent|test) [SML]\" --rules EB-TESTEQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-gap-divfacts",
+  "check": "division:div_facts fade packet at L: the bare page 3 puts its line 16.9 mm under the fact (under-tab start) against 9.0 mm on pages 1-2 (critic r7 R7-2)",
+  "kind": "commit-pair",
+  "rule": "ws-fact-pages EB-GAP (fact-to-answer-line distance within 1 mm across a render with an under-tab fact)",
+  "browser": true,
+  "fail": {
+   "commit": "c127c3e6",
+   "state": "lf-ops r7: EB-GAP 1 (fade packet 3p L: 9.04 mm p1, 16.92 mm p3)"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "the under-tab bare stage keeps the line under the fact, rows 1.1 x footprint, page 3 holds 18; EB-GAP OK (re-pointed f471ecb2 -> 4c5de5a27, the master deploy of the div_facts support aids that carries the fix; the check restored as ws-fact-pages, 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-fact-pages.cjs --skill division:div_facts --page-only --hosts none --no-baseline --sizes L --only \"^fade packet\" --rules EB-GAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-gap-divfacts",
+  "check": "an array of more than 5 columns or rows draws the 1.5 mm subitising gap after every 5th (WDS RP-81 / RP-21; critic div_facts r5 R5-3), on paper S/M/L and every screen host - div_facts and mult_facts arrays",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-GAP",
+  "browser": true,
+  "fail": {
+   "commit": "9a8acc59c",
+   "state": "ARRAY-GAP: 27 / 3, 40 / 4, 20 / 2 ... arrays drawn with no gap between rows 5 and 6 (paper S)"
+  },
+  "pass": {
+   "commit": "4c5de5a27",
+   "state": "0 findings: the gap after every 5th row and column (the R5-3 fix e81243f99, deployed at 4c5de5a27)"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only GAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "support-label-facts",
+  "check": "every support text on screen (the sign box's word, the number line's labels, the skip strip's terms) is >= 8 pt and >= 95 % of the same text on paper (lf-checks TEXT-SIZE findings routed to lf-ops, lead 2026-11-13: add / sub number-line labels 7.6 pt, mult skip-strip terms, div \"divide\" 8.9 pt)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SUPPORT-LABEL",
+  "browser": true,
+  "fail": {
+   "commit": "850b686b5",
+   "state": "origin/master: number-line labels 10.2 px (7.6 pt) on add / sub, skip-strip terms 10.9 px (8.2 pt, print 8.9) on mult, the sign box at 89 % on the div 390 card"
+  },
+  "pass": {
+   "commit": "b92e5ab29",
+   "state": "0 findings: support cues at one CSS mm per paper mm (r1 SIZE-INK) and the sign box never shrinks on screen"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --only LABEL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-digit-ws-divfacts",
+  "check": "the div_facts online-worksheet numeral is at least the host digit floor for its width - 56 px at 1366 / 1280, 48 px at 1024 / 820 - as the card and quiz are (lead 2026-11-13, lf-checks' tablet-width sweep: it was 40 px, the touch floor)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots SCREEN-DIGIT (--digit-widths)",
+  "browser": true,
+  "fail": {
+   "commit": "850b686b5",
+   "state": "origin/master: worksheet numeral 40 px at 1366 / 1280 / 1024 / 820"
+  },
+  "pass": {
+   "commit": "898f800d7",
+   "state": "0 misses: the div_facts worksheet cell takes the host floor (data-mq-host-floor)"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --screen-digit --digit-widths 1366,1280,1024,820 --rule-skills division:div_facts",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

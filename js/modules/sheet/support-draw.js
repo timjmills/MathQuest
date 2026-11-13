@@ -283,12 +283,20 @@ function pieceOf(id, p, template, ctx) {
         // S4 array pane draws the dividend's counters loose, to be ringed (answer-free, §S4.2).
         const panes = pp.op === '-' ? CUE_PANE[id] || [] : pp.op === '/' && id === 'array' ? ['array'] : [];
         // (facts card F2: a ÷ fact whose section offers the array - every dividend 50 or less, print-sheet.js - draws the
-        // TRUE array, the quotient's rows of the divisor's dots, in the section's one frame `supports.arrayFrame`)
-        const af = pp.op === '/' && id === 'array' && p.supports && p.supports.arrayFrame;
+        // TRUE array, landscape since the owner's 2026-11-13 ruling - the divisor's rows of the quotient's dots - in the
+        // section's one frame `supports.arrayFrame`)
+        // (lead ruling 2026-11-13: a mult_facts × array is drawn in its section's one frame too)
+        const af = (pp.op === '/' || pp.op === '*') && id === 'array' && p.supports && p.supports.arrayFrame;
         if (af) {
-            // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M)
-            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: ctx && ctx.size === 'S' ? Object.assign({}, af, { pitch: 2.25 }) : af };
-            const html = factCueOf(cp, twin);
+            // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M;
+            // facts card §5.9, landscape: at M and L the dots grow into the cell's width - ARRAY_PITCH_MM; a screen host
+            // draws paper M's frame, scaled to its digit)
+            const PITCH = pp.op === '*' ? X_ARRAY_PITCH_MM : ARRAY_PITCH_MM;
+            const pitch = PITCH[twin ? 'M' : (ctx && ctx.size) || 'M'] || PITCH.M;
+            const cp = { a: pp.a, b: pp.b, op: pp.op, cue: 'array', frame: Object.assign({}, af, { pitch }) };
+            // (facts card §5.9, owner 2026-11-13: on screen the landscape array follows the cell's digit, its dots
+            // SCREEN_ARRAY_SCALE x paper's dot-to-digit ratio - bigger, never smaller than the print dot - capped by the cell)
+            const html = factCueOf(cp, twin, twin ? SCREEN_CUE_DIGIT_MM / SCREEN_ARRAY_SCALE : 0);
             const m = MM_RE.exec(factCueOf(cp, false)) || [];
             return html ? { html: `<div class="ws-factcue">${html}</div>`, foot: { wMm: Number(m[1]) || 16, hMm: Number(m[2]) || 38, placements: ['beside', 'under'] }, place: null } : null;
         }
@@ -302,7 +310,10 @@ function pieceOf(id, p, template, ctx) {
         }
         // (facts card F3: a ÷ skip strip runs to the section's top multiple, the tally length - 10 or 12 - never the quotient)
         const cp = { a: pp.a, b: pp.b, op: pp.op, cue: id, ...(id === 'skip' && pp.op === '/' ? { n: Number(p.supports && p.supports.tally) || 12 } : {}) };
-        const cue = factCueOf(cp, twin, twin && pp.op === '/' && (id === 'skip' || id === 'think') ? SCREEN_CUE_DIGIT_MM : 0);
+        // (a × array on screen follows the cell's digit like the ÷ array, facts card §5.10)
+        // (SCREEN-CUE-SIZE: a × skip strip follows the digit at paper's ratio as the ÷ one does)
+        const cue = factCueOf(cp, twin, twin && (pp.op === '/' || pp.op === '*') && (id === 'skip' || id === 'think') ? SCREEN_CUE_DIGIT_MM
+            : twin && id === 'array' ? SCREEN_CUE_DIGIT_MM / SCREEN_ARRAY_SCALE : 0);
         if (!cue) return null;
         const m = MM_RE.exec(factCueOf(cp, false)) || [];
         const foot = { wMm: Number(m[1]) || 40, hMm: Number(m[2]) || 12, placements: ['beside', 'under'] };
@@ -315,10 +326,25 @@ function pieceOf(id, p, template, ctx) {
 // (installCueDrawer) rather than imported (no import cycle).
 let factCueOf = () => '';
 const twin0 = (ctx) => !!ctx && ctx.mode === 'screen';
-export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin, digitMm = 0) => fn(p, twin ? { px: 3.4, digitMm } : {}); }
+// (SIZE-INK, facts card §5.10: a screen cue is never under its print size - one CSS mm per paper mm, 96 / 25.4 px - where the
+// old 3.4 px / mm drew tiles, frames, skip strips and arrays at 90 % of paper)
+export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin, digitMm = 0) => fn(p, twin ? { px: SCREEN_PX_PER_MM, digitMm } : {}); }
+const SCREEN_PX_PER_MM = 96 / 25.4;
 // A ÷ fact's skip strip and think box on screen follow the cell's digit at paper's ratio (lf-ops div_facts screen critic
 // r1 D3): paper draws them beside a 24 pt (8.47 mm) fact digit.
 const SCREEN_CUE_DIGIT_MM = 24 * 25.4 / 72;
+// The ÷ landscape array on screen (facts card §5.9): its dots this many times paper's ratio to the fact digit (capped by the cell: max-width 100 %).
+const SCREEN_ARRAY_SCALE = 1.7;
+// The ÷ landscape array's dot pitch on paper by size (mm; facts card §5.9: "as large as the cell width allows", and never
+// under the old 2.6 mm print dot): its frame is 12 columns wide at most (the 12s band) - 35.8 / 43.0 / 57.4 mm at S / M / L.
+const ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 4.4 });
+// The × band frame's dot pitch (lead ruling 2026-11-13): never under the 2.6 mm print dot, and as large as the cell's width
+// allows with the frame BESIDE the fact (one place on every page, critic divarray r1 N2). A 12 x 12 frame is then 35.8 / 43.0 /
+// 44.2 mm at S / M / L, beside the fact in a two-column cell (at L a 4.4 mm pitch pushed it under the fact: 4 facts a page).
+const X_ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 3.3 });
+// ... and the columns that give that frame its width (a 3-column cell holds ~49 mm inside its pads, a 2-column L cell ~79 mm):
+// the frame is never shrunk to fit the cell (max-width), it is given the cell it needs.
+const ARRAY_MAX_COLS = Object.freeze({ S: 3, M: 3, L: 2 });
 
 /**
  * Wrap a problem's HTML with the supports its payload carries. `problemWMm` / `problemHMm` are
@@ -479,7 +505,9 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     // measured height already holds its supports and pads, so its rows keep the Test's 1.05 room over it (test.js), not the
     // practice 1.2 - touch S / M prints 3 x 5 = 15, as the Test of the same support does.
     const room = pp && pp.op === '/' ? { denseRoom: 1.05 } : {};
-    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) }, room);
+    // (facts card §5.9: the landscape ÷ array takes the columns its frame needs at this size, ARRAY_MAX_COLS)
+    const arrCap = pp && (pp.op === '/' || pp.op === '*') && s && s.on.includes('array') && s.arrayFrame ? ARRAY_MAX_COLS[ctx.size] || ARRAY_MAX_COLS.L : 10;
+    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4, arrCap), ...(arrCap < 10 ? { hardCap: true } : {}) }, room);
 }
 
 // Every template's render and footprint go through the registry, which draws the supports round

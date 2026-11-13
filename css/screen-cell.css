@@ -2103,3 +2103,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
+
+/* lf-ops divarray r2 (lead 2026-11-13, lf-checks' tablet-width sweep; ws-screen-slots --screen-digit --digit-widths): a div_facts
+   online-worksheet cell takes the host's digit floor for its width - the card's own 40 / 48 / 56 px at its 600 / 1200 px
+   breakpoints (48 at 820 / 1024, 56 at 1280 / 1366) - above the 40 px touch floor. ADDITIVE; worksheet.js sets the marker. */
+html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 40px; }
+@media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 48px; } }
+@media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell[data-mq-host-floor] { --mq-digit: 56px; } }
