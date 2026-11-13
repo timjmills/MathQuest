@@ -1,8 +1,8 @@
-# Short lessons: Prerequisite Check ON (lf-engine PC round, 2026-11-12; r3 rebuild 2026-11-13)
+# Short lessons: Prerequisite Check ON (lf-engine PC round, 2026-11-12; r3 rebuild 2026-11-13; r6 2026-11-13: M and L)
 
 Rendered with the check forced on (`node tests/scripts/ws-lesson-samples.cjs --force-check`, buildSheet `prereqsForce`;
-the committed records keep `prereqsLive: false` until this critic passes). Seed 4242. L in `<packet>/`, S printed at M in
-`<packet>/S/`, for add-within-10, subtract-2-digit-regroup and round-nearest-10.
+the committed records keep `prereqsLive: false` until this critic passes). Seed 4242. L in `<packet>/`, M in `<packet>/M/`
+(r6: S dropped by the owner; earlier sections below name S), for add-within-10, subtract-2-digit-regroup and round-nearest-10.
 
 | File | Page |
 |---|---|
@@ -13,6 +13,68 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p3 / key-p4 | lesson sheet (Vocabulary, Remember, We Do, Independent) |
 | pupil-p4 / key-p5 | Practice |
 | pupil-p5 / key-p6 | Mixed |
+
+## r6 pass (lf-engine PC r6, 2026-11-13, builder after critic r5 FAIL): every r5 finding, its check, its live pages
+Tree: branch `claude/sweet-newton-c8wrv1-lf-engine-pc`, merged with origin/master 76bc11c61 (twice this round: 453 then 82
+commits; P1). **Sizes M and L only** (owner 2026-11-13: print size S dropped) - the packet's second size is now `M/`, every
+gate and proof runs `--sizes M,L`. The Prerequisite Check packet is rendered forced on (seed 4242); the LIVE pages (check off)
+are proved against a pin of master written at M,L on a detached master worktree.
+
+| r5 finding | Fix | Check (backtest row: FAIL dd2a4aff7 -> PASS) | Page evidence (proof PNGs below) |
+|---|---|---|---|
+| R1 round Mixed Place Value T O T O T O; every check T O O T | a lesson Mixed band's place items are never all one place, never strictly alternating / cycling (near-twins `placePick` / `placeOrder`, seeded; a band with no pattern prints as before); the check's `mixOrder` varies by seed (A B B A / A B B B, either kind first) | PC-PV place pattern on every lesson page, check on and off (`placeRunBad`, the dealer's own reading) - lesson-r6-pv-pattern; unit pc-r6-place-pattern | nearest_10 L Mixed 57 61 32 51 85 71 (O O T O O T) |
+| R2 live Practice / Mixed near twins (nearest_10 34 / 35 / 39, 40 x 3; sub_2d_1d L "- 2" x 4; sub_50 44 - 23 / 46 - 24) | page rules on EVERY library lesson, check on or off: Practice / Mixed lead and partners (`pageRules`, lessonRules caps); the sheet (`nearRules`: Warm-up, Guided, Independent; one-number pools dealt twice as deep); detailed lessons unchanged | PG-LR6 / PG-LR67 check OFF on every lesson (one in-page read, `collectReads`; the gate's `nearKeyPair` copy replaced by near-twins `nearKeys`) - lesson-r6-lr6-live, lesson-r6-lr67-live | nearest_10 L Mixed rounding 78 45 34 / 96 49 23; sub_2d_1d L Mixed 29 - 7, 64 - 2, 86 - 4 |
+| R2 "78 twice" | one number once a page across skills on a lesson Mixed page (`pageUnique`; one-number pools dealt one shelf deeper) | PG-LR6 cross-skill read - lesson-r6-lr6-live, lesson-pg-lr6, lesson-pg-lr6-size (PASS -> baed9bc06) | nearest_10 Mixed: the place band's 78 is now 57 |
+| R3 identify's own Mixed partner lost its heads | `noPlaceHeads` skipped when the partner is the lesson's own skill (lead ruling) | PC-PVHEADS live: own skill keeps the heads its Practice prints, other skills none (cells aligned with plan items) - lesson-r6-pvheads-own | identify L / M Mixed Q4-9 T O heads, Q1-3 H T O |
+| R3 "Write the value" over ring-only cells | a skill dealt twice reads its own items' instruction (`twinSkills` -> mixed-practice `bandKey`) | PC-INSTR value slot on every page - lesson-r6-instr-value | identify Mixed Q4-9 band: "Circle the place of the underlined digit." |
+| R4 sub_2d_1d / sub_50_no_regroup / sub_100_no_regroup L Mixed 1 -> 2 pages | a lessonFit start over page 1 by no more than hMinAt's spare safety (0.5 mm a shelf) keeps to one page (212.5 mm of start in 212.3 mm) | ws-lesson-baseline PARTPAGES (`--pages-only`) - lesson-r6-partpages; PM-FOOT - lesson-r6-mixed-foot | sub_2d_1d L Mixed: ONE page, foot about 4 % |
+| R5 combine L Mixed 22 % foot | one-item rows (k = 1) at L take no tab drop (they clear the tab sideways; `noDrop`, inline) and grow by their MEASURED content (print-sheet `measured[k].inkHMm`) - no more 52 % / lopsided rows; **the foot stays 27 %: for a lead ruling** (5 one-line rows is 12.1's L ceiling, and their 8 mm of ink is already 33-35 % banded at the natural 22 mm, so growth breaks H13; only a 6th row closes it) | PM-FOOT (KNOWN for combine / expand L, named) | combine L Mixed |
+| P1 branch behind master | merged; precritic row "merged with origin/master" (FAIL when origin/master is not an ancestor of HEAD) | exempt: a moving ref | - |
+
+Near-misses from r5: round sheet Independent ones digits, round L Mixed 61 / 51 / 71 and add Independent answers were not re-dealt
+on purpose beyond the rules above; the critic's reading of them on the r6 pages is welcome.
+
+**Also found and checked this round (own build):** an empty Mixed page passed a rule-scoped run (PC-BUILD now counts an empty
+Practice / Mixed page, lesson-r6-empty-part); a CSS selector edit changed every Practice / Mixed page's html (the lesson CSS is
+inlined) - replaced by a per-cell inline style, so pages that do not change keep their hash.
+
+### LIVE pages changed (check off; `ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check`
+against master 76bc11c61's pin written at M,L): 468 of 1,856 keys (pupil and key pages and the whole-document hashes)
+**No part prints more pages anywhere** (no PARTPAGES / NEW / MISSING line); div_facts, the vocabulary lessons, add_facts,
+sub_1k ... sub_1m, sub_wp_* and all 7 detailed lessons are identical to master. Changed, by lesson / part / size (both seeds
+unless named), and why:
+- add_wp_10, add_wp_10_plain, add_wp_20, add_wp_20_plain, fact_family_sort: **Mixed** M, L - the partners' page rules (R2):
+  the subtraction partner is re-dealt without near twins / an answer twice. Practice unchanged.
+- sub_2d_1d, sub_50_no_regroup: **Practice** M, L and **Mixed** M, L - page rules on the lead (LR-6, the lesson's LR-7 caps); Mixed
+  on one page (R4). sub_100_no_regroup: **Mixed** M, L (R4, R2).
+- sub (the sample) / sub_100_regroup: **chart** M, L (r5 N3: panels 5 / 6 centred), **Mixed** M, **Practice** M, L seed 1 (R2).
+- nearest_10 / round: **chart, sheet, Practice, Mixed** M, L - the sheet's one-number pool dealt twice as deep with the near-twin
+  split (the chart's examples come from that pool, so the chart changes too), Practice / Mixed page rules, place pattern,
+  pageUnique.
+- identify, value, expand: **chart, sheet, Mixed** M, L; unit_form the same (chart seed 1 only); number_word_form also
+  **Practice**; combine **sheet, Mixed** - the deeper one-number sheet pool (charts / sheets), Mixed: own heads and instruction
+  (identify), place pattern, page rules, one-item rows centred and grown by measured content (L), pageUnique.
+
+### Proof PNGs, before (master 76bc11c61) / after (this branch), M and L, pupil and key (`design/lessons/proof/pc-r6/<lesson>/{before,after}/`,
+files `<size>-<part>-<pupil|key>-pN.png`) - a SPREAD (lead condition): at least one Practice AND one Mixed page per affected family
+| Family | Lesson | Parts (M and L) | Why it is here |
+|---|---|---|---|
+| number_sense | nearest_10 | chart, teach, practice, mixed | R1, R2, "78 twice" (named by the critic) |
+| placevalue | identify | chart, teach, practice, mixed | R3 heads + instruction (named) |
+| placevalue | value | chart, teach, practice, mixed | named |
+| placevalue | combine | teach, practice, mixed | R5 (named) |
+| placevalue | expand, unit_form | chart, teach, practice, mixed | biggest pv diffs |
+| composing | number_word_form | chart, teach, practice, mixed | biggest diff (0-4 of 44 identical) |
+| subtraction | sub_2d_1d, sub_50_no_regroup, sub_100_no_regroup | chart, teach, practice, mixed | R4 (named) |
+| subtraction | sub_100_regroup | chart, teach, practice, mixed | chart N3, Practice seed-1 page rules |
+| addition | add_wp_10 | chart, teach, practice, mixed | Mixed partner re-deal (Practice identical: shown for the spread) |
+Families with no changed page (division, multiplication partners, vocabulary, patterns / algebra, the detailed lessons): none
+shown, identical to master.
+
+### The forced packet (check on, seed 4242; L at the packet root, M in `M/`; the old `S/` removed)
+Every page re-rendered. Gates on the head (merged with master): `ws-lesson-samples --check --force-check --sizes M,L` (8 seeds)
+OK; `--seeds 64` dealing (forced and live) OK; `--all-lessons --sizes M,L` with PM-CONT, SHEET-2PG, PG-TURN, PC-FRAME, PG-LR6,
+PG-LR67, PC-PV, PC-PVHEADS, PC-INSTR, PM-FOOT: only master's vocab PM-CONT reds (3, identical on master) and named KNOWN.
 
 ## r5 pass (lf-engine PC r5, 2026-11-13, fresh builder after critic r4 FAIL): every r4 finding, its page evidence and its check
 Rendered again (check forced on, seed 4242, L at the root, S in `S/`, the engine prints S at M). Every page of the three
