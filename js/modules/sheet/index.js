@@ -31,7 +31,7 @@ export {
 export {
     esc, label, defaultLabelStyle, tabStepFor, tabSideMm,
     cell, cutLine, blank, line, box, circle, check, unknownBox,
-    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE,
+    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE, ebItemOf,
 } from './cell.js';
 
 /* --------------------------------------------------------------------------- frame */

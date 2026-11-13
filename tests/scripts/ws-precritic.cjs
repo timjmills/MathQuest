@@ -74,8 +74,10 @@
 //               H13-ABS,GRID-EVEN-ALL at L / S / M, node-lint-s1 + WRONG-FITS-SLOTS,WRONG-FILL, slot-clip --slot-w-equal
 //               --draw-cap, screen-slots --screen-digit, options-render --bands); they are added with --rule-skills <the
 //               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
+//             ws-grade-render --raster-fit (lf-checks queue 13, F3: the lane skills' scripted-model and guided pages at
+//               S / M / L printed to a real PDF and rasterised: RR-PAGES, RR-EDGE, RR-CLIP; tests/lib/ws-role-raster.cjs)
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
-//             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
+//             --roles <role> --skills <the role sample> --baseline, + ws-grade-render --raster-fit on the sample at L. The sample is tests/fixtures/precritic/role-sample.json
 //             + ws-empty-band --roles <role> --hosts none on the lane's --skill skills (the role sample when none is given;
 //             critic eb-r3 D4: the role's empty-band rows were off this path); a Scripted Model run adds --model-states
 //   --lesson <id>     (without --teacher; with it, --lesson is ws-teacher-wrm's site lesson as before) a detailed lesson of
@@ -977,6 +979,13 @@ function buildPlan(ctx) {
         add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
             ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         const BASE_ROLES = ['lesson', 'test', 'independent'];
+        // LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3: the npr Scripted Model's Say band ran 6 mm past
+        // its frame, clean on screen and in emulated print, cut in half in the printed PDF): the lane skills' tall-state roles
+        // - Scripted Model and Guided, the pages that run nearest full - printed to a real PDF at S, M and L and rasterised
+        // (RR-PAGES the plan's page count, RR-EDGE no ink at the paper's edge, RR-CLIP no clipped or covered text). Only
+        // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
+        add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at S, M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × S/M/L`, 'browser', 'ws-grade-render',
+            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'S,M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
         // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
         if (carded.length >= 2) for (const sz of ['S', 'L']) {
@@ -1108,6 +1117,10 @@ function buildPlan(ctx) {
         const sample = [...new Set([...ctx.roleSample, ...ctx.skills.map((s) => s.key)])];
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
         add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'], parse: PARSE.gradeRender, expectUnits: sample.length }));
+        // LP-RASTER on role R (lf-checks queue 13, F3): the sample's R pages at L (the tallest size, where F3 ran over),
+        // printed to PDF and rasterised; the lane skills also get S / M / L of scripted-model and guided on --skill
+        add(gate(`raster-fit-role-${ctx.role}`, `ws-grade-render --raster-fit --roles ${ctx.role} --size L (RR-PAGES, RR-EDGE, RR-CLIP in the printed PDF)`, `${sc} × L`, 'browser', 'ws-grade-render',
+            ['--roles', ctx.role, '--skills', sample.join(','), '--size', 'L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, `raster-fit-${ctx.role}`)], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: sample.length }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
         // print-lint names a role page "cat:skill#role" (independent: plain "cat:skill"); the pin lists those it holds.
@@ -1185,6 +1198,9 @@ function buildPlan(ctx) {
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
         addPartOpts(add, ctx);
     }
+    // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
+    // a tracked file holding one (node, < 1 s)
+    add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
     // (owner rule 2026-11-13, lf-checks) every finding row of design/lessons-first/CHECKS_FROM_CRITICS.md names a backtest id
     // that is in backtests.json and on precritic's path, or a reasoned exemption - on EVERY precritic run (node, ~5 s)
     add(gate('checks-from-critics', 'ws-precritic-plan --checks-from-critics (every critic / owner / lead finding has a backtest id on the path, or an exemption)', 'CHECKS_FROM_CRITICS.md', 'node', 'ws-precritic-plan', ['--checks-from-critics', ...((ctx.skills || []).length ? ['--skills', ctx.skills.map((x) => x.key).join(',')] : [])], { needFlags: ['checks-from-critics'], missingMsg: 'ws-precritic-plan has no --checks-from-critics' }));
