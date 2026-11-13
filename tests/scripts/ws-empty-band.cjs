@@ -64,6 +64,9 @@
 //             height on the page) AND whose grid stands in more columns than the Independent page at that size (buildSheet's
 //             plan.meta.fits[0].cols, both). combine Test S, 4 across against the Independent page's 3, left about 45 % of the
 //             page white under its grid. --self-test checks it.
+//             With --columns N (a TEACHER-chosen, non-default column count; lead ruling 2026-11-13, WORKSHEET_DESIGN_STANDARD
+//             CL-2c) the rule judges one-page Independent / More practice / Test / Review renders by the tolerance instead: the
+//             white under the grid may be up to 25 % of the page body (one-line in-place items; compare 2 columns at S, 24 %).
 //   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
 //             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
 //   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
@@ -89,6 +92,10 @@ const gdpCap = (role, size, tries) => (role === 'guided' && GDP_CAP[size] != nul
     ? `${tries} scored tries on the Guided page(s) at ${size}; the §12.1 ceiling is ${GDP_CAP[size]} plus the Model` : null);
 // EB-GRIDFOOT (opt-in --grid-foot): the verdict on one Test / Review render (null = fine). pages: its page count; whiteMm: the white
 // under the grid on its page; rowMm: one row's height (the median cell); cols / indCols: its columns and the Independent page's.
+// teacherFootBad: the --columns tolerance (CL-2c): white under the grid over 25 % of the body on a one-page practice / Test / Review.
+const teacherFootBad = (role, pages, whiteMm, bodyMm) => (/^(independent|more-practice|test|review)$/.test(role) && pages === 1
+    && Number.isFinite(whiteMm) && Number.isFinite(bodyMm) && bodyMm > 0 && whiteMm / bodyMm > 0.25
+    ? `${Math.round(whiteMm / bodyMm * 1000) / 10} % of the body white under the grid at the teacher's columns (CL-2c tolerance 25 %)` : null);
 const gridFootBad = (role, pages, whiteMm, rowMm, cols, indCols) => ((role === 'test' || role === 'review') && pages === 1
     && Number.isFinite(whiteMm) && Number.isFinite(rowMm) && rowMm > 0 && whiteMm > rowMm + 0.5
     && Number.isFinite(cols) && Number.isFinite(indCols) && cols > indCols
@@ -153,13 +160,17 @@ if (argv.includes('--self-test')) {
             ['review M, 3 vs 2 across', gridFootBad('review', 1, 60, 30, 3, 2), true]];
         const fbad = fc.filter(([, got, want]) => !!got !== want);
         for (const [n, , want] of fbad) console.log(`self-test FAIL: EB-GRIDFOOT ${n} should ${want ? 'fail' : 'pass'}`);
+        const tc = [['compare 2 cols S at 1.2 x, 31 %', teacherFootBad('independent', 1, 79, 255), true], ['compare 2 cols S at 1.3 x, 24 %', teacherFootBad('independent', 1, 61, 255), false],
+            ['two pages', teacherFootBad('independent', 2, 120, 255), false], ['guided not judged', teacherFootBad('guided', 1, 120, 255), false]];
+        for (const [n, v, want] of tc) if (!!v !== want) fbad.push([n, v, want]);
+        for (const [n, , want] of fbad.slice(fc.filter(([, v, w]) => !!v !== w).length)) console.log(`self-test FAIL: EB-GRIDFOOT teacher ${n} should ${want ? 'fail' : 'pass'}`);
         if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-GRIDFOOT)`); process.exit(1); }
     }
     const cases = [['guided', 'S', 10, false], ['guided', 'S', 11, true], ['guided', 'M', 8, false], ['guided', 'M', 23, true], ['guided', 'L', 6, false],
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT cases)`);
+    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases)`);
     process.exit(bad.length ? 1 : 0);
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -171,6 +182,8 @@ const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts',
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
 const OPTS = arg('opts', null) ? JSON.parse(arg('opts')) : null;
+// --columns N: the teacher's column count (buildSheet section `columns`) on every role render (lead ruling 2026-11-13, CL-2c)
+const TCOLS = arg('columns', null) ? Number(arg('columns')) : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
 // (`--margin N`, lf-placevalue critic r4 N-r4-1, owner 2026-11-09 "every finding a check": a fix that clears the 30 % limit by under
 // N points is fragile - G2 passed at 29.9 % - so the band and side limits are judged at 30 - N %; absent, 30 % as before)
@@ -344,13 +357,13 @@ async function main() {
             const step = vlist.length > NVAR ? vlist.length / NVAR : 1;
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
-            for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
+            for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, cols: TCOLS, tag: `${role} ${size}${TCOLS ? ` cols ${TCOLS}` : ''}` });
             for (const v of variants) jobs.push({ role: 'independent', size: 'L', opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent L {${v.option}: ${v.value}}` });
             notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
                 const b = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
                     try {
-                        const r = await window.buildSheet({ role: j.role, sections: [{ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }], size: j.size, paper: 'A4', seed: SEED, key: false });
+                        const r = await window.buildSheet({ role: j.role, sections: [Object.assign({ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }, j.cols ? { columns: j.cols } : {})], size: j.size, paper: 'A4', seed: SEED, key: false });
                         const cols = r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
                         const sections = new Set((r.items || []).map((it) => it.section)).size;
                         const tries = r.plan && r.plan.meta ? Number(r.plan.meta.scoreOutOf) : NaN;
@@ -394,7 +407,7 @@ async function main() {
                         }), 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
                     }
-                    if (has('grid-foot') && (j.role === 'test' || j.role === 'review') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
+                    if (has('grid-foot') && (j.cols ? /^(independent|more-practice|test|review)$/.test(j.role) : (j.role === 'test' || j.role === 'review')) && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
                         const gf = await sh.evaluate((scope) => {
                             const MM = 96 / 25.4;
                             const pgs = [...document.querySelectorAll(scope)];
@@ -403,9 +416,10 @@ async function main() {
                             const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
                             const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
                             const hs = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')).map((c) => c.getBoundingClientRect().height).filter((h) => h > 0).sort((a, b) => a - b);
-                            return { pages: pgs.length, whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN };
+                            return { pages: pgs.length, bodyMm: br.height / MM, whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN };
                         }, 'body > section.ws-page, body > .ws-page');
-                        if (gf.pages === 1 && gf.whiteMm > gf.rowMm + 0.5) {
+                        if (j.cols) { const why = teacherFootBad(j.role, gf.pages, gf.whiteMm, gf.bodyMm); if (why) F('EB-GRIDFOOT', `${key} ${j.tag} p1`, why); }
+                        else if (gf.pages === 1 && gf.whiteMm > gf.rowMm + 0.5) {
                             const ind = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
                                 try {
                                     const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }], size: j.size, paper: 'A4', seed: SEED, key: false });
