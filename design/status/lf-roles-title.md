@@ -80,3 +80,29 @@ addition:add_facts) and `dialog-teacher-print-1280.png`, `dialog-simple-print-12
   read the option.
 - The `&set=` link of My sets carries the teacher sheet's print settings, which have no title control; the simple print's
   QP1 code is the share code that carries it.
+
+## Round 2 (critic title r1 FAIL: simple print C1 7, T1) — medium, fix round
+- **Probe first** (`aa89a22de`, corrected in `a2460c266`): `tests/scripts/ws-frame-title-ui.cjs` now drives both title boxes with
+  real keystrokes: UI-CARET (type, Home + 5 x ArrowRight, X, wait past the rebuild, Y: "XY" at 5), UI-TITLE-OFF, UI-WIDTH,
+  `--width`. On `aaafcfb67` (served by MQ_ROOT): FAIL (4) - `UI-CARET simple print: … "FractXions and more wordsY"`,
+  exactly the critic's repro (`design/status/lf-roles/title/ws-frame-title-ui-before-r2.log`). After: OK at 1280 and 1024.
+- **T1** `js/modules/simple-print.js` `render()`: the focused box's selectionStart / selectionEnd / direction are kept across
+  the redraw (was: always the end).
+- **T4** `js/modules/teacher-print.js` `syncTitleControls()`: Header Title unticked disables the Page title box and Title place
+  and the caption says "Title is off (Header: Title) …". **T7** caption says the title replaces the page type's own title.
+- **T5** `css/simple-print.css` (additive, this lane's rules): `.sp-ptitle` full width, label one line (box ≈ 450 px at 1024).
+- **T8** `js/modules/sheet/frame.js`: `HEADER_DEFAULTS` shared by `page()` and `pageHeader()`, so `pageHeader({title})` prints
+  page()'s Name / Date line; the stale `tabMeta` doc fixed. ws-frame-title TITLE-API asserts pageHeader(h) === page()'s header.
+- **T2** `css/sheet-kit.css` (only the `.ws-head--title-above` rules this lane added): above, 2 mm move from the field row to the
+  top of the band (title margin-top 3 mm, row 9 mm), so the title sits by the Name line; band and body heights unchanged.
+- **T10** both dialogs: a 2-line title "may hold one row of problems fewer".
+- **T6** `WORKSHEET_DESIGN_STANDARD.md` HD-10 amendment + new HD-14a (teacher-written titles: two lines, cut with "…" and a
+  dialog warning). L-VERBS reads only instruction lines (`.ws-instrline`, strips) and VQ-TITLE judges the provider's iCan
+  string, never the printed `.ws-title`: neither reads a `data-ws-title="custom"` title, so neither needs a skip.
+- **T3** (2-line custom title: descenders 0.7-0.85 mm above the rule) NOT changed: more clearance needs either a taller band
+  (a row of problems on every 2-line page) or a tighter line pitch (the critic already measured 0.5 mm between the lines at L).
+  Listed for the owner.
+- **T9** pre-existing, not this lane.
+- Pin: no-option pages still 196/196 identical to origin/master a6883082c (T2 touches only above pages).
+- Backtest `title-ui-caret` (aaafcfb67 FAIL → a2460c266 OK) PASS; `title-ui` gate on precritic `--teacher`; ledger rows added.
+- PNGs refreshed: `dialog-{teacher,simple}-print-{1280,1024}.png`, the page PNGs (above pages show T2).
