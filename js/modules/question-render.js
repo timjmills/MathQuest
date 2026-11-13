@@ -1600,6 +1600,7 @@ function _applyScreenCell() {
     card.classList.toggle('mq-card', practice);
     ['mq-qpaper', 'mq-scell', 'mq-mono'].forEach(c => paper.classList.toggle(c, practice));
     paper.classList.remove('mq-kind-eq', 'mq-kind-fact', 'mq-kind-stack', 'mq-kind-division', 'mq-kind-legacy', 'mq-slot-moved', 'mq-tick-mode');
+    paper.removeAttribute('data-ws-cell');
     card.classList.remove('mq-wide');
     const qt = document.getElementById('questionText');
     if (qt) qt.classList.remove('mq-dup');
@@ -1739,6 +1740,20 @@ function _applyScreenCell() {
     try { if (q && q.answerType === 'coord-input') wireLiveCorrect(document.getElementById('answerInputArea'), { q }); } catch (e) { /* optional */ }
     // Widgets mount late (dynamic import) and re-render on interaction: each time the cell
     // changes, the mono pass re-inks it and the repeated prompt is looked for again.
+    // Screen parity (lf-checks queue 20, lead 2026-11-13): the card's B&W cell carries [data-ws-cell] as the online worksheet's
+    // (.ws-card-visual) and the quiz's (.qt-cell) do - the kit template's kind, else 'legacy' - so every host check reads the
+    // card (the mult_facts card drew none, and the card-host checks read nothing there). A kit twin that already draws its own
+    // [data-ws-cell] cell (the words twin) keeps it as the card's cell.
+    // lf-hosts critic r2 F3: the label is the kind the quiz stamps on the same item (quiz-take.js: 'msc' for a "Click ALL" item,
+    // else the kit template's kind for ANY answer type), so the card and the quiz agree; 'legacy' only where no template exists.
+    if (!paper.querySelector('[data-ws-cell]')) {
+        let label = kind ? kind.kind : null;
+        if (!label && q) {
+            if (q.answerType === 'multi-select-check' && Array.isArray(q.options) && q.options.length) label = 'msc';
+            else { try { const k2 = cellKindFor({ ...q, options: [] }); label = k2 && k2.kind ? k2.kind : null; } catch (e) { label = null; } }
+        }
+        paper.setAttribute('data-ws-cell', label || 'legacy');
+    }
     monoCell(paper, {
         afterInk: () => {
             const va = document.getElementById('visualAid');

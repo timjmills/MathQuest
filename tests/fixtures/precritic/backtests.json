@@ -5842,17 +5842,17 @@
   },
   {
    "id": "screen-digit-npr-worksheet",
-   "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: screen digits >= 40 / 48 / 56 px at 390 / 820 / 1280 on every host",
+   "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: card / quiz digits >= 40 / 48 / 56 px, the online worksheet >= 29 px (lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master). CORRECTED (lf-hosts critic r1 F1): under the ruling the fail state no longer misses SCREEN-DIGIT (the worksheet's 29 px holds); it FAILs on the card's CELL-READ (0 [data-ws-cell] on the card), which the cell-read-* rows now prove. Kept (never drop a row); it cannot re-point to WS-REFLOW because the raise left npr's worksheet unchanged at 3c7b548a",
    "kind": "commit-pair",
    "rule": "ws-screen-slots SCREEN-DIGIT (default since lead 2026-11-13)",
    "browser": true,
    "fail": {
     "commit": "8d7343c0f",
-    "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
+    "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px [under the 2026-11-13 ruling these 29 px pass; this state now FAILs only on the card CELL-READ: 0 [data-ws-cell] on the card]"
    },
    "pass": {
-    "commit": "TBD-lf-ops-npr-digits",
-    "state": "lf-ops' fix (pass commit to come)"
+    "commit": "b6107d339",
+    "state": "lf-checks probe merge (branch claude/sweet-newton-c8wrv1-lf-checks-r2-digitpass): the worksheet per-cell digit floor 46a7c3c45 (lf-checks queue 11/18/21) + lf-ops-props 63b26321a (contains 85c694896: card / quiz count-row digits, the count-row grid-cell digit rule). npr passes card, worksheet and quiz at 1280 / 820 / 390"
    },
    "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit --widths 1280,820,390",
    "expect": {
@@ -7185,6 +7185,590 @@
    }
   },
   {
+   "id": "no-size-s-76bc",
+   "check": "ws-no-size-s (owner 2026-11-13, CLAUDE.md plan item 9: two print sizes, M and L; size S dropped): no size picker offers S (APP-PICKER), no app module keeps a stored S as S (APP-RESTORE), the kit reads S as M (APP-ALIAS: offeredSize, OFFERED_SIZES), and no gate's default run includes S (GATE-DEFAULT); on every ws-precritic run and in deploy session 1",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s APP-PICKER / APP-RESTORE / APP-ALIAS / GATE-DEFAULT",
+   "browser": false,
+   "fail": {
+    "commit": "76bc11c6",
+    "state": "the owner's ruling commit: teacher print, simple print, worksheet sheet and print settings offer S; printDefaults keeps a stored S; no S -> M alias; precritic, empty-band, cell-checks, capacity-pin and the rest default to S,M,L (52 findings)"
+   },
+   "pass": {
+    "commit": "32689e907",
+    "state": "lf-tools-nos r3: M and L pickers, offeredSize at every restore, gates default to M,L, each S kept on purpose on the reasoned allow-list (moved from a3b128cd1 in r3: the r3 TOKEN rule rightly fails a3b's fitsNotes \"Small\", critic nos r2 nit)"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "fact-cols-m-fixture",
+   "check": "ws-fact-cols-m (owner 2026-11-13: fact sheets keep everything when S goes): a fact-rows sheet with 9 or 10 columns PICKED prints at Size M with exactly those columns (FCM-COLS) at the 16 pt rung (FCM-PT), on the teacher print (buildSheet fact-rows) and the simple print (Columns Exactly n); ÷ to 9",
+   "kind": "fixture",
+   "rule": "ws-fact-cols-m FCM-COLS / FCM-PT / FCM-FIT",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/fact-cols-m/fail.json",
+    "state": "a naive S removal: the picked 9 / 10 clamped to M's Auto (6 across at 24 pt) - the 9-10 column sheets lost"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/fact-cols-m/pass.json",
+    "state": "the live measurement on lf-tools-nos (ws-fact-cols-m --json): 9 / 10 across at 16 pt on both print paths"
+   },
+   "command": "node tests/scripts/ws-fact-cols-m.cjs --fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-browser-c81",
+   "check": "ws-no-size-s --browser (critic nos r1 F1, blocker): S seeded in every restore path (stored print defaults, the worksheet sheet, the simple print, a saved set, a &set= share link, applyPrintSettings / a tray snapshot, a quick print) reads M; every drawn Size control offers M / L only with M checked; the Library labels a set saved at S as Size M; the one-page count-by sheet shows one label, Compact (12 tables on one page), with no unchecked M / L control; on every ws-precritic run and in deploy session 1",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s --browser STORE-* / SAVED-SET / SET-LINK / APPLY / PICKERS / PAGES / COMPACT",
+   "browser": true,
+   "fail": {
+    "commit": "c81e70178",
+    "state": "lf-tools-nos r1 head: applyPrintSettings copies a stored S raw (saved set, &set= link, tray), decodeSetParam keeps S, the Library says Size S, the worksheet sheet shows M / L with neither checked, and the one-page option draws an unchecked M / L radiogroup under \"Size fixed ... smaller digits\" and \"Small\" (17 findings)"
+   },
+   "pass": {
+    "commit": "32689e907",
+    "state": "lf-tools-nos r3: offeredSize on every restore and display path; the compact one-page label everywhere, and no visible picker under it (moved from 6b59329af in r3: the visibility gate rightly fails 6b59's live Big / Medium buttons in simple print, critic nos r2 N1)"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-r1-mutations",
+   "check": "ws-no-size-s line rules (critic nos r1 F2 / F4): an S option list moved to its own const, a restore written as /^[SML]$/.test(...), and a live instruction (PRE-FLIGHT) that says \"S and L\" each FAIL the static guard",
+   "kind": "fixture",
+   "rule": "ws-no-size-s APP-PICKER (any S tuple list) / APP-RESTORE (regex) / DOC",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-fail.json",
+    "state": "the critic's two mutations that passed the r1 guard, and the PRE-FLIGHT line as it stood on c81e70178"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-pass.json",
+    "state": "the same three lines as they stand on lf-tools-nos r2"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-docs-c81",
+   "check": "ws-no-size-s DOC (critic nos r1 F4): RUBRIC, the LESSONS_LEARNED PRE-FLIGHT checklist, PAGE_TYPES PT-DLG rows and .claude/agents name no S size to render or grade at",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s DOC",
+   "browser": false,
+   "fail": {
+    "commit": "c81e70178",
+    "state": "PRE-FLIGHT items 1-2 \"at S and L\", RUBRIC scope \"S and L\", PT-DLG-5 \"S, M, L\" (4 findings)"
+   },
+   "pass": {
+    "commit": "32689e907",
+    "state": "M and L, with the date S was dropped (moved from 6b59329af in r3: the r3 DOC token rule rightly fails 6b59's WORKSHEET_DESIGN_STANDARD / EXTENSION_PLAYBOOK S / M / L definitions, critic nos r2 N3)"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-n1-4a8e",
+   "check": "ws-no-size-s --browser VISIBLE / FIXED / WORKS (round cap after critic nos r2 N1): every size surface in every mode, simple print's compact \"All rows on one page\" included, is judged by what is visible and clickable (computed style, box, elementFromPoint), never the hidden attribute: no visible S option, no visible size picker where the layout is fixed, and every visible size option clicked changes the size the preview page is built at; on every ws-precritic run and in deploy session 1",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s --browser FIXED / WORKS / VISIBLE",
+   "browser": true,
+   "fail": {
+    "commit": "4a8e539b4",
+    "state": "lf-tools-nos r2 head: simple print compact shows the label AND a live Big / Medium picker (.sp-root .sp-sizes { display: grid } overrides [hidden]); clicking Big or Medium leaves the page at the compact size (3 findings)"
+   },
+   "pass": {
+    "commit": "32689e907",
+    "state": "lf-tools-nos r3: .sp-root .sp-sizes[hidden] { display: none } (additive): one label, no picker"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-r3-static-4a8e",
+   "check": "ws-no-size-s --docs TOKEN rules (round cap after critic nos r2 N2 / N3 / nit): APP-TOKEN and GATE-TOKEN flag any size-letter string or quoted S / Small on a size line; DOC scans every non-record *.md (CLAUDE.md and WORKSHEET_DESIGN_STANDARD.md included) for a size-S token beside M / L, after size / at / --sizes, or Small beside Medium / Large; only dropped / alias / history lines or a nos marker pass",
+   "kind": "commit-pair",
+   "rule": "ws-no-size-s APP-TOKEN / GATE-TOKEN / DOC",
+   "browser": false,
+   "fail": {
+    "commit": "4a8e539b4",
+    "state": "lf-tools-nos r2 head: WORKSHEET_DESIGN_STANDARD.md:22 and EXTENSION_PLAYBOOK.md:72 define S / M / L with no note, LESSONS_LEARNED L2 says S/M/L, the live docs offer S in ~180 lines, teacher-print fitsNotes names S \"Small\""
+   },
+   "pass": {
+    "commit": "32689e907",
+    "state": "lf-tools-nos r3: instructions rewritten to M / L, token values marked as the compact token / decode alias, findings logs marked history, fitsNotes says the compact layout; CLAUDE.md's two lines allow-listed for the owner"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "no-size-s-r2-mutations",
+   "check": "ws-no-size-s line rules (critic nos r2 C / D / E, N2's three missed phrasings, N3's three lines): an S picker from 'SML'.split(''), \"at size S and at L\", \"Small and Large\", \"--sizes S,M,L\" in a doc and an S / M / L definition with no note each FAIL",
+   "kind": "fixture",
+   "rule": "ws-no-size-s APP-TOKEN / DOC",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-fail.json",
+    "state": "the critic's r2 mutations and the N3 lines as they stood on 4a8e539b4"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-pass.json",
+    "state": "the same lines at M and L, and N3 as fixed"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "nos-runtime-s-button",
+   "check": "lead decision NOS-DOCS-ADVISORY (2026-11-13; critic nos r3): the docs token rule only reports, so the BROWSER gate must still fail an S option added by JS at runtime (a MutationObserver button, no S in any source line the static rules read)",
+   "kind": "fixture",
+   "rule": "ws-no-size-s --browser (VISIBLE: no visible or clickable S option), run via --plant",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/nos-runtime-s.fail.txt",
+    "state": "mutation r3-runtime-s-button planted in a copy of the served tree: the browser gate FAILs (VISIBLE simple print shows S)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/nos-runtime-s.pass.txt",
+    "state": "the unplanted copy: the browser gate is OK"
+   },
+   "command": "node tests/scripts/ws-no-size-s.mjs --plant $(cat {fixture})",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-ss-mult-facts-card",
+   "check": "ws-screen-slots CELL-READ: a host render that reads 0 [data-ws-cell] cells is the finding host:read, never a pass",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots CELL-READ (lf-checks queue 20, lead 2026-11-13; lf-ops divarray critic)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts practice card (#questionPaper) carries no [data-ws-cell]: card:read"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "question-render.js: the card paper carries data-ws-cell=\"fact\""
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:mult_facts --hosts card",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-sa-mult-facts-card",
+   "check": "ws-screen-answer CELL-READ: each host root must hold a [data-ws-cell] cell before the answer is entered",
+   "kind": "commit-pair",
+   "rule": "ws-screen-answer CELL-READ (lf-checks queue 20)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts card has 0 [data-ws-cell] cells at #questionPaper"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "the card paper carries data-ws-cell"
+   },
+   "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:mult_facts --hosts card --no-live",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-pc-mult-facts-card",
+   "check": "ws-phone-card CELL-READ: the card at 390 carries a [data-ws-cell] cell",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card CELL-READ (lf-checks queue 20)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "the mult_facts card at 390 has 0 [data-ws-cell] cells"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "the card paper carries data-ws-cell"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_facts --items 1 --sizes 390x844 --hosts card --only CELL-READ --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-target-sub-wp-390",
+   "check": "ws-phone-card TOUCH-TARGET: every typed answer place on card, worksheet and quiz at 390 has a >= 48 x 48 px touch box (working boxes >= 44)",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-TARGET (lf-checks queue 10; lf-builds word-stories critic F3, lead 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "sub_word_problems .mq-wwans answer inputs 40 x 44 px (card, quiz) and 44 x 44 (worksheet) at 390"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "screen-cell.css: the input is >= 48 x 48 as transparent padding around the drawn 44 px box"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 390x844 --only TOUCH-TARGET --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-mult-facts-worksheet",
+   "check": "RE-POINTED (lf-hosts critic r1 F1, lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master): the premise 'worksheet grid digits >= 40 / 48 / 56 px' was overturned, and 1fbdb8eca now passes ws-screen-slots --screen-digit (worksheet 40 px >= 29). The row now proves ws-worksheet-reflow WS-REFLOW / WS-DIGIT on mult_facts: the worksheet holds master's columns, card heights, answer places and numerals at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT (re-pointed from ws-screen-slots SCREEN-DIGIT, lf-checks queue 11 / 18 / 21)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "hand-off 1's raise of the worksheet to 40 / 48 / 56 px: mult_facts cards 345 -> 373 px, answer place 86 x 48 -> 104 x 58 px at every width (before the ruling this row failed 1fbdb8eca on SCREEN-DIGIT)"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "the raise removed: mult_facts holds master's worksheet layout and 40 px numerals"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-dealt",
+   "check": "queue 14 (lf-vocab, 11-13): a worksheet item is matched with the print cell of the SAME item it dealt (the kit's renderCell at the print size), never read as SIZE-REF because the Independent seed-7 page never deals that word (4 vocab words read as false SIZE-REF); the dealt cell then judges its size",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK / SIZE-REF (dealt print cells)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/vocab-dealt-small.fail.html",
+    "state": "the dealt print cell draws the word's 3 marks at 5 mm; the screen draws them at 2.5 mm (50 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/vocab-dealt.pass.html",
+    "state": "the Independent page holds only a 12-dot array; the dealt cell (w1) holds the word at 5 mm, the screen 6 mm (the old tool read SIZE-REF here)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-term",
+   "check": "queue 15 (lead, 11-13): a growing-pattern TERM drawing is judged by its unit (ring / dot / square mm, screen vs print), never by its bounding width: a one-dot-wide column is taller than wide by the maths (the old SIZE-WIDTH failed it at 2 %); a term with 1-2 marks is still judged",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK on pattern terms (SIZE-WIDTH skips them)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-small.fail.html",
+    "state": "Terms 1-3 as columns of 2 / 3 / 4 rings, screen rings 1.0 mm against print 2.2 mm (45 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-column.pass.html",
+    "state": "the same columns, screen rings 2.6 mm (the old tool: SIZE-WIDTH FAIL 2 %)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-WIDTH,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-growing",
+   "check": "queue 15 on the real tree: patterns:growing_shape_patterns worksheet 1280 (9 term drawings the old SIZE-WIDTH failed) passes SIZE-WIDTH / SIZE-INK / SIZE-REF; a real too-small pattern fails",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size SIZE-INK on pattern terms",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/term-small.fail.html",
+    "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-WIDTH,SIZE-REF",
+    "state": "A FIXTURE (the growing worksheet draws its terms at print size, so no commit is too small): screen rings 45 % of print"
+   },
+   "pass": {
+    "commit": "791c84183",
+    "state": "lf-algebra head: the growing worksheet at 1280, its term columns judged by the ring (2.19 mm print)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:growing_shape_patterns --hosts worksheet --only SIZE-INK,SIZE-WIDTH,SIZE-REF --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-label",
+   "check": "queue 16 G9 (lf-algebra critic r2): TEXT-SIZE - a label's rendered size (font-size x every transform above it) on a screen host is >= its print size (5 % tolerance) and never under 8 pt; the growing quiz 'Term 1-4' labels at 8.3 pt against 11 pt on paper FAIL",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (labels)",
+   "browser": true,
+   "fail": {
+    "commit": "791c84183",
+    "state": "lf-algebra head: growing quiz 1280, 'Term 1' 11.0 px (8.3 pt) against 11 pt on paper"
+   },
+   "pass": {
+    "commit": "5297534b5",
+    "state": "MOVED FROM A FIXTURE TO A COMMIT (lf-hosts, 2026-11-13; was the fixture text-label-ok.pass.html, which screen-ink-size-text-fixture still proves): 5297534b5 is 791c84183 plus the one screen-cell.js hunk master already carries (917807f41, lf-vocab r5: the k2 twin fit skips an element with no box). Root cause of G9: the quiz hides the growing pattern's given counts (display:none); their 0 x 0 rects at 0,0 read as 145 px of overflow each side at 1280 and the fit shrank --mq-k2 5.4 -> 2.4 px. After: quiz 'Term n' 24.3 px (18.2 pt) at 1280, 20.6 px at 820, 16.8 px at 390, against 11 pt on paper. Branch claude/sweet-newton-c8wrv1-lf-hosts-g9-probe."
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:growing_shape_patterns --hosts quiz --only TEXT-SIZE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-cell-read",
+   "check": "CELL-READ (lf-hosts, 2026-11-13): ws-screen-ink-size FAILS a host render that read 0 [data-ws-cell] cells (not rendered, root missing, a card / quiz paper with no [data-ws-cell], a worksheet of 0 cards or a card with none) instead of passing it with nothing judged; judged on every full run (an --only run judges it when it names CELL-READ). The same rule as ws-screen-slots / ws-screen-answer / ws-phone-card (lf-checks 1fbdb8eca); --self-test holds 8 CELL-READ cases",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size CELL-READ",
+   "browser": true,
+   "fail": {
+    "commit": "1fbdb8eca",
+    "state": "lf-checks before hand-off 1's fix: the mult_facts practice card draws no [data-ws-cell]; the old ws-screen-ink-size read 0 cells there and passed"
+   },
+   "pass": {
+    "commit": "46a7c3c45",
+    "state": "lf-checks hand-off 1: the card paper carries data-ws-cell (the fix the cell-read-ss / -sa / -pc rows prove)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill multiplication:mult_facts --hosts card --widths 390 --only CELL-READ --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-fixture",
+   "check": "queue 16: TEXT-SIZE on a saved cell - labels under their print size FAIL, at print size pass",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size TEXT-SIZE (labels)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/text-label-small.fail.html",
+    "state": "Term labels 11 px (8.3 pt) against 11 pt on paper"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/text-label-ok.pass.html",
+    "state": "the same labels at 15 px"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only TEXT-SIZE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-text-countrow",
+   "check": "queue 17 G1 (lf-algebra critic r2 via lf-ops): TEXT-SIZE - non-slot digit text (every numeral but the cell's largest, which ws-screen-slots SCREEN-DIGIT judges) is >= the host's digit floor (40 / 48 / 56 px, read from ws-screen-slots; a count row on a phone TY-10b 29 px); number_patterns_rule card 390 count-row digits at 19.7 px FAIL",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE (digits)",
+   "browser": true,
+   "fail": {
+    "commit": "662c6bbea",
+    "state": "lf-ops-props before r4b (parent of 8d7343c0f): count-row digits 19.7 px on the 390 card"
+   },
+   "pass": {
+    "commit": "85c694896",
+    "state": "lf-ops-props r4b: box-train numerals at the host digit size"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:number_patterns_rule --hosts card --widths 390 --only TEXT-SIZE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-raise-3c7b",
+   "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: at 820 / 1024 / 1280 / 1366 the online worksheet's column count never falls, its tallest card and largest answer place grow <= 6 px, and its worst card's numeral never falls below master's (baseline pinned from 77f0acad)",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r1 F1; lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "hand-off 1's #worksheetView 40 / 48 / 56 px digit raise: placevalue:expand 2 -> 1 column at 1024, cards +84-101 px, answer places to 251 x 111; sub_100_no_regroup / mult_facts / add_facts cards +28-32 px"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "the raise removed: every sample skill holds master's columns, cards, answer places and numerals"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "focus-ring-sub-wp-tablet",
+   "check": "ws-phone-card FOCUS-RING: in each [data-ws-cell] cell every focused answer place draws one ring and every focused working box one ring (after the page's focus handlers settle), each >= 3:1 against its fill (AX-6); card and quiz at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS-RING (lf-hosts critic r1 F3)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "sub_word_problems: the focused .mq-wwans answer box outlined in yellow #f2c200, 1.68:1 on white, beside master's ring on the other boxes"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "screen-cell.css: the focused / next .mq-wwans box draws master's O-1 next-box ring (--mq-next-*, blue 4 px) on the drawn edge"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only FOCUS-RING --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-unique-sub-wp-tablet",
+   "check": "ws-phone-card TOUCH-UNIQUE: elementFromPoint 1 px inside each edge of every typed answer place returns that input, never another typed box; card, worksheet and quiz at 820 / 1024",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-UNIQUE (lf-hosts critic r1 F4)",
+   "browser": true,
+   "fail": {
+    "commit": "3c7b548a",
+    "state": "sub_word_problems .mq-wwans: 44 px drawn boxes on a 47 px pitch with 48 px touch boxes overlap 1 px; a tap on a box's right edge focuses its neighbour (card, worksheet, quiz)"
+   },
+   "pass": {
+    "commit": "f6a014a1a",
+    "state": "screen-cell.css: a column-work grid holding answer boxes opens its column gap to >= 4 px on screen (pitch >= 48); the drawn boxes keep their size"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only TOUCH-UNIQUE --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-word-work-tablet",
+   "check": "ws-phone-card TOUCH-HIT: a REAL tap (page.mouse.click) 1 px inside each of the 4 edge midpoints and 4 corners of every typed box's touch area leaves document.activeElement on that box; card, worksheet and quiz at 820 / 1024 / 1280 / 1366",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card TOUCH-HIT (lf-hosts critic r2 F1)",
+   "browser": true,
+   "fail": {
+    "commit": "d53fa104e",
+    "state": "div_word_problems / add_wp_20 .mq-wwans: the column work's overflow-x:auto wrapper clipped the 48 px touch ring, so a tap 1 px inside the top edge of answer box 1 hit div.mq-wwstep and the cell focused box 0 (card, worksheet, quiz; 820 and 1280)"
+   },
+   "pass": {
+    "commit": "b024860c9",
+    "state": "screen-cell.css: the wrapper gets padding cancelled by a negative margin and the input is lifted (position:relative; z-index:2); the drawn boxes do not move"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills division:div_word_problems,subtraction:sub_word_problems,addition:add_wp_20 --items 1 --sizes 820x1180,1024x768,1280x900,1366x768 --only TOUCH-HIT --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "timeoutS": 2400
+  },
+  {
+   "id": "cell-read-empty-card",
+   "check": "ws-phone-card CELL-READ: a card cell that carries a kind but holds no drawn mark and no answer slot is a finding (the host stamps 'legacy' on any paper, so r1's CELL-READ passed by construction)",
+   "kind": "fixture",
+   "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-empty.fail.html",
+    "state": "#questionPaper data-ws-cell=\"legacy\" with nothing in it"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+    "state": "a fact cell holding its numerals and answer slot, labelled 'fact'"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cell-read-kind-card",
+   "check": "ws-phone-card CELL-READ: the card cell's [data-ws-cell] kinds include the kind the quiz stamps on the same item (msc, else the kit template's kind cellKindFor)",
+   "kind": "fixture",
+   "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-kind.fail.html",
+    "state": "a 3 x 4 fact item (answerType text) labelled 'legacy' on the card while the quiz's rule labels it 'fact'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+    "state": "the same item labelled 'fact' on the card (question-render.js labels with the quiz's rule)"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-shrink-r2",
+   "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: a sheet that SHRINKS (tallest card, any card, the answer place), a card width that changes either way, and a numeral drop on ANY card are findings, not only growth and the worst card's numeral",
+   "kind": "commit-pair",
+   "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r2 F5)",
+   "browser": true,
+   "fail": {
+    "commit": "b024860c9",
+    "args": "--baseline tests/fixtures/precritic/worksheet-reflow/r2-f5-shrink.fail.json",
+    "state": "same commit, judged against master's baseline with mult_facts@1280 20 px taller / wider and card 1's numeral +4 px: the measured sheet reads as shrunk, re-widthed and one card's numeral dropped (r1's growth-only ratchet passed it)"
+   },
+   "pass": {
+    "commit": "b024860c9",
+    "args": "--baseline design/audit/baselines/worksheet-reflow.json",
+    "state": "the real baseline pinned from master 77f0acad2"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-widths-plan-owner-set",
+   "check": "ws-screen-widths-plan: every screen gate on precritic's --skill plan (ws-phone-card, ws-screen-slots --screen-digit, ws-screen-ink-size per host, ws-worksheet-reflow) renders at exactly the owner set read from tests/lib/ws-screen-widths.cjs (820 / 1024 / 1280 / 1366), and no gate label names another width",
+   "kind": "commit-pair",
+   "rule": "ws-screen-widths-plan SW-MISSING / SW-SET / SW-UNREAD / SW-LABEL (lf-hosts critic r2 F2)",
+   "browser": false,
+   "fail": {
+    "commit": "d53fa104e",
+    "state": "precritic planned ws-phone-card at its 390 x 844 / 390 x 664 default with the label 'practice card at 390 px' (so TOUCH-UNIQUE, FOCUS-RING and the card CELL-READ never ran at a tablet width); the other screen gates could not state their widths"
+   },
+   "pass": {
+    "commit": "341c0dd84",
+    "state": "every screen gate at 820 / 1024 / 1280 / 1366 from the one table (ws-screen-ink-size's worksheet and quiz too), labels name the set"
+   },
+   "command": "node tests/scripts/ws-screen-widths-plan.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "pv-gridfoot-combine-test-s",
    "check": "placevalue:combine one-page Test / Review: the white under the grid is at most one row, or the page stands in no more columns than the Independent page (lead-approved F1, lf-placevalue compare round: combine Test S 4 across against the Independent page's 3, about 45 % of the page white under the grid)",
    "kind": "commit-pair",
@@ -7900,9 +8484,7 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true,
-   "reason": "lead 2026-11-13 (compare deploy): needs TEXT-SIZE in ws-screen-ink-size; w2 carried an unchecked WIP copy, master keeps its own until lf-hosts lands TEXT-SIZE, then this row is re-run and un-pended"
+   }
   },
   {
    "id": "pv-compare-wrap-sign-bands",
@@ -7925,186 +8507,6 @@
    }
   },
   {
-   "id": "no-size-s-76bc",
-   "check": "ws-no-size-s (owner 2026-11-13, CLAUDE.md plan item 9: two print sizes, M and L; size S dropped): no size picker offers S (APP-PICKER), no app module keeps a stored S as S (APP-RESTORE), the kit reads S as M (APP-ALIAS: offeredSize, OFFERED_SIZES), and no gate's default run includes S (GATE-DEFAULT); on every ws-precritic run and in deploy session 1",
-   "kind": "commit-pair",
-   "rule": "ws-no-size-s APP-PICKER / APP-RESTORE / APP-ALIAS / GATE-DEFAULT",
-   "browser": false,
-   "fail": {
-    "commit": "76bc11c6",
-    "state": "the owner's ruling commit: teacher print, simple print, worksheet sheet and print settings offer S; printDefaults keeps a stored S; no S -> M alias; precritic, empty-band, cell-checks, capacity-pin and the rest default to S,M,L (52 findings)"
-   },
-   "pass": {
-    "commit": "32689e907",
-    "state": "lf-tools-nos r3: M and L pickers, offeredSize at every restore, gates default to M,L, each S kept on purpose on the reasoned allow-list (moved from a3b128cd1 in r3: the r3 TOKEN rule rightly fails a3b's fitsNotes \"Small\", critic nos r2 nit)"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --root {root}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "fact-cols-m-fixture",
-   "check": "ws-fact-cols-m (owner 2026-11-13: fact sheets keep everything when S goes): a fact-rows sheet with 9 or 10 columns PICKED prints at Size M with exactly those columns (FCM-COLS) at the 16 pt rung (FCM-PT), on the teacher print (buildSheet fact-rows) and the simple print (Columns Exactly n); ÷ to 9",
-   "kind": "fixture",
-   "rule": "ws-fact-cols-m FCM-COLS / FCM-PT / FCM-FIT",
-   "browser": false,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/fact-cols-m/fail.json",
-    "state": "a naive S removal: the picked 9 / 10 clamped to M's Auto (6 across at 24 pt) - the 9-10 column sheets lost"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/fact-cols-m/pass.json",
-    "state": "the live measurement on lf-tools-nos (ws-fact-cols-m --json): 9 / 10 across at 16 pt on both print paths"
-   },
-   "command": "node tests/scripts/ws-fact-cols-m.cjs --fixture {fixture}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-browser-c81",
-   "check": "ws-no-size-s --browser (critic nos r1 F1, blocker): S seeded in every restore path (stored print defaults, the worksheet sheet, the simple print, a saved set, a &set= share link, applyPrintSettings / a tray snapshot, a quick print) reads M; every drawn Size control offers M / L only with M checked; the Library labels a set saved at S as Size M; the one-page count-by sheet shows one label, Compact (12 tables on one page), with no unchecked M / L control; on every ws-precritic run and in deploy session 1",
-   "kind": "commit-pair",
-   "rule": "ws-no-size-s --browser STORE-* / SAVED-SET / SET-LINK / APPLY / PICKERS / PAGES / COMPACT",
-   "browser": true,
-   "fail": {
-    "commit": "c81e70178",
-    "state": "lf-tools-nos r1 head: applyPrintSettings copies a stored S raw (saved set, &set= link, tray), decodeSetParam keeps S, the Library says Size S, the worksheet sheet shows M / L with neither checked, and the one-page option draws an unchecked M / L radiogroup under \"Size fixed ... smaller digits\" and \"Small\" (17 findings)"
-   },
-   "pass": {
-    "commit": "32689e907",
-    "state": "lf-tools-nos r3: offeredSize on every restore and display path; the compact one-page label everywhere, and no visible picker under it (moved from 6b59329af in r3: the visibility gate rightly fails 6b59's live Big / Medium buttons in simple print, critic nos r2 N1)"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-r1-mutations",
-   "check": "ws-no-size-s line rules (critic nos r1 F2 / F4): an S option list moved to its own const, a restore written as /^[SML]$/.test(...), and a live instruction (PRE-FLIGHT) that says \"S and L\" each FAIL the static guard",
-   "kind": "fixture",
-   "rule": "ws-no-size-s APP-PICKER (any S tuple list) / APP-RESTORE (regex) / DOC",
-   "browser": false,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-fail.json",
-    "state": "the critic's two mutations that passed the r1 guard, and the PRE-FLIGHT line as it stood on c81e70178"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/no-size-s/r1-mutations-pass.json",
-    "state": "the same three lines as they stand on lf-tools-nos r2"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-docs-c81",
-   "check": "ws-no-size-s DOC (critic nos r1 F4): RUBRIC, the LESSONS_LEARNED PRE-FLIGHT checklist, PAGE_TYPES PT-DLG rows and .claude/agents name no S size to render or grade at",
-   "kind": "commit-pair",
-   "rule": "ws-no-size-s DOC",
-   "browser": false,
-   "fail": {
-    "commit": "c81e70178",
-    "state": "PRE-FLIGHT items 1-2 \"at S and L\", RUBRIC scope \"S and L\", PT-DLG-5 \"S, M, L\" (4 findings)"
-   },
-   "pass": {
-    "commit": "32689e907",
-    "state": "M and L, with the date S was dropped (moved from 6b59329af in r3: the r3 DOC token rule rightly fails 6b59's WORKSHEET_DESIGN_STANDARD / EXTENSION_PLAYBOOK S / M / L definitions, critic nos r2 N3)"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-n1-4a8e",
-   "check": "ws-no-size-s --browser VISIBLE / FIXED / WORKS (round cap after critic nos r2 N1): every size surface in every mode, simple print's compact \"All rows on one page\" included, is judged by what is visible and clickable (computed style, box, elementFromPoint), never the hidden attribute: no visible S option, no visible size picker where the layout is fixed, and every visible size option clicked changes the size the preview page is built at; on every ws-precritic run and in deploy session 1",
-   "kind": "commit-pair",
-   "rule": "ws-no-size-s --browser FIXED / WORKS / VISIBLE",
-   "browser": true,
-   "fail": {
-    "commit": "4a8e539b4",
-    "state": "lf-tools-nos r2 head: simple print compact shows the label AND a live Big / Medium picker (.sp-root .sp-sizes { display: grid } overrides [hidden]); clicking Big or Medium leaves the page at the compact size (3 findings)"
-   },
-   "pass": {
-    "commit": "32689e907",
-    "state": "lf-tools-nos r3: .sp-root .sp-sizes[hidden] { display: none } (additive): one label, no picker"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-r3-static-4a8e",
-   "check": "ws-no-size-s --docs TOKEN rules (round cap after critic nos r2 N2 / N3 / nit): APP-TOKEN and GATE-TOKEN flag any size-letter string or quoted S / Small on a size line; DOC scans every non-record *.md (CLAUDE.md and WORKSHEET_DESIGN_STANDARD.md included) for a size-S token beside M / L, after size / at / --sizes, or Small beside Medium / Large; only dropped / alias / history lines or a nos marker pass",
-   "kind": "commit-pair",
-   "rule": "ws-no-size-s APP-TOKEN / GATE-TOKEN / DOC",
-   "browser": false,
-   "fail": {
-    "commit": "4a8e539b4",
-    "state": "lf-tools-nos r2 head: WORKSHEET_DESIGN_STANDARD.md:22 and EXTENSION_PLAYBOOK.md:72 define S / M / L with no note, LESSONS_LEARNED L2 says S/M/L, the live docs offer S in ~180 lines, teacher-print fitsNotes names S \"Small\""
-   },
-   "pass": {
-    "commit": "32689e907",
-    "state": "lf-tools-nos r3: instructions rewritten to M / L, token values marked as the compact token / decode alias, findings logs marked history, fitsNotes says the compact layout; CLAUDE.md's two lines allow-listed for the owner"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "no-size-s-r2-mutations",
-   "check": "ws-no-size-s line rules (critic nos r2 C / D / E, N2's three missed phrasings, N3's three lines): an S picker from 'SML'.split(''), \"at size S and at L\", \"Small and Large\", \"--sizes S,M,L\" in a doc and an S / M / L definition with no note each FAIL",
-   "kind": "fixture",
-   "rule": "ws-no-size-s APP-TOKEN / DOC",
-   "browser": false,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-fail.json",
-    "state": "the critic's r2 mutations and the N3 lines as they stood on 4a8e539b4"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-pass.json",
-    "state": "the same lines at M and L, and N3 as fixed"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "nos-runtime-s-button",
-   "check": "lead decision NOS-DOCS-ADVISORY (2026-11-13; critic nos r3): the docs token rule only reports, so the BROWSER gate must still fail an S option added by JS at runtime (a MutationObserver button, no S in any source line the static rules read)",
-   "kind": "fixture",
-   "rule": "ws-no-size-s --browser (VISIBLE: no visible or clickable S option), run via --plant",
-   "browser": true,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/nos-runtime-s.fail.txt",
-    "state": "mutation r3-runtime-s-button planted in a copy of the served tree: the browser gate FAILs (VISIBLE simple print shows S)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/nos-runtime-s.pass.txt",
-    "state": "the unplanted copy: the browser gate is OK"
-   },
-   "command": "node tests/scripts/ws-no-size-s.mjs --plant $(cat {fixture})",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
    "id": "story-pronouns-p-wp-19",
    "check": "ws-story-pronouns: a story's gendered pronoun agrees with its name (STATIC-PRONOUN over every template that interpolates a name; PRONOUN-AGREE / PRONOUN-ONE / UNMAPPED on sampled stories)",
    "kind": "commit-pair",
@@ -8118,6 +8520,68 @@
     "state": "the 6 templates repeat the name instead of a pronoun"
    },
    "command": "node tests/scripts/ws-story-pronouns.mjs --root {root} --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:tape_diagram,algebra:write_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-settle-retap",
+   "check": "ws-phone-card TOUCH-HIT de-flake: the tap point is read after two animation frames and once the scroll and the box's rect hold still, a miss is re-tapped the same way, and only a REPEATED miss is a finding (lf-hosts hand-over r3 m1: 2-3 random 'focuses nothing (body)' misses a run on untouched cells, all at 1280 x 900 bottom edges / corners: sub_100_no_regroup, placevalue:expand, add_facts; they never repeated)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "--no-retap",
+    "state": "the d23e42fa6 tap (--no-retap): the point read in the same task as the blur, one tap; the page's focusout moves the card 80 px on the next task, so the tap lands on a stale point and reports a miss that is not there (the 1280 x 900 flake class)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "",
+    "state": "the same page, today's tap: settled point, re-tap on a miss; nothing covers the box, so OK (3 of 3 runs)"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-overlay-true-miss",
+   "check": "ws-phone-card TOUCH-HIT still FAILS a box that truly cannot be hit after the de-flake: a div painted over the bottom 12 px of the answer box swallows the bottom edge and corner taps, the settled re-tap misses again, and the finding is reported (every run)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.fail.html",
+    "state": "an overlay covers the answer box's bottom 12 px: 3 repeated misses (bottom, bottom-left, bottom-right), FAIL 3 of 3 runs"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.pass.html",
+    "state": "the same overlay 4 px below the box: every tap focuses it"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-slot-x",
+   "check": "ws-worksheet-reflow WS-REFLOW per-slot x: no typed answer place moves sideways inside its card by more than 1.5 px against the baseline's slotXs (the r1 F4 4 px gap moves a box by up to 1 px): 1 px holds, 2 px fails",
+   "kind": "fixture",
+   "rule": "ws-worksheet-reflow WS-REFLOW slot x (lf-hosts critic r3)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-2px.fail.json",
+    "state": "card 1's second answer place 2 px right of master's (before: no per-slot x measure at all, so any sideways move under 6 px of card width passed)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-1px.pass.json",
+    "state": "the same place 1 px right (the r1 F4 gap's move): holds"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8222,43 +8686,43 @@
     "pass": "OK"
    }
   },
- {
-  "id": "onerow-strip-tight",
-  "check": "the ONE-ROW PAGEFILL exemption (mq-onerow) accepts a strip only while it is shorter than the row it holds; a one-row page with a strip a whole row tall (another row fits) still FAILs (critic r9, lf-roles)",
-  "kind": "fixture",
-  "rule": "ws-print-lint L-DENSITY PAGEFILL (one-row strip)",
-  "fail": {
-   "fixture": "tests/fixtures/precritic/onerow/strip-tall.fail.json",
-   "state": "one-row page, 90 mm strip under a 60 mm row: PAGEFILL"
+  {
+   "id": "onerow-strip-tight",
+   "check": "the ONE-ROW PAGEFILL exemption (mq-onerow) accepts a strip only while it is shorter than the row it holds; a one-row page with a strip a whole row tall (another row fits) still FAILs (critic r9, lf-roles)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (one-row strip)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-tall.fail.json",
+    "state": "one-row page, 90 mm strip under a 60 mm row: PAGEFILL"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/onerow/strip-short.pass.json",
+    "state": "one-row page, 45 mm strip under a 172 mm row: accepted"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --onerow-probe {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/onerow/strip-short.pass.json",
-   "state": "one-row page, 45 mm strip under a 172 mm row: accepted"
-  },
-  "command": "node tests/scripts/ws-print-lint.cjs --onerow-probe {fixture}",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "spill-p1",
+   "check": "SPILL-P1 (lead 2026-11-13 r9b): page 1 of a spilled Opener may leave over 30 % white only when the next part (the Guided band at its measure) is taller than the white; white that could hold it FAILs",
+   "kind": "fixture",
+   "rule": "ws-roles-unit OPENER-SPILL SPILL-P1 (opener.js spillP1Ok)",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/spill-p1/fit-spilled.fail.json",
+    "state": "planted: 120 mm white (52 %) that could hold a 95 mm Guided band"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/spill-p1/honest.pass.json",
+    "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- },
- {
-  "id": "spill-p1",
-  "check": "SPILL-P1 (lead 2026-11-13 r9b): page 1 of a spilled Opener may leave over 30 % white only when the next part (the Guided band at its measure) is taller than the white; white that could hold it FAILs",
-  "kind": "fixture",
-  "rule": "ws-roles-unit OPENER-SPILL SPILL-P1 (opener.js spillP1Ok)",
-  "fail": {
-   "fixture": "tests/fixtures/precritic/spill-p1/fit-spilled.fail.json",
-   "state": "planted: 120 mm white (52 %) that could hold a 95 mm Guided band"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/spill-p1/honest.pass.json",
-   "state": "letter_equation opener L: 93.7 mm white, the Guided band needs 105 mm - an honest leftover"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --spill-p1-fixture {fixture}",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- }
  ]
 }
