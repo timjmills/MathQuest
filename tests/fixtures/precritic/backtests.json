@@ -8096,7 +8096,7 @@
     "commit": "feadad0b",
     "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --roles guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8116,7 +8116,7 @@
     "commit": "feadad0b",
     "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --roles guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8136,7 +8136,7 @@
     "commit": "feadad0b",
     "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --roles guided",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages guided",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -8156,7 +8156,7 @@
     "commit": "feadad0b",
     "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
    },
-   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --roles opener",
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --pages opener",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

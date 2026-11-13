@@ -35,7 +35,7 @@ const DEALS = [['default', null], ['band 20', { band: 20 }], ['band 100', { band
     ['band 1000 hto', { band: 1000, answerSlot: 'hto' }], ['band 100 hto', { band: 100, answerSlot: 'hto' }],
     ['to_words', { wordform: ['to_words'] }], ['to_words band 20', { wordform: ['to_words'], band: 20 }], ['to_words band 1000', { wordform: ['to_words'], band: 1000 }]];
 // (critic live1 N3: the Opener's Guided band - its items share the Model's kind)
-const ROLES = list(arg('roles', 'guided,opener'));
+const ROLES = list(arg('pages', 'guided,opener'));   // (--pages, not --roles: the page kinds read, the plan's role path is precritic --skill)
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen',
     'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
