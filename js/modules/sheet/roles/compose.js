@@ -403,6 +403,18 @@ export function wrongOf(it) {
     else v = String(w.value);
     const norm = (t) => String(t).replace(/\s+/g, '').toLowerCase();
     if (!v.trim() || norm(v) === norm(answerOf(it))) return null;
+    // ONE error an item (lead ruling N9, 2026-11-13; ws-roles-unit FIX-MINIMAL): a several-part wrong answer that differs from the
+    // right one in more than one part keeps its FIRST error only - the later parts follow the correct rule, so the pupil's fix is
+    // one part, never a rewrite of every term after it. Its own slots no longer match, so they are dropped.
+    const cParts = answerListOf(answerOf(it));
+    const wParts = cParts ? answerListOf(v) : null;
+    if (cParts && wParts && wParts.length === cParts.length) {
+        const at = wParts.findIndex((x, i) => x !== cParts[i]);
+        if (at >= 0 && wParts.some((x, i) => i > at && x !== cParts[i])) {
+            const one = cParts.map((x, i) => (i === at ? wParts[i] : x)).join(', ');
+            return Object.assign({}, w, { value: one, display: one, slots: undefined, oneError: true });
+        }
+    }
     return Object.assign({}, w, { value: v, display: w.display !== undefined ? String(w.display) : v });
 }
 

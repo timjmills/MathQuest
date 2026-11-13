@@ -303,4 +303,8 @@ export function plan(input = {}) {
     });
 }
 
+// A Test plans every item at level 0 (PT-TST-2: no hints; planItem level 0), so the bridge measures it there too - measured at
+// level 1, a hint scaffold the page never draws sized its rows (lf-algebra r8 via the lead). A function: a bare 0 reads as unset.
+export const MEASURE_LEVEL = () => 0;
+
 export default { ROLE_ID, sources, measureCols, counts, plan };

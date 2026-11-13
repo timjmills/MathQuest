@@ -44,15 +44,19 @@ function stepsFor(it) {
  * says "Write 25" shows 25 traced in its own drawing. Only a count row draws a partial state (its `traceSlots`); a
  * provider's mark `blankN` is the row's slot `bN`. null: the default (blank states, the last one answered).
  */
-function marksFor(it, steps) {
+// (the templates that draw a state's marks from `traceSlots`: a count row's blanks, a function table's cells - PT-MOD-1, lf-roles)
+const TRACE_TEMPLATES = new Set(['count-row', 'function-table']);
+export function marksFor(it, steps) {
     const q = it.q || {};
-    if (!q.cell || q.cell.template !== 'count-row') return null;
+    if (!q.cell || !TRACE_TEMPLATES.has(q.cell.template)) return null;
     const worked = providerWorkedSteps(it, 6).filter((s) => s.text.length <= 90);
     if (worked.length !== steps.length || !worked.some((s) => s.marks.length)) return null;
     const acc = {};
     return worked.map((s) => {
-        s.marks.forEach((m) => { if (m && m.slot !== undefined) acc[String(m.slot).replace(/^blank(\d+)$/, 'b$1')] = String(m.value); });
-        return Object.assign({}, acc);
+        const fresh = [];
+        s.marks.forEach((m) => { if (m && m.slot !== undefined) { const id = String(m.slot).replace(/^blank(\d+)$/, 'b$1'); if (acc[id] !== String(m.value)) fresh.push(id); acc[id] = String(m.value); } });
+        // (this step's own marks: drawn grey, the earlier ones black - PT-MOD-1; not enumerable, so traceSlots stays a plain map)
+        return Object.defineProperty(Object.assign({}, acc), '__new', { value: fresh, enumerable: false });
     });
 }
 
@@ -364,17 +368,25 @@ export function plan(input = {}) {
     // empty. When the beside layout's text cell would be 30 % or more empty AND it needs more than one page, the states stand
     // side by side like a fact page's (each with its step text over it), if that grid fits one page; every other model -
     // every one-page model of a passed skill among them - keeps its layout.
-    const tallBeside = !factRows(input) && !marks && !story && cols === 2 && steps.length >= 2 && steps.length <= 4
+    // (a count row re-plans itself above; a function table's traced marks draw in any layout)
+    const rowMarks = !!marks && it.q && it.q.cell && it.q.cell.template === 'count-row';
+    const tallBeside = !factRows(input) && !rowMarks && !story && cols === 2 && steps.length >= 2 && steps.length <= 5
         && hMinAt([it], 2, ctx) * 0.7 >= textH2 && deal.length > 1;
-    const acrossOk = (a) => {
+    const acrossOk = (a, em = 0.5) => {
         if (!tallBeside) return true;
         const colW = 186 / a - 6 - 9.5;
-        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const charMm = em * m.textPt * (25.4 / 72);
         const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
-        return lines <= 2 && (steps.length / a) * (hMinAt([it], a, ctx) + lines * m.textPt * 1.3 * (25.4 / 72) + 4) <= room1;
+        return lines <= 2 && Math.ceil(steps.length / a) * (hMinAt([it], a, ctx) + lines * m.textPt * 1.3 * (25.4 / 72) + 4) <= room1;
     };
-    const acrossAt = (factRows(input) || tallBeside) && !marks && !story && steps.length >= 2 && steps.length <= 4
-        ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx) && acrossOk(a)) : 0;
+    // (FIVE states - a provider's five worked steps, function_table_easy since its PT-MOD-1 marks: 3 + 2, a row of three over a
+    // row of two, never a 2 x 3 grid with an empty state cell, MOD-GRID; lf-roles r8)
+    const acrossAt = (factRows(input) || tallBeside) && !rowMarks && !story && steps.length >= 2 && steps.length <= 4
+        ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx) && acrossOk(a))
+        : tallBeside && steps.length === 5 && fitsAt([it], 3, ctx) && acrossOk(3, 0.6)
+            // (the state draws the SAME at three columns as at two - a word bank that wraps narrower changes the drawing from
+            // state to state: identify L, lf-roles r8)
+            && hMinAt([it], 3, ctx) <= hMinAt([it], 2, ctx) * 1.02 ? 3 : 0;
     if (acrossAt) {
         across = acrossAt;
         const colW = 186 / across - 6 - 9.5;
@@ -384,7 +396,7 @@ export function plan(input = {}) {
         H = hMinAt([it], across, ctx) + textMm;
         deal = [steps.length];
     }
-    const acrossRows = across ? steps.length / across : 0;
+    const acrossRows = across ? Math.ceil(steps.length / across) : 0;
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
@@ -394,7 +406,7 @@ export function plan(input = {}) {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-                marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
+                marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
     });
     const textItem = (i) => ({
@@ -409,9 +421,13 @@ export function plan(input = {}) {
         const take = steps.slice(i, i + cap).map((_, k) => i + k);
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2 && !across) cells.push(textItem(k)); }
-        const grid = across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        const split = across && take.length % across !== 0;
+        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        // (3 + 2: the full rows in `across` columns, the rest in a grid of their own count, same row height)
+        const grids = split ? [gridPart(cells.slice(0, across * Math.floor(take.length / across)), { cols: across, rows: Math.floor(take.length / across), cellH: H, labels: 'none' }),
+            gridPart(cells.slice(across * Math.floor(take.length / across)), { cols: take.length % across, rows: 1, cellH: H, labels: 'none' })] : null;
         const storyHtml = story ? `<div class="mq-wwstory mq-modelstory" style="padding:1.5mm 4mm 2mm;font-size:${m.textPt + 2}pt;line-height:1.3;">${story.map((l) => `<div>${esc(l)}</div>`).join('')}</div>` : '';
-        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), ...(story ? { contents: [{ kind: 'html', html: storyHtml }, grid] } : { content: grid }) }];
+        const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), ...(story ? { contents: [{ kind: 'html', html: storyHtml }, grid] } : grids ? { contents: grids } : { content: grid }) }];
         i += take.length;
         if (i >= steps.length) sections.push({ kind: 'say', frame: oralFrameOf(it, { fill: true }) });
         pages.push({ sections });
