@@ -106,6 +106,11 @@ export const lettersFit = (pageCounts) => pageCounts.every((c) => c <= LETTER_CA
 
 /** PT-FRM-4: the Score denominator is every scored cell on the whole sheet. */
 export const scoreDenominator = (counts) => counts.reduce((a, b) => a + (Number(b) || 0), 0);
+/**
+ * The points a run of items scores: one an item, or the item's template `footprint.points` (owner ruling Q-C, 2026-11-07:
+ * a Match 3 cell scores one point a word, 3). Anchors score nothing. Additive: every other template scores 1, as before.
+ */
+export const scorePoints = (items) => (items || []).reduce((a, it) => a + (it && it.anchor ? 0 : (Number(it && it.footprint && it.footprint.points) || 1)), 0);
 
 /* ================================================================= placing sections */
 
@@ -151,4 +156,4 @@ export function placeSections(sections, { bodyFirstMm, bodyContMm }) {
     return pages;
 }
 
-export default { paginate, labelStarts, lettersFit, scoreDenominator, placeSections };
+export default { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections };

@@ -79,7 +79,8 @@ export function prepare(it, info = {}) {
     // (a sentence story is a story too: its number sentence fits half the cell, so it lays out like a column story - it stacked,
     // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)
     const story1 = sentence || column;
-    const legacy = it.template === 'equation' && workW > halfBeside;
+    // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
+    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW > halfBeside);
     const under = !legacy && (story1 ? true : workW > halfBeside && workW <= halfCell);
     const wide = legacy || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');

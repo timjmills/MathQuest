@@ -40,6 +40,7 @@ import {
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
 import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows } from '../layout.js';
+import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
 const isMixItem = (it) => !!(it && it.q && it.q.divMix);
@@ -114,7 +115,10 @@ const mixPartialEnd = (nM, cols, n) => {
 const mixRowAdd = (r, cols, nM, pEnd, extra, hint) => Math.max(r * cols < nM ? extra : 0,
     hint && r * cols < pEnd && (r + 1) * cols > nM ? hint : 0);
 /** The page ceiling with the Models it leads with: a Mix page's extra Models are not scored tries. */
-const ceilFor = (ctx, items) => ceilOf(ctx) + Math.max(0, mixModels(items || []) - 1);
+// (a cell that scores several tries - Match 3, footprint `points` 3, owner ruling Q-C - counts them against the ceiling:
+// 10 / 8 / 6 scored tries hold 3 / 2 / 2 such cells plus the Model; lf-vocab r9, ws-empty-band EB-GDPCAP)
+const pointsOf = (items) => { const its = (items || []).filter(Boolean); const p = its.length && its.every((it) => it.footprint && Number(it.footprint.points) > 1) ? Math.max(...its.map((it) => Number(it.footprint.points))) : 1; return p; };
+const ceilFor = (ctx, items) => { const p = pointsOf(items); return (p > 1 ? Math.floor(CEILING[ctx.size] / p) + 1 : ceilOf(ctx)) + Math.max(0, mixModels(items || []) - 1); };
 /**
  * The fact pages (lf-ops facts-roles task, RUBRIC H13): add / sub / mult facts, div_facts_long and div_facts. Their cells are
  * short, so the shared ceiling (10 / 8 / 6 tries) and the row stretch (up to FILL_CAP) left 31-58 % empty bands under every
@@ -168,6 +172,12 @@ export const measureCols = (ctx) => (ctx && ctx.size === 'S' ? [1, 2, 3, 4, 5] :
 
 /** The Model plus at least three guided tries (round-3 re-grade: "a model and ONE practice item"). */
 export const MIN_ITEMS = 4;
+/**
+ * Whether n leading items (the Model first) meet MIN_ITEMS, counted in SCORED ANSWERS (lead ruling 2026-11-12): a cell that
+ * scores several answers (Match 3, footprint `points` 3) counts each of them, by the same pointsOf the EB-GDPCAP ceiling
+ * uses, so the Model and ONE Match 3 try (3 answers) meets "Model + 3 tries". A single-answer cell counts 1, as before.
+ */
+export const minMet = (items, n) => { const p = pointsOf(items); return n >= MIN_ITEMS || (p > 1 && (n - 1) * p >= MIN_ITEMS - 1); };
 const MAX_PAGES = 3;
 
 /**
@@ -463,9 +473,9 @@ function sheetFit(items, cols, ctx, input, limit = Infinity) {
     // Round-4 re-grade: a spanning Model that pushed the tries onto a second page (Model + 2 on
     // page 1, a quarter-empty page 2) gives way to the Model in a cell of its own when that keeps
     // the Model and three tries on page 1.
-    if (a.span && a.pages[0].cap < MIN_ITEMS) {
+    if (a.span && !minMet(items, a.pages[0].cap)) {
         const b = sheetFitWith(items, cols, ctx, input, true, !a.hint, limit);
-        if (b.pages[0].cap >= MIN_ITEMS || b.pages.length < a.pages.length) return b;
+        if (minMet(items, b.pages[0].cap) || b.pages.length < a.pages.length) return b;
     }
     // Critic pv-r2 (a rounding table of 6 places at L): the Model still alone on page 1. Its
     // work lines give way (the traced cells of a table, a chart, a clock's boxes ARE its
@@ -497,7 +507,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const ceil = ceilFor(ctx, items);
     const facts = factRows(input);
     const nM = mixModels(items);
-    while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || total < MIN_ITEMS)) {
+    while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || !minMet(items, total))) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
         const maxR = Math.max(1, Math.ceil((ceil - total) / cols));
@@ -549,6 +559,9 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
         }
         over = total - most();
     }
+    // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
+    // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
+    if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
     return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total) });
 }
 
@@ -979,7 +992,9 @@ export function plan(input = {}) {
     // worked example carries the "Model" tab and is not scored; the rest run a. b. c. ...
     const worked = use.length > 1 && !!answerOf(use[0]);
     const nModels = worked ? mixModels(use) : 0;
-    const scored = use.length - nModels;
+    // (owner ruling Q-C, 2026-11-07: a template that scores per word - Match 3, `footprint.points` 3 - scores so here too;
+    // every other template 1 a cell, as before: paginate.js scorePoints; lf-vocab r5, critic r3 #2)
+    const scored = scorePoints(use.slice(nModels));
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: scored });
     // The partial stage is the rest of the Model's row (or the first row of tries), partialEndOf.
     // (a Mix page led by a Model per form: its first tries are the whole next row - every cell of
@@ -1056,9 +1071,22 @@ export function plan(input = {}) {
         const sumT = tF.reduce((x, y) => x + y, 0);
         const lam = sumT > sumW ? Math.max(0, Math.min(1, (room - sumW) / (sumT - sumW))) : 0;
         // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
-        // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND)
+        // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
+        // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
         const tight = tightRows(host);
-        const Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
+        // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
+        // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
+        if (!tight && rows > 1 && host.length && host.every((it) => it.footprint && it.footprint.evenRows)) {
+            // (the share is at least the tallest row's content when the page holds that many rows of it: lf-vocab r5, critic r3
+            // #6 - at L the Model row's tab and the hint line made it taller than the average, so the rows stayed 99 / 78 mm)
+            const even = Math.max(Hr.reduce((a, b) => a + b, 0) / rows, Math.max(...w));
+            // (and when the page cannot give every row the tallest row's planned height, every row still takes ONE share - the
+            // page's height over the rows: the planned hint row (a two-line meaning hint) drew 100 / 77 mm at L while its
+            // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
+            Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
+        }
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
