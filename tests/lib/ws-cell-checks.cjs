@@ -155,6 +155,11 @@ function cellChecksInPage(opts) {
                     if (lim > 0 && below >= lim) out.findings.push({ rule: 'H13-ABS', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': an empty band ' + mm(below) + ' mm under the lowest ink of a ' + mm(cr.height) + ' mm cell (' + Math.round((below / cr.height) * 100) + '%; limit 30 % of the cell = ' + mm(lim) + ' mm): size the row to the item (RUBRIC H13, H13-ABS; critic lf-placevalue r2 N6)' });
                 }
             }
+            // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-6): grey pupil work always sits under its "<Name> wrote:" label,
+            // so the single grey never reads as "trace me"
+            if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {
+                out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': grey pupil work with no "<Name> wrote:" label (PT-ERR-6: the grey must never read as trace)' });
+            }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {

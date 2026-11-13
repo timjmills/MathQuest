@@ -27,7 +27,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -56,6 +56,8 @@ function selfTest() {
         { name: 'tag outside the box (TAGINK control)', html: page(cell({ h: 36, val: '<span style="color:#888;padding-left:8mm">10</span>', tag: 'A', w: 22 })), want: null, rules: ['TAGINK'] },
         { name: 'two answers in one key slot (KEYJOIN)', html: page(cell({ h: 36, val: '15, 15' })), want: 'KEYJOIN', key: true },
         { name: 'a redraw zone printing a list (KEYJOIN open-zone control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="ea-draw" data-ws-shape="open">12, 15, 18</span></div></div>')), want: null, key: true, rules: ['KEYJOIN'] },
+        { name: 'grey pupil work with no label (PUPILTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span class="mq-pupil" style="color:#949494">48</span></div></div>')), want: 'PUPILTAG' },
+        { name: 'grey pupil work under "Sam wrote:" (PUPILTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span class="mq-pupiltag">Sam wrote:</span><span class="mq-pupil" style="color:#949494">48</span></div></div>')), want: null, rules: ['PUPILTAG'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
