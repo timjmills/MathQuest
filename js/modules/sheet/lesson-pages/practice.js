@@ -50,6 +50,18 @@ export function stripItem(data, steps) {
  * order, for a page that needs more. Absent: the
  * pool as it was. Pure.
  */
+/** A one-number item's number (payload n, 10 or more), else null. */
+const oneNumOf = (it) => { const v = Number(((it && it.q && it.q.cell && it.q.cell.payload) || {}).n); return Number.isFinite(v) && v >= 10 ? v : null; };
+const nearNum = (x, y) => x !== y && (Math.abs(x - y) <= 2 || String(x).split('').sort().join('') === String(y).split('').sort().join(''));
+/** `pool` split: {clean, later} - every one-number item that is a near twin of one taken before it (or of `taken`) goes to
+ *  `later`, in order; `keep` never moves (lf-engine PC r4, the re-dealt sheet with the check on). Pure. */
+export function nearSplit(pool, taken = [], keep = null) {
+    const ns = taken.map(oneNumOf).filter((v) => v !== null);
+    const clean = [], later = [];
+    for (const it of pool) { const v = oneNumOf(it); if (v !== null && it !== keep && ns.some((u) => nearNum(u, v))) later.push(it); else { clean.push(it); if (v !== null) ns.push(v); } }
+    return { clean, later };
+}
+
 export function indepRuled(pool, weDo, data) {
     const rules = data && data.indepRules;
     if (!rules) return pool;
@@ -66,7 +78,8 @@ export function indepRuled(pool, weDo, data) {
     const chartT = Array.isArray(rules.chartTexts) ? rules.chartTexts : [];
     const first = [], later = [];
     for (const it of pool) { const x = plainOf(it); if (!chartT.includes(String((it.q && it.q.text) || '')) && ok(x)) { first.push(it); taken.push(x); } else later.push(it); }
-    return first.concat(later);
+    const nl = nearSplit(first, weDo || []);
+    return nl.clean.concat(nl.later, later);
 }
 
 export function independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter }) {

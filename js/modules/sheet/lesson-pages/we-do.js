@@ -6,6 +6,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
+import { nearSplit } from './practice.js';
 import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
 import { workedStepsOf, stepTemplateOf } from '../anchors.js';
@@ -181,7 +182,11 @@ export function weDoBand(env) {
     if (stackRows) gk = stackRows;
     // (lf-engine PC r4, `indepRules.chartTexts` - the check on only: no chart example again in the Guided cells)
     const chartT = data && data.indepRules && Array.isArray(data.indepRules.chartTexts) ? data.indepRules.chartTexts : [];
-    const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4 && (it === example || !chartT.includes(String((it.q && it.q.text) || ''))));
+    const weDoPool0 = main.filter((it) => it !== example2 && it !== example3 && it !== example4 && (it === example || !chartT.includes(String((it.q && it.q.text) || ''))));
+    // (... and a one-number item that is a near twin of an earlier one - its digits turned round, or within 2: round L 47 / 74,
+    // 88 / 89 - goes last, as PC-LR6 reads twins on the check; practice.js nearSplit)
+    // (pickWeDo reorders by case, so the twins are left out while 6 clean items remain)
+    const weDoPool = data && data.indepRules ? (() => { const o = nearSplit(weDoPool0, [], example); return o.clean.length >= 6 ? o.clean : o.clean.concat(o.later); })() : weDoPool0;
     const exOthers = [example2, example3, example4].filter(Boolean);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
