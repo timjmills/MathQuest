@@ -52,10 +52,14 @@ export function prepare(it, info = {}) {
     // box; the response column stays beside both.
     const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
+    // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
+    // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
+    const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="margin-top:auto;margin-bottom:auto${wide ? ';grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm' : ''}">`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
         + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
-        + `<div class="mq-abresp"${at(2, '1 / 3')}>`
+        // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
+        // the ring in a mostly empty column); inline, so only Reason It pages change
+        + `<div class="mq-abresp"${wide ? ` style="grid-column:2;grid-row:1 / 3;justify-content:flex-start"` : ' style="justify-content:flex-start"'}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
         + (place.kind === 'none' || place.words ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
