@@ -25,7 +25,7 @@
 //
 // Light only; tokens from css/teacher-tokens.css; styles in css/teacher-sheet.css (.tvs-*).
 
-import { buildSheet, sheetDocument } from './print-sheet.js';
+import { buildSheet, sheetDocument, printsCompactOnePage } from './print-sheet.js';
 import {
     icon, esc, toast, copyText, currentSet, findSkill, skillLabel, readStore, writeStore, printDefaults,
     addToCurrentSet, pupilCode,
@@ -37,6 +37,7 @@ import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
 import { openPdfPreview, warmPdfPreview, isPdfPreviewOpen } from './teacher-pdf-preview.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
+import { offeredSize, COMPACT_LABEL } from './sheet/tokens.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
@@ -71,6 +72,7 @@ const S = (() => {
     const saved = readStore(STORE_KEY, null);
     if (saved && typeof saved === 'object') {
         if (saved.opts) Object.assign(base.opts, saved.opts, { header: Object.assign({}, base.opts.header, saved.opts.header || {}) });
+        base.opts.size = offeredSize(base.opts.size, 'M');   // owner 2026-11-13: size S is dropped; a saved S reads as M
         if (saved.quiz) Object.assign(base.quiz, saved.quiz);
         if (saved.share) Object.assign(base.share, saved.share);
         if (Array.isArray(saved.touched)) base.touched = saved.touched;
@@ -163,7 +165,7 @@ function common(seed, quiz, version) {
     const h = o.header || {};
     const V = versionsOf(quiz);
     return {
-        size: o.size, look: 'auto', paper: o.paper || 'A4',
+        size: offeredSize(o.size, 'M'), look: 'auto', paper: o.paper || 'A4',
         anchors: o.examples === 'sections' || o.examples === 'side' ? o.examples : 'off',
         header: { name: h.name !== false, date: h.date !== false, score: quiz ? true : !!h.score, title: quiz ? ((S.quiz.name || '').trim() || autoQuizName(items())) : (S.batchTitle || true) },
         key: { on: true, placement: !sameKeyEnd && o.keyPlace === 'after-page' ? 'after-page' : 'end', style: o.keyStyle === 'short' ? 'short' : 'copy' },
@@ -766,11 +768,16 @@ function optionsHTML() {
             const div = list.some(isDivision);
             const cur = String(S.opts.factCols || 'auto');
             const cols = `<div class="tvs-seg" role="group" aria-label="Columns">${[['auto', 'Auto'], ['5', '5'], ['6', '6'], ['8', '8'], ['10', '10']].map(([v, l]) => { const off = div && v === '10'; return `<button type="button" class="tvs-btn" data-act="factcols" data-v="${v}" aria-pressed="${cur === v}"${off ? ' disabled title="8 is the most for ÷"' : ''}>${cur === v ? icon('check', 16) : ''}<span>${l}</span></button>`; }).join('')}</div>`;
-            // Size S stays one tap away beside the columns (more across needs the smaller digits)
-            h += row('Columns', div ? 'Facts across each row · 8 is the most for ÷' : 'Facts across each row', cols + seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
+            // Size sits beside the columns (owner 2026-11-13: M and L only; the column count sets the digit size, 9-10 across
+            // print at the 16 pt rung at either size)
+            h += row('Columns', div ? 'Facts across each row · 8 is the most for ÷' : 'Facts across each row', cols + seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size'));
         }
     }
-    h += row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
+    // lead ruling 2026-11-13 (critic nos r1 F3): "All rows on one page" prints compact whatever is asked, so the row names that
+    // ONE size instead of an M / L choice that would not be used
+    h += printsCompactOnePage(list)
+        ? row('Size', 'Set by "All rows on one page"', `<p class="tvs-muted" data-size-fixed="compact">${esc(COMPACT_LABEL)}</p>`)
+        : row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size'));
     if (quiz) {
         h += row('Points', 'Shown on the summary', seg('points', S.quiz.points, [['1', '1 per question'], ['2', '2 per question']], 'Points'));
         h += row('How many versions?', 'Each version has its own order and its own key', stepper('versions', S.quiz.versions, 1, 6, 'Versions') + (S.quiz.versions > 1 ? keyVersionsSeg() : ''));
@@ -1307,6 +1314,7 @@ export function printSettings() {
 export function applyPrintSettings(p) {
     if (!p || typeof p !== 'object') return;
     if (p.opts && typeof p.opts === 'object') Object.assign(S.opts, p.opts, { header: Object.assign({}, S.opts.header, p.opts.header || {}) });
+    S.opts.size = offeredSize(S.opts.size, 'M');   // owner 2026-11-13: a saved set / &set= link / tray snapshot holding S restores as M (critic nos r1 F1)
     if (p.quiz && typeof p.quiz === 'object') for (const k of ['mode', 'n', 'nEach', 'pages', 'versions', 'points']) if (p.quiz[k] !== undefined) S.quiz[k] = p.quiz[k];
     S.preview = null;
     persist();

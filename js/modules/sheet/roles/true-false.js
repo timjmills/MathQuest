@@ -20,6 +20,11 @@ import {
     esc, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 
+import { getProvider } from '../index.js';
+
+/** The item's provider declares `falseNeedsWrong` (contract.js OPTIONAL_MEMBERS). */
+const falseNeedsWrongOf = (it) => { const q = (it && it.q) || {}; try { return getProvider(q.categoryId || '', q.skillId || '').falseNeedsWrong === true; } catch (e) { return false; } };
+
 export const ROLE_ID = 'true-false';
 const CEILING = { S: 8, M: 6, L: 4 };
 
@@ -30,6 +35,9 @@ export function prepare(it, info = {}) {
     const correct = answerOf(it);
     if (!correct) return null;
     const wrong = wrongOf(it);
+    // (opt-in, lf-placevalue compare r4 / critic r2 N1: a provider declaring `falseNeedsWrong` skips an item with no named error
+    // in a False slot - the host deals the next - so PT-TOF-1's 40-60 % false holds; every other skill prints it True, as before)
+    if (info.wrong && !wrong && falseNeedsWrongOf(it)) return null;
     const isFalse = !!(wrong && info.wrong);
     const shown = isFalse ? wrong.value : correct;
     // the frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one line a part of a list ("12, 15, 18"), or no frame row

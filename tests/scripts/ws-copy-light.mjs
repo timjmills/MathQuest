@@ -84,7 +84,7 @@ export function scanDrawings(draw, n = 8, max = 24) {
     while (items < max && newAt >= items - Math.ceil(n / 2)) step(Math.min(max, items + n));
     return { counts, items };
 }
-const SIZES = ['S', 'L', 'M'];
+const SIZES = ['L', 'M'];   // owner 2026-11-13 (plan item 9): print sizes M and L (S dropped)
 
 /* ============================================================== pure: eligibility */
 /** The kit templates an info's scan drew (legacy / error excluded). Pure. */
@@ -320,7 +320,7 @@ async function selfTest() {
     eq('sample covers roles', R3.every((r) => pg.some((p) => p.role === r)), true);
     eq('sample covers hosts', DEFAULT_HOSTS.every((h) => pg.some((p) => p.host === h)), true);
     eq('sample covers option values', vs.every((v) => pg.some((p) => p.option === v.option && p.value === v.value)), true);
-    eq('sample sizes S L M', pg.filter((p) => p.size).map((p) => p.size), ['S', 'L', 'M']);
+    eq('sample sizes L M', pg.filter((p) => p.size).map((p) => p.size), ['L', 'M']);
     eq('sample deterministic', JSON.stringify(buildSample([{ key: 'a:f1', roles: R3, hosts: DEFAULT_HOSTS, variants: vs }], { cap: 12 })), JSON.stringify(s1));
     const many = Array.from({ length: 15 }, (_, i) => `r${i}`);
     const s2 = buildSample([{ key: 'a:big', roles: many, hosts: DEFAULT_HOSTS, variants: [] }], { cap: 12 });

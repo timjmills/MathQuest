@@ -1,5 +1,5 @@
 # Defects waiting for a lane that is not running yet (from critic ea-r5, 2026-09-26)
-- operations lane: div_remainders counters 4.7 mm in rows of 10, single-row pictures 32 % band (cells/ops-counters.js); nl_sub repeated numbers + a missing-change item (gen-operations.js); add_5_pictures repeats at size S (gen-counting.js)
+- operations lane: div_remainders counters 4.7 mm in rows of 10, single-row pictures 32 % band (cells/ops-counters.js); nl_sub repeated numbers + a missing-change item (gen-operations.js); add_5_pictures repeats at size S (gen-counting.js) <!-- nos: history (a past finding at the S token) -->
 - timemoney lane: money_compare coin sets A and B not in panels (cells/coins.js)
 - placevalue lane (on resume): mixed_placevalue "10 = __" without a unit and "80 = 80 + 0"; round_nl_hundred_thousands deals only 900,000–1,000,000 (gen-algebraic.js)
 - support ladder (unowned): fails on worksheet + quiz hosts for multi-slot items (rounding_table, expand notation); card works (pv lane, 2026-09-26)

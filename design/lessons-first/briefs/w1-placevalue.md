@@ -45,7 +45,7 @@ Shared registries append-only; registry additions in `design/lanes/lf-placevalue
 4. **Build entries** `value_ten_times`, `thousandths_pv`, `pv10_exponents` as presets / options / skills per the owner rule,
    each tagged (SKILL_STANDARDS, SKILL_WRM, links, search terms, appended share code) in the same change.
 5. **Clean before critic** on the branch merged with the integration tip; one independent critic for the family (every scope
-   skill on every page type, S / M / L, keys, three screen hosts, option panel). PASS → `redesign-passed.js` in the same commit.
+   skill on every page type, M / L (size S dropped, owner 2026-11-13), keys, three screen hosts, option panel). PASS → `redesign-passed.js` in the same commit.
 
 ## Gates
 `ws-spec-card --check-signed design/cards/pv/pv.md`, `ws-precritic --skill <scope> --strict`, `ws-content-audit --skill`,

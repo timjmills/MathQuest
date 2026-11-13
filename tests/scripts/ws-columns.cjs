@@ -41,7 +41,7 @@ const ONE_COLUMN = {
     equation: { cols: { S: 3, M: 2, L: 2 }, why: 'at M / L an equation with two 2-digit numbers, a sign circle and a slot is wider than a 3-column cell at the size\'s digit height (DN-11: columns never shrink digits); 2 columns hold it' },
 };
 
-const SIZES = (arg('sizes', 'S,M,L')).split(',').filter(Boolean);
+const SIZES = (arg('sizes', 'M,L')).split(',').filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const ONLY = (arg('templates', '') || '').split(',').filter(Boolean);
 
 (async () => {

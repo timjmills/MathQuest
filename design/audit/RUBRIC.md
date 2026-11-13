@@ -2,7 +2,7 @@
 
 > **Scope note (owner ruling 2026-09-26):** the error-analysis / "Find the mistake" page type is out of the pass bar. Critics do not grade it; a skill passes on its other page types and screen hosts. See `design/LESSON_LIBRARY_PLAN.md` §8d.
 
-> **Scope (owner ruling 2026-09-26, three kinds of paper):** a skill passes on **Practice** (single skill and mixed, S and L, with keys), **Quiz** (with key), its **Lesson** where it has one, the three screen hosts and its option panel. Stand-alone Guided, Worked example, Review, Opener, Pre-skill check, Find the mistake, True or False?, Reason It and Stretch are not graded as separate pages. See `design/LESSON_LIBRARY_PLAN.md` §8e.
+> **Scope (owner ruling 2026-09-26, three kinds of paper):** a skill passes on **Practice** (single skill and mixed, M and L since 2026-11-13 when S was dropped, with keys), **Quiz** (with key), its **Lesson** where it has one, the three screen hosts and its option panel. Stand-alone Guided, Worked example, Review, Opener, Pre-skill check, Find the mistake, True or False?, Reason It and Stretch are not graded as separate pages. See `design/LESSON_LIBRARY_PLAN.md` §8e.
 
 **Version 1 · 2026-09-24 · owner-approved rules** (2026-10-23 additions: how a page counts as graded, batch critic, near-miss re-check, the benchmark, finding classes — the bar is unchanged)**:** every criterion must score **8 or more** on
 **every** graded version of a skill, on paper and on screen. One criterion at 7 anywhere is a fail,
@@ -211,10 +211,11 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 
 ## How a page counts as graded (owner Q-S4, 2026-10-23)
 
-**Every size (owner, 2026-10-23).** Every grade covers the print sizes: an independent critic grades sizes **S and L in
-full** and **spot-checks M** on every page type it grades; the machine checks (print-lint, the coverage matrix) cover
-S, M and L on every page. A grade given at one size only is not a grade of the page (it hides L1, "Size S ignored").
-Every critic brief names the sizes.
+**Every size (owner, 2026-10-23; revised 2026-11-13: two print sizes, M and L - size S is dropped).** Every grade covers
+the print sizes: an independent critic grades sizes **M and L in full** on every page type it grades; the machine checks
+(print-lint, the coverage matrix, empty-band, cell-checks, grade-render) cover M and L on every page. A grade given at one
+size only is not a grade of the page (it hides L1, "Size S ignored", now "the small size ignored"). Every critic brief names <!-- nos: history: the old name of failure class L1 -->
+the sizes. Size S is not graded: no picker offers it and an old S setting prints at M (`ws-no-size-s` is the gate).
 
 The bar does not change: 8 or more on all four criteria, on every page and every screen host. One 7 is a fail.
 **No unscored legibility notes (owner, 2026-11-13).** A critic's note that anything on the page or screen is small, hard to
@@ -267,7 +268,7 @@ Limits:
 ## Batch critic (contact sheet)
 
 For copies of an approved template only (§1.3). It is allowed only when:
-- `ws-precritic` passes for **every kind of worksheet (with its options) × S / M / L × the three screen hosts**
+- `ws-precritic` passes for **every kind of worksheet (with its options) × M / L × the three screen hosts**
   (practice card, online worksheet, quiz);
 - the critic also opens a random **20 %** of the (role, size, host) pages at full scale;
 - any role whose code path differs from the approved model gets a **full grade**.
