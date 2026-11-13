@@ -2348,6 +2348,10 @@ function _vocabForms() {
 export const PRESET_HIDE_VALUES = {
     'algebra:two_step_add_then_div': { band: [50] },
     'algebra:two_step_letter_equation': { band: [50] },
+    // Lead ruling 2026-11-13 (step 0, round 3b): band 50 on ×/÷-first and +-then-× changes only 5.7 % / 9.3 % of items,
+    // under the BAND-BITES 10 % bar, so it is hidden the same way.
+    'algebra:two_step_mult_div_first': { band: [50] },
+    'algebra:two_step_add_then_mult': { band: [50] },
 };
 // A PRESET skill (skill-presets.js) shows its HOST's controls with the preset values as their
 // defaults: "preset values under any explicit opts", and a share code packs only the changes.
