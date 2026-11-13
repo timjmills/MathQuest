@@ -269,7 +269,7 @@ function shellHTML() {
     <div>
       <label class="tv-label" for="tvSheetTitle">Page title</label>
       <input id="tvSheetTitle" class="tv-input" type="text" placeholder="Taken from the skill when left empty" maxlength="160" aria-describedby="tvTitleCap">
-      <p class="tv-cap" id="tvTitleCap" style="margin-top:4px;">Prints at the top of every page and key, at full size. A long title takes two lines.</p>
+      <p class="tv-cap" id="tvTitleCap" style="margin-top:4px;">${esc(TITLE_CAP)}</p>
     </div>
     <div id="tvSections" style="display:flex;flex-direction:column;gap:12px;"></div>
     <div class="tv-row">
@@ -1002,6 +1002,21 @@ function renderSetup() {
   ${classicHTML()}`;
     const det = box.querySelector('.tv-extras');
     if (det) det.addEventListener('toggle', () => { pr.classic.open = det.open; });
+    syncTitleControls();
+}
+
+/** Critic title r1 T4: with the Header "Title" box unticked the page prints no title, so the Page title box and Title place
+ *  are disabled and their caption says why. */
+const TITLE_OFF_CAP = 'Title is off (Header: Title), so the pages print no title. Tick Title to use these.';
+function syncTitleControls() {
+    if (!root) return;
+    const off = !pr.header.title;
+    const inp = root.querySelector('#tvSheetTitle');
+    if (inp) inp.disabled = off;
+    root.querySelectorAll('[data-act="title-pos"]').forEach((b) => { b.disabled = off; b.setAttribute('aria-disabled', String(off)); });
+    const cap = root.querySelector('#tvTitleCap');
+    if (cap && off) { cap.textContent = TITLE_OFF_CAP; cap.classList.remove('tv-fits-warn'); cap.dataset.tvWarn = 'title-off'; }
+    else if (cap && cap.dataset.tvWarn === 'title-off') { cap.dataset.tvWarn = ''; titleFitCaption(last); }
 }
 
 /** Wave 4.4 (critic r1, D7): the key placement and style are the teacher's print defaults. */
@@ -1199,16 +1214,17 @@ async function buildAll(req) {
 }
 
 /** The caption under the Page title box: what the custom title printed as (two lines, or cut with a warning). */
-const TITLE_CAP = 'Prints at the top of every page and key, at full size. A long title takes two lines.';
+const TITLE_CAP = 'Prints at the top of every page and key, at full size, in place of the page type\'s own title (Test A, Review …). A long title takes two lines.';
 function titleFitCaption(built) {
     const cap = root && root.querySelector('#tvTitleCap');
     if (!cap) return;
+    if (!pr.header.title) { syncTitleControls(); return; }
     const fit = built && built.parts.map((p) => p.res && p.res.titleFit).find(Boolean);
     cap.classList.toggle('tv-fits-warn', !!(fit && fit.truncated));
     cap.dataset.tvWarn = fit && fit.truncated ? 'title-cut' : '';
     cap.textContent = !fit ? TITLE_CAP
         : fit.truncated ? `Too long for two lines: the page prints "${fit.text}". Shorten the title to print all of it.`
-        : fit.lines > 1 ? 'This title takes two lines on the page (the body is 6 mm shorter).' : TITLE_CAP;
+        : fit.lines > 1 ? 'This title takes two lines on the page: the page is 6 mm shorter and may hold one row of problems fewer.' : TITLE_CAP;
 }
 
 function scheduleBuild(delay = 350) {

@@ -1201,6 +1201,9 @@ function buildPlan(ctx) {
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
         // (lf-roles 2026-11-13: the page title travels with the simple print's share code; old codes decode unchanged)
         add(gate('title-code', 'ws-title-code (TITLE-CODE-RT / -OLD / -REQ: the page title in the quick-print share code)', 'quick-print codes', 'browser', 'ws-title-code', [], { missingMsg: 'no tests/scripts/ws-title-code.cjs' }));
+        // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
+        // disables its controls; the simple print box is wide enough)
+        add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
         addPartOpts(add, ctx);
     }
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails

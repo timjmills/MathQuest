@@ -83,6 +83,7 @@ export const LANE_TOOLS = {
     'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
     // (lane lf-roles, 2026-11-13: the page title in the simple print's share code is a teacher-site check)
     'ws-title-code': { scope: ['--teacher'], flags: [] },
+    'ws-frame-title-ui': { scope: ['--teacher'], flags: [] },
 };
 /** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
 export function readLaneCommand(cmd) {

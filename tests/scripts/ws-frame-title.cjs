@@ -18,6 +18,7 @@
 //   TITLE-PLACE   titlePos 'above' draws the title BEFORE the Name / Date / Score row, 'below' after it; neither overlaps or
 //                 clips: title, field row, (strand tab if any), the header rule and the first row of the body are each clear
 //                 of the next, at M and L, on the pupil page and the key
+//   TITLE-API     frame.js pageHeader(h) equals the <header> page({header: h}) prints, with page()'s defaults (the lf-engine hook)
 //   TITLE-LONG    a custom title: printed (or truncated at a word with "…" past two lines, and reported in res.titleFit for
 //                 the dialog); its font is the size's title token (never shrinks); at most two lines; inside the header band
 //
@@ -158,6 +159,19 @@ function geomCheck(m, where, pos, expectText) {
     try {
         const roleIds = await page.evaluate(async () => (await import('./js/modules/sheet/roles/index.js')).ROLE_IDS.filter((r) => r !== 'answer-key'));
         const ROLES = ROLES_ARG ? ROLES_ARG.split(',') : roleIds;
+        // TITLE-API (critic title r1 T8): the frame hook pageHeader(h) draws the header page() draws, with the same defaults
+        const api = await page.evaluate(async () => {
+            const k = await import('./js/modules/sheet/index.js');
+            if (typeof k.pageHeader !== 'function') return ['sheet/index.js exports no pageHeader'];
+            const out = [];
+            for (const h of [{ title: 'I Can add' }, { title: 'I Can add', titlePos: 'above' }, { title: 'Own words', titleCustom: true, name: false }, {}]) {
+                const pg = k.page({ header: h, body: '' });
+                const slice = (pg.match(/<header class="ws-head[\s\S]*?<\/header>/) || [''])[0];
+                if (k.pageHeader(h) !== slice) out.push(`pageHeader(${JSON.stringify(h)}) differs from page()'s header`);
+            }
+            return out;
+        });
+        for (const a of api) fail(`TITLE-API ${a}`);
         for (const r of ROLES) if (!roleIds.includes(r)) fail(`usage: role ${r} is not in sheet/roles/index.js ROLE_IDS`);
         if (PNG_DIR) fs.mkdirSync(PNG_DIR, { recursive: true });
         for (const role of ROLES) for (const sk of SKILLS) for (const size of SIZES) {

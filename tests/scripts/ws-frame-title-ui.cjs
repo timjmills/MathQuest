@@ -99,7 +99,9 @@ async function caretProbe(page, sel, where, settleMs) {
             sp.openSimplePrint([{ categoryId: 'addition', skillId: 'add_facts', label: 'Add facts' }], { from: 'tray' });
         });
         await page.waitForSelector('#spRoot .sp-more', { timeout: 30000 });
-        await page.evaluate(() => { const d = document.querySelector('#spRoot .sp-more'); d.open = true; d.scrollIntoView({ block: 'center' }); });
+        // (opened by its summary, as a teacher does: the dialog remembers it across redraws)
+        await page.click('#spRoot .sp-more > summary');
+        await page.evaluate(() => { const d = document.querySelector('#spRoot .sp-more'); d.scrollIntoView({ block: 'center' }); });
         await wait(300);
         if (ONLY.has('width') && W >= 1024) {
             const g = await page.evaluate(() => {

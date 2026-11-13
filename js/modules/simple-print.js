@@ -1330,6 +1330,10 @@ function render() {
     const dlg = S.root.querySelector('.sp-dialog');
     const ae = document.activeElement && S.root.contains(document.activeElement) ? document.activeElement : null;
     const focusId = ae ? ae.id : '';
+    // (critic title r1 T1: a text box keeps the teacher's cursor and selection across the redraw - the Page title is edited
+    // in the middle, not only at the end; null where the box has no selection, e.g. type="number")
+    let caret = null;
+    try { caret = ae && typeof ae.selectionStart === 'number' ? [ae.selectionStart, ae.selectionEnd, ae.selectionDirection || 'none'] : null; } catch (e) { caret = null; }
     const focusSel = ae && !focusId && ae.dataset && ae.dataset.sp ? `[data-sp="${ae.dataset.sp}"]${ae.dataset.v !== undefined ? `[data-v="${ae.dataset.v}"]` : ''}` : '';
     const many = S.list.length > 1;
     const o = opts();
@@ -1419,7 +1423,7 @@ function render() {
     // Name / Date line; never smaller (a long title takes two lines; past two it is cut, and this says so)
     const fitNow = S.pageTitle && S.pageTitle.trim() ? (() => { try { return fitTitle(S.pageTitle, P.size); } catch (e) { return null; } })() : null;
     h += `<div class="sp-row sp-ptitle"><label class="sp-lbl" for="spPageTitle">Page title</label><input id="spPageTitle" class="sp-ptitle-in" type="text" maxlength="${PAGE_TITLE_MAX}" autocomplete="off" value="${esc(S.pageTitle || '')}" placeholder="The skill's own title" aria-describedby="spPageTitleCap"></div>`;
-    h += `<p class="sp-hint sp-ptitle-cap${fitNow && fitNow.truncated ? ' is-warn' : ''}" id="spPageTitleCap"${fitNow && fitNow.truncated ? ' data-sp-warn="title-cut"' : ''}>${fitNow && fitNow.truncated ? `Too long for two lines: the page prints “${esc(fitNow.text)}”. Shorten it to print all of it.` : fitNow && fitNow.lines > 1 ? 'This title takes two lines on the page.' : 'Prints on every page and key, at full size.'}</p>`;
+    h += `<p class="sp-hint sp-ptitle-cap${fitNow && fitNow.truncated ? ' is-warn' : ''}" id="spPageTitleCap"${fitNow && fitNow.truncated ? ' data-sp-warn="title-cut"' : ''}>${fitNow && fitNow.truncated ? `Too long for two lines: the page prints “${esc(fitNow.text)}”. Shorten it to print all of it.` : fitNow && fitNow.lines > 1 ? 'This title takes two lines on the page: the page is 6 mm shorter and may hold one row of problems fewer.' : 'Prints on every page and key, at full size.'}</p>`;
     h += `<div class="sp-row"><span class="sp-lbl">Title place</span><div class="sp-seg" role="radiogroup" aria-label="Title place">${[['below', 'Below name'], ['above', 'Above name']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="titlepos" data-v="${v}" aria-checked="${(S.titlePos === 'above' ? 'above' : 'below') === v}">${l}</button>`).join('')}</div></div>`;
     h += `<button type="button" class="sp-link" data-sp="newnums">New numbers</button>`;
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
@@ -1428,7 +1432,7 @@ function render() {
     h += `</div><footer class="sp-foot"><button type="button" class="sp-btn sp-btn-2" data-sp="preview" aria-label="Preview every page"><span class="sp-wide">Preview every page</span><span class="sp-narrow">Preview</span></button><button type="button" class="sp-btn sp-btn-1" data-sp="print"${S.busy && !b ? ' aria-disabled="true"' : ''}>Print</button></footer>`;
     dlg.innerHTML = h;
     showThumb();
-    if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } catch (e) { /* */ } } }
+    if (focusId) { const el = document.getElementById(focusId); if (el) { try { el.focus({ preventScroll: true }); if (el.setSelectionRange && el.type === 'text') { if (caret) el.setSelectionRange(Math.min(caret[0], el.value.length), Math.min(caret[1], el.value.length), caret[2]); else el.setSelectionRange(el.value.length, el.value.length); } } catch (e) { /* */ } } }
     else if (focusSel && dlg.querySelector(focusSel)) { try { dlg.querySelector(focusSel).focus({ preventScroll: true }); } catch (e) { /* */ } }
     // Focus inside a skill's Options panel (a popover outside the dialog) stays there while the preview redraws.
     else if (document.activeElement && document.activeElement.closest && document.activeElement.closest('#skillOptionsPopover')) { /* keep */ }

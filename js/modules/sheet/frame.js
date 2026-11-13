@@ -54,9 +54,13 @@ export const TITLE_POSITIONS = Object.freeze(['below', 'above']);
  *   h.titlePos     'below' (default, byte-identical to the header before the option) | 'above'
  *   h.titleCustom  the teacher's own words (fitted to two lines by the host, print-sheet.js fitTitle): marked
  *                  data-ws-title="custom", which wraps by the kit stylesheet and never shrinks
- *   h.name / date / time / goal / score / tab   as headerFields(); tabMeta = the unprinted data-ws-tab attribute
+ *   h.name / date / time / goal / score   as headerFields(), with page()'s defaults (HEADER_DEFAULTS: Name and Date on,
+ *                  Score off), so pageHeader({title}) prints the same Name / Date line page({header: {title}}) does.
+ *                  (The strand-tab lines h.tab are not drawn here: page() keeps them as its unprinted data-ws-tab attribute.)
  */
-export function pageHeader(h = {}, { cls = '' } = {}) {
+export const HEADER_DEFAULTS = Object.freeze({ name: true, date: true, score: false, tab: false, title: '' });
+export function pageHeader(h0 = {}, { cls = '' } = {}) {
+    const h = { ...HEADER_DEFAULTS, ...h0 };
     const fields = headerFields(h);
     const title = pageTitle(h.title, h.titleNote, { custom: !!h.titleCustom });
     const above = !!title && h.titlePos === 'above';
@@ -96,7 +100,7 @@ export const copyrightLine = (year) => `© ${year || new Date().getFullYear()} $
  * @param {string} [o.note]       reviewer note; screen only, hidden by @media print
  */
 export function page({ look = DEFAULT_LOOK, size = DEFAULT_SIZE, tab = 6, header = {}, footer = {}, body, cls = '', note = '' }) {
-    const h = { name: true, date: true, score: false, tab: false, title: '', ...header };
+    const h = { ...HEADER_DEFAULTS, ...header };
     // Owner ruling 2026-10-23: no strand-tab box on any page (the "I Can" title names the skill).
     // The tab lines survive only as unprinted metadata, data-ws-tab, for the lints that read the role.
     const tabMeta = Array.isArray(h.tab) && h.tab.length ? ` data-ws-tab="${esc(h.tab.join('|'))}"` : '';
