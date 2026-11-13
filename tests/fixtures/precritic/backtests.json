@@ -3280,6 +3280,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
- }
-]
+ },
+  {
+   "id": "tf-eval-word-stories",
+   "check": "TF-EVAL: every sentence the True or False? / Error analysis / Reason It pages of the word-stories skills print or key is true arithmetic, and every True / False verdict matches the drawn work (word-stories critic r1 F1, lf-builds 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-key-arith TF-EVAL (RUBRIC H1, AK-1, L27)",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "4632 findings on the 7 skills: the add missing-part kinds' finish line '19 + 3 = 16' (q.op '+' paired with the cell's [whole, part]); a column cell drew the step's own answer under a False claim ('41 - 23 = 18' keyed False) and Reason It's A and B the same work"
+   },
+   "pass": {
+    "commit": "87462276f",
+    "state": "0 findings: opOf takes the sign from the payload that names the operands; the column answer row writes the shown value"
+   },
+   "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
+ ]
 }
