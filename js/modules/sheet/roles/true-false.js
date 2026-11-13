@@ -50,12 +50,13 @@ export function prepare(it, info = {}) {
     const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : place.kind === 'list' ? 'Answer: ' : 'The answer is ';
     const render = (c, o = {}) => {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
-        // no frame row (a sentence answer, PT-TOF-4): the True / False boxes stand BESIDE the statement, one over the other, so
+        // no frame row (a sentence answer, PT-TOF-4): the True / False boxes stand BESIDE the statement (10 mm off any box column
+        // the statement draws itself, critic r3 D7), one over the other, so
         // the cell is as tall as its statement (critic r2 R2: under it, the cell kept a frame row's height and L printed 3 of 4)
         const beside = place.kind === 'none' && c.size === 'L';   // (L lays one column; S / M keep 2 columns with the boxes under)
         return `<div class="mq-judge mq-tf"${beside ? ' style="grid-template-columns:minmax(0,1fr) auto;align-items:center"' : ''}>`
             + `<div class="mq-judge-work">${work}</div>`
-            + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`, beside ? 'mq-tfside" style="flex-direction:column;gap:5mm;padding:0 2mm 0 0' : '')
+            + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`, beside ? 'mq-tfside" style="flex-direction:column;gap:5mm;padding:0 2mm 0 10mm' : '')
             + (place.kind === 'none' ? '' : `<div class="${answerFrameCls(place)}">${esc(stem)}${answerPlaceHtml(place, 'tf-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
             + `</div>`;
     };
