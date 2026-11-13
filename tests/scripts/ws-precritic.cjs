@@ -1071,6 +1071,13 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
+        // OPENER-OVERFLOW (lf-engine roles, lead ruling 2026-11-13: coordinate_q1's Opener at L gained a split cell and a page overrun
+        // from an engine change no gate saw): every Opener the lane renders, at M and L, against master's pinned L-OVERFLOW / L-SPLIT
+        // counts - an engine change never adds a split or an overflow to any opener, passed or legacy
+        if (ctx.role === 'opener') for (const sz of ['M', 'L']) {
+            const pin = path.join(ROOT, 'design', 'audit', 'baselines', `opener-overflow.${sz}.json`);
+            if (fs.existsSync(pin)) add(gate(`opener-overflow-${sz}`, `ws-print-lint --source kit --roles opener --size ${sz} --lints L-OVERFLOW,L-SPLIT against the master pin (OPENER-OVERFLOW)`, sc, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'opener', '--size', sz, '--lints', 'L-OVERFLOW,L-SPLIT', '--baseline', rel(pin), '--skills', sample.join(',')], { parse: PARSE.printLint, expect: { ids: sample.map(docId) } }));
+        }
         // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
         // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
         const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];

@@ -2906,12 +2906,16 @@ function writeJson(results, source, file) {
 // must be clean.
 function ratchet(results, file) {
     const base = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'));
+    // (lf-engine roles OPENER-OVERFLOW: with --lints the ratchet compares those lints only, so a pin of one lint family -
+    // design/audit/baselines/opener-overflow.<size>.json holds L-OVERFLOW / L-SPLIT - is judged on that family)
+    const only = (arg('lints', '') || '').split(',').map(s => s.trim()).filter(Boolean);
+    const kept = (f) => !only.length || only.includes(f.lint);
     const idx = new Map();
-    for (const d of base.documents) { const m = new Map(); for (const f of d.findings) if (!f.waived) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); } idx.set(d.id, m); }
+    for (const d of base.documents) { const m = new Map(); for (const f of d.findings) if (!f.waived && kept(f)) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); } idx.set(d.id, m); }
     const rises = [];
     for (const r of results) {
         const m = new Map();
-        for (const f of r.findings) if (!f.waived) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); }
+        for (const f of r.findings) if (!f.waived && kept(f)) { const k = `${f.lint} ${f.rule}`; m.set(k, (m.get(k) || 0) + 1); }
         const b = idx.get(r.info.id) || new Map();
         for (const [k, n] of m) if (n > (b.get(k) || 0)) rises.push(`${r.info.id} ${k}: ${b.get(k) || 0} -> ${n}`);
     }
