@@ -104,6 +104,22 @@ Test trees: lf-algebra 2d03850fc + this lane (scratch alg), then (lead) lf-algeb
   a ruled capacity (RI two-step 1 a page) or an exemption in LONE-PAGE.
 Times: r9, start 2026-11-13T21:00Z, end 2026-11-13T23:10Z, profile mq-opus-medium (rebuild after a failed precritic)
 
+## Round 9d - critic r9 fixes (design/status/lf-roles/critic-r9.md; opener only, plus the one-row exemption)
+- D2: in since 8d41853f1 (spill page 2 titled "Guided Practice" / "Guided Practice and Your turn"); ws-roles-unit OPENER-SPILL header.
+- D1: the two-column Steps band under a full-width Model is content-sized (no stepLines estimate as its height). OPENER-SPILL fixed-
+  height assertion FAIL on 8b7751c94 -> OK. Rendered: the band ends at its text (r9b/*-opener-L.png).
+- D3: page 2 is fitted from the stories it DEALS (Guided row, then each Independent row at its level-1 height + the row's tab
+  keep-out), never the spares. OPENER-SPILL SPILL-FILL FAIL on 8b7751c94 -> OK. Rendered at M (rolehash seeds): page 2 white under the
+  Guided row 95-101 mm; the next dealt row needs 102-105 mm (level-1 story 86-93 mm + 1 + tab 3 + strip 7.5), so no Independent row
+  fits on plain / Visual / x÷-first / add-first at M - the critic's 224 mm sum left out the band strip, the tab and the titled
+  header (plain M with a row overflowed 6.2 mm, measured). estimate M and letter L do hold one.
+- Exemption: PAGEFILL (ws-print-lint) and EB-PAGE (ws-empty-band) accept an mq-onerow strip only while it is shorter than the row;
+  backtest onerow-strip-tight (fixture, --onerow-probe).
+- Passed pages (30 skills x opener / review / independent / more-practice / test / guided x M / L) vs origin/master 88cc98b00: identical
+  but the 2 accepted Review pages. ws-cell-checks opener (7 skills, M / L, alg2 = lf-algebra 201692a31 + lane): OK. Opener pages of the
+  7 skills change (header, Steps band, row heights): PNGs r9b/.
+- Noted, not changed: page 1 of a spilled M Opener now shows 60-69 mm white under Say (26-30 %) - the Steps band no longer hides it.
+
 ## Round 9c - lead rulings on r9 (2026-11-13, all four as recommended; logged in design/decisions/LEAD_DECISIONS.md)
 - PT-OPN-10 (PAGE_TYPES.md, additive): the spill page's continuation header is titled with its part(s) - "Guided Practice" /
   "Guided Practice and Your turn"; its rows are sized to the stories PLACED (not the deal's tallest spare), top-aligned; it keeps
