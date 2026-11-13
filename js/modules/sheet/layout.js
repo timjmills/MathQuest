@@ -156,6 +156,20 @@ export const IN_PLACE_FILL = 1.12;
  */
 export const tightRows = (infos) => Array.isArray(infos) && infos.length > 0
     && infos.every((i) => !!i && !!((i.fp || i.footprint || {}).tightRows));
+/**
+ * CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): does a row of `rowMm` stretch this item by 30 % or more?
+ * The room inside the cell's pads (CL-8: 3 mm a side) against the item's one-line ink (`footprint.inkHMm`, the compare line's
+ * height) - what ws-print-lint L-TOPSTART measures - or, with no ink height, against its measured height. A cell it holds carries
+ * `ws-rowstretch`; css/sheet-kit.css centres it only when its template opted in (`data-ws-stretchmid`).
+ */
+export const STRETCH_MID = 1.3;
+export const rowStretches = (it, cols, rowMm) => {
+    if (!it || !(rowMm > 0)) return false;
+    const ink = Number((it.footprint || it.fp || {}).inkHMm);
+    if (ink > 0) return rowMm - 6 >= STRETCH_MID * ink;
+    const h = measuredH(it, cols);
+    return h > 0 && rowMm >= STRETCH_MID * h;
+};
 /** DN-1: outside fact layouts no page holds more than 20 scored problems. */
 export const DN1_MAX = 20;
 /**

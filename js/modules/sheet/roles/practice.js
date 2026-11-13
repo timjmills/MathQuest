@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows,
+    tightRows, rowStretches,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -1304,8 +1304,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 fill = Math.round((used / area) * 1000) / 1000;
             }
         }
-        // CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): a pv cell whose row is at least 1.3 x its
-        // measured height carries `ws-rowstretch`; css/sheet-kit.css centres it down the box only when its template opted in
+        // CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): a pv cell whose row stretches it by 30 % or more
+        // (layout.rowStretches) carries `ws-rowstretch`; css/sheet-kit.css centres it down the box only when its template opted in
         // (`data-ws-stretchmid`), so an unstretched row keeps the top of the box (CL-4b) and L-TOPSTART judges both.
         for (const x of sections) {
             if (x.kind !== 'grid' || !x._its || !(parseFloat(x.height) > 0) || /mq-anchorgrid/.test(x.cls || '')) continue;
@@ -1317,9 +1317,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             x.items.forEach((pi, i) => {
                 const it = x._its[i];
                 if (!it || it.anchor || (it.template || (it.q && it.q.cell && it.q.cell.template)) !== 'pv') return;
-                const h = measuredH(it, x.cols);
                 const R = net * fr[Math.floor(i / x.cols)] / sum;
-                if (h > 0 && R >= 1.3 * h) pi.cls = `${pi.cls || ''} ws-rowstretch`.trim();
+                if (rowStretches(it, x.cols, R)) pi.cls = `${pi.cls || ''} ws-rowstretch`.trim();
             });
         }
         for (const x of sections) delete x._its;

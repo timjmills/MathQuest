@@ -1027,7 +1027,9 @@ register('pv', {
                 const dg = txt.replace(/[^0-9]/g, '').length, cm = txt.replace(/[^,]/g, '').length;
                 const circle = { S: 8, M: 10, L: 12 }[ctx.size] || 10;
                 const inkWMm = Math.round((0.606 * em * dg + 0.324 * em * cm + 8 + circle + 0.5) * 10) / 10;
-                return { wMm: 62, inkWMm, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
+                // (`inkHMm`, compare r3 CL-4d: the line is as tall as its sign circle - Chrome, S / M / L - so a row is judged stretched
+                // against the ink, as L-TOPSTART reads it, never against a measured height that holds the tab clearance and the pads)
+                return { wMm: 62, inkWMm, inkHMm: circle, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
             }
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)

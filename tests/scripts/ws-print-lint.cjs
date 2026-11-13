@@ -1026,7 +1026,7 @@ function wsLintPage(cfg) {
                    stretches it less keeps the top of the box (the top rule below, 3 mm). OPT-IN rule TOPSTART-STRETCH
                    (--rules, --rule-skills) judges every ONE-LINE cell of the named skills the same way, marked or not, so a
                    stretched one-line cell left at the top of its box is found before the attribute exists. */
-                const smMark = c.hasAttribute('data-ws-stretchmid') || !!c.querySelector('[data-ws-stretchmid]');
+                const smMark = c.hasAttribute('data-ws-stretchmid') || !!c.querySelector(':scope > [data-ws-stretchmid]');   // the one line IS the cell (a Guided try's line over its hint is two)
                 let smLine = false;
                 if (!smMark && optOn('TOPSTART-STRETCH') && inkTop < Infinity) {
                     let fs = 0;

@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, rowStretches } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -1054,9 +1054,17 @@ export function plan(input = {}) {
         // ceiling can stop more rows; the spare height then stays under the grid).
         const host = use.slice(at, at + chunk.length);
         const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
-        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
+        // (lf-placevalue compare r3, step 4: a one-line cell that names its ink height - footprint `inkHMm`, the compare line - is
+        // measured under a number tab (CL-40's clearance over its line), and a Guided cell carries none (CL-14): its row needs the
+        // pads and the line, never the 3-4 mm of tab clearance the measurement holds)
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, 6 + ink + 1) : h; });
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
+        // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
+        // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
+        // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
+        const tightAdd = tightRows(use.slice(at, at + chunk.length));
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
+            : tightAdd && r === 0 && r === hintRow && !spanHere ? Math.max(pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
         const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
         const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
@@ -1094,6 +1102,13 @@ export function plan(input = {}) {
         if (pi === 0) sections.push({ kind: 'html', html: GUIDED_CSS });
         if (fit.steps.length) sections.push(stepsBand());
         // CL-14: Model and Guided cells are unlabelled (the band names them); still scored.
+        // (CL-4d, lead 2026-11-13; lf-placevalue compare r3: a cell its row stretches by 30 % or more - layout.rowStretches -
+        // carries `ws-rowstretch`; css/sheet-kit.css centres it when its template opted in, data-ws-stretchmid)
+        chunk.forEach((p, i) => {
+            const r = spanHere ? (i === 0 ? 0 : 1 + Math.floor((i - 1) / cols)) : Math.floor(i / cols);
+            const it = host[i];
+            if (p && it && it.template === 'pv' && Hr[r] && rowStretches(it, cols, Hr[r])) p.cls = `${p.cls || ''} ws-rowstretch`.trim();
+        });
         const part = gridPart(chunk, { cols, rows, cellH, labels: 'none', start: letter });
         if (spanHere) part.spanFirst = true;
         if (rows > 1 && Math.max(...Hr) - Math.min(...Hr) >= 1) part.rowsTpl = Hr.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ');
