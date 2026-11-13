@@ -7022,6 +7022,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120-card-plan-preset",
+   "check": "a PRESET skill is planned from its host's signed card (every role it offers, the host's other option values): composing:chart_to_120 fell back to the 9 default roles and no option values, so opener / scripted-model / pre-skill-check / mixed-practice / stretch were never rendered before a critic (L25)",
+   "kind": "commit-pair",
+   "rule": "ws-card-plan preset plan",
+   "fail": {
+    "commit": "f80dfd9d6",
+    "state": "cardPlanFor(composing:chart_to_120): no card, 0 card roles (the 9 default roles)"
+   },
+   "pass": {
+    "commit": "a810a6cbc",
+    "state": "preset planned from the chartwindow card: 14 roles"
+   },
+   "command": "node -e \"const o=JSON.parse(require('child_process').execFileSync('node',['{root}/tests/lib/ws-card-plan.mjs','--skill','composing:chart_to_120','--root','{root}'],{stdio:['ignore','pipe','ignore']}).toString())[0];const ok=!!(o.preset&&o.roles.length>9);console.log('ws-card-plan --preset: '+(ok?'OK':'FAIL'));process.exit(ok?0:1)\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
