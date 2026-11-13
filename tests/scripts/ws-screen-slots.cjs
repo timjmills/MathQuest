@@ -742,11 +742,11 @@ if (arg('digit-fixture', null)) {
                 } catch (e) { const l = `${key} ERR SCREEN-DIGIT @${vp.w} ${String(e.message || e).split('\n')[0]}`; errors.push(l); console.log(l); }
             }
         }
-        // ARRAY-ORIENT on paper: the Independent page at S, M and L (each skill judged; a page with no array is not judged)
+        // ARRAY-ORIENT on paper: the Independent page at M and L (size S dropped, owner 2026-11-13) (each skill judged; a page with no array is not judged)
         if (ARRAY_ORIENT) {
             const judged = skills.filter((s) => !RULE_SKILLS.length || RULE_SKILLS.includes(`${s.categoryId}:${s.skillId}`));
             for (const { categoryId: c, skillId: k } of judged) {
-                for (const size of ['S', 'M', 'L']) {
+                for (const size of ['M', 'L']) {
                     const html = await page.evaluate(async (c, k, size) => { try { const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: c, skillId: k }] }], size, paper: 'A4', seed: 7, key: false }); return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }); } catch (e) { return ''; } }, c, k, size);
                     if (!html) continue;
                     const sh = await app.browser.newPage();
