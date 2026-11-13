@@ -174,4 +174,22 @@ export function sentenceState(it, groups, k, c) {
     return html;
 }
 
-export default { CASES, wpParts, msOf, twoState, isWordSentence, sentenceState, isWordBar, barNums, chartStepsOf, inkSpan, barState };
+/**
+ * A one-step story in COLUMN work on a 2 x 2 chart (word-stories fix r2, 2026-11-13): the whole cell - story, story bar,
+ * sign row, columns and answer - is taller than a half panel (the 92 x 114 mm panel overflowed by 24 mm with no bar and
+ * 60 mm with the change / compare story bar the card draws on teaching pages). As the sentence form does (sentenceState),
+ * each panel draws the zones its step uses: panel 1 the story (read, find what it knows), panel 2 the story bar with what
+ * was found written grey over the sign row and the columns, the second row the work (write, solve). Nothing shrinks. Null (the whole cell) for any
+ * other item or chart: a payload override for the host item's render (print-sheet.js `payload`), never a new item.
+ */
+export function columnPanel(it, groups, k) {
+    const cl = it && it.q && it.q.cell;
+    const p = cl && cl.template === 'word-work' ? cl.payload : null;
+    if (!p || !Array.isArray(p.steps) || p.steps.length !== 1 || p.neutral || (p.layout && p.layout !== 'column') || groups.length < 4) return null;
+    // panel 1 the story (read, find what it knows); panel 2 the story bar with the numbers found written grey, over the
+    // sign row and the columns; panels 3+ the work (write, solve) - no story, no bar
+    if (k === 0) return { pic: null, kb: false, noWork: true, noBar: true };
+    return k === 1 ? { pic: null, kb: false, lines: [], barInk: 'trace' } : { pic: null, kb: false, lines: [], noBar: true };
+}
+
+export default { CASES, wpParts, msOf, twoState, isWordSentence, sentenceState, isWordBar, barNums, chartStepsOf, inkSpan, barState, columnPanel };

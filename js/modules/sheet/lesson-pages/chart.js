@@ -17,7 +17,7 @@ import { factMarks, panelHops } from '../lesson-arch/fact.js';
 import { checkStackOf } from '../lesson-arch/column.js';
 import { roundState, isRound, chartLineMmOf } from '../lesson-arch/line.js';
 import { pvNumberOf, isExpand, expandState } from '../lesson-arch/pv.js';
-import { isWordBar, chartStepsOf, barState, msOf, twoState, isWordSentence, sentenceState } from '../lesson-arch/story.js';
+import { isWordBar, chartStepsOf, barState, msOf, twoState, isWordSentence, sentenceState, columnPanel } from '../lesson-arch/story.js';
 import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, hOf } from './common.js';
 
 /**
@@ -119,8 +119,10 @@ export function stateDrawing(it, steps, groups, k, c) {
     // A template with no step states: the problem blank, then answered in grey on the last state.
     const ans = answerOf(it);
     const last = k === groups.length - 1;
+    // (a one-step story in COLUMN work: each panel draws the zones its step uses - word-stories fix r2, columnPanel)
+    const payload = columnPanel(it, groups, k);
     let html = '';
-    try { html = last && ans ? it.render(ctx, { cols: 2, shown: ans, ink: 'trace' }) : it.render(ctx, { cols: 2 }); } catch (e) { html = ''; }
+    try { html = last && ans ? it.render(ctx, { cols: 2, shown: ans, ink: 'trace', payload }) : it.render(ctx, { cols: 2, payload }); } catch (e) { html = ''; }
     return unslot(html);
 }
 

@@ -1284,7 +1284,10 @@ function colBar(ctx, p, put, narrow) {
     if (p.storyBar && p.steps.length === 1 && (p.bar || (!twin && Number(ctx.scaffoldLevel) >= 2))) {
         const st = p.steps[0];
         const digits = Math.max(2, ...[st.top, st.bottom, st.ans].map((v) => digitsOf(v).length));
-        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show: put && !twin, ink: put && !twin ? inkOf(ctx) : null })}</div>`;
+        // (`barInk: 'trace'`, a lesson chart's panel - lesson-arch/story.js columnPanel: the known numbers written grey, the
+        // newest marks, while the work under it is still blank)
+        const show = !twin && (put || p.barInk === 'trace');
+        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show, ink: !show ? null : p.barInk === 'trace' ? 'trace' : inkOf(ctx) })}</div>`;
     }
     return p.bar ? barModel(ctx, p) : '';
 }
@@ -1339,7 +1342,10 @@ function renderWork(p, ctx) {
     const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
     const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
     const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
-        + pictureRow(ctx, p.pic) + colBar(ctx, p, put, narrow);
+        + pictureRow(ctx, p.pic) + (p.noBar ? '' : colBar(ctx, p, put, narrow));
+    // (`noWork` / `noBar`: a lesson chart's panel draws only the zones its step uses - lesson-arch/story.js columnPanel;
+    // the story and its bar on the first row, the sign row, the columns and the answer on the second)
+    if (p.noWork) return `<div class="mq-ww" data-ww-ops="${p.steps.map((s) => s.op).join(' ')}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : KO(ctx, narrow ? 2.5 : 5)};">${head}</div>`;
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
     // under it on the left, the columns and the answer on the right. The page then holds three
     // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).

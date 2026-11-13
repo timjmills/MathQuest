@@ -1,0 +1,13 @@
+$ node tests/scripts/ws-card-rulings.mjs --skill addition:add_word_problems --skill addition:add_word_problems_plain --skill subtraction:sub_word_problems --skill subtraction:sub_word_problems_plain --check offered
+
+ws-card-rulings: design/cards/word-stories/word-stories.md on this tree; 4 skill(s), 300 items per ruling
+  FAIL addition:add_word_problems           N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) offers "wpCues" (Key words), which the card lists as not offered
+  FAIL addition:add_word_problems_plain     N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) offers "wpCues" (Key words), which the card lists as not offered
+  FAIL subtraction:sub_word_problems        N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) offers "wpCues" (Key words), which the card lists as not offered
+  FAIL subtraction:sub_word_problems_plain  N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) offers "wpCues" (Key words), which the card lists as not offered
+  FAIL addition:add_word_problems           N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) offers "wpBank" (Keyword bank), which the card lists as not offered
+  FAIL addition:add_word_problems_plain     N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) offers "wpBank" (Keyword bank), which the card lists as not offered
+  FAIL subtraction:sub_word_problems        N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) offers "wpBank" (Keyword bank), which the card lists as not offered
+  FAIL subtraction:sub_word_problems_plain  N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) offers "wpBank" (Keyword bank), which the card lists as not offered
+  design/cards/word-stories/word-stories.md: rulings block present, 9 prose ruling(s) not machine-checked (§5.1, §5.2, §5.3, §9.1, §9.2, §9.3, §9.4, §9.5, §9.6)
+ws-card-rulings: FAIL - 8 broken: N-D-wpCues add_word_problems; N-D-wpCues add_word_problems_plain; N-D-wpCues sub_word_problems; N-D-wpCues sub_word_problems_plain; N-D-wpBank add_word_problems; N-D-wpBank add_word_problems_plain (0 ruling check(s), 8 not-offered check(s), 4 of 4 skill(s) checked; 0.4 s)

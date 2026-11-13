@@ -1,0 +1,98 @@
+$ node tests/scripts/ws-coverage-matrix.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain --baseline design/audit/matrix/baseline.json --slots 2 --out /tmp/mq-precritic/20261113-015353-14350/coverage-matrix.json
+
+ws-coverage-matrix: 136 row(s) (single 64, sections 40, mixed 20, quiz 12) for 4 skill(s) of 725 live; partners from tests/fixtures/precritic/matrix-partners.json; 249 print-input files hashed (fb66f56d2f17)
+  RUN 64 · PENDING 56 · N/A 16 · documents to run 192
+ws-coverage-matrix: running 64 row(s) = 192 document(s) on 2 slot(s), 9 document(s) a browser start
+  batch 1/22: 9 document(s) in 44.1 s (3 s of it waiting for a slot)
+  batch 2/22: 9 document(s) in 78.8 s (44 s of it waiting for a slot)
+  batch 3/22: 9 document(s) in 60.7 s (32 s of it waiting for a slot)
+  batch 4/22: 9 document(s) in 69.9 s (45 s of it waiting for a slot)
+  batch 5/22: 9 document(s) in 75.1 s (44 s of it waiting for a slot)
+  batch 6/22: 9 document(s) in 85.8 s (51 s of it waiting for a slot)
+  batch 7/22: 9 document(s) in 97.0 s (55 s of it waiting for a slot)
+  batch 8/22: 9 document(s) in 98.9 s (61 s of it waiting for a slot)
+  batch 9/22: 9 document(s) in 73.3 s (57 s of it waiting for a slot)
+  batch 10/22: 9 document(s) in 71.4 s (42 s of it waiting for a slot)
+  batch 11/22: 9 document(s) in 87.2 s (55 s of it waiting for a slot)
+  batch 12/22: 9 document(s) in 100.2 s (58 s of it waiting for a slot)
+  batch 13/22: 9 document(s) in 106.7 s (69 s of it waiting for a slot)
+  batch 14/22: 9 document(s) in 57.3 s (40 s of it waiting for a slot)
+  batch 15/22: 9 document(s) in 59.0 s (30 s of it waiting for a slot)
+  batch 16/22: 9 document(s) in 73.7 s (41 s of it waiting for a slot)
+  batch 17/22: 9 document(s) in 84.1 s (45 s of it waiting for a slot)
+  batch 18/22: 9 document(s) in 86.8 s (52 s of it waiting for a slot)
+  batch 19/22: 9 document(s) in 101.4 s (70 s of it waiting for a slot)
+  batch 20/22: 9 document(s) in 95.0 s (66 s of it waiting for a slot)
+  batch 21/22: 9 document(s) in 140.0 s (109 s of it waiting for a slot)
+  batch 22/22: 3 document(s) in 127.9 s (111 s of it waiting for a slot)
+  168 document(s) linted in 945.8 s: 0.178 documents/s (5.63 s a document, browser starts included; 1180 s of batch time spent waiting for a slot another session held)
+
+row                                                             S          M          L          status
+addition:add_word_problems_plain|mixed/defaults                 4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems_plain|sections/defaults              4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems_plain|sections/ex-each               6+3k .     4+2k 12    8+4k 2     PENDING(no-baseline)
+addition:add_word_problems_plain|sections/ex-group              6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems_plain|sections/pages-2               10+5k 8    10+5k 7    12+6k 10   PENDING(no-baseline)
+addition:add_word_problems_plain|single/defaults                2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/ex-each                 2+1k 2     2+1k .     2+1k .     PENDING(no-baseline)
+addition:add_word_problems_plain|single/ex-group                2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/layout-fact-rows        n/a        n/a        n/a        N/A
+addition:add_word_problems_plain|single/layout-timed            n/a        n/a        n/a        N/A
+addition:add_word_problems_plain|single/layout-todays-number    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+nline+short  2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/pages-3                 6+3k .     6+3k .     6+3k .     OK
+addition:add_word_problems|mixed/defaults                       4+2k 2     4+2k 2     4+2k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/defaults                    4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems|sections/ex-each                     6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/ex-group                    6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/pages-2                     10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+addition:add_word_problems|single/defaults                      2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/ex-each                       2+1k .     2+1k 2     2+1k .     PENDING(no-baseline)
+addition:add_word_problems|single/ex-group                      2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/layout-fact-rows              n/a        n/a        n/a        N/A
+addition:add_word_problems|single/layout-timed                  n/a        n/a        n/a        N/A
+addition:add_word_problems|single/layout-todays-number          2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+nline+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+nline+short        2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+short+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-nline+short+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/pages-3                       6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_word_problems_plain|mixed/defaults              4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems_plain|sections/defaults           4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems_plain|sections/ex-each            4+2k 6     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems_plain|sections/ex-group           6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems_plain|sections/pages-2            10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+subtraction:sub_word_problems_plain|single/defaults             2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/ex-each              2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/ex-group             2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/layout-fact-rows     n/a        n/a        n/a        N/A
+subtraction:sub_word_problems_plain|single/layout-timed         n/a        n/a        n/a        N/A
+subtraction:sub_word_problems_plain|single/layout-todays-number 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+nline+short2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/pages-3              6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_word_problems|mixed/defaults                    4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems|sections/defaults                 4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems|sections/ex-each                  4+2k 11    6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems|sections/ex-group                 6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems|sections/pages-2                  10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+subtraction:sub_word_problems|single/defaults                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/ex-each                    2+1k 3     2+1k .     2+1k .     PENDING(no-baseline)
+subtraction:sub_word_problems|single/ex-group                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/layout-fact-rows           n/a        n/a        n/a        N/A
+subtraction:sub_word_problems|single/layout-timed               n/a        n/a        n/a        N/A
+subtraction:sub_word_problems|single/layout-todays-number       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+nline+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+nline+short     2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+short+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-nline+short+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/pages-3                    6+3k .     6+3k .     6+3k .     OK
+
+ws-coverage-matrix: OK 40 · CACHED 0 · RED 0 · PENDING 72 · N/A 24 · ERROR 0
+wrote ../../../../../mq-precritic/20261113-015353-14350/coverage-matrix.json
+ws-coverage-matrix: OK (136 row(s), 64 run, 0 cached, 948 s; 16 row(s) PENDING(no-baseline): printed, not judged)

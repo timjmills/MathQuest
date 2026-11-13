@@ -1,0 +1,32 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-content-audit.cjs --skill add_word_problems,add_word_problems_plain,sub_word_problems,sub_word_problems_plain
+
+note addition/add_word_problems  "Addition Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note addition/add_word_problems_plain  "Addition Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems  "Subtraction Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems_plain  "Subtraction Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+     4  unknown-format
+     4  zero-facts
+
+By family:
+  operations    4 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 4 skills, 60 items each
+baseline: design/audit/baselines/content-audit-mc.json (27 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (4 skills, 60 items each: 0 with production items as buttons (0 pinned), 0 new, 0 label-bank notes)
+
+ws-content-audit: OK (4 add_word_problems,add_word_problems_plain,sub_word_problems,sub_word_problems_plain skills, 240 items each, Max Number 100, 0 failing, 0 mixed pools held to their pool union, 8 notes)

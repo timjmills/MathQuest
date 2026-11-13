@@ -1,0 +1,22 @@
+$ node tests/scripts/ws-visual-quality.mjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain
+
+ws-visual-quality: 4 skill(s), 6 item(s) each, rules VQ-REP VQ-ONEANSWER VQ-LIVE VQ-TITLE VQ-NOLEGACY VQ-ONCE; app .
+  PINNED addition:add_word_problems
+      pinned VQ-LIVE sign row offers × ÷ on a grade 2 skill that deals + −
+      pinned VQ-LIVE unit bank holds filler word(s) the story never says: boxes, days
+  PINNED addition:add_word_problems_plain
+      pinned VQ-LIVE sign row offers × ÷ on a grade 2 skill that deals − +
+      pinned VQ-LIVE unit bank holds filler word(s) the story never says: boxes, days
+  PINNED subtraction:sub_word_problems
+      pinned VQ-LIVE sign row offers × ÷ on a grade 2 skill that deals − +
+      pinned VQ-LIVE unit bank holds filler word(s) the story never says: boxes, days
+  PINNED subtraction:sub_word_problems_plain
+      pinned VQ-LIVE sign row offers × ÷ on a grade 2 skill that deals − +
+      pinned VQ-LIVE unit bank holds filler word(s) the story never says: boxes, days
+  stale pin (no longer found; --write-baseline drops it): VQ-ONCE|addition:add_word_problems|reason-it-story-repeated
+  stale pin (no longer found; --write-baseline drops it): VQ-ONCE|addition:add_word_problems_plain|reason-it-story-repeated
+  stale pin (no longer found; --write-baseline drops it): VQ-ONCE|subtraction:sub_word_problems|reason-it-story-repeated
+  stale pin (no longer found; --write-baseline drops it): VQ-ONCE|subtraction:sub_word_problems_plain|reason-it-story-repeated
+  per rule: VQ-REP 0 new / 0 pinned; VQ-ONEANSWER 0 new / 0 pinned; VQ-LIVE 0 new / 8 pinned; VQ-TITLE 0 new / 0 pinned; VQ-NOLEGACY 0 new / 0 pinned; VQ-ONCE 0 new / 0 pinned
+  register: PASSED 0, TEMPLATE-ONLY 0, NEVER-GRADED 4 (js/modules/redesign-passed.js; "passed" is only the first)
+ws-visual-quality: OK (4 skill(s), 8 pinned finding(s), 4 stale pin(s), 0.7 s)

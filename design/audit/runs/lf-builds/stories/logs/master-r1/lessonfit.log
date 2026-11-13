@@ -1,0 +1,6 @@
+$ node tests/scripts/ws-lessonfit.mjs
+
+Y1: exit 0 | lessonfit: 39 lessons, 116 links, 40 items a link; 0 findings
+Y4: exit 0 | lessonfit: 23 lessons, 88 links, 40 items a link; 0 findings
+Y6: exit 0 | lessonfit: 24 lessons, 101 links, 40 items a link; 0 findings
+ws-lessonfit: OK (Y1, Y4, Y6: 0 findings)

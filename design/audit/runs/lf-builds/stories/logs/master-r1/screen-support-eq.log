@@ -1,0 +1,9 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain
+
+mq-browser-run: slot 1 after 62s
+addition:add_word_problems: no supports (nothing to compare)
+addition:add_word_problems_plain: no supports (nothing to compare)
+subtraction:sub_word_problems: no supports (nothing to compare)
+subtraction:sub_word_problems_plain: no supports (nothing to compare)
+ws-screen-support-eq: addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain — no renders
+ws-screen-support-eq: OK
