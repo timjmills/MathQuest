@@ -3372,7 +3372,7 @@
    "state": "round-2 tree: the 12 x 12 chart's 765 px table in a 400 px overflow:auto box (div 765>400 wide) on both parts"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "the clipping box is opened (_sampleUnclip) and the table paged in tiles"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip",
@@ -3392,7 +3392,7 @@
    "state": "round-2 tree: 73 of 162 blocks on no part (columns 7-12 of the chart)"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "the chart in 4 tiles (rows 1-6 / 7-12 x columns 1-6 / 7-12, heading row and row labels on each): every cell on a part"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks cover",
@@ -3412,7 +3412,7 @@
    "state": "round-2 tree: 4 unlettered figures packed A | BC | D, A with the question"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "the four figures lettered A-D, two to a row, one part of their own"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks choices",
@@ -3432,7 +3432,7 @@
    "state": "round-2 tree: geo_translate's 'original' tag 5.8 px; fraction_of_set's group numbers 8.6 px"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "SVG text counted in _sampleNeed: parts zoomed (<= 2) or sliced, an undividable drawing may grow the frame to 45 %"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate,fractions:fraction_of_set --checks svgtext",
@@ -3452,7 +3452,7 @@
    "state": "round-2 tree: algebra_all's summary clamped after an option change, full text only in the title attribute"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "a 'Show all' button (aria-expanded, aria-controls) opens the summary"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra_mixed:algebra_all --change --changed-only --checks summary",
@@ -3472,7 +3472,7 @@
    "state": "round-2 tree: the story in the question line and again in the story block ('how many cards does lena have now')"
   },
   "pass": {
-   "commit": "71a055f4",
+   "commit": "19138956",
    "state": "the preview hides a question line the visual already says (as live play's mq-dup does)"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra:multi_step_word --checks repeat",
