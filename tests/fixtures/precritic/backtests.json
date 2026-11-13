@@ -7631,6 +7631,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-band-bites-50-mdf-atm",
+   "check": "ws-two-step BAND-BITES on two_step_mult_div_first and two_step_add_then_mult: band 50 is no longer PENDING; offered, it changes under 10 % of items and fails; hidden, an old code reads the default",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-BITES (lead ruling 2026-11-13, step 0 of two-step round 3b: hide band 50 on mult_div_first 5.7 % / add_then_mult 9.3 %)",
+   "fail": {
+    "commit": "6b00bb989",
+    "state": "band 50 offered on two_step_mult_div_first (17 / 300 items changed, 5.7 %) and two_step_add_then_mult (28 / 300, 9.3 %)"
+   },
+   "pass": {
+    "commit": "2828fc427",
+    "state": "PRESET_HIDE_VALUES hides band 50 on both presets; normalizeOptions reads an old band 50 as the default"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules BAND-BITES --skill algebra:two_step_mult_div_first,algebra:two_step_add_then_mult",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
