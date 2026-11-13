@@ -3,6 +3,7 @@
 // --mq-next-* custom properties on :root; the class `mq-next-yellow` on <html> restores the 2026-10-04 yellow).
 //
 //   node tests/scripts/ws-next-box.cjs                    # prints ws-next-box: OK | FAIL
+//   node tests/scripts/ws-next-box.cjs --rules NB1,NB2    # the verdict counts only those rules (all findings printed)
 //   node tests/scripts/ws-next-box.cjs --skills addition:add,placevalue:unit_form
 //
 // NB1  on each host the next box's painted ring (its first box-shadow) is the switch's colour (--mq-next-color), at least
@@ -53,10 +54,11 @@ function READ(sel) {
 const YELLOW = 'rgb(242, 194, 0)';
 
 (async () => {
-    const app = await open({ seed: 1, viewport: { width: 390, height: 844, deviceScaleFactor: 1 } });
+    const app = await open({ seed: 1, viewport: { width: 820, height: 1180, deviceScaleFactor: 1 } });
     const { page } = app;
     const hosts = [
-        ['card-390', '#questionCard', 390, async (c, k) => page.evaluate((c, k) => {
+        // owner 2026-11-13: no phone width - the card host is the 820 px tablet (was card-390)
+        ['card-820', '#questionCard', 820, async (c, k) => page.evaluate((c, k) => {
             const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
             window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: 11 }); window.renderQuestion();
             document.activeElement && document.activeElement.blur && document.activeElement.blur();
@@ -322,6 +324,11 @@ const YELLOW = 'rgb(242, 194, 0)';
     } finally { await app.close(); }
     console.log(`ws-next-box: ${judged} host(s) judged`);
     for (const f of fails.slice(0, 40)) console.log(`  - ${f}`);
-    console.log(`ws-next-box: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
-    process.exit(fails.length ? 1 : 0);
+    // --rules NB1,NB2 (lf-tools r1 A4): the verdict counts only those rules (a backtest row proving its own rule on an old
+    // commit, where a later rule NB6-NB9 was not built yet); every finding is still printed above
+    const RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+    const counted = RULES.length ? fails.filter((f) => RULES.includes(f.split(' ')[0])) : fails;
+    if (RULES.length) console.log(`ws-next-box: --rules ${RULES.join(',')}: ${counted.length} of ${fails.length} finding(s) counted`);
+    console.log(`ws-next-box: ${counted.length ? `FAIL (${counted.length})` : 'OK'}`);
+    process.exit(counted.length ? 1 : 0);
 })().catch((e) => { console.error(e); console.log('ws-next-box: FAIL'); process.exit(1); });

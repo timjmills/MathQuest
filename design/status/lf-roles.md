@@ -221,3 +221,40 @@ Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-
 
 ## Log
 - 2026-11-13: fixes 1-5, 3 backtest rows, ws-roles-unit (new, node, 40 checks, ~1 s).
+
+- 2026-11-13 deploy-5 hold: duplicate per-role precritic gates removed (747acce99); deploy head 3e3cfff70 merged with master, ws-precritic-plan OK (model-*-facts rows pass), roles-unit 80 OK. Awaiting the Guided SIZE-ORDER ruling.
+
+- 2026-11-13 r8a (lead: Guided SIZE-ORDER ruling (e); guided-tight-rows re-point; capacity-pin timeout). Used (e), not (c):
+  the two-cell Model draws cleanly for column stacks once its working is written beside it (sideLinesOf: "Ones: 8 − 3 = 5."
+  "Tens: 4 − 2 = 2." "Check: 25 + 23 = 48."), so S prints Model + 10 (11 >= M 9) on sub_50 / sub_100 / sub_1k / sub_10k /
+  sub_100k / sub_1m no regroup and sub_2d_1d. General rule (sheetFit): any one-page, one-Model Guided grid the ceiling trims,
+  where a two-cell Model completes the last row at exactly the ceiling; fact pages (ruled option b) and Mix pages excluded.
+  On those pages every cell sits centred in its row (the Model's row band was 35.7 %, now < 30 %). Tight rows: the try rows
+  drop the measure's label keep-out (koMm) and sit centred - expand / unit_form / combine Guided tries 37.4 % -> 26.4 % max.
+  ws-capacity-pin builds one skill an evaluate (full --check 182 s + ProtocolError -> 195 s, complete; output identical).
+  Checks: ws-roles-unit GUIDED-MODEL-SPAN; backtests guided-model-span, guided-size-order-s, guided-tight-rows (re-pointed),
+  all PASS. Debt seen, not changed: these stack Guided pages keep EB-SIDE 32.4 % at S / 31.7 % at M (stack in a 4- / 3-column
+  cell; 5 columns at S would hold 27.7 %) and EB-BAND 34.8 % at L - pre-existing on base, untouched pages.
+Times: r8a, start 2026-11-13T13:45Z, end 2026-11-13T15:10Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8b (lead: the pages r8a changed pass their own band checks; (a) chart_to_120 Guided bands; (b) skipped by the lead's
+  priority order). Stack Guided pages of the 7 no-regroup subtraction skills: ws-empty-band OK at S/M/L (was EB-SIDE 57, EB-BAND 30).
+  How: a measured column stack whose every offered grid leaves >= 30 % beside it (measured slack) takes one column more (S 5, M 4);
+  the Model spans the fewest cells (2 .. the whole row) that complete the grid at the ceiling - on a full row the drawing and its
+  working each in the middle of one half; every stack cell centred in its row. Capacity: S 11, M 9, L 7 (L rose from 6); no drop.
+  (a) GUIDED-MODEL-ROW: the Model's row is held to what the try beside it fills (0.8), never under the Model's need, only where the
+  try would fill under 70 % and holding it passes - chart_to_120 Guided M/L pass (worktree of lf-builds e1389d1f3); the 8 add_wp /
+  sub_wp Guided S pages' first try (40-42 %) now passes; number_word_form row 1 57/50 % -> 47/37 % (its other rows pre-existing).
+  Checks: ws-roles-unit GUIDED-STACK-SIDE, GUIDED-MODEL-ROW; backtests guided-stack-side(-unit), guided-model-row(-wp): PASS.
+  Hash vs r8a: 29 of 87 passed guided pages changed (the 7 subtraction skills' 17 pages; 8 word-problem S, vocab_pick3_words S,
+  number_word_form S/M/L by the model-row rule); ws-lesson-baseline --all-lessons 1732 identical.
+Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8c (critic r8b D1; round cap: check first). GUIDED-TIGHT-REFILL = ws-empty-band EB-REFILL: a one-page Guided page
+  whose next whole row stays within the §12.1 ceiling fails when a drawn try row is white under its grid (FAIL 5 on e62f1da34:
+  expand M/L, unit_form M/L, combine L; no other passed M/L Guided page). Root cause fixed in the fit (sheetFitWith): a tightRows
+  page's plain try rows are counted at their drawn height (less koMm), as plan() draws them. expand / unit_form M 6 -> 8 tries,
+  L 5 -> 6; combine L 5 -> 6 (ceiling kept, M >= L). Hash: only those 5 M/L pages changed; lesson baseline 1732 identical.
+  Nits not taken (each would move a page the critic passed): n1 (working lines only on a spanning Model: sub_1k / sub_10k M) and
+  n2 (3-line cap drops "Check:" on sub_1k / sub_10k L).
+Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medium

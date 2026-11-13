@@ -1,7 +1,8 @@
 // ws-screen-support-eq — a fact skill's supports on SCREEN are paper's supports (lane lf-ops, critic div_facts screen r1).
 //
 // Three rules, each judged per support value the skill offers (its `support` option's render values), on the practice
-// card (1280, 820, 390), the online worksheet (1280, 820) and the quiz (1280):
+// card (1280, 1366, 820, 1024; owner 2026-11-13: no phone width, --widths 390 on request), the online worksheet (1280, 820)
+// and the quiz (1280):
 //   SCREEN-SUPPORT-EQ    (D1, D2) every screen cell draws the SAME support structure as the paper cell of the same
 //                        support: the ÷ array a framed TRUE array (the section frame's size, the item's rows x cols, an
 //                        empty frame on 0 ÷ n), the touch tally the same count, the skip strip the same terms, the think
@@ -218,7 +219,8 @@ function readCellsInPage({ sel, cellSel }) {
                     }
                     return [zero, ...qs].filter(Boolean);
                 }, { cat, skill, opts });
-                for (const [w, h] of [[1280, 900], [820, 1180], [390, 844]]) {
+                // owner 2026-11-13: no phone width - the card at the computer / Chromebook and tablet widths (--widths overrides)
+                for (const [w, h] of require('../lib/ws-screen-widths.cjs').widthsArg(process.argv).map((x) => [x, require('../lib/ws-screen-widths.cjs').heightOf(x)])) {
                     await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
                     for (const seed of cardItems) {
                         const ok = await page.evaluate(({ cat, skill, opts, seed }) => {
