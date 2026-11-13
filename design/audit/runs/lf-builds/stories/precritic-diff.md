@@ -26,3 +26,24 @@ Scope: the 4 hosts `addition:add_word_problems(_plain)`, `subtraction:sub_word_p
 | screen-support-eq | FAIL (no supports: nothing rendered) | same | pre-existing | none |
 | sibling-compare | FAIL (no approved siblings, 60 unproven) | FAIL (113 unproven) | pre-existing (no sibling baseline) | none |
 | card-rulings --check offered | FAIL on master (wpCues / wpBank offered) | INCOMPLETE: 8 ok on the hosts; presets carry no rulings block | not a FAIL | open: the presets' panel is the host's; a rulings entry for them is a card edit (re-sign) |
+
+## Final (precritic r3 on cd802731, `logs/pc3.log`; then e4e5d3d3 the compare rule's no-break spaces)
+
+18 FAIL / 19 PASS (4 on the baseline) / 1 N/A / 2 SKIPPED-INCOMPLETE, against 22 FAIL on master for the 4 hosts. Every
+remaining FAIL is the master finding (or its class) on the hosts, or a preset page of the same class as its host or its
+approved sibling:
+
+| gate | r3 | master | verdict |
+|---|---|---|---|
+| print-lint lesson S | sub_word_problems_plain H13 x4 (Warm-up fact cells, 34 % side band) | the same 0 -> 4 | pre-existing; presets clean |
+| print-lint lesson L | compare preset WRAP-OP x2 (the rule) | - | FIXED e4e5d3d3: re-run `logs/print-lint-lesson-L-r4.log` OK, 0 findings on all 7 |
+| grade-render --gate | 12 TARGET (card-390 column boxes 40 x 44 px), 0 overflow | 48 overflow + 12 TARGET | lesson overflow FIXED (columnPanel); targets pre-existing |
+| grade-render other roles | reason-it mq-ww / pre-skill-check L, the master counts | same | pre-existing |
+| cell-checks --card-opts | add 16 (master 154), the rest likewise far under master | 150-390 | pre-existing reason-it / pre-skill-check overflow left |
+| empty-band | 266 (204 BAND, 38 SIDE, 24 EDGE) | 252 | see the table above: host lesson bands traded for the overflow; preset guided = approved siblings |
+| sections S / L, phone-card FOCUS, screen-support-eq, sibling-compare | as master | | pre-existing |
+| options-render | hosts as master; presets: which-numbers (host class), compare preset forms 1/2/3 capacity 9 vs 11 at S | | open: needs an owner capacity ruling |
+
+Lesson gates: `ws-lesson-baseline --all-lessons --check` against master's 1556 hashes: OK, every live packet identical.
+g1-oa1-bar-model-wp-20 `--check` FAIL E9 / E35, identical on master (`logs/detailed-…-check-MASTER.log`); `--repeats` OK;
+g3-oa8-two-step-wp `--check` and `--repeats` OK.
