@@ -1850,6 +1850,24 @@ function _applyCardTwin(q, paper, visualAid, qt) {
         const line = document.createElement('div');
         line.className = 'mq-ibline';
         while (qt.firstChild) line.appendChild(qt.firstChild);
+        // (lead ruling 2026-11-13 c, lf-placevalue live1: placevalue:expand's number sentence is set at the card's digit size,
+        // bold as on paper - it was the 24 px sentence size under the 40-56 px card floor - and each operator keeps its box,
+        // as the worksheet twin does: screen-cell.js inlineBlanksHTML `numeric`)
+        if (q.cell && q.cell.payload && q.cell.payload.kind === 'expand') {
+            line.classList.add('mq-ibnum');
+            line.querySelectorAll('input.ib-cell').forEach((inp) => {
+                const prev = inp.previousSibling;
+                if (!prev || prev.nodeType !== 3) return;
+                const m = /^([\s\S]*?)([+=\u2212\u00d7])\s*$/.exec(prev.nodeValue);
+                if (!m) return;
+                prev.nodeValue = m[1];
+                const keep = document.createElement('span');
+                keep.className = 'mq-ibkeep';
+                inp.parentNode.insertBefore(keep, inp);
+                keep.appendChild(document.createTextNode(`${m[2]} `));
+                keep.appendChild(inp);
+            });
+        }
         visualAid.insertBefore(line, visualAid.firstChild);
         visualAid.style.display = 'block';
         paper.classList.add('mq-twin');

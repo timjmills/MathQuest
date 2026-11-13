@@ -1,0 +1,4 @@
+{
+ "about": "SCREEN-DIGIT ratchet (lead ruling 2026-11-13 21:21 a, LEAD_DECISIONS): the online worksheet's digit floor is the shared table's 29 px (tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR); a skill whose worksheet numeral was already raised above 29 px and passed is pinned here at that size, and ws-screen-slots --screen-digit holds it there (it may not fall back to 29). Values are CSS px at every width. Add a skill when its worksheet numeral is raised and passes; never lower an entry.",
+ "skills": {}
+}

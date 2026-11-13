@@ -755,6 +755,8 @@ html .mq-scell .mq-work-area .mq-work:focus { box-shadow: inset 0 0 0 3px #000 !
 /* lf-placevalue live1: a number sentence (placevalue:expand) at the host's digit size, bold as on paper; an operator keeps its box */
 .mq-scell .mq-ibline.mq-ibnum { font-size: var(--mq-digit); font-weight: 700; line-height: 1.5; text-align: center; }
 .mq-scell .mq-ibline.mq-ibnum .mq-ibkeep { white-space: nowrap; }
+/* (the card's own inputs on that line: room for a 4-digit part at the digit size) */
+.mq-scell .mq-ibline.mq-ibnum input.ib-cell { min-width: max(56px, 2.4em) !important; }
 
 /* cloze twin: the equation, then the two lists in ink */
 .mq-scell .mq-cloze { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
