@@ -516,6 +516,7 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
+| lf-placevalue number_word_form critic rounds | — | 3 (r1 9 findings, r2 3, r3 PASS); 11 findings now checks with backtests, 1 minor open, 2 engine |
 
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
@@ -525,6 +526,7 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
 | 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
 | ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+| 2026-11-13 | lf-placevalue | pv debt (tightRows) | narrow critic 1 round PASS | builder ~$13 + critic ~$6 | F1 not held; checks for the pixel rows wait on lf-checks |
 
 ### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
 

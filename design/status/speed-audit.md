@@ -958,6 +958,16 @@ ws-backtest removes each checkout as soon as its state has run (c3245504). **Rul
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
 
+### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
+**Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
+chant vs slots, word breaks). **Speed-up next time:** before the critic, render scripted-model / guided / opener / true-false for a NEW
+skill and read its provider outputs per band (the 5 earlier pv skills had been through those roles; this one never had).
+
+### lf-placevalue number_word_form (2026-11-12/13): 3 critic rounds to pass
+**Lost:** r1 found 9 provider / cell findings no check covered (a new skill never rendered on scripted-model / guided / true-false
+before its critic); r2 found the N4 class again (N10) because the r1 fix keyed on one name's length. **Kept:** a builder (Opus medium)
+fixed 6 findings + 7 checks in one pass; the r3 narrow critic took 9 minutes. **Next skill:** run ws-cell-checks --words-rules and
+ws-words-checks style provider checks for compare / more_less BEFORE the first critic.
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
 | Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |

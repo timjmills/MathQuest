@@ -3970,9 +3970,58 @@ function pvTimesTwin(q, categoryId) {
     return { mode: 'slots', html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: k + 1, kit: 'pv-times' };
 }
 
+/**
+ * The number-name cell on screen (composing:number_word_form; critic nwf r1 N9, lead ruling: screen parity is a contract rule):
+ * the kit's `words` cell, drawn as on paper, with ONE answer place - the name's answer line takes the host's own input (mode
+ * 'blank'), and the H T O boxes (option answerSlot) are one digit a box, joined left to right into the number (as the pv chart).
+ */
+function wordsTwin(q, categoryId) {
+    if (typeof document === 'undefined') return null;
+    const p = q.cell.payload;
+    if (!p || typeof p !== 'object') return null;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        // (on screen the name keeps its own height: the paper's two-line box aligns a printed row, a card has one item)
+        html = renderCell(Object.assign({}, q, { cell: { template: 'words', payload: Object.assign({}, p, { inPlace: false }), v: 1 } }), ctx);
+    } catch (e) { return null; }
+    if (!html) return null;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]')).filter((s) => s.getAttribute('data-ws-graded') !== '0');
+    if (!slots.length) return null;
+    let mode;
+    if (slots.length === 1) {
+        const b = document.createElement('span');
+        b.className = 'mq-kblank mq-kblank--line';
+        b.setAttribute('data-mq-blank', 'line');
+        slots[0].replaceWith(b);
+        mode = 'blank';
+    } else {
+        const row = tpl.content.querySelector('[data-ws-hto]');
+        if (!row) return null;
+        row.setAttribute('data-mq-join', '');
+        slots.forEach((s, k) => {
+            const t = document.createElement('template');
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
+            const box = t.content.firstChild;
+            box.classList.add('mq-cellbox--chart');
+            s.replaceWith(box);
+        });
+        mode = 'slots';
+    }
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="words"><div data-ws-cell="words">${wrap.innerHTML}</div></div>`;
+    return { mode, html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: 0, kit: 'words' };
+}
+
 export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const c = q && q.cell;
     if (c && c.template === 'pv-times' && c.payload) return pvTimesTwin(q, categoryId);
+    if (c && c.template === 'words' && c.payload) return wordsTwin(q, categoryId);
     const eqTwin = equationKitTwin(q, categoryId);
     if (eqTwin !== undefined) return eqTwin;
     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;
