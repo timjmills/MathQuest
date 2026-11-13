@@ -35,7 +35,12 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   Nits N1 (fte step 5 text says "every row" while one mark is new), N2 (npr Model steps 1-2 add no mark; pre-existing).
 - Lesson baseline --all-lessons vs master 8a7c5d43: 1560/1596 identical; the 36 are g3-oa9-input-output-rule (the function
   table's vertical-align attribute) and its 23 pages are pixel-identical.
-- Next: deploy-3; then Reason It F2 / compare band 999999 (A over B), overflow not pinnable, F7; F8 needs a PT-RSN-4 ruling.
+- Deploy-3: PR #43 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ b25479c5), gates green on the deploy tree.
+- r10 (244a84b6): Reason It A over B for any template whose true work width passes half the room; a column story prints once
+  over A and B (word-work storyOnly / noStory, lf-builds' file); RI-DISTINCT; ws-precritic never pins an overflow; 3 ruled
+  capacity pins. Backtest ri-overflow-stack PASS (34 OVERFLOW on b25479c5 -> 0). Passed RI pages: only the 3 that overflowed
+  change. Compare at band 999999 stacks once pv supplies footprint.inkWMm (its wMm carries slack, so it is not trusted).
+  F7 (an added answer under -): SIGNMATCH 0 on the word-story RI / TF / EA pages here. F8 waits on a PT-RSN-4 ruling.
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.

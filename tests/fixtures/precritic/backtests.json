@@ -4022,6 +4022,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ri-overflow-stack",
+  "check": "Reason It A / B work never leaves its cell: work wider than half the room stands A over B (lead ruling 2026-11-13; word-stories critic r1 F2, compare F1)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "b25479c5",
+   "state": "34 OVERFLOW on sub/add_word_problems + sub_1m_no_regroup RI S/M/L"
+  },
+  "pass": {
+   "commit": "244a84b6",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_word_problems,subtraction:sub_1m_no_regroup --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
