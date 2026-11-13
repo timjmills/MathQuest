@@ -103,7 +103,11 @@ function geometry(items, input, cap = {}) {
         const lv1 = practice.every((it) => it.measured && it.measured[gc] && it.measured[gc].atLevel && Number(it.measured[gc].atLevel[1]) > 0)
             ? Math.max(...practice.map((it) => Number(it.measured[gc].atLevel[1]))) + 1 : gH;
         const iH = Math.min(gH, lv1);
-        let used2 = m2.strip + gH;
+        // (the drawn page 2 ran 2-6 mm past the strip estimate - its titled continuation header and the two band rules: measured on
+        // the rendered spill pages, plain M 6.2 mm; the Independent row is placed only with that much in hand, never squeezed)
+        const instr2 = instructionText(instructionKeyOf(practice, input.skills), practice);
+        const hand2 = SPILL_HAND_MM + stripExtraMm(ctx, 'Guided Practice:', instr2) + stripExtraMm(ctx, 'Independent Practice:', instr2);
+        let used2 = m2.strip + gH + hand2;
         let iRows = 0;
         const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
         while (iRows < iMax && used2 + (iRows ? 0 : m2.strip) + iH <= m2.budget) { used2 += (iRows ? 0 : m2.strip) + iH; iRows++; }
@@ -132,6 +136,8 @@ function geometry(items, input, cap = {}) {
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used, stepPairs };
 }
 
+/** PT-OPN-10: the room a spill page keeps in hand past the strip estimate (rendered: plain M 6.2 mm over without it). */
+const SPILL_HAND_MM = 7;
 /** PT-OPN-10: the spill page's continuation header, titled with the part(s) it holds (lead ruling 2026-11-13, r9). */
 const spillHeader = (frame, yourTurn) => Object.assign({}, frame.contHeader, { title: yourTurn ? 'Guided Practice and Your turn' : 'Guided Practice', titleLines: 1 });
 const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
