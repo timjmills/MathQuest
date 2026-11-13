@@ -549,3 +549,28 @@ add 1-3 lesson.
 | add Practice (check on) turns round its own items, +41 vs unforced: the sheet's hard avoid left the 21-fact pool dry and the last try dropped noTurnaround and the operand floor | ws-lesson-samples PG-TURN (every page, every lesson, forced and unforced) | lesson-pg-turn (be9528776 FAIL → 15fe4f6de OK) | precritic lesson-samples-check (forced) and lesson-samples-all (unforced, every lesson) | 1 round |
 | sub check-on lesson sheet: near twins (74 - 68 / 71 - 68) and 3 underTen a page - the sheet's Independent band read neither LR-6 nor the library's caps | ws-lesson-samples PG-LR67 (sheet always; Practice / Mixed with the check on) | lesson-pg-lr67 (be9528776 FAIL → 15fe4f6de OK) | precritic lesson-samples-check | 1 round |
 | a check number bond "2 + 6 = ?" under the chart's "6 + 2" (add L 1629); a Mixed bond "9 + 1 = ?" beside the lead's "1 + 9" - a bond had no fact key | PG-TURN (same page); ws-lesson-check --force-check LR-5 (chart, cross page) | lesson-pg-turn covers the Mixed case | lesson-samples-check | 0.5 |
+
+### lf-engine PC r5 (2026-11-13, fresh builder after critic r4 FAIL, min 6): §1.7 loop stop - root causes, checks first
+**§1.7 root-cause entry.** Two defect classes survived two medium rounds: near twins (r3 F11 -> r4 N4 / N5) and the place-value
+give-away (r3 F1 -> r4 N2). Root causes: (1) **three near-twin definitions** (practice.js nearNum, pre-skill-check
+nearNumbers / nearKeys, lesson-rules nearTwins), each wired to some pages only - every round fixed the page the critic named
+and the same class reappeared on the next page; (2) **a one-sided check written from the critic's proposed fix** (r3 PC-PV
+asked only "never always WRONG"; the r3 fix made the nearest word always RIGHT and passed). Rules: one module per rule,
+read by every page AND by the gate (sheet/near-twins.js; the gate imports the engine's thresholds); a check of a critic-proposed
+fix is written BOTH ways (never always right, never always wrong; never constant, never alternating); a dealing change re-runs
+the dealing rules on 64 seeds (precritic lesson-samples-deal64), not 8.
+
+| Finding | Check that catches it | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| N1 "20 - 11" under "1-digit from a teen" (ref minTop 11, maxTop 18, maxBottom 9): the relaxed last try kept no floor | PC-RANGE reads the route ref's declared floors (64 seeds + the 4242 check at L / S) | lesson-check-range-floors (6a9c268ce FAIL -> 302af774a OK) | lesson-samples-deal64, lesson-samples-check | 1 |
+| N2 the word nearest the underlined digit was always the key; round alternated T O T O | PC-PV both ways, per question | lesson-check-pv-bothways (-> 302af774a) | lesson-samples-check | 1 |
+| N3 sub chart panels 33 % bands | CHART-H13 (blocking) | lesson-chart-h13 (-> f18533dd7) | lesson-samples-check | 1 |
+| N4 / N5 one-number near twins on Practice, Mixed and the sheet (11 / 12, 97 / 98, four in the 60s, 74 / 47) | PG-LR6 (every lesson page, sheet/near-twins.js) | lesson-pg-lr6 (-> 302af774a) | lesson-samples-deal64 | 1 (class survived 2 rounds) |
+| N6 grown Vocabulary band 29 % under the words, 7 % over | PC-GAPS (lopsided gaps in band-wide cells) | lesson-check-gaps (-> 9775cf9eb) | lesson-samples-check | 1 |
+| N7 "10 more, 10 less" printed one "10 more" item | PC-NAME both parts | lesson-check-name-parts (-> 302af774a) | lesson-samples-check | 1 |
+| N8 chart-grey.png was the check page | --verify-grey on the committed packet | lesson-packet-grey (-> the r5 packet commit) | lesson-samples-grey | 0.5 |
+| N9 (lead ruling) T O heads over a Mixed "name the place" numeral | PC-PVHEADS (Check and Mixed pages) | lesson-pvheads (-> f18533dd7) | lesson-samples-check | 1 |
+| r3 F14 "missing numbers" over one blank; one-word widow | PC-INSTR | lesson-check-instr (-> 302af774a) | lesson-samples-check | 0.5 |
+| (r5 own read) "11 - 3" beside "11 - 5" on the check; 13 - 7 / 16 - 9 at 2 of 64 seeds | PC-LR6 / PG-LR6 take-away twins (nearSubs) | covered by lesson-pg-lr6's module (no separate row) | lesson-samples-check, deal64 | 0.5 |
+| (r5 own build) a Mixed shelf measured without the page's TAB-CLEAR drop: 29.5 mm cells in 25.1 mm rows once a shelf was added (LIVE on master: identify / sub_2d_1d L Mixed cut at the frame) | PC-FRAME on every lesson (--all-lessons) | lesson-frame-all (6a9c268ce FAIL -> 4095d2e83 OK) | lesson-samples-all | 1 |
+| (r5 own read) round S Mixed Place Value printed "8 5" twice | PG-LR6 at every size, one number twice on a page | lesson-pg-lr6-size (4095d2e83 FAIL -> 5be6526e4 OK) | lesson-samples-check | 0.5 |

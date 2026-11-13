@@ -3622,6 +3622,206 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-check-range-floors",
+  "check": "Every routed Prerequisite Check item keeps its route ref's DECLARED floors (minTop / maxTop / maxBottom / minOperand / zeroOnes), 64 seeds and the 4242 check at L / S",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-RANGE (floors); critic lf-engine-pc r4 N1",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "sub L Q9 / S Q10 \"20 - 11\" under Y2.B2.S10 (minTop 11, maxTop 18, maxBottom 9): the relaxed last try kept no floor"
+  },
+  "pass": {
+   "commit": "302af774a",
+   "state": "floorsHard: the route ref's floors on every try, the relaxed last one included (refFloorsOk)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 64 --only sub --rules PC-RANGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-check-pv-bothways",
+  "check": "Per question of a routed check, the place-word bank nearest the underlined digit is neither always the key nor always wrong, and the underlined places are neither constant nor strictly alternating",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-PV both ways; critic lf-engine-pc r4 N2",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "\"tens\" under the tens digit, \"ones\" under the ones digit: the nearest word always the key; round alternated T O T O"
+  },
+  "pass": {
+   "commit": "302af774a",
+   "state": "pv.js bankSide (a column right of the number) and pre-skill-check mixOrder (T O O T)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-PV",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-check-name-parts",
+  "check": "A routed question whose step title names two (\"10 more, 10 less\") prints an item of each (ruling A: a two-way question keeps 2)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-NAME (both parts); critic lf-engine-pc r4 N7",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "round L Q9: one item, \"10 more than 30\""
+  },
+  "pass": {
+   "commit": "302af774a",
+   "state": "twoWay questions keep ROUTE_ITEMS, mixOrder lays one more and one less first"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only round --sizes L --rules PC-NAME",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pg-lr6",
+  "check": "On every page of the round lesson packet (check on, 64 seeds) one skill's one-number items keep sheet/near-twins.js NEAR: no pair within 2 or turned round, at most 2 in one ten, one answer at most twice",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PG-LR6; LESSON_RULES LR-6; critic lf-engine-pc r4 N4 / N5",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "round Practice 11 / 12, 97 / 98, four in the 60s, 40 x 3; Mixed 47 45 49, 50 x 3; sheet 74 / 47, 43 / 34"
+  },
+  "pass": {
+   "commit": "302af774a",
+   "state": "one near-twin module on the check, the sheet (Guided + Independent, pool x2), Practice and Mixed (pageRules, partners too)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 64 --only round --sizes L --rules PG-LR6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-check-gaps",
+  "check": "A band-wide cell on the check page or the lesson sheet keeps no lopsided gap (the larger >= 25 % of the cell and > 2 x the smaller)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-GAPS; critic lf-engine-pc r4 N6",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "add S sheet Vocabulary band grown: 29.3 % under the words, 6.7 % over"
+  },
+  "pass": {
+   "commit": "9775cf9eb",
+   "state": "the grown match fills its cell and spends the height in its line gap (vocab.js item.fill)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only add --sizes S --rules PC-GAPS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-check-instr",
+  "check": "On the check page an instruction's plural matches its blanks and never ends on a one-word line",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-INSTR; critic lf-engine-pc r3 F14 (r4 open)",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "add L \"Count by 1. Write the missing numbers.\" over one blank; round L \"... in the boxes.\" widow"
+  },
+  "pass": {
+   "commit": "302af774a",
+   "state": "pre-skill-check routedInstr"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-INSTR",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-chart-h13",
+  "check": "Every anchor-chart cell of a sample lesson keeps its empty band under 30 % (blocking)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples CHART-H13; WORKSHEET_DESIGN_STANDARD H13; critic lf-engine-pc r4 N3",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "sub chart panels 5 / 6: 33 % bands beside the taller step 4"
+  },
+  "pass": {
+   "commit": "f18533dd7",
+   "state": "chart.js CHART_MID: a panel far shorter than its row is centred"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only sub --rules CHART-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pvheads",
+  "check": "No \"name the place\" item on a lesson Check or Mixed page prints place heads (lead ruling 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-PVHEADS; PEDAGOGY_STANDARD 4.1a; critic lf-engine-pc r4 N9",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "round Mixed Place Value partner: T O over every underlined numeral"
+  },
+  "pass": {
+   "commit": "f18533dd7",
+   "state": "noPlaceHeads on the Mixed partners"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only round --rules PC-PVHEADS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pg-lr6-size",
+  "check": "PG-LR6 on the 4242 build at every size: one skill's number never twice on a page (and the near-twin rules) on the forced packet",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PG-LR6; r5 builder's own page read",
+  "browser": true,
+  "fail": {
+   "commit": "4095d2e83",
+   "state": "round S Mixed Place Value partner printed \"8 5\" twice"
+  },
+  "pass": {
+   "commit": "5be6526e4",
+   "state": "near-twins oneNumFits: the same number is no new item"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only round --rules PG-LR6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-frame-all",
+  "check": "PC-FRAME on every lesson of --all-lessons: no Mixed cell runs past its band (the page's TAB-CLEAR drop under the tab was not in the shelf's measure)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PC-FRAME (all lessons); r5 builder's own build",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "sub_2d_1d L Mixed: the Place Value cells need 52.2 mm in 47.9 mm, cut at the frame (live)"
+  },
+  "pass": {
+   "commit": "4095d2e83",
+   "state": "mixed-practice pvLiftOf + head-less tabFree items"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only subtraction:sub_2d_1d --sizes L --rules PC-FRAME",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

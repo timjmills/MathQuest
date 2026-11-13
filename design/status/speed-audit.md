@@ -1049,3 +1049,19 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Lost time: the Mixed fix went into the 'turn' rung of the Mixed ladder first - a lesson Mixed page deals in sections, never on the ladder. Speed-up: print which deal path a page takes (keepPrompts / arrangement) before editing one. | | | | |
 | Lost time: a pool filter moved a chart example out of the Guided pool and pickWeDo then chose 47 / 74 (it reorders by case). Speed-up: probe the dealt parts (a 20-line item dump per part) after every dealing change, not only the rule counts. | | | | |
 | Speed-up: the class table of `ws-lesson-check --dump` (forced r3, unforced, forced now) answered "every delta <= 0" in one step. | | | | |
+
+### lf-engine PC r5 (2026-11-13, fresh builder, §1.7 loop stop after critic r4 FAIL)
+| Finding | Check | Backtest | On precritic | Rounds saved |
+|---|---|---|---|---|
+| N1 route floors on the relaxed last try | PC-RANGE (declared floors) | lesson-check-range-floors | yes (deal64, check) | 1 |
+| N2 pv bank give-away | PC-PV both ways | lesson-check-pv-bothways | yes | 1 |
+| N3 chart bands | CHART-H13 | lesson-chart-h13 | yes | 1 |
+| N4 / N5 near twins | PG-LR6 (one module) | lesson-pg-lr6 | yes (deal64) | 1 |
+| N6 lopsided gaps | PC-GAPS | lesson-check-gaps | yes | 1 |
+| N7 two-part step | PC-NAME both parts | lesson-check-name-parts | yes | 1 |
+| N8 grey PNG | --verify-grey | lesson-packet-grey | yes (grey) | 0.5 |
+| N9 Mixed heads | PC-PVHEADS | lesson-pvheads | yes | 1 |
+| F14 instruction | PC-INSTR | lesson-check-instr | yes | 0.5 |
+| Lost time: a stylesheet rule added for two check-on cells changed the html of 1,396 of 1,556 live pages (the lesson CSS is inlined in every page): one 14-minute baseline spent. Speed-up: a new rule travels with the page that uses it (an item flag or a `<style>` section), never in the shared lesson stylesheet - checked before the first baseline. | | | | |
+| Lost time: the 64-seed deal surfaced 3 cornered deals (seed 2628 Practice, take-away twins at 2221 / 2776) the 8-seed gate never saw. Speed-up: lesson-samples-deal64 on precritic; a page-rules run is re-dealt (12 attempts) before any rule is given up. | | | | |
+| Lost time: a shared-module change exposed a measure gap (Mixed pv shelves measured without the page's TAB-CLEAR drop). Speed-up: after a dealing change, render the packet and read every page, not only the rule counts (critic r4 speed-up 5). | | | | |

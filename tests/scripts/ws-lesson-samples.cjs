@@ -605,6 +605,8 @@ async function checkMain() {
                 // PC-PVHEADS (lead ruling 2026-11-13, N9): no "name the place" item on a Check or Mixed page prints place heads (the letter
                 // over the underlined digit is the answer); Practice keeps them (the support)
                 pm.forEach((m, n) => { if (!['prereq', 'mixed'].includes(m.part)) return; for (const c of ((P.pc || [])[n] || {}).pv || []) if (c.named && c.heads) F('PC-PVHEADS', where('pupil', n), `${m.part === 'prereq' ? 'check' : m.part} cell ${c.cell}: place heads over a "name the place" numeral`); });
+                // PC-FRAME (critic r3 F3; r5: on the spot / --all-lessons lessons too - sub_2d_1d L Mixed cut at the frame): every page of the packet, pupil and key, ends inside its body (no band cut at the foot)
+                for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if (pg.frame && pg.frame.over > 0.3) F('PC-FRAME', where(k, n) + ` (${(mm[n] || {}).part || '?'})`, `${pg.frame.what === 'body' ? 'ink runs' : `a cell runs past its ${pg.frame.what} by`} ${pg.frame.over} mm${pg.frame.what === 'body' ? " past the body's bottom" : ''} (the band has no bottom rule inside the frame)`); });
                 if (l.spot) continue;
                 // CHART-H13 (critic r4 N3): every anchor-chart cell keeps its empty band under 30 % (blocking)
                 pm.forEach((m, n) => { if (m.part !== 'chart') return; for (const b of bandsOf(P.sc, n)) if (!/blank at the bottom/.test(b)) F('CHART-H13', where('pupil', n), b.replace(/^page \d+:? ?/, '')); });
@@ -616,8 +618,6 @@ async function checkMain() {
                 pm.forEach((m, n) => { if (m.part !== 'prereq') return; for (const x of ((P.pc || [])[n] || {}).instr || []) {
                     if (/\b(numbers|boxes)\b/.test(x.text) && x.slots.length && x.slots.every((v) => v === 1)) F('PC-INSTR', where('pupil', n), `"${x.text}" over one blank an item`);
                     if (x.widow) F('PC-INSTR', where('pupil', n), `"${x.text}" ends on a one-word line ("${x.widow}")`); } });
-                // PC-FRAME (critic r3 F3): every page of the packet, pupil and key, ends inside its body (no band cut at the foot)
-                for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if (pg.frame && pg.frame.over > 0.3) F('PC-FRAME', where(k, n) + ` (${(mm[n] || {}).part || '?'})`, `${pg.frame.what === 'body' ? 'ink runs' : `a cell runs past its ${pg.frame.what} by`} ${pg.frame.over} mm${pg.frame.what === 'body' ? " past the body's bottom" : ''} (the band has no bottom rule inside the frame)`); });
                 // PC-CLIP on ink (critic r3 F2): on the check page and its key, each routed band's grid ink ends above its tag, and
                 // every "If missed" tag is drawn inside its band
                 for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if ((mm[n] || {}).part !== 'prereq') return;
