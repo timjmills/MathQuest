@@ -104,14 +104,18 @@ export function prepare(it, info = {}) {
     // stacked trains held 2 a page at S with a 33 % band under them; critic r6f F1)
     // (at S and M only: it buys a third item there; L's ceiling is 2 rows, so the saved height only grew the band under the work
     // to 32 % - ws-empty-band EB-BAND)
-    const stackTagOf = (c) => (wide && !legacy && c && c.size !== 'L' ? ';padding:2.5mm 2mm 2.5mm 11mm;align-items:flex-start' : '');
+    // (a count row's three-line panels at L: the gutter tag too - with the tag band each item stood 115 mm, over L's 113.5 mm
+    // cell, and the page held ONE item; ws-cell-checks LONE-PAGE, lf-ops-props cbt r2)
+    const stackTagOf = (c) => (wide && !legacy && c && (c.size !== 'L' || it.template === 'count-row') ? ';padding:2.5mm 2mm 2.5mm 11mm;align-items:flex-start' : '');
     const boxAt = (c, col, row) => (stackTagOf(c) ? ` style="grid-column:${col};grid-row:${row}${stackTagOf(c)}"` : at(col, row));
     // (critic cbt r1 D6: wrapToCell + a fractional column count make the row take MORE LINES at the size's own box width - it
     // squeezed six boxes a line to 8-10 mm, two-digit numbers touching the box sides; count-row narrowLive caps at 186 / c - 14)
     // (lf-ops-props r5, the count-row Reason It wrap: a STACKED count row - an arcs row of 12-15 numbers is 150-170 mm - is drawn
     // at its PANEL's width, the cell less the response column, the gutters and the panel's pads, so it wraps to more lines inside
     // the panel and never runs past its rules - ws-empty-band EB-EDGE / ws-cell-checks OVERFLOW on count_by_tables Reason It S/M/L)
-    const panelLive = (c) => LIVE_W_MM - 52 - 10 - (stackTagOf(c) ? 13 : 4) - 6;
+    // (the response column is the A / B rings alone - `auto`, about 36 mm - when the answer is a list (no answer frame): the panel
+    // takes the rest, so a count row keeps two lines at L and the page its two items - ws-cell-checks LONE-PAGE)
+    const panelLive = (c) => LIVE_W_MM - (place.kind !== 'one' ? 36 : 52) - 10 - (stackTagOf(c) ? 13 : 4) - 6;
     const work0 = work;
     work = (c, o, v, slots) => {
         if (!(it.template === 'count-row' && wide && !legacy)) return work0(c, o, v, slots);

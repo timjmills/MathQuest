@@ -599,6 +599,9 @@ function planMixed(input, pools) {
     });
 }
 
+/** How far past its budget a page may take a LONE last shelf (critic cbt r1 D5): the budget's own reserve. */
+const LONE_SLACK_MM = 6;
+
 export function counts(pools, input) {
     if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
@@ -674,12 +677,12 @@ export function plan(input = {}) {
     })();
     // (critic cbt r1 D5, H5 / PG-23: a last page holding ONE shelf while an earlier page holds several - Mixed practice M
     // printed 6 + 1 - is laid again with the shelves shared evenly over the same pages: 4 + 3, never a lone item)
-    const runShelves = (breaks) => {
+    const runShelves = (breaks, slack = 0) => {
     pages.length = 0; cur = null; start = 1;
     for (const [i, sh] of shelves.entries()) {
         const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), sh.growCap === undefined ? Infinity : sh.growCap);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
-        const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
+        const budget = (pages.length > 1 ? p.mCont.budget : m.budget) + slack;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
         let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
@@ -724,7 +727,14 @@ export function plan(input = {}) {
     {
         const shelvesOn = (pg) => pg.sections.reduce((a, x) => a + (x.kind === 'band' ? (x.contents ? x.contents.filter((c) => c && c.kind === 'grid' && !/mq-anchorgrid/.test(c.cls || '')).length : 1) : 0), 0);
         const P = pages.length, last = P > 1 ? shelvesOn(pages[P - 1]) : 0;
-        if (P > 1 && last === 1 && shelves.length >= 2 * P - 1) {
+        // (first: the lone shelf joins the page before when the budget's own reserve - 1.5 mm kept back, the title's second line
+        // reserved - is all it lacks: up to LONE_SLACK_MM; a 6 + 1 sheet became 7 on one page. Else: an even split.)
+        if (P > 1 && last === 1) {
+            const keep0 = pages.slice();
+            runShelves(new Set(), LONE_SLACK_MM);
+            if (pages.length === P - 1) { /* kept: one page fewer */ } else { pages.length = 0; pages.push(...keep0); }
+        }
+        if (pages.length === P && P > 1 && last === 1 && shelves.length >= 2 * P - 1) {
             const per = Math.ceil(shelves.length / P);
             const breaks = new Set(Array.from({ length: P - 1 }, (_, k) => (k + 1) * per));
             const keep = pages.slice();
