@@ -3365,6 +3365,46 @@
    }
   },
   {
+   "id": "eb-fixture-screen-slot",
+   "check": "ws-empty-band reads a SCREEN answer slot by what it draws (critic eb-r4 D1, lead ruling 2026-11-13 (a)): its inked edges plus one written digit (Hw = 0.75 x its font size), never its whole touch box. A centred one-line problem whose answer is a 48 px underline-only input (data-ws-slot kept) in a 140 px online-worksheet cell FAILS; the same input drawn at the digit height, the touch target kept as transparent padding outside the drawn box, in a cell sized to its content, passes",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (screen slot) (critic eb-r4 D1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/screen-slot.fail.html",
+    "state": "seeded: 140 px .mq-scell in #worksheetView, \"970 = ___ tens 0 ones\" centred, the 48 px input draws only its 2 px underline: 12.1 mm (32.6 %) above the ink beyond the 3 mm top pad"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/screen-slot.pass.html",
+    "state": "the input drawn at 1.15em with its underline at the foot, 48 px touch target as padding pulled out by a negative margin (css/screen-cell.css kit LINE slot rule); the cell sized to its content"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-fixture-toppad-real-band",
+   "check": "ws-empty-band takes the kit's mandatory top pad (CL-40: 3 mm, or the label side + 1 mm) off the band above the ink (lead ruling 2026-11-13 on critic eb-r4's minor), and a real band beyond the pad is still caught: two 56 mm fact cells with a 7 mm top pad and the fact at the bottom FAIL (36 % beyond the pad); cells sized to their items pass",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (top pad) (critic eb-r4 minor)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/toppad.fail.html",
+    "state": "seeded: 56 mm cells, 6 mm tab, padding-top 7 mm, ink at the bottom: 20.3 mm (36.3 %) above the ink beyond the 7 mm pad"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "the same items in 36 mm cells"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "eb-foot-div-facts",
    "check": "ws-empty-band EB-FOOT: div_facts Independent at S / M / L draws each cell within 10 % of the footprint the bridge measured for it (lf-checks L25: the supports-off rows were stretched past the measured height)",
    "kind": "commit-pair",
@@ -3404,7 +3444,7 @@
     "pass": "OK"
    },
    "pending": true,
-   "pendingReason": "critic eb-r4 D1 (2026-11-13): the pass commit da17b9ba only re-labelled the 48 px underline-only input as a slot; 2 of 6 unit_form rename=more tiles are 47.9 % empty above the digits as a pupil sees them. The label was reverted; re-arm with a real app fix (lead ruling pending, rule 7 hand-over)"
+   "pendingReason": "critic eb-r4 D1 (2026-11-13): the pass commit da17b9ba only re-labelled the 48 px underline-only input as a slot; 2 of 6 unit_form rename=more tiles are 47.9 % empty above the digits as a pupil sees them. The label was reverted. Rule-7 rebuild (lead ruling (b)+(a), 2026-11-13): the input is now drawn at the digit height (touch target as padding outside it) and the tool reads a screen slot by what it draws; the input part of the band is gone (EB-BAND 3 -> 1 on this command; 46-47 % -> 33.5-34.4 %). STILL PENDING: the one finding left is a one-line tile (\"691 = ___ tens 1 one\") centred in a row the equal-rows rule (_wsEvenRows, R1-16) sizes for a two-line neighbour (\"7 hundreds / 15 tens = ___\"): 108 px for 27 px of ink, so centred it leaves ~33 % above and under. That is the row height (option c), which needs a lead / owner ruling; re-arm once ruled"
   },
   {
    "id": "screen-ink-size-ink",

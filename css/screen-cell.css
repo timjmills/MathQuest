@@ -1900,3 +1900,42 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 /* the library's sentence frame: the sign is written IN A CIRCLE on screen as on paper (the slot
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
+
+/* lf-checks eb-r4 D1 (lead ruling 2026-11-13, (b)): a kit LINE slot taken by the host's input. Its DRAWN box is the digit
+   height (1.15em) and the underline under it; the 48 px touch target stays, as transparent padding around the drawn box,
+   pulled out of the layout by an equal negative margin, so no blank box shows above the digits. The underline is a
+   background strip on the drawn box's foot; every fill (white, the yellow next-box glow, the green / red checks) is clipped
+   to the drawn box, and every ring is an outline set back by the padding onto it. ADDITIVE: the 1128 rule stays. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    --mq-tp: calc((max(48px, 1.15em) - 1.15em) / 2);
+    box-sizing: border-box !important; height: max(48px, 1.15em) !important;
+    padding: var(--mq-tp) calc(0.15em + var(--mq-tp)) !important;
+    margin: calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0.2em - var(--mq-tp)) !important;
+    width: calc(var(--mq-n, 3) * 0.62em + 0.9em + 2 * var(--mq-tp)) !important;
+    min-width: calc(max(64px, 2.4em) + 2 * var(--mq-tp)) !important; max-width: none !important;
+    border-width: 0 !important;
+    background-image: linear-gradient(#000, #000) !important; background-size: 100% 2px !important;
+    background-position: 0 100% !important; background-repeat: no-repeat !important;
+    background-origin: content-box !important; background-clip: content-box !important;
+    box-shadow: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):is(:focus, .mq-active-box) {
+    box-shadow: none !important; outline: 3px solid #f2c200 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .online-edition .problem-card.mq-wscard .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):focus {
+    outline: 3px solid #5E3FCC !important; outline-offset: calc(2px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-correct {
+    box-shadow: none !important; outline: 3px solid var(--mq-box-ok) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: linear-gradient(var(--mq-box-ok), var(--mq-box-ok)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-wrong {
+    box-shadow: none !important; outline: 3px dashed var(--mq-box-bad) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-correct, .flash-correct, [style*="var(--correct)"], [style*="var(--accent-green)"]) {
+    box-shadow: none !important; outline: 2px solid #2E7D5B !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-wrong, .flash-wrong, [style*="var(--incorrect)"], [style*="var(--accent-red)"]) {
+    box-shadow: none !important; outline: 2px solid #B73838 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}

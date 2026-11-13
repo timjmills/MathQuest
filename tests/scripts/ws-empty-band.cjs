@@ -114,7 +114,7 @@ function gapBad(role, cells, i, lim) {
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
 const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
-const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)'];
+const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
 // compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
 const RULE_EXEMPT = {
@@ -244,10 +244,15 @@ function measureCells(scope) {
             }
             // the cell is marked for the pixel read (measurePix) under the same page:cell index
             c.setAttribute('data-eb-i', `${pi + 1}:${ci + 1}`);
+            // the kit's MANDATORY TOP PAD (lead ruling 2026-11-13, critic eb-r4 minor): the cell's own padding-top, up to the kit's
+            // top inset (WORKSHEET_DESIGN_STANDARD CL-40 / section 796: 3 mm, or the label side + 1 mm). It is structural, the same
+            // on every cell, so it is neither band nor cell: judge() takes it off the band above the ink and off the cell height.
+            const labSide = Math.max(0, ...[...c.querySelectorAll(':scope > [data-ws-label], :scope > .ws-letter, :scope > .ws-tab, :scope > .ws-modeltab')].map((e) => e.getBoundingClientRect().height));
+            const padMm = Math.max(0, Math.min(parseFloat(cs.paddingTop) || 0, Math.max(3 * MM, labSide + 1 * MM))) / MM;
             const label = ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim();
             const tmpl = c.getAttribute('data-ws-cell') || (c.classList.contains('mq-scell') ? 'screen-cell' : '');
             // a cell with no ink is recorded, never dropped (critic eb-r2 D7 / eb-r3 D2): judge() reports it as EB-READ
-            if (!box) { out.push({ page: pi + 1, cell: ci + 1, label, tmpl, noInk: true, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1), hRaw: cr.height / MM, topPx: Math.round(cr.top) }); return; }
+            if (!box) { out.push({ page: pi + 1, cell: ci + 1, label, tmpl, padMm, noInk: true, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1), hRaw: cr.height / MM, topPx: Math.round(cr.top) }); return; }
             // the largest empty band BETWEEN blocks of ink (merged vertical intervals)
             rects.sort((a, b) => a.t - b.t); let between = 0, reach = rects.length ? rects[0].b : 0;
             for (const r of rects) { if (r.t > reach) between = Math.max(between, r.t - reach); reach = Math.max(reach, r.b); }
@@ -260,7 +265,7 @@ function measureCells(scope) {
             const side = !screen || Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
-            out.push({ page: pi + 1, cell: ci + 1, label, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -306,11 +311,33 @@ async function measurePix(arg) {
             if (masks.some((m) => x >= m.l && x < m.r && y >= m.t && y < m.b)) continue;
             rows[y] = 1; cols[x] = 1;
         }
-        for (const sl of c.querySelectorAll('[data-ws-slot]')) {
-            const cs2 = getComputedStyle(sl); if (cs2.display === 'none' || cs2.visibility === 'hidden') continue;
+        // a SCREEN answer slot (critic eb-r4 D1, lead ruling 2026-11-13 (a)) counts only over what it draws: a closed box (inked
+        // top AND bottom edge) is its whole box; otherwise its inked edges plus the height of ONE written digit (Hw = 0.75 x its
+        // font size) where the digit is written - centred in an input's content box, on the line of any other slot. A 48 px
+        // underline-only touch input is not ink over its blank top. A PRINT slot is its whole box, as before (the writing room).
+        const screen = !c.hasAttribute('data-ws-cell') || !!c.closest('#gameView, #worksheetView, #quizTakeView');
+        const paints = (v) => !!v && v !== 'none' && v !== 'transparent' && !/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(v) && !/^(#fff(fff)?|white|rgb\(255,\s*255,\s*255\))$/i.test(v);
+        const slots = screen ? c.querySelectorAll('[data-ws-slot], input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])') : c.querySelectorAll('[data-ws-slot]');
+        for (const sl of slots) {
+            const cs2 = getComputedStyle(sl); if (cs2.display === 'none' || cs2.visibility === 'hidden' || parseFloat(cs2.opacity || '1') <= 0.05) continue;
             const r = sl.getBoundingClientRect(); if (!r.width || !r.height) continue;
             const q = rel(r, 0);
-            for (let y = Math.max(0, q.t); y < Math.min(h, q.b); y++) rows[y] = 1;
+            const spans = [];
+            if (!screen) spans.push([q.t, q.b]);
+            else {
+                const ew = (k) => (parseFloat(cs2[`border${k}Width`]) > 0 && !/^(none|hidden)$/.test(cs2[`border${k}Style`]) && paints(cs2[`border${k}Color`]) ? parseFloat(cs2[`border${k}Width`]) : 0);
+                const bt = ew('Top'), bb2 = ew('Bottom');
+                if (bt && bb2) spans.push([q.t, q.b]);
+                else {
+                    if (bt) spans.push([q.t, q.t + Math.ceil(bt)]);
+                    if (bb2) spans.push([q.b - Math.ceil(bb2), q.b]);
+                    const hw = 0.75 * (parseFloat(cs2.fontSize) || 16);
+                    const ct = q.t + (parseFloat(cs2.borderTopWidth) || 0) + (parseFloat(cs2.paddingTop) || 0), cb = q.b - (parseFloat(cs2.borderBottomWidth) || 0) - (parseFloat(cs2.paddingBottom) || 0);
+                    const mid = sl.tagName === 'INPUT' ? (ct + cb) / 2 : cb - hw / 2;
+                    spans.push([Math.floor(mid - hw / 2), Math.ceil(mid + hw / 2)]);
+                }
+            }
+            for (const [a, b] of spans) for (let y = Math.max(0, a); y < Math.min(h, b); y++) rows[y] = 1;
             for (let x = Math.max(0, q.l); x < Math.min(w, q.r); x++) cols[x] = 1;
         }
         const fr = rows.indexOf(1); if (fr < 0) { out[id] = { noInk: true }; continue; }
@@ -445,12 +472,16 @@ function judge(cells, where, F, role) {
         // a cell with no ink at all (critic eb-r3 D2: it was dropped, so a blank cell beside a good one read OK)
         if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with no pixel darker than the ink threshold 225 of 255: blank, or only ink too faint to count, e.g. #eee) [${c.tmpl}]`); return; }
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
-        const lim = BAND * c.hRaw;
+        // the kit's mandatory top pad is not band (lead ruling 2026-11-13): it comes off the band above the ink; the limit stays
+        // 30 % of the whole cell, so the exclusion never makes a band under or between the ink count more than before
+        const pad = c.pix ? Math.min(c.padMm || 0, c.aboveMm || 0) : 0,   // (the DOM read's band already starts inside the padding)
+            hJ = c.hRaw, aboveJ = Math.max(0, (c.aboveMm || 0) - pad);
+        const lim = BAND * hJ;
         // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
         // pixels with PT-MOD-3; here a model state is judged under and above its ink only)
-        const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', c.aboveMm]].sort((a, b) => b[1] - a[1]);
+        const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', aboveJ]].sort((a, b) => b[1] - a[1]);
         const [where2, band] = bands[0];
-        if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
+        if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / hJ * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm${pad > 0.05 ? `; the ${pad.toFixed(1)} mm top pad excluded` : ''}) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.sideMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
     });
