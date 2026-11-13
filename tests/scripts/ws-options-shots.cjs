@@ -22,6 +22,8 @@
 //   (d) the panel's controls leave the window (critic-panel-r1 F2): `.tv-sko-foot`'s bottom below innerHeight, or the
 //       Done button not wholly inside the window, or the panel itself outside it;
 //   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4);
+//   [hit] (critic-panel-r3 P1) a visible option control whose centre does not take the pointer (document.elementFromPoint
+//       there is not the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click;
 //   (f) the drawing's scale is under 0.30 (its strokes are hairlines), or the frame ends shorter than its CSS height
 //       (critic-panel-r1 F3: a grown frame computed from clientHeight but written as a border-box height).
 // The main sweep is every skill at 1280×1000, 1366×768, 1024×768 and 820×1180. The SPOT set (the critic's cases: the coordinates
@@ -80,7 +82,7 @@ const NO_SPOT = flag('no-spot');
 // show every block of the item, F1/F2), choices (the answer choices one lettered part of their own, F2), svgtext (SVG
 // labels at the floor, F3), parts (every part walked), summary (the clamped
 // option summary has a keyboard/touch expand control, F5), repeat (no sentence shown twice, F6).
-const FAMILIES = ['inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
+const FAMILIES = ['hit', 'inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
 const CHECKS = new Set(String(one('checks', FAMILIES.join(','))).split(',').map((x) => x.trim()).filter(Boolean));
 const BAD_CHECK = [...CHECKS].filter((c) => !FAMILIES.includes(c));
 if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (${FAMILIES.join(', ')})`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
@@ -254,6 +256,28 @@ function measure(page) {
         const clamped = !!sum && sum.scrollHeight > sum.clientHeight + 1;
         const more = pop.querySelector('.tv-sko-head button[aria-expanded]');
         const moreOK = !!more && more.getClientRects().length > 0 && !more.disabled && more.tabIndex >= 0;
+        // P1 (critic-panel-r3): every visible option control takes a pointer at its centre. document.elementFromPoint there
+        // must be the control, inside it, or its own <label> (a "?" hit area hung off the row swallowed every click).
+        const blocked = [];
+        let hitN = 0;
+        if (bodyEl) {
+            const bR = bodyEl.getBoundingClientRect();
+            for (const e of bodyEl.querySelectorAll('input, select, button:not(.sko-tip), textarea')) {
+                if (!e.getClientRects().length || !seen(e) || e.disabled) continue;
+                let t = e;
+                const r0 = e.getBoundingClientRect();
+                // (a visually hidden tick box is pointed at through its label)
+                if (r0.width < 2 || r0.height < 2 || Number(getComputedStyle(e).opacity) === 0) { const lb = e.closest('label') || (e.labels && e.labels[0]); if (!lb) continue; t = lb; }
+                const r = t.getBoundingClientRect();
+                const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                if (cy < Math.max(0, bR.top) + 1 || cy > Math.min(innerHeight, bR.bottom) - 1 || cx < 0 || cx > innerWidth) continue;
+                hitN++;
+                const hit = document.elementFromPoint(cx, cy);
+                const lab = e.closest('label');
+                const ok = hit && (hit === e || e.contains(hit) || t.contains(hit) || (hit.tagName === 'LABEL' && hit.contains(e)) || (lab && lab.contains(hit)) || [...(e.labels || [])].some((l) => l.contains(hit)));
+                if (!ok) blocked.push(`${e.tagName.toLowerCase()} "${String((lab || e).textContent || e.value || '').replace(/\s+/g, ' ').trim().slice(0, 24)}" -> ${hit ? hit.tagName.toLowerCase() + (typeof hit.className === 'string' && hit.className ? '.' + hit.className.trim().split(/\s+/)[0] : '') : 'nothing'}`);
+            }
+        }
         const sR = stage ? stage.getBoundingClientRect() : null;
         const foot = pop.querySelector('.tv-sko-foot');
         const done = foot && [...foot.querySelectorAll('button')].pop();
@@ -264,7 +288,7 @@ function measure(page) {
             f: box(frame), s: box(stage), cssH, frameH: frame.offsetHeight, pop: box(pop), foot: box(foot), done: box(done),
             vw: document.documentElement.clientWidth || window.innerWidth, vh: window.innerHeight,
             transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null, svgText,
-            item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
+            hit: { n: hitN, blocked }, item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
             body: bodyEl ? { h: bodyEl.clientHeight, sh: bodyEl.scrollHeight } : null, sum: { clamped, moreOK },
             partBox: sR ? { x: Math.max(0, sR.left - fR.left), y: Math.max(0, sR.top - fR.top), w: Math.min(sR.right, fR.right) - Math.max(sR.left, fR.left), h: Math.min(sR.bottom, fR.bottom) - Math.max(sR.top, fR.top) } : null,
             part: part && !part.hidden ? String(part.querySelector('.tv-sko-part-n') ? part.querySelector('.tv-sko-part-n').textContent : part.textContent).replace(/\s+/g, ' ').trim() : '',
@@ -298,6 +322,7 @@ function judge(m, inkR) {
     const k = Number(scaleOf(m.transform));
     if (!m.unavailable && s && k < 0.2995) fails.push(`[scale] drawn at scale ${k} (needs >= 0.30: below it a sample's strokes are hairlines)`);
     if (!m.unavailable && m.frameH < m.cssH) fails.push(`[scale] the frame is ${m.frameH} px, shorter than its CSS height ${m.cssH} px (critic-panel-r1 F3: a grown frame never shrinks)`);
+    if (m.hit && m.hit.blocked.length) fails.push(`[hit] ${m.hit.blocked.length} of ${m.hit.n} option controls do not take a pointer at their centre: ${m.hit.blocked.slice(0, 3).join('; ')}`);
     if (m.foot && m.foot.y + m.foot.h > m.vh + 0.5) fails.push(`[controls] the panel footer's bottom is at ${Math.round(m.foot.y + m.foot.h)}, below the ${m.vh} px window`);
     if (m.done && (m.done.x < -0.5 || m.done.y < -0.5 || m.done.x + m.done.w > m.vw + 0.5 || m.done.y + m.done.h > m.vh + 0.5)) fails.push(`[controls] the Done button (${Math.round(m.done.x)},${Math.round(m.done.y)} ${Math.round(m.done.w)}×${Math.round(m.done.h)}) is not inside the ${m.vw}×${m.vh} window`);
     else if (m.pop && (m.pop.y < -0.5 || m.pop.y + m.pop.h > m.vh + 0.5)) fails.push(`[controls] the panel (top ${Math.round(m.pop.y)}, bottom ${Math.round(m.pop.y + m.pop.h)}) leaves the ${m.vh} px window`);
@@ -313,20 +338,41 @@ async function frameInk(page, partBox = null) {
 
 const note = (m, inkR) => (m.noFrame ? '' : `ink ${(inkR.ink * 100).toFixed(2)} %${inkR.own != null ? ` (own box ${(inkR.own * 100).toFixed(1)} %)` : ''}, scale ${scaleOf(m.transform)}, text >= ${m.minPx != null ? m.minPx.toFixed(1) : '-'} px${m.svgPx != null ? ` (svg text ${m.svgPx.toFixed(1)} px)` : ''}, frame ${Math.round(m.f.h)} px${m.body ? `, options ${m.body.h}/${m.body.sh} px` : ''}${m.part ? `, part ${m.part}` : ''}${m.unavailable ? ' (sample unavailable)' : ''}`);
 
-// Change the panel's first option (the first select or tick box of its body).
-function changeFirstOption(page) {
-    return page.evaluate(() => {
+// Change the panel's first option (the first select or tick box of its body) the way a teacher does: a real pointer click
+// at the control's centre (P1, critic-panel-r3: a DOM el.click() never hit-tests, so a row-wide "?" hit area went unseen).
+// A select must take focus from that click before its value is chosen; a tick box must change. Returns '' (nothing to
+// change), the control's kind, or a '[hit] ...' failure.
+async function changeFirstOption(page) {
+    const at = await page.evaluate(() => {
         const c = document.querySelector('#skillOptionsPopover .tv-sko-body select, #skillOptionsPopover .tv-sko-body input[type="checkbox"]');
-        if (!c) return '';
-        if (c.tagName === 'SELECT') {
-            if (c.options.length < 2) return '';
-            c.selectedIndex = (c.selectedIndex + 1) % c.options.length;
-            c.dispatchEvent(new Event('change', { bubbles: true }));
-            return 'select';
-        }
-        c.click();
-        return 'tick box';
+        if (!c) return null;
+        if (c.tagName === 'SELECT' && c.options.length < 2) return null;
+        c.scrollIntoView({ block: 'nearest' });
+        let t = c;
+        const r0 = c.getBoundingClientRect();
+        if (r0.width < 2 || r0.height < 2 || Number(getComputedStyle(c).opacity) === 0) t = c.closest('label') || (c.labels && c.labels[0]) || c;
+        const r = t.getBoundingClientRect();
+        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2, kind: c.tagName === 'SELECT' ? 'select' : 'tick box', was: c.tagName === 'SELECT' ? c.selectedIndex : c.checked };
     });
+    if (!at) return '';
+    await page.mouse.click(at.x, at.y);
+    const res = await page.evaluate((at) => {
+        const c = document.querySelector('#skillOptionsPopover .tv-sko-body select, #skillOptionsPopover .tv-sko-body input[type="checkbox"]');
+        if (!c) return 'gone';
+        if (at.kind === 'tick box' && c.checked === at.was) {
+            // (a tick the skill will not clear, e.g. its last ticked table, stays: that is no hit failure if the click reached it)
+            const hit = document.elementFromPoint(at.x, at.y);
+            const lab = c.closest('label');
+            if (hit && (hit === c || (lab && lab.contains(hit)))) return 'same';
+        }
+        if (at.kind === 'tick box') return c.checked !== at.was ? 'ok' : `[hit] a mouse click on the first tick box "${String((c.closest('label') || c).textContent).replace(/\s+/g, ' ').trim().slice(0, 24)}" did not change it`;
+        if (document.activeElement !== c) return `[hit] a mouse click on the first select did not focus it (focus: ${document.activeElement ? document.activeElement.tagName.toLowerCase() + '.' + String(document.activeElement.className).split(' ')[0] : 'none'})`;
+        c.selectedIndex = (c.selectedIndex + 1) % c.options.length;
+        c.dispatchEvent(new Event('change', { bubbles: true }));
+        return 'ok';
+    }, at);
+    return res === 'ok' || res === 'gone' ? at.kind : res === 'same' ? '' : res;
 }
 
 // One check: open the panel at `vp`, read it after both tidies; then optionally resize it while open (`resizeTo`), or
@@ -418,7 +464,9 @@ async function checkSkill(app, ref, vp, mode = {}) {
         const rz = await read(`${vp.w}x${vp.h}>${mode.resizeTo}`);
         if (rz && !rz.part) walkPush(`${vp.w}x${vp.h}>${mode.resizeTo}`, [rz]);
     }
-    if (mode.change && await changeFirstOption(page)) {
+    const changed = mode.change ? await changeFirstOption(page) : '';
+    if (/^\[hit\]/.test(changed)) out.push({ ref, width: `${vp.label} option change`, fails: CHECKS.has('hit') ? [changed] : [], note: changed });
+    else if (changed) {
         await sleep(50);
         await read(`${vp.label} changed +50ms`);
         await sleep(1450);
