@@ -754,3 +754,26 @@ the dealing rules on 64 seeds (precritic lesson-samples-deal64), not 8.
 | (r5 own read) "11 - 3" beside "11 - 5" on the check; 13 - 7 / 16 - 9 at 2 of 64 seeds | PC-LR6 / PG-LR6 take-away twins (nearSubs) | covered by lesson-pg-lr6's module (no separate row) | lesson-samples-check, deal64 | 0.5 |
 | (r5 own build) a Mixed shelf measured without the page's TAB-CLEAR drop: 29.5 mm cells in 25.1 mm rows once a shelf was added (LIVE on master: identify / sub_2d_1d L Mixed cut at the frame) | PC-FRAME on every lesson (--all-lessons) | lesson-frame-all (6a9c268ce FAIL -> 4095d2e83 OK) | lesson-samples-all | 1 |
 | (r5 own read) round S Mixed Place Value printed "8 5" twice | PG-LR6 at every size, one number twice on a page | lesson-pg-lr6-size (4095d2e83 FAIL -> 5be6526e4 OK) | lesson-samples-check | 0.5 |
+
+### lf-engine PC r6 (2026-11-13, builder after critic r5 FAIL, min 6): the rules ran only where the critic had looked
+**Root cause (one class, four findings).** r5 made each rule ONE module but wired it only to the pages the r4 critic graded:
+the near-twin page rules (`pageRules`) and the place-pattern rule (`mixOrder`, PC-PV) ran only with the Prerequisite Check
+forced on, the gate read PG-LR6 / PG-LR67 only on forced builds (and its no-check branch `break`-ed before the reads), and
+`noPlaceHeads` could not tell the lesson's own skill from a partner. Live Practice / Mixed, which ship, kept every r4 defect.
+A shared-height fix (`pvLiftOf`) then tipped three L Mixed starts 0.2 mm past page 1 and the page count doubled unseen inside
+"176 hashes changed". **Rules:** (1) a rule runs on EVERY page that deals the same items, check on and off, every lesson -
+the gate's reads are one in-page pass (`collectReads`) with no FORCE gating; (2) a live change is proven by PAGE COUNTS per
+part, not hashes (ws-lesson-baseline PARTPAGES); (3) a skill dealt twice on a page (lead and partner) is a named case
+(`twinSkills`) - metadata keyed by id finds the lead for both; (4) grow a cell only by its MEASURED content (print-sheet
+measured[k].inkMm), never a padding guess.
+
+| Finding | Check that catches it | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| R1 round S Mixed Place Value T O T O T O; every check T O O T | PC-PV place pattern on every lesson page, check on and off (near-twins placeRunBad, the dealer's own reading); unit: mixOrder varies by seed | lesson-r6-pv-pattern | lesson-samples-all, -deal64, -deal64-live | 1 |
+| R2 live Practice / Mixed near twins (nearest_10 34 / 35 / 39, 40 x 3; sub_2d_1d "- 2" x 4) | PG-LR6 / PG-LR67 check OFF on every lesson (collectReads; the gate's nearKeyPair copy replaced by near-twins nearKeys) | lesson-r6-lr6-live, lesson-r6-lr67-live | lesson-samples-all, -deal64-live | 1 |
+| R3 identify's own Mixed partner lost its heads | PC-PVHEADS live: own skill keeps the heads its Practice prints, others none (cells aligned with plan items) | lesson-r6-pvheads-own | lesson-samples-all | 1 |
+| R3 "Write the value" over ring-only cells | PC-INSTR value slot on every page | lesson-r6-instr-value | lesson-samples-all | 0.5 |
+| R4 sub L Mixed 1 -> 2 pages | ws-lesson-baseline PARTPAGES (`--pages-only`; per part where the pin has `/parts`, else page totals) | lesson-r6-partpages | lesson-baseline-pages; the deploy gate's --check | 1 |
+| R4 / R5 Mixed blank foot 25 % / 22 % | PM-FOOT (lesson Mixed foot <= 15 %; master's vocab reds and combine / expand L named KNOWN, one lesson each) | lesson-r6-mixed-foot | lesson-samples-all | 0.5 |
+| P1 branch 450 commits behind master at the critic | precritic row "merged with origin/master" (FAIL when origin/master is not an ancestor of HEAD) | exempt: a moving ref - no commit pair holds its FAIL and PASS | every precritic run | 0.5 |
+| (r6 own build) `git stash` during a merge dropped MERGE_HEAD (the merge commit had to be rebuilt with commit-tree) | process rule: never stash in a worktree with a merge in progress; compare another tree with a second worktree / MQ_ROOT | - | - | 0.2 |

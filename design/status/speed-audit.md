@@ -1113,6 +1113,18 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Lost time: a stylesheet rule added for two check-on cells changed the html of 1,396 of 1,556 live pages (the lesson CSS is inlined in every page): one 14-minute baseline spent. Speed-up: a new rule travels with the page that uses it (an item flag or a `<style>` section), never in the shared lesson stylesheet - checked before the first baseline. | | | | |
 | Lost time: the 64-seed deal surfaced 3 cornered deals (seed 2628 Practice, take-away twins at 2221 / 2776) the 8-seed gate never saw. Speed-up: lesson-samples-deal64 on precritic; a page-rules run is re-dealt (12 attempts) before any rule is given up. | | | | |
 | Lost time: a shared-module change exposed a measure gap (Mixed pv shelves measured without the page's TAB-CLEAR drop). Speed-up: after a dealing change, render the packet and read every page, not only the rule counts (critic r4 speed-up 5). | | | | |
+### lf-engine PC r6 (2026-11-13, builder after critic r5 FAIL, min 6)
+| Finding | Check | Backtest | On precritic | Rounds saved |
+|---|---|---|---|---|
+| R1 place pattern on Mixed | PC-PV place pattern, every page, check on / off | lesson-r6-pv-pattern | yes (all, deal64, deal64-live) | 1 |
+| R2 live near twins | PG-LR6 / PG-LR67 check off, every lesson | lesson-r6-lr6-live, lesson-r6-lr67-live | yes (all, deal64-live) | 1 |
+| R3 own heads / value instruction | PC-PVHEADS live, PC-INSTR value slot | lesson-r6-pvheads-own, lesson-r6-instr-value | yes (all) | 1.5 |
+| R4 page count | ws-lesson-baseline PARTPAGES | lesson-r6-partpages | yes (lesson-baseline-pages) | 1 |
+| R4 / R5 foot | PM-FOOT | lesson-r6-mixed-foot | yes (all) | 0.5 |
+| Lost time: the merge's `git stash` (to run master's unit gate in place) dropped MERGE_HEAD; the merge commit was rebuilt from the resolved tree. Speed-up: compare against a detached master worktree (MQ_ROOT), never stash mid-merge. | | | | |
+| Lost time: running EVERY rule on --all-lessons surfaced ~90 reds, most master's (LIVE-PART 40, PM-H13 18, vocab PM-FOOT / PM-CONT); a master run of the same rules was needed to attribute them (~25 min). Speed-up: when a rule joins a wider scope, run it on master's tree first (MQ_ROOT) and diff the two lists. | | | | |
+| Lost time: two passes at the one-line-row growth cap (a 12 mm guess, then the measuring cell's worst gap) before using the measured content height; the H13 reading sees ~8 mm of ink in a 22 mm row. Speed-up: compute a growth cap from what the gate measures (the same boxes), never from padding. | | | | |
+
 ### Lane lf-vocab r14 (2026-11-13)
 | Round | What was lost | Cause | Fix |
 |---|---|---|---|
