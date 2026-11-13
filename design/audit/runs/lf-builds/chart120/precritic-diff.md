@@ -49,3 +49,21 @@ Card: `card.json` decisions / M-C1 / §3 note / three 2026-11-13 rulings; `ws-sp
 packet moves. (An earlier check against a stale baseline from 8a50aa9d9 showed 1184 differences; those were the master
 merge's own deploy-4 reason-it/lesson rewrite, not this lane's changes. reason-it.js on the branch differs from master by a
 comment only.)
+
+## Precritic r5 / r6 on the fix (HEAD 65166e942 for chart_to_120, a90fd31ff-era code for hundreds_chart_fill)
+
+r5 found one new item on chart_to_120 — the new Reason It TEXT form ran out of its cell at M / L (cell-checks and render-gate
+OVERFLOW 8, the two statements side by side): fixed in 65166e942 (A over B, the response beside them); r6 clean, and the
+hundreds_chart_fill band=120 thinking roles re-checked clean (`logs/r6-hcf-band120-thinking.log`).
+
+| Gate | hundreds_chart_fill (r5) | chart_to_120 (r6) | Verdict |
+|---|---|---|---|
+| cell-checks --card --card-opts | PASS | PASS | OVERFLOW lesson / guided and LONE-PAGE test cleared (ruling 1) |
+| role-hidden (new) | PASS (6 fall back, 2 controls) | PASS | ruling 1 |
+| text-misconception (new) | PASS (N/A reach: band 100) | PASS | ruling 5 |
+| card-not-offered | PASS (N-D-grid-roles-1) | SKIPPED (no block names the preset) | as before for the preset; ws-role-hidden covers its deal |
+| render-gate (+ card roles) | PASS | PASS | |
+| empty-band | FAIL 6: EB-BAND guided M/L (2), EB-SIDE review / pre-skill-check S (4) | FAIL 11: EB-BAND guided M/L (2) + lesson S/M/L p1 cells 1, 2, 4 (9) | guided + EB-SIDE: ROUTED to lf-roles (rulings 2, 3). The 9 lesson lines (template-less cells of the engine's Count on to 120 lesson page, 30-35 % under the ink) are line-identical on e1389d1f3 (`/tmp` precritic of that commit, pc-c120-final): not this fix's; not on the earlier OPEN list — **for the lead to route** (lesson engine page) |
+| sibling-compare | FAIL (13 NO-SIBLING) | FAIL (NO-SIBLING) | SKIPPED by ruling 4: the critic grades the named pages |
+| spec-card-signed | INCOMPLETE (needs owner signature) | N/A (preset not on the card's §1) | |
+| every other gate | PASS | PASS | |
