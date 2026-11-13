@@ -187,8 +187,8 @@ function packing(poolsIn, input) {
 export const pvLiftOf = (its, input, ctx, k = 0) => {
     if (!(input && input.lessonFit && ctx.size === 'L')) return 0;
     // (r6, critic r5 R5: a shelf of ONE item a row - combine's "100 + 70 + 4 = __" - is centred across the whole width and clears
-    // the tab sideways; the drop only sank it, 17 mm above and 6 mm below, and stopped the shelf growing: no lift, and its grid is
-    // marked mq-lpm1 so the page's drop rule (print-sheet.js LESSON_PM_CENTRE_CSS) leaves it out)
+    // the tab sideways; the drop only sank it, 17 mm above and 6 mm below, and stopped the shelf growing: no lift, and its cells
+    // take margin-top:0 inline (noDrop) over the page's drop rule, print-sheet.js LESSON_PM_CENTRE_CSS)
     if (k === 1) return 0;
     const pv = (its || []).filter((it) => /^pv(-support)?$/.test(String((it && it.template) || '')));
     if (!pv.length) return 0;
@@ -210,8 +210,11 @@ function bandKey(pupil, skill, skills, twins) {
 
 /* ============================================================ the MIXED arrangement (M1) */
 
-/** The class of a lesson Mixed grid of one item a row (r6): no tab drop (pvLiftOf). */
-export const LPM_ONE = 'mq-lpm1';
+/** A lesson Mixed item of a one-item row at L (r6, critic r5 R5): its place-value cell takes no tab drop - its own margin-top:0, inline,
+ *  over print-sheet.js LESSON_PM_CENTRE_CSS's drop - since a row's centred item clears the tab sideways (pvLiftOf counts none). */
+const noDrop = (it) => (typeof it.render === 'function'
+    ? Object.assign({}, it, { render: (c, o) => String(it.render(c, o)).replace(/<div class="pv-cell"(?=[ >])(?![^>]*\bstyle=)/, '<div class="pv-cell" style="margin-top:0"') })
+    : it);
 /** A shelf's shorter cell keeps at least this share of the tallest's height (H13: < 30 % empty). */
 export const MIX_H_RATIO = 0.75;
 /** lessonFit: a shelf's height less its content (cell padding 2 x 3 mm, the tab clearance, the grid's 1 mm), taken large
@@ -757,7 +760,8 @@ export function plan(input = {}) {
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
-        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start, ...(input.lessonFit && sh.k === 1 ? { cls: LPM_ONE } : {}) });
+        const one = input.lessonFit && sh.k === 1 && p.ctx.size === 'L';
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(one ? noDrop(it) : it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
         if (joins) {
             // A further shelf of the same skill on the same page: its grid under the last one.
             const prev = cur.sections[cur.sections.length - 1];

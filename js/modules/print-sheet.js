@@ -1809,8 +1809,9 @@ const LESSON_PM_CENTRE_CSS = `<style data-mq-lpmcentre>${LESSON_PM_SEL}:not(.bla
     // place-value cells ("T|O 78 -> __" runs the cell's width; the T O heads of an identify cell sit in the tab's corner) start
     // under the tab - at M / S they clear it sideways, and a 22 mm row has no room to drop them. Practice rows are tall:
     // their centred content clears the tab already.)
-    // (r6, critic r5 R5: not in a grid of one item a row - mq-lpm1, mixed-practice.js LPM_ONE - whose centred item clears the tab sideways)
-    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid:not(.mq-lpm1)>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
+    // (r6, critic r5 R5: a grid of one item a row drops nothing - mixed-practice.js noDrop sets the cell's own margin-top:0 inline, so
+    // this rule, inlined in every Practice / Mixed page, stays byte for byte)
+    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
 const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
 
 /**

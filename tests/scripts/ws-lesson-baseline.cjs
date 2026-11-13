@@ -179,7 +179,7 @@ async function inPage(page, fn, arg) {
         return;
     }
     const base = JSON.parse(fs.readFileSync(CHECK, 'utf8'));
-    const keys = Object.keys(base).filter((k) => !k.startsWith('__') && (!ONLY.length || ONLY.some((id) => k.startsWith(`${id}/`)))).sort();   // (a key the baseline lacks is not compared; --only: those lessons')
+    const keys = Object.keys(base).filter((k) => !k.startsWith('__') && (!ONLY.length || ONLY.some((id) => k.startsWith(`${id}/`) && (id.startsWith('detailed/') || SIZES.some((z) => SEEDS.some((sd) => k.startsWith(`${id}/${z}/${sd}/`))))))).sort();   // (a key the baseline lacks is not compared; --only: those lessons')
     // PARTPAGES (r6): no part prints more pages than the pin - per part where the pin has `/parts`, else the page totals
     const grew = [];
     { const builds = [...new Set(Object.keys(out).filter((k) => !k.startsWith('__')).map((k) => k.replace(/\/(pupil-p\d+|key-p\d+|pupilHtml|keyHtml|parts|p\d+|html|error)$/, '')))];
