@@ -1,7 +1,4 @@
-To eliminate this warning, add "type": "module" to /home/user/MathQuest/package.json.
-(Use `node --trace-warnings ...` to show where the warning was created)
-NOTE design/cards/chartwindow/chartwindow.md: decisions: 55 live line(s) — 43 offered, 0 hidden, 12 out of scope, 0 mixed by skill, 0 undecided; 50 PROPOSED
-FAIL design/cards/chartwindow/chartwindow.md: 8 problem(s) — the build may not start
-ws-spec-card: FAIL — design/cards/chartwindow/chartwindow.md: 8 problem(s) — the build may not start
+ws-code-snapshot: OK (735 codes, 35 categories, +163 appended since the pinned baseline of 572, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable, 3216 option round trips)
 ws-providers-unit: OK (105868 checks, 32 time and money + 24 re-graded skills + 9 siblings + 41 place-value / rounding / estimation + 4 count-by)
 ws-roles-unit: OK (87 check(s))
+ws-spec-card: FAIL — needs owner signature: design/cards/chartwindow/chartwindow.md (everything else green)
