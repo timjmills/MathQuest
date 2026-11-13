@@ -3622,6 +3622,9 @@ export function fitTwinRows(root) {
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
             const r = el.getBoundingClientRect();
+            // (an element with no box - a cell's own <style>, a hidden word waiting to drop onto vocab-pick3's line - reads as a
+            // 0,0 rect, i.e. as overflow, and shrank the drawing to 57 %: lf-vocab r5, critic r3 #4)
+            if (!r.width && !r.height) return m;
             return Math.max(m, r.right - box.right, box.left - r.left);
         }, 0);
         if (over > 1 || tw > avail + 1) {
