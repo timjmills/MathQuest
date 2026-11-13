@@ -743,7 +743,6 @@ async function checkMain() {
         { rule: 'PM-FOOT', lesson: 'placevalue:expand', size: 'L', note: 'r6: as combine - its one-line rows cannot grow under H13 (master 20 %)' },
         { rule: 'PM-FOOT', lesson: 'addition:add_wp_10', size: 'L', note: 'master live state (16 %), not changed by r6' },
         { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'L', note: 'master live state: a 3-page Mixed (17 / 24 / 72 %) - vocab lane' },
-        { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'S', note: 'master live state (19 %) - vocab lane' },
         { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_pick3_words', size: 'L', note: 'master live state (27 %) - vocab lane' },
     ];
     const known = findings.filter((x) => KNOWN.some((k) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `)));
