@@ -59,9 +59,10 @@ function cellW(p, size, pt) {
     const digits = String(top).length;
     // The 1-100 chart (its one three-digit number is 100) keeps the size's width.
     if (top <= 100) return base;
-    // Three digits (the chart to 120, band 120): to the half millimetre, so the 3 x 5 window at L is 87.5 mm and
-    // keeps 1.5 mm clear of a half-page cell's border (17.5 mm holds 120 at 22.4 pt with 2 mm either side).
-    if (digits === 3) return Math.max(base, Math.ceil((3 * 0.56 * pt * (25.4 / 72) + 4) * 2) / 2);
+    // Three digits (the chart to 120, band 120): the size's own width (15 / 16 / 17 mm). 120 at 22.4 pt is 13.3 mm, so
+    // 17 mm keeps 1.8 mm clear either side, and the 3 x 5 window (85 mm at L, as the 1-100 window) shares a row at L
+    // (measured: 87.5 and 90 mm windows printed one to a row on the independent page).
+    if (digits === 3) return Math.max(base, Math.min(17, Math.ceil(3 * 0.56 * pt * (25.4 / 72) + 3)));
     return Math.max(base, Math.ceil((digits * 0.56 + (digits >= 4 ? 0.28 : 0)) * pt * (25.4 / 72) + (digits >= 4 ? 5.5 : 4)));
 }
 /** A chart number as the page writes it: the thousands comma from 1,000 up (SC-4). */
