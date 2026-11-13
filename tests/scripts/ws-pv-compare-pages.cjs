@@ -204,7 +204,12 @@ const m6Of = (a, b, sign) => {
                         const cs = getComputedStyle(m);
                         const b = m.getBoundingClientRect();
                         let box;
-                        if (m.dataset.pvMark === 'digit') {
+                        const fr = m.dataset.pvMark === 'digit' && m.querySelector('[data-pv-box]');
+                        if (fr) {
+                            // (a drawn frame - compare r4: its border box is the mark)
+                            const fb = fr.getBoundingClientRect();
+                            box = { l: fb.left, r: fb.right, t: fb.top, b: fb.bottom, what: 'box' };
+                        } else if (m.dataset.pvMark === 'digit') {
                             const e = parseFloat(cs.outlineOffset) + parseFloat(cs.outlineWidth);
                             box = { l: b.left - e, r: b.right + e, t: b.top - e, b: b.bottom + e, what: 'box' };
                         } else {

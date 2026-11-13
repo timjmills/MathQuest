@@ -832,14 +832,13 @@ function pvRenderBody(p, ctx0) {
                     const col = (ink) => (ink === 'trace' ? '#949494' : '#000');
                     const sd = (n) => String(Math.trunc(Math.abs(Number(n))));
                     // (compare r4, critic r2 N2: the box round the deciding digit was that digit's own advance wide, so its rules ran
-                    // through the ink of the digits beside it - "4[1]7". The digit the item is decided at - and every digit of an "="
-                    // stands in 1.6 mm of room each side in EVERY state, boxed or not (the problem stands still from state to state):
-                    // the box's 0.5 mm offset and 1.5 pt rule end 0.5 mm short of its neighbours. An "=" item's "every digit" box is
-                    // one box round the whole number. The digit count over each number stands 2 mm above it (1.2 mm put the box's top
-                    // rule on the descender of "digits"). ws-pv-compare-pages MARK-CLEAR)
-                    const sA = sd(p.a), sB = sd(p.b);
-                    const decAt = sA.length !== sB.length || sA === sB ? -1 : [...sA].findIndex((d, k) => d !== sB[k]);
-                    const boxCss = (ink) => `display:inline-block;line-height:1;outline:1.5pt solid ${ink};outline-offset:0.5mm;border-radius:0.8mm;`;
+                    // through the ink of the digits beside it - "4[1]7". A boxed digit stands in 1.6 mm of room each side, and its box
+                    // - a drawn frame, 0.5 mm out to the sides and below, 0.12 em above the digit - ends 0.5 mm short of every
+                    // character it does not mark (the digit count above stands 2.6 mm over a boxed state, not 1.2). A state that draws no
+                    // box keeps the line as it was, so a Guided cell (the counts only) is neither widened nor heightened. An "=" item's "every digit" box is one box round the
+                    // whole number. ws-pv-compare-pages MARK-CLEAR)
+                    const boxed = (inner, ink, room) => `<span data-pv-mark="digit" style="position:relative;display:inline-block;line-height:1;${room ? 'margin:0 1.6mm;' : ''}">${inner}`
+                        + `<span data-pv-box="1" style="position:absolute;left:-0.5mm;right:-0.5mm;top:-0.12em;bottom:-0.5mm;border:1.5pt solid ${ink};border-radius:0.8mm;"></span></span>`;
                     const side = (n, who) => {
                         let di = 0;
                         const all = !!mk.digits && mk.digits.value === 'all';
@@ -847,12 +846,11 @@ function pvRenderBody(p, ctx0) {
                             if (!/\d/.test(ch)) return esc(ch);
                             const i = di++;
                             const on = !all && !!mk.digits && Number(mk.digits.value) === i;
-                            if (!on && decAt !== i) return ch;
-                            return `<span${on ? ' data-pv-mark="digit"' : ''} style="${boxCss(on ? col(mk.digits.ink) : 'transparent')}margin:0 1.6mm;">${ch}</span>`;
+                            return on ? boxed(ch, col(mk.digits.ink), true) : ch;
                         }).join('');
-                        const body = all ? `<span data-pv-mark="digit" style="${boxCss(col(mk.digits.ink))}">${body0}</span>` : body0;
+                        const body = all ? boxed(body0, col(mk.digits.ink), false) : body0;
                         const len = sd(n).length;
-                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:2mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
+                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:${mk.digits ? 2.6 : 1.2}mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
                         const win = mk.win && mk.win.value === who;
                         return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
                             + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.3mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
