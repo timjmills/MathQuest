@@ -3232,7 +3232,7 @@
     "state": "the legacy place chart: no [data-ws-cell=words] on the card, empty tens / ones boxes beside the input"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "the kit words cell on every host, the input in its line"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
@@ -3252,7 +3252,7 @@
     "state": "every H T O box empty on the pupil page; the key marks False against nothing"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "the claim one digit a box"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
@@ -3272,7 +3272,7 @@
     "state": "the traced state drew an empty answer line on every Model"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "the answer traced in grey"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
@@ -3292,7 +3292,7 @@
     "state": "the two-line name box was a flex box: the space between the text run and the underlined span dropped"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "the name one inner span"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
@@ -3312,7 +3312,7 @@
     "state": "'seven / hundred eight', 'seven / hundred nine' at band 1000"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "'seven hundred' kept on one line"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
@@ -3332,7 +3332,7 @@
     "state": "'one hundred' in a two-line box, its line 5 mm under its row (test S)"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "only a name long enough to wrap takes the two-line box"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
@@ -3352,7 +3352,7 @@
     "state": "the default deal had no boxes; the practice deal gave 1000 four boxes"
    },
    "pass": {
-    "commit": "3d927dbf",
+    "commit": "35bc76fe",
     "state": "'Every box gets a digit.', the lesson deals its practice options"
    },
    "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-box",
