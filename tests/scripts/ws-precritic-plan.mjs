@@ -39,6 +39,14 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TOOL = 'ws-precritic-plan';
 const args = process.argv.slice(2);
+// --capacity-pin <file>: ONLY the capacity-roles check on that pin (the backtest's fixtures), then exit
+if (args.includes('--capacity-pin')) {
+    const r = spawnSync(process.execPath, [join(dirname(fileURLToPath(import.meta.url)), 'ws-capacity-pin.cjs'), '--roles-check', '--pin', args[args.indexOf('--capacity-pin') + 1]], { encoding: 'utf8' });
+    const line = String(r.stdout || '').trim().split('\n').pop() || String(r.stderr || '').slice(0, 200);
+    console.log(`  ${line}`);
+    console.log(r.status === 0 ? 'ws-precritic-plan: OK (capacity roles)' : 'ws-precritic-plan: FAIL (capacity roles)');
+    process.exit(r.status === 0 ? 0 : 1);
+}
 // tools that are drivers or wrappers, never the check under test
 const WRAPPERS = new Set(['ws-backtest', 'ws-precritic', 'ws-precritic-plan']);
 
@@ -441,6 +449,17 @@ else if (args.includes('--checks-from-critics')) {
             console.log(`  ${leak ? 'FAIL' : 'OK  '} opt-in ${lane.lane}: not on another skill's plan (${other})`);
             if (leak) fails.push(`opt-in ${lane.lane}: ws-precritic --skill ${other} --dry-run carries --rule-skills (the lane's rules leak onto another skill)`);
         }
+    }
+    // CAPACITY ROLES (lead 2026-11-13, lf-roles): every role that draws a grid has pinned pages in the capacity pin, so no role sits
+    // outside CAPACITY-NO-DROP / SIZE-ORDER (Guided was, and printed fewer items at S than at M on 12 passed pages);
+    // --capacity-pin <file> checks another pin (the backtest's fixture)
+    {
+        checked++;
+        const pinArg = args.includes('--capacity-pin') ? ['--pin', args[args.indexOf('--capacity-pin') + 1]] : [];
+        const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-capacity-pin.cjs'), '--roles-check', ...pinArg], { cwd: ROOT, encoding: 'utf8' });
+        const line = String(r.stdout || '').trim().split('\n').pop() || String(r.stderr || '').slice(0, 200);
+        console.log(`  ${r.status === 0 ? 'OK  ' : 'FAIL'} capacity-roles                 ${line}`);
+        if (r.status !== 0) fails.push(`capacity-roles: ${line}`);
     }
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
     // the ledger sweep rides along on the default run (its rows' path verdicts are the ones just computed); --no-sweep skips it

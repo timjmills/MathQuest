@@ -6098,6 +6098,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "capacity-roles",
+  "check": "every role that draws a grid has pinned pages, so none sits outside CAPACITY-NO-DROP / SIZE-ORDER (lead 2026-11-13: Guided was, and printed fewer items at S than M on 12 passed pages)",
+  "kind": "fixture",
+  "rule": "ws-precritic-plan capacity-roles (ws-capacity-pin --roles-check)",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/capacity-roles.fail.json",
+   "state": "a pin with no guided page"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/capacity-roles.pass.json",
+   "state": "a page per grid role"
+  },
+  "command": "node tests/scripts/ws-precritic-plan.mjs --capacity-pin {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
