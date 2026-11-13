@@ -177,6 +177,22 @@ function cellChecksInPage(opts) {
                     if (sig(boxes[0]) === sig(boxes[1])) out.findings.push({ rule: 'RI-DISTINCT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': panels A and B show the same work (PT-RSN-4: two different worked solutions)' });
                 }
             }
+            // ---- ABTAG (critic r6g): a Reason It panel's A / B tag stands clear of the work's ink - 2 mm at least where they share rows
+            if (role === 'reason-it') {
+                c.querySelectorAll('.mq-abbox').forEach(function (bx) {
+                    var tg = bx.querySelector('.mq-abtag'); if (!tg) return;
+                    var tr = tg.getBoundingClientRect(), hit = '';
+                    [].forEach.call(bx.querySelectorAll('*'), function (e) {
+                        if (hit || e === tg || tg.contains(e) || !shownEl(e)) return;
+                        var cs = getComputedStyle(e), own = [].some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
+                        var ink = own || (cs.borderTopStyle !== 'none' && parseFloat(cs.borderTopWidth) > 0) || /svg/i.test(e.tagName);
+                        if (!ink) return;
+                        var r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+                        if (r.top < tr.bottom - 0.5 && r.bottom > tr.top + 0.5 && r.left < tr.right + 2 * PX && r.right > tr.left) hit = (e.textContent || e.tagName).trim().slice(0, 12);
+                    });
+                    if (hit) out.findings.push({ rule: 'ABTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the A / B tag touches the work ("' + hit + '" within 2 mm)' });
+                });
+            }
             // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
             // so the single grey never reads as "trace me"
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {

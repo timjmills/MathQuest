@@ -30,7 +30,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -72,6 +72,8 @@ function selfTest() {
         { name: 'a "Sam wrote:" label 20 mm over its work (PUPILTAG distance)', html: page(cell({ h: 60, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:20mm;color:#949494">48</span></div></div></div>')), want: 'PUPILTAG' },
         { name: 'an added answer under the minus sign (SIGNMATCH)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 13</div></div></div>')), want: 'SIGNMATCH', role: 'reason-it' },
         { name: 'Reason It panels A and B show the same work (RI-DISTINCT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 29</div></div></div>')), want: 'RI-DISTINCT', role: 'reason-it' },
+        { name: 'a Reason It tag on the first term (ABTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:5mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">x</div></div></div>')), want: 'ABTAG', role: 'reason-it' },
+        { name: 'a Reason It tag clear of the work (ABTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:12mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">y</div></div></div>')), want: null, role: 'reason-it', rules: ['ABTAG'] },
         { name: 'Reason It panels differ (RI-DISTINCT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 39</div></div></div>')), want: null, role: 'reason-it', rules: ['RI-DISTINCT'] },
         { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
         { name: 'a key word past its line (KEYFIT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:8mm;white-space:nowrap;overflow:visible">hundreds</span></div></div>')), want: 'KEYFIT', key: true },
