@@ -1246,6 +1246,11 @@ function _gridOptions() {
             values: [{ v: 'window', l: 'A small piece (3 rows of 5)' }, { v: 'rows', l: 'Three whole rows of ten' },
                 { v: 'whole', l: 'The whole chart (to "Numbers to")' }],
             help: 'A small piece is cut from anywhere in the chart. Whole rows of ten show the down-ten pattern in full. The whole chart is one grid to a page.',
+            // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): the whole chart and three rows of ten are
+            // one chart to a page by design, so they stay on Independent, More practice and the simple print; the Lesson,
+            // Guided and Test pages share the page with Steps / a Model / other items and draw the window instead
+            // (optsForRole). ws-role-hidden holds every role's deal to this.
+            hiddenOnRoles: { lesson: ['rows', 'whole'], guided: ['rows', 'whole'], test: ['rows', 'whole'] },
         },
         {
             id: 'gaps', label: 'Empty squares', type: 'enum', default: 'scatter', group: 'difficulty',
@@ -3921,6 +3926,43 @@ export function offeredOptionsFor(categoryId, skillId) {
 }
 
 /** The defaults for a skill: what it generates when the teacher chooses nothing. */
+/**
+ * The option values a page ROLE must not deal (an option def's `hiddenOnRoles: {role: [values]}`): {optionId: [values]}.
+ * A role-scoped hidden decision of a signed card (§7a `roles`) is mirrored here; ws-role-hidden checks the two agree and
+ * that the role's deal never holds a hidden value.
+ */
+export function roleHiddenValues(categoryId, skillId, role) {
+    const out = {};
+    if (!role) return out;
+    for (const def of optionsFor(categoryId, skillId)) {
+        const vs = def && def.hiddenOnRoles && def.hiddenOnRoles[role];
+        if (Array.isArray(vs) && vs.length) out[def.id] = vs.slice();
+    }
+    return out;
+}
+
+/**
+ * A skill's opts as a page ROLE deals them: a value the role hides (`hiddenOnRoles`) falls back to the option's default
+ * (grid whole / rows on a Lesson, Guided or Test page draw the window). Other values pass through untouched.
+ */
+export function optsForRole(categoryId, skillId, opts, role) {
+    const hid = roleHiddenValues(categoryId, skillId, role);
+    const ids = Object.keys(hid);
+    if (!ids.length || !opts || typeof opts !== 'object') return opts;
+    // a preset's own values count too (chart_to_120 is hundreds_chart_fill with band 120): read through normalizeOptions
+    let norm;
+    try { norm = normalizeOptions(categoryId, skillId, opts); } catch (e) { norm = opts; }
+    let out = opts;
+    for (const id of ids) {
+        const v = id in opts ? opts[id] : norm[id];
+        if (!hid[id].some((h) => String(h) === String(v))) continue;
+        const def = optionsFor(categoryId, skillId).find((d) => d.id === id);
+        if (out === opts) out = { ...opts };
+        out[id] = def ? def.default : undefined;
+    }
+    return out;
+}
+
 export function defaultOptions(categoryId, skillId) {
     const out = {};
     for (const o of optionsFor(categoryId, skillId)) out[o.id] = o.default;

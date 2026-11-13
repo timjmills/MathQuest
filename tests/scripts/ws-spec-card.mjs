@@ -859,6 +859,10 @@ function configShaOf(cfg) { return sha1(JSON.stringify(cfg)).slice(0, 12); }
  * DECISIONS live in card.json `decisions` {options, roles, hosts}: arrays of
  *   {"key": "notation=across", "d": "offered"|"hidden"|"out of scope", "why": "...", "source": "§5.8",
  *    "skills": ["cat:skill", ...]?   only these skills (a decision for one skill beats one for all),
+ *    "roles": ["lesson", ...]?       ROLE-SCOPED (a `hidden` option decision only, lead 2026-11-13): the values stay
+ *                                    offered (another entry decides the line) but these page roles never deal them; it
+ *                                    becomes a notOffered entry with `roles` (ws-card-rulings --check offered holds the
+ *                                    option's `hiddenOnRoles` to it; ws-role-hidden holds the role's deal to it),
  *    "proposed": true?}              pre-filled for the lead, not yet confirmed: signing the card accepts it
  * or {"option": "nlStep", "values": ["1", "2", ...], "d": ...} for several values of one option at once (values are
  * listed, never wildcarded, so a NEW value is an undecided line; "*" is the free-number line's own value). The
@@ -876,7 +880,7 @@ export function expandDecisions(cfg) {
     for (const [g] of DEC_GROUPS) {
         for (const e of dec[g] || []) {
             const keys = e.option ? (e.values || []).map((v) => `${e.option}=${v}`) : [g === 'options' ? e.key : `${g === 'roles' ? 'role' : 'host'}:${String(e.key).replace(/^(role|host):/, '')}`];
-            for (const key of keys) out.push({ group: g, key, d: e.d, why: e.why || '', source: e.source || '', skills: e.skills || null, proposed: !!e.proposed });
+            for (const key of keys) out.push({ group: g, key, d: e.d, why: e.why || '', source: e.source || '', skills: e.skills || null, proposed: !!e.proposed, roles: Array.isArray(e.roles) && e.roles.length ? e.roles.map((r) => String(r).replace(/^role:/, '')) : null });
         }
     }
     return out;
@@ -887,12 +891,14 @@ function decisionProblems(cfg) {
     for (const e of expandDecisions(cfg)) {
         if (!DECISIONS.includes(e.d)) out.push(`decision "${e.key}": "${e.d}" is not one of ${DECISIONS.join(' / ')}`);
         if (e.group === 'options' && !/^[\w-]+=.+$/.test(e.key)) out.push(`decision "${e.key}": an option decision is "option=value" (or {option, values})`);
+        if (e.roles && (e.group !== 'options' || e.d !== 'hidden')) out.push(`decision "${e.key}": "roles" scopes a HIDDEN option decision only`);
     }
     return out;
 }
 /** The decision for one live line on one skill: the most specific entry (skills named beats all skills), else null. */
 function decisionFor(decs, key, skill) {
-    const hit = decs.filter((e) => e.key === key);
+    // (a role-scoped entry refines a line another entry decides: it never decides the line itself)
+    const hit = decs.filter((e) => e.key === key && !e.roles);
     return hit.find((e) => e.skills && e.skills.includes(skill)) || hit.find((e) => !e.skills) || null;
 }
 /**
@@ -927,8 +933,9 @@ export function hiddenNotOffered(cfg) {
         if (e.group !== 'options' || e.d !== 'hidden') continue;
         const [opt, ...rest] = e.key.split('='); const v = rest.join('=');
         const scope = (e.skills || []).slice().sort().join(',');
-        const k = `${opt}|${scope}`;
-        if (!by.has(k)) by.set(k, { id: `N-D-${opt}${scope ? `-${by.size + 1}` : ''}`, source: `§7a (decision${e.proposed ? ', PROPOSED' : ''}: ${e.source || 'card'})`, option: opt, values: [], ...(e.skills ? { skills: e.skills.slice().sort() } : {}), any: false });
+        const rs = (e.roles || []).slice().sort().join(',');
+        const k = `${opt}|${scope}|${rs}`;
+        if (!by.has(k)) by.set(k, { id: `N-D-${opt}${rs ? '-roles' : ''}${scope ? `-${by.size + 1}` : ''}`, source: `§7a (decision${e.proposed ? ', PROPOSED' : ''}: ${e.source || 'card'})`, option: opt, values: [], ...(e.skills ? { skills: e.skills.slice().sort() } : {}), ...(rs ? { roles: rs.split(',') } : {}), any: false });
         const x = by.get(k);
         if (v === '*') x.any = true; else x.values.push(v);
         // a hidden on/off control (both values) is the whole control hidden: notOffered names the option alone
@@ -943,7 +950,7 @@ function signedEntriesOf(cfg) {
     const out = {};
     for (const x of r.rulings || []) out[`R:${x.id}`] = sha1(JSON.stringify(x)).slice(0, SHA_LEN);
     for (const x of r.notOffered || []) out[`N:${x.id}`] = sha1(JSON.stringify(x)).slice(0, SHA_LEN);
-    for (const e of expandDecisions(cfg)) out[`D:${e.key}${e.skills ? `@${e.skills.slice().sort().join(',')}` : ''}`] = sha1(JSON.stringify([e.d, e.proposed])).slice(0, SHA_LEN);
+    for (const e of expandDecisions(cfg)) out[`D:${e.key}${e.skills ? `@${e.skills.slice().sort().join(',')}` : ''}${e.roles ? `#${e.roles.slice().sort().join(',')}` : ''}`] = sha1(JSON.stringify([e.d, e.proposed])).slice(0, SHA_LEN);
     return out;
 }
 /** §7a: the signed decisions, from card.json, one line per entry (several values of one option on one line). */
@@ -959,7 +966,7 @@ function decisionsSection(cfg) {
         for (const e of list) {
             n++;
             const key = e.option ? `${e.option}=${(e.values || []).join(' | ')}` : String(e.key);
-            L.push(`- \`${key}\` — **${e.d}**${e.proposed ? ' (PROPOSED)' : ''}${e.skills ? ` on ${e.skills.map((s) => `\`${s.split(':')[1]}\``).join(', ')}` : ''}${e.why ? ` — ${e.why}` : ''}${e.source ? ` (${e.source})` : ''}`);
+            L.push(`- \`${key}\` — **${e.d}**${e.proposed ? ' (PROPOSED)' : ''}${e.skills ? ` on ${e.skills.map((s) => `\`${s.split(':')[1]}\``).join(', ')}` : ''}${Array.isArray(e.roles) && e.roles.length ? ` on the role${e.roles.length > 1 ? 's' : ''} ${e.roles.map((r) => `\`${String(r).replace(/^role:/, '')}\``).join(', ')} only` : ''}${e.why ? ` — ${e.why}` : ''}${e.source ? ` (${e.source})` : ''}`);
         }
         L.push('');
     }

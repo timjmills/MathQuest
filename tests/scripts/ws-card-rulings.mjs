@@ -42,7 +42,8 @@
 //   The operands come from q.cell.payload.operands, else q.a / q.b, else the first "a − b" / "a + b" of q.text; ans
 //   is q.ans. An item none of these read is a FAIL (the ruling cannot be checked), never a skip.
 //   NOT OFFERED: offeredOptionsFor(category, skill) (js/modules/skill-options.js: what the panel shows) must not carry
-//   the option id (no "values"), or must not carry any of the listed values.
+//   the option id (no "values"), or must not carry any of the listed values. An entry with "roles" (a role-scoped hidden
+//   decision, card §7a) instead needs the option's `hiddenOnRoles` to hide every listed value on every listed role.
 //
 // Last line `ws-card-rulings: OK (...)` or `ws-card-rulings: FAIL - ...`; exit 1 on FAIL (0 with --report-only), 2 on a
 // usage / setup error. A --skill scope that no card rules on prints `ws-card-rulings: NO-RULINGS (...)`, exit 4:
@@ -321,6 +322,19 @@ async function main() {
                 let offered;
                 try { offered = app.so.offeredOptionsFor(category, skill) || []; } catch (e) { fail(Object.assign(head, { msg: `offeredOptionsFor threw: ${e.message}` })); continue; }
                 const o = offered.find((d) => d && d.id === n.option);
+                // a ROLE-SCOPED entry (card §7a `roles`, lead 2026-11-13): the panel still offers the values, but the option
+                // must hide them on those roles (`hiddenOnRoles`, which print-sheet's optsForRole falls back from); the
+                // role's deal itself is ws-role-hidden's (browser) check
+                if (Array.isArray(n.roles) && n.roles.length) {
+                    let def;
+                    try { def = (app.so.optionsFor(category, skill) || []).find((d) => d && d.id === n.option); } catch (e) { def = null; }
+                    if (!def) { pass(Object.assign(head, { msg: `${n.option} not an option (nothing to deal on ${n.roles.join(', ')})` })); continue; }
+                    const vals = n.values || (def.values || []).map((v) => (v && typeof v === 'object' ? v.v : v));
+                    const miss = [];
+                    for (const r of n.roles) for (const v of vals) if (!((def.hiddenOnRoles || {})[r] || []).some((x) => String(x) === String(v))) miss.push(`${r}:${v}`);
+                    (miss.length ? fail : pass)(Object.assign(head, { msg: miss.length ? `${n.option} does not hide ${miss.join(', ')} on its roles (skill-options.js hiddenOnRoles), which the card hides there` : `${n.option} = ${vals.join(', ')} hidden on ${n.roles.join(', ')} (hiddenOnRoles)` }));
+                    continue;
+                }
                 if (!o) { pass(Object.assign(head, { msg: `${n.option} not offered` })); continue; }
                 if (!n.values) { fail(Object.assign(head, { msg: `offers "${n.option}" (${o.label || ''}${Array.isArray(o.values) ? `: ${o.values.map((v) => (v && typeof v === 'object' ? v.v : v)).join(' / ')}` : ''}), which the card lists as not offered` })); continue; }
                 const vals = (o.values || []).map((v) => (v && typeof v === 'object' ? v.v : v));

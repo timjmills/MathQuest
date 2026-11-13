@@ -28,7 +28,7 @@ import { solvePracticeFromPack } from './lessons/pack-solve.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
-import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
+import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX, optsForRole } from './skill-options.js';
 import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
@@ -268,6 +268,15 @@ function normaliseRequest(req = {}) {
             ...(s && Number(s.blockShare) > 0 ? { blockShare: Number(s.blockShare) } : {}),
         }))
         .filter((s) => s.skills.length);
+    // Lead ruling 2026-11-13 (chartwindow card §7a, role-scoped hidden): an option value the ROLE hides (`hiddenOnRoles`,
+    // grid whole / rows on Lesson, Guided, Test) falls back to the option's default, so the role never deals or draws it.
+    for (const sec of sections) {
+        sec.skills = sec.skills.map((k) => {
+            let o;
+            try { o = optsForRole(k.categoryId, k.skillId, k.opts || {}, role); } catch (e) { o = k.opts; }
+            return o === k.opts || (o && k.opts === undefined && !Object.keys(o).length) ? k : { ...k, opts: o };
+        });
+    }
     // (critic r8 D8-2) a skill held to the owner's page ceiling (PAGE_CAP) fills its page by the
     // problems' size: its rows share the whole grid instead of leaving a strip under capped rows.
     // The ceiling is the section's own dense ceiling too, so the grid is laid for that count.

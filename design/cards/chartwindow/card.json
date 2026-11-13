@@ -54,7 +54,7 @@
       "Key (AK-1, AK-2): the same window with each answer written bold in its own square; values joined ', ' in reading order (`q.ans`).",
       "Screen: every empty square is `data-mq-cell` (its own input). A 3 x 5 window fits the card at 390 / 820 / 1280, the online worksheet and the quiz; a row of ten (grid=rows / whole, band 10) stays one row of ten and swipes inside its cell on a phone (SP-11a), sized from its digits above a phone (SP-12a: `--mq-chd` 3 at band 120, squares 3 x 0.58 em + 10 px wide).",
       "Title and words follow the band (L6, L28): at band 120 the I Can reads 'I Can find missing numbers on a chart to 120' (not 'a hundreds chart'), chosen from the options when the page asks with no item; the worked steps already read only numbers the window prints.",
-      "Distractors (wrongAnswer) at band 120: the new misconception 'writes-ten-ten' (110 written 1010, 101 written 1001, 100 written 1000) joins wrong-row and one-less; reversed-digits stays for two-digit answers only."
+      "Distractors at band 120 (lead ruling 2026-11-13, §5.5): wrongAnswer (drawn IN the chart square: error analysis, True or False?, Reason It's drawn pairs) deals wrong-row and one-less; reversed-digits stays for two-digit answers only. The misconception 'writes-ten-ten' (110 written 1010, 101 written 1001, 100 written 1000) is RE-SCOPED, not dropped: never inside a three-digit chart square (four digits printed '1,011' over the next square, True or False? L), it is taught in TEXT - Reason It's statements in words (provider wrongText; the chart once above, A / B 'The missing number is 110.' / '... 1010.', the answer slot as wide as four digits) - and on the screen practice card (typing 1010 names the error). ws-text-misconception holds both: it reaches the card and Reason It within 16 seeds, and no chart square ever holds more digits than its window's widest number."
     ]
   },
   "ruleGroups": [
@@ -179,13 +179,34 @@
       "date": "2026-10-17",
       "ruling": "A distinct option is ALSO a findable skill when it is a distinct new difficulty or skill (a harder size class, a new task kind); small tweaks stay plain options. chart_120 is checked against this rule in open question 1.",
       "source": "owner rule, CLAUDE.md"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "grid=whole and grid=rows (one chart to a page by design) are HIDDEN on the Lesson, Guided and Test roles: those roles never deal or draw them and fall back to the window. They stay offered on Independent, More practice and the simple print.",
+      "source": "lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 1); §7a role-scoped decision; ws-role-hidden"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "'writes-ten-ten' (110 written 1010) is RE-SCOPED, not dropped: it is still taught on the screen practice card and in Reason It's TEXT (a worked-wrong statement in words, a wrong number in a slot wide enough for four digits), but never inside a three-digit chart square.",
+      "source": "lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 5); §3 notes, §6 M-C1; ws-text-misconception"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "Routed, not this card's: the Guided Model-row band (EB-BAND guided M/L, the shared Guided layout) and the review / pre-skill-check counters band (EB-SIDE 4, known master debt) go to lane lf-roles; sibling-compare stays SKIPPED (first family on the template: the critic grades the named pages).",
+      "source": "lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 2-4)"
     }
   ],
   "misconceptions": [
     {
       "id": "M-C1",
-      "error": "writes the number as it is said, ten by ten (place value not yet three digits)",
-      "wrong": "110 written 1010; 101 written 1001; 100 written 1000 or 10 0"
+      "error": "writes the number as it is said, ten by ten (place value not yet three digits); taught in TEXT only (Reason It statements, the screen practice card), never in a chart square (lead ruling 2026-11-13, §5.5)",
+      "wrong": "110 written 1010; 101 written 1001; 100 written 1000 or 10 0",
+      "textOnly": {
+        "skills": [
+          "composing:chart_to_120"
+        ],
+        "where": "Reason It (provider wrongText) and the screen practice card (distractorTags); ws-text-misconception"
+      }
     },
     {
       "id": "M-C2",
@@ -367,7 +388,25 @@
           "composing:hundreds_chart_fill"
         ],
         "source": "skill-options.js _gridOptions (Wave 1 lane C)",
-        "why": "O6: a 3 x 5 piece / three rows of ten / the whole chart (12 rows at band 120, one cell to a page)"
+        "why": "O6: a 3 x 5 piece / three rows of ten / the whole chart (12 rows at band 120, one cell to a page); rows / whole are one chart to a page, so they are offered on Independent, More practice and the simple print and hidden on Lesson, Guided and Test (the next decision)"
+      },
+      {
+        "option": "grid",
+        "values": [
+          "rows",
+          "whole"
+        ],
+        "d": "hidden",
+        "roles": [
+          "lesson",
+          "guided",
+          "test"
+        ],
+        "skills": [
+          "composing:hundreds_chart_fill"
+        ],
+        "source": "lead ruling 2026-11-13 (chart_120 precritic OPEN 1; §5.4)",
+        "why": "three rows of ten and the whole chart are one chart to a page by design; on a Lesson (beside the Steps and the anchor chart), a Guided page (under the Model) and a Test (many items a page) they overflowed (OVERFLOW lesson 18 / 24, guided 8-12) or printed one item a page (LONE-PAGE test 3). These roles never deal them: the option falls back to the window (skill-options.js hiddenOnRoles, print-sheet optsForRole); ws-role-hidden holds every hidden role's deal to it"
       },
       {
         "option": "gaps",
@@ -459,7 +498,7 @@
         "d": "offered",
         "proposed": true,
         "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
-        "why": "provider wrongAnswer real; band 120 adds 'writes-ten-ten' (1010 for 110)"
+        "why": "provider wrongAnswer real; band 120 deals wrong-row and one-less in the square; 'writes-ten-ten' (1010 for 110) is never drawn in a three-digit chart square (lead ruling 2026-11-13, §5.5)"
       },
       {
         "key": "role:review",
@@ -487,14 +526,14 @@
         "d": "offered",
         "proposed": true,
         "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
-        "why": "provider wrongAnswer real"
+        "why": "provider wrongAnswer real; 'writes-ten-ten' is never drawn in a chart square (lead ruling 2026-11-13, §5.5)"
       },
       {
         "key": "role:reason-it",
         "d": "offered",
         "proposed": true,
         "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
-        "why": "provider workedSteps and wrongAnswer real"
+        "why": "provider workedSteps and wrongAnswer real; band 120 also states 'writes-ten-ten' in WORDS (provider wrongText: A / B are 'The missing number is 110.' / '... 1010.', the chart drawn once above, the answer slot as wide as four digits; lead ruling 2026-11-13, §5.5)"
       },
       {
         "key": "role:stretch",

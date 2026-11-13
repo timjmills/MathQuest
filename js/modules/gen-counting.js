@@ -975,6 +975,15 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // The chart's real error: moving ten (down a column) where the gap is one along the row.
         const wrongFirst = blanks[0] + 10 <= top ? blanks[0] + 10 : blanks[0] - 10;
         q.distractorTags = { [[wrongFirst, ...blanks.slice(1)].join(', ')]: 'moved ten instead of one along the row' };
+        // chart_120 (card chartwindow M-C1 'writes-ten-ten', lead ruling 2026-11-13): the screen practice card names the
+        // error of writing 100-120 as it is said (110 -> 1010) when the pupil types it; it is never drawn in a chart square
+        if (_to120) {
+            const tt = blanks.findIndex((n) => n >= 100 && n <= 120);
+            if (tt >= 0) {
+                const n = blanks[tt], w = `10${String(n - 100).padStart(2, '0')}`;
+                q.distractorTags[blanks.map((x, i) => (i === tt ? w : x)).join(', ')] = `wrote ${n} as it is said (${w}): ${n} has three digits, 1 hundred, ${Math.floor((n - 100) / 10)} ten${Math.floor((n - 100) / 10) === 1 ? '' : 's'} and ${n % 10} one${n % 10 === 1 ? '' : 's'}`;
+            }
+        }
         _kSetCell(q, 'chartwindow', { rows, cols, blanks });
         q.skillLabel = big ? "Number Chart Fill" : _to120 ? "120-Chart Fill" : "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";

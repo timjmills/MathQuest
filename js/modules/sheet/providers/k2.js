@@ -404,13 +404,31 @@ registerSkill('composing:hundreds_chart_fill', {
         const c = [{ value: t <= 90 ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const rev = num(String(t).split('').reverse().join(''));
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
-        // (chart_120, card M-C1 'writes-ten-ten' - 110 written 1010 - is NOT dealt in a chart square: four digits at the
+        // (chart_120, card M-C1 'writes-ten-ten' - 110 written 1010 - is NEVER dealt in a chart square: four digits at the
         // working size are 17.7 mm at L, wider than the 17 mm square, and printed '1,011' over the next square on True or
-        // False? L (ws-empty-band EB-EDGE, lf-builds chart_120 fix). Open for the lead: the card's §3 / §7a line.)
+        // False? L (ws-empty-band EB-EDGE). Lead ruling 2026-11-13: it is taught in TEXT instead - `wrongText` below, Reason
+        // It's worked-wrong statement in words - and on the screen practice card (gen-counting distractorTags).)
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
         return chooseWrong(q, c);
     },
+    // Lead ruling 2026-11-13 (card chartwindow M-C1, re-scoped): the wrong answer a TEXT panel shows (Reason It's statement in
+    // words, its answer slot as wide as four digits), never a chart square: 110 written as it is said, "one hundred, ten" ->
+    // 1010. Band 120 items with a gap at 100 to 120 only.
+    wrongText: (q) => {
+        if (!chartTo120({ q })) return null;
+        const parts = (Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : [q.ans]).map(num);
+        const at = parts.findIndex((t) => Number.isFinite(t) && t >= 100 && t <= 120);
+        if (at < 0) return null;
+        const t = parts[at];
+        const w = tenTen(t);
+        const value = parts.map((x, i) => (i === at ? w : x)).join(', ');
+        return { value, misconception: 'writes-ten-ten', explain: `Wrote ${t} as it is said, ${w}: ${t} has three digits.`,
+            statement: parts.length === 1 ? `The missing number is ${w}.` : `The missing numbers are ${value}.`,
+            rightStatement: parts.length === 1 ? `The missing number is ${t}.` : `The missing numbers are ${parts.join(', ')}.` };
+    },
 });
+/** 100 to 120 written as it is said (card chartwindow M-C1 'writes-ten-ten'): 100 -> 1000, 101 -> 1001, 110 -> 1010. */
+export function tenTen(t) { return Number(`10${String(t - 100).padStart(2, '0')}`); }
 
 // The same window cut from the chart of the hundreds and the thousands (owner, 2026-09-25).
 // Its real errors: the number from the wrong row (ten off), the number before, and a place-value

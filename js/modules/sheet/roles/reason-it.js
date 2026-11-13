@@ -19,7 +19,9 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern, answerPlace, answerPlaceHtml, answerFrameCls,
+    esc,
 } from './compose.js';
+import { getProvider } from '../index.js';
 
 export const ROLE_ID = 'reason-it';
 const ROWS = { S: 4, M: 3, L: 2 };
@@ -29,9 +31,28 @@ export const measureCols = () => [1];
 
 const TRUE_W = new Set(['equation', 'stack', 'word-work', 'count-row']);
 
+/**
+ * A provider's TEXT-only wrong answer (`wrongText`, contract OPTIONAL_MEMBERS): a misconception whose wrong number does not
+ * fit the cell's own writing place (chart_120 'writes-ten-ten', 1010 in a three-digit chart square; lead ruling 2026-11-13).
+ * Reason It shows it as a statement in words beside the right one, never drawn in the cell. Null when none.
+ */
+function wrongTextOf(it, correct) {
+    const q = it.q || {};
+    let w = null;
+    try { const p = getProvider(q.categoryId || '', q.skillId || ''); w = typeof p.wrongText === 'function' ? p.wrongText(q) : null; } catch (e) { w = null; }
+    if (!w || w.value === undefined || w.value === null || !w.statement || !w.rightStatement) return null;
+    const v = String(w.value);
+    if (v.replace(/\s+/g, '') === String(correct).replace(/\s+/g, '')) return null;
+    return Object.assign({}, w, { value: v, display: v, text: true });
+}
+
 export function prepare(it, info = {}) {
     const correct = answerOf(it);
-    const wrong = correct ? wrongOf(it) : null;
+    // (lead ruling 2026-11-13, chart_120: a TEXT-only misconception takes half the items that have one, seeded, so the page
+    // teaches it in words while every other misconception keeps its drawn panels)
+    const wt = correct ? wrongTextOf(it, correct) : null;
+    const useText = !!wt && rng(deriveSeed(info.seed === undefined ? 0 : info.seed, `${ROLE_ID}-text`, info.index || 0))() < 0.5;
+    const wrong = useText ? wt : (correct ? wrongOf(it) || wt : null);
     if (!wrong) return null;
     // Which letter holds the right answer is a seeded half-and-half pattern over the page
     // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
@@ -79,6 +100,27 @@ export function prepare(it, info = {}) {
     // (a sentence story is a story too: its number sentence fits half the cell, so it lays out like a column story - it stacked,
     // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)
     const story1 = sentence || column;
+    // TEXT mode (a `wrongText` answer): the item drawn ONCE on top, its writing places empty; A and B are statements in words
+    // ("The missing number is 110." / "The missing number is 1010."), side by side; the response row under them, its answer
+    // slot as wide as the wrong number (answerPlace above reads it)
+    if (wrong.text) {
+        const statement = (isRight) => `<div class="mq-frame" style="padding-left:9mm">${esc(isRight ? wrong.rightStatement : wrong.statement)}</div>`;
+        const respT = (c) => `<div class="mq-abresp" style="grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm">`
+            + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
+            + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
+            + `</div>`;
+        const renderT = (c, o = {}) => `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { prompt: false }))}</div>`
+            + `<div class="mq-ab" data-ws-misc="${esc(wrong.misconception || '')}" style="margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm">`
+            + `<div class="mq-abbox"><span class="mq-abtag">A</span>${statement(aRight)}</div>`
+            + `<div class="mq-abbox"><span class="mq-abtag">B</span>${statement(!aRight)}</div>`
+            + respT(c) + `</div>`;
+        return Object.assign({}, it, {
+            render: renderT, key, measured: null, drawsAnswer: true,
+            footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),
+            fclass: 'standard', thinking: { correct, wrong: wrong.value, right, text: true },
+            cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
+        });
+    }
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
     // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - states its true width as footprint
     // inkWMm, so it takes the UNDER layout: A | B at half the cell each, the response under them; stacked it held one a page)

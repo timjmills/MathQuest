@@ -1,0 +1,7 @@
+  ok   composing:chart_to_120         REACH-SCREEN  30 of 32 items: the card names the text wrong answer
+  ok   composing:chart_to_120         REACH-TEXT    28 of 32 Reason It pair(s) are statements in words (writes-ten-ten)
+  ok   composing:chart_to_120         SQUARE        48 page(s): every written number fits its square
+  FAIL composing:hundreds_chart_fill  REACH-SCREEN  no item of 32 has a text-only wrong answer (provider wrongText): the misconception is taught nowhere
+  FAIL composing:hundreds_chart_fill  REACH-TEXT    no Reason It pair of 40 (8 seeds x S/L) states a text-only misconception
+  ok   composing:hundreds_chart_fill  SQUARE        48 page(s): every written number fits its square
+ws-text-misconception: FAIL - 2 judge(s): REACH-SCREEN composing:hundreds_chart_fill, REACH-TEXT composing:hundreds_chart_fill
