@@ -15,6 +15,8 @@
 //   node tests/scripts/ws-precritic.cjs --unit G3-Y4.B4                      # every long lesson of a queue unit
 //   node tests/scripts/ws-precritic.cjs --skill a:b --json out.json        # also write the table as JSON
 //   node tests/scripts/ws-precritic.cjs --skill a:b --dry-run              # print the plan (gates, commands), run nothing
+//   node tests/scripts/ws-precritic.cjs --skill a:b --copy-light [--dry-run]  # + the copy-light route (owner 2026-11-13, below)
+//   node tests/scripts/ws-precritic.cjs --batch a:b,c:d,e:f [--dry-run]    # + one batch critic: 3-6 skills on ONE passed template
 //   node tests/scripts/ws-precritic.cjs --write-role-sample                # re-derive tests/fixtures/precritic/role-sample.json
 //   node tests/scripts/ws-precritic.cjs --list-live                        # every live skill as a JSON array (cat:skill)
 //
@@ -106,6 +108,22 @@
 //                                             the matrix runs as a node gate with --slots 2 (it takes its own slots)
 //   --print-lint-baseline <file> / --screen-slots-baseline <file> / --options-verify-baseline <file> point a run at
 //   another pin (the S / M pins sit beside the print-lint one: <name>.S.json, <name>.M.json).
+//
+// COPY-LIGHT AND BATCH ROUTES (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 2-3; RUBRIC "How a page counts
+//   as graded"): every --skill run plans `ws-copy-light --skill <keys>` (a report row: may each skill take the narrow critic?).
+//   --copy-light      makes that row a gate: a skill is ELIGIBLE when every kit template its generator draws (defaults + the
+//                     card's option values) was passed by an ANCHOR in js/modules/redesign-passed.js whose signed card offers
+//                     every role and screen host the skill's card offers; else the row FAILs naming why (template X never
+//                     passed, role Y not on the anchor's card, legacy cell, ...) and the skill needs a FULL critic. It writes
+//                     the narrow critic's page sample, <logs>/copy-light-sample.json: per skill {n, role, size, seed, host,
+//                     width, option, value, opts}, every offered role, host and option value at least once (--sample-cap N,
+//                     default 12 a skill; coverage raises it, never cuts it). ALL the other gates still run: nothing is skipped.
+//                     With --dry-run the verdict and the sample are produced (node only, seconds) and the dry run ends FAIL
+//                     when a skill is not eligible.
+//   --batch k1,k2,..  one batch critic (design/lessons-first/briefs/critic-batch.md): 3-6 skills, each eligible, sharing ONE
+//                     passed template, else FAIL with the reason (mixed templates, ...); implies --copy-light and adds the
+//                     skills to the scope; the combined sample is <logs>/copy-light-batch-sample.json (one shared budget,
+//                     --sample-cap default 24). Never a template's FIRST skill: that one gets the full critic.
 //
 // OTHER OPTIONS
 //   --json <file>        the rows, the commit and the timings as JSON
@@ -350,7 +368,11 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
         ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases)`}`);
+    // the copy-light eligibility, batch and sample cases (owner rule 2026-11-13) live in ws-copy-light --self-test
+    const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+    const clLine = String(cl.stdout || '').trim().split('\n').pop();
+    if (cl.status !== 0) { bad.push(['copy-light', clLine, 'OK']); console.log(String(cl.stdout || '').trim()); }
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -723,7 +745,7 @@ function cardPlans(keys) {
 }
 
 /* ============================================================== plan */
-function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--copy-light | --batch k1,k2,k3] [--sample-cap N]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
 const OPT_IN_FILE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'opt-in-rules.json');
 /** Add each opted-in lane's args to its gate rows (opt-in-rules.json), judged only on the scope's skills of that lane. */
@@ -791,6 +813,13 @@ function buildPlan(ctx) {
         const extraNote = extras.length ? `also audits ${extras.length} skill(s) of other categories that share an id (bare ids; --category takes one): ${listShort(extras, 4)}` : '';
         const nodeLintJson = path.join(ctx.logs, 'node-lint.json');
         add(gate('node-lint', 'ws-node-lint', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--json', nodeLintJson], { parse: PARSE.nodeLint, jsonOut: nodeLintJson, expect: { skills: keys.length } }));
+        // COPY-LIGHT (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 2-3): every --skill run says whether each skill
+        // may take the narrow critic (an anchor in redesign-passed.js passed its template with its roles and hosts) - a report;
+        // with --copy-light / --batch it is a gate (not eligible = FAIL, a batch off one passed template = FAIL) and writes the
+        // page sample for the narrow / batch critic next to the logs. Every other gate of the plan still runs: nothing is skipped.
+        const clArgs = ctx.batch.length ? ['--batch', ctx.batch.join(','), ...(keys.filter((k) => !ctx.batch.includes(k)).length ? ['--skill', keys.filter((k) => !ctx.batch.includes(k)).join(',')] : [])] : ['--skill', keys.join(',')];
+        if (ctx.copyLight) clArgs.push('--require', '--sample-out', ctx.samplePath, ...(ctx.sampleCap ? ['--sample-cap', ctx.sampleCap] : []));
+        add(gate('copy-light', `ws-copy-light (copy-light eligibility${ctx.copyLight ? `, ${ctx.batch.length ? 'batch' : 'required'}; sample ${rel(ctx.samplePath)}` : ': report'})`, scope, 'node', 'ws-copy-light', clArgs, { missingMsg: 'ws-copy-light is not in this tree' }));
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
@@ -1271,9 +1300,9 @@ async function pool(items, n, fn) {
 }
 
 /* ============================================================== flags */
-const VALUE_FLAGS = new Set(['skill', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
+const VALUE_FLAGS = new Set(['skill', 'batch', 'sample-cap', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
 const REPEATABLE = new Set(['skill', 'lesson', 'unit']);
-const BOOL_FLAGS = new Set(['teacher', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
+const BOOL_FLAGS = new Set(['teacher', 'copy-light', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
 /** Every problem with the command line, as messages (empty when it is good). */
 function checkArgs(argv) {
     const errs = [];
@@ -1337,7 +1366,10 @@ async function main() {
         return;
     }
 
-    const wantSkills = argAll('skill');
+    const batchKeys = argAll('batch');
+    const wantSkills = [...new Set([...argAll('skill'), ...batchKeys])];
+    const copyLight = has('copy-light') || batchKeys.length > 0;
+    if (copyLight && !wantSkills.length) usage('--copy-light needs --skill (or --batch)');
     const template = arg('template', null);
     let role = arg('role', null);
     const teacher = has('teacher');
@@ -1370,7 +1402,7 @@ async function main() {
     const dry = has('dry-run');
     const logs = path.resolve(arg('logs', `/tmp/mq-precritic/${stamp}-${process.pid}`));
     if (!dry) fs.mkdirSync(logs, { recursive: true });
-    const ctx = { logs, template, role, teacher, grade: arg('grade', null), lesson: teacher ? arg('lesson', null) : null, lessons, unitInfo, timeoutMin: +arg('timeout', '90'), skills: [], roleSample: [], live: [], templateScan: null };
+    const ctx = { batch: batchKeys, copyLight, samplePath: path.join(logs, batchKeys.length ? 'copy-light-batch-sample.json' : 'copy-light-sample.json'), sampleCap: arg('sample-cap', null), logs, template, role, teacher, grade: arg('grade', null), lesson: teacher ? arg('lesson', null) : null, lessons, unitInfo, timeoutMin: +arg('timeout', '90'), skills: [], roleSample: [], live: [], templateScan: null };
 
     // ---- scope: skills (validated against the live list), the template's skills, the role sample
     let scanNote = '';
@@ -1419,10 +1451,23 @@ async function main() {
     const scopeLine = [ctx.skills.length && !template ? `--skill ${ctx.skills.map((s) => s.key).join(',')}` : '', template ? `--template ${template} (${ctx.skills.length} skills${scanNote})` : '', template && wantSkills.length ? `--skill ${wantSkills.join(',')}` : '', lessons.length || unitIds.length ? `${unitIds.map((u) => `--unit ${u}`).join(' ')}${lessonScope.length ? ` --lesson ${lessonScope.join(',')}` : ''} (${lessons.length} long lesson(s))` : '', role ? `--role ${role}` : '', teacher ? `--teacher${ctx.grade ? ` --grade ${ctx.grade}` : ''}${ctx.lesson ? ` --lesson ${ctx.lesson}` : ''}` : ''].filter(Boolean).join(' ');
 
     if (dry) {
-        say(`${TOOL} plan: ${scopeLine} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (not created)`);
+        say(`${TOOL} plan: ${scopeLine} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (${copyLight ? 'created for the copy-light sample only' : 'not created'})`);
         for (const g of rows) {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
+        }
+        if (copyLight) {
+            // the copy-light verdict is quick (node, no browser): a dry run gives it, and writes the sample, so a lane knows its
+            // route before it spends a run
+            const cl = rows.find((g) => g.id === 'copy-light');
+            fs.mkdirSync(logs, { recursive: true });
+            const r = spawnSync(process.execPath, [cl.file, ...cl.args], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 << 20 });
+            const out = String(r.stdout || '').split('\n').filter((l) => l.trim() && !NOISE.test(l));
+            say(`${TOOL} copy-light${batchKeys.length ? ' batch' : ''} (owner rule 2026-11-13; ${rel(cl.file)}):`);
+            for (const l of out) say(`  ${l}`);
+            if (r.status !== 0) { say(`${TOOL}: FAIL (dry run, nothing ran; copy-light: ${(out.filter((l) => /why not/.test(l))[0] || out.slice(-1)[0] || 'error').replace(/^\s*why not: /, '')})`); process.exit(1); }
+            say(`${TOOL}: OK (dry run, nothing ran; copy-light: ${batchKeys.length ? `batch on one passed template` : 'every skill eligible'}, sample ${ctx.samplePath})`);
+            return;
         }
         say(`${TOOL}: OK (dry run, nothing ran)`);
         return;
