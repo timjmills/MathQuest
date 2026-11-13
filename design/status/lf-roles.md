@@ -25,6 +25,7 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
 - D7: True / False boxes 10 mm off the statement's own tick column (pattern_features L, still 4 items).
 - mult_facts Review with supports (print-lint supports S, 12 x 32 % side band on Mixed Review stacks): looks like the supports
   engine's reserved support room inside the earlier skill's stacks, not the Review grid - to verify with the S2 supports owner.
+- Queued (lead 2026-11-13): PUPILTAG measured on ink, 2-4 mm (critic r4 n1); R4 / N4 capacity pins (ruled by design); FIX-MINIMAL (N9 ruled: one error an item); lf-algebra r8 role items (F3, F4, PT-MOD-1 marksFor function-table, F5 traceSlots, measure level 1 vs test level 0, teacher-preview F8).
 - Open: R4 (fte TF L 2 items: tall table, likely a capacity ruling), R13 (Pre-skill Check strips / page 2), R15 (EA judgement x per
   item), N4 (Review totals < 8 on tall items: ruling), N9 (fix-minimal: design), npr TF M 4 -> 3. These pages need critic r4.
 
