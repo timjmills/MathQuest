@@ -28,7 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
@@ -476,11 +476,21 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def && skillId) try { def = optionsFor(categoryId, skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    let chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const template = SCREEN_TEMPLATE[k.kind];
     if (!template) return null;
-    const p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
+    let p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
+    // Facts card F2 on screen (lf-ops div_facts screen critic r1 D1 / D2): div_facts' array is the TRUE array paper draws
+    // (print-sheet.js supportPlanFor): the quotient's rows of the divisor's dots in the section's one frame - an empty
+    // frame on 0 ÷ n - and, past the options' reach (a dividend over 50), not drawn at all, as on paper.
+    const cat0 = q.categoryId || categoryId, sk0 = q.requestedSkillId || q.skillId || skillId;
+    const divArr = cat0 === 'division' && sk0 === 'div_facts' && opKey(k.op) === '/' && chosen.includes('array');
+    let no = o;
+    if (divArr) { try { no = normalizeOptions(cat0, sk0, o); } catch (e) { no = o; } }
+    if (divArr && divFactsMaxDividend(no) > DIV_ARRAY_MAX) { chosen = chosen.filter((x) => x !== 'array'); if (!chosen.length) return null; }
+    const arrayFrame = divArr && chosen.includes('array');
+    if (arrayFrame) p = Object.assign({}, p, { arrayFrame: true });
     const can = chosen.filter((id) => canDraw(id, p, template));
     if (!can.length) return null;
     const need = Object.fromEntries(can.map((id) => [id, supportNeeds(id, p, template)]));
@@ -488,6 +498,10 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     if (!r.on.length) return null;
     const out = { on: r.on };
     if (opKey(k.op) === '/') out.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (arrayFrame) {
+        out.tally = Number(no.band) >= 144 ? 12 : 10;
+        out.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(no) / out.tally), rows: out.tally };
+    }
     if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
         const cs = o.constant;
         if (cs.includes(k.a) !== cs.includes(k.b)) out.table = cs.includes(k.a) ? k.a : k.b;

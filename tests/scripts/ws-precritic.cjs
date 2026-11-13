@@ -877,6 +877,8 @@ function buildPlan(ctx) {
         if (ssFile && srcHas(ssFile, 'uniform')) ss.push('--uniform');
         add(gate('screen-slots', 'ws-screen-slots --skills', scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
+        // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];
@@ -1298,9 +1300,13 @@ async function main() {
     const browserPlanned = rows.some((g) => g.kind === 'browser' && !g.missing);
     let pre = { bad: [] };
     if (browserPlanned) {
-        if (!fs.existsSync(RUNNER)) {
-            fs.copyFileSync(RUNNER_SRC, RUNNER); fs.chmodSync(RUNNER, 0o755);
-            say(`${TOOL}: installed ${RUNNER} from ${rel(RUNNER_SRC)}`);
+        // installed when missing OR older than the repo's copy (lf-engine 2026-11-12: a stale runner kept handing its
+        // slot lock to orphaned Chromes); replaced by rename, so a runner already running keeps its own file
+        const cur = fs.existsSync(RUNNER) ? fs.readFileSync(RUNNER, 'utf8') : null;
+        if (cur !== fs.readFileSync(RUNNER_SRC, 'utf8')) {
+            const tmp = `${RUNNER}.${process.pid}`;
+            fs.copyFileSync(RUNNER_SRC, tmp); fs.chmodSync(tmp, 0o755); fs.renameSync(tmp, RUNNER);
+            say(`${TOOL}: ${cur === null ? 'installed' : 'updated'} ${RUNNER} from ${rel(RUNNER_SRC)}`);
         }
         pre = prerequisites();
         if (pre.bad.length) {

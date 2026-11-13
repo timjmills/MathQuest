@@ -110,6 +110,15 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    reading the full standards and RUBRIC.
    *Check:* `ws-spec-card --check-signed` passes before any build. `--check-coverage` (every rule id a critic has cited
    for the family is on the card) runs again at each build start, so a rule added after signing is caught.
+3a. **Delegated approval (owner, 2026-11-12: "I always approve the designs — I can always go back and ask you to change
+   something if I don't like it").** The lead approves designs and signs spec cards on the RECOMMENDED answers without
+   asking the owner first. The signature keeps the form `Signed: owner, <date>`; the commit message says "delegated
+   approval (owner rule 2026-11-12)" and lists the answers taken. Every delegated decision gets one line in
+   `design/decisions/LEAD_DECISIONS.md` (date, card or design, the answers taken, the commit), and the owner sees the
+   result as screenshots when it passes. The lead STILL asks the owner first when a choice: contradicts an earlier owner
+   ruling or the design / pedagogy standards; has no clear recommended answer (options are a matter of taste); changes
+   the weekly budget or pass bar; is hard to reverse (deleting or retiring a skill, changing share codes); or touches
+   anything outside the app (accounts, money, other people). A lane never self-signs; it sends the card to the lead.
 4. **The order of checks is fixed** (§1.7):
    1. machine checks in node;
    2. machine checks in the browser;
@@ -450,3 +459,11 @@ white on any other role.
 - Lesson: a row-alignment fix keyed to ONE item's length (>= 15 letters) misses the item of the same row it does not cover ('one
   thousand', 12): key it to what the PAGE deals (the band) so every cell of the row gets the same box.
 - Lesson: getProvider takes (category, skill); one string silently reads the defaults - a provider check must assert real members.
+### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| A full ws-backtest run hung 7,000 s with no output (leftover checkout pv-expand-card-kit-fail). The row itself passes in 263 s; cause: mq-browser-run.sh passed its slot flock fd to the command, so a child that outlived it (puppeteer's detached Chrome of a killed gate) held the slot for ever; with both slots held every browser row waited without end, and spawnSync with no timeout printed nothing | `ws-backtest --runner-orphan <runner>` (also in `--self-test`); ws-backtest `--timeout` / `--browser-timeout` (kills the tree, TIMEOUT + 20-line tail) and `--lock-warn` (prints the slot holders); runner now runs `"$@" {fd}>&-`; ws-precritic / ws-backtest refresh a stale /tmp runner | runner-orphan-slot (fixture: master runner FAIL / fixed runner OK) | ws-backtest (deploy gates); runner used by every browser gate | 1 full run (~2 h) per hang |
+| Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
+| 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
+| ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
