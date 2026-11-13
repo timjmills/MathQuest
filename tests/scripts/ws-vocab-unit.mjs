@@ -34,6 +34,7 @@
 //     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
 //     reads as cycle
 // --browser V-PAGE (r15) no two Match 3 cells of one printed page put the same pictures in the same places
+// --browser r16 (critic r5 nits): V-NAMES no Error analysis page repeats a pupil name while one is unused
 // V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
 //     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
@@ -843,6 +844,7 @@ async function browserChecks() {
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
         if (ONLY && ONLY.every((k) => ['V-PAGE'].includes(k))) { await pageRepeatChecks(page, fail); return; }
+        if (ONLY && ONLY.every((k) => r16List().includes(k))) { await r16Checks(page, fail, sheet, build); return; }
         if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
         await pageRepeatChecks(page, fail);
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
@@ -933,6 +935,7 @@ async function browserChecks() {
             if (skillId === 'vocab_grade_pictures' && res.some((t) => new Set(t.words.map((w) => w.y)).size !== t.words.length)) fail(`V19 ${skillId} worksheet-1280: the words are not one a row (${sigs[0]})`);
             if (skillId === 'vocab_pick3_words' && res.some((t) => ![1, t.pills.length].includes(new Set(t.pills.map((p) => p.y)).size))) fail(`V19 ${skillId} worksheet-1280: the pills wrap 2 + 1 (${sigs.join(' | ')})`);
         }
+        await r16Checks(page, fail, sheet, build);
         // V23 (owner R-1) + V25 (owner R-2), lf-vocab r7: the screen feedback, and the print pupil pages unchanged
         await r7Checks(page, fail, sheet);
     } finally { await app2.close(); }
@@ -964,6 +967,40 @@ async function pageRepeatChecks(page, fail) {
         }
     }
     if (!cells) fail('V-PAGE: no Match 3 cell printed');
+}
+// ---- lf-vocab r16: the critic r5 nits as checks (design/lanes/lf-vocab/r16-builder-brief.md) --------------------------------
+// V-NAMES   (nit 5) no Error analysis page repeats a pupil name while an unused one remains ("Mia wrote" twice on Match 3 EA S
+//           items 3-4, "Sam wrote" twice on Pick 3 EA M items 1 and 4)
+function r16List() { return ['V-NAMES']; }   // (a function: browserChecks runs before this line, top-level await)
+function R16_FNV(x) { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+// the seeds a page is judged at: 7, V23's 143869 and ws-grade-render's seed for the role (the critic's page)
+function r16Seeds(skillId, role) { return [...new Set([7, 143869, R16_FNV(`vocabulary__${skillId}:${role}`) % 1000000])]; }
+async function r16Checks(page, fail, sheet, build) {
+    const want = (k) => !ONLY || ONLY.includes(k);
+    const SK = ['vocab_grade_pictures', 'vocab_pick3_words'];
+    const pupil = (skillId, role, size, seed, opts) => page.evaluate(async (a) => {
+        try {
+            const x = await window.buildSheet({ role: a.role, sections: [{ skills: [Object.assign({ categoryId: 'vocabulary', skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: a.seed, key: false });
+            return { pupil: x.pupilHtml };
+        } catch (e) { return { error: String(e && e.message || e) }; }
+    }, { skillId, role, size, seed, opts });
+    if (want('V-NAMES')) {
+        const NAMES = 6;   // error-analysis.js PUPILS
+        let pages = 0;
+        for (const skillId of SK) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds(skillId, 'error-analysis')) for (const opts of [null, { vocabGrade: 2 }, { vocabGrade: 4 }]) {
+            const r = await pupil(skillId, 'error-analysis', size, seed, opts);
+            const tag = `${skillId} error-analysis ${size} seed ${seed}${opts ? ` ${JSON.stringify(opts)}` : ''}`;
+            if (r.error) { fail(`V-NAMES ${tag}: not composed (${r.error})`); continue; }
+            r.pupil.split(/<section class="ws-page\b/).slice(1).forEach((pg, pi) => {
+                const names = [...pg.matchAll(/class="mq-pupiltag[^"]*"[^>]*>([^<]+?) [a-z]+:<\/span>/g)].map((m) => m[1]);
+                if (!names.length) return;
+                pages++;
+                const seen = new Set();
+                names.forEach((n, i) => { if (seen.has(n) && seen.size < NAMES) fail(`V-NAMES ${tag} page ${pi + 1}: "${n} wrote" twice (items ${names.indexOf(n) + 1} and ${i + 1}) while ${NAMES - seen.size} name(s) are unused`); seen.add(n); });
+            });
+        }
+        if (!pages) fail('V-NAMES: no Error analysis page shows a pupil name');
+    }
 }
 async function r7Checks(page, fail, sheet) {
     // the pupil print pages' sha256, per skill / role / size / seed (V23: byte-identical to 70cdbaf9); the pin is read from THIS

@@ -696,7 +696,7 @@ export function prepare(it, info = {}) {
         const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
         const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(o.who || who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -791,7 +791,7 @@ export function prepare(it, info = {}) {
     // never printed; the host deals another item. The key would otherwise "fix" a right answer.
     if (isWrong && !showsWrong({ it, kind, shown, shownSlots, sParts, correct, P, drawn: drewWork })) return null;
     return Object.assign({}, it, {
-        render, key, measured: null, drawsAnswer: true, answerWords: isWrong ? `Fix it: ${correct}` : 'Correct',
+        who, render, key, measured: null, drawsAnswer: true, answerWords: isWrong ? `Fix it: ${correct}` : 'Correct',
         // The judgement flows beside the work in one column and under it in two: a taller cell in
         // two columns is that layout, not markup collapsing, so the host measures each count as
         // it is and the page takes whichever holds more (critic round 3: half-empty pages).
@@ -1047,8 +1047,12 @@ export function plan(input = {}) {
     const ws = items.map((it) => Number(it.workWMm) || 0).filter((w) => w > 0);
     // (only where the items' planned widths differ, so a page of equal items prints as before)
     const pageWork = ws.length > 1 && Math.max(...ws) - Math.min(...ws) > 1 ? Math.max(...ws) : 0;
-    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom }, pageWork ? { workW: pageWork } : {})) : undefined);
-    const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
+    // one pupil a cell on the page (lf-vocab r16, critic r5 nit 5: "Mia wrote" twice on Match 3 EA S while Leo was unused - the
+    // name was picked at deal time and the page sorts and selects items after it): a name already on the page takes the next
+    // unused one, so a page repeats a name only once every name is used (ws-roles-unit EA-NAMES)
+    const names = pageNames(items.map((it) => it.who));
+    const judged = (it, i) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom, who: names[i] }, pageWork ? { workW: pageWork } : {})) : undefined);
+    const grid = gridPart(items.map((it, i) => planItem(it, { cols: L.cols, render: judged(it, i) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
     // share of the grid - cells stretched to G / rows left 30-45% empty under the fix. Spare
@@ -1076,8 +1080,25 @@ export function plan(input = {}) {
     });
 }
 
+/**
+ * The pupil names of one page, in cell order: each item keeps the name it was dealt unless an earlier cell holds it, then it
+ * takes the next name of PUPILS no cell holds yet (a page repeats a name only when all of them are used).
+ */
+export function pageNames(dealt) {
+    const used = new Set();
+    return dealt.map((w) => {
+        let n = PUPILS.includes(w) ? w : PUPILS[0];
+        if (used.has(n) && used.size < PUPILS.length) {
+            const i0 = PUPILS.indexOf(n);
+            for (let k = 1; k <= PUPILS.length; k++) { const c = PUPILS[(i0 + k) % PUPILS.length]; if (!used.has(c)) { n = c; break; } }
+        }
+        used.add(n);
+        return n;
+    });
+}
+
 /** Which items show a wrong answer: a seeded 40-60% pattern over the run (PT-ERR-1). */
 export const wrongFlags = (n, seed) => wrongPattern(n, seed, ROLE_ID);
 
-export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, wrongFlags, realWrongOf, pupilInk, intoAnswerColumn, likeAnswer, roomOf, varied, rowHeights, emptiness };
+export default { ROLE_ID, sources, measureCols, prepare, supports, counts, plan, pageNames, wrongFlags, realWrongOf, pupilInk, intoAnswerColumn, likeAnswer, roomOf, varied, rowHeights, emptiness };
 export { esc };
