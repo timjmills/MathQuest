@@ -821,3 +821,11 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Screen gates, briefs and RUBRIC hosts run at 1280 / 1366 / 820 / 1024 (owner rule); ws-no-phone-width on precritic. Teacher phone steps stay allow-listed (lead added the teacher lesson-parts panel in ws-partopts-shots).
 - Copy-light sample / batch / --sample render / brief lint / ws-drawing-key; eligibility is ADVISORY (every skill still gets the full critic).
 - Gates: conflict-markers, boot-smoke, code-snapshot (734), backtest self-test, precritic self-test, precritic-plan (193), checks-from-critics, no-phone-width, copy-light self-test. No app code changed.
+
+## 2026-11-13 — Hotfix: option rows with a "?" tip took every click as the tip (critic-panel-r3 P1)
+- One additive CSS line (css/teacher.css): the tip button is its own containing block again, so tick boxes, All / None and selects work by mouse and touch. Its [hit] check and backtest row options-panel-hit land with the lf-partopts panel deploy.
+
+## 2026-11-13 — Deploy no size S (lf-checks; critic r3 C1 9 / C3 9 / C4 9, C2 7 on doc phrasing only -> NOS-DOCS-ADVISORY)
+- Print and screen size pickers offer M and L only; any stored or shared S setting restores as M (codes still decode, 734). Compact simple print shows no dead picker.
+- Gates stop running S; the browser visibility gate (73 checks) and the code guard block; the docs token rule is advisory. CLAUDE.md tokens line now reads "sizes M/L; S is an alias of M".
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot, redesign-passed, simple-print, screen-answer, pdf-preview (one 0.08 % pixel diff on a set-cover page under 13-way load, then 3 clean runs on this head and master: load flake), roles-unit, teacher-wrm, no-size-s --browser, precritic-plan, backtest self-test; lane: capacity-pin (0 drops), lesson baseline 1732 identical.

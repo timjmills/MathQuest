@@ -5,7 +5,7 @@
 //   node tests/scripts/ws-capacity-pin.cjs --write [--pin file]              # pin this tree (run on master)
 //   node tests/scripts/ws-capacity-pin.cjs --check [--pin file] [--skills a:b,..] [--roles r,..]
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: EVERY grid role of
-//   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes S,M,L; seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
+//   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes M,L (S dropped 2026-11-13); seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -26,7 +26,7 @@ async function gridRoles(root) {
     return ['independent', 'more-practice', ...Object.keys(m.ROLE_MODULES)].filter((r, i, a) => a.indexOf(r) === i && !NOT_GRID.has(r));
 }
 let ROLES = list(arg('roles', ''));
-const SIZES = list(arg('sizes', 'S,M,L'));
+const SIZES = list(arg('sizes', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const ALLOW = new Set(list(arg('allow', '')));
 
 (async () => {
@@ -107,7 +107,7 @@ const ALLOW = new Set(list(arg('allow', '')));
     const fmt = (v) => (Number(v.pages) > 1 ? `${v.items} over ${v.pages} pages` : `${v.items}`);
     for (const [k, v] of Object.entries(now)) { if (v.na) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v; }
     for (const [g, z] of Object.entries(groups)) {
-        // Size S is dropped (owner, 2026-11-13; CLAUDE.md fastest plan item 9): SIZE-ORDER compares M >= L only; S pages stay pinned
+        // Size S is dropped (owner, 2026-11-13; CLAUDE.md fastest plan item 9): SIZE-ORDER compares M >= L only; the S keys are removed from the pin (no-size-S)
         // for CAPACITY-NO-DROP but no longer order against M.
         if (z.M && z.L && perPage(z.M) < perPage(z.L)) order.push(`${g}: M ${fmt(z.M)} < L ${fmt(z.L)} items a page (SIZE-ORDER)`);
     }
