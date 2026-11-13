@@ -877,6 +877,8 @@ function buildPlan(ctx) {
         if (ssFile && srcHas(ssFile, 'uniform')) ss.push('--uniform');
         add(gate('screen-slots', 'ws-screen-slots --skills', scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
+        // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];
@@ -984,7 +986,9 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, H13, H13P, CLIP, FRAME, PV, PAGES)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, H13, CLIP, FRAME, PV, PAGES; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
+            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
@@ -1299,9 +1303,13 @@ async function main() {
     const browserPlanned = rows.some((g) => g.kind === 'browser' && !g.missing);
     let pre = { bad: [] };
     if (browserPlanned) {
-        if (!fs.existsSync(RUNNER)) {
-            fs.copyFileSync(RUNNER_SRC, RUNNER); fs.chmodSync(RUNNER, 0o755);
-            say(`${TOOL}: installed ${RUNNER} from ${rel(RUNNER_SRC)}`);
+        // installed when missing OR older than the repo's copy (lf-engine 2026-11-12: a stale runner kept handing its
+        // slot lock to orphaned Chromes); replaced by rename, so a runner already running keeps its own file
+        const cur = fs.existsSync(RUNNER) ? fs.readFileSync(RUNNER, 'utf8') : null;
+        if (cur !== fs.readFileSync(RUNNER_SRC, 'utf8')) {
+            const tmp = `${RUNNER}.${process.pid}`;
+            fs.copyFileSync(RUNNER_SRC, tmp); fs.chmodSync(tmp, 0o755); fs.renameSync(tmp, RUNNER);
+            say(`${TOOL}: ${cur === null ? 'installed' : 'updated'} ${RUNNER} from ${rel(RUNNER_SRC)}`);
         }
         pre = prerequisites();
         if (pre.bad.length) {

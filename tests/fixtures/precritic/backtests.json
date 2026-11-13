@@ -3200,6 +3200,207 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-support-eq-divfacts",
+  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-cue-size-divfacts",
+  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-place-divfacts",
+  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: every ÷ card under once one wraps"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "runner-orphan-slot",
+  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
+  "kind": "fixture",
+  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
+   "state": "master 7e0c074b runner: the command inherits the slot fd"
+  },
+  "pass": {
+   "fixture": "tests/scripts/mq-browser-run.sh",
+   "state": "lf-engine-bt: \"$@\" {fd}>&-"
+  },
+  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-h13",
+  "check": "every Practice and Mixed page of a short lesson has no cell band >= 30 % (lf-engine-pc critic r3 F5: add L Mixed Addition row 55 %; F7: round L / S Practice 49 % in all 15 cells)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 (H13 on Practice / Mixed, blocking)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "PM-H13 FAIL 4: add L Mixed 52 %, add S Practice 30 %, round L / S Practice 49 %"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-live-carry",
+  "check": "every carry / regroup box a lesson key page draws is filled by >= 1 stack of its section (lf-engine-pc critic r3 F6: sub / round Mixed, add_100_regroup partner, a hundreds carry box no sum < 100 reaches)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples LIVE-PART (H15 dead part)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "LIVE-PART FAIL 4: sub L / S, round L / S Mixed, the hundreds box filled on none"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-h13-spot",
+  "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-cont",
+  "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-CONT",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-tab-clear",
+  "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples TAB-CLEAR",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-sheet-2pg",
+  "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples SHEET-2PG",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
+  },
+  "pending": true,
+  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  
  ,{

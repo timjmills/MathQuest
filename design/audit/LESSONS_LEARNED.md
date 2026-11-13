@@ -110,6 +110,15 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    reading the full standards and RUBRIC.
    *Check:* `ws-spec-card --check-signed` passes before any build. `--check-coverage` (every rule id a critic has cited
    for the family is on the card) runs again at each build start, so a rule added after signing is caught.
+3a. **Delegated approval (owner, 2026-11-12: "I always approve the designs — I can always go back and ask you to change
+   something if I don't like it").** The lead approves designs and signs spec cards on the RECOMMENDED answers without
+   asking the owner first. The signature keeps the form `Signed: owner, <date>`; the commit message says "delegated
+   approval (owner rule 2026-11-12)" and lists the answers taken. Every delegated decision gets one line in
+   `design/decisions/LEAD_DECISIONS.md` (date, card or design, the answers taken, the commit), and the owner sees the
+   result as screenshots when it passes. The lead STILL asks the owner first when a choice: contradicts an earlier owner
+   ruling or the design / pedagogy standards; has no clear recommended answer (options are a matter of taste); changes
+   the weekly budget or pass bar; is hard to reverse (deleting or retiring a skill, changing share codes); or touches
+   anything outside the app (accounts, money, other people). A lane never self-signs; it sends the card to the lead.
 4. **The order of checks is fixed** (§1.7):
    1. machine checks in node;
    2. machine checks in the browser;
@@ -476,3 +485,42 @@ white on any other role.
   A number bond "2 + 2" has no fact key: the sheet's texts go in as a soft avoid too.
 - **Speed:** `ws-lesson-check --force-check` exists now but is red on 194 findings (chart vs practice LR-1 / LR-5, LR-13) -
   not wired into precritic; the four PC rules ride the precritic lesson-samples step.
+### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| A full ws-backtest run hung 7,000 s with no output (leftover checkout pv-expand-card-kit-fail). The row itself passes in 263 s; cause: mq-browser-run.sh passed its slot flock fd to the command, so a child that outlived it (puppeteer's detached Chrome of a killed gate) held the slot for ever; with both slots held every browser row waited without end, and spawnSync with no timeout printed nothing | `ws-backtest --runner-orphan <runner>` (also in `--self-test`); ws-backtest `--timeout` / `--browser-timeout` (kills the tree, TIMEOUT + 20-line tail) and `--lock-warn` (prints the slot holders); runner now runs `"$@" {fd}>&-`; ws-precritic / ws-backtest refresh a stale /tmp runner | runner-orphan-slot (fixture: master runner FAIL / fixed runner OK) | ws-backtest (deploy gates); runner used by every browser gate | 1 full run (~2 h) per hang |
+| Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
+| 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
+| ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+
+### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+
+Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
+touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem
+cells of the critic's spot lessons were never read; the rounding fix reached Practice and not Mixed. ws-lesson-samples
+--check now carries the four spot lessons, and precritic runs PM-CONT / SHEET-2PG over every library lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| 1 div_facts Mixed equation / missing-factor cells top-anchored: 53 % (L), 54 % and 40 % (S) bands | ws-lesson-samples PM-H13 on the spot lessons (every cell kind) | lesson-pm-h13-spot (9135190b FAIL 6 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 2 sub_wp_10 / add_wp_20 S Mixed word problem 37 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 3 fact_family_sort L Mixed: one 6-cell row alone on a continuation page 72 % blank | ws-lesson-samples PM-CONT (new: no Practice / Mixed continuation page >= 50 % blank) | lesson-pm-cont (9135190b FAIL → 709605bb OK) | precritic lesson-samples-check + lesson-samples-all | 1 round |
+| 4 nearest_10 L Mixed rounding cells not centred, item number on the "T" head | PM-H13 + ws-lesson-samples TAB-CLEAR (new: tab >= 2 mm from ink; 1 mm for an across fact, CL-40) | lesson-tab-clear (9135190b FAIL 2 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
+| 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+| 6 (re-critic lf-engine-live-pm2) re-flow of a sheet fixed one measure (pages used) and broke another (tab clearance): number tab over the T head on sheet items 10-12, pages 27-35 % blank; 709605bb reverted | gate every page rule on the page you change: TAB-CLEAR on sheet Guided / Independent blocks; SHEET-2PG fails when a page >= 30 % blank while any row is below design height; pages balanced within 15 % (proposed, not yet built) | lesson-sheet-2pg PENDING (item 6 redone separately) | precritic lesson-samples-all | 1 round lost |
