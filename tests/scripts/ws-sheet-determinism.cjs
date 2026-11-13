@@ -6,7 +6,7 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const SKILLS = arg('skills', 'multiplication:mixed_multiplication,subtraction:mixed_subtraction,counting_mixed:counting_all,composing:mixed_composing,addition:add_sub_10s,division:missing_mult_div').split(',');
 const BEFORE = arg('before', 'addition:mixed_addition,measurement:mixed_time,multiplication:dot_array_mult,counting:mixed_counting').split(',').filter(Boolean);
-const SIZES = arg('size', 'S,L').split(',');
+const SIZES = arg('size', 'M,L').split(',');
 const ITEMS = process.argv.includes('--items');
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const build = (page, k, size) => page.evaluate(async ({ k, size, seed, ITEMS }) => {

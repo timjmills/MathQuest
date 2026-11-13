@@ -46,7 +46,7 @@ const { ROOT, open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
-const SIZES = (arg('sizes', 'L,S') || 'L,S').split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'L,M') || 'L,M').split(',').map((s) => s.trim()).filter(Boolean);
 const ONLY = arg('only', '');
 const OUT = path.resolve(ROOT, arg('out', 'tests/audit-runs/lessons'));
 const DPI = parseInt(arg('dpi', '110'), 10);

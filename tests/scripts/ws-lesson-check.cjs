@@ -33,7 +33,7 @@ const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
 const SEEDS = Math.max(1, parseInt(arg('seeds', '25'), 10));
-const SIZES = (arg('sizes', 'L,S') || 'L,S').split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'L,M') || 'L,M').split(',').map((s) => s.trim()).filter(Boolean);
 const ONLY = arg('only', '');
 const LAYOUT = Math.max(0, parseInt(arg('layout', '3'), 10));
 const RULE_OFF = (arg('rule-off', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
@@ -275,8 +275,9 @@ async function renderDoc(app, html) {
         const skills = [Object.assign({}, l.skill)].concat(d.mixWith.map((m) => prereqs.skillRef(m)));
         const where = `${l.id} mixed-page`;
         const at = {};
-        for (const size of ['S', 'L']) {
-            at[size] = await app.page.evaluate(async ({ skills, size }) => {
+        // (owner 2026-11-13: the small end is M now - S again only with an explicit --sizes S; at.S names the small end)
+        for (const [key, size] of [['S', SIZES.includes('S') ? 'S' : 'M'], ['L', 'L']]) {
+            at[key] = await app.page.evaluate(async ({ skills, size }) => {
                 const b = await window.buildSheet({ role: 'mixed-practice', sections: [{ skills }], size, seed: 4242, key: false });
                 return { n: b.items.length, pages: b.pageCount, doc: window.sheetDocument(b.pupilHtml, b.title, { paper: 'A4' }) };
             }, { skills, size });
@@ -287,7 +288,7 @@ async function renderDoc(app, html) {
             const low = await pg.evaluate(() => [...document.querySelectorAll('.ws-stack')].filter((st) => st.querySelector('.rg'))
                 .filter((st) => parseFloat(getComputedStyle(st).fontSize) < 22 * 96 / 72 - 0.5).length);
             if (low) fail(where, 'LR-16', `${low} regroup stack(s) below their M floor at S`);
-            for (const [rule, msg] of await layoutCheck(pg, 'S', false)) fail(where, rule, msg);
+            for (const [rule, msg] of await layoutCheck(pg, SIZES.includes('S') ? 'S' : 'M', false)) fail(where, rule, msg);
         } finally { await pg.close(); }
         console.log(`  ${l.id} mixed page: S ${at.S.n} items on ${at.S.pages}, L ${at.L.n} on ${at.L.pages}`);
     }

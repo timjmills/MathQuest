@@ -60,7 +60,15 @@ const { open } = require('../lib/ws-harness.cjs');
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
-const SIZES = arg('sizes', 'S,M,L').split(',');
+const SIZES = arg('sizes', 'M,L').split(',');
+// owner 2026-11-13 (plan item 9): the print sizes are M and L, size S is dropped. The cases that ran at S run at the smallest
+// size asked for: M by default, S again with an explicit `--sizes S,M,L` (the backtest rows on trees from before the rule).
+const SMALL = SIZES.includes('S') ? 'S' : 'M';
+const SML = SIZES.includes('S') ? ['S', 'M', 'L'] : ['M', 'L'];
+const SM = SIZES.includes('S') ? ['S', 'M'] : ['M'];
+// (the same three names inside page.evaluate bodies: set on every page of the run, before its scripts)
+const SIZE_GLOBALS = `window.SMALL = ${JSON.stringify(SMALL)}; window.SML = ${JSON.stringify(SML)}; window.SM = ${JSON.stringify(SM)};`;
+async function withSizeGlobals(pg) { await pg.evaluateOnNewDocument(SIZE_GLOBALS); await pg.evaluate(SIZE_GLOBALS); return pg; }
 const sk = (c, s) => ({ categoryId: c, skillId: s });
 const SETS = {
     six: [sk('addition', 'add_facts'), sk('subtraction', 'sub_facts'), sk('multiplication', 'mult_facts'), sk('division', 'div_facts'), sk('subtraction', 'missing_add_sub'), sk('division', 'missing_mult_div')],
@@ -178,7 +186,7 @@ async function factsPrint(page) {
         const out = { withDiv: await optsMax(owner), noDiv: await optsMax(owner.slice(0, 3)), builds: [] };
         const dv = (form) => [{ categoryId: 'division', skillId: 'div_facts', opts: form ? { divForm: form } : {} }];
         for (const [nm, list] of [['owner', owner], ['div_facts', dv('')], ['div long', dv('long')], ['div fraction', dv('fraction')], ['+ -', owner.slice(0, 2)]]) {
-            for (const size of ['S', 'M']) {
+            for (const size of SM) {
                 const o = { how: 'pages', n: 2, size, cols: 10, colsMode: 'exact', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
                 const b = await m.buildSimple(L(list), o);
                 out.builds.push({ nm, size, grids: b.grids || [{ div: nm !== '+ - x', cols: b.cols }], cols: b.cols, line: m.summaryLine(b, o), notes: (b.notes || []).join(' ') });
@@ -207,7 +215,7 @@ async function factsPrint(page) {
     const fb = await page.evaluate(async ({ six, owner }) => {
         const m = await import('/js/modules/simple-print.js');
         const out = [];
-        for (const [nm, list, how, n, size] of [['six', six, 'pages', 1, 'M'], ['six', six, 'pages', 1, 'S'], ['facts problems', owner, 'problems', 40, 'S']]) {
+        for (const [nm, list, how, n, size] of [['six', six, 'pages', 1, 'M'], ['six', six, 'pages', 1, SMALL], ['facts problems', owner, 'problems', 40, SMALL]]) {
             const L = list.map((s) => Object.assign({ amt: '' }, s));
             const plan = (b) => JSON.stringify({ pages: b.pages, total: b.total, counts: b.counts, cols: b.colsList || [b.cols], perPage: b.perPage, keyPages: b.keyPages });
             const o = (arrange) => ({ how, n, size, cols: 'auto', colsMode: 'aim', key: true, arrange, seed: 4242, title: true, paper: 'A4' });
@@ -247,7 +255,7 @@ async function factsCounts(page) {
         cases.push({ size, arrange, how: 'pages', n: 1, sets: 1 });
         cases.push({ size, arrange, how: 'problems', n: 50, sets: 1 });
     }
-    cases.push({ size: 'S', arrange: 'mixed', how: 'pages', n: 1, sets: 2 }, { size: 'S', arrange: 'sections', how: 'problems', n: 130, sets: 1 }, { size: 'M', arrange: 'mixed', how: 'problems', n: 130, sets: 2 });
+    cases.push({ size: SMALL, arrange: 'mixed', how: 'pages', n: 1, sets: 2 }, { size: SMALL, arrange: 'sections', how: 'problems', n: 130, sets: 1 }, { size: 'M', arrange: 'mixed', how: 'problems', n: 130, sets: 2 });
     const res = await page.evaluate(async ({ list, cases }) => {
         const m = await import('/js/modules/simple-print.js');
         const out = [];
@@ -346,7 +354,7 @@ async function factsCounts(page) {
     // SIZE: Problems 50 at S and at L differ in digit size and capacity
     for (const arrange of ['sections', 'mixed']) {
         const at = (sz) => res.find((r) => r.c.how === 'problems' && r.c.n === 50 && r.c.size === sz && r.c.arrange === arrange && r.sets === 1);
-        const S = at('S'), Lg = at('L');
+        const S = at(SMALL), Lg = at('L');
         if (!S || !Lg) continue;
         const pt = (r) => (r.pages.find((p) => !p.key && p.pt) || {}).pt || 0;
         const cap = (r) => ((r.full && r.full.grids) || [])[0] ? r.full.grids[0].perPage : 0;
@@ -385,10 +393,10 @@ async function factsSetPage(page) {
     const cases = [];
     const C = (how, n, size, arrange, cols = 'auto', sets = 1, seed = 918528) => cases.push({ how, n, size, arrange, cols, sets, seed });
     for (const size of SIZES) for (const arrange of ['sections', 'mixed']) { C('pages', 1, size, arrange); C('problems', 50, size, arrange); C('problems', 130, size, arrange); }
-    for (const size of ['S', 'L'].filter((s) => SIZES.includes(s))) for (const arrange of ['sections', 'mixed']) for (const cols of [5, 9]) { C('pages', 1, size, arrange, cols); C('problems', 50, size, arrange, cols); }
+    for (const size of [SMALL, 'L'].filter((s) => SIZES.includes(s))) for (const arrange of ['sections', 'mixed']) for (const cols of [5, 9]) { C('pages', 1, size, arrange, cols); C('problems', 50, size, arrange, cols); }
     // Sets (critic D2: set 2 printed 10 columns / 48 in 8 columns beside set 1's 8 / 54 in 9)
-    C('problems', 130, 'S', 'sections', 'auto', 2, 7); C('problems', 130, 'S', 'mixed', 9, 2); C('pages', 1, 'L', 'mixed', 9, 3, 7);
-    C('pages', 1, 'L', 'sections', 9, 3); C('problems', 50, 'M', 'mixed', 'auto', 2, 7); C('pages', 1, 'S', 'sections', 'auto', 2); C('problems', 130, 'L', 'sections', 5, 3, 7);
+    C('problems', 130, SMALL, 'sections', 'auto', 2, 7); C('problems', 130, SMALL, 'mixed', 9, 2); C('pages', 1, 'L', 'mixed', 9, 3, 7);
+    C('pages', 1, 'L', 'sections', 9, 3); C('problems', 50, 'M', 'mixed', 'auto', 2, 7); C('pages', 1, SMALL, 'sections', 'auto', 2); C('problems', 130, 'L', 'sections', 5, 3, 7);
     const measureSrc = `(doc) => [...doc.querySelectorAll('.ws-page')].map((pg) => {
         const mm = (px) => px * 25.4 / 96;
         const foot = pg.querySelector('footer.ws-foot');
@@ -502,8 +510,8 @@ async function factsSetPage(page) {
 
     // UI: the owner's path through the real dialog, Print pressed, the printed document measured
     const ui = [
-        { how: 'problems', n: 50, size: 'S', arrange: 'sections', cols: 'auto', sets: 1 },
-        { how: 'problems', n: 130, size: 'S', arrange: 'sections', cols: 'auto', sets: 2 },
+        { how: 'problems', n: 50, size: SMALL, arrange: 'sections', cols: 'auto', sets: 1 },
+        { how: 'problems', n: 130, size: SMALL, arrange: 'sections', cols: 'auto', sets: 2 },
         { how: 'pages', n: 1, size: 'L', arrange: 'mixed', cols: 9, sets: 3 },
     ];
     for (const c of ui) {
@@ -554,14 +562,14 @@ async function factsSetPage(page) {
         const mixes = [['+ −', owner.slice(0, 2)], ['+', owner.slice(0, 1)], ['−', owner.slice(1, 2)], ['×', owner.slice(2, 3)], ['+ − ×', owner.slice(0, 3)], ['÷', owner.slice(3)], ['owner', owner],
             ['× 3', [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [3] } }]]];
         const out = [];
-        for (const [nm, l] of mixes) for (const size of ['S', 'M', 'L']) for (const how of ['pages', 'problems']) {
+        for (const [nm, l] of mixes) for (const size of SML) for (const how of ['pages', 'problems']) {
             const o = { how, n: how === 'pages' ? 1 : 40, size, cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
             const b = await m.buildSimple(L(l), o);
             const cols = (String(b.pupilHtml).match(/grid-template-columns:\s*repeat\((\d+)/g) || []).map((x) => Number(/(\d+)$/.exec(x)[1]));
             out.push({ nm, size, how, cols: [...new Set([...(b.grids || []).map((g) => g.cols), b.cols, ...cols])].filter(Boolean), line: m.summaryLine(b, o) });
         }
         // picked 10 on + − prints 10
-        const o10 = { how: 'pages', n: 1, size: 'S', cols: 10, colsMode: 'aim', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
+        const o10 = { how: 'pages', n: 1, size: SMALL, cols: 10, colsMode: 'aim', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
         const b10 = await m.buildSimple(L(owner.slice(0, 2)), o10);
         return { out, picked10: b10.cols };
     }, OWNER);
@@ -737,10 +745,10 @@ async function factsR4(app) {
     const { spawnSync } = require('child_process');
     const DIV_MIX = OWNER.map((s) => (s.skillId === 'div_facts' ? Object.assign({}, s, { opts: { divForm: 'mix' } }) : s));
     const cases = [];
-    const C = (tag, list, o, extra = {}) => cases.push(Object.assign({ tag, list, o: Object.assign({ how: 'pages', n: 1, sets: 1, size: 'S', cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) }, extra));
+    const C = (tag, list, o, extra = {}) => cases.push(Object.assign({ tag, list, o: Object.assign({ how: 'pages', n: 1, sets: 1, size: SMALL, cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) }, extra));
     // the owner's page (images/17.png) and the ÷ Mix family
-    C('OWNER ÷ Mix p1 S c9 mixed', DIV_MIX, { size: 'S', cols: 9, seed: 926447, arrange: 'mixed' }, { mix: true, pdf: true, owner: true });
-    C('OWNER ÷ Mix p1 S c9 sections', DIV_MIX, { size: 'S', cols: 9, seed: 926447 }, { mix: true, divsec: true, owner: true });
+    C('OWNER ÷ Mix p1 S c9 mixed', DIV_MIX, { size: SMALL, cols: 9, seed: 926447, arrange: 'mixed' }, { mix: true, pdf: true, owner: true });
+    C('OWNER ÷ Mix p1 S c9 sections', DIV_MIX, { size: SMALL, cols: 9, seed: 926447 }, { mix: true, divsec: true, owner: true });
     for (const size of SIZES) {
         for (const arrange of ['mixed', 'sections']) {
             C(`÷ Mix set pages 1 @${size} ${arrange}`, DIV_MIX, { size, arrange, seed: 926447 }, { mix: true, divsec: arrange === 'sections', sizemix: true });
@@ -750,7 +758,7 @@ async function factsR4(app) {
     }
     // FULLPAGE: Problems mode over sizes, columns, counts and both arrangements; the owner's Pages 1; mult_facts alone at L
     for (const size of SIZES) for (const cols of ['auto', 5, 9]) for (const n of [30, 50, 63, 130]) for (const arrange of ['sections', 'mixed']) C(`owner problems ${n} @${size} cols ${cols} ${arrange}`, OWNER, { size, cols, how: 'problems', n, arrange });
-    for (const size of SIZES) C(`owner pages 1 @${size}`, OWNER, { size }, { pdf: size === 'S' });
+    for (const size of SIZES) C(`owner pages 1 @${size}`, OWNER, { size }, { pdf: size === SMALL });
     C('mult_facts alone problems 30 @L', [OWNER[2]], { size: 'L', how: 'problems', n: 30 });
     C('mult_facts alone pages 1 @L', [OWNER[2]], { size: 'L' });
     const res = await page.evaluate(async ({ cases, src }) => {
@@ -1020,7 +1028,7 @@ async function factsR5(app) {
     const rows = [], fails = [];
     const DIV_MIX = OWNER.map((s) => (s.skillId === 'div_facts' ? Object.assign({}, s, { opts: { divForm: 'mix' } }) : s));
     const cases = [];
-    const C = (mix, o) => cases.push({ mix, o: Object.assign({ how: 'problems', n: 50, sets: 1, size: 'S', cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) });
+    const C = (mix, o) => cases.push({ mix, o: Object.assign({ how: 'problems', n: 50, sets: 1, size: SMALL, cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) });
     for (const size of SIZES) for (const cols of ['auto', 5, 9]) for (const arrange of ['sections', 'mixed']) {
         for (let n = 20; n <= 150; n += 5) C(false, { size, cols, arrange, n });
         for (const n of [1, 2]) { C(false, { size, cols, arrange, how: 'pages', n }); C(true, { size, cols, arrange, how: 'pages', n }); }
@@ -1119,8 +1127,8 @@ const SW_LISTS = (() => {
 })();
 function sweepCases(full) {
     const cases = [];
-    const C = (list, o) => cases.push({ list, o: Object.assign({ how: 'problems', n: 50, sets: 1, size: 'S', cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) });
-    const sizes = ['S', 'M', 'L'];
+    const C = (list, o) => cases.push({ list, o: Object.assign({ how: 'problems', n: 50, sets: 1, size: SMALL, cols: 'auto', colsMode: 'aim', key: false, arrange: 'sections', seed: 918528, title: true, paper: 'A4' }, o) });
+    const sizes = SML;
     // ÷ Mix In sections, the small counts (D-R6-1)
     for (const size of sizes) for (const cols of ['auto', 7, 9]) for (let n = 10; n <= 60; n += full ? 1 : 4) C('ownerMix', { size, cols, n });
     // the owner's set, every count 1-150 by 5 (by 1 in full), Columns Auto / 7 / 9, both arrangements
@@ -1369,7 +1377,7 @@ async function factsSweep(app, full) {
         const { spawnSync } = require('child_process');
         const py = pathx.join(__dirname, '..', 'lib', 'ws-inkclear.py');
         const dir = fsx.mkdtempSync(pathx.join(os.tmpdir(), 'ws-inkclear-'));
-        const jobs = [['÷ Mix alone problems 63 @S cols 9', SW_LISTS.divMix, { how: 'problems', n: 63, size: 'S', cols: 9 }], ['ownerMix pages 1 @L cols 9', SW_LISTS.ownerMix, { how: 'pages', n: 1, size: 'L', cols: 9 }]];
+        const jobs = [['÷ Mix alone problems 63 @S cols 9', SW_LISTS.divMix, { how: 'problems', n: 63, size: SMALL, cols: 9 }], ['ownerMix pages 1 @L cols 9', SW_LISTS.ownerMix, { how: 'pages', n: 1, size: 'L', cols: 9 }]];
         const p2 = await app.browser.newPage();
         await p2.setViewport({ width: 900, height: 1200, deviceScaleFactor: 300 / 96 });
         let skipped = '';
@@ -1406,6 +1414,8 @@ async function factsSweep(app, full) {
 (async () => {
     const app = await open({ seed: 7 });
     const page = app.page;
+    await withSizeGlobals(page);
+    { const np = app.browser.newPage.bind(app.browser); app.browser.newPage = async (...a) => withSizeGlobals(await np(...a)); }
     await page.evaluate(() => window.__mqLoadDeferred());
     const fails = [];
     const rows = [];
@@ -1604,7 +1614,7 @@ async function factsSweep(app, full) {
             const F = (x) => out.fails.push(x);
             const L = (l) => l.map((s) => Object.assign({ amt: '' }, s));
             if (bt) {
-                for (const size of ['S', 'M']) {
+                for (const size of SM) {
                     // the old pass-through: the asked 9 sent as is to a Mixed up page of non-fact problems
                     const res = await window.buildSheet({ role: 'mixed-practice', arrangement: 'mixed', columns: 9, size, look: 'auto', paper: 'A4', seed: 5, key: { on: false }, sections: [{ skills: sets.missing, count: 24, columns: 9 }] });
                     const c = ((res.fits && res.fits.sections) || []).map((x) => x.cols).concat(res.fits && res.fits.cols ? [res.fits.cols] : []);
@@ -1612,7 +1622,7 @@ async function factsSweep(app, full) {
                 }
             }
             // COLS7 + EXACT on the six set (facts + missing numbers) and the missing set (no facts)
-            for (const size of bt ? [] : ['S', 'M']) {
+            for (const size of bt ? [] : SM) {
                 for (const mode of ['exact', 'aim']) {
                     for (const [nm, list, arrange] of [['six', sets.six, 'sections'], ['missing', sets.missing, 'sections'], ['missing-mixed', sets.missing, 'mixed']]) {
                         const o = { how: 'pages', n: 1, size, cols: 9, colsMode: mode, key: false, arrange, seed: 4242, title: true };
@@ -1654,7 +1664,7 @@ async function factsSweep(app, full) {
                     // (facts-print-fix 2026-11-05: Auto at S takes 9 when a dividend reaches 3 digits, 2 mm of white each side)
                     const want = { S: [10, 9, 8], M: [6], L: [5] };
                     const per = {};
-                    for (const size of ['S', 'M', 'L']) {
+                    for (const size of SML) {
                         const b = await m.buildSimple(dv, { how: 'pages', n: 1, size, cols: 'auto', key: false, arrange: 'sections', seed: 4242, title: true });
                         const cl = (b.colsList && b.colsList.length ? b.colsList : [b.cols]).map(Number);
                         per[size] = b.total / Math.max(1, b.pages);
@@ -1681,7 +1691,7 @@ async function factsSweep(app, full) {
                 // down, and at most half the columns hold a run of 3 rows of one table (with 2–4 ticked tables some 3-runs
                 // are unavoidable: the generator cannot know the page's column count, and a run-free deal for every column
                 // count 5–10 and both diagonals does not exist for 3 values; a fixed cycle makes EVERY column one table)
-                for (const size of ['S', 'M', 'L']) {
+                for (const size of SML) {
                     for (const seed of [4242, 77]) {
                         const set = [6, 7, 8];
                         const b = await m.buildSimple(L([{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: set } }]), { how: 'pages', n: 1, size, cols: 'auto', key: false, arrange: 'sections', seed, title: true });
@@ -1704,7 +1714,7 @@ async function factsSweep(app, full) {
             if (bt) return Object.assign(out, await within());
             localStorage.removeItem('mq_quick_prints');
             const skills = [{ categoryId: 'multiplication', skillId: 'mult_facts', opts: { constant: [6, 7, 8] }, amt: '' }, { categoryId: 'addition', skillId: 'add_20_mixed', opts: { band: 10 }, amt: '40%' }];
-            const pr = { how: 'problems', n: 30, sets: 2, size: 'S', cols: 5, colsMode: 'exact', key: false, arrange: 'sections' };
+            const pr = { how: 'problems', n: 30, sets: 2, size: SMALL, cols: 5, colsMode: 'exact', key: false, arrange: 'sections' };
             const rec = m.saveQuickPrint('Tables 6–8', skills, pr);
             const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
             if (!rec || m.quickPrints().length !== 1) F('QUICK save: not saved');
@@ -1719,7 +1729,7 @@ async function factsSweep(app, full) {
             m.openQuickPrint(rec.id, { from: 'tray' });
             for (let i = 0; i < 80; i++) { const st = m.simplePrintState(); if (st && st.built && !st.busy) break; await new Promise((r) => setTimeout(r, 200)); }
             const st = m.simplePrintState();
-            if (!st || !same(st.list.map((x) => [x.key, x.opts, x.amt]), skills.map((x) => [`${x.categoryId}:${x.skillId}`, x.opts, x.amt])) || st.prefs.size !== 'S' || st.prefs.how !== 'problems' || st.prefs.nProblems !== 30 || st.prefs.cols !== 5 || st.prefs.colsMode !== 'exact' || st.prefs.sets !== 2 || st.prefs.key !== false) F(`QUICK open: the dialog is not filled in: ${JSON.stringify(st && { list: st.list, prefs: st.prefs })}`);
+            if (!st || !same(st.list.map((x) => [x.key, x.opts, x.amt]), skills.map((x) => [`${x.categoryId}:${x.skillId}`, x.opts, x.amt])) || st.prefs.size !== SMALL || st.prefs.how !== 'problems' || st.prefs.nProblems !== 30 || st.prefs.cols !== 5 || st.prefs.colsMode !== 'exact' || st.prefs.sets !== 2 || st.prefs.key !== false) F(`QUICK open: the dialog is not filled in: ${JSON.stringify(st && { list: st.list, prefs: st.prefs })}`);
             window.closeSimplePrint();
             m.deleteQuickPrint(rec.id);
             if (m.quickPrints().length !== 0) F('QUICK delete');

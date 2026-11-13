@@ -2857,14 +2857,14 @@ function foldRulings(out, j) {
             try {
                 const kit = await import('/js/modules/sheet/index.js');
                 const rows = [];
-                for (const size of ['S', 'M', 'L']) {
+                for (const size of ['M', 'L']) {
                     for (const place of [1, 10, 100, 1000]) {
                         rows.push({ size, place, d: kit.diskDiameter(place, size), zone: kit.zoneSide(place, size), capacity: kit.zoneCapacity(place, size) });
                     }
                 }
                 const q = window.generateQuestionFor({ category: 'placevalue', skill: 'pv_disks_build', range: 1000, decimals: 0, seed: 7, itemIndex: 0 });
                 const cells = [];
-                for (const size of ['S', 'M', 'L']) {
+                for (const size of ['M', 'L']) {
                     const html = kit.renderCell(q, { mode: 'print', size, state: 'blank' });
                     const zones = [...html.matchAll(/<rect[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*data-pv-zone="(\d+)"/g)]
                         .map(m => Math.min(parseFloat(m[1]), parseFloat(m[2])));

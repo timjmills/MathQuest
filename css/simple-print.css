@@ -209,3 +209,6 @@ body.sp-open { overflow: hidden; }
     .sp-root .sp-lg-title { flex: 1 1 auto; }
     .sp-root .sp-lg-meta { order: 5; flex: 1 1 100%; }
 }
+/* owner 2026-11-13 (plan item 9): two sizes, M and L - the size row holds two buttons (additive: the 3-column rule stays
+   for any older markup) */
+.sp-root .sp-sizes.sp-sizes-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }

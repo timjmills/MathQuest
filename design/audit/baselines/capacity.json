@@ -1,21 +1,13 @@
 {
- "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling",
+ "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling Owner 2026-11-13 (plan item 9): size S dropped - its S keys removed; M / L keys untouched.",
  "written": "2026-11-13",
  "pages": {
-  "addition:add_facts true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_facts true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_facts reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "addition:add_facts reason-it M": {
@@ -26,19 +18,11 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "addition:add_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -50,20 +34,12 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "addition:add_facts review M": {
    "items": 10,
    "pages": 1
   },
   "addition:add_facts review L": {
    "items": 10,
-   "pages": 1
-  },
-  "addition:add_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "addition:add_facts test M": {
@@ -74,20 +50,12 @@
    "items": 12,
    "pages": 1
   },
-  "addition:add_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "addition:add_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "addition:add_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "addition:add_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "addition:add_facts more-practice M": {
@@ -98,20 +66,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_facts true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_facts true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_facts reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "subtraction:sub_facts reason-it M": {
@@ -122,19 +82,11 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -146,20 +98,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_facts review S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_facts review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_facts review L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_facts test M": {
@@ -170,20 +114,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "subtraction:sub_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "subtraction:sub_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_facts more-practice M": {
@@ -194,20 +130,12 @@
    "items": 12,
    "pages": 1
   },
-  "multiplication:mult_facts true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "multiplication:mult_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "multiplication:mult_facts true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "multiplication:mult_facts reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "multiplication:mult_facts reason-it M": {
@@ -218,19 +146,11 @@
    "items": 2,
    "pages": 1
   },
-  "multiplication:mult_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "multiplication:mult_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "multiplication:mult_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "multiplication:mult_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -242,20 +162,12 @@
    "items": 4,
    "pages": 1
   },
-  "multiplication:mult_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "multiplication:mult_facts review M": {
    "items": 12,
    "pages": 1
   },
   "multiplication:mult_facts review L": {
    "items": 12,
-   "pages": 1
-  },
-  "multiplication:mult_facts test S": {
-   "items": 20,
    "pages": 1
   },
   "multiplication:mult_facts test M": {
@@ -266,20 +178,12 @@
    "items": 12,
    "pages": 1
   },
-  "multiplication:mult_facts independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "multiplication:mult_facts independent M": {
    "items": 20,
    "pages": 1
   },
   "multiplication:mult_facts independent L": {
    "items": 12,
-   "pages": 1
-  },
-  "multiplication:mult_facts more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "multiplication:mult_facts more-practice M": {
@@ -290,19 +194,11 @@
    "items": 12,
    "pages": 1
   },
-  "division:div_facts_long true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "division:div_facts_long true-false M": {
    "items": 6,
    "pages": 1
   },
   "division:div_facts_long true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts_long reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -314,10 +210,6 @@
    "items": 2,
    "pages": 1
   },
-  "division:div_facts_long error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "division:div_facts_long error-analysis M": {
    "items": 4,
    "pages": 1
@@ -325,10 +217,6 @@
   "division:div_facts_long error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "division:div_facts_long pre-skill-check S": {
-   "items": 7,
-   "pages": 2
   },
   "division:div_facts_long pre-skill-check M": {
    "items": 7,
@@ -338,20 +226,12 @@
    "items": 7,
    "pages": 2
   },
-  "division:div_facts_long review S": {
-   "items": 16,
-   "pages": 1
-  },
   "division:div_facts_long review M": {
    "items": 8,
    "pages": 1
   },
   "division:div_facts_long review L": {
    "items": 8,
-   "pages": 1
-  },
-  "division:div_facts_long test S": {
-   "items": 20,
    "pages": 1
   },
   "division:div_facts_long test M": {
@@ -362,20 +242,12 @@
    "items": 12,
    "pages": 1
   },
-  "division:div_facts_long independent S": {
-   "items": 30,
-   "pages": 1
-  },
   "division:div_facts_long independent M": {
    "items": 24,
    "pages": 1
   },
   "division:div_facts_long independent L": {
    "items": 15,
-   "pages": 1
-  },
-  "division:div_facts_long more-practice S": {
-   "items": 30,
    "pages": 1
   },
   "division:div_facts_long more-practice M": {
@@ -386,19 +258,11 @@
    "items": 15,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -410,20 +274,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup pre-skill-check M": {
@@ -434,20 +290,12 @@
    "items": 16,
    "pages": 2
   },
-  "subtraction:sub_50_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup test M": {
@@ -458,20 +306,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_50_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_50_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_50_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_50_no_regroup more-practice M": {
@@ -482,19 +322,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -506,20 +338,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup pre-skill-check M": {
@@ -530,20 +354,12 @@
    "items": 10,
    "pages": 2
   },
-  "subtraction:sub_100_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup test M": {
@@ -554,20 +370,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_100_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_100_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_100_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_100_no_regroup more-practice M": {
@@ -578,19 +386,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -602,20 +402,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup pre-skill-check M": {
@@ -626,20 +418,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_1k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup test M": {
@@ -650,20 +434,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_1k_no_regroup independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_1k_no_regroup independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_1k_no_regroup more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_1k_no_regroup more-practice M": {
@@ -674,19 +450,11 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -698,20 +466,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup pre-skill-check M": {
@@ -722,20 +482,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_10k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup review L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup test M": {
@@ -746,20 +498,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_10k_no_regroup independent S": {
-   "items": 20,
-   "pages": 1
-  },
   "subtraction:sub_10k_no_regroup independent M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_10k_no_regroup more-practice S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_10k_no_regroup more-practice M": {
@@ -770,20 +514,12 @@
    "items": 9,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup true-false L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup reason-it S": {
-   "items": 4,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup reason-it M": {
@@ -794,20 +530,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup error-analysis L": {
    "items": 3,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup pre-skill-check S": {
-   "items": 16,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup pre-skill-check M": {
@@ -818,20 +546,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_100k_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup review M": {
    "items": 12,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_100k_no_regroup test S": {
-   "items": 15,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup test M": {
@@ -842,10 +562,6 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup independent M": {
    "items": 8,
    "pages": 1
@@ -854,19 +570,11 @@
    "items": 6,
    "pages": 1
   },
-  "subtraction:sub_100k_no_regroup more-practice S": {
-   "items": 15,
-   "pages": 1
-  },
   "subtraction:sub_100k_no_regroup more-practice M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_100k_no_regroup more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -878,20 +586,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup reason-it S": {
-   "items": 4,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup reason-it M": {
    "items": 3,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup error-analysis M": {
@@ -902,10 +602,6 @@
    "items": 3,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup pre-skill-check S": {
-   "items": 14,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup pre-skill-check M": {
    "items": 8,
    "pages": 2
@@ -914,20 +610,12 @@
    "items": 8,
    "pages": 2
   },
-  "subtraction:sub_1m_no_regroup review S": {
-   "items": 16,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup review M": {
    "items": 9,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_1m_no_regroup test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup test M": {
@@ -938,10 +626,6 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup independent S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup independent M": {
    "items": 8,
    "pages": 1
@@ -950,19 +634,11 @@
    "items": 6,
    "pages": 1
   },
-  "subtraction:sub_1m_no_regroup more-practice S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_1m_no_regroup more-practice M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_1m_no_regroup more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -974,20 +650,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_2d_1d reason-it S": {
-   "items": 4,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d reason-it M": {
    "items": 3,
    "pages": 1
   },
   "subtraction:sub_2d_1d reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "subtraction:sub_2d_1d error-analysis M": {
@@ -998,10 +666,6 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_2d_1d pre-skill-check S": {
-   "items": 6,
-   "pages": 2
-  },
   "subtraction:sub_2d_1d pre-skill-check M": {
    "items": 6,
    "pages": 2
@@ -1010,20 +674,12 @@
    "items": 6,
    "pages": 2
   },
-  "subtraction:sub_2d_1d review S": {
-   "items": 12,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_2d_1d review L": {
    "items": 5,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d test S": {
-   "items": 20,
    "pages": 1
   },
   "subtraction:sub_2d_1d test M": {
@@ -1034,20 +690,12 @@
    "items": 12,
    "pages": 1
   },
-  "subtraction:sub_2d_1d independent S": {
-   "items": 25,
-   "pages": 1
-  },
   "subtraction:sub_2d_1d independent M": {
    "items": 16,
    "pages": 1
   },
   "subtraction:sub_2d_1d independent L": {
    "items": 9,
-   "pages": 1
-  },
-  "subtraction:sub_2d_1d more-practice S": {
-   "items": 25,
    "pages": 1
   },
   "subtraction:sub_2d_1d more-practice M": {
@@ -1058,20 +706,12 @@
    "items": 9,
    "pages": 1
   },
-  "addition:fact_family_sort true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:fact_family_sort true-false M": {
    "items": 4,
    "pages": 1
   },
   "addition:fact_family_sort true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:fact_family_sort reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "addition:fact_family_sort reason-it M": {
@@ -1082,20 +722,12 @@
    "items": 2,
    "pages": 1
   },
-  "addition:fact_family_sort error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:fact_family_sort error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:fact_family_sort error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:fact_family_sort pre-skill-check S": {
-   "items": 6,
    "pages": 1
   },
   "addition:fact_family_sort pre-skill-check M": {
@@ -1106,20 +738,12 @@
    "items": 6,
    "pages": 2
   },
-  "addition:fact_family_sort review S": {
-   "items": 9,
-   "pages": 1
-  },
   "addition:fact_family_sort review M": {
    "items": 8,
    "pages": 1
   },
   "addition:fact_family_sort review L": {
    "items": 5,
-   "pages": 1
-  },
-  "addition:fact_family_sort test S": {
-   "items": 12,
    "pages": 1
   },
   "addition:fact_family_sort test M": {
@@ -1130,10 +754,6 @@
    "items": 6,
    "pages": 1
   },
-  "addition:fact_family_sort independent S": {
-   "items": 12,
-   "pages": 1
-  },
   "addition:fact_family_sort independent M": {
    "items": 9,
    "pages": 1
@@ -1142,19 +762,11 @@
    "items": 6,
    "pages": 1
   },
-  "addition:fact_family_sort more-practice S": {
-   "items": 12,
-   "pages": 1
-  },
   "addition:fact_family_sort more-practice M": {
    "items": 9,
    "pages": 1
   },
   "addition:fact_family_sort more-practice L": {
-   "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain true-false S": {
    "items": 6,
    "pages": 1
   },
@@ -1166,20 +778,12 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_wp_20_plain reason-it S": {
-   "items": 2,
-   "pages": 1
-  },
   "addition:add_wp_20_plain reason-it M": {
    "items": 2,
    "pages": 1
   },
   "addition:add_wp_20_plain reason-it L": {
    "items": 2,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain error-analysis S": {
-   "items": 6,
    "pages": 1
   },
   "addition:add_wp_20_plain error-analysis M": {
@@ -1190,10 +794,6 @@
    "items": 4,
    "pages": 1
   },
-  "addition:add_wp_20_plain pre-skill-check S": {
-   "items": 10,
-   "pages": 2
-  },
   "addition:add_wp_20_plain pre-skill-check M": {
    "items": 10,
    "pages": 2
@@ -1202,20 +802,12 @@
    "items": 10,
    "pages": 2
   },
-  "addition:add_wp_20_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "addition:add_wp_20_plain review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_20_plain test M": {
@@ -1226,20 +818,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_20_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_20_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_20_plain more-practice M": {
@@ -1250,20 +834,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10 true-false S": {
-   "items": 4,
-   "pages": 1
-  },
   "addition:add_wp_10 true-false M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10 true-false L": {
    "items": 2,
-   "pages": 1
-  },
-  "addition:add_wp_10 reason-it S": {
-   "items": 1,
    "pages": 1
   },
   "addition:add_wp_10 reason-it M": {
@@ -1274,20 +850,12 @@
    "items": 1,
    "pages": 1
   },
-  "addition:add_wp_10 error-analysis S": {
-   "items": 4,
-   "pages": 1
-  },
   "addition:add_wp_10 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10 error-analysis L": {
    "items": 3,
-   "pages": 1
-  },
-  "addition:add_wp_10 pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "addition:add_wp_10 pre-skill-check M": {
@@ -1298,19 +866,11 @@
    "items": 14,
    "pages": 1
   },
-  "addition:add_wp_10 review S": {
-   "items": 7,
-   "pages": 1
-  },
   "addition:add_wp_10 review M": {
    "items": 7,
    "pages": 1
   },
   "addition:add_wp_10 review L": {
-   "items": 7,
-   "pages": 1
-  },
-  "addition:add_wp_10 test S": {
    "items": 7,
    "pages": 1
   },
@@ -1322,20 +882,12 @@
    "items": 5,
    "pages": 1
   },
-  "addition:add_wp_10 independent S": {
-   "items": 7,
-   "pages": 1
-  },
   "addition:add_wp_10 independent M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_10 independent L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10 more-practice S": {
-   "items": 7,
    "pages": 1
   },
   "addition:add_wp_10 more-practice M": {
@@ -1346,20 +898,12 @@
    "items": 4,
    "pages": 1
   },
-  "subtraction:sub_wp_20 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_20 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_20 reason-it M": {
@@ -1370,20 +914,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_20 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_20 error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 pre-skill-check S": {
-   "items": 12,
    "pages": 1
   },
   "subtraction:sub_wp_20 pre-skill-check M": {
@@ -1394,20 +930,12 @@
    "items": 12,
    "pages": 2
   },
-  "subtraction:sub_wp_20 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20 review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20 test M": {
@@ -1418,20 +946,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_20 independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_20 more-practice M": {
@@ -1442,20 +962,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_10_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_10_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "addition:add_wp_10_plain reason-it M": {
@@ -1466,20 +978,12 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_wp_10_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_10_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "addition:add_wp_10_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "addition:add_wp_10_plain pre-skill-check M": {
@@ -1490,20 +994,12 @@
    "items": 14,
    "pages": 2
   },
-  "addition:add_wp_10_plain review S": {
-   "items": 8,
-   "pages": 1
-  },
   "addition:add_wp_10_plain review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_10_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_10_plain test M": {
@@ -1514,20 +1010,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_10_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_10_plain independent M": {
    "items": 10,
    "pages": 1
   },
   "addition:add_wp_10_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_10_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_10_plain more-practice M": {
@@ -1538,20 +1026,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_20 true-false M": {
    "items": 6,
    "pages": 1
   },
   "addition:add_wp_20 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "addition:add_wp_20 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "addition:add_wp_20 reason-it M": {
@@ -1562,10 +1042,6 @@
    "items": 2,
    "pages": 1
   },
-  "addition:add_wp_20 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "addition:add_wp_20 error-analysis M": {
    "items": 4,
    "pages": 1
@@ -1573,10 +1049,6 @@
   "addition:add_wp_20 error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "addition:add_wp_20 pre-skill-check S": {
-   "items": 12,
-   "pages": 2
   },
   "addition:add_wp_20 pre-skill-check M": {
    "items": 12,
@@ -1586,20 +1058,12 @@
    "items": 12,
    "pages": 2
   },
-  "addition:add_wp_20 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "addition:add_wp_20 review M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20 review L": {
    "items": 6,
-   "pages": 1
-  },
-  "addition:add_wp_20 test S": {
-   "items": 10,
    "pages": 1
   },
   "addition:add_wp_20 test M": {
@@ -1610,20 +1074,12 @@
    "items": 8,
    "pages": 1
   },
-  "addition:add_wp_20 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "addition:add_wp_20 independent M": {
    "items": 8,
    "pages": 1
   },
   "addition:add_wp_20 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "addition:add_wp_20 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "addition:add_wp_20 more-practice M": {
@@ -1634,20 +1090,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10 true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_10 true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_10 reason-it M": {
@@ -1658,20 +1106,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_10 error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_10 error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "subtraction:sub_wp_10 pre-skill-check M": {
@@ -1682,20 +1122,12 @@
    "items": 14,
    "pages": 2
   },
-  "subtraction:sub_wp_10 review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 review M": {
    "items": 9,
    "pages": 1
   },
   "subtraction:sub_wp_10 review L": {
    "items": 7,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_10 test M": {
@@ -1706,20 +1138,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10 independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_10 independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10 independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10 more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_10 more-practice M": {
@@ -1730,20 +1154,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain reason-it M": {
@@ -1754,20 +1170,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain pre-skill-check S": {
-   "items": 14,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain pre-skill-check M": {
@@ -1778,20 +1186,12 @@
    "items": 14,
    "pages": 2
   },
-  "subtraction:sub_wp_10_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain test M": {
@@ -1802,20 +1202,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_10_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_10_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_10_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_10_plain more-practice M": {
@@ -1826,20 +1218,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain true-false S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain true-false M": {
    "items": 6,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain reason-it S": {
-   "items": 2,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain reason-it M": {
@@ -1850,20 +1234,12 @@
    "items": 2,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain pre-skill-check M": {
@@ -1874,20 +1250,12 @@
    "items": 10,
    "pages": 2
   },
-  "subtraction:sub_wp_20_plain review S": {
-   "items": 10,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain review M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain review L": {
    "items": 6,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain test S": {
-   "items": 10,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain test M": {
@@ -1898,20 +1266,12 @@
    "items": 8,
    "pages": 1
   },
-  "subtraction:sub_wp_20_plain independent S": {
-   "items": 11,
-   "pages": 1
-  },
   "subtraction:sub_wp_20_plain independent M": {
    "items": 8,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain independent L": {
    "items": 8,
-   "pages": 1
-  },
-  "subtraction:sub_wp_20_plain more-practice S": {
-   "items": 11,
    "pages": 1
   },
   "subtraction:sub_wp_20_plain more-practice M": {
@@ -1922,19 +1282,11 @@
    "items": 8,
    "pages": 1
   },
-  "placevalue:expand true-false S": {
-   "items": 5,
-   "pages": 1
-  },
   "placevalue:expand true-false M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:expand true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:expand reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -1946,20 +1298,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:expand error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:expand error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:expand error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:expand pre-skill-check S": {
-   "items": 13,
    "pages": 1
   },
   "placevalue:expand pre-skill-check M": {
@@ -1970,20 +1314,12 @@
    "items": 9,
    "pages": 2
   },
-  "placevalue:expand review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:expand review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:expand review L": {
    "items": 11,
-   "pages": 1
-  },
-  "placevalue:expand test S": {
-   "items": 12,
    "pages": 1
   },
   "placevalue:expand test M": {
@@ -1994,20 +1330,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:expand independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "placevalue:expand independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:expand independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:expand more-practice S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:expand more-practice M": {
@@ -2018,20 +1346,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:identify true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:identify true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:identify true-false L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:identify reason-it S": {
-   "items": 3,
    "pages": 1
   },
   "placevalue:identify reason-it M": {
@@ -2042,20 +1362,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:identify error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:identify error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:identify error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:identify pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "placevalue:identify pre-skill-check M": {
@@ -2066,20 +1378,12 @@
    "items": 6,
    "pages": 2
   },
-  "placevalue:identify review S": {
-   "items": 10,
-   "pages": 1
-  },
   "placevalue:identify review M": {
    "items": 5,
    "pages": 1
   },
   "placevalue:identify review L": {
    "items": 5,
-   "pages": 1
-  },
-  "placevalue:identify test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:identify test M": {
@@ -2090,20 +1394,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:identify independent S": {
-   "items": 20,
-   "pages": 1
-  },
   "placevalue:identify independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:identify independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:identify more-practice S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:identify more-practice M": {
@@ -2114,19 +1410,11 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form true-false S": {
-   "items": 5,
-   "pages": 1
-  },
   "placevalue:unit_form true-false M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:unit_form true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:unit_form reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2138,20 +1426,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:unit_form error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:unit_form error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:unit_form error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:unit_form pre-skill-check S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:unit_form pre-skill-check M": {
@@ -2162,20 +1442,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:unit_form review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:unit_form review L": {
    "items": 9,
-   "pages": 1
-  },
-  "placevalue:unit_form test S": {
-   "items": 12,
    "pages": 1
   },
   "placevalue:unit_form test M": {
@@ -2186,20 +1458,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:unit_form independent S": {
-   "items": 15,
-   "pages": 1
-  },
   "placevalue:unit_form independent M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:unit_form independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:unit_form more-practice S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:unit_form more-practice M": {
@@ -2210,19 +1474,11 @@
    "items": 10,
    "pages": 1
   },
-  "composing:number_word_form true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "composing:number_word_form true-false M": {
    "items": 6,
    "pages": 1
   },
   "composing:number_word_form true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "composing:number_word_form reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2234,10 +1490,6 @@
    "items": 2,
    "pages": 1
   },
-  "composing:number_word_form error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "composing:number_word_form error-analysis M": {
    "items": 4,
    "pages": 1
@@ -2245,10 +1497,6 @@
   "composing:number_word_form error-analysis L": {
    "items": 4,
    "pages": 1
-  },
-  "composing:number_word_form pre-skill-check S": {
-   "items": 10,
-   "pages": 2
   },
   "composing:number_word_form pre-skill-check M": {
    "items": 6,
@@ -2258,20 +1506,12 @@
    "items": 6,
    "pages": 2
   },
-  "composing:number_word_form review S": {
-   "items": 16,
-   "pages": 1
-  },
   "composing:number_word_form review M": {
    "items": 12,
    "pages": 1
   },
   "composing:number_word_form review L": {
    "items": 10,
-   "pages": 1
-  },
-  "composing:number_word_form test S": {
-   "items": 20,
    "pages": 1
   },
   "composing:number_word_form test M": {
@@ -2282,20 +1522,12 @@
    "items": 12,
    "pages": 1
   },
-  "composing:number_word_form independent S": {
-   "items": 28,
-   "pages": 1
-  },
   "composing:number_word_form independent M": {
    "items": 21,
    "pages": 1
   },
   "composing:number_word_form independent L": {
    "items": 15,
-   "pages": 1
-  },
-  "composing:number_word_form more-practice S": {
-   "items": 28,
    "pages": 1
   },
   "composing:number_word_form more-practice M": {
@@ -2306,19 +1538,11 @@
    "items": 15,
    "pages": 1
   },
-  "placevalue:value true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:value true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:value true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:value reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2330,20 +1554,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:value error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:value error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:value error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:value pre-skill-check S": {
-   "items": 10,
    "pages": 1
   },
   "placevalue:value pre-skill-check M": {
@@ -2354,20 +1570,12 @@
    "items": 6,
    "pages": 2
   },
-  "placevalue:value review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:value review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:value review L": {
    "items": 12,
-   "pages": 1
-  },
-  "placevalue:value test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:value test M": {
@@ -2378,20 +1586,12 @@
    "items": 12,
    "pages": 1
   },
-  "placevalue:value independent S": {
-   "items": 30,
-   "pages": 1
-  },
   "placevalue:value independent M": {
    "items": 24,
    "pages": 1
   },
   "placevalue:value independent L": {
    "items": 18,
-   "pages": 1
-  },
-  "placevalue:value more-practice S": {
-   "items": 30,
    "pages": 1
   },
   "placevalue:value more-practice M": {
@@ -2402,19 +1602,11 @@
    "items": 18,
    "pages": 1
   },
-  "placevalue:combine true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "placevalue:combine true-false M": {
    "items": 6,
    "pages": 1
   },
   "placevalue:combine true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "placevalue:combine reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2426,20 +1618,12 @@
    "items": 2,
    "pages": 1
   },
-  "placevalue:combine error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "placevalue:combine error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "placevalue:combine error-analysis L": {
    "items": 4,
-   "pages": 1
-  },
-  "placevalue:combine pre-skill-check S": {
-   "items": 15,
    "pages": 1
   },
   "placevalue:combine pre-skill-check M": {
@@ -2450,20 +1634,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:combine review S": {
-   "items": 16,
-   "pages": 1
-  },
   "placevalue:combine review M": {
    "items": 12,
    "pages": 1
   },
   "placevalue:combine review L": {
    "items": 9,
-   "pages": 1
-  },
-  "placevalue:combine test S": {
-   "items": 20,
    "pages": 1
   },
   "placevalue:combine test M": {
@@ -2474,20 +1650,12 @@
    "items": 10,
    "pages": 1
   },
-  "placevalue:combine independent S": {
-   "items": 27,
-   "pages": 1
-  },
   "placevalue:combine independent M": {
    "items": 18,
    "pages": 1
   },
   "placevalue:combine independent L": {
    "items": 10,
-   "pages": 1
-  },
-  "placevalue:combine more-practice S": {
-   "items": 27,
    "pages": 1
   },
   "placevalue:combine more-practice M": {
@@ -2498,19 +1666,11 @@
    "items": 10,
    "pages": 1
   },
-  "division:div_facts true-false S": {
-   "items": 8,
-   "pages": 1
-  },
   "division:div_facts true-false M": {
    "items": 6,
    "pages": 1
   },
   "division:div_facts true-false L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts reason-it S": {
    "items": 4,
    "pages": 1
   },
@@ -2522,19 +1682,11 @@
    "items": 2,
    "pages": 1
   },
-  "division:div_facts error-analysis S": {
-   "items": 6,
-   "pages": 1
-  },
   "division:div_facts error-analysis M": {
    "items": 4,
    "pages": 1
   },
   "division:div_facts error-analysis L": {
-   "items": 4,
-   "pages": 1
-  },
-  "division:div_facts pre-skill-check S": {
    "items": 4,
    "pages": 1
   },
@@ -2546,20 +1698,12 @@
    "items": 4,
    "pages": 1
   },
-  "division:div_facts review S": {
-   "items": 16,
-   "pages": 1
-  },
   "division:div_facts review M": {
    "items": 12,
    "pages": 1
   },
   "division:div_facts review L": {
    "items": 12,
-   "pages": 1
-  },
-  "division:div_facts test S": {
-   "items": 36,
    "pages": 1
   },
   "division:div_facts test M": {
@@ -2570,20 +1714,12 @@
    "items": 18,
    "pages": 1
   },
-  "division:div_facts independent S": {
-   "items": 36,
-   "pages": 1
-  },
   "division:div_facts independent M": {
    "items": 24,
    "pages": 1
   },
   "division:div_facts independent L": {
    "items": 18,
-   "pages": 1
-  },
-  "division:div_facts more-practice S": {
-   "items": 36,
    "pages": 1
   },
   "division:div_facts more-practice M": {
@@ -2603,10 +1739,6 @@
   "algebra:function_table_easy true-false L": {
    "items": 2,
    "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
-  },
-  "patterns:growing_shape_patterns review S": {
-   "items": 7,
-   "reason": "items taller than the page allows: Term 1-4 drawings (lead ruling 2026-11-13, critic r2/r3 N4: PT-REV-1's 8 cannot fit)"
   },
   "patterns:growing_shape_patterns review M": {
    "items": 5,

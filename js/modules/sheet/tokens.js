@@ -126,6 +126,16 @@ export const SIZES = Object.freeze({
 });
 export const SIZE_IDS = Object.freeze(['S', 'M', 'L']);
 export const DEFAULT_SIZE = 'L';
+// Owner 2026-11-13 (CLAUDE.md plan item 9): the print sizes OFFERED are M and L; size S is dropped. The S token above
+// stays so an old S setting, stored print, URL or saved quiz still decodes: it is an ALIAS of M, never a deletion.
+// Every size picker offers OFFERED_SIZES only, and every restore path reads a stored size through offeredSize().
+export const OFFERED_SIZES = Object.freeze(['M', 'L']);
+/** A stored / requested size as one the app offers: 'S' (dropped) -> 'M'; 'M' / 'L' as given; anything else -> fallback. */
+export function offeredSize(v, fallback = 'M') {
+    const u = String(v == null ? '' : v).toUpperCase();
+    if (u === 'S') return 'M';
+    return OFFERED_SIZES.includes(u) ? u : fallback;
+}
 
 /* --------------------------------------------------------- the two looks (section 1.2) */
 
@@ -381,7 +391,7 @@ export function metricsFor(size = DEFAULT_SIZE, look = DEFAULT_LOOK, { factColum
 
 export default {
     INK, STROKE, STROKE_WIDTHS, DASH, HATCH, PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE, LOOKS, LOOK_IDS, DEFAULT_LOOK,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, OFFERED_SIZES, offeredSize, LOOKS, LOOK_IDS, DEFAULT_LOOK,
     FACT_TRACK_EM, FACT_TRACKS, MINUS, TIMES, DIV, opGlyph,
     EM_MM, trackMm, trackEmFor, trackFloorMm, SEPARATOR_EM,
     FACT_LADDER, FACT_AUTO_COLS, FACT_PROBE_COLS, FACT_PROBE_XL_PT, FACT_CELL_H_MM, factDigitPt, factCellHMm,

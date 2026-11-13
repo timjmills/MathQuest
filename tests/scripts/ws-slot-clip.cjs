@@ -296,7 +296,7 @@ out('\\n' + JSON.stringify(res) + '\\n'); process.exit(0);`;
     const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: HERE, env: Object.assign({}, process.env, { SC_ROOT: ROOT, SC_KEYS: JSON.stringify(keys) }), encoding: 'utf8', maxBuffer: 64 << 20 });
     try { return JSON.parse(String(r.stdout || '').trim().split('\n').pop()); } catch (e) { throw new Error(`cannot read the skills' options in node: ${String(r.stderr || '').slice(0, 400)}`); }
 }
-const EXTRA_SIZES = ['S'];
+const EXTRA_SIZES = argAll('sizes').includes('S') ? ['S'] : ['M'];   // owner 2026-11-13: the smallest offered size (S only when asked)
 function extraRows(keys) {
     const spec = extraSpecs(keys);
     const rows = [];
@@ -450,7 +450,7 @@ async function main() {
         if (VALUE.has(m[1])) i++;
     }
     const T0 = Date.now();
-    const sizes = argAll('sizes').length ? argAll('sizes') : ['S', 'M', 'L'];
+    const sizes = argAll('sizes').length ? argAll('sizes') : ['M', 'L']; // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
     if (sizes.some((z) => !['S', 'M', 'L'].includes(z))) { say(`${TOOL}: --sizes takes S,M,L`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const onlyRows = argAll('rows');
     let keys = argAll('skills');

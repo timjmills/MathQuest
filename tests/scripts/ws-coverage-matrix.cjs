@@ -215,7 +215,7 @@ const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.reso
 const PRINT_LINT = path.join(__dirname, 'ws-print-lint.cjs');
 const ENVELOPE = path.join(__dirname, 'ws-envelope.mjs');
 const RUNNER = '/tmp/mq-browser-run.sh';
-const SIZES = ['S', 'M', 'L'];
+const SIZES = String(arg('sizes', 'M,L') || 'M,L').split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const MATRIX_DIR = path.join(ROOT, 'design', 'audit', 'matrix');
 const PARTNERS_FALLBACK = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'matrix-partners.json');
 const ROLE_SAMPLE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'role-sample.json');

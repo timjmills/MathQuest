@@ -17,7 +17,7 @@ const has = (k) => argv.includes('--' + k);
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 const PIN = path.resolve(arg('pin', path.join(__dirname, '..', '..', 'design', 'audit', 'baselines', 'capacity.json')));
 const ROLES = list(arg('roles', 'true-false,reason-it,error-analysis,pre-skill-check,review,test,independent,more-practice'));
-const SIZES = list(arg('sizes', 'S,M,L'));
+const SIZES = list(arg('sizes', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const ALLOW = new Set(list(arg('allow', '')));
 
 (async () => {

@@ -879,10 +879,10 @@ function buildPlan(ctx) {
         const pl = ['--source', 'kit', '--skills', keys.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
         add(gate('print-lint-kit', `ws-print-lint --source kit --size L (${dup})`, scope, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: keys } }));
-        // S and M (LESSONS_LEARNED L1: "Size S ignored"): their own pins, print-lint.<S|M>.json. A skill missing from a
-        // size's pin runs without --baseline, so any finding there is red (print-lint's rule: an unpinned document
-        // must be clean) and the row says how to pin it.
-        for (const sz of ['S', 'M']) {
+        // M (LESSONS_LEARNED L1: "Size S ignored"; owner 2026-11-13: the print sizes are M and L, size S is dropped): its own
+        // pin, print-lint.M.json. A skill missing from the pin runs without --baseline, so any finding there is red
+        // (print-lint's rule: an unpinned document must be clean) and the row says how to pin it.
+        for (const sz of ['M']) {
             const file = sizeBase(sz);
             const pinned = pinnedIds(file);
             const all = keys.every((k) => pinned.has(k));
@@ -895,11 +895,11 @@ function buildPlan(ctx) {
         // lesson pages, N2 / N6 / N7, and the role sample never held them). Against the lesson pins (ids cat:skill#lesson); a
         // lesson page the pin does not hold must be clean. With --role lesson the keys join that role's sample instead.
         if (ctx.role !== 'lesson') {
-            for (const sz of ['L', 'S']) {
-                const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+            for (const sz of ['L', 'M']) {   // (owner 2026-11-13: M and L; a lesson asked for at S always printed at M)
+                const file = sz === 'L' ? PRINT_BASE : sizeBase('M');
                 const ids = keys.map((k) => `${k}#lesson`);
                 const pinnedL = pinnedIds(file);
-                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'S' ? ['--size', 'S'] : []), '--skills', keys.join(',')];
+                const a = ['--source', 'kit', '--roles', 'lesson', ...(sz === 'M' ? ['--size', 'M'] : []), '--skills', keys.join(',')];
                 if (fs.existsSync(file)) a.push('--baseline', rel(file));
                 const unp = keys.filter((k) => !pinnedL.has(`${k}#lesson`));
                 add(gate(`print-lint-lesson-${sz}`, `ws-print-lint --source kit --roles lesson --size ${sz} (the lane skills' own lesson pages: H13, WRAP-OP, ...)`, scope, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint, expect: { ids }, note: unp.length ? `lesson page not pinned at ${sz}: ${listShort(unp)} (must be clean)` : '' }));
@@ -912,8 +912,8 @@ function buildPlan(ctx) {
         if (divFormKeys.length) {
             const DF_ROLES = 'fact-rows,independent,more-practice,test,fact-probe,mixed-practice,opener,guided,review,reason-it,true-false,stretch';
             for (const form of ['standard', 'long', 'fraction', 'vertical', 'mix']) {
-                for (const sz of ['S', 'L']) {
-                    const file = sz === 'L' ? PRINT_BASE : sizeBase('S');
+                for (const sz of ['M', 'L']) {
+                    const file = sz === 'L' ? PRINT_BASE : sizeBase('M');
                     const a = ['--source', 'kit', '--skills', divFormKeys.join(','), '--roles', DF_ROLES, '--size', sz, '--opts', JSON.stringify({ divForm: [form] })];
                     if (fs.existsSync(file)) a.push('--baseline', rel(file));
                     add(gate(`print-lint-divform-${form}-${sz}`, `ws-print-lint --source kit --roles (fact family) --size ${sz} --opts divForm=${form} (critic r1 R1-15: each written form on every page type)`, `${divFormKeys.join(',')} × divForm ${form} × ${sz}`, 'browser', 'ws-print-lint', a, { parse: PARSE.printLint }));
@@ -937,20 +937,20 @@ function buildPlan(ctx) {
             'division:div_facts': ['touch', 'skip', 'array', 'think', 'boxsign'],
         };
         if (factKeys.length) {
-            add(gate('print-lint-supports-S', `ws-print-lint --source kit --supports all --size S --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                ['--source', 'kit', '--supports', 'all', '--size', 'S', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
+            add(gate('print-lint-supports-M', `ws-print-lint --source kit --supports all --size M --roles ${SUP_ROLES} (fact skills with every support on: PG-12, PG-21, CL-40, SCC-T10)`, `${factKeys.join(', ')} × supports × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                ['--source', 'kit', '--supports', 'all', '--size', 'M', '--roles', SUP_ROLES, '--skills', factKeys.join(',')], { parse: PARSE.printLint, expect: { ids: factKeys } }));
             const singles = [...new Set(factKeys.flatMap((k) => FACT_SUPPORTS[k] || []))];
             for (const sup of singles) {
                 const ks = factKeys.filter((k) => (FACT_SUPPORTS[k] || []).includes(sup));
-                add(gate(`print-lint-supports-${sup}-S`, `ws-print-lint --source kit --supports ${sup} --size S --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
-                    ['--source', 'kit', '--supports', sup, '--size', 'S', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
+                add(gate(`print-lint-supports-${sup}-M`, `ws-print-lint --source kit --supports ${sup} --size M --roles ${SUP_ROLES} (critic r3 R3-1: each support alone, one fact x per section)`, `${ks.join(', ')} × ${sup} × ${SUP_ROLES}`, 'browser', 'ws-print-lint',
+                    ['--source', 'kit', '--supports', sup, '--size', 'M', '--roles', SUP_ROLES, '--skills', ks.join(',')], { parse: PARSE.printLint, expect: { ids: ks } }));
             }
         }
         // The fact probe of every fact skill at S / M / L (Lane D restart critic r2 R2-3: the + - x probe's 20th fact spanned
         // the across block, and the ÷ probes at L re-laid cells 19-20 at 1.5 columns; L-DENSITY GRID-EVEN now reads every
         // kit grid). div_facts' forms run on the probe in the divForm gates above (fact-probe is in DF_ROLES).
         if (factKeys.length) {
-            for (const sz of ['S', 'M', 'L']) {
+            for (const sz of ['M', 'L']) {
                 add(gate(`print-lint-probe-${sz}`, `ws-print-lint --source kit --roles fact-probe --size ${sz} --lints L-DENSITY (critic r2 R2-3: one cell width per probe grid)`, `${factKeys.join(', ')} × fact-probe × ${sz}`, 'browser', 'ws-print-lint',
                     ['--source', 'kit', '--roles', 'fact-probe', '--size', sz, '--lints', 'L-DENSITY', '--skills', factKeys.join(',')], { parse: PARSE.printLint }));
             }
@@ -977,7 +977,7 @@ function buildPlan(ctx) {
         const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
         // (every skill keeps the lesson / test / independent gate; a carded skill's other offered roles render in a gate of its own)
         add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+            ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         const BASE_ROLES = ['lesson', 'test', 'independent'];
         // LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3: the npr Scripted Model's Say band ran 6 mm past
         // its frame, clean on screen and in emulated print, cut in half in the printed PDF): the lane skills' tall-state roles
@@ -985,10 +985,10 @@ function buildPlan(ctx) {
         // (RR-PAGES the plan's page count, RR-EDGE no ink at the paper's edge, RR-CLIP no clipped or covered text). Only
         // these two roles, to stay affordable (about 10 s a role and size a skill); --role R runs R on its sample at L.
         add(gate('raster-fit', 'ws-grade-render --raster-fit (scripted-model / guided printed to PDF at S, M, L: RR-PAGES, RR-EDGE, RR-CLIP)', `${scope} × scripted-model, guided × S/M/L`, 'browser', 'ws-grade-render',
-            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'S,M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
+            ['--skills', keys.join(','), '--roles', 'scripted-model,guided', '--size', 'M,L', '--no-screen', '--raster-fit', '--out', path.join(ctx.logs, 'raster-fit')], { needFlags: ['raster-fit'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         // (critic lf-ops r1 check 5, D-MP-13 / D-AG-8: two lane skills on one card print together as a SECTIONS sheet of 2
         // pages - page 1 held 2 items, 64 % empty - at S and L, every page filled, the last one at least half)
-        if (carded.length >= 2) for (const sz of ['S', 'L']) {
+        if (carded.length >= 2) for (const sz of ['M', 'L']) {
             add(gate(`print-lint-sections-${sz}`, `ws-print-lint --source kit --kind sections --pages 2 --size ${sz} --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)`, `${carded.join(' + ')} × sections × 2 pages × ${sz}`, 'browser', 'ws-print-lint',
                 ['--source', 'kit', '--kind', 'sections', '--pages', '2', '--size', sz, '--lints', 'L-DENSITY', '--skills', carded.join(',')], { parse: PARSE.printLint }));
         }
@@ -996,7 +996,7 @@ function buildPlan(ctx) {
             const pl = plans[k], sid = k.split(':')[1];
             const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
             if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × S/M/L`, 'browser', 'ws-grade-render',
-                ['--skills', k, '--roles', more.join(','), '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+                ['--skills', k, '--roles', more.join(','), '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
             add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }
@@ -1064,7 +1064,7 @@ function buildPlan(ctx) {
             // render gate above drew only lesson / test / independent; LESSONS_LEARNED lf-vocab last row)
             const vk = keys.filter((k) => /^vocabulary:vocab_(grade_pictures|pick3_words)$/.test(k));
             add(gate('vocab-roles-render', 'ws-grade-render --gate on the card\'s other offered roles (guided, more-practice, error-analysis) at S, M, L', scope, 'browser', 'ws-grade-render',
-                ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
+                ['--skills', vk.join(','), '--roles', 'guided,more-practice,error-analysis', '--size', 'M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, 'vocab-roles-render')]));
         }
         const s1Json = path.join(ctx.logs, 'node-lint-s1.json');
         add(gate('node-lint-s1', 'ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot)', scope, 'node', 'ws-node-lint', ['--skill', keys.join(','), '--rules', 'LESSON-DATA,OPTION-HELP,WRONG-FITS', '--baseline', 'tests/fixtures/precritic/node-lint-s1.baseline.json', '--json', s1Json], { parse: PARSE.nodeLint, jsonOut: s1Json, expect: { skills: keys.length }, needFlags: ['rules'], missingMsg: 'ws-node-lint is not in this tree' }));
@@ -1128,10 +1128,11 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
-        // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
-        // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
-        const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];
-        const baseS = sizeBase('S');
+        // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at the small size
+        // too - M since the owner dropped S (2026-11-13) - against the M pin (print-lint.M.json); a role page that pin does
+        // not hold must be clean
+        const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'M', '--skills', sample.join(',')];
+        const baseS = sizeBase('M');
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
         // ws-empty-band on the role page (critic eb-r3 D4): the lane's skills (else the sample) x S/M/L on this role only; the
@@ -1150,7 +1151,7 @@ function buildPlan(ctx) {
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
             add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
-        add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
+        add(gate(`print-lint-role-${ctx.role}-M`, `ws-print-lint --source kit --roles ${ctx.role} --size M`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
         // options, and only ws-teacher-wrm (detailed-lesson cards: link decodes to skills.used, use by use) saw it. The
         // lesson role runs it too (every detailed lesson card), unless --teacher adds it already.
@@ -1169,7 +1170,7 @@ function buildPlan(ctx) {
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
             const SAMPLES = 'addition:add_facts,subtraction:sub_100_regroup,number_sense:nearest_10';
-            for (const sz of ['L', 'S']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
+            for (const sz of ['L', 'M']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
         }
         if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
         if (ctx.role === 'lesson') addPartOpts(add, ctx);
@@ -1201,6 +1202,9 @@ function buildPlan(ctx) {
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
     // a tracked file holding one (node, < 1 s)
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
+    // owner 2026-11-13 (CLAUDE.md plan item 9: two print sizes, M and L; S dropped): no size picker offers S, no gate's default
+    // run includes S, and the kit reads a stored S as M (node, < 1 s)
+    add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib', 'node', 'ws-no-size-s', []));
     // (owner rule 2026-11-13, lf-checks) every finding row of design/lessons-first/CHECKS_FROM_CRITICS.md names a backtest id
     // that is in backtests.json and on precritic's path, or a reasoned exemption - on EVERY precritic run (node, ~5 s)
     add(gate('checks-from-critics', 'ws-precritic-plan --checks-from-critics (every critic / owner / lead finding has a backtest id on the path, or an exemption)', 'CHECKS_FROM_CRITICS.md', 'node', 'ws-precritic-plan', ['--checks-from-critics', ...((ctx.skills || []).length ? ['--skills', ctx.skills.map((x) => x.key).join(',')] : [])], { needFlags: ['checks-from-critics'], missingMsg: 'ws-precritic-plan has no --checks-from-critics' }));

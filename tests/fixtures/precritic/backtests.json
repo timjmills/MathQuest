@@ -305,7 +305,7 @@
     "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
     "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D3, the answer strip on 0.95 em tracks"
    },
-   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-slot-clip.cjs --root {root} --skills subtraction:sub_100_no_regroup --rows single/defaults",
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- node tests/scripts/ws-slot-clip.cjs --root {root} --skills subtraction:sub_100_no_regroup --rows single/defaults --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -557,7 +557,7 @@
     "commit": "a930c43",
     "state": "fix r2: the AP4 notation control skips the six no-regroup ids; level 3 / 1 / 0 and the number line render as well as the default"
    },
-   "command": "node tests/scripts/ws-options-verify.cjs --render --root {root} --skill subtraction:sub_100_no_regroup",
+   "command": "node tests/scripts/ws-options-verify.cjs --render --root {root} --skill subtraction:sub_100_no_regroup --sizes S,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1325,7 +1325,7 @@
     "commit": "bcc3ab2d",
     "state": "R4d: missing-number sentences on the kit's tight across tracks (ACROSS_OP_EM / ACROSS_GAP_EM): Auto 3 x 8, Exactly 6 -> 3 (max), Aim -> 2"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs",
+   "command": "node tests/scripts/ws-simple-print.cjs --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1345,7 +1345,7 @@
     "commit": "b84a624a8",
     "state": "facts-print-fix: interleaved fact rows, fallback = In sections, drawn rules, ÷ Auto 9 at S, footers in words"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1365,7 +1365,7 @@
     "commit": "91bd40cbe",
     "state": "facts-print-fix r2: balanced keepShares + printedSkills, Problems-mode fact rows, k/n footers per page, operation titles, docs at most 9"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1385,7 +1385,7 @@
     "commit": "e023c34dc",
     "state": "facts-print-fix r3: all groups planned together (÷ section shares the page), reach-based columns and digits, page-by-page counts, Auto 9, docs at most 9"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --facts-print",
+   "command": "node tests/scripts/ws-simple-print.cjs --facts-print --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1405,7 +1405,7 @@
     "commit": "aa1377878",
     "state": "facts-print-fix r4: one three-line frame for mixed forms, ÷ sections In sections, planFactRows (every page but the last full, <= 1.3), one digit size a page, frame in the grid height, nowrap footer names, background-clip seam fix"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --r4",
+   "command": "node tests/scripts/ws-simple-print.cjs --r4 --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1425,7 +1425,7 @@
     "commit": "21304044e",
     "state": "facts-print-fix r5: teacher's order kept, every section but the last in whole rows, Pages mode planned to the shares (one mixed ÷ section when needed), titles from the options, Size caps the digits with Columns picked"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --r5",
+   "command": "node tests/scripts/ws-simple-print.cjs --r5 --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1445,7 +1445,7 @@
     "commit": "bb4ca1fa9",
     "state": "facts-print-fix r6: exact counts for groups under a row and merged ÷ forms in Problems mode, Pages mode fills the last page, per-page stretch where one height cannot fill all, size notes and buttons, bracket clearance"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1465,7 +1465,7 @@
     "commit": "313a81983",
     "state": "facts-print-fix r7: groups in list order, Columns 5+ for facts with a note for a saved 1-4, one plain sentence a note"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1485,7 +1485,7 @@
     "commit": "cdaa80fc2",
     "state": "facts-print-fix r8: sets reuse set 1's plan; the answer line and the mixed bracket room keep the printed ink >= 2.03 mm"
    },
-   "command": "node tests/scripts/ws-simple-print.cjs --sweep",
+   "command": "node tests/scripts/ws-simple-print.cjs --sweep --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1867,7 +1867,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --card-opts --rules OVERFLOW --show 20 --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1887,7 +1887,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20 --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1907,7 +1907,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules TAGINK --show 20 --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1927,7 +1927,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:mult_properties --card --rules KEYJOIN --show 20 --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1947,7 +1947,7 @@
     "commit": "TBD-lf-ops-fix4",
     "state": "the lf-ops fix4 commit (filled when the fixes land)"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:arrays_groups --card --rules SIZE-S --show 20 --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2027,7 +2027,7 @@
     "commit": "9f483f78",
     "state": "lf-placevalue r2: two fixed lines for six-part expressions, Model and Reason It rows wrap between units"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:combine --card --card-opts",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:combine --card --card-opts --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2167,7 +2167,7 @@
     "commit": "dca16b12",
     "state": "rename frames are one full-width row a line (rowOnly): S 1 x 15, no band"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:unit_form --card --card-opts --h13-abs --opt-roles independent --rules H13-ABS",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:unit_form --card --card-opts --h13-abs --opt-roles independent --rules H13-ABS --size S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2209,7 +2209,7 @@
     "commit": null,
     "state": "engine change not built (layout.js)"
    },
-   "command": "node tests/scripts/ws-coverage-matrix.cjs --skills placevalue:expand,placevalue:unit_form --rows 'placevalue:expand|single/more-cols2+short,placevalue:unit_form|single/more-cols2+short' --baseline design/audit/matrix/baseline.json --red-no-baseline PAGEFILL,H5 --rule-skills placevalue:expand,placevalue:unit_form",
+   "command": "node tests/scripts/ws-coverage-matrix.cjs --skills placevalue:expand,placevalue:unit_form --rows 'placevalue:expand|single/more-cols2+short,placevalue:unit_form|single/more-cols2+short' --baseline design/audit/matrix/baseline.json --red-no-baseline PAGEFILL,H5 --rule-skills placevalue:expand,placevalue:unit_form --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2422,7 +2422,7 @@
     "commit": "668f6a8c",
     "state": "tightRows: in-place rows held to their ink on every role; worst S band 21.1 %"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2462,7 +2462,7 @@
     "commit": "64f70063",
     "state": "blocks picture `compact`: a ones-only picture one cube tall"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --vocab-ink --no-baseline --only EB-VOCAB",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --vocab-ink --no-baseline --only EB-VOCAB --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2482,7 +2482,7 @@
     "commit": "1f18505d",
     "state": "standard and rename rows tightRows; rename write line +4 digits at S; worst side 26.8 %"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -2995,7 +2995,7 @@
     "commit": "a1c8d595",
     "state": "Fix-it words from the pv frame"
    },
-   "command": "node tests/scripts/ws-fixit-words.cjs --skills placevalue:unit_form",
+   "command": "node tests/scripts/ws-fixit-words.cjs --skills placevalue:unit_form --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3056,7 +3056,7 @@
     "commit": "3690ccb3f",
     "state": "master, where the pin was written with --write: every hash identical, every lesson the tree prints is pinned"
    },
-   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned --check design/audit/baselines/lesson-baseline.json",
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --unpinned --check design/audit/baselines/lesson-baseline.json",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3076,7 +3076,7 @@
     "commit": "6e962016",
     "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-BAND,EB-SIDE",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-BAND,EB-SIDE --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3096,7 +3096,7 @@
     "commit": "31418ea0",
     "state": "0 findings: Guided fact pages at S 9 / M 7-8 / L 5 tries"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided --hosts none --no-baseline --only EB-GDPCAP --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3116,7 +3116,7 @@
     "commit": "f5b77f7a",
     "state": "0 findings: Guided + / - S at 4 columns, the hinted row fits"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-EDGE",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-EDGE --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3136,7 +3136,7 @@
     "commit": "fcf13401",
     "state": "0 findings: jot lines, count lists and dot tiles added step by step"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-MARKS",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-MARKS --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3156,7 +3156,7 @@
     "commit": "fcf13401",
     "state": "0 findings: the providers' short step texts (drawStep)"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-LINES",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-LINES --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3176,7 +3176,7 @@
     "commit": "fcf13401",
     "state": "0 findings: two (div S: three) worked examples, rows up to 1.4 x content"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-PAGE",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-PAGE --sizes S,M,L",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3196,7 +3196,7 @@
    "commit": "966292ff",
    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3216,7 +3216,7 @@
    "commit": "04683166",
    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3476,7 +3476,7 @@
    "commit": "ce1d96f5",
    "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
   },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13 --sizes L,S",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3556,7 +3556,7 @@
    "commit": "ce1d96f5",
    "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
   },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART --sizes L,S",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3616,7 +3616,7 @@
    "commit": "35bc76fe",
    "state": "the claim one digit a box"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK --size S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3636,7 +3636,7 @@
    "commit": "35bc76fe",
    "state": "the answer traced in grey"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER --size S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3696,7 +3696,7 @@
    "commit": "35bc76fe",
    "state": "only a name long enough to wrap takes the two-line box"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y --size S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3736,7 +3736,7 @@
    "commit": "5a4ca828",
    "state": "twoLine on every band-1,000 name"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules --size S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3856,7 +3856,7 @@
    "commit": "ce4c3eed",
    "state": "0"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3916,7 +3916,7 @@
    "commit": "7a463602",
    "state": "0"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH --size S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3936,7 +3936,7 @@
    "commit": "709605bb",
    "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
   },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13 --sizes L,S",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4058,7 +4058,7 @@
    "commit": "de8e7531",
    "state": "rows of 1.1 x the measured height (noStretch): the drawn cell is the footprint"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --roles independent --hosts none --no-baseline --only EB-FOOT",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --roles independent --hosts none --no-baseline --only EB-FOOT --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4078,7 +4078,7 @@
    "commit": "48e24daa6",
    "state": "the kit writes data-eb-item: every cell judged against its own item, EB-FOOT 0, no fallback note"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:arrays_groups --hosts none --no-baseline --only EB-FOOT",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:arrays_groups --hosts none --no-baseline --only EB-FOOT --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4617,7 +4617,7 @@
    "commit": "b28f3960",
    "state": "lf-vocab r9 item 3b"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --only EB-GDPCAP | tail -1",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --only EB-GDPCAP --sizes S,M,L | tail -1",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5226,7 +5226,7 @@
    "commit": "8307219c",
    "state": "EB-BAND PASS"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5386,7 +5386,7 @@
    "commit": "87b0c18c",
    "state": "0"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5628,7 +5628,7 @@
    "commit": "990e66a8",
    "state": "kit line slot drawn at digit height (0f1a0bda) + the bordered box capped at its row only while content fills >= 78 % (c3, lead 2026-11-13)"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5792,7 +5792,7 @@
    "commit": "the lf-ops fix of the add_facts review cells",
    "state": "EB-FOOT 0 on add_facts review"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles review --hosts none --only EB-FOOT --no-baseline",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles review --hosts none --only EB-FOOT --no-baseline --sizes S,M,L",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

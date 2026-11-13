@@ -37,6 +37,7 @@ import { encodeSetParam } from './teacher-ui.js';
 import { printHtml } from './teacher-print.js';
 import { openPdfPreview, warmPdfPreview, isPdfPreviewOpen } from './teacher-pdf-preview.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
+import { offeredSize } from './sheet/tokens.js';
 import { makeShareLink, showBoardCodeFor } from './teacher-sets.js';
 import { mountSample } from './teacher-preview.js';
 import { generateQuestionFor } from './generate-question.js';
@@ -71,6 +72,7 @@ const S = (() => {
     const saved = readStore(STORE_KEY, null);
     if (saved && typeof saved === 'object') {
         if (saved.opts) Object.assign(base.opts, saved.opts, { header: Object.assign({}, base.opts.header, saved.opts.header || {}) });
+        base.opts.size = offeredSize(base.opts.size, 'M');   // owner 2026-11-13: size S is dropped; a saved S reads as M
         if (saved.quiz) Object.assign(base.quiz, saved.quiz);
         if (saved.share) Object.assign(base.share, saved.share);
         if (Array.isArray(saved.touched)) base.touched = saved.touched;
@@ -766,11 +768,12 @@ function optionsHTML() {
             const div = list.some(isDivision);
             const cur = String(S.opts.factCols || 'auto');
             const cols = `<div class="tvs-seg" role="group" aria-label="Columns">${[['auto', 'Auto'], ['5', '5'], ['6', '6'], ['8', '8'], ['10', '10']].map(([v, l]) => { const off = div && v === '10'; return `<button type="button" class="tvs-btn" data-act="factcols" data-v="${v}" aria-pressed="${cur === v}"${off ? ' disabled title="8 is the most for ÷"' : ''}>${cur === v ? icon('check', 16) : ''}<span>${l}</span></button>`; }).join('')}</div>`;
-            // Size S stays one tap away beside the columns (more across needs the smaller digits)
-            h += row('Columns', div ? 'Facts across each row · 8 is the most for ÷' : 'Facts across each row', cols + seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
+            // Size sits beside the columns (owner 2026-11-13: M and L only; the column count sets the digit size, 9-10 across
+            // print at the 16 pt rung at either size)
+            h += row('Columns', div ? 'Facts across each row · 8 is the most for ÷' : 'Facts across each row', cols + seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size'));
         }
     }
-    h += row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Size'));
+    h += row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size'));
     if (quiz) {
         h += row('Points', 'Shown on the summary', seg('points', S.quiz.points, [['1', '1 per question'], ['2', '2 per question']], 'Points'));
         h += row('How many versions?', 'Each version has its own order and its own key', stepper('versions', S.quiz.versions, 1, 6, 'Versions') + (S.quiz.versions > 1 ? keyVersionsSeg() : ''));

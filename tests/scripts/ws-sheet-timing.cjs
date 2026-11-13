@@ -17,7 +17,7 @@
 const { open } = require('../lib/ws-harness.cjs');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const SKILLS = arg('skills', 'multiplication:mixed_multiplication,addition:mixed_addition,subtraction:mixed_subtraction,composing:mixed_composing,counting_mixed:counting_all').split(',').filter(Boolean);
-const SIZES = arg('size', 'S,L').split(',').filter(Boolean);
+const SIZES = arg('size', 'M,L').split(',').filter(Boolean);
 const ROLES = arg('roles', 'independent,more-practice').split(',').filter(Boolean);
 const SEEDS = arg('seed-list', '') ? arg('seed-list', '').split(',').map(Number) : Array.from({ length: Number(arg('seeds', 20)) }, (_, i) => i + 1);
 const P90 = Number(arg('p90', 5000));

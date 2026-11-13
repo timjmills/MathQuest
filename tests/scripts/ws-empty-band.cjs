@@ -361,7 +361,7 @@ const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const HTML = arg('html', null);
 if (require.main === module && !HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
-const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
@@ -753,7 +753,7 @@ async function main() {
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
-            const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
+            const vSize = ['L', 'M'].find((z) => SIZES.includes(z)) || SIZES[0];
             if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
             notes.push(`${key}: slot ink ${SLOT_INK ? 'on' : 'off'}; card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);

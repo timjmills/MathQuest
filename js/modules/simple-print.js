@@ -10,7 +10,7 @@
 // Four steps, then Print:
 //   1 Skills      each with a number OR a % of the problems (blank = share evenly)
 //   2 How many    Problems | Pages, and the number
-//   3 Size        Big / Medium / Small (each shows its columns) + Columns "Auto (n)" or 2–10
+//   3 Size        Big / Medium (each shows its columns) + Columns "Auto (n)" or 2–10
 //   4 Answer key  on / off
 //   More options  Arrange: In sections (default) | Mixed up; the full dialog (teacher only)
 //
@@ -42,15 +42,18 @@ import { printHtml } from './teacher-print.js';
 import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
+import { offeredSize } from './sheet/tokens.js';
 import { SKILLS } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
 import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.js';
 
 const STORE_KEY = 'mq_simple_print';
-const SIZES = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']];
+// owner 2026-11-13 (CLAUDE.md plan item 9): two print sizes, M and L; size S is dropped. A stored S (this dialog's own
+// settings, a saved quick print) reads as M through offeredSize - an alias, never a deletion.
+const SIZES = [['L', 'Big'], ['M', 'Medium']];
 const SIZE_NAME = Object.fromEntries(SIZES);
 // (facts-print-fix r3, owner rule 2026-11-05: "Columns: Auto = 9; 10 only if the owner picks it")
-const FACT_AUTO = { S: 9, M: 6, L: 5 };
+const FACT_AUTO = { M: 6, L: 5 };
 // Owner 2026-11-03 (item 4): "7, 8, 9, 10 should be just for small problems": a fast fact may go up to 10 across, every
 // larger cell at most 6 (and the engine clamps either to what really fits at the size).
 const FACT_MAX_COLS = 10, CELL_MAX_COLS = 6;
@@ -82,7 +85,7 @@ function loadPrefs() {
             if (Number(s.nProblems) > 0) d.nProblems = Math.min(MAX_PROBLEMS, Math.round(Number(s.nProblems)));
             if (Number(s.nPages) > 0) d.nPages = Math.min(MAX_PAGES, Math.round(Number(s.nPages)));
             if (Number(s.sets) >= 1) d.sets = Math.min(MAX_SETS, Math.round(Number(s.sets)));
-            if (SIZE_NAME[s.size]) d.size = s.size;
+            if (s.size != null) d.size = offeredSize(s.size, d.size);
             if (s.cols === 'auto' || (Number(s.cols) >= 1 && Number(s.cols) <= 10)) d.cols = s.cols === 'auto' ? 'auto' : Number(s.cols);
             if (s.colsMode === 'aim' || s.colsMode === 'exact') d.colsMode = s.colsMode;
             if (typeof s.key === 'boolean') d.key = s.key;
@@ -314,6 +317,8 @@ export function footerOf(list, max = 3) {
 }
 
 export async function buildSimple(list, o) {
+    // (owner 2026-11-13: size S is dropped - an S request, e.g. an old saved print, builds at M)
+    if (o && o.size !== offeredSize(o.size, 'M')) o = Object.assign({}, o, { size: offeredSize(o.size, 'M') });
     // (a footer the caller did not give names the skills; a fact print names each page's own skills, D4)
     if (!o.footer) o = Object.assign({}, o, { footer: footerOf(list), __footerAuto: true });
     const amounts = list.map((s) => parseAmount(s.amt));
@@ -1084,7 +1089,7 @@ function cleanPrint(p) {
     if (p.how === 'problems' || p.how === 'pages') o.how = p.how;
     if (Number(p.n) >= 1) o.n = Math.min(o.how === 'pages' ? MAX_PAGES : MAX_PROBLEMS, Math.round(Number(p.n)));
     if (Number(p.sets) >= 1) o.sets = Math.min(MAX_SETS, Math.round(Number(p.sets)));
-    if (SIZE_NAME[p.size]) o.size = p.size;
+    if (p.size != null) o.size = offeredSize(p.size, o.size);
     if (p.cols === 'auto' || (Number(p.cols) >= 1 && Number(p.cols) <= 10)) o.cols = p.cols === 'auto' ? 'auto' : Number(p.cols);
     if (p.colsMode === 'exact' || p.colsMode === 'aim') o.colsMode = p.colsMode;
     if (typeof p.key === 'boolean') o.key = p.key;
@@ -1362,7 +1367,7 @@ function render() {
     <div class="sp-row sp-sets"><span class="sp-lbl" id="spSetsLbl">Sets</span><div class="sp-stepper"><button type="button" class="sp-sb" data-sp="sdec" aria-label="Fewer sets">−</button><input id="spSets" class="sp-n" type="number" inputmode="numeric" min="1" max="${MAX_SETS}" value="${P.sets}" aria-labelledby="spSetsLbl"><button type="button" class="sp-sb" data-sp="sinc" aria-label="More sets">+</button></div><span class="sp-hint">${P.sets > 1 ? 'each set has different problems' : ''}</span></div></section>`;
 
     // 3 Size
-    h += `<section class="sp-step">${stepHead(3, 'Size')}<div class="sp-sizes" role="radiogroup" aria-label="Size">`;
+    h += `<section class="sp-step">${stepHead(3, 'Size')}<div class="sp-sizes sp-sizes-${SIZES.length}" role="radiogroup" aria-label="Size">`;
     for (const [v, l] of SIZES) {
         const c = S.probes[v];
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? sizeColsText(v) : '…'}</span></button>`;
