@@ -3957,6 +3957,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-card-d2-d6",
+   "check": "ws-two-step: the two-step stories against their signed card - WITHIN-N (the Step 1 result and the answer within the band or Max Number 100), ANS-STORY (the answer no story number, not the Step 1 answer), BAR-DRAWN (wpBar / multi_step_word (Visual) draws both bars and Step 2 carries the Step 1 answer, paper and screen), VISUAL ((Visual) differs from _plain), HINT-L0 (the middle question on the Model / Guided only, never at level 0 or 1 or on screen)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step WITHIN-N / ANS-STORY / BAR-DRAWN / VISUAL / HINT-L0 (two-step card decisions 2, 4, 5, 6; owner rule 2026-11-13: each finding a check before its fix)",
+   "fail": {
+    "commit": "0e119f312",
+    "state": "card signed, pre-build: answers to 125-150 (Step 1 to 150) against Max Number 100, Step 1 over band 30 / 50, 1-3 % of answers a story number, wpBar draws nothing on a two-step story, multi_step_word (Visual) = _plain, no middle question"
+   },
+   "pass": {
+    "commit": "814109016",
+    "state": "two-step build: every computed number within the cap, answer guards, the two-step bar model drawn with the carried Step 1 answer, Visual draws it by default, middle question on teaching cells only"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
