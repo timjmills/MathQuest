@@ -390,6 +390,19 @@ function judge(g, run, p) {
 }
 
 const PARSE = {
+    // ws-screen-support-eq (lf-hosts 2026-11-13): its verdict comes from ONE place, the tool's own verdict() line, which
+    // accounts for every skill in scope (checked / no supports / not run). The row maps it 1:1 - OK PASS, N/A N/A, FAIL FAIL -
+    // and applies no rule of its own (the generic skill-mention rule read "algebra:x: no supports" as an absent skill, so the
+    // log said OK and the row FAIL). ws-gate-agree holds the two together.
+    screenSupportEq(g, out, code) {
+        const m = [...out.matchAll(/^ws-screen-support-eq: (OK|N\/A|FAIL)\b(.*)$/gm)];
+        if (!m.length) return unparsed('no "ws-screen-support-eq: OK|N/A|FAIL" line', out);
+        const v = m[m.length - 1];
+        const says = v[2].trim().replace(/^\(|\)$/g, '').trim().slice(0, 200);
+        if (v[1] === 'OK') return { result: 'PASS', findings: says || '-', detail: [], explainsExit: false };
+        if (v[1] === 'N/A') return { result: 'N/A', findings: says || 'no supports model in scope', detail: [], explainsExit: code === 0 };
+        return { result: 'FAIL', findings: v[0].slice(0, 200), detail: out.split('\n').filter((l) => /^\s+SCREEN-|^\s+\S+: /.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: true };
+    },
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
     lessonSamples(g, out, code) {
@@ -1026,7 +1039,14 @@ function buildPlan(ctx) {
         add(gate('screen-slots', `ws-screen-slots --skills${ss.includes('--screen-digit') ? ' --screen-digit' : ''}`, scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
-        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], parse: PARSE.screenSupportEq, missingMsg: 'ws-screen-support-eq is not in this tree' }));
+        // (lf-hosts 2026-11-13) the screen grades a word-work story's letter equation / estimate exactly as its paper key does
+        if (skills.some((sk) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(sk.key))) {
+            const ww = keys.filter((k) => /^algebra:(multi_step_word(_plain)?|two_step_\w+)$/.test(k));
+            // (and the screen-support-eq row agrees with its tool's own verdict line on them: ws-gate-agree)
+            add(gate('gate-agree', 'ws-gate-agree screen-support-eq (the precritic row = the tool\'s own verdict line)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'node', 'ws-gate-agree', ['--gate', 'screen-support-eq', '--skills', ww.join(',')], { missingMsg: 'no tests/scripts/ws-gate-agree.mjs' }));
+            add(gate('screen-grade', 'ws-screen-grade (screen verdict = paper key verdict: right, wrong, equivalent, every graded part)', ww.length <= 3 ? ww.join(', ') : `${ww.length} word-work skills`, 'browser', 'ws-screen-grade', ['--skills', ww.join(','), '--n', '20'], { expect: { mention: ww }, missingMsg: 'no tests/scripts/ws-screen-grade.cjs' }));
+        }
         // --baseline only when a pin exists (none yet: then it runs plain, and any failure is red)
         const cbFile = scriptPath('ws-chromebook-fit');
         const cb = ['--skills', keys.join(',')];

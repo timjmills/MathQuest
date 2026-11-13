@@ -207,7 +207,10 @@ function PLAN(rootSel, which) {
         parts(ans).forEach((v, k) => { if (!tiles.some(x => x.dataset.mqBankFor === String(k)) && typed[k]) tag(typed[k], { type: 'text', value: v }); });
         return { plan, q: String(ans) };
     }
-    const slots = all('input.mq-cellslot, input.cloze-cell');
+    // (lf-hosts 2026-11-13) a two-step story's graded letter equation / estimate (`data-mq-part`, two-step card decisions 7 / 8)
+    // is answered too: the pupil writes each of its boxes (the box's own expected value), then the answer
+    all('[data-mq-part] input').forEach(c => tag(c, { type: 'text', value: c.getAttribute('data-mq-expect') || '' }));
+    const slots = all('input.mq-cellslot, input.cloze-cell').filter(c => !c.closest('[data-mq-part]'));
     if (slots.length) {
         const sets = q.inlineBlanksData && q.inlineBlanksData.acceptedSets;
         const joinEl = slots[0].closest('[data-mq-join]');

@@ -7055,6 +7055,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lfhosts-phone-focus-twostep",
+   "check": "ws-phone-card FOCUS / INVIEW / CLIP-X at 390 x 844 on the 7 two-step skills: the box the pupil writes first (Step 1 / the letter equation's first box - never the answer at the foot, a regroup box or a must-stay-blank copy box) has the focus when the card opens, in view, nothing cut off",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS (lf-hosts item 4 a; precritic two-step r11)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "lf-algebra head (8438ca59d in its history): question-render _firstWriteBox knew only the one-step sentence layout, so the answer slot at the foot took the focus on all 7 skills; the frames rows ran 18-34 px past 390"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "the two-step twin's first write box takes the focus, centred; the frames work column wraps on screen"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes 390x844 --items 2 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-screen-grade-twostep",
+   "check": "ws-screen-grade: on the practice card, quiz and online worksheet the screen verdict of a two-step story equals its paper key's verdict (gradeSlots on the key's graded slots and accept forms) for right, equivalent (turn-around, typed signs) and wrong / blank letter equation and estimate",
+   "kind": "commit-pair",
+   "rule": "ws-screen-grade GRADE-AGREE (lf-hosts item 4 b; two-step card decisions 7 / 8)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the twin's equation and estimate boxes were scratch (mq-wwork, data-ws-graded=0): any equation / estimate scored right with the right answer"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "data-mq-part composes them into the host value; every host grades with wordWorkVerdict = the paper key's gradeSlots"
+   },
+   "command": "node tests/scripts/ws-screen-grade.cjs --skills algebra:two_step_letter_equation,algebra:two_step_estimate_check --n 8",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-support-eq-agree",
+   "check": "ws-gate-agree: the precritic screen-support-eq row says what ws-screen-support-eq's own verdict line says (OK PASS, N/A N/A, FAIL FAIL) on two-step skills, which have no supports model",
+   "kind": "commit-pair",
+   "rule": "ws-gate-agree on screen-support-eq (lf-hosts item 4 c)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the tool logged 'algebra:x: no supports' and 'ws-screen-support-eq: OK'; precritic's skill-mention rule did not read 'algebra:x:' as a mention, so the row said FAIL"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "one verdict() line names every skill (N/A here); PARSE.screenSupportEq maps it 1:1"
+   },
+   "command": "node tests/scripts/ws-gate-agree.mjs --root {root} --gate screen-support-eq --skills algebra:two_step_letter_equation,algebra:multi_step_word",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lfhosts-focus-twostep-desktop",
+   "check": "ws-phone-card FOCUS / INVIEW / CLIP-X at the screen targets 820 x 1180, 1024 x 768 and 1280 x 900 (lead 2026-11-13: no phone width) on the 7 two-step skills: the box the pupil writes first has the focus when the card opens, in view",
+   "kind": "commit-pair",
+   "rule": "ws-phone-card FOCUS at desktop / tablet widths (lf-hosts item 4 a, scope change)",
+   "browser": true,
+   "fail": {
+    "commit": "32ab8ffce",
+    "state": "the answer slot at the foot took the focus at every width (_firstWriteBox knew only the one-step sentence layout)"
+   },
+   "pass": {
+    "commit": "70b67eedd",
+    "state": "the two-step twin's first write box takes the focus"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --skills algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes 820x1180,1024x768,1280x900 --items 1 --no-siblings-check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

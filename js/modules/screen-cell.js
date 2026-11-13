@@ -28,6 +28,7 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
+import { wordWorkVerdict, wordWorkFilled } from './sheet/index.js';
 import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
@@ -2251,11 +2252,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
     // denominator, the whole or the fraction left out when its boxes are empty.
     const mixed = join === 'mixed';
     const splitMixed = (v) => { const m = /^\s*(?:(\d+)\s+)?(\d*)\s*\/?\s*(\d*)\s*$/.exec(String(v || '')); return m ? [m[1] || '', m[2] || '', m[3] || ''] : []; };
-    let saved = mixed ? splitMixed(input.value) : String(input.value || '').split(join.trim() || ',').map((t) => t.trim());
+    // (lf-hosts 2026-11-13) a word-work twin's graded parts beyond the answer - the letter equation, the estimate
+    // (`data-mq-part`) - ride in the same value after the answer, "58 | equation: 5×9+13=n", so every host grades them
+    // with the paper key (wordWorkVerdict); a saved value's parts are not the answer's
+    const partEls = Array.from(cellEl.querySelectorAll('[data-mq-part]'));
+    const baseValue = partEls.length ? String(input.value || '').split(/\s*\|\s*(?=[\w-]+:)/)[0] : String(input.value || '');
+    let saved = mixed ? splitMixed(baseValue) : baseValue.split(join.trim() || ',').map((t) => t.trim());
     // A row that joins with NO separator (a word problem's answer digits, data-mq-join=""): "816" is one digit per box, the
     // digits in the rightmost boxes (the row's spare boxes stand on the left) - small fixes item 4, "[816|_|_|_]" on going back.
     if (!mixed && join === '' && slots.length > 1) {
-        const ch = [...String(input.value || '').replace(/\s/g, '')];
+        const ch = [...baseValue.replace(/\s/g, '')];
         saved = ch.length <= slots.length ? [...Array(slots.length - ch.length).fill(''), ...ch] : saved;
     }
     const boxes = slots.map((slot, k) => {
@@ -2279,7 +2285,16 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
         slot.appendChild(el);
         return el;
     });
-    const compose = () => {
+    // a part's text as written: its printed symbols and each box's value (an empty box reads "?", never a right part)
+    const partText = (el) => {
+        let t = '';
+        const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) t += c.nodeValue; else if (c.tagName === 'INPUT') t += (c.value || '').trim() || '?'; else if (c.nodeType === 1) walk(c); } };
+        walk(el);
+        return t.replace(/\s+/g, '');
+    };
+    const withParts = (v) => (partEls.length ? `${v}${partEls.map((el) => ` | ${el.getAttribute('data-mq-part')}: ${partText(el)}`).join('')}` : v);
+    const compose = () => withParts(composeAnswer());
+    const composeAnswer = () => {
         const v = boxes.map((b) => (b.value || '').trim());
         if (!mixed) return v.join(join);
         const [w, n, d] = v;
@@ -2323,6 +2338,10 @@ export function wireCellSlots(cellEl, input, { onChange = null } = {}) {
             }
         });
     });
+    partEls.forEach((el) => el.querySelectorAll('input').forEach((b) => {
+        b.addEventListener('input', () => { input.value = compose(); input.dispatchEvent(new Event('input', { bubbles: true })); });
+        b.addEventListener('change', () => { if (onChange) onChange(compose()); });
+    }));
     input.classList.add('mq-cellslot-host');
     return true;
 }
@@ -3233,10 +3252,24 @@ export function workRowsHTML(k) {
  *   - an array answer (cloze addends, the missing numbers of a strip): position by position
  *   - "q R r": quotient and remainder
  */
+/** The word-work verdict of a composed value ("58 | equation: 5×9+13=n") on every host: the paper key's gradeSlots over the
+ *  answer and each graded part (wordWorkVerdict); null for an item with no graded part beyond its answer. */
+export function wordWorkScreenVerdict(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p ? wordWorkVerdict(value, p) : null;
+}
+/** Every graded place of such an item filled (null when it is not one): a host waits for it before it marks. */
+export function wordWorkScreenFilled(value, q) {
+    const p = q && q.cell && q.cell.template === 'word-work' ? q.cell.payload : null;
+    return p && wordWorkVerdict('', p) !== null ? wordWorkFilled(value, p) : null;
+}
 export function slotAnswerMatches(value, q) {
     if (!q) return null;
     // A function table checks each slot against the rule (a 'make your own' table has no one answer).
     if (q.ftCheck) return ftAnswerMatches(value, q.ftCheck);
+    // a two-step word-work item's letter equation / estimate: the paper key's verdict (lf-hosts 2026-11-13)
+    const wv = wordWorkScreenVerdict(value, q);
+    if (typeof wv === 'boolean') return wv;
     const cv = cellInputVerdict(value, q);
     if (typeof cv === 'boolean') return cv;
     const parts = String(value == null ? '' : value).split(/\s*(?:,|\bR\b)\s*/i).map((s) => s.trim().toLowerCase());

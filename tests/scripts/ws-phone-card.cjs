@@ -80,7 +80,11 @@ function PROBE() {
         }
         order.push(...run.reverse());
     }
-    let graded = order.filter((el) => !isOptional(el));
+    // a word-work copy box whose place holds no digit (data-mq-expect="", the spare left place of a column number) is never
+    // the first box: active-box.js never makes it active (critic D6: focusing it invites a wrong digit). (lf-hosts 2026-11-13:
+    // the two-step columns twin; the probe read that spare box as the box the pupil writes first.)
+    const staysBlank = (el) => el.matches('input.mq-wwork') && el.getAttribute('data-mq-expect') === '';
+    let graded = order.filter((el) => !isOptional(el) && !staysBlank(el));
     // a column item (the kit stack, or a legacy column cell) is written ones first whatever its inputs are called
     // (SP-20). The ones box is found STRUCTURALLY, never by pixel row (critic r6 D2: the focused legacy box
     // `.column-answer-input.mq-active-box` sits 3-4 px above its row, so a 2 px row tolerance picked the tens box):

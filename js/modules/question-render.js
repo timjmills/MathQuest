@@ -1550,8 +1550,17 @@ function _applyMapSlots(q) {
         input.style.setProperty('display', 'none', 'important');
         visualAid.classList.add('mq-map-cellslots');
         const first = _firstWriteBox(visualAid);
-        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+        if (first && !state.hasAnswered) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } _centreTwoStepBox(first); }
     }
+}
+
+// (lf-hosts 2026-11-13, ws-phone-card INVIEW) A two-step story's first box sits at the top of a tall cell, above where the
+// host's own #answerInput focus left the page; active-box's 'nearest' reveal set it at exactly 0 and the drawing's late
+// 1-2 px settle pushed it over the top edge. It is brought to the middle of the screen instead.
+function _centreTwoStepBox(first) {
+    if (!first || !first.closest('.mq-ww[data-ww-ops*=" "]')) return;
+    const r = first.getBoundingClientRect();
+    if (r.top < 8 || r.bottom > innerHeight - 8) { try { first.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) { /* ignore */ } }
 }
 
 // The box the pupil writes in FIRST. A word-problem number sentence (`[ ] ◯ [ ] = [ ] unit`, the
@@ -1563,6 +1572,16 @@ function _firstWriteBox(visualAid) {
     if (sentence) {
         const box = [...sentence.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
             .find((el) => !el.disabled && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
+        if (box) return box;
+    }
+    // A two-step story (lf-hosts 2026-11-13, ws-phone-card FOCUS on the 7 two-step skills): the pupil writes Step 1 -
+    // or the letter equation - before the answer, so its first box takes the focus, not the answer box at the foot.
+    // (Before, the answer slot was focused: the cell holds no .mq-wwsentence.)
+    const two = visualAid.querySelector('.mq-wwtwin .mq-ww[data-ww-ops*=" "]');
+    if (two) {
+        // (a regroup box is optional, never first; a copy box whose place holds no digit stays blank - active-box.js)
+        const box = [...two.querySelectorAll('input.mq-wwork, input.mq-cellslot')]
+            .find((el) => !el.disabled && el.getAttribute('data-mq-kind') !== 'regroup' && !(el.classList.contains('mq-wwork') && el.getAttribute('data-mq-expect') === ''));
         if (box) return box;
     }
     return visualAid.querySelector('input.mq-cellslot');
@@ -1719,6 +1738,7 @@ function _applyScreenCell() {
             const first = _firstWriteBox(visualAid);
             if (first && !state.hasAnswered) {
                 try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+                _centreTwoStepBox(first);
             }
         } else if (!(q.options && q.options.length) && input && !input.disabled && qt && !qt.classList.contains('mq-dup')
             && !(visualAid && visualAid.style.display !== 'none' && visualAid.querySelector('input, [data-mq-cell], [data-mq-blank]'))
