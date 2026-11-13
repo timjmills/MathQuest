@@ -1,0 +1,17 @@
+$ node tests/scripts/ws-node-lint.mjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --json design/audit/runs/lf-builds/stories/logs/pc3/node-lint.json
+
+ws-node-lint: 7 skill(s), 30 items each, page 12, root /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee
+
+rule        skills   items  findings  skills hit  skipped
+NOTATION         7     210         0           0  -
+L1               7      28         0           0  7 measured footprint: grid check needs the browser (drawing-scale check run)
+L3               7     117         0           0  93 answer equals a number the question gives (items)
+L6               7     210         0           0  -
+L10              7     210         0           0  -
+REPEATS          7      84         0           0  -
+
+baseline: design/audit/baselines/node-lint.json (6834 finding keys pinned at n=30, page=12)
+no finding beyond the baseline
+json: /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/node-lint.json
+time: load 2.8 s, lint 0.4 s, total 3.3 s
+ws-node-lint: OK

@@ -1,0 +1,64 @@
+{
+ "root": "/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee",
+ "n": 30,
+ "page": 12,
+ "rules": [
+  "NOTATION",
+  "L1",
+  "L3",
+  "L6",
+  "L10",
+  "REPEATS"
+ ],
+ "subjects": [
+  "addition:add_word_problems",
+  "addition:add_word_problems_plain",
+  "addition:add_wp_change_unknown",
+  "subtraction:sub_word_problems",
+  "subtraction:sub_word_problems_plain",
+  "subtraction:sub_wp_change_unknown",
+  "subtraction:sub_wp_compare_smaller"
+ ],
+ "checked": {
+  "NOTATION": {
+   "skills": 7,
+   "items": 210
+  },
+  "L1": {
+   "skills": 7,
+   "items": 28
+  },
+  "L3": {
+   "skills": 7,
+   "items": 117
+  },
+  "L6": {
+   "skills": 7,
+   "items": 210
+  },
+  "L10": {
+   "skills": 7,
+   "items": 210
+  },
+  "REPEATS": {
+   "skills": 7,
+   "items": 84
+  }
+ },
+ "skipped": {
+  "L1": {
+   "measured footprint: grid check needs the browser (drawing-scale check run)": 7
+  },
+  "L3": {
+   "answer equals a number the question gives (items)": 93
+  }
+ },
+ "counts": {},
+ "findings": [],
+ "added": [],
+ "gone": [],
+ "ms": {
+  "load": 2842,
+  "run": 400
+ }
+}

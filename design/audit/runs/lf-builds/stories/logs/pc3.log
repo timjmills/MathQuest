@@ -1,0 +1,8 @@
+ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3
+  N/A             ws-providers-unit --skill (3 s)
+  PASS            ws-node-lint (3 s)
+  PASS            ws-code-snapshot (1 s)
+  SKIPPED (no rulings) ws-card-rulings --check rulings (spec card numeric rulings, 300 items) (0 s)
+  INCOMPLETE (partial rulings) ws-card-rulings --check offered (panel offers nothing the card bans) (0 s)
+  PASS            ws-content-audit --skill (11 s)
+  PASS (baseline) ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) (9 s)

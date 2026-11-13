@@ -1,12 +1,8 @@
 ws-card-rulings: design/cards/word-stories/word-stories.md on this tree; 7 skill(s), 300 items per ruling
-  ok   addition:add_word_problems           N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) wpCues not offered
-  ok   addition:add_word_problems_plain     N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) wpCues not offered
-  ok   subtraction:sub_word_problems        N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) wpCues not offered
-  ok   subtraction:sub_word_problems_plain  N-D-wpCues         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 hid it on the 8 sentence-layout story skills (family-check))) wpCues not offered
-  ok   addition:add_word_problems           N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) wpBank not offered
-  ok   addition:add_word_problems_plain     N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) wpBank not offered
-  ok   subtraction:sub_word_problems        N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) wpBank not offered
-  ok   subtraction:sub_word_problems_plain  N-D-wpBank         (§7a (decision, PROPOSED: P-21; owner 2026-10-31 (family-check))) wpBank not offered
   no rulings for: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller (not checked)
   design/cards/word-stories/word-stories.md: rulings block present, 9 prose ruling(s) not machine-checked (§5.1, §5.2, §5.3, §9.1, §9.2, §9.3, §9.4, §9.5, §9.6)
-ws-card-rulings: INCOMPLETE - not checked: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller (0 ruling check(s), 8 not-offered check(s), 4 of 7 skill(s) checked, 3 NOT checked (3 without a rulings block); 0.2 s)
+  no ruling applies to addition:add_word_problems (not checked)
+  no ruling applies to addition:add_word_problems_plain (not checked)
+  no ruling applies to subtraction:sub_word_problems (not checked)
+  no ruling applies to subtraction:sub_word_problems_plain (not checked)
+ws-card-rulings: NO-RULINGS (the blocks hold no rulings for the skills in scope; nothing checked)
