@@ -47,6 +47,14 @@ W1.VOCAB_SETS.forEach((s, i) => {
 console.log(`ws-vocab-set-renders: ${changed.length} of ${W1.VOCAB_SETS.length} sets changed since ${SINCE}`);
 for (const c of changed) console.log(`  set ${c.i} ${c.s.title} (grade ${c.s.grade}): ${c.why.join('; ')}`);
 if (process.argv.includes('--list') || !OUT) { console.log('ws-vocab-set-renders: OK'); process.exit(0); }
+// (r13, critic r11 / r12: the dealt-pairs table) EVERY bank a 1 picture, 3 words item of each set can deal (vocab-words.js
+// dealtBanks: the picture plus the other two words of a vetted trio), written to manifest.json so the critic reads them all
+const dealt = W1.VOCAB_SETS.map((s, i) => ({ set: i, title: s.title, grade: s.grade, words: s.words.slice(), noPicture: (s.noPicture || []).slice(),
+    trios: typeof W1.vettedTrios === 'function' ? W1.vettedTrios(s) : [],
+    banks: typeof W1.dealtBanks === 'function' ? W1.dealtBanks(s).map((b) => ({ picture: b.picture, bank: b.bank })) : [] }));
+execFileSync('mkdir', ['-p', OUT]);
+writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify({ since: SINCE, changed: changed.map((c) => ({ set: c.i, title: c.s.title, why: c.why })), dealtBanks: dealt }, null, 1));
+console.log(`  dealt-pairs table: ${dealt.reduce((n, d) => n + d.banks.length, 0)} banks over ${dealt.length} sets -> ${path.join(OUT, 'manifest.json')}`);
 let bad = 0;
 for (const c of changed) {
     for (const skill of ['vocab_grade_pictures', 'vocab_pick3_words']) {

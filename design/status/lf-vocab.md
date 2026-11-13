@@ -471,3 +471,15 @@ the critic's falling-run redraws then pass; with "any step" rule, term, first te
 sets 7 and 8 and both sets needed a drop that also broke V6 (no clash-free core trio exists).
 New notWith (no set holds both, so no V7 change): rule / row, column, multiple; row, column / commutative, distributive;
 grow / multiple; factor / divisor, quotient, ones digit; quotient / ones digit.
+
+## r13 builder (Opus low, structural fix; brief design/lanes/lf-vocab/r13-builder-brief.md), 2026-11-13
+After narrow critic r12 (FAIL, min 7). Items 1-5 land in one commit: each check's fix needs the set re-picks (item 5) to stay
+green, so they cannot be split without a red commit.
+| item | check | backtest row (fail a35dbd72 -> pass) | on precritic's path |
+|---|---|---|---|
+| 1 pick3 deals only vetted trios (vocab-words.js vettedTrios / dealtBanks; gen-vocabulary.js); manifest.json dealt-pairs table | V7-ALL | vocab-r13-v7all | y (vocab-unit) |
+| 2 V-NUM: all-even / all-odd read from ringed or boxed numbers; row rings 3, 6, 9, 12; input / output In 2, 3 Out 5, 6 | V-NUM | vocab-r13-vnum | y |
+| 3 times table implies product (VOCAB_DEFS product / multiple += table + skip-count); product notWith row, column | V-FEAT | vocab-r13-feat-product-row | y |
+| 4 V-TWIN: one feature class, one notWith list; first term notWith rule | V-TWIN | vocab-r13-vtwin | y |
+| 5 sets re-picked in place: 0 product -> factor; 7 term -> repeat (core {grow, first term, repeat}); 8 first term -> odd | V6, V7, V7-ALL | as above | y |
+Hatch drops: none.

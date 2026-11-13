@@ -24,14 +24,14 @@
 export const VOCAB_WORDS = Object.freeze({
     even: { meaning: 'makes pairs, none left over', explain: 'Even means the dots make pairs, with none left over.', notWith: ['equal groups'] },
     odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left', 'grow'] },
-    product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation', 'multiple'] },
+    product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation', 'multiple', 'row', 'column'] },
     factor: { meaning: 'a number you multiply', explain: 'Factor means a number you multiply: the 4 and the 3 in boxes.', notWith: ['equation', 'divisor', 'quotient', 'ones digit'] },
-    row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive'] },
-    column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive'] },
+    row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive', 'product'] },
+    column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive', 'product'] },
     multiple: { meaning: 'a number you land on counting in steps', explain: 'Multiple means a number you land on when you count in threes.', notWith: ['pattern', 'sequence', 'count on', 'rule', 'grow', 'product'] },
     input: { meaning: 'the number that goes in', explain: 'Input means the number that goes in, on the In side.', notWith: ['column'] },
     output: { meaning: 'the number that comes out', explain: 'Output means the number that comes out, on the Out side.', notWith: ['column'] },
-    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern', 'row', 'column', 'multiple', 'term'] },
+    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern', 'row', 'column', 'multiple', 'term', 'first term'] },
     pattern: { meaning: 'numbers that change the same way', explain: 'Pattern means numbers that change the same way, plus 2 each time.', notWith: ['multiple', 'sequence', 'rule', 'repeat'] },
     array: { meaning: 'things in equal rows', explain: 'Array means things in equal rows, like 3 rows of 4 dots.', notWith: ['equal groups', 'distributive', 'commutative', 'even', 'row', 'column'] },
     commutative: { meaning: 'turn it round, the answer stays the same', explain: 'Commutative means you can turn it round and the answer stays the same.', notWith: ['array', 'row', 'column'] },
@@ -62,7 +62,7 @@ export const VOCAB_WORDS = Object.freeze({
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
     grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd', 'multiple'] },
     term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 14 in the box.', notWith: ['first term', 'sequence', 'multiple', 'pattern', 'rule'] },
-    'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 30 in the box.', notWith: ['term', 'sequence', 'multiple', 'pattern'] },
+    'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 30 in the box.', notWith: ['term', 'sequence', 'multiple', 'pattern', 'rule'] },
     'times as many': { meaning: 'the same amount, again and again', explain: 'Times as many means one bar is 3 times as long as the other.', notWith: ['compare'] },
     compare: { meaning: 'find which is more, and by how much', explain: 'Compare means find which bar is longer, and by how much.', notWith: ['times as many'] },
     equation: { meaning: 'two sides that are equal', explain: 'Equation means both sides are equal: 12 is the same as 3 times 4.', notWith: [] },
@@ -80,15 +80,17 @@ export const VOCAB_WORDS = Object.freeze({
  * (ws-vocab-unit V-FEAT). A word with no picture of its own still has a definition: other pictures may read as it.
  */
 export const VOCAB_DEFS = Object.freeze({
-    even: [['pairs-ringed', '!lone-mark']],
-    odd: [['pairs-ringed', 'lone-mark']],
-    product: [['boxed-answer', 'times-sign']],
+    // (r13 V-NUM, critic r12 #1: a picture whose ringed or boxed numbers are all even reads as even - 2, 4, 6, 8 ringed)
+    even: [['pairs-ringed', '!lone-mark'], ['all-even']],
+    odd: [['pairs-ringed', 'lone-mark'], ['all-odd']],
+    // (r13, critic r12 #2: every cell of a times table is a product, as it is a multiple)
+    product: [['boxed-answer', 'times-sign'], ['table', 'skip-count']],
     factor: [['boxed-operand', 'times-sign']],
     row: [['row-ringed'], ['array']],
     column: [['column-ringed'], ['array']],
     // (r12, critic r11 #2: a product is a multiple of each of its factors - 4.OA.B.4 - so a boxed answer of a times sentence
     // reads as multiple too; product / multiple are notWith)
-    multiple: [['hops', 'number-line'], ['skip-count'], ['boxed-answer', 'times-sign']],
+    multiple: [['hops', 'number-line'], ['skip-count'], ['boxed-answer', 'times-sign'], ['table', 'skip-count']],
     input: [['arrow-into-box', 'numbers-at-ends'], ['in-ringed']],
     output: [['arrow-out-of-box', 'numbers-at-ends'], ['out-ringed']],
     // (a run reads as THE rule when its step is the rule picture's own +3, or when its step is written on it, +2 hops; a bare
@@ -151,7 +153,10 @@ export const VOCAB_SETS = Object.freeze([
     { lesson: 'G3|-|patternsonthemultiplicationtable', title: 'Patterns on the multiplication table', grade: 3, round: 1, ccss: ['3.OA.D.9', '3.OA.C.7'],
         // (r12, critic r11 #2: product / multiple notWith - 12 is a multiple of 4 and of 3 - so multiple joins the core trio;
         // trios {even, odd, multiple} / {product, row, column}; edited in place, the set keeps its position - V7)
-        words: ['even', 'odd', 'multiple', 'product', 'row', 'column'] },
+        // (r13, critic r12 #2: product reads in every times-table cell, so product / row and product / column went notWith; with
+        // multiple / product too the six words had no clash-free split - product (taught by sets 1-3) gave way to factor, a
+        // 3.OA.C.7 word; trios {even, odd, multiple} / {factor, row, column}; edited in place, the set keeps its position - V7)
+        words: ['even', 'odd', 'multiple', 'factor', 'row', 'column'] },
     { lesson: 'G3|-|findtheruleinaninputoutputtable', title: 'Find the rule in an input-output table', grade: 3, round: 1, ccss: ['3.OA.D.9'],
         words: ['input', 'output', 'rule', 'pattern', 'product', 'factor'] },
     { lesson: 'G3|-|propertiesofmultiplicationcommutativeidentityanddistributive', title: 'Properties of multiplication', grade: 3, round: 1, ccss: ['3.OA.B.5'],
@@ -177,12 +182,18 @@ export const VOCAB_SETS = Object.freeze([
         // squares are odd); odd / grow notWith; edited in place, the set keeps its position - V7)
         // (r12, critic r11 #3: term / rule notWith - the term picture's run can read as the rule "take 4" - so the trios are
         // {rule, odd, first term} (core) / {grow, term, equation}; edited in place, the set keeps its position - V7)
-        words: ['rule', 'odd', 'first term', 'grow', 'term', 'equation'] },
+        // (r13, critic r12 #3: first term / rule notWith - the twin of term / rule, V-TWIN - so rule, term and first term all clash
+        // and two trios cannot hold them: term gave way to repeat (4.OA.C.5 patterns); trios {grow, first term, repeat} (core) /
+        // {rule, odd, equation}; edited in place, the set keeps its position - V7)
+        words: ['grow', 'first term', 'repeat', 'rule', 'odd', 'equation'] },
     { lesson: 'G4|-|followagivenruletoextendanumberpattern', title: 'Follow a given rule to extend a number pattern', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         // (r9, critic r7 #6: pattern gave way to output (what a rule gives): pattern clashed with rule, term, first term and repeat (V-AMBIG+); edited in place, the set keeps its position - V7)
         // (r10, critic r9 #5: output belongs to input-output tables, not to extending a pattern by a rule - output gave way to grow;
         // trios {rule, first term, ones digit} / {term, repeat, grow}; edited in place, the set keeps its position - V7)
-        words: ['rule', 'first term', 'ones digit', 'term', 'repeat', 'grow'] },
+        // (r13, critic r12 #3: rule, term and first term all clash now (V-TWIN) - first term gave way to odd, named by the set's
+        // standard (4.OA.C.5 "alternate between odd and even"); trios {rule, odd, ones digit} / {term, repeat, grow}; edited in
+        // place, the set keeps its position - V7)
+        words: ['rule', 'odd', 'ones digit', 'term', 'repeat', 'grow'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],
         // (r9, critic r7 #6: equation gave way to total: factor, product and unknown each draw a number sentence ("=", V-AMBIG+); edited in place, the set keeps its position - V7)
         // (r10, critic r9 #4: total's 5 + 3 bar is ADDITIVE part-whole, wrong for a 4.OA.A.1 core trio - total gave way to multiple;
@@ -232,6 +243,27 @@ export function compatible(words) {
     for (const a of words) for (const b of words) if (a !== b && ((VOCAB_WORDS[a] || {}).notWith || []).includes(b)) return false;
     return true;
 }
+/**
+ * The set's VETTED trios (r13, critic r12 root cause: pick3 dealt any clash-free pair of the whole set, so banks crossed the
+ * trios): every trio of the set's words that is clash-free AND leaves a clash-free rest - the splits a Match 3 page deals.
+ */
+export function vettedTrios(set) {
+    const ws = set ? set.words : [];
+    const out = [];
+    for (let a = 0; a < ws.length; a++) for (let b = a + 1; b < ws.length; b++) for (let c = b + 1; c < ws.length; c++) {
+        const t = [ws[a], ws[b], ws[c]], rest = ws.filter((w) => !t.includes(w));
+        if (compatible(t) && compatible(rest)) out.push(t);
+    }
+    return out;
+}
+/**
+ * EVERY bank a "1 picture, 3 words" item of this set can deal (r13): the picture's word plus the other two words of a vetted
+ * trio that holds it. The generator deals only these (gen-vocabulary.js), so ws-vocab-unit V7-ALL judges every one.
+ */
+export function dealtBanks(set) {
+    const trios = vettedTrios(set);
+    return pictureWords(set).flatMap((w) => trios.filter((t) => t.includes(w)).map((t) => ({ picture: w, bank: t.slice() })));
+}
 /** The grades that have sets (K = 0). */
 export const VOCAB_GRADES = Object.freeze([...new Set(VOCAB_SETS.map((s) => s.grade))].sort((a, b) => a - b));
 
@@ -248,4 +280,4 @@ export function vocabHowSteps(template, word, wrong = []) {
         ? ['Read the three words in the box.', `Tap ${word}.`]
         : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
 }
-export default { VOCAB_DEFS, featuresSatisfy, vocabWordsReading, pictureWords, VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
+export default { vettedTrios, dealtBanks, VOCAB_DEFS, featuresSatisfy, vocabWordsReading, pictureWords, VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };

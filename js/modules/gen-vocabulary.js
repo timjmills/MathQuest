@@ -38,7 +38,7 @@ import {
 } from './svg-geometry.js';
 import { createAnalogClockSVG, createDigitalClockHTML } from './svg-clock.js';
 // The vocabulary redesign (lane lf-vocab, 2026-11-07): the lesson word sets and the kit cells.
-import { VOCAB_SETS, VOCAB_WORDS, vocabSetAt, gradeWords, compatible, VOCAB_GRADES, pictureWords } from './sheet/lesson-pages/vocab-words.js';
+import { VOCAB_SETS, VOCAB_WORDS, vocabSetAt, gradeWords, compatible, VOCAB_GRADES, pictureWords, dealtBanks } from './sheet/lesson-pages/vocab-words.js';
 import { k2Twin as _vk2Twin } from './sheet/index.js';
 import { onNewPage as _vOnNewPage } from './page-deal.js';
 
@@ -675,9 +675,15 @@ function _genPictureTask(q) {
     }
     const pickFrom = words.length >= 3 ? words : gradeWords(grade);
     const bankFrom = words.length >= 3 ? bankWords : gradeWords(grade);
-    const target = pick(_freshFirst(pickFrom, 1));
+    // (r13, critic r12 root cause: a bank is one of its set's VETTED trios - vocab-words.js dealtBanks - never any clash-free
+    // pair of the pool; a grade pool deals the banks of its sets)
+    const oSet = o.vocabSet !== null && o.vocabSet !== undefined ? vocabSetAt(o.vocabSet) : null;
+    const banks = (oSet ? [oSet] : VOCAB_SETS.filter((st) => st.grade === grade)).flatMap((st) => dealtBanks(st));
+    const dealable = pickFrom.filter((w) => banks.some((b) => b.picture === w));
+    const target = pick(_freshFirst(dealable.length ? dealable : pickFrom, 1));
     _vtUsed.add(target);
-    const three = _compatiblePick(bankFrom, 3, target) || [target].concat(bankFrom.filter((w) => w !== target).slice(0, 2));
+    const mine = banks.filter((b) => b.picture === target);
+    const three = (mine.length ? pick(mine).bank : null) || _compatiblePick(bankFrom, 3, target) || [target].concat(bankFrom.filter((w) => w !== target).slice(0, 2));
     const bank = shuffle(three.slice());
     const payload = { word: target, bank, grade };
     q.cell = { template: 'vocab-pick3', v: 1, payload };
@@ -694,6 +700,8 @@ function _genPictureTask(q) {
     q.hint = `${target}: ${VOCAB_WORDS[target].meaning}.`;
     // (the bank is part of the key: a one-lesson set has 6 words and grades 4-6 print 8 a page (owner Q2), so once every
     // picture has been dealt (_freshFirst, V5) a picture may come back with another bank - r5: 6 cells stretched over 8)
-    q.dupKey = `vocab-pick3:${target}:${three.slice().sort().join('|')}`;
+    // (r13: a set whose words split only one way - sets 0 and 6 - has ONE bank per picture, so a repeat deals it in another
+    // order, as Match 3 deals a trio in its other rotation: ws-empty-band EB-FOOT)
+    q.dupKey = `vocab-pick3:${target}:${bank.join('|')}`;
     q.vocabWords = bank.slice();
 }

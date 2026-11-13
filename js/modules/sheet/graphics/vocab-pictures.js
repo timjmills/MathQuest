@@ -142,7 +142,8 @@ const PICS = {
     row: {
         ccss: ['3.OA.C.7', '3.OA.D.9'], op: 'table',
         alt: 'a times table, one line across it drawn round',
-        draw: () => table([[1, 2, 3, 4], [2, 4, 6, 8], [3, 6, 9, 12]], { x0: 6, y0: 3.5, cw: 12, ch: 11, size: 8, outline: { row: 1 } }),
+        // (r13 V-NUM, critic r12 #1: the ringed row was 2, 4, 6, 8 - all even, so it read as "even"; now 3, 6, 9, 12, odd and even)
+        draw: () => table([[1, 2, 3, 4], [2, 4, 6, 8], [3, 6, 9, 12]], { x0: 6, y0: 3.5, cw: 12, ch: 11, size: 8, outline: { row: 2 } }),
     },
     column: {
         ccss: ['3.OA.C.7', '3.OA.D.9'], op: 'table',
@@ -161,15 +162,16 @@ const PICS = {
         },
     },
     /* ---- Grade 3: input-output tables (3.OA.D.9) */
+    // (r13 V-NUM: In 2, 4 / Out 5, 7 ringed read as all even / all odd - now In 2, 3 and Out 5, 6, the rule still add 3)
     input: {
         ccss: ['3.OA.D.9', '5.OA.B.3'], op: 'io-table',
         alt: 'an In and Out table, the In side drawn round',
-        draw: () => table([['In', 'Out'], [2, 5], [4, 7]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 0 } }),
+        draw: () => table([['In', 'Out'], [2, 5], [3, 6]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 0 } }),
     },
     output: {
         ccss: ['3.OA.D.9', '5.OA.B.3'], op: 'io-table',
         alt: 'an In and Out table, the Out side drawn round',
-        draw: () => table([['In', 'Out'], [2, 5], [4, 7]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 1 } }),
+        draw: () => table([['In', 'Out'], [2, 5], [3, 6]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 1 } }),
     },
     rule: {
         ccss: ['3.OA.D.9', '4.OA.C.5', '5.OA.B.3'], op: 'rule',
@@ -570,7 +572,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     cycle: ['repeat', 'circle'],
     grow: ['pattern', 'sequence', 'step'],
     term: ['first term', 'sequence', 'number', 'rule'],  // (r12, critic r11 #3: 18, [14], 10 reads as the rule "take 4")
-    'first term': ['term', 'sequence'],
+    'first term': ['term', 'sequence', 'rule'],  // (r13 V-TWIN, critic r12 #3: the twin of term - [30], 25, 20 reads as "take 5")
     'times as many': ['compare', 'bar', 'equal parts'],
     compare: ['times as many', 'difference'],
     equation: ['number sentence', 'multiply', 'equal'],
@@ -594,6 +596,8 @@ export const VOCAB_FEATURES = Object.freeze([
     'rising-run', 'falling-run', 'step:<d>', 'skip-count', 'boxed-number', 'boxed-question', 'op-box', 'boxed-answer',
     'boxed-operand', 'boxed-divisor', 'boxed-dividend', 'boxed-first-of-run', 'boxed-in-run', 'row-ringed', 'column-ringed', 'in-ringed', 'out-ringed',
     'crossed-mark', 'lone-mark', 'loop-arrows', 'loop-numbers', 'arrow-into-box', 'arrow-out-of-box', 'numbers-at-ends',
+    // (r13 V-NUM: two or more numbers ringed or boxed, all even / all odd)
+    'all-even', 'all-odd',
     // declared only (not read from the markup)
     'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
     'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
@@ -635,6 +639,10 @@ export function vocabReadFeatures(body) {
         i = j - 1;
     }
     const heavy = rects.filter((r) => r.sw >= 2 && r.fill === 'none');
+    // V-NUM (r13, critic r12 #1): the numbers the picture rings or boxes; two or more, all even or all odd, read as even / odd
+    const marked = heavy.flatMap((r) => texts.filter((t) => inR(t, r)).map((t) => t.t.trim())).filter((t) => /^\d+$/.test(t)).map(Number);
+    if (marked.length >= 2 && marked.every((n) => n % 2 === 0)) f.add('all-even');
+    if (marked.length >= 2 && marked.every((n) => n % 2 === 1)) f.add('all-odd');
     const eqX = texts.filter((t) => t.t.trim() === '=' || /\s=\s/.test(t.t)).map((t) => t);
     for (const r of heavy) {
         const inside = texts.filter((t) => inR(t, r));

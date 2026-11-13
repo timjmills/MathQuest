@@ -28,6 +28,8 @@
 //     beside factor's boxed 4 and 3
 // V-HATCH (r11, the escape hatch) a set's noPicture words are never drawn for it (Match 3, the 1 picture, 3 words picture);
 //     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
+// V7-ALL (r13) every bank dealtBanks lists is judged (V-FEAT reading + today's notWith); V-NUM ringed/boxed numbers all
+//     even / all odd read as even / odd; V-TWIN pictures of one feature class share their notWith lists
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
@@ -223,6 +225,60 @@ const ambig = [];
                 if (!W.compatible([a, b])) continue;
                 const hit = sens.find(([, t]) => named(a).test(t) && named(b).test(t));
                 if (hit && (reads(a, b) || reads(b, a))) fail(`V-STD set "${s.title}": ${hit[0]} names "${a}" and "${b}" together, and the "${reads(a, b) ? a : b}" picture reads as "${reads(a, b) ? b : a}": make them notWith`);
+            }
+        }
+    }
+    // V7-ALL (r13, critic r12 root cause: pick3 dealt any clash-free pair of the whole set, across its trios): EVERY bank a set
+    // can deal - dealtBanks(set) when the tree has it, else every clash-free trio holding a picture word (what the old
+    // _compatiblePick could deal) - is judged: no picture in it reads as another bank word (today's VOCAB_DEFS) and no two of
+    // its words are notWith by TODAY's word list.
+    {
+        const banksOf = (s) => {
+            if (typeof W.dealtBanks === 'function') return W.dealtBanks(s);
+            const out = [];
+            for (const w of picsOf(s)) for (let i = 0; i < s.words.length; i++) for (let j = i + 1; j < s.words.length; j++) {
+                const t = [w, s.words[i], s.words[j]];
+                if (new Set(t).size === 3 && W.compatible(t)) out.push({ picture: w, bank: t });
+            }
+            return out;
+        };
+        const todayClash = (a, b) => ((HERE_W.VOCAB_WORDS[a] || {}).notWith || []).includes(b) || ((HERE_W.VOCAB_WORDS[b] || {}).notWith || []).includes(a);
+        W.VOCAB_SETS.forEach((s, si) => {
+            const seen = new Set();
+            for (const { picture: a, bank } of banksOf(s)) for (const b of bank) {
+                if (a === b) continue;
+                const why = todayClash(a, b) ? 'notWith' : (P.hasVocabPicture(a) && HERE_W.featuresSatisfy([...featOf(a), ...HERE_P.vocabReadFeatures(svgOf(P, a))], b) ? `the picture reads as "${b}"` : null);
+                const k = `${a}|${b}`;
+                if (!why || seen.has(k)) continue;
+                seen.add(k);
+                fail(`V7-ALL set ${si} "${s.title}": the "${a}" picture is dealt with "${b}" (bank ${bank.join(', ')}; ${why})`);
+            }
+        });
+    }
+    // V-NUM (r13, critic r12 #1): the numbers a picture rings or boxes, read from its drawing by today's reader - two or more,
+    // all even (or all odd) - read as even (odd); such a picture may not be dealt with that word unless they are notWith.
+    for (const pl of pools) for (const a of pl.pics) {
+        if (!P.hasVocabPicture(a)) continue;
+        const read = HERE_P.vocabReadFeatures(svgOf(P, a));
+        for (const [f, b] of [['all-even', 'even'], ['all-odd', 'odd']]) {
+            if (a !== b && read.includes(f) && pl.words.includes(b) && W.compatible([a, b])) fail(`V-NUM ${pl.name}: the "${a}" picture rings or boxes only ${b} numbers, and it may be dealt with "${b}"`);
+        }
+    }
+    // V-TWIN (r13, critic r12 #3: first term missed the term / rule pin): two pictures of one pool with the same feature
+    // class (their features less the box position and skip-count, every step:n as step) are notWith the same other words.
+    {
+        const cls = (id) => [...new Set(featOf(id).filter((f) => !['boxed-first-of-run', 'boxed-in-run', 'skip-count', 'all-even', 'all-odd'].includes(f)).map((f) => (f.startsWith('step:') ? 'step' : f)))].sort().join(' ');
+        const nw = (a, b) => ((W.VOCAB_WORDS[a] || {}).notWith || []).includes(b) || ((W.VOCAB_WORDS[b] || {}).notWith || []).includes(a);
+        const seenT = new Set();
+        for (const pl of pools) for (let i = 0; i < pl.pics.length; i++) for (let j = i + 1; j < pl.pics.length; j++) {
+            const a = pl.pics[i], b = pl.pics[j];
+            if (!P.hasVocabPicture(a) || !P.hasVocabPicture(b) || cls(a) !== cls(b)) continue;
+            for (const c of pl.words) {
+                if (c === a || c === b || nw(a, c) === nw(b, c)) continue;
+                const k = [pl.name, a, b, c].join('|');
+                if (seenT.has(k)) continue;
+                seenT.add(k);
+                fail(`V-TWIN ${pl.name}: "${a}" and "${b}" draw the same kind of picture (${cls(a)}), but only "${nw(a, c) ? a : b}" is notWith "${c}"`);
             }
         }
     }
