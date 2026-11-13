@@ -2103,3 +2103,37 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
+
+/* lf-checks queue 11 / 18 / 21 (lead 2026-11-13; SCREEN-DIGIT 40 / 48 / 56 px at 390 / 820 / 1280, RUBRIC C3): the online
+   worksheet's per-cell digit FLOOR. The grid's 29 px digit (rule .mq-scell.mq-grid-cell above) and the 40 px touch floor sat
+   under the screen host's floor, and worksheet.js _wsOneDigit copied ONE size to every card of a sheet, so number_patterns_rule,
+   count_by_tables and mult_properties (arrays-turn) drew 29 px numerals on the worksheet while the card and quiz drew 40-56.
+   Every grid cell of the worksheet now takes AT LEAST the host's floor at its width (the card's own 40 / 48 / 56 px at the
+   card's breakpoints), so every card of a sheet still shares one size; the grid then drops a column when a card no longer fits
+   (layoutWorksheetGrid). The digit inputs grow with the digits, as on the card. ADDITIVE (the 29 px rule stays for the other
+   grid hosts: teacher preview, explorer thumbs); ws-screen-slots --screen-digit is the check. */
+html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 40px; --ws-hw: max(48px, calc(var(--mq-digit) * 1.2)); --ws-answer: calc(var(--ws-hw) + 14px); }
+@media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 48px; } }
+@media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 56px; } }
+
+/* lf-checks queue 10 (lf-builds word-stories critic F3, lead 2026-11-13): a word-work answer digit box (.mq-wwans, the column
+   row of a story's answer) drew a 44 px box whose input was 40 x 44 px at 390 (card, quiz) and 44 x 44 on the worksheet, under
+   the 48 px touch floor (SP-10). The DRAWN box stays the span's 2 px border; the input's touch box grows to >= 48 x 48 as
+   transparent padding around the drawn interior, pulled out of the layout by an equal negative margin (the kit line-slot rule's
+   pattern). Every fill (white, the next-box yellow, green / red) is clipped to the drawn interior, and every ring is an outline
+   set back by the padding onto it. ADDITIVE. ws-phone-card TOUCH-TARGET is the check (every host at 390). */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot {
+    --mq-tp: 4px;
+    box-sizing: border-box !important; flex: none !important;
+    width: calc(100% + 2 * var(--mq-tp)) !important; min-width: 48px !important; max-width: none !important;
+    height: max(48px, calc(100% + 2 * var(--mq-tp))) !important; min-height: 48px !important;
+    margin: calc(0px - var(--mq-tp)) !important; padding: var(--mq-tp) !important;
+    background-clip: content-box !important; background-origin: content-box !important;
+    box-shadow: none !important; outline: none;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot:is(:focus, :focus-visible) {
+    box-shadow: none !important; outline: 3px solid #000 !important; outline-offset: calc(-3px - var(--mq-tp)) !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot.mq-active-box:not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: none !important; outline: 3px solid #f2c200 !important; outline-offset: calc(-3px - var(--mq-tp)) !important;
+}
