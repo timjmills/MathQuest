@@ -70,6 +70,18 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-13 **pv debt PASSED** (narrow critic pvdebt, Opus medium, `design/audit/runs/lf-placevalue/critic-pvdebt.md`): fixes 668f6a8c
+  (combine) + 1f18505d (unit_form), footprint flag `tightRows`. combine / unit_form / expand x independent / more-practice / test /
+  review at S (M / L for combine and unit_form, L for expand), rename=more S, and the combine lesson M / L: all >= 8, keys match.
+  Master merged at cbbbdade (redesign-passed 27). Open: F1 (C3 8, not held): combine Test S / Review S / Review M leave 34-45 % white
+  under the grid; proposed check "a one-page Test / Review leaves at most one row's height under the grid, or uses no more columns than
+  the Independent page at that size". O1 (item text): combine "+" spacing differs between pages. Backtest rows pv-combine-side-band /
+  pv-unit-form-rename-side / -margin keep their old pointers until lf-checks' pixel tool (1c64a449) is on master; then fail 16014137,
+  pass 668f6a8c / 1f18505d.
+
+| Finding | Check (proposed / existing) | Backtest | On path | Would have saved |
+|---|---|---|---|---|
+| F1 white under the grid on a tight one-page Test / Review | proposed: ws-empty-band EB-PAGE "<= one row under the grid on a single page, else column count <= Independent's" | to add (fail 5ae74b97 combine Test S) | precritic via ws-empty-band | a re-grade |
 - 2026-11-13 **composing:number_word_form PASSED** (critic nwf r3, 0fe802c4; r1 / r2 FAIL). redesign-passed.js PVW; PNGs
   design/status/lf-placevalue/nwf-pass/ (53) plus the r2 / r3 renders listed in critic-nwf3.md. Lesson 1 changed pages (number-name cells,
   14 of 30 at each seed) re-graded >= 8; ws-detailed-lesson --check / --repeats OK. Open, minor: N12 ("1 ones" steps). pv debt next
