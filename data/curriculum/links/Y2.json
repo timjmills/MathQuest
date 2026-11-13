@@ -4975,8 +4975,23 @@
   "Y2.B4.S10": {
    "title": "Two-step problems",
    "direct": [],
-   "partial": [],
-   "verdict": "gap",
+   "partial": [
+    {
+     "key": "algebra:multi_step_word",
+     "missing": "two-step + / − stories within 100 with the two-step bar model; the step's money context (prices, change) is not dealt",
+     "opts": {
+      "band": 100
+     }
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "missing": "two-step + / − stories within 100; the step's money context (prices, change) is not dealt",
+     "opts": {
+      "band": 100
+     }
+    }
+   ],
+   "verdict": "partial",
    "missing": "two-step money stories: add two prices, then find the change or the amount left (buy a $3 and a $4 toy with $10)",
    "build": [
     "money_2step"
@@ -5012,13 +5027,6 @@
    ],
    "preBuild": [],
    "related": [
-    {
-     "key": "algebra:multi_step_word",
-     "why": "two-step stories in other contexts",
-     "opts": {
-      "band": 50
-     }
-    },
     {
      "key": "measurement:enough_money",
      "why": "checking the total against the money you have: the check after a two-step total",

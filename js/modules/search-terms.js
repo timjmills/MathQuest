@@ -191,6 +191,9 @@ export const CONCEPTS = {
     exponents: ['exponent', 'exponents', 'powers', 'squared', 'cubed', 'indices', 'index'],
     teen_numbers: ['teen numbers', 'teens', 'teen', '11 to 19', 'ten and some ones', '10 and ones'],
     visual: ['pictures', 'visual', 'with pictures', 'picture', 'visuals', 'model'],
+    // two-step card 2026-11-13 (§7, decision 12): the seven two-step story skills
+    two_step: ['two step', 'two-step', 'two steps', 'multi step', 'multi-step', 'multistep', 'two operations', 'two step word problems',
+        'multi step word problems', 'two step problems'],
 };
 
 /* ================================================================= the mapping table */
@@ -344,6 +347,8 @@ export const CONCEPT_RULES = [
     [/^patterns:growing_shape_patterns$/, ['patterns']],
     [/^patterns:pattern_features$/, ['patterns', 'odd_even']],
     [/^patterns:follow_given_rule$/, ['patterns']],
+    // two-step card 2026-11-13 (§7): 'two-step' / 'multi-step' find the host, its twin and the five presets
+    [/^algebra:(multi_step_word(_plain)?|two_step_\w+)$/, ['two_step', 'word_problems']],
 ];
 
 /* ================================================================= hand-written terms */
@@ -421,8 +426,10 @@ export const SKILL_TERMS = {
     'shapes_early:partition_shapes': ['half', 'fractions', 'halves', 'quarters', 'fourths', 'thirds', 'equal parts', 'fractions of shapes'],
     'fractions:identify': ['what fraction', 'name the fraction', 'fraction pictures', 'shaded part'],
     'conversions:percent_of_number': ['percent of', 'percentage of an amount', 'percent of a quantity'],
-    'algebra:multi_step_word': ['two step word problems', 'two-step problems', 'multi-step', 'equation with a letter', 'letter for the unknown', 'estimate to check', 'is the answer reasonable', 'multiply then subtract', 'divide then add', 'add then divide'],
-    'algebra:multi_step_word_plain': ['two step word problems', 'two-step problems', 'equation with a letter', 'estimate to check', 'reasonable answer', 'four operations word problems'],
+    'algebra:multi_step_word': ['two step word problems', 'two-step problems', 'multi-step', 'equation with a letter', 'letter for the unknown', 'estimate to check', 'is the answer reasonable', 'multiply then subtract', 'divide then add', 'add then divide',
+        'two operations', 'add then subtract story', 'bar model two steps', 'two step bar model', 'strip model two steps'],
+    'algebra:multi_step_word_plain': ['two step word problems', 'two-step problems', 'equation with a letter', 'estimate to check', 'reasonable answer', 'four operations word problems',
+        'multi-step', 'two operations', 'add then subtract story'],
     'algebra:solve_unknown': ['solve for x', 'find x', 'missing number'],
     'algebra:balance_addsub': ['balance', 'equal sign', 'balancing equations', 'equals means same as'],
     'addition:equal_sign': ['equal sign', 'equals', 'true or false', 'balance'],
@@ -608,11 +615,11 @@ export const SKILL_TERMS = {
     'algebra:write_equation_story': ['write an equation for a story', 'equation from a word problem', 'write an equation word problem', 'story to equation', 'translate a story into an equation', 'model a story with an equation'],
     'algebra:factor_out_gcf': ['factor out the gcf', 'factor out the greatest common factor', 'factoring expressions', '12 + 18 = 6(2 + 3)', 'factorise', 'factor an expression'],
     'algebra:function_table_find_rule': ['find the rule', 'function table find the rule', 'in and out table rule', 'input output rule', 'what is the rule', 'function machine rule'],
-    'algebra:two_step_mult_div_first': ['two step word problems multiply first', 'multiply then add', 'multiply then subtract', 'divide then add', 'divide then subtract', 'two-step four operations', 'groups then a change', 'share then a change'],
-    'algebra:two_step_add_then_mult': ['add then multiply', 'subtract then multiply', 'two step word problems brackets', 'parentheses word problem', 'add first then multiply', 'each bag has red and blue'],
+    'algebra:two_step_mult_div_first': ['two step word problems multiply first', 'multiply then add', 'multiply then subtract', 'divide then add', 'divide then subtract', 'two-step four operations', 'groups then a change', 'share then a change', 'divide then subtract story'],
+    'algebra:two_step_add_then_mult': ['add then multiply', 'subtract then multiply', 'two step word problems brackets', 'parentheses word problem', 'add first then multiply', 'each bag has red and blue', 'brackets story'],
     'algebra:two_step_add_then_div': ['add then divide', 'subtract then divide', 'add first then share', 'two step division word problem', 'brackets then divide', 'share the total equally'],
-    'algebra:two_step_letter_equation': ['equation with a letter', 'letter for the unknown', 'write one equation two step', 'two-step equation word problem', 'n for the unknown', 'represent with an equation'],
-    'algebra:two_step_estimate_check': ['estimate to check', 'is the answer reasonable', 'reasonableness', 'round to check', 'estimate two step problem', 'check with rounding'],
+    'algebra:two_step_letter_equation': ['equation with a letter', 'letter for the unknown', 'write one equation two step', 'two-step equation word problem', 'n for the unknown', 'represent with an equation', 'unknown n'],
+    'algebra:two_step_estimate_check': ['estimate to check', 'is the answer reasonable', 'reasonableness', 'round to check', 'estimate two step problem', 'check with rounding', 'rounding check', 'reasonable answer'],
     'algebra:function_table_find_inputs': ['find the input', 'function table missing inputs', 'in and out table missing in', 'work the rule backward', 'missing input', 'function machine inverse'],
     'order_of_operations:square_numbers': ['square numbers', 'squared', 'squares', '5 squared', 'square of a number', 'exponent 2'],
     'order_of_operations:cube_numbers': ['cube numbers', 'cubed', 'cubes', '5 cubed', 'cube of a number', 'exponent 3'],

@@ -910,8 +910,9 @@ export const SKILL_WRM = {
 
     // ---- algebra
     'algebra:tape_diagram': ['Y5.B2.S6'],
-    'algebra:multi_step_word': ['Y5.B2.S6', 'Y5.B5.S6', 'Y6.B2.S8', 'Y6.B2.S14'],
-    'algebra:multi_step_word_plain': ['Y6.B2.S14'],
+    // (two-step card 2026-11-13, decision 12: Y2.B4.S10 partial - two-step + / − stories, without its money context)
+    'algebra:multi_step_word': ['Y5.B2.S6', 'Y5.B5.S6', 'Y6.B2.S8', 'Y6.B2.S14', { step: 'Y2.B4.S10', partial: 'two-step + and − stories within 100; the money context (prices, change) is not dealt' }],
+    'algebra:multi_step_word_plain': ['Y6.B2.S14', { step: 'Y2.B4.S10', partial: 'two-step + and − stories within 100; the money context (prices, change) is not dealt' }],
     'algebra:write_expression': ['Y6.B7.S3'],
     'algebra:evaluate_expression': ['Y6.B7.S4'],
     'algebra:evaluate_expression_hard': ['Y6.B7.S4'],

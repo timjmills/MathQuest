@@ -10740,7 +10740,17 @@
        0,
        1
       ],
-      "band": 50
+      "band": 100
+     }
+    },
+    {
+     "key": "algebra:multi_step_word_plain",
+     "opts": {
+      "forms": [
+       0,
+       1
+      ],
+      "band": 100
      }
     }
    ],

@@ -7452,6 +7452,14 @@
     {
      "key": "algebra:two_step_mult_div_first",
      "why": "two-step stories that mix × or ÷ with + or − (3.OA.D.8, the code this step shares)"
+    },
+    {
+     "key": "algebra:two_step_add_then_mult",
+     "why": "two-step stories: add or take away, then multiply (3.OA.D.8, the code this step shares)"
+    },
+    {
+     "key": "algebra:two_step_add_then_div",
+     "why": "two-step stories: add or take away, then share (3.OA.D.8, the code this step shares)"
     }
    ],
    "note": "Generated with defaults the money skill added whole dollars only (16, 8); with step 5 and USD it deals dollars and cents."
