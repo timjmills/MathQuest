@@ -3320,6 +3320,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "story-ladder-word-stories",
+   "check": "LADDER: a page of several story kinds deals them in the card's ladder order (first kind first, no kind outnumbering the one before it on a first page of 4-12), a Model + 3 Guided page practises the Model's kind, the practice card opens on the first kind, and the lesson deals one kind (word-stories critic r1 F6 / F15, lf-builds 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-story-ladder LADDER-FIRST / LADDER-PAGE / GUIDED-SUBSET / SCREEN-FIRST / LESSON-SAME (PEDAGOGY P-1, P-WP-1, P-WP-3; card 3)",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "41 findings: the compare preset dealt 2 'fewer' then 9 trap items on a page of 11 (count unset), Guided practised the trap under a 'fewer' Model, the hosts' default mix interleaved at random"
+   },
+   "pass": {
+    "commit": "6f26be25f",
+    "state": "0 findings on 16 ladders and lesson deals"
+   },
+   "command": "node tests/scripts/ws-story-ladder.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
