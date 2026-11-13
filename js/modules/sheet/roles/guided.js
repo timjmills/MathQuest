@@ -955,7 +955,10 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
             return cue(stage === 'model' && it.template === 'stack' ? traceCarries(html, it) : html);
         }
         if (stage === 'model') {
-            const html = it.render(c, Object.assign({}, o, { shown: ans, ink: 'trace' }));
+            // (lf-vocab r16b: the Model's cell knows it is on a Guided page too - `inside` - so a hintInside template anchors its
+            // answer place by `guidedRow` alone, never by scaffoldLevel, which a Scripted Model shares: ws-empty-band EB-BAND)
+            const mo = Object.assign({}, o, { shown: ans, ink: 'trace' });
+            const html = it.render(c, inside ? inside(mo) : mo);
             return cue(it.template === 'stack' ? traceCarries(html, it) : html);
         }
         if (stage === 'partial' && it.template === 'stack') {

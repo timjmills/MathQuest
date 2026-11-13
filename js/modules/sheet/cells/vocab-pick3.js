@@ -121,7 +121,10 @@ register(PICK3_TEMPLATE, {
         // (lf-vocab r16, critic r5 nit 2: on a Guided page the write line is anchored to the cell's bottom in EVERY cell - the
         // free height shared above the picture, the bank and the line - and the try's hint (payload.hintHtml, guided.js
         // hintInside) prints between the bank and the line, so the lines of a row stand at one y; ws-vocab-unit V-GLINE)
-        const guidedCell = !twin && !(ctx.chartZoom !== undefined && ctx.chartZoom !== null) && (Number(ctx.scaffoldLevel) >= 2 || !!p.guidedRow);
+        // (lf-vocab r16b: by `guidedRow` alone - guided.js sets it on every cell of a Guided page, the Model included. By
+        // scaffoldLevel >= 2 the Scripted Model's cells (level 3) anchored their line too, and with the line not counted as ink
+        // (ws-empty-band --slot-ink off) the free height left a 28.9 mm band under the bank: EB-BAND 30.1 % at L)
+        const guidedCell = !twin && !(ctx.chartZoom !== undefined && ctx.chartZoom !== null) && !!p.guidedRow;
         const hint = guidedCell && p.hintHtml ? `<div class="mq-hintline ws-trace" data-ws-ink="trace" style="margin-top:0">${p.hintHtml}</div>` : '';
         const gl = guidedCell ? '<style>:is(.ws-page,.ws-sheet) .mq-vp[data-ws-guided] > :not(style):not(.mq-hintline){margin-top:auto}</style>' : '';
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
