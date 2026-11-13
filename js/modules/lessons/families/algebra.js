@@ -428,11 +428,12 @@ export const LESSONS = Object.freeze({
         ],
         mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
     },
-    // ---- two-step stories (two-step card 2026-11-13, decision 11): the G2 lesson (BUILD #17) on the host and its twin,
-    // band 100 (decision 2: appended, the G2 lesson's band); lesson 7's x / ÷ first and its four follow-ons on the presets
+    // ---- two-step stories (two-step card 2026-11-13, decision 11): the G2 lesson (BUILD #17) on the host and its twin at
+    // "no band" (lead ruling R2 2026-11-13: band 100 dropped; at Max Number 100 it dealt the same); lesson 7's x / ÷ first and
+    // its four follow-ons on the presets
     'skill:algebra:multi_step_word': {
         routine: 'two-step-addsub',
-        practice: { skill: 'algebra:multi_step_word', opts: { band: 100 } },
+        practice: { skill: 'algebra:multi_step_word' },
         defaultFor: true,
         prereqsPending: TWO_STEP_CHECK,
         warmup: [
@@ -443,7 +444,7 @@ export const LESSONS = Object.freeze({
     },
     'skill:algebra:multi_step_word_plain': {
         routine: 'two-step-addsub',
-        practice: { skill: 'algebra:multi_step_word_plain', opts: { band: 100 } },
+        practice: { skill: 'algebra:multi_step_word_plain' },
         defaultFor: true,
         prereqsPending: TWO_STEP_CHECK,
         warmup: [

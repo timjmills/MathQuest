@@ -13,6 +13,9 @@
 //              bar is drawn on the Visual twin and not on the plain one
 //   HINT-L0    (decision 6) the hidden middle question prints on the teaching cells (scaffold level >= 2: Model, Guided)
 //              and never at level 0 or 1 or on the screen twin
+//   BAND-ALIAS (lead ruling R2 2026-11-13) band 100 is no longer offered on the seven skills (the G2 lesson takes "no band",
+//              which at Max Number 100 deals the same), and a share code written with band 100 before the change (pinned
+//              below, encoded on 8438ca59d) still decodes to its skill at "no band" (band null) - a round trip, never lost
 //   CAP-BAND   (--print, browser; lead ruling R1 2026-11-13, card decision 9 re-signed) multi_step_word (Visual) - the bar
 //              ABOVE the column work - holds its ruled capacity on the practice pages (independent / more-practice / test):
 //              at least S 2 / M 1 / L 1 stories a page (CAP), and no cell keeps an empty band of 30 % or more of its height
@@ -61,7 +64,7 @@ const short = (k) => k.split(':')[1];
 for (const key of mine) {
     const sk = short(key);
     const addsub = /^multi_step_word|estimate/.test(sk);
-    const bands = addsub ? [null, 30, 50, 100] : [30, 50];
+    const bands = addsub ? [null, 30, 50] : [30, 50];
     for (const band of bands) {
         const cap = band || 100;
         const bad = [], story = [];
@@ -134,12 +137,32 @@ for (const key of mine) {
     }
 }
 
+// BAND-ALIAS: band 100 is not offered; the codes written with it before R2 decode to "no band"
+{
+    const BAND100_CODES = { multi_step_word: 'M7~B100', multi_step_word_plain: 'M8~B100', two_step_mult_div_first: 'ZA~B100', two_step_add_then_mult: 'ZB~B100',
+        two_step_add_then_div: 'ZC~B100', two_step_letter_equation: 'ZD~B100', two_step_estimate_check: 'ZE~B100' };   // generateSkillCode on 8438ca59d
+    let sc = null;
+    try { sc = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'skill-codes.js')).href); } catch (e) { fail('BAND-ALIAS', `skill-codes.js did not load: ${e.message}`); }
+    for (const key of mine) {
+        const sk = short(key);
+        const band = (app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band');
+        if (band && (band.values || []).some((x) => x.v === 100)) fail('BAND-ALIAS', `${sk}: band 100 is still offered (R2: the G2 lesson takes "no band")`);
+        if (!sc || !BAND100_CODES[sk]) continue;
+        const got = sc.parseSkillCodeParts(BAND100_CODES[sk]);
+        const one = got.length === 1 ? got[0] : null;
+        const norm = one ? app.so.normalizeOptions('algebra', one.skillId, one.opts) : null;
+        if (!one || one.skillId !== sk) fail('BAND-ALIAS', `${BAND100_CODES[sk]} decodes to ${one ? one.skillId : 'nothing'}, not ${sk}`);
+        else if (norm.band !== null && norm.band !== undefined) fail('BAND-ALIAS', `${BAND100_CODES[sk]} (${sk}, band 100) decodes to band ${norm.band}, not "no band"`);
+        else if (sc.generateSkillCode([{ categoryId: 'algebra', skillId: sk, opts: one.opts }]) !== BAND100_CODES[sk].split('~')[0]) fail('BAND-ALIAS', `${BAND100_CODES[sk]} re-encodes as ${sc.generateSkillCode([{ categoryId: 'algebra', skillId: sk, opts: one.opts }])}, not the no-band code ${BAND100_CODES[sk].split('~')[0]}`);
+    }
+}
+
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */

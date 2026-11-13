@@ -4979,16 +4979,12 @@
     {
      "key": "algebra:multi_step_word",
      "missing": "two-step + / − stories within 100 with the two-step bar model; the step's money context (prices, change) is not dealt",
-     "opts": {
-      "band": 100
-     }
+     "opts": {}
     },
     {
      "key": "algebra:multi_step_word_plain",
      "missing": "two-step + / − stories within 100; the step's money context (prices, change) is not dealt",
-     "opts": {
-      "band": 100
-     }
+     "opts": {}
     }
    ],
    "verdict": "partial",

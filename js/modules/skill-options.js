@@ -2099,6 +2099,11 @@ SKILL_OPTIONS['algebra:function_table_easy'] = _ftOptions(true);
 SKILL_OPTIONS['algebra:function_table_hard'] = _ftOptions(false);
 OPTION_FOLDS['algebra:function_table_easy'] = _ftFold(true);
 OPTION_FOLDS['algebra:function_table_hard'] = _ftFold(false);
+// Two-step stories (lead ruling R2 2026-11-13): band 100 is no longer offered; a share code, saved page or quiz written with it
+// (B100, between the two-step build and R2) reads as "no band" - at Max Number 100 the same deal (ws-two-step BAND-ALIAS).
+const _twoStepBandFold = (raw) => { const next = { ...raw }; if (Number(next.band) === 100) next.band = null; return next; };
+OPTION_FOLDS['algebra:multi_step_word'] = _twoStepBandFold;
+OPTION_FOLDS['algebra:multi_step_word_plain'] = _twoStepBandFold;
 // ============================ end function tables ============================
 // ===========================================================================
 // P12 · EVERY OTHER FAMILY  (design/audit/OPTIONS-RUBRIC.md, 2026-09-25)
@@ -2996,8 +3001,10 @@ const _o2Add = (key, ...defs) => {
     // A tape diagram's whole runs to about twice the Max Number: it draws at half the band.
     ['algebra:tape_diagram', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
     ['algebra:tape_diagram_plain', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
-    ['algebra:multi_step_word', _o2RangeBand([30, 50, 100])],   // 100 appended (two-step card decision 2: the G2 lesson's band)
-    ['algebra:multi_step_word_plain', _o2RangeBand([30, 50, 100])],   // 100 appended (two-step card decision 2: the G2 lesson's band)
+    // (band 100 was appended for the G2 lesson and dropped again, lead ruling R2 2026-11-13: at Max Number 100 it dealt the same
+    // as "no band", which the lesson now takes; a code written with B100 decodes to "no band" through the fold below)
+    ['algebra:multi_step_word', _o2RangeBand([30, 50])],
+    ['algebra:multi_step_word_plain', _o2RangeBand([30, 50])],
     ['algebra:algebra_word_mixed_plain', _o2RangeBand([20, 50])],
     ['algebra:solve_unknown', _o2RangeBand([10, 20])],
     ['algebra:balance_addsub', _o2RangeBand([10, 20])],
