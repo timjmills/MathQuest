@@ -48,7 +48,10 @@ const ALLOW = new Set(list(arg('allow', '')));
     const ruledSkills = [...new Set(Object.keys(ruled).map((k) => k.split(' ')[0]))];
     const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
     const app = await H.open({});
-    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
+    // (lf-roles r8a, deploy: ONE evaluate over every skill x role x size ran past the DevTools protocol timeout on the full check -
+    // "Runtime.callFunctionOn timed out" - so the pages are built one skill a call; the keys come in the same order)
+    const now = {};
+    for (const one of skills) Object.assign(now, await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
         const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
         const out = {};
         for (const k of skills) for (const role of ROLES) for (const size of SIZES) {
@@ -61,7 +64,7 @@ const ALLOW = new Set(list(arg('allow', '')));
             } catch (e) { out[`${k} ${role} ${size}`] = { na: String((e && e.message) || e).slice(0, 80) }; }
         }
         return out;
-    }, { skills, ROLES, SIZES });
+    }, { skills: [one], ROLES, SIZES }));
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
