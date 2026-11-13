@@ -1,6 +1,9 @@
 # lf-partopts step A, critic round 4 (independent)
 
 Branch `claude/sweet-newton-c8wrv1-lf-partopts` @ 5efc60b. I rendered everything myself.
+While I graded, the builder pushed e1e7b1b-d0aa37a (precritic path, backtest rows, ledger). `git diff 5efc60b d0aa37a -- js css
+index.html` is empty, so the app I graded is the app at the branch tip. The gates ran the 5efc60b copies of the lane's
+test scripts.
 
 - **UI:** **Playwright** 1.63 (`/opt/node-tools`, the pre-installed Chromium, device scale 1) drove the real Print screen with
   real mouse clicks (`locator.click`) on the steppers, ticks and size buttons. Library lessons were opened with
@@ -29,7 +32,14 @@ Lessons used (29 walks, 9 packets / 104 pages, M and L, all with non-default cou
 
 ## Gates (final lines)
 
-GATES_TABLE
+| Gate | Result |
+|---|---|
+| `node tests/scripts/ws-partopts-unit.cjs` (full) | FILL-BT, ROWFIT-BT, BAND-BT PASS · PO-4 PASS · PO-2w 815 settled states in 52 cases · PO-2a-d, EB-ROWFIT, EB-ROWFIT+ (report-only: **105 states, 94 on changed sheets**), PO-NOROOM, PO-REM, PO-CAP, PO-VOC PASS · PO-2e We Do 7/52, Practice 52/52 · 1835 builds, 4044 s · **`ws-partopts-unit: OK`** |
+| `node tests/scripts/ws-partopts-shots.cjs --out <scratch>` (committed shots untouched) | R4 "Practice 75 Mixed 42: the page is 0 px wider than 390"; R2 "mixed 42 -> L 30: Now 30: the most size L holds" · **`ws-partopts-shots: OK`** |
+| `node tests/scripts/ws-code-snapshot.mjs` | **`ws-code-snapshot: OK (732 codes, 35 categories, +160 appended since the pinned baseline of 572, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable, 3203 option round trips)`** |
+| `node tests/scripts/ws-boot-smoke.cjs` | **`ws-boot-smoke: OK`** |
+| Default identity: d34311d worktree (scratch) `ws-lesson-baseline --all-lessons --write`, then `--check` on HEAD | `wrote 1556 hashes` · **`ws-lesson-baseline: OK (1556 hashes identical)`** (worktree removed) |
+| `ws-detailed-lesson --check --repeats`, run per lesson (`--lesson <id>`; with no `--lesson` it checks only g2-nbt3) | OK: g2-nbt3, g3-oa5, g3-oa9-input-output-rule, g3-oa9-mult-table-patterns, g4-nbt1. FAIL as on master: g1-oa1 (E9 overflow P6 +5 mm / key +4 mm, E35), g3-oa8 (E35). |
 
 ## Scores
 
@@ -75,9 +85,35 @@ Across all 29 walks: 0 console/page errors, 0 cell overlaps, 0 page overflows, 0
 
 ## Findings
 
-No lane-introduced defect at or above a 7 on any criterion. The observations below are all **master-only** (byte-identical
+No lane-introduced defect at or above a 7 on any criterion. Two minor lane findings (cost no point) and three master-only
+observations.
+
+**F1 · MINOR · process / docs: DESIGN §8d understates how often EB-ROWFIT+ fires.** `design/partopts/DESIGN.md` §8d "R3"
+says the check "flags 2 states today (both this fact_family_sort case)" and calls R3 "a single sub-threshold case". The full
+unit run on HEAD prints `EB-ROWFIT+ (report-only): 105 state(s) … (94 on changed sheets)`, which the lane's own status row
+also records. The decision still holds (PO-2d passes, so every one of those feet is under the 30 % EB-PAGE line), but the
+proportion argument is written on a wrong count. **Fix:** correct the count in §8d and list the lessons the 94 changed
+sheets come from, so lf-engine sizes the row-packer work on the real number. **Check:** `ws-partopts-unit` prints the
+EB-ROWFIT+ lessons grouped by case, and a doc lint (or the status row) quotes the gate's own line, not a hand count.
+
+**F2 · MINOR · UI correctness (nit): a size round trip loses the teacher's count.** fact_family_sort M, Practice + to 45,
+Size L (30, "the most size L holds"), Size M → **27**, "Rounded to 27 so no page is under half full". 45 fits at M, but the
+screen re-snaps from the clamped 30, not from the 45 the teacher asked for. Each note is true for the value it snapped, so
+this is a nit, not a false caption (`r2-practice-ML-ui.png`). **Fix:** keep the teacher's asked count next to the snapped one
+(`s.partAsk`) and re-snap from it on each re-limit (`teacher-print.js` near `:1238`). **Check:** PO-2w, size M → L → M
+restores every count that M offers.
+
+**P6 · master code, reachable on master too: the preview shows at most 8 page tabs.** `teacher-print.js:1336`
+`tabs.slice(0, 8)`. Y4.B1.S14 L with Practice 75 + Mixed 30 builds 10 pages: the tabs read Page 1-8, and Page 9, Page 10 and
+**Answer keys** cannot be previewed on screen (`tabs-L-max-tabs.png`). M with Practice 60 + Mixed 42 (8 pages) also loses the
+Answer keys tab. Master d34311d has the same slice, and its lesson Practice select (0-5 pages) + Mixed reaches 9 pages too,
+so it is not scored. This lane does make long packets easier to reach. **Fix:** show every tab (they wrap at phone width
+already) or add a "More" tab. **Check:** in `ws-partopts-shots`, after the max packet, the tab count equals pupil pages
+(+1 with keys). The observations below are all **master-only** (byte-identical
 to d34311d, `ws-lesson-baseline` 1556 hashes identical) and are **not scored** against this lane; recorded so the lead can
 route them.
+
+Master-only, not scored:
 
 **M1 · master-only · C3 · the `multiplication:mult_facts` M lesson sheet prints a 32 % (75.6 mm) foot.** Standard render,
 We Do fixed 3 + rows fixed 2 under a Guided/Steps/Independent band. Same class as the div_facts anchor chart. Not this lane:
@@ -105,7 +141,9 @@ I reproduced the exact case (fact_family_sort M, Vocabulary 2, Remember off, We 
    1556-hash baseline and a print overflow. That is a lane-wide engine change with a worse failure mode than a 25 % foot,
    rightly routed to lf-engine, with EB-ROWFIT+ as the tripwire that flips to gating when the row packer is reworked.
 
-The judgement to carry it forward as report-only is correct for this step.
+The judgement to carry it forward as report-only is correct for this step. One caveat (F1): the doc's "2 states" is wrong;
+the gate flags 105 (94 on changed sheets), all under the 30 % line. That makes routing to lf-engine more important. It does
+not argue for gating it in this lane.
 
 ## Checks the fixes rest on (verified present and correct)
 
