@@ -40,11 +40,14 @@
 // V27 (r9) key dot underlays never overlap; the pick3 "Here is how" uses the screen verb; no broken comparison in an explain
 // V26 (r9) the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below
 //     (provider `preSkills`), never the Grade 6 definition-matching skills listed before it in data.js
-// --browser: V23 (R-1) card-390 and worksheet-1280 highlight after the answer and not before, the pupil print pages are
+// --browser: V23 (R-1) card-820 and worksheet-1280 highlight after the answer and not before, the pupil print pages are
 //     byte-identical to 70cdbaf9 (sha256 per role / size / seed, tests/fixtures/precritic/vocab-pupil-hashes.json), the
 //     key's highlight is GREY only; V25 (R-2) a wrong answer shows and speaks the RIGHT word's explanation once, with
 //     sound off shows it and does not speak, a right answer shows none
 //   --pin-pupil   (with --browser) write the pupil hashes of this tree to the fixture (run on 70cdbaf9 only)
+//   --no-pupil-pin (with --browser) skip ONLY the pupil-hash comparison (lf-tools r1 A4: the pin is read from today's
+//                 checkout, so on an old commit it misses on print pages later lanes changed; a backtest row that proves the
+//                 SCREEN half of V23 / V25 at 820 uses it). Every other V23 check (no highlight on the pupil page, grey key) runs.
 
 import { pathToFileURL } from 'url';
 import path from 'path';
@@ -929,12 +932,13 @@ async function r7Checks(page, fail, sheet) {
         if (bad.length) fail(`V23 ${skillId} key: ${bad.length} highlight mark(s) painted ${bad[0]} (want the single grey rgb(148, 148, 148))`);
     }
     if (process.argv.includes('--pin-pupil')) { fs.writeFileSync(PUPIL_PIN, JSON.stringify(hashes, null, 1) + '\n'); console.log(`ws-vocab-unit: pinned ${Object.keys(hashes).length} pupil hashes`); }
+    else if (process.argv.includes('--no-pupil-pin')) console.log('ws-vocab-unit: note: --no-pupil-pin: the pupil-hash pin is not compared');
     else {
         const pin = fs.existsSync(PUPIL_PIN) ? JSON.parse(fs.readFileSync(PUPIL_PIN, 'utf8')) : null;
         if (!pin) fail('V23: no pinned pupil hashes (tests/fixtures/precritic/vocab-pupil-hashes.json)');
         else for (const [id, h] of Object.entries(pin)) if (hashes[id] !== h) fail(`V23 ${id}: the pupil print page changed (${hashes[id] || 'missing'} vs pinned ${h})`);
     }
-    // ---- the screen: card-390 and worksheet-1280
+    // ---- the screen: card-820 and worksheet-1280
     // (in the page) the state of a host's vocabulary cell: highlight shown, glowing words, explanation
     const READ = (sel) => {
         const root = document.querySelector(sel);
@@ -1027,10 +1031,10 @@ async function r7Checks(page, fail, sheet) {
             if (JSON.stringify(spoken) !== JSON.stringify(wantSpoken)) fail(`V25 ${tag}: spoken ${JSON.stringify(spoken)}, want ${JSON.stringify(wantSpoken)} (sound ${tts ? 'on' : 'off'})`);
         }
     };
-    // card-390: wrong with sound on, wrong with sound off, right
-    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+    // card-820 (owner 2026-11-13: no phone width; was card-390): wrong with sound on, wrong with sound off, right
+    await page.setViewport({ width: 820, height: 1180, deviceScaleFactor: 1 });
     for (const skillId of SK) for (const [right, tts] of [[false, true], [false, false], [true, true]]) {
-        const tag = `${skillId} card-390 ${right ? 'right' : 'wrong'} sound ${tts ? 'on' : 'off'}`;
+        const tag = `${skillId} card-820 ${right ? 'right' : 'wrong'} sound ${tts ? 'on' : 'off'}`;
         await page.evaluate((k, tts) => {
             window.__spoken = []; window.speak = (t) => { window.__spoken.push(String(t)); };
             const st = window.state; st.ttsEnabled = tts; st.quizMode = false; st.mapMode = false; st.category = 'vocabulary'; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;

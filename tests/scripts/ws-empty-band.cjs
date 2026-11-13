@@ -15,8 +15,9 @@
 //
 // WHAT IS RENDERED (the plan): the roles the skill's SIGNED spec card offers (tests/lib/ws-card-plan.mjs, lf-ops: §7a
 // "offered" page roles minus "hidden"), each at sizes S, M and L with the skill's defaults; the card's option variants on the
-// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 390,
-// 820 and 1280 px wide, the online worksheet and the quiz at 1280 px. No card: the default role list below. A role buildSheet
+// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 1280,
+// 1366, 820 and 1024 px wide (owner 2026-11-13: no phone width; --widths 390 still runs on request), the online worksheet
+// and the quiz at 1280 px. No card: the default role list below. A role buildSheet
 // cannot compose for the skill is listed as "not composed", never passed.
 //
 // WHAT IS MEASURED, per kit cell ([data-ws-cell], top-level; print pupil pages; the B&W screen cell on a host):
@@ -100,6 +101,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const SW = require('../lib/ws-screen-widths.cjs');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
 
 const argv = process.argv.slice(2);
@@ -363,7 +365,7 @@ const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const HTML = arg('html', null);
 if (require.main === module && !HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
-const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
@@ -755,7 +757,7 @@ async function main() {
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
-            const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
+            const vSize = ['L', 'M'].find((z) => SIZES.includes(z)) || SIZES[0];
             if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
             notes.push(`${key}: slot ink ${SLOT_INK ? 'on' : 'off'}; card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
@@ -851,12 +853,13 @@ async function main() {
                 } finally { await sh.close(); }
             }
             // screen hosts
-            const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
+            // owner 2026-11-13: no phone width; the card at the computer / Chromebook and tablet widths (--widths overrides)
+            const widths = { card: SW.widthsArg(process.argv), worksheet: [1280], quiz: [1280] };
             // every host at the skill's defaults AND at each sampled option variant (lf-checks hosts lane 2026-11-12: unit_form's
             // worksheet band appeared only at rename=more, an option no host run had rendered)
             const hostOpts = [{ tag: '', opts: OPTS }, ...variants.map((v) => ({ tag: ` {${v.option}: ${v.value}}`, opts: Object.assign({}, OPTS || {}, v.opts) }))];
             for (const ho of hostOpts) for (const host of HOSTS) for (const w of widths[host] || []) {
-                await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
+                await page.setViewport({ width: w, height: w < 500 ? 844 : (w === 1366 || w === 1024) ? 768 : 900, deviceScaleFactor: 1 });
                 const ok = await page.evaluate(async ({ c, k, host, SEED, OPTS }) => {
                     try {
                         const st = window.state;

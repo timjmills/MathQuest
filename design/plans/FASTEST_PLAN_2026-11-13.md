@@ -12,7 +12,7 @@
    current round needs; nothing outside the round is started.
 2. **Copies of an approved drawing get a light pass.** First skill on a template: full critic. Every later skill on the
    same template: machine gates + ONE narrow critic page sample (its own content: answers, ladder, words), not a
-   full S/M/L x every role x every host review. Most of the 520 remaining skills reuse ~15 templates.
+   full M/L x every role x every host review. Most of the 520 remaining skills reuse ~15 templates.
 3. **One critic per batch, not per skill.** A lane sends 3-6 same-template skills to one critic run.
 4. **Round cap.** Two failed rounds on the same defect class -> stop, root-cause, machine check, then one more round
    (section 1.7 already says this; enforce it at 2 rounds, not "two rounds at medium").

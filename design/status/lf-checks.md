@@ -9,6 +9,18 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-13 (lf-tools, branch claude/sweet-newton-c8wrv1-lf-tools): COPY-LIGHT and BATCH critic routes (owner rule, fastest plan 2-3).
+  `tests/scripts/ws-copy-light.mjs` (new): eligibility = every kit template the generator draws (defaults + the card's option values,
+  q.cell via kitCellSpec) has an ANCHOR in redesign-passed.js whose signed card offers every role and host the skill's card offers
+  (no card §7a: every buildSheet role); writes a deterministic page sample {n, role, size, seed, host, width, option, value, opts}
+  (every role, host and option value once; cap 12 a skill / 24 a batch, raised to coverage, never cut). `ws-precritic --copy-light`
+  (gate + `<logs>/copy-light-sample.json`; all other gates still run) and `--batch k1,..` (3-6 eligible skills on ONE passed template,
+  else FAIL; `<logs>/copy-light-batch-sample.json`); every --skill plan carries the report row. Dry runs give the verdict.
+  Examples: addition:add_sub_10s ELIGIBLE (fact, anchor add_facts); placevalue:compare / more_less_10 / more_less_100 ELIGIBLE
+  (pv via expand, pv-support via value) and BATCH OK on pv; measurement:time_5min NOT (clock never passed);
+  placevalue:expanded_notation NOT (no card: roles word-problems, fact-rows, fact-probe, stretch not on expand's card).
+  Briefs: design/lessons-first/briefs/critic-copy-light.md, critic-batch.md; RUBRIC "How a page counts as graded" routes 3-4
+  (never a template's first skill). Backtest `copy-light-eligibility` PASS (FAIL 91182e61b → OK 3a32a8b8f); ledger row added.
 - 2026-11-08 (lead, resumed, cap $60): ws-empty-band.cjs - the ONE shared empty-band / footprint check (L25) - built, on `ws-precritic --skill`;
   FAILs on the three critic-failed heads (lf-vocab bebf5b36, lf-placevalue b28a0867 N5 / N6, lf-ops b23e418d div_facts S); add_facts OK against its pin.
   Not independently critiqued yet.
@@ -454,3 +466,224 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
 - CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
   - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
   - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.
+- CRITIC lf-tools r2 FIXES (fresh builder, Opus medium; round cap fired: the "drawing key" class failed r1 B1 and r2 D1; commit
+  fdc35fb99 + the rows / ledger / this note):
+  - ROOT CAUSE (checked): ws-copy-light decided "same drawing" by comparing a HAND-KEPT list of payload fields (r1: the template id;
+    r2: kind / task / layout / mode / type / form). A template picks its picture from whatever fields its render reads, so every
+    field off the list was invisible: r2's stack op, unknown, regroup and operand rows. Run on fac8e03a0, the new check finds 115
+    such fields on 38 of 46 templates (stack.op '+' -> '-', word-work.signRow, timeline.faces, pv.places ...). Adding names a third
+    time would have failed the same way.
+  - THE CHECK (step 1): `ws-drawing-key.mjs` (new). Corpus = every live skill, 4 seeded items (generateQuestionFor + kitCellSpec);
+    per registered template up to 4 base payloads (different skills, different skeletons); each field mutated to every other corpus
+    value (max 8, and absent); render print + screen blank; compare the normalised skeleton (tests/lib/ws-drawing-skeleton.mjs:
+    tags, class tokens, slot count and shape, SVG primitive kinds, operator glyphs; digits and words masked; a run of identical
+    siblings is one or many; an unclassed <g> in an <svg> is one icon). FAIL when the skeleton changes and the tree's drawingOf
+    key does not. fac8e03a0 FAIL (115), now OK (46 templates, 4166 mutations, ~4 s; 6 registered templates no live skill draws).
+    On precritic's path (every --skill plan + precritic --self-test).
+  - THE FIX (step 2): drawingOf = template + the skeleton hash (no field list anywhere); reasons show a readable label
+    ([op=* ...]). Verdicts: mult_2by1_column, add_column_multi, add_missing_digit, sub_missing_digit NOT ELIGIBLE (no passed skill
+    draws their skeletons); `--batch add_column_multi,add_missing_digit,sub_missing_digit` FAIL; add_sub_10s ELIGIBLE (its horiz
+    + / - fact drawings are anchored by add_facts / sub_facts option values); time_5min, placevalue:compare NOT ELIGIBLE.
+    Side effect, correct by the rule: more_less_10 / more_less_100 are no longer eligible (their word-frame and strip / hchart
+    support drawings never passed). Self-tests: copy-light 52 (stack op * vs -, missing digit, carry row, rows; pv compare vs
+    expand; clock read vs draw; the D1 batch FAIL), drawing-key 19.
+  - D3: copy-light mode (several skills, each its own narrow brief) gives EVERY skill 1280 / 1366 / 820 / 1024; a batch still
+    deals across the batch. Self-test 2.
+  - D2: ws-share-options' pupil steps (Quick Start grid shot, Direct Play landing + twelve practice answers) run at 1024 x 768
+    (re-run: ws-share-options OK); its allow reason now says only the teacher steps keep 390. NP-PUPIL (new in ws-no-phone-width):
+    a 390 line in an allowed file with a pupil / student step within 6 lines is a finding; it also found ws-simple-print's pupil
+    home TOAST / BAR loop at 390, moved to 1366 / 820 / 1024. Residue (routed to the lead / the size-S builder, who owns that file's
+    print-dialog steps): ws-simple-print COLSFIT / OPTKEY at [390, false] "student view" (line ~2006) - NP-ARRAY does not read
+    [w, bool] pairs, so it is not flagged yet.
+  - D5: the render-gate label names the card, worksheet and quiz at 820 / 1024.
+  - A4 residue: the `vocab-r11-nb9-blur` route to lf-vocab is now in the CHECKS_FROM_CRITICS A4 row.
+  - Backtests (ws-backtest --row): drawing-key-complete, copy-light-stack-batch, copy-light-sample-widths-per-skill,
+    no-phone-width-pupil-allow (new), copy-light-eligibility, copy-light-drawing-batch, copy-light-sample-widths,
+    copy-light-brief-names PASS; no-phone-width-default and no-phone-width-derived went red at 27545964d under NP-PUPIL (the
+    pupil steps were still at 390 there) and were re-pointed to fdc35fb99: PASS. ws-precritic-plan OK (160 on path);
+    --checks-from-critics none dropped (314 → 324), 79 pass / 31 exempt / 15 fail (none lf-tools). ws-no-phone-width OK.
+    ws-boot-smoke OK.
+- CRITIC lf-tools r1 FIXES (builder, Opus medium, rebuild after FAIL A 8/7/8/8, B 6/7/7/7; commits 27545964d, 4dc89d89f, 270a832ea + this note):
+  - B1 (major): ws-copy-light keys eligibility on the DRAWING = kit template + every payload discriminator it draws by
+    (kind / task / layout / mode / type / form): `pv/kind=compare` is not `pv/kind=expand`. placevalue:compare is NOT ELIGIBLE
+    ("pv passed only as pv/kind=expand, expand-line, blanks, value, frame, place, place-bank"). A batch still shares ONE
+    template, with every drawing of every skill anchored. Re-check: add_sub_10s ELIGIBLE (fact via add_facts); time_5min
+    NOT (clock/kind=read / draw / words never passed); compare NOT; batch compare + more_less_10 + more_less_100 FAIL; the mixed
+    batch compare + add_sub_10s + more_less_10 FAIL; batch more_less_10 + more_less_100 + place_value_10x OK on pv (sample
+    byte-identical over two runs). Self-test 8 drawing cases. Rows `copy-light-drawing-batch`, `copy-light-eligibility`.
+  - B5: `copy-light-eligibility` re-pointed: FAIL f3ae7acca (its own tool reads compare ELIGIBLE) → OK 27545964d. PASS.
+  - B2: the sample shows every SCREEN_WIDTHS width (1280, 1366, 820, 1024), single and batch (widths dealt across the batch;
+    screen pages added until there are four). Self-test 5 cases; row `copy-light-sample-widths` PASS.
+  - B3: `ws-grade-render --sample <copy-light json>` renders exactly the sampled pages (role, size, seed, host, width, opts; one
+    directory per page, meta.json `sampleSeed` / `sampleWidth`). `--sample-self-test` 5 cases. Real run: a 3-page add_sub_10s
+    sample (guided S seed 20001, card 1024, worksheet 1366) → ws-grade-render OK, 4 pages. The worksheet / quiz view has no box
+    at 1366 x 768 and 1024 x 768 ("Node is either not visible"): the page is shot instead, as the card already was.
+  - B4: critic-copy-light.md and critic-batch.md name C1 Ease of use, C2 Educational value, C3 Spacing and layout, C4 Standard
+    fidelity. `ws-copy-light --brief-lint` (also on every --skill / --batch run): FAIL on f3ae7acca (12 names), OK now. Self-test
+    4; row `copy-light-brief-names` PASS.
+  - B6: every option value is scanned 8 items, +8 while the last half still brought a new drawing (max 24). Self-test: a drawing
+    dealt at item 5 and 13 is found (2 items miss it). A no-card skill held to every role now also reads "no signed card §7a
+    ... sign its card first" (only when the role miss is why). Ledger: exempt (self-test; no commit pair separates it).
+  - A1: ws-grade-render --gate (and --tablet-hosts) renders the online worksheet and the quiz at 820 and 1024 too, and
+    TOUCH-TARGET judges card, worksheet and quiz there (answer box 48 px, other controls 44 px). `--touch-self-test` 9 cases.
+    Real run: **placevalue:unit_form FAILs (24 findings: `input.mq-cellslot` 50 x 46 px on worksheet-820 and worksheet-1024)** -
+    a REAL RED, routed to lf-hosts (not fixed here). division:div_facts: no tablet target finding.
+  - A2: ws-no-phone-width scans every script ws-precritic.cjs, ws-deploy-gates.sh or opt-in-rules.json names (73 derived) plus
+    the per-skill screen gates; ALLOW carries a reason per file. Allowed: ws-teacher-wrm, -shell, -library, -preview,
+    ws-pdf-preview, ws-simple-print, ws-share-options (TEACHER screens: their 390 steps test the teacher's own phone layout on
+    purpose; dropping them is an owner / lead call) and the check itself. FIXED: ws-student-explorer (a PUPIL screen) now runs
+    1366 / 1024 / 820, ROOM and THUMB touch at 820. Its run: FAIL (1) `THUMB legible (S): placevalue:unit_form NODUP` - the same
+    single fault at f3ae7acca (its 390 version, run from a f3ae7acca worktree): pre-existing, routed to lf-placevalue / lf-hosts.
+    Self-test 26 (6 new); rows `no-phone-width-derived` (new) and `no-phone-width-default` (pass re-pointed 29ef1eb21 →
+    27545964d: that commit still had student-explorer at 390) PASS.
+  - A3: SCREEN-DIGIT floors come from ONE table, tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR / digitFloor(host, width):
+    card and quiz 56 / 56 / 48 / 48 at 1280 / 1366 / 820 / 1024, the online worksheet 29 px (SP table). Self-test 8 cases + table
+    coverage. Real run `--skills placevalue:unit_form,division:div_facts --screen-digit`: OK (0 misses; unit_form's 29 px and
+    div_facts' 40 px worksheet numerals pass). NOTE for `screen-digit-npr-worksheet` (PENDING, lf-ops): its fail state cited
+    number_patterns_rule's 29 px worksheet digits, which now pass by the lead's ruling; it also named count_by_tables' 26-29 px
+    arcs train. lf-ops: re-run its fail side with today's tool before the pass commit lands (it may need a new fail state).
+  - A4, the 9 rows moved to 820 (ws-backtest, this tree):
+    | row | outcome |
+    |---|---|
+    | vocab-r9-nb6-quiz-red, vocab-r9-nb7-pick3-line, vocab-r10-nb8-wrong-focus-tick, vocab-r12-nb9-every-card | PASS at 820 (critic r1's run; unchanged) |
+    | vocab-o1-next-box-blue | was red at both commits (NB6-NB9, built later, fail on 5d8fe328). Verdict now NB1-NB5 only (`ws-next-box --rules`, new): **PASS** at 820 |
+    | vocab-v23-v25-screen-feedback | was red (today's V25, tightened by r8, and the re-pinned pupil hashes fail df31bcb3 at any width). `--only V23 --no-pupil-pin` (new flag): **PASS** at 820. V25 is proven by the r8 row |
+    | vocab-v23-painted | same scope: **PASS** |
+    | vocab-r8-v25plus-v26-v27 | was red (today's V26 / V27 are r9 checks). `--only V25 --no-pupil-pin`: **PASS** |
+    | vocab-r11-nb9-blur | **UNPROVEN, still red** at both commits: NB9 fails on the WORKSHEET (1280, a width this change did not touch) and the card at 7c8fee58; the critic found the same red with the 390 tool from 91182e61. ws-next-box has no 390 card any more, and 390 was red too, so keeping 390 would prove nothing. Routed to lf-vocab |
+  - Verify: self-tests OK (ws-copy-light 48, ws-no-phone-width 26, ws-screen-slots, ws-grade-render --touch 9 / --sample 5,
+    ws-precritic, ws-precritic-plan 48). ws-backtest: copy-light-eligibility, copy-light-drawing-batch, copy-light-sample-widths,
+    copy-light-brief-names, no-phone-width-derived, no-phone-width-default, and the 4 re-scoped rows PASS. ws-no-phone-width OK
+    (75 files). ws-precritic-plan OK (158 on path); --checks-from-critics: none dropped (314 → 320), 75 pass / 30 exempt / 15
+    fail, none lf-tools or lf-checks (10 ledger rows added). ws-boot-smoke OK.
+  - Routed reds: unit_form worksheet answer boxes 50 x 46 at 820 / 1024 (lf-hosts); unit_form thumbnail NODUP in
+    ws-student-explorer (pre-existing; lf-placevalue / lf-hosts); vocab-r11-nb9-blur (lf-vocab).
+
+## 2026-11-13 — lf-tools after critic r3 (round cap): COPYLIGHT-ADVISORY
+
+- Critic r3 (09cec53eb): A (no phone width) PASS 8/8/9/8; B (copy-light) FAIL 6/6/7/7, third round on drawing identity.
+- Lead decision COPYLIGHT-ADVISORY: ws-copy-light keeps its verdict, sample, batch check, `--sample` render and brief lint, but
+  `criticRoute()` sends EVERY skill to the FULL critic. Row `copy-light-advisory-mult-div` (the planted mult/div anchor pair still
+  routes FULL) FAIL b99cf0bde → OK fd85daebf. No critic round for the switch (lead: it removes the risk B failed on).
+- PARKED under FOCUS (QUEUE.md is generated, so it is listed here): template-declared drawing keys — each sheet template declares
+  its drawing key; a must-differ pair list (fact × vs ÷, clock 12 vs 4 numerals, part-whole vs comparison bar, regroup row vs none);
+  a seed-stability check (a skill's key set is stable across seeds; count_by_2s anchors count_by_3s). Then lift ADVISORY.
+- Open, routed: ws-simple-print student-view print-dialog step at 390 (→ no-size-S branch).
+
+### lf-tools-nos: print size S dropped (owner 2026-11-13, CLAUDE.md plan item 9) - builder, Opus medium
+- Guard first: `tests/scripts/ws-no-size-s.mjs` (node, < 1 s). APP-PICKER (a size control offers S), APP-RESTORE (a stored
+  size kept as S), APP-ALIAS (the kit's `offeredSize` reads S as M, `OFFERED_SIZES` = M,L, the S token kept so old settings
+  decode), GATE-DEFAULT (an arg default, literal size list, planned `--size(s)` or deploy line with S). A reasoned allow-list
+  (buildSheet's explicit-S bridge, kit-token unit tests, 9 dated lane scripts on no gate path); a stale entry fails. On every
+  ws-precritic run and in deploy session 1. Row `no-size-s-76bc` (76bc11c6 FAIL 52 -> a3b128cd1 OK, ws-backtest PASS).
+- App: teacher print, simple print, worksheet sheet (+ fact Columns row) and print settings offer M and L. A stored S
+  (print defaults, simple-print prefs, saved quick prints, recent printouts in buildAll, the legacy kit ctx, buildSimple)
+  prints at M. "All 12 tables on one page" still forces the kit S internally (12 rows fit only there); its locked Size
+  control now shows M / L with "Size fixed" - a lead decision whether that option should move to M.
+- Gates default to M,L (precritic S runs -> M with the M pin; empty-band, cell-checks, capacity-pin, fixit-words, slot-clip,
+  options-verify, lesson-samples/-hash/-check, coverage-matrix, simple-print, columns, sheet-*). Every backtest row that
+  relied on an old default now names it (`--sizes S,M,L` etc., 49 rows, text edits; none dropped).
+- Pins: capacity / empty-band S keys removed; lesson-baseline S keys RENAMED M (lesson at S always printed at M; the M
+  hashes equal the S keys, 30/30 checked), deploy session 4 runs `--sizes L,M`; print-lint.M.json gains the 22 lesson pages
+  from the S pin; print-lint.S.json kept for old `--baseline` rows.
+- Fact sheets: `ws-fact-cols-m` (FCM-COLS / FCM-PT / FCM-FIT: 9 and 10 picked columns at M, 16 pt, teacher + simple print),
+  on precritic's fact-skill path; row `fact-cols-m-fixture`.
+- Screenshots (before 76bc11c6 / after, dsf 2): design/status/lf-checks/no-size-s/.
+- Verified: ws-no-size-s OK (76bc11c6 FAIL 52); ws-code-snapshot OK (nothing moved); ws-boot-smoke OK; ws-content-audit
+  add_facts OK; ws-simple-print (default, now M,L) OK; ws-fact-cols-m OK (x facts at their own cap of 8 - the same at S on
+  76bc11c6); ws-precritic-plan OK + --checks-from-critics (15 old warnings, unchanged; none dropped); ws-print-lint kit
+  add_facts + combine at M and L OK; ws-backtest no-size-s-76bc and fact-cols-m-fixture PASS.
+- Open (not caused here): add_facts#lesson L-TOPSTART CL-4b 0 -> 32 against the M pin, identical on 76bc11c6 at S with the
+  S pin (a lesson at S is the M page) - the precritic lesson-M row will show it until lf-ops / lf-engine fixes or re-pins it.
+
+### lf-tools-nos r2 (2026-11-13, Opus medium rebuild after critic r1 FAIL: C1 6, C2 6, C3 9, C4 7)
+Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
+- F1 (blocker) fixed: `applyPrintSettings` (saved set from the Library, tray snapshot / Undo, `&set=` link opened),
+  `decodeSetParam` (the link's imported set), the worksheet sheet's build request and the Library's set words all read the
+  size through `offeredSize`. Recent printouts (`buildAll`), the simple print / quick prints (`cleanPrint`), the stores and
+  Settings already did. Grep found no URL size parameter, no cookie size and no size in saved quizzes.
+- F2: `ws-no-size-s --browser` (new; ~15 s). It seeds S in 3 localStorage keys, a saved set, a `&set=` link and a quick
+  print, then calls `tvSheetPrint.set`. It then opens Settings, Library > My sets, the worksheet sheet, the Print screen and
+  the simple print (stored, and from a quick print). Each must read M, with no S option, M checked and no preview page at S.
+  On every ws-precritic run and in deploy session 1. Row `no-size-s-browser-c81` (FAIL 17, then OK).
+  The static guard now flags any S tuple list, a regex restore (`/^[SML]$/`, `/^(S|M|L)$/`) and a forced `'S'` (APP-FORCE).
+  Self-test: 30 lines, including the critic's mutations, which I also re-ran on a mutated copy (both FAIL now). Row
+  `no-size-s-r1-mutations` (fixture, via the new `--lines` mode).
+- F3, measured (buildSheet, count_by_tables onePage, forced to M on a scratch copy): A4 fits 12 rows on 1 page at 22 pt
+  with no slack. Letter fits 11 rows, so 2 pages plus a 2-page key. The rows do not fit at M on every paper, so per the
+  lead's ruling the layout stays compact for this ONE layout. The allow-list reason is "ruled exception (lead, owner
+  informed)".
+  - One label everywhere: `COMPACT_LABEL` = "Compact (12 tables on one page)" (sheet/tokens.js). It is used on the Print
+    screen Setup, in the section note, in the worksheet sheet's Size row and in the simple print.
+  - No M/L control is drawn for this layout. The option help says "compact layout", and `ONE_PAGE_WHY` now names the
+    option's real label ("All rows on one page").
+  - The browser gate's COMPACT checks: one label, no Size control, every radiogroup has exactly one checked, no "Small"
+    caption.
+  - For the lead: the owner may prefer M on A4 only (it fits), with compact on Letter.
+- F4: LESSONS_LEARNED PRE-FLIGHT 1-2 (M and L; card hosts 1280/820), the L1/L2/L25 rules, the template-first rule and the
+  family-round rule now say M and L. The same change was made in RUBRIC scope, PAGE_TYPES PT-DLG-5 / PT-CMP-4, EXTENSION_PLAYBOOK #27
+  and TEACHER_SCREENS. Dated history rows and the signed cards are kept as records. `ws-no-size-s --docs` (DOC) scans RUBRIC,
+  the PRE-FLIGHT section, the PT-DLG rows and .claude/agents; precritic and deploy pass `--docs`, so the old row
+  `no-size-s-76bc` stays valid. Row `no-size-s-docs-c81` (FAIL 4, then OK).
+- Verified:
+  - ws-no-size-s --docs OK, plus --self-test OK and --browser OK (41 checks).
+  - ws-backtest rows no-size-s-browser-c81 / -r1-mutations / -docs-c81 / -76bc all PASS (347 rows, none deleted).
+  - ws-precritic-plan OK; --checks-from-critics 104 pass / 24 exempt / 15 fail (the 15 are the same old rows, none dropped).
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK.
+  - node --check on every edited module.
+  - ws-node-lint FAIL 50, identical on the base.
+
+### lf-tools-nos r3 (2026-11-13, ROUND CAP: fresh builder, Opus medium; critic r1 and r2 both failed on reintroduced S)
+- **Root cause.** The static and doc guards listed PHRASINGS with regexes, so every new spelling ('SML'.split(''), "at size S
+  and at L", "Small and Large") slipped through. The browser gate read ATTRIBUTES (`hidden`, `aria-label="Size"`), not what
+  is VISIBLE, so a CSS rule (`.sp-root .sp-sizes { display: grid }`) that put a hidden picker back on screen passed (N1).
+- **Checks first** (each FAILs on 4a8e539b4 or on a planted mutation):
+  - `ws-no-size-s --browser` judges visibility: computed style up the tree, a box, and elementFromPoint at the centre. It
+    finds a size option by what it does (data-act/sp/k "size") or says (S M L Small Medium Large Big under a size label),
+    not by aria-label. Surfaces: Settings, the worksheet sheet, the Print screen, and simple print (fact rows, quick print,
+    cells, compact). In each it asserts no visible or clickable S option, no visible picker where the layout is fixed, and
+    that every visible option, clicked with the mouse, changes the preview page's data-ws-size. 4a8e539b4: FAIL 3 (N1). The
+    head passes 73 checks.
+  - TOKEN rules replace phrase lists: APP-TOKEN, GATE-TOKEN, and DOC over every non-record *.md (records: DOC_RECORDS with
+    reasons). Exemptions are explicit: dropped / alias / compact token / history wording, or a `<!-- nos: why -->` marker
+    (one line, one block, or a `nos-section` for a dated findings log).
+  - A MUTATION corpus of 29 rows: the critic's r1 code mutations, r2 A-F and E, the six N2 doc phrasings, and our own (a CSS
+    display override, a new picker array, an S built with String.fromCharCode, a renamed label, S defaults in a gate, plus
+    doc lines in CLAUDE.md, an agent brief and PEDAGOGY). Every run of this tree plants the static rows (precritic and deploy
+    session 1), so the self-test is on precritic's path. `--self-test --browser` plants the 9 browser rows in a copy of the
+    served tree. All 29 are caught.
+  - Backtest rows (text insertion; none deleted, 347 -> 350): `no-size-s-n1-4a8e` (browser), `no-size-s-r3-static-4a8e` and
+    `no-size-s-r2-mutations` (fixture). Three older rows had a pass commit that the stricter check now rightly fails:
+    a3b128cd1 (fitsNotes "Small") and 6b59329af (N1, N3). Their pass side moves to 32689e907, and each row's state says so.
+  - CHECKS_FROM_CRITICS: 3 rows (N1, N2, N3 + nit).
+- **Fixes.** N1: additive `.sp-root .sp-sizes[hidden] { display: none; }`. Screenshot:
+  `design/status/lf-checks/no-size-s/r3-simple-print-compact.png` shows the one label, with no picker. N3: WDS:22 and
+  EXTENSION_PLAYBOOK:72 now say "S dropped as a choice; the token stays as the decode alias and the compact layout". L2 now
+  reads "M and L". The other live docs: instructions are rewritten to M / L, and token values are marked. The nit:
+  fitsNotes maps S to the compact label, never "Small".
+- **Owner file.** CLAUDE.md:60 ("Size S ignored") and :461 ("Tokens (sizes S/M/L ...") fail the DOC rule. They are not
+  edited, are reported to the lead, and are allow-listed with that reason. These entries go stale, and so FAIL, once the
+  owner rewrites the lines.
+- **Coordinator item.** ws-simple-print's student-view COLSFIT/OPTKEY step now runs at 1024, not 390. ws-simple-print OK.
+- **Verified:**
+  - ws-no-size-s (default, --docs, --self-test, --self-test --browser, --browser): all OK.
+  - Backtests: no-size-s-76bc / -docs-c81 / -r1-mutations / -browser-c81 / -n1-4a8e / -r3-static-4a8e / -r2-mutations all
+    PASS.
+  - ws-precritic-plan --checks-from-critics: 107 pass / 24 exempt / 15 fail. The 15 are the same older rows; none dropped.
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK; node --check on teacher-print.js and both scripts.
+
+## 2026-11-13 — no size S after critic nos r3 (round cap): NOS-DOCS-ADVISORY
+
+- Critic nos r3 (df9682751): FAIL C1 9 / C2 7 / C3 9 / C4 9; the app change and the browser gate pass; the text guards miss
+  phrasings (third round on doc phrasing).
+- Lead decision NOS-DOCS-ADVISORY: precritic and deploy session 1 run `ws-no-size-s --docs-advisory` (doc findings report as
+  ADVISORY, never block). `--docs` alone still blocks (the old rows keep their meaning). The --browser visibility gate and the
+  app / gate code guard stay blocking. New `--plant <row|none>` runs one browser mutation in a copy of the served tree; row
+  `nos-runtime-s-button` proves the browser gate FAILs an S button added by JS at runtime and is OK unplanted.
+- KNOWN HOLE (D2), beside the browser gate: the code guard reads lines, so a gate default built another way
+  (`Object.keys({S:1,M:1,L:1})`, `String.fromCharCode(83)`) passes it; the browser gate covers the behaviour (every Size control
+  offers M / L only), not a gate's own --sizes default.
+- PARKED under FOCUS (D1-D4): one shared SIZES constant every gate reads, checked on the resolved `--dry-run` sizes (D2);
+  per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
+  `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
+- CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
