@@ -20,6 +20,17 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
   fix closes it, no cell change; fixture rows re-point once our branch merges lf-roles. RI-DISTINCT fixed b1da0079e (backtest
   two-step-ri-distinct-frames PASS). In progress: EB-SIDE (the 120 are the FRAMES cells - letter / estimate / msLetter - not the
   columns: centring the frames work) and the ÷ bar OVERFLOW (groups row grows by the `?` height so the bars stand across).
+  Done since: ÷ bar OVERFLOW c3aef9acc (backtest two-step-div-bar-guided-L), frames EB-SIDE 126eab3e4 (EB-SIDE 120 -> 0 on the
+  frames; backtest two-step-frames-eb-side), EA-ROWX regression of b1da0079e fixed in 126eab3e4 (backtest two-step-letter-ea-rowx).
+  Cards re-regenerated after the master merge: **sign 0e92ecb40** (supersedes f05e43ed9; rule-index sha only).
+  Step 2 (lesson overflow, all 7 at M / L) split: (lf-engine) the anchor chart routes a panel to twoState / twoStepPart only for
+  a x / ÷-first story with 4 steps and 3 groups (chart.js stateDrawing `msOf && steps 4 && groups 3`): the + / − stories
+  (multi_step_word*, add_then_mult / add_then_div, estimate) and the letter routine (4 groups) draw the WHOLE cell in a half panel
+  (bar, columns, mid questions) - 30-80 mm out of each panel; twoStepPart already draws every part for any two-step story (k 0-2
+  columns, k 0-3 letter / estimate), so the fix is the routing. (lf-engine) the lesson's Guided page sets the two-step cell in
+  the left column beside the Steps panel (~100 mm): the bar stacks and the two step blocks stack, 28 mm over the body; a
+  two-step cell needs the full width there. Ours: none found - the cell's narrow layout cannot fit two 52 mm blocks + the
+  unit bank in 100 mm without shrinking (content never shrinks); no lesson-record change moves either.
 - 2026-11-13 two-step precritic r12 (mq-opus-medium; after the merges): merged origin/master e76e0815f (ff455466d), lf-hosts-twostep
   5719fe9b6 (f457eed3b), then origin/master a6883082c (3faaf82a9, pushed: lf-roles tests two-step on it). Fixed (check first): the
   x / ÷ / add-first deals repeat on a page (ws-two-step PAGE-FRESH 33810c189 FAIL -> fix 5921196d7, backtest two-step-page-fresh).
