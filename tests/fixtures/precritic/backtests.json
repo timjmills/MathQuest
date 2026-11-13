@@ -7096,8 +7096,8 @@
     "state": "round Practice 11 / 12, 97 / 98, four in the 60s, 40 x 3; Mixed 47 45 49, 50 x 3; sheet 74 / 47, 43 / 34"
    },
    "pass": {
-    "commit": "5be6526e4",
-    "state": "one near-twin module on every lesson page (302af774a), one number never twice on a page (5be6526e4)"
+    "commit": "97947d45c",
+    "state": "one near-twin module on every lesson page (302af774a), one number never twice on a page (5be6526e4); r6: one number never printed by two skills on a page (pageUnique)"
    },
    "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 64 --only round --sizes L --rules PG-LR6",
    "expect": {
@@ -7196,8 +7196,8 @@
     "state": "round S Mixed Place Value partner printed \"8 5\" twice"
    },
    "pass": {
-    "commit": "5be6526e4",
-    "state": "near-twins oneNumFits: the same number is no new item"
+    "commit": "97947d45c",
+    "state": "near-twins oneNumFits: the same number is no new item; r6: one number never printed by two skills on a page (pageUnique)"
    },
    "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only round --rules PG-LR6",
    "expect": {
@@ -7276,8 +7276,8 @@
     "state": "live round sheet 96 / 95 / 99, 100 x 3; Practice 3 in the 20s, 60 x 3; Mixed 35 / 34 / 39"
    },
    "pass": {
-    "commit": "73a3b7573",
-    "state": "pageRules on live Practice / Mixed, nearRules on the live sheet"
+    "commit": "97947d45c",
+    "state": "pageRules on live Practice / Mixed, nearRules on the live sheet; r6: one number never printed by two skills on a page (pageUnique)"
    },
    "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 8 --only round --sizes L --rules PG-LR6",
    "expect": {

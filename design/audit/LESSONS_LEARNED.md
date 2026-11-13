@@ -771,6 +771,7 @@ measured[k].inkMm), never a padding guess.
 |---|---|---|---|---|
 | R1 round S Mixed Place Value T O T O T O; every check T O O T | PC-PV place pattern on every lesson page, check on and off (near-twins placeRunBad, the dealer's own reading); unit: mixOrder varies by seed | lesson-r6-pv-pattern | lesson-samples-all, -deal64, -deal64-live | 1 |
 | R2 live Practice / Mixed near twins (nearest_10 34 / 35 / 39, 40 x 3; sub_2d_1d "- 2" x 4) | PG-LR6 / PG-LR67 check OFF on every lesson (collectReads; the gate's nearKeyPair copy replaced by near-twins nearKeys) | lesson-r6-lr6-live, lesson-r6-lr67-live | lesson-samples-all, -deal64-live | 1 |
+| R2 "78 twice": one number printed by two skills on one Mixed page (rounding 78, place 78), at 5 of 8 seeds | PG-LR6 cross-skill read; Mixed pageUnique (one-number pools dealt one shelf deeper) | lesson-r6-lr6-live, lesson-pg-lr6, lesson-pg-lr6-size | lesson-samples-all, -deal64, -deal64-live | 0.5 |
 | R3 identify's own Mixed partner lost its heads | PC-PVHEADS live: own skill keeps the heads its Practice prints, others none (cells aligned with plan items) | lesson-r6-pvheads-own | lesson-samples-all | 1 |
 | R3 "Write the value" over ring-only cells | PC-INSTR value slot on every page | lesson-r6-instr-value | lesson-samples-all | 0.5 |
 | R4 sub L Mixed 1 -> 2 pages | ws-lesson-baseline PARTPAGES (`--pages-only`; per part where the pin has `/parts`, else page totals) | lesson-r6-partpages | lesson-baseline-pages; the deploy gate's --check | 1 |
