@@ -2667,7 +2667,7 @@ default: [0, 1, 2] });
 // the list, so the default is one of the values (options-verify) and the card signs it.
 const _wpBand = () => { const o = _opsBand([10, 20, 100], null, { label: 'Numbers to',
     help: 'The largest number in the story, the answer too (the sum, the number you take from, the bigger amount). Within 20 the pupil writes a number sentence; within 100, the columns. No limit: the Max Number setting decides.' });
-    return { ...o, values: [...(o.values || []).filter(x => x.v !== null), { v: null, l: 'No limit (the Max Number)' }] }; };
+    return { ...o, values: [{ v: null, l: 'No limit (the Max Number)' }, ...(o.values || []).filter(x => x.v !== null)] }; };
 const _wpMul = () => _p12Variants('mult_word_problems', ['equal_groups', 'arrays', 'comparison'],
     ['Equal groups (4 bags of 6)', 'An array (rows and columns)', 'A comparison (3 times as many)'], { label: 'The story' });
 const _wpDiv = () => _p12Variants('div_word_problems', ['equal_share', 'grouping', 'remainder'],
