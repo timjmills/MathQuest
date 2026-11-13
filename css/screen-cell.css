@@ -1902,3 +1902,10 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 /* the library's sentence frame: the sign is written IN A CIRCLE on screen as on paper (the slot
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
+
+/* lf-ops-props r4b (lf-algebra critic r2 G1; SCREEN-DIGIT 40 / 48 / 56 px): a worksheet card that holds a count-row box train
+   (number_patterns_rule) keeps the host's own digit size, not the grid cell's 29 px - its train wraps to the card's width. The
+   arcs train (count_by_tables) is excluded pending the lead's ruling on its screen line count. */
+.mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 40px; }
+@media (min-width: 600px) { .mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 48px; } }
+@media (min-width: 1200px) { .mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 56px; } }
