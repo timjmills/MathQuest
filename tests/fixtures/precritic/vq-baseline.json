@@ -45,14 +45,6 @@
    ]
   },
   "VQ-LIVE": {
-   "addition:add_word_problems": [
-    "dead-signs:*/",
-    "filler-bank"
-   ],
-   "addition:add_word_problems_plain": [
-    "dead-signs:*/",
-    "filler-bank"
-   ],
    "addition:add_wp_100": [
     "dead-signs:*/",
     "filler-bank"
@@ -208,14 +200,6 @@
     "filler-bank"
    ],
    "subtraction:mixed_subtraction": [
-    "dead-signs:*/",
-    "filler-bank"
-   ],
-   "subtraction:sub_word_problems": [
-    "dead-signs:*/",
-    "filler-bank"
-   ],
-   "subtraction:sub_word_problems_plain": [
     "dead-signs:*/",
     "filler-bank"
    ],
@@ -1508,12 +1492,6 @@
    ]
   },
   "VQ-ONCE": {
-   "addition:add_word_problems": [
-    "reason-it-story-repeated"
-   ],
-   "addition:add_word_problems_plain": [
-    "reason-it-story-repeated"
-   ],
    "addition:add_wp_100": [
     "reason-it-story-repeated"
    ],
@@ -1641,12 +1619,6 @@
     "reason-it-story-repeated"
    ],
    "subtraction:mixed_subtraction": [
-    "reason-it-story-repeated"
-   ],
-   "subtraction:sub_word_problems": [
-    "reason-it-story-repeated"
-   ],
-   "subtraction:sub_word_problems_plain": [
     "reason-it-story-repeated"
    ],
    "subtraction:sub_wp_100": [

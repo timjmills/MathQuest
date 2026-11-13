@@ -62,6 +62,9 @@ export const IN_SCOPE = Object.freeze([
     'addition:add_wp_10', 'addition:add_wp_10_plain', 'addition:add_wp_20', 'addition:add_wp_20_plain',
     'subtraction:sub_wp_10', 'subtraction:sub_wp_10_plain', 'subtraction:sub_wp_20', 'subtraction:sub_wp_20_plain',
     'addition:fact_family_sort',
+    // word-stories fix r2 (critic r1 F4): the four general + / − story hosts and their presets - never pinned
+    'addition:add_word_problems', 'addition:add_word_problems_plain', 'subtraction:sub_word_problems', 'subtraction:sub_word_problems_plain',
+    'addition:add_wp_change_unknown', 'subtraction:sub_wp_change_unknown', 'subtraction:sub_wp_compare_smaller',
 ]);
 /** Skills that hang in node (an infinite deal loop without a DOM): skipped in a sweep with a note, never silently. Empty
  *  today: the census hang on number_theory:divisibility_sort was at range 20; at the skill's own range it answers. Every
@@ -192,19 +195,28 @@ export function judgeSkill(f, rules = RULES) {
         if (r.sayBlanks) add('VQ-ONEANSWER', 'say-blanks', `a "Say:" frame with blanks inside the cell (${it.kind === 'kit' ? it.template : 'legacy'}): the oral frame belongs to the model, not the answer place`);
         if (r.choice > 0 && r.answerLine) add('VQ-ONEANSWER', 'choice+answer-line', 'a tick / choice list AND an "Answer:" line for one answer');
     }
-    // VQ-LIVE (word-work)
-    const ww = kit.filter((it) => it.template === 'word-work' && it.ww);
-    if (ww.length) {
+    // VQ-LIVE (word-work), judged on the default page AND on every offered value of the skill's `band` option (word-stories
+    // critic r1 F4, L13 / L29: the column cell of the band "no limit" / 100 pages offered × ÷, a "boxes / days" bank and a
+    // 3-track grid for "had 4, now 6"). A band page's finding carries ` @band=<v>` in its signature.
+    const wwAll = kit.filter((it) => it.template === 'word-work' && it.ww);
+    const groups = new Map();
+    for (const it of wwAll) { const g = it.band === undefined ? '' : ` @band=${it.band}`; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(it); }
+    for (const [at, ww] of groups) {
         const dealt = [...new Set(ww.flatMap((it) => it.ops || []))];
         const ok = allowedSigns(dealt, f.grade);
         const drawn = [...new Set(ww.flatMap((it) => it.ww.signs))];
         const dead = drawn.filter((o) => !ok.has(o)).sort();
-        if (dead.length) add('VQ-LIVE', `dead-signs:${dead.join('')}`, `sign row offers ${dead.map((o) => GLYPH[o]).join(' ')} on a grade ${f.grade} skill that deals ${dealt.map((o) => GLYPH[o]).join(' ') || 'nothing'}`);
+        if (dead.length) add('VQ-LIVE', `dead-signs:${dead.join('')}${at}`, `sign row offers ${dead.map((o) => GLYPH[o]).join(' ')} on a grade ${f.grade} skill that deals ${dealt.map((o) => GLYPH[o]).join(' ') || 'nothing'}${at}`);
         const maxAns = Math.max(...ww.map((it) => Number(it.maxAns) || 0));
-        if (maxAns <= 20 && ww.some((it) => it.ww.grid)) add('VQ-LIVE', 'grid-within-20', `a column digit grid on stories whose answers are all ≤ 20 (largest ${maxAns}): count on / make ten, not the column algorithm`);
+        if (maxAns <= 20 && ww.some((it) => it.ww.grid)) add('VQ-LIVE', `grid-within-20${at}`, `a column digit grid on stories whose answers are all ≤ 20 (largest ${maxAns}): count on / make ten, not the column algorithm${at}`);
+        // (one + / − story whose numbers are all ≤ 20 drawn in a column grid on a page of bigger ones: the same dead grid)
+        const small = ww.filter((it) => it.ww.grid && (it.ops || []).every((o) => o === '+' || o === '-') && (Number(it.maxAns) || 0) <= 20);
+        // (judged on the lane targets only - IN_SCOPE: the ranged _wp_100 / _1k ... skills show the same grid on 1-4 small
+        // stories at band 50 / 100, a finding for their own lane, not pinned here because the pin may only shrink)
+        if (small.length && maxAns > 20 && at && IN_SCOPE.includes(f.key)) add('VQ-LIVE', `grid-small-story${at}`, `${small.length} + / − stor(ies) with every number ≤ 20 drawn in a column digit grid${at}`);
         const fill = new Set(f.fillers || DEFAULT_FILLERS);
         const fillers = [...new Set(ww.flatMap((it) => it.ww.bank.filter((w) => fill.has(w) && !new RegExp(`\\b${w}\\b`, 'i').test(it.ww.story))))].sort();
-        if (fillers.length) add('VQ-LIVE', 'filler-bank', `unit bank holds filler word(s) the story never says: ${fillers.join(', ')}`);
+        if (fillers.length) add('VQ-LIVE', `filler-bank${at}`, `unit bank holds filler word(s) the story never says: ${fillers.join(', ')}${at}`);
     }
     // VQ-ONCE (Reason It prints the story once)
     const reps = kit.filter((it) => (it.riStory || 0) > 1);
@@ -229,6 +241,7 @@ async function loadApp(root) {
     const gq = await import(M('generate-question.js'));
     const data = await import(M('data.js'));
     for (const side of ['skill-options.js', 'skill-options-derived.js', 'skill-options-pools.js', 'skill-presets.js']) { try { await import(M(side)); } catch (e) { /* not in this tree */ } }
+    let so = null; try { so = await import(M('skill-options.js')); } catch (e) { so = null; }
     const pg = await import(M('print-generate.js'));
     try { await import(M('print-sheet.js')); } catch (e) { /* providers register through it; skillWords still answers */ }
     const kit = await import(M('sheet/index.js'));
@@ -237,7 +250,7 @@ async function loadApp(root) {
     let standards = null; try { standards = await import(M('standards.js')); } catch (e) { standards = null; }
     let fillers = DEFAULT_FILLERS;
     try { const m = /const FILLERS = \[([^\]]*)\]/.exec(readFileSync(join(root, 'js/modules/sheet/cells/word-work.js'), 'utf8')); if (m) fillers = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]); } catch (e) { /* default */ }
-    return { gq, data, pg, kit, practice, standards, fillers, reasonIt };
+    return { gq, data, pg, kit, practice, standards, fillers, reasonIt, so };
 }
 
 /** The facts of one skill (see judgeSkill). `items` given (a fixture) or generated. */
@@ -251,9 +264,16 @@ function factsOf(app, s, n, given) {
     const label = s.label || (data.SKILL_FULL_LABELS && data.SKILL_FULL_LABELS[s.id]) || s.id;
     const items = [];
     let first = null;
-    for (let i = 0; i < (given ? given.length : n); i++) {
+    // every offered value of the skill's `band` option is a page of its own (L29): its items carry `band`
+    const runs = [{ opts: null }];
+    if (!given && app.so && typeof app.so.offeredOptionsFor === 'function') {
+        let bd = null;
+        try { bd = (app.so.offeredOptionsFor(s.cat, s.id) || []).find((d) => d && d.id === 'band'); } catch (e) { bd = null; }
+        for (const v of (bd && bd.values) || []) if (v && v.v !== bd.default) runs.push({ opts: { band: v.v }, band: v.v === null ? 'none' : v.v });
+    }
+    for (const run of runs) for (let i = 0; i < (given ? given.length : n); i++) {
         let q;
-        try { q = given ? given[i] : gq.generateQuestionFor({ category: s.cat, skill: s.id, seed: (fnv(key) % 100000) * 100 + i, itemIndex: i, itemCount: n }); }
+        try { q = given ? given[i] : gq.generateQuestionFor(Object.assign({ category: s.cat, skill: s.id, seed: (fnv(key) % 100000) * 100 + i, itemIndex: i, itemCount: n }, run.opts ? { opts: run.opts } : {})); }
         catch (e) { items.push({ kind: 'error', msg: String(e && e.message || e).slice(0, 120) }); continue; }
         if (!q) { items.push({ kind: 'error', msg: 'no item' }); continue; }
         first = first || q;
@@ -264,6 +284,7 @@ function factsOf(app, s, n, given) {
             let html = '';
             try { html = kit.renderCell({ cell: { template: spec.template, payload } }, { mode: 'print', size: 'M', state: 'blank' }); } catch (e) { html = ''; }
             const it = { kind: 'kit', template: spec.template, resp: responseAreas(html) };
+            if (run.opts) it.band = run.band;
             if (spec.template === 'word-work') {
                 const steps = Array.isArray(payload.steps) ? payload.steps : [];
                 it.ops = [...new Set(steps.map((st) => OPKEY[st.op]).filter(Boolean))];
@@ -462,8 +483,11 @@ async function main() {
         const now = Object.values((base.rules || {})[rule] || {}).reduce((a, s) => a + s.length, 0);
         if (now > cnt) baseErrors.push(`${rule}: the pin holds ${now} finding(s), above its frozen ${cnt} (the baseline may only shrink)`);
     }
-    for (const f of findings) f.pinned = pinned.has(pinKey(f));
-    const found = new Set(findings.map(pinKey));
+    // a band page's finding (` @band=<v>`) is the SAME defect as the skill's default-page finding: pinned when that is
+    // (the pin may only shrink, so the band extension of 2026-11-13 adds no new pin; a lane target is never pinned)
+    const baseSig = (f) => Object.assign({}, f, { sig: String(f.sig).replace(/ @band=.*$/, '') });
+    for (const f of findings) f.pinned = pinned.has(pinKey(f)) || (/ @band=/.test(f.sig) && !IN_SCOPE.includes(f.key) && pinned.has(pinKey(baseSig(f))));
+    const found = new Set(findings.flatMap((f) => [pinKey(f), pinKey(baseSig(f))]));
     const judgedKeys = new Set(factsList.map((f) => f.key));
     const stale = [...pinned].filter((p) => rules.includes(p.split('|')[0]) && judgedKeys.has(p.split('|')[1]) && !found.has(p));
 

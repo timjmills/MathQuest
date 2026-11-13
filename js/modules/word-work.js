@@ -135,6 +135,15 @@ export function applyWordWork(q) {
         if (payload && (/^remainder_/.test(skill) || /^remainder_/.test(outer)) && payload.steps.length === 1 && payload.steps[0].op === '/') payload.signs = false;
     } catch (e) { payload = null; }
     if (!payload) return q;
+    // The four general + / − story hosts and their presets (word-stories critic r1 F4, L13 / VQ-LIVE: every drawn part is
+    // live): the sign row offers + and − only (a Grade 1-2 story never needs × or ÷), and the unit bank holds only nouns the
+    // story says (no filler "boxes" / "days" the pupil never read).
+    const storyHost = (id) => /^(add|sub)_word_problems(_plain)?$|^(add|sub)_wp_(change_unknown|compare_smaller)$/.test(String(id || ''));
+    if ((storyHost(skill) || storyHost(outer)) && payload.steps.every((st) => st.op === '+' || st.op === '-')) {
+        payload.signSet = ['+', '-'];
+        const said = ` ${payload.lines.join(' ').toLowerCase().replace(/[^a-z ]+/g, ' ')} `;
+        if (Array.isArray(payload.bank)) payload.bank = payload.bank.filter((w) => said.includes(` ${String(w).toLowerCase()} `));
+    }
     // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
     if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';
     // `msLetter` / `msCheck` (3.OA.D.8, detailed lesson 7 round 2): the compact cell answers as ONE equation with a

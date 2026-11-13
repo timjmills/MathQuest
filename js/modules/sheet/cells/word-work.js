@@ -692,14 +692,17 @@ function abox(ctx, { id, value = '', expect = '', w, pt }) {
 }
 
 /** The small sign row: + − × ÷, the chosen one ringed on the key. */
-function signRow(ctx, op, pick, idx, traceIt = false) {
+function signRow(ctx, op, pick, idx, traceIt = false, set = null) {
+    // (`set`, payload.signSet: the signs a skill's page can need - the + / − story hosts offer + and − only, so no × ÷
+    // choice is a dead part on a Grade 1-2 story; word-stories critic r1 F4, L13 / VQ-LIVE)
+    const ops = Array.isArray(set) && set.length >= 2 ? OPS.filter((o) => set.includes(o)) : OPS;
     const s = boxMm(ctx) * (isTwin(ctx) ? 0.78 : 0.72);
     const pt = textPt(ctx) + 5;
     // (`traceIt` - a blank cell's sign ringed in grey: Guided cell 1 of the detailed lesson maker, lesson 7)
     const tr = traceIt && !isTwin(ctx);
     if (tr) pick = op;
     const ink = tr ? 'trace' : pick && filled(ctx) ? inkOf(ctx) : null;
-    const cells = OPS.map((o) => {
+    const cells = ops.map((o) => {
         const ring = ink && o === pick
             ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -1.6)};top:${L(ctx, -1.6)};right:${L(ctx, -1.6)};bottom:${L(ctx, -1.6)};color:${ink === 'trace' ? GREY : INK};border:${B(ctx, 1.5)} solid currentColor;border-radius:50%;"></span>`
             : '';
@@ -856,7 +859,7 @@ function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', no
             : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
         : grid;
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
-    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
+    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx), p.signSet)}`
         + `<div style="max-width:100%;overflow-x:auto;">${work}</div></div>`;
 }
 
@@ -1361,7 +1364,7 @@ function renderWork(p, ctx) {
     const workW = blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 44);
     if (!twin && !narrow && !two && !p.kb && workW <= 88) {
         const grid = stepBlock(ctx, p.steps[0], sh.steps[0], put ? sh.picks[0] : null, 0, '', p, unitHere, true);
-        const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0)}</div>`;
+        const left = `<div style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:${L(ctx, 2)};">${head}${noSigns ? '' : signRow(ctx, p.steps[0].op, put ? sh.picks[0] : null, 0, false, p.signSet)}</div>`;
         const right = `<div style="flex:none;display:flex;align-items:flex-end;gap:${L(ctx, 5)};">${grid}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`;
         return `<div class="mq-ww" data-ww-ops="${p.steps[0].op}" style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${KO(ctx, 5)};display:flex;gap:${L(ctx, 6)};align-items:flex-start;">${left}${right}</div>`;
     }
