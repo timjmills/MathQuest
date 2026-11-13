@@ -326,10 +326,18 @@ const PICS = {
         draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
     },
     cycle: {
-        alt: 'four numbers 2, 4, 8, 6 in a ring of arrows going round and back to the start',
+        // (r10, critic r9 #3: the 2, 4, 8, 6 ring also read as a sequence - now a loop of four SHAPES, no run of numbers; the
+        // ones-digit link stays in the explanation; V-AMBIG+ derives sequence / pattern from a loop of numbers)
+        alt: 'a circle, a square, a triangle and a diamond in a ring of arrows going round and back to the start',
         draw: () => {
-            const c = [30, 20], R = 12.5, pts = [[30, 7.5], [43.5, 20], [30, 32.5], [16.5, 20]];
-            let b = [2, 4, 8, 6].map((v, i) => tx(pts[i][0], pts[i][1], 0, String(v), { size: 8.5 })).join('');
+            const c = [30, 20], R = 12.5, pts = [[30, 7.5], [43.5, 20], [30, 32.5], [16.5, 20]], s = 3.4;
+            const shape = [
+                (x, y) => ring(x, y, s, W.part),
+                (x, y) => rect(x - s, y - s, 2 * s, 2 * s, W.part),
+                (x, y) => `<path d="M${r2(x)} ${r2(y - s - 0.4)} L${r2(x + s + 0.5)} ${r2(y + s)} L${r2(x - s - 0.5)} ${r2(y + s)} Z" fill="none" stroke="#000" stroke-width="${W.part}" ${NS} stroke-linejoin="round"/>`,
+                (x, y) => `<path d="M${r2(x)} ${r2(y - s - 0.6)} L${r2(x + s + 0.6)} ${r2(y)} L${r2(x)} ${r2(y + s + 0.6)} L${r2(x - s - 0.6)} ${r2(y)} Z" fill="none" stroke="#000" stroke-width="${W.part}" ${NS} stroke-linejoin="round"/>`,
+            ];
+            let b = pts.map((p, i) => shape[i](p[0], p[1])).join('');
             for (let i = 0; i < 4; i++) {
                 const a0 = -Math.PI / 2 + i * Math.PI / 2 + 0.42, a1 = a0 + Math.PI / 2 - 0.84;
                 const p0 = [c[0] + R * Math.cos(a0), c[1] + R * Math.sin(a0)], p1 = [c[0] + R * Math.cos(a1), c[1] + R * Math.sin(a1)];
@@ -468,6 +476,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
  *   a crossed mark (two strokes across each other), or a ring round one lone dot -> left
  *   three or more arrow heads round a centre (a loop of arrows)   -> pattern
  *   an arrow INTO a box and an arrow OUT of it, a number at both ends -> input, output (r10, critic r9 #2: 2 -> [+3] -> 5)
+ *   a loop of three or more numbers (round a centre, not in table cells) -> sequence, pattern (r10, critic r9 #3: 2 4 8 6)
  * vocabPictureAlsoShows() is these plus the hand list (VOCAB_ALSO_SHOWS), which stays only as an extra.
  */
 const num_ = (s) => Number(s);
@@ -528,6 +537,16 @@ function derivedFromBody(body) {
             const x0 = Math.min(a.x1, a.x2), x1 = Math.max(b.x1, b.x2);
             if (numT.some((t) => t.x < x0 && Math.abs(t.y - a.y1) < r.h / 2) && numT.some((t) => t.x > x1 && Math.abs(t.y - b.y1) < r.h / 2)) { words.add('input'); words.add('output'); }
         }
+    }
+    // 7. a loop of numbers: three or more numbers, outside any box, spread round a centre (each about as far from it, the
+    // spread as tall as it is wide) -> sequence, pattern (r10, critic r9 #3: the 2, 4, 8, 6 ring read as numbers in order)
+    const free = numT.filter((t) => !rects.some((r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h));
+    if (free.length >= 3) {
+        const cx = free.reduce((a, t) => a + t.x, 0) / free.length, cy = free.reduce((a, t) => a + t.y, 0) / free.length;
+        const ds = free.map((t) => Math.hypot(t.x - cx, t.y - cy)), md = ds.reduce((a, d) => a + d, 0) / ds.length;
+        const xs = free.map((t) => t.x), ys = free.map((t) => t.y);
+        const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+        if (md > 3 && ds.every((d) => Math.abs(d - md) < 0.3 * md) && Math.min(w, h) / Math.max(w, h) > 0.5) { words.add('sequence'); words.add('pattern'); }
     }
     return [...words];
 }

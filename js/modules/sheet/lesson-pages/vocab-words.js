@@ -57,7 +57,7 @@ export const VOCAB_WORDS = Object.freeze({
     'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 3 in 473.', notWith: ['digit'] },
     repeat: { meaning: 'the same part comes again', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
     sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term'] },
-    cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round and comes back to the start.', notWith: ['repeat', 'pattern'] },
+    cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round and back to the start, like ones digits do.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
     grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern'] },
