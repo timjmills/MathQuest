@@ -26,6 +26,8 @@
 //       drawing's clipped edge too), or any drawn leaf (SVG text
 //       and shapes, HTML words) not wholly inside the frame - or its scroll area, when the frame scrolls a drawing shown
 //       whole at the 9 px floor;
+//   [scroll-cue] (critic-panel-r4 N1-cue) a frame that scrolls by more than 8 px with no visible [data-sko-scroll-cue]
+//       element beside it (overlay scrollbars on tablets and ChromeOS show nothing), or a cue under a frame that does not scroll;
 //   [hit] (critic-panel-r3 P1) a visible option control whose centre does not take the pointer (document.elementFromPoint
 //       there is not the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click;
 //   (f) the drawing's scale is under 0.30 (its strokes are hairlines), or the frame ends shorter than its CSS height
@@ -86,7 +88,7 @@ const NO_SPOT = flag('no-spot');
 // show every block of the item, F1/F2), choices (the answer choices one lettered part of their own, F2), svgtext (SVG
 // labels at the floor, F3), parts (every part walked), summary (the clamped
 // option summary has a keyboard/touch expand control, F5), repeat (no sentence shown twice, F6).
-const FAMILIES = ['hit', 'slice', 'inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
+const FAMILIES = ['hit', 'scroll-cue', 'slice', 'inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
 const CHECKS = new Set(String(one('checks', FAMILIES.join(','))).split(',').map((x) => x.trim()).filter(Boolean));
 const BAD_CHECK = [...CHECKS].filter((c) => !FAMILIES.includes(c));
 if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (${FAMILIES.join(', ')})`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
@@ -225,6 +227,18 @@ function measure(page) {
         const fcs = getComputedStyle(frame);
         const scrolls = (/(auto|scroll)/.test(fcs.overflowX) && frame.scrollWidth > frame.clientWidth + 1) || (/(auto|scroll)/.test(fcs.overflowY) && frame.scrollHeight > frame.clientHeight + 1);
         const fR = scrolls ? (() => { const l = fR0.left + frame.clientLeft - frame.scrollLeft, t = fR0.top + frame.clientTop - frame.scrollTop; return { left: l, top: t, right: l + Math.max(frame.scrollWidth, frame.clientWidth), bottom: t + Math.max(frame.scrollHeight, frame.clientHeight), width: Math.max(frame.scrollWidth, frame.clientWidth), height: Math.max(frame.scrollHeight, frame.clientHeight) }; })() : fR0;
+        // [scroll-cue] (critic-panel-r4 N1-cue): a frame that scrolls by more than 8 px must SAY so with a visible element
+        // ([data-sko-scroll-cue]) - tablet and ChromeOS scrollbars are overlays that show nothing until touched, so a
+        // scrollbar alone is no cue (headless Chromium hides scrollbars too, which is the overlay host this reads as).
+        const overPx = scrolls ? Math.max(frame.scrollWidth - frame.clientWidth, frame.scrollHeight - frame.clientHeight) : 0;
+        const cueEl = frame.parentElement ? frame.parentElement.querySelector(':scope > [data-sko-scroll-cue]') : null;
+        const cueOK = (() => {
+            if (!cueEl || cueEl.hidden || !cueEl.getClientRects().length) return false;
+            const cs = getComputedStyle(cueEl), r = cueEl.getBoundingClientRect();
+            if (cs.visibility === 'hidden' || +cs.opacity < 0.5 || !String(cueEl.textContent).trim()) return false;
+            return r.width > 0 && r.height > 0 && r.top >= 0 && r.bottom <= window.innerHeight && parseFloat(cs.fontSize) >= 9;
+        })();
+        const scrollCue = { over: Math.round(overPx), ok: cueOK, stray: !scrolls && !!cueEl && !cueEl.hidden };
         const within = (r, b) => r.left >= b.left - 1.5 && r.top >= b.top - 1.5 && r.right <= b.right + 1.5 && r.bottom <= b.bottom + 1.5;
         const clipOK = (from, r) => { for (let a = from; a && a !== frame; a = a.parentElement) { const cs = getComputedStyle(a); if ((cs.overflowX !== 'visible' || cs.overflowY !== 'visible') && !within(r, a.getBoundingClientRect())) return false; } return true; };
         const visible = (a) => { if (!seen(a.el)) return false; const r = rectOf(a); return !!r && within(r, fR) && clipOK(a.n.parentElement, r); };
@@ -342,7 +356,7 @@ function measure(page) {
             f: box(frame), s: box(stage), cssH, frameH: frame.offsetHeight, pop: box(pop), foot: box(foot), done: box(done),
             vw: document.documentElement.clientWidth || window.innerWidth, vh: window.innerHeight,
             transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null, svgText,
-            hit: { n: hitN, blocked }, sliceCut, outLeaves, area: scrolls ? { x: fR.left, y: fR.top, w: fR.width, h: fR.height } : null, item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
+            hit: { n: hitN, blocked }, scrollCue, sliceCut, outLeaves, area: scrolls ? { x: fR.left, y: fR.top, w: fR.width, h: fR.height } : null, item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
             body: bodyEl ? { h: bodyEl.clientHeight, sh: bodyEl.scrollHeight } : null, sum: { clamped, moreOK },
             partBox: sR ? { x: Math.max(0, sR.left - fR.left), y: Math.max(0, sR.top - fR.top), w: Math.min(sR.right, fR.right) - Math.max(sR.left, fR.left), h: Math.min(sR.bottom, fR.bottom) - Math.max(sR.top, fR.top) } : null,
             part: part && !part.hidden ? String(part.querySelector('.tv-sko-part-n') ? part.querySelector('.tv-sko-part-n').textContent : part.textContent).replace(/\s+/g, ' ').trim() : '',
@@ -359,6 +373,8 @@ function judge(m, inkR) {
     if (m.noFrame) return ['[inside] no sample frame in the panel'];
     const { s } = m;
     const f = m.area || m.f;   // (a frame that scrolls: its scroll area - critic-panel-r3 N1)
+    if (!m.unavailable && m.scrollCue && m.scrollCue.over > 8 && !m.scrollCue.ok) fails.push(`[scroll-cue] the frame scrolls ${m.scrollCue.over} px but shows no visible cue that it scrolls (overlay scrollbars on tablets and ChromeOS show nothing)`);
+    if (!m.unavailable && m.scrollCue && m.scrollCue.stray) fails.push('[scroll-cue] a scroll cue shows under a frame that does not scroll');
     if (!m.unavailable && m.sliceCut && m.sliceCut.length) fails.push(`[slice] ${m.sliceCut.length} label(s) or shape(s) cut by a viewBox slice: ${[...new Set(m.sliceCut)].slice(0, 6).join(', ')}`);
     if (!m.unavailable && m.outLeaves && m.outLeaves.length) fails.push(`[inside] ${m.outLeaves.length} drawn label(s) or shape(s) not wholly inside the frame${m.area ? ' or its scroll area' : ''}: ${[...new Set(m.outLeaves)].slice(0, 6).join(', ')}`);
     if (s) {
@@ -473,7 +489,7 @@ async function checkSkill(app, ref, vp, mode = {}) {
         const judged = !CHANGED_ONLY || /changed/.test(label);
         const shown = fails.slice();
         fails.length = 0;
-        if (judged) for (const f of shown) if (CHECKS.has((/^\[(\w+)\]/.exec(f) || [])[1])) fails.push(f);
+        if (judged) for (const f of shown) if (CHECKS.has((/^\[([\w-]+)\]/.exec(f) || [])[1])) fails.push(f);
         const tag = `${categoryId}-${skillId}-${label.replace(/[^\w]+/g, '_')}`;
         if (keep && SHOTS && b64) { fs.mkdirSync(SHOTS, { recursive: true }); fs.writeFileSync(path.join(SHOTS, tag + '.png'), Buffer.from(b64, 'base64')); }
         if (keep && FAIL_SHOTS && b64 && fails.length) { fs.mkdirSync(FAIL_SHOTS, { recursive: true }); fs.writeFileSync(path.join(FAIL_SHOTS, tag + '.png'), Buffer.from(b64, 'base64')); }
@@ -499,7 +515,7 @@ async function checkSkill(app, ref, vp, mode = {}) {
     const walkPush = (label, ms) => {
         const v = walkVerdict(label, ms);
         if (!v) return;
-        const fails = CHANGED_ONLY && !/changed/.test(label) ? [] : v.fails.filter((f) => CHECKS.has((/^\[(\w+)\]/.exec(f) || [])[1]));
+        const fails = CHANGED_ONLY && !/changed/.test(label) ? [] : v.fails.filter((f) => CHECKS.has((/^\[([\w-]+)\]/.exec(f) || [])[1]));
         out.push({ ref, width: `${label} (all parts)`, fails, walk: true, sig: v.sig, note: `${ms.length} reading(s), choices ${v.sig || '-'}` });
     };
     // (a resize check's reading before the resize is the main sweep's own: not reported twice)
