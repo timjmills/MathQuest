@@ -535,6 +535,10 @@ export function prepare(it, info = {}) {
     }
     // a multiple-choice item keeps its own choice even when it reads as a story (word names)
     const choice = !P && !redraw && (!story || (Array.isArray(q.options) && q.options.length >= 2)) ? choicesOf(it, correct, shown) : null;
+    // A sentence answer is fixed by CHECKING the right sentence among the item's own choices (q.options, or a word-choice
+    // payload's labels); with no choices the item has no low-writing fix shape and is skipped, never written on a line
+    // (PT-TOF-4; lf-roles critic r1 R6-R8: redrawing the item halved the page and asked for "write" where the pupil ticks)
+    if (prose && !choice) return null;
     // ONE number written a digit per box (a column sum's answer row, a quotient, a place-value
     // chart): the fix is that number, in one box - the work above already shows it split.
     const digitSplit = !!(P && glue && P.parts.every((x) => /^\d$/.test(x.value))
@@ -547,7 +551,6 @@ export function prepare(it, info = {}) {
     else if (redraw) kind = 'redo';
     else if (LINED.has(it.template)) kind = 'line';
     else if (choice) kind = 'choice';
-    else if (prose) kind = 'redo';
     else if (P && P.parts.length > 1 && digitSplit) kind = 'value';
     else if (P && P.parts.length > 1) {
         labels = isList(glue) || !glue ? partLabels(it, P.parts, null) : null;

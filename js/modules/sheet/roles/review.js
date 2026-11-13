@@ -116,6 +116,19 @@ function allocate(main, cols, mRows, skills) {
     return out.sort((a, b) => a.at - b.at).map((g) => Object.assign(g.items, { kindKey: g.k || neutralForKinds('default-write', g.items) }));
 }
 
+/**
+ * The Review's title: "Review: <topic>" when it fits one line (measured by the bridge, input.titleLinesOf), else the fixed
+ * "Review" (as the Pre-skill Check falls back to its fixed title) - a two-line title took the room of the Mixed Review band
+ * (lf-roles critic r1 R9: growing_shape_patterns Review L lost its Mixed Review). A teacher's own title is kept.
+ */
+function reviewTitle(input, topic) {
+    const h0 = input.header || {};
+    if (h0.title === false) return '';
+    if (typeof h0.title === 'string' && h0.title.trim()) return h0.title.trim();
+    const t = `Review: ${topic}`;
+    return typeof input.titleLinesOf === 'function' && input.titleLinesOf(t) > 1 ? 'Review' : t;
+}
+
 function geometry(pools, input) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
@@ -124,8 +137,7 @@ function geometry(pools, input) {
     // its line off the body here too (lf-roles: growing_shape_patterns L ran 1.3 mm over the body under a 2-line title)
     const skills0 = (input.skills || []).slice(0, 1);
     const topic = topicOf((skills0[0] || {}).iCan || '');
-    const h0 = input.header || {};
-    const title = h0.title === false ? '' : typeof h0.title === 'string' && h0.title.trim() ? h0.title.trim() : `Review: ${topic}`;
+    const title = reviewTitle(input, topic);
     // the bridge measures it (input.titleLinesOf); a host with no measure keeps the old one-line budget
     const titleLines = !title ? 0 : typeof input.titleLinesOf === 'function' ? input.titleLinesOf(title) : 1;
     const frame = frameOf({ skills: skills0.length ? skills0 : input.skills || [], input: Object.assign({}, input, { header: Object.assign({}, input.header || {}, { titleLines }) }), tabId: 'Review 1', title, score: 1 });
@@ -264,7 +276,7 @@ export function plan(input = {}) {
     }
     const n = useM.length + useE.length + useEW.length;
     const n0 = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
+    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: reviewTitle(input, topic), score: n });
     const rowsOf = groups.map((gr) => Math.ceil(gr.length / g.cols));
     const rowsM = rowsOf.reduce((a, b) => a + b, 0);
     const rowsE = Math.ceil(useE.length / eCols);

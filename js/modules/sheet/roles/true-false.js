@@ -42,7 +42,9 @@ export function prepare(it, info = {}) {
     // true answer beside its own question; a skill with no operation says "The answer is ____."
     const ops = operandsOf(it.q || {});
     const glyph = opGlyphOf(opOf(it.q || {}));
-    const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : 'The answer is ';
+    // a list's lines keep their handwriting width, so its stem is the short "Answer:" - "The answer is" wrapped a 5-part list
+    // at L and cost the page an item (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3)
+    const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : place.kind === 'list' ? 'Answer: ' : 'The answer is ';
     const render = (c, o = {}) => {
         const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
         return `<div class="mq-judge mq-tf">`
@@ -56,7 +58,7 @@ export function prepare(it, info = {}) {
         // The judgement column sits beside the work, so a cell is at most half the page wide; a
         // word problem or a wide picture keeps its own single column (PT-WPR-1).
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(2, (it.footprint && it.footprint.maxCols) || 2) }),
-        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse },
+        fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong: isFalse, frame: place.kind },
         cellCls: [it.cellCls || '', 'mq-thinkcell'].join(' ').trim(),
     });
 }
@@ -82,7 +84,7 @@ export function plan(input = {}) {
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     const falseShare = items.length ? items.filter((it) => it.thinking && it.thinking.isWrong).length / items.length : 0;
-    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart('true-false'), grid] }], {
+    return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(items.length && items.every((it) => it.thinking && it.thinking.frame === 'none') ? 'true-false-judge' : 'true-false'), grid] }], {
         meta: { items: items.length, scoreOutOf: items.length, falseShare, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });
 }
