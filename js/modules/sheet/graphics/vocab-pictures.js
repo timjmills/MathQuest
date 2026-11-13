@@ -702,6 +702,27 @@ export function vocabReadFeatures(body) {
     }
     return [...f].sort();
 }
+/**
+ * V-REF (lf-vocab r11): the marks an explanation can POINT at, read from a drawn picture body: every text, the texts inside a
+ * heavy box, the kinds of line drawn round (row / column), and each line's text run together ("4", "7", "2" -> "472").
+ */
+export function vocabReadMarks(body) {
+    body = String(body || '');
+    const attrs = (x) => Object.fromEntries([...x.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    const texts = [...body.matchAll(/<text([^>]*)>([^<]*)<\/text>/g)].map((m) => { const a = attrs(m[1]); return { x: num_(a.x), y: num_(a.y), t: m[2].replace(/&amp;/g, '&').trim() }; });
+    const rects = [...body.matchAll(/<rect([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.x), y: num_(a.y), w: num_(a.width), h: num_(a.height), sw: num_(a['stroke-width']), fill: a.fill }));
+    const inR = (t, r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h;
+    const boxed = [], ringed = [];
+    for (const r of rects.filter((q) => q.sw >= 2 && q.fill === 'none')) {
+        const inside = texts.filter((t) => inR(t, r));
+        if (inside.length === 1) boxed.push(inside[0].t);
+        if (inside.length >= 2) { if (r.w > 1.5 * r.h) ringed.push('row'); if (r.h > 1.5 * r.w) ringed.push('column'); }
+    }
+    const byLine = new Map();
+    for (const t of texts) { const k = Math.round(t.y / 2); if (!byLine.has(k)) byLine.set(k, []); byLine.get(k).push(t); }
+    const lines = [...byLine.values()].map((l) => l.sort((a, b) => a.x - b.x).map((t) => t.t).join(''));
+    return { texts: texts.map((t) => t.t), tokens: texts.flatMap((t) => t.t.match(/\d+|\?/g) || []), boxed, ringed, lines };
+}
 /** The features a library picture's drawing shows, read from its markup ([] for no picture). */
 export const vocabPictureReadFeatures = (id) => (Object.prototype.hasOwnProperty.call(PICS, String(id)) ? vocabReadFeatures(bodyFor(String(id), '')) : []);
 /** The features a library picture DECLARES it draws (its `feat`; null when it declares none). */
@@ -910,4 +931,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabReadMarks, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

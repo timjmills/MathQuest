@@ -16,6 +16,8 @@
 // NB8  (lf-vocab r10, critic r9 #1) Match 3 answered wrong on the worksheet: a FOCUSED wrong letter box keeps the red dashed
 //      edge (no black / purple focus outline) and its box no next ring; the quiz, answered with one right box: the right box is
 //      green and carries the card's tick badge (.mq-live-badge), each wrong box its cross badge
+// NB9  (lf-vocab r11, critic r10 #4) Match 3 on the worksheet: after Check the active element is not a vocab slot (Check blurs
+//      the slots, so no caret shows inside a red box)
 const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
@@ -209,19 +211,22 @@ const YELLOW = 'rgb(242, 194, 0)';
                     const ins = [...document.querySelectorAll('#ws_card_0 .mq-vm-box input')];
                     if (ins.length !== 3) return { error: `${ins.length} letter boxes` };
                     ins.forEach((el, n) => { el.value = v[n]; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); });
+                    ins[0].focus();
                     window.checkAllWorksheet();
+                    const ae = document.activeElement, slotAfter = !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line'));
                     const el = ins[0]; el.focus();
                     const cs = getComputedStyle(el), pcs = getComputedStyle(el.parentElement);
                     const sw = getComputedStyle(document.documentElement).getPropertyValue('--mq-next-color').trim();
                     const probe = document.createElement('span'); document.body.appendChild(probe); probe.style.color = sw; const swc = getComputedStyle(probe).color; probe.remove();
                     const first = (x) => (x.match(/rgba?\([^)]*\)/) || [''])[0];
-                    return { focused: document.activeElement === el, wrong: el.classList.contains('mq-live-wrong'), style: cs.outlineStyle, color: cs.outlineColor, pfirst: first(pcs.boxShadow), first: first(cs.boxShadow), swc };
+                    return { slotAfter, focused: document.activeElement === el, wrong: el.classList.contains('mq-live-wrong'), style: cs.outlineStyle, color: cs.outlineColor, pfirst: first(pcs.boxShadow), first: first(cs.boxShadow), swc };
                 });
                 if (fw.error) fails.push(`NB8 worksheet Match 3: ${fw.error}`);
                 else {
                     judged++;
                     if (!fw.wrong) fails.push('NB8 worksheet Match 3 box 1: not marked wrong');
                     if (!fw.focused) fails.push('NB8 worksheet Match 3 box 1: could not be focused');
+                    if (fw.slotAfter) fails.push('NB9 worksheet Match 3: after Check the focus (the caret) is still in a vocab slot - Check must blur the slots');
                     if (fw.style !== 'dashed' || !RED.test(fw.color)) fails.push(`NB8 worksheet Match 3 box 1 (wrong, focused): its outline is ${fw.style} ${fw.color}, not the red dashed edge`);
                     if (fw.pfirst === fw.swc || fw.first === fw.swc) fails.push('NB8 worksheet Match 3 box 1 (wrong, focused): it carries the blue next ring');
                     console.log(`${'vocabulary:vocab_grade_pictures ws-wrong-focus'.padEnd(44)} focused ${fw.focused} outline ${fw.style} ${fw.color} box ring ${fw.pfirst || 'none'}`);

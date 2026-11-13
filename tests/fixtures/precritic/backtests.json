@@ -4137,6 +4137,45 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r11-vref",
+   "check": "V-REF: every mark a wrong-answer explanation points at is drawn in its own picture and in no picture dealt with it: critic r10 R-2 #2 (cycle's 'ones digits' beside shapes), #3 (unknown's 'the one in the box' beside factor's boxed 4 and 3)",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-REF (lf-vocab r11 item 3)",
+   "fail": {
+    "commit": "03eddcc2",
+    "state": "lf-vocab r10 head"
+   },
+   "pass": {
+    "commit": "TBD-r11-3",
+    "state": "cycle and unknown explains reworded; factor / divisor / dividend / first term point at boxed marks"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-REF 2>&1 | grep -q '\"cycle\": its explanation points at \"ones digits\"\\|\"unknown\".s explanation points at \"the one in the box\", and the \"factor\"' && echo 'vref: FAIL' || echo 'vref: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r11-nb9-blur",
+   "check": "NB9: after Check on the worksheet, the active element is not a vocab slot (no caret in a red box): critic r10 Match 3 #4",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "screen-cell.js markVocabFeedback blurs the vocab slots; ws-next-box NB9",
+   "fail": {
+    "commit": "03eddcc2",
+    "state": "lf-vocab r10 head"
+   },
+   "pass": {
+    "commit": "TBD-r11-3",
+    "state": "Check blurs the vocab slots"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

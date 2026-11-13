@@ -23,6 +23,9 @@
 //     declares its defining features (vocab-words.js VOCAB_DEFS). A picture of A dealt with B (the same set or grade pool, one
 //     item) whose features satisfy B's definition FAILS unless A and B are notWith. An older tree (backtest rows) declares
 //     none: its pictures take today's declaration where the drawing is today's, else the features its markup shows.
+// V-REF (r11) every mark a wrong-answer explanation points at is drawn in its own picture and in no picture dealt with it
+//     (same set or grade pool, compatible) - critic r10: cycle's "ones digits" beside shapes, unknown's "the one in the box"
+//     beside factor's boxed 4 and 3
 // V-HATCH (r11, the escape hatch) a set's noPicture words are never drawn for it (Match 3, the 1 picture, 3 words picture);
 //     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
@@ -195,6 +198,50 @@ const ambig = [];
             if (seenClash.has(k)) continue;
             seenClash.add(k);
             fail(`V-FEAT ${pl.name}: the "${a}" picture reads as "${b}" (${featOf(a).join(' ')}), and the two may be dealt together (notWith, redraw or the hatch)`);
+        }
+    }
+    // V-REF (r11, critic r10 R-2 #2 / #3): every mark an explanation POINTS at ("the 12 in the box", "the one in the box",
+    // "the one drawn round", "the ?", "like the 4", "the 7 in 472", "ones digits") is drawn in its own picture, and is not
+    // drawn in a picture dealt with it unless the two are notWith. Marks are read from the drawings (vocabReadMarks).
+    const marksOfExplain = (e) => {
+        const out = [];
+        const x = String(e || '');
+        for (const m of x.matchAll(/the ([\d?]+)(?: and the ([\d?]+))? in (?:the )?box(?:es)?/g)) for (const t of [m[1], m[2]].filter(Boolean)) out.push({ k: 'boxed', t, say: `the ${t} in the box` });
+        if (/the one in the box/.test(x)) out.push({ k: 'boxed-any', say: 'the one in the box' });
+        if (/the one drawn round/.test(x)) out.push({ k: 'ringed-own', say: 'the one drawn round' });
+        for (const m of x.matchAll(/the (\d+) in (\d+)/g)) out.push({ k: 'digit-in', t: m[1], n: m[2], say: `the ${m[1]} in ${m[2]}` });
+        for (const m of x.matchAll(/like the (\d+)\b(?! in| and)/g)) out.push({ k: 'text', t: m[1], say: `the ${m[1]}` });
+        if (/the \?(?! in)/.test(x)) out.push({ k: 'text', t: '?', say: 'the ?' });
+        if (/ones digits?\b(?! means)/i.test(x.replace(/^Ones digit means/, ''))) out.push({ k: 'digits', say: 'ones digits' });
+        return out;
+    };
+    const marksCache = new Map();
+    const marksOfPic = (id) => { if (!marksCache.has(id)) marksCache.set(id, HERE_P.vocabReadMarks(svgOf(P, id))); return marksCache.get(id); };
+    const draws = (id, mk, ownId) => {
+        const p = marksOfPic(id);
+        if (mk.k === 'boxed') return p.boxed.includes(mk.t);
+        if (mk.k === 'boxed-any') return p.boxed.length > 0;
+        if (mk.k === 'ringed-own') { const own = marksOfPic(ownId).ringed; return p.ringed.some((r) => own.includes(r)); }
+        if (mk.k === 'digit-in') return p.lines.some((l) => l.includes(mk.n)) && p.tokens.includes(mk.t);
+        if (mk.k === 'text') return p.tokens.includes(mk.t);
+        if (mk.k === 'digits') return p.tokens.some((t) => /^\d+$/.test(t));
+        return false;
+    };
+    const seenRef = new Set();
+    for (const [w, e] of Object.entries(W.VOCAB_WORDS)) {
+        if (!P.hasVocabPicture(w)) continue;
+        for (const mk of marksOfExplain(e.explain)) if (!draws(w, mk, w)) fail(`V-REF "${w}": its explanation points at "${mk.say}", which its picture does not draw`);
+    }
+    for (const pl of pools) for (const a of pl.words) {
+        const e = (W.VOCAB_WORDS[a] || {}).explain;
+        if (!e || !P.hasVocabPicture(a)) continue;
+        for (const mk of marksOfExplain(e)) for (const b of pl.pics) {
+            // ("ones digits" names a kind of mark, not one mark: its own picture must draw digits; other pictures' numbers are not it)
+            if (mk.k === 'digits' || a === b || !P.hasVocabPicture(b) || !W.compatible([a, b]) || !draws(b, mk, a)) continue;
+            const k = `${a}|${b}|${mk.say}`;
+            if (seenRef.has(k)) continue;
+            seenRef.add(k);
+            fail(`V-REF ${pl.name}: "${a}"'s explanation points at "${mk.say}", and the "${b}" picture dealt with it draws one too (notWith or reword)`);
         }
     }
     if (process.argv.includes('--feat-list')) for (const id of P.VOCAB_PICTURE_IDS) console.log(`  feat ${id}: ${featOf(id).join(' ')} -> ${HERE_W.vocabWordsReading(featOf(id)).join(', ')}`);

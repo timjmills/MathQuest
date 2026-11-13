@@ -1189,6 +1189,12 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
             }
         }
     }
+    // (lf-vocab r11, critic r10 #4: Check leaves no caret in a vocab slot - a focused wrong box showed a text caret inside its
+    // red edge; ws-next-box NB9)
+    try {
+        const ae = cell.ownerDocument && cell.ownerDocument.activeElement;
+        if (ae && cell.contains(ae) && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line') && typeof ae.blur === 'function') ae.blur();
+    } catch (e) { /* no document */ }
     if (ok || !wrong.length) return '';
     // the line names the RESPONSE the pupil gives: pick3 writes the word ("The answer is step!"), Match 3 writes the letter
     // ("Input is picture C!"); then the word's explanation (R-2)
