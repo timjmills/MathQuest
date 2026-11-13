@@ -4740,10 +4740,21 @@ async function buildLesson(n, metaOf) {
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
     const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
-    const data0 = recordOf(sk0);
+    // (opt-in `dealPracticeOpts` on a library lesson, lf-placevalue critic nwf r1 N6: a lesson asked for by its skill alone - no
+    // options on the request - deals its OWN practice options (the LESSONS record's `practice.opts`), so its chant and steps
+    // describe what the pages deal. Every other lesson keeps the request's options as before.)
+    {
+        const lib = libId ? lessonById(libId) : null;
+        if (lib && lib.dealPracticeOpts && lib.practice && lib.practice.opts && !sk0.opts && lib.practice.skill === `${sk0.categoryId}:${sk0.skillId}`) {
+            const sk1 = Object.assign({}, sk0, { opts: JSON.parse(JSON.stringify(lib.practice.opts)) });
+            n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk1, ...n.sections[0].skills.slice(1)] }), ...n.sections.slice(1)] });
+        }
+    }
+    const sk0b = n.sections[0].skills[0];
+    const data0 = recordOf(sk0b);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
-    if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
+    if (data0 && data0.minOperand !== undefined && sk0b.minOperand === undefined) flags.minOperand = data0.minOperand;
     if (data0 && data0.distinctFirst) flags.distinctFirst = true;
     if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
     if (data0 && data0.maxTop !== undefined) flags.maxTop = data0.maxTop;
@@ -4752,7 +4763,7 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
     if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
     if (data0) flags.noTurnaround = true;
-    let sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    let sk = Object.keys(flags).length ? Object.assign({}, sk0b, flags) : sk0b;
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
@@ -4762,7 +4773,7 @@ async function buildLesson(n, metaOf) {
     if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
         sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
-    if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
+    if (sk !== sk0b) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = recordOf(sk);
     // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its PREREQUISITE CHECK - one

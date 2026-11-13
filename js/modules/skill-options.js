@@ -1625,7 +1625,8 @@ SKILL_OPTIONS['composing:number_word_form'] = [{
 }, {
     // Detailed lesson 1 (2026-10-16): "Numbers to" bounds the number itself (the answer). 0 = the
     // Max Number setting, the old behaviour (10 up to Max Number), so every saved code deals as it
-    // did. 20 / 100 / 1,000 deal from just above the band below (11-20, 21-100, 101-1,000).
+    // did. 100 / 1,000 deal from just above the band below (21-100, 101-1,000); 20 deals 0-20 (critic nwf r1: ten teen names
+    // could not fill a page).
     id: 'band', label: 'Numbers to', type: 'enum', default: 0, group: 'difficulty',
     values: [{ v: 0, l: 'Max Number setting' }, { v: 20, l: '20' }, { v: 100, l: '100' }, { v: 1000, l: '1,000' }],
     help: 'The numbers the page reads and writes. 1,000 deals 101 to 1,000.',

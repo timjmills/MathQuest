@@ -40,6 +40,14 @@ export function numberWords(n) {
 const pt = (v) => `${Math.round(v * 100) / 100}pt`;
 const toWords = (p) => p.way === 'to_words';
 const PLACE_LETTERS = { 3: ['H', 'T', 'O'], 4: ['Th', 'H', 'T', 'O'] };
+/** The digits of a shown wrong value, one a box, right-aligned in the item's boxes ('' where it wrote nothing). */
+function wrongDigits(p, wrong) {
+    const n = htoDigits(p).length;
+    const w = wrong || {};
+    if (w.slots && Object.keys(w.slots).some((k) => /^pv-\d+$/.test(k))) return Array.from({ length: n }, (_, i) => String(w.slots[`pv-${i}`] === undefined || w.slots[`pv-${i}`] === null ? '' : w.slots[`pv-${i}`]));
+    const v = String(w.value === undefined || w.value === null ? '' : w.value).replace(/[^0-9]/g, '').slice(-n);
+    return Array.from({ length: n }, (_, i) => { const j = i - (n - v.length); return j >= 0 ? v[j] : ''; });
+}
 const htoDigits = (p) => String(Math.trunc(Number(p.n))).padStart(3, '0').split('');
 /** The place boxes row: `valueOf(i)` the digit shown in box i ('' = empty), `inkOf(i)` 'trace' | 'solid' | null. */
 function htoRow(p, ctx, valueOf, inkOf) {
@@ -68,10 +76,13 @@ function nameHtml(p, under) {
     const u = (t) => `<span style="text-decoration:underline;text-decoration-thickness:1.5pt;text-underline-offset:1.2mm;">${esc(t)}</span>`;
     return under === 0 ? `${u(head)}${rest ? ` ${esc(rest)}` : ''}` : `${esc(head)}${rest ? ` ${u(rest)}` : ''}`;
 }
+// (critic nwf r1 N7: the two-line name box is a flex box, so a bare text run and an underlined span inside it were two flex
+// items and the space between them was dropped - "one hundredthirteen". The name is ONE inner span: one flex item, its spaces kept.)
+const nameSpan = (p, textPt, inner) => `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, textPt)}"><span data-ws-name style="max-width:100%;">${inner}</span></span>`;
 function htoCell(p, ctx, valueOf, inkOf, under) {
     const m = ctx.metrics || {};
     return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:4mm;">`
-        + `<span style="font-size:${pt((m.textPt || 15) + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, m.textPt || 15)}">${nameHtml(p, under)}</span>`
+        + nameSpan(p, m.textPt || 15, nameHtml(p, under))
         + `${htoRow(p, ctx, valueOf, inkOf)}</div>`;
 }
 // (lf-placevalue w2, ws-empty-band band=1000 at L 39 %: a name of a 3-digit number may take two lines, so one cell of a row is a
@@ -85,20 +96,31 @@ register('words', {
     render(p, ctx) {
         const m = ctx.metrics || {};
         const digitPt = m.digitPt || 28, textPt = m.textPt || 15;
-        const key = ctx.state === 'answered' ? keyOf(p) : null;
+        // (critic nwf r1 N5: a Model cell is drawn `traced` - the answer in grey; the key was read in `answered` only, so every
+        // Model, the Scripted Model's last row and the opener's Model cells printed an EMPTY answer line)
+        const key = ctx.state === 'answered' || ctx.state === 'traced' ? keyOf(p) : null;
         if (toWords(p)) {
             const line = blank({ id: 'answer', kind: 'text', shape: 'line', widthMm: ctx.size === 'S' ? 70 : ctx.size === 'M' ? 85 : 100, graded: true }, ctx, key);
             return `<div class="ws-words" data-ws-words="to_words" style="display:flex;flex-direction:column;align-items:center;gap:2mm;">`
                 + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${esc(Number(p.n).toLocaleString('en-US'))}</span>`
                 + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;">${line}</span></div>`;
         }
-        if (p.slot === 'hto') return htoCell(p, ctx, (i) => (key === null ? '' : htoDigits(p)[i]), () => null, p.under === 0 || p.under === 1 ? p.under : null);
-        const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits: 4, graded: true }, ctx, key);
+        if (p.slot === 'hto') {
+            // (critic nwf r1 N2: a True or False? / Reason It / error-analysis cell draws the CLAIM in state `wrong`; the boxes read
+            // the key only, so the claimed number never printed and the key marked False against empty boxes. The wrong value is
+            // written one digit a box, right-aligned, as the pupil wrote it; a traced Model writes the answer in grey.)
+            const wv = ctx.state === 'wrong' ? wrongDigits(p, ctx.wrong) : null;
+            const ds = htoDigits(p);
+            return htoCell(p, ctx, (i) => (wv ? wv[i] : key === null ? '' : ds[i]), () => (ctx.state === 'traced' ? 'trace' : null), p.under === 0 || p.under === 1 ? p.under : null);
+        }
+        // (numbers to 20, a K-1 page: the line is a digit wider - young writers' digits are big, and at S three across the 4-digit
+        // line left 32 % of the cell beside the ink, ws-empty-band EB-SIDE)
+        const slot = blank({ id: 'answer', kind: 'number', shape: 'line', digits: p.pool === 20 ? 5 : 4, graded: true }, ctx, key);
         // (lf-placevalue w2: the room over the answer line grows with the size - 5 / 6 / 7 mm, was 4 at every size - the numeral is
         // written above its line at the digit size, and 4 mm left the L and test rows 30-33 % empty under the line)
         const gapMm = p.inPlace === false ? 4 : (({ S: 5, M: 6, L: 7 })[ctx.size] || 6);
         return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:${gapMm}mm;">`
-            + `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, textPt)}">${esc(String(p.words || numberWords(p.n)).replace(/ hundred/g, '\u00a0hundred'))}</span>`
+            + nameSpan(p, textPt, esc(String(p.words || numberWords(p.n)).replace(/ hundred/g, '\u00a0hundred')))
             + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${slot}</span></div>`;
     },
     answerKey(p) {
@@ -129,7 +151,9 @@ register('words', {
         // (and its columns are capped by size - 4 / 3 / 3 at S / M / L: five across a 30-item S page left six rows for thirty
         // short cells, each stretched 31-37 % past its ink; more rows at the item's own height fill the page instead)
         const ip = p.inPlace === false ? {} : { inPlace: true, denseRoom: 1, hardCap: true };
-        const capCols = ({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3;
+        // (critic nwf r1 band 20: the 21 names 0-20 cannot fill the S page's 4 x 7 - its rows were stretched 45 % past their ink;
+        // three across x 7 rows holds all 21 at about the item's own height)
+        const capCols = p.pool === 20 && ctx && ctx.size === 'S' ? 3 : (({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3);
         if (p.slot === 'hto' && !toWords(p)) return { wMm: Math.min(84, Math.max(62, words.length * (textPt + 2) * 0.52 * 0.3528 + 10)), hMm: null, measure: true, factLike: false, maxCols: p.inPlace === false ? 2 : Math.max(2, capCols), ...ip };
         const wMm = toWords(p) ? 110 : Math.min(84, Math.max(60, words.length * (textPt + 2) * 0.52 * 0.3528 + 10));
         return { wMm, hMm: null, measure: true, factLike: false, maxCols: toWords(p) ? 1 : p.inPlace === false ? 2 : capCols, ...ip };

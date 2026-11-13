@@ -197,7 +197,9 @@ export const ROUTINES = Object.freeze({
             { icon: 'decide', text: 'Read the rest. Tens and ones.' },
             { icon: 'check', text: 'Read the number back.' },
         ],
-        chant: 'Three boxes, three digits.',
+        // (critic nwf r1 N6: "Three boxes, three digits." was printed over 2-digit items with no boxes and over "one thousand" in
+        // four boxes; the chant names no count - every item the lesson deals is boxed, one digit a box, the empty place a 0)
+        chant: 'Every box gets a digit.',
         format: { kind: 'numbered steps with icons + a chant', why: 'The one step pupils skip is the empty place; the chant cues its 0.' },
         example: { match: 'hundred' },
         // (three across where the name and its boxes fit: two across left 31 % beside the boxes at S - ws-print-lint H13)
@@ -293,6 +295,8 @@ export const LESSONS = Object.freeze({
     'skill:composing:number_word_form': {
         routine: 'pv-number-words',
         practice: { skill: 'composing:number_word_form', opts: { wordform: ['to_number'], band: 1000, zeroPlace: 'some', answerSlot: 'hto' } },
+        // (critic nwf r1 N6: the lesson asked for by the skill alone deals these practice options - print-sheet buildLesson)
+        dealPracticeOpts: true,
         defaultFor: true,
         prereqsPending: 'New with lf-placevalue w2: its Warm-up until its Prerequisite Check is written (LR-17).',
         warmup: [

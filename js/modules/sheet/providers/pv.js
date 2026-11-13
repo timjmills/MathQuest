@@ -1224,10 +1224,13 @@ const WORDS_TO_NUMBER = { iCan: 'I Can write a number from its name', instructio
 const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey: 'number-words',
     steps: ['Say the hundreds: three hundred.', 'Say the last two digits as one number.', 'Write the words.'],
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.n, p.words] : null; } };
+// (critic nwf r1 opener / scripted-model C2: "Read the hundreds word." beside "eleven" - a name under 100 has no hundreds word;
+// its steps read the tens word, then the ones word)
+const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
 registerSkill('composing:number_word_form', {
-    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : null), WORDS_TO_NUMBER),
+    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_TO_NUMBER_2 : null), WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
     workedSteps: (q) => {
         const p = pvOf(q);
@@ -1269,6 +1272,16 @@ registerSkill('composing:number_word_form', {
         if (!h && r >= 20 && r % 10) { c.push({ value: Number(`${Math.floor(r / 10) * 10}${r % 10}`), misconception: 'M-V9', explain: 'Wrote the ty word and the one side by side.' });
             c.push({ value: (r % 10) * 10 + Math.floor(r / 10), misconception: 'M-L3', explain: 'Wrote the digits the other way round.' }); }
         if (!h && r >= 20 && !(r % 10)) c.push({ value: r / 10, misconception: 'M-Z1', explain: 'Left out the 0 in the ones.' });
+        // (critic nwf r1 N2: in the H T O boxes a claim is written one digit a box, so it has the boxes' own digit count - 3005
+        // cannot be written in three boxes. The box errors: the ones digit put in the empty tens box (305 -> 350), the tens and
+        // ones the other way round (452 -> 425).)
+        const hto = !!(q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto');
+        if (hto) {
+            const t = Math.floor(r / 10), o = r % 10;
+            if (h && !t && o) c.push({ value: h * 100 + o * 10, misconception: 'M-Z1', explain: 'Put the ones digit in the tens box.' });
+            if (h && t > 1 && o && t !== o) c.push({ value: h * 100 + o * 10 + t, misconception: 'M-L3', explain: 'Wrote the tens and ones the other way round.' });
+            return choose(q, c.filter((x) => x.value !== n && String(x.value).length === String(n).length));
+        }
         return choose(q, c.filter((x) => x.value !== n));
     },
 });
