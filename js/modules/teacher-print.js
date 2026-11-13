@@ -723,7 +723,7 @@ function partsHTML(s, i) {
             }
         }
         // (step B opens the Supports panel here; step A states the standard as plain text - F8)
-        const supports = SHEET_GROUP.has(p) && p !== 'wedo' && p !== 'rows' ? '' : '<span class="tv-part-sup-t">Supports: standard</span>';
+        const supports = (SHEET_GROUP.has(p) && p !== 'wedo' && p !== 'rows') || none ? '' : '<span class="tv-part-sup-t"><span class="tv-part-sup-l">Supports: </span>Standard</span>';
         const refresh = SHEET_GROUP.has(p) || none ? '' : `<button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="${p}" aria-label="New numbers: ${esc(name)}" title="New numbers"${on ? '' : ' disabled'}>${icon('reset', 18)}</button>`;
         const warn = p === 'prereq' && on && lim && partCount(s, p, lim, po) < Math.min(PREREQ_WARN_BELOW, lim.max) ? `<p class="tv-part-warn" role="status">${icon('info', 14)}<span>${esc(PREREQ_FEW_WARNING)}</span></p>` : '';
         return `<div class="tv-part${on && !none ? '' : ' is-off'}${SHEET_GROUP.has(p) ? ' is-sheet' : ''}" role="group" aria-labelledby="${id}" data-part-row="${p}">

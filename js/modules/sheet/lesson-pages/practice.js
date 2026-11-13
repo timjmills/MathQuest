@@ -62,7 +62,19 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
     // border in 3 columns) - fewer columns, never a cramped or shrunk problem.
     const cramped = (it, c) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm < CL8_MM; };
     const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)));
-    const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
+    let ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
+    // (lf-partopts §8b: rows that appear in height the teacher freed keep each cell's ink at half its width or more - a 26 mm
+    // stack in a 62 mm cell left a 30 % side, EB-SIDE; more, narrower columns where they fit, else no extra row)
+    const pn0 = input.lesson && input.lesson.partN;
+    const freed0 = !!pn0 && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn0[k] !== undefined);
+    let inkShort = false;
+    if (freed0) {
+        const inkOk = (c) => indepPool.slice(0, 6).every((it) => { const mm = it.measured && it.measured[c]; return !mm || !(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4); });
+        if (!inkOk(ic)) {
+            const c2 = [ic + 1, ic + 2, ic + 3].find((c) => c <= 4 && indepPool.slice(0, 6).every((it) => it.measured && it.measured[c] && it.measured[c].fits !== false) && !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)) && inkOk(c));
+            if (c2) ic = c2; else inkShort = true;
+        }
+    }
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
     let indep = [];
@@ -99,7 +111,7 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (lf-partopts §8b: on a sheet whose bands the teacher turned down, the height they gave up goes to more rows - as many
         // whole rows as the pool dealt and the room holds; the 6 of 12.1 is the standard sheet's)
         const pn = input.lesson && input.lesson.partN;
-        const freed = !!pn && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn[k] !== undefined);
+        const freed = !!pn && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn[k] !== undefined) && !inkShort;
         let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : freed ? Math.max(6, indepPool.length) : 6) / ic)), Math.floor(room / hI));
         if (freed && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         if (oneNum && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
@@ -109,7 +121,7 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (lf-partopts: the rows that fit are the part's fit - the Parts table's max; `lesson.partN.rows` caps them, 0 = none)
         cur.indepFit = { rows: rows >= 1 && hRows(rows) <= room ? rows : 0, ic };
         const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
-        if (rN === 0) return indep;
+        if (rN === 0 || inkShort) return indep;
         if (rN !== null && rN < rows) rows = rN;
         // (critic r2 N1: how far ONE row is short of the room - roles/lesson.js frees it before it ever drops the row)
         cur.indepShort = rows >= 1 && hRows(rows) <= room ? 0 : hRows(1) - room;

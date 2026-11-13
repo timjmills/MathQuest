@@ -1005,4 +1005,5 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-parts-head { grid-template-areas: none; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-text-2); border-bottom: 1px solid var(--tv-rule); }
     .tv-part:first-of-type { border-top: 1px solid var(--tv-rule); }
     .tv-part-many { flex-direction: row; align-items: center; gap: 4px 12px; }
+    .tv-part-sup-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
