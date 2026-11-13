@@ -28,8 +28,10 @@
 //                 sub_2d_1d) lays the worked Model over TWO cells of row 1, its working written beside it, so Model + 10
 //                 tries fill 3 whole rows (lead ruling (e), 2026-11-13). Control: at M (3 columns, 9 cells fill the grid)
 //                 the Model keeps one cell.
+//   GUIDED-STACK-SIDE a narrow column stack's Guided grid leaves under 30 % beside the stack (EB-SIDE), keeps S 11 / M 9 / L 6,
+//                 fills every row (the Model spanning the cells that complete it) and centres each cell in its row (EB-BAND; r8b).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN]
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -350,6 +352,37 @@ if (on('GUIDED-MODEL-SPAN')) {
             if (span && hasSpan && !/Ones: 8 − 3 = 5\./.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the two-cell Model has no working beside it (an empty band either side of the stack, EB-SIDE)`);
             if (span && /Write 5/.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the working beside the Model repeats "Write 5." (the traced digit says it)`);
         } catch (e) { findings.push(`GUIDED-MODEL-SPAN ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-STACK-SIDE')) {
+    // lf-roles r8b (coordinator via the lead: the stack Guided pages of the 7 subtraction skills failed EB-SIDE at S 32.4 % / M 31.7 %
+    // and EB-BAND at L 34.8 %): a planted 16 mm column stack (S/M/L heights of sub_50) is laid in a column count whose side band is
+    // under 30 % of the cell (the measured slack beside it), keeps its capacity (S 11, M 9, L >= 6), every row full, and its cells
+    // centred in their rows
+    try { registerSkill('rolesunit:gside', { workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }], wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const W = { S: 16.2, M: 22.5, L: 28.4 };
+    const item = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gside', ans: '25', text: '48 − 23 = ?', answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 0.5 - W[size]) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 6 }, fclass: 'standard' };
+    };
+    for (const [size, want] of [['S', 11], ['M', 9], ['L', 6]]) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gside', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => item(i, size)) });
+            const f = pl.meta.fits[0];
+            const side = (186 / f.cols - 0.5 - W[size]) / 2 / (186 / f.cols - 0.5);
+            const parts = (pl.pages || []).flatMap((pg) => (pg.sections || []).map((s) => s.content).filter((c) => c && c.items));
+            const cells = parts.flatMap((c) => c.items);
+            const span = cells.reduce((a, c) => { const m = /grid-column:\s*span\s+(\d+)/.exec(c.style || ''); return a + (m ? Number(m[1]) - 1 : 0); }, 0);
+            if (side >= 0.30) findings.push(`GUIDED-STACK-SIDE ${size}: ${f.cols} columns leave ${(side * 100).toFixed(1)} % beside the stack (EB-SIDE, want < 30 %)`);
+            if (pl.meta.items < want) findings.push(`GUIDED-STACK-SIDE ${size}: ${pl.meta.items} cells (want at least ${want}: capacity and SIZE-ORDER kept)`);
+            if ((cells.length + span) % f.cols !== 0) findings.push(`GUIDED-STACK-SIDE ${size}: ${cells.length} cells + ${span} spanned in ${f.cols} columns leave a part row`);
+            if (cells.some((c) => !/justify-content:center/.test(c.style || ''))) findings.push(`GUIDED-STACK-SIDE ${size}: a stack cell is not centred in its row (EB-BAND under a stretched row)`);
+        } catch (e) { findings.push(`GUIDED-STACK-SIDE ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }
 
