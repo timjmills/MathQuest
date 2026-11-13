@@ -1054,7 +1054,16 @@ function shownSteps(p, ctx) {
     // It's A or B, Error analysis's wrong answer - is the one written in the answer box; critic visual-quality r2 N4:
     // the sentence frame wrote p.ans, so every "False" claim printed the true answer)
     const wv = w && w.value !== undefined && w.value !== null && w.value !== '' ? String(w.value) : null;
-    if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
+    if (!wop) {
+        // the shown value is WRITTEN in the answer row of a + / − column too (word-stories critic r1 F1 / F2): the column
+        // drew the step's own answer, so a "False" claim printed the true work ("41 − 23 = 18" keyed False) and Reason
+        // It's A and B showed the same work. Only the answer row changes; the numbers and the sign stand.
+        const last = p.steps[p.steps.length - 1];
+        const nv = wv !== null && /^\d+$/.test(wv.replace(/,/g, '')) ? Number(wv.replace(/,/g, '')) : null;
+        const steps = nv !== null && last && (last.op === '+' || last.op === '-') && nv !== last.ans
+            ? p.steps.map((s, i) => (i === p.steps.length - 1 ? Object.assign({}, s, { ans: nv }) : s)) : p.steps;
+        return { steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
+    }
     const out = p.steps.map((s, i) => {
         if (i !== p.steps.length - 1) return s;
         const x = Math.max(s.a, s.b), y = Math.min(s.a, s.b);

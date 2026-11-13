@@ -905,6 +905,16 @@ function buildPlan(ctx) {
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
+        // word-stories critic r1 F1 (2026-11-13), TF-EVAL: every sentence a True or False? / Error analysis / Reason It page
+        // prints or keys is true arithmetic and every True / False verdict matches the work it judges (node, seeded, every
+        // forms x band value). Skills with no one-step word-work item: N/A (exit 4).
+        add(gate('key-arith', 'ws-key-arith (TF-EVAL: thinking-page sentences and verdicts evaluated, every forms x band value)', scope, 'node', 'ws-key-arith', ['--skill', keys.join(',')], { missingMsg: 'ws-key-arith is not in this tree', parse: (g, out, code) => {
+            const m = /^ws-key-arith: (OK|FAIL|N\/A)\b(.*)$/m.exec(out);
+            if (!m) return unparsed('no "ws-key-arith: OK|FAIL|N/A" line', out);
+            if (m[1] === 'N/A' && code === 4) return { result: 'N/A', findings: m[2].trim().slice(0, 200), detail: [], explainsExit: true };
+            if (m[1] === 'OK' && code === 0) return { result: 'PASS', findings: m[2].trim().slice(0, 200), detail: [], explainsExit: false };
+            return { result: 'FAIL', findings: m[2].trim().slice(0, 200), detail: out.split('\n').filter((l) => /^ {6}\[/.test(l)).slice(0, 10).map((l) => l.trim()), explainsExit: code === 1 };
+        } }));
         // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,
         // VQ-ONEANSWER, VQ-LIVE, VQ-TITLE, VQ-NOLEGACY (node, seeded); pins in tests/fixtures/precritic/vq-baseline.json
         // (shrink-only). A pinned finding is PASS (baseline); any other finding, or a skill missing from the output, is FAIL.

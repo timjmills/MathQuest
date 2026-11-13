@@ -367,6 +367,12 @@ const OPS = {
 
 /** add | subtract | multiply | divide | '' - from the question's operator or its category. */
 export function opOf(q = {}) {
+    // The sign and the operands of a printed statement come from ONE source (word-stories critic r1 F1, TF-EVAL): when
+    // the cell names the operands it draws (`payload.operands`, read first by operandsOf), its own sign goes with them.
+    // A story whose generator keeps its action (+, "part + ? = whole") draws its SOLVING step (whole − part): pairing
+    // the item's '+' with the cell's [whole, part] printed "19 + 3 = 16" on True or False? and Error analysis.
+    const pl = q.cell && q.cell.payload;
+    if (pl && Array.isArray(pl.operands) && pl.operands.length >= 2 && pl.op && OPS[pl.op]) return OPS[pl.op];
     if (q.op && OPS[q.op]) return OPS[q.op];
     const pop = q.cell && q.cell.payload && q.cell.payload.op;
     if (pop && OPS[pop]) return OPS[pop];
