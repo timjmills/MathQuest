@@ -5189,6 +5189,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r15-vkey",
+  "check": "V-KEY: every key underlay lies inside the cell, box or ring it sits in (+0.5 mm); a whole-drawing focal part on a structure greys at most 60 %; the hundred chart key (set 4 pick3 item 1): critic r14 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-KEY (lf-vocab r15)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r14 pass)"
+  },
+  "pass": {
+   "commit": "61c136c1",
+   "state": "cell underlays; hundred chart focal row"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --only V-KEY 2>&1 | grep -q 'V-KEY \"hundred chart\"' && echo 'v-key: FAIL' || echo 'v-key: OK'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
