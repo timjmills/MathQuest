@@ -6987,7 +6987,7 @@
  },
  {
   "id": "frame-title-ident-planted",
-  "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master fdfddfdd2 passes",
+  "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master a6883082c passes",
   "kind": "fixture",
   "rule": "ws-frame-title TITLE-IDENT",
   "browser": true,
@@ -6997,7 +6997,7 @@
   },
   "pass": {
    "fixture": "tests/fixtures/precritic/frame-title/master-hashes.json",
-   "state": "the hashes of origin/master fdfddfdd2 (no option)"
+   "state": "the hashes of origin/master a6883082c (no option)"
   },
   "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only ident --hashes-against {fixture}",
   "expect": {
