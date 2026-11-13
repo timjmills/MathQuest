@@ -216,7 +216,9 @@ function sweepSelfTest() {
         ['flip date read', +globalFlip('**Blocks globally from: 2026-11-14 13:00 UTC**'), Date.UTC(2026, 10, 14, 13, 0)],
         ['no flip date', globalFlip('no header'), null]];
     for (const [nm, got, w] of sk) if (got !== w) bad.push(`hybrid scope: ${nm}: ${got}, want ${w}`);
-    return { n: want.length + 7 + sk.length, bad };
+    const dr = [['a row dropped', droppedIds(['a', 'b', 'c'], ['a', 'c']).join(','), 'b'], ['rows only added', droppedIds(['a'], ['a', 'z']).length, 0], ['renamed counts as dropped', droppedIds(['old-id'], ['new-id']).join(','), 'old-id']];
+    for (const [nm, got, w] of dr) if (got !== w) bad.push(`no-dropped-row: ${nm}: ${got}, want ${w}`);
+    return { n: want.length + 7 + sk.length + 3, bad };
 }
 
 /* ============================================================== the path verdict of one backtest row (shared) */
@@ -343,6 +345,26 @@ export function rowNamesSkill(row, keys) {
 }
 export function globalFlip(text) { const m = /Blocks globally from:\s*(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})\s*UTC/.exec(text); return m ? new Date(`${m[1]}T${m[2]}:00Z`) : null; }
 let SWEEP_WARN_ONLY = false;
+// NO DROPPED ROW (lead 2026-11-13, lf-ops: 7 div_facts rows were lost when a deploy cherry-pick kept master's tests/ files): a
+// tree must hold every backtest row id the baseline held. The baseline is `--rows-before <file>` (a backtests.json), else
+// origin/master's table. This BLOCKS always, in every scope, whatever the ledger header's warning date says.
+export function droppedIds(before, after) { const a = new Set(after); return [...new Set(before)].filter((id) => !a.has(id)); }
+function baselineIds() {
+    const i = args.indexOf('--rows-before');
+    let text = null, from = '';
+    if (i >= 0 && args[i + 1]) { try { text = readFileSync(resolve(process.cwd(), args[i + 1]), 'utf8'); from = args[i + 1]; } catch (e) { return { ids: null, from: `${args[i + 1]} (unreadable)` }; } }
+    else { const r = spawnSync('git', ['show', 'origin/master:tests/fixtures/precritic/backtests.json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); if (r.status !== 0) return { ids: null, from: 'origin/master (not readable here)' }; text = r.stdout; from = 'origin/master'; }
+    try { const o = JSON.parse(text); return { ids: (Array.isArray(o) ? o : o.rows || []).map((x) => x.id), from }; } catch (e) { return { ids: null, from: `${from} (not JSON)` }; }
+}
+function dropSweep() {
+    const C = ctx();
+    const now = (C.table.rows || []).map((r) => r.id);
+    const b = baselineIds();
+    if (!b.ids) { console.log(`  no-dropped-row: baseline ${b.from}: skipped`); return 0; }
+    const gone = droppedIds(b.ids, now);
+    console.log(`  no-dropped-row: ${b.ids.length} row id(s) in ${b.from}, ${now.length} here: ${gone.length ? `${gone.length} DROPPED: ${gone.join(', ')}` : 'none dropped'}`);
+    return gone.length;
+}
 function runSweep() {
     const C = ctx();
     const ids = new Set((C.table.rows || []).map((r) => r.id));
@@ -374,6 +396,8 @@ function runSweep() {
 
 if (args.includes('--self-test')) selfTest();
 else if (args.includes('--checks-from-critics')) {
+    const dropped = dropSweep();
+    if (dropped) { runSweep(); console.log(`${TOOL}: FAIL (no-dropped-row: ${dropped} backtest row id(s) the baseline held are missing from this tree)`); process.exit(1); }
     const bad = runSweep();
     if (bad && SWEEP_WARN_ONLY) { console.log(`${TOOL}: OK (checks-from-critics WARNING: ${bad} ledger row(s) with no backtest id on precritic's path; blocking from the ledger header's date)`); process.exit(0); }
     console.log(bad ? `${TOOL}: FAIL (checks-from-critics: ${bad} ledger row(s) with no backtest id on precritic's path)` : `${TOOL}: OK (checks-from-critics)`);
