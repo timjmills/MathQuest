@@ -363,3 +363,46 @@ ws-screen-ink-size does NOT flag the count-row card digits (18-29 px): its rules
 HTML leaf marks) and touch numerals (svg[data-digit]); the count-row train's digits are plain text, so no rule sees them and
 SIZE-REF never fires (no mark group). The check that DOES catch them is ws-screen-slots `--screen-digit` (SCREEN-DIGIT) and the
 new TRAIN-FIT. lf-checks is making SCREEN-DIGIT default-on in precritic.
+
+## Round r5 (2026-11-13, builder, Opus medium) - part A count_by_tables, critic cbt r1 fixes, part B (b') / ARRAY-ORIENT
+
+Logs: /tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/props-r5/ (precritic pc-cbt*.log/json, backtests bt-*.log,
+renders rg*/). The critic cbt r1 report is copied to design/audit/runs/lf-ops/critic-cbt-r1.md. Size S is dropped (owner, plan item 9):
+S-only findings are out of scope.
+
+### Part A (count_by_tables to the critic)
+- count-row card: rule drift re-generated (f61e1cda9), Stretch not offered for count_by_tables (d3eaf650e); both signed by the lead.
+- Lesson record `mult-count-by-table` (multdiv family): 4 steps = the provider's 4 worked states, chartWide, tailLast, practiceShapes one row a line.
+- Reason It: a stacked count row draws at its panel's width (master's stacking merged in had lost r3b's panel width).
+- precritic --skill count_by_tables at a33ff1a5b: 35 PASS / 2 FAIL (EB-FOOT 8 review legacy partner cells = master; sibling-compare no
+  approved siblings). Critic cbt r1 on a33ff1a5b: FAIL, lowest 5 (D2 worksheet, D5 Mixed M, D9 lesson jumps=15 L).
+
+### Critic cbt r1: findings -> checks (all four: check FAILs on a33ff1a5b and PASSes on a144edd8f; backtest row; precritic path; ledger row)
+| Finding | Fix | Check | Backtest |
+|---|---|---|---|
+| D1 S digits 10.2 pt | out of scope: size S dropped (owner) | — | — |
+| D2 worksheet row one number a line | worksheet card with a count-row train spans the grid row (screen-cell.css, additive) | ws-screen-slots TRAIN-FIT numbers a line (>= 3, 820 / 1280) | cbt-r1-d2-trainfit PASS |
+| D3 Warm-up cells 34-35 % bands | warm-up.js: in-place cells (k2kit, seqstrip, count-row, arrays) keep their measured height | ROW-STRETCH on ink + Warm-up cells | cbt-r1-d3-warmup PASS |
+| D4 Guided rows 1.33-1.6 x ink | guided.js: noStretch rows keep their measured height | ROW-STRETCH reads ink (not empty reserve blocks) | cbt-r1-d4-guided PASS |
+| D5 Mixed M 6 + 1 | mixed-practice.js: a lone last shelf re-laid evenly over the same pages | L-DENSITY LONE / PG-23 on the lane rows | cbt-r1-d5-mixed PASS |
+| D6 Reason It boxes 8-10 mm | reason-it.js: the stacked row wraps (wrapToCell, panel width) at the size's box width | SLOT-FIT (new) | cbt-r1-d6-slotfit PASS |
+| D7 Reason It CL40-INK | reason-it.js: count-row A/B block starts below --ws-koin | L-OVERLAP on reason-it (lane rows) | cbt-r1-d7-cl40 PASS |
+| D8 chart row 13 pt, 60 % width | chart.js: chartWide panel width 1 column; 15 jumps in two lines; `chartMaxStates` 2 (byOption times / jumps) with per-panel row heights | CHART-WIDTH (new) | cbt-r1-d8-chart PASS |
+| D9 jumps=15 L sheet half empty, lone row | byOption jumps 15: guidedRows 1 (one sheet page, Practice page kept) | L-DENSITY on the lesson --opts jumps 15 | cbt-r1-d9-jumps15 PASS |
+| D10 card 390 | out of scope: 390 not a host (owner) | — | — |
+| m1 title from options | print-sheet retitleByDealt (practice and role sheets) | TITLE-ROWS (new) | cbt-r1-m1-title PASS |
+| m2 Warm-up shapes mixed | warm-up refs shape: box | SHAPE-ONE (new) | cbt-r1-m2-shape PASS |
+| m3 "number in the box" | "the number in the arrow" (contract, provider steps, generator, lesson concept) | BOX-WORD (new) | cbt-r1-m3-wording PASS |
+| m4 Review 8 x 100, 80 x 7 | print-sheet EARLIER_STEPS: count_by_tables reviews number_seq_fill | REVIEW-LADDER (new) | cbt-r1-m4-review PASS |
+| npr worksheet digit 26.5 px (lf-hosts) | r4b worksheet :has(.k2-countrow-wrap) digit CSS | SCREEN-DIGIT (worksheet) | ss-npr-ws-digit PASS (fdfddfdd2 FAIL) |
+New print-lint opt-in rules are on the lane's precritic path (opt-in-rules.json lf-ops-props: rowstretch rows now lint reason-it and
+L-DENSITY / L-OVERLAP too); ws-precritic-plan OK.
+
+### Part B (as far as reached)
+| Item | State | Check | Backtest |
+|---|---|---|---|
+| arrays_groups landscape (owner) | built 149d7cb4a: the smaller factor sets the rows; mult_properties items hash-identical (38b862a502e1) | ARRAY-ORIENT (ws-screen-slots, same id as -divarray) | ss-array-orient-ag PASS (203a4052 FAIL) |
+| ruling (b') boundary re-deal | built e95fca804 (print-sheet evenMixedRows); independent / test / mixed swaps seen | ROW-MIXED (print-lint opt-in) | pl-row-mixed-props-m PASS (85c694896 FAIL) |
+| Guided mixed Model rows (mult_properties S/L, arrays_groups M/L) | NOT fixed: the Model + tries row mixes classes on the Guided page | ROW-STRETCH (ink) reports them | — |
+| Lesson Practice fill (practiceShapes extended) | NOT committed (scratchpad B-multdiv.patch): untested | — | — |
+| EB-FOOT forms:3 | NOT reached; the count_by_tables review EB-FOOT 8 is the same class on legacy partner cells (= master) | EB-FOOT | — |
