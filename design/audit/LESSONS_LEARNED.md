@@ -459,3 +459,20 @@ white on any other role.
 - **Check:** PC-H13 / PC-LR6 (existing, on precritic); backtest `lesson-check-h13-trade` (round S). **Tool:** the check's
   layout is on `buildSheet().lesson.prereqLayout` (units, rows, h0, cap, h, natW, need) for the next dump.
 
+
+### lf-engine PC r3 fix (2026-11-13, builder): the screen squeezes, the PDF does not
+- **What the critic found that no gate saw:** F2 / F3 - a fixed grid row shorter than its cells' natural height. On screen
+  (and under `emulateMediaType('print')`) the flex cell squeezes to the row and reports no overflow; Chrome's PDF lays the
+  cell out at its natural height and paints it over the band's bottom rule (sub L sheet Independent 68.7 mm in 64.8 mm; sub S
+  check "15 - 6" 40.1 in 37.0). Causes: an Independent row sized from the pool's own measure while it draws the Guided frame
+  (LR-17b `indepFrame`), and a routed check row laid 3 across but measured only at 1 / 2 / 4 columns.
+- **Rule:** a planned row is never below the drawn height of what it holds; measure every column count the planner lays.
+- **Check:** PC-FRAME reads each fixed `.ws-grid` row against its cells' natural height (the grid's height freed, read,
+  restored) on every page, pupil and key; PC-CLIP reads ink (each band's grid ink above its "If missed" tag). Backtests
+  `lesson-frame-closure`, `lesson-check-clip-ink`.
+- **F1 (answer given away):** a pv cell's place heads and its words dealt "ones tens" - read the item as the pupil does.
+  PC-PV: no heads on a routed check; the word nearest the underlined digit not always wrong. Backtest `lesson-check-pv-heads`.
+- **F4 (LR-5 only with the switch on):** a re-dealt sheet is a new avoid set. PC-LR5 (placed items, 8 seeds, forced on).
+  A number bond "2 + 2" has no fact key: the sheet's texts go in as a soft avoid too.
+- **Speed:** `ws-lesson-check --force-check` exists now but is red on 194 findings (chart vs practice LR-1 / LR-5, LR-13) -
+  not wired into precritic; the four PC rules ride the precritic lesson-samples step.

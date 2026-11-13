@@ -14,6 +14,27 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p4 / key-p5 | Practice |
 | pupil-p5 / key-p6 | Mixed |
 
+## This pass (lf-engine PC r3 fix, 2026-11-13; critic r3 F1-F4 - the check pages, the sub sheet and the deal; check-on only)
+- **F1** routed check place cells ("circle the place of the underlined digit", sub Q1-3, round): no T O heads (they named the
+  answer) and the words in the number's place order, tens before ones, one row under the number (`prepare()`). Gate PC-PV.
+- **F2** a routed check also measures its items at 3 columns (`measureCols(ctx.routed)`): rows laid 3 across were sized from
+  the 4-column measure - sub S "15 - 6" cells drew 38-40 mm in a 37.6 mm row and hid their tag. Gates PC-CLIP on ink (each
+  band's grid ink above its tag, every tag drawn) and PC-FRAME.
+- **F3** sub sheet Independent row at least a Guided cell's measured height (LR-17b `indepFrame`: same heads, exchange row and
+  boxes) - it was 64.8 mm for 68.7 mm cells and the PDF drew them past the band's bottom rule. Gate PC-FRAME (every page, pupil
+  and key: no fixed grid row shorter than its cells' natural height - the screen squeezes, the PDF does not).
+- **F4** with the check on the sheet re-deals; its fact keys (hard) and texts (soft) are avoided by Practice and the Mixed
+  partners: no "50 - 36" twice. Gate PC-LR5 (placed sheet items vs Practice / Mixed, 8 seeds).
+- **F5 not changed here**: the add L Mixed 52 % band is on the live packet too (`ws-lesson-samples --check` without
+  --force-check) - the live-fix builder owns it, with F6 / F7. PC-H13P (new, Practice and Mixed) lists them.
+- Live packets: `ws-lesson-baseline --all-lessons` 1,556 hashes identical.
+
+## Known open (`ws-lesson-samples --check --force-check`, 8 seeds)
+- PC-H13P (live pages, owned by the live-fix branch): add L Mixed 52 % (F5), add S Practice 30 %, round L / S Practice 49 % (F7).
+  F6 (dead hundreds carry box) is the live-fix builder's too.
+- PC-H13 add S lesson sheet foot 9 % (F8, as on master).
+- F13 (near-twin numbers in a check question: 77 / 27 / 71) not changed: `itemNumberKey` still drops exact repeats only.
+
 ## What changed since r2 (7744c2b4)
 - **One-page check (lead ruling A, LR-17a (2))**: after the N2 floor the check ran to two pages at L (all three) and at S
   (add). Now a question that is not two-choice may print ONE item when two do not fit; two-choice questions (compare,
@@ -46,15 +67,14 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 - Gate: `ws-lesson-samples --check --force-check` PC-H13 0 on every check page (L and S, 8 seeds), every PC-* PASS but
   the two sheet feet below; live packets 0 differences (`ws-lesson-baseline --all-lessons`, 1,556 hashes).
 
-## Known open (`ws-lesson-samples --check --force-check`)
+## Known open at r3 (`ws-lesson-samples --check --force-check`)
 - Lesson sheet feet add S 9 %, sub S 11 % (pupil-p3; the sheet with the check on has no Warm-up). As on master; not
   closed by a small change: the sheet's spare goes only to its Independent band (cap 10 %); letting its bands grow as on
   a page with no Independent rows (tried, gated to a live check) cleared both feet (3.5 %) but grew the top-started
   We Do / fact cells (growth lands under the item, CL-4b) to 29 % (add) and 33 % (sub We Do cell 2) - a new H13. Closing
   it needs those cells centred in a grown row (the routed check's `mq-lprectr` move) - a lesson-sheet change for the
   sheet's own lane.
-- Seen, not changed (as at a09c60f3a): sub S check Q6-8 ("15 - 6" fact cells) draw 2 mm taller than their row (ink 36.1 in
-  a 35.9 mm cell) and the band's teacher tag is not visible under them; PC-CLIP / PC-H13 do not flag it.
+- (closed in the r3 fix: sub S check Q6-8 fact cells taller than their row - F2.)
 
 ## r2 side by side
 `git show 7744c2b4:design/lesson-samples/<packet>/pupil-p1.png > /tmp/r2-p1.png` (same for any page / `S/`), or

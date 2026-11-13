@@ -981,3 +981,14 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | page-wide LR-6 (27 under two questions) | PC-LR6 (existing) | - | yes | 0.5 |
 | Lost time: first baseline `--write` given a directory (EISDIR after 11 min); `--seeds 4242,1` parses as 4242 content seeds (killed). Fix: both flags documented in the brief template - `--write <file>.json`, `--seeds N` is a COUNT | | | | |
 
+
+## lf-engine PC r3 fix (2026-11-13, builder, budget ~$22)
+| Finding | Check that would have caught it | Backtest | On precritic | Rounds lost |
+|---|---|---|---|---|
+| F1 pv heads + "ones tens" order give the answer | PC-PV (new) | lesson-check-pv-heads (FAIL 316102081 / PASS 88f20e544) | yes (lesson-samples step) | 1 |
+| F2 fact cells taller than their row, tag hidden (3-across row measured at 4 columns) | PC-CLIP on ink + PC-FRAME (new) | lesson-check-clip-ink | yes | 2 (seen at a09c60f3a, not gated) |
+| F3 Independent band cut at the body foot in the PDF only | PC-FRAME (natural height of a fixed row) | lesson-frame-closure | yes | 2 (D10 / D19 recur) |
+| F4 "50 - 36" on sheet and Practice with the check on | PC-LR5 (new, placed items, forced on) | lesson-lr5-forced | yes | 1 |
+| F5 / F7 Practice / Mixed H13 (live pages) | PC-H13P (new; red on master's live packet too) | - (no pass state on this branch) | yes | 1 |
+| Lost time: the first DOM frame check passed - the defect exists only in the PDF. Fix: read the natural height of a fixed row (one evaluate), not the screen box | | | | |
+| Lost time: a second baseline `--write` started while the first (not run through the browser runner) was still alive; both wrote the same file. Rule: every browser run goes through /tmp/mq-browser-run.sh, and one background job per gate | | | | |

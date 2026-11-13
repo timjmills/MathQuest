@@ -984,7 +984,7 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, H13, H13P, CLIP, FRAME, PV, PAGES)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
