@@ -5528,6 +5528,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+{
+ "id": "c120-role-hidden",
+ "check": "an option value a signed card hides on a role (chartwindow §7a: grid rows / whole on lesson, guided, test) is never dealt there: the role's page with the value is byte-identical to its page with the default (lead ruling 2026-11-13; the whole chart overflowed lesson 18/24, guided 8-12, and printed one a page on the test)",
+ "kind": "commit-pair",
+ "rule": "ws-role-hidden ROLE-HIDDEN (card role-scoped hidden decisions)",
+ "browser": true,
+ "fail": {
+  "commit": "e1389d1f3",
+  "state": "grid=rows / whole drawn on lesson, guided, test of hundreds_chart_fill and chart_to_120"
+ },
+ "pass": {
+  "commit": "25e62c6d6",
+  "state": "skill-options hiddenOnRoles + print-sheet optsForRole: the roles fall back to the window"
+ },
+ "command": "node tests/scripts/ws-role-hidden.cjs --skills composing:hundreds_chart_fill,composing:chart_to_120",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
  }
+},
+{
+ "id": "c120-text-misc",
+ "check": "a misconception a card re-scopes to TEXT (chartwindow M-C1 'writes-ten-ten', textOnly) reaches the screen practice card and Reason It's statements in words within 16 seeds, and no chart square ever holds more digits than its window's widest number (lead ruling 2026-11-13: re-scoped, not dropped)",
+ "kind": "commit-pair",
+ "rule": "ws-text-misconception REACH-SCREEN / REACH-TEXT / SQUARE",
+ "browser": true,
+ "fail": {
+  "commit": "e1389d1f3",
+  "state": "writes-ten-ten taught nowhere (dropped from the square with no text form)"
+ },
+ "pass": {
+  "commit": "25e62c6d6",
+  "state": "provider wrongText + Reason It text pairs + screen distractorTags; squares unchanged"
+ },
+ "command": "node tests/scripts/ws-text-misconception.cjs --skills composing:chart_to_120",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+}
 ]
 }
