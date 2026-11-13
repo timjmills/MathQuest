@@ -36,7 +36,8 @@ export function prepare(it, info = {}) {
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
     // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
-    const place = answerPlace('ri-ans', correct, it);
+    const place0 = answerPlace('ri-ans', correct, it);
+    const place = place0.kind === 'list' && !place0.words ? { kind: 'none', slots: {}, parts: null } : place0;
     const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right }, place.slots), `${right}: ${correct}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
@@ -62,11 +63,16 @@ export function prepare(it, info = {}) {
         + `<div class="mq-abresp"${wide ? ` style="grid-column:2;grid-row:1 / 3;justify-content:flex-start"` : ' style="justify-content:flex-start"'}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
-        + (place.kind === 'none' || place.words ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
+        + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
         + `</div>`
         // a unit-form answer ("[2] hundreds [9] tens [7] ones") is wider than the response column: its frame is a full-width
         // row under A and B (in the column it wrapped to three lines and cost the page an item at S: ws-capacity-pin 4 -> 3)
-        + (place.words ? `<div class="mq-frame" style="grid-column:1 / -1;padding-left:2mm">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}</div>` : '')
+        // every LIST frame too (critic r3 D1 / D5: in the 56 mm column a 5-part list wrapped a blank a line and "Rule: subtract __
+        // each time" ran out of the cell, costing the page an item); the row wraps at the cell's full width
+        // a unit form keeps its frame, full width under A and B; a LIST (pattern terms, table outputs) prints none: the panel the
+        // pupil names in "__ is correct." already holds every part, so the frame only made them copy it (H16) and, at 5-6 parts,
+        // cost the page an item or ran out of the cell (critic r3 D1 / D2 / D5; PT-TOF-4 extended to Reason It lists)
+        + (place.kind === 'list' && place.words ? `<div class="mq-frame" style="grid-column:1 / -1;padding-left:2mm">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}</div>` : '')
         + `</div>`;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,

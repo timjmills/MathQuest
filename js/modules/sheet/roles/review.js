@@ -125,9 +125,16 @@ function reviewTitle(input, topic) {
     const h0 = input.header || {};
     if (h0.title === false) return '';
     if (typeof h0.title === 'string' && h0.title.trim()) return h0.title.trim();
-    const t = `Review: ${topic}`;
-    // decided at L, the widest title, so every size prints the SAME title (critic r2 N5, PT-FRM-6: L said "Review", S / M the topic)
-    return typeof input.titleLinesOf === 'function' && input.titleLinesOf(t, 'L') > 1 ? 'Review' : t;
+    // decided at L, the widest title, so every size prints the SAME title (critic r2 N5, PT-FRM-6); a topic too long for one line
+    // is shortened at a phrase break ("of", "in", "with", "to", "from", "for") until it fits, never dropped (critic r3 D4)
+    const fits = (t) => typeof input.titleLinesOf !== 'function' || input.titleLinesOf(t, 'L') <= 1;
+    let tp = topic;
+    while (!fits(`Review: ${tp}`)) {
+        const m = /^(.*\S)\s+(?:of|in|with|to|from|for|on|by)\s+.*$/.exec(tp);
+        if (!m || m[1] === tp) break;
+        tp = m[1];
+    }
+    return fits(`Review: ${tp}`) ? `Review: ${tp}` : 'Review';
 }
 
 function geometry(pools, input) {

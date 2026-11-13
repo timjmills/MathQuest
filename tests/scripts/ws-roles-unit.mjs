@@ -53,6 +53,7 @@ const PLANT = {
     list: { ans: '12, 15, 18', wrong: '12, 15, 19' },
     // LIST-HOMOGENEOUS: a count row's missing terms + its rule (number_patterns_rule; critic r2 N1)
     rule: { ans: '13, 15, 17, 2', wrong: '13, 15, 18, 2', payload: { ruleBox: { pre: 'Rule: add', post: 'each time', value: '2' } } },
+    rule2: { ans: '4, 2', wrong: '5, 2', payload: { ruleBox: { pre: 'Rule: divide by', post: '', value: '2' } } },
     one: { ans: '42', wrong: '48' },
     // control: a unit form is written on its line (placevalue:unit_form, a passed skill) - it starts with a digit
     unit: { ans: '2 hundreds 1 ten 1 one', wrong: '1 hundred 2 tens 1 one' },
@@ -104,8 +105,10 @@ if (on('KEYJOIN-ROLE')) {
             if (id === 'unit' && role !== 'error-analysis' && slots.filter((s) => /^[12]$/.test(s.text.trim())).length !== 3) findings.push(`${tag}: a unit form answer is not written a number a line (its words printed after each)`);
             if (id === 'unit' && role !== 'error-analysis' && /\bten\b|\bone\b|\bhundred\b/.test(html.replace(/<[^>]+>/g, ' ').replace(/2 hundreds 1 ten 1 one|1 hundred 2 tens 1 one/g, ''))) findings.push(`${tag}: a frame word is singular - it gives the value away (FIX-WORDS)`);
             if (id === 'unit' && role !== 'error-analysis' && slots.some((s) => /[A-Za-z]{3}/.test(s.text))) findings.push(`${tag}: a unit form's words written into a slot`);
-            if (id === 'list' && role !== 'error-analysis' && slots.filter((s) => /^1[258]$/.test(s.text.trim())).length !== 3) findings.push(`${tag}: the list answer is not written one part a box`);
-            if (id === 'rule' && role !== 'error-analysis' && !/Rule: add <span[^>]*data-ws-slot="(?:tf|ri)-ans-3"[^>]*>2<\/span> each time/.test(html)) findings.push(`${tag}: the rule part of a list is not named "Rule: add [ ] each time" (LIST-HOMOGENEOUS)`);
+            if (id === 'list' && role === 'true-false' && slots.filter((s) => /^1[258]$/.test(s.text.trim())).length !== 3) findings.push(`${tag}: the list answer is not written one part a box`);
+            if (id === 'rule' && role === 'true-false' && !/Rule: add <span[^>]*data-ws-slot="(?:tf|ri)-ans-3"[^>]*>2<\/span> each time/.test(html)) findings.push(`${tag}: the rule part of a list is not named "Rule: add [ ] each time" (LIST-HOMOGENEOUS)`);
+            if (id === 'rule2' && role === 'true-false' && !/Rule: divide by <span[^>]*data-ws-slot="(?:tf|ri)-ans-1"/.test(html)) findings.push(`${tag}: a two-part answer's rule is not named (critic r3 D3)`);
+            if (/^(list|rule|rule2)$/.test(id) && role === 'reason-it' && /data-ws-slot="ri-ans/.test(html)) findings.push(`${tag}: a Reason It list answer printed an answer frame (the named panel holds it; critic r3 D1/D2/D5)`);
             if (id === 'proseopts' && role === 'error-analysis' && !/data-ws-slot="ea-pick-\d"/.test(html)) findings.push(`${tag}: a sentence answer with choices is not fixed by checking the right one`);
             if (id === 'prose' && role === 'true-false' && /class="mq-frame/.test(html)) findings.push(`${tag}: a sentence answer printed a frame row (PT-TOF-4)`);
         } catch (e) { findings.push(`${tag}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
@@ -165,14 +168,15 @@ if (on('REVIEW-MIXED')) {
     const main = [0, 1, 2, 3, 4, 5].map(() => Object.assign(itemOf('one'), { pool: 'main' }));
     const earlier = [0, 1, 2, 3].map(() => Object.assign(itemOf('one'), { pool: 'earlier' }));
     try {
-        const pl = RV.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t) => (t.length > 40 ? 2 : 1) });
+        const pl = RV.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t) => (t.length > 50 ? 2 : 1) });
         const t = pageText(pl);
         if (!/Mixed Review/.test(t)) findings.push('REVIEW-MIXED: the Review lost its Mixed Review band under a title that wraps');
-        if (/Review: drawing/.test(t)) findings.push('REVIEW-MIXED: a title that wraps was printed (want the fixed "Review")');
+        if (/Review: drawing and counting the next term of/.test(t)) findings.push('REVIEW-MIXED: a title that wraps was printed');
+        if (!/Review: drawing and counting the next term/.test(t)) findings.push('REVIEW-MIXED: the topic was dropped (want it shortened at a phrase break, critic r3 D4)');
         // N5: the title is decided at L for every size (a title that wraps at L is "Review" at S too)
         checks++;
-        const plS = RV.plan({ ctx: { size: 'S' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t2, z) => ((z || 'S') === 'L' && t2.length > 40 ? 2 : 1) });
-        if (/Review: drawing/.test(pageText(plS))) findings.push('REVIEW-MIXED: S printed the topic title that L cannot hold (one title at every size, PT-FRM-6)');
+        const plS = RV.plan({ ctx: { size: 'S' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t2, z) => ((z || 'S') === 'L' && t2.length > 50 ? 2 : 1) });
+        if (/next term of a growing/.test(pageText(plS))) findings.push('REVIEW-MIXED: S printed the long topic title that L cannot hold (one title at every size, PT-FRM-6)');
     } catch (e) { findings.push(`REVIEW-MIXED: ERROR ${String(e && e.message || e).slice(0, 120)}`); }
 }
 

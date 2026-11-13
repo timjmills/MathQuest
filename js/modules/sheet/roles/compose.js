@@ -362,7 +362,7 @@ export function answerPlace(id, correct, it = null) {
     // terms ("13, 15, 17, 19, 21, 2") - names that part with the item's own words ("Rule: add [ ] each time."), never a sixth
     // unlabelled blank
     const rb = it && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.ruleBox;
-    const tail = rb && parts.length >= 3 && String(rb.value) === parts[parts.length - 1] ? { pre: String(rb.pre || 'Rule:'), post: String(rb.post || '') } : null;
+    const tail = rb && parts.length >= 2 && String(rb.value) === parts[parts.length - 1] ? { pre: String(rb.pre || 'Rule:'), post: String(rb.post || '') } : null;
     return { kind: 'list', slots, parts, digits: parts.map(width), tail };
 }
 
@@ -375,7 +375,7 @@ export function answerPlaceHtml(place, id, ctx, key) {
     if (place.tail) {
         const k = n - 1;
         const terms = place.parts.slice(0, k).map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${i < k - 1 ? ',' : '.'}</span>`).join('');
-        return terms + `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:1mm;white-space:nowrap;margin-left:2mm">${esc(place.tail.pre)} ${writeLine(`${id}-${k}`, ctx, key, place.digits[k])}${place.tail.post ? ` ${esc(place.tail.post)}` : ''}.</span>`;
+        return terms + `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:1mm;white-space:nowrap;margin-left:2mm;max-width:100%">${esc(place.tail.pre)} ${writeLine(`${id}-${k}`, ctx, key, place.digits[k])}${place.tail.post ? ` ${esc(place.tail.post)}` : ''}.</span>`;
     }
     const after = (i) => (place.words ? `<span style="margin-left:1mm">${esc(place.words[i])}${i < n - 1 ? '' : '.'}</span>` : (i < n - 1 ? ',' : '.'));
     return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap${place.words ? ';margin-right:1.5mm' : ''}">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${after(i)}</span>`).join('');
