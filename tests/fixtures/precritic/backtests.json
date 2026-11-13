@@ -5684,6 +5684,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-exgroup-fill",
+  "check": "placevalue:compare with grouped examples (--anchors sections) at L: the page holds no empty strip of 20 % under its blocks (compare r2 coverage single/ex-group L PAGEFILL: r2's whole example strip, 1.8 mm shorter a block, left 48 mm / 21 % under three blocks)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-DENSITY PAGEFILL (ws-coverage-matrix single/ex-group --red-no-baseline PAGEFILL)",
+  "browser": true,
+  "fail": {
+   "commit": "023cafca",
+   "state": "ex-group L page 1: a 48 mm strip (21 %) under three example blocks of 1 x 3 compare rows at 24.6 mm"
+  },
+  "pass": {
+   "commit": "f0e27e94",
+   "state": "the block rows share the spare (28.8 mm, spreadMax x the shortest problem): PAGEFILL 0 at S / M / L"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --anchors sections --skills placevalue:compare --lints L-DENSITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
