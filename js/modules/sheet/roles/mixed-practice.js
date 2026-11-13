@@ -65,7 +65,7 @@ const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ?
  * fewer problems a page than a larger one). The Daily lattice is 8 / 6 / 4 at S / M / L, and a shelf takes the widest divisor
  * of it up to 6 that its cells fit - so at S a fact shelf took 4 across (8's divisor) where M took 6, and S printed 20 facts to
  * M's 30. The page now also tries the lattice of each larger size AT THIS SIZE (this size's cells, this size's heights: nothing
- * is drawn below this size's metrics) and keeps the one that prints the most problems on no more pages (its own on a tie).
+ * is drawn below this size's metrics) and keeps the one that prints the most problems on its one page (its own on a tie).
  * Every shelf of a page still shares one lattice. A lattice the caller fixed (`latticeN`), and a lesson's Mixed page (its
  * step strip, fill and lead rules are sized on the size's own lattice), keep it.
  */
@@ -80,7 +80,10 @@ function packing(poolsIn, input) {
         const N = AUTO_N[ctx.look][sz];
         if (N === best.N) continue;
         const p = packingAt(poolsIn, input, N);
-        if (p.pages <= best.pages && totalOf(p) > totalOf(best)) best = p;
+        // (one-page sheets only: there the packing's budget is the plan's page; a sheet that runs on - anchors, a spilled
+        // start - is paginated by the plan with a strip on every continued skill, which the packing's page count does not
+        // model, so a wider lattice there added a page: sub_50 M 20 on 2 pages became 21 on 3)
+        if (best.pages === 1 && p.pages === 1 && totalOf(p) > totalOf(best)) best = p;
     }
     return best;
 }
