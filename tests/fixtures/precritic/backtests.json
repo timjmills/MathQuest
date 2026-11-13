@@ -7041,6 +7041,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "partopts-fu1-packet",
+  "check": "critic-panel-r3 FU-1: after a size round trip M -> L -> M the preview's packet agrees with the screen: its lesson-practice and lesson-mixed page counts equal the Practice and Mixed steppers' 'n pages', and the tabs are the pupil pages + 1 for the keys (fact_family_sort every Practice count M offers; Y4.B1.S14 Practice 75 / Mixed 42)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots A4-F2 packetCheck (Print screen, by clicks)",
+  "browser": true,
+  "fail": {
+   "commit": "219e8d90",
+   "state": "fact_family_sort Practice 27 / 36 / 45 at M -> L -> M: the stepper says 3 / 4 / 5 pages, the packet has 1; Y4.B1.S14 Mixed 42: the stepper says 2 pages, the packet has 1"
+  },
+  "pass": {
+   "commit": "75361fd9",
+   "state": "the re-snap that changed partOpts builds again: every packet equals its steppers"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only A4-F2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-fu1-resnap-build",
+  "check": "critic-panel-r3 FU-1: teacher-print.js's re-snap of s.partOpts after a build schedules a build when it changes the counts (guarded by a before / after compare, so no loop)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 resnap builds",
+  "browser": false,
+  "fail": {
+   "commit": "219e8d90",
+   "state": "the re-snap redraws the Parts table and schedules NO build"
+  },
+  "pass": {
+   "commit": "75361fd9",
+   "state": "const resnapped = JSON.stringify(r.partOpts) !== JSON.stringify(s.partOpts); if (resnapped) scheduleBuild()"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only FU-1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
