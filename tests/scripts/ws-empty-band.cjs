@@ -258,9 +258,9 @@ function measureCells(scope, slotInk = true) {
             const inner = { t: cr.top + parseFloat(cs.paddingTop) + parseFloat(cs.borderTopWidth), b: cr.bottom - parseFloat(cs.paddingBottom) - parseFloat(cs.borderBottomWidth), l: cr.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r: cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth) };
             let box = null; const runs = [];
             const inks = [];   // each ink box's top/bottom (for EB-SUPBAND: the gap under the support drawing)
-            const take = (r) => { if (!r.width || !r.height) return; runs.push([r.top, r.bottom]); inks.push({ t: r.top, b: r.bottom }); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
+            const take = (r) => { if (!r.width || !r.height) return; runs.push([r.top, r.bottom]); inks.push({ t: r.top, b: r.bottom, l: r.left, r: r.right }); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
             // the support array drawing (÷ frame or × array): its bottom edge, so EB-SUPBAND can read the band below IT (D4)
-            const supSvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg, .ws-support svg')].find((v) => /rows of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+            const supSvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg, .ws-support svg')].find((v) => /rows? of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
             for (const d of c.querySelectorAll('*')) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab') || !visible(d)) continue;
                 const st = getComputedStyle(d);
@@ -290,7 +290,11 @@ function measureCells(scope, slotInk = true) {
             let supBelow = null;
             if (supSvg) {
                 const sr = supSvg.getBoundingClientRect();
-                if (sr.height > 0) {
+                // (r2: a support BESIDE ink that runs lower - the fact beside the × band frame - has no empty band under it: the
+                // strip under the frame holds the fact's lower rows, and the band under the cell's LAST ink is EB-BAND's)
+                const beside = inks.some((r) => r.t < sr.bottom - 1 && r.b > sr.bottom + 1 && (r.r <= sr.left + 1 || r.l >= sr.right - 1));
+                if (sr.height > 0 && beside) supBelow = 0;
+                else if (sr.height > 0) {
                     const below = inks.filter((r) => r.t >= sr.bottom - 1);
                     const nextTop = below.length ? Math.min(...below.map((r) => r.t)) : inner.b;
                     supBelow = Math.max(Math.min(nextTop, inner.b) - sr.bottom, 0);

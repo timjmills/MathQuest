@@ -6,8 +6,9 @@
 //   node tests/scripts/ws-capacity-pin.cjs --check [--pin file] [--skills a:b,..] [--roles r,..] [--test-eq-ind]
 //   SIZE-ORDER-OPT (critic divarray r1 D3): the pin's `sizeOrderOpts` option pages are measured at S/M/L; an option page
 //     whose cells measure smaller at S must fit MORE at S (strict S > L), never the same page at every size.
-//   --test-eq-ind (critic divarray r1 Q1, OFF by default pending the lead's ruling): the pin's `testEqOpts` option pages'
-//     Test count must equal their Independent count on each support (TEST-EQ-IND; live for div_facts in the role code).
+//   TEST-EQ-IND (critic divarray r1 Q1; lead ruling 2026-11-13: Test count = Independent count extends to mult_facts, so it
+//     runs by DEFAULT for the fact family): the pin's `testEqOpts` option pages' Test count equals their Independent count on
+//     each support. --no-test-eq-ind turns it off (--test-eq-ind is still accepted).
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: the shared thinking /
 //   practice roles; sizes S,M,L; seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
@@ -39,10 +40,10 @@ const ALLOW = new Set(list(arg('allow', '')));
     // SIZE-ORDER on option pages (critic divarray r1 D3): the ruled option pages were left out of SIZE-ORDER, so
     // mult_facts {support:array} printed the same count at S / M / L unnoticed. Each is measured at S/M/L and judged.
     const sizeOrderOpts = (has('check') ? (pinJson.sizeOrderOpts || []) : []);
-    // TEST-EQ-IND (critic divarray r1 Q1, pending the lead's ruling): a fact skill's Test count follows its Independent
-    // count on each support. OFF unless --test-eq-ind (it is live for div_facts in the role code; this generalises the
-    // MEASURE to mult_facts behind a flag).
-    const testEqOpts = (has('check') && has('test-eq-ind') ? (pinJson.testEqOpts || []) : []);
+    // TEST-EQ-IND (critic divarray r1 Q1; lead ruling 2026-11-13): a fact skill's Test count follows its Independent count on
+    // each support - div_facts (2026-11-09) and mult_facts. ON by default; --no-test-eq-ind turns it off.
+    const testEqOn = has('check') && !has('no-test-eq-ind');
+    const testEqOpts = (testEqOn ? (pinJson.testEqOpts || []) : []);
     const onlyFilter = list(arg('skills', ''));
     const inFilter = (sk) => !onlyFilter.length || onlyFilter.includes(sk);
     const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
@@ -136,9 +137,9 @@ const ALLOW = new Set(list(arg('allow', '')));
         if (z.S !== undefined && z.L !== undefined && z.S <= z.L) order.push(`${g}: S ${z.S} not greater than L ${z.L} items - the option page is the same at every size (SIZE-ORDER-OPT, D3)`);
     }
     drops.push(...order);
-    // TEST-EQ-IND (critic divarray r1 Q1; OFF unless --test-eq-ind, pending the lead's ruling): a fact skill's Test count
-    // follows its Independent count on each support (live for div_facts in the role code; this measures it for mult_facts too).
-    if (has('test-eq-ind')) {
+    // TEST-EQ-IND (critic divarray r1 Q1; lead ruling 2026-11-13, on by default): a fact skill's Test count follows its
+    // Independent count on each support (div_facts and mult_facts).
+    if (testEqOn) {
         const indBy = {}, testBy = {};
         for (const [k, v] of Object.entries(now)) {
             if (!v.optProbe || !v.eq || v.na) continue;

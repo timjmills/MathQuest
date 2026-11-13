@@ -212,7 +212,11 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
         // mult_facts (facts card §5.10, lead ruling C 2026-11-13): always landscape too - the SMALLER factor is the rows, the
         // larger across (7 x 3 and 3 x 7 are both 3 rows of 7); the caption names what is drawn and the fact it supports.
         const cols = div ? (b ? a / b : 0) : Math.max(a, b), rows = div ? b : Math.min(a, b);
-        if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
+        // (lead ruling 2026-11-13, critic divarray r1 D1 / D4: ONE frame per band for × arrays too - the band's largest smaller
+        // factor's rows by its largest larger factor's columns - so every cell has one geometry and a × 0 fact draws the band's
+        // EMPTY frame, the same box its neighbours draw, never a lone slot-like box)
+        const rowsWord = (n) => `${n} ${n === 1 ? 'row' : 'rows'}`;
+        if (p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
             const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = Number(p.frame.pitch) || 2.6, r = pitch * 0.377, pad = 0.8;   // (r: 0.98 mm at the old 2.6 pitch)
             // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
             const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
@@ -221,7 +225,8 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
             let body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
             const some = Number.isInteger(cols) && cols > 0 && rows > 0;
             if (some) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2 + (fc > 5 ? gap(x) : 0), pad + y * pitch + pitch / 2 + (fr > 5 ? gap(y) : 0), r, false);
-            return wrap(w, h, body, some ? `array, ${rows} rows of ${cols}` : 'no dots');
+            if (!div) return wrap(w, h, body, `${rowsWord(some ? rows : 0)} of ${Math.max(a, b)}, for ${a} × ${b}`);
+            return wrap(w, h, body, some ? `array, ${rowsWord(rows)} of ${cols}` : 'no dots');
         }
         // A × fact with a zero factor (4 × 0, 0 × n) draws the empty landscape frame as 0 ÷ n does (lead ruling 2026-11-13):
         // one row tall, as wide as the larger factor's dots (a five-group at least) - no dots, the support still in its place.
@@ -239,7 +244,7 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
         const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
         let body = '';
         for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(0.5 + x * pitch + pitch / 2 + (cols > 5 ? gap(x) : 0), 0.5 + y * pitch + pitch / 2 + (rows > 5 ? gap(y) : 0), r, false);
-        return wrap(span(cols) + 1, span(rows) + 1, body, `${rows} rows of ${cols}${div ? '' : `, for ${a} × ${b}`}`);
+        return wrap(span(cols) + 1, span(rows) + 1, body, `${rowsWord(rows)} of ${cols}${div ? '' : `, for ${a} × ${b}`}`);
     }
     if (kind === 'think') {
         // (critic r2 R2-4: "= 108" ran over the 36 mm box's border and the box touched the "x". The box is

@@ -4264,7 +4264,7 @@
   },
   {
    "id": "supband-below-support-multfacts-array",
-   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item, in Test cells and on the screen worksheet/card/quiz - an unframed x array in a cell sized for a 10-12-row one leaves 36-44% empty below it (critic divarray r1 D4)",
+   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item, in Test cells and on the screen worksheet/card/quiz - an unframed x array in a cell sized for a 10-12-row one leaves 36-44% empty below it (critic divarray r1 D4) (the scripted model's own tall step cells are the page-types lane's, facts card ruling 2026-10-31, so the row runs the practice, test, review and teaching roles; a support BESIDE taller ink - the fact beside the x band frame - has no band under it)",
    "kind": "commit-pair",
    "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
    "browser": true,
@@ -4276,7 +4276,7 @@
     "commit": "TBD-divarray-r2",
     "state": "0 findings: the x array gets a band frame (or the rows size to the items)"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --roles independent,more-practice,test,review,guided,opener,error-analysis --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

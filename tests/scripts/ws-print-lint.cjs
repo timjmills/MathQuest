@@ -1585,7 +1585,7 @@ function wsLintPage(cfg) {
                     // SUPPORT-NOT-SLOT (critic divarray r1 D1): the cell's array support drawing (÷ frame or × array), whether
                     // it is a closed box (a <rect>), its dot count and drawn size; and the cell's graded answer slot box.
                     supArr: (() => {
-                        const asvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg')].find(v => /rows of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+                        const asvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg')].find(v => /rows? of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
                         if (!asvg) return null;
                         const br = asvg.getBoundingClientRect();
                         return { framed: !!asvg.querySelector('rect'), dots: asvg.querySelectorAll('circle').length, wMm: mm(br.width), hMm: mm(br.height) };

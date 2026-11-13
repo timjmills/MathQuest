@@ -57,6 +57,26 @@
    }
   },
   {
+   "skill": "multiplication:mult_facts",
+   "opts": {
+    "support": [
+     "skip"
+    ]
+   }
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "opts": {
+    "support": [
+     "boxsign"
+    ]
+   }
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "opts": {}
+  },
+  {
    "skill": "division:div_facts",
    "opts": {
     "support": [
@@ -2661,8 +2681,8 @@
  },
  "ruled": {
   "multiplication:mult_facts review S {\"support\":[\"touch\"]}": {
-   "items": 15,
-   "reason": "RE-PIN 16 -> 15: lead ruling 2026-11-13: master's 16 relied on defective 32 % side bands (3-column Mixed Review stacks); 10 facts + 5 stacks (lf-ops-divarray, status note in design/status/lf-ops-divarray.md)"
+   "items": 16,
+   "reason": "master's 16, restored (lead ruling 2026-11-13, critic divarray r1 D2: the 16 -> 15 re-pin is withdrawn; the Review lays 4 x 3 facts + 4 stacks band-free, review.js geometry)"
   },
   "multiplication:mult_facts review S {\"support\":[\"array\"]}": {
    "items": 13,

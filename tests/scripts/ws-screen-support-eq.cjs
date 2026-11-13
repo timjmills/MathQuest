@@ -22,8 +22,8 @@
 //                        (±40 %), and a frame drawn on only some cells of a band (the × zero frame, the lone framed support)
 //                        is a finding - on paper and on every screen host. ARRAY-CAPTION also fails "1 rows" for one row.
 //   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
-//                        with a zero factor (4 × 0, 0 × n) the short empty landscape frame, as 0 ÷ n does (no dots, at
-//                        most half as tall as wide) - never nothing, so no row is sized round an absent array.
+//                        with a zero factor (4 × 0, 0 × n) the band's EMPTY frame, as 0 ÷ n does (no dots, never portrait;
+//                        r2 ruling: one frame per band, so it is the frame its neighbours draw) - never nothing.
 // ARRAY-ORIENT, ARRAY-DOT-MIN and ARRAY-CAPTION judge every dot array a support draws: the ÷ framed array and the × array.
 //
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
@@ -57,7 +57,7 @@ function eqFinding(id, paper, screen, item) {
     if (pk !== sk) return `${id}: screen draws "${sk}", paper "${pk}"`;
     if (screen && screen.kind === 'frame-array' && item) {
         // (owner 2026-11-13: landscape - the divisor's rows of the quotient's dots)
-        const want = item.a === 0 ? 'no dots' : `array, ${item.b} rows of ${item.a / item.b}`;
+        const want = item.a === 0 ? 'no dots' : `array, ${item.b} ${item.b === 1 ? 'row' : 'rows'} of ${item.a / item.b}`;
         if (screen.label !== want) return `${id}: ${item.a} ÷ ${item.b} array "${screen.label}", want "${want}"`;
     }
     return null;
@@ -83,12 +83,13 @@ function dotFinding(id, paperRatio, screenRatio) {
 /** CAPTION: the caption's rows x cols against the drawn grid; a × fact's array is min rows of max and names the fact. */
 function captionFinding(id, arr, item) {
     if (!arr || !item) return null;
-    const m = /(\d+) rows of (\d+)/.exec(arr.label || '');
+    const m = /(\d+) rows? of (\d+)/.exec(arr.label || '');
     if (!m) return arr.dots ? `${id}: ${item.a} ${item.op} ${item.b} array caption "${arr.label}" names no rows` : null;
     const R = Number(m[1]), C = Number(m[2]);
     if (arr.dots && (R !== arr.rows || C !== arr.cols)) return `${id}: caption "${arr.label}" but ${arr.rows} rows of ${arr.cols} drawn`;
     if (item.op === '×') {
-        const want = `${Math.min(item.a, item.b)} rows of ${Math.max(item.a, item.b)}, for ${item.a} × ${item.b}`;
+        const lo = Math.min(item.a, item.b);
+        const want = `${lo} ${lo === 1 ? 'row' : 'rows'} of ${Math.max(item.a, item.b)}, for ${item.a} × ${item.b}`;
         if (Math.min(item.a, item.b) > 0 && arr.label !== want) return `${id}: ${item.a} × ${item.b} caption "${arr.label}", want "${want}" (the smaller factor's rows, the fact named)`;
     }
     // (critic divarray r1 N1) a one-row array reads out "1 rows of n"; the caption is spoken, so a single row is "1 row of n"
@@ -120,7 +121,9 @@ function frameFinding(id, sup, item) {
     if (!arr) return `${id}: ${item.a} ${item.op} ${item.b} draws no array or frame`;
     if (item.op === '×' && (item.a === 0 || item.b === 0)) {
         if (arr.dots) return `${id}: ${item.a} × ${item.b} frame holds ${arr.dots} dots (want the empty frame)`;
-        if (!(arr.hPx > 0 && arr.hPx <= arr.wPx / 2 + 0.5)) return `${id}: ${item.a} × ${item.b} frame ${arr.wPx.toFixed(0)} x ${arr.hPx.toFixed(0)} px is not a short landscape frame`;
+        // (lead ruling 2026-11-13, r2: a × 0 fact draws its BAND's empty frame - the frame its neighbours draw, landscape or
+        // square - not a short strip of its own; SUPPORT-NOT-SLOT's band rule checks it matches the band)
+        if (!(arr.hPx > 0 && arr.hPx <= arr.wPx + 0.5)) return `${id}: ${item.a} × ${item.b} frame ${arr.wPx.toFixed(0)} x ${arr.hPx.toFixed(0)} px is portrait (want the band's landscape frame)`;
     }
     return null;
 }
@@ -157,7 +160,10 @@ function selfTest() {
     eq('place mixed (D4)', !!placeFinding('touch', ['under', 'beside', 'beside']), true);
     eq('frame missing × 0', !!frameFinding('array', {}, { a: 4, b: 0, op: '×' }), true);
     eq('frame empty short × 0', frameFinding('array', { arr: { dots: 0, wPx: 60, hPx: 12 } }, { a: 4, b: 0, op: '×' }), null);
-    eq('frame tall × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('frame band square × 0 (r2: the 12 x 12 band frame)', frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), null);
+    eq('frame portrait × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 20, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('frame dots × 0', !!frameFinding('array', { arr: { dots: 3, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('caption 1 row ok (N1)', captionFinding('array', { label: '1 row of 7, for 7 × 1', rows: 1, cols: 7, dots: 7 }, { a: 7, b: 1, op: '×' }), null);
     eq('frame other support', frameFinding('touch', {}, { a: 4, b: 0, op: '×' }), null);
     eq('place one', placeFinding('touch', ['beside', 'beside', null]), null);
     // caption grammar (N1): one row is "1 row", not "1 rows"
@@ -205,7 +211,7 @@ function readCellsInPage({ sel, cellSel }) {
             let sig = { kind: 'other' };
             if (tally) sig = { kind: 'tally', n: Number(tally.getAttribute('data-ws-tally')) };
             else if (skip) sig = { kind: 'skip', n: skip.querySelectorAll('[data-ws-term]').length };
-            else if (svg && /^(array, \d+ rows of \d+|no dots)$/.test(svg.getAttribute('aria-label') || '') && svg.firstElementChild && svg.firstElementChild.tagName.toLowerCase() === 'rect') {
+            else if (svg && /^(array, \d+ rows? of \d+|no dots)$/.test(svg.getAttribute('aria-label') || '') && svg.firstElementChild && svg.firstElementChild.tagName.toLowerCase() === 'rect') {
                 const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
                 const br = svg.getBoundingClientRect(), k = br.width / (vb[2] || 1);
                 const c0 = svg.querySelector('circle');
@@ -233,7 +239,7 @@ function readCellsInPage({ sel, cellSel }) {
             }
             // any dot array (÷ frame or × array): its drawn box, dot, caption and the dots' distinct rows / columns
             let arr = null;
-            const asvg = [...s.querySelectorAll('svg')].find((v) => /rows of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+            const asvg = [...s.querySelectorAll('svg')].find((v) => /rows? of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
             if (asvg) {
                 const vb = (asvg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
                 const br = asvg.getBoundingClientRect(), k = br.width / (vb[2] || 1);

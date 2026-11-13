@@ -137,7 +137,7 @@ function reviewTitle(input, topic) {
     return fits(`Review: ${tp}`) ? `Review: ${tp}` : 'Review';
 }
 
-function geometry(pools, input) {
+function geometryAt(pools, input, mainCols = 0) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
     const earlier = pools.earlier || [];
@@ -154,7 +154,7 @@ function geometry(pools, input) {
     // A wrapped instruction takes its extra line off the page too.
     const wrap = stripExtraMm(ctx, '', instructionText(instructionKeyOf(main, input.skills), main))
         + (earlier.length ? stripExtraMm(ctx, 'Mixed Review:', instructionText(instructionKeyOf(earlier, input.skills), earlier)) : 0);
-    const M = sectionFit(main, ctx);
+    const M = mainCols ? { cols: mainCols, h: hMinAt(main, mainCols, ctx) } : sectionFit(main, ctx);
     const E = sectionFit(earlier, ctx);
     const ceil = CEILING[ctx.size];
     // The earlier band may print fewer columns than it could, so a WHOLE row of it keeps the share
@@ -257,8 +257,32 @@ function geometry(pools, input) {
     }
     const kb = mainAt(best.mRows).bands;
     const avail = availOf(kb);
-    return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
+    return { n: best.n, cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
         rows: best.mRows + best.eRows + (best.eWide || 0), avail, h: M.h, eh: best.eh, ehw: best.ehw || 0, ctx, strip: m.strip, kindBands: kb };
+}
+
+/**
+ * The Review's geometry. lf-ops divarray r2 (critic r1 D2; lead ruling 2026-11-13: mult_facts Review S with touch prints 16):
+ * a band of SUPPORTED × facts at S may take another column count than its own best rate when that prints MORE problems on
+ * the page with the Mixed Review band (touch: 5 x 2 facts + 5 stacks = 15 left a 30 % strip under the grid; 4 x 3 + 4 = 16
+ * fills it). An equal count keeps the band's own columns; every other Review is as before.
+ */
+function geometry(pools, input) {
+    const g = geometryAt(pools, input);
+    const ctx = g.ctx;
+    const main = pools.main || [];
+    const xFacts = ctx.size === 'S' && (pools.earlier || []).length > 0 && main.length > 0
+        && main.every((it) => it && it.template === 'fact' && it.supportsBox && it.supportsBox.plan && /^(\*|×|x)$/.test(String(((it.q && it.q.cell && it.q.cell.payload) || {}).op || '')));
+    if (!xFacts) return g;
+    let best = g;
+    for (const c of [5, 4, 3]) {
+        if (c === g.cols || !fitsAt(main, c, ctx)) continue;
+        const h = hMinAt(main, c, ctx);
+        if (!(Number.isFinite(h) && h > 0)) continue;
+        const alt = geometryAt(pools, input, c);
+        if (alt.n > best.n) best = alt;
+    }
+    return best;
 }
 
 /** Enough of each pool that the plan can fill its bands with whole rows of each kind. */
