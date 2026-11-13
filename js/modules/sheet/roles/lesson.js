@@ -117,15 +117,28 @@ export function counts(pools, input) {
 /* =========================================================================== the extras */
 
 /**
+ * The lesson data the chart and the We Do band read. A skill with NO lesson data (the fallback lesson) whose example
+ * draws wider than half the page (footprint maxCols 1, or wMm past 93 mm: a row of ten, the whole number chart) takes
+ * the full-width chart rows of `chartWide`, as an authored lesson would (lf-builds chart_120 fix, ws-cell-checks
+ * OVERFLOW on lesson {band: 10} / {grid: rows} / {grid: whole}: a 170 mm row of ten was drawn in a 92 mm panel and beside
+ * the Steps). Authored lesson data decides chartWide itself and is returned unchanged.
+ */
+function chartDataOf(data, example) {
+    if (data || !example) return data;
+    const fp = example.footprint || {};
+    return fp.maxCols === 1 || Number(fp.wMm) > 93 ? { chartWide: true, chartRow: false } : data;
+}
+
+/**
  * The blocks the host measures before the plan (compose.js protocol): the anchor chart's panels
  * and drawings, the vocabulary match, the Steps zone and the practice pages' step strip. The
  * example is chosen here and again in `plan` by the same deterministic rule.
  */
 export function extras(input = {}) {
     const lesson = input.lesson || {};
-    const data = lesson.data || null;
     const main = poolItems(input, 'main');
-    const ex = pickExample(main, data);
+    const ex = pickExample(main, lesson.data || null);
+    const data = chartDataOf(lesson.data || null, ex);
     // (a bar story with the lesson's own chart steps: the Steps zone and strip name those steps)
     const steps = ex ? (data && Array.isArray(data.chartSteps) && isWordBar(ex) ? chartStepsOf(ex, data) : workedStepsOf(ex)) : [];
     const out = [];
@@ -183,9 +196,10 @@ function partPlan(def, input) {
 function planOnce(input = {}) {
     const ctx = ctxOf(input);
     const lesson = input.lesson || {};
-    const data = lesson.data || null;
+    const data0 = lesson.data || null;
     const main = poolItems(input, 'main');
-    const example = pickExample(main, data);
+    const example = pickExample(main, data0);
+    const data = chartDataOf(data0, example);
     const exSteps = example ? workedStepsOf(example) : [];
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const extrasList = input.extras || [];
@@ -311,7 +325,7 @@ function planOnce(input = {}) {
             // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
             exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],
-            notes: data ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
+            notes: data0 ? [] : ['No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.'],
         },
     });
     // The anchor chart page is no pupil page: the teaching sheet's first page carries the full

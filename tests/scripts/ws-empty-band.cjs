@@ -138,13 +138,13 @@ if (argv.includes('--self-test')) {
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases)`);
-    process.exit(bad.length ? 1 : 0);
+    if (bad.length) { console.log(`ws-empty-band self-test: FAIL (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases)`); process.exit(1); }
+    // (the centred EB-BAND cases run below, once the limits are defined)
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
-if (!SKILLS.length || SKILLS.some((s) => !s.includes(':'))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+if (!argv.includes('--self-test') && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
 const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
@@ -157,6 +157,16 @@ const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.
 const BAND = 0.30 - MARGIN, SIDE = 0.30 - MARGIN, FOOT = 0.10, MIN_MM = 10, EDGE_MM = 1.5;
 // the roles that lay their grid out from the items' measured footprints (buildSheet items[i].measured[cols].hMm)
 const GRID_ROLES = new Set(['independent', 'more-practice', 'test', 'review', 'mixed-practice']);
+if (argv.includes('--self-test')) {   // centred cells (lf-builds chart_120 fix): white above + under counts as one band; 23 % passes, 45 % fails, as top-aligned
+        const cell = (centreMm, belowMm) => ({ page: 1, cell: 1, hMm: 76.5, belowMm, centreMm, sideMm: 0, innerW: 86, edgeMm: 5, tmpl: 'chartwindow' });
+        const run = (c) => { const got = []; judge([c], 't', (rule) => got.push(rule), 'independent'); return got.includes('EB-BAND'); };
+        const cc = [['centred 8.7 + 8.7 mm of 76.5 (23 %)', run(cell(8.7, 8.7)), false], ['centred 17 + 17 mm of 76.5 (44 %)', run(cell(17, 17)), true],
+            ['top-aligned 25 mm under of 76.5 (33 %)', run(cell(0, 25)), true]];
+        const cbad = cc.filter(([, got, want]) => got !== want);
+        for (const [n, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${n} should ${want ? 'fail' : 'pass'}`);
+        console.log(`ws-empty-band self-test: ${cbad.length ? 'FAIL' : 'OK'} (EB-GDPCAP, 6 PT-MOD-3, 6 EB-GAP, ${cc.length} EB-BAND centred cases)`);
+        process.exit(cbad.length ? 1 : 0);
+    }
 
 /** The render plan of a skill from its signed card (lf-ops' ws-card-plan.mjs), or the default roles. */
 function planOf(key) {
@@ -202,9 +212,27 @@ function measureCells(scope) {
             const side = Math.max(box.l - inner.l, inner.r - box.r, 0);
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
+            // EB-FOOT's "top pad + ink": a cell that CENTRES its content (justify-content center: chartwindow, clock, number
+            // line ...) in a row the page stretched holds equal white above and below its flow; that white above is the row's
+            // stretch, not the drawing, so it comes off the needed height (lf-builds chart_120 fix: a 59 mm chart window in a
+            // 76.5 mm row read "drawn 67.5 mm vs footprint 59.1" at M). Only when the flow's top and bottom slack match within
+            // 1 mm: a top-aligned cell, or a centred cell whose content outgrew its footprint, is measured as before.
+            let centreMm = 0;
+            if (/center/.test(cs.justifyContent) && /column/.test(cs.flexDirection)) {
+                let ft = Infinity, fb = -Infinity;
+                for (const k of c.children) {
+                    if (k.matches('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab') || !visible(k)) continue;
+                    const ks = getComputedStyle(k);
+                    if (ks.position === 'absolute' || ks.position === 'fixed') continue;
+                    const kr = k.getBoundingClientRect();
+                    ft = Math.min(ft, kr.top - (parseFloat(ks.marginTop) || 0)); fb = Math.max(fb, kr.bottom + (parseFloat(ks.marginBottom) || 0));
+                }
+                const top = ft - inner.t, bot = inner.b - fb;
+                if (Number.isFinite(top) && top > 0 && bot > 0 && Math.abs(top - bot) < MM) centreMm = top;
+            }
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1), edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
+                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b) - centreMm) / MM).toFixed(1), centreMm: +(centreMm / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
                 step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
         });
     });
@@ -301,7 +329,10 @@ function measureVocab(scope) {
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
         const lim = BAND * c.hMm;
-        if (c.belowMm >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.belowMm} mm under the ink of a ${c.hMm} mm cell (${(c.belowMm / c.hMm * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
+        // (a centred cell's white is split above and below its ink: both halves count, as one band would under a top-aligned
+        // cell - the same 30 % holds whichever way the template aligns; lf-builds chart_120 fix, with EB-FOOT's centring)
+        const white = +((c.belowMm || 0) + (c.centreMm || 0)).toFixed(1);
+        if (white >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${white} mm ${c.centreMm ? `around (${c.centreMm} mm above, ${c.belowMm} mm under)` : 'under'} the ink of a ${c.hMm} mm cell (${(white / c.hMm * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
         if (Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.sideMm} mm beside the ink of a ${c.wMm} mm wide cell (${Math.round(c.sideMm / c.innerW * 100)} %) [${c.tmpl}]`);
     });
