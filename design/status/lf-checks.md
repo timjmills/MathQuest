@@ -319,6 +319,7 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 13. LP-RASTER (rasterise the PDF, page overrun) on ROLE pages (lf-roles, 11-13): lf-algebra's F3 (a Scripted Model overruns the page by 6 mm) shows only in the printed PDF; screen and emulated print are clean. Fail case: patterns:number_patterns_rule scripted-model L at 47b1f2a86. Backtest it. After (i)-(iii).
 14. (low) ws-screen-ink-size SIZE-REF (lf-vocab, 11-13): the paper reference is an Independent M seed-7 page that may never deal the word the screen host dealt, so 4 vocab words (distributive, equal groups, pattern, set 4's hundred chart) read as false SIZE-REF. Build the reference page for the SAME word/item the host dealt; backtest.
 15. ws-screen-ink-size SIZE-WIDTH false positives (lead, 11-13): 9 term drawings on the growing-shape-patterns worksheet at 1280. A one-dot-wide column is taller than wide BY THE MATHS. For shape-pattern / array term drawings, judge the unit size (dot / square mm, screen vs print), not the bounding width. Backtest: a real too-small pattern FAILs; the current growing worksheet PASSes.
+16. G9 (lf-algebra critic r2, lead 11-13): growing-pattern QUIZ labels at about 8.6 pt, below the floor. Fix it in the quiz host, and add a label-size rule to the screen ink-size gate. Backtest.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
@@ -370,3 +371,19 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - What holds: r5's D1/D2/m1; the index pairing is stated honestly; 28 of 31 rows pass.
   - Lead plan for a FAIL unrelated to the pairing: port m1 (data-eb-item plus index pairing) to master's tool as a narrow deploy for
     lf-ops.
+- eb-r6 fix round (builder, Opus medium, 11-13; commits 2e947661, 10a53821, 255dfe95 + this note):
+  - D1: a SCREEN slot's WIDTH is ink only where it draws a dark (< 225) top or bottom line (an underline or a closed box: its whole
+    width) or a dark left / right edge (that edge). Otherwise it is ONE written digit (0.6 x its font size) at the slot's text start,
+    by its computed text-align on the content box (an input writes at its start by default; centre / end when so aligned). The
+    vertical rule is unchanged. Fixtures wide-slot-faint / wide-slot-invisible (the critic's q5 / q6): OK on 8dc176e6's tool, FAIL
+    EB-SIDE 61 % now; rows eb-fixture-wide-slot-faint / -invisible (pass side screen-side.pass.html); case 'EB-SIDE (slot width)'.
+  - m1: footFindings names its mode in a note whenever it is not a fully judged index page ('position' fallback, by order or by
+    height; '' not paired; 'index' with N cells not judged). 6 new self-test cases (21 in all).
+  - m2: FOCUS-GAP also judges text above and below the ring that overlaps it horizontally, measured to the GLYPH INK (canvas metrics,
+    calibrated against pixels in `--focus-gap-self-test`, 10 cases + 3 calibrations). To the text box instead, --focus-gap-all read
+    21 false touches (column digits, area-model headers: 9-11 px of paper in fact). The critic's "another line" probe is now a
+    finding: the wrapped line's ascenders sit under the ring (screenshot).
+  - m3: the 4 rows of backtests-empty-band.json are still PENDING (no fix commits). Their fail sides, re-run with today's tool via
+    MQ_ROOT: vocab bebf5b36 FAIL 4, pv value b28a0867 FAIL 12, pv unit_form b28a0867 FAIL 16, div_facts b23e418d FAIL (361, --no-baseline, all roles).
+  - Gates: self-tests OK; precritic-plan OK (136); ws-screen-answer OK; --focus-gap-all OK; ws-phone-card OK (12/12); boot-smoke OK;
+    the facts pin OK (no count rose, no re-pin, no EB-FOOT mode note).
