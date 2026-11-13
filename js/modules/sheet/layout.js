@@ -957,10 +957,12 @@ export function inPlaceRows(infos, pc, c, budgetMm) {
     if (!Array.isArray(infos) || !infos.length || !infos.every((i) => i && i.fp && i.fp.inPlace)) return 0;
     const hs = (pc && pc.hs) || [];
     if (hs.length !== infos.length || hs.some((h) => !(h > 0))) return 0;
-    const desc = hs.slice().sort((a, b) => b - a);
+    // (+ 1 mm a row: the grid's frame and rules come out of its height, as measuredH counts them; + 1.2 mm the grid's own
+    // top and bottom border - counted without them, ten rows at S ran the body 2.6 mm over its foot)
+    const desc = hs.slice().sort((a, b) => b - a).map((h) => h + 1);
     if (desc[0] - desc[desc.length - 1] < 2) return 0;
-    const top = Math.max(desc[0], Number(pc.fH) || 0);
-    let sum = 0, nr = 0;
+    const top = Math.max(desc[0], (Number(pc.fH) || 0) + 1);
+    let sum = 1.2, nr = 0;
     for (let i = 0; i < desc.length; i += c) {
         if (sum + desc[i] > budgetMm) return nr;
         sum += desc[i]; nr++;
