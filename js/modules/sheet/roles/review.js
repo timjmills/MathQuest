@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, cellWidthMm, LIVE_W_MM } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
@@ -150,7 +150,14 @@ function geometry(pools, input) {
     // prints them one a row - "30 − 10 =" (62 mm) centred in a 185 mm cell left two 56 mm bands
     // (add_facts Review M, cells 10-12). One column stays for a pool of one problem (its only row).
     const oneColOk = E.cols < 2 || earlier.length < 2;
-    if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
+    // lf-ops r-review (RUBRIC H13 across the cell): an earlier step of STATIC-width problems (stacks) keeps its own columns
+    // when fewer would only widen the cell round the same ink - mult_facts array Review S took the mixed band from 4 to 3
+    // columns to fit a second row under the 45 % share, and every "47 - 6" stack sat in a 61.5 mm cell with a 19.7 mm
+    // empty band (32 %). A narrower column count stays open while the widest problem still fills 70 % of the cell.
+    const eStatic = earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
+    const eWMax = eStatic ? Math.max(...earlier.map((it) => it.footprint.wMm)) : 0;
+    const widens = (c) => eStatic && c < E.cols && eWMax < 0.7 * cellWidthMm(c, LIVE_W_MM, ctx.look).inner;
+    if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) if (!widens(c)) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
     // What mr rows of the skill's own problems ARE: the bands allocate() prints (one per item
     // kind, whole rows), each row grouped by height and as tall as what it holds (H13). Heights
@@ -293,7 +300,10 @@ export function plan(input = {}) {
     // div_facts critic r5 R5-2 (RUBRIC H13 on ink): a band of div_facts facts grows to at most FACT_ROOM x its rows' own
     // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
     // div_facts only: the passed fact Reviews keep their rows.
-    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
+    // lf-ops r-review: a band of SUPPORTED facts (a mult_facts array / touch / skip page) is held the same way - its rows are
+    // as tall as their pictures, and a page's spare height stretched a 9 x 7 array's row round a 2 x 5 one (32 % under it).
+    const supportedFact = (it) => it.template === 'fact' && !!(it.supportsBox && it.supportsBox.plan);
+    const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && ((it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))) || supportedFact(it)));
     const cellsM = hsM.map((hs, gi) => (factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
     const cellM = cellsM[0] || hM;
     const cellE = cellOf(hsE, hE);
