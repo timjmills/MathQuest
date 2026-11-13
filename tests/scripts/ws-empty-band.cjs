@@ -61,8 +61,8 @@
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
 //             its size: 10 / 8 / 6 at S / M / L, plus the Model(s) (lead ruling 2026-11-12, lf-ops facts-roles option b: the fact
 //             pages had lifted it to 31 / 23 / 19 to fill the page). Read from buildSheet's plan.meta.scoreOutOf. --self-test checks it.
-//   EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1) a one-page Guided page under its tries ceiling with at least one drawn
-//             row of tries (the grid's last row) white under its grid: the fit must count rows at the height they are drawn.
+//   EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1) a one-page Guided page whose next whole row of tries keeps it within
+//             its tries ceiling, with at least one drawn row (the grid's last) white under its grid: the fit counts rows as drawn.
 //   EB-EDGE   ink within EDGE_MM (1.5 mm) of, or across, the cell's own border (a cell divider or the page frame), on every
 //             row of every role and host (lf-ops facts-roles critic r1 G1: Guided S add / sub facts, the hinted row 1's dot tiles
 //             ran onto the divider and the fifth cell's tile across the frame; EB-SIDE reads the band beside the ink, never a
@@ -823,7 +823,9 @@ async function main() {
                             const row = cells.filter((c) => Math.abs(c.getBoundingClientRect().top - lastTop) < 0.5).map((c) => c.getBoundingClientRect().height);
                             return { spare: (body.getBoundingClientRect().bottom - gr.bottom) / mm, row: Math.max(...row) / mm };
                         }, 'body > section.ws-page, body > .ws-page');
-                        if (rf && rf.spare >= rf.row) F('EB-REFILL', `${key} ${j.tag}`, `${rf.spare.toFixed(1)} mm white under the grid holds another ${rf.row.toFixed(1)} mm row of tries, but the page prints ${b.tries} of the ${GDP_CAP[j.size]} the ceiling allows (the fit counted rows taller than they are drawn)`);
+                        // (a row adds `cols` tries: only a page the next whole row keeps within the ceiling can be refilled - a 4-column fact
+                        // page at 5 of 6 is trimmed to whole rows, not under-filled)
+                        if (rf && rf.spare >= rf.row && b.tries + Math.max(1, Number(b.cols) || 1) <= GDP_CAP[j.size]) F('EB-REFILL', `${key} ${j.tag}`, `${rf.spare.toFixed(1)} mm white under the grid holds another ${rf.row.toFixed(1)} mm row of tries, but the page prints ${b.tries} of the ${GDP_CAP[j.size]} the ceiling allows (the fit counted rows taller than they are drawn)`);
                     }
                     // (Guided is exempt from EB-PAGE: lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1 - white under its grid is accepted)
                     if (has('page-fill') && j.role !== 'guided') {
