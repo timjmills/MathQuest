@@ -98,7 +98,9 @@ async function keyInPage({ cat, skill, seed }) {
     const html = K.renderCell(q, { mode: 'print', size: 'M', look: 'ican', state: 'answered' });
     const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
     const txt = (el) => (el ? el.textContent.replace(/\s+/g, '') : '');
-    const parts = K.wordWorkGradedParts ? K.wordWorkGradedParts(p) : [];
+    // the graded parts beyond the answer are read off the PAPER KEY's graded slots (never off the screen code under test)
+    const ks = (K.cellAnswerKey(q) || {}).slots || {};
+    const parts = ['equation', 'es-r'].filter((id) => ks[id] && ks[id].graded !== false);
     const key = { answer: String(q.ans), parts, layout: p.layout || 'columns' };
     const g = doc.querySelector('[data-ws-slot="equation"]');
     if (parts.includes('equation')) {
@@ -195,16 +197,31 @@ async function main() {
                     for (const r of responsesFor(key)) {
                         cases++;
                         await page.evaluate((cat, skill, seed) => {
+                            for (const id of window.__wsGradeTimers || []) clearTimeout(id);
+                            window.__wsGradeTimers = [];
                             const st = window.state; st.hasAnswered = false; st.currentQAttempts = 0;
-                            st.currentQ = window.__wsGrade[`${cat}:${skill}:${seed}`];
+                            // a fresh copy each case: a wrong case climbs the support ladder on the item it was given
+                            st.currentQ = JSON.parse(JSON.stringify(window.__wsGrade[`${cat}:${skill}:${seed}`]));
                             window.renderQuestion();
                         }, cat, skill, seed);
+                        await page.evaluate(() => {
+                            if (window.__wsGradeTimerHook) return;
+                            window.__wsGradeTimerHook = true; window.__wsGradeTimers = [];
+                            const st = window.setTimeout;
+                            window.setTimeout = function (...a) { const id = st.apply(this, a); window.__wsGradeTimers.push(id); return id; };
+                        });
                         await sleep(60);
                         const t = await page.evaluate(typeInPage, { sel: '#visualAid', answer: r.answer, parts: r.parts });
+                        await sleep(80);
                         if (t.error) { findings.push(`${s} seed ${seed} card ${r.kase}: ${t.error}`); continue; }
                         const screen = await page.evaluate(() => {
                             if (!window.state.hasAnswered) window.submitAnswer();
+                            // the card's own late timers (the move to the next item after a right answer) are cleared, so they
+                            // never redraw the card under the next case (the auto-check on a right part started them at typing)
+                            for (const id of window.__wsGradeTimers || []) clearTimeout(id);
+                            window.__wsGradeTimers = [];
                             const f = document.getElementById('feedbackArea');
+                            if (f && /mq-ladder-feedback/.test(f.className)) return false;   // a calm wrong answer: the ladder's rung
                             // right: the feedback says so; wrong: the attempt is recorded (a calm wrong answer climbs the support
                             // ladder with its own message, never the "incorrect" class)
                             return f && /\bcorrect\b/.test(f.className) ? true : (window.state.currentQAttempts > 0 || (f && /\bincorrect\b/.test(f.className))) ? false : null;
@@ -262,7 +279,8 @@ async function main() {
                         const html = K.renderCell(q, { mode: 'print', size: 'M', look: 'ican', state: 'answered' });
                         const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
                         const txt = (el) => (el ? el.textContent.replace(/\s+/g, '') : '');
-                        const parts = K.wordWorkGradedParts(p);
+                        const ks = (K.cellAnswerKey(q) || {}).slots || {};
+                        const parts = ['equation', 'es-r'].filter((id) => ks[id] && ks[id].graded !== false);
                         const key = { answer: String(q.ans), parts };
                         const g = doc.querySelector('[data-ws-slot="equation"]');
                         if (g) { key.eqBoxes = ['fr0-a', 'op0', 'fr0-b', 'op1', 'fr1-b'].map((id) => txt(g.querySelector(`[data-ws-slot="${id}"]`))); key.brk = /^\(/.test(txt(g)); }
@@ -287,7 +305,7 @@ async function main() {
                     }
                 }
             }
-            summary.push(`${s}: ${n} item(s) x ${cases ? (cases / Math.max(1, n)).toFixed(1) : 0} case(s) on the card; graded parts: answer${[...parts].map((p) => `, ${p}`).join('')}`);
+            summary.push(`${s} - ${n} item(s) x ${cases ? (cases / Math.max(1, n)).toFixed(1) : 0} case(s) on the card; graded parts: answer${[...parts].map((p) => `, ${p}`).join('')}`);
             console.log(summary[summary.length - 1]);
         }
         if (app.problems.length) findings.push(`console: ${app.problems.slice(0, 3).map((p) => String(p.text).split('\n')[0]).join(' | ')}`);
