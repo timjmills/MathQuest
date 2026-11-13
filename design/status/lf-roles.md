@@ -17,6 +17,19 @@ Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
 
+## Round 4 (2026-11-13, lead +$40): fixes, checks first
+| Finding | Fix (commit) | Check |
+|---|---|---|
+| N10 ruling | PT-ERR-4: grey pupil work always under "<Name> wrote:" | ws-cell-checks PUPILTAG (default rule, self-test) |
+| N1 | count-row rule part named: "Answer: [ ], ... Rule: add [ ] each time." (3df2b556) | ws-roles-unit LIST-HOMOGENEOUS; backtest roles-list-rule-named |
+| R2 | sentence-answer True or False? at L: True/False boxes beside the statement; pf L 3 -> 4 (S 6, M 4 kept) (3df2b556) | counts tool (alg skills are not pinned: not on master) |
+| R5 | a True statement's key leaves the frame empty (PT-TOF-2); 75 passed-skill TF KEY pages change, pupil pages identical (3df2b556) | ws-roles-unit KEY-TRUE-BLANK; backtest roles-key-true-blank |
+| N5 | one Review title at every size, decided at L (3df2b556); passed-skill reviews unchanged | ws-roles-unit REVIEW-MIXED (S case) |
+| R10, R11 | Reason It: frames packed under the A/B ring; A/B block centred in a stretched cell; every passed skill's RI page changes (layout) | ws-empty-band EB-BAND 4 (master) -> 0; backtest roles-ri-band-passed |
+- Proof: ws-lesson-baseline --all-lessons L,S seeds 4242,1 vs master: 1556/1556 identical; ws-capacity-pin 0 drops; ws-roles-unit 63 OK.
+- Left for the next round: R4 (fte TF L 2 items), R13 (Pre-skill Check strips / page 2), R15 (EA judgement x), N2 (S = M capacity), N3
+  (EA bands unit_form S/M), N4 (Review totals < 8), N9 (fix-minimal), mult_facts Review supports side band (0b); critic r3.
+
 ## Critic r2 (2026-11-13, mq-opus-medium, 116 pages): FAIL - 14 role findings (4 new: R2, N1, N5, N6; 10 pre-existing)
 - FIXED and confirmed: R1, R3, R6-R8 (pf EA n/a by ruling), R9, R12 (closed by PT-MOD-5); unit_form Reason It S/M/L PASS 8/8/8/8 (was off
   the sheet); the 5 subtraction Model L 2 + 2 layout passes as a layout (C2 7 is the subtraction skill's missing step marks, lf-ops).
@@ -88,6 +101,7 @@ Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.
   the answer; on Reason It "__ is correct" names it); a list answer writes one line a part. Suggested: accept.
 
 ## Times
+Times: r4 (N10, N1, R2, R5, N5, R10, R11), start 2026-11-13T06:45Z, end 2026-11-13T08:10Z, profile lane session
 Times: r3 (ws-capacity-pin, unit-form RI row, PT-MOD-5, critic r2, master comparison), start 2026-11-13T05:25Z, end 2026-11-13T06:40Z, profile lane session
 Times: critic r2, start 2026-11-13T06:05Z, end 2026-11-13T06:13Z, profile mq-opus-medium
 Times: fix r2 + r2b (critic r1 findings, precritic triage), start 2026-11-13T03:45Z, end 2026-11-13T05:20Z, profile lane session
