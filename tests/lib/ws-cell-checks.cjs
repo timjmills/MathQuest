@@ -177,9 +177,31 @@ function cellChecksInPage(opts) {
             var tg = c.querySelector('.mq-pupiltag');
             var sib = tg && tg.parentElement ? [].filter.call(tg.parentElement.children, function (e) { return e !== tg && e.getBoundingClientRect().height > 0; }) : [];
             if (tg && c.querySelector('.mq-pupil') && sib.length) {
-                var top = Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
-                var gap = top - tg.getBoundingClientRect().bottom;
-                if (gap > 8 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, 1.5-8 mm; critic r3 D6: 1 mm on the H T O heads read as one line)' });
+                // measured on INK (lead 2026-11-13, critic r4 n1): the top of the first text or drawing in the work, not its box (a
+                // stack's box starts with padding: the label floated 8 mm over the T O heads), from the label's text foot
+                var inkTop = Infinity;
+                // a text box's ink: its capitals (0.7 em) centred in the line box, not the line box's top (leading)
+                var capTop = function (node) {
+                    var o = [], tw = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+                    for (var n = tw.nextNode(); n; n = tw.nextNode()) {
+                        if (!n.nodeValue.trim() || !n.parentElement || n.parentElement.closest('.mq-pupiltag') || !shownEl(n.parentElement)) continue;
+                        var fs = parseFloat(getComputedStyle(n.parentElement).fontSize) || 0, rg = document.createRange();
+                        rg.selectNodeContents(n);
+                        [].forEach.call(rg.getClientRects(), function (r) { if (r.height > 0 && r.width > 0) o.push(r.top + Math.max(0, (r.height - 0.7 * fs) / 2)); });
+                    }
+                    return o;
+                };
+                sib.forEach(function (e) {
+                    capTop(e).forEach(function (t) { if (t < inkTop) inkTop = t; });
+                    e.querySelectorAll('svg, img, .ws-box, .ws-line, .ws-check').forEach(function (g) { var r = g.getBoundingClientRect(); if (r.height > 0 && shownEl(g) && r.top < inkTop) inkTop = r.top; });
+                });
+                var tfs = parseFloat(getComputedStyle(tg).fontSize) || 0;
+                // the label's foot: its baseline, about 0.2 em over the line box's bottom
+                var tagFoot = Math.max.apply(null, rectsOfText(tg).map(function (r) { return r.bottom - Math.max(0, (r.height - 0.7 * tfs) / 2); }).concat([tg.getBoundingClientRect().top]));
+                var top = isFinite(inkTop) ? inkTop : Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
+                // 2-4 mm (lead) with 0.5 mm for the cap-height estimate of the ink edge
+                var gap = top - tagFoot;
+                if (gap > 4.5 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
             }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {

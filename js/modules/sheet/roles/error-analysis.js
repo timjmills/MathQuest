@@ -47,6 +47,10 @@ export const ROLE_ID = 'error-analysis';
 // The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
 // white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
 const CENTRE = 'flex:0 0 auto;margin-top:auto;margin-bottom:auto';
+// The work's first element keeps no top margin (a stack's 5 mm): the "<Name> wrote:" label sits over the work's INK, not over an
+// empty margin (critic r4 n1, lead 2026-11-13: PUPILTAG measured on ink, 1.5-4 mm; the label floated 6-9 mm over stacks)
+const noLeadMargin = (html) => String(html).replace(/^(\s*<(?!svg)[a-z][a-z0-9]*\b)([^>]*)>/i, (m, tag, attrs) => (/\sstyle="/.test(attrs)
+    ? `${tag}${attrs.replace(/\sstyle="/, ' style="margin-top:0;')}>` : `${tag}${attrs} style="margin-top:0">`));
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
 // predates the ceiling; the standard is law for capacity).
 const CEILING = { S: 6, M: 4, L: 4 };
@@ -678,7 +682,7 @@ export function prepare(it, info = {}) {
         }
         // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
         // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
-        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ' style="top:auto;bottom:calc(100% + 2mm);left:0"'}>${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1 : 0.5}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
