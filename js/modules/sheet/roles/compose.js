@@ -66,8 +66,10 @@ export function topicOf(iCan) {
     const verbs = new Set(['add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
         'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'identify', 'sort']);
     if (!verbs.has(v) || GERUND_SKIP.has(v)) return t;
-    const ing = /e$/.test(v) && !/ee$/.test(v) ? `${v.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(v) && v.length <= 3 ? `${v}${v.slice(-1)}ing` : `${v}ing`;
-    return `${ing}${m[2]}`;
+    const gerund = (w) => (/e$/.test(w) && !/ee$/.test(w) ? `${w.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(w) && w.length <= 3 ? `${w}${w.slice(-1)}ing` : `${w}ing`);
+    // "draw and count the next term" -> "drawing and counting ...", never "drawing and count" (lf-roles, growing review)
+    const rest = m[2].replace(/^(\s+and\s+)([a-z]+)\b/i, (all, and, w) => (verbs.has(w.toLowerCase()) ? `${and}${gerund(w.toLowerCase())}` : all));
+    return `${gerund(v)}${rest}`;
 }
 
 /**
@@ -304,6 +306,79 @@ export function answerOf(it) {
     if (Array.isArray(q.ans) && q.ans.length && q.ans.every((v) => v !== null && typeof v !== 'object')) return q.ans.map(String).join(', ');
     if (k.value !== undefined && k.value !== null && typeof k.value !== 'object') return String(k.value);
     return '';
+}
+
+/**
+ * A SENTENCE answer ("The ones digits go 0, 2, 4, 6, 8.", "Every number is even."): three or more words. A role never
+ * writes one into a write line (PAGE_TYPES 6.1 "number blanks only"; ws-roles-unit KEYJOIN-ROLE, lf-roles 2026-11-13).
+ * It starts with a word: "8 R 5", "1 h 15 min", "2 hundreds 3 tens 5 ones" (a unit form, written on its line) or "Even"
+ * are not sentences.
+ */
+export const isProseAnswer = (v) => {
+    const s = String(v === undefined || v === null ? '' : v).trim();
+    return /^[A-Za-z]{2,}\b/.test(s) && (s.match(/[A-Za-z]{2,}/g) || []).length >= 3;
+};
+
+/**
+ * The parts of a several-value answer ("12, 15, 18" -> ['12', '15', '18']: a number pattern's terms, a function table's
+ * outputs), or null for one value or a sentence. A role writes them one part a box, never joined in one slot (RUBRIC H1,
+ * ws-cell-checks KEYJOIN / ws-roles-unit KEYJOIN-ROLE).
+ */
+export function answerListOf(v) {
+    const s = String(v === undefined || v === null ? '' : v).trim();
+    if (!/,\s/.test(s) || isProseAnswer(s)) return null;
+    const parts = s.split(/,\s+/).map((x) => x.trim());
+    return parts.length >= 2 && parts.every((x) => x && /\d/.test(x)) ? parts : null;
+}
+
+/**
+ * A role's answer frame place ("The answer is ____."): `kind` 'one' (one write line), 'list' (one line a part, joined by
+ * commas) or 'none' for a sentence (the frame row is left out; the judgement is the answer). `slots` are its key entries.
+ */
+// (inline, not in the engine stylesheet: the stylesheet travels on every page, and a page with no list stays byte-identical)
+export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list'
+    ? `mq-frame mq-framelist" style="flex-wrap:wrap;row-gap:3mm;white-space:normal${maxMm ? `;max-width:${maxMm}mm` : ''}` : 'mq-frame');
+export function answerPlace(id, correct, it = null) {
+    const width = (v) => Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2));
+    if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
+    const parts = answerListOf(correct);
+    // numbers joined by unit words ("2 hundreds 9 tens 7 ones"): a line a number, its word printed after it - one value a
+    // line (critic precritic r2: unit_form Reason It key wrote the whole unit form on one 2-digit line, off the cell)
+    const tok = String(correct).trim().split(/(\d[\d,.]*)/);
+    const nums = tok.filter((_, i) => i % 2 === 1);
+    const glue = tok.filter((_, i) => i % 2 === 0);
+    if (!parts && nums.length >= 2 && !glue[0].trim() && glue.slice(1).every((g) => /^\s*[A-Za-z]+(?:\s[A-Za-z]+)?\s*$/.test(g))) {
+        const slots = {};
+        nums.forEach((v, i) => { slots[`${id}-${i}`] = v; });
+        // the word printed after a line never tells its value: "1 ten" would give the 1 away (lf-placevalue G5, FIX-WORDS), so
+        // every unit word prints in its plural, the way the item prints its place names
+        const plural = (w) => w.split(' ').map((x, k, a) => (k === a.length - 1 && !/s$/i.test(x) ? `${x}s` : x)).join(' ');
+        return { kind: 'list', slots, parts: nums, digits: nums.map(width), words: glue.slice(1).map((g) => plural(g.trim())) };
+    }
+    if (!parts) return { kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) };
+    const slots = {};
+    parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
+    // LIST-HOMOGENEOUS (lf-roles critic r2 N1): a list whose LAST part is another kind - a count row's rule after its missing
+    // terms ("13, 15, 17, 19, 21, 2") - names that part with the item's own words ("Rule: add [ ] each time."), never a sixth
+    // unlabelled blank
+    const rb = it && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.ruleBox;
+    const tail = rb && parts.length >= 2 && String(rb.value) === parts[parts.length - 1] ? { pre: String(rb.pre || 'Rule:'), post: String(rb.post || '') } : null;
+    return { kind: 'list', slots, parts, digits: parts.map(width), tail };
+}
+
+/** The write line(s) of an `answerPlace` ('' for 'none'); a list carries its own closing full stop. */
+export function answerPlaceHtml(place, id, ctx, key) {
+    if (place.kind === 'none') return '';
+    if (place.kind === 'one') return writeLine(id, ctx, key, place.digits);
+    // a part and its comma never part; the list wraps under the frame's words in a narrow cell (.mq-framelist)
+    const n = place.parts.length;
+    if (place.tail) {
+        const k = n - 1;
+        const terms = place.parts.slice(0, k).map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${i < k - 1 ? ',' : '.'}</span>`).join('');
+        return terms + `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:1mm;white-space:nowrap;margin-left:2mm;max-width:100%">${esc(place.tail.pre)} ${writeLine(`${id}-${k}`, ctx, key, place.digits[k])}${place.tail.post ? ` ${esc(place.tail.post)}` : ''}.</span>`;
+    }
+    const after = (i) => (place.words ? `<span style="margin-left:1mm">${esc(place.words[i])}${i < n - 1 ? '' : '.'}</span>` : (i < n - 1 ? ',' : '.'));
+    return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap${place.words ? ';margin-right:1.5mm' : ''}">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${after(i)}</span>`).join('');
 }
 
 /**

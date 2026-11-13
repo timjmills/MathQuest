@@ -1,0 +1,673 @@
+ws-backtest row notation: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row l1-sizes: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row l3-key: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row l6-steps: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row l10-cycle: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row node-lint-keys: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row mc-production: PASS  fail state FAIL 1.3s, pass state OK 0.2s
+ws-backtest row baseline-night-keeps-red: PASS  fail state FAIL 1.8s, pass state OK 1.8s
+ws-backtest row lone-item: PASS  fail state FAIL 16.1s, pass state OK 6.7s
+ws-backtest row text-generator-wrm-page: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row text-generator-wrm-tagging: PASS  fail state FAIL 6.7s, pass state OK 6.9s
+ws-backtest row chromebook-viewport: PASS  fail state FAIL 81.0s, pass state OK 81.2s
+ws-backtest row repeats-lesson: PASS  fail state FAIL 8.7s, pass state OK 14.0s
+ws-backtest row sibling-compare-pilot: PASS  fail state FAIL 19.5s, pass state OK 18.3s
+ws-backtest row sibling-compare-unpinned-pilot: PASS  fail state FAIL 19.8s, pass state OK 16.6s
+ws-backtest row slot-clip-pilot: PASS  fail state FAIL 24.7s, pass state OK 25.0s
+ws-backtest row slot-clip-heads-pilot: PASS  fail state FAIL 11.9s, pass state OK 13.3s
+ws-backtest row phone-card-pilot: PASS  fail state FAIL 79.6s, pass state OK 78.6s
+ws-backtest row card-rulings-pilot: PASS  fail state FAIL 4.8s, pass state OK 4.4s
+ws-backtest row card-rulings-partial-pilot: PASS  fail state ERROR(2) 1.1s, pass state OK 1.9s
+ws-backtest row card-not-offered-pilot: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row s1-zero-case-content-audit: PASS  fail state FAIL 3.6s, pass state OK 3.9s
+ws-backtest row s1-dealer-uniform: PASS  fail state FAIL 3.8s, pass state OK 4.0s
+ws-backtest row s1-lesson-data: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row s1-option-help: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row s1-wrong-fits: PASS  fail state FAIL 0.5s, pass state OK 0.4s
+ws-backtest row s1-presets-obey: PASS  fail state FAIL 9.6s, pass state OK 10.0s
+ws-backtest row s1-presets-obey-seeded: PASS  fail state FAIL 11.3s, pass state OK 11.5s
+ws-backtest row options-render-pilot: PASS  fail state FAIL 55.7s, pass state OK 47.7s
+ws-backtest row card-gate-decisions: PASS  fail state FAIL 0.1s, pass state OK 0.1s
+ws-backtest row card-gate-rulings: PASS  fail state FAIL 0.1s, pass state OK 0.1s
+ws-backtest row ansarea-ty21-pilot: PASS  fail state FAIL 7.7s, pass state OK 7.6s
+ws-backtest row overlap-d7-pilot: PASS  fail state FAIL 8.0s, pass state OK 7.6s
+ws-backtest row overlap-n8-pilot: PASS  fail state FAIL 8.1s, pass state OK 7.6s
+ws-backtest row wrap-op-pilot: PASS  fail state FAIL 11.7s, pass state OK 12.2s
+ws-backtest row h13-lesson-warmup-pilot: PASS  fail state FAIL 11.8s, pass state OK 11.9s
+ws-backtest row d1-partner-attribution: PASS  fail state FAIL 0.0s, pass state OK 0.0s
+ws-backtest row d1-real-partner: PASS  fail state FAIL 0.0s, pass state OK 0.1s
+ws-backtest row d1-real-unattributed: PASS  fail state FAIL 0.0s, pass state OK 0.0s
+ws-backtest row e41-relation: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row arc-ink-laned: PASS  fail state FAIL 10.7s, pass state OK 10.5s
+ws-backtest row grid-even-probe-laned: PASS  fail state FAIL 7.0s, pass state OK 6.2s
+ws-backtest row grid-even-laned: PASS  fail state FAIL 8.7s, pass state OK 6.9s
+ws-backtest row frac-keepout-laned: PASS  fail state FAIL 7.0s, pass state OK 7.4s
+ws-backtest row screen-uniform-laned: PASS  fail state FAIL 6.1s, pass state OK 5.6s
+ws-backtest row section-overlap-lesson-warmup: PASS  fail state FAIL 8.2s, pass state OK 8.9s
+ws-backtest row detailed-link-every-use: PASS  fail state FAIL 192.8s, pass state OK 206.3s
+ws-backtest row pupil-link-every-use: PASS  fail state FAIL 6.2s, pass state OK 5.7s
+ws-backtest row link-default-use: PASS  fail state FAIL 3.1s, pass state OK 3.1s
+ws-backtest row link-stale-uses: PASS  fail state FAIL 14.5s, pass state OK 14.1s
+ws-backtest row link-seeded-uses: PASS  fail state FAIL 5.8s, pass state OK 5.4s
+ws-backtest row link-identical-repeats: PASS  fail state FAIL 4.2s, pass state OK 4.3s
+ws-backtest row support-fact-x-laned: PASS  fail state FAIL 6.9s, pass state OK 7.1s
+ws-backtest row vq-rep: PASS  fail state FAIL 0.8s, pass state OK 0.4s
+ws-backtest row vq-rep-commit: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row vq-oneanswer: PASS  fail state FAIL 0.5s, pass state OK 0.4s
+ws-backtest row vq-oneanswer-commit: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row vq-live: PASS  fail state FAIL 0.5s, pass state OK 0.4s
+ws-backtest row vq-live-commit: PASS  fail state FAIL 0.9s, pass state OK 0.8s
+ws-backtest row vq-title: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row vq-title-commit: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row vq-nolegacy: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row vq-nolegacy-commit: PASS  fail state FAIL 0.5s, pass state OK 0.5s
+ws-backtest row vq-r2-render-gate: PASS  fail state FAIL 14.9s, pass state OK 15.1s
+ws-backtest row vq-r2-inplace-h13: PASS  fail state FAIL 11.0s, pass state OK 11.2s
+ws-backtest row vq-once-reason-it-story: PASS  fail state FAIL 0.5s, pass state OK 0.6s
+ws-backtest row rp1-skipstrip-laned: PASS  fail state FAIL 0.7s, pass state OK 0.8s
+ws-backtest row simple-print-exact-missing-add-sub: FAIL  fail state FAIL 426.8s, pass state FAIL 402.6s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 11 line(s) of the pass state:
+      | ws-simple-print: r2 …
+      | ws-simple-print: MIXLAYOUT / COLS1 / SKOPTIONS …
+      | Error [TypeError]: m.lastSimpleRequests is not a function
+      |     at evaluate (evaluate at /tmp/claude-0/bt-wt/tests/scripts/ws-simple-print.cjs:1793:31, <anonymous>:38:36)
+      |     at #evaluate (/tmp/claude-0/bt-wt/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:391:56)
+      |     at async ExecutionContext.evaluate (/tmp/claude-0/bt-wt/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/ExecutionContext.js:277:16)
+      |     at async IsolatedWorld.evaluate (/tmp/claude-0/bt-wt/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/IsolatedWorld.js:100:16)
+      |     at async CdpFrame.evaluate (/tmp/claude-0/bt-wt/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Frame.js:362:20)
+      |     at async CdpPage.evaluate (/tmp/claude-0/bt-wt/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Page.js:830:20)
+      |     at async /tmp/claude-0/bt-wt/tests/scripts/ws-simple-print.cjs:1793:20
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix: FAIL  fail state FAIL 349.9s, pass state FAIL 364.5s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL divAdd pages 2 @S cols auto sections: ORDER prints add_facts > div_facts, the list is div_facts > add_facts
+      |   FAIL divAdd pages 1 @S cols auto mixed: ORDER the ÷ section prints after the + − × facts; the list puts ÷ first
+      |   FAIL divAdd pages 2 @S cols auto mixed: ORDER the ÷ section prints after the + − × facts; the list puts ÷ first
+      |   FAIL divAdd pages 1 @M cols auto sections: ORDER prints add_facts > div_facts, the list is div_facts > add_facts
+      |   FAIL divAdd pages 2 @M cols auto sections: ORDER prints add_facts > div_facts, the list is div_facts > add_facts
+      |   FAIL divAdd pages 1 @M cols auto mixed: ORDER the ÷ section prints after the + − × facts; the list puts ÷ first
+      |   FAIL owner pages 1 @S cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @S cols 2 sections page 2: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @M cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @M cols 2 sections page 2: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @L cols 2 sections page 2: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL ownerMix pages 1 @S cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL ownerMix pages 1 @M cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL ownerMix pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL COLNOTE the dialog offers Columns 1, 2, 3, 4 for an all-fact list (fact rows print 5 to 10 across)
+      |   FAIL SIZEBTN @L Columns 9: the Big button reads "5 columns" but the print is 16 pt
+      |   FAIL SIZEBTN @L Columns 9: the dialog's notes do not say Big prints at 16 pt ("Fast facts in fact rows: every page is full.")
+      |   FAIL ownerMix pages 1 @L cols 9: BRKINK printed ink 1.27 mm from a cell's rule (>= 2.0 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r2: FAIL  fail state FAIL 352.3s, pass state FAIL 329.3s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL owner pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner pages 1 @L cols 2 sections page 2: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner problems 50 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner problems 50 @L cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner problems 50 @L cols 2 sections page 3: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL ownerMix pages 1 @S cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL ownerMix problems 50 @S cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL ownerMix problems 50 @S cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL ownerMix pages 1 @M cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL ownerMix problems 50 @M cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL ownerMix problems 50 @M cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL ownerMix pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 5 rows.")
+      |   FAIL ownerMix problems 50 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL ownerMix problems 50 @L cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + fraction + bracket): 2 columns x 5 rows. | Division facts as ")
+      |   FAIL COLNOTE the dialog offers Columns 1, 2, 3, 4 for an all-fact list (fact rows print 5 to 10 across)
+      |   FAIL SIZEBTN @L Columns 9: the Big button reads "5 columns" but the print is 16 pt
+      |   FAIL SIZEBTN @L Columns 9: the dialog's notes do not say Big prints at 16 pt ("Fast facts in fact rows: every page is full.")
+      |   FAIL ÷ Mix alone problems 63 @S cols 9: BRKINK printed ink 1.02 mm from a cell's rule (>= 2.0 mm)
+      |   FAIL ownerMix pages 1 @L cols 9: BRKINK printed ink 1.27 mm from a cell's rule (>= 2.0 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r3: FAIL  fail state FAIL 319.5s, pass state FAIL 342.1s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL divMixSub pages 1 @M cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub problems 40 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub problems 40 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub problems 97 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub problems 97 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub pages 1 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL divMixSub pages 1 @L cols auto sections sets 2: ORDER prints sub_facts > div_facts, the list is div_facts > sub_facts
+      |   FAIL subDivMixAdd problems 40 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 40 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd pages 1 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd pages 1 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 40 @M cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL COLNOTE the dialog offers Columns 1, 2, 3, 4 for an all-fact list (fact rows print 5 to 10 across)
+      |   FAIL SIZEBTN @L Columns 9: the Big button reads "5 columns" but the print is 16 pt
+      |   FAIL SIZEBTN @L Columns 9: the dialog's notes do not say Big prints at 16 pt ("Answers over 99: at most 8 columns (PT-FRW-5). Digits 16 pt so 3-digit facts fit 8 columns. | Fast facts in fact rows: e")
+      |   FAIL ÷ Mix alone problems 63 @S cols 9: BRKINK printed ink 1.02 mm from a cell's rule (>= 2.0 mm)
+      |   FAIL ownerMix pages 1 @L cols 9: BRKINK printed ink 1.27 mm from a cell's rule (>= 2.0 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r4: FAIL  fail state FAIL 106.4s, pass state FAIL 70.5s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL ÷ Mix set pages 1 @M sections page 1: QROOM "80 divided by 8" 9.5 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set pages 1 @M sections page 1: QROOM "24 divided by 4" 9.5 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set pages 1 @M sections page 1: QROOM "99 divided by 11" 9.5 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set pages 1 @M sections page 1: QROOM "28 divided by 7" 9.5 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set problems 63 @M sections page 2: QROOM "18 divided by 9" 9.6 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set problems 63 @M sections page 2: QROOM "30 divided by 5" 9.6 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set problems 63 @M sections page 2: QROOM "132 divided by 12" 9.6 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set problems 63 @M sections page 2: QROOM "64 divided by 8" 9.6 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set problems 63 @M sections page 2: QROOM "36 divided by 4" 9.6 mm to write the quotient over the vinculum (>= 11.736666666666665 mm)
+      |   FAIL ÷ Mix set pages 1 @L sections page 1: QROOM "15 divided by 5" 12.5 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set pages 1 @L sections page 1: QROOM "132 divided by 12" 12.5 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set pages 1 @L sections page 1: QROOM "80 divided by 8" 12.5 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set pages 1 @L sections page 1: QROOM "24 divided by 4" 12.5 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set pages 1 @L sections page 1: QROOM "99 divided by 11" 12.5 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set problems 63 @L sections page 3: QROOM "36 divided by 9" 9.8 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set problems 63 @L sections page 3: QROOM "15 divided by 5" 9.8 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set problems 63 @L sections page 3: QROOM "84 divided by 12" 9.8 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set problems 63 @L sections page 3: QROOM "40 divided by 8" 9.8 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      |   FAIL ÷ Mix set problems 63 @L sections page 3: QROOM "36 divided by 4" 9.8 mm to write the quotient over the vinculum (>= 13.359444444444442 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r5: PASS  fail state FAIL 99.7s, pass state OK 106.9s
+ws-backtest row facts-print-fix-r6: FAIL  fail state FAIL 239.1s, pass state FAIL 274.4s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd pages 1 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd pages 1 @S cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 40 @M cols auto sections sets 2: ORDER prints sub_facts > add_facts > div_facts, the list is sub_facts > div_facts > add_facts
+      |   FAIL subDivMixAdd problems 40 @L cols auto sections sets 2: SETSHAPE set 2 has 1,3 sections a page, set 1 1,1
+      |   FAIL owner pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Pages 1: the division section shares a page with the other facts.")
+      |   FAIL owner pages 1 @L cols 2 sections page 1: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "Pages 1: the division section shares a page with the other facts.")
+      |   FAIL owner problems 50 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner problems 50 @L cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL owner problems 50 @L cols 2 sections page 3: COLNOTE a ÷ section prints 5 columns for 2 picked and no note says why (notes: "")
+      |   FAIL ownerMix problems 50 @S cols 2 sections: SHARES div_facts 10 of 50 (share 12.5, a row 2)
+      |   FAIL ownerMix problems 50 @M cols 2 sections: SHARES div_facts 10 of 50 (share 12.5, a row 2)
+      |   FAIL ownerMix pages 1 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 4 rows. | Big, Pages 1: the ")
+      |   FAIL ownerMix problems 50 @L cols 2 sections: SHARES div_facts 10 of 50 (share 12.5, a row 2)
+      |   FAIL ownerMix problems 50 @L cols 2 sections page 1: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 4 rows. | Division facts as ")
+      |   FAIL ownerMix problems 50 @L cols 2 sections page 2: COLNOTE a + − × section prints 5 columns for 2 picked and no note says why (notes: "Division facts as written (stacked ÷ + bracket + fraction): 2 columns x 4 rows. | Division facts as ")
+      |   FAIL COLNOTE the dialog offers Columns 1, 2, 3, 4 for an all-fact list (fact rows print 5 to 10 across)
+      |   FAIL ownerMix pages 1 @L cols 9: BRKINK printed ink 1.78 mm from a cell's rule (>= 2.0 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r7: FAIL  fail state FAIL 333.3s, pass state FAIL 289.4s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-simple-print: FAIL; pass: ws-simple-print: FAIL
+    last 20 line(s) of the pass state:
+      |   FAIL ownerMix pages 2 @L cols auto sections sets 2: SETSHAPE set 2 has 1,4 sections a page, set 1 1,2
+      |   FAIL divMixSub pages 1 @S cols auto sections sets 2: SETSKILLDIFF set 2 prints 27/35 per skill, set 1 26/36
+      |   FAIL divMixSub pages 1 @S cols auto sections sets 2: SETSHAPE set 2 has 2 sections a page, set 1 4
+      |   FAIL divMixSub pages 1 @M cols auto sections sets 2: SETSHAPE set 2 has 4 sections a page, set 1 2
+      |   FAIL divMixSub problems 97 @L cols auto sections sets 2: SHARES div_facts 40 of 97 (share 48.5, a row 5)
+      |   FAIL divMixSub problems 97 @L cols auto sections sets 2: SHARES sub_facts 57 of 97 (share 48.5, a row 5)
+      |   FAIL divMixSub problems 97 @L cols auto sections sets 2: SETSKILLDIFF set 2 prints 40/57 per skill, set 1 45/52
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: SETSKILLDIFF set 2 prints 36/27/34 per skill, set 1 36/26/35
+      |   FAIL subDivMixAdd problems 97 @S cols auto sections sets 2: SETSHAPE set 2 has 2,1 sections a page, set 1 3,2
+      |   FAIL subDivMixAdd problems 40 @L cols auto sections sets 2: SETSHAPE set 2 has 2,3 sections a page, set 1 2,2
+      |   FAIL divMixMSA problems 97 @S cols auto sections sets 2: SETSKILLDIFF set 2 prints 26/24/23/24 per skill, set 1 27/23/23/24
+      |   FAIL divMixMSA problems 97 @S cols auto sections sets 2: SETSHAPE set 2 has 4,1 sections a page, set 1 2,1
+      |   FAIL divMixMSA pages 3 @S cols auto sections sets 2: SHARES div_facts 52 of 163 (share 40.8, a row 9)
+      |   FAIL divMixMSA pages 3 @S cols auto sections sets 2: SETSKILLDIFF set 2 prints 52/37/37/37 per skill, set 1 43/40/40/40
+      |   FAIL divMixMSA pages 3 @S cols auto sections sets 2: SETSHAPE set 2 has 3,1,1 sections a page, set 1 4,1,1
+      |   FAIL divMixMSA problems 97 @L cols auto sections sets 2: SHARES div_facts 30 of 97 (share 24.3, a row 5)
+      |   FAIL divMixMSA problems 97 @L cols auto sections sets 2: SETSKILLDIFF set 2 prints 30/22/22/23 per skill, set 1 25/24/24/24
+      |   FAIL divMixMSA problems 97 @L cols auto sections sets 2: SETSHAPE set 2 has 2,2,1,1,1 sections a page, set 1 3,2,1,1,1
+      |   FAIL ownerMix pages 1 @L cols 9: BRKINK printed ink 1.78 mm from a cell's rule (>= 2.0 mm)
+      | ws-simple-print: FAIL
+ws-backtest row facts-print-fix-r8: PASS  fail state FAIL 295.1s, pass state OK 296.4s
+ws-backtest row pv-combine-dealer: PASS  fail state FAIL 2.1s, pass state OK 2.5s
+ws-backtest row pv-equation-row-cl40: PASS  fail state FAIL 54.3s, pass state OK 14.9s
+ws-backtest row pv-lesson-data: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row card-rulings-value-reader: PASS  fail state FAIL 1.1s, pass state OK 1.0s
+ws-backtest row pv-expand-card-kit: PASS  fail state FAIL 139.1s, pass state OK 141.5s
+ws-backtest row precritic-offered-na: PASS  fail state FAIL 0.0s, pass state OK 0.1s
+ws-backtest row pv-r1-wrong-per-slot: PASS  fail state FAIL 0.8s, pass state OK 1.0s
+ws-backtest row pv-r1-plural: PASS  fail state FAIL 0.9s, pass state OK 1.0s
+ws-backtest row pv-r1-grade2-times: PASS  fail state FAIL 0.9s, pass state OK 1.0s
+ws-backtest row pv-r1-model-not-ones: PASS  fail state FAIL 0.9s, pass state OK 1.0s
+ws-backtest row optin-h13-abs: PENDING
+ws-backtest row optin-grid-even-all: PASS  fail state FAIL 4.7s, pass state OK 4.5s
+ws-backtest row optin-wrong-fits-slots: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row optin-wrong-fill: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row optin-slot-w-equal: PASS  fail state FAIL 3.5s, pass state OK 3.4s
+ws-backtest row optin-draw-cap: PASS  fail state FAIL 115.9s, pass state OK 117.3s
+ws-backtest row optin-screen-digit: PASS  fail state FAIL 12.0s, pass state OK 77.9s
+ws-backtest row optin-options-render-bands: PASS  fail state FAIL 67.4s, pass state OK 54.8s
+ws-backtest row cc-card-overflow: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-card-overflow-cbt: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-tagink: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-keyjoin: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-size-s: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-title: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row cc-title-cbt: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row pl-sections-pagefill: PENDING (placeholder commit TBD-lf-ops-fix4)
+ws-backtest row pv-r2-option-fit: PASS  fail state FAIL 106.3s, pass state OK 90.5s
+ws-backtest row pv-r2-wrong-differs: FAIL  fail state FAIL 1.2s, pass state FAIL 1.2s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-providers-unit: FAIL (420 of 105853 checks); pass: ws-providers-unit: FAIL (419 of 105853 checks)
+    last 20 line(s) of the pass state:
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): Scripted Model step 2 "Adding 0 does not change the number." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 1 "Start with 10." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 2 "Count on 7: 11, 12, 13, 14, 15, 16, 17." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 1 "4 + 4 is a double." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 2 "Double 4 is 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 1 "Start with 7." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 2 "Count on 1: 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 1 "Start with 9." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 2 "Count on 2: 10, 11." draws no grey mark (PT-MOD-1)
+      |   ... and 359 more
+      | ws-providers-unit: FAIL (419 of 105853 checks)
+ws-backtest row pv-r2-printed-instruction: FAIL  fail state FAIL 0.9s, pass state FAIL 1.0s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-providers-unit: FAIL (420 of 105853 checks); pass: ws-providers-unit: FAIL (419 of 105853 checks)
+    last 20 line(s) of the pass state:
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): Scripted Model step 2 "Adding 0 does not change the number." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 1 "Start with 10." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 2 "Count on 7: 11, 12, 13, 14, 15, 16, 17." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 1 "4 + 4 is a double." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 2 "Double 4 is 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 1 "Start with 7." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 2 "Count on 1: 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 1 "Start with 9." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 2 "Count on 2: 10, 11." draws no grey mark (PT-MOD-1)
+      |   ... and 359 more
+      | ws-providers-unit: FAIL (419 of 105853 checks)
+ws-backtest row pv-r2-combine-parts: FAIL  fail state FAIL 1.4s, pass state FAIL 1.5s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-providers-unit: FAIL (420 of 105852 checks); pass: ws-providers-unit: FAIL (419 of 105852 checks)
+    last 20 line(s) of the pass state:
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): Scripted Model step 2 "Adding 0 does not change the number." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 1 "Start with 10." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 2 "Count on 7: 11, 12, 13, 14, 15, 16, 17." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 1 "4 + 4 is a double." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 2 "Double 4 is 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 1 "Start with 7." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 2 "Count on 1: 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 1 "Start with 9." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 2 "Count on 2: 10, 11." draws no grey mark (PT-MOD-1)
+      |   ... and 359 more
+      | ws-providers-unit: FAIL (419 of 105852 checks)
+ws-backtest row pv-r2-place-word-live: FAIL  fail state FAIL 1.2s, pass state FAIL 1.1s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-providers-unit: FAIL (420 of 105852 checks); pass: ws-providers-unit: FAIL (419 of 105852 checks)
+    last 20 line(s) of the pass state:
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): Scripted Model step 2 "Adding 0 does not change the number." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 9 (0 + 9 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 1 "Start with 10." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): Scripted Model step 2 "Count on 7: 11, 12, 13, 14, 15, 16, 17." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 10 (7 + 10 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 1 "4 + 4 is a double." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): Scripted Model step 2 "Double 4 is 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 11 (4 + 4 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 1 "Start with 7." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): Scripted Model step 2 "Count on 1: 8." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 12 (7 + 1 = ?): step 2 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 1 "Start with 9." draws no grey mark (PT-MOD-1)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): step 1 short text "undefined" is missing or over 26 characters (PT-MOD-2)
+      |   FAIL addition:add_facts item 13 (9 + 2 = ?): Scripted Model step 2 "Count on 2: 10, 11." draws no grey mark (PT-MOD-1)
+      |   ... and 359 more
+      | ws-providers-unit: FAIL (419 of 105852 checks)
+ws-backtest row pv-r2-band-h13: PASS  fail state FAIL 25.2s, pass state OK 26.8s
+ws-backtest row pv-r3-band99-s: PASS  fail state FAIL 45.1s, pass state OK 47.1s
+ws-backtest row pv-r2-cell-h13-abs: PASS  fail state FAIL 34.7s, pass state OK 33.5s
+ws-backtest row pv-r2-review-one-layout: PASS  fail state FAIL 11.9s, pass state OK 11.7s
+ws-backtest row pv-r2-red-no-baseline: PENDING
+ws-backtest row e24-family: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lp-text-no-x: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lp-fallback: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lp-numbers: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lp-prereq: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lp-raster: PASS  fail state FAIL 1.2s, pass state OK 1.2s
+ws-backtest row lp-giveaway: PASS  fail state FAIL 26.9s, pass state OK 21.5s
+ws-backtest row lp-modelled: PASS  fail state FAIL 9.7s, pass state OK 142.1s
+ws-backtest row lp-measure: PASS  fail state FAIL 14.4s, pass state OK 11.4s
+ws-backtest row lp-sweep: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row pv-combine-side-band: PASS  fail state FAIL 37.5s, pass state OK 36.4s
+ws-backtest row pv-detailed-lesson-1: PASS  fail state FAIL 13.4s, pass state OK 13.2s
+ws-backtest row pv-identify-vocab-ink: PASS  fail state FAIL 14.6s, pass state OK 14.6s
+ws-backtest row pv-unit-form-rename-side: PASS  fail state FAIL 38.0s, pass state OK 37.3s
+ws-backtest row lesson-title-constant: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row lesson-routing-one-builder: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row lesson-route-no-literal-styles: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest row lesson-routed-plan-units: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row lesson-prereq-checks-field: PASS  fail state FAIL 0.2s, pass state OK 0.1s
+ws-backtest row lesson-bind-stamps-refuses: PASS  fail state FAIL 0.1s, pass state OK 0.1s
+ws-backtest row lesson-parts-plugin: PASS  fail state FAIL 0.2s, pass state OK 0.3s
+ws-backtest row lesson-chart-sizing-fails: PASS  fail state FAIL 0.2s, pass state OK 0.3s
+ws-backtest row lesson2-page-fresh: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row lesson-practice-cap: PASS  fail state FAIL 0.2s, pass state OK 0.1s
+ws-backtest row lesson-dealer-seeds: PASS  fail state FAIL 0.1s, pass state OK 0.2s
+ws-backtest row lesson-repeat-key: PASS  fail state FAIL 0.1s, pass state OK 0.2s
+ws-backtest row lesson-route-floor: PASS  fail state FAIL 0.3s, pass state OK 0.2s
+ws-backtest row lesson-sheet-indep: PASS  fail state FAIL 9.7s, pass state OK 14.0s
+ws-backtest row pool-capacity-3a: PASS  fail state FAIL 10.0s, pass state OK 0.5s
+ws-backtest row e24b-lesson2-near-twins: PENDING
+ws-backtest row lp-family-repeat-3a-p0: PENDING
+ws-backtest row e27-five-gap: PASS  fail state FAIL 0.1s, pass state OK 0.2s
+ws-backtest row e12-practice-pages: PASS  fail state FAIL 33.4s, pass state OK 35.0s
+ws-backtest row practice-units: PASS  fail state FAIL 0.1s, pass state OK 0.1s
+ws-backtest row solve-story-e24b: PASS  fail state FAIL 0.2s, pass state OK 0.1s
+ws-backtest row pack-feasible-p0: PASS  fail state FAIL 16.8s, pass state OK 2.5s
+ws-backtest row pack-feasible-sources: PASS  fail state FAIL 2.3s, pass state OK 2.6s
+ws-backtest row p0-overlap: PASS  fail state FAIL 0.1s, pass state OK 0.1s
+ws-backtest row pv-unit-form-rename-margin: PASS  fail state FAIL 19.5s, pass state OK 19.5s
+ws-backtest row pv-unit-form-fixit-words: PASS  fail state FAIL 11.3s, pass state OK 7.1s
+ws-backtest row pv-identify-lesson-page-fill: PASS  fail state FAIL 9.0s, pass state OK 9.3s
+ws-backtest row lesson-baseline-phase0-optin: PASS  fail state FAIL 20.5s, pass state OK 19.6s
+ws-backtest row eb-fact-roles: FAIL  fail state FAIL 67.7s, pass state FAIL 69.0s
+    expected {"fail":"FAIL","pass":"OK"}; fail: ws-empty-band: FAIL (200); pass: ws-empty-band: FAIL (25)
+    last 20 line(s) of the pass state:
+      | EB-VOCAB PASS
+      | EB-PAGE  PASS
+      | EB-GDPCAP FAIL 15
+      |    addition:add_facts guided S: 29 scored tries on the Guided page(s) at S; the §12.1 ceiling is 10 plus the Model
+      |    addition:add_facts guided M: 15 scored tries on the Guided page(s) at M; the §12.1 ceiling is 8 plus the Model
+      |    addition:add_facts guided L: 15 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+      |    subtraction:sub_facts guided S: 29 scored tries on the Guided page(s) at S; the §12.1 ceiling is 10 plus the Model
+      |    subtraction:sub_facts guided M: 15 scored tries on the Guided page(s) at M; the §12.1 ceiling is 8 plus the Model
+      |    subtraction:sub_facts guided L: 11 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+      |    multiplication:mult_facts guided S: 29 scored tries on the Guided page(s) at S; the §12.1 ceiling is 10 plus the Model
+      |    multiplication:mult_facts guided M: 11 scored tries on the Guided page(s) at M; the §12.1 ceiling is 8 plus the Model
+      |    multiplication:mult_facts guided L: 11 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+      |    division:div_facts_long guided S: 31 scored tries on the Guided page(s) at S; the §12.1 ceiling is 10 plus the Model
+      |    division:div_facts_long guided M: 23 scored tries on the Guided page(s) at M; the §12.1 ceiling is 8 plus the Model
+      |    division:div_facts_long guided L: 15 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+      |    division:div_facts guided S: 31 scored tries on the Guided page(s) at S; the §12.1 ceiling is 10 plus the Model
+      |    division:div_facts guided M: 23 scored tries on the Guided page(s) at M; the §12.1 ceiling is 8 plus the Model
+      |    division:div_facts guided L: 14 scored tries on the Guided page(s) at L; the §12.1 ceiling is 6 plus the Model
+      | (5 skill(s), 30 renders, 371 cells, 67 s)
+      | ws-empty-band: FAIL (25)
+ws-backtest row guided-cap-facts: PASS  fail state FAIL 39.9s, pass state OK 40.0s
+ws-backtest row guided-edge-facts: PASS  fail state FAIL 71.1s, pass state OK 74.8s
+ws-backtest row model-marks-facts: PASS  fail state FAIL 41.2s, pass state OK 42.0s
+ws-backtest row model-lines-facts: PASS  fail state FAIL 41.8s, pass state OK 41.6s
+ws-backtest row model-fill-facts: PASS  fail state FAIL 40.7s, pass state OK 48.0s
+ws-backtest row model-grid-facts: PASS  fail state FAIL 42.1s, pass state OK 42.6s
+ws-backtest row model-interior-band-facts: PASS  fail state FAIL 42.8s, pass state OK 46.9s
+ws-backtest row runner-orphan-slot: PASS  fail state FAIL 0.6s, pass state OK 0.6s
+ws-backtest: 163 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state      pass state      verdict
+notation                    fixture      FAIL 0.3s       OK 0.3s         PASS
+l1-sizes                    fixture      FAIL 0.3s       OK 0.3s         PASS
+l3-key                      fixture      FAIL 0.3s       OK 0.3s         PASS
+l6-steps                    fixture      FAIL 0.3s       OK 0.3s         PASS
+l10-cycle                   fixture      FAIL 0.3s       OK 0.3s         PASS
+node-lint-keys              fixture      FAIL 0.3s       OK 0.3s         PASS
+mc-production               fixture      FAIL 1.3s       OK 0.2s         PASS
+baseline-night-keeps-red    commit-pair  FAIL 1.8s       OK 1.8s         PASS
+lone-item                   commit-pair  FAIL 16.1s      OK 6.7s         PASS
+text-generator-wrm-page     commit-pair  FAIL 0.3s       OK 0.3s         PASS
+text-generator-wrm-tagging  commit-pair  FAIL 6.7s       OK 6.9s         PASS
+chromebook-viewport         commit-pair  FAIL 81.0s      OK 81.2s        PASS
+repeats-lesson              commit-pair  FAIL 8.7s       OK 14.0s        PASS
+sibling-compare-pilot       fixture      FAIL 19.5s      OK 18.3s        PASS
+sibling-compare-unpinned-pi fixture      FAIL 19.8s      OK 16.6s        PASS
+slot-clip-pilot             fixture      FAIL 24.7s      OK 25.0s        PASS
+slot-clip-heads-pilot       fixture      FAIL 11.9s      OK 13.3s        PASS
+phone-card-pilot            fixture      FAIL 79.6s      OK 78.6s        PASS
+card-rulings-pilot          fixture      FAIL 4.8s       OK 4.4s         PASS
+card-rulings-partial-pilot  fixture      ERROR(2) 1.1s   OK 1.9s         PASS
+card-not-offered-pilot      fixture      FAIL 0.3s       OK 0.3s         PASS
+s1-zero-case-content-audit  commit-pair  FAIL 3.6s       OK 3.9s         PASS
+s1-dealer-uniform           commit-pair  FAIL 3.8s       OK 4.0s         PASS
+s1-lesson-data              commit-pair  FAIL 0.5s       OK 0.5s         PASS
+s1-option-help              commit-pair  FAIL 0.5s       OK 0.5s         PASS
+s1-wrong-fits               commit-pair  FAIL 0.5s       OK 0.4s         PASS
+s1-presets-obey             commit-pair  FAIL 9.6s       OK 10.0s        PASS
+s1-presets-obey-seeded      fixture      FAIL 11.3s      OK 11.5s        PASS
+options-render-pilot        commit-pair  FAIL 55.7s      OK 47.7s        PASS
+card-gate-decisions         fixture      FAIL 0.1s       OK 0.1s         PASS
+card-gate-rulings           fixture      FAIL 0.1s       OK 0.1s         PASS
+ansarea-ty21-pilot          commit-pair  FAIL 7.7s       OK 7.6s         PASS
+overlap-d7-pilot            commit-pair  FAIL 8.0s       OK 7.6s         PASS
+overlap-n8-pilot            commit-pair  FAIL 8.1s       OK 7.6s         PASS
+wrap-op-pilot               commit-pair  FAIL 11.7s      OK 12.2s        PASS
+h13-lesson-warmup-pilot     commit-pair  FAIL 11.8s      OK 11.9s        PASS
+d1-partner-attribution      fixture      FAIL 0.0s       OK 0.0s         PASS
+d1-real-partner             fixture      FAIL 0.0s       OK 0.1s         PASS
+d1-real-unattributed        fixture      FAIL 0.0s       OK 0.0s         PASS
+e41-relation                fixture      FAIL 0.2s       OK 0.2s         PASS
+arc-ink-laned               commit-pair  FAIL 10.7s      OK 10.5s        PASS
+grid-even-probe-laned       commit-pair  FAIL 7.0s       OK 6.2s         PASS
+grid-even-laned             commit-pair  FAIL 8.7s       OK 6.9s         PASS
+frac-keepout-laned          commit-pair  FAIL 7.0s       OK 7.4s         PASS
+screen-uniform-laned        commit-pair  FAIL 6.1s       OK 5.6s         PASS
+section-overlap-lesson-warm commit-pair  FAIL 8.2s       OK 8.9s         PASS
+detailed-link-every-use     commit-pair  FAIL 192.8s     OK 206.3s       PASS
+pupil-link-every-use        commit-pair  FAIL 6.2s       OK 5.7s         PASS
+link-default-use            commit-pair  FAIL 3.1s       OK 3.1s         PASS
+link-stale-uses             commit-pair  FAIL 14.5s      OK 14.1s        PASS
+link-seeded-uses            commit-pair  FAIL 5.8s       OK 5.4s         PASS
+link-identical-repeats      commit-pair  FAIL 4.2s       OK 4.3s         PASS
+support-fact-x-laned        commit-pair  FAIL 6.9s       OK 7.1s         PASS
+vq-rep                      fixture      FAIL 0.8s       OK 0.4s         PASS
+vq-rep-commit               commit-pair  FAIL 0.5s       OK 0.5s         PASS
+vq-oneanswer                fixture      FAIL 0.5s       OK 0.4s         PASS
+vq-oneanswer-commit         commit-pair  FAIL 0.5s       OK 0.5s         PASS
+vq-live                     fixture      FAIL 0.5s       OK 0.4s         PASS
+vq-live-commit              commit-pair  FAIL 0.9s       OK 0.8s         PASS
+vq-title                    fixture      FAIL 0.4s       OK 0.4s         PASS
+vq-title-commit             commit-pair  FAIL 0.5s       OK 0.5s         PASS
+vq-nolegacy                 fixture      FAIL 0.4s       OK 0.4s         PASS
+vq-nolegacy-commit          commit-pair  FAIL 0.5s       OK 0.5s         PASS
+vq-r2-render-gate           commit-pair  FAIL 14.9s      OK 15.1s        PASS
+vq-r2-inplace-h13           commit-pair  FAIL 11.0s      OK 11.2s        PASS
+vq-once-reason-it-story     commit-pair  FAIL 0.5s       OK 0.6s         PASS
+rp1-skipstrip-laned         fixture      FAIL 0.7s       OK 0.8s         PASS
+simple-print-exact-missing- commit-pair  FAIL 426.8s     FAIL 402.6s     FAIL
+facts-print-fix             commit-pair  FAIL 349.9s     FAIL 364.5s     FAIL
+facts-print-fix-r2          commit-pair  FAIL 352.3s     FAIL 329.3s     FAIL
+facts-print-fix-r3          commit-pair  FAIL 319.5s     FAIL 342.1s     FAIL
+facts-print-fix-r4          commit-pair  FAIL 106.4s     FAIL 70.5s      FAIL
+facts-print-fix-r5          commit-pair  FAIL 99.7s      OK 106.9s       PASS
+facts-print-fix-r6          commit-pair  FAIL 239.1s     FAIL 274.4s     FAIL
+facts-print-fix-r7          commit-pair  FAIL 333.3s     FAIL 289.4s     FAIL
+facts-print-fix-r8          commit-pair  FAIL 295.1s     OK 296.4s       PASS
+pv-combine-dealer           commit-pair  FAIL 2.1s       OK 2.5s         PASS
+pv-equation-row-cl40        commit-pair  FAIL 54.3s      OK 14.9s        PASS
+pv-lesson-data              commit-pair  FAIL 0.4s       OK 0.4s         PASS
+card-rulings-value-reader   fixture      FAIL 1.1s       OK 1.0s         PASS
+pv-expand-card-kit          commit-pair  FAIL 139.1s     OK 141.5s       PASS
+precritic-offered-na        commit-pair  FAIL 0.0s       OK 0.1s         PASS
+pv-r1-wrong-per-slot        commit-pair  FAIL 0.8s       OK 1.0s         PASS
+pv-r1-plural                commit-pair  FAIL 0.9s       OK 1.0s         PASS
+pv-r1-grade2-times          commit-pair  FAIL 0.9s       OK 1.0s         PASS
+pv-r1-model-not-ones        commit-pair  FAIL 0.9s       OK 1.0s         PASS
+optin-h13-abs               fixture      PENDING         PENDING         PENDING
+optin-grid-even-all         fixture      FAIL 4.7s       OK 4.5s         PASS
+optin-wrong-fits-slots      fixture      FAIL 0.3s       OK 0.3s         PASS
+optin-wrong-fill            fixture      FAIL 0.4s       OK 0.4s         PASS
+optin-slot-w-equal          fixture      FAIL 3.5s       OK 3.4s         PASS
+optin-draw-cap              fixture      FAIL 115.9s     OK 117.3s       PASS
+optin-screen-digit          fixture      FAIL 12.0s      OK 77.9s        PASS
+optin-options-render-bands  commit-pair  FAIL 67.4s      OK 54.8s        PASS
+cc-card-overflow            commit-pair  PENDING         PENDING         PENDING
+cc-card-overflow-cbt        commit-pair  PENDING         PENDING         PENDING
+cc-tagink                   commit-pair  PENDING         PENDING         PENDING
+cc-keyjoin                  commit-pair  PENDING         PENDING         PENDING
+cc-size-s                   commit-pair  PENDING         PENDING         PENDING
+cc-title                    commit-pair  PENDING         PENDING         PENDING
+cc-title-cbt                commit-pair  PENDING         PENDING         PENDING
+pl-sections-pagefill        commit-pair  PENDING         PENDING         PENDING
+pv-r2-option-fit            commit-pair  FAIL 106.3s     OK 90.5s        PASS
+pv-r2-wrong-differs         commit-pair  FAIL 1.2s       FAIL 1.2s       FAIL
+pv-r2-printed-instruction   commit-pair  FAIL 0.9s       FAIL 1.0s       FAIL
+pv-r2-combine-parts         commit-pair  FAIL 1.4s       FAIL 1.5s       FAIL
+pv-r2-place-word-live       commit-pair  FAIL 1.2s       FAIL 1.1s       FAIL
+pv-r2-band-h13              commit-pair  FAIL 25.2s      OK 26.8s        PASS
+pv-r3-band99-s              commit-pair  FAIL 45.1s      OK 47.1s        PASS
+pv-r2-cell-h13-abs          commit-pair  FAIL 34.7s      OK 33.5s        PASS
+pv-r2-review-one-layout     commit-pair  FAIL 11.9s      OK 11.7s        PASS
+pv-r2-red-no-baseline       commit-pair  PENDING         PENDING         PENDING
+e24-family                  fixture      FAIL 0.2s       OK 0.2s         PASS
+lp-text-no-x                fixture      FAIL 0.2s       OK 0.2s         PASS
+lp-fallback                 fixture      FAIL 0.2s       OK 0.2s         PASS
+lp-numbers                  fixture      FAIL 0.2s       OK 0.2s         PASS
+lp-prereq                   fixture      FAIL 0.2s       OK 0.2s         PASS
+lp-raster                   fixture      FAIL 1.2s       OK 1.2s         PASS
+lp-giveaway                 commit-pair  FAIL 26.9s      OK 21.5s        PASS
+lp-modelled                 commit-pair  FAIL 9.7s       OK 142.1s       PASS
+lp-measure                  commit-pair  FAIL 14.4s      OK 11.4s        PASS
+lp-sweep                    fixture      FAIL 0.2s       OK 0.2s         PASS
+pv-combine-side-band        commit-pair  FAIL 37.5s      OK 36.4s        PASS
+pv-detailed-lesson-1        commit-pair  FAIL 13.4s      OK 13.2s        PASS
+pv-identify-vocab-ink       commit-pair  FAIL 14.6s      OK 14.6s        PASS
+pv-unit-form-rename-side    commit-pair  FAIL 38.0s      OK 37.3s        PASS
+lesson-title-constant       commit-pair  FAIL 0.3s       OK 0.3s         PASS
+lesson-routing-one-builder  commit-pair  FAIL 0.4s       OK 0.4s         PASS
+lesson-route-no-literal-sty commit-pair  FAIL 0.2s       OK 0.2s         PASS
+lesson-routed-plan-units    commit-pair  FAIL 0.3s       OK 0.3s         PASS
+lesson-prereq-checks-field  commit-pair  FAIL 0.2s       OK 0.1s         PASS
+lesson-bind-stamps-refuses  fixture      FAIL 0.1s       OK 0.1s         PASS
+lesson-parts-plugin         commit-pair  FAIL 0.2s       OK 0.3s         PASS
+lesson-chart-sizing-fails   commit-pair  FAIL 0.2s       OK 0.3s         PASS
+lesson2-page-fresh          commit-pair  FAIL 0.4s       OK 0.4s         PASS
+lesson-practice-cap         commit-pair  FAIL 0.2s       OK 0.1s         PASS
+lesson-dealer-seeds         commit-pair  FAIL 0.1s       OK 0.2s         PASS
+lesson-repeat-key           commit-pair  FAIL 0.1s       OK 0.2s         PASS
+lesson-route-floor          commit-pair  FAIL 0.3s       OK 0.2s         PASS
+lesson-sheet-indep          commit-pair  FAIL 9.7s       OK 14.0s        PASS
+pool-capacity-3a            commit-pair  FAIL 10.0s      OK 0.5s         PASS
+e24b-lesson2-near-twins     commit-pair  PENDING         PENDING         PENDING
+lp-family-repeat-3a-p0      commit-pair  PENDING         PENDING         PENDING
+e27-five-gap                fixture      FAIL 0.1s       OK 0.2s         PASS
+e12-practice-pages          commit-pair  FAIL 33.4s      OK 35.0s        PASS
+practice-units              commit-pair  FAIL 0.1s       OK 0.1s         PASS
+solve-story-e24b            commit-pair  FAIL 0.2s       OK 0.1s         PASS
+pack-feasible-p0            commit-pair  FAIL 16.8s      OK 2.5s         PASS
+pack-feasible-sources       commit-pair  FAIL 2.3s       OK 2.6s         PASS
+p0-overlap                  commit-pair  FAIL 0.1s       OK 0.1s         PASS
+pv-unit-form-rename-margin  commit-pair  FAIL 19.5s      OK 19.5s        PASS
+pv-unit-form-fixit-words    commit-pair  FAIL 11.3s      OK 7.1s         PASS
+pv-identify-lesson-page-fil commit-pair  FAIL 9.0s       OK 9.3s         PASS
+lesson-baseline-phase0-opti commit-pair  FAIL 20.5s      OK 19.6s        PASS
+eb-fact-roles               commit-pair  FAIL 67.7s      FAIL 69.0s      FAIL
+guided-cap-facts            commit-pair  FAIL 39.9s      OK 40.0s        PASS
+guided-edge-facts           commit-pair  FAIL 71.1s      OK 74.8s        PASS
+model-marks-facts           commit-pair  FAIL 41.2s      OK 42.0s        PASS
+model-lines-facts           commit-pair  FAIL 41.8s      OK 41.6s        PASS
+model-fill-facts            commit-pair  FAIL 40.7s      OK 48.0s        PASS
+model-grid-facts            commit-pair  FAIL 42.1s      OK 42.6s        PASS
+model-interior-band-facts   commit-pair  FAIL 42.8s      OK 46.9s        PASS
+runner-orphan-slot          fixture      FAIL 0.6s       OK 0.6s         PASS
+
+simple-print-exact-missing-add-sub: expected {"fail":"FAIL","pass":"OK"}
+  fail state (33bf69bf): ws-simple-print: FAIL
+  pass state (bcc3ab2d): ws-simple-print: FAIL
+
+facts-print-fix: expected {"fail":"FAIL","pass":"OK"}
+  fail state (18fbc70c2): ws-simple-print: FAIL
+  pass state (b84a624a8): ws-simple-print: FAIL
+
+facts-print-fix-r2: expected {"fail":"FAIL","pass":"OK"}
+  fail state (c2c0fe24f): ws-simple-print: FAIL
+  pass state (91bd40cbe): ws-simple-print: FAIL
+
+facts-print-fix-r3: expected {"fail":"FAIL","pass":"OK"}
+  fail state (115302a69): ws-simple-print: FAIL
+  pass state (e023c34dc): ws-simple-print: FAIL
+
+facts-print-fix-r4: expected {"fail":"FAIL","pass":"OK"}
+  fail state (7fab88a7e): ws-simple-print: FAIL
+  pass state (aa1377878): ws-simple-print: FAIL
+
+facts-print-fix-r6: expected {"fail":"FAIL","pass":"OK"}
+  fail state (1d4c97a5c): ws-simple-print: FAIL
+  pass state (bb4ca1fa9): ws-simple-print: FAIL
+
+facts-print-fix-r7: expected {"fail":"FAIL","pass":"OK"}
+  fail state (2bebf4f94): ws-simple-print: FAIL
+  pass state (313a81983): ws-simple-print: FAIL
+
+pv-r2-wrong-differs: expected {"fail":"FAIL","pass":"OK"}
+  fail state (528707e8): ws-providers-unit: FAIL (420 of 105853 checks)
+  pass state (4a57b5c2): ws-providers-unit: FAIL (419 of 105853 checks)
+
+pv-r2-printed-instruction: expected {"fail":"FAIL","pass":"OK"}
+  fail state (528707e8): ws-providers-unit: FAIL (420 of 105853 checks)
+  pass state (4a57b5c2): ws-providers-unit: FAIL (419 of 105853 checks)
+
+pv-r2-combine-parts: expected {"fail":"FAIL","pass":"OK"}
+  fail state (528707e8): ws-providers-unit: FAIL (420 of 105852 checks)
+  pass state (4a57b5c2): ws-providers-unit: FAIL (419 of 105852 checks)
+
+pv-r2-place-word-live: expected {"fail":"FAIL","pass":"OK"}
+  fail state (528707e8): ws-providers-unit: FAIL (420 of 105852 checks)
+  pass state (4a57b5c2): ws-providers-unit: FAIL (419 of 105852 checks)
+
+eb-fact-roles: expected {"fail":"FAIL","pass":"OK"}
+  fail state (7e0c074b): ws-empty-band: FAIL (200)
+  pass state (6e962016): ws-empty-band: FAIL (25)
+
+139 PASS, 12 FAIL, 12 PENDING, 0 TIMEOUT, 0 ERROR; 10628.1 s
+
+  FAIL cc-card-overflow               ws-cell-checks on multiplication:mult_properties
+  FAIL cc-card-overflow-cbt           ws-cell-checks on multiplication:count_by_tables
+  FAIL cc-tagink                      ws-cell-checks on multiplication:arrays_groups
+  FAIL cc-keyjoin                     ws-cell-checks on multiplication:mult_properties
+  FAIL cc-size-s                      ws-cell-checks on multiplication:arrays_groups
+  FAIL cc-title                       ws-cell-checks on multiplication:mult_properties
+  FAIL cc-title-cbt                   ws-cell-checks on multiplication:count_by_tables
+  FAIL pv-identify-vocab-ink          ws-empty-band --roles lesson on placevalue:identify
+  FAIL pv-identify-lesson-page-fill   ws-empty-band --roles lesson on placevalue:identify
+  FAIL guided-cap-facts               ws-empty-band --roles guided on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role guided)
+  FAIL model-marks-facts              ws-empty-band --roles scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role scripted-model)
+  FAIL model-lines-facts              ws-empty-band --roles scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role scripted-model)
+  FAIL model-fill-facts               ws-empty-band --roles scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role scripted-model)
+  FAIL model-grid-facts               ws-empty-band --roles scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role scripted-model)
+  FAIL model-interior-band-facts      ws-empty-band --roles scripted-model on addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts (via --role scripted-model)
+  FAIL opt-in lf-placevalue: not on another skill's plan (addition:add_facts)
+  cc-card-overflow: ws-precritic --skill multiplication:mult_properties plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-card-overflow-cbt: ws-precritic --skill multiplication:count_by_tables plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-tagink: ws-precritic --skill multiplication:arrays_groups plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-keyjoin: ws-precritic --skill multiplication:mult_properties plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-size-s: ws-precritic --skill multiplication:arrays_groups plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-title: ws-precritic --skill multiplication:mult_properties plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  cc-title-cbt: ws-precritic --skill multiplication:count_by_tables plans no ws-cell-checks gate on it (the check is backtested but not on the lane's path)
+  pv-combine-side-band: ws-precritic --skill placevalue:combine --role independent,more-practice,test,review --dry-run failed: ws-precritic: FAIL (usage)
+  pv-identify-vocab-ink: ws-precritic --skill placevalue:identify plans no ws-empty-band --roles lesson gate on it (the check is backtested but not on the lane's path)
+  pv-unit-form-rename-side: ws-precritic --skill placevalue:unit_form --role independent,more-practice,test,review --dry-run failed: ws-precritic: FAIL (usage)
+  pv-unit-form-rename-margin: ws-precritic --skill placevalue:unit_form --role independent,more-practice,test,review --dry-run failed: ws-precritic: FAIL (usage)
+  pv-identify-lesson-page-fill: ws-precritic --skill placevalue:identify plans no ws-empty-band --roles lesson gate on it (the check is backtested but not on the lane's path)
+  eb-fact-roles: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role guided,scripted-model --dry-run failed: ws-precritic: FAIL (usage)
+  guided-cap-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role guided plans no ws-empty-band --roles guided gate on it (the check is backtested but not on the lane's path)
+  guided-edge-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role guided,scripted-model --dry-run failed: ws-precritic: FAIL (usage)
+  model-marks-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role scripted-model plans no ws-empty-band --roles scripted-model gate on it (the check is backtested but not on the lane's path)
+  model-lines-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role scripted-model plans no ws-empty-band --roles scripted-model gate on it (the check is backtested but not on the lane's path)
+  model-fill-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role scripted-model plans no ws-empty-band --roles scripted-model gate on it (the check is backtested but not on the lane's path)
+  model-grid-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role scripted-model plans no ws-empty-band --roles scripted-model gate on it (the check is backtested but not on the lane's path)
+  model-interior-band-facts: ws-precritic --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --role scripted-model plans no ws-empty-band --roles scripted-model gate on it (the check is backtested but not on the lane's path)
+ws-precritic-plan: FAIL (21 of 111 rows not on the lane's path)
+ws-backtest: FAIL (24, 12 pending, plan: a check not on the lane's path)
