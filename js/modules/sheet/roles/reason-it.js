@@ -18,7 +18,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
-    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern,
+    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern, answerPlace, answerPlaceHtml, answerFrameCls,
 } from './compose.js';
 
 export const ROLE_ID = 'reason-it';
@@ -35,8 +35,10 @@ export function prepare(it, info = {}) {
     // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
-    const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
-    const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
+    // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
+    const place0 = answerPlace('ri-ans', correct, it);
+    const place = place0.kind === 'list' && !place0.words ? { kind: 'none', slots: {}, parts: null } : place0;
+    const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right }, place.slots), `${right}: ${correct}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
     // below, B under A, drawn as a half-page column so its unit word still sits beside the box; the story once on top)
@@ -44,7 +46,10 @@ export function prepare(it, info = {}) {
     const sentence = it.template === 'word-work' && pl.layout === 'sentence';
     // (a sentence story prints ONCE, over both panels; each panel holds its number sentence only - critic r3 N12: a
     // panel that repeated the story held one item a page at L. `noFrame` + `bar: false`: the story with no work zone)
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
+    // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
+    // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
+    const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
+    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -52,14 +57,27 @@ export function prepare(it, info = {}) {
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A too - lf-vocab r5, ws-empty-band)
     const wide = sentence || it.template === 'vocab-match3' || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
-        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
-        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
-        + `<div class="mq-abresp"${at(2, '1 / 3')}>`
+    // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
+    // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
+    const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="margin-top:auto;margin-bottom:auto${wide ? ';grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm' : ''}">`
+        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
+        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
+        // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
+        // the ring in a mostly empty column); inline, so only Reason It pages change
+        + `<div class="mq-abresp"${wide ? ` style="grid-column:2;grid-row:1 / 3;justify-content:flex-start"` : ' style="justify-content:flex-start"'}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
-        + `<div class="mq-frame">The answer is ${writeLine('ri-ans', c, key, digits)}.</div>`
-        + `</div></div>`;
+        + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
+        + `</div>`
+        // a unit-form answer ("[2] hundreds [9] tens [7] ones") is wider than the response column: its frame is a full-width
+        // row under A and B (in the column it wrapped to three lines and cost the page an item at S: ws-capacity-pin 4 -> 3)
+        // every LIST frame too (critic r3 D1 / D5: in the 56 mm column a 5-part list wrapped a blank a line and "Rule: subtract __
+        // each time" ran out of the cell, costing the page an item); the row wraps at the cell's full width
+        // a unit form keeps its frame, full width under A and B; a LIST (pattern terms, table outputs) prints none: the panel the
+        // pupil names in "__ is correct." already holds every part, so the frame only made them copy it (H16) and, at 5-6 parts,
+        // cost the page an item or ran out of the cell (critic r3 D1 / D2 / D5; PT-TOF-4 extended to Reason It lists)
+        + (place.kind === 'list' && place.words ? `<div class="mq-frame" style="grid-column:1 / -1;padding-left:2mm">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}</div>` : '')
+        + `</div>`;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),

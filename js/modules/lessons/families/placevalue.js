@@ -180,6 +180,33 @@ export const ROUTINES = Object.freeze({
         chartWide: true,
         practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
     },
+    // lf-placevalue w2 (2026-11-12): number names to the numeral (2.NBT.A.3), the H T O boxes keep a missing tens word's 0.
+    'pv-number-words': {
+        archetype: 'pv',
+        casesPending: 'New with lf-placevalue w2; its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'parts', text: 'A number name says the hundreds, then the rest.' },
+            { id: 'zero', text: 'No tens word? Write 0 tens.' },
+        ],
+        vocab: [
+            { word: 'number name', meaning: 'a number in words', picture: { kind: 'text', text: 'forty-one' } },
+            { word: 'numeral', meaning: 'a number in digits', picture: { kind: 'glyph', text: '41' } },
+            { word: 'place', meaning: 'hundreds, tens or ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the hundreds word.' },
+            { icon: 'write', text: 'Write the hundreds digit.' },
+            { icon: 'decide', text: 'Read the rest. Tens and ones.' },
+            { icon: 'check', text: 'Read the number back.' },
+        ],
+        // (critic nwf r1 N6: "Three boxes, three digits." was printed over 2-digit items with no boxes and over "one thousand" in
+        // four boxes; the chant names no count - every item the lesson deals is boxed, one digit a box, the empty place a 0)
+        chant: 'Every box gets a digit.',
+        format: { kind: 'numbered steps with icons + a chant', why: 'The one step pupils skip is the empty place; the chant cues its 0.' },
+        example: { match: 'hundred' },
+        // (three across where the name and its boxes fit: two across left 31 % beside the boxes at S - ws-print-lint H13)
+        practiceShapes: [[15, 3], [12, 3], [12, 2], [10, 2], [8, 2], [6, 2]],
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -265,6 +292,20 @@ export const LESSONS = Object.freeze({
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
         ],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
+    // lf-placevalue w2 (2026-11-12, 2.NBT.A.3 / 1.NBT.B.2): number names to numerals; skill: id.
+    'skill:composing:number_word_form': {
+        routine: 'pv-number-words',
+        practice: { skill: 'composing:number_word_form', opts: { wordform: ['to_number'], band: 1000, zeroPlace: 'some', answerSlot: 'hto' } },
+        // (critic nwf r1 N6: the lesson asked for by the skill alone deals these practice options - print-sheet buildLesson)
+        dealPracticeOpts: true,
+        defaultFor: true,
+        prereqsPending: 'New with lf-placevalue w2: its Warm-up until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'composing:number_word_form', opts: { wordform: ['to_number'], band: 100 }, why: 'Names to 100 first: forty-one is 41.' },
+            { key: 'placevalue:unit_form', opts: { band: 999 }, why: 'A 3-digit number is hundreds, tens and ones.' },
+        ],
+        mixWith: [{ key: 'placevalue:unit_form' }, { key: 'placevalue:expand' }],
     },
 });
 

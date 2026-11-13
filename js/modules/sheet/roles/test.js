@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 import { scorePoints } from '../paginate.js';
 
@@ -153,6 +153,10 @@ function layout(items, input, count) {
         // (11 rows -> 10; a page under 8 keeps what it holds: 5 stays 5 when two columns hold 4)
         const ok = [20, 16, 12, 10, 8, 4].find((t) => t <= best.perPage);
         const rows = best.cols === 1 && ok >= 8 && ok >= (alt ? alt.perPage : 0) ? ok : best.rows;
+        // (lf-placevalue pv debt: fewer rows than the layout filled the grid with are no longer the grid's height - unit form's
+        // Test at S, 15 -> 12 rows, kept fill and flexed every row from 15 to 19 mm, 38 % empty under the one line of boxes. A
+        // `tightRows` section keeps its rows; the others keep their passed pages.)
+        if (rows !== best.rows && tightRows(items)) return Object.assign({}, best, { requested: 'auto', rows, perPage: rows * best.cols, fill: false });
         return Object.assign({}, best, { requested: 'auto', rows, perPage: rows * best.cols });
     }
     return L;

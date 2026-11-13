@@ -361,8 +361,22 @@ export function plan(input = {}) {
     // step text over it at one height (the facts level), so the row is as tall as one fact and the longest step's text.
     let across = 0, textMm = 0;
     // (a fact too wide for one column a state - div_facts' "42 ÷ 7 = ___" at L - takes two a row: 2 + 2)
-    const acrossAt = factRows(input) && !marks && !story && steps.length >= 2 && steps.length <= 4
-        ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx)) : 0;
+    // A TALL state beside its step text (lf-roles, RUBRIC H13; ws-empty-band EB-BAND / EB-SIDE on the text cell): a function
+    // table 74 mm tall beside a one-line step left 60-80 % of the text cell empty, and two states a page left half of page 1
+    // empty. When the beside layout's text cell would be 30 % or more empty AND it needs more than one page, the states stand
+    // side by side like a fact page's (each with its step text over it), if that grid fits one page; every other model -
+    // every one-page model of a passed skill among them - keeps its layout.
+    const tallBeside = !factRows(input) && !marks && !story && cols === 2 && steps.length >= 2 && steps.length <= 4
+        && hMinAt([it], 2, ctx) * 0.7 >= textH2 && deal.length > 1;
+    const acrossOk = (a) => {
+        if (!tallBeside) return true;
+        const colW = 186 / a - 6 - 9.5;
+        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
+        return lines <= 2 && (steps.length / a) * (hMinAt([it], a, ctx) + lines * m.textPt * 1.3 * (25.4 / 72) + 4) <= room1;
+    };
+    const acrossAt = (factRows(input) || tallBeside) && !marks && !story && steps.length >= 2 && steps.length <= 4
+        ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx) && acrossOk(a)) : 0;
     if (acrossAt) {
         across = acrossAt;
         const colW = 186 / across - 6 - 9.5;

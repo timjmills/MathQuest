@@ -977,6 +977,16 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | r9 critic FAIL min 7 | 1 round | Word swaps were checked for look-alikes but not for lesson fit; the critic's band render was blank because the lead render step used the wrong lesson file | V-FIT / V-FIT6; ws-lesson-render with title and body checks |
 | r10 critic FAIL min 7 | 1 round | The look-alike class was closed rule by rule after each critic (r6, r7, r9, r10); the swap in "grow" was not run against every picture of its set in the same change | Rule 5 stop: replace the derived rules with a feature model (V-FEAT) and a referent lint (V-REF); render every changed set on both skills automatically |
 
+### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
+**Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
+chant vs slots, word breaks). **Speed-up next time:** before the critic, render scripted-model / guided / opener / true-false for a NEW
+skill and read its provider outputs per band (the 5 earlier pv skills had been through those roles; this one never had).
+
+### lf-placevalue number_word_form (2026-11-12/13): 3 critic rounds to pass
+**Lost:** r1 found 9 provider / cell findings no check covered (a new skill never rendered on scripted-model / guided / true-false
+before its critic); r2 found the N4 class again (N10) because the r1 fix keyed on one name's length. **Kept:** a builder (Opus medium)
+fixed 6 findings + 7 checks in one pass; the r3 narrow critic took 9 minutes. **Next skill:** run ws-cell-checks --words-rules and
+ws-words-checks style provider checks for compare / more_less BEFORE the first critic.
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
 | Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
@@ -988,3 +998,16 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | r11 critic FAIL min 7 | 1 round | V-FEAT word definitions were written from the pictures, not from each set's standard text (4.OA.B.4 names product/multiple); NB9 probed card 1 only | V-STD (standard-text pairs); NB9 on every card and host |
 | r12 critic FAIL min 7 | 1 round | pick3 banks are drawn from the whole set, so new pairs appear each deal; hand links fixed one picture of a twin pair; the numbers a picture rings were not features | Enumerate the dealable pairs (or deal pick3 only from vetted trios); V-NUM; V-TWIN |
 | r13 critic FAIL min 7 | 1 round | V-NUM had an untested boundary (1 marked number); place and tower-step features were not modelled | V-NUM single mark; V-PLACE; V-TWIN over all run pictures; the enumerated banks make the next review complete |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |

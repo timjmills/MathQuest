@@ -131,6 +131,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'check-fix-mixed': 'Is it right? Check one box. Fix it: write or check.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
+    // (PT-TOF-4: a page whose statements all have sentence answers prints no frame, so nothing to finish; lf-roles critic r1 R1)
+    'true-false-judge': 'Check one box: True or False.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',

@@ -526,6 +526,7 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
+| lf-placevalue number_word_form critic rounds | — | 3 (r1 9 findings, r2 3, r3 PASS); 11 findings now checks with backtests, 1 minor open, 2 engine |
 
 ### lf-vocab rounds 9-10 (2026-11-12 to 13)
 | Metric | Value |
@@ -547,3 +548,17 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | r11 | fresh Opus medium builder (V-FEAT, hatch, V-REF, NB9; finished by the lead session after a container restart); narrow critic r11 FAIL min 7 (product ≈ multiple; caret) |
 | r12 | Opus low builder (finished by the lead session after a container restart); narrow critic r12 FAIL min 7 (row ≈ even, row/column ≈ product, first term ≈ rule) |
 | r13 | Opus low builder (pick3 deals only vetted trios, V7-ALL, V-NUM, V-TWIN); narrow critic r13 FAIL min 7 (3 clashes in sets 5, 7, 8; 8 of 11 sets clean, all 234 banks graded) |
+| 2026-11-13 | lf-placevalue | pv debt (tightRows) | narrow critic 1 round PASS | builder ~$13 + critic ~$6 | F1 not held; checks for the pixel rows wait on lf-checks |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
