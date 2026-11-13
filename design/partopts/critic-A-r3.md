@@ -24,7 +24,14 @@ never shows and could not be walked.
 
 ## Gates (final lines)
 
-GATES_TABLE
+| Gate | Result |
+|---|---|
+| `node tests/scripts/ws-partopts-unit.cjs` (full) | FILL-BT, ROWFIT-BT, BAND-BT PASS · PO-2w 815 settled states in 52 cases · PO-2a-d, EB-ROWFIT, PO-NOROOM, PO-REM, PO-CAP, PO-VOC PASS · PO-2e We Do 7/52, Practice 52/52 · 1835 builds, 3763 s · **`ws-partopts-unit: OK`** |
+| `node tests/scripts/ws-partopts-shots.cjs --out <scratch>` (committed shots untouched) | **`ws-partopts-shots: OK`** |
+| `node tests/scripts/ws-code-snapshot.mjs` | **`ws-code-snapshot: OK (732 codes, 35 categories, +160 appended since the pinned baseline of 572, no frozen code or position moved, no frozen skill deleted, insertion + retirement stable, 3203 option round trips)`** |
+| `node tests/scripts/ws-boot-smoke.cjs` | **`ws-boot-smoke: OK`** |
+| Default identity: d34311d worktree (scratch) `ws-lesson-baseline --all-lessons --write`, then `--check` on HEAD | `wrote 1556 hashes` · **`ws-lesson-baseline: OK (1556 hashes identical)`** (worktree removed) |
+| `ws-detailed-lesson --check --repeats`, the 7 detailed lessons | OK: g2-nbt3, g3-oa5, g3-oa9-input-output-rule, g3-oa9-mult-table-patterns, g4-nbt1. FAIL as on master: g1-oa1 (E9 overflow P6 +5 mm, E35), g3-oa8 (E35). |
 
 ## Scores
 
