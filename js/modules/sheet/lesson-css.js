@@ -126,6 +126,9 @@ export const LESSON_ROUTE_CSS = [
     // and drops the CL-40 tab spacer where its content clears the tab; pre-skill-check.js band() decides per cell)
     '.ws-page .mq-lprecol .ws-grid>.ws-cell.mq-lprectr:not(.blankrun){justify-content:safe center !important}',
     '.ws-page .mq-lprecol .ws-grid>.ws-cell.mq-lprefree:not(.blankrun)::before{content:none !important;display:none !important}',
+    // (lf-engine PC 2026-11-13, PC-H13 width: a natural-width grid - its cells as wide as their items + the tab room - is
+    // centred as a group in its band, boxed on every side; pre-skill-check.js routedLayout ROUTE_NAT_BAND)
+    '.ws-page .mq-lprecol>.ws-grid.mq-lprenat{align-self:center;width:max-content;max-width:100%;border-left-width:var(--ws-heavy);border-right-width:var(--ws-heavy)}',
 ].join('');
 
 export default { LESSON_CSS, LESSON_ROUTE_CSS };

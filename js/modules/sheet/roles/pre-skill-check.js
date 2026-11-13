@@ -58,7 +58,11 @@ export function itemNumberKey(it) {
 const poolItems = (input, id) => {
     const its = dealtItems(input, id);
     if (!routedCheck(input)) return its;
+    // (lf-engine PC 2026-11-13: page-wide, as PC-LR6 reads it - an item repeating an EARLIER question's numbers is dropped
+    // too: round S printed "27 is between __ and __" under "27: circle the tens")
+    const k0 = Number(String(id).replace(/\D/g, ''));
     const seen = new Set();
+    for (let j = 0; j < k0; j++) for (const it of poolItems(input, `q${j}`)) { const k = itemNumberKey(it); if (k) seen.add(k); }
     return its.filter((it) => { const k = itemNumberKey(it); if (!k) return true; if (seen.has(k)) return false; seen.add(k); return true; });
 };
 const PER_QUAD = 4;
@@ -127,6 +131,19 @@ export const ROUTE_GROW = 1.15;
  *  up to ROUTE_GROW - while every item's centred empty band stays under ROUTE_BAND (H13 is 30 %): a row never grows past
  *  its shortest content / (1 - 2 x ROUTE_BAND). Was 1.05 with CL-4b's top start (the growth all went under the item). */
 export const ROUTE_BAND = 0.29;
+/** (lf-engine PC 2026-11-13) The drawn join between two routed bands (mm): the kit's bands and rows share a border
+ *  (sheet-kit.css `.ws-band` / practice.js `.mq-row` margin-top: -1.5pt), so the check page spends no gap between its
+ *  bands - bandMetrics' 3 mm gap left 15-18 mm of every S check page unplanned (round S: planned 232 mm, drawn 222 mm). */
+export const ROUTE_GAP_MM = 0;
+/** (lf-engine PC 2026-11-13, PC-H13 width) A lone routed question whose items leave a side band of ROUTE_BAND or more
+ *  in their equal columns lies in a NATURAL-WIDTH grid: each cell its widest item's ink + room for the tab on both
+ *  sides, at least ink / (1 - 2 x ROUTE_NAT_BAND), the cells centred as a group in the band (sub S: two "circle ones
+ *  / tens" items 34 mm wide in 92 mm cells, 31 %; three expanded forms 62 mm wide in 184 mm, 33 %). */
+export const ROUTE_NAT_BAND = 0.2;
+/** (lf-engine PC 2026-11-13, PC-H13 height) A row whose cells keep CL-40's spacer (no side room past the tab) takes the
+ *  height that drops it - its content + the tab clear above and below - from the page's spare height, then from other
+ *  rows' growth (the ROW-HEIGHT TRADE), when that height is at most this share past its measured height. */
+export const ROUTE_TRADE_MAX = 1.3;
 /** Templates that keep CL-40's (tab - 2 mm) spacer above their content (sheet-kit.css; pv by its own rule). */
 const SPACER_T = /^(pv|seqstrip|word-work|words|counters|remainder)$/;
 /** An item's drawn content height at `c` columns (mm): its measured height less the pads and the spacer. */
@@ -337,7 +354,7 @@ function planCheck(input, cut) {
     const letterOf = (k) => String(k);
     // (an item's answer as the routing table prints it: "B", "70 and 80", "40, 60, 70")
     const answerOf = (it) => { const a = it && it.q ? it.q.ans : ''; return Array.isArray(a) ? a.join(', ') : a && typeof a === 'object' ? Object.values(a).join(', ') : String(a === undefined || a === null ? '' : a); };
-    const band = (its, cols, rows, cellH, pageCols, tagLines = 1) => {
+    const band = (its, cols, rows, cellH, pageCols, tagLines = 1, natW = 0) => {
         const qi = qIndex[bandNo++];
         const instr = instructionText(instructionKeyOf(its, input.skills), its);
         // (the detailed lesson's check centres each item in its grown cell, H13; a lesson's routed check keeps CL-4b's top
@@ -355,7 +372,9 @@ function planCheck(input, cut) {
             if (!(centre && routed)) return centre ? 'mq-lvcenter' : '';
             const tab = (ctx.s && ctx.s.tabMm) || 5;
             const mm = it.measured && it.measured[pageCols];
-            const slack = mm && Number.isFinite(mm.slackMm) ? mm.slackMm : 0;
+            // (a natural-width cell's side slack is its own: (natW - ink) / 2, routedLayout)
+            const slack0 = mm && Number.isFinite(mm.slackMm) ? mm.slackMm : 0;
+            const slack = natW > 0 ? slack0 + (natW - FULL_W_MM / pageCols) / 2 : slack0;
             const ch = contentMm(it, pageCols, ctx);
             // (a w2 tab - numbers past 9 - is 1.4 tab sides wide)
             const koW = (start + its.length - 1 > 9 ? tab * 1.4 : tab) + 1;
@@ -363,7 +382,9 @@ function planCheck(input, cut) {
             const down = (cellH - ch) / 2 >= tab + 0.3;
             return ['mq-lvcenter', 'mq-lprectr', side || down ? 'mq-lprefree' : ''].filter(Boolean).join(' ');
         };
-        const grid = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', cellCls(it)].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
+        const grid0 = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', cellCls(it)].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
+        // (lf-engine PC 2026-11-13: a natural-width grid - cells natW wide, centred as a group, mq-lprenat - ROUTE_NAT_BAND)
+        const grid = natW > 0 ? Object.assign(grid0, { cls: `${grid0.cls} mq-lprenat`, colsTpl: `repeat(${cols},${natW.toFixed(2)}mm)` }) : grid0;
         const r = routed ? routeOf(input, qi) : null;
         const b = {
             // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
@@ -417,20 +438,20 @@ function planCheck(input, cut) {
             // CL-4b top start). What the rows cannot take is left at the foot (reported in meta.foot).
             const lay = routedLayout(quads, qIndex, input, ctx, m);
             lay.units.forEach((u) => {
-                const uh = u.fixed + u.rows * u.h + (cur.sections.length ? m.gap : 0);
+                const uh = u.fixed + u.rows * u.h + (cur.sections.length ? ROUTE_GAP_MM : 0);
                 if (cur.sections.length && cur.used + uh > cur.budget + 0.5) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
                 cur.used += uh;
                 // (critic r2 N6: when one of the pair's instructions wraps, BOTH strips take the taller height - `--ws-strip`
                 // is the strip's min-height - so the two grids, their number tabs and their tags start on one line)
                 if (u.qs.length === 2) cur.sections.push(Object.assign({ kind: 'row', widths: u.qs.map((q) => `${q.length}fr`), cls: 'mq-quadrow mq-lprerow', parts: u.qs.map((q) => band(q, q.length, 1, u.h, u.cols, u.tagLines)) },
                     u.stripMm > m.strip + 0.05 ? { style: `--ws-strip:${u.stripMm.toFixed(2)}mm;` } : {}));
-                else cur.sections.push(band(u.qs[0], u.cols, u.rows, u.h, u.cols, u.tagLines));
+                else cur.sections.push(band(u.qs[0], u.cols, u.rows, u.h, u.cols, u.tagLines, u.natW || 0));
                 kept += u.qs.reduce((t, q) => t + q.length, 0);
             });
             routedFoot = lay.foot;
             routedUsed = +lay.used.toFixed(1);
             routedFits = lay.fits;
-            routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack }));
+            routedUnits = lay.units.map((u) => ({ qs: u.qs.map((q) => q.length), cols: u.cols, rows: u.rows, h0: +u.h0.toFixed(1), cap: +u.cap.toFixed(1), h: +u.h.toFixed(1), slack: u.slack, natW: u.natW ? +u.natW.toFixed(1) : 0, need: u.need ? +u.need.toFixed(1) : 0 }));
         } else for (const q0 of quads) {
             const cols = [4, 2, 1].find((c) => fitsAt(q0, c, ctx)) || 1;
             const h = hMinAt(q0, cols, ctx) * grow;
@@ -501,9 +522,47 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         u.fixed = u.stripMm + routeTagMm(u.tagLines);
         u.h = u.h0;
     }
-    const gaps = Math.max(0, units.length - 1) * m.gap;
+    // (lf-engine PC 2026-11-13) per unit: its first label (a w2 tab past 9), a natural width (ROUTE_NAT_BAND) and the
+    // height that drops CL-40's spacer (ROUTE_TRADE_MAX)
+    const tab = (ctx.s && ctx.s.tabMm) || 5;
+    let label = 1;
+    for (const u of units) {
+        const n = u.qs.reduce((t, q) => t + q.length, 0);
+        const koW = (label + n - 1 > 9 ? tab * 1.4 : tab) + 1;
+        label += n;
+        const cw = FULL_W_MM / u.cols;
+        const its = u.qs.flat();
+        const legacy = its.some((it) => it.legacy);
+        const sl = its.map((it) => { const mm = it.measured && it.measured[u.cols]; return mm && Number.isFinite(mm.slackMm) ? mm.slackMm : NaN; });
+        const ink = sl.every(Number.isFinite) ? Math.max(...sl.map((v) => cw - 2 * v)) : NaN;
+        if (!legacy && u.qs.length === 1 && ink > 0 && (cw - ink) / 2 / cw >= ROUTE_BAND - 0.01) {
+            const w = Math.max(ink + 2 * (koW + 0.3), ink / (1 - 2 * ROUTE_NAT_BAND));
+            if (w < cw - 1) u.natW = w;
+        }
+        // (a cell keeps the spacer when its content clears the tab neither sideways nor - at its row height - downwards)
+        const sideOf = (v) => (u.natW ? v + (u.natW - cw) / 2 : v) >= koW + 0.3;
+        const kept = its.filter((it, x) => SPACER_T.test(String(it.template || '')) && !(Number.isFinite(sl[x]) && sideOf(sl[x])));
+        if (!legacy && kept.length) {
+            // (only a row the spacer pushes past the band: its content centred under the spacer at its measured height -
+            // pad + spacer + half what is left - is ROUTE_BAND or more of the row; round S's "10 less than 15 is __", 34 %)
+            const sp = Math.max(0, tab - 2);
+            const over = kept.some((it) => { const ch = contentMm(it, u.cols, ctx); return (3 + sp + Math.max(0, u.h0 - 6 - sp - ch) / 2) / u.h0 >= ROUTE_BAND; });
+            const need = over ? Math.max(...kept.map((it) => contentMm(it, u.cols, ctx))) + 2 * (tab + 0.3) + 0.1 : NaN;
+            const chLo = Math.min(...its.map((it) => contentMm(it, u.cols, ctx)));
+            if (Number.isFinite(need) && need > u.h0 + 0.05 && need <= u.h0 * ROUTE_TRADE_MAX && (need - chLo) / 2 / need < ROUTE_BAND) u.need = need;
+        }
+    }
+    const gaps = Math.max(0, units.length - 1) * ROUTE_GAP_MM;
     const used0 = units.reduce((t, u) => t + u.fixed + u.rows * u.h, 0) + gaps;
     let spare = m.budget - used0 - 1;
+    // The ROW-HEIGHT TRADE (lf-engine PC 2026-11-13): a row that needs its spacer-free height takes it first from the page's
+    // spare height; what the spare cannot give it takes, after the growth pass, from the other rows' growth past their
+    // measured height (never below it). All of it or none: a row that cannot have its whole height keeps the spacer.
+    const pending = [];
+    for (const u of units.filter((x) => x.need)) {
+        const want = (u.need - u.h) * u.rows;
+        if (spare + 1e-6 >= want) { spare -= want; u.h = u.need; u.cap = u.need; } else pending.push(u);
+    }
     for (let pass = 0; pass < 8 && spare > 0.5; pass++) {
         const open = units.filter((u) => u.h < u.cap - 0.05);
         if (!open.length) break;
@@ -511,6 +570,14 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         let took = 0;
         for (const u of open) { const add = Math.min(u.cap - u.h, (spare * u.h) / w); u.h += add; took += add * u.rows; }
         spare -= took;
+    }
+    for (const u of pending) {
+        let short = (u.need - u.h) * u.rows - Math.max(0, spare);
+        const donors = units.filter((x) => !x.need && x.h > x.h0 + 0.05);
+        if (donors.reduce((t, x) => t + (x.h - x.h0) * x.rows, 0) + 1e-6 < short) { delete u.need; continue; }
+        spare = Math.min(0, spare);
+        for (const x of donors) { if (short <= 0) break; const g = Math.min((x.h - x.h0) * x.rows, short); x.h -= g / x.rows; short -= g; }
+        u.h = u.need; u.cap = u.need;
     }
     const used = units.reduce((t, u) => t + u.fixed + u.rows * u.h, 0) + gaps;
     return { units, used, foot: +(Math.max(0, m.budget - used) / m.budget).toFixed(3), fits: used <= m.budget + 0.5 };

@@ -5085,6 +5085,8 @@ async function buildLesson(n, metaOf) {
             id: libId, skill: `${sk.categoryId}:${sk.skillId}`, tags: { ccss, ee, line: tagLine },
             // LR-17: the Prerequisite Check's questions and routes (null without one).
             prereqCheck: prereqs ? prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', why: p.why || '', checks: p.checks || '', skill: `${p.ref.categoryId}:${p.ref.skillId}` })) : null,
+            // (lf-engine PC 2026-11-13: the check's routed layout - units, rows, heights, foot - for the gate's geometry dump)
+            prereqLayout: (() => { const p = parts.find((x) => x.part === 'prereq'); const mt = p && p.res && p.res.plan && p.res.plan.meta; return mt && mt.units ? { units: mt.units, used: mt.used, foot: mt.foot, fitsPage: mt.fitsPage } : null; })(),
             prerequisites: data
                 ? { skills: data.skills.map((s) => s.key), concepts: data.concepts.map((c) => c.text), vocab: data.vocab.map((v) => v.word) }
                 : { skills: warmSkills.map((s) => `${s.categoryId}:${s.skillId}`), concepts: [], vocab: [] },
