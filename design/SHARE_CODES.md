@@ -104,7 +104,7 @@ opening a new link gets the right skills at their default options — never a di
 
 ## The key registry (`js/modules/skill-option-keys.js`)
 
-All 26 one-letter keys are taken (`C N L R M D W G O U S P B T I K Z X E A V Q H F Y J`). Every
+All 26 one-letter keys are taken (`C N L R M D W G O U S P B T I K Z X E A V Q H F Y J`). Every <!-- nos: share-code letter, not a size -->
 later option id gets a **two-character key: a digit, then a letter**. Each digit is a **block**
 owned by one wave, 26 keys a block, and a wave takes only the next letter of its own block:
 
@@ -157,18 +157,18 @@ The union token tables today (value → character; numeric set members in base 3
 | `notation` | stacked S · across A · bracket B · fraction F |
 | `response` | standard S · which-numbers W · array-builder A · write R · circle-all C |
 | `regroup` | none N · always A · mixed M |
-| `orientation` | vertical V · horizontal H · rows R · line L · scattered S |
-| `unknown` | answer A · first F · second S · mixed M · 0 1 2 |
+| `orientation` | vertical V · horizontal H · rows R · line L · scattered S <!-- nos: share-code letter, not a size --> |
+| `unknown` | answer A · first F · second S · mixed M · 0 1 2 <!-- nos: share-code letter, not a size --> |
 | `wordform` | to_number N · to_words W |
 | `dir` | more M · less L · both B · fewer F · same S · mixed X · forward W · back K · 0 1 |
 | `task` | read R · count C · compute P · closest N · reasonable E · length L · height H · thickness T · all A · 0–3 |
 | `zeroPlace` | none N · some S · always A |
 | `op` | x M · / D |
-| `order` | largest L · scrambled S |
+| `order` | largest L · scrambled S <!-- nos: share-code letter, not a size --> |
 | `midpoint` | never N · seeded S · only O |
 | `support` | cut C · line L · none N · labels B · chart T · tile D · frame R · skip K · array A · think H · bar M · label E |
 | `objects` | shapes S · pictures P · frame F · dice D |
-| `model` | none N · area A · bar B · circle C · line L · set S · grid G · blocks K · analog H · digital D |
+| `model` | none N · area A · bar B · circle C · line L · set S · grid G · blocks K · analog H · digital D <!-- nos: share-code letter, not a size --> |
 | `labels` | all A · some S · none N |
 | `precision` | hour H · half F · quarter Q · five V · one O · 0–3 |
 | `coins` | p P · n N · d D · q Q |

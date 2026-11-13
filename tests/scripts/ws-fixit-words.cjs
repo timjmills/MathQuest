@@ -13,7 +13,7 @@ const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const SKILLS = String(arg('skills', arg('skill', 'placevalue:unit_form'))).split(',').map((x) => x.trim()).filter(Boolean);
-const SIZES = String(arg('sizes', 'S,M,L')).split(',');
+const SIZES = String(arg('sizes', 'M,L')).split(','); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const SEED = parseInt(arg('seed', '7'), 10);
 
 (async () => {

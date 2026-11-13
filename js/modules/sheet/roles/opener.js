@@ -35,6 +35,11 @@ const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1, 2, 3, 4];
+/** lf-placevalue compare r2, critic r1 F4: the Model (the first item) is never an item marked `noModel` (the compare "=",
+ * which decides nothing); the host deals the next one. Every later item is kept as dealt. */
+export function prepare(it, info = {}) {
+    return it && it.q && it.q.noModel && !(info && info.index) ? null : it;
+}
 
 /** Lines a list of steps takes in the 93 mm Steps zone, from an Andika width estimate. */
 function stepLines(list, textPt, zoneMm = 93) {

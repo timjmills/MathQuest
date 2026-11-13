@@ -183,6 +183,11 @@ const OUT = arg('out', null) ? path.resolve(ROOT, arg('out'))
 const DPI = parseInt(arg('dpi', GOLDEN_MODE ? '150' : '96'), 10);
 const NO_SCREEN = has('no-screen');
 const NO_PRINT = has('no-print');
+// --quiz-builder (opt-in, lf-placevalue compare r4 / critic r2 N8): the quiz host deals through the quiz builder - openQuizBuilder +
+// addMultipleQuestions with the skill's category, the app's own path, so a provider's roleOpts('test') (identify's heads off) and
+// the builder's set positions apply - instead of seeded generateQuestionFor calls; Math.random reseeded first, and the quiz
+// view's HTML is written beside the PNG (quiz-1280.html) for a check to read. Off: the quiz is dealt as before (golden hashes).
+const QUIZ_BUILDER = has('quiz-builder');
 // --gate: end with `ws-grade-render: OK | FAIL` on the measured overflow and phone / tablet card targets (see the run's end)
 const GATE = has('gate');
 // the online worksheet and quiz ALSO at 820 and 1024 (the tablets) - under --gate always, else on --tablet-hosts
@@ -223,13 +228,13 @@ if (has('sample-self-test')) {
     // critic lf-tools r1 B3: at f3ae7acca a copy-light sample read as the older list (json.pages is a number): no unit, no
     // seed, no width. Now each page is one unit carrying exactly its sampled values.
     const j = { tool: 'ws-copy-light', mode: 'batch', skills: [{ skill: 'placevalue:more_less_10', pages: [
-        { n: 1, role: 'guided', size: 'S', seed: 12345, host: 'print', width: null, opts: { band: '20' } },
+        { n: 1, role: 'guided', size: 'M', seed: 12345, host: 'print', width: null, opts: { band: '20' } },
         { n: 2, role: null, size: null, seed: 12346, host: 'practice-card', width: 1024, opts: null },
         { n: 3, role: null, size: null, seed: 12347, host: 'quiz', width: 1366, opts: { support: ['touch'] } }] }] };
     const u = copyLightUnits(j);
     const want = [
         ['3 units', u.length, 3],
-        ['print page role / size / seed / opts', [u[0].role, u[0].size, u[0].seed, u[0].opts && u[0].opts.band, u[0].hosts], ['guided', 'S', 12345, '20', null]],
+        ['print page role / size / seed / opts', [u[0].role, u[0].size, u[0].seed, u[0].opts && u[0].opts.band, u[0].hosts], ['guided', 'M', 12345, '20', null]],
         ['card page host / width / seed', [u[1].role, u[1].hosts, u[1].width, u[1].seed], [null, ['practice-card'], 1024, 12346]],
         ['quiz page width / opts', [u[2].hosts, u[2].width, u[2].opts && u[2].opts.support], [['quiz'], 1366, ['touch']]],
         ['skill split', [u[0].categoryId, u[0].skillId], ['placevalue', 'more_less_10']],
@@ -459,10 +464,19 @@ async function renderWorksheet(page, skill, file, width = 1280, height = 900, se
 async function renderQuiz(page, skill, file, width = 1280, height = 900, seedOver = null) {
     await viewport(page, width, height);
     await hideOverlays(page);
-    const info = await page.evaluate(async ({ skill, seed }) => {
+    const info = await page.evaluate(async ({ skill, seed, viaBuilder }) => {
         try {
             const questions = [];
-            for (let i = 0; i < 3; i++) {
+            if (viaBuilder) {
+                if (window.__wsReseed) window.__wsReseed(seed);
+                window.openQuizBuilder();
+                window.addMultipleQuestions(skill.skillId, 3, skill.categoryId);
+                await window.saveQuiz();
+                const tests = (await window.listTests()) || [];
+                const t = tests.slice().sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')))[0];
+                for (const q of (t ? t.sections.flatMap((x) => x.questions) : [])) questions.push(Object.assign({}, q, { id: questions.length }));
+            }
+            for (let i = 0; !viaBuilder && i < 3; i++) {
                 const q = window.generateQuestionFor({ category: skill.categoryId, skill: skill.skillId, seed: seed + i, itemIndex: i });
                 if (!q) continue;
                 // what the quiz builder stores (quiz-take.js quizQuestionData), so the quiz renders as a real one
@@ -481,14 +495,15 @@ async function renderQuiz(page, skill, file, width = 1280, height = 900, seedOve
             name.value = 'Audit'; name.dispatchEvent(new Event('input'));
             window.startQuizTest();
             window.scrollTo(0, 0);
-            return { questions: questions.length };
+            return { questions: questions.length, ...(viaBuilder ? { via: 'quiz-builder' } : {}) };
         } catch (e) { return { error: e.message || String(e) }; }
-    }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':quiz') });
+    }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':quiz'), viaBuilder: QUIZ_BUILDER });
     if (info.error) return { error: info.error };
     await sleep(400);
     let el = await page.$('#quizTakeView');
     if (el && !(await el.boundingBox())) el = null;   // (as the worksheet: no box of its own at 768 px tall)
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
+    if (QUIZ_BUILDER) fs.writeFileSync(file.replace(/\.png$/, '.html'), await page.evaluate(() => { const v = document.getElementById('quizTakeView'); return v ? v.outerHTML : ''; }));
     const m = await measure(page, '#quizTakeView');
     const contentHash = hashOf(await page.evaluate(G.canonicalHostInPage, '#quizTakeView'), file);
     // leave quiz mode so the next host starts clean
