@@ -549,3 +549,11 @@ reference for an item paper does not hold (e.g. the same word on paper), or a le
 Precritic --strict after the last fix (c0ea9b03 Match 3; 75b0e131 pick3): both skills FAIL 2, PASS 33 - sibling-compare (known) and
 ws-screen-ink-size (the default SIZE-REF coverage findings above, only). ws-vocab-unit --browser, ws-next-box, both ws-empty-band
 modes and ws-chromebook-fit green; no pupil page moved (screen-only changes, V23 pin holds), no picture changed (no new renders).
+
+### Known findings (lead ruling 2026-11-13, option (a))
+ws-screen-ink-size SIZE-REF at default options: 4 findings on the online worksheet: distributive (Match 3); equal groups
+and pattern (pick3); and set 4's pick3 hundred chart. They are a gate COVERAGE gap, not a size defect. The worksheet host
+deals its own items (seed 4242), but the paper reference (Independent M seed 7) never deals those words, so there is no
+paper mark to compare. Same-word proof: `ws-screen-ink-size --skill vocabulary:<skill> --opts '{"vocabSet": n}' --no-baseline
+--only SIZE-INK` is OK for both skills × sets 1-4. Log: design/lanes/lf-vocab/size-proof-r14.txt. Gate fix (build the reference for
+the same word) routed to lf-checks by the lead.
