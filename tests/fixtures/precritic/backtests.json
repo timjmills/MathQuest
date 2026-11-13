@@ -3920,6 +3920,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "model-marks-ink",
+  "check": "a Scripted Model state draws only its own new marks in trace grey; earlier steps' marks are black (PT-MOD-1, P-LC-9; lf-roles critic r5b D2)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit MOD-MARKS-INK",
+  "browser": false,
+  "fail": {
+   "commit": "3b324bcc",
+   "state": "states carry no new-mark list: every traceSlots value drawn grey"
+  },
+  "pass": {
+   "commit": "88032a8a",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-MARKS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

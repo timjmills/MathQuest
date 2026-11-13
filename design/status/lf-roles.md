@@ -17,6 +17,19 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
 
+## Round 9 (2026-11-13; lead order 1-5)
+- Critic r5b D2 (PT-MOD-1, P-LC-9) fixed in 88032a8a: each Model state names its own new marks (`traceNew`); function-table and
+  count-row draw only those in trace grey and the earlier marks black; a last "fill in every row" re-mark adds only the new answer;
+  the lesson chart's F5 count-row states the same. Check ws-roles-unit MOD-MARKS-INK (FAIL on 3b324bcc, OK on 88032a8a; backtest
+  row model-marks-ink PASS).
+- Lead order 5 (PUPILTAG offsets on table / count-row work): function-table's inline-block wrapper is vertical-align:top (it sat
+  3.6 mm under the cell top on the line strut, so the label floated 5.5 mm over the table at L); error-analysis TAG_LIFT lifts the
+  label 0.5 mm over count-row / function-table work (ink flush with the box: 1.8 mm before). PUPILTAG counts a bordered box's top
+  edge as ink. ws-cell-checks PUPILTAG + OVERFLOW: 0 on function_table_easy / number_patterns_rule / function_table EA S/M/L.
+- Proofs: passed skills 810/810 role pages (27 skills x 10 roles x S/M/L, pupil + key) identical vs 3b324bcc; lesson baseline
+  --all-lessons vs master 8a7c5d43: see below.
+- Next: critic r5c on the fte Model + the changed EA pages; deploy-3; R13 ruling asked.
+
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
 - N9 FIX-MINIMAL (25d7bf2f): compose.wrongOf keeps a list's FIRST error only (later parts follow the correct rule); 0 passed pages
