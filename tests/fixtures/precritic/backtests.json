@@ -5838,6 +5838,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "no-dropped-row",
+  "check": "ws-precritic-plan --checks-from-critics: a deploy tree never DROPS a backtest row id the baseline (origin/master, or --rows-before) held; blocks always, whatever the ledger's warning date",
+  "kind": "fixture",
+  "rule": "ws-precritic-plan no-dropped-row (lead 2026-11-13, lf-ops: 7 div_facts rows lost in a deploy cherry-pick)",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/no-dropped-row/fail.json",
+   "state": "the baseline holds a row id this tree lacks"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/no-dropped-row/pass.json",
+   "state": "every baseline id is in this tree"
+  },
+  "command": "node tests/scripts/ws-precritic-plan.mjs --checks-from-critics --skills zz_probe:zz_no_such_skill_q7 --rows-before {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

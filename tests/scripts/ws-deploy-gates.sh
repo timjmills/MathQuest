@@ -38,7 +38,8 @@
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
-#            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
+#            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
+#            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
 #            catch their fixtures), ws-lessonfit (every year's WRM site-lesson gate) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
 #            no browser slot, seconds: it folds the nightly's options-pin-*.json by `finished`, newest result per skill;
 #            FAIL on a NEW failing pair of a live skill that no later check fixed, WARNING while fewer than 28 slices
@@ -857,6 +858,7 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
   # browser slot, seconds); it never runs the pin itself (the whole pin is ≈ 1 h 52 min on the two slots). On a node
