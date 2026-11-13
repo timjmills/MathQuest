@@ -193,6 +193,11 @@
    "date": "2026-10-02",
    "ruling": "'Within N' bounds the answer, never the operands; a skill's NAME is its declaration.",
    "source": "CLAUDE.md governing rules"
+  },
+  {
+   "date": "2026-11-13",
+   "ruling": "Card signed by the lead under the owner's delegation: decisions 1-12 as recommended, decision 3 amended (wpBar findable as multi_step_word '(Visual)'; msChoose read in the code: a response mode on the same task, so a plain option, no preset).",
+   "source": "design/decisions/LEAD_DECISIONS.md (2026-11-13, two-step card)"
   }
  ],
  "misconceptions": [
@@ -234,7 +239,7 @@
  ],
  "options": [
   "Every option is read by gen-algebraic.js (multi_step_word block) and word-work.js: forms (the four + / − orders, key = variants), msOps (key 4P), band, wpCues / wpBank / wpBar (8A-8C), wpFrames, msLetter, msCheck, msChoose. Keys append to skill-option-keys.js ONLY when built: the new ones this card proposes are band value 100 (the shared key B, value appended) and none else (wpBar on two-step reuses 8C).",
-  "Preset skills (skill-presets.js, live): two_step_mult_div_first {msOps: multdiv}, two_step_add_then_mult {addmult}, two_step_add_then_div {adddiv}, two_step_letter_equation {multdiv, msLetter}, two_step_estimate_check {msCheck}. Checked against the 2026-10-17 rule: msOps mult and div alone (lesson 7 chunks) stay options of two_step_mult_div_first (one lesson, chunked); msChoose a response mode; wpFrames and wpBar scaffolds; forms the order of the + / − steps (one G2 lesson) - none a preset (PROPOSED Q3). The G2 lesson's skill is the host's default (multi_step_word), so no G2 preset.",
+  "Preset skills (skill-presets.js, live): two_step_mult_div_first {msOps: multdiv}, two_step_add_then_mult {addmult}, two_step_add_then_div {adddiv}, two_step_letter_equation {multdiv, msLetter}, two_step_estimate_check {msCheck}. Checked against the 2026-10-17 rule: msOps mult and div alone (lesson 7 chunks) stay options of two_step_mult_div_first (one lesson, chunked); msChoose a response mode (the pupil still solves the story and checks one of four answers; not a choice of operations); wpBar a new representation, findable as multi_step_word '(Visual)' (decision 5); wpFrames a scaffold; forms the order of the + / − steps (one G2 lesson) - none a preset (Q3, amended 2026-11-13). The G2 lesson's skill is the host's default (multi_step_word), so no G2 preset.",
   "addsDrawingValues (PROPOSED): wpBar=true and msCheck=true add a drawing (a page may hold fewer stories).",
   "Search terms (search-terms.js, in the build change; ws-search-terms gate): add to SKILL_TERMS of the host and twin 'two step word problems', 'multi-step', 'two operations', 'add then subtract story', 'bar model two steps'; presets: 'multiply then add', 'divide then subtract', 'brackets story', 'equation with a letter', 'unknown n', 'reasonable answer', 'estimate to check', 'rounding check'; CONCEPT_RULES hits on 'two-step' / 'multi-step' -> the seven (PROPOSED Q12)."
  ],
@@ -283,7 +288,7 @@
   },
   {
    "q": "Any new preset skill under the 2026-10-17 rule (msOps mult / div alone, msChoose, wpFrames, wpBar, a G2 'two-step + and − within 100')?",
-   "recommended": "No: the five presets stay; the G2 BUILD lesson uses the host's default (multi_step_word, band 100), the rest are chunks, response modes or scaffolds."
+   "recommended": "No new preset (amended by the lead, 2026-11-13, under the owner's delegation, against the 2026-10-17 rule that a distinct option - a new representation or task kind - is ALSO a findable preset skill): the five presets stay; wpBar (a new representation) IS findable, as multi_step_word '(Visual)', which defaults to it (decision 5); msChoose stays a plain option: read in gen-algebraic.js (msChoose block), word-work.js and cells/word-work.js chooseLayout, the pupil still SOLVES the same x / ÷-first two-step story and only answers by checking one of four numbers (the answer and the three two-step errors) - a response mode on the same task, not choosing the operations (no new task kind); msOps mult / div alone are the two chunks of two_step_mult_div_first's one lesson; wpFrames is a scaffold fade; forms are the orders of one G2 lesson, whose skill is the host's default (multi_step_word, band 100)."
   },
   {
    "q": "Build the two-step bar model (a new graphic: Step 1 bar - equal groups or part-whole - and Step 2 bar carrying the Step 1 answer), drawn on the teaching pages and as wpBar on practice pages? Today wpBar is offered but draws nothing on a two-step story.",
@@ -437,11 +442,12 @@
     "values": [
      "null",
      "30",
-     "50"
+     "50",
+     "100"
     ],
     "d": "offered",
     "source": "skill-options.js _o2RangeBand; §9.2",
-    "why": "caps every computed number (PROPOSED Q2; value 100 appended at build)",
+    "why": "caps every computed number, the Step 1 result and the answer (Q2); 100 appended at build (the G2 lesson's band)",
     "proposed": true
    },
    {
