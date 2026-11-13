@@ -492,7 +492,7 @@ async function collectReads({ skill }) {
     const own = `${skill.categoryId}:${skill.skillId}`;
     const plain = (t) => String(t || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     const gridsOf = (node, out = []) => { if (!node) return out; if (node.kind === 'grid') out.push(node); if (node.content) gridsOf(node.content, out); (node.contents || []).forEach((c) => gridsOf(c, out)); (node.parts || []).forEach((c) => gridsOf(c, out)); return out; };
-    const byPg = new Map(); const one = new Map(); const pvpat = []; const pages = {}; let pg = 0;
+    const byPg = new Map(); const one = new Map(); const cmp = new Map(); const pvpat = []; const pages = {}; let pg = 0;
     for (const pp of r.partPlans || []) (pp.plans || []).forEach((pl, pi) => { for (const page of (pl && pl.pages) || []) {
         pg++;
         const rows = [];
@@ -505,6 +505,7 @@ async function collectReads({ skill }) {
                 if (it.model) continue;
                 if (place) seq.push(it.q.ans);
                 if (it.skill === own && ['teach', 'practice', 'mixed'].includes(pp.part)) { const t = plain(it.q.text); const m = /^(\d+)\s*[−-]\s*(\d+)/.exec(t); const k = `${pp.part}#${pg}`; if (!byPg.has(k)) byPg.set(k, []); byPg.get(k).push({ text: t, ops: m ? [Number(m[1]), Number(m[2])] : [] }); }
+                if (p && p.kind === 'compare' && ['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) { const k = `${pp.part}#${pg}`; if (!cmp.has(k)) cmp.set(k, []); for (const v of [p.a, p.b]) if (Number(v) >= 10) cmp.get(k).push({ skill: it.skill || '', n: Number(v) }); }
                 if (p && Number(p.n) >= 10 && ['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) { const k = `${pp.part}#${pg}|${it.skill || ''}`; if (!one.has(k)) one.set(k, []);
                     const a = typeof it.q.ans === 'object' || it.q.ans === null || it.q.ans === undefined ? '' : String(it.q.ans).replace(/,/g, '').trim(); one.get(k).push({ n: Number(p.n), ans: /^\d+$/.test(a) ? Number(a) : null, text: plain(it.q.text) }); }
             }
@@ -521,6 +522,8 @@ async function collectReads({ skill }) {
     }
     // (r6, critic r5 "78 twice": one number printed twice on a page by two skills - the rounding 78 and the place-value 78)
     const cross = new Map(); for (const [k, its] of one) { const pgk = k.split('|')[0]; if (!cross.has(pgk)) cross.set(pgk, []); for (const x of its) cross.get(pgk).push(Object.assign({ skill: k.split('|')[1] }, x)); }
+    // (r6 own proof read: a place-value compare item prints two numbers - compare 715 / 702 beside the place partner's 715)
+    for (const [pgk, list] of cmp) { if (!cross.has(pgk)) cross.set(pgk, []); cross.get(pgk).push(...list); }
     for (const [pgk, its] of cross) { const by = new Map(); for (const x of its) { if (!by.has(x.n)) by.set(x.n, new Set()); by.get(x.n).add(x.skill); }
         for (const [n, sk] of by) if (sk.size > 1) lr6x.push({ part: pgk, msg: `${n} printed by ${sk.size} skills on one page (${[...sk].join(', ')})` }); }
     return { lr67, oneNum: [...one.entries()], pvpat, pages, own, lr6x, partList: ((r.lesson && r.lesson.parts) || []).map((p) => p.part) };
