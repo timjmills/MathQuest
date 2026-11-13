@@ -971,7 +971,9 @@ export function groupByHeight(items, cols) {
     // (lane lf-ops critic r1 D-MP-1 / D-AG-1: cells answered in place - footprint `inPlace`, an array and its turn, an
     // array and its sentence - keep no writing room, so a short one beside a tall one is pure empty band: they are
     // grouped by height from a 1.2 x spread, not 1.6 x)
-    const inPlaceAll = items.every((it) => it && it.footprint && it.footprint.inPlace);
+    // (lf-ops-props r3: a `noStretch` template - top-started, answered in its cell - is grouped the same way: a 2-row array
+    // beside a 5-row one left a 40 % band under the short one, print-lint H13-ROW, arrays_groups test L)
+    const inPlaceAll = items.every((it) => it && it.footprint && (it.footprint.inPlace || it.footprint.noStretch));
     if (!(hi > lo * (inPlaceAll ? 1.2 : 1.6))) return items;
     // Wave 1 C2: a one-page count-by sheet is the teacher's row list, printed in the teacher's order (its title names that order).
     if (items.every((it) => it && it.q && it.q.countBy && it.q.countBy.onePage)) return items;
@@ -1030,6 +1032,15 @@ export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     // Each row stretches by the page's share (k) but no further than its own shortest problem
     // allows, and never below its tallest (1).
     const k = Math.max(1, Math.min((rows * cellH) / S, FILL_CAP));
+    // (lf-ops-props r3, CL-4b: a template answered in its cell - footprint `noStretch`: arrays, arrays-turn, count-row - is
+    // top-started with no writing room under it, so a row grows to at most NO_STRETCH_ROOM x its SHORTEST problem, never to
+    // the page's share: a 64 mm pair stood in a 106 mm row, 40 % empty, once the centring was gone)
+    const noStr = items.every((it) => it && it.footprint && it.footprint.noStretch);
+    if (noStr) {
+        const Hn = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, NO_STRETCH_ROOM * mins[r]))));
+        const tn = Hn.reduce((a, b) => a + b, 0);
+        return { rowsTpl: Hn.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(tn * 100) / 100 };
+    }
     let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]))));
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
