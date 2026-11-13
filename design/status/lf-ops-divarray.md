@@ -177,3 +177,14 @@ Both rows PASS, run directly.
 Renders: `/tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/divarray-renders/` (`mult_facts-review-array-S-p1.png`
 and `-key-p1.png` show 0 × 1 with its frame; `mult_facts-card-1280-zero.png` is 6 × 0, `mult_facts-card-390-zero.png` is 10 × 0, and
 `mult_facts-worksheet-1280-zero.png` is 11 × 0 among 12 cards).
+
+## Critic divarray r1 (e3aa95d32, independent Opus medium) - FAIL, lowest C3 6 (mult_facts array Test S/M/L, worksheet 1280)
+Report design/audit/runs/lf-ops/critic-divarray-r1.md (renders in the session scratchpad critic-divarray-r1/). div_facts array: PASS on every host and page type; add_facts screen size: clean. Every lint / gate was green - none caught these.
+| Finding | Check that would have caught it |
+|---|---|
+| D1 (major) mult x 0 empty frame reads as an answer slot (the only framed support in a band; next to / under the input on screen) | SUPPORT-NOT-SLOT: a support draws no empty closed box the size/shape of the answer slot, nor is the only framed support in its band |
+| D2 (major) mult_facts Review S touch at the ruled 15: 71 mm blank strip under the grid (30 %), stacks ~37 % empty; 15 not a Review total | PAGEFILL on review and test roles |
+| D3 (major) mult_facts array page identical at S / M / L (Ind 10, Test 12) | ws-capacity-pin size-order check must include the ruled option pages |
+| D4 (H13, C3 6) x arrays unframed: a small array in a cell sized for 10-12 rows (Test S cell 4 38 %, worksheet 1280 cards 36-44 %) | empty-band below the support on Test cells and on the screen worksheet |
+| nit: "1 rows of 1" caption (fact.js:242) | ARRAY-CAPTION grammar (row/rows) |
+Open question to the lead: does Test count = Independent count (2026-11-09, div_facts) extend to mult_facts?
