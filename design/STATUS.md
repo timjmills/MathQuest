@@ -778,3 +778,4 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-13 — Owner rule: everything becomes an automatic check
 - Owner: "make sure you are saving everything to automatic checks as well". Sent to all 9 lanes: every critic / owner / lead-ruling finding ships with a failing-then-passing check, a proven backtest row, a place on precritic's path and a CHECKS_FROM_CRITICS row; each lane lists today's gaps in its next report and closes them before its next critic. lf-checks builds a ledger sweep so the rule enforces itself.
+- 2026-11-13 ~12:25 owner on the 7-day usage warning: "we will go back to the limits later but for now just let things be" - no slow-down; lanes continue as they are.
