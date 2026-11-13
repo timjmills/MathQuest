@@ -1861,6 +1861,9 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 /* CL-4b (owner ruling 2026-10-23), additive: the online worksheet's fitted cell starts at the top of
    the box; a write-above cell (regroup stack, division bracket) stays centred. */
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:not(:has([data-ws-writeabove])) { justify-content: flex-start; }
+/* CL-4b as amended (owner, 2026-11-12), additive: a fitted cell that its row stretches by 30 % or more of its own height
+   (worksheet.js _wsEvenRows sets data-mq-stretched) is centred, so the stretch never leaves a >= 30 % band under the ink. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell[data-mq-stretched]:not(:has([data-ws-writeabove])) { justify-content: center; }
 
 /* Critic s3-stack r1 S1: a 6-digit stack (7 tracks, its comma track) is 348 px of 48 px tracks and ran
    past a 346 px card at 390. On a phone the tracks of a 7+-track stack are 46 px (the boxes keep
@@ -1897,6 +1900,67 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 /* the library's sentence frame: the sign is written IN A CIRCLE on screen as on paper (the slot
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
+
+/* lf-checks eb-r4 D1 (lead ruling 2026-11-13, (b)): a kit LINE slot taken by the host's input. Its DRAWN box is the digit
+   height (1.15em) and the underline under it; the 48 px touch target stays, as transparent padding around the drawn box,
+   pulled out of the layout by an equal negative margin, so no blank box shows above the digits. The underline is a
+   background strip on the drawn box's foot; every fill (white, the yellow next-box glow, the green / red checks) is clipped
+   to the drawn box, and every ring is an outline set back by the padding onto it. ADDITIVE: the 1128 rule stays. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    --mq-tp: calc((max(48px, 1.15em) - 1.15em) / 2);
+    box-sizing: border-box !important; height: max(48px, 1.15em) !important;
+    padding: var(--mq-tp) calc(0.15em + var(--mq-tp)) !important;
+    margin: calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0.2em - var(--mq-tp)) !important;
+    width: calc(var(--mq-n, 3) * 0.62em + 0.9em + 2 * var(--mq-tp)) !important;
+    min-width: calc(max(64px, 2.4em) + 2 * var(--mq-tp)) !important; max-width: none !important;
+    border-width: 0 !important;
+    background-image: linear-gradient(#000, #000) !important; background-size: 100% 2px !important;
+    background-position: 0 100% !important; background-repeat: no-repeat !important;
+    background-origin: content-box !important; background-clip: content-box !important;
+    box-shadow: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):is(:focus, .mq-active-box) {
+    box-shadow: none !important; outline: 3px solid #f2c200 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .online-edition .problem-card.mq-wscard .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):focus {
+    outline: 3px solid #5E3FCC !important; outline-offset: calc(2px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-correct {
+    box-shadow: none !important; outline: 3px solid var(--mq-box-ok) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: linear-gradient(var(--mq-box-ok), var(--mq-box-ok)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-wrong {
+    box-shadow: none !important; outline: 3px dashed var(--mq-box-bad) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-correct, .flash-correct, [style*="var(--correct)"], [style*="var(--accent-green)"]) {
+    box-shadow: none !important; outline: 2px solid #2E7D5B !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-wrong, .flash-wrong, [style*="var(--incorrect)"], [style*="var(--accent-red)"]) {
+    box-shadow: none !important; outline: 2px solid #B73838 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+
+/* lf-checks critic eb-r5 D2 (legibility): the kit LINE slot's focus ring (3 px, at up to 2 px offset beyond the drawn box)
+   must keep >= 4 px from the word beside it. The negative side margins above pulled the next word ("tens") under the ring
+   (0 px). Each side margin now leaves ring + offset + 4 px (9 px) beyond the drawn box. ADDITIVE: the rule above stays;
+   ws-screen-answer FOCUS-GAP is the check. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    margin-left: calc(max(0.2em, 9px) - var(--mq-tp)) !important;
+    margin-right: calc(9px - var(--mq-tp)) !important;
+}
+
+/* FOCUS-GAP (lf-checks 2026-11-13, critic eb-r5 D2 extended by --focus-gap-all): a focused answer box's ring keeps >= 4 px
+   from the word beside it on every host. Additive.
+   (1) On the online worksheet the host rule `.online-edition .problem-card.mq-wscard .mq-scell input:focus` (offset 1 px)
+       outranked the in-box cell-slot rule (offset -4 px), so a boxed cell slot drew its ring 3 px OUTSIDE its box, onto the
+       next word (arrays_groups -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px). The cell slot keeps its
+       inset ring on every host.
+   (2) The inline-blanks box (input.ib-cell, its own border, 6 px side margin) drew its ring 4 px outside: 2 px from the
+       word. The box itself thickens in ink, as the stack digits and cell slots do. */
+html body .online-edition .problem-card.mq-wscard .mq-scell [data-mq-cell] > input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard .mq-scell .mq-multchart input.mq-cellslot:focus { outline-offset: -4px !important; }
+html body .online-edition .problem-card.mq-wscard .mq-scell input.ib-cell:focus,
+html body .mq-scell input.ib-cell:focus { outline-offset: -3px !important; }
 
 /* Vocabulary feedback (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). Additive, scoped to the vocabulary
    cells. Before the answer nothing changes: the picture's halo (vocab-pictures.js) is drawn hidden. Once a host judges

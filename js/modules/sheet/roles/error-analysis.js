@@ -695,7 +695,9 @@ export function prepare(it, info = {}) {
         // D1: div_facts_long S lost its padding and the label started 0.5 mm off the cell rule)
         const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
         const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
-        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
+        // (a REDO item - a count row, a strip - is written again in a zone under it that starts at the cell's left: its work starts
+        // there too, never centred over it - lf-algebra critic r2 G2, the copy train 60 px left of the original)
+        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:${kind === 'redo' ? 'flex-start' : 'center'}` : '';
         // (a word-work COLUMN story starts its ink at the work's top - the story's first line, no top pad as the sentence layout
         // keeps - so its label sat 1.8 mm over it at M, under PT-ERR-4's 2 mm: lifted 0.5 mm, word-stories r3 PUPILTAG)
         const wwLift = it.template === 'word-work' && !(((it.q || {}).cell || {}).payload || {}).layout ? 0.5 : 0;
@@ -783,9 +785,13 @@ export function prepare(it, info = {}) {
         // (a page whose items differ in width but cannot widen its work in this cell: the judgement stands against the cell's right
         // padding instead, so it still starts at one x a column - R15 / EA-ROWX, CL-8 kept)
         const spread = Number(o.workW) > 0 && !story && !widen && mode === 'beside' ? ';justify-content:space-between' : '';
+        // (a REDO item - count rows plan one footprint whatever their length, so no page work width lines them up - stands its
+        // judgement against the cell's right padding: the judgement column GREW into the free width (flex-grow 1) and its boxes
+        // started right after the work, 69.5 vs 131.5 mm beside a 4- and an 8-term train; ws-cell-checks EA-ROWX, root cause r16)
+        const judgeAt = !story && !widen && kind === 'redo' ? judge.replace('<div class="mq-judge-row ', '<div style="flex:0 0 auto;margin-left:auto" class="mq-judge-row ') : judge;
         return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
             + shownWork
-            + judge
+            + judgeAt
             + (below ? fix : '')
             + `</div>`;
     };

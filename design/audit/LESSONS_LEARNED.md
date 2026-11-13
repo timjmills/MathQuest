@@ -89,6 +89,19 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    the change's intended page on a lesson the change was made for (opt-in on that lesson's data, LR-17b) or a defect.
    Backtest row `lesson-baseline-phase0-optin` (FAIL 3bf3ef5c / PASS the LR-17b fix).
    *Why:* the lf-engine landing found 80 hashes of live packets changed by two critic fixes made for the sample lessons.
+   **Now a DEPLOY GATE (lead ruling 2026-11-13):** the lane rule alone let a change through when a lane skipped it (2 days
+   unseen), so `ws-deploy-gates.sh` session 4 runs `ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson
+   --unpinned --check design/audit/baselines/lesson-baseline.json` on every deploy (≈ 13 min, one slot; its own session
+   because sessions 1-3 sit at 27-28 of their 30 min). A lesson page that differs from the pin, or a lesson the tree prints
+   that the pin lacks (UNPINNED), fails the deploy. **Re-pin protocol:** a deploy whose lesson pages change ON PURPOSE
+   re-writes the pin in the same deploy commit (`--write design/audit/baselines/lesson-baseline.json`, same flags) and the
+   commit message names the changed lessons / pages; never re-pin to silence an unexplained difference. Backtest row
+   `lesson-baseline-deploy-gate` (FAIL 3bf3ef5c → PASS 3690ccb3f against the pin). *Lesson:* a whole-library proof that
+   only a careful lane runs is not a check; put it where every deploy passes through it, and pay its minutes.
+   *Found while proving it:* the backtest read the fail state as ERROR, not FAIL. The tool printed hundreds of CHANGED lines
+   to a pipe, then called `process.exit`, which cut the output off before its verdict line. A check whose verdict line can
+   be lost is not a gate. The tool now exits only after stdout has drained (`exitAfterFlush`). Rule for every ws-* check
+   that can print a long list: never `process.exit` straight after a large piped write.
 0. **Batch design decisions (owner, 2026-10-23).** A new design idea from the owner while a build or fix round is running
    goes on the lane's "Owner design list" (status file, date + the owner's words) and the owner is told it is queued; it
    is not folded into the running round. When the round passes its critic, the owner sees the whole thing once and
@@ -148,6 +161,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
    options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
    *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
+10. **A legibility, size or readability note is a SCORED defect, never an unscored note (owner, 2026-11-13).** The div_facts
+   screen r2 critic listed "array dots are small on screen" as an unscored note and still passed the skill. The owner then saw
+   tall, narrow strips of tiny dots. A critic who notes that anything is small, hard to read, cramped, faint or thin files it as
+   a numbered defect against C3 (or the criterion it touches), with its hard cap. A page with one is not passed. Every critic
+   brief says so (`design/lessons-first/briefs/README.md` "Critic briefs"). *Check:* ws-screen-ink-size SCREEN-INK-SIZE (every
+   screen host and every skill in redesign-passed.js: a drawn element at least its print size in CSS mm; a drawing uses at least
+   60 % of the cell's free width before it grows taller). Backtest rows fail on master 73e96fc1 (div_facts array).
 
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay

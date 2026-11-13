@@ -39,6 +39,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
 const LP = require('../lib/ws-lesson-lp.cjs');
+const FONTS = require('../lib/ws-fonts.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes('--' + k);
@@ -902,6 +903,9 @@ else (async () => {
         await sheet.setContent(built.html, { waitUntil: 'networkidle0', timeout: 60000 });
         await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        // E2 asserts Andika 700 + 400: wait for both (bounded retry); a declared face that never arrives is ERROR, not a FAIL
+        const fontWait = await FONTS.awaitFonts(sheet, { faces: ['700 28px Andika', '400 15px Andika'] });
+        if (FONTS.isEnvError(fontWait)) { console.log(`ws-detailed-lesson: ERROR (fonts: the web font never arrived - environment, not the page) ${FONTS.describe(fontWait)}`); await app.close(); process.exit(2); }
         await sheet.emulateMediaType('print');
         const R = has('check') ? await sheet.evaluate(measure, [...LIB, ...built.kitLib]) : null;
         if (has('repeats')) {
