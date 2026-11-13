@@ -6259,6 +6259,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "roles-opener-overflow",
+   "check": "no Opener (passed or legacy) gains a split cell or an overflow against master at M or L (lead ruling 2026-11-13: coordinate_q1's Opener at L gained PG-12 / PG-21 from round 1's Model sizing): ws-print-lint's ratchet on L-OVERFLOW / L-SPLIT against the master pin opener-overflow.<size>.json",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint OPENER-OVERFLOW (PG-12 / PG-21 / PG-13 ratchet)",
+   "browser": true,
+   "fail": {
+    "commit": "2d7a7f158",
+    "state": "coordinates:coordinate_q1 opener L: PG-12 0 -> 2, PG-21 0 -> 2 (Model + one Guided row 10 mm past the page foot)"
+   },
+   "pass": {
+    "commit": "44f52bafe",
+    "state": "OK: the practice on page 2, both pages closed"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills coordinates:coordinate_q1 --roles opener --size L --lints L-OVERFLOW,L-SPLIT --baseline design/audit/baselines/opener-overflow.L.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

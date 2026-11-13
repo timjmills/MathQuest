@@ -20,8 +20,8 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
 - MIX-S (lead add): Mixed practice at S held fewer problems a page than M on 8 passed skills (master). Check: lf-roles'
   ws-capacity-pin SIZE-ORDER + mixed pins (FAIL on 8df014ab7); fix: a one-page sheet also tries each larger size's lattice
   at this size's metrics, and the shelf budget compare takes an epsilon (value / combine S 8 + 1 spill). Pin OK, 0 drops.
-- Known, not this round: coordinates:coordinate_q1 opener L overflows (Model + one Guided taller than the page; master hid
-  it as a text collision inside the squashed Model). Lead ruling wanted (RULED capacity or a side-by-side layout).
+- OPENER-OVERFLOW (lead ruling): coordinate_q1 L fixed - the practice moves to page 2 when both pages close; every Opener
+  is ratcheted against a master pin of L-OVERFLOW / L-SPLIT at M and L (all 727 live skills). Size S dropped (owner).
 - Capacity pin scope (lead 2026-11-13, item 2): lf-roles' pin script checks EVERY grid role by default, but this branch keeps
   only the mixed-practice pins from lf-roles (plus the eight pre-widening roles master already pinned). ws-precritic's
   capacity-pin steps run on those pinned roles only (CAPACITY_PIN_ROLES in ws-precritic.cjs), so no unpinned role (opener,

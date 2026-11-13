@@ -682,3 +682,15 @@ Model Infinity mm). Lesson pages byte-identical (ws-lesson-baseline --all-lesson
 Rules: a height compare against a budget that shares are computed to fill exactly takes an epsilon; a choice that changes the
 page count is taken only where the packing's page model is the plan's (one-page sheets) - the first cut added a page on 14 multi-
 skill sheets, caught by the sweep's pages-rose / per-page-fell columns before commit.
+
+### lf-engine roles OPENER-OVERFLOW (lead ruling 2026-11-13): an engine change never adds a split or an overflow to any Opener
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| Round 1 sized coordinate_q1's Model at its real height; Model + Say + one Guided row ran 10 mm past the page foot at L (master hid it by squashing the Model into its own Answer line) | ws-print-lint L-OVERFLOW / L-SPLIT ratchet against a master pin of EVERY live skill's Opener at M and L (727 documents each). Fix: the practice moves to page 2 when both pages close; legacy cells keep master's page unless the split closes both | roles-opener-overflow (2d7a7f158 FAIL → 44f52bafe OK) | ws-precritic --role opener (opener-overflow-M / -L gates) | 1 critic round |
+
+Rules: (1) an engine change to a shared role is checked on EVERY skill that role prints (passed and legacy), against a master pin -
+the passed-skill sweep alone missed coordinate_q1; (2) legacy cells (old print HTML) print taller than they measure, so a layout
+rule that trusts measured heights is applied to kit cells, and a legacy page keeps master's layout unless the new layout closes
+every page; (3) fractions:fraction_of_set_hard's Opener is an order-dependent flake (master fails it in the same long run, both
+trees pass it alone) - read a ratchet rise on a legacy skill against master in the same run before chasing it.

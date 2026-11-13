@@ -595,3 +595,12 @@ Master dropped every Independent row on expand/combine/unit_form L (Model sized 
 Single-skill Mixed: 16 of 81 builds changed, 14 item rises, value / combine S 2 pages -> 1; 4-skill sweep unchanged by MIX-S;
 lessons 1596 hashes identical.
 | r14 | Opus medium builder (V-NUM single, V-PLACE, V-TWIN runs, screen size fixes); narrow critic r14 PASS min 8. Narrow rounds after r5: r6-r14 = 9 (r6, r7, r9-r14), 1 pass |
+
+### lf-engine roles OPENER-OVERFLOW (lead ruling 2026-11-13)
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| coordinate_q1 Opener L split cell / overrun (round 1) | ws-print-lint OPENER-OVERFLOW ratchet vs master pin (every Opener, M + L) | roles-opener-overflow | precritic --role opener | 1 critic round |
+
+All-skill Opener sweep (M, L; 1454 builds) master 4cdadb3d9 vs branch: 260 changed (160 skills), 103 now print the practice on
+page 2, no item count fell (mixed_placevalue M: same 4 items, Guided 1 -> 2, Independent 1 -> 0, PT-OPN-6).

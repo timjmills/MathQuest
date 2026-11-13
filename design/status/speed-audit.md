@@ -1089,3 +1089,10 @@ reports pages rose and items-per-page fell, not only "changed".
 | Round | What was lost | Cause | Fix |
 |---|---|---|---|
 | r14 critic PASS min 8 | - | Medium rebuild closed the complete defect list from r13 in one round; master merge brought ws-screen-ink-size (2 real screen size defects fixed, 4 SIZE-REF coverage findings ruled known) | Keep the dealt-banks table; the 3 minors are follow-ups |
+
+### lf-engine roles OPENER-OVERFLOW (lead ruling 2026-11-13)
+
+The check came first (master pin of every Opener at M/L, ~70 min a size); the fix took four sweep + ratchet rounds because the
+first two layouts trusted legacy cells' measured heights (perimeter_grid, fraction_of_set_hard, measure_angles, composite_shapes
+rose). Lost time ~3 h, plus a container restart. Speed-ups: an all-skill render-hash sweep (2 min) narrows the ratchet to the
+skills whose Opener changed (160 of 727); run master on the same list to separate order-dependent flakes from real rises.
