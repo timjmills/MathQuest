@@ -1030,3 +1030,13 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
 | 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
 | 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+
+### lf-engine PC r3 rebuild (2026-11-13, builder, budget ~$15)
+| Finding | Check | Backtest | On precritic | Rounds saved |
+|---|---|---|---|---|
+| F13 near twins on the check (77 / 27 / 71; 75 / 45) | PC-LR6 near twins (drawn cells, question from lesson.prereqLayout units) | lesson-check-near-twins | yes | 1 |
+| add S check-on sheet foot 9 % (a known red at r3) | PC-H13 forced | lesson-check-sheet-foot-forced | yes | 1 |
+| check items repeated on Mixed (soft avoid relaxed) | ws-lesson-check --force-check LR-5 | - | no (delta not 0) | 0.5 |
+| Lost time: a first near-twin rule (one place different, page-wide) cornered every pool - 8 dealt items all twins; reading the dealt pool (dump of r.items by pool) showed it in one run. Speed-up: dump the dealt pool before tuning a dealing rule. | | | | |
+| Lost time: two tries at the chart-turnaround finding (hardAvoid, then an avoidPlus filter) - a number bond has no fact key and the role deals off a different path; reverted, listed. Speed-up: find which dealer a role uses before adding an avoid. | | | | |
+| Speed-up: ws-lesson-check --dump f.json gives the forced / unforced diff by class in seconds; the raw forced count (194, then 354) misled two rounds. | | | | |

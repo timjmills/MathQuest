@@ -524,3 +524,15 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
 | 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
 | 6 (re-critic lf-engine-live-pm2) re-flow of a sheet fixed one measure (pages used) and broke another (tab clearance): number tab over the T head on sheet items 10-12, pages 27-35 % blank; 709605bb reverted | gate every page rule on the page you change: TAB-CLEAR on sheet Guided / Independent blocks; SHEET-2PG fails when a page >= 30 % blank while any row is below design height; pages balanced within 15 % (proposed, not yet built) | lesson-sheet-2pg PENDING (item 6 redone separately) | precritic lesson-samples-all | 1 round lost |
+
+### lf-engine PC r3 rebuild (2026-11-13, builder): the whole packet gated, the check's deal measured against the packet
+Rule (from this round): **a forced-on gate is only meaningful against the same run without the switch.** `ws-lesson-check
+--force-check` alone read 354 findings; the same tree unforced reads 428, so most of them are master's. Triage is a
+rule-by-rule, class-by-class diff of the two runs (`--dump`), never the forced count alone.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F13 near twins on the check: sub S 77 / 27 / 71, round 75 / 45 (itemNumberKey dropped exact repeats only) | ws-lesson-samples PC-LR6 extended: one number different, that pair reordered / within 2 on the page, one place different (shared digit not 0) inside one question | lesson-check-near-twins (7ff8a87ab FAIL → 6fccd7134 OK) | precritic lesson-samples-check | 1 round |
+| add S lesson sheet with the check on: 9 % blank foot (the Warm-up gone, the Vocabulary grew only on a page with no rows) - a lane red at 7ff8a87ab that the r3 packet carried | PC-H13 (existing, forced) | lesson-check-sheet-foot-forced (7ff8a87ab FAIL → 6fccd7134 OK) | precritic lesson-samples-check | 1 round |
+| "? + 2 = 6" / "How many triangles" on the check AND on Mixed (soft text avoid relaxed) | ws-lesson-check --force-check LR-5 "on prereq and mixed" (8 → 0) | - (ws-lesson-check is not on precritic: delta not 0, see below) | no | 0.5 |
+| ws-lesson-check --force-check is not wired into precritic: its delta on the samples is not 0 (LR-6 +8 and LR-7 +11 on the sub check-on sheet; add Practice turn-arounds +41 for -46 sheet repeats) | the triage table (CRITIC-READY.md) | - | no (by rule: wire only at delta 0) | - |
