@@ -144,6 +144,28 @@ if (on('MOD-ACROSS')) {
 }
 
 const pageText = (pl) => JSON.stringify(pl);
+if (on('MOD-MARKS')) {
+    // PT-MOD-1 (lf-algebra r8 via the lead): a function table's Model states carry the marks of steps 1..k (traceSlots), and its
+    // five states lay 3 + 2 on one page (states 1-3 drew the same blank table over three pages)
+    checks++;
+    const steps5 = ['The rule is n + 1.', '1 + 1 = 2. Write 2.', '6 + 1 = 7. Write 7.', '14 + 1 = 15. Write 15.', 'Fill in every row.'];
+    const mk = [[], [{ slot: 'o0', value: '2' }], [{ slot: 'o1', value: '7' }], [{ slot: 'o2', value: '15' }], [{ slot: 'o3', value: '19' }]];
+    try { registerSkill('rolesunit:ftmod', { workedSteps: () => steps5.map((text, i) => ({ text, marks: mk[i] })) }); } catch (e) { /* re-run */ }
+    const seen = [];
+    const it = Object.assign(itemOf('one'), { pool: 'main', footprint: { wMm: 50, hMm: 64, maxCols: 3 } });
+    it.q = Object.assign({}, it.q, { skillId: 'ftmod', cell: { template: 'function-table', payload: {} } });
+    const r0 = it.render;
+    it.render = (c, o = {}) => { if (o.payload && o.payload.traceSlots) seen.push(Object.keys(o.payload.traceSlots).length); return r0(c, o); };
+    try {
+        const pl = SM.plan({ ctx: { size: 'M' }, skills: [{ categoryId: 'rolesunit', skillId: 'ftmod', iCan: 'I Can use a rule', grade: 4 }], items: [it] });
+        const html = JSON.stringify(pl);
+        if ((pl.pages || []).length !== 1) findings.push(`MOD-MARKS: a 5-state function-table Model takes ${(pl.pages || []).length} pages (want 1, 3 + 2)`);
+        void html;
+    } catch (e) { findings.push(`MOD-MARKS: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+    const mm = typeof SM.marksFor === 'function' ? SM.marksFor(it, steps5) : null;
+    const sizes = mm ? mm.map((x) => Object.keys(x).length) : [];
+    if (sizes.join(',') !== '0,1,2,3,4') findings.push(`MOD-MARKS: the states do not carry the marks of steps 1..k (traceSlots sizes ${JSON.stringify(sizes)})`);
+}
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
     // changes one part (a propagated wrong "12, 15, 19, 22" against "12, 15, 18, 21" made the pupil rewrite every later term)

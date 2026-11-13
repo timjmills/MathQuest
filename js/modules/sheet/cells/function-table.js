@@ -516,8 +516,10 @@ register('function-table', {
         const slots = ftSlots(p);
         const slotsById = Object.fromEntries(slots.map((s) => [s.id, s]));
         const key = keyMap(p);
-        const ink = inkOf(ctx);
-        const vals = slotValues(ctx, key, (w) => {
+        // a Scripted Model state (PT-MOD-1, lf-roles): the marks of steps 1..k written in trace (p.traceSlots, as count-row)
+        const traced = ctx.state === 'blank' && p.traceSlots && typeof p.traceSlots === 'object';
+        const ink = traced ? 'trace' : inkOf(ctx);
+        const vals = traced ? Object.fromEntries(Object.entries(p.traceSlots).map(([id, v]) => [id, v === undefined || v === null ? '' : String(v)])) : slotValues(ctx, key, (w) => {
             const l = splitParts(w);
             const o = {};
             slots.forEach((s, n) => { if (l[n] !== undefined) o[s.id] = l[n]; });
