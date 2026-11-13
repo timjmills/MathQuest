@@ -3,7 +3,17 @@
 // its lesson page.) "A check that is not on the lane's path is not wired."
 //
 //   node tests/scripts/ws-precritic-plan.mjs              # every row of tests/fixtures/precritic/backtests.json
-//   node tests/scripts/ws-precritic-plan.mjs --self-test  # the command reader, no precritic run
+//   node tests/scripts/ws-precritic-plan.mjs --self-test  # the command reader + the ledger sweep on planted rows, no precritic run
+//   node tests/scripts/ws-precritic-plan.mjs --checks-from-critics   # ONLY the ledger sweep (below); also run by default
+//   node tests/scripts/ws-precritic-plan.mjs --no-sweep   # the path check without the ledger sweep
+//
+// THE LEDGER SWEEP (owner rule 2026-11-13: every finding becomes an automatic check before its fix lands). Each finding row
+// of design/lessons-first/CHECKS_FROM_CRITICS.md names its backtest id(s) in the "Backtest row" column, or a reasoned
+// exemption (`exempt: <why>`, `not machine-measurable: <why>`, or a process rule). The sweep FAILS a row with neither, a
+// row whose id is not in backtests.json, and a row whose id is not on precritic's path - the SAME per-row verdict the
+// path check below gives (rowPath); a fixture row with no skill is on the path when its tool is a ws-precritic or deploy
+// gate. It lives here, not in ws-backtest, because "on the lane's path" is decided here and the default run has already
+// computed it for every row. Failing rows are listed by owner lane (the ledger's Lane column).
 //
 // For each backtest row whose command runs a tests/scripts/ws-* check on named skills (--skill / --skills), it runs
 // `ws-precritic --skill <those skills> --dry-run` once per skill set and asserts that the plan holds a gate running that
@@ -102,17 +112,115 @@ function selfTest() {
     eq('flag carried', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 1);
     eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
+    // the CHECKS_FROM_CRITICS sweep on planted ledger rows: missing id, unknown id, off-path id, exempt, good (+ legacy forms)
+    const sw = sweepSelfTest(); n += sw.n; bad.push(...sw.bad.map((b) => `checks-from-critics: ${b}`));
+    eq('tool of a fixture command', commandTool('node tests/scripts/ws-backtest.mjs x; node tests/scripts/ws-empty-band.cjs --html {fixture}'), 'ws-empty-band');
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
 }
 
-if (args.includes('--self-test')) selfTest();
-else {
+/* ============================================================== the CHECKS_FROM_CRITICS sweep (owner rule 2026-11-13) */
+// Every finding (critic, owner, lead ruling) becomes an automatic check BEFORE its fix lands, and its ledger row in
+// design/lessons-first/CHECKS_FROM_CRITICS.md names that check's backtest id(s). The sweep FAILS a row whose "Backtest row"
+// cell names no id and carries no reasoned exemption, a row whose id is not in backtests.json, and a row whose id is not on
+// precritic's path (the same verdict this tool gives that backtest row; a row with no skill in its command - a fixture of a
+// tool - is on the path when its tool is a ws-precritic gate or a ws-deploy-gates.sh gate).
+export const LEDGER = 'design/lessons-first/CHECKS_FROM_CRITICS.md';
+const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
+
+/** The ledger's finding rows: [{n (1-based line), date, lane, finding, cell}] from every `| <date> | ...` table line; the
+ *  backtest cell is the column whose header names "Backtest". Pure. */
+export function parseLedger(text) {
+    const lines = String(text).split('\n');
+    const cells = (l) => l.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim());
+    let col = -1; const rows = [];
+    lines.forEach((l, i) => {
+        if (!/^\s*\|/.test(l)) return;
+        const c = cells(l);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(c[0] || '')) { if (c.some((x) => /^backtest/i.test(x))) col = c.findIndex((x) => /^backtest/i.test(x)); return; }
+        rows.push({ n: i + 1, date: c[0], lane: c[1] || '', finding: c[2] || '', cell: col >= 0 ? (c[col] || '') : '' });
+    });
+    return rows;
+}
+/** What a "Backtest row" cell declares: {ids[], exempt (reason) | null}. Grammar (backwards compatible with the rows
+ *  written before the sweep): `exempt: <reason>` / `not machine-measurable: <reason>` (a reason of >= 10 characters), or a
+ *  process rule (`— (process rule)`, `process rule: ...`: a rule for people, not a property of a page); `same row` = the
+ *  previous row's ids; else the ids in `backticks`, or, with no backticks, every hyphenated lower-case token outside
+ *  parentheses (so free text such as "lf-checks backtests" reads as an UNKNOWN id, never as a pass). Pure. */
+export function readBacktestCell(cell, prevIds = []) {
+    const s = String(cell).trim();
+    const ex = /^(?:exempt|not machine[- ]measurable)\s*:\s*(.*)$/i.exec(s);
+    if (ex) return ex[1].trim().length >= 10 ? { ids: [], exempt: s } : { ids: [], exempt: null, bad: 'an exemption with no reason (>= 10 characters)' };
+    if (/^(?:[—–-]\s*)?\(?\s*process rule\b/i.test(s)) return { ids: [], exempt: 'process rule' };
+    if (/^same row\b/i.test(s)) return { ids: [...prevIds], exempt: null };
+    const ticks = [...s.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim());
+    if (ticks.length) return { ids: [...new Set(ticks.flatMap((t) => t.split(/[\s,]+/)).filter((t) => ID_RE.test(t)))], exempt: null };
+    const bare = s.replace(/\([^)]*\)/g, ' ');
+    return { ids: [...new Set([...bare.matchAll(/(?:^|[\s,;])([a-z][a-z0-9]*(?:-[a-z0-9]+)+)(?=$|[\s,;.])/g)].map((m) => m[1]))], exempt: null };
+}
+/** Judge every ledger row: [{row, ids, status 'PASS'|'EXEMPT'|'FAIL', why}]. `known(id)` says the id is a backtests.json row;
+ *  `onPath(id)` gives {ok, why}. Pure (given the two callbacks). */
+export function sweepLedger(rows, { known, onPath }) {
+    let prev = [];
+    return rows.map((row) => {
+        const d = readBacktestCell(row.cell, prev);
+        if (d.ids.length) prev = d.ids;
+        if (d.exempt) return { row, ids: [], status: 'EXEMPT', why: d.exempt };
+        if (d.bad) return { row, ids: [], status: 'FAIL', why: d.bad };
+        if (!d.ids.length) return { row, ids: [], status: 'FAIL', why: `no backtest id and no exemption ("${row.cell.slice(0, 60)}")` };
+        const unknown = d.ids.filter((id) => !known(id));
+        if (unknown.length) return { row, ids: d.ids, status: 'FAIL', why: `not in backtests.json: ${unknown.join(', ')}` };
+        const off = d.ids.map((id) => ({ id, p: onPath(id) })).filter((x) => !x.p.ok);
+        if (off.length) return { row, ids: d.ids, status: 'FAIL', why: `not on precritic's path: ${off.map((x) => `${x.id} (${x.p.why})`).join('; ')}` };
+        return { row, ids: d.ids, status: 'PASS', why: d.ids.join(', ') };
+    });
+}
+/** The owner lane of a ledger row: the Lane cell's first word ("lf-engine live-pm2" -> lf-engine). Pure. */
+export const ownerLane = (row) => (String(row.lane).trim().split(/\s+/)[0] || '?');
+
+function sweepSelfTest() {
+    const md = ['| Date | Lane | Finding | Check id | Backtest row (FAIL failed state → PASS fix) | On path | Saved |', '|---|---|---|---|---|---|---|',
+        '| 2026-11-13 | lane-a | missing id | X | — | precritic | 1 |',
+        '| 2026-11-13 | lane-b | unknown id | X | `no-such-row` | precritic | 1 |',
+        '| 2026-11-13 | lane-c | off-path id | X | `row-off` | precritic | 1 |',
+        '| 2026-11-13 | lane-d | exempt | X | not machine-measurable: message wording only, read by the critic | - | 0 |',
+        '| 2026-11-13 | lane-e | good | X | `row-good` (FAIL abc → OK def) | precritic | 1 |',
+        'free text between tables',
+        '| 2026-11-13 | lane-f live-x | legacy bare ids | X | row-good, row-good-2 (3 → 0) | precritic | 1 |',
+        '| 2026-11-13 | lane-g | same row | X | same row | lane gate | 1 |',
+        '| 2026-11-13 | lane-h | process rule | Rule: ... | — (process rule) | hand-over | 1 |',
+        '| 2026-11-13 | lane-i | free text | X | lf-checks backtests | precritic | 1 |',
+        '| 2026-11-13 | lane-j | empty exemption | X | exempt: n/a | - | 0 |',
+        '| 2026-11-13 | lane-k | a later cell says backtest | X | `row-good` | backtest only | 1 |',
+        '| 2026-11-13 | lane-l | column kept | X | `row-good-2` | precritic | 1 |'].join('\n');
+    const known = (id) => ['row-off', 'row-good', 'row-good-2'].includes(id);
+    const onPath = (id) => (id === 'row-off' ? { ok: false, why: 'precritic plans no gate on it' } : { ok: true, why: '' });
+    const res = sweepLedger(parseLedger(md), { known, onPath });
+    const got = res.map((r) => `${r.row.lane.split(' ')[0]}:${r.status}`);
+    const want = ['lane-a:FAIL', 'lane-b:FAIL', 'lane-c:FAIL', 'lane-d:EXEMPT', 'lane-e:PASS', 'lane-f:PASS', 'lane-g:PASS', 'lane-h:EXEMPT', 'lane-i:FAIL', 'lane-j:FAIL', 'lane-k:PASS', 'lane-l:PASS'];
+    const bad = [];
+    if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`verdicts ${JSON.stringify(got)}, want ${JSON.stringify(want)}`);
+    const why = (lane) => (res.find((r) => r.row.lane.startsWith(lane)) || {}).why || '';
+    if (!/no backtest id/.test(why('lane-a'))) bad.push(`missing id reason: ${why('lane-a')}`);
+    if (!/not in backtests\.json: no-such-row/.test(why('lane-b'))) bad.push(`unknown id reason: ${why('lane-b')}`);
+    if (!/not on precritic's path: row-off/.test(why('lane-c'))) bad.push(`off-path reason: ${why('lane-c')}`);
+    if (why('lane-f') !== 'row-good, row-good-2') bad.push(`legacy bare ids read as ${why('lane-f')}`);
+    if (why('lane-g') !== 'row-good, row-good-2') bad.push(`"same row" read as ${why('lane-g')}`);
+    if (!/lf-checks/.test(why('lane-i'))) bad.push(`free text not read as an unknown id: ${why('lane-i')}`);
+    if (ownerLane(res[5].row) !== 'lane-f') bad.push('owner lane of "lane-f live-x"');
+    return { n: want.length + 7, bad };
+}
+
+/* ============================================================== the path verdict of one backtest row (shared) */
+let CTX = null;
+function ctx() {
+    if (CTX) return CTX;
     const table = JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/precritic/backtests.json'), 'utf8'));
     const ll = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--list-live'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 });
     let live;
     try { live = new Set(JSON.parse(ll.stdout)); } catch (e) { console.log(`${TOOL}: FAIL (ws-precritic --list-live gave no JSON list)`); process.exit(1); }
     const deploy = readFileSync(join(ROOT, 'tests/scripts/ws-deploy-gates.sh'), 'utf8');
+    const precriticSrc = readFileSync(join(ROOT, 'tests/scripts/ws-precritic.cjs'), 'utf8');
     const plans = new Map();
     const plan = (skills, role) => {
         const key = `${skills.join(',')}|${role || ''}`;
@@ -136,55 +244,120 @@ else {
         });
         return sets.length ? sets[0].filter((r) => sets.every((s) => s.includes(r))) : [];
     };
+    CTX = { table, live, deploy, precriticSrc, plan, cardRolesOf, lplans: new Map(), memo: new Map() };
+    return CTX;
+}
+
+/** One backtest row's path verdict: {status 'OK'|'FAIL'|'NA', print (the line shown) | null, fail (reason) | null, na | null}.
+ *  The one place "on the lane's path" is decided: the default run and the ledger sweep both read it. */
+function rowPath(row) {
+    const C = ctx();
+    if (C.memo.has(row.id)) return C.memo.get(row.id);
+    const v = rowPathRaw(row, C);
+    C.memo.set(row.id, v);
+    return v;
+}
+function rowPathRaw(row, C) {
+    const { live, deploy, plan, cardRolesOf, lplans } = C;
+    const lc = readLessonCommand(row.command || '');
+    if (lc) {
+        if (!lplans.has(lc.lesson)) { const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--lesson', lc.lesson, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }); lplans.set(lc.lesson, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` }); }
+        const p = lplans.get(lc.lesson);
+        const via = `ws-precritic --lesson ${lc.lesson}`;
+        if (!p.ok) return { status: 'FAIL', print: null, fail: `${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}` };
+        const hit = planHasLesson(p.text, lc);
+        const print = `  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ws-detailed-lesson --${lc.mode} on lesson ${lc.lesson} (via ${via})`;
+        return hit.length ? { status: 'OK', print } : { status: 'FAIL', print, fail: `${row.id}: ${via} plans no ws-detailed-lesson --${lc.mode} on it (the check is backtested but not on the lane's path)` };
+    }
+    const c0 = readCommand(row.command || '');
+    if (!c0) return { status: 'NA', na: row.id };
+    const gone = c0.skills.filter((k) => !live.has(k));
+    // `--roles none` (ws-empty-band: the screen hosts only) is the --skill plan's host run, not a page role
+    const c = { ...c0, skills: c0.skills.filter((k) => live.has(k)), roles: c0.roles === 'none' ? null : c0.roles };
+    if (!c.skills.length) return { status: 'NA', na: `${row.id} (not live here: ${gone.join(',')})` };
+    // a row on several roles (`--roles a,b`, critic eb-r3 D4) is on the path when EACH role is: lesson / independent through
+    // the --skill plan, any other role R through `ws-precritic --skill X --role R` (a lane that touches R runs it). A
+    // ws-empty-band line with no --roles renders every role the signed card offers; the row's rule flags must be carried.
+    const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
+    const cr = c.tool === 'ws-empty-band' ? cardRolesOf(c.skills) : null;
+    const per = (c.roles ? c.roles.split(',') : [null]).map((r) => {
+        const role = r && r !== 'lesson' && r !== 'independent' ? r : null;
+        const p = plan(c.skills, role);
+        const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
+        return { r, role, p, via, hit: p.ok ? planHas(p.text, { ...c, roles: r, flags, cardRoles: cr }) : [] };
+    });
+    const broken = per.find((x) => !x.p.ok);
+    if (broken) return { status: 'FAIL', print: null, fail: `${row.id}: ${broken.via} --dry-run failed: ${broken.p.text.trim().split('\n').slice(-1)[0]}` };
+    const missing = per.filter((x) => !x.hit.length);
+    if (per.length > 1 || flags.length) {
+        const print = `  ${missing.length ? 'FAIL' : 'OK  '} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''}${flags.length ? ` ${flags.join(' ')}` : ''} on ${c.skills.join(',')} (per role: ${per.map((x) => `${x.r || '-'}${x.role ? ' via --role' : ''}`).join(', ')})`;
+        return missing.length ? { status: 'FAIL', print, fail: `${row.id}: ${missing.map((x) => `${x.via} plans no ${c.tool} on role ${x.r}${flags.length ? ` with ${flags.join(' ')}` : ''}`).join('; ')} (the check is backtested but not on the lane's path)` } : { status: 'OK', print };
+    }
+    const { role, p, via } = per[0];
+    let hit = per[0].hit;
+    // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
+    // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
+    const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);
+    if (onDeploy) hit = ['deploy'];
+    const print = `  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : role ? ` (via --role ${role})` : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}`;
+    return hit.length ? { status: 'OK', print } : { status: 'FAIL', print, fail: `${row.id}: ${via} plans no ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} gate on it (the check is backtested but not on the lane's path)` };
+}
+/** The tool a row's command runs (the last tests/scripts/ws-* that is not a wrapper), or null. Pure. */
+export function commandTool(cmd) {
+    const t = [...String(cmd).matchAll(/tests\/scripts\/(ws-[\w-]+)\.(?:c?js|mjs|sh)/g)].map((m) => m[1]).filter((x) => !WRAPPERS.has(x));
+    return t.length ? t[t.length - 1] : null;
+}
+/** Is a backtest row ON PRECRITIC'S PATH, for the ledger sweep: the row's own path verdict; a row that names no live skill
+ *  (a fixture of a tool) is on the path when its tool is a ws-precritic gate or a ws-deploy-gates.sh gate. */
+function idOnPath(id) {
+    const C = ctx();
+    const row = (C.table.rows || []).find((r) => r.id === id);
+    if (!row) return { ok: false, why: 'no such row' };
+    if (!row.command) return { ok: false, why: 'the row has no command yet' };
+    const v = rowPath(row);
+    if (v.status === 'OK') return { ok: true, why: '' };
+    if (v.status === 'FAIL') return { ok: false, why: v.fail.replace(`${id}: `, '') };
+    const tool = commandTool(row.command);
+    if (!tool) return { ok: false, why: 'its command runs no tests/scripts/ws-* check' };
+    const inPre = C.precriticSrc.includes(`'${tool}'`) || C.precriticSrc.includes(`tests/scripts/${tool}.`);
+    const inDeploy = C.deploy.includes(`${tool}.`);
+    return inPre || inDeploy ? { ok: true, why: '' } : { ok: false, why: `${tool} is neither a ws-precritic gate nor a deploy gate` };
+}
+/** Run the sweep on the ledger: prints one line per failing row (grouped by owner lane) and a summary; returns the count. */
+function runSweep() {
+    const C = ctx();
+    const ids = new Set((C.table.rows || []).map((r) => r.id));
+    const rows = parseLedger(readFileSync(join(ROOT, LEDGER), 'utf8'));
+    if (!rows.length) { console.log(`  checks-from-critics: no finding rows read from ${LEDGER}`); return 1; }
+    const res = sweepLedger(rows, { known: (id) => ids.has(id), onPath: idOnPath });
+    const failed = res.filter((r) => r.status === 'FAIL');
+    const byLane = new Map();
+    for (const r of failed) { const l = ownerLane(r.row); if (!byLane.has(l)) byLane.set(l, []); byLane.get(l).push(r); }
+    console.log(`\n  checks-from-critics (${LEDGER}): ${res.length} finding rows`);
+    for (const [lane, rs] of byLane) {
+        console.log(`  owner lane ${lane}: ${rs.length} row(s) missing a backtest id or off the path`);
+        for (const r of rs) console.log(`    FAIL line ${r.row.n} (${r.row.date}, ${r.row.lane}): ${r.row.finding.slice(0, 90)}${r.row.finding.length > 90 ? '…' : ''}\n         ${r.why}`);
+    }
+    const n = (s) => res.filter((r) => r.status === s).length;
+    console.log(`  checks-from-critics: ${n('PASS')} pass, ${n('EXEMPT')} exempt, ${n('FAIL')} fail`);
+    return failed.length;
+}
+
+if (args.includes('--self-test')) selfTest();
+else if (args.includes('--checks-from-critics')) {
+    const bad = runSweep();
+    console.log(bad ? `${TOOL}: FAIL (checks-from-critics: ${bad} ledger row(s) with no backtest id on precritic's path)` : `${TOOL}: OK (checks-from-critics)`);
+    process.exit(bad ? 1 : 0);
+} else {
+    const C = ctx();
+    const { table, live, plan } = C;
     const fails = []; const na = []; let checked = 0;
-    const lplans = new Map();
     for (const row of table.rows || []) {
-        const lc = readLessonCommand(row.command || '');
-        if (lc) {
-            if (!lplans.has(lc.lesson)) { const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--lesson', lc.lesson, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }); lplans.set(lc.lesson, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` }); }
-            const p = lplans.get(lc.lesson);
-            checked++;
-            const via = `ws-precritic --lesson ${lc.lesson}`;
-            if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
-            const hit = planHasLesson(p.text, lc);
-            console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ws-detailed-lesson --${lc.mode} on lesson ${lc.lesson} (via ${via})`);
-            if (!hit.length) fails.push(`${row.id}: ${via} plans no ws-detailed-lesson --${lc.mode} on it (the check is backtested but not on the lane's path)`);
-            continue;
-        }
-        const c0 = readCommand(row.command || '');
-        if (!c0) { na.push(row.id); continue; }
-        const gone = c0.skills.filter((k) => !live.has(k));
-        // `--roles none` (ws-empty-band: the screen hosts only) is the --skill plan's host run, not a page role
-        const c = { ...c0, skills: c0.skills.filter((k) => live.has(k)), roles: c0.roles === 'none' ? null : c0.roles };
-        if (!c.skills.length) { na.push(`${row.id} (not live here: ${gone.join(',')})`); continue; }
+        const v = rowPath(row);
+        if (v.status === 'NA') { na.push(v.na); continue; }
         checked++;
-        // a row on several roles (`--roles a,b`, critic eb-r3 D4) is on the path when EACH role is: lesson / independent through
-        // the --skill plan, any other role R through `ws-precritic --skill X --role R` (a lane that touches R runs it). A
-        // ws-empty-band line with no --roles renders every role the signed card offers; the row's rule flags must be carried.
-        const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
-        const cr = c.tool === 'ws-empty-band' ? cardRolesOf(c.skills) : null;
-        const per = (c.roles ? c.roles.split(',') : [null]).map((r) => {
-            const role = r && r !== 'lesson' && r !== 'independent' ? r : null;
-            const p = plan(c.skills, role);
-            const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
-            return { r, role, p, via, hit: p.ok ? planHas(p.text, { ...c, roles: r, flags, cardRoles: cr }) : [] };
-        });
-        const broken = per.find((x) => !x.p.ok);
-        if (broken) { fails.push(`${row.id}: ${broken.via} --dry-run failed: ${broken.p.text.trim().split('\n').slice(-1)[0]}`); continue; }
-        const missing = per.filter((x) => !x.hit.length);
-        if (per.length > 1 || flags.length) {
-            console.log(`  ${missing.length ? 'FAIL' : 'OK  '} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''}${flags.length ? ` ${flags.join(' ')}` : ''} on ${c.skills.join(',')} (per role: ${per.map((x) => `${x.r || '-'}${x.role ? ' via --role' : ''}`).join(', ')})`);
-            if (missing.length) fails.push(`${row.id}: ${missing.map((x) => `${x.via} plans no ${c.tool} on role ${x.r}${flags.length ? ` with ${flags.join(' ')}` : ''}`).join('; ')} (the check is backtested but not on the lane's path)`);
-            continue;
-        }
-        const { role, p, via } = per[0];
-        let hit = per[0].hit;
-        // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
-        // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
-        const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);
-        if (onDeploy) hit = ['deploy'];
-        console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : role ? ` (via --role ${role})` : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}`);
-        if (!hit.length) fails.push(`${row.id}: ${via} plans no ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} gate on it (the check is backtested but not on the lane's path)`);
+        if (v.print) console.log(v.print);
+        if (v.fail) fails.push(v.fail);
     }
     console.log(`  not applicable (no skill in the command): ${na.join(', ')}`);
     // OPT-IN lane rules (lead ruling D1 2026-11-07; tests/fixtures/precritic/opt-in-rules.json): each opted-in lane's flags
@@ -216,6 +389,11 @@ else {
         }
     }
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
-    if (fails.length) { console.log(`${fails.map((f) => `  ${f}`).join('\n')}\n${TOOL}: FAIL (${fails.length} of ${checked} rows not on the lane's path)`); process.exit(1); }
-    console.log(`${TOOL}: OK (${checked} rows on the lane's path, ${na.length} not applicable)`);
+    // the ledger sweep rides along on the default run (its rows' path verdicts are the ones just computed); --no-sweep skips it
+    const sweepBad = args.includes('--no-sweep') ? 0 : runSweep();
+    if (fails.length || sweepBad) {
+        console.log(`${fails.map((f) => `  ${f}\n`).join('')}${TOOL}: FAIL (${fails.length} of ${checked} rows not on the lane's path${sweepBad ? `; checks-from-critics: ${sweepBad} ledger row(s) with no backtest id on precritic's path` : ''})`);
+        process.exit(1);
+    }
+    console.log(`${TOOL}: OK (${checked} rows on the lane's path, ${na.length} not applicable${args.includes('--no-sweep') ? '' : '; checks-from-critics OK'})`);
 }
