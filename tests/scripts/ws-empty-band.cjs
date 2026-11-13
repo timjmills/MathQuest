@@ -62,6 +62,8 @@
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
 //             its size: 10 / 8 / 6 at S / M / L, plus the Model(s) (lead ruling 2026-11-12, lf-ops facts-roles option b: the fact
 //             pages had lifted it to 31 / 23 / 19 to fill the page). Read from buildSheet's plan.meta.scoreOutOf. --self-test checks it.
+//   EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1) a one-page Guided page whose next whole row of tries keeps it within
+//             its tries ceiling, with at least one drawn row (the grid's last) white under its grid: the fit counts rows as drawn.
 //   EB-EDGE   ink within EDGE_MM (1.5 mm) of, or across, the cell's own border (a cell divider or the page frame), on every
 //             row of every role and host (lf-ops facts-roles critic r1 G1: Guided S add / sub facts, the hinted row 1's dot tiles
 //             ran onto the divider and the fifth cell's tile across the frame; EB-SIDE reads the band beside the ink, never a
@@ -134,7 +136,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -363,7 +365,7 @@ const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const HTML = arg('html', null);
 if (require.main === module && !HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
-const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
@@ -755,7 +757,7 @@ async function main() {
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
-            const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
+            const vSize = ['L', 'M'].find((z) => SIZES.includes(z)) || SIZES[0];
             if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
             notes.push(`${key}: slot ink ${SLOT_INK ? 'on' : 'off'}; card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
@@ -805,6 +807,27 @@ async function main() {
                         if (process.env.EB_GAP_DEBUG) for (const c of cells) console.log('gap', key, j.tag, c.page, c.cell, c.step, c.hMm, 'below', c.belowMm, (c.belowMm / c.hMm * 100).toFixed(1), c.gapAtMm, c.gapMm, (c.gapMm / c.hMm * 100).toFixed(1) + '%', JSON.stringify(c.iv));
                         cells.forEach((c, i) => { if (gapBad(j.role, cells, i, BAND)) F('EB-GAP', `${key} ${j.tag} p${c.page} cell ${c.cell} (state ${c.step})`, `empty band ${c.gapMm} mm between the step text and the problem in a ${c.hMm} mm cell (${(c.gapMm / c.hMm * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} %, RUBRIC H13; critic r3 S5)`); });
                         mo.used.forEach((v, i) => { if (v < 70) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the Scripted Model page body used (limit 70 %)`); });
+                    }
+                    // EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1): a one-page Guided page under its §12.1 tries ceiling leaves
+                    // white under its grid of at least one drawn row of tries (the grid's last row) - the fit counted rows at a taller
+                    // height than the page draws them (tight rows held to their ink AFTER the fit), so more tries fit and were never dealt.
+                    // White under a page AT the ceiling is accepted (PT-ENG-3), as is white under a Guided page in general (EB-PAGE note).
+                    if (j.role === 'guided' && GDP_CAP[j.size] != null && Number.isFinite(b.tries) && b.tries < GDP_CAP[j.size]) {
+                        const rf = await sh.evaluate((scope) => {
+                            const mm = 96 / 25.4;
+                            const pgs = [...document.querySelectorAll(scope)];
+                            if (pgs.length !== 1) return null;
+                            const body = pgs[0].querySelector('.ws-body'); const grids = [...pgs[0].querySelectorAll('.ws-grid')];
+                            if (!body || !grids.length) return null;
+                            const g = grids[grids.length - 1]; const gr = g.getBoundingClientRect();
+                            const cells = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun'));
+                            const lastTop = Math.max(...cells.map((c) => c.getBoundingClientRect().top));
+                            const row = cells.filter((c) => Math.abs(c.getBoundingClientRect().top - lastTop) < 0.5).map((c) => c.getBoundingClientRect().height);
+                            return { spare: (body.getBoundingClientRect().bottom - gr.bottom) / mm, row: Math.max(...row) / mm };
+                        }, 'body > section.ws-page, body > .ws-page');
+                        // (a row adds `cols` tries: only a page the next whole row keeps within the ceiling can be refilled - a 4-column fact
+                        // page at 5 of 6 is trimmed to whole rows, not under-filled)
+                        if (rf && rf.spare >= rf.row && b.tries + Math.max(1, Number(b.cols) || 1) <= GDP_CAP[j.size]) F('EB-REFILL', `${key} ${j.tag}`, `${rf.spare.toFixed(1)} mm white under the grid holds another ${rf.row.toFixed(1)} mm row of tries, but the page prints ${b.tries} of the ${GDP_CAP[j.size]} the ceiling allows (the fit counted rows taller than they are drawn)`);
                     }
                     // (Guided is exempt from EB-PAGE: lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1 - white under its grid is accepted)
                     if (has('page-fill') && j.role !== 'guided') {

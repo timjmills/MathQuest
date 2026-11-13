@@ -1,0 +1,69 @@
+{
+ "note": "fixture: one pinned page per role (ws-capacity-pin --roles-check)",
+ "pages": {
+  "addition:add_facts independent M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts more-practice M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts opener M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts scripted-model M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts error-analysis M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts review M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts test M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts pre-skill-check M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts word-problems M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts fact-rows M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts fact-probe M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts true-false M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts reason-it M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_facts stretch M": {
+   "items": 4,
+   "pages": 1
+  }
+ }
+}

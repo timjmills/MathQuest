@@ -458,7 +458,7 @@ on screen (`design/SKILL_CELL_CONTRACT.md` is the API; `design/PAGE_TYPES.md` th
 `design/ROADMAP.md` P7 the plan).
 
 - **`js/modules/sheet/*`** — the kit. Pure ES modules (SCC-01: no `window`, no DOM, no state, no
-  `Math.random`); import only through `sheet/index.js`. Tokens (sizes S/M/L, looks, ink, the single
+  `Math.random`); import only through `sheet/index.js`. Tokens (sizes M/L; S is an alias of M, looks, ink, the single
   grey), `cell.js` (the boxed cell, labels, slots via `blank()`), `frame.js` (header, strand tab,
   "I Can" title, footer), `layout.js` + `paginate.js` (columns, no split cell, rebalanced last page),
   the template registry (`registerCell`, `hasCell`, `coverage`), `contract.js` (the per-skill

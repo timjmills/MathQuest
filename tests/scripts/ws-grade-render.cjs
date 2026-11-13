@@ -223,13 +223,13 @@ if (has('sample-self-test')) {
     // critic lf-tools r1 B3: at f3ae7acca a copy-light sample read as the older list (json.pages is a number): no unit, no
     // seed, no width. Now each page is one unit carrying exactly its sampled values.
     const j = { tool: 'ws-copy-light', mode: 'batch', skills: [{ skill: 'placevalue:more_less_10', pages: [
-        { n: 1, role: 'guided', size: 'S', seed: 12345, host: 'print', width: null, opts: { band: '20' } },
+        { n: 1, role: 'guided', size: 'M', seed: 12345, host: 'print', width: null, opts: { band: '20' } },
         { n: 2, role: null, size: null, seed: 12346, host: 'practice-card', width: 1024, opts: null },
         { n: 3, role: null, size: null, seed: 12347, host: 'quiz', width: 1366, opts: { support: ['touch'] } }] }] };
     const u = copyLightUnits(j);
     const want = [
         ['3 units', u.length, 3],
-        ['print page role / size / seed / opts', [u[0].role, u[0].size, u[0].seed, u[0].opts && u[0].opts.band, u[0].hosts], ['guided', 'S', 12345, '20', null]],
+        ['print page role / size / seed / opts', [u[0].role, u[0].size, u[0].seed, u[0].opts && u[0].opts.band, u[0].hosts], ['guided', 'M', 12345, '20', null]],
         ['card page host / width / seed', [u[1].role, u[1].hosts, u[1].width, u[1].seed], [null, ['practice-card'], 1024, 12346]],
         ['quiz page width / opts', [u[2].hosts, u[2].width, u[2].opts && u[2].opts.support], [['quiz'], 1366, ['touch']]],
         ['skill split', [u[0].categoryId, u[0].skillId], ['placevalue', 'more_less_10']],

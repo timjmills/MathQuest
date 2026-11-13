@@ -1,0 +1,5 @@
+[
+ {"kind": "app", "file": "js/modules/simple-print.js", "line": "const SIZE_LIST = [['L', 'Big'], ['M', 'Medium'], ['S', 'Small']]; const SIZES = SIZE_LIST;", "why": "critic nos r1 F2 mutation 1: the picker list moved to its own const (missed by the r1 guard)"},
+ {"kind": "app", "file": "js/modules/teacher-ui.js", "line": "        size: /^[SML]$/.test(d.size) ? d.size : 'L',", "why": "critic nos r1 F2 mutation 2: a restore written as a regex test (missed by the r1 guard)"},
+ {"kind": "doc", "file": "design/audit/LESSONS_LEARNED.md", "line": "1. Rendered at **S and L** (and M if the grid differs): independent, guided, test, error-analysis + keys; card at", "why": "critic nos r1 F4: the PRE-FLIGHT line as it stood on c81e70178"}
+]
