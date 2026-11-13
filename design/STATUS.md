@@ -794,3 +794,6 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Nothing lost; every lane pushed its work with resume points in design/status/<lane>.md. Do NOT deploy: lf-engine -pc (79ea333b8, WIP), -roles (a8ec3f2ac, pre re-critic), -g7; lf-partopts -deploy (2d008dfb3, gates not re-run; §8d 12 mm margin reason needs a re-read after the ROWFIT-BT re-pin).
 - Live today: vocabulary (both skills redesign-passed), Reason It deploy-4, roles deploy-3/-5, pixel empty-band + ledger sweep + no-dropped-row guard (+ merge-base hotfix), EB-FOOT item pairing, lesson-baseline deploy gate.
 - On reset: each lane resumes its builders where they stopped (no fresh starts); first deploy in line is lf-partopts step A.
+
+## 2026-11-13 ~17:00 UTC — Owner: usage back at 0 %; cap 70 % for now
+- All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.
