@@ -4,11 +4,15 @@ Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
 State: paused
-Updated: 2026-11-13 (fix r7: function-table lesson chart states, precritic r7)
+Updated: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
 Builder profile: mq-opus-medium
-Critic rounds: 0, none
+Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
 
 ## Now
+- 2026-11-13 fix r8 (after critic r1, all six FAIL): ours fixed - F1 hints off on Test / quiz, F5 function-table chart states,
+  F6 / F6b steps follow the preset and the lesson, F7 growing title, pattern_features q.options, notice "40", screen grey,
+  growing screen dots. Handed: F2 / slot width -> lf-ops; F3, F4, PT-MOD-1 (marksFor), F5 npr / fgr chart -> lf-roles; F8 ->
+  the options-panel owner; EB-FOOT pairing -> lf-checks. Precritic r8 (below): 32 PASS, 13 FAIL, all red by owner.
 - 2026-11-13 fix r7: function_table_easy lesson anchor chart fits its 2 x 2 panels on every option value but ftTask=rule-check
   (cell-checks lesson findings 354 -> 18; skill total 371 -> 35). Precritic r7 (below, function_table_easy only): 27 PASS, 3 FAIL
   (empty-band 39 and cell-checks 35, both the r6 role-owned rows plus rule-check; sibling-compare). rule-check panels 1 and 2 stay
@@ -67,6 +71,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r8 (critic r1 findings F1 F5 F6 F6b F7 + lead items + minors; precritic r8), start 2026-11-13T02:25Z, end 2026-11-13T04:55Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r7 (function-table lesson chart states + precritic), start 2026-11-13T01:36Z, end 2026-11-13T02:20Z, profile mq-opus-low
 Times: fix r6 (KEYJOIN + lesson chart overflows + empty-band triage + precritic), start 2026-11-12T23:30Z, end 2026-11-13T01:35Z, profile mq-opus-low
 Times: fix r5 (merge master + growing sizes + precritic), start 2026-11-12T21:55Z, end 2026-11-12T23:40Z, profile mq-opus-medium
@@ -75,6 +80,266 @@ Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-m
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
+
+## Critic r1 (2026-11-13, mq-opus-medium, independent; HEAD 47b1f2a86): all six skills FAIL
+Copied from the verdict (PNGs: /tmp/claude-0/-home-user-MathQuest/ddf8a20a-aa76-5111-8f71-96dbc22bf54b/scratchpad/critic-r1/).
+
+### Verdict
+
+| Skill | Result | Fails |
+|---|---|---|
+| algebra:function_table_easy | **FAIL** | model S/L (2 half pages), lesson anchor (states do not show the step's mark), review L (spiral cell), screen OK |
+| patterns:number_patterns_rule | **FAIL** | model L (Say band clipped), all three screen hosts (row wraps, caption overprinted by boxes, tiny quiz digits), lesson anchor |
+| patterns:follow_given_rule | **FAIL** | the same screen-host defects as number_patterns_rule, lesson anchor |
+| patterns:notice_patterns | **FAIL** | the parity hint on Test and Quiz gives the decision away; guided H13 |
+| patterns:pattern_features | **FAIL** | guided page prints the PARITY steps; model L on 2 pages; hint on test |
+| patterns:growing_shape_patterns | **FAIL** | model S/L on 2 half pages; Test/Review title "drawing and count" (H17); hint counts on test; option panel sample is blank |
+
+No skill passes. Most defects are a few shared causes (F1 to F6 below), so one fix round could clear several skills at once.
+
+### Score tables (C1 ease · C2 teaching · C3 spacing · C4 standard; the lowest across S/M/L unless a size is named)
+
+Not graded (see the end): true-false, reason-it, error-analysis, pre-skill-check (KEYJOIN), stretch and word-problems (unsupported for
+all six: "no open problem" / "no stories"), the lesson practice pages' chartWide packing (lesson p2+ PAGEFILL / DN-2), growing review L
+overflow, sections pages-2, ftTask=rule-check lesson.
+
+#### algebra:function_table_easy
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor (p1) | 8 | 7 | 8 | 8 | F5: states 2 and 3 say "Write 1" / "Write 6" but their Out boxes stay empty; only state 4 is filled |
+| Scripted model | 8 | 8 | **6** | 8 | F4: 4 states over 2 pages at S and L; p2 is half empty (S/algebra__function_table_easy/scripted-model-p1,p2.png; L same) |
+| Guided | 8 | 8 | 7 | 8 | L: 2 pages, p1 holds the model + 1 item and is ~20 % empty (L/.../guided-p1.png) |
+| Independent | 9 | 8 | 8 | 9 | S 12 / M 6 / L 6 tables; key correct; cells ~28 % empty at the bottom at L (just under H13) |
+| More practice | 9 | 8 | 8 | 9 | |
+| Review | **6** | 8 | 7 | 8 | L: the spiral's "Make both sides equal" cells have a 1 mm "Answer: _" stub under a grey box (H16) (L/.../review-p1.png) |
+| Test + key | 9 | 9 | 8 | 9 | worked column correctly gone; key checked item by item (8 − 8 = 0, 9 − 9 = 0 right) |
+| Mixed practice | 8 | 8 | 7 | 8 | L: 4 tables, ~20 % page empty |
+| Practice card / worksheet / quiz | 8 | 8 | 8 | 8 | (screen-*/ renders; table + boxes, digits readable) |
+| Option panel | 8 | 8 | 7 | 8 | Task select truncates "write each O…"; sample table tiny |
+
+#### patterns:number_patterns_rule
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor | 8 | 7 | 8 | 8 | F5: states 1 to 3 are the same picture; "Write 4" / "Write 15" never shown |
+| Scripted model | **4** | 8 | 6 | 7 | F3: at L the Say band is clipped by the frame, its text cut in half (L/patterns__number_patterns_rule/scripted-model-p1.png, crop-npr-L-say.png). S fits |
+| Guided | 8 | 7 | 8 | 8 | F6b: guided steps ("Look at two numbers side by side…") differ from the lesson's four step names |
+| Independent / more practice | 8 | 8 | 8 | 8 | slot width grows to 3 digits on rows that pass 100 (a small length clue) |
+| Review | 8 | 8 | 8 | 8 | spiral "Half of 42" cell is another skill's legacy cell (note only) |
+| Test + key | 8 | 8 | 8 | 8 | key correct |
+| Mixed practice | 8 | 8 | 8 | 8 | |
+| Practice card 1280 / 820 / 390 | 6 | 7 | **5** | 7 | F2: the 8-box train wraps (3 given + 1 box, then 4 boxes on a second row), "After each number, press Space." collides with the boxes |
+| Online worksheet | **4** | 7 | **5** | 7 | F2: caption overprinted by the boxes in 4 of 6 cards (H2); digits ~14 px, below the 29 px floor (S/patterns__number_patterns_rule/worksheet-1280.png) |
+| Quiz | **4** | 7 | **5** | 7 | F2: digits ~12 px in a 600 px box, caption overprinted (quiz-1280.png) |
+| Option panel | 8 | 8 | 8 | 8 | |
+
+#### patterns:follow_given_rule (preset)
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor | 8 | 7 | 8 | 8 | F5 (S/patterns__follow_given_rule/lesson-p1.png) |
+| Scripted model | 8 | 8 | 8 | 8 | L fits, Say band whole |
+| Guided / independent / more practice / review / test + key / mixed | 8 | 8 | 8 | 8 | test key checked (halve 8 → 1, 96 → 12) |
+| Practice card / worksheet / quiz | **4** | 7 | **5** | 7 | F2, same as number_patterns_rule (screen-fg.png) |
+| Option panel | 8 | 8 | 8 | 8 | |
+
+#### patterns:notice_patterns
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor | 8 | 7 | 8 | 8 | models only an even × even fact (4 × 10); step 4 prints the product "40" though card P2 hides it |
+| Scripted model | 9 | 8 | 7 | 8 | S: 4 states fill ~65 % of the page |
+| Guided | 8 | 8 | **6** | 8 | S: guided cells ~45 % empty at the bottom (H13) (S/patterns__notice_patterns/guided-p1.png); steps differ from the lesson's |
+| Independent / more practice | 9 | 8 | 8 | 9 | 15 / 15 / 8 a page; key correct |
+| Review | 8 | 8 | 8 | 8 | |
+| Test + key | 8 | **5** | 8 | 8 | F1: "even / odd" under each factor printed on the Test; the item reduces to "is there an 'even' word?" (S/…/test-p1.png, L/…/test-p1.png) |
+| Mixed practice | 8 | 7 | 8 | 8 | |
+| Practice card / worksheet | 8 | 7 | 8 | 7 | the hint words are BLACK on screen and grey on paper (paper ≠ screen); card says no "Tap one", worksheet does |
+| Quiz | 8 | **5** | 8 | 7 | F1: the hint shows in the quiz |
+| Option panel | 8 | 8 | 8 | 8 | |
+
+#### patterns:pattern_features (preset)
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor | 8 | 7 | 8 | 8 | "Sentence 2: not true for every number" never names the counter-example; step 1 "Write the numbers" with the numbers printed |
+| Scripted model | 8 | 7 | **6** | 8 | L: 2 pages, p1 ~35 % empty (L/patterns__pattern_features/scripted-model-p1.png) |
+| Guided | 6 | **4** | **6** | 8 | F6: the Steps box is the PARITY routine ("Look at each number in the fact…") on a pattern page; cells ~45 % empty (S/…/guided-p1.png) |
+| Independent / more practice | 8 | 8 | 8 | 8 | |
+| Review | 8 | 8 | 8 | 8 | |
+| Test + key | 8 | 7 | 8 | 8 | F1 (milder): the printed six numbers are the patShow hint and stay on the Test; key correct (checked all 8) |
+| Practice card / quiz | 8 | 7 | 8 | 8 | |
+| Online worksheet | 7 | 7 | 7 | 8 | the 6-number track wraps 3 + 3; sentences wrap to 3 lines |
+| Option panel | 8 | 7 | 8 | 8 | "Numbers to: 100 (tables to 10 × 10)" names tables on a pattern page |
+
+#### patterns:growing_shape_patterns
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor | 8 | 8 | 8 | 8 | |
+| Scripted model | 8 | 8 | **5** | 8 | F4: S and L on 2 pages, each ~45-55 % used (S/patterns__growing_shape_patterns/scripted-model-p1,p2.png) (H5) |
+| Guided | 8 | 8 | 7 | 8 | L 2 pages of 1 × 2 |
+| Independent / more practice | 8 | 8 | 7 | 8 | drawing ~45 % of a full-width row; 5 / 4 / 4 a page at S / M / L |
+| Review S | 8 | 8 | 8 | **6** | F7: title "Review: drawing and count the next term…" (H17) |
+| Test + key | 8 | 6 | 8 | **6** | F7 title (wraps to 2 lines at L); F1: Term 1-3 counts printed on the Test; key draws Term 4, correct |
+| Practice card / quiz | 8 | 8 | 8 | 8 | 7 × 7 working grid (P3), unit grows S 2.5 / M 2.8 / L 3.3 mm (UNIT in growing-pattern.js:35; the S and L rasters agree) |
+| Online worksheet | 7 | 8 | 7 | 8 | term dots ~6 px, hard to count |
+| Option panel | **4** | 6 | 7 | 8 | the Sample question box is BLANK (panels/patterns-growing_shape_patterns.png) |
+
+### Findings, each with the check that would have caught it
+
+**F1. Fading hints print on Test and Quiz (notice, pattern_features, growing).** PT-TST-2 / P-SC-5 say "Hints on tests" is off by
+default. The test role plans with `level: 0` (sheet/roles/test.js:246, 256), but the cells read only the generator's `p.show`
+(`js/modules/sheet/cells/notice.js:65` `showOn`, `js/modules/sheet/cells/growing-pattern.js:158`, 196). `patShow` is declared as
+"A hint that fades" (skill-options.js:3892, 3918). On parity the hint decides the item. PNG: S/patterns__notice_patterns/test-p1.png,
+L/…/test-p1.png, S/screen-np.png (quiz). **Check:** new `ws-cell-checks HINT-ON-TEST`. For every option the panel groups as
+`support` with a fading `help`, render Test (and quiz with hints off) and fail when the cell DOM still carries the hint part. A
+backtest on this HEAD must fail.
+
+**F2. The count-row train on screen: wrap, caption overprint, tiny digits (number_patterns_rule, follow_given_rule).** At 1280 the
+8-slot train breaks into 4 + 4 rows, "After each number, press Space." is drawn under or through the second row, and the worksheet and
+quiz digits are ~12-14 px (floor 29 px). Likely the interim revert of 3d8bca1's wrap hunk (2cfeb1d7) the status names. PNG:
+S/patterns__number_patterns_rule/worksheet-1280.png, quiz-1280.png, S/patterns__follow_given_rule/worksheet-1280.png.
+**Existing checks that missed it:** ws-screen-slots and ws-chromebook-fit (they measure slots and scroll, not text against box
+overlap or digit px on the worksheet and quiz). **Check:** add a TEXT-OVERLAP probe (any text node's box intersecting a slot box in
+the screen cell) and a digit-px floor per host (card 40/48/56, worksheet 29) to ws-screen-slots.
+
+**F3. Say band clipped at L (number_patterns_rule scripted model).** The 4 states plus the Say band run 6 mm past the frame. The text
+is cut in half. PNG: L/patterns__number_patterns_rule/scripted-model-p1.png. **Existing check that missed it:** ws-grade-render
+`--gate` overflow (it reported no OVERFLOW for scripted-model L; precritic runs the gate on lesson, test and independent only, not on
+scripted-model). **Check:** put scripted-model and guided at S/M/L on the render gate, and add a text-clip probe (scrollHeight >
+clientHeight on the Say band).
+
+**F4. Model pages split over two half-empty pages (function_table_easy S/L, growing S/L, pattern_features L).** 2 states a page with
+a ~half-empty second page (H5). The model role stacks states full-width at one per row; a 2 × 2 like the anchor chart would fit.
+PNG: S/algebra__function_table_easy/scripted-model-p2.png, S/patterns__growing_shape_patterns/scripted-model-p1,p2.png,
+L/patterns__pattern_features/scripted-model-p1.png. **Check:** ws-print-lint PAGEFILL on `--roles scripted-model` (the precritic
+plan lints the lesson and independent roles only).
+
+**F5. The anchor chart's states never show the step they describe (number_patterns_rule, follow_given_rule, function_table_easy).**
+"Write 10" sits under a picture with an empty box; the states only change at step 4, so 3 of 4 panels are the same picture. PNG:
+S/patterns__number_patterns_rule/lesson-p1.png, S/patterns__follow_given_rule/lesson-p1.png,
+S/algebra__function_table_easy/lesson-p1.png. (The scripted model of the same skills does progress: 39 is traced in state 3.)
+**Check:** ws-detailed-lesson / cell-checks STATE-PROGRESS. A step whose sentence says "Write N" must have N in a slot of its state,
+and two consecutive states must not be identical.
+
+**F6. pattern_features guided page prints the parity steps.** `noticeStrings.def = NOTICE_STRINGS.parity.def`
+(`js/modules/sheet/providers/patterns.js:99`): the page-level steps with no item fall to parity. This is the L28 class ("what the
+pipeline reads with NO item must follow the options"). PNG: S/patterns__pattern_features/guided-p1.png. **Check:** ws-node-lint
+STEPS-FOLLOW-PRESET. For each preset skill, call the provider's page-level strings with `{skillId, opts}` and no item, and compare
+the steps to the item-level `stepsFor` task. **F6b (minor):** the guided steps of number_patterns_rule and notice_patterns use other
+words than the lesson's four step names (L6). Check: guided `Steps:` text equals the routine's step names.
+
+**F7. Growing Test / Review title "drawing and count the next term" (H17).** The role title gerundises only the first verb. PNG:
+S/patterns__growing_shape_patterns/review-p1.png, L/…/test-p1.png. **Existing check that missed it:** VQ-TITLE (it checks for a
+sentence, not grammar). **Check:** a VQ-TITLE rule for a role title made from an I Can with "X and Y": both verbs must take -ing.
+
+**F8. Growing option panel: the sample question is blank.** PNG: panels/patterns-growing_shape_patterns.png. **Check:** add a
+non-empty sample (cell DOM has ≥ 1 drawn part) to the option-panel gate (ws-options-shots has no assertion; make it a gate).
+
+**F9 (minor, not by themselves fails).** Slot width grows on rows that pass 100 (number_patterns_rule, follow_given_rule: a length
+clue). The notice hint is black on screen and grey on paper. Growing worksheet dots ~6 px. Notice lesson step 4 prints the product
+"40" (card P2 hides it). function_table review L spiral cell "Answer: _" stub (another skill's legacy cell: file it on that skill).
+
+### Checked and OK
+- "Within N" bounds the answer: function_table_easy numbers to 20 cap every In, Out and rule number (8 items read, 0 over; test key
+  0..20). Growing "Answers to 20": answers 7..20. notice "Numbers to 100": products ≤ 100.
+- Parity and true/false answers read Even / Odd and True / False (q.ans and keys capitalised; truefalse sample ans "False").
+- Keys are facsimiles of their pages and correct on every key read: ft test S, notice independent S + test S, pattern_features test S
+  (8/8), follow test S, growing test S, number_patterns independent S.
+- Size S honoured on practice pages: S holds more than L (ft 12/6/6, npr 9/7/6, notice 15/15/8, growing 5/4/4, features 8/5/4, follow
+  10/9/8). The lesson anchor is the same at S and M (identical md5): engine behaviour, noted only.
+- The growing unit is S 2.5 / M 2.8 / L 3.3 mm (growing-pattern.js:35; the drawings grow S → L on the rasters).
+- A Say band is on every model and anchor (clipped only at npr model L, F3). The misconception-based error items are in the
+  NOT GRADED roles this round.
+
+### Not graded (with reason)
+- true-false, reason-it, error-analysis, pre-skill-check: KEYJOIN, red for other lanes (brief).
+- Review L overflow on growing (`review 1p+1k 1x4 OVERFLOW` in log-L.txt): known red (brief).
+- true-false M overflow (pattern_features): known red. The lesson practice pages' chartWide packing (lesson p2+ of notice / features
+  / growing): lf-engine. count-row reason-it train and capacity: lf-ops. sections pages-2: engine.
+- ftTask=rule-check lesson: lf-engine stepsBy pending. sibling-compare: skipped (first family).
+- stretch and word-problems: the role answers "unsupported" for all six skills (no open problem / no stories). Per RUBRIC scope note
+  2026-09-26 Stretch is not graded as a separate page. Word problems is not a role these skills own.
+
+### Speed reflection
+1. **The most rounds were lost to defects no gate renders.** F2 (screen overlap), F3 (model clip) and F4 (model page fill) are on
+   roles or hosts that precritic's plan skips: the render gate runs lesson, test and independent; print-lint runs lesson and
+   independent. Rule: precritic `--strict` renders and gates EVERY role the card lists as offered (scripted-model and guided
+   included), at S/M/L. This is LESSONS_LEARNED L25 again, so make the plan derive the roles from card §7b, not a fixed list.
+2. **Hints on tests (F1) is a contract the cell cannot see.** Give `registerCell` a declared `hints: ['show']` payload field that the
+   kit strips at `scaffoldLevel 0`, so no template has to remember it. The HINT-ON-TEST check proves it.
+3. **Option-unaware page strings (F6) repeat L28.** One node-lint rule over every preset skill (no browser, about 1 s) catches it before any render.
+4. **The anchor charts copy one picture into four panels (F5).** A state-diff check in ws-detailed-lesson (adjacent states must differ, and the
+   number a step says to "Write" must be in its state) would have flagged three skills in seconds.
+5. **Tooling cost:** `ws-grade-render --roles` already writes the screen hosts. A separate screen-only run re-renders the legacy print
+   (5 pages a skill) for nothing: skip the legacy print when `--roles` ran in the same out dir. ws-options-shots writes into the repo with no
+   `--out` and asserts nothing: give it `--out` and make it a gate (F8).
+6. **Waits:** each S/M/L role render took ~6 min for 6 skills. Most of the wait was the three sizes running one after another; with
+   `--size S,M,L` in one browser session (the flag already takes a list in golden mode), the boot happens once.
+
+## Precritic r8 (796952c0 + the notice level-0 line, on our branch merged with lf-roles 83bcbf32 and lf-checks' ws-empty-band 1bcfcb72 in a scratch worktree; 6 skills, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261113-030943-19618, wall ~5400 s): 32 PASS, 13 FAIL
+After the run: ws-spec-card --check-signed is OK (the FAIL row ran before the rule ids came out of the new comments, see Log);
+ws-empty-band EB-FOOT 15 on notice_patterns test (drawn at level 0 without the hint line, measured by the bridge at level 1)
+cleared by keeping the hint's line empty at level 0 - rerun `ws-empty-band --skill patterns:notice_patterns --roles test,independent`: OK.
+
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | 6 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-providers-unit --skill | 6 skills | PASS | 2 of 6 skills checked; not covered: patterns:follow_given_rule, patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns | 1 |
+| ws-roles-unit (shared page roles) | shared roles | PASS | - | 0 |
+| ws-content-audit --skill | 6 skills | PASS | 2 skill(s) audited (4 of the 6 in scope are outside the audited families) | 7 |
+| ws-options-verify --skill | 6 skills | PASS (baseline) | 189 value(s) checked; 6 failing, 6 pinned, 0 new | 143 (52 waiting) |
+| ws-presets-unit | 5 preset / host skill(s) | PASS | - | 39 (32 waiting) |
+| ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT) | 6 skills × card roles × S/M/L + hosts | FAIL | ws-empty-band: FAIL (292) | 895 (41 waiting) |
+| ws-lessonfit (WRM site lessons, every year) | site lessons Y1, Y4, Y6 | PASS | - | 26 |
+| ws-coverage-matrix --skills | 6 skills × kinds × S/M/L | PASS | 50 of 200 row(s) run × S/M/L: OK 50, RED 0, ERROR 0; PENDING 114, N/A 36 | 1249 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s)) | 53 (18 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s), unpinned) | 79 (47 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | 6 skills | PASS | 0 found (6 doc(s), unpinned) | 63 (31 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 6 skills | FAIL | 3 found in 2 of 6 doc(s); 2 (document, lint, rule) count(s) above the pin; lesson page not pinned at L: algebra:function_table_easy, patterns:number_patterns_rule, patterns:follow_given_rule, patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns (must be clean) | 75 (28 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 6 skills | FAIL | 8 found in 3 of 6 doc(s); 6 (document, lint, rule) count(s) above the pin; lesson page not pinned at S: algebra:function_table_easy, patterns:number_patterns_rule, patterns:follow_given_rule, patterns:notice_patterns, patterns:pattern_features, patterns:growing_shape_patterns (must be clean) | 73 (23 waiting) |
+| ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) | 6 skills × lesson, test, independent × S/M/L + screen hosts | PASS | - | 461 (16 waiting) |
+| ws-print-lint --source kit --kind sections --pages 2 --size S --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) | algebra:function_table_easy + patterns:number_patterns_rule + patterns:follow_given_rule + patterns:notice_patterns + patterns:pattern_features + patterns:growing_shape_patterns × sections × 2 pages × S | FAIL | 28 found in 1 of 1 doc(s) (no pinned baseline: an unpinned document must be clean) | 18 (5 waiting) |
+| ws-print-lint --source kit --kind sections --pages 2 --size L --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) | algebra:function_table_easy + patterns:number_patterns_rule + patterns:follow_given_rule + patterns:notice_patterns + patterns:pattern_features + patterns:growing_shape_patterns × sections × 2 pages × L | FAIL | 15 found in 1 of 1 doc(s) (no pinned baseline: an unpinned document must be clean) | 48 (34 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (function-table §7a; critic lf-ops r1 check 2) | algebra:function_table_easy × 11 roles × S/M/L | PASS | - | 263 (36 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | algebra:function_table_easy × 14 roles + 33 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 20 finding(s) (OVERFLOW 20) on 534 page(s), 398s | 433 (33 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (patterns §7a; critic lf-ops r1 check 2) | patterns:number_patterns_rule × 11 roles × S/M/L | FAIL | ws-grade-render: FAIL - 16 finding(s) (16 overflow, 0 small target) in 1 unit(s) | 235 |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | patterns:number_patterns_rule × 14 roles + 21 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 170 finding(s) (OVERFLOW 170) on 351 page(s), 357s | 361 |
+| ws-grade-render --gate on every other role the signed card offers (patterns §7a; critic lf-ops r1 check 2) | patterns:follow_given_rule × 11 roles × S/M/L | FAIL | ws-grade-render: FAIL - 12 finding(s) (12 overflow, 0 small target) in 1 unit(s) | 198 |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | patterns:follow_given_rule × 14 roles + 21 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 60 finding(s) (OVERFLOW 60) on 351 page(s), 339s | 342 |
+| ws-grade-render --gate on every other role the signed card offers (patterns §7a; critic lf-ops r1 check 2) | patterns:notice_patterns × 11 roles × S/M/L | PASS | - | 195 |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | patterns:notice_patterns × 14 roles + 6 option values × S/M/L | PASS | - | 69 |
+| ws-grade-render --gate on every other role the signed card offers (patterns §7a; critic lf-ops r1 check 2) | patterns:pattern_features × 11 roles × S/M/L | PASS | - | 194 |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | patterns:pattern_features × 14 roles + 6 option values × S/M/L | PASS | - | 62 |
+| ws-grade-render --gate on every other role the signed card offers (patterns §7a; critic lf-ops r1 check 2) | patterns:growing_shape_patterns × 11 roles × S/M/L | PASS | - | 195 |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | patterns:growing_shape_patterns × 14 roles + 7 option values × S/M/L | PASS | - | 94 |
+| ws-screen-slots --skills | 6 skills | PASS | 0 found, 0 pinned, 0 new (30 host renders, --baseline design/audit/baselines/screen-slots.json) | 24 |
+| ws-screen-answer --skills | 6 skills | PASS | - | 60 |
+| ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE) | 6 skills | FAIL | 5 of 6 skill(s) in scope absent from the output (checked nothing for them): algebra:function_table_easy, patterns:number_patterns_rule, patterns:follow_given_rule, patterns:notice_patterns, patterns:pattern_features | 3 |
+| ws-chromebook-fit --skills | 6 skills | PASS | - | 253 |
+| ws-code-snapshot | all share codes | PASS | - | 2 |
+| ws-boot-smoke | app boot | PASS | - | 4 |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | 6 skills: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 106 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 30 printed row(s) with findings (PENDING(no-baseline) 30; siblings per skill: function_table_easy: 0, number_patterns_rule: 0, follow_given_rule: 0, notice_patterns: 0, pattern_features: 0, growing_shape_patterns: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | 6 skills × matrix rows × S/M/L + extras at S | PASS | 80 matrix row(s) × S/M/L + 12 extra document(s) (test, more-practice, supports on): 252 document(s), SLOT 0 / CLIP 0 finding(s), 7331 box segment(s) and 0 head(s) probed (SLOT-W N/A on 51, HEADS N/A on 252 document(s): no digit strip / no heads); every SLOT / CLIP count at or below the approved siblings | 1762 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | 6 skills × 390x844, 390x664 | PASS | - | 144 |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | 6 skills | PASS | - | 5 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | 6 skills | PASS | - | 0 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | 6 skills | PASS | - | 2 |
+| ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) | 6 skills | PASS | 6 skill(s), 0 pinned finding(s), 0 stale pin(s), 2.1 s | 2 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | 6 skills | PASS | 0 found, 0 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | 6 skills | FAIL | 2 of 2 SIGNED card(s) failing: design/cards/function-table/function-table.md, design/cards/patterns/patterns.md | 2 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | 6 skills × S/L | FAIL | 12 value page(s) worse than the default: number_patterns_rule pattern="add" @S, number_patterns_rule pattern="sub" @S, number_patterns_rule pattern="grow" @S, number_patterns_rule shape="circle" @S, number_patterns_rule  | 590 |
+
+Against r6 (same 6 skills): cell-checks pattern_features 39 -> 0, growing 34 -> 0, function_table_easy 371 -> 20 (all
+ftTask=rule-check lesson + mixed guided L: lf-engine, as r7), number_patterns_rule 192 -> 170, follow_given_rule 81 -> 60
+(count-row: lf-ops); render-gate notice / pf / growing / ft OK. Red, by owner:
+- lf-ops (count-row.js): npr / fgr cell-checks + render-gate overflow (reason-it train, places 1000, shape circle / hex / mixed),
+  options-verify --render pattern / shape @S, EB-EDGE reason-it / pre-skill-check, the screen train (F2), the slot width.
+- lf-roles: scripted-model layout (F4; EB-BAND / EB-SIDE on scripted-model), the Model's marksFor for function-table (PT-MOD-1),
+  chart.js generic-state progress (F5 npr / fgr), F3 L clip; EB-ROLE 33 (stretch / fact-probe "not composed": roles the
+  card's §7b lists but the role answers unsupported).
+- lf-engine: lesson.js chartWide packing (print-lint lesson DN-2 / LONE / PAGEFILL / H13 on pf, notice, fgr), sections
+  pages-2 L-DENSITY, ftTask=rule-check chart (cell-checks ft 20).
+- lf-checks: ws-screen-support-eq scope (5 of 6 skills absent: no support option to check), sibling-compare (first family:
+  no siblings), EB-FOOT index pairing (Log).
+- ours, left: EB-BAND function_table_easy guided 8 / lesson 2 / error-analysis 1 - the guided cell height is the we-do
+  role's (2 rows a page); not changed this round.
 
 ## Baseline precritic (head 9398c3a, --skill function_table_easy,number_patterns_rule --strict): 6 FAIL
 - print-lint lesson L/S: function_table_easy L-TOPSTART CL-4b, L-ANSAREA SL-6, L-DENSITY DN-2; number_patterns_rule L-OVERFLOW PG-12 (x8)
@@ -383,6 +648,68 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 04:55: fix r8 (Opus medium: rebuild after critic r1 FAILED all six). Merged for precritic only: our branch + origin
+  lf-roles (83bcbf32; backtests.json conflict resolved by keeping both rows) + lf-checks' ws-empty-band.cjs (1bcfcb72, EB-FOOT
+  footCols), in a scratch worktree; nothing of theirs committed here. Each critic finding:
+  - F1 FIXED (notice.js showOn(p, ctx), growing-pattern.js `show`): the fading hint never draws at scaffold level 0 (the Test),
+    whatever patShow says; every hint part carries data-ws-hint="fade" and css/quiz-mode.css hides it in #quizTakeView (the
+    quiz deals the practice twin; additive rule, the asset stamp is the deploy's). Node probe: level 0 -> 0 hint parts, level 1
+    -> 2 (notice) / 3 (growing). At level 0 the parity hint's LINE stays (a no-break space, no word), because the bridge
+    measures every item at level 1: without it precritic r8 found EB-FOOT 15 on the notice Test (32.6 drawn vs 38.6 mm);
+    rerun OK. (Engine note for lf-roles: measure a role's items at the level it plans them.) CHECK: none exists. PROPOSED for lf-checks: ws-cell-checks HINT-ON-TEST - for every option
+    the panel groups as support with a fading help, render the Test (level 0) and the quiz host and FAIL when a
+    [data-ws-hint] part (or, without the mark, the item's hint text) is in the cell; backtest fail 47b1f2a86, pass this commit.
+  - F2 NOT OURS: count-row train wrap / caption overprint / tiny digits on screen (count-row.js + the interim revert 2cfeb1d7):
+    lf-ops. count-row.js untouched.
+  - F3 HANDED to lf-roles: the npr Model at L runs 6 mm past the frame and clips the Say band. Our Say string is one line
+    (crop-npr-L-say.png); the overflow is the Scripted Model's count-row re-plan (scripted-model.js marksFor / variants)
+    under-measuring the L states. Proposed check (critic's): render gate + text-clip probe on scripted-model and guided S/M/L.
+  - F4 HANDED to lf-roles: our footprints match the drawing (function_table_easy S hMm 63 vs ~66 drawn; growing measured),
+    and the worked-step count is the standard four. The Model role lays one state a row (state + step text), so 4 states x
+    ~66 mm cannot fit a page (deal [2, 2]); a 2 x 2 like the anchor chart fits. Proposed check: print-lint PAGEFILL on
+    --roles scripted-model in precritic's plan.
+  - F5 FIXED for function_table_easy (function-table.js ftStepState: each state before the last shows the marks of steps
+    1..k traced grey, ctx.ftOnly; looked at the S lesson p1: empty / 8 / 8, 9 / all four). number_patterns_rule and
+    follow_given_rule: their chart state is chart.js stateDrawing's generic path (count-row has no stepState), which draws
+    blank, blank, blank, answered: HANDED to lf-roles (pass `payload.traceSlots` from the merged marks in the generic path,
+    as scripted-model marksFor already does for count-row) or lf-ops (a count-row stepState). PROPOSED check: ws-detailed-lesson
+    / cell-checks STATE-PROGRESS (adjacent chart states differ; a step that says "Write N" has N in a slot of its state).
+  - PT-MOD-1 (lead) PARTLY: function-table now draws `payload.traceSlots` (a blank state with the marks of steps 1..k, grey),
+    count-row's convention. The Model passes traceSlots only for count-row (scripted-model.js marksFor:
+    `q.cell.template !== 'count-row'`): HANDED to lf-roles - accept 'function-table' there and the Model states progress.
+  - F6 FIXED (providers/patterns.js): the per-item `stepsFor` is gone for every notice task and the growing tasks, so every
+    item of a page has the same steps and the Steps band takes the item's (feature steps on pattern_features), never the
+    item-less fallback that fell to parity (`noticeStrings.def` is read by nothing; kept). Node probe: pattern_features guided
+    steps = the feature list. PROPOSED check: ws-node-lint STEPS-FOLLOW-PRESET (critic's: per preset skill, the page-level
+    steps with {skillId, opts} and no item equal the item-level task's).
+  - F6b FIXED: the provider steps are the lesson's step names (notice parity, pattern features, growing next, number patterns
+    find / use the rule in the countby.js block, function-table outputs). PROPOSED check: guided `Steps:` text equals the
+    routine's step names (ws-lesson-unit).
+  - F7 FIXED: growing next iCan "I Can find the next term of a growing pattern" (one verb; the role title gerundises the first
+    verb only). PROPOSED check: VQ-TITLE "X and Y" rule (both verbs -ing) - compose.js topicOf is lf-roles'.
+  - F8 HANDED (skill-options-ui.js / teacher-preview.js owner): the sample mounts (42 kB, stage 400 x 963 px) and teacher-preview
+    fit() puts the frame in is-cropped mode (scale 0.45, top-left); skill-options-ui _tidySample then sets
+    translate(-50%, -50%) scale(k) on the same stage, which moves it out of the frame: blank. PROPOSED check (critic's):
+    ws-options-shots asserts a drawn part inside the frame's box.
+  - EB-FOOT 61.2 / 55.7 vs 49.2 (lead item): NOT a measure error. The independent role lays items 3 and 4 (measured 50.2 mm at
+    2 across, fits) in the 2-across row and items 0-2 (2-across fits:false 'reflow', 61.2 / 55.7) full width; ws-empty-band
+    pairs cell i with items[i] by index, so it compares cells 1-2 (items 3, 4: 50.2 vs 49.2 drawn, -2 %) with items 0, 1.
+    HANDED to lf-checks: pair each cell with its own item (letter / sig), not the index. Backtest row
+    eb-foot-gridcols-patterns NOT armed: no fix commit of ours exists for it; its fail state would need the pairing fix.
+  - q.options (lead) DONE: pattern_features' three sentences in printed order (gen-patterns-notice.js noticeFeature).
+  - Minors: slot width past 100 = count-row.js maxDigits of the row (lf-ops: size slots from the band's widest number);
+    notice hint black on screen FIXED (mq-keep-color, so the screen ink pass keeps the one grey); growing twin dots FIXED (term
+    box never under 100 px on screen: 10 px dots from ~6); notice lesson "40" FIXED (step 4 "So the product is even.").
+  - Card: the first build of these edits changed both signed cards (rule ids PT-TST-2 / PT-MOD-1 cited in new comments are
+    hashed into the card); the ids were taken out of the comments, cards green, no card change.
+  Checks: node --check on every changed file; ws-boot-smoke OK; ws-code-snapshot OK (736); ws-card-rulings OK (6/6);
+  ws-providers-unit OK; ws-lesson-unit OK; ws-node-lint 58 before and after (none ours); ws-detailed-lesson --check OK on
+  g3-oa9-input-output-rule and g3-oa9-mult-table-patterns; precritic r8 above.
+  Speed reflection: (1) three of the nine findings were in host or role files (chart.js generic state, scripted-model marksFor,
+  skill-options-ui) - a lane that owns only cells needs a "who draws this" map before the fix round, or the round splits into
+  hand-offs late; (2) the EB-FOOT row would have been diagnosed in minutes if ws-empty-band printed each cell's item letter
+  beside its measure; (3) the card gate caught comment-only rule-id citations, after the change - run ws-spec-card
+  --check-signed before every commit (it is 2 s).
 - 2026-11-13 02:20: fix r7 (precritic r7 above). One target: the function_table_easy lesson chart on 8 option values.
   `sheet/cells/function-table.js` chartState (ftStepState's path for every table that is not the plain find-the-rule one):
   Check row on the last state only (or from the state whose step marks `chk`), beside the table when table + 5 mm + Check fit

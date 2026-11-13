@@ -124,7 +124,11 @@ function parityCell(p, ctx) {
     const dp = digitPt(ctx);
     const hint = (n) => (showOn(p, ctx)
         ? `<span class="mq-nt-hint mq-keep-color"${HINT_ATTR} style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};font-weight:400;color:${GREY};line-height:1.1;">${n % 2 === 0 ? 'even' : 'odd'}</span>`
-        : '');
+        // (at level 0 the hint's line is kept EMPTY - a no-break space, no word - so the Test cell is as tall as the cell the
+        // bridge measures at level 1: the drawn height matches its footprint, ws-empty-band EB-FOOT, precritic r8 notice test 15)
+        : ctx && ctx.scaffoldLevel === 0 && p.show !== false
+            ? `<span class="mq-nt-hint" aria-hidden="true" style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};line-height:1.1;">\u00a0</span>`
+            : '');
     const num = (n) => `<span style="display:inline-flex;flex-direction:column;align-items:center;min-width:${L(ctx, 10)};">`
         + `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
     const fact = `<div class="mq-nt-fact" role="img" aria-label="${esc(`${p.a} times ${p.b}`)}" style="display:flex;justify-content:center;align-items:flex-start;gap:${L(ctx, 3)};">`
