@@ -9,6 +9,12 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-13 two-step round 3b (mq-opus-medium, resumed after a container restart). **CARD FOR THE LEAD TO SIGN: f05e43ed9**
+  (design/cards/two-step regenerated --resign on top of 05c23756c, UNSIGNED; also check the reason-it "provider stories" line).
+  Step 0 (lead ruling): band 50 hidden on two_step_mult_div_first / two_step_add_then_mult too. Check first 6b00bb989
+  (ws-two-step BAND-BITES, PENDING exemption removed: FAIL 17 / 300, 28 / 300) -> fix 2828fc427 (PRESET_HIDE_VALUES) OK;
+  backtest two-step-band-bites-50-mdf-atm PASS; CHECKS_FROM_CRITICS row. Next: CAP-BAND (lf-roles 9e3059d18), lf-roles r9 reds
+  (EB-SIDE re-measure, ÷ bar OVERFLOW guided L, RI-DISTINCT), lesson overflow, precritic r13 in shards.
 - 2026-11-13 two-step precritic r12 (mq-opus-medium; after the merges): merged origin/master e76e0815f (ff455466d), lf-hosts-twostep
   5719fe9b6 (f457eed3b), then origin/master a6883082c (3faaf82a9, pushed: lf-roles tests two-step on it). Fixed (check first): the
   x / ÷ / add-first deals repeat on a page (ws-two-step PAGE-FRESH 33810c189 FAIL -> fix 5921196d7, backtest two-step-page-fresh).
