@@ -56,6 +56,15 @@ const ALLOW = new Set(list(arg('allow', '')));
         if (v.items < b.items) (ALLOW.has(k) ? allowed : drops).push(`${k}: ${b.items} -> ${v.items} items (${b.pages} -> ${v.pages} page(s))`);
         else if (v.items > b.items) rises.push(`${k}: ${b.items} -> ${v.items}`);
     }
+    // SIZE-ORDER (critic r2 N2, "Size S ignored" L1): a smaller size never prints FEWER items than a larger one (S >= M >= L)
+    const order = [];
+    const groups = {};
+    for (const [k, v] of Object.entries(now)) { if (v.na) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v.items; }
+    for (const [g, z] of Object.entries(groups)) {
+        if (z.S !== undefined && z.M !== undefined && z.S < z.M) order.push(`${g}: S ${z.S} < M ${z.M} items (SIZE-ORDER)`);
+        if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER)`);
+    }
+    drops.push(...order);
     for (const d of drops) console.log(`  FAIL ${d}`);
     for (const d of allowed) console.log(`  allowed ${d}`);
     for (const d of rises) console.log(`  rise ${d}`);
