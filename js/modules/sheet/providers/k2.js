@@ -446,18 +446,21 @@ function chartWrong(q, perGap) {
     const one = parts.length === 1;
     const start = itemHash(q, 'gap') % parts.length;
     const order = parts.map((_, i) => (start + i) % parts.length);
-    const c = [];
+    // the gap that carries the error is dealt from the item (every gap equally often), its errors rotated by chooseWrong; a
+    // gap with no usable error passes to the next
     for (const k of order) {
         const t = parts[k];
+        const c = [];
         for (const w of perGap(t, q)) {
             if (!Number.isFinite(w.value) || w.value < 1 || w.value === t) continue;
             const vals = parts.map((x, i) => (i === k ? w.value : x));
             const slots = Object.fromEntries(vals.map((v, i) => [`b${i}`, String(v)]));
             c.push(Object.assign({}, w, one ? { value: w.value } : { value: vals.join(', '), slot: `b${k}`, slots }));
         }
+        const got = chooseWrong(q, c);
+        if (got) return got;
     }
-    // (chooseWrong rotates the whole list by the item, so the gap that carries the error moves from item to item)
-    return chooseWrong(q, c);
+    return null;
 }
 
 /** The 1-100 chart's strings; band 120 (chart_120) names the chart to 120 (L6, L28). */
