@@ -215,6 +215,26 @@ function cellChecksInPage(opts) {
             }
         });
     });
+    // ---- EA-ROWX (critic r1-r3 R15): on an Error Analysis page every cell of one grid column starts its Correct / Fix it judgement at
+    // the same x (within 4 mm: a work a few mm wider shifts its centred group by half that - word forms drift 3.5 mm; R15 was a
+    // 31 mm jump between judgement modes) - the same task in two places reads as two tasks (AX-4, C1)
+    if (role === 'error-analysis') {
+        pages.forEach(function (pg, pi) {
+            var cols = {};
+            [].forEach.call(pg.querySelectorAll('.ws-cell'), function (c) {
+                var j = c.querySelector('[data-ws-slot="ea-judge"]');
+                if (!j) return;
+                var cr = c.getBoundingClientRect(), jr = j.getBoundingClientRect();
+                var key = Math.round(cr.left / PX);
+                (cols[key] = cols[key] || []).push(jr.left - cr.left);
+            });
+            Object.keys(cols).forEach(function (k) {
+                var xs = cols[k]; if (xs.length < 2) return;
+                var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+                if (hi - lo > 4 * PX) out.findings.push({ rule: 'EA-ROWX', page: pi + 1, cell: 0, msg: 'page ' + (pi + 1) + ': the Correct / Fix it judgement starts at ' + mm(lo) + '-' + mm(hi) + ' mm into the cells of one column (one place a page, critic R15)' });
+            });
+        });
+    }
     return out;
 }
 

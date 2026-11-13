@@ -682,7 +682,10 @@ export function prepare(it, info = {}) {
         }
         // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
         // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
-        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1 : 0.5}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // ONE work width a page (critic R15, ws-cell-checks EA-ROWX): every item's work is as wide as the page's widest, so the
+        // Correct / Fix it judgement beside it starts at one x in every cell of a column
+        const workW = Number(o.workW) > 0 && !story ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1 : 0.5}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -782,6 +785,7 @@ export function prepare(it, info = {}) {
         // the places the Correct / Fix-it block can take; the host measures each (AX-4)
         judgeModes: kind === 'draw' || kind === 'redo' ? undefined : JUDGE_MODES,
         fixRoom: room0,
+        workWMm: Number(fp0.wMm) || 0,
         // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
         // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
         fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
@@ -1024,7 +1028,11 @@ export function plan(input = {}) {
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one fix width for every cell of the page: the widest item's (critic pv-r2)
     const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
-    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom })) : undefined);
+    // one work width a page: the widest item's (critic R15)
+    const ws = items.map((it) => Number(it.workWMm) || 0).filter((w) => w > 0);
+    // (only where the items' planned widths differ, so a page of equal items prints as before)
+    const pageWork = ws.length > 1 && Math.max(...ws) - Math.min(...ws) > 1 ? Math.max(...ws) : 0;
+    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom }, pageWork ? { workW: pageWork } : {})) : undefined);
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's
