@@ -714,8 +714,8 @@ registerSkill('placevalue:compare', {
                 write];
         }
         return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
-            step(`The first different digits are in the ${d.place} place: ${d.da} and ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
-            step(`${d.da} is ${d.da > d.db ? 'greater' : 'less'} than ${d.db}, so ${A} is ${d.da > d.db ? 'greater' : 'less'} than ${B}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }]),
+            step(`The ${d.place} digits differ: ${d.da} and ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            step(`${d.da} is ${d.da > d.db ? 'greater' : 'less'} than ${d.db}, so ${A} is ${d.da > d.db ? 'greater' : 'less'}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }]),
             write];
     },
     wrongAnswer: (q) => {

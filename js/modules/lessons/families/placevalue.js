@@ -232,7 +232,7 @@ export const ROUTINES = Object.freeze({
         // length. The chant names both rules: the count first, then the first different digit; ws-lesson-unit chant-fit)
         chant: 'More digits wins. Then first different digit.',
         format: { kind: 'numbered steps with icons + a chant', why: 'The error is comparing the wrong digits (M6); the chant puts the digit count first, then the first different digit.' },
-        example: { match: 'first different' },
+        example: { match: 'digits differ' },
         // (two blocks, the card's step 5 in order: same length, then different lengths. The rows are held to the ink
         // (tightRows), so one 12-item grid left 42-54 % of the page white - ws-print-lint PAGEFILL; 20 in two blocks fill it,
         // DN-1's ceiling at L)

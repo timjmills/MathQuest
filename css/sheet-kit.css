@@ -617,6 +617,7 @@
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }
 /* lf-placevalue compare r2 (pixel ws-empty-band EB-BAND, 37-41 % under the line at S / M / L): a compare problem "408 ( ) 666" is
    one line answered in its circle; a row the practice spread or a Review share grows put all its white under that line. The
-   line is centred in its cell, the white split above and below (as the Reason It panels, CL-4b). Additive: compare cells only. */
-.ws-page .ws-grid > .ws-cell.mqt--pv:has(> .pv-cell > .pv-compare),
-.ws-page .ws-grid > .ws-cell.mqt--pv:has(> .ws-cell-body > .pv-cell > .pv-compare) { justify-content: center !important; }
+   line is centred in its cell, the white split above and below (as the Reason It panels). Additive: compare cells only.
+   Not on a lesson sheet's cells (.mq-lv*: the lesson's own rows keep the top of the box, CL-4b, ws-print-lint L-TOPSTART). */
+.ws-page .ws-grid > .ws-cell.mqt--pv:not([class*="mq-lv"]):has(> .pv-cell > .pv-compare),
+.ws-page .ws-grid > .ws-cell.mqt--pv:not([class*="mq-lv"]):has(> .ws-cell-body > .pv-cell > .pv-compare) { justify-content: center !important; }

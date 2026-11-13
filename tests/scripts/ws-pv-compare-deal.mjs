@@ -130,7 +130,7 @@ if (on('WORKED-STEP-DOES')) {
                 const t = String(s.text || '');
                 const plain = t.replace(/(\d),(\d)/g, '$1$2').replace(new RegExp(`\\b(${nums.map((x) => x.replace(/,/g, '')).join('|')})\\b`, 'g'), '#').replace(/[.]/g, '').trim().toLowerCase();
                 if (/^(compare )?# (and|with) #$/.test(plain) || /^compare #/.test(plain)) { bad.push(`WORKED-STEP-DOES: "${t}" only restates the item ${nums.join(' / ')}`); n++; }
-                if (/\bdigits? (are|is)\b|\bdigits?:/i.test(t) && /\d/.test(t.replace(/\b\d{2,}\b/g, '')) && !(s.marks || []).length) { bad.push(`WORKED-STEP-DOES: "${t}" names digits and marks nothing`); n++; }
+                if (/\bdigits?\b/i.test(t) && /(^|[^\d,])\d([^\d,]|$)/.test(t) && !(s.marks || []).length) { bad.push(`WORKED-STEP-DOES: "${t}" names digits and marks nothing`); n++; }
                 if (n > 8) break;
             }
         }
