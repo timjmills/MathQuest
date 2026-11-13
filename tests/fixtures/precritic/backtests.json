@@ -2415,12 +2415,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "aacae5ea",
-    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure (1c64a449): combine S/M/L EB-BAND 140 (S 37.6 %, review S 40.1 %)"
    },
    "pass": {
-    "commit": "deb9e426",
-    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+    "commit": "668f6a8c",
+    "state": "tightRows: in-place rows held to their ink on every role; worst S band 21.1 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
    "expect": {
@@ -2475,12 +2475,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "8573c66a",
-    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure: rename=more EB-BAND 12 + EB-SIDE 3 (test S band 39.3 %, review S side 30.6 %)"
    },
    "pass": {
-    "commit": "64f70063",
-    "state": "rename frames' write line two digits longer at S"
+    "commit": "1f18505d",
+    "state": "standard and rename rows tightRows; rename write line +4 digits at S; worst side 26.8 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
    "expect": {
@@ -2968,12 +2968,12 @@
    "rule": "ws-empty-band EB-SIDE --margin 2",
    "browser": true,
    "fail": {
-    "commit": "2fe21f2b",
-    "state": "r4 head on master: worst side band 29.9 %"
+    "commit": "16014137",
+    "state": "pixel measure: worst rename=more S side band 28.3-30.6 %"
    },
    "pass": {
-    "commit": "a1c8d595",
-    "state": "write line +3 digits after the fixed slot width: worst 27 %"
+    "commit": "1f18505d",
+    "state": "worst side band 26.8 % (clears the limit by 3.2 points)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --sizes S --hosts none --no-baseline --margin 2 --only EB-SIDE",
    "expect": {
@@ -3042,6 +3042,27 @@
    }
   },
   {
+   "id": "lesson-baseline-deploy-gate",
+   "check": "The deploy gate (ws-deploy-gates.sh session 4, lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c) catches a lesson page that changes silently: ws-lesson-baseline --all-lessons --unpinned --check against the PINNED whole-library baseline design/audit/baselines/lesson-baseline.json (every page of every lesson master prints) FAILS on a tree whose live lesson pages differ from the pin and PASSES on master, from which the pin was written",
+   "kind": "commit-pair",
+   "rule": "LESSONS_LEARNED process rule 0c as a deploy gate; ws-deploy-gates.sh session 4",
+   "browser": true,
+   "timeoutS": 2400,
+   "fail": {
+    "commit": "3bf3ef5c",
+    "state": "the landing drift before the opt-in (vocab zoom / rounding rows changed live lesson pages): many of the pin's hashes differ"
+   },
+   "pass": {
+    "commit": "3690ccb3f",
+    "state": "master, where the pin was written with --write: every hash identical, every lesson the tree prints is pinned"
+   },
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned --check design/audit/baselines/lesson-baseline.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "eb-fact-roles",
    "check": "add_facts, sub_facts, mult_facts, div_facts_long and div_facts on the guided and scripted-model pages at S, M and L: no cell has an empty band of 30 % or more under or beside its ink (facts-roles task: fact cells sized for a taller worked item, guided bands 31-41 %, scripted-model side bands 35-72 %)",
    "kind": "commit-pair",
@@ -3055,7 +3076,7 @@
     "commit": "6e962016",
     "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-BAND,EB-SIDE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3542,25 +3563,25 @@
   }
  },
  {
-  "id": "pv-words-provider",
-  "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
-  "kind": "commit-pair",
-  "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
-  "browser": false,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
+   "id": "pv-words-provider",
+   "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
+   "browser": false,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
+   },
+   "pass": {
+    "commit": "1e3b128e",
+    "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "1e3b128e",
-   "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
-  },
-  "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
  {
   "id": "pv-words-parity",
   "check": "composing:number_word_form on the practice card / worksheet / quiz draws the kit words cell with its answer place inside it, and no empty legacy box beside it (critic nwf r1 N9, lead ruling: screen parity is a contract rule)",
@@ -4034,10 +4055,10 @@
    "state": "EB-FOOT 156 on independent (rows stretched past the facts' measured footprint)"
   },
   "pass": {
-   "commit": "48e24daa6",
-   "state": "rows of 1.1 x the measured height (noStretch, de8e7531) on every offered role, each cell judged by its own data-eb-item: EB-FOOT within the pin (the 10 mixed-practice L findings are pinned facts debt)"
+   "commit": "de8e7531",
+   "state": "rows of 1.1 x the measured height (noStretch): the drawn cell is the footprint"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --hosts none --only EB-FOOT",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --roles independent --hosts none --no-baseline --only EB-FOOT",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4096,7 +4117,7 @@
    "commit": "6cec18b7",
    "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none --only EB-BAND",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4596,7 +4617,7 @@
    "commit": "b28f3960",
    "state": "lf-vocab r9 item 3b"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures | tail -1",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --only EB-GDPCAP | tail -1",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5392,722 +5413,1570 @@
   }
  },
  {
-  "id": "pv-gridfoot-combine-test-s",
-  "check": "placevalue:combine one-page Test / Review: the white under the grid is at most one row, or the page stands in no more columns than the Independent page (lead-approved F1, lf-placevalue compare round: combine Test S 4 across against the Independent page's 3, about 45 % of the page white under the grid)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-GRIDFOOT",
-  "browser": true,
-  "fail": {
-   "commit": "a837b8d4",
-   "state": "combine Test S 4 x 5 (102 mm white), Review S 4 across (89 mm white); the Independent page 3 across"
-  },
-  "pass": {
-   "commit": "81aac843",
-   "state": "a ghost frame at S held to three across (hardCap) on every role"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles test,review --hosts none --no-baseline --grid-foot --only EB-GRIDFOOT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-pages3-fill",
-  "check": "placevalue:compare three pages at M: every page filled to 80 % with no band of 30 % under the line (compare round 2, coverage-matrix single/pages-3 PAGEFILL: rows held to their ink at 1.2 x left page 2 22 % white)",
-  "kind": "commit-pair",
-  "rule": "ws-print-lint L-DENSITY PAGEFILL + H13-ABS",
-  "browser": true,
-  "fail": {
-   "commit": "834d2ad1",
-   "state": "pages-3 M page 2: a 53 mm strip (22 %)"
-  },
-  "pass": {
-   "commit": "1f0e99f2",
-   "state": "spreadMax 1.3 at S and M"
-  },
-  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --pages 3 --skills placevalue:compare --rules H13-ABS,GRID-EVEN-ALL --rule-skills placevalue:compare",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-gridfoot-teacher-cols",
-  "check": "a teacher-chosen, non-default column count leaves at most 25 % of a one-page Independent / More practice body white under the grid (lead ruling 2026-11-13, CL-2c; compare 2 columns at S)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-GRIDFOOT --columns (CL-2c)",
-  "browser": true,
-  "fail": {
-   "commit": "834d2ad1",
-   "state": "compare rows at 1.2 x: 2 columns at S leave the strip under the grid over 25 %"
-  },
-  "pass": {
-   "commit": "1f0e99f2",
-   "state": "spreadMax 1.3 at S: 24 %"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:compare --roles independent,more-practice --sizes S --hosts none --no-baseline --columns 2 --grid-foot --only EB-GRIDFOOT --rule-skills placevalue:compare",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-thinking-bands",
-  "check": "ws-cell-checks --card --card-opts renders every thinking role (true-false, reason-it, error-analysis, opener, scripted-model, guided) under every offered option value: the lf-placevalue opt-in --opt-roles (critic compare r1 F1: precritic missed reason-it at band 999,999, its numerals over the A / B boxes)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks OVERFLOW (--opt-roles, opt-in lf-placevalue cell-checks-compare)",
-  "browser": true,
-  "fail": {
-   "commit": "16748cd8",
-   "state": "reason-it L band 9,999+: the numerals leave the A / B boxes and the cell (OVERFLOW 4 a page)"
-  },
-  "pass": {
-   "commit": "d9a565fd",
-   "state": "lf-roles Reason It A-over-B (master e4d12d6a, inkWMm against the panel inner width) merged: reason-it S / M / L band 999,999 no OVERFLOW"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:compare --card --card-opts --opt-roles reason-it --rules OVERFLOW --size S,L",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-eq-live",
-  "check": "live play never pins the compare \"=\" to one position (critic compare r1 F4: card, worksheet and quiz all opened on \"897 = 897\")",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal EQ-LIVE",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "20 of 20 live sessions dealt \"=\" as item 1"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "the live blockOrder mixes on a per-session value"
-  },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-LIVE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-close-depth",
-  "check": "closeness=close spreads the deciding place over place 2 .. the last (critic compare r1 F5: every close 6-digit pair decided at the 2nd digit)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal CLOSE-DEPTH",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "91 of 100 close 6-digit items decided at place 2, none past place 3"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "comparePair shares 1 .. nd-1 digits"
-  },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only CLOSE-DEPTH",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-mixed-1digit",
-  "check": "lengths=mixed deals one digit apart, a 1-digit number at most one item in five, and the bigger first digit on the shorter number a quarter of the time (critic compare r1 F6, M6)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal MIXED-1DIGIT",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "61 of 120 mixed items held a 1-digit number"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "1 in 6, 60 of 120 the 89 / 312 trap"
-  },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only MIXED-1DIGIT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-m6-wrong",
-  "check": "every wrong answer compare names is the card's M6 (M-C2 / M-C3), M-C3 on a quarter of a mixed deal (critic compare r1 F3)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal M6-WRONG",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "M-C1 on 72 of 120 default items"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "M6 only; an item M6 gets right has none"
-  },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only M6-WRONG",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-worked-step-does",
-  "check": "no worked step restates the item and a step naming digits marks them (critic compare r1 F2)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal WORKED-STEP-DOES",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "\"Compare 487 and 858.\"; \"The first different digits are 4 and 8.\" unmarked"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "count / boxed digits / bigger digit / sign, every step marked"
-  },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only WORKED-STEP-DOES",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-m6-shown",
-  "check": "Error analysis, True or False? and Reason It show the card's M6 in at least half their errors at S / M / L, and the first-digit form on a lengths=mixed page (critic compare r1 F3)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages M6-SHOWN",
-  "browser": true,
-  "fail": {
-   "commit": "16748cd8",
-   "state": "reason-it L default: 0 of 2 errors M6; mixed pages: no 89 > 312"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "every shown error M6, the first-digit form on every mixed page"
-  },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only M6-SHOWN",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-eq-model",
-  "check": "\"=\" is never a worked model: Guided, Scripted Model, Opener, lesson anchor (critic compare r1 F4)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages EQ-MODEL",
-  "browser": true,
-  "fail": {
-   "commit": "16748cd8",
-   "state": "guided S / M / L: the Model is \"691 = 691\""
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "unequal same-length Models (4 worked steps; noModel)"
-  },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-MODEL",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-state-marks",
-  "check": "the Scripted Model's states and the lesson anchor's panels each draw a new mark (critic compare r1 F2: states 1 and 2 the same picture)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages STATE-MARKS",
-  "browser": true,
-  "fail": {
-   "commit": "16748cd8",
-   "state": "scripted-model and lesson S / M / L: state 2 = state 1"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "count, boxed digits, underline, sign"
-  },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only STATE-MARKS",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-chant-fit",
-  "check": "a lesson's chant decides at least half the items its practice deals (critic compare r1 F2 LESSON-CHANT-FIT: \"More digits, bigger number.\" decided 8 of 33)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-unit chant-fit",
-  "fail": {
-   "commit": "16748cd8",
-   "state": "chant decides 40 % of the practice deal"
-  },
-  "pass": {
-   "commit": "1240f552",
-   "state": "the chant names both rules"
-  },
-  "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-fit",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-cl4d-stretched-top",
-  "check": "CL-4d (lead ruling 2026-11-13, CL-4b stretch exception): a one-line compare cell whose row stretches it by 30 % or more is centred down its box; left at the top it leaves a band of 30 % under the line (compare r2 EB-BAND independent / more-practice 144)",
-  "kind": "commit-pair",
-  "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (lf-placevalue print-lint-kit / -S / -M)",
-  "browser": true,
-  "fail": {
-   "commit": "023cafca",
-   "state": "compare L independent: 36 one-line cells at the top of rows that stretch them 111 %, 9.3 mm (30 %) white under each"
-  },
-  "pass": {
-   "commit": "cd47e0a5",
-   "state": "data-ws-stretchmid + ws-rowstretch: the stretched cells centred (L-TOPSTART 0, EB-BAND independent / more-practice M / L 0)"
-  },
-  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --skills placevalue:compare --rules TOPSTART-STRETCH --rule-skills placevalue:compare --lints L-TOPSTART",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-cl4d-unstretched-centred",
-  "check": "CL-4d (lead ruling 2026-11-13): a one-line cell its row stretches by LESS than 30 % keeps the top of the box; centred there is a fail (the ungated r3 centring CSS)",
+  "id": "eb-fixture-band",
+  "check": "ws-empty-band EB-BAND: an empty band of >= 30 % of the cell under the ink fails, a cell sized to its item passes (the shared check of LESSONS_LEARNED L25; the real-head rows are in backtests-empty-band.json, pending each lane's fix)",
   "kind": "fixture",
-  "rule": "ws-print-lint L-TOPSTART CL-4d (unstretched one-line cell centred)",
+  "rule": "ws-empty-band --html (measureCells + judge on a saved page)",
   "browser": true,
   "fail": {
-   "fixture": "tests/fixtures/precritic/cl4d-unstretched/fail.html",
-   "state": "the real compare L page, rows cut to 1.28 x the line (tabs off), every marked cell centred: 18 cells 4.2 mm down"
+   "fixture": "tests/fixtures/precritic/empty-band/fail.html",
+   "state": "seeded: two 60 mm fact cells, ink ends at ~30 mm (45 % band)"
   },
   "pass": {
-   "fixture": "tests/fixtures/precritic/cl4d-unstretched/pass.html",
-   "state": "the same page with no ws-rowstretch mark: the lines at the top of the box"
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
   },
-  "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-TOPSTART",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-exgroup-fill",
-  "check": "placevalue:compare with grouped examples (--anchors sections) at L: the page holds no empty strip of 20 % under its blocks (compare r2 coverage single/ex-group L PAGEFILL: r2's whole example strip, 1.8 mm shorter a block, left 48 mm / 21 % under three blocks)",
-  "kind": "commit-pair",
-  "rule": "ws-print-lint L-DENSITY PAGEFILL (ws-coverage-matrix single/ex-group --red-no-baseline PAGEFILL)",
+  "id": "eb-fixture-svg-black",
+  "check": "ws-empty-band reads black SVG ink (critic eb-r2 D7: rgb(0, 0, 0) was classed as transparent, so a black array drawing read as a 60 % band and the pin was inflated): a black drawing with ~44 mm empty under it FAILS, the same drawing filling its cell passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band measureCells paints() + EB-BAND",
   "browser": true,
   "fail": {
-   "commit": "023cafca",
-   "state": "ex-group L page 1: a 48 mm strip (21 %) under three example blocks of 1 x 3 compare rows at 24.6 mm"
+   "fixture": "tests/fixtures/precritic/empty-band/svg-black.fail.html",
+   "state": "seeded: black SVG array + answer box in a 100 mm cell"
   },
   "pass": {
-   "commit": "f0e27e94",
-   "state": "the block rows share the spare (28.8 mm, spreadMax x the shortest problem): PAGEFILL 0 at S / M / L"
+   "fixture": "tests/fixtures/precritic/empty-band/svg-black.pass.html",
+   "state": "the same in a 60 mm cell (FAILED before the D7 fix: band read \"above\" the invisible drawing)"
   },
-  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --anchors sections --skills placevalue:compare --lints L-DENSITY",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-cl4d-twin-row",
-  "check": "H13 / H13-ABS exempt the white above and below a CL-4d centred one-line cell (data-ws-stretchmid, its own line) whose row's height a taller SIBLING's measured ink sets (compare's ex-each worked twin), each band <= 40 % of the cell; a band over 40 % or a page-fill row with no taller sibling still counts (lead ruling (a) 2026-11-13 13:35, CL-4b / CL-4d). The command runs each state's OWN ws-print-lint: the ruling changes the check, not the page",
+  "id": "mc-make-a-ten-choice",
+  "check": "content-audit MC-ALL P-29: a Make a Ten CHOICE item prints its four choices on paper (it printed the written Step 1-3 scaffold while the screen offered buttons; new pair algebra_mixed:algebraic_all [make-a-ten/multiple-choice] on master d34311d5)",
   "kind": "commit-pair",
-  "rule": "ws-print-lint L-DENSITY H13 / H13-ABS (CL-4d twin row exemption)",
+  "rule": "ws-content-audit --mc-all (P-29 / RM-P-01)",
   "browser": true,
   "fail": {
-   "commit": "fb05bcb1",
-   "state": "single ex-each: 14 H13 at S, 10 at L - the compare line centred by CL-4d beside the worked twin (3.3 x the line), each band 33-34 %"
+   "commit": "d34311d5",
+   "state": "master: 1 new (skill, kind) pair, algebraic_all make-a-ten/multiple-choice"
   },
   "pass": {
-   "commit": "38667589",
-   "state": "the twin-sized centred line exempt (bands 33-34 % <= 40 %): H13 0 at S and L; sections/pages-2 L (page fill, no taller sibling) still counted"
+   "commit": "b4095bd5",
+   "state": "print-generate make-a-ten prints the choices of a multiple-choice item"
   },
-  "command": "node {root}/tests/scripts/ws-print-lint.cjs --source kit --size S --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-S.json && tests/scripts/mq-browser-run.sh node {root}/tests/scripts/ws-print-lint.cjs --source kit --size L --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-L.json && node -e \"const n={};for(const z of ['S','L'])n[z]=require('{root}/exeach-'+z+'.json').documents.flatMap(d=>d.findings||[]).filter(f=>f.rule==='H13'||f.rule==='H13-ABS').length;console.log('ex-each-h13: '+(n.S+n.L?'FAIL':'OK')+' (H13 S '+n.S+', L '+n.L+')')\"",
+  "command": "node tests/scripts/ws-content-audit.cjs --mc-all --category algebra_mixed --skill algebraic_all",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-guided-model-reserve",
-  "check": "a tightRows Guided page's Model row (the Model beside the hinted tries) reserves max(the Model tab's clearance, the hint line), never their sum: its fullest cell leaves at most 3 mm white under its ink (lf-roles review of the compare r3 guided.js change, item b2, 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages MODEL-RESERVE",
+  "id": "eb-fixture-padding-leading",
+  "check": "ws-empty-band EB-BAND reads the visible band (border box or pixels), not padding box to line box",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (critic eb-r3 D1)",
   "browser": true,
   "fail": {
-   "commit": "023cafca",
-   "state": "compare Guided Model row 41.3 / 53.7 / 60.8 mm at S / M / L, 21-28 mm white under the hint line (tab clearance + hint line + stretch)"
+   "fixture": "tests/fixtures/precritic/empty-band/padding-leading.fail.html",
+   "state": "60 mm cell, padding-bottom 25 mm, line-height 2: the tool reads 28.5 %, the visible band is over 65 % (before the pixel read); the pixels read 73 %"
   },
   "pass": {
-   "commit": "f0d0ac7d",
-   "state": "the Model row 22.6 / 30.0 / 33.7 mm: 1-2 mm white under the hint line (max(tab, hint), rows at pads + line)"
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "items in 36 mm cells"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-RESERVE",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": false
+ },
+ {
+  "id": "eb-fixture-blank-cell",
+  "check": "ws-empty-band EB-READ: a kit cell with no ink fails (never dropped)",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-READ (critic eb-r2 D7, eb-r3 D2)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/blank-cell.fail.html",
+   "state": "one good cell beside a blank cell: the tool reads OK (before the D2 fix); now EB-READ \"cell 2 has no ink\""
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "every cell inked"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": false
+ },
+ {
+  "id": "eb-fixture-band-above",
+  "check": "ws-empty-band EB-BAND reads the band ABOVE the ink (critic eb-r3 D5: no row held it): ink at the bottom of a 50 mm cell with ~40 % empty above fails, a cell sized to its item passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (above) (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/above.fail.html",
+   "state": "seeded: two 50 mm fact cells, the fact and its answer box at the bottom: 20.4 mm (41 %) above the ink"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-identify-heads-unaided",
-  "check": "placevalue:identify's place heads (labels H T O, or the chart's place names) are off on the unaided pages - Review, Test, the pre-skill check - and in the quiz (the online test), and kept on Practice / Mixed: the answer is the place name (lead ruling PEDAGOGY 4.1a, 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-identify-heads PV-HEADS-UNAIDED / PV-HEADS-TAUGHT / PV-HEADS-QUIZ",
+  "id": "eb-fixture-band-between",
+  "check": "ws-empty-band EB-BAND reads the band BETWEEN two blocks of ink (critic eb-r3 D5): the fact at the top and its answer box at the bottom of a 50 mm cell, ~39 % between them, fails",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (between) (critic eb-r3 D5)",
   "browser": true,
   "fail": {
-   "commit": "1db0e330",
-   "state": "origin/master: every identify item on Review / Test / pre-skill check at S / M / L prints H T O (or the chart's names); the quiz builder deals fractions:identify for 'identify'"
+   "fixture": "tests/fixtures/precritic/empty-band/between.fail.html",
+   "state": "seeded: two 50 mm fact cells, 19.3 mm (39 %) between the fact and its answer box"
   },
   "pass": {
-   "commit": "0d61403a",
-   "state": "provider roleOpts: support none on the unaided roles and the quiz; Practice / Mixed keep the heads"
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
   },
-  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-vocab-cell-growth",
-  "check": "a lesson vocabulary CELL (.mq-lvocabcell) is under 35 % white above + below its ink, to its drawn edge: it never grows into the height another part freed (critic r5 N-r5-2, ledger line 21 part 3; EB-VOCAB alone read only the picture inside its own box)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-VOCAB (--vocab-ink, vocab cell)",
+  "id": "eb-fixture-screen-side",
+  "check": "ws-empty-band EB-SIDE on a SCREEN cell (.mq-scell in #gameView): content pinned to one side of the card fails; the same content centred (a wide, even margin) passes (critic eb-r3 D5)",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (screen) (critic eb-r3 D5)",
   "browser": true,
   "fail": {
-   "commit": "07634a75",
-   "state": "identify lesson S / M p2: the vocabulary cell 50.7 mm, 4.6 mm white above and 14.9 mm below its ink (38.5 %; the critic's pixel rows ~43 %)"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.fail.html",
+   "state": "seeded: a 160 mm practice-card cell, the fact and its box pinned left: 103 mm (65 %) empty on the right"
   },
   "pass": {
-   "commit": "43475c3d",
-   "state": "today: identify's vocabulary cell 71.8 mm at S / M, about 22 % white, all below its ink (the lane's lessons at most 32 %)"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred: about 53 mm each side, not pinned"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --no-baseline --vocab-ink --only EB-VOCAB",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-identify-warmup-side-l",
-  "check": "identify's lesson page 2 at L: the Warm-up cells two across leave no side band of 30 % or more (critic r5 N-r5-1, ledger line 21 part 2; ENGINE-ROLES, lesson.js warm-up column count)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-SIDE (--roles lesson)",
+  "id": "eb-fixture-screen-slot",
+  "check": "ws-empty-band reads a SCREEN answer slot by what it draws (critic eb-r4 D1, lead ruling 2026-11-13 (a)): its inked edges plus one written digit (Hw = 0.75 x its font size), never its whole touch box. A centred one-line problem whose answer is a 48 px underline-only input (data-ws-slot kept) in a 140 px online-worksheet cell FAILS; the same input drawn at the digit height, the touch target kept as transparent padding outside the drawn box, in a cell sized to its content, passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (screen slot) (critic eb-r4 D1)",
   "browser": true,
   "fail": {
-   "commit": "43475c3d",
-   "state": "OPEN RED today: identify lesson L p2 cells 1-2, 26.7 mm beside the ink of a 91.8 mm cell (31 %)"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-slot.fail.html",
+   "state": "seeded: 140 px .mq-scell in #worksheetView, \"970 = ___ tens 0 ones\" centred, the 48 px input draws only its 2 px underline: 12.1 mm (32.6 %) above the ink beyond the 3 mm top pad"
   },
   "pass": {
-   "commit": "",
-   "state": "the lf-engine fix (lesson.js warm-up column count; lead D3) - arm with its commit"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-slot.pass.html",
+   "state": "the input drawn at 1.15em with its underline at the foot, 48 px touch target as padding pulled out by a negative margin (css/screen-cell.css kit LINE slot rule); the cell sized to its content"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --sizes L --hosts none --no-baseline --only EB-SIDE",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-toppad-real-band",
+  "check": "ws-empty-band takes the kit's mandatory top pad (CL-40: 3 mm, or the label side + 1 mm) off the band above the ink (lead ruling 2026-11-13 on critic eb-r4's minor), and a real band beyond the pad is still caught: two 56 mm fact cells with a 7 mm top pad and the fact at the bottom FAIL (36 % beyond the pad); cells sized to their items pass",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (top pad) (critic eb-r4 minor)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/toppad.fail.html",
+   "state": "seeded: 56 mm cells, 6 mm tab, padding-top 7 mm, ink at the bottom: 20.3 mm (36.3 %) above the ink beyond the 7 mm pad"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-wsheet-cl4b-stretch",
+  "check": "placevalue:unit_form on the online-worksheet host at every option variant (rename=more): no tile has an empty band of 30 % or more above, between or under its ink; a cell its row stretches >= 30 % is centred (CL-4b amended 2026-11-12) and the 48 px host input that takes the kit slot reads as the slot (data-ws-slot)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on host:worksheet (CL-4b amended)",
+  "browser": true,
+  "fail": {
+   "commit": "35df47d7",
+   "state": "EB-BAND 3 on worksheet 1280px {rename: more}: 36.6 / 46.3 % above (82 px cells), 46.3 % under a stretched cell"
+  },
+  "pass": {
+   "commit": "990e66a8",
+   "state": "kit line slot drawn at digit height (0f1a0bda) + the bordered box capped at its row only while content fills >= 78 % (c3, lead 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-gridcols-patterns",
+  "check": "ws-empty-band EB-FOOT pairs each cell with the measure of the grid that lays it (a full-width problem in its own 1-column grid at 1 column; a lone last-row cell of a 2-column grid at 2)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "lf-algebra head before 2a7e74b9",
+   "state": "pattern_features independent M: 5 EB-FOOT, 3 of them full-width cells paired with the 2-column measure"
+  },
+  "pass": {
+   "commit": "lf-algebra 2a7e74b9 with this tool",
+   "state": "EB-FOOT 2 (the notice cell's own measure, lf-algebra's)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill <cat>:pattern_features --roles independent --sizes M --only EB-FOOT --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "FAIL"
+  },
+  "pending": true,
+  "pendingReason": "pattern_features lives only on lf-algebra's branch; arm on its merge with real commits (the pairing rule itself is in --self-test 'EB-FOOT columns'; since eb-r5 m1 EB-FOOT pairs each cell by the kit's data-eb-item, so a reordered page no longer pairs by position; still not on master 8a7c5d43)"
+ },
+ {
+  "id": "eb-fixture-faint-slot",
+  "check": "ws-empty-band counts a SCREEN slot's edge as drawn only when it is darker than the 225 pixel ink threshold (critic eb-r5 D1, probe p3): a 150 px input with a 1 px #eee closed border in a 200 px online-worksheet cell, \"970 =\" at the foot, FAILS EB-BAND; the same box drawn in black (a real writing box) passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (faint slot edge) (critic eb-r5 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/faint-slot.fail.html",
+   "state": "seeded: the #eee box read as one 150 px block of ink (OK at 3cea85a7); read as one written digit, 18.5 mm (35.0 %) between the blocks"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/faint-slot.pass.html",
+   "state": "the same box with a 1 px #000 border: a drawn closed box is the writing room"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-unit-form",
+  "check": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, legibility): the focused kit LINE slot's focus ring keeps >= 4 px from the nearest word beside it (placevalue:unit_form rename=more, online worksheet)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2)",
+  "browser": true,
+  "fail": {
+   "commit": "0f1a0bda",
+   "state": "the LINE slot's negative side margin pulls \"tens\" under the ring: 0.5 px (worksheet items 1 and 3)"
+  },
+  "pass": {
+   "commit": "2af22377",
+   "state": "additive css/screen-cell.css: each side margin leaves ring + offset + 4 px (9 px) beyond the drawn box"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills placevalue:unit_form --opts '{\"rename\":\"more\"}' --hosts worksheet --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fonts-late",
+  "check": "Font-load race (lf-engine 2026-11-13, ws-detailed-lesson E2 flakes on g2-nbt3 / g3-oa8 / g4-nbt1): a gate checks Andika only after loading it (tests/lib/ws-fonts.cjs, 3 tries over ~10 s, then fonts.ready)",
+  "kind": "commit-pair",
+  "rule": "ws-fonts awaitFonts (ws-detailed-lesson E2, ws-print-lint L-FONT, ws-grade-render, ws-pdf-preview, ws-touchdots-raster)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture} --old",
+   "state": "the old one-shot document.fonts.check after networkidle0 + fonts.ready, on a page whose Andika arrives 2.5 s late: a false page FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+   "state": "the same page through awaitFonts: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fonts-never",
+  "check": "A declared web font that never arrives is an environment ERROR, never a page FAIL (tests/lib/ws-fonts.cjs)",
+  "kind": "fixture",
+  "rule": "ws-fonts isEnvError",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-never.html",
+   "state": "Andika declared, its woff2 files 404: ERROR (exit 2), not FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "state": "Andika arrives late: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "ERROR(2)",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-cellslot-ws",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): on the online worksheet a boxed cell slot (input.mq-cellslot inside its [data-mq-cell] box) keeps its inset ring, >= 4 px from the word beside it (arrays_groups, function_table_hard, elapsed_find_duration)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the worksheet host's input:focus rule (offset 1 px) outranks the cell slot's inset ring: -0.2 px to \"groups of\", 1.4 px to \"n\", 3.3 px to \"h\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: the cell slot's -4 px offset holds on the worksheet host"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups,algebra:function_table_hard,measurement:elapsed_find_duration --hosts worksheet --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-ibcell-card",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): the inline-blanks box (input.ib-cell, practice card) thickens inward on focus, its ring >= 4 px from the word beside it (multiplication:arrays_groups)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the ib-cell ring sits 4 px outside a box with a 6 px margin: 2 px to \"rows of\" / \"make\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: outline-offset -3 px on the focused ib-cell"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups --hosts card --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-review-add-facts",
+  "check": "ws-empty-band EB-FOOT on every cell of a grid-role page, against the items it holds (data-eb-item; lead ruling 2026-11-13): a Review that deals 28 and draws 16, with a Mixed Review band, is judged cell by cell",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (widened scope, lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "addition:add_facts review S/M/L: 12 EB-FOOT, cells drawn 17-23 % over their own items' footprints (12.5/15/16 mm drawn 14.6/18.2/19.7 mm)"
+  },
+  "pass": {
+   "commit": "the lf-ops fix of the add_facts review cells",
+   "state": "EB-FOOT 0 on add_facts review"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles review --hosts none --only EB-FOOT --no-baseline",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   },
   "pending": true,
-  "pendingReason": "open red, owner lf-engine (lead D3: ENGINE-ROLES, lesson.js warm-up two across). The check is on precritic's path (the default ws-empty-band row renders every offered role, lesson included); this row is armed with the fix commit when it lands."
+  "pendingReason": "no commit has fixed the add_facts review footprints yet (routed to lf-ops, pinned facts debt); arm with lf-ops' fix commit. The widened pairing itself is in --self-test 'EB-FOOT pairing' (15 cases: a Review dealing 4 / drawing 2, two sections at their own column counts, a multi-item cell with and without a bridge measure, an unindexed cell)"
  },
  {
-  "id": "pv-unit-form-ws-host-band",
-  "check": "unit_form rename=more on the online worksheet host: no cell with an empty band of 30 % or more under its ink (critic r5, ledger line 21 part 1; the legacy screen cell, hosts lane)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-BAND (--hosts worksheet --opts rename=more)",
+  "id": "eb-fixture-wide-slot-faint",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q5): a practice card with its content pinned left plus a 95 mm input with a 1 px #eee border to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
   "browser": true,
   "fail": {
-   "commit": "43475c3d",
-   "state": "OPEN RED today: unit_form worksheet 1280 px p1 cell 1, 10.4 mm under the ink of a 32.5 mm cell (32.0 %) [legacy]"
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-faint.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
   },
   "pass": {
-   "commit": "",
-   "state": "the hosts-lane fix (the unit_form worksheet cell drawn by the kit, lead D3) - arm with its commit"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent --hosts worksheet --no-baseline --only EB-BAND",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
-  },
-  "pending": true,
-  "pendingReason": "open red, owner the hosts lane (lead D3: the worksheet host draws unit_form's legacy cell). NOT on precritic's path today: precritic's ws-empty-band renders the screen hosts with the default options only (option variants on hosts are not rendered); proposed for the hosts lane: hosts x option variants in ws-empty-band's precritic row."
+  }
  },
  {
-  "id": "pv-words-plural",
-  "check": "composing:number_word_form: no worked step counts ONE of a place in the plural (\"3 tens, 1 ones\", \"1 tens 8 ones\") on any band, with the answer line or the H T O boxes (critic nwf r2 / r3 N12)",
+  "id": "eb-fixture-wide-slot-invisible",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q6): a practice card with its content pinned left plus a 95 mm borderless white input to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-invisible.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-digit-npr-worksheet",
+  "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: screen digits >= 40 / 48 / 56 px at 390 / 820 / 1280 on every host",
   "kind": "commit-pair",
-  "rule": "ws-words-checks WORDS-STEPS-PLURAL",
+  "rule": "ws-screen-slots SCREEN-DIGIT (default since lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8d7343c0f",
+   "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
+  },
+  "pass": {
+   "commit": "TBD-lf-ops-npr-digits",
+   "state": "lf-ops' fix (pass commit to come)"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-dropped-row",
+  "check": "ws-precritic-plan --checks-from-critics: a deploy tree never DROPS a backtest row id the baseline (origin/master, or --rows-before) held; blocks always, whatever the ledger's warning date",
+  "kind": "fixture",
+  "rule": "ws-precritic-plan no-dropped-row (lead 2026-11-13, lf-ops: 7 div_facts rows lost in a deploy cherry-pick)",
   "browser": false,
   "fail": {
-   "commit": "abbfd37e",
-   "state": "band 1,000: 25 plural steps with the answer line (\"The rest is 18: 1 tens 8 ones.\"), 12 with the H T O boxes (\"5 tens, 1 ones.\")"
+   "fixture": "tests/fixtures/precritic/no-dropped-row/fail.json",
+   "state": "the baseline holds a row id this tree lacks"
   },
   "pass": {
-   "commit": "827b394b",
-   "state": "one / ones and ten / tens follow the count"
+   "fixture": "tests/fixtures/precritic/no-dropped-row/pass.json",
+   "state": "every baseline id is in this tree"
   },
-  "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-STEPS-PLURAL",
+  "command": "node tests/scripts/ws-precritic-plan.mjs --checks-from-critics --skills zz_probe:zz_no_such_skill_q7 --rows-before {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
+  {
+   "id": "ea-redo-align",
+   "check": "an Error Analysis redo item's widened work starts at the cell's left like the redraw zone under it (lf-algebra critic r2 G2)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit EA-REDO-ALIGN",
+   "browser": false,
+   "fail": {
+    "commit": "244849a9",
+    "state": "align-items:center on a redo work"
+   },
+   "pass": {
+    "commit": "f4fd737d",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only EA-REDO-ALIGN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "psc-2pg-balance",
+   "check": "a Pre-skill Check that runs to 2 pages splits 2 + 2, never one item a page, every prerequisite kept, the FULL header on every page (lead ruling R13)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit PSC-2PG-BALANCE",
+   "browser": false,
+   "fail": {
+    "commit": "3a9476fa",
+    "state": "3 + 1 split, short header on page 2"
+   },
+   "pass": {
+    "commit": "b7110b89",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only PSC-2PG-BALANCE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupiltag-ink",
+   "check": "the '<Name> wrote:' label's foot sits 2-4 mm over the work's first INK (lead ruling PUPILTAG, critic r4 n1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "25d7bf2f8",
+    "state": "PUPILTAG 28 on add_facts EA"
+   },
+   "pass": {
+    "commit": "b0efa7ee8",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-rowx",
+   "check": "one Correct / Fix it place a column on an Error Analysis page (critic R15)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX",
+   "browser": true,
+   "fail": {
+    "commit": "b0efa7ee8",
+    "state": "EA-ROWX 8 on div_facts_long"
+   },
+   "pass": {
+    "commit": "2d958ba1d",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills division:div_facts_long --roles error-analysis --size S,M,L --rules EA-ROWX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-pad",
+   "check": "an Error Analysis cell keeps its 3 mm padding when its work is widened (critic r5 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "947db3a87",
+    "state": "EA-PAD 12 on div_facts_long S"
+   },
+   "pass": {
+    "commit": "ba2367a79",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills division:div_facts_long --roles error-analysis --size S --rules EA-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupiltag-table",
+   "check": "the '<Name> wrote:' label over a function table / count row stays 2-4 mm over its ink (lead order 5: 5.5 mm / 1.8 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "3b324bcc",
+    "state": "fte L 5.5 mm, npr M 1.8 mm"
+   },
+   "pass": {
+    "commit": "88032a8a",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-level",
+   "check": "the Test role measures its items at level 0, where it lays them out (lf-algebra r8)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit TEST-LEVEL",
+   "browser": false,
+   "fail": {
+    "commit": "24cbb0678",
+    "state": "measured at level 1"
+   },
+   "pass": {
+    "commit": "947db3a87",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only TEST-LEVEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "key-fit-letters",
+   "check": "a letter answer ('C, A, B') takes the word line - the key fits (KEYFIT on the passed vocab_grade_pictures)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks KEYFIT",
+   "browser": true,
+   "fail": {
+    "commit": "1f762c471",
+    "state": "KEYFIT 4"
+   },
+   "pass": {
+    "commit": "e86ed3517",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills vocabulary:vocab_grade_pictures --roles reason-it --size M --rules KEYFIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ri-distinct",
+   "check": "Reason It's A and B panels show different work (word-stories critic r1 F2)",
+   "kind": "fixture",
+   "rule": "ws-cell-checks RI-DISTINCT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ri-distinct.fail.html",
+    "state": "A and B the same work"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ri-distinct.pass.html",
+    "state": "A and B differ"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --fixture {fixture} --fixture-role reason-it --rules RI-DISTINCT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "abtag",
+   "check": "a Reason It A / B tag stands 2 mm clear of the work (critic r6g)",
+   "kind": "fixture",
+   "rule": "ws-cell-checks ABTAG",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/abtag.fail.html",
+    "state": "the tag on the first term box"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/abtag.pass.html",
+    "state": "12 mm clear"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --fixture {fixture} --fixture-role reason-it --rules ABTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "overflow-not-pinnable",
+   "check": "an overflow named in a gate's pinned output turns the row FAIL - it is never pinnable (lead 2026-11-13, word-stories F2 / compare F1)",
+   "kind": "fixture",
+   "rule": "ws-precritic overflowOf",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/overflow-pinned.fail.txt",
+    "state": "pinned 'mq-ww leaves the cell'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/overflow-pinned.pass.txt",
+    "state": "pinned card targets only"
+   },
+   "command": "node tests/scripts/ws-precritic.cjs --overflow-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-rowx-redo",
+   "check": "an Error Analysis redo item's Correct / Fix it stands at one x a column whatever its train's length (npr S 69.5 vs 131.5 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX",
+   "browser": true,
+   "fail": {
+    "commit": "c1f2879c2",
+    "state": "EA-ROWX 2 on npr EA S"
+   },
+   "pass": {
+    "commit": "cec8a53ce",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles error-analysis --size S --rules EA-ROWX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
  {
-  "id": "pv-compare-cl4d-guided",
-  "check": "CL-4d on the Guided role: a one-line compare cell its Guided row stretches by 30 % or more is centred (the r3 ws-rowstretch marks on Guided rows; lf-roles review of compare r3, item b3)",
-  "kind": "commit-pair",
-  "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (--roles guided)",
+  "id": "sa-focus-gap-fixture-below",
+  "check": "ws-screen-answer FOCUS-GAP judges the text ABOVE and BELOW the focused box's ring, to the glyph ink (critic eb-r6 m2): the word \"tens\" with its ink 1 px under the ring FAILS; the same word 10 px clear passes",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (above / below, critic eb-r6 m2)",
   "browser": true,
   "fail": {
-   "commit": "cd47e0a5",
-   "state": "compare Guided L: 8 one-line cells at the top of rows that stretch them 319 %, 38.3 mm (63 %) white under each (CL-4d on practice pages only)"
+   "fixture": "tests/fixtures/precritic/focus-gap/below-1px.fail.html",
+   "state": "seeded: no finding with 8dc176e6's FOCUS_GAP (it judged only words on the ring's own line; proven 2026-11-13 by running that commit's function on this fixture); FAIL 1 px now"
   },
   "pass": {
-   "commit": "f0d0ac7d",
-   "state": "Guided rows sized to pads + line and marked ws-rowstretch where they stretch: L-TOPSTART 0"
+   "fixture": "tests/fixtures/precritic/focus-gap/below-clear.pass.html",
+   "state": "the word's ink 10 px under the ring"
   },
-  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --roles guided --skills placevalue:compare --lints L-TOPSTART --rules TOPSTART-STRETCH --rule-skills placevalue:compare",
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-tof-share",
-  "check": "a compare True or False? page is 40-60 % false at S / M / L on every offered option value (critic compare r2 N1, PT-TOF-1)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages TOF-SHARE",
+  "id": "sa-focus-gap-wrap-line",
+  "check": "ws-screen-answer FOCUS-GAP reads a wrapped text node LINE BY LINE (critic eb-r7 m1): one text node under the ring, line 1 \"wer once\" (x-height only), line 2 \"Tall\"; line 1's ink 1 px under the ring FAILS, 5 px clear passes (the whole-node metrics put \"Tall\"'s ascenders on line 1 and read 0 px)",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (per line, critic eb-r7 m1)",
   "browser": true,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "12-33 % false: a False slot whose item names no error (\"=\", a pair the ones place decides) printed True"
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-1px.fail.html",
+   "state": "line 1's ink 1 px under the ring: a real touch, FAIL with either read"
   },
   "pass": {
-   "commit": "10d3ce7c",
-   "state": "provider falseNeedsWrong: the False slot skips such an item; every page half false"
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-clear.pass.html",
+   "state": "line 1's ink 5 px clear: FAIL 0 px at 7bd6f3d31 (the whole-node read, the old way, so the row FAILED there); OK per line now"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only TOF-SHARE --seeds 2",
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-mark-clear",
-  "check": "the compare marks (deciding-digit box, bigger-number underline) keep 0.5 mm from every character they do not mark: Scripted Model, lesson anchor, Guided at S / M / L (critic compare r2 N2)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages MARK-CLEAR",
+  "id": "eb-fixture-interior-hole",
+  "check": "ws-empty-band EB-SIDE judges the widest run of columns with no ink from top to bottom BETWEEN two pieces of ink in a cell, side to side (critic eb-r7 m5, probe u3): a practice card with its content pinned left and a 95 mm input whose only dark edge is its right one leaves about 93 mm of paper between the written digit and that edge, and FAILS; the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (between) (critic eb-r7 m5)",
   "browser": true,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "the box is the digit's own advance wide: its rules cross the digits beside it (4[1]7, [7]33) and its top meets the digit count's descender"
+   "fixture": "tests/fixtures/precritic/empty-band/interior-hole.fail.html",
+   "state": "seeded: OK at 96ba50e36 (only the outer side bands judged; proven 2026-11-13 with that tree's tool); FAIL EB-SIDE 93.4 mm (58.6 %) between the pieces of ink now"
   },
   "pass": {
-   "commit": "10d3ce7c",
-   "state": "1.6 mm room each side of the deciding digit in every state, one box round an '=' number, the count 2 mm above"
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the content centred in the card: no interior hole"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MARK-CLEAR --seeds 1",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-SIDE",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-model-m6",
-  "check": "a compare worked example (Guided, Scripted Model, Opener Model, lesson anchor) is an item M6 gets wrong, on the default, band 999,999 and lengths=mixed (critic compare r2 N4)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages MODEL-M6",
+  "id": "eb-fixture-item-key",
+  "check": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3, its key-leak probe made a gate): on a grid role the pupil page's data-eb-item sequence equals its key's, and no index appears twice on a pupil page; a key whose first two cells answer each other's item FAILS, the sheet as built (arrays_groups independent L) passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3)",
   "browser": true,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "band 999,999: Guided Model 992,323 > 992,321 and lesson anchor 448,825 / 355,672 - decided where the last digits agree"
+   "fixture": "tests/fixtures/precritic/empty-band/item-key.fail.html",
+   "state": "seeded: the key's first two cells answer each other's item (pupil item 1, key item 2 at cell 1)"
   },
   "pass": {
-   "commit": "10d3ce7c",
-   "state": "noModel on every item M6 gets right; the lesson anchor (pickExample) honours it"
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's own pupil page and key: the same item order"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-M6 --seeds 2",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMKEY",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-eq-share-page",
-  "check": "on a printed compare page at most ceil(n/6) of its n problems are '=', never a Test's item 1 nor a Guided page's Model or first try (critic compare r2 N7)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages EQ-SHARE-PAGE",
+  "id": "eb-fixture-item-parity",
+  "check": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3, its parity probe made a gate): on a grid role the pupil page and key with data-eb-item / data-eb-partial removed are byte-identical to the same sheet built with ebItem: false; a tagged page whose first cell also gained a style FAILS, the sheet as built passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3)",
   "browser": true,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "Test item 1 '724 = 724', Guided first try '620 = 620', two '=' side by side across a block of six"
+   "fixture": "tests/fixtures/precritic/empty-band/item-parity.fail.html",
+   "state": "seeded: the tagged pupil page's first cell also carries min-height:1mm (a tag that changes what is drawn)"
   },
   "pass": {
-   "commit": "10d3ce7c",
-   "state": "the page plan: first '=' at item 3-7, then every 6th or 7th"
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's tagged and untagged sheets: identical once the tags are removed"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-SHARE-PAGE --seeds 2",
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMPARITY",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-wrap-sign",
-  "check": "no compare worked step breaks after its sign ('7 >' / '5.'): Scripted Model, Guided, lesson at S / M / L (critic compare r2; ws-geom-probe WRAP-OP with wrapOps < >)",
+  "id": "rr-clip-npr-model-l",
+  "check": "ws-grade-render --raster-fit (LP-RASTER on role pages, tests/lib/ws-role-raster.cjs): a role sheet printed to a real PDF and rasterised - RR-PAGES the PDF's pages = the plan's, RR-EDGE no ink within 5 mm of the paper's edge, RR-CLIP every text span's tall glyphs inked at top and foot. lf-algebra critic F3: the number_patterns_rule Scripted Model at L ran its Say band 6 mm past the panel frame and the frame cut the text in half - clean on screen and in emulated print, visible only in the PDF",
   "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages WRAP-SIGN",
+  "rule": "ws-grade-render --raster-fit RR-CLIP (lf-checks queue 13; lf-algebra critic F3, via lf-roles)",
   "browser": true,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "scripted-model L / guided M: 'The hundreds digits differ: 7 >' / '5.'"
+   "commit": "47b1f2a86",
+   "state": "lf-algebra r7: npr Scripted Model L on one page, the Say band ('Say: The rule is count on by 10...') clipped by the frame: RR-CLIP x2"
   },
   "pass": {
-   "commit": "10d3ce7c",
-   "state": "the sign joined to its digits with no-break spaces"
+   "commit": "7c1e3dbb4",
+   "state": "master (lf-roles' Scripted Model re-plan, 35c881b64 / 24cbb0678, merged): the same Model laid on 2 pages, every text span inked; lf-algebra made no fix of its own (F3 handed to lf-roles)"
   },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN",
+  "command": "node tests/scripts/ws-grade-render.cjs --skills patterns:number_patterns_rule --roles scripted-model --size L --no-screen --raster-fit --out tests/audit-runs/rr-clip-npr",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
  {
-  "id": "pv-compare-side-pad",
-  "check": "three across at L every compare digit stands at least 5 mm inside its cell's rules (critic compare r1 F9 / r2)",
+  "id": "conflict-markers-3c7b",
+  "check": "ws-conflict-markers: no tracked file holds a merge conflict marker line (a line starting with seven '<' or '>' and a space); on every ws-precritic run and in deploy session 1",
   "kind": "commit-pair",
-  "rule": "ws-pv-compare-pages SIDE-PAD",
-  "browser": true,
-  "fail": {
-   "commit": "ae799fbf",
-   "state": "independent L default: 4.80 mm"
-  },
-  "pass": {
-   "commit": "10d3ce7c",
-   "state": "the gaps give way to 1.6 mm: 5.19 mm"
-  },
-  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only SIDE-PAD",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-compare-sign-parity",
-  "check": "the compare sign is never the item's parity: on every offered option value the share of '>' at even and at odd places is 0.25-0.75 and no page holds 4 strictly alternating signs (critic compare r2 N3)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal SIGN-PARITY",
+  "rule": "ws-conflict-markers (lf-hosts critic r1 F2)",
   "browser": false,
   "fail": {
-   "commit": "ae799fbf",
-   "state": "lengths=mixed: > < > < down every page (the longer number first, swapped on the odd items)"
+   "commit": "3c7b548a",
+   "state": "lf-hosts merge of the lf-checks hand-off: <<<<<<< HEAD / >>>>>>> marker lines committed in design/lessons-first/CHECKS_FROM_CRITICS.md"
   },
   "pass": {
-   "commit": "54ec52ae",
-   "state": "the page plan's seeded sign, no 4-long alternation or run"
+   "commit": "28d13e788",
+   "state": "the g9 merge resolved the ledger: no marker line in any tracked file"
   },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only SIGN-PARITY",
+  "command": "node tests/scripts/ws-conflict-markers.mjs --root {root}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
   }
  },
- {
-  "id": "pv-compare-eq-share",
-  "check": "the compare deal: no '=' at item 1 or 2, any n items hold at most ceil(n/6) '=', and an '=' item's Guided cue is step 2 (critic compare r2 N7)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-compare-deal EQ-SHARE",
-  "browser": false,
-  "fail": {
-   "commit": "ae799fbf",
-   "state": "'=' at items 1 and 2, '=' pairs 1-2 items apart across a block's edge; the '=' cue 'Both have three digits.'"
+  {
+   "id": "pv-gridfoot-combine-test-s",
+   "check": "placevalue:combine one-page Test / Review: the white under the grid is at most one row, or the page stands in no more columns than the Independent page (lead-approved F1, lf-placevalue compare round: combine Test S 4 across against the Independent page's 3, about 45 % of the page white under the grid)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GRIDFOOT",
+   "browser": true,
+   "fail": {
+    "commit": "a837b8d4",
+    "state": "combine Test S 4 x 5 (102 mm white), Review S 4 across (89 mm white); the Independent page 3 across"
+   },
+   "pass": {
+    "commit": "81aac843",
+    "state": "a ghost frame at S held to three across (hardCap) on every role"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles test,review --hosts none --no-baseline --grid-foot --only EB-GRIDFOOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "cb2c9741",
-   "state": "the page plan; step 2 'Every digit is the same: 724 and 724.'"
+  {
+   "id": "pv-compare-pages3-fill",
+   "check": "placevalue:compare three pages at M: every page filled to 80 % with no band of 30 % under the line (compare round 2, coverage-matrix single/pages-3 PAGEFILL: rows held to their ink at 1.2 x left page 2 22 % white)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL + H13-ABS",
+   "browser": true,
+   "fail": {
+    "commit": "834d2ad1",
+    "state": "pages-3 M page 2: a 53 mm strip (22 %)"
+   },
+   "pass": {
+    "commit": "1f0e99f2",
+    "state": "spreadMax 1.3 at S and M"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --pages 3 --skills placevalue:compare --rules H13-ABS,GRID-EVEN-ALL --rule-skills placevalue:compare",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-SHARE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "pv-gridfoot-teacher-cols",
+   "check": "a teacher-chosen, non-default column count leaves at most 25 % of a one-page Independent / More practice body white under the grid (lead ruling 2026-11-13, CL-2c; compare 2 columns at S)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GRIDFOOT --columns (CL-2c)",
+   "browser": true,
+   "fail": {
+    "commit": "834d2ad1",
+    "state": "compare rows at 1.2 x: 2 columns at S leave the strip under the grid over 25 %"
+   },
+   "pass": {
+    "commit": "1f0e99f2",
+    "state": "spreadMax 1.3 at S: 24 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:compare --roles independent,more-practice --sizes S --hosts none --no-baseline --columns 2 --grid-foot --only EB-GRIDFOOT --rule-skills placevalue:compare",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-thinking-bands",
+   "check": "ws-cell-checks --card --card-opts renders every thinking role (true-false, reason-it, error-analysis, opener, scripted-model, guided) under every offered option value: the lf-placevalue opt-in --opt-roles (critic compare r1 F1: precritic missed reason-it at band 999,999, its numerals over the A / B boxes)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (--opt-roles, opt-in lf-placevalue cell-checks-compare)",
+   "browser": true,
+   "fail": {
+    "commit": "16748cd8",
+    "state": "reason-it L band 9,999+: the numerals leave the A / B boxes and the cell (OVERFLOW 4 a page)"
+   },
+   "pass": {
+    "commit": "d9a565fd",
+    "state": "lf-roles Reason It A-over-B (master e4d12d6a, inkWMm against the panel inner width) merged: reason-it S / M / L band 999,999 no OVERFLOW"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:compare --card --card-opts --opt-roles reason-it --rules OVERFLOW --size S,L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-eq-live",
+   "check": "live play never pins the compare \"=\" to one position (critic compare r1 F4: card, worksheet and quiz all opened on \"897 = 897\")",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal EQ-LIVE",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "20 of 20 live sessions dealt \"=\" as item 1"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "the live blockOrder mixes on a per-session value"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-LIVE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-close-depth",
+   "check": "closeness=close spreads the deciding place over place 2 .. the last (critic compare r1 F5: every close 6-digit pair decided at the 2nd digit)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal CLOSE-DEPTH",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "91 of 100 close 6-digit items decided at place 2, none past place 3"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "comparePair shares 1 .. nd-1 digits"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only CLOSE-DEPTH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-mixed-1digit",
+   "check": "lengths=mixed deals one digit apart, a 1-digit number at most one item in five, and the bigger first digit on the shorter number a quarter of the time (critic compare r1 F6, M6)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal MIXED-1DIGIT",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "61 of 120 mixed items held a 1-digit number"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "1 in 6, 60 of 120 the 89 / 312 trap"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only MIXED-1DIGIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-m6-wrong",
+   "check": "every wrong answer compare names is the card's M6 (M-C2 / M-C3), M-C3 on a quarter of a mixed deal (critic compare r1 F3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal M6-WRONG",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "M-C1 on 72 of 120 default items"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "M6 only; an item M6 gets right has none"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only M6-WRONG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-worked-step-does",
+   "check": "no worked step restates the item and a step naming digits marks them (critic compare r1 F2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal WORKED-STEP-DOES",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "\"Compare 487 and 858.\"; \"The first different digits are 4 and 8.\" unmarked"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "count / boxed digits / bigger digit / sign, every step marked"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only WORKED-STEP-DOES",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-m6-shown",
+   "check": "Error analysis, True or False? and Reason It show the card's M6 in at least half their errors at S / M / L, and the first-digit form on a lengths=mixed page (critic compare r1 F3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages M6-SHOWN",
+   "browser": true,
+   "fail": {
+    "commit": "16748cd8",
+    "state": "reason-it L default: 0 of 2 errors M6; mixed pages: no 89 > 312"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "every shown error M6, the first-digit form on every mixed page"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only M6-SHOWN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-eq-model",
+   "check": "\"=\" is never a worked model: Guided, Scripted Model, Opener, lesson anchor (critic compare r1 F4)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages EQ-MODEL",
+   "browser": true,
+   "fail": {
+    "commit": "16748cd8",
+    "state": "guided S / M / L: the Model is \"691 = 691\""
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "unequal same-length Models (4 worked steps; noModel)"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-MODEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-state-marks",
+   "check": "the Scripted Model's states and the lesson anchor's panels each draw a new mark (critic compare r1 F2: states 1 and 2 the same picture)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages STATE-MARKS",
+   "browser": true,
+   "fail": {
+    "commit": "16748cd8",
+    "state": "scripted-model and lesson S / M / L: state 2 = state 1"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "count, boxed digits, underline, sign"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only STATE-MARKS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-chant-fit",
+   "check": "a lesson's chant decides at least half the items its practice deals (critic compare r1 F2 LESSON-CHANT-FIT: \"More digits, bigger number.\" decided 8 of 33)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit chant-fit",
+   "fail": {
+    "commit": "16748cd8",
+    "state": "chant decides 40 % of the practice deal"
+   },
+   "pass": {
+    "commit": "1240f552",
+    "state": "the chant names both rules"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-fit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-cl4d-stretched-top",
+   "check": "CL-4d (lead ruling 2026-11-13, CL-4b stretch exception): a one-line compare cell whose row stretches it by 30 % or more is centred down its box; left at the top it leaves a band of 30 % under the line (compare r2 EB-BAND independent / more-practice 144)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (lf-placevalue print-lint-kit / -S / -M)",
+   "browser": true,
+   "fail": {
+    "commit": "023cafca",
+    "state": "compare L independent: 36 one-line cells at the top of rows that stretch them 111 %, 9.3 mm (30 %) white under each"
+   },
+   "pass": {
+    "commit": "cd47e0a5",
+    "state": "data-ws-stretchmid + ws-rowstretch: the stretched cells centred (L-TOPSTART 0, EB-BAND independent / more-practice M / L 0)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --skills placevalue:compare --rules TOPSTART-STRETCH --rule-skills placevalue:compare --lints L-TOPSTART",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-cl4d-unstretched-centred",
+   "check": "CL-4d (lead ruling 2026-11-13): a one-line cell its row stretches by LESS than 30 % keeps the top of the box; centred there is a fail (the ungated r3 centring CSS)",
+   "kind": "fixture",
+   "rule": "ws-print-lint L-TOPSTART CL-4d (unstretched one-line cell centred)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/cl4d-unstretched/fail.html",
+    "state": "the real compare L page, rows cut to 1.28 x the line (tabs off), every marked cell centred: 18 cells 4.2 mm down"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/cl4d-unstretched/pass.html",
+    "state": "the same page with no ws-rowstretch mark: the lines at the top of the box"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-TOPSTART",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-exgroup-fill",
+   "check": "placevalue:compare with grouped examples (--anchors sections) at L: the page holds no empty strip of 20 % under its blocks (compare r2 coverage single/ex-group L PAGEFILL: r2's whole example strip, 1.8 mm shorter a block, left 48 mm / 21 % under three blocks)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL (ws-coverage-matrix single/ex-group --red-no-baseline PAGEFILL)",
+   "browser": true,
+   "fail": {
+    "commit": "023cafca",
+    "state": "ex-group L page 1: a 48 mm strip (21 %) under three example blocks of 1 x 3 compare rows at 24.6 mm"
+   },
+   "pass": {
+    "commit": "f0e27e94",
+    "state": "the block rows share the spare (28.8 mm, spreadMax x the shortest problem): PAGEFILL 0 at S / M / L"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --anchors sections --skills placevalue:compare --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-cl4d-twin-row",
+   "check": "H13 / H13-ABS exempt the white above and below a CL-4d centred one-line cell (data-ws-stretchmid, its own line) whose row's height a taller SIBLING's measured ink sets (compare's ex-each worked twin), each band <= 40 % of the cell; a band over 40 % or a page-fill row with no taller sibling still counts (lead ruling (a) 2026-11-13 13:35, CL-4b / CL-4d). The command runs each state's OWN ws-print-lint: the ruling changes the check, not the page",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 / H13-ABS (CL-4d twin row exemption)",
+   "browser": true,
+   "fail": {
+    "commit": "fb05bcb1",
+    "state": "single ex-each: 14 H13 at S, 10 at L - the compare line centred by CL-4d beside the worked twin (3.3 x the line), each band 33-34 %"
+   },
+   "pass": {
+    "commit": "38667589",
+    "state": "the twin-sized centred line exempt (bands 33-34 % <= 40 %): H13 0 at S and L; sections/pages-2 L (page fill, no taller sibling) still counted"
+   },
+   "command": "node {root}/tests/scripts/ws-print-lint.cjs --source kit --size S --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-S.json && tests/scripts/mq-browser-run.sh node {root}/tests/scripts/ws-print-lint.cjs --source kit --size L --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-L.json && node -e \"const n={};for(const z of ['S','L'])n[z]=require('{root}/exeach-'+z+'.json').documents.flatMap(d=>d.findings||[]).filter(f=>f.rule==='H13'||f.rule==='H13-ABS').length;console.log('ex-each-h13: '+(n.S+n.L?'FAIL':'OK')+' (H13 S '+n.S+', L '+n.L+')')\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-guided-model-reserve",
+   "check": "a tightRows Guided page's Model row (the Model beside the hinted tries) reserves max(the Model tab's clearance, the hint line), never their sum: its fullest cell leaves at most 3 mm white under its ink (lf-roles review of the compare r3 guided.js change, item b2, 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages MODEL-RESERVE",
+   "browser": true,
+   "fail": {
+    "commit": "023cafca",
+    "state": "compare Guided Model row 41.3 / 53.7 / 60.8 mm at S / M / L, 21-28 mm white under the hint line (tab clearance + hint line + stretch)"
+   },
+   "pass": {
+    "commit": "f0d0ac7d",
+    "state": "the Model row 22.6 / 30.0 / 33.7 mm: 1-2 mm white under the hint line (max(tab, hint), rows at pads + line)"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-RESERVE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-heads-unaided",
+   "check": "placevalue:identify's place heads (labels H T O, or the chart's place names) are off on the unaided pages - Review, Test, the pre-skill check - and in the quiz (the online test), and kept on Practice / Mixed: the answer is the place name (lead ruling PEDAGOGY 4.1a, 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-identify-heads PV-HEADS-UNAIDED / PV-HEADS-TAUGHT / PV-HEADS-QUIZ",
+   "browser": true,
+   "fail": {
+    "commit": "1db0e330",
+    "state": "origin/master: every identify item on Review / Test / pre-skill check at S / M / L prints H T O (or the chart's names); the quiz builder deals fractions:identify for 'identify'"
+   },
+   "pass": {
+    "commit": "0d61403a",
+    "state": "provider roleOpts: support none on the unaided roles and the quiz; Practice / Mixed keep the heads"
+   },
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-vocab-cell-growth",
+   "check": "a lesson vocabulary CELL (.mq-lvocabcell) is under 35 % white above + below its ink, to its drawn edge: it never grows into the height another part freed (critic r5 N-r5-2, ledger line 21 part 3; EB-VOCAB alone read only the picture inside its own box)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-VOCAB (--vocab-ink, vocab cell)",
+   "browser": true,
+   "fail": {
+    "commit": "07634a75",
+    "state": "identify lesson S / M p2: the vocabulary cell 50.7 mm, 4.6 mm white above and 14.9 mm below its ink (38.5 %; the critic's pixel rows ~43 %)"
+   },
+   "pass": {
+    "commit": "43475c3d",
+    "state": "today: identify's vocabulary cell 71.8 mm at S / M, about 22 % white, all below its ink (the lane's lessons at most 32 %)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --no-baseline --vocab-ink --only EB-VOCAB",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-warmup-side-l",
+   "check": "identify's lesson page 2 at L: the Warm-up cells two across leave no side band of 30 % or more (critic r5 N-r5-1, ledger line 21 part 2; ENGINE-ROLES, lesson.js warm-up column count)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (--roles lesson)",
+   "browser": true,
+   "fail": {
+    "commit": "43475c3d",
+    "state": "OPEN RED today: identify lesson L p2 cells 1-2, 26.7 mm beside the ink of a 91.8 mm cell (31 %)"
+   },
+   "pass": {
+    "commit": "",
+    "state": "the lf-engine fix (lesson.js warm-up column count; lead D3) - arm with its commit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --sizes L --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "open red, owner lf-engine (lead D3: ENGINE-ROLES, lesson.js warm-up two across). The check is on precritic's path (the default ws-empty-band row renders every offered role, lesson included); this row is armed with the fix commit when it lands."
+  },
+  {
+   "id": "pv-unit-form-ws-host-band",
+   "check": "unit_form rename=more on the online worksheet host: no cell with an empty band of 30 % or more under its ink (critic r5, ledger line 21 part 1; the legacy screen cell, hosts lane)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (--hosts worksheet --opts rename=more)",
+   "browser": true,
+   "fail": {
+    "commit": "43475c3d",
+    "state": "OPEN RED today: unit_form worksheet 1280 px p1 cell 1, 10.4 mm under the ink of a 32.5 mm cell (32.0 %) [legacy]"
+   },
+   "pass": {
+    "commit": "",
+    "state": "the hosts-lane fix (the unit_form worksheet cell drawn by the kit, lead D3) - arm with its commit"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent --hosts worksheet --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   },
+   "pending": true,
+   "pendingReason": "open red, owner the hosts lane (lead D3: the worksheet host draws unit_form's legacy cell). NOT on precritic's path today: precritic's ws-empty-band renders the screen hosts with the default options only (option variants on hosts are not rendered); proposed for the hosts lane: hosts x option variants in ws-empty-band's precritic row."
+  },
+  {
+   "id": "pv-words-plural",
+   "check": "composing:number_word_form: no worked step counts ONE of a place in the plural (\"3 tens, 1 ones\", \"1 tens 8 ones\") on any band, with the answer line or the H T O boxes (critic nwf r2 / r3 N12)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-STEPS-PLURAL",
+   "browser": false,
+   "fail": {
+    "commit": "abbfd37e",
+    "state": "band 1,000: 25 plural steps with the answer line (\"The rest is 18: 1 tens 8 ones.\"), 12 with the H T O boxes (\"5 tens, 1 ones.\")"
+   },
+   "pass": {
+    "commit": "827b394b",
+    "state": "one / ones and ten / tens follow the count"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-STEPS-PLURAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-cl4d-guided",
+   "check": "CL-4d on the Guided role: a one-line compare cell its Guided row stretches by 30 % or more is centred (the r3 ws-rowstretch marks on Guided rows; lf-roles review of compare r3, item b3)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (--roles guided)",
+   "browser": true,
+   "fail": {
+    "commit": "cd47e0a5",
+    "state": "compare Guided L: 8 one-line cells at the top of rows that stretch them 319 %, 38.3 mm (63 %) white under each (CL-4d on practice pages only)"
+   },
+   "pass": {
+    "commit": "f0d0ac7d",
+    "state": "Guided rows sized to pads + line and marked ws-rowstretch where they stretch: L-TOPSTART 0"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --roles guided --skills placevalue:compare --lints L-TOPSTART --rules TOPSTART-STRETCH --rule-skills placevalue:compare",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-tof-share",
+   "check": "a compare True or False? page is 40-60 % false at S / M / L on every offered option value (critic compare r2 N1, PT-TOF-1)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages TOF-SHARE",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "12-33 % false: a False slot whose item names no error (\"=\", a pair the ones place decides) printed True"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "provider falseNeedsWrong: the False slot skips such an item; every page half false"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only TOF-SHARE --seeds 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-mark-clear",
+   "check": "the compare marks (deciding-digit box, bigger-number underline) keep 0.5 mm from every character they do not mark: Scripted Model, lesson anchor, Guided at S / M / L (critic compare r2 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages MARK-CLEAR",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "the box is the digit's own advance wide: its rules cross the digits beside it (4[1]7, [7]33) and its top meets the digit count's descender"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "1.6 mm room each side of the deciding digit in every state, one box round an '=' number, the count 2 mm above"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MARK-CLEAR --seeds 1",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-model-m6",
+   "check": "a compare worked example (Guided, Scripted Model, Opener Model, lesson anchor) is an item M6 gets wrong, on the default, band 999,999 and lengths=mixed (critic compare r2 N4)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages MODEL-M6",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "band 999,999: Guided Model 992,323 > 992,321 and lesson anchor 448,825 / 355,672 - decided where the last digits agree"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "noModel on every item M6 gets right; the lesson anchor (pickExample) honours it"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-M6 --seeds 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-eq-share-page",
+   "check": "on a printed compare page at most ceil(n/6) of its n problems are '=', never a Test's item 1 nor a Guided page's Model or first try (critic compare r2 N7)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages EQ-SHARE-PAGE",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "Test item 1 '724 = 724', Guided first try '620 = 620', two '=' side by side across a block of six"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "the page plan: first '=' at item 3-7, then every 6th or 7th"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-SHARE-PAGE --seeds 2",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-wrap-sign",
+   "check": "no compare worked step breaks after its sign ('7 >' / '5.'): Scripted Model, Guided, lesson at S / M / L (critic compare r2; ws-geom-probe WRAP-OP with wrapOps < >)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages WRAP-SIGN",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "scripted-model L / guided M: 'The hundreds digits differ: 7 >' / '5.'"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "the sign joined to its digits with no-break spaces"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-side-pad",
+   "check": "three across at L every compare digit stands at least 5 mm inside its cell's rules (critic compare r1 F9 / r2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages SIDE-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "independent L default: 4.80 mm"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "the gaps give way to 1.6 mm: 5.19 mm"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only SIDE-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-sign-parity",
+   "check": "the compare sign is never the item's parity: on every offered option value the share of '>' at even and at odd places is 0.25-0.75 and no page holds 4 strictly alternating signs (critic compare r2 N3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal SIGN-PARITY",
+   "browser": false,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "lengths=mixed: > < > < down every page (the longer number first, swapped on the odd items)"
+   },
+   "pass": {
+    "commit": "54ec52ae",
+    "state": "the page plan's seeded sign, no 4-long alternation or run"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only SIGN-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-eq-share",
+   "check": "the compare deal: no '=' at item 1 or 2, any n items hold at most ceil(n/6) '=', and an '=' item's Guided cue is step 2 (critic compare r2 N7)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-deal EQ-SHARE",
+   "browser": false,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "'=' at items 1 and 2, '=' pairs 1-2 items apart across a block's edge; the '=' cue 'Both have three digits.'"
+   },
+   "pass": {
+    "commit": "cb2c9741",
+    "state": "the page plan; step 2 'Every digit is the same: 724 and 724.'"
+   },
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-SHARE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-compare-remember-fit",
+   "check": "a lesson's Remember line (the routine's first concept) decides at least half the items its practice deals, as its chant does (critic compare r2 N6)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit remember-fit",
+   "browser": false,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "'More digits is the bigger number.' decides 40 % (the mixed block only)"
+   },
+   "pass": {
+    "commit": "10d3ce7c",
+    "state": "'More digits wins. Same count: the first different digit decides.'"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only remember-fit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-identify-heads-chosen",
+   "check": "identify's Review / Test keep a support the teacher CHOSE (the chart): only the default drops to none (lead ruling 14:24, 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-identify-heads PV-HEADS-CHOSEN",
+   "browser": true,
+   "fail": {
+    "commit": "0d61403a",
+    "state": "roleOpts set support none on review / test whatever the teacher chose: the chart was dropped"
+   },
+   "pass": {
+    "commit": "cb2c9741",
+    "state": "roleOpts replaces only the default (support absent or 'labels')"
+   },
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-CHOSEN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-grade-render-quiz",
+   "check": "the critic's quiz render deals through the quiz builder (ws-grade-render --quiz-builder): identify's quiz view has no place heads (critic compare r2 N8)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-identify-heads PV-HEADS-GRADE-QUIZ",
+   "browser": true,
+   "fail": {
+    "commit": "ae799fbf",
+    "state": "ws-grade-render deals the quiz with generateQuestionFor (no roleOpts) and has no --quiz-builder: no builder quiz view to judge"
+   },
+   "pass": {
+    "commit": "cb2c9741",
+    "state": "--quiz-builder: openQuizBuilder + addMultipleQuestions, quiz-1280.html written, 0 headed items"
+   },
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-GRADE-QUIZ --grade-render {root}/tests/scripts/ws-grade-render.cjs",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-screen-text-size",
+   "check": "identify's screen numeral meets the card / quiz digit floor (40 / 48 / 56 px) and unit_form / value words are at least their print size on every screen host (lead 15:35; lf-checks TEXT-SIZE)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size TEXT-SIZE",
+   "browser": true,
+   "fail": {
+    "commit": "6d1ffb80",
+    "state": "identify card / quiz digits 30.4 px (floor 40-56); unit_form 'hundreds' and value 'worth' 14 pt on the worksheet (print 16 pt): 18 findings"
+   },
+   "pass": {
+    "commit": "611a7784",
+    "state": "numeral at --mq-digit; pv twin words floored at their M print size: 0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill placevalue:identify,placevalue:unit_form,placevalue:value --only TEXT-SIZE --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- },
- {
-  "id": "pv-compare-remember-fit",
-  "check": "a lesson's Remember line (the routine's first concept) decides at least half the items its practice deals, as its chant does (critic compare r2 N6)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-unit remember-fit",
-  "browser": false,
-  "fail": {
-   "commit": "ae799fbf",
-   "state": "'More digits is the bigger number.' decides 40 % (the mixed block only)"
-  },
-  "pass": {
-   "commit": "10d3ce7c",
-   "state": "'More digits wins. Same count: the first different digit decides.'"
-  },
-  "command": "node tests/scripts/ws-lesson-unit.mjs --only remember-fit",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-identify-heads-chosen",
-  "check": "identify's Review / Test keep a support the teacher CHOSE (the chart): only the default drops to none (lead ruling 14:24, 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-identify-heads PV-HEADS-CHOSEN",
-  "browser": true,
-  "fail": {
-   "commit": "0d61403a",
-   "state": "roleOpts set support none on review / test whatever the teacher chose: the chart was dropped"
-  },
-  "pass": {
-   "commit": "cb2c9741",
-   "state": "roleOpts replaces only the default (support absent or 'labels')"
-  },
-  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-CHOSEN",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-grade-render-quiz",
-  "check": "the critic's quiz render deals through the quiz builder (ws-grade-render --quiz-builder): identify's quiz view has no place heads (critic compare r2 N8)",
-  "kind": "commit-pair",
-  "rule": "ws-pv-identify-heads PV-HEADS-GRADE-QUIZ",
-  "browser": true,
-  "fail": {
-   "commit": "ae799fbf",
-   "state": "ws-grade-render deals the quiz with generateQuestionFor (no roleOpts) and has no --quiz-builder: no builder quiz view to judge"
-  },
-  "pass": {
-   "commit": "cb2c9741",
-   "state": "--quiz-builder: openQuizBuilder + addMultipleQuestions, quiz-1280.html written, 0 headed items"
-  },
-  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-GRADE-QUIZ --grade-render {root}/tests/scripts/ws-grade-render.cjs",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-screen-text-size",
-  "check": "identify's screen numeral meets the card / quiz digit floor (40 / 48 / 56 px) and unit_form / value words are at least their print size on every screen host (lead 15:35; lf-checks TEXT-SIZE)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-ink-size TEXT-SIZE",
-  "browser": true,
-  "fail": {
-   "commit": "6d1ffb80",
-   "state": "identify card / quiz digits 30.4 px (floor 40-56); unit_form 'hundreds' and value 'worth' 14 pt on the worksheet (print 16 pt): 18 findings"
-  },
-  "pass": {
-   "commit": "611a7784",
-   "state": "numeral at --mq-digit; pv twin words floored at their M print size: 0 findings"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill placevalue:identify,placevalue:unit_form,placevalue:value --only TEXT-SIZE --no-baseline",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- }
  ]
 }

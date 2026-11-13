@@ -46,11 +46,6 @@
       "--draw-cap"
      ]
     },
-    "screen-slots": {
-     "args": [
-      "--screen-digit"
-     ]
-    },
     "options-render": {
      "args": [
       "--bands",
@@ -232,8 +227,6 @@
     },
     "empty-band": {
      "args": [
-      "--vocab-ink",
-      "--page-fill",
       "--screen-parity",
       "--grid-foot"
      ]

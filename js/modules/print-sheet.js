@@ -33,7 +33,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { applySheetTags } from './sheet/index.js';
+import { applySheetTags, ebItemOf } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -3111,12 +3111,12 @@ function tagItemIndex(plan, items) {
     const walk = (s) => {
         if (!s || typeof s !== 'object') return;
         // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        // (critic ebitem-r1 m2: one that matched only SOME of them also carries ebPartial "k/n": data-eb-partial, an EB-FOOT note)
         if (s.kind === 'grid') for (const pi of s.items || []) {
             if (!pi) continue;
-            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
-            if (many.length > 1) pi.ebItem = many;
-            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
-            else if (many.length) pi.ebItem = many[0];
+            const t = ebItemOf(pi, idx);
+            if (t.ebItem !== undefined) pi.ebItem = t.ebItem;
+            if (t.ebPartial) pi.ebPartial = t.ebPartial;
         }
         if (Array.isArray(s.contents)) s.contents.forEach(walk);
         if (s.content) walk(s.content);
@@ -3163,6 +3163,9 @@ function touchFitLine(line, html, size) {
 async function buildSheetDeal(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
+    // `ebItem: false` (ws-empty-band EB-ITEMPARITY, critic ebitem-r1 m3): the same sheet with no data-eb-item tags, to prove the
+    // tags change nothing else in the pupil page or its key
+    n.ebTag = req.ebItem !== false;
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();
@@ -3966,7 +3969,7 @@ async function buildSheetDeal(req = {}) {
         const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
         plan = t.plan; trimmed = t.trimmed;
     }
-    tagItemIndex(plan, hostItems);
+    if (n.ebTag !== false) tagItemIndex(plan, hostItems);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -4728,7 +4731,7 @@ async function buildRoleSheet(n, metaOf) {
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
-    tagItemIndex(plan, items);
+    if (n.ebTag !== false) tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
