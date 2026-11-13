@@ -69,7 +69,7 @@ Every domain section has the same eight parts, in this order.
 Terms used throughout:
 
 - **Look**: "I Can" look or "Daily" look (owner decision 4).
-- **Size**: S / M / L, digits 16 / 22 / 28 pt, writing height Hw 6 / 8 / 10 mm. All exemplars are drawn at L on A4.
+- **Size**: M / L, digits 22 / 28 pt, writing height Hw 8 / 10 mm (owner 2026-11-13: S dropped as a choice; its 16 pt / 6 mm token stays as the decode alias of M and the compact layout). All exemplars are drawn at L on A4.
 - **Level N**: the pupil-facing label. Grade and CCSS code appear only in the teacher footer.
 - **Delta**: the single thing that changes between two ladder steps.
 
@@ -116,14 +116,14 @@ except where a minimum is stated. Minimums are never crossed (XP-G-12).
 | XP-D-01 | Line weights | As the design standard's ink table. Heavy 1.5 pt: page frame, band dividers, axes, outline of any figure the pupil judges, counts or measures. Hairline 0.75 pt: every line that bounds a writing place (answer rule, digit box, check box, table cell), figure partitions, hop arcs. Hairline 0.5 pt: only inside a visual and never bounding a writing place (graph and unit-grid lines, minor ticks, protractor degree ticks, hidden edges of solids). In this file "heavy" means 1.5 pt and "hairline" means 0.75 pt unless the element is in the 0.5 pt list |
 | XP-D-02 | Line styles | Solid = given. Dotted = trace / model / a measuring or construction guide. Dashed = cut line, with one exception: the short-dash digit box that marks the unknown digit of a missing-digit item (design standard LS-8). Nothing else is dashed. The unknown part of a diagram is a solid box or arc with a label-size `?` or its answer slot. Never decorative |
 | XP-D-03 | Grey | The one 40% grey: shaded regions, trace digits, faded scaffolds, the inactive protractor scale, pre-filled bars. Photocopy-safe: regions ≥ 6 mm become 45-degree hatch (second category 135-degree); trace digits become dotted outlines |
-| XP-D-04 | Unit grid | Square cells 8 mm (L), 7 mm (M), 6 mm (S). Hairline. A figure on the grid has a heavy outline |
+| XP-D-04 | Unit grid | Square cells 8 mm (L), 7 mm (M), 6 mm (S). Hairline. A figure on the grid has a heavy outline <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | XP-D-05 | Labelled figure | Minimum short side 18 mm. Side labels in cell text (15 / 13 / 11 pt), centred outside the side, 1.5 mm clear. A blank for a missing side is a 14 mm rule in the same position |
 | XP-D-06 | Equal-side ticks, right-angle square, parallel arrows | Tick 2.5 mm hairline across the side; corner square 3 mm; arrow 3 mm chevron on the side. One mark family per step |
-| XP-D-07 | Number line | Heavy line with arrowheads where it continues; labelled ticks 5 mm at heavy weight, part ticks 3 mm at hairline weight; labels below in label size (12 / 10 / 9 pt); minimum tick pitch 8 / 7 / 6 mm at L / M / S wherever the pupil marks a tick or draws a hop. Hop arrows are hairline arcs above the line, 5 mm high, with a number above each (solid when given, dotted when modelled) |
+| XP-D-07 | Number line | Heavy line with arrowheads where it continues; labelled ticks 5 mm at heavy weight, part ticks 3 mm at hairline weight; labels below in label size (12 / 10 / 9 pt); minimum tick pitch 8 / 7 / 6 mm at L / M / S wherever the pupil marks a tick or draws a hop. Hop arrows are hairline arcs above the line, 5 mm high, with a number above each (solid when given, dotted when modelled) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | XP-D-08 | Vertical scale (thermometer, jug, scale bar) | Same tick rules as XP-D-07, turned 90 degrees. Labels to the left. Liquid level is a grey fill with a heavy top edge |
 | XP-D-09 | Coordinate grid | Cells 8 mm (L). Axes heavy with arrowheads, every integer labelled, origin labelled 0 once. Points are solid 2.5 mm dots with a bold capital letter 1.5 mm up-right |
 | XP-D-10 | Protractor | Half-disc, radius 38 mm minimum (never scaled below), hairline. Degree ticks each 1, longer each 5, numerals each 10. The active scale is bold black; the other scale is grey. Centre mark is a 2 mm cross |
-| XP-D-11 | Angle | Two heavy rays of 35 mm minimum at L (30 / 25 at M / S) from a solid 1.5 mm vertex dot; hairline arc radius 8 mm. Right angle uses the 3 mm square instead of the arc |
+| XP-D-11 | Angle | Two heavy rays of 35 mm minimum at L (30 / 25 at M / S) from a solid 1.5 mm vertex dot; hairline arc radius 8 mm. Right angle uses the 3 mm square instead of the arc <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | XP-D-12 | Solid (3-D) | Oblique projection, receding edges at 30 degrees and 0.4 of their length. Hidden edges 0.5 pt solid hairline (never dashed, never dotted: dotted means a guide to follow). Unit-cube stacks show every visible cube edge in hairline with a heavy silhouette |
 | XP-D-13 | Shape tokens | Star, circle, triangle, square, each 6 mm, in two states: solid black and hollow. These are the only category markers for probability, ratio pictures and sorting |
 | XP-D-14 | Bars in graphs | Bar width = 60% of category pitch. Bars are at least 8 mm wide. Fill: first series grey with a heavy outline, second series hollow (white) with a heavy outline; a graph has at most two series. A single-series graph uses grey. Hatch appears only as the Photocopy-safe form of the grey. Gridlines hairline at every scale step |
@@ -132,7 +132,7 @@ except where a minimum is stated. Minimums are never crossed (XP-G-12).
 | XP-D-17 | Step columns | A cell split by a hairline vertical into "Step 1", "Step 2" (bold label size at the top-left of each column). Used for two-stage procedures |
 | XP-D-18 | Funnel | An expression redrawn once per line, each line centred under the underlined part of the line above. Line pitch = Hw + 4 mm |
 | XP-D-19 | Word bank | A rounded box, words in cell text separated by 6 mm, alphabetical order. Appears in the Guided band only unless the step says otherwise |
-| XP-D-20 | Check box | 7 mm square at L (6 / 5 at M / S), hairline, 2 mm left of its sentence. Decision sentences are first person ("I need the space inside, so I find the area") |
+| XP-D-20 | Check box | 7 mm square at L (6 / 5 at M / S), hairline, 2 mm left of its sentence. Decision sentences are first person ("I need the space inside, so I find the area") <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 
 ---
 
@@ -198,7 +198,7 @@ Follow-on (Level 5-6, same cell formats): bank of 6 quadrilateral words; triangl
 
 | Representation | Drawn how |
 |---|---|
-| 2-D shape | Heavy outline, no fill, minimum bounding box 30 / 36 / 42 mm at S / M / L (design standard 11.2). From SH-2, rotation is any multiple of 15 degrees and aspect ratio varies 1:1 to 1:3 |
+| 2-D shape | Heavy outline, no fill, minimum bounding box 30 / 36 / 42 mm at S / M / L (design standard 11.2). From SH-2, rotation is any multiple of 15 degrees and aspect ratio varies 1:1 to 1:3 <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Attribute marks | XP-D-06. Only the attribute of the current step is marked; other marks are absent, not greyed |
 | Solid | XP-D-12. From SH-5 each solid appears once as a wireframe and once as a plain line-art object of that form (box, can, ball, cone) |
 | Sort boxes | Two square-cornered boxes 80 × 50 mm under the set, each with a bold head word. Shapes carry small letters so the pupil writes letters in the boxes |
@@ -314,7 +314,7 @@ Follow-on (Level 5-6): angles around a point (360), angle sum of a triangle, dra
 | Frame `180 − __ = __` | Two inline inputs |
 | Draw a fold line on dot paper | Tap two dots (existing `place_symmetry_lines` interaction) |
 
-**Page roles.** Best fit: opener + independent; full-width rows for protractor items (4 per page at L, because XP-D-10 fixes the radius at 38 mm minimum); visual grid 3 × 3 for naming; decision page (AN-6); error analysis (reading the wrong scale); True or False? ("An obtuse angle is bigger than a right angle"). Spiral panel and Daily 4 take one naming cell or one `180 − __` frame; they never take a protractor cell at S because it cannot shrink — the packer substitutes a naming item and notes this in the dialog.
+**Page roles.** Best fit: opener + independent; full-width rows for protractor items (4 per page at L, because XP-D-10 fixes the radius at 38 mm minimum); visual grid 3 × 3 for naming; decision page (AN-6); error analysis (reading the wrong scale); True or False? ("An obtuse angle is bigger than a right angle"). Spiral panel and Daily 4 take one naming cell or one `180 − __` frame; they never take a protractor cell at S because it cannot shrink — the packer substitutes a naming item and notes this in the dialog. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 **Scaffolds**
 
@@ -498,7 +498,7 @@ Follow-on: word problems with a box diagram; `net_surface_area` (a separate Leve
 
 | Representation | Drawn how |
 |---|---|
-| Cube stack | XP-D-12. Cube edge 8 mm at L (7 / 6 at M / S). Heavy silhouette, hairline cube edges. In VO-1 to VO-3 the top layer is grey (hatched in Photocopy-safe) so "one layer" is visible. Maximum 5 × 4 × 4 cubes; dimensions from `Math.pow(state.range, 1/3)` |
+| Cube stack | XP-D-12. Cube edge 8 mm at L (7 / 6 at M / S). Heavy silhouette, hairline cube edges. In VO-1 to VO-3 the top layer is grey (hatched in Photocopy-safe) so "one layer" is visible. Maximum 5 × 4 × 4 cubes; dimensions from `Math.pow(state.range, 1/3)` <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Labelled box | `create3DBoxSVG` in mono. Labels sit outside the front-bottom edge (length), the receding bottom edge (width) and the front-right vertical edge (height), always in that order and wording: "length", "width", "height" in the Model, letters l, w, h after VO-6 |
 | Step blanks | To the right of the figure: "cubes in one layer ____", "layers ____", "volume ____ cubic units" |
 | Composite | Two boxes sharing a face; each has a bold letter A, B on its front face; the join is a hairline |
@@ -2104,7 +2104,7 @@ Decisions made here that the owner decisions do not cover. Each can be changed w
 | Id | Assumption |
 |---|---|
 | XP-A-01 | Line weights are taken from the ink table of `WORKSHEET_DESIGN_STANDARD.md` (1.5 / 0.75 / 0.5 pt). Geometric figures keep the order of side lengths but not exact proportion; unknown sides snap to stock lengths so that a drawing never gives the answer away |
-| XP-A-02 | Size scaling for diagrams is ×0.85 (M) and ×0.70 (S) of the L dimension, with stated minimums that are never crossed (protractor radius 38 mm, graph cell width 86 mm, integer line 160 mm) |
+| XP-A-02 | Size scaling for diagrams is ×0.85 (M) and ×0.70 (S) of the L dimension, with stated minimums that are never crossed (protractor radius 38 mm, graph cell width 86 mm, integer line 160 mm) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | XP-A-03 | A printed ruler is true scale and the sheet must print at 100%; on screen the ruler is not true scale and the app says so outside the cell |
 | XP-A-04 | Spellings follow US usage ("meter", "liter", "favorable"); both metric and customary ladders exist, metric first |
 | XP-A-05 | Ladders longer than 12 steps in the research notes were split into a main ladder plus a named follow-on (coordinates, integers, expressions) or into two ladders (area / perimeter, graphs / statistics, ratios / percents, rounding / estimation, measuring / converting) |

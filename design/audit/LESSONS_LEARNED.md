@@ -12,7 +12,7 @@ lane had self-graded 8. The failures fall into a small number of RECURRING class
 | # | Class (seen in) | Design rule — do this first | Automatic check |
 |---|---|---|---|
 | L1 | **Size S ignored** — same grid and drawing at S as at L (options R3: 87 skills) | Every drawing sizes from `ctx.metrics` (never fixed mm/px); decide the M/L grids on paper before coding (S dropped 2026-11-13) | `ws-columns` + NEW `--sizes` check: S must fit more items or more columns than L, drawings must scale. *Since 2026-11-13 (S dropped, plan item 9) the rule reads M against L: M must fit more items or more columns than L.* |
-| L2 | **Wasted space** — empty bands in cells, 1–3 items per page, blank page strips (R3, R4, options, lessons) | Size the cell to its content; count how many fit at S/M/L before building; mixed-height items get their own rows | `ws-print-lint` L-DENSITY H13 + PAGEFILL (on); run at M and L (S dropped 2026-11-13) |
+| L2 | **Wasted space** — empty bands in cells, 1–3 items per page, blank page strips (R3, R4, options, lessons) | Size the cell to its content; count how many fit at M and L before building; mixed-height items get their own rows | `ws-print-lint` L-DENSITY H13 + PAGEFILL (on); run at M and L (S dropped 2026-11-13) |
 | L3 | **Answer given away** — result drawn (combine shapes), slot width = answer length, regroup boxes only where needed, labelled target tick, "wrong" answer = right answer | Structural scaffolds on EVERY item or none; slot widths from the widest possible answer; never draw what is asked | NEW lint: pupil page must not contain the key value inside the question drawing; providers-unit: wrong ≠ right |
 | L4 | **Wrong or incoherent content** — unshaded "shaded" circles, axis 0, 1.8, 3.7…, carries on 1-digit facts, ungrammatical stories, "Up to 10" dealing 11–19 | Generate 50 items per option value and READ them before building the drawing; the name and each option value are promises | `ws-content-audit`, `ws-story-lint`, `ws-options-verify` predicates; add a predicate per new option |
 | L5 | **Paper ≠ screen** — doubled answer areas, paper verbs on screen, MC on screen but writing on paper | One kit cell drawn on both; the cell's slots ARE the inputs; screen verbs via the contract map | `ws-screen-slots` (0 doubled, 0 paper verbs), `ws-screen-answer` |
@@ -84,13 +84,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    roles / templates / hosts the lane did not touch.
 0c. **Every engine change is proved against master before hand-over (lead, lf-engine landing, 2026-11-09).** A change to the
    lesson engine (sheet/roles/lesson.js, sheet/lesson-pages/*, print-sheet.js buildLesson, lessons/library.js or the lesson
-   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --check
+   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --check
    <master baseline>` (written with `--write` on a master worktree) before the lane hands over; every differing hash is either
    the change's intended page on a lesson the change was made for (opt-in on that lesson's data, LR-17b) or a defect.
    Backtest row `lesson-baseline-phase0-optin` (FAIL 3bf3ef5c / PASS the LR-17b fix).
    *Why:* the lf-engine landing found 80 hashes of live packets changed by two critic fixes made for the sample lessons.
    **Now a DEPLOY GATE (lead ruling 2026-11-13):** the lane rule alone let a change through when a lane skipped it (2 days
-   unseen), so `ws-deploy-gates.sh` session 4 runs `ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson
+   unseen), so `ws-deploy-gates.sh` session 4 runs `ws-lesson-baseline --all-lessons --sizes L,M --seeds 4242,1 --per-lesson
    --unpinned --check design/audit/baselines/lesson-baseline.json` on every deploy (≈ 13 min, one slot; its own session
    because sessions 1-3 sit at 27-28 of their 30 min). A lesson page that differs from the pin, or a lesson the tree prints
    that the pin lacks (UNPINNED), fails the deploy. **Re-pin protocol:** a deploy whose lesson pages change ON PURPOSE
@@ -197,7 +197,7 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
   drops to 8 columns only when a product over 99 is dealt; seed 11 never deals one, so 56 facts in a 10-column grid
   passed. *Check:* L-DENSITY COUNT-FITS — printed items = dialog count = Score /N over seeds 1–24 for every mix (R2-2; to build).
 - **A grid rule belongs to every grid.** GRID-EVEN was scoped to fact rows; the fact probe widened its last row (R2-3).
-  *Check:* GRID-EVEN on every kit grid section + fact-probe × divForm × S/L on precritic's plan (to build).
+  *Check:* GRID-EVEN on every kit grid section + fact-probe × divForm × M/L on precritic's plan (to build).
 - **Text in a bordered box ends inside the border.** "Think: 12 × [ ] = 108" overran its box in 6 of 12 cells (R2-4).
   *Check:* L-OVERLAP TEXT-FRAME (to build).
 - **A family round runs precritic on every role, not the role it changed.** `--role fact-rows` never saw the add_facts
@@ -260,6 +260,7 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
     of H14-H17 you checked and why each does not apply.
 
 ## simple-print-2 critic r1 (2026-11-03): one line per finding, the check that now catches it
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - A mode whose request differs only by a field the engine ignores is a label, not a mode (Aim = Exactly) -> ws-simple-print EXACT builds one set in both modes and FAILS when the page plans are identical.
 - A band's values are not always answer bounds ("Tables to 12 × 12" shown as "Highest number 144") -> ws-simple-print WITHIN: a band shown as Highest number N on × / ÷ facts must deal a 12 when N >= 12; `numberOptionsOf().band.answer` decides the label.
 - A fixed stride over a small ticked set lines one table up every column (8, 7, 6 at 6 across) -> ws-simple-print FACTPATTERN (no column / diagonal one table all the way down; at most half the columns with a 3-row run) on × 6–8 at S/M/L.
@@ -272,6 +273,7 @@ A check that two clamped cards show different strings passed "Subtract within 1,
 Rule: the first word where two names differ must be visible WHOLE on both. Check: ws-student-explorer QSVISIBLE (diff word), at
 every common width including 1024x768 and 360x740.
 ## facts-print-fix r3 critic (2026-11-05): one line per finding, the check that now catches it
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - Problems mode left pages 30–80 % empty and gave ÷ a page of its own (Problems 50 at S: 2 pages, 72 + 169 mm white) -> ws-simple-print FILL: white under the grid in mm <= one row on every page (the last too unless the set is one page), pages <= ceil(rows needed / rows a page) over all groups together.
 - Columns and counts changed between sets (set 2: 10 columns; Columns 9 at L: 48 in 8 beside 54 in 9) because the × clamp read the facts DEALT -> SETPAGE: every grid of every page of every set has the summary's columns and per-skill counts; the layout reads the skills' reach (simple-print reachOf).
 - Per-skill totals drifted at L (35/32/31/32 for 33/33/32/32) when a page fell back to its own apportion -> SETPAGE: printed per skill = splitCounts(request) for every set; counts are dealt page by page from what is left.
@@ -281,6 +283,7 @@ every common width including 1024x768 and 360x740.
 - Speed: one machine check that compares the PRINT with the REQUEST (not with another build or the chips) would have caught D1–D4 in round 2; a planner whose rule is "a last page under 60 %" cannot meet "no white space" - write the owner's rule in mm first, then plan to it.
 
 ## facts-print-fix r4 critic (2026-11-05): one line per finding, the check that now catches it
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - The owner's ÷ Mix page zig-zagged: bracket centred, stacked ÷ and fraction top-aligned (css/sheet-kit.css CL-4b, three templates) -> MIXBASE: one baseline a row (±1 mm), the row's items centred down the cell and each across it; fixed by one three-line frame for every form (fact-rows.js mixWrap, .ws-mixform).
 - Answer slots in three places, the bracket's quotient over an invisible box -> SLOTPOS: every slot has a drawn rule on its edge (sum rule, answer line, vinculum); the stacked and fraction slots end on one line, the bracket's on the top digit line.
 - "=" 0.85 mm from the fraction bar; the bar only as wide as the numerator ("0" over "12") -> FRACEQ: >= 0.25 em, the fraction and "=" centred (±1 mm).
@@ -293,6 +296,7 @@ every common width including 1024x768 and 360x740.
 - Speed: matching the owner's screenshot to its seed first, and a dev dump of every page's grids, columns, pt and white, found every root cause in one pass; the r4 checks ran in 31 s, so each fix was measured at once.
 
 ## facts-print-fix r5 critic (2026-11-05): one line per finding, the check that now catches it
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - ÷ Mix In sections, Pages 1, Big printed 2 / 2 / 1 / 15 (every group given one row first, fill preferred to the shares) -> SHARES: each skill within one row of its share, or a note; Pages mode is now planned as Problems mode for the most problems filling the n pages, and the ÷ forms share one mixed section when a section each would break the shares.
 - The r4 "÷ first" reorder put a short ÷ row (1 fact, 4 empty cells) on page 1 -> DIVORDER and BLANKMID; the reorder is removed and every section but the last prints whole rows (the difference goes to the last section, at most a row a skill).
 - Problems 30 at M: a 1-fact last page titled "Divide by 6" -> TITLEONE (a number in the title only when the skill's option fixes it) and ORPHAN (the last page holds a full row or the dialog says so); the rebalanced plan prints 8 / 8 / 8 / 6 on one page.
@@ -325,6 +329,7 @@ second family on the template is machine-compared. Applied to pv (lf-placevalue)
 A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.
 
 ## lf-vocab (vocabulary pictures) precritic r1-r5 and critics r1-r2 (2026-11-07): one line per finding, the check that catches it
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Rule | Check |
 |---|---|---|
 | A picture's word could be read off a second picture in the same item (row/column, term/sequence, round up/quotient) | Words whose pictures share a mark are `notWith`; every word set splits into two clash-free trios | ws-vocab-unit V3-V7; backtest row `vocab-sets-split` |
@@ -337,6 +342,7 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | Match 3 guided at S overflows (r3 render) while precritic is green | precritic's render gate (lesson, test, independent) does not draw guided / more-practice / error-analysis: render EVERY role the card offers before calling a page clean | proposed: ws-precritic --skill runs ws-grade-render --gate on the card's offered roles (lead) |
 
 ### lf-vocab critic r3 (2026-11-07, FAIL min 6): each finding, its rule, its check (check FIRST on the next vocabulary page)
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Rule | Check |
 |---|---|---|
 | H13 empty bands of 30-40 % in Match 3 guided (S, L), both error-analysis pages, and worksheet-1280 tiles, with every precritic gate green | An empty band of 30 % or more in any cell fails, on EVERY role the card offers and on every screen host. The critic's row-ink scan is the measure, so the lane runs it before the critic. | NEW: a row-ink empty-band scan (>= 30 % of a cell's height with no ink) per cell on every role page and worksheet/quiz host that ws-grade-render writes. It goes on precritic's path for the card's offered roles. Backtest row: the critic4 renders FAIL, the fix PASSes. |
@@ -351,6 +357,7 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | The grade 1 and 4 lesson renders showed the pilot lesson's title and footer | Render each word set inside its own BUILD lesson, never in a borrowed host | The render harness takes the set's own lesson id |
 
 ### lf-vocab critic r4 (2026-11-08, FAIL min 6): the checks passed what the critic failed
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Rule | Check |
 |---|---|---|
 | Pick 3 error analysis at S: the critic measured 30.1-30.2 % empty bands while ws-empty-band PASSed | A check and the critic must measure the SAME band. If they differ, the check is wrong until it is aligned (a 0.2 % margin is not a pass). | ws-empty-band: state which ink counts (empty answer slots, text, rules) and match the critic's column-aware row-ink scan. Add a backtest row on 31bee0fb for pick3 error-analysis S (lf-checks owns it). |
@@ -360,6 +367,7 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 | The "left" picture reads as take away (it marks what goes, not what stays) | A picture marks its referent with a heavy mark | NEW: each picture declares its referent, and a test checks that the referent carries the heavy mark |
 
 ### lf-vocab round 6 and critic r5 (2026-11-09): PASS min 8. Findings-to-checks
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Check | Backtest | On precritic? | Would have saved |
 |---|---|---|---|---|
 | OQ-1: base-ten "one" a 2.5 mm speck | V16 extended: one unit per item, >= 5 mm with no hundred | vocab-v16-base10-per-item | y | 1 |
@@ -408,6 +416,7 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - Rule 7 applied: N7 and N8 survived two medium rounds -> the lane stopped its build loop; root causes above, next builder briefed fresh.
 
 ## lf-placevalue critic r3 / r3b (2026-11-08): one line per finding, the check that catches it (or PROPOSED)
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - F3 identify lesson vocab: the "underlined" picture drew no underline (the H T O picture carried the rule) -> PROPOSED LESSON-DATA
   rule: a vocabulary picture for a word that names a mark (underlined, circled) draws that mark, and no other picture carries it.
 - G1 value lesson vocab: "worth" and "value" meant the same (two right matches) -> PROPOSED LESSON-DATA rule: no vocab meaning uses
@@ -449,6 +458,7 @@ A card that offers every §7a option and has no `notOffered` entry reads card-no
 - Speed: a page-hash diff (graded commit vs head) limited the re-grade to the changed pages; one critic did four skills in 18 min.
 
 ## lf-placevalue round 4 (2026-11-08): identify E-A1 and unit_form G2, the checks first
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - E-A1 -> ws-empty-band `--vocab-ink` (EB-VOCAB: each lesson vocabulary picture's drawing against its own box, 70 %), opt-in for
   the lane on precritic's path; backtest `pv-identify-vocab-ink` (8573c66a FAIL 3 -> 64f70063 OK). Fix: the `blocks` picture's
   opt-in `compact` (ones only: one cube tall), set only where the lane's data asks, so no other lesson's picture moved.
@@ -477,6 +487,7 @@ One line per finding: the rule, then the check.
 - **P4-2 41 % band, lesson 3a live critic.** Rule: when a ruling stretches cells to a shared height, the content sits in the MIDDLE of the stretched cell, never top-anchored. Check: the critic's pixel band probe (longest ink-free run / cell height <= 33 %) - proposed for ws-detailed-lesson --check.
 - **E24b, lesson 2 P0 on the lane (twin answers at 5 of 6 seeds; lf-engine 2026-11-09).** Rule: when one tree passes and another with the same data fails, DIFF THE ENGINE HUNKS since the merge base before guessing (`git diff <merge-base> origin/master -- <engine files>` against the lane's extracted copies): master's `pageLr6` (lf-placevalue 2026-11-08) dealt a `perQuestion` Prerequisite Check against ONE page answer set, the lane's covered Mixed pages only - one line, found in minutes once diffed, after a round lost to a guessed cause. And a P0 question whose answers can meet another's (lesson 2: count 11-20, + facts 13-19) is legal only with that set wired and ranges that hold every item. Check: `ws-lesson-unit --only p0-overlap` (backtest `p0-overlap`, FAIL dcdb50d4 / PASS b1e30155); deal dump: `tests/scripts/ws-lesson-deal-diff.cjs` (P0 per seed, twins, first difference vs another tree's dump).
 ## lf-placevalue round 5 (2026-11-09): every finding a check (owner)
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Check that now catches it | Backtest row (FAIL old -> PASS fix) | On precritic / detailed-lesson path | Would have saved |
 |---|---|---|---|---|
 | N-r4-1 unit_form rename=more S side band passed at 29.9 % (fragile) | ws-empty-band `--margin N` (EB-SIDE / EB-BAND at 30 - N %) | pv-unit-form-rename-margin (2fe21f2b FAIL -> a1c8d595 OK) | backtest only: `--margin` not default on precritic (it would flag every near-limit cell of every lane; proposed as a lane opt-in once pinned) | 1 round (r5) |
@@ -489,6 +500,7 @@ One line per finding: the rule, then the check.
   first ran words together and failed the fixed state; its backtest caught it before commit.
 
 ## lf-engine landing (2026-11-09): the hash proof found engine drift beyond lesson 2 / g3-oa8 P0 (STOPPED, lead's rule)
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 - **Finding L1 - a lane critic fix changes live packets.** The lane's P1b N1 (Vocabulary drawn smaller, `vocab.zoom` in
   roles/lesson.js planOnce, so one Independent row fits) fires on lessons master prints without it: nearest_10 (L), placevalue
   value (L), identify (S), sub_100_no_regroup (S), add/sub_wp_10/20(_plain) (S) - the lesson sheet's score goes /3 -> /4,
@@ -583,6 +595,7 @@ white on any other role.
   in the same change, or the re-sign stalls.
 
 ## lf-placevalue number_word_form r2-r3 (2026-11-13): findings -> checks
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 | Finding | Check (new / extended) | Backtest row (FAIL old -> PASS fix) | Path | Saved |
 |---|---|---|---|---|
 | N1 2-digit names: no named wrong answer | ws-words-checks WORDS-WRONG-RATE (new; reads the real provider) | pv-words-provider (2ccd5b21 -> 1e3b128e) | precritic opt-in | 1 round |
@@ -612,6 +625,7 @@ white on any other role.
 | ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
 
 ### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 
 Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
 F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
@@ -625,6 +639,7 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
 
 ### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+<!-- nos-section: history - a dated findings record; S here is the size the finding was made at -->
 
 Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
 touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem

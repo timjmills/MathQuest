@@ -26,7 +26,7 @@ each with its reason), `tests/scripts/ws-deploy-gates.sh` (the lesson rows only)
 lane that owns the file.
 
 ## Step 1 — gate hygiene (so "clean before critic" is possible for every lesson lane)
-1. `placevalue:more_less_10#lesson L-OVERLAP CL40-INK 0 → 2` (L and S, red on main, pin drift): find whether the 2 findings
+1. `placevalue:more_less_10#lesson L-OVERLAP CL40-INK 0 → 2` (L and S, red on main, pin drift): find whether the 2 findings <!-- nos: history (a finding on a pin made at S) -->
    are real (render, measure). Real → report to the lead for the placevalue lane; drift → re-pin with a reason line.
 2. Lesson 2 `ws-detailed-lesson` E9 (P6 exit slip +5 mm since the 10-25 word-work tab spacing): confirm on master; report the
    cause to the lead (an engine fix belongs to lf-engine).

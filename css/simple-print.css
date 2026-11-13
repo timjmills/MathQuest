@@ -212,3 +212,7 @@ body.sp-open { overflow: hidden; }
 /* owner 2026-11-13 (plan item 9): two sizes, M and L - the size row holds two buttons (additive: the 3-column rule stays
    for any older markup) */
 .sp-root .sp-sizes.sp-sizes-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* lf-tools-nos r3 (critic nos r2 N1): the Size picker is `hidden` when "All rows on one page" fixes the compact layout;
+   `.sp-root .sp-sizes { display: grid }` above overrode the attribute, so the dead Big / Medium buttons stayed on screen */
+.sp-root .sp-sizes[hidden] { display: none; }

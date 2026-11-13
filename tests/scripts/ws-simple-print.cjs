@@ -2013,15 +2013,15 @@ async function factsSweep(app, full) {
         }
         // COLSFIT + OPTKEY + OPTESC at 390 and 1366 (student view)
         const two = [{ categoryId: 'division', skillId: 'div_facts' }, { categoryId: 'addition', skillId: 'add_facts' }];
-        for (const [w, tv] of [[390, false], [1366, false], [1366, true]]) {
+        for (const [w, tv] of [[1024, false], [1366, false], [1366, true]]) {   // owner 2026-11-13: no phone width
             await page.setViewport({ width: w, height: w === 390 ? 844 : 768, deviceScaleFactor: 1 });
             await page.evaluate((tv) => { document.body.classList.toggle('teacher-mode', tv); document.body.classList.toggle('student-mode', !tv); }, tv);
             await page.evaluate((two, tv) => window.openSimplePrint(two, { from: tv ? 'tray' : 'student' }), two, tv);
             await page.evaluate(idleJs);
-            if (w === 390) {
+            if (w === 1024) {
                 const fit = await page.evaluate(() => { const s = document.querySelector('#spCols'), d = document.querySelector('.sp-dialog'); if (!s || !d) return null; const a = s.getBoundingClientRect(), b = d.getBoundingClientRect(); return { r: Math.round(a.right), dr: Math.round(b.right), vw: window.innerWidth }; });
                 if (!fit) F2('COLSFIT no Columns select');
-                else if (fit.r > fit.dr || fit.r > fit.vw) F2(`COLSFIT @390 the Columns select ends at ${fit.r}, past the dialog (${fit.dr})`);
+                else if (fit.r > fit.dr || fit.r > fit.vw) F2(`COLSFIT @${w} the Columns select ends at ${fit.r}, past the dialog (${fit.dr})`);
             }
             await page.focus('[data-sp="skoptions"][data-v="0"]');
             await page.keyboard.press('Enter');

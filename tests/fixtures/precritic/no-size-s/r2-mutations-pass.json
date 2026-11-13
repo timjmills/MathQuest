@@ -1,0 +1,11 @@
+[
+ {"kind": "app", "file": "js/modules/teacher-shell.js", "line": "        <div><span class=\"tv-label\">Size</span>${segBtns('Size', pd.size, [['M', 'M'], ['L', 'L']])}</div>", "why": "the live Settings picker"},
+ {"kind": "app", "file": "js/modules/teacher-print.js", "line": "        : seg('size', pr.size, [['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}</div>", "why": "the live Print Setup picker"},
+ {"kind": "doc", "file": "design/audit/RUBRIC.md", "line": "Render every page at size M and at L.", "why": "M and L"},
+ {"kind": "doc", "file": "design/audit/RUBRIC.md", "line": "Print the sample at size M and at L.", "why": "M and L"},
+ {"kind": "doc", "file": "design/EXTENSION_PLAYBOOK.md", "line": "Draw the exemplar at Medium and Large.", "why": "M and L"},
+ {"kind": "doc", "file": "design/LESSON_RULES.md", "line": "Run `ws-lesson-check --sizes M,L` before the critic.", "why": "M and L"},
+ {"kind": "doc", "file": "WORKSHEET_DESIGN_STANDARD.md", "line": "Terms used throughout: **M / L** = the size preset (owner 2026-11-13: size S is dropped as a choice; the kit keeps an S token only as the decode alias of M and the one compact layout).", "why": "the line as fixed (N3)"},
+ {"kind": "doc", "file": "design/EXTENSION_PLAYBOOK.md", "line": "- **Size**: M / L, digits 22 / 28 pt, writing height Hw 8 / 10 mm (owner 2026-11-13: S dropped as a choice; its 16 pt / 6 mm token stays as the decode alias of M and the compact layout).", "why": "the line as fixed (N3)"},
+ {"kind": "doc", "file": "design/audit/LESSONS_LEARNED.md", "line": "| L2 | **Wasted space** | Size the cell to its content; count how many fit at M and L before building |", "why": "the L2 row as fixed"}
+]

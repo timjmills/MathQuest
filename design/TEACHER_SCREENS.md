@@ -66,7 +66,7 @@ use thumbnail view as well. Don't do this now. Just record."
 
 - **Gallery by default.** Every place a teacher picks skills (Practice paper, mixed review, Quiz, Send practice code,
   practice) opens the gallery of skill thumbnails first.
-- **Thumbnail size choice:** Big = 3 across, Medium = 4, Small = 5 (on desktop; fewer where the screen is too narrow,
+- **Thumbnail size choice:** Big = 3 across, Medium = 4, Small = 5 (on desktop; fewer where the screen is too narrow, <!-- nos: thumbnail zoom, not a print size -->
   never a horizontal scroll). The list view stays available.
 - **Filter bar:** a search box plus Grade, Domain and Topic selection (the shared search also accepts WRM / CCSS / EE
   codes).
@@ -83,7 +83,7 @@ use thumbnail view as well. Don't do this now. Just record."
 - **Thumbnail view and list view everywhere** a teacher picks from many things (skills library, the skill picker inside
   each paper, saved sets, the lesson library), with the same toggle in the same place, remembered per teacher.
 - **Thumbnails in three columns** (was two) on desktop; fewer columns only where the screen is too narrow (tablet 2,
-  phone 1) — never a horizontal scroll. *(Superseded 2026-09-27 by the Big 3 / Medium 4 / Small 5 choice above.)*
+  phone 1) — never a horizontal scroll. *(Superseded 2026-09-27 by the Big 3 / Medium 4 / Small 5 choice above.)* <!-- nos: thumbnail zoom, not a print size -->
 - The thumbnail shows the real first page (or the screen card) of that skill / set / lesson.
 - One consistent search-and-filter bar (grade, domain, WRM / CCSS / EE code, text).
 

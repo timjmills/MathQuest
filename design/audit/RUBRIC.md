@@ -209,7 +209,7 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 **Every size (owner, 2026-10-23; revised 2026-11-13: two print sizes, M and L - size S is dropped).** Every grade covers
 the print sizes: an independent critic grades sizes **M and L in full** on every page type it grades; the machine checks
 (print-lint, the coverage matrix, empty-band, cell-checks, grade-render) cover M and L on every page. A grade given at one
-size only is not a grade of the page (it hides L1, "Size S ignored", now "the small size ignored"). Every critic brief names
+size only is not a grade of the page (it hides L1, "Size S ignored", now "the small size ignored"). Every critic brief names <!-- nos: history: the old name of failure class L1 -->
 the sizes. Size S is not graded: no picker offers it and an old S setting prints at M (`ws-no-size-s` is the gate).
 
 The bar does not change: 8 or more on all four criteria, on every page and every screen host. One 7 is a fail.

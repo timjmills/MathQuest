@@ -40,7 +40,7 @@ the controlled wording lives in `PEDAGOGY_STANDARD.md`.
 ## 0. Conventions of this document
 
 - **PT-DOC-1.** Every rule has an id `PT-<AREA>-<n>`. Lints and manual checks cite the id.
-- **PT-DOC-2.** All lengths are millimetres unless marked pt or px. Three figures separated by slashes mean S / M / L.
+- **PT-DOC-2.** All lengths are millimetres unless marked pt or px. Three figures separated by slashes mean S / M / L, where S is the kit's compact token and the decode alias of M (S dropped as a choice 2026-11-13; sizes offered are M and L).
 - **PT-DOC-3.** "Body" is the 186 x 236 mm area between header and footer on an A4 first page. Every capacity table shows its arithmetic against that body.
 - **PT-DOC-4.** Every role section has the same parts: Purpose, Look, Page anatomy, Cell anatomy (where a cell exists), Geometry and capacity, Teacher options, Skill supplies, Screen.
 - **PT-DOC-5.** Pupil-facing text says "Level N" (K, 1 to 6). Grade and CCSS codes appear only in the footer (PT-FRM-7).
@@ -116,7 +116,7 @@ Header, first page (every field is a teacher check box, PT-FRM-3):
 
 Owned by `WORKSHEET_DESIGN_STANDARD.md`; restated so the arithmetic below can be checked.
 
-| Token | S | M | L (default) |
+| Token | S | M | L (default) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Digit size (pt) / em (mm) | 16 / 5.64 | 22 / 7.76 | 28 / 9.88 |
 | Ladder steps between presets (pt / em) | 18 / 6.35, 20 / 7.06, 24 / 8.47 | | |
@@ -205,14 +205,14 @@ One pure function serves the dialog note, the preview thumbnail and the printer:
 
 | Section type | Ladder |
 |---|---|
-| Vertical facts, K trace rows | Keyed by column count N, independent of S / M / L: N <= 5: 28 pt, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16. Columns win. |
-| Horizontal equations | L: 28, 24, 22 pt. M: 22, 20, 18, 16 pt. S: 16 pt. |
+| Vertical facts, K trace rows | Keyed by column count N, independent of S / M / L: N <= 5: 28 pt, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16. Columns win. <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
+| Horizontal equations | L: 28, 24, 22 pt. M: 22, 20, 18, 16 pt. S: 16 pt. <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Everything else | The preset size only. Size wins; columns only divide the width. |
 
 - **PT-COL-3. Explicit N.** The dialog offers Auto, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. An explicit count is honoured if the widest problem fits at some ladder step; otherwise it clamps to the largest count that fits at the ladder floor. The stored choice is never overwritten by the clamp.
 - **PT-COL-4. Auto** is the largest N, up to the role's Auto cap, that keeps the top ladder step with width fill of 92% or less (tableaux: at least 6 mm slack). Auto never returns 1 when the maximum is 2 or more.
 - **PT-COL-5. Clamp notes** appear in the dialog and the preview only, as persistent text beside the Columns control. Nothing about a clamp is printed on the pupil sheet. Three templates:
-  - Clamp: "3-digit problems, size M: max 4 columns. Showing 4. Size S fits 6."
+  - Clamp: "3-digit problems, size M: max 4 columns. Showing 4."
   - Step-down: "10 columns: digits 16 pt (size L is 28 pt). Writing space stays 10 mm."
   - Forced: "Word problems print in 1 column." / "Charts use the full page." / "Mixed sheets use even columns. Using 4." / "Max 4 columns for horizontal facts. Use fact rows for 5-10."
 - **PT-COL-6. Auto and caps by role.**
@@ -222,7 +222,7 @@ One pure function serves the dialog note, the preview thumbnail and the printer:
 | Fact rows | 9 / 6 / 5 (owner rule 2026-11-05: 10 only when picked) | 10; 8 when answers exceed 99; at most 9 when division is included (owner ruling 2026-11-05) |
 | Fact Fluency Probe | 5 | 5 to 10 (1 to 4 become 5); division sheets 2 to 3 |
 | Computation grid | 3 (Daily), 2 (I Can) | 6 |
-| Equation drill | 3 (2 for L classes F and T; 1 for L class H; 2 for M class H) | by fit, up to 5; 2-digit comparisons reach 6 at S |
+| Equation drill | 3 (2 for L classes F and T; 1 for L class H; 2 for M class H) | by fit, up to 5; 2-digit comparisons reach 6 at S <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Long division | table 3.3 | 6, with a 30 mm minimum cell |
 | Lesson packet grids | 4 / 3 / 3 for stacks on the Opener and Guided page; 2 on Independent pages; visuals up to 4 | stacks 6, visuals 4 |
 | Visual grid | the visual's table maximum; clocks 4x4, 3x3, 2x3 | 5 |
@@ -260,7 +260,7 @@ Defined in `design/SKILL_CELL_CONTRACT.md`. Each role section names the members 
 
 Minimum cell sizes the capacity tables below rely on. "T" is the track count including the operator track; "t" is the look's track width.
 
-| Class | Typical skills | Min width | Min height S / M / L |
+| Class | Typical skills | Min width | Min height S / M / L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | F vertical fact | basic facts to 12 x 12 | 2.16 em of the ladder size + 2 x pad (pad 3, or 2 at 7+ columns) | table 4.1 |
 | E horizontal equation | facts, missing number, comparison | eqW(pt) + B(n) + overhead (3.2) | pitch 12 / 14 / 18 (label beside), 14 / 17 / 20 (label above), 20 / 24 / 30 (think box above) |
@@ -332,7 +332,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 
 **Geometry and capacity** (banded page, budget 232, PT-ENG-3):
 
-| Band | S | M | L |
+| Band | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | What's New (strip + 2) | 8 | 8 | 10 |
 | Vocabulary (strip + cards + oral frame) | 6 + 18 + 6 = 30 | 6 + 22 + 8 = 36 | 8 + 26 + 10 = 44 |
@@ -384,7 +384,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 +-----------------------------------------------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | State row height = Hg | 36 | 45 | 54 |
 | Closing `Say:` band (Hw + 3, PT-OPN-9) | 9 | 11 | 13 |
@@ -430,7 +430,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 +-----------------------------------------------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Steps strip (strip + 3 text lines + 3) | 6 + 15 + 3 = 24 | 6 + 18 + 3 = 27 | 8 + 21 + 3 = 32 |
 | Rows = floor((232 - steps - band strip) / Hg) | (232-24-6)/36 = 5 | (232-27-6)/45 = 4 | (232-32-8)/54 = 3 |
@@ -470,7 +470,7 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 | +-----------------------------------+--------------------------------+
 ```
 
-| Footprint class | Grid (cols x rows) | Cell at S, M / L | Items |
+| Footprint class | Grid (cols x rows) | Cell at S, M / L | Items <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Stack, short computation, medium visual | 2 x 3 | 93 x 76 / 93 x 75.67 | 6 |
 | Long algorithm (multi-row multiply, long division), heavy visual | 2 x 2 | 93 x 114 / 93 x 113.5 | 4 |
@@ -518,7 +518,7 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
  no answer slot; check one box       +----------------------+      copy into the frame; do not solve
 ```
 
-| Variant | Grid S / M / L | Cell height check at L | Items S / M / L |
+| Variant | Grid S / M / L | Cell height check at L | Items S / M / L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Decide-only, stacked expression | 2x4 / 2x4 / 2x3 | label 8 + problem 25 + 3 + two check-box lines 18 + 3 = 57 > 56.75, so 3 rows | 8 / 8 / 6 |
 | Decide-only, horizontal expression | 2x4 | 7 + 11.4 + 3 + 18 + 3 = 42.4 <= 56.75 | 8 |
@@ -550,7 +550,7 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 +-----------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Cell height = answered cell + decision row (check box + 2, doubled for wrap allowance) + fix row (Hw + 4) | 33 + 14 + 10 = 57 | 41 + 16 + 12 = 69 | 49 + 18 + 14 = 81 |
 | Rows on a 2-column page | floor(227 / 57) = 3 | floor(227 / 69) = 3 | floor(226 / 81) = 2 |
@@ -618,7 +618,7 @@ M: 6 + 82 + 6 + 41 + 6 + 57 = 198 <= 232; spare 34 lets the three stack rows gai
 | Footprint class | 12 | 16 | 20 | Note |
 |---|---|---|---|---|
 | Fact, equation | 4 x 3 (76) | 4 x 4 (57) | 4 x 5 (45.6) | Facts normally use the probe (4.2) |
-| Stack, 2- or 3-digit | 4 x 3 | 4 x 4 | 4 x 5 at S and M; at L 45.4 < 49, so 20 items take 2 pages | 4-digit at L needs 47.6 > 46.5, so 3 columns: 3 x 4 = 12 |
+| Stack, 2- or 3-digit | 4 x 3 | 4 x 4 | 4 x 5 at S and M; at L 45.4 < 49, so 20 items take 2 pages | 4-digit at L needs 47.6 > 46.5, so 3 columns: 3 x 4 = 12 <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Long algorithm | 2 x 2 = 4 per page | | | |
 | Medium visual | 3 x 3 grid, 8 items (the ninth position is the unruled trailing area, PT-ENG-7) | 3 x 4 = 12 only when the visual's row fits 57 | | |
 
@@ -647,7 +647,7 @@ M: 6 + 82 + 6 + 41 + 6 + 57 = 198 <= 232; spare 34 lets the three stack rows gai
 ```
 
 - **PT-PRE-1.** Four boxed quadrants, 93 x 117.5 ((236 - 1) / 2), one prerequisite skill each, each with its own strip.
-- **PT-PRE-2.** Quadrant grid: 3 x 2 at S and M (cells 31 x 55.7), 2 x 2 at L (46.5 x 54.7); long algorithms 1 x 2. Each quadrant holds 4 or 5 scored items and prints its own small score `__/4` or `__/5` (pedagogy standard P-25); at S and M the unused grid positions are the unruled trailing area (PT-ENG-7), so the drawing above shows positions, not a count. Totals at most 20 / 20 / 16.
+- **PT-PRE-2.** Quadrant grid: 3 x 2 at S and M (cells 31 x 55.7), 2 x 2 at L (46.5 x 54.7); long algorithms 1 x 2. Each quadrant holds 4 or 5 scored items and prints its own small score `__/4` or `__/5` (pedagogy standard P-25); at S and M the unused grid positions are the unruled trailing area (PT-ENG-7), so the drawing above shows positions, not a count. Totals at most 20 / 20 / 16. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-PRE-3.** Prerequisite skills come from the ladder's pre-skill list; without a ladder the teacher picks four skills. Forms A and B are seeded.
 
 **Teacher options.** Form; the four skills; count per quadrant. **Skill supplies.** `renderCell` level 0 or 1, `footprint`. **Screen.** Test mode, four short sets.
@@ -675,7 +675,7 @@ M: 6 + 82 + 6 + 41 + 6 + 57 = 198 <= 232; spare 34 lets the three stack rows gai
 +-----------------------------------------------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Steps box (rounded, a read container) | 30 | 34 | 40 |
 | Row height = (232 - steps - 3 strips) / 3 | (232-30-18)/3 = 61 | (232-34-18)/3 = 60 | (232-40-24)/3 = 56 |
@@ -733,7 +733,7 @@ Track count T (operator track included): add or subtract d-digit operands: d + 1
 
 Maximum columns = largest c <= 6 with `c x (T x t + separators x 0.3 em + 2 x sidePad) + (c + 1) x border <= 186` (border 0.26 I Can, 0.53 Daily). Cells show width needed -> columns:
 
-| T | I Can S | I Can M | I Can L | Daily S | Daily M | Daily L |
+| T | I Can S | I Can M | I Can L | Daily S | Daily M | Daily L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|---|
 | 3 (2-digit) | 20.2 -> 6 | 28.8 -> 6 | 33.3 -> 5 | 24.1 -> 6 | 34.1 -> 5 | 40.2 -> 4 |
 | 4 (3-digit) | 24.3 -> 6 | 34.4 -> 5 | 40.5 -> 4 | 29.5 -> 6 | 41.5 -> 4 | 49.5 -> 3 |
@@ -744,7 +744,7 @@ Maximum columns = largest c <= 6 with `c x (T x t + separators x 0.3 em + 2 x si
 
 Minimum cell height = top pad + [letters 4 / 5 / 6] + [add regroup row 6 / 7 / 8, or subtract headroom 8 / 10 / 12] + 2 line heights + [Daily gap 2] + rule 2 + [n partial-product rows + rule 2] + answer row + 4. Rows = floor((G - 1) / hMin) with G - 1 = 227 / 227 / 226, then capped by the column target.
 
-| Case | I Can hMin | Daily hMin | Rows that fit S / M / L |
+| Case | I Can hMin | Daily hMin | Rows that fit S / M / L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Plain | 33 / 41 / 49 | 35 / 43 / 51 | 6 / 5 / 4 |
 | + place-value letters | 37 / 46 / 55 | 39 / 48 / 57 | I Can 6 / 4 / 4; Daily 5 / 4 / 3 |
@@ -754,7 +754,7 @@ Minimum cell height = top pad + [letters 4 / 5 / 6] + [add regroup row 6 / 7 / 8
 | Multiply by 2 digits | 47 / 59 / 71 | 49 / 61 / 73 | 4 / 3 / 3 |
 | Multiply by 3 digits | 53 / 67 / 81 | 55 / 69 / 83 | 4 / 3 / 2 |
 
-| Columns | Cell width | Target rows | Rows S / M / L (plain) | Cell height | Problems per page |
+| Columns | Cell width | Target rows | Rows S / M / L (plain) | Cell height | Problems per page <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|
 | 1 (stack centred in the left 62 mm) | 186 | 4 | 4 / 4 / 4 | 57 / 57 / 56.75 | 4 |
 | 2 | 93 | 3 | 3 / 3 / 3 | 76 / 76 / 75.67 | 6 |
@@ -790,7 +790,7 @@ Minimum cell height = top pad + [letters 4 / 5 / 6] + [add regroup row 6 / 7 / 8
 +####+------------------+####+------------------+####+------------------+
 |# 4#  27 - [    ] = 14 |# 5#  74 + [    ] = 85 |# 6#  84 - [    ] = 70 |
 +-----------------------+-----------------------+-----------------------+
-|  ... default 7 / 10 / 12 rows at L / M / S ...                        |
+|  ... default 7 / 10 / 12 rows at L / M / S ... <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 ```
 
 One cell (label beside; when that does not fit, the equation drops below the label):
@@ -809,7 +809,7 @@ Row pitch: label beside 12 / 14 / 18 (19 / 16 / 12 rows); label above 14 / 17 / 
 
 Fit table, no strip (pt, b = label beside, s = label above, total width):
 
-| Cols | Cell | S: F | S: T | S: H | M: F | M: T | M: H | L: F | L: T | L: H |
+| Cols | Cell | S: F | S: T | S: H | M: F | M: T | M: H | L: F | L: T | L: H <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 186 | 16 b | 16 b | 16 b | 22 b | 22 b | 22 b | 28 b | 28 b | 28 b |
 | 2 | 93 | 16 b 40.8 | 16 b 47.4 | 16 b 55.9 | 22 b 48.5 | 22 b 57.5 | 22 b 72.5 | 28 b 59.2 | 28 b 70.7 | 28 b 90.1 |
@@ -818,7 +818,7 @@ Fit table, no strip (pt, b = label beside, s = label above, total width):
 | 5 | 37.2 | 16 s 35.8 | clamp 4 | clamp 3 | 16 s 35.8 | clamp 4 | clamp 3 | clamp 4 | clamp 3 | clamp 2 |
 | 6-10 | <= 31 | clamp 5 | clamp 4 | clamp 3 | clamp 5 | clamp 4 | clamp 3 | clamp 4 | clamp 3 | clamp 2 |
 
-Maximum problems per page (rows x columns, columns 1 upward): S class F 19 / 38 / 57 / 76 / 80; M class F 16 / 32 / 48 / 52 / 65; L class F 12 / 24 / 36 / 44. Default counts are 7 / 10 / 12 rows at L / M / S times the Auto column count (21 / 30 / 36 at 3 columns); the row pitch then stretches to fill (L: 227 / 7 = 32.4 <= 2.0 x 18).
+Maximum problems per page (rows x columns, columns 1 upward): S class F 19 / 38 / 57 / 76 / 80; M class F 16 / 32 / 48 / 52 / 65; L class F 12 / 24 / 36 / 44. Default counts are 7 / 10 / 12 rows at L / M / S times the Auto column count (21 / 30 / 36 at 3 columns); the row pitch then stretches to fill (L: 227 / 7 = 32.4 <= 2.0 x 18). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 With a side support strip (4.2) the grid is 168 / 168 / 166 wide; class F then fits 3 columns at 28 pt label-above at L (52.2 <= 54.7) and 4 columns at 20 pt at M.
 
@@ -827,7 +827,7 @@ Comparison items: circle diameter Hw + 2 = 8 / 10 / 12; width = n ch + circle + 
 - **PT-EQD-1.** This fit function is the only authority for horizontal equations on every role (fact layouts, mixed sheets, spiral cells, tests).
 - **PT-EQD-2.** In a single-type section operands are right-aligned in fixed tracks so signs and blanks align down each column. A section whose blank position varies counts as mixed: left edges align and the column maximum comes from the widest item.
 - **PT-EQD-3.** The unknown appears in every position the skill allows, including the form `5 = 2 + [ ]`.
-- **PT-EQD-4.** Remainder form: both blanks are boxes, `17 / 5 = [B] R [12]`; 2 columns at M, 3 columns label-above at S.
+- **PT-EQD-4.** Remainder form: both blanks are boxes, `17 / 5 = [B] R [12]`; 2 columns at M, 3 columns label-above at S. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-EQD-5.** Worked example (option): a full-width Example band above the grid, 1.5 x pitch tall, unscored; with fade on, the first grid row carries grey trace answers. Never replaces cell 1.
 - **PT-EQD-6.** Glyphs are the real signs (U+00D7, U+00F7, U+2212), never letters.
 
@@ -923,13 +923,13 @@ Exact-division sheets (no R-block, 30 mm floor) reach at most 6 / 6 / 5 columns 
 
 Required cell height = visual + name label + inset (3, or label + 1) + 2 + AZ + 3. Rows = min(4, floor((G - 1) / required)). Max columns = floor(186 / (max(visual min width, answer width) + 6)), never more than 5.
 
-| Visual | Min size S / M / L | Max cols | Rows | Per page |
+| Visual | Min size S / M / L | Max cols | Rows | Per page <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Analog clock, hour / half hour / 5 minutes | D 36 / 42 / 50 | 4 / 3 / 3 | 4 / 3 / 3 | 16 / 9 / 9 (Auto at L: 2 x 3 = 6) |
 | Analog clock, 1 minute, or draw the hands | D 46 / 50 / 52 | 3 / 3 / 3 | 3 / 3 / 3 | 9 |
 | Clock with outer minute ring (Model cells) | 47 / 55 / 65 | 3 / 3 / 2 | 3 / 3 / 2 | 9 / 9 / 4 |
 | Digital clock (digits 1.5 x digit size) | 31x14 / 40x17 / 48x19 | 4 / 4 / 3 | 4 | 16 / 16 / 12 |
-| Generic coins, scale 0.85 / 1.0 / 1.0, Independent | up to 6 of the largest coin | 2 (3 if <= 4 coins at S, M) | 3 | 6 |
+| Generic coins, scale 0.85 / 1.0 / 1.0, Independent | up to 6 of the largest coin | 2 (3 if <= 4 coins at S, M) | 3 | 6 <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Generic coins, Model and Guided (value labels or running-total boxes) | one row of <= 6 | 1 | 3 | 3 |
 | Generic notes 60 x 26 (design standard RP-115) | | 2 | 4 / 4 / 3 | 8 / 8 / 6 |
 | Fraction circle with a side-by-side answer stack | w 52 / 62 / 72 | 3 / 2 / 2 | 4 / 4 / 3 | 12 / 8 / 6 |
@@ -943,10 +943,10 @@ Required cell height = visual + name label + inset (3, or label + 1) + 2 + AZ + 
 | Base-10 blocks 100 to 299 | 66.5x52 / 77x62 / 85.4x70 | 2 | 3 / 2 / 2 | 6 / 4 / 4 |
 
 - **PT-VIS-1.** A visual is never smaller than its minimum, never larger than 1.25 x its minimum, never distorted. If it does not fit, a row is dropped.
-- **PT-VIS-2.** Clock precision needs diameter: hour and half hour 26, 5 minutes 30, 1 minute 42, draw the hands 46. In a half-width panel (Daily Spiral sections, Daily 4 cells) a 38 mm clock is allowed at S, M and L only for read-the-time items to the hour, half hour or 5 minutes; 1-minute reading and draw-the-hands items take the full minimum of the table above and therefore a full-width panel (design standard RP-102). Hands differ by length and weight only. The time answer is two boxes 16 / 18 / 20 wide with a printed colon.
+- **PT-VIS-2.** Clock precision needs diameter: hour and half hour 26, 5 minutes 30, 1 minute 42, draw the hands 46. In a half-width panel (Daily Spiral sections, Daily 4 cells) a 38 mm clock is allowed at S, M and L only for read-the-time items to the hour, half hour or 5 minutes; 1-minute reading and draw-the-hands items take the full minimum of the table above and therefore a full-width panel (design standard RP-102). Hands differ by length and weight only. The time answer is two boxes 16 / 18 / 20 wide with a printed colon. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-VIS-3.** A fraction answer or target is a side-by-side stack (12 / 14 / 16 wide) beside the model, never under it. Shade-the-model parts are at least 6 mm wide at mid-radius: circles up to 8 / 10 / 12 parts, bars up to 8 parts in 3 columns and 12 in 2.
 - **PT-VIS-4.** Shaded parts use the flat grey, or 45-degree hatch when Photocopy-safe (PT-TOK-2).
-- **PT-VIS-5.** Generic coins: outlined circles sized by value (diameters 17.5, 19.75, 22.0 and 24.26 mm for the values 1, 5, 10 and 25 at scale 1.0: 1 the smallest, 25 the largest, 2.25 mm a step; not US relative sizes) showing only the value in Andika 700. No portraits, no national art, no edge detail. Coins sit in rows, largest value first, 2 mm apart, never overlapping or fanned. Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width sections of other roles; never smaller.
+- **PT-VIS-5.** Generic coins: outlined circles sized by value (diameters 17.5, 19.75, 22.0 and 24.26 mm for the values 1, 5, 10 and 25 at scale 1.0: 1 the smallest, 25 the largest, 2.25 mm a step; not US relative sizes) showing only the value in Andika 700. No portraits, no national art, no edge detail. Coins sit in rows, largest value first, 2 mm apart, never overlapping or fanned. Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width sections of other roles; never smaller. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-VIS-6.** Money answers are plain number blanks B(n). No currency sign prints in any cell; a currency sign may appear only inside word-problem text. The section may print one teacher-chosen unit word after the blank.
 - **PT-VIS-7.** Counting objects and array marks come from the teacher-picked set (PT-DLG-15): plain counters, or one of 8 in-house line-art pictures, one kind per cell.
 - **PT-VIS-8.** Mixed sections are allowed only among visuals that share one answer type.
@@ -970,7 +970,7 @@ COUNT (side layout, 2 columns)                      TRACE ROW (N = 6)
   objects one kind per cell, 1.5 pt outline; answer square 16 / 20 / 24 at 0.75 pt
 ```
 
-| Variant | Columns | Cell w x h S / M / L | Rows (total) | Per page |
+| Variant | Columns | Cell w x h S / M / L | Rows (total) | Per page <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Count 1 to 10, side layout | 2 | 93 x 32 / 36 / 44; picture box 65x24 / 60x28 / 55x36 | 7 (224) / 6 (216) / 5 (220) | 14 / 12 / 10 |
 | Count, stacked layout, or circle-a-number | 3 | 62 x 64 / 69 / 74 | 3 | 9 |
@@ -980,7 +980,7 @@ COUNT (side layout, 2 columns)                      TRACE ROW (N = 6)
 | Number bond | 3 | 62 x 50 / 60 / 68; square-cornered boxes of side 14 / 16 / 20 (design standard RP-60) | 4 / 3 / 3 | 12 / 9 / 9 |
 | Function table (6 / 5 / 4 data rows) | 3 | 62 x 98 / 110 / 102 | 2 | 6 |
 
-Trace rows and sequence strips: the column count N sets the trace digit size (PT-COL-2); S / M / L sets only Auto N (10 / 8 / 6) and the instruction size.
+Trace rows and sequence strips: the column count N sets the trace digit size (PT-COL-2); S / M / L sets only Auto N (10 / 8 / 6) and the instruction size. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 | N | Trace cell | Cap height / pt | Rows (total) | Strip box | Strips per page |
 |---|---|---|---|---|---|
@@ -1066,7 +1066,7 @@ HUNDRED CHART (1-120) + band            BAR GRAPH + question band
 +-----------------------------------------------------------------------+
 ```
 
-| Zone | S | M | L |
+| Zone | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Story box: pad 3 + up to 5 lines (5.43 / 6.42 / 7.41 each, rounded up: 28 / 33 / 38) + answer row 8 / 10 / 12 + pad 3 | 42 | 49 | 56 |
 | Schema diagram zone (minimum) | 40 | 48 | 56 |
@@ -1080,13 +1080,13 @@ HUNDRED CHART (1-120) + band            BAR GRAPH + question band
 
 **Two-step: one per page.** Story box 56; below it a vertical 1.5 pt rule splits two columns of 91.5, each with a sub-goal label (8), a schema (50), a `Total` blank (12) and a work grid (50); a full-width final answer row (14) closes the page: 56 + 3 + 120 + 3 + 14 = 196 <= 226 (the instruction line is already outside G).
 
-**K picture version.** Story of 15 words or fewer in 3 lines (29), a picture zone with countable line-art objects and "draw lines to show it" space (80 at L), the frame `[__] ( ) [__] = [__]` with 16 / 20 / 24 answer squares and a sign circle (30), and an oral answer line (10): 29 + 3 + 80 + 3 + 30 + 3 + 10 = 158 <= 226 at L, the spare going to the picture zone. One per page at M and L; two per page at S (each cell 113.5: 23 + 3 + 40 + 3 + 22 + 3 + 8 = 102). Compare stories use bottom-aligned stacked object columns.
+**K picture version.** Story of 15 words or fewer in 3 lines (29), a picture zone with countable line-art objects and "draw lines to show it" space (80 at L), the frame `[__] ( ) [__] = [__]` with 16 / 20 / 24 answer squares and a sign circle (30), and an oral answer line (10): 29 + 3 + 80 + 3 + 30 + 3 + 10 = 158 <= 226 at L, the spare going to the picture zone. One per page at M and L; two per page at S (each cell 113.5: 23 + 3 + 40 + 3 + 22 + 3 + 8 = 102). Compare stories use bottom-aligned stacked object columns. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 **Keyword-checklist panel variant.** One per page: it is the v1 page with the schema diagram and the decision check-box lines replaced by the panel (`PEDAGOGY_STANDARD.md` section 8.5). The two-per-page form (v2) never carries the panel. The right 62 mm of the page body is a rounded panel holding the six fixed check box steps of P-WP-14, identical on every page, and nothing else; the left 124 mm holds the story box and the work zone. With fade on, the panel is withdrawn on the last problem of a set.
 
-**Word-problem band** (the form other roles embed: Review, Exit band, Daily Spiral, Mixed): 186 x 76 / 57 / 50 at L / M / S = pad 2 + story (3 lines: 23 / 20 / 17) + 2 + work row (33 / 19 / 17) + 2 + answer row (12 / 10 / 8) + 2. The M band holds the equation frame only; L and S also hold a two-row bar model.
+**Word-problem band** (the form other roles embed: Review, Exit band, Daily Spiral, Mixed): 186 x 76 / 57 / 50 at L / M / S = pad 2 + story (3 lines: 23 / 20 / 17) + 2 + work row (33 / 19 / 17) + 2 + answer row (12 / 10 / 8) + 2. The M band holds the equation frame only; L and S also hold a two-row bar model. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
-- **PT-WPR-1.** Word problems always print in 1 column. The Columns control shows the forced note; a "Problems per page" control (Auto, 1, 2, 3, 4) takes its place: 1 = v1, two-step, K picture, keyword variant; 2 = v2; 3 = bands at L or M; 4 = bands at M or S.
+- **PT-WPR-1.** Word problems always print in 1 column. The Columns control shows the forced note; a "Problems per page" control (Auto, 1, 2, 3, 4) takes its place: 1 = v1, two-step, K picture, keyword variant; 2 = v2; 3 = bands at L or M; 4 = bands at M or S. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-WPR-2.** The variant is picked by measured line count, not word count; a wrapped sentence counts as two lines. Text never shrinks: drop the illustration first, then step down the density.
 - **PT-WPR-3.** Reading load caps by Level band: K-1 15 words, 3 sentences; 2-3 25 words, 4 sentences; 4-6 35 words, 4 sentences; multi-step 40 words, 5 sentences; sentence length within P-WP-18 (8 / 10 / 12 words by Level band). Present or simple past tense, one fact per sentence, the name repeated instead of a pronoun.
 - **PT-WPR-4.** v1 answer sentence: the blank is `max(24 / 20 / 16, chars x 6 / 5 / 4 + 4)` long and the unit word is pre-printed after it. Equation boxes are `digits x 6 / 5 / 4 + 4` wide, the sign circle Hw + 2. When the frame would squeeze the diagram below 80 mm it takes its own full-width row.
@@ -1179,7 +1179,7 @@ One cell:
 
 Geometry. `h = padTop + 2.30 em + 1 + answerRow + 2`, rounded up; padTop = 2 at N = 5 and N >= 8, 3 at N = 6 or 7. `rows = floor((G - 1) / h)` with G - 1 = 227 / 227 / 226; stretch cap 1.3.
 
-| N | w | digit pt (em) | track | fact width (fill) | gap between facts | free corner | h S / M / L | rows S / M / L | facts S / M / L |
+| N | w | digit pt (em) | track | fact width (fill) | gap between facts | free corner | h S / M / L | rows S / M / L | facts S / M / L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|---|---|---|---|
 | <= 5 | 37.2 | 28 (9.88) | 7.11 | 21.34 (57%) | 15.9 | 15.0 | 37 / 37 / 38 | 6 / 6 / 5 | 30 / 30 / 25 |
 | 6 | 31.0 | 24 (8.47) | 6.10 | 18.29 (59%) | 12.7 | 12.5 | 34 / 34 / 36 | 6 / 6 / 6 | 36 / 36 / 36 |
@@ -1193,7 +1193,7 @@ At 1 to 4 columns digits stay 28 pt and h = 37 / 37 / 38.
 
 Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separated by 3 mm and never split.
 
-| N | Band, 3 rows, S / M / L | Bands per page S / M / L | Five-day set |
+| N | Band, 3 rows, S / M / L | Bands per page S / M / L | Five-day set <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | 5 | 118 / 119 / 124 | 1 / 1 / 1 | 5 pages (or 2 rows per band: 2 per page) |
 | 6 | 109 / 110 / 118 | 2 (221) / 2 (223) / 1 | 3 pages; 5 at L |
@@ -1201,8 +1201,8 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
 | 8 | 85 / 92 / 100 | 2 / 2 / 2 | 3 pages |
 | 9, 10 | 79 / 86 / 94 | 2 / 2 / 2 | 3 pages; with 2 rows per band, 3 bands fit (M: 3 x 60 + 6 = 186; L: 3 x 66 + 6 = 204), so 2 pages |
 
-- **PT-FRW-1. Columns drive digit size** along the fact ladder (PT-COL-2). S / M / L sets only the answer-row height, label and text sizes, and therefore the rows per page. The dialog's step-down note reports the real digit size.
-- **PT-FRW-2. Auto** is 9 / 6 / 5 columns at S / M / L (owner rule 2026-11-05, facts-print-fix r3: "Columns: Auto = 9; 10 only if the owner picks it", for every fact mix, + − alone included; 9 and 10 columns share the 16 pt rung and the 24 mm cell, so the digits are the same), so Auto never prints digits below the preset size. 10 prints only when the teacher picks 10, and never with division (PT-FRW-9).
+- **PT-FRW-1. Columns drive digit size** along the fact ladder (PT-COL-2). S / M / L sets only the answer-row height, label and text sizes, and therefore the rows per page. The dialog's step-down note reports the real digit size. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
+- **PT-FRW-2. Auto** is 9 / 6 / 5 columns at S / M / L (owner rule 2026-11-05, facts-print-fix r3: "Columns: Auto = 9; 10 only if the owner picks it", for every fact mix, + − alone included; 9 and 10 columns share the 16 pt rung and the 24 mm cell, so the digits are the same), so Auto never prints digits below the preset size. 10 prints only when the teacher picks 10, and never with division (PT-FRW-9). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-FRW-3.** Every cell in a section uses T = 3, so ones digits align down the page. Tracks stay 0.72 em in the Daily look too (0.95 em would crowd at 10 columns and merge neighbouring sum rules).
 - **PT-FRW-4. Label options** for dense rows (8 to 10 columns), also available at 5 to 7:
   - `Day bands` (default when two or more days are chosen): a black `Day N` tab and a Score write-in per band, no cell labels; the header Score is hidden; numbering, if any, restarts in each band.
@@ -1212,13 +1212,13 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
 - **PT-FRW-5.** Clamps: answers over 99 (x10 to x12 tables) clamp to 8 columns, because a handwritten 3-digit answer needs about 21 mm. The clamp is read off the **band**, which bounds the answer (`PEDAGOGY_STANDARD.md` P-35), so it never fires on a + or − fact section: those bands stop at 30. **Division facts do not clamp** (owner ruling 2026-10-30, replacing "bracket division clamps to 8, wide division to 6"): a ÷ fact's answer never passes 12, and every notation takes the page's columns, at most 9 when division is included (owner ruling 2026-11-05, PT-FRW-9). A section drops a column only if a form would not fit its column even at 16 pt, and the dialog says so.
 - **PT-FRW-6.** Bracket division is always its own section with its own instruction (div_facts Mix is the one exception: one third each of the three notations, one instruction "Divide.", owner ruling 2026-10-30; under In sections even Mix gives each form its own section, owner ruling 2026-11-05, PT-FRW-12); the write zone is the open space over the vinculum, right-aligned over the dividend, no boxes. A mixed-operations vertical section excludes division. A ÷ section is its own SECTION, not its own page: in Problems mode it follows the + − × rows on the same page when its rows fit (PT-FRW-12).
 - **PT-FRW-7.** Horizontal facts are a separate section sized by the equation fit function (3.2): in practice at most 4 columns (3 for 2-digit by 2-digit). "Both orientations" prints vertical rows first, then a horizontal block. A div_facts Standard section ("12 ÷ 3 = __") is not a horizontal block on this page: it prints as the stacked ÷ fact (PT-FRW-9), because the across sentence of a 3-digit dividend is 28 mm at 16 pt and cannot reach even 5 columns at its rung.
-- **PT-FRW-9. Division facts in the fact columns, all three notations, at most 9 across** (owner ruling 2026-10-30; at most 9 columns since the owner ruling of 2026-11-05, below). A page or section of ÷ facts takes 9 columns at Size S Auto and whenever the teacher picks 9 (the Columns control offers 1–9 when the set includes division), in the ÷ sign, the fraction and the long-division bracket; 5, 6 and 8 columns and Mix work the same way. Each form takes the vertical-fact grammar in its column's width, at the column's ladder digit (PT-FRW-1), never below the Size S fact digit (16 pt), and passes the real-fit gate (drawn ink + 1 mm of white each side):
+- **PT-FRW-9. Division facts in the fact columns, all three notations, at most 9 across** (owner ruling 2026-10-30; at most 9 columns since the owner ruling of 2026-11-05, below). A page or section of ÷ facts takes 9 columns at Size S Auto and whenever the teacher picks 9 (the Columns control offers 1–9 when the set includes division), in the ÷ sign, the fraction and the long-division bracket; 5, 6 and 8 columns and Mix work the same way. Each form takes the vertical-fact grammar in its column's width, at the column's ladder digit (PT-FRW-1), never below the Size S fact digit (16 pt), and passes the real-fit gate (drawn ink + 1 mm of white each side): <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   - **÷ sign, stacked** (div_facts Standard and Vertical): the dividend, "÷ divisor" under it, the 1.5 pt rule, the answer row, as + − ×. With a 3-digit dividend over a shorter divisor the operator track is 0.62 em (the ÷ ink is 0.45 em; the divisor row's empty first track keeps it clear, VA-2 / VA-2a): (0.62 + 3 x 0.72) em = 15.7 mm at 16 pt in a 20.1 mm column (9 across). Where the narrow track puts the dividend's first digit under the number tab's keep-out (a picked 9 at M and L), the fact starts below the keep-out (CL-40).
-  - **Fraction**: the dividend over the divisor on a 1.5 pt bar (0.1 em side pads) as wide as the wider number, "=" 0.3 em after the bar in a 0.62 em track, and the answer line under them, centred, 2 mm clear of the border each side; the line is the band's blank width B(n), capped at the column's room (14 mm at S, 16.2 mm at L in 10 columns). 144 over 12 with its "=" is 15.0 mm of ink at 16 pt. The numerator clears the tab's keep-out.
+  - **Fraction**: the dividend over the divisor on a 1.5 pt bar (0.1 em side pads) as wide as the wider number, "=" 0.3 em after the bar in a 0.62 em track, and the answer line under them, centred, 2 mm clear of the border each side; the line is the band's blank width B(n), capped at the column's room (14 mm at S, 16.2 mm at L in 10 columns). 144 over 12 with its "=" is 15.0 mm of ink at 16 pt. The numerator clears the tab's keep-out. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   - **Long-division bracket**: the divisor, the arc and the vinculum over the dividend, the quotient written above it (no boxes). The digit track is the largest of 1.0, 0.9, 0.8, 0.72, 0.64, 0.58, 0.55, 0.54 em that fits with **2 mm of white each side of the ink** (facts-print-fix r4 CLEAR: 1 mm a side left "12)108" 0.98 mm from the border); the gutter is 0.6 track less 0.15 em, 0.17 to 0.45 em, and the arc starts at 47 % of the gutter and bows into the dividend's first digit's side bearing. The bracket is centred on its ink and always drawn on its section's row geometry (never a 1 em fallback track). "12 ) 144" at 16 pt: 0.54 em tracks (3.0 mm), 0.17 em gutter, 15.8 mm of ink.
   - **Rows**: the + − × need for the stacked ÷; for the fraction padTop + 2.42 em + 0.6 + Hw + 3; for the bracket (centred, CL-4b) 2 + the digit strip + 1.33 em + 4. A section takes its tallest form's need; Mix keeps one third of each form (the count a multiple of 3).
   - Capacity (A4, Auto, every fact numbered, at most 9 across): S 9 x 7 = 63 (stacked ÷), 9 x 8 (fraction), 9 x 10 (bracket), 9 x 7 = 63 (Mix); M 6 x 5, 6 x 6, 6 x 8, 6 x 5; L 5 x 5, 5 x 5, 5 x 7, 5 x 5 = 24.
-  - **AUTO room for the stacked ÷ (owner, 2026-11-05, facts-print-fix):** a 3-digit dividend ("132", "110") needs room in its box (1.3 mm of white beside a 15.7 mm fact in the old 18 mm column). At **Auto**, a stacked ÷ page whose dividends can reach 3 digits takes the most columns, at most 9, that leave **2 mm of white each side** of the drawn fact: **9 x 7 = 63 at Size S** (16 pt kept), 6 at M, 5 at L. The bracket and the fraction take Auto 9 at S under the 9-column rule below.
+  - **AUTO room for the stacked ÷ (owner, 2026-11-05, facts-print-fix):** a 3-digit dividend ("132", "110") needs room in its box (1.3 mm of white beside a 15.7 mm fact in the old 18 mm column). At **Auto**, a stacked ÷ page whose dividends can reach 3 digits takes the most columns, at most 9, that leave **2 mm of white each side** of the drawn fact: **9 x 7 = 63 at Size S** (16 pt kept), 6 at M, 5 at L. The bracket and the fraction take Auto 9 at S under the 9-column rule below. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   - **At most 9 columns with division (owner ruling, 2026-11-05: "If division is included don't make 10 columns an option, just 9").** Any fact-rows page or part that prints ÷ facts (stacked ÷, fraction, bracket, Mix) takes at most 9 columns: the Columns control offers 1–9 when the set includes division facts, and an explicit 10 (an old saved quick print or share code) prints 9 on the division parts, the summary saying "(max 9 with division)". + − × parts keep 10. This replaces "whenever the teacher picks 10" above for ÷ pages.
 - **PT-FRW-10. Mixed up on fact rows (owner, 2026-11-05; ruling 2026-10-31).** A fast-facts-only set printed Mixed up in Pages mode is fact rows, never the Mixed practice fallback: the same pages, problems and grids as In sections, the operations of each page INTERLEAVED in the one grid by the Mixed practice order (sheet/interleave.js: at most 2 of one sign in a row, every sign in the first third). Division keeps its own SECTION in both arrangements (PT-FRW-6): its own page in Pages mode, and in Problems mode the section after the + − × rows on a shared page when its rows fit (PT-FRW-12). Whenever Mixed up cannot be drawn, the print is exactly the In sections print and the summary says "In sections".
 - **PT-FRW-11. Drawn rules (owner, 2026-11-05).** The hairline interiors of a fact-rows grid are drawn rules (each cell's left and top border, the cell pulled one hairline under its neighbour), never the ink background seen through a gap between white cells: a PDF viewer or printer rasterises such a gap away or doubles it ("no lines between the rows", "one vertical thicker"). Every row is closed and every inner rule is one weight (ws-simple-print ROWRULES).
@@ -1269,7 +1269,7 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     when the skill's own option sets that one value (a one-value `constant`); facts that happen to share a number (a short
     last page) keep "Division facts".
   - **Size with Columns picked (owner ruling 2026-11-05: columns win).** In the simple print a picked column count keeps its
-    columns and the Size sets the digits as far as the column fits them: S at most 18 pt, M 24, L 28 (Columns 5: 18 / 24 /
+    columns and the Size sets the digits as far as the column fits them: S at most 18 pt, M 24, L 28 (Columns 5: 18 / 24 / <!-- nos: S token value (compact layout / decode alias), not an offered size -->
     28 pt). Where Medium or Big digits do not fit, the digits drop to the largest that fits and the dialog SAYS SO ("Big
     digits don't fit 9 columns; printing at 16 pt."); the size buttons then read "8 columns · 16 pt", what prints at that
     size and those columns.
@@ -1285,10 +1285,10 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     for on every page whatever it dealt); at Small "12)144" then takes 8 columns, and the dialog says so. Its row holds the
     stacked fact's answer room over the vinculum (a written line + 2 mm).
   - **One column count and one digit size a group, on every page of every set.** They come from what the group's skills
-    can REACH (x 1-12 reaches 144: 3 tracks, answers over 99, so 8 columns at S - one probe of the skills, never the
+    can REACH (x 1-12 reaches 144: 3 tracks, answers over 99, so 8 columns at S - one probe of the skills, never the <!-- nos: S token value (compact layout / decode alias), not an offered size -->
     facts a page happens to deal), and the summary says what prints: "8 columns · division 9 columns · 34–48 a page".
   - **Exact counts.** Each skill's count is dealt page by page from what is still left (the last page takes the rest), so
-    the totals are the even split of the request: 130 over 4 skills prints 33/33/32/32 at S, M and L.
+    the totals are the even split of the request: 130 over 4 skills prints 33/33/32/32 at S, M and L. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   - A group asked for less than a row's worth prints that count from the top of its grid, its short last row keeping the
     lattice (no stretched cell). Every page keeps its skills balanced (within 1), and the dialog's per-skill "prints"
     counts are the facts printed. Page k of n reads "k/n" on the pupil and key pages, and each page's footer names the
@@ -1299,7 +1299,7 @@ Day bands: band height = strip (7 / 8 / 10) + rowsPerBand x h; bands are separat
     size a group, per-skill totals = the split of the request), FILL (white in mm <= one row on every page but the last;
     fewest pages), AUTO9, COUNTS, PROBLEMS, FOOTER, TITLE, DIVMAX9 docs, and r4's MIXBASE, SLOTPOS, FRACEQ, CLEAR,
     BRKTRACK, PDFIUM-RULES, FOOTWRAP, DIVSECTIONS, SIZEMIX, FULLPAGE, ONEDIGIT, ROWSAME, QROOM (`--r4`), and r5's sweep
-    (Problems 20-150 by 5 × S/M/L × Auto/5/9 × both arrangements; Pages 1 and 2) SHARES, BLANKMID, DIVORDER, TITLEONE, ORPHAN,
+    (Problems 20-150 by 5 × M/L × Auto/5/9 × both arrangements; Pages 1 and 2) SHARES, BLANKMID, DIVORDER, TITLEONE, ORPHAN,
     COLSIZE (`--r5`), and r6's MEASURED sweep (`--sweep`; `--sweep-full` for the critic and the deploy run): every print
     drawn print-emulated and its white measured - TOTAL, SHARES, SIZENOTE, PAGESFULL (the last page too in Pages mode),
     BLANKMID, DIVORDER, STRETCH, SIZEBTN.
@@ -1346,7 +1346,7 @@ Geometry (one section, one instruction). Grid width W = 186 - strip - 4: strip 1
 | 9 | fills the page: 9 x 8 = 72 | 16 pt | 18.9 | 28 | 28.25 | 235 |
 | 10 | fills the page: 10 x 8 = 80 | 16 pt | 17.0 | 28 | 28.25 | 235 |
 
-Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fit (28 pt label-beside at L: 59.2 <= 84.4). At C = 5, sizes S and M use vertical rows of 48 (1.3 x 37) and totals of 206 and 218.
+Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fit (28 pt label-beside at L: 59.2 <= 84.4). At C = 5, sizes S and M use vertical rows of 48 (1.3 x 37) and totals of 206 and 218. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 - **PT-FPR-1.** Auto is always 5 columns; a choice of 1 to 4 becomes 5 with a note. At 8 to 10 columns the probe fills the page with vertical facts (the Fact rows grid with the probe's header, strip and forms) and Score becomes /N; a "Keep 20" switch restores 16 + 4 or 20 + 0.
 - **PT-FPR-2.** The set's constant is always the second (bottom) operand unless "turn-around facts" is checked. The other operand is drawn so the answer stays inside the band (PT-FPR-12), never from the band itself. Every fact of the set appears at least once across the probe; the horizontal block repeats the hardest facts; no identical fact sits in adjacent cells.
@@ -1368,7 +1368,7 @@ Horizontal block: 2 columns, row 16 / 20 / 24; its digits follow the equation fi
 |---|---|---|
 | Division probe, horizontal form, L | 3 x 7 = 20 facts + one unruled slot, Score /20 | 3 x 6 = 18 facts, Score /18 |
 | Division probe, sets 10 to 12, L | 2 x 10 = 20 facts, Score /20 | 2 x 6 = 12 facts, Score /12 |
-| Equation drill, rows at S / M / L | 19 / 16 / 12 (label beside) or 16 / 13 / 11 (label above) | 10 / 8 / 6 |
+| Equation drill, rows at S / M / L | 19 / 16 / 12 (label beside) or 16 / 13 / 11 (label above) | 10 / 8 / 6 <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 
   Every fact of the set still appears at least once (PT-FPR-2); the repeats of the hardest facts are what the dropped row removes. The black answer line is the only place an answer goes. A Model cell shows the box filled in.
 - **PT-FPR-8. Forms.** Form B (C, D) holds Form A's facts in a seeded re-order (seed = set + form). "Strip on" and "strip off" versions keep identical rows and order.
@@ -1492,14 +1492,14 @@ PAGE 1                                        PAGE 2 (12 mm header, body 250)
   3 x 3 cells of 62 x 76; slot 3 is the reference box | [22]-[25]       | [26]-[28]        |
 ```
 
-Compact one page (S and M only): strip 6 + 2 rows of four 46.5 x 38 cells (76) + word problem 34 + Time|Fractions 46 + Money|Puzzles 42 + Rounding|Patterns 32 = 236.
+Compact one page (M only, S dropped 2026-11-13): strip 6 + 2 rows of four 46.5 x 38 cells (76) + word problem 34 + Time|Fractions 46 + Money|Puzzles 42 + Rounding|Patterns 32 = 236.
 
-| Variant | Computation grid | Cell | Max tracks S / M / L | Items |
+| Variant | Computation grid | Cell | Max tracks S / M / L | Items <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Spread, 3 columns (default) | 3 x 3, slot 3 = reference box | 62 x 76.67 (76 at L) | 8 / 7 / 5 | 8 + 20 = 28 |
 | Spread, 2 columns (add, subtract, decimals only) | 2 x 4 | 93 x 57.5 | 8 / 8 / 9 | 28 |
 | Spread, tall cells (long division, multi-row multiply) | 4 x 2 | 46.5 x 115 | 7 / 5 / 4 | 28 |
-| Compact one page, S and M | 4 x 2 | 46.5 x 38 | 7 / 5 / - | 8 + 12 = 20 |
+| Compact one page, M (S dropped 2026-11-13) | 4 x 2 | 46.5 x 38 | 7 / 5 / - | 8 + 12 = 20 |
 
 | Page-2 section (spread) | Height | Interior at L (height - 14) | Holds |
 |---|---|---|---|
@@ -1522,7 +1522,7 @@ Slot map (positions never move; the binding changes by Level band; any slot can 
 | Patterns | count by 1, 2, 5, 10 | 3s, 4s, 100s from any start | rule tables, decimals |
 | Puzzles | one more and one less, to 50 | +/- 1 and 10, to 120 or 1,000 | missing factor, fact family |
 
-- **PT-DSR-1.** The spread is the default and the only variant at L. The compact page is opt-in at S and M, scored /20, and carries no multi-row multiplication, no long division, clocks to 5 minutes only and one coin group.
+- **PT-DSR-1.** The spread is the default and the only variant at L. The compact page is opt-in at M (S dropped 2026-11-13), scored /20, and carries no multi-row multiplication, no long division, clocks to 5 minutes only and one coin group.
 - **PT-DSR-2.** A slot with nothing taught yet rebinds to its prerequisite skill and retitles itself; it is never left blank.
 - **PT-DSR-3.** Half-width section titles are at most 9 characters and their instructions at most 20, so title and instruction share one line inside 87 mm. Titles sit under a 2.25 pt rule.
 - **PT-DSR-4.** Slot 3 of the 3 x 3 grid is a rounded reference box built from the day's computation skill (`strings.rule` or up to 3 `workedSteps`); the teacher may choose a ninth problem instead (Score /29).
@@ -1564,9 +1564,9 @@ GROUPED (default): one shelf per skill             SHUFFLED: strips two units hi
 +---------------------------------------------+      then top to bottom inside the block
 ```
 
-Unit grid. The page is N units wide; unit width = 186 / N. A template's `footprint.span` is `w x h` in units: vertical fact 1 x 1; 3- to 6-digit stack 2 x 1 (1 x 1 in a Daily L unit of 46.5 for 3 digits); horizontal equation 2 or 3 x 1; clock or other medium visual 2 x 2; fraction of a set 2 x 1; number line 3 or 4 x 1; word problem N x 1 (N x 2 when the story exceeds 3 lines at L, 2 lines at M and S).
+Unit grid. The page is N units wide; unit width = 186 / N. A template's `footprint.span` is `w x h` in units: vertical fact 1 x 1; 3- to 6-digit stack 2 x 1 (1 x 1 in a Daily L unit of 46.5 for 3 digits); horizontal equation 2 or 3 x 1; clock or other medium visual 2 x 2; fraction of a set 2 x 1; number line 3 or 4 x 1; word problem N x 1 (N x 2 when the story exceeds 3 lines at L, 2 lines at M and S). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Auto N on a mixed sheet, I Can / Daily | 10 / 8 | 8 / 6 | 6 / 4 |
 | Unit width, I Can / Daily | 18.6 / 23.25 | 23.25 / 31.0 | 31.0 / 46.5 |
@@ -1664,7 +1664,7 @@ SIDE 1                                                    SIDE 2 (12 mm header, 
 +-----------------------------------------------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Band pitch, 5 days = (236 - I - 1 - 4 x 3) / 5 | 43.0 | 43.0 | 42.8 |
 | Cell = pitch - Day strip (7 / 8 / 10); width 46.5 | 36.0 | 35.0 | 32.8 |
@@ -1708,7 +1708,7 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 +--------------------------------------+
 ```
 
-| Statement footprint | Cell height needed S / M / L | Grid | Items S / M / L |
+| Statement footprint | Cell height needed S / M / L | Grid | Items S / M / L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Horizontal equation (14 / 17 / 20) | 14+3+9+2+10+3 = 41 / 47 / 53 | 2 x 4 (57); 2 x 3 at M, 2 x 2 at L | 8 / 6 / 4 (design-standard ceiling) |
 | Stack, answered (33 / 41 / 49) | 60 / 71 / 82 | 2 x 3; L 2 x 2 (113.5) | 6 / 6 / 4 |
@@ -1748,7 +1748,7 @@ ALWAYS / SOMETIMES / NEVER
 | d. | statement ...          [ ] Always  [ ] Sometimes  [ ] Never     Example: __ + __ = __    |
 ```
 
-- **PT-RSN-1.** Default page: one format per page (one of each only when the teacher chooses Mixed; pedagogy standard 9.4, design standard SF-61), 1 column x 4 / 3 / 2 rows at S / M / L (cells 186 x 57 / 76 / 113.5; design-standard ceiling 4 / 3 / 2). Long algorithms use 2 rows at every size.
+- **PT-RSN-1.** Default page: one format per page (one of each only when the teacher chooses Mixed; pedagogy standard 9.4, design standard SF-61), 1 column x 4 / 3 / 2 rows at S / M / L (cells 186 x 57 / 76 / 113.5; design-standard ceiling 4 / 3 / 2). Long algorithms use 2 rows at every size. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **PT-RSN-2.** Spot the mistake: the solution is `workedSteps(q)` with exactly one step replaced by the misconception behind `wrongAnswer(q)`; step rings are outlined circles at least Hw + 2 across.
 - **PT-RSN-3.** Odd one out: four boxed items, three sharing a property the skill names; the pupil circles one and completes the frame "__ does not belong. It is not ______ ." with a word from a printed bank of at most 4 words (pedagogy standard 9.4, P-TH-15).
 - **PT-RSN-4.** Which is correct: two worked solutions labelled "A" and "B" (never named characters, P-TH-14), side by side at the same cell size; the pupil circles A or B and completes "The answer is __ ." (lead ruling F8, 2026-11-13: "Circle A or B. The answer is __." - the old "__ is correct." asked the same choice a second time, H16; a list answer, whose circled panel already holds every part, prints no answer frame, PT-TOF-4; check ws-roles-unit RI-ONEANSWER)
@@ -1778,7 +1778,7 @@ ALWAYS / SOMETIMES / NEVER
 +-----------------------------------------------------------------------+
 ```
 
-| | S | M | L |
+| | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Prompt box (rounded) | 32 | 36 | 40 |
 | Table header + 1 traced row + up to 6 empty rows (row = Hw + 6) | 9 + 7 x 12 = 93 | 10 + 7 x 14 = 108 | 12 + 7 x 16 = 124 |

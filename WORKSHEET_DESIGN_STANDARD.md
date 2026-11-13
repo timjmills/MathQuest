@@ -19,7 +19,7 @@ A page that breaks a rule here is a defect, even if it "looks fine".
 
 Where two documents disagree on a visual value, this file wins. Where they disagree on teaching sequence, `PEDAGOGY_STANDARD.md` wins.
 
-Terms used throughout: **S / M / L** = the size preset. **Hw** = writing height (6 / 8 / 10 mm). **em** = the working digit size in mm (section 3). **Track** = one fixed-width digit column. **T** = number of tracks in a stacked problem, operator track included. **gridH** = height available to the cell grid on one page. Three numbers separated by slashes always mean S / M / L.
+Terms used throughout: **M / L** = the size preset (owner 2026-11-13: size S is dropped as a choice; the kit keeps an S token only as the decode alias of M and the one compact layout, "Compact (12 tables on one page)"; S columns in the tables below are that token). **Hw** = writing height (6 / 8 / 10 mm). **em** = the working digit size in mm (section 3). **Track** = one fixed-width digit column. **T** = number of tracks in a stacked problem, operator track included. **gridH** = height available to the cell grid on one page. Three numbers separated by slashes always mean S / M / L.
 
 ---
 
@@ -147,7 +147,7 @@ cannot fill every page, a page's rows may stretch on their own, never past 1.3, 
 
 ### 3.2 Size table (pt)
 
-| Role | S | M | L | Weight | Notes |
+| Role | S | M | L | Weight | Notes <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|
 | Working digits (operands, equations, printed targets) | 16 | 22 | 28 | 400 | Largest element on the page (TY-10) |
 | Fact ladder steps | 24 / 20 / 18 / 16 | - | - | 400 | Set by column count, not by size (TY-30) |
@@ -165,7 +165,7 @@ cannot fill every page, a page's rows may stretch on their own, never past 1.3, 
 | Teacher footer | 7 | 7 | 7 | 400 | Only text below 8 pt on a pupil page |
 
 - **TY-10** Size order on any page: working digits > title > instruction = band label = cell text > zone labels > quiet letter > footer. Working digits are at least 1.4 x the instruction size.
-- **TY-11** Minimum pupil-facing type is 8 pt (the quiet letter at S). Everything a pupil must read to act is at least 11 pt.
+- **TY-11** Minimum pupil-facing type is 8 pt (the quiet letter at S). Everything a pupil must read to act is at least 11 pt. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **TY-10a** (2026-10-02, OWNER EXCEPTION to "content never shrinks", **count-by rows only**: `multiplication:count_by_tables`, the `count-row` cell in its `arcs` look) Every count-by row is exactly two lines of six numbers (the 15-number long row is three lines of five), across the cell's full width: the boxes take their writing width and the remaining width is the space between them. When the widest number cannot be written in a box of the width six boxes leave ("1,000,000", "25,000"), the row's digits and boxes shrink just enough to fit. **Hard floor: 9 pt** (3.2 mm), above the 8 pt minimum of TY-11; the multiplication labels under the numbers (a hint) floor at 8 pt. A row whose six boxes already hold its digits at the size's working size keeps that size (nothing is shrunk that fits). No other cell may shrink content under this rule. Measured by `tests/scripts/wave1-c2-sizes.cjs`.
 - **TY-10b** (OWNER EXCEPTION, decided 2026-10-03, **count-by rows on phones only**: `multiplication:count_by_tables`, `count-row` in its `arcs` look, screen hosts at 480 px and under) Count rows on phones: **~29 px digits**, an owner exception to the 40 px card floor. The boxes scale with the digits (the same box:digit ratio as before, width about 2.6x the digit: boxes about 76 × 53 px, above the 48 px touch target). The row keeps swiping inside its cell with the SP-11a cue on one line; the gap between columns is capped at 24 px absolute on a phone (never under 3 mm), the geometry and arcs laid out on that pitch, so the window shows as many whole columns as fit in the cell's inner box (3 on the 390 px worksheet and quiz); the row opens at its start; the page never scrolls sideways. A number too wide for six boxes still shrinks under TY-10a. When the card holds its auto-focus back (the first box does not show at the start), the first digit key typed with nothing focused moves to the first box under the same rule as Tab. Desktop, tablet and print are unchanged. Implemented in `screen-cell.js` (`screenTwin`, `fitTwinRows`, `wireSwipeRows`) and `count-row.js` (`arcsGeom`, `twinGapPx`); measured by `tests/scripts/wave1-c2-phone.cjs`.
 - **TY-12** A long word in cell text never shrinks below the table size; it wraps, then hyphenates (`hyphens: manual; overflow-wrap: anywhere`), and the cell grows by whole rows.
@@ -183,14 +183,14 @@ cannot fill every page, a page's rows may stretch on their own, never past 1.3, 
 - **TY-20** Stacked arithmetic is a CSS grid with one fixed track per digit plus one operator track. Track width is **0.72 em in the I Can look** and **0.95 em in the Daily look**. Digits are right-aligned to the ones track.
 - **TY-21** Any regroup scaffold (carry boxes, Tens / Ones boxes, subtraction headroom) forces **0.95 em** tracks in both looks, because a pupil cannot write in a box narrower than about 4.4 mm.
 - **TY-22** Vertical facts (single-digit and to-12 facts in fact layouts) always use 0.72 em tracks and T = 3 in both looks. The look changes border weight only.
-- **TY-23** Track floor for multi-digit stacked arithmetic: a track is never narrower than 0.7 x Hw, i.e. 4.2 / 5.6 / 7.0 mm. In practice only the I Can look is affected (S: 4.06 becomes 4.2; M: 5.59 becomes 5.6). The floor does not apply to fact sections, whose answer row is open and whose digit size follows the column ladder (TY-30).
+- **TY-23** Track floor for multi-digit stacked arithmetic: a track is never narrower than 0.7 x Hw, i.e. 4.2 / 5.6 / 7.0 mm. In practice only the I Can look is affected (S: 4.06 becomes 4.2; M: 5.59 becomes 5.6). The floor does not apply to fact sections, whose answer row is open and whose digit size follows the column ladder (TY-30). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **TY-24** A decimal point or a thousands comma takes its own 0.3 em separator track, aligned down every row of the problem. In horizontal equations a separator takes 0.5 ch. A unit sign in a stacked problem takes one full track.
 - **TY-25** Horizontal equations keep natural digit spacing with 1 em slots for each operator and for `=`. The 0.95 em Daily track applies to stacked work only.
 - **TY-26** Every cell in a section uses the T of the section's widest problem, so ones digits align down the page and a wider answer never reveals itself.
 
 ### 3.4 Fact column ladder
 
-For fact sections the chosen column count drives the digit size. S / M / L still fixes writing height, blank width, tab size and text sizes.
+For fact sections the chosen column count drives the digit size. S / M / L still fixes writing height, blank width, tab size and text sizes. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 | Columns | 1-5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|
@@ -200,7 +200,7 @@ For fact sections the chosen column count drives the digit size. S / M / L still
 | Fill of column | 57% | 59% | 57% | 59% | 59% | 66% |
 | Gap between neighbouring facts (mm) | 15.9 | 12.7 | 11.3 | 9.5 | 8.5 | 6.4 |
 
-- **TY-30** The ladder is independent of S / M / L ("columns win"). Auto columns are chosen so digits never fall below the preset: Auto = 9 / 6 / 5 columns at S / M / L for fact rows (owner rule 2026-11-05: "Auto = 9; 10 only if the owner picks it"; 9 and 10 columns share the 16 pt rung); the fact probe's Auto is always 5.
+- **TY-30** The ladder is independent of S / M / L ("columns win"). Auto columns are chosen so digits never fall below the preset: Auto = 9 / 6 / 5 columns at S / M / L for fact rows (owner rule 2026-11-05: "Auto = 9; 10 only if the owner picks it"; 9 and 10 columns share the 16 pt rung); the fact probe's Auto is always 5. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **TY-31** Fill of column stays between 55% and 75%. The gap between neighbouring sum rules is never below 6 mm, so rules never read as one line across the page.
 - **TY-32** A three-digit fact answer (tables of 10-12) is written with its hundreds digit under the operator; T stays 3. Addition and subtraction facts never reach three digits, because their band caps the sum or the minuend at 30 or less (`PEDAGOGY_STANDARD.md` P-FL-20).
 - **TY-33** Optional probe XL: 32 pt at 5 columns, fact families to 10 only.
@@ -287,7 +287,7 @@ Line style and corner shape carry meaning. They are never decorative, and a styl
 | **Dashed box** (short dash) | 0.75 pt, 1.5 mm on / 1 mm off, on a digit-box outline only | **The unknown digit** inside a stacked problem | The missing-digit box (section 6, VA-7) |
 | **Solid shape vs hollow shape** | Solid black vs 0.75 pt outline | Two sets | Counters for addend 1 vs addend 2; series 1 vs series 2 |
 | **Square corners** (radius 0) | | Structure: the page's own frame | Cell frames, grid dividers, band strips, tables, tabs, the header score / strand box |
-| **Slightly rounded** (slot radius 1 / 1.25 / 1.5 mm at S / M / L, SL-11) | | A place to WRITE | Answer boxes, digit boxes and digit strips, regroup / carry strips, the missing-digit box, checkboxes, time boxes, stand-alone write-in boxes |
+| **Slightly rounded** (slot radius 1 / 1.25 / 1.5 mm at S / M / L, SL-11) | | A place to WRITE | Answer boxes, digit boxes and digit strips, regroup / carry strips, the missing-digit box, checkboxes, time boxes, stand-alone write-in boxes <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | **Rounded corners** (radius 3 mm; 1 mm on objects under 8 mm) | | Something to read or think with, or a number object | Story box, Steps box, vocabulary box, think box, skip-count strip, number-track boxes, flashcard cells, fact-family trio box, dot tile, generic notes |
 
 - **LS-1** Dotted lines are always 1 pt round dots at 1.2 mm pitch, black or grey.
@@ -305,7 +305,7 @@ Line style and corner shape carry meaning. They are never decorative, and a styl
 
 The shape of the slot tells the pupil what kind of answer goes in it. One answer type has one shape on every page type, in both looks, on paper and on screen.
 
-| Slot | Shape | Size (S / M / L) | Means | `data-ws-shape` |
+| Slot | Shape | Size (S / M / L) | Means | `data-ws-shape` <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Line | Baseline rule, 0.75 pt | Width B(n); clear height Hw above it | A number | `line` |
 | Digit box | Box, 0.75 pt, slot radius (SL-11) | Stand-alone missing-number box B(n) x (Hw + 2). A ROW of digit boxes is always a digit strip (next row) | One digit, or a missing number inside an expression | `box` |
@@ -340,7 +340,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **SL-1** No answer line or stand-alone box is narrower than 14 mm. Tracks in stacked arithmetic, regroup boxes and chart / puzzle / pattern grid cells are exempt; chart cells are at least 12 mm wide.
 - **SL-2** One width per section: every blank in a section uses B for the section's longest answer, so blank width never hints at the size of an individual answer. In a banded section the longest answer is the band, because the band bounds the answer and not the operands (`PEDAGOGY_STANDARD.md` P-35): "Add within 20" gives n = 2, not the n = 3 that today's 93 + 84 would force.
 - **SL-3** An answer after `=` is a **line**. A blank inside an expression (missing addend, missing factor) is a **box**. If any blank in a section is mid-expression, every blank in that section is a box.
-  - **SL-3a** (2026-10-03, OWNER EXCEPTION, **count rows only**: the `count-row` cell, `multiplication:count_by_tables`) The skill option "Answer spaces: Lines" replaces each missing-number box with a bare write-on line (1.5 pt rule) as wide as the number needs, "____ → ____ → ____". Lines fit more on a page; boxes show pupils exactly where to write, so Boxes stays the default. With Lines the row has no box height. On paper at Size S it holds its 12 numbers on ONE line, its lines narrowing (digits never below the 9 pt floor of TY-10a) before it splits ("use small to fit more"). At M and L, and on the one-page sheet, a row never shrinks its digits or its step tab below the size's working size: when 12 will not fit at that size it takes two even lines of 6 (owner 2026-10-09), so every row of a page keeps one digit size. On SCREEN Lines wraps 6 + 6 like Boxes (no swipe at Chromebook width); 12 on a line is a paper rule. Each step is a short bold arrow centred in the gap between neighbours, at least 1.5 mm clear of both (the one-page sheet's 12-number row and a narrow Lines gap keep 1.0 mm). The key writes the answers on the lines; on screen the input fills exactly its drawn line, never wider, so the next-box yellow and the right/wrong tints never cover an arrow.
+  - **SL-3a** (2026-10-03, OWNER EXCEPTION, **count rows only**: the `count-row` cell, `multiplication:count_by_tables`) The skill option "Answer spaces: Lines" replaces each missing-number box with a bare write-on line (1.5 pt rule) as wide as the number needs, "____ → ____ → ____". Lines fit more on a page; boxes show pupils exactly where to write, so Boxes stays the default. With Lines the row has no box height. On paper at Size S it holds its 12 numbers on ONE line, its lines narrowing (digits never below the 9 pt floor of TY-10a) before it splits ("use small to fit more"). At M and L, and on the one-page sheet, a row never shrinks its digits or its step tab below the size's working size: when 12 will not fit at that size it takes two even lines of 6 (owner 2026-10-09), so every row of a page keeps one digit size. On SCREEN Lines wraps 6 + 6 like Boxes (no swipe at Chromebook width); 12 on a line is a paper rule. Each step is a short bold arrow centred in the gap between neighbours, at least 1.5 mm clear of both (the one-page sheet's 12-number row and a narrow Lines gap keep 1.0 mm). The key writes the answers on the lines; on screen the input fills exactly its drawn line, never wider, so the next-box yellow and the right/wrong tints never cover an arrow. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **SL-4** Slot height: the clear writing height inside or above a slot is exactly Hw (6 / 8 / 10 mm), measured inside the stroke. Size fixes this; nothing reduces it.
 - **SL-5** A word-problem answer blank always has the unit word pre-printed after it (correctly pluralised). Pupils never have to compose the label except on the faded v2 form.
 - **SL-6** Blanks are drawn as ruled lines or boxes, never as underscore characters.
@@ -348,7 +348,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **SL-8** A 3 mm rounded container, a grey shape or a dotted shape is never an answer slot (LS-6). The black line, box or circle is the only place a scored answer goes.
 - **SL-9** Generic-coin totals are plain numbers on a line: no currency sign, no unit word. A currency sign may be pre-printed beside a blank only inside a word problem whose story text uses that currency, or where RP-116 allows it for a money skill whose currency is not Plain numbers.
 - **SL-10** A missing-digit box is dashed and every regroup, carry and headroom box is solid, so the two are never confused in one stack (LS-8, VA-7). The dashed box is a scored answer slot; the solid boxes above the stack are scratch space (VA-13).
-- **SL-11** **Slot radius** (owner ruling 2026-09-25: "the square boxes should be slightly rounded"). Every writing box - digit box, digit strip, answer box, regroup / carry strip, missing-digit box, checkbox, time box, stand-alone write-in box - has a corner radius of **1 / 1.25 / 1.5 mm at S / M / L** (`SLOT.slotRadiusMm`, CSS `--ws-slot-r`). The cell frame, the grid dividers, band strips, tables, tabs and the header score / strand box stay square (radius 0): they are the page, not a place to write. On screen the same boxes round at 0.15 x the digit size (min 4 px, `--mq-slot-r`).
+- **SL-11** **Slot radius** (owner ruling 2026-09-25: "the square boxes should be slightly rounded"). Every writing box - digit box, digit strip, answer box, regroup / carry strip, missing-digit box, checkbox, time box, stand-alone write-in box - has a corner radius of **1 / 1.25 / 1.5 mm at S / M / L** (`SLOT.slotRadiusMm`, CSS `--ws-slot-r`). The cell frame, the grid dividers, band strips, tables, tabs and the header score / strand box stay square (radius 0): they are the page, not a place to write. On screen the same boxes round at 0.15 x the digit size (min 4 px, `--mq-slot-r`). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **SL-12** **Digit strip** (owner ruling 2026-09-25: "they could be one box actually with dividers between them"). A row of digit boxes is ONE rounded outline with a 0.75 pt divider on every track boundary, never a row of separate boxes with gaps. Each segment is exactly one track wide (the column pitch of the digits above it), so every divider sits between two place-value columns and place value still lines up. Only the two ends are rounded; only the last segment draws a right edge, so no divider doubles. A run of boxes interrupted by a non-box track (the operator track, a decimal point) is two strips. Heights: the **answer strip is 7.2 / 9.6 / 12 mm** (1.2 x Hw, was a Hw-tall box; it fits the 8 / 10 / 12 mm answer row, VA-4), the **regroup strip is 6 / 7 / 8 mm** (was a 5 / 6 / 7 mm carry box; it fills the 6 / 7 / 8 mm regroup row). Widths grow from track - 1 mm to the full track (4.4 / 6.4 / 8.4 mm to 5.4 / 7.4 / 9.4 mm at the 0.95 em regroup track). No row height changes, so no page capacity changes (section 13). The answer key writes each digit inside its own segment (AK-2).
 - **SL-13** On screen the strip is still one input per digit, each input a full-track target of at least 44 px (SP-10): the strip's outline and dividers are drawn on the inputs, keyed on `data-ws-seg`, so markup saved before the ruling (no `data-ws-seg`) keeps its separate boxes.
 
@@ -361,7 +361,7 @@ B(n, size) = max(14, ceil(n x 0.75 x Hw + 2 + s))   mm
 - **CL-1** A page body is one outer frame (1.5 pt) containing cells that share borders like a table. No gutters, no floating cards, no per-cell shadows or rounded cells.
 - **CL-2** Permitted grids: 2 x 3 (default independent page), 2 x 2 (heavy items, long procedures), 2 x 4 / 2 x 5 / 2 x 8 (one-symbol answers), 3 x 3 (Daily computation), 3-7 full-width rows (wide visuals), open 4 x 4 or 4 x 5 (tests), fact grids at 5-10 columns. Tests and probes may drop interior borders (open array) but keep the outer frame.
   - **CL-2a** (owner, 2026-10-09) A single-skill practice page whose count is capped by the skill's own distinct problems may also use **2 x 9 or 2 x 10** (within the DN-1a ceiling for short problems), *as long as it looks good*: the page must still pass the independent critic at 8 or better on all four RUBRIC criteria. If it does not, use a listed grid (e.g. 4 x 5) instead.
-  - **CL-2b** (owner, 2026-10-09) A single-skill page of short one-line problems (e.g. missing-number sentences) may also use **3 x 10** at size S, under the same "as long as it looks good" rule (critic 8+ on all four criteria). **A page that holds more than 26 items labels every item with numbers 1 to N from the first item** - one page never mixes letters and number tabs.
+  - **CL-2b** (owner, 2026-10-09) A single-skill page of short one-line problems (e.g. missing-number sentences) may also use **3 x 10** at size S, under the same "as long as it looks good" rule (critic 8+ on all four criteria). **A page that holds more than 26 items labels every item with numbers 1 to N from the first item** - one page never mixes letters and number tabs. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **CL-3** All cells in a section are the same size. Cell size is identical on every page of the section (PG-11).
 - **CL-4** Problem in the top half: the printed problem (or the visual plus its prompt) starts at the top pad and its printed content ends within the top half of the cell, except cells whose visual is the workspace (draw the hands, shade the model, plot the point).
 - **CL-4a** A scaffold the pupil writes in is writing space, not printed content, so CL-4 is measured below it (owner ruling 2026-09-19, applied to the think box SF-40). In a think-box cell the box occupies the top of the cell and the fact must end within the top half of what is left under it; the cell keeps one row fewer than the same section without the box. The same reading applies to any other write-in scaffold placed above the problem.
@@ -636,7 +636,7 @@ A band is a full-width horizontal slice of the body frame with a label. Bands st
 
 Minimum cell height (mm), I Can / Daily:
 
-| Case | S | M | L |
+| Case | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Plain add or subtract | 33 / 35 | 41 / 43 | 49 / 51 |
 | + place-value heads | 37 / 39 | 46 / 48 | 55 / 57 |
@@ -672,7 +672,7 @@ Minimum cell height (mm), I Can / Daily:
   ===============                ==================
 ```
 
-- **VA-20** When the subtraction regroup scaffold is on, a **headroom row of 8 / 10 / 12 mm** is always present above the top operand (structural). It is open space at S and M.
+- **VA-20** When the subtraction regroup scaffold is on, a **headroom row of 8 / 10 / 12 mm** is always present above the top operand (structural). It is open space at S and M. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **VA-21** At L, in Model and Guided cells, the headroom row holds boxes above **every** digit of the top number (width track - 1, height Hw - 2), regardless of whether the problem regroups. The first Model cell labels them with the place words at zone-label size ("Tens", "Ones").
 - **VA-22** **Across zeros**: where the top number contains a run of zeros, one wide box spans the run together with the non-zero digit to its left (the pupil renames 40 tens as 39 tens), and a single box stands over the ones. Box layout is derived from the top number's digits only, never from the answer.
 - **VA-23** The pupil crosses out given digits by hand; the sheet never pre-prints a strike in Independent cells. Model cells show the strike as a 0.75 pt solid diagonal and the new value in grey.
@@ -739,7 +739,7 @@ Minimum cell height (mm), I Can / Daily:
 +---------------------------+
 ```
 
-- **VA-70** Fact cell height by columns (S / M / L, mm): 5: 37 / 37 / 38; 6: 34 / 34 / 36; 7: 29 / 31 / 33; 8: 26 / 28 / 30; 9 and 10: 24 / 26 / 28. At 1-4 columns: 28 pt digits, 37 / 37 / 38.
+- **VA-70** Fact cell height by columns (S / M / L, mm): 5: 37 / 37 / 38; 6: 34 / 34 / 36; 7: 29 / 31 / 33; 8: 26 / 28 / 30; 9 and 10: 24 / 26 / 28. At 1-4 columns: 28 pt digits, 37 / 37 / 38. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **VA-71** Every fact page can show both orientations as separate sections: vertical rows first, then a horizontal block. Horizontal facts follow the equation fit function (DN-22), which in practice clamps them to 4 columns (3 for 2-digit by 2-digit).
 
 ---
@@ -750,7 +750,7 @@ Minimum cell height (mm), I Can / Daily:
 
 - **RP-1** **Never draw the answer.** A visual shows the given information and the workspace, nothing that states or implies the response. Specifically: no count label on a set to be counted; no hands on a draw-the-hands clock; no pre-marked point on a plot item; slot counts, box counts and track counts that are constant across a section (TY-26, VA-4, VA-10, VA-62); partition lines absent when partitioning is the task; number-line labels omitted at the answer's tick; bars absent when drawing bars is the task. A Model cell is the only place a completed response may be drawn, and there it is grey or dotted.
 - **RP-2** One SVG builder per representation serves print and screen (`opts.mono` on; viewBox in mm; strokes from section 4; text in Andika). Screen scales by CSS width; minimum rendered stroke is 1 CSS px.
-- **RP-3** Minimum size is fixed by S / M / L. A visual may grow to fill its zone up to 1.25 x its minimum; it is never drawn below the minimum and never distorted. If it does not fit, drop a column or a row (PG-20).
+- **RP-3** Minimum size is fixed by S / M / L. A visual may grow to fill its zone up to 1.25 x its minimum; it is never drawn below the minimum and never distorted. If it does not fit, drop a column or a row (PG-20). <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **RP-4** One kind of visual per cell. A section may mix visuals only when they share one answer-slot type.
 - **RP-5** Any part a pupil shades, colors, counts by touching, or writes in is at least 6 mm in its smaller dimension (also guarantees INK-20).
 - **RP-6** Labels inside a visual use zone-label size; printed targets and prompts (for example the time to draw) use working digit size.
@@ -759,7 +759,7 @@ Minimum cell height (mm), I Can / Daily:
 
 ### 11.2 Minimum sizes
 
-| Representation | S | M | L | Max columns S/M/L |
+| Representation | S | M | L | Max columns S/M/L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Ten frame, single (cell 8 / 9 / 10 mm) | 40 x 16 | 45 x 18 | 50 x 20 | 4 / 3 / 3 |
 | Ten frame, pupil draws counters (cell 10 / 10 / 11) | 50 x 20 | 50 x 20 | 55 x 22 | 3 / 3 / 3 |
@@ -768,7 +768,7 @@ Minimum cell height (mm), I Can / Daily:
 | Base-10, 100-299 (u = 2.5 / 3 / 3.4) | 66.5 x 52 | 77 x 62 | 85.4 x 70 | 2 / 2 / 2 |
 | Base-10, 300 and over (u = 2.5, flats 5 per row) | 174.5 x 52 | same | same | 1 |
 | Place-value chart (column width x row height) | 14 x 8 | 14 x 10 | 17 x 12 | by columns |
-| Number line (tick pitch; line length) | 6; >= 120 | 7; >= 140 | 8; >= 160 | 1 (2 at S for 0-10) |
+| Number line (tick pitch; line length) | 6; >= 120 | 7; >= 140 | 8; >= 160 | 1 (2 at S for 0-10) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Number bond / part-whole (box side) | 14 | 16 | 20 | 3 / 3 / 2 |
 | Schema diagram / bar model (bar height; min bar length) | 10; 30 | 12; 36 | 14; 42 | 1 (2 in v2) |
 | Array up to 5 x 5 (pitch 7 / 8 / 9) | 35 | 40 | 45 | 4 / 4 / 3 |
@@ -785,12 +785,12 @@ Minimum cell height (mm), I Can / Daily:
 | Analog clock: draw the hands | 46 | 50 | 52 | 3 |
 | Clock with outer minute ring (Model) | 47 | 55 | 65 | 3 / 3 / 2 |
 | Digital clock | 31 x 14 | 40 x 17 | 48 x 19 | 4 / 4 / 3 |
-| Generic coins (scale of the RP-111 diameters) | 0.85 | 1.0 | 1.0 | 2 (3 if <= 4 coins at S / M) |
+| Generic coins (scale of the RP-111 diameters) | 0.85 | 1.0 | 1.0 | 2 (3 if <= 4 coins at S / M) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Ruler | true scale only (RP-160) | | | 1 |
 | 2D shape / solid (bounding box) | 30 | 36 | 42 | 5 / 4 / 3 |
 | Angle (arm length) | 25 | 30 | 35 | 3 |
 | Coordinate grid (cell) | 6 | 7 | 8 | 1-2 |
-| Graph (plot area) | 80 x 60 | 90 x 70 | 100 x 80 | 1 (2 at S) |
+| Graph (plot area) | 80 x 60 | 90 x 70 | 100 x 80 | 1 (2 at S) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Tally box | 24 x 8 | 28 x 10 | 32 x 12 | - |
 
 Required cell height for a visual cell = visual height + optional name label + top inset (3, or label + 1 per CL-40) + 2 + answer zone (Hw + 4) + 3. Maximum columns = `floor(W / (max(visualMinW, answerW) + 6))`, capped at 5.
@@ -863,21 +863,21 @@ MathQuest's own schema set. The same shapes are used from Level K to Level 6; on
 - **RP-90** Fraction circle: outline 1.5 pt, partitions 0.75 pt, sectors start at 12 o'clock and run clockwise. Fraction bar: outline 1.5 pt, dividers 0.75 pt, shading contiguous from the left. Shaded parts are flat grey (hatch in photocopy-safe mode).
 - **RP-91** Fraction cells lay out **side by side**: the printed fraction or the fraction answer stack (12 / 14 / 16 mm wide), a 6 mm gap, then the model. No bottom answer zone.
 - **RP-92** Values above 1 are normal, not special: improper fractions and mixed numbers are drawn as a row of whole models with a 3 mm gap, and fraction number lines run **past 1** (0 to 2 or 0 to 3 by default from the step where improper fractions are introduced). Whole ticks are heavy, part ticks hairline (RP-50).
-- **RP-93** Shade-it and partition-it items: parts are empty; each part is at least 6 mm at mid-radius or across. Denominator caps: circle 8 / 10 / 12 at S / M / L; bar 8 in 3 columns, 12 in 2 columns. Partition items show guide dots on the circumference (dotted semantics), never the partition lines.
+- **RP-93** Shade-it and partition-it items: parts are empty; each part is at least 6 mm at mid-radius or across. Denominator caps: circle 8 / 10 / 12 at S / M / L; bar 8 in 3 columns, 12 in 2 columns. Partition items show guide dots on the circumference (dotted semantics), never the partition lines. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **RP-94** Decimal grid: 10 x 10, outline 1.5 pt, interior 0.5 pt with 0.75 pt lines every 5; cell at least 4 mm. Tenths strip: 10 parts, each at least 6 mm wide. Decimal number lines label both forms only in the Model.
 
 ### 11.12 Clocks
 
 - **RP-100** Analog face: rim circle 1.5 pt at R; inner ring 0.5 pt at 0.90 R; minute ticks 0.90 R to 0.85 R at 0.5 pt; five-minute ticks 0.90 R to 0.80 R at 0.75 pt; numerals 1-12 Andika 700 at 0.12 D (never below zone-label minimum) centred on radius 0.66 R; pivot solid dot radius 1 mm.
 - **RP-101** Hands: hour hand 0.46 R, 2.25 pt; minute hand 0.78 R, 1.5 pt; both with round caps and a solid arrow tip. Told apart by length and weight only. Hour-hand angle = 30h + 0.5m degrees (at 12:30 it sits midway between 12 and 1). At 12:00 the minute hand is drawn on top. Hours are written 12, never 0.
-- **RP-102** Precision depends on diameter: hour and half hour need D >= 26 mm; 5-minute D >= 30; 1-minute D >= 42; draw-the-hands D >= 46. A panel that cannot give the diameter offers only the coarser items. **Half-width panels** (Daily Spiral sections, Daily 4 cells): a 38 mm clock is allowed at S, M and L, only for read-the-time items to the hour, half hour or 5 minutes. 1-minute reading and draw-the-hands items always take the full table 11.2 minimum (46 / 50 / 52) and therefore a full-width panel.
+- **RP-102** Precision depends on diameter: hour and half hour need D >= 26 mm; 5-minute D >= 30; 1-minute D >= 42; draw-the-hands D >= 46. A panel that cannot give the diameter offers only the coarser items. **Half-width panels** (Daily Spiral sections, Daily 4 cells): a 38 mm clock is allowed at S, M and L, only for read-the-time items to the hour, half hour or 5 minutes. 1-minute reading and draw-the-hands items always take the full table 11.2 minimum (46 / 50 / 52) and therefore a full-width panel. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **RP-103** Variants: (a) plain face; (b) face ringed by 12 rounded write-in boxes for the minute counts (Model / Guided); (c) outer minute ring 5-55 at 1.14 R, black in Model, grey in Guided, off in Independent; (d) half-shaded face (grey right half) for "half past" models; (e) draw-the-hands face: bold rim, numerals, five-minute ticks, **no hands** (hour hand may be pre-drawn grey in Guided); (f) digital: rounded rectangle 1.5 pt, solid Andika 700 digits, two colon dots, no leading zero, no seven-segment styling.
 - **RP-104** The time answer slot is the two-box `__:__` slot (section 6); AM / PM is a words-to-circle choice beside it.
 
 ### 11.13 Generic coins and notes
 
 - **RP-110** Coins are **generic**: circles that show only a value. Values 1, 5, 10 and 25 only — and, at the Qatari riyal currency only, 50 (owner ruling Q2, 2026-09-25), drawn the same way at the next RP-111 step, 26.51 mm. No national portraits, buildings, mottoes, edge reeding, dates, or dollar / cent art.
-- **RP-111** Coins are sized **by value**, never by a national coinage: diameters 17.5 (1), 19.75 (5), 22.0 (10), 24.26 (25) mm at scale 1.0. The 1 is the smallest and the 25 the largest, each step is 2.25 mm, and a bigger coin is always worth more (owner ruling 2026-09-19; this replaces the US relative sizes, in which the 10 was the smallest coin). Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width spiral and mixed panels. Coins never go smaller, never overlap, never fan.
+- **RP-111** Coins are sized **by value**, never by a national coinage: diameters 17.5 (1), 19.75 (5), 22.0 (10), 24.26 (25) mm at scale 1.0. The 1 is the smallest and the 25 the largest, each step is 2.25 mm, and a bigger coin is always worth more (owner ruling 2026-09-19; this replaces the US relative sizes, in which the 10 was the smallest coin). Scale is 1.0 at M and L, 0.85 at S, 0.8 in half-width spiral and mixed panels. Coins never go smaller, never overlap, never fan. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **RP-112** Drawing: outer rim 1.5 pt, inner ring 0.5 pt at 0.88 r (the double ring distinguishes a coin from a counter), value numeral Andika 700 centred, height 0.40 D. White fill.
 - **RP-113** Layout: rows, highest value first, 2 mm gaps, each row centred. Independent cells: at most 6 coins per 93 mm cell in up to 2 rows. Model and Guided coin cells are full-width single rows of at most **5** coins, because they carry count-on boxes (a writing box under each coin, Hw + 2 tall) and a running-total zone: five 25s plus gaps is 129.3 mm, leaving 56.7 mm of the 186 mm body, while six would need 155.6 mm and overflow. Six is still allowed in an Independent cell, which has no count-on boxes.
 - **RP-114** Optional count-by-fives dots (hint scaffold): solid 1.5 mm dots under the numeral, one per five (5: one dot, 10: two, 25: five); the 1 coin carries a short stroke. Off in Independent by default.
@@ -922,11 +922,11 @@ MathQuest's own schema set. The same shapes are used from Level K to Level 6; on
 
 Items per page. "By table" means the computed capacity in 12.3. A ceiling is never exceeded; a smaller count is always allowed.
 
-| Page role | S | M | L | Notes |
+| Page role | S | M | L | Notes <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | Lesson opener | 2 Model + 4 Guided | 1-2 + 3 | 1-2 + 2-3 | Plus bands; K one-pager: 2 Model / 2 Guided / 2 alone |
 | Scripted model | 1 problem, 3-6 frames | same | same | Second example only with identical wording |
-| Guided page | 10 | 8 | 3-6 | Tries, plus the unscored Model (CL-14: cells unlabelled). Steps strip stays visible. 10 / 8 at S / M since 2026-09-25 (pv-r1 critic: short problems left a 20-26% strip under 8); tall problems stop sooner by height |
+| Guided page | 10 | 8 | 3-6 | Tries, plus the unscored Model (CL-14: cells unlabelled). Steps strip stays visible. 10 / 8 at S / M since 2026-09-25 (pv-r1 critic: short problems left a 20-26% strip under 8); tall problems stop sooner by height <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Independent / More Practice | 6 (up to 16 for one-symbol answers, using the 2 x 5 and 2 x 8 grids) | 6 (one-symbol answers: as S) | 6 (one-symbol answers: as S); 4 for long procedures | 2 x 3 default |
 | Wide-visual rows | 5 | 4 | 3 | Number lines, base-10 over 100, coin rows |
 | Sub-skill / decision | 12 | 8 | 6-8 | No answer computed |
@@ -941,7 +941,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 | Fact probe | 20 (15 vertical + 5 horizontal) | 20 | 20 | A division probe with the think box on drops one row: 18 (SF-40). 8-10 columns fill the page: 56 / 72 / 80 facts at L (same rows as fact rows, 12.3) |
 | Fact-family probe | 40 | 40 | 40 (2 pages) | |
 | Practice strips, 2-up | 2 x 10 | 2 x 10 | 2 x 10 | Dashed cut line between strips |
-| Daily spiral | spread 28 responses; compact 20 | same | spread only | Compact one-page form at S and M only |
+| Daily spiral | spread 28 responses; compact 20 | same | spread only | Compact one-page form at M only (S dropped 2026-11-13) |
 | Mixed practice | 9 rows | 7 rows | 5 rows | Unit-packed |
 | Daily 4 | 5 days x 4 | 5 days x 4, or 3 + 2 | 3 + 2 days over two sides | DN-30 |
 | True or False? | 8 | 6 | 4 | Check box + sentence frame each |
@@ -956,32 +956,32 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 - **DN-1** Reference densities above about 40 responses per page were judged too dense for these pupils; outside fact layouts no page exceeds 20 scored responses at L.
 - **DN-2** Every cell passes CL-5 (40% free) at every capacity in this section.
-- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **30 / 20 / 12** standard problems at S / M / L, and a page of short problems up to **30 / 24 / 20** (DN-1's 20 is at L; critic guided-r1), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L.
+- **DN-1a** (2026-09-25, `design/audit/LESSONS_LEARNED.md` L1) A kit Independent / More Practice page packed to its problems' measured size (dense packing) holds up to **30 / 20 / 12** standard problems at S / M / L, and a page of short problems up to **30 / 24 / 20** (DN-1's 20 is at L; critic guided-r1), and may take one more column at S than at L where the problem's own width allows it (12.3's stacked-arithmetic table). Size S never prints the grid of L. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 ### 12.2 The column x size rule
 
 **One rule: Size fixes the writing space and the top digit size. Columns may move digits only along the section type's ladder. Past the ladder floor, the column count clamps. Content never shrinks.**
 
-- **DN-10** S / M / L always sets writing height Hw, blank width B, label size, text sizes, minimum visual sizes and the top digit size (16 / 22 / 28). None of these ever changes with column count.
+- **DN-10** S / M / L always sets writing height Hw, blank width B, label size, text sizes, minimum visual sizes and the top digit size (16 / 22 / 28). None of these ever changes with column count. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 - **DN-11** Ladders:
 
 | Section type | Ladder |
 |---|---|
 | Vertical facts; numeral trace rows | Column-keyed ladder (TY-30), independent of size. Columns win |
-| Horizontal equations | L: 28, 24, 22 pt. M: 22, 20, 18, 16 pt. S: 16 pt |
+| Horizontal equations | L: 28, 24, 22 pt. M: 22, 20, 18, 16 pt. S: 16 pt <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Everything else | The preset size only. Size wins; columns clamp |
 
 - **DN-12** The dialog keeps **Auto, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10**. The teacher's stored choice is never overwritten; the effective value is derived on every render.
 - **DN-13** Explicit N is honoured if the section's widest problem fits at some ladder step (fit tests: VA-6 for stacked work, DN-22 for equations, `max(visual, answer) + 6 mm` for visuals). Otherwise N clamps to the largest count that fits at the ladder floor.
 - **DN-14** Clamp and step-down notes appear **in the dialog and the preview only**, as persistent text beside the Columns control. Nothing about a clamp is ever printed on a pupil sheet, a footer or an answer key. Three templates:
-  - Clamp: "3-digit problems, size M: max 4 columns. Showing 4. Size S fits 6."
+  - Clamp: "3-digit problems, size M: max 4 columns. Showing 4."
   - Step-down: "10 columns: digits 16 pt (size L is 28 pt). Writing space stays 10 mm."
   - Forced: "Word problems print in 1 column." / "Charts use the full page." / "Mixed sheets use even columns. Using 4." / "Max 4 columns for horizontal facts. Use fact rows for 5-10."
 - **DN-15** Auto = the largest N, up to the page type's auto cap, that keeps the top ladder step with column fill of 92% or less and at least 6 mm slack on stacked work. Auto never returns 1 when 2 or more fit.
 
 | Page type | Auto columns | Hard cap |
 |---|---|---|
-| Fact rows | 9 / 6 / 5 (owner rule 2026-11-05: 10 only when picked) | 10; 8 when answers exceed 99; at most 9 when division is included, in every notation (owner ruling 2026-11-05, replacing 10 of 2026-10-30); at Auto a stacked ÷ page with 3-digit dividends takes 9 at S for 2 mm of white each side (owner 2026-11-05, PAGE_TYPES PT-FRW-9) |
+| Fact rows | 9 / 6 / 5 (owner rule 2026-11-05: 10 only when picked) | 10; 8 when answers exceed 99; at most 9 when division is included, in every notation (owner ruling 2026-11-05, replacing 10 of 2026-10-30); at Auto a stacked ÷ page with 3-digit dividends takes 9 at S for 2 mm of white each side (owner 2026-11-05, PAGE_TYPES PT-FRW-9) <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | Fact probe | 5 | 5-10 (a choice of 1-4 becomes 5); division probes 2-3 |
 | Computation grid | 3 Daily, 2 I Can | 6 |
 | Long division | by table | 6, min cell width 30 mm |
@@ -996,7 +996,7 @@ Items per page. "By table" means the computed capacity in 12.3. A ceiling is nev
 
 ### 12.3 Capacity tables (A4, full header, one section)
 
-Letter and header-off capacities are produced by the same formulas with the paper's gridH; the layout unit tests hold the generated tables. Figures are S / M / L.
+Letter and header-off capacities are produced by the same formulas with the paper's gridH; the layout unit tests hold the generated tables. Figures are S / M / L. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 
 **Fact rows (vertical)**
 
@@ -1010,7 +1010,7 @@ Day-band height = strip (7 / 8 / 10) + 3 x cell height, 3 mm between bands. At L
 
 **Stacked arithmetic: maximum columns** = largest c <= 6 with `c x (T x track + separators x 0.3 em + 2 x sidePad) + (c + 1) x border <= W`.
 
-| T | I Can S | I Can M | I Can L | Daily S | Daily M | Daily L |
+| T | I Can S | I Can M | I Can L | Daily S | Daily M | Daily L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|---|---|
 | 3 (2-digit) | 6 | 6 | 5 | 6 | 5 | 4 |
 | 4 (3-digit) | 6 | 5 | 4 | 6 | 4 | 3 |
@@ -1023,7 +1023,7 @@ With any regroup scaffold, use the Daily columns of this table for both looks (T
 
 **Stacked arithmetic: rows and items** (plain add / subtract; target rows by columns {1: 4, 2: 3, 3: 3, 4: 4, 5: 5, 6: 6})
 
-| Columns | Cell w (mm) | Rows S / M / L | Cell h (mm) | Items |
+| Columns | Cell w (mm) | Rows S / M / L | Cell h (mm) | Items <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|---|
 | 1 | 186 (stack in left 62) | 4 / 4 / 4 | 57 | 4 |
 | 2 | 93 | 3 / 3 / 3 | 76 | 6 |
@@ -1036,7 +1036,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 
 **Long division (maximum / Auto)**
 
-| Problem | S | M | L |
+| Problem | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | 2-digit by 1-digit | 20 / 16 | 12 / 9 | 9 / 9 |
 | 3 by 1 | 12 / 12 | 9 / 9 | 6 / 4 |
@@ -1046,7 +1046,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 
 **Visual grid (items per page)**
 
-| Visual | S | M | L |
+| Visual | S | M | L <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 |---|---|---|---|
 | Clock, read | 16 | 9 | 9 (Auto 6) |
 | Clock, draw hands | 9 | 9 | 9 |
@@ -1136,7 +1136,7 @@ Multiply by 2-digit at 3 columns: 12 / 9 / 9. Regroup scaffolds on at 3 columns:
 - **SF-31** Four-part fade for + and − facts, with identical item order across parts: **Part 1** tile (or dots) + circle the bigger number; **Part 2** circle only; **Part 3** no cue; **Part 4** mixed and cumulative facts, no cue. The set is one constant (0 to 13) chosen in the dialog and named in the title, and the band caps the sum or the minuend independently of it (P-FL-20); the tile is drawn for the other operand, whose size the band controls. The part is chosen in the dialog and named in the teacher footer only (P-FL-14); tab line 3 carries the probe id and form ("Probe ×3 A").
 - **SF-32** The cue marks the smaller number only. The ring is drawn by the pupil; only the first cell of Part 1 and Part 2 shows a dotted model ring.
 - **SF-33** **Multiplication and division facts**: the teacher chooses the cue per print; dialog option "× ÷ fact cue: skip-count strip / array tile / none", default **skip-count strip** (owner ruling 2026-09-19).
-- **SF-34** **Touch numerals** (owner report 2026-10-03; `js/modules/sheet/touchdots.js`; geometry per SUPPORTS.md §S1.1 owner rulings 9-11). A touched digit is the real Andika digit with its marks on its strokes: 1-5 solid dots 0.16 em with a white keyline (>= 0.15 mm on paper; on screen a 0.5 px hairline, owner exception 2026-10-03); 6-9 a 0.08 em centre dot on a white keyline (>= 0.26 mm / 1.5 px) inside an OPEN ring 0.23 em across, ring line 0.03 em (>= 0.25 mm / 1.5 px), gap >= 0.30 mm (x 1.25 photocopy-safe) / 2 px; 0 none. Marks never merge (edge gap >= 0.6 x the counted dot; gate `tests/scripts/ws-touchdots.cjs`). **Floor: drawn only at >= 24 pt on paper and >= 40 px on screen**; a cell carrying them is raised to that size (S / M pages print stacked touch cells at 28 pt and say so in the fit line, a fact at no less than 24 pt; the online-worksheet grid draws at 40 px once touch numerals appear and keeps it). Content never shrinks. Only single-digit OPERANDS are touch numerals, never the answer, a sign or a two-digit number (a stack dots its digits column by column). Black; photocopy-safe sheets keep solid black marks with the wider gap (never dashed, LS-2); the screen trace greys the marks only.
+- **SF-34** **Touch numerals** (owner report 2026-10-03; `js/modules/sheet/touchdots.js`; geometry per SUPPORTS.md §S1.1 owner rulings 9-11). A touched digit is the real Andika digit with its marks on its strokes: 1-5 solid dots 0.16 em with a white keyline (>= 0.15 mm on paper; on screen a 0.5 px hairline, owner exception 2026-10-03); 6-9 a 0.08 em centre dot on a white keyline (>= 0.26 mm / 1.5 px) inside an OPEN ring 0.23 em across, ring line 0.03 em (>= 0.25 mm / 1.5 px), gap >= 0.30 mm (x 1.25 photocopy-safe) / 2 px; 0 none. Marks never merge (edge gap >= 0.6 x the counted dot; gate `tests/scripts/ws-touchdots.cjs`). **Floor: drawn only at >= 24 pt on paper and >= 40 px on screen**; a cell carrying them is raised to that size (S / M pages print stacked touch cells at 28 pt and say so in the fit line, a fact at no less than 24 pt; the online-worksheet grid draws at 40 px once touch numerals appear and keeps it). Content never shrinks. Only single-digit OPERANDS are touch numerals, never the answer, a sign or a two-digit number (a stack dots its digits column by column). Black; photocopy-safe sheets keep solid black marks with the wider gap (never dashed, LS-2); the screen trace greys the marks only. <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   - **Skip-count side strip (default)**: the rounded support strip at the side of the grid listing k, 2k ... 12k (to 10k when the fact range is limited to 10), anchored to the grid top; the grid narrows to 186 - (strip width + 4 mm gap) (section 2.3).
   - **Array tile**: a rounded tile (a number object, section 5) with a 0.75 pt outline in the dot tile's slot beside the fact, showing the fact as an array of solid dots: the set's constant in each row, one row per count, with the 1.5 mm subitising gap after the 5th row and column (RP-81). Dot pitch is never under 1.5 mm and dot diameter is 0.6 of the pitch. Offered only at **5 columns or fewer**; when any fact of the set cannot be drawn at the minimum pitch inside its slot, the dialog disables the tile with its reason and the strip stands.
   - **None**: no cue.
@@ -1323,8 +1323,8 @@ v1: one per page, fully scaffolded
 | **M-COPY** | Photocopy a copy on the school copier in standard and photocopy-safe modes: grey, 0.5 pt lines, hatch, dotted-outline digits, tabs all legible; tabs do not checkerboard | INK-20, INK-23, CL-36 |
 | **M-GLYPH** | Read the specimen block: flagged 1, open 4, single-storey a and g, O vs 0, track alignment | TY-40 (b-e), VA-30 |
 | **M-SEMANTICS** | Review each new cell template against the line-style and corner table: dotted, dashed, solid / hollow, square / rounded used only for their meanings; dashed only on cut lines (long dash) and on the missing-digit box (short dash); no distinction carried by grey level; band labels and section titles plain; the `Say:` band's rule weight and height | LS-2 to LS-8, INK-6, BD-4, BD-6, BD-8, RP-140 to RP-146 |
-| **M-ARITH** | Review stacked-arithmetic, fact and division mock-ups against section 10 at S / M / L in both looks: operator track, rule span, anchoring, separators, partial rows, bracket path, helper strips, own-section rule for bracket division, both fact orientations | VA-1, VA-2, VA-3, VA-5, VA-13, VA-42, VA-51, VA-52, VA-60, VA-64, VA-65, VA-66, VA-71, TY-26 |
-| **M-DRAW** | Review each representation builder against its RP rules at S / M / L in both looks, in the gallery page | RP-10 to RP-133, RP-161, RP-170, RP-2, RP-4, RP-6, RP-8 |
+| **M-ARITH** | Review stacked-arithmetic, fact and division mock-ups against section 10 at M / L in both looks: operator track, rule span, anchoring, separators, partial rows, bracket path, helper strips, own-section rule for bracket division, both fact orientations | VA-1, VA-2, VA-3, VA-5, VA-13, VA-42, VA-51, VA-52, VA-60, VA-64, VA-65, VA-66, VA-71, TY-26 |
+| **M-DRAW** | Review each representation builder against its RP rules at M / L in both looks, in the gallery page | RP-10 to RP-133, RP-161, RP-170, RP-2, RP-4, RP-6, RP-8 |
 | **M-HEADER** | Toggle the five header check boxes (plus Time / Goal) through the combinations in 8.3 in the dialog; confirm heights, field positions, persistence after reopening | HD-1, HD-3, HD-4, HD-12, HD-15, HD-16 |
 | **M-FADE** | Print a lesson packet: hints only ever decrease page to page; structural scaffolds persist; first-cell cues drop; options for tests behave as checked | SF-1 to SF-4, SF-10 to SF-12, SF-30 to SF-34, SF-41, SF-42, BD-7, VA-11, VA-21, VA-31, VA-32, VA-40, VA-41 |
 | **M-WORDPROB** | Review word-problem, True or False?, Reason It, Stretch and error-analysis mock-ups against 13.5-13.6; stories original and neutral | SF-50 to SF-54, SF-60 to SF-63, RP-70, RP-71, RP-116 |

@@ -159,7 +159,7 @@ Pre-skill check: before the first step of a ladder.
 | Pre-skill check | assessment | 0 | one boxed section per prerequisite, 4 or 5 items each; total from {8, 10, 12, 16, 20} | letters inside each box |
 
 **Item caps per page.** These are teaching caps at any size, not layout results. The design standard's
-density table (12.1) sets the ceiling for each size S / M / L; the layout engine may place fewer than a
+density table (12.1) sets the ceiling for each size S / M / L; the layout engine may place fewer than a <!-- nos: S token value (compact layout / decode alias), not an offered size -->
 cap, never more.
 
 | Item kind | Cap per page |
@@ -915,7 +915,7 @@ tile + circle     circle only       no cue
 ### 7.3 Daily Spiral Review
 
 A two-page spread by default: a computation page facing a mixed page. A compact one-page version exists
-at sizes S and M. Section titles are plain, bold, sentence case.
+at size M (S dropped 2026-11-13). Section titles are plain, bold, sentence case.
 
 | Id | Rule |
 |---|---|
@@ -1142,7 +1142,7 @@ misconception.
 
 | Id | Rule |
 |---|---|
-| P-TH-12 | Each item is one statement (an equation, an inequality, a fact about a picture), two check boxes, and one frame of at most 2 blanks that makes the pupil compute the evidence. Blanks are numbers, or a word from a bank. Up to 8 / 6 / 4 per page at S / M / L (the design standard's ceiling). |
+| P-TH-12 | Each item is one statement (an equation, an inequality, a fact about a picture), two check boxes, and one frame of at most 2 blanks that makes the pupil compute the evidence. Blanks are numbers, or a word from a bank. Up to 8 / 6 / 4 per page at S / M / L (the design standard's ceiling). <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | P-TH-13 | Statements are generated from the skill's own items: a true statement uses the correct answer; a false one uses `wrongAnswer(q)`. Statement forms rotate: result on the right; result on the left; two expressions compared; a picture with a claim. |
 
 ### 9.4 Reason It
@@ -1510,7 +1510,7 @@ can check it over seeded samples at ranges 10 / 20 / 100 / 1,000; "Manual" means
 | Q-15 | Every unknown position | Equation and word-problem skills generate every position in the table of section 8.3 on request. | Auto |
 | Q-16 | Worked steps | `workedSteps(q)` is non-empty, 3-6 steps, each within P-5, and the final marks equal the answer. | Auto |
 | Q-17 | Strings complete | `iCan`, `whatsNew`, `instructionKey`, `vocabulary` (at most 3, each with gloss and diagram), `oralFrame` are present and pass section 10. | Auto |
-| Q-18 | Works on every page role | The skill renders on every role in P-27 at S / M / L in both looks without overflow or shrinkage. | Auto |
+| Q-18 | Works on every page role | The skill renders on every role in P-27 at M / L in both looks without overflow or shrinkage. | Auto |
 | Q-19 | Print and screen parity | Same cell, same response mode, inputs for blanks (P-29); feedback follows section 11.3. | Auto + Manual |
 | Q-20 | Level and neutrality | The skill has a Level (K, 1-6, or M for multi-level); pupil text says "Level"; contexts pass P-WP-22; coins are generic; no emoji, no colour dependence. | Auto + Manual |
 

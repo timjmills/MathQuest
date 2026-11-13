@@ -87,7 +87,7 @@ New files. The kit lives in `js/modules/sheet/`; two new modules live beside the
 | `js/modules/skill-aliases.js` | 0 | `SKILL_ALIASES`, `resolveSkill()` (section 11). Already present, table empty |
 | `js/modules/skill-codes-frozen.js` | 0 | frozen share-code tables (section 11). Already present |
 | `js/modules/ladders.js` | 0 | ladder and step data only (section 9) |
-| `js/modules/sheet/tokens.js` | 1 | sizes S/M/L, looks, paper, the grey token, line weights |
+| `js/modules/sheet/tokens.js` | 1 | sizes S/M/L, looks, paper, the grey token, line weights <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | `js/modules/sheet/rng.js` | 1 | `mulberry32`, `deriveSeed` |
 | `js/modules/sheet/registry.js` | 1 | `registerCell`, `getCell`, `hasCell`, `listCells`, `coverage` |
 | `js/modules/sheet/cell.js` | 1 | `renderCellBox`, `blank`, `mountCell`, `gradeSlots`, `markSlots`, `cutLine` |
@@ -333,7 +333,7 @@ export function coverage(skillKeys) {}  // {[skillKey]: {template, isLegacy, def
 |---|---|---|
 | `look` | role default: `ican` for lesson, review, test, reasoning and word-problem roles; `daily` for computation grid, fact layouts, spiral, mixed, Daily 4, Today's Number | composer; the dialog may override it (one look per page) |
 | `size` | `L` | dialog |
-| `metrics` | from `tokens.js`: digits 16 / 22 / 28 pt and writing height 6 / 8 / 10 mm at S / M / L | `page.js`. For fact sections the chosen column count sets `digitPt`: up to 5 columns 28, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16 |
+| `metrics` | from `tokens.js`: digits 16 / 22 / 28 pt and writing height 6 / 8 / 10 mm at S / M / L | `page.js`. For fact sections the chosen column count sets `digitPt`: up to 5 columns 28, 6: 24, 7: 20, 8: 18, 9: 16, 10: 16 <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 | `label.style` | `letter` in the I Can look, `tab` in the Daily look | composer; dialog override letters / black tabs / none |
 | `mono` | `true` | always `true` inside the question card, sheets and migrated hosts |
 
@@ -953,7 +953,7 @@ measured by the host at the builder's column counts, and reads an item only thro
 | the template's `stepState(payload, groups, k, ctx)` (through `anchors.js stepTemplateOf`) | chart panels, We Do | the problem drawn after step k (newest marks grey, earlier black) |
 | `strings(ref)` (3.4, 3.8): `instructionKey`, `say` | every band's instruction, the chart's Say line | the library instruction, the oral frame |
 | `answerKey` / `q.ans` | We Do variety, keys | the answer |
-| `footprint(p, ctx).minSize` | practice, mixed | the item's size floor on an S / M page |
+| `footprint(p, ctx).minSize` | practice, mixed | the item's size floor on an S / M page <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 
 **The lesson page data** (`lessons/prereqs.js` LESSONS shape; a detailed lesson's `lessonData`) tells the builders what
 the skill teaches: `steps`, `example` / `second` / `third` / `fourth` (case names from `CASE_TESTS`), `guided`,
@@ -1798,7 +1798,7 @@ has at most 10 words. `iCan` starts with "I Can ". No string contains "Grade" or
 | 6 | Screen: slots through `blank()`, `legacyClass` where SCC-S10 allows, entry order, feedback mode | SCC-LINT-28 |
 | 7 | Twin skills merged through aliases, never by deleting or reordering | SCC-LINT-02, share-code tests |
 | 8 | Delete the family's branches from `formatProblemForPrintLegacy`, `generateWorkedSolution` and `legacySniff` in deletion-only commits | baseline differences reviewed |
-| 9 | Compliance run green at S, M, L, both looks, print and screen, every role | matrix row green |
+| 9 | Compliance run green at M, L, both looks, print and screen, every role | matrix row green |
 | 10 | The two gates: independent code review of the full diff, then live browser QA | report triaged |
 
 ### 10.2 Family notes

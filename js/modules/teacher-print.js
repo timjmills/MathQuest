@@ -1320,7 +1320,7 @@ function fitsNotes(res) {
             t = t.replace(/^\d+\s+columns?\s*[x×]\s*\d+\s+rows?,?\s*(\d+\s+per page,?\s*)?(\d+\s+pages?\.?)?\s*/i, '').trim();
             if (!t) continue;
         }
-        t = t.replace(/\bat size ([SML])\b/g, (m, z) => `at size ${z === 'S' ? 'Small' : z === 'M' ? 'Medium' : 'Large'}`)
+        t = t.replace(/\bat size ([SML])\b/g, (m, z) => (z === 'S' ? `in the ${COMPACT_LABEL} layout` : `at size ${z === 'M' ? 'Medium' : 'Large'}`))   // critic nos r2 nit: S is only ever the compact layout
             .replace(/\bmax (\d+) columns?\b/gi, (m, k) => `at most ${k} column${k === '1' ? '' : 's'}`)
             .replace(/\bstep-by-step steps\b/g, 'worked steps');
         if (!out.includes(t)) out.push(t);

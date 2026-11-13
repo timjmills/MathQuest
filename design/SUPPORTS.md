@@ -40,7 +40,7 @@ These supersede the standards where they differ.
    default; the knocked-out ring stays only as an option.
 10. **Keep the white keyline on single dots.**
 11. **Touch dots force size L.** When touch dots are on and an item's digits would fall under
-    24 pt (for example column stacks at M, 22 pt, or anything at S), **that item switches to size
+    24 pt (for example column stacks at M, 22 pt, or anything at S), **that item switches to size <!-- nos: S token value (compact layout / decode alias), not an offered size -->
     L** (28 pt). It never falls back to the dot tile. This is a rule for the allocator lane (S2):
     an item that carries touch dots is laid out at L whatever the sheet's preset.
 
@@ -128,7 +128,7 @@ outward; the centre dot never shrinks.
 - **Owner ruling 11 — force L, never the tile.** When touch dots are on and an item's digits would
   fall under 24 pt, **that item switches to size L** (28 pt). On the kit's fact ladder, L (5
   columns, 28 pt) and M (6 columns, 24 pt) facts already qualify; a fact at 7+ columns or at the S
-  preset, and a column stack at M (22 pt) or S (16 pt), are laid out at L instead. **Allocator rule
+  preset, and a column stack at M (22 pt) or S (16 pt), are laid out at L instead. **Allocator rule <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   (S2):** `allocateSupports` marks such an item `forceSize: 'L'`, and the layout places it with
   L's metrics (its own section or row), so the page stays regular; the dot tile is never
   substituted for touch dots.
@@ -268,7 +268,7 @@ Specimen: `node tests/scripts/ws-touchdots-specimen.cjs` → `design/audit/runs/
   - **layout:** a kit fact and stack have identical boxes with and without the overlay;
   - **screen:** the specimen card's targets are ≥ 44 × 44 px at 390 and 1280, taps count, extra
     taps do nothing, "Start again" clears, no horizontal scroll.
-  - `--size S|L` runs the same gate for another size (evidence for §S1.4).
+  - `--size M|L` runs the same gate for another size (evidence for §S1.4).
 - Specimen: `design/specimens/touch-dots.html` (+ `touch-dots-card.html`), rendered by
   `node design/specimens/render-touch-dots.cjs` to `touch-dots.png`, `touch-dots-digits.png` and
   `touch-dots-facts-L.png`.
@@ -302,7 +302,7 @@ problem.
 | **Touch dots for × and ÷**: × dots on the factor that is not the table number (count by the table number); ÷ a tally-dot row of the section's one length (10, or 12 on a ×12 set), touched while counting by the divisor. | SF-33 / PT-FPR-10 / P-FL-17 ("never for × and ÷"), SF-32 (smaller number only: + now has count all → count on → none, − count all → count back → none). |
 | **A support level fades DOWN THE PAGE**, never cycles: {3, 2, 1} on six cells is 3, 3, 2, 2, 1, 1. | The `supportLevelFor` / `_kLevel` round-robin by item index (gen-operations.js, gen-counting.js). |
 | **Clashing supports** are shared by section (default) or problem by problem; compatible supports stack. | — |
-| **Touch-dot digits under 24 pt force size L** for that section (a stack or sentence drawn at L inside an M / S page; a fact takes the ladder, capped at 6 columns = 24 pt). | §S1.1 ruling 11. |
+| **Touch-dot digits under 24 pt force size L** for that section (a stack or sentence drawn at L inside an M / S page; a fact takes the ladder, capped at 6 columns = 24 pt). | §S1.1 ruling 11. <!-- nos: S token value (compact layout / decode alias), not an offered size --> |
 
 The standards' own text is not rewritten in this change; these rows are the record, and the S1.12
 amendment list carries them when the owner signs S1 off.
@@ -393,7 +393,7 @@ Supports cost only their own room:
   cell's left (2 mm in), so the answer zone stands in one place even when the pictures differ in
   width.
 - **Smaller attached supports**: a pane drawn round a problem is one preset smaller than the page
-  (pictures at M, keeping their touch floors; marks and the checklist at S), without its own number
+  (pictures at M, keeping their touch floors; marks and the checklist at S), without its own number <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   sentence (the problem is the sentence). The checklist uses short lines (`SUPPORT_STEPS`, about 13
   characters) so it fits beside a column stack in a two-column cell.
 - **Subtraction cues** (dot tiles, ten frames) use the S4 panes (`dice`, `tenframe`), whose crosses
@@ -730,7 +730,7 @@ answer traced grey, and every step listed beside it.
   - the steps before the first mark get a state of their own (the problem, not yet worked);
   - beyond 4 states, the shortest adjacent pair is merged.
 
-  The states are drawn one preset smaller than the page (S on a page at L), so the example reads as
+  The states are drawn one preset smaller than the page (S on a page at L), so the example reads as <!-- nos: S token value (compact layout / decode alias), not an offered size -->
   the teacher's worked example beside the pupil's full-size problems. States are divided by a grey
   hairline.
 - **Steps.** Each state's numbered steps sit under it, one sentence a line (`stepLines`). A line

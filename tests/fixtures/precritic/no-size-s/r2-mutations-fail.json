@@ -1,0 +1,11 @@
+[
+ {"kind": "app", "file": "js/modules/teacher-shell.js", "line": "        <div><span class=\"tv-label\">Size</span>${segBtns('Size', pd.size, 'SML'.split('').map((z) => [z, z]))}</div>", "why": "critic nos r2 mutation C: the Settings picker built from 'SML'.split('') (missed by the r2 static guard)"},
+ {"kind": "app", "file": "js/modules/teacher-print.js", "line": "        : seg('size', pr.size, 'SML'.split('').map((z) => [z, z]), 'Print size')}</div>", "why": "critic nos r2 mutation D: the Print Setup picker from 'SML'.split(''), labelled Print size"},
+ {"kind": "doc", "file": "design/audit/RUBRIC.md", "line": "Render every page at size S and at L.", "why": "critic nos r2 mutation E (missed by the r2 DOC rule)"},
+ {"kind": "doc", "file": "design/audit/RUBRIC.md", "line": "Print the sample at size S and at L.", "why": "critic nos r2 N2: \"at size S and at L\""},
+ {"kind": "doc", "file": "design/EXTENSION_PLAYBOOK.md", "line": "Draw the exemplar at Small and Large.", "why": "critic nos r2 N2: \"Small and Large\""},
+ {"kind": "doc", "file": "design/LESSON_RULES.md", "line": "Run `ws-lesson-check --sizes S,M,L` before the critic.", "why": "critic nos r2 N2: \"--sizes S,M,L\" in a doc"},
+ {"kind": "doc", "file": "WORKSHEET_DESIGN_STANDARD.md", "line": "Terms used throughout: **S / M / L** = the size preset. **Hw** = writing height (6 / 8 / 10 mm).", "why": "critic nos r2 N3: WORKSHEET_DESIGN_STANDARD.md:22 as it stood on 4a8e539b4"},
+ {"kind": "doc", "file": "design/EXTENSION_PLAYBOOK.md", "line": "- **Size**: S / M / L, digits 16 / 22 / 28 pt, writing height Hw 6 / 8 / 10 mm. All exemplars are drawn at L on A4.", "why": "critic nos r2 N3: EXTENSION_PLAYBOOK.md:72 as it stood on 4a8e539b4"},
+ {"kind": "doc", "file": "design/audit/LESSONS_LEARNED.md", "line": "| L2 | **Wasted space** | Size the cell to its content; count how many fit at S/M/L before building |", "why": "critic nos r2 N3: the L2 row (S/M/L)"}
+]
