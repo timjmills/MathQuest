@@ -788,3 +788,9 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-13 — Deploy shared page roles deploy-5 (lf-roles, critic r7a PASS, 0 counted defects)
 - npr Error Analysis S: the Correct / Fix it column keeps its own width (was flex-grow, judgement at 69.5 vs 131.5 mm); EA redo work left-aligned like its copy (G2, EA-REDO-ALIGN); owner rule batch: 11 backtest rows, ws-cell-checks --fixture, ws-precritic --overflow-fixture, per-role precritic plans (duplicate per-role gate removed so --model-states stays); teacher-preview F8 ledger row closed against options-panel-sample. r17 (widened capacity pin) NOT included - ships with the Guided S round.
 - Gates: boot-smoke, roles-unit (80), precritic-plan (156 on path; no row dropped), capacity-pin, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, empty-band self-test. 0 passed EA pages change.
+
+## 2026-11-13 ~16:45 UTC — Weekly usage limit reached (resets 2026-11-19 22:00 UTC)
+- Lane builders hit HTTP 429 (weekly limit). Owner had lifted the budget limits ("let things be"); the CLAUDE.md 80 % rule was suspended by owner and the account reached 100 %.
+- Nothing lost; every lane pushed its work with resume points in design/status/<lane>.md. Do NOT deploy: lf-engine -pc (79ea333b8, WIP), -roles (a8ec3f2ac, pre re-critic), -g7; lf-partopts -deploy (2d008dfb3, gates not re-run; §8d 12 mm margin reason needs a re-read after the ROWFIT-BT re-pin).
+- Live today: vocabulary (both skills redesign-passed), Reason It deploy-4, roles deploy-3/-5, pixel empty-band + ledger sweep + no-dropped-row guard (+ merge-base hotfix), EB-FOOT item pairing, lesson-baseline deploy gate.
+- On reset: each lane resumes its builders where they stopped (no fresh starts); first deploy in line is lf-partopts step A.
