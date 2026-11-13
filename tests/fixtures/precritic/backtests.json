@@ -5246,6 +5246,44 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r16-vletter",
+  "check": "V-LETTER: a Match 3 picture letter sits at one anchor, the top-left of its picture, in every slot of a line of pictures (tops, letter-to-picture offset and gap within 0.5 mm): every print role that deals Match 3 at S / M / L and seeds 7, 143869 and the render seed, and the practice card at 1280 / 820 / 390 px; Match 3 S independent item 3 and card-1280, critic r5 nit 3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit --browser V-LETTER (lf-vocab r16)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r5 pass): pictures bottom-aligned, letters at each picture top"
+  },
+  "pass": {
+   "commit": "0defd42f",
+   "state": "the picture row hangs from one top line"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-LETTER 2>&1 | grep -q \"  - V-LETTER \" && echo \"v-letter: FAIL\" || echo \"v-letter: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r16-vbox390",
+  "check": "V-BOX390: on the practice card at 390 px the three Match 3 letter boxes stand in one column (left x within 4 px, 8 questions): critic r5 nit 4, x 230 / 260 / 225 px",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit --browser V-BOX390 (lf-vocab r16)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r5 pass): the words wrap 2 + 1, boxes follow the centred words"
+  },
+  "pass": {
+   "commit": "223174ce",
+   "state": "up to 600 px: one word a row, right-aligned in a centred column"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-BOX390 2>&1 | grep -q \"  - V-BOX390 \" && echo \"v-box390: FAIL\" || echo \"v-box390: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
