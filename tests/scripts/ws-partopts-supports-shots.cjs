@@ -21,6 +21,8 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const ROOT = path.resolve(__dirname, '..', '..');
 const OUT = path.resolve(arg('out', path.join(ROOT, 'design', 'partopts', 'shots-B')));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const ONLY = arg('only', '');   // (--only panel,quiz,packets,screen: take only those shots)
+const take = (k) => !ONLY || ONLY.split(',').includes(k);
 
 (async () => {
     fs.mkdirSync(OUT, { recursive: true });
@@ -31,7 +33,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const idle = async () => { await sleep(400); await page.waitForFunction(() => { const s = document.querySelector('#tvStage'); return s && s.dataset.state !== 'building' && document.querySelector('.tv-parts'); }, { timeout: 180000, polling: 300 }).catch(() => {}); await sleep(400); };
     try {
         /* the Print screen's panel at 1280 and 390 */
-        for (const width of [1280, 390]) {
+        if (take('panel')) for (const width of [1280, 390]) {
             await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
             await page.evaluate(() => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith([{ categoryId: 'subtraction', skillId: 'sub_100_regroup' }]); });
             await sleep(500);
@@ -48,9 +50,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             await click('[data-act="sup-open"][data-part="wedo"]');
             if (width === 1280) await shotEl('#tvPartsWide', 'panel-wedo-1280.png');
         }
-        /* the Quiz sheet */
+        if (take('quiz')) {   // the Quiz sheet
         await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
         await page.evaluate(async () => {
+            try { window.setUserRole('teacher'); } catch (e) { /* */ }
             const TU = await import('./js/modules/teacher-ui.js');
             const U = TU.currentSet(); while (U.length) U.pop();
             TU.addToCurrentSet('addition', 'add_facts');
@@ -69,9 +72,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         console.log('quiz panel', JSON.stringify(await page.evaluate(() => window.__supShot)));
         await shotEl('.tvs-sup-rows', 'quiz-1280.png');
         await page.evaluate(() => { try { window.tvCloseSheet(); } catch (e) { /* */ } });
+        }
 
         /* packets: standard, supports off, a hint on */
-        for (const lid of ['subtraction:sub_100_regroup', 'addition:add_facts', 'placevalue:identify']) for (const size of ['M', 'L']) {
+        if (take('packets')) for (const lid of ['subtraction:sub_100_regroup', 'addition:add_facts', 'placevalue:identify']) for (const size of ['M', 'L']) {
             const skill = { categoryId: lid.split(':')[0], skillId: lid.split(':')[1] };
             const docs = await page.evaluate(async ({ skill, size }) => {
                 const P = await import('./js/modules/sheet/part-opts.js');
@@ -113,30 +117,59 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             }
         }
 
-        /* paper = screen */
-        for (const [name, opts] of [['std', {}], ['off', { off: ['regroup'] }]]) {
-            const html = await page.evaluate(async (opts) => {
-                const SC = await import('./js/modules/screen-cell.js');
-                const G = await import('./js/modules/generate-question.js');
-                const b = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'subtraction', skillId: 'sub_100_regroup', opts }], count: 1 }], size: 'L', paper: 'A4', seed: 901, key: false });
-                const m = /<div class="ws-cell[\s\S]*?<\/div><\/div>/.exec(b.pupilHtml);
-                const q = G.generateQuestionFor({ category: 'subtraction', skill: 'sub_100_regroup', opts, seed: 901 });
-                q.skillOptions = Object.assign({}, q.skillOptions || {}, opts);
-                const k = SC.cellKindFor(q);
-                const card = SC.kindHTML(k, { regroup: SC.regroupFor('sub_100_regroup'), off: SC.screenOffFor(q) });
-                const quiz = SC.kindHTML(k, { regroup: SC.regroupFor('sub_100_regroup'), answerClass: 'mq-qt-digit', off: SC.screenOffFor(q) });
-                const style = [...document.querySelectorAll('style, link[rel="stylesheet"]')].map((x) => x.outerHTML).join('');
-                return `<!doctype html><html><head><meta charset="utf-8">${style}<style>body{background:#fff;font-family:Andika,sans-serif;padding:16px}.row{display:flex;gap:24px;align-items:flex-start}.box{border:1px solid #999;padding:12px;min-width:220px}.box h3{font:600 14px system-ui;margin:0 0 8px}</style></head><body><div class="row"><div class="box"><h3>Paper (Practice page cell): ${JSON.stringify(opts)}</h3>${b.pupilHtml.includes('ws-cell') ? b.pupilHtml : ''}</div></div><div class="row"><div class="box"><h3>Screen: practice card / online worksheet</h3>${card}</div><div class="box"><h3>Screen: quiz</h3>${quiz}</div></div><p style="font:12px system-ui">${q.text || ''}</p></body></html>`;
+        /* paper = screen: the REAL practice card (question-render.js) and the REAL quiz (quiz-take.js), each with the skill's
+           options carrying `off`, beside the same item on paper (the Practice page built with those options, seed 905) */
+        if (take('screen')) for (const [name, opts] of [['std', {}], ['off', { off: ['regroup'] }]]) {
+            await page.setViewport({ width: 900, height: 1000, deviceScaleFactor: 1 });
+            const doc = await page.evaluate(async (opts) => {
+                const b = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'subtraction', skillId: 'sub_100_regroup', opts }], count: 4 }], size: 'L', paper: 'A4', seed: 905, key: false });
+                return window.sheetDocument(b.pupilHtml, 'Paper', { paper: 'A4' });
             }, opts);
             const sh = await browser.newPage();
             try {
-                await sh.setViewport({ width: 900, height: 1300, deviceScaleFactor: 1 });
+                await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
                 await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
-                await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
-                await sleep(500);
-                await sh.screenshot({ path: path.join(OUT, `paper-screen-${name}.png`), fullPage: true });
-                console.log('wrote', `paper-screen-${name}.png`);
+                await sh.setContent(doc, { waitUntil: 'networkidle0', timeout: 60000 });
+                await sh.emulateMediaType('print');
+                const el = await sh.$('body > section.ws-page, body > .ws-page');
+                if (el) { await el.screenshot({ path: path.join(OUT, `paper-${name}.png`) }); console.log('wrote', `paper-${name}.png`); }
             } finally { await sh.close(); }
+            // the practice card
+            const card = await page.evaluate(async (opts) => {
+                try {
+                    const G = await import('./js/modules/generate-question.js');
+                    const st = window.state;
+                    st.category = 'subtraction'; st.skill = 'sub_100_regroup'; st.gameMode = 'practice'; st.isMixedMode = false;
+                    if (window.showView) window.showView('gameView');
+                    const q = G.generateQuestionFor({ category: 'subtraction', skill: 'sub_100_regroup', opts, seed: 905 });
+                    q.skillOptions = Object.assign({}, q.skillOptions || {}, opts);
+                    st.currentQ = q;
+                    window.renderQuestion();
+                    return { text: q.text, carries: document.querySelectorAll('#questionCard input.mq-carry').length };
+                } catch (e) { return { error: String(e) }; }
+            }, opts);
+            await sleep(400);
+            console.log('card', name, JSON.stringify(card));
+            await shotEl('#questionCard', `card-${name}.png`);
+            // the quiz
+            const quiz = await page.evaluate(async (opts) => {
+                try {
+                    const G = await import('./js/modules/generate-question.js');
+                    const QT = await import('./js/modules/quiz-take.js');
+                    const q = G.generateQuestionFor({ category: 'subtraction', skill: 'sub_100_regroup', opts, seed: 905 });
+                    const qd = QT.quizQuestionData(q);
+                    qd.skillOptions = Object.assign({}, qd.skillOptions || {}, opts);
+                    window.state.currentQuiz = { id: 'supshot', title: 'Supports', settings: { sectionMode: 'sequential' }, sections: [{ name: 'A', questions: [{ skillId: 'sub_100_regroup', questionData: qd, points: 1 }] }] };
+                    if (window.showView) window.showView('quizTakeView');
+                    const inp = document.getElementById('qtStudentName');
+                    if (inp) inp.value = 'Shot';
+                    QT.startQuizTest();
+                    await new Promise((r) => setTimeout(r, 500));
+                    return { carries: document.querySelectorAll('#quizTakeView input.mq-carry').length };
+                } catch (e) { return { error: String(e) }; }
+            }, opts);
+            console.log('quiz', name, JSON.stringify(quiz));
+            await shotEl('#quizTakeView', `quiz-screen-${name}.png`);
         }
         console.log('ws-partopts-supports-shots: OK');
     } catch (e) {
