@@ -7552,6 +7552,45 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-band-bites",
+   "check": "ws-two-step BAND-BITES: every band value a two-step skill offers changes >= 10 % of the items dealt alone (300 seeds) against the default; a band hidden on a preset reads an old code's value as the default",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-BITES (lf-algebra precritic two-step r12, ws-options-verify band=50 on add_then_div / letter_equation; lead ruling B (a) 2026-11-13)",
+   "fail": {
+    "commit": "438dc65bc",
+    "state": "band 50 offered on two_step_add_then_div (12 / 300 items changed, 4 %) and two_step_letter_equation (27 / 300, 9 %)"
+   },
+   "pass": {
+    "commit": "bc2001891",
+    "state": "PRESET_HIDE_VALUES hides band 50 on both presets; normalizeOptions reads an old band 50 as the default"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules BAND-BITES --skill algebra:two_step_add_then_div,algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "options-verify-wide-band",
+   "check": "ws-options-verify WIDE: a band value whose 12-item sample matches the default is re-dealt on 600 independent seeds before the verdict; a ~6 % effect is a RARE warning with its share, not 'the control does nothing'; the row runs each commit's OWN tool ({root}/tests/scripts): the fail commit holds the tool before WIDE, the pass commit the WIDE tool, both on the same options (band 50 still offered)",
+   "kind": "commit-pair",
+   "rule": "ws-options-verify (lead ruling B 2026-11-13: band=50 on add_then_div 37 / 600, letter_equation 38 / 600 was reported as identical to the default)",
+   "browser": true,
+   "fail": {
+    "commit": "c0ae1e93e",
+    "state": "the tool before WIDE, band 50 still offered: FAIL band=50 'items identical to the default (the control does nothing)' on both presets"
+   },
+   "pass": {
+    "commit": "f35da17ed",
+    "state": "the WIDE tool on the same options (band 50 still offered): band=50 ok, warn 'rare effect: changes 33 / 600 items (5.5 %)' and 42 / 600 (7 %)"
+   },
+   "command": "node {root}/tests/scripts/ws-options-verify.cjs --root {root} --skill two_step_add_then_div,two_step_letter_equation --category algebra --deadline 600000",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
