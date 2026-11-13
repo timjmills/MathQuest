@@ -194,11 +194,6 @@ function measureCells(scope) {
             }
             if (!box) return;
             const H = inner.b - inner.t, W = inner.r - inner.l;
-            // (lf-ops-props 2026-11-13: a cell whose content is CENTRED in a taller row - LESSONS_LEARNED P4-2, the arrays /
-            // arrays-turn / count-row cells - is judged by EB-FOOT without the centring offset above its first block: the free
-            // space a row shares out is not drawn height, and the cell a top-anchored item needs is the same either way)
-            const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0);
-            const centOff = /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0;
             const hwVar = parseFloat(getComputedStyle(c).getPropertyValue('--ws-hw')) || 0;
             const hw = /mm/.test(getComputedStyle(c).getPropertyValue('--ws-hw')) ? hwVar * MM : hwVar;
             const below = Math.max(inner.b - box.b, 0);
@@ -207,7 +202,7 @@ function measureCells(scope) {
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1), edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top - centOff) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
+                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
                 step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
         });
     });
@@ -340,8 +335,6 @@ async function main() {
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
                 }, { categoryId, skillId, j, SEED });
                 if (b.error) { notes.push(`${key} ${j.tag}: not composed (${b.error})`); continue; }
-                // (`--dump <dir>`: each render's pupil HTML written there, to look at what a finding measured)
-                if (arg('dump', null)) { try { fs.mkdirSync(arg('dump'), { recursive: true }); fs.writeFileSync(path.join(arg('dump'), `${key.replace(/:/g, '-')}-${j.tag.replace(/[^\w-]+/g, '_')}.html`), b.html); } catch (e) { /* the dump is a convenience */ } }
                 { const cap = gdpCap(j.role, j.size, b.tries); if (cap) F('EB-GDPCAP', `${key} ${j.tag}`, cap); }
                 const sh = await app.browser.newPage();
                 try {
@@ -385,13 +378,7 @@ async function main() {
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
                     if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
-                        // (lf-ops-props 2026-11-13: a page that sorts its rows by height - layout groupByHeight, tallest first -
-                        // prints the items in another order than they were dealt; when the cells and the footprints pair one to one
-                        // by height (both sorted), every drawn height matches a footprint and the page is judged so)
-                        const bad = (cs, ms) => cs.some((c, i) => Math.abs(c.neededMm - ms[i]) > FOOT * ms[i]);
-                        const byH = bad(cells, m) && !bad(cells.slice().sort((x, y) => y.neededMm - x.neededMm), m.slice().sort((x, y) => y - x));
-                        if (byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page reorders its rows)`);
-                        else cells.forEach((c, i) => { const fp = m[i]; if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${b.cols} columns (${Math.round((c.neededMm - fp) / fp * 100)} %)`); });
+                        cells.forEach((c, i) => { const fp = m[i]; if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${b.cols} columns (${Math.round((c.neededMm - fp) / fp * 100)} %)`); });
                     } else if (j.role === 'independent' && !j.opts) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
                 } finally { await sh.close(); }
             }
