@@ -1,0 +1,44 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill
+
+mq-browser-run: slot 1 after 32s
+note: composing:hundreds_chart_fill: card design/cards/chartwindow/chartwindow.md; 14 roles x S/M/L + 6 option variant(s) of 23 + hosts card, worksheet, quiz
+note: composing:hundreds_chart_fill stretch S: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill stretch M: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill stretch L: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill card 390: no kit cell on the host (legacy screen item?)
+note: composing:hundreds_chart_fill card 820: no kit cell on the host (legacy screen item?)
+note: composing:hundreds_chart_fill card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  PASS
+EB-SIDE  FAIL 4
+   composing:hundreds_chart_fill review S p1 cell 5: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill review S p1 cell 6: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill pre-skill-check S p2 cell 7: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill pre-skill-check S p2 cell 8: empty band 26.2 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  FAIL 60
+   composing:hundreds_chart_fill independent M p1 cell 1: drawn 67.5 mm, footprint hMm 59.1 mm at 2 columns (14 %)
+   composing:hundreds_chart_fill independent M p1 cell 2: drawn 67.5 mm, footprint hMm 58.8 mm at 2 columns (15 %)
+   composing:hundreds_chart_fill independent M p1 cell 3: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   composing:hundreds_chart_fill independent M p1 cell 4: drawn 67.6 mm, footprint hMm 58.9 mm at 2 columns (15 %)
+   composing:hundreds_chart_fill independent M p1 cell 5: drawn 67.5 mm, footprint hMm 59.1 mm at 2 columns (14 %)
+   composing:hundreds_chart_fill independent M p1 cell 6: drawn 67.5 mm, footprint hMm 58.8 mm at 2 columns (15 %)
+   composing:hundreds_chart_fill independent L p1 cell 1: drawn 68.8 mm, footprint hMm 62.1 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill independent L p1 cell 2: drawn 68.8 mm, footprint hMm 61.8 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill independent L p1 cell 3: drawn 68.8 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill independent L p1 cell 4: drawn 68.9 mm, footprint hMm 61.9 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill independent L p1 cell 5: drawn 68.8 mm, footprint hMm 62.1 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill independent L p1 cell 6: drawn 68.8 mm, footprint hMm 61.8 mm at 2 columns (11 %)
+   composing:hundreds_chart_fill more-practice M p1 cell 1: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   composing:hundreds_chart_fill more-practice M p1 cell 2: drawn 67.5 mm, footprint hMm 58.8 mm at 2 columns (15 %)
+   composing:hundreds_chart_fill more-practice M p1 cell 3: drawn 67.4 mm, footprint hMm 58.9 mm at 2 columns (14 %)
+   ... 45 more
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(1 skill(s), 50 renders, 271 cells, 114 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (64)
