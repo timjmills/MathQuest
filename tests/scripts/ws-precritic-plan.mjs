@@ -66,6 +66,28 @@ export function readLessonCommand(cmd) {
     const mode = /--sweep(?:-packets)?\b/.test(tail) ? 'sweep' : /--(lp|packet|raster)\b/.test(tail) ? 'lp' : /--repeats\b/.test(tail) ? 'repeats' : 'check';
     return { tool: 'ws-detailed-lesson', lesson, mode };
 }
+/** Lane tools whose backtests name no skill and no detailed lesson: the precritic scope each one is wired to.
+ *  (lane lf-partopts, 2026-11-13: the lesson parts are on the --role lesson path - which --lesson and --unit bring - and on
+ *  --teacher; a row's scope flag, --bt-only / --coverage-only / --lessons, must be on a planned line of that tool too, so a
+ *  row cannot be proved by a differently scoped run of the same tool.) */
+export const LANE_TOOLS = {
+    'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
+    'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
+};
+/** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
+export function readLaneCommand(cmd) {
+    const c = String(cmd);
+    const tool = Object.keys(LANE_TOOLS).find((t) => new RegExp(`tests/scripts/${t}\\.(?:c?js|mjs)`).test(c));
+    if (!tool) return null;
+    const tail = c.slice(c.lastIndexOf(`${tool}.`));
+    const spec = LANE_TOOLS[tool];
+    return { tool, scope: spec.scope, flag: spec.flags.find((f) => new RegExp(`${f}\\b`).test(tail)) || null };
+}
+/** The plan lines that run a lane tool (with the row's scope flag, when it has one). Pure. */
+export function planHasLane(planText, { tool, flag }) {
+    return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`)).filter((l) => !flag || new RegExp(`${flag}\\b`).test(l));
+}
+
 /** The plan lines that run ws-detailed-lesson on `lesson` in `mode`. Pure. */
 export function planHasLesson(planText, { lesson, mode }) {
     return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
@@ -73,6 +95,9 @@ export function planHasLesson(planText, { lesson, mode }) {
 
 // the ws-empty-band flags that switch rules ON: a row run with one is on the path only where the plan runs it too
 export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
+// the ws-grade-render modes that switch a check on (lf-checks queue 13: --raster-fit is LP-RASTER on role pages; a plain
+// render of the same role is not that check)
+export const GR_FLAGS = ['--raster-fit'];
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
  *  comma list, or - `cardRoles` given - the line has no --roles and so renders every role the signed card offers, R among
  *  them), carrying every flag of `flags`. Pure. */
@@ -111,7 +136,18 @@ function selfTest() {
     eq('a role the card does not offer', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'stretch', cardRoles: ['guided'] }).length, 0);
     eq('flag carried', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 1);
     eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
+    eq('grade-render raster flag carried', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model,guided --raster-fit', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 1);
+    eq('grade-render raster flag missing', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model --gate', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
+    // lane rows (lf-partopts): no skill, no detailed lesson - the tool and its scope flag
+    eq('lane bt row', readLaneCommand('/tmp/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--bt-only' });
+    eq('lane lessons row', readLaneCommand('MQ_ROOT={root} node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M --only PO-2d'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--lessons' });
+    eq('lane shots row', readLaneCommand('node tests/scripts/ws-partopts-shots.cjs --no-shots --only R1'), { tool: 'ws-partopts-shots', scope: ['--role', 'lesson'], flag: null });
+    eq('not a lane row', readLaneCommand('node tests/scripts/ws-node-lint.mjs --skill addition:add'), null);
+    const lanePlan = '  [browser] parts — tests/scripts/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M,L --walk-depth 1\n  [browser] bt — node tests/scripts/ws-partopts-unit.cjs --bt-only\n  [browser] shots — node tests/scripts/ws-partopts-shots.cjs --no-packets --no-shots';
+    eq('lane bt planned', planHasLane(lanePlan, { tool: 'ws-partopts-unit', flag: '--bt-only' }).length, 1);
+    eq('lane coverage not planned', planHasLane(lanePlan, { tool: 'ws-partopts-unit', flag: '--coverage-only' }).length, 0);
+    eq('lane shots planned', planHasLane(lanePlan, { tool: 'ws-partopts-shots', flag: null }).length, 1);
     // the CHECKS_FROM_CRITICS sweep on planted ledger rows: missing id, unknown id, off-path id, exempt, good (+ legacy forms)
     const sw = sweepSelfTest(); n += sw.n; bad.push(...sw.bad.map((b) => `checks-from-critics: ${b}`));
     eq('tool of a fixture command', commandTool('node tests/scripts/ws-backtest.mjs x; node tests/scripts/ws-empty-band.cjs --html {fixture}'), 'ws-empty-band');
@@ -254,7 +290,17 @@ function ctx() {
         });
         return sets.length ? sets[0].filter((r) => sets.every((s) => s.includes(r))) : [];
     };
-    CTX = { table, live, deploy, precriticSrc, plan, cardRolesOf, lplans: new Map(), memo: new Map() };
+    // lane rows (lf-partopts): the precritic plan of a lane tool's scope (e.g. --role lesson), one dry run per scope
+    const scopePlans = new Map();
+    const scopePlan = (argv) => {
+        const key = argv.join(' ');
+        if (!scopePlans.has(key)) {
+            const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), ...argv, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 });
+            scopePlans.set(key, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` });
+        }
+        return scopePlans.get(key);
+    };
+    CTX = { table, live, deploy, precriticSrc, plan, cardRolesOf, scopePlan, lplans: new Map(), memo: new Map() };
     return CTX;
 }
 
@@ -268,7 +314,18 @@ function rowPath(row) {
     return v;
 }
 function rowPathRaw(row, C) {
-    const { live, deploy, plan, cardRolesOf, lplans } = C;
+    const { live, deploy, plan, cardRolesOf, lplans, scopePlan } = C;
+    // a lane-tool row (lf-partopts: no skill, no detailed lesson) is on the path when the tool's precritic scope plans it,
+    // with the row's scope flag (--bt-only / --coverage-only / --lessons) on that planned line
+    const lane = readLaneCommand(row.command || '');
+    if (lane) {
+        const p = scopePlan(lane.scope);
+        const via = `ws-precritic ${lane.scope.join(' ')}`;
+        if (!p.ok) return { status: 'FAIL', print: null, fail: `${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}` };
+        const hit = planHasLane(p.text, lane);
+        const print = `  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${lane.tool}${lane.flag ? ` ${lane.flag}` : ''} (via ${via})`;
+        return hit.length ? { status: 'OK', print } : { status: 'FAIL', print, fail: `${row.id}: ${via} plans no ${lane.tool}${lane.flag ? ` ${lane.flag}` : ''} gate (the check is backtested but not on the lane's path)` };
+    }
     const lc = readLessonCommand(row.command || '');
     if (lc) {
         if (!lplans.has(lc.lesson)) { const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--lesson', lc.lesson, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }); lplans.set(lc.lesson, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` }); }
@@ -288,7 +345,8 @@ function rowPathRaw(row, C) {
     // a row on several roles (`--roles a,b`, critic eb-r3 D4) is on the path when EACH role is: lesson / independent through
     // the --skill plan, any other role R through `ws-precritic --skill X --role R` (a lane that touches R runs it). A
     // ws-empty-band line with no --roles renders every role the signed card offers; the row's rule flags must be carried.
-    const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
+    const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command))
+        : c.tool === 'ws-grade-render' ? GR_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
     const cr = c.tool === 'ws-empty-band' ? cardRolesOf(c.skills) : null;
     const per = (c.roles ? c.roles.split(',') : [null]).map((r) => {
         const role = r && r !== 'lesson' && r !== 'independent' ? r : null;
@@ -353,7 +411,15 @@ function baselineIds() {
     const i = args.indexOf('--rows-before');
     let text = null, from = '';
     if (i >= 0 && args[i + 1]) { try { text = readFileSync(resolve(process.cwd(), args[i + 1]), 'utf8'); from = args[i + 1]; } catch (e) { return { ids: null, from: `${args[i + 1]} (unreadable)` }; } }
-    else { const r = spawnSync('git', ['show', 'origin/master:tests/fixtures/precritic/backtests.json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); if (r.status !== 0) return { ids: null, from: 'origin/master (not readable here)' }; text = r.stdout; from = 'origin/master'; }
+    else {
+        // the baseline is the FORK POINT with origin/master, not master's tip (lf-checks 2026-11-13: a lane branch behind master read
+        // master's NEWER rows as "dropped"). A deploy tree has master merged in, so its merge base is master's tip: same check there.
+        const mb = spawnSync('git', ['merge-base', 'HEAD', 'origin/master'], { cwd: ROOT, encoding: 'utf8' });
+        const ref = mb.status === 0 && mb.stdout.trim() ? mb.stdout.trim() : 'origin/master';
+        const r = spawnSync('git', ['show', `${ref}:tests/fixtures/precritic/backtests.json`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+        if (r.status !== 0) return { ids: null, from: `${ref.slice(0, 9)} (not readable here)` };
+        text = r.stdout; from = ref === 'origin/master' ? 'origin/master' : `the fork point with origin/master (${ref.slice(0, 9)})`;
+    }
     try { const o = JSON.parse(text); return { ids: (Array.isArray(o) ? o : o.rows || []).map((x) => x.id), from }; } catch (e) { return { ids: null, from: `${from} (not JSON)` }; }
 }
 function dropSweep() {

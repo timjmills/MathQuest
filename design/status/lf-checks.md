@@ -329,6 +329,15 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - npr / count_by_tables count-row digits pass SCREEN-DIGIT on card and quiz from -props 85c694896. The arcs train passes their new TRAIN-FIT (ws-screen-slots --train-fit; row ss-train-fit-cbt) from 85c694896.
     - Row screen-digit-npr-worksheet still CANNOT be armed: the WORKSHEET host stays at about 29 px because worksheet.js:1052 sets one --mq-digit per sheet. That is OURS (item 11): a per-cell digit floor. mult_properties arrays-turn numerals are also 29 px. Arm the row with pass = the item-11 fix commit, once 85c694896 is merged in.
     - The CL40-INK more-practice row (pass c1c54b5c4) is already recorded (item 7).
+22. On merge with lf-placevalue w2 (claude/lf-placevalue-w2 fb05bcb1), carry into ws-empty-band:
+    - --grid-foot / --columns (item 12);
+    - EB-FOOT measures a CL-4d centred `ws-rowstretch` cell as pads + tab clearance + the line's box (lead ruling 11-13, CL-4d: a one-line cell its row stretches >= 30 % is centred; it raised 234 false findings before);
+    - an OPT_IN_FLAGS literal near the top. The builder's 5a8e27ec already names the opt-in flags in the first 80 lines; reconcile the two. Plus a GUARD: precritic should not rely on an 80-line source scan for flags (a self-test that every flag precritic passes is accepted).
+    Info: compare's pixel totals went 337 → 93 (lesson 17, opener 30, scripted-model 17, review 10, mixed 18, pre-skill-check EB-PAGE 1): lf-placevalue's.
+23. Host items from lf-algebra's two-step build (branch claude/sweet-newton-c8wrv1-lf-algebra @ 8438ca59d, lead 11-13); checks first, each with a backtest:
+    - (a) phone-card first-box focus FAILs on all 7 two-step skills (the _plain ones too);
+    - (b) GRADING PARITY: on screen the letter equation and the estimate are only "typed", not scored, while paper grades both. Add a check that every slot paper scores is scored on every screen host, then fix the hosts;
+    - (c) screen-support-eq: the log says OK but precritic's gate says FAIL. A parser / verdict mismatch: fix it, and add a self-test that the parsed verdict equals the tool's last line.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
@@ -408,6 +417,22 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - 20a CELL-READ: ws-screen-slots (host:read; a host that did not render, a worksheet of 0 cards, a cell with no [data-ws-cell]), ws-screen-answer (--cell-read-self-test), ws-phone-card (card + worksheet/quiz); ws-empty-band already EB-READ. ws-screen-ink-size (read only, other owner) still passes a host with 0 drawings / 0 cells (`if (!sc.drawings.length) continue`): routed.
   - 20b the card paper carries data-ws-cell (kit kind, else legacy). 10: ws-phone-card TOUCH-TARGET on card, worksheet and quiz at 390 (answer >= 48 x 48, working box >= 44); .mq-wwans inputs fixed. A 39-skill sample still shows 33 under-48 groups (mostly [data-mq-cell] > input.mq-cellslot 44-47 px tall: time, money, mult_chart, long_div, arrays_groups, div_remainders, count_sequence, fact_family, add_three worksheet) - owning lanes.
   - 11/18/21: #worksheetView grid cells take the host floor 40 / 48 / 56 px (additive CSS). screen-digit-npr-worksheet re-armed: pass b6107d339 = this fix + lf-ops-props 63b26321a (contains 85c694896; npr already passes from lf-ops' count-row rule, the floor covers mult_facts / div_facts / mult_properties / pv).
+- OPEN LEDGER ROWS CLOSED (builder, Opus medium, 11-13; commits 7bd6f3d31, 96ba50e36, c484ffca7, 5a8e27ec9 + this note):
+  - eb-r6 m2: ws-screen-answer `--focus-gap-html <file>` judges a saved page. Row `sa-focus-gap-fixture-below`: "tens" 1 px under the ring gives no finding with 8dc176e6's FOCUS_GAP (proven by running that commit's function on the fixture) and FAILs now; 10 px clear is OK.
+  - eb-r7 m1: FOCUS-GAP reads text above and below the ring LINE BY LINE (a Range per character on each line box). Self-test: 12 cases. Row `sa-focus-gap-wrap-line`: its pass fixture ("wer once" 5 px clear over "Tall") read 0 px at 7bd6f3d31 and is OK now.
+  - eb-r7 m3: each run prints `note: slot ink on|off` (and each skill's note names it). The legacy note gives its band and %. Under off the kit's top pad STAYS EXCLUDED from the band above, as under on; the tool header says so. Self-test: 3 cases. Ledger: exempt (note lines, no verdict).
+  - eb-r7 m4: HONEST LIMIT. Multi-item cells are NOTED, NOT JUDGED. The bridge measures items one by one, `b.combo` has no writer, and no live grid role draws such a cell (the facts pin raises no note). The tool header says so. Ledger: exempt with that reason.
+  - eb-r7 m5: EB-SIDE (between) judges the widest column run with no ink from top to bottom between two pieces of ink, at >= 30 % of the width. Row `eb-fixture-interior-hole` (u3): OK at 96ba50e36, FAIL 93.4 mm (58.6 %) now; the centred pass side is OK.
+  - ebitem-r1 m1: EB-FOOT uses an item's measure only at the cell's own column count. When that is missing, the note is "item N fallback (unmeasured at k across ...)", and the cell is not judged. Self-test: 3 cases. Ledger: exempt (a note).
+  - ebitem-r1 m2: the kit's pure `ebItemOf` (sheet/cell.js) gives a part-matched multi-question cell `ebPartial` "k/n"; cell() writes `data-eb-partial`, and EB-FOOT notes "partly indexed" without judging it. Self-test: 2 note cases and 7 ebItemOf cases on the kit's own function. Ledger: exempt (a note).
+  - ebitem-r1 m3: two new gates on every grid role of every --skill run. EB-ITEMKEY: the pupil's data-eb-item order equals the key's, and no index appears twice on a page. EB-ITEMPARITY: the pupil page and key, with the tags removed, are byte-identical to the same sheet built with `ebItem: false` (a new buildSheet switch). Rows `eb-fixture-item-key` and `eb-fixture-item-parity`; the pass fixture is arrays_groups independent L as built.
+  - Tool fix found on the way: the header's new lines pushed `--vocab-ink` / `--screen-parity` past line 80, so ws-precritic's srcHas dropped them from the plan (precritic-plan FAILed 2 rows). The opt-in flags are now named at the top.
+  - The owner row "saving everything to automatic checks" and the lead-deploys row named the sweep as pending lf-checks work. Both now carry exemptions naming the built sweep and `no-dropped-row`.
+  - Sweep: no lf-checks row fails (47 pass, 22 exempt, 12 fail, all in other lanes). Facts pin: OK, 276 renders, 828 within the pin (unchanged), 9 "tighten the pin" notes (unchanged). EB-SIDE (between), EB-ITEMKEY and EB-ITEMPARITY raise NO count, so no re-pin. The run took 505 s, because each grid role is now built twice.
+  - Backtests: 46 rows call ws-empty-band or ws-screen-answer. 42 PASS, including all 5 new rows. 2 PENDING, as before (eb-foot-gridcols-patterns, eb-foot-review-add-facts). 2 FAIL:
+    - eb-fact-roles: the known facts-lane red.
+    - guided-tight-rows: a NEW red, on lf-roles' row from the master merge (b98b0f28a, not in r7's table). Its pass state 8307219c FAILs `--only EB-BAND` (53 pv guided bands of 34-36 %) under this branch's PIXEL read, which reads the visible band (critic eb-r3 D1). Master's DOM read passed it. EB-BAND is untouched in this round. ROUTED to lf-roles / the lead: re-point the pass commit to a fix, or accept the bands as pv debt. Not pinned.
+  - Other gates: self-tests OK (ws-empty-band; FOCUS-GAP 12 + 3; precritic-plan 46 cases); ws-precritic-plan OK (150 rows on the path); --focus-gap-all OK; boot-smoke OK.
 - Queue 14-17 (ws-screen-ink-size, builder Opus medium, 11-13; commits ca096176, 2c3d574e, + the re-pin):
   - 14: worksheet cards are also matched with the kit's print cell of the item they DEALT (`renderCell` at the print size, `[data-mq-dealt]`), before any geometric fallback. The 4 vocab SIZE-REF are gone. Row `screen-ink-size-dealt`.
   - 15: a pattern TERM ("Term n", `.mq-gp-term`, `[data-ws-term]`) is judged by its unit (SIZE-INK, 1+ marks) and never by SIZE-WIDTH. The growing worksheet at 791c8418 passes; a too-small pattern fails. Rows `screen-ink-size-term`, `screen-ink-size-growing`.
@@ -416,3 +441,20 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - lf-ops: add_facts / sub_facts {support line} number-line labels at 7.6 pt, under 8 pt at 390; mult_facts {skip} strip labels at 96 % of print; div_facts {boxsign} "divide" at 8.9 pt vs 10 pt.
     - lf-placevalue: identify card / quiz secondary digit 30.4 px vs 40-56; unit_form / value worksheet words 14 pt vs 16 pt.
   - Not on master (route): growing quiz G9 goes to the quiz host; number_patterns_rule is fixed on -props.
+
+### Queue moved to lf-hosts (lead, 11-13, session_013pHDnQ4fgVajj5vZ6fwpwV)
+lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 touch targets (10); G9 quiz labels (16/17); the two-step host items (23); SIZE-REF same-word (14); and SIZE-WIDTH by unit (15). Builders A and B were already mid-way on these; their commits are offered to lf-hosts as a hand-off, pending the lead's ruling. lf-checks keeps: the checker tools, LP-RASTER for role pages (13: done, ws-grade-render --raster-fit), the -r2 narrow critic, and tool support for lf-hosts.
+- 2026-11-13 queue 13 DONE (builder, Opus medium): LP-RASTER on role pages = `ws-grade-render --raster-fit` (a mode, not a new
+  script: grade-render already builds each role through buildSheet and prints it to a real PDF; the reader is
+  tests/lib/ws-role-raster.cjs). RR-PAGES (PDF pages = plan pageCount / keyPageCount), RR-EDGE (ink within 5 mm of the paper
+  edge), RR-CLIP (each text span's tall glyphs inked at cap and foot: F3's Say band cut by the frame never left the page, so
+  edge/page alone would miss it). `--raster-pdf <pdf> [--expect-pages N]` and `--raster-self-test` (6 cases, no browser, ~1 s).
+  Precritic: --skill runs scripted-model + guided at S/M/L (`raster-fit`, ~10 s a sheet); --role R runs R on its sample at L
+  only (`raster-fit-role-R`). ws-precritic-plan carries `--raster-fit` as a required flag (GR_FLAGS). Row `rr-clip-npr-model-l`:
+  FAIL 47b1f2a86 (RR-CLIP x2) -> OK 7c1e3dbb4 (master; lf-roles' Model re-plan, 2 pages; lf-algebra had no fix of its own).
+  False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.
+- no-dropped-row baseline FIXED (lf-checks 11-13): it compared with origin/master's tip, so a lane branch behind master read master's newer rows as dropped (13 false drops on -r2). Now the merge base of HEAD and origin/master; a deploy tree (master merged in) is unchanged.
+- The -r2 narrow critic was STOPPED by the weekly usage limit before its verdict; its partial report is committed as PARTIAL. Resume after 2026-11-19 22:00 UTC. All lf-checks work is paused until then.
+- CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
+  - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
+  - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.

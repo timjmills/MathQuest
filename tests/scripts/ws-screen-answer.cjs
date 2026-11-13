@@ -15,6 +15,7 @@
 //   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
 //   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
 //                         only the kit's answer slots (input.mq-slot)
+//   --focus-gap-html <f>  FOCUS-GAP on a saved page (backtest fixtures: tests/fixtures/precritic/focus-gap/), no app
 //   --focus-gap-self-test FOCUS-GAP on synthetic pages, no app (critic eb-r6 m2: a word 1 px under or over the ring is a finding)
 //   --cell-read-self-test CELL-READ on synthetic pages, no app (lf-checks queue 20): a host render whose cell carries no
 //                         [data-ws-cell] (or has no cell) is a finding, never a pass - every host, before the answer is entered
@@ -285,7 +286,7 @@ function PLAN(rootSel, which) {
 // FOCUS-GAP (critic eb-r5 D2, legibility): in the page, on the FOCUSED answer box: the outer edge of its focus ring (its
 // outline: the border box grown by outline-offset + outline-width) must keep >= 4 px from every text box of the cell beside it
 // on its line (a text line box that overlaps the ring vertically by >= 30 % of its height), AND from every text box above or below
-// it that overlaps the ring horizontally, measured to the glyph ink (critic eb-r6 m2: "tens" 1 px under the ring passed). 0f1a0bda's kit LINE slot pulled the
+// it that overlaps the ring horizontally, measured to the glyph ink OF THAT LINE (critic eb-r6 m2: "tens" 1 px under the ring passed; eb-r7 m1: a wrapped text node is read line by line). 0f1a0bda's kit LINE slot pulled the
 // next word under the ring (0 px to "tens" on unit_form). Returns a message, or '' when the ring is clear or no ring is drawn.
 function FOCUS_GAP(e, rootSel, all) {
     if (document.activeElement !== e || (!all && !e.matches('input.mq-slot'))) return '';
@@ -299,6 +300,17 @@ function FOCUS_GAP(e, rootSel, all) {
     const cv = document.createElement('canvas').getContext('2d');
     // a text's ink rows inside its text box: {top, bottom} from the box's top, by canvas metrics in its own font ('' -> null)
     const ink = (txt, pcs) => { if (!txt) return null; cv.font = `${pcs.fontStyle} ${pcs.fontWeight} ${pcs.fontSize} ${pcs.fontFamily}`; const m = cv.measureText(txt); if (!(m.fontBoundingBoxAscent > 0)) return null; return { top: m.fontBoundingBoxAscent - m.actualBoundingBoxAscent, bottom: m.fontBoundingBoxAscent + m.actualBoundingBoxDescent }; };
+    // the characters of text node n that sit on line rect t (a Range per character; its centre inside t), trimmed
+    const lineText = (n, t) => {
+        const tx = n.textContent, r1 = document.createRange(); let s = '';
+        for (let i = 0; i < tx.length; i++) {
+            r1.setStart(n, i); r1.setEnd(n, i + 1); const q = r1.getBoundingClientRect();
+            if (!q.height) continue;
+            const cy = (q.top + q.bottom) / 2;
+            if (cy >= t.top && cy <= t.bottom && q.left >= t.left - 1 && q.right <= t.right + 1) s += tx[i];
+        }
+        return s.trim() || tx.trim();
+    };
     let worst = null;
     for (let n = tw.nextNode(); n; n = tw.nextNode()) {
         if (!n.textContent.trim() || !n.parentElement) continue;
@@ -312,12 +324,14 @@ function FOCUS_GAP(e, rootSel, all) {
             else if (Math.min(t.right, R.r) - Math.max(t.left, R.l) > 0) {
                 // above / below: to the GLYPH INK, not the text box (its content area carries the font's internal leading, about
                 // 0.2 em over a digit: a column sum's answer row read "1 px" from the digits over it with 5 px of paper between)
-                const fm = ink(n.textContent.trim(), pcs);
+                // ... and to THIS line's ink (critic eb-r7 m1): a text node that wraps has one rect per line, and the whole node's
+                // metrics put line 2's ascenders ("Tall") on line 1 ("wer once", x-height only, 5 px clear read 0 px)
+                const fm = ink(lineText(n, t), pcs);
                 const it = fm ? t.top + fm.top : t.top, ib = fm ? t.top + fm.bottom : t.bottom;
                 gap = Math.max(it - R.b, R.t - ib); where = (it + ib) / 2 >= (R.t + R.b) / 2 ? 'below' : 'above';
             }
             else continue;
-            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, where, word: n.textContent.trim().slice(0, 12) };
+            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, where, word: (where === 'beside' ? n.textContent.trim() : lineText(n, t)).slice(0, 12) };
         }
     }
     return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" ${worst.where} it (need >= 4 px)` : '';
@@ -451,8 +465,34 @@ async function liveGreen(page) {
 
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
+// --focus-gap-html <file>: FOCUS-GAP on a saved page, no app (the backtest fixtures, tests/fixtures/precritic/focus-gap/): every
+// visible text input is focused in turn and judged as --focus-gap-all judges it (the ring against the words of `.c`, else the
+// page body). Prints each finding and `ws-screen-answer: OK` / `FAIL`.
+if (arg('focus-gap-html', null)) (async () => {
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const file = require('path').resolve(process.cwd(), arg('focus-gap-html'));
+    const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    const found = []; let n = 0;
+    try {
+        const p = await b.newPage();
+        await p.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
+        await p.setContent(require('fs').readFileSync(file, 'utf8'), { waitUntil: 'load' });
+        const root = await p.evaluate(() => (document.querySelector('.c') ? '.c' : 'body'));
+        const ins = await p.$$('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])');
+        for (const h of ins) {
+            if (!(await h.evaluate((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }))) continue;
+            n++; await h.focus();
+            const msg = await h.evaluate(FOCUS_GAP, root, true);
+            if (msg) found.push(msg);
+        }
+    } finally { await b.close(); }
+    for (const m of found) console.log(`${require('path').basename(file)}: ${m}`);
+    console.log(`(${n} box(es) focused)`);
+    console.log(`ws-screen-answer: ${found.length || !n ? `FAIL (${found.length || 'no box'})` : 'OK'}`);
+    process.exit(found.length || !n ? 1 : 0);
+})();
 // --stress N: one command that loads the CPU and repeats the whole run N times.
-if (has('cell-read-self-test')) (async () => {
+else if (has('cell-read-self-test')) (async () => {
     // CELL-READ on synthetic pages (no app): a host whose cell carries no [data-ws-cell] (the r1 mult_facts card), a missing
     // root and a hidden cell are findings; the attribute on the root, or on a cell inside it, reads.
     const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
@@ -497,6 +537,10 @@ else if (has('focus-gap-self-test')) (async () => {
         // the critic's r6 "another line" probe: the wrapped next line's "tens" has its ink 1-2 px inside the ring (a screenshot
         // shows the ring on its ascenders), so under m2 it is a finding; the same words with line-height 2.2 clear the ring
         ['wrapped next line under the ring', `<div style="${W};width:120px">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, true],
+        // critic eb-r7 m1: ONE text node on two lines under the ring, line 1 x-height only ("wer once"), line 2 "Tall": judged per
+        // line, line 1's ink 5 px clear is no finding (the whole node's metrics read 0 px), and 1 px is one
+        ['x-height line 5 px under the ring, ascenders on line 2', `<input class="mq-slot" style="display:block"><div style="${W};white-space:pre-line;margin-top:__WRAP5__px">wer once\nTall</div>`, false],
+        ['x-height line 1 px under the ring, ascenders on line 2', `<input class="mq-slot" style="display:block"><div style="${W};white-space:pre-line;margin-top:__WRAP1__px">wer once\nTall</div>`, true],
         ['wrapped lines, clear of the ring', `<div style="${W};width:120px;line-height:2.2">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, false],
     ];
     const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
@@ -507,8 +551,10 @@ else if (has('focus-gap-self-test')) (async () => {
         await p.setContent(`<canvas></canvas>`);
         const fm = await p.evaluate((W) => { const g = document.querySelector('canvas').getContext('2d'); g.font = '24px sans-serif'; const m = g.measureText('tens'); const d = document.createElement('div'); d.style.cssText = W; d.textContent = 'tens'; document.body.appendChild(d); const r = document.createRange(); r.selectNodeContents(d.firstChild); const t = r.getClientRects()[0], box = d.getBoundingClientRect(); return { lead: t.top - box.top, top: m.fontBoundingBoxAscent - m.actualBoundingBoxAscent, bottom: m.fontBoundingBoxAscent + m.actualBoundingBoxDescent, h: box.height }; }, W);
         const BELOW1 = Math.round(5 + 1 - fm.lead - fm.top), ABOVE1 = Math.round(5 + 1 - (fm.h - fm.lead - fm.bottom));
+        const xt = await p.evaluate(() => { const g = document.querySelector('canvas').getContext('2d'); g.font = '24px sans-serif'; const m = g.measureText('wer once'); return m.fontBoundingBoxAscent - m.actualBoundingBoxAscent; });
+        const WRAP5 = Math.round(5 + 5 - fm.lead - xt), WRAP1 = Math.round(5 + 1 - fm.lead - xt);
         for (const [name, html0, want] of cases) {
-            const html = html0.replace("__BELOW1__", BELOW1).replace("__ABOVE1__", ABOVE1);
+            const html = html0.replace("__BELOW1__", BELOW1).replace("__ABOVE1__", ABOVE1).replace("__WRAP5__", WRAP5).replace("__WRAP1__", WRAP1);
             await p.setContent(`<style>${css}</style><div class="c" style="padding:40px">${html}</div>`);
             await p.focus('input.mq-slot');
             const msg = await (await p.$('input.mq-slot')).evaluate(FOCUS_GAP, '.c', false);

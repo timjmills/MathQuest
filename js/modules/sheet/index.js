@@ -31,7 +31,7 @@ export {
 export {
     esc, label, defaultLabelStyle, tabStepFor, tabSideMm,
     cell, cutLine, blank, line, box, circle, check, unknownBox,
-    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE,
+    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE, ebItemOf,
 } from './cell.js';
 
 /* --------------------------------------------------------------------------- frame */
@@ -208,6 +208,13 @@ export {
     REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
     columnAdd, lineSteps, longDivision,
 } from './providers/index.js';
+
+/* ------------------------------------------- part options (lane lf-partopts, design/partopts/DESIGN.md) */
+export {
+    PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount,
+    rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN,
+    PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages,
+} from './part-opts.js';
 
 /* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
 export { applySheetTags, shortCcss } from './sheet-tags.js';
