@@ -3,7 +3,11 @@
 // role change made its frame wrap; nothing measured it). A rise, or a fall a ruling allows (--allow k), is reported, not failed.
 //
 //   node tests/scripts/ws-capacity-pin.cjs --write [--pin file]              # pin this tree (run on master)
-//   node tests/scripts/ws-capacity-pin.cjs --check [--pin file] [--skills a:b,..] [--roles r,..]
+//   node tests/scripts/ws-capacity-pin.cjs --check [--pin file] [--skills a:b,..] [--roles r,..] [--test-eq-ind]
+//   SIZE-ORDER-OPT (critic divarray r1 D3): the pin's `sizeOrderOpts` option pages are measured at S/M/L; an option page
+//     whose cells measure smaller at S must fit MORE at S (strict S > L), never the same page at every size.
+//   --test-eq-ind (critic divarray r1 Q1, OFF by default pending the lead's ruling): the pin's `testEqOpts` option pages'
+//     Test count must equal their Independent count on each support (TEST-EQ-IND; live for div_facts in the role code).
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: the shared thinking /
 //   practice roles; sizes S,M,L; seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
@@ -31,9 +35,19 @@ const ALLOW = new Set(list(arg('allow', '')));
     // 2026-11-13): it is measured with those options (a support page's count is not the default page's).
     const ruledOpts = Object.keys(ruled).map((k) => /^(\S+) (\S+) ([SML]) (\{.*\})$/.exec(k)).filter(Boolean)
         .map((m) => ({ key: m[0], skill: m[1], role: m[2], size: m[3], opts: JSON.parse(m[4]) }));
+    const pinJson = has('check') && fs.existsSync(PIN) ? JSON.parse(fs.readFileSync(PIN, 'utf8')) : {};
+    // SIZE-ORDER on option pages (critic divarray r1 D3): the ruled option pages were left out of SIZE-ORDER, so
+    // mult_facts {support:array} printed the same count at S / M / L unnoticed. Each is measured at S/M/L and judged.
+    const sizeOrderOpts = (has('check') ? (pinJson.sizeOrderOpts || []) : []);
+    // TEST-EQ-IND (critic divarray r1 Q1, pending the lead's ruling): a fact skill's Test count follows its Independent
+    // count on each support. OFF unless --test-eq-ind (it is live for div_facts in the role code; this generalises the
+    // MEASURE to mult_facts behind a flag).
+    const testEqOpts = (has('check') && has('test-eq-ind') ? (pinJson.testEqOpts || []) : []);
+    const onlyFilter = list(arg('skills', ''));
+    const inFilter = (sk) => !onlyFilter.length || onlyFilter.includes(sk);
     const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
     const app = await H.open({});
-    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES, ruledOpts }) => {
+    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES, ruledOpts, sizeOrderOpts, testEqOpts }) => {
         const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
         const out = {};
         for (const k of skills) for (const role of ROLES) for (const size of SIZES) {
@@ -53,8 +67,25 @@ const ALLOW = new Set(list(arg('allow', '')));
                 out[j.key] = { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (r.items || []).length, pages: r.pageCount, opts: true };
             } catch (e) { out[j.key] = { na: String((e && e.message) || e).slice(0, 80) }; }
         }
+        // SIZE-ORDER option pages (D3) + TEST-EQ-IND option pages: each measured at S / M / L (+ Test for TEST-EQ)
+        const probes = [
+            ...sizeOrderOpts.map((x) => ({ ...x, role: x.role || 'independent' })),
+            ...testEqOpts.flatMap((x) => [{ ...x, role: 'independent', eq: true }, { ...x, role: 'test', eq: true }]),
+        ];
+        for (const j of probes) {
+            const [cat, id] = j.skill.split(':');
+            for (const size of SIZES) {
+                const key = `${j.eq ? 'EQ' : 'OPT'} ${j.skill} ${j.role} ${size} ${JSON.stringify(j.opts)}`;
+                if (out[key]) continue;
+                try {
+                    const r = await window.buildSheet({ role: j.role, sections: [{ skills: [{ categoryId: cat, skillId: id, opts: j.opts }], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed: hash(`${cat}__${id}:${j.role}`) % 1000000, form: 'A', key: true, anchors: 'off' });
+                    const m = r.plan && r.plan.meta;
+                    out[key] = { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (r.items || []).length, pages: r.pageCount, optProbe: true, skill: j.skill, role: j.role, size, opts: JSON.stringify(j.opts), eq: !!j.eq };
+                } catch (e) { out[key] = { na: String((e && e.message) || e).slice(0, 80), optProbe: true }; }
+            }
+        }
         return out;
-    }, { skills, ROLES, SIZES, ruledOpts });
+    }, { skills, ROLES, SIZES, ruledOpts, sizeOrderOpts, testEqOpts });
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
@@ -89,7 +120,37 @@ const ALLOW = new Set(list(arg('allow', '')));
         if (z.S !== undefined && z.M !== undefined && z.S < z.M) order.push(`${g}: S ${z.S} < M ${z.M} items (SIZE-ORDER)`);
         if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER)`);
     }
+    // SIZE-ORDER-OPT (critic divarray r1 D3): the ruled OPTION pages (a support ticked) were excluded from SIZE-ORDER, so
+    // mult_facts {support:array} printed 10 / 10 / 10 at S / M / L unseen. An option page whose cells measure smaller at S
+    // must fit MORE at S (strict S > L), never the same page at every size.
+    const optGroups = {};
+    for (const [k, v] of Object.entries(now)) {
+        if (!v.optProbe || v.na || v.eq) continue;
+        const m = /^OPT (\S+) (\S+) ([SML]) (\{.*\})$/.exec(k); if (!m) continue;
+        const g = `${m[1]} ${m[2]} ${m[4]}`; (optGroups[g] = optGroups[g] || {})[m[3]] = v.items;
+    }
+    for (const [g, z] of Object.entries(optGroups)) {
+        if (!inFilter(g.split(' ')[0])) continue;
+        if (z.S !== undefined && z.M !== undefined && z.S < z.M) order.push(`${g}: S ${z.S} < M ${z.M} items (SIZE-ORDER-OPT)`);
+        if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER-OPT)`);
+        if (z.S !== undefined && z.L !== undefined && z.S <= z.L) order.push(`${g}: S ${z.S} not greater than L ${z.L} items - the option page is the same at every size (SIZE-ORDER-OPT, D3)`);
+    }
     drops.push(...order);
+    // TEST-EQ-IND (critic divarray r1 Q1; OFF unless --test-eq-ind, pending the lead's ruling): a fact skill's Test count
+    // follows its Independent count on each support (live for div_facts in the role code; this measures it for mult_facts too).
+    if (has('test-eq-ind')) {
+        const indBy = {}, testBy = {};
+        for (const [k, v] of Object.entries(now)) {
+            if (!v.optProbe || !v.eq || v.na) continue;
+            const m = /^EQ (\S+) (\S+) ([SML]) (\{.*\})$/.exec(k); if (!m) continue;
+            const g = `${m[1]} ${m[4]} ${m[3]}`;
+            (m[2] === 'test' ? testBy : indBy)[g] = v.items;
+        }
+        for (const g of Object.keys(indBy)) {
+            if (!inFilter(g.split(' ')[0])) continue;
+            if (testBy[g] !== undefined && testBy[g] !== indBy[g]) drops.push(`${g}: Test ${testBy[g]} != Independent ${indBy[g]} items (TEST-EQ-IND)`);
+        }
+    }
     for (const d of drops) console.log(`  FAIL ${d}`);
     for (const d of allowed) console.log(`  allowed ${d}`);
     for (const d of rises) console.log(`  rise ${d}`);

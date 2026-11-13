@@ -4201,6 +4201,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "size-order-opt-multfacts-array",
+   "check": "the ruled option pages are judged by SIZE-ORDER: an option page whose cells measure smaller at S must fit more at S (strict S > L), never the same page at every size (critic divarray r1 D3; mult_facts {support:array} printed 10/10/10 and 12/12/12 at S/M/L)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin SIZE-ORDER-OPT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12) - same page at every size. (master also fails: pre-existing, 10/10/10)"
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "0 findings: the x array page sizes from its cells, S > L"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-eq-ind-multfacts",
+   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1). DISABLED behind --test-eq-ind pending the lead's ruling on whether the div_facts rule (2026-11-09) extends to mult_facts",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin TEST-EQ-IND (--test-eq-ind)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts array Test 12 != Independent 10 (S/M/L); touch Test 20/16 != Independent 25/20 (S/M). (master also fails touch 20!=25)"
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "pending the lead's ruling; if ruled, Test == Independent per support"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --test-eq-ind",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

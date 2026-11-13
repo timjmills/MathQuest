@@ -1,6 +1,70 @@
 {
  "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling",
  "written": "2026-11-13",
+ "sizeOrderOpts": [
+  {
+   "skill": "multiplication:mult_facts",
+   "role": "independent",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "role": "test",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "role": "more-practice",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "skill": "division:div_facts",
+   "role": "independent",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  }
+ ],
+ "testEqOpts": [
+  {
+   "skill": "multiplication:mult_facts",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  },
+  {
+   "skill": "multiplication:mult_facts",
+   "opts": {
+    "support": [
+     "touch"
+    ]
+   }
+  },
+  {
+   "skill": "division:div_facts",
+   "opts": {
+    "support": [
+     "array"
+    ]
+   }
+  }
+ ],
  "pages": {
   "addition:add_facts true-false S": {
    "items": 6,
