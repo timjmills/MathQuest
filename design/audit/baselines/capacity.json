@@ -2593,6 +2593,354 @@
   "division:div_facts more-practice L": {
    "items": 18,
    "pages": 1
+  },
+  "addition:add_facts mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice S": {
+   "items": 36,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice S": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice M": {
+   "items": 9,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice S": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice S": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice S": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice M": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice S": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice S": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice S": {
+   "items": 20,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice L": {
+   "items": 8,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice S": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice S": {
+   "items": 32,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice S": {
+   "items": 36,
+   "pages": 2
+  },
+  "placevalue:value mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice S": {
+   "items": 36,
+   "pages": 2
+  },
+  "placevalue:combine mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice S": {
+   "items": 36,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice L": {
+   "items": 10,
+   "pages": 1
   }
  },
  "ruled": {
