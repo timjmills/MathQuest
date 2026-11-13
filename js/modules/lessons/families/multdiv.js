@@ -238,6 +238,9 @@ export const ROUTINES = Object.freeze({
     // worked states of countby.js rowSteps (the jump; the first gap; the next gap; every gap, each jump checked).
     'mult-count-by-table': {
         archetype: 'count',
+        // (a count-by row is a full-width drawing - two lines of six numbers: the anchor chart's panels one column, the step's
+        // words under the row, LESSONS L11; in a half-page panel the row shrank its boxes to 2.6 mm, print-lint TY-12)
+        chartWide: true,
         casesPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): written from the count-row card (signed 2026-11-12) and the provider steps; its cases are declared when the lesson is carded (lessons-first).',
         concepts: [
             { id: 'jump', text: 'Every jump is the same size: the number in the box.' },
@@ -261,6 +264,9 @@ export const ROUTINES = Object.freeze({
             why: 'Four actions, one icon each; the count itself ("I count by 5: 5, 10, 15") is the Say band, so a chant would only repeat it.',
         },
         example: { match: 'Count by' },
+        // (one count row a line - the footprint's maxCols 1: the default 6 x 2 shape fell back to two pages, 4 + 2 with no step strip,
+        // print-lint PAGEFILL / PG-23. Densest first: the page takes as many rows as print on it, LR-17's single Practice page)
+        practiceShapes: [[8, 1], [7, 1], [6, 1], [5, 1], [4, 1], [3, 1]],
     },
 });
 
