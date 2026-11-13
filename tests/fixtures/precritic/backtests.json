@@ -6964,6 +6964,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "one-row-cap",
+  "check": "a practice page (independent / more-practice / test) holding ONE row of a tall story is held to its work, never stretched to the page (lead ruling R1 / R4a; lf-algebra precritic two-step r11 ws-two-step --print CAP-BAND: multi_step_word (Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit ONE-ROW-CAP (browser twin on lf-algebra: ws-two-step --print CAP-BAND)",
+  "browser": false,
+  "fail": {
+   "commit": "bc32eecc9",
+   "state": "one 125 mm story stretched to 214 mm (independent) / 184 mm (test): 41 % / 32 % under it"
+  },
+  "pass": {
+   "commit": "2157224a1",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only ONE-ROW-CAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-drawn-fit",
+  "check": "a one-column Guided page of two-step stories holds two plain tries a page where they fit at the height they DRAW (level 1), and no one-row page stretches past its ink / 0.72 (lf-algebra precritic two-step r11: Guided 1 story a page, EB-BAND 31-53 %)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-DRAWN-FIT (browser twin: ws-empty-band EB-BAND guided on the 7 two-step skills)",
+  "browser": false,
+  "fail": {
+   "commit": "bc32eecc9",
+   "state": "1 + 1 + 1 stories; one-row rows 200-208 mm"
+  },
+  "pass": {
+   "commit": "2157224a1",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-DRAWN-FIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "opener-spill",
+  "check": "a two-step story Opener: a Model measured over the half-width cell takes the full width, and a Model + Guided row that cannot share the page spill the Guided / Independent rows to page 2 - never over the budget (lf-algebra precritic two-step r11: Opener OVERFLOW / EB-EDGE 38 at M / L)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit OPENER-SPILL (browser twin: ws-cell-checks OVERFLOW + ws-empty-band EB-EDGE opener)",
+  "browser": false,
+  "fail": {
+   "commit": "bc32eecc9",
+   "state": "one page over its budget, the Model in the 93 mm zone"
+  },
+  "pass": {
+   "commit": "2157224a1",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only OPENER-SPILL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-twostep",
+  "check": "a two-step column story on Reason It prints its story once and stands A over B at the full width (lf-algebra precritic two-step r11: Reason It OVERFLOW at M / L - 107-115 mm step columns side by side in half cells)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-TWOSTEP (browser twin: ws-cell-checks OVERFLOW reason-it)",
+  "browser": false,
+  "fail": {
+   "commit": "bc32eecc9",
+   "state": "A | B side by side (1fr 1fr)"
+  },
+  "pass": {
+   "commit": "2157224a1",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-TWOSTEP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
-]
+ ]
 }
