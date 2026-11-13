@@ -5367,6 +5367,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r16b-topstart-l",
+  "check": "L-TOPSTART (CL-4b): the Match 3 first printed row starts within 3 mm of the top pad at L, on the Independent page and the lesson (its practice pages, 3 a page since r16 item 7), Grade 1 words (flat pictures): r16 put the picture row 3.4 mm down a 50 mm work and the work 10.7-13 mm down a 76 mm lesson cell; ws-options-verify --render failed vocabGrade 1/2/4 and vocabSet 4/5/7/8/10 at L, lesson L ratchet 0 -> 12",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-print-lint L-TOPSTART (lf-vocab r16b fix 1)",
+  "fail": {
+   "commit": "9fa898ed",
+   "state": "r15+r16 critic pass head: picture row centred in the work (margin:auto 0), work centred in a taller cell"
+  },
+  "pass": {
+   "commit": "b52eac93",
+   "state": "picture row hangs from the work top (margin:0 0 auto); the capped work margin-bottom:auto"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills vocabulary:vocab_grade_pictures --roles independent,lesson --size L --opts '{\"vocabGrade\":[1]}' --lints L-TOPSTART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
