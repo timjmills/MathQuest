@@ -26,7 +26,8 @@
   "placevalue:identify",
   "placevalue:unit_form",
   "placevalue:value",
-  "placevalue:combine"
+  "placevalue:combine",
+  "division:div_facts"
  ],
  "counts": {
   "addition:add_facts {support touch} card 390px|SIZE-INK": 1,
@@ -56,6 +57,16 @@
   "multiplication:mult_facts {support array} card 1280px|SIZE-WIDTH": 3,
   "multiplication:mult_facts {support array} worksheet 1280px|SIZE-INK": 4,
   "multiplication:mult_facts {support array} worksheet 1280px|SIZE-WIDTH": 2,
-  "multiplication:mult_facts {support array} quiz 1280px|SIZE-INK": 1
+  "multiplication:mult_facts {support array} quiz 1280px|SIZE-INK": 1,
+  "division:div_facts {support array} card 390px|SIZE-INK": 3,
+  "division:div_facts {support array} card 390px|SIZE-WIDTH": 3,
+  "division:div_facts {support array} card 820px|SIZE-INK": 3,
+  "division:div_facts {support array} card 820px|SIZE-WIDTH": 3,
+  "division:div_facts {support array} card 1280px|SIZE-INK": 3,
+  "division:div_facts {support array} card 1280px|SIZE-WIDTH": 3,
+  "division:div_facts {support array} worksheet 1280px|SIZE-INK": 4,
+  "division:div_facts {support array} worksheet 1280px|SIZE-WIDTH": 4,
+  "division:div_facts {support array} quiz 1280px|SIZE-INK": 1,
+  "division:div_facts {support array} quiz 1280px|SIZE-WIDTH": 1
  }
 }
