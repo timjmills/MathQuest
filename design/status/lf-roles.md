@@ -221,3 +221,5 @@ Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-
 
 ## Log
 - 2026-11-13: fixes 1-5, 3 backtest rows, ws-roles-unit (new, node, 40 checks, ~1 s).
+
+- 2026-11-13 deploy-5 hold: duplicate per-role precritic gates removed (747acce99); deploy head 3e3cfff70 merged with master, ws-precritic-plan OK (model-*-facts rows pass), roles-unit 80 OK. Awaiting the Guided SIZE-ORDER ruling.
