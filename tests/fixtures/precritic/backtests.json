@@ -6088,6 +6088,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-screen-text-size",
+  "check": "identify's screen numeral meets the card / quiz digit floor (40 / 48 / 56 px) and unit_form / value words are at least their print size on every screen host (lead 15:35; lf-checks TEXT-SIZE)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size TEXT-SIZE",
+  "browser": true,
+  "fail": {
+   "commit": "6d1ffb80",
+   "state": "identify card / quiz digits 30.4 px (floor 40-56); unit_form 'hundreds' and value 'worth' 14 pt on the worksheet (print 16 pt): 18 findings"
+  },
+  "pass": {
+   "commit": "611a7784",
+   "state": "numeral at --mq-digit; pv twin words floored at their M print size: 0 findings"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill placevalue:identify,placevalue:unit_form,placevalue:value --only TEXT-SIZE --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
