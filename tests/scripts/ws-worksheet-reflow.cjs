@@ -10,7 +10,11 @@
 //   node tests/scripts/ws-worksheet-reflow.cjs --sample-only a:b     # judge only these members of the pinned sample (a backtest
 //                                                                    # row on one skill; precritic runs the whole sample)
 //   node tests/scripts/ws-worksheet-reflow.cjs --pin                 # re-pin the baseline from THIS tree (pin from master)
+//   node tests/scripts/ws-worksheet-reflow.cjs --pin-slots           # add / refresh ONLY each key's slotXs from this tree (the
+//                                                                    # other fields keep their pin; run it with MQ_ROOT=<master>)
 //   node tests/scripts/ws-worksheet-reflow.cjs --self-test           # the judging rules on fixed numbers (no browser)
+//   node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture F     # judge a saved {baseline, measured} pair (no browser;
+//                                                                    # backtest rows such as ws-reflow-slot-x)
 //   MQ_ROOT=<checkout> ... serves another tree (ws-backtest commit-pair rows)
 //
 // For each sample skill (placevalue:expand, subtraction:sub_100_no_regroup, multiplication:mult_facts, addition:add_facts,
@@ -22,6 +26,8 @@
 //              more than 6 px in either direction (a layout change that should land is re-pinned with --pin, in the same change).
 //              (lf-hosts critic r2 F5) Nor does the tallest card or the largest answer place SHRINK by more than 6 px, the card
 //              width change by more than 6 px either way, or any card's height move by more than 6 px (card by card).
+//              (lf-hosts critic r3) Nor does any typed answer place move sideways inside its card by more than 1.5 px (slot by
+//              slot: its left edge from the card's left edge; judged when the baseline carries `slotXs`).
 //   WS-DIGIT   the worst card's numeral is not smaller than master's (0.5 px): a worksheet digit never falls below what master
 //              prints (the ruling's no-regression floor; the 29 px contract floor itself is ws-screen-ink-size TEXT-SIZE's and
 //              ws-screen-slots --screen-digit's). (r2 F5) Nor is ANY card's numeral smaller than that card's on master.
@@ -44,6 +50,8 @@ const WIDTHS = [...SW.SCREEN_WIDTHS].sort((a, b) => a - b).map((w) => ({ w, h: S
 const CARDS = 6;
 const TOL_H = 6;      // px a card / answer place may grow
 const TOL_D = 0.5;    // px a numeral may shrink (rounding)
+const TOL_X = 1.5;    // px a typed answer place may move sideways inside its card (lf-hosts critic r3: the r1 F4 4 px gap
+                      // moves boxes by up to 1 px; a 2 px move is a layout change)
 
 /** The verdicts on one measure against its baseline: [] when it holds. */
 function judge(m, b) {
@@ -67,6 +75,16 @@ function judge(m, b) {
     if (Array.isArray(b.digits) && Array.isArray(m.digits) && b.digits.length === m.digits.length) {
         const drop = b.digits.map((d, i) => [i, d, m.digits[i]]).filter(([, d, x]) => d > 0 && !(x >= d - TOL_D));
         if (drop.length) out.push(`WS-DIGIT ${drop.length} card(s) print a smaller numeral than master's: ${drop.slice(0, 3).map(([i, d, x]) => `card ${i + 1} ${d} -> ${x} px`).join(', ')}`);
+    }
+    if (Array.isArray(b.slotXs) && Array.isArray(m.slotXs)) {
+        const moved = [];
+        if (b.slotXs.length !== m.slotXs.length) out.push(`WS-REFLOW slot x: ${b.slotXs.length} card(s) in the baseline, ${m.slotXs.length} measured`);
+        else b.slotXs.forEach((row, i) => {
+            const now = m.slotXs[i] || [];
+            if (row.length !== now.length) { moved.push(`card ${i + 1} has ${now.length} answer place(s), master ${row.length}`); return; }
+            row.forEach((x, j) => { if (Math.abs(now[j] - x) > TOL_X) moved.push(`card ${i + 1} slot ${j + 1} x ${x} -> ${now[j]} px`); });
+        });
+        if (moved.length) out.push(`WS-REFLOW ${moved.length} answer place(s) moved sideways by more than ${TOL_X} px: ${moved.slice(0, 3).join(', ')}`);
     }
     return out;
 }
@@ -101,15 +119,17 @@ function MEASURE() {
         }
         return px;
     };
+    // each card's typed answer places, left edge from the card's left edge, in DOM order (lf-hosts critic r3: per-slot x)
+    const slotXs = cards.map((c) => { const cl = c.getBoundingClientRect().left; return Array.from(c.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=button]), textarea')).filter((el) => vis(el) && !el.closest('.mq-wsbar')).map((el) => Math.round((el.getBoundingClientRect().left - cl) * 10) / 10); });
     const perCard = cards.map(digitOf);
     const ds = perCard.filter((x) => x > 0);
     const r1 = (x) => Math.round(x * 10) / 10;
     return { cards: cards.length, cols, cardH: r1(cardH), cardW: r1(cardW), boxW: r1(boxW), boxH: r1(boxH), digit: ds.length ? r1(Math.min(...ds)) : 0,
-        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1) };
+        cardHs: cards.map((c) => r1(c.getBoundingClientRect().height)), digits: perCard.map(r1), slotXs };
 }
 
 function selfTest() {
-    const b = { cols: 2, cardH: 300, cardW: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 290], digits: [29, 40] };
+    const b = { cols: 2, cardH: 300, cardW: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 290], digits: [29, 40], slotXs: [[40, 100], [40]] };
     const cases = [
         ['same layout', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29 }, []],
         ['r1 expand at 1280: 2 -> 1 column', { cols: 1, cardH: 300, boxW: 144, boxH: 192, digit: 29 }, [/columns 2 -> 1/]],
@@ -125,6 +145,10 @@ function selfTest() {
         ['r2 F5 the card width changes 300 -> 340', { cols: 2, cardH: 300, cardW: 340, boxW: 144, boxH: 192, digit: 29 }, [/card width 300 -> 340/]],
         ['r2 F5 card 2 numeral 40 -> 32 (the worst card holds 29)', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 290], digits: [29, 32] }, [/WS-DIGIT 1 card\(s\).*card 2 40 -> 32/]],
         ['r2 F5 card 2 shrinks 290 -> 250 (the tallest holds)', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, cardHs: [300, 250], digits: [29, 40] }, [/card 2 290 -> 250/]],
+        // lf-hosts critic r3: per-slot x, tolerance 1.5 px (the r1 F4 4 px gap moves a box by up to 1 px)
+        ['r3 a slot 1 px sideways holds', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40, 101], [40]] }, []],
+        ['r3 a slot 2 px sideways fails', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40, 102], [40]] }, [/1 answer place\(s\) moved sideways.*card 1 slot 2 x 100 -> 102/]],
+        ['r3 a card that lost an answer place fails', { cols: 2, cardH: 300, boxW: 144, boxH: 192, digit: 29, slotXs: [[40], [40]] }, [/card 1 has 1 answer place\(s\), master 2/]],
     ];
     let bad = 0;
     for (const [name, m, want] of cases) {
@@ -138,9 +162,19 @@ function selfTest() {
     process.exit(bad ? 1 : 0);
 }
 
+/** --judge-fixture FILE: {about, baseline, measured} judged with the same rules (no browser). */
+function judgeFixture(file) {
+    const fx = JSON.parse(fs.readFileSync(path.resolve(file), 'utf8'));
+    const v = judge(fx.measured, fx.baseline);
+    for (const f of v) say(`  ${path.basename(file)}: ${f}`);
+    say(v.length ? `${TOOL}: FAIL - ${v.length} finding(s) on fixture ${path.basename(file)}` : `${TOOL}: OK (fixture ${path.basename(file)})`);
+    process.exit(v.length ? 1 : 0);
+}
+
 async function main() {
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'sample-only', 'baseline']), BOOL = new Set(['pin', 'self-test', 'print-widths']);
+    if (has('judge-fixture')) return judgeFixture(arg('judge-fixture'));
+    const VALUE = new Set(['skills', 'sample-only', 'baseline']), BOOL = new Set(['pin', 'pin-slots', 'self-test', 'print-widths']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -148,7 +182,8 @@ async function main() {
     }
     if (has('print-widths')) { say(`widths: ${WIDTHS.map((v) => v.w).join(',')}`); return; }
     const basePath = path.resolve(arg('baseline', BASE));
-    const pin = has('pin');
+    const pinSlots = has('pin-slots');
+    const pin = has('pin') || pinSlots;
     const skills = String(arg('skills', arg('sample-only', SAMPLE.join(',')))).split(',').map((s) => s.trim()).filter(Boolean);
     if (has('sample-only') && skills.some((k) => !SAMPLE.includes(k))) { say(`${TOOL}: --sample-only takes members of the sample (${SAMPLE.join(', ')})`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     let base = null;
@@ -194,13 +229,24 @@ async function main() {
                 rows[key] = m;
                 const v = pin ? (m.error ? [`WS-REFLOW nothing measured (${m.error})`] : []) : judge(m, base.keys[key]);
                 for (const f of v) fails.push(`${key}: ${f}`);
-                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
+                say(`${key.padEnd(40)} ${m.error ? 'ERR ' + m.error : `${m.cols} col(s), tallest card ${m.cardH} px (w ${m.cardW}), answer place ${m.boxW} x ${m.boxH}, numeral ${m.digit} px, ${m.slotXs.flat().length} slot x`}${v.length ? '\n    ' + v.join('\n    ') : ''}`);
             }
         }
     } finally { await app.close(); }
     if (pin) {
         if (fails.length) { say(`${TOOL}: FAIL - not pinned: ${fails.join(' | ')}`); process.exit(1); }
         const prev = (() => { try { return JSON.parse(fs.readFileSync(basePath, 'utf8')); } catch (e) { return { keys: {} }; } })();
+        if (pinSlots) {
+            const missing = Object.keys(rows).filter((k) => !(prev.keys || {})[k]);
+            if (missing.length) { say(`${TOOL}: FAIL - --pin-slots needs pinned keys first: ${missing.join(', ')}`); process.exit(1); }
+            const { execSync } = require('child_process');
+            let head = '?';
+            try { head = execSync('git rev-parse --short=9 HEAD', { cwd: process.env.MQ_ROOT || path.resolve(__dirname, '..', '..') }).toString().trim(); } catch (e) { /* none */ }
+            for (const [k, m] of Object.entries(rows)) { prev.keys[k].slotXs = m.slotXs; prev.keys[k].slotXsFrom = head; }
+            fs.writeFileSync(basePath, JSON.stringify(prev, null, 1) + '\n');
+            say(`${TOOL}: OK (pinned slotXs of ${Object.keys(rows).length} key(s) from ${head} into ${path.relative(process.cwd(), basePath)})`);
+            return;
+        }
         const keys = Object.assign({}, prev.keys || {}, rows);
         const { execSync } = require('child_process');
         let head = '?';

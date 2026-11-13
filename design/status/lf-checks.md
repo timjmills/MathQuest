@@ -9,6 +9,26 @@ Builder profile: — (the lane session builds; Opus 5.5, effort medium per the b
 Critic rounds: 2, FAIL C1 7 / C2 7 / C3 8 / C4 8 (stopped: rule 7, a defect class survived two rounds)
 
 ## Now
+- 2026-11-13 (lf-checks, branch claude/sweet-newton-c8wrv1-lf-tools-touch, builder Opus medium; lf-hosts hand-over d23e42fa6 merged in):
+  1. TOUCH-HIT de-flake (ws-phone-card). Measured on d23e42fa6, 3 runs of sub_100_no_regroup + placevalue:expand + add_facts
+     (--only TOUCH-HIT, 4 widths x card/worksheet/quiz): run 1 sub_100 1280 card item 1 bottom-right; run 2 expand 1280 item 2
+     bottom; run 3 sub_100 1280 item 1 bottom + add_facts 1280 item 3 bottom. Every miss "focuses nothing (body)", at 1280 x 900,
+     on a bottom edge / corner, never the same twice. Cause: the tap point was read in the same task as the blur and the
+     scrollIntoView, so a scroll / focusout layout that settled on the next frames left the point stale. Fix in the CHECK: the
+     point is read after two frames and once the scroll and the box rect hold still; a miss is re-tapped the same way and only
+     a REPEATED miss is a finding (`--no-retap` = the old tap, `--touch-debug` prints misses that held). After: 3 of 3 runs OK
+     with 0 re-taps needed (settling alone removed them). Rows `touch-hit-settle-retap` (stale single tap FAIL -> settled OK) and
+     `touch-hit-overlay-true-miss` (a planted overlay on the box's bottom 12 px FAILs every run, 3 of 3) PASS; ledger row added.
+  2. WS-REFLOW per-slot x (ws-worksheet-reflow): each typed answer place's left edge inside its card vs the baseline's slotXs,
+     tolerance 1.5 px; self-test 1 px holds / 2 px fails; `--pin-slots` adds slotXs only (pinned from master a8258e3f3);
+     sub_word_problems' slotXs pinned from d23e42fa6 (lf-hosts' word-work gap moved its working boxes 3-4 px; passed critic r3,
+     so re-pinned in this change per the ratchet rule). Row `ws-reflow-slot-x` (`--judge-fixture`, 2 px FAIL -> 1 px OK).
+  3. `ws-backtest --help` prints the usage and exits 0 (its --self-test asserts it). New `tests/scripts/ws-touch-diff.mjs`:
+     one command runs today's ws-phone-card (TOUCH-HIT by default, `--rules`) on HEAD and on origin/master (temporary worktree)
+     and prints only the cells that differ (`--self-test`).
+  WAITING until the de-flaked TOUCH-HIT is live on master (lf-hosts hand-over item 4): the touch-target re-check at 820 / 1024 of
+  box_division_hard, time_hour, money, vocab_grade_pictures, the mult_chart family, long_div_2digit, order_negatives, the fact
+  families, arrays_groups / mult_arrays.
 - 2026-11-13 (lf-tools, branch claude/sweet-newton-c8wrv1-lf-tools): COPY-LIGHT and BATCH critic routes (owner rule, fastest plan 2-3).
   `tests/scripts/ws-copy-light.mjs` (new): eligibility = every kit template the generator draws (defaults + the card's option values,
   q.cell via kitCellSpec) has an ANCHOR in redesign-passed.js whose signed card offers every role and host the skill's card offers
