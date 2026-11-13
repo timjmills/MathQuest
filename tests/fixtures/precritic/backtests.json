@@ -3740,6 +3740,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
- }
+ },
+  {
+   "id": "pl-cl40-arrays-turn-mp",
+   "check": "An array dot never enters the cell label's 7 x 7 mm keep-out (CL-40; lf-ops-props precritic: mult_properties more-practice L, first dot 6.8 mm across, 4.8 mm down, cells 1 and 5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK (more-practice)",
+   "browser": true,
+   "fail": {
+    "commit": "fc981d0c7",
+    "state": "lf-ops-props precritic tree: the arrays-turn spacer keyed on ctx.columns"
+   },
+   "pass": {
+    "commit": "c1c54b5c4",
+    "state": "lf-ops-props r3b: the pair set in from the left by --ws-koin"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice --size L --lints L-OVERLAP --skills multiplication:mult_properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
  ]
 }
