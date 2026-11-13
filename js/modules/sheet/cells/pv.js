@@ -712,6 +712,7 @@ function pvRender(p, ctx0) {
     return p.noTabSpacer ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
 }
 
+
 function pvRenderBody(p, ctx0) {
     {
         // Finished work that is RIGHT arrives as state `wrong` with the whole answer and no
@@ -815,8 +816,65 @@ function pvRenderBody(p, ctx0) {
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${fr}</div>`;
             }
             case 'compare': {
+                // (the gap between each number and the circle: 4 mm; lf-placevalue compare r2 - F9: three across at L the digits
+                // stood 4 mm from the cell rules, so 3 mm there; pixel EB-SIDE: a row wider than its line - band 9,999 at L in one
+                // column, 30.6 % each side; the Guided page's two columns at S, 30.6 % - so on paper the gaps widen, up to 10 mm,
+                // until the line spans 46 % of its cell: the problem spread over its row, never enlarged)
+                const cols = Number(ctx.columns) || 0;
+                let gapMm = ctx.size === 'L' && cols >= 3 ? 3 : 4;
+                // (compare r4, critic r2 F9: three across at L the 6-digit line stood 4.5-4.8 mm from the cell rules - the gaps
+                // give way, down to 1.6 mm, until the line keeps 5.2 mm a side inside its 61.5 mm cell; the digits and the circle
+                // keep their size. ws-pv-compare-pages SIDE-PAD)
+                if (ctx.mode !== 'screen' && ctx.size === 'L' && cols >= 3) {
+                    const em = m.digitPt * 25.4 / 72;
+                    const txt = fmt(p.a) + fmt(p.b);
+                    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + 12;
+                    gapMm = Math.max(1.6, Math.min(gapMm, Math.floor(((186 / cols - 0.6 - 2 * 5.2) - bare) / 2 * 10) / 10));
+                }
+                if (ctx.mode !== 'screen' && cols > 0 && cols <= 2) {
+                    const em = m.digitPt * 25.4 / 72;
+                    const txt = fmt(p.a) + fmt(p.b);
+                    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + ({ S: 8, M: 10, L: 12 }[ctx.size] || 10);
+                    gapMm = Math.max(gapMm, Math.min(10, Math.round(((0.46 * (186 / cols - 1) - bare) / 2) * 10) / 10));
+                }
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
-                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
+                // (lf-placevalue compare r2, critic r1 F2: a step state - stepState below, `_marks` - draws each step's own mark: the
+                // digit count over each number, the two deciding digits boxed, the bigger number underlined; the newest mark grey,
+                // earlier ones black, as every step state is. Every state keeps the room of the last, so the problem stands still)
+                if (p._marks) {
+                    const mk = p._marks;
+                    const col = (ink) => (ink === 'trace' ? '#949494' : '#000');
+                    const sd = (n) => String(Math.trunc(Math.abs(Number(n))));
+                    // (compare r4, critic r2 N2: the box round the deciding digit was that digit's own advance wide, so its rules ran
+                    // through the ink of the digits beside it - "4[1]7". A boxed digit stands in 1.6 mm of room each side, and its box
+                    // - a drawn frame, 0.5 mm out to the sides and below, 0.12 em above the digit - ends 0.5 mm short of every
+                    // character it does not mark (the digit count above stands 2.6 mm over a boxed state, not 1.2). A state that draws no
+                    // box keeps the line as it was, so a Guided cell (the counts only) is neither widened nor heightened. An "=" item's "every digit" box is one box round the
+                    // whole number. ws-pv-compare-pages MARK-CLEAR)
+                    const boxed = (inner, ink, room) => `<span data-pv-mark="digit" style="position:relative;display:inline-block;line-height:1;${room ? 'margin:0 1.6mm;' : ''}">${inner}`
+                        + `<span data-pv-box="1" style="position:absolute;left:-0.5mm;right:-0.5mm;top:-0.12em;bottom:-0.5mm;border:1.5pt solid ${ink};border-radius:0.8mm;"></span></span>`;
+                    const side = (n, who) => {
+                        let di = 0;
+                        const all = !!mk.digits && mk.digits.value === 'all';
+                        const body0 = [...fmt(n)].map((ch) => {
+                            if (!/\d/.test(ch)) return esc(ch);
+                            const i = di++;
+                            const on = !all && !!mk.digits && Number(mk.digits.value) === i;
+                            return on ? boxed(ch, col(mk.digits.ink), true) : ch;
+                        }).join('');
+                        const body = all ? boxed(body0, col(mk.digits.ink), false) : body0;
+                        const len = sd(n).length;
+                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:${mk.digits ? 2.6 : 1.2}mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
+                        const win = mk.win && mk.win.value === who;
+                        return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
+                            + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.3mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
+                    };
+                    return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;align-items:flex-end;">`
+                        + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
+                }
+                // (`data-ws-stretchmid`, lead 2026-11-13: the one line is centred down a row that stretches it by 30 % or more -
+                // css/sheet-kit.css, ws-print-lint L-TOPSTART - the white split above and below it, never all under it)
+                return `<div class="pv-cell" data-ws-stretchmid="1" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
             case 'order':
@@ -984,7 +1042,28 @@ register('pv', {
             // (and expand's rows, combine's Mixed Review band: one line of boxes in 19.6 mm rows, 40 % empty under it; and unit
             // form's standard row "119 = [ ] hundreds [ ] tens [ ] ones", 12 rows flexed to 19 mm on its Test at S, 39 %)
             const tight = (p.kind === 'frame' && (!!p.ghost || !!p.rowOnly)) || p.kind === 'expand' || (p.kind === 'blanks' && !!p.words)
-                ? { tightRows: true } : {};
+                || p.kind === 'compare' ? { tightRows: true } : {};
+            // (compare, lf-placevalue compare round: "408 ( ) 666" is one line answered in its circle - held to its ink on every role
+            // (tightRows), at most three across (hardCap: at S a fourth column put the numbers against the cell's edges), fewer where
+            // the measured line is wider - band 999,999 - so a Test never stands wider than its Independent page, EB-GRIDFOOT;
+            // `keepCols`: the page is never re-laid in fewer, wider columns to fill it - print-sheet's re-seat put it 2 x 14 at S,
+            // a 31 % band each side; `spreadMax`: on the practice pages its rows may still grow - the band under the line stays
+            // under 30 % - so the grid fills the page, ws-print-lint PAGEFILL. 1.3 x at S and M (compare round 2: 1.2 x left a pages-3 M
+            // page 22 % white; 1.38 x was 30-32 % under the line at S and M); at L the 3 x 6 page needs 1.38 x: 1.3 x
+            // left 23 % of the page white, 1.4 x 31 % of each cell under the line - the dense layout takes no 2 x 8 there (1 x 10))
+            // (`inkWMm`, lf-placevalue compare r2 / critic r1 F1 - the interface lf-roles set: the TRUE ink width of "a ( ) b" as drawn - Andika bold digits 0.606 em,
+            // a comma 0.324 em, two 4 mm gaps, the sign circle - measured in Chrome at S / M / L, within 0.3 mm. `wMm` stays the
+            // layout's nominal cell; Reason It reads inkWMm and stacks A over B when it is wider than half the room)
+            if (p.kind === 'compare') {
+                const em = (Number(ctx.metrics && ctx.metrics.digitPt) || { S: 16, M: 22, L: 28 }[ctx.size] || 22) * 25.4 / 72;
+                const txt = fmt(p.a) + fmt(p.b);
+                const dg = txt.replace(/[^0-9]/g, '').length, cm = txt.replace(/[^,]/g, '').length;
+                const circle = { S: 8, M: 10, L: 12 }[ctx.size] || 10;
+                const inkWMm = Math.round((0.606 * em * dg + 0.324 * em * cm + 8 + circle + 0.5) * 10) / 10;
+                // (`inkHMm`, compare r3, the lead's stretch ruling 2026-11-13: the line is as tall as its sign circle - Chrome, S / M / L - so a row is judged stretched
+                // against the ink, as L-TOPSTART reads it, never against a measured height that holds the tab clearance and the pads)
+                return { wMm: 62, inkWMm, inkHMm: circle, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
+            }
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
             // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
@@ -1002,11 +1081,41 @@ register('pv', {
             // (lf-placevalue r3 F2: held to 3 across at S, "10 + 4" / "= ____" in a 62 mm cell left 32-35 % each side; four
             // across, the two-line frame fills its 46 mm cell - the layout still takes fewer where the measured fit says so)
             if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
+            // (lf-placevalue compare round, F1 - ws-empty-band EB-GRIDFOOT: combine's Independent page stands its frames 3 across at S,
+            // rows held to their ink, but a Test and a Review dealt fewer packed them 4 across - the frames' maxCols is no hard cap -
+            // and left 102 / 89 mm white under the grid. A ghost frame at S is held to three across, its write line two digits
+            // longer there (wide3), on every role.)
+            if (p.kind === 'frame' && p.ghost && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
             return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}), ...tight };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
+    /**
+     * Step states (steps.js) for the compare item only (lf-placevalue compare r2, critic r1 F2): its marks `count`,
+     * `digits`, `win` and `answer` (placevalue:compare workedSteps) drawn up to step k, step k's grey. Every other pv kind
+     * keeps the anchor's whole-cell fallback (anchors.js stepTemplateOf reads `hasStepState`).
+     */
+    hasStepState(p) { return !!p && p.kind === 'compare'; },
+    // Guided cell 1 of a lesson sheet is drawn at step 1 (lesson-pages/we-do.js): the digit counts traced grey. Read
+    // only through stepTemplateOf, so only the compare item - the one kind with step states - takes it.
+    guidedStepOne: true,
+    // (a practice page's example strip - anchors.js, --anchors - draws the compare item whole: its states with their count
+    // labels cost the page a row, ws-coverage-matrix single/ex-group PAGEFILL)
+    anchorStates: false,
+    /** State k as a payload variant (`_marks`) and the answer's ink ('trace' | 'solid' | null): the Scripted Model draws it. */
+    statePayload(p, steps, k) {
+        const mk = {};
+        (steps || []).forEach((s, i) => {
+            if (i > k) return;
+            for (const x of (s && s.marks) || []) if (x && x.slot) mk[x.slot] = { value: String(x.value), ink: i < k ? 'solid' : 'trace' };
+        });
+        return { payload: { _marks: mk }, answer: mk.answer ? mk.answer.ink : null };
+    },
+    stepState(p, steps, k, ctx) {
+        const st = this.statePayload(p, steps, k);
+        return pvRender(Object.assign({}, p, st.payload), Object.assign({}, ctx, { state: st.answer ? (st.answer === 'trace' ? 'traced' : 'answered') : 'blank' }));
+    },
     layout(p) {
         const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.kind === 'table' || p.kind === 'line-mark'
             || p.kind === 'chart' || p.support === 'line');

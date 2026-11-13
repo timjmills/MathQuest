@@ -151,8 +151,10 @@ export default {
     // Five bank types on 2-digit numbers (Grade 1-2 prior knowledge), one a row, the same order in A
     // and B; each row prints its item's own library instruction. B: the same types, harder numbers.
     numberSense: {
-        A: { items: [NS('more_less_10', { step: 10, dir: 'more', band: 100 }), NS('compare', { closeness: 'far' }), NS('unit_form'), NS('more_less_10', { step: 1, dir: 'less', band: 100 }), NS('more_less_10', { step: 10, dir: 'less', band: 100 })] },
-        B: { items: [NS('more_less_10', { step: 10, dir: 'more', band: 100 }, { minNum: 85 }), NS('compare', { closeness: 'close' }), NS('unit_form'), NS('more_less_10', { step: 1, dir: 'less', band: 100 }, { minNum: 85 }), NS('more_less_10', { step: 10, dir: 'less', band: 100 }, { minNum: 85 })] },
+        // (compare at minNum 21, the pack's pool floor: compare r4 deals its sign from a seeded plan, so the first number may be
+        // the smaller - "18 / 19" fell under the pool's 21, E24)
+        A: { items: [NS('more_less_10', { step: 10, dir: 'more', band: 100 }), NS('compare', { closeness: 'far' }, { minNum: 21 }), NS('unit_form'), NS('more_less_10', { step: 1, dir: 'less', band: 100 }), NS('more_less_10', { step: 10, dir: 'less', band: 100 })] },
+        B: { items: [NS('more_less_10', { step: 10, dir: 'more', band: 100 }, { minNum: 85 }), NS('compare', { closeness: 'close' }, { minNum: 21 }), NS('unit_form'), NS('more_less_10', { step: 1, dir: 'less', band: 100 }, { minNum: 85 }), NS('more_less_10', { step: 10, dir: 'less', band: 100 }, { minNum: 85 })] },
     },
 
     // ------------------------------------------------------------------ P5 Word problem (Q5)

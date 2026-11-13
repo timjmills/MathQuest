@@ -35,7 +35,7 @@ import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
 import { applySheetTags, ebItemOf } from './sheet/index.js';
-import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
+import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, roleOptions, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
@@ -237,7 +237,10 @@ function normaliseRequest(req = {}) {
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
     const sections = (Array.isArray(req.sections) ? req.sections : [])
         .map((s) => ({
-            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId),
+            // (a support that follows the role - provider `roleOpts`: identify's place heads off on Review / Test / the
+            // pre-skill check, lead ruling PEDAGOGY 4.1a 2026-11-13; every other skill's opts pass through unchanged)
+            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId)
+                .map((k) => { const o = roleOptions(role, k.categoryId, k.skillId, k.opts); return o === k.opts ? k : Object.assign({}, k, { opts: o }); }),
             count: s && s.count !== undefined && s.count !== null && s.count !== 'auto' ? clampInt(s.count, 1, MAX_ITEMS, null) : null,
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
@@ -4163,6 +4166,8 @@ async function buildSheetDeal(req = {}) {
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
+            // (`keepCols`, additive: the re-seat below reads it - a pv compare page keeps its columns)
+            ...(it.footprint && it.footprint.keepCols ? { keepCols: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -4402,6 +4407,12 @@ async function buildRoleSheet(n, metaOf) {
     const reqSkills = n.sections.flatMap((s) => s.skills);
     const pools = (mod.sources(reqSkills, { earlier: earlierSkills, lesson: n.lessonInput, factSections: n.factSections ? n.sections.map((s) => s.skills) : null }) || []).filter((p) => p && p.skills && p.skills.length);
     if (!pools.length) throw new Error(`buildSheet: ${n.role} has no skill to print`);
+    // (the skills a role sources for itself - a pre-skill check's earlier skills, a review's - take the role's option values
+    // too: provider roleOpts, identify's place heads off on the unaided roles, lead ruling PEDAGOGY 4.1a 2026-11-13)
+    for (let i = 0; i < pools.length; i++) {
+        const sk2 = pools[i].skills.map((k) => { const o = roleOptions(n.role, k.categoryId, k.skillId, k.opts); return o === k.opts ? k : Object.assign({}, k, { opts: o }); });
+        if (sk2.some((k, j) => k !== pools[i].skills[j])) pools[i] = Object.assign({}, pools[i], { skills: sk2 });
+    }
     const allSkills = [];
     const seenSkill = new Set();
     for (const p of pools) for (const sk of p.skills) {
@@ -6909,7 +6920,11 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
                     // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
-                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    // (nor a section whose footprints say `keepCols` - pv compare, lf-placevalue compare round: "408 ( ) 666" at S in
+                    // rows held to its ink fills 3 x 10 to about 80 %, and the re-lay to 2 x 14 left a 31 % band each side of every
+                    // cell; the spare height stays under the grid, as `tightRows` keeps it on every role)
+                    const keepCols = (best.items || []).length > 0 && best.items.every((it) => !!(it && it.keepCols));
+                    const cMin = divFactsPlainSection(s) || keepCols ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;
