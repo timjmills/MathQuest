@@ -56,6 +56,75 @@ const STORY_SUB = {
     chant: 'Whole − part = part.',
 };
 const STORY_PENDING = 'Ported from the visual-quality lane with its Warm-up (the facts the story is solved with) until its Prerequisite Check is written (LR-17).';
+// ---- the change-unknown and compare-smaller story routines (word-stories card, 2026-11-12; fix r2): the three presets
+// add_wp_change_unknown / sub_wp_change_unknown / sub_wp_compare_smaller teach a NEW unknown position each, so their lesson
+// names the structure the bar shows (First / Then / Now, or the bigger amount and the difference), never "parts and whole"
+// on a compare story; the structure step and the solving step are the provider's (providers/word-work.js structureStep).
+const STORY_CHANGE_STEPS = [
+    { icon: 'look', text: 'Read the story two times.' },
+    { icon: 'decide', text: 'Find First, Then and Now.' },
+    { icon: 'write', text: 'Write the number sentence.' },
+    { icon: 'check', text: 'Solve. Say the answer and its label.' },
+];
+const STORY_COMPARE_STEPS = [
+    { icon: 'look', text: 'Read the story two times.' },
+    { icon: 'decide', text: 'Find the bigger amount.' },
+    { icon: 'write', text: 'Write the number sentence.' },
+    { icon: 'check', text: 'Solve. Say the answer and its label.' },
+];
+const STORY_STRUCT_BASE = {
+    format: {
+        kind: 'numbered steps with icons + a rule',
+        why: 'The story names the numbers in an order that does not say the sign; the bar shows which amount is missing, and the rule names what to do.',
+    },
+    example: { match: 'I subtract' },
+    practiceShapes: [[8, 2], [6, 2], [4, 2]],
+};
+const STORY_JOIN_CHANGE = {
+    concepts: [
+        { id: 'first-then-now', text: 'First and the change make Now.' },
+        { id: 'change-missing-sub', text: 'I know First and Now. I subtract to find the change.' },
+        { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+    ],
+    vocab: STORY_VOCAB('13 − 8 = 5'),
+    steps: STORY_CHANGE_STEPS,
+    chant: 'Now − first = the change.',
+};
+const STORY_SEPARATE_CHANGE = {
+    concepts: [
+        { id: 'first-then-now', text: 'What went and what is left make First.' },
+        { id: 'went-missing-sub', text: 'I know First and Now. I subtract to find what went.' },
+        { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+    ],
+    vocab: STORY_VOCAB('15 − 9 = 6'),
+    steps: STORY_CHANGE_STEPS,
+    chant: 'First − now = what went.',
+};
+const STORY_COMPARE_SMALLER = {
+    concepts: [
+        { id: 'two-bars', text: 'The long bar is the bigger amount.' },
+        { id: 'smaller-missing-sub', text: 'I know the bigger amount and the difference. I subtract to find the smaller amount.' },
+        { id: 'more-than-fewer', text: '"Maya has 6 more than Tom" means Tom has 6 fewer than Maya.' },
+    ],
+    vocab: [
+        { word: 'more than', meaning: 'the bigger amount', picture: { kind: 'text', text: '9 is more than 4' } },
+        { word: 'fewer than', meaning: 'the smaller amount', picture: { kind: 'text', text: '4 is fewer than 9' } },
+        { word: 'difference', meaning: 'how many more or fewer', picture: { kind: 'text', text: '9 − 4 = 5' } },
+    ],
+    steps: STORY_COMPARE_STEPS,
+    chant: 'Bigger − difference = smaller.',
+};
+const STORY_STRUCT_PENDING = 'Word-stories presets (2026-11-12): the Warm-up deals the take-away facts the story is solved with until the Prerequisite Check is written (LR-17).';
+const storyStructLessons = () => {
+    const subFacts = { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'The story is solved with a take-away fact within 20.' };
+    const mix = [{ key: 'composing:number_bonds', opts: { band: 10 } }, { key: 'addition:add_facts', opts: { band: 20 } }];
+    const lesson = (routine, skill) => ({ routine, practice: { skill }, prereqsPending: STORY_STRUCT_PENDING, warmup: [subFacts], mixWith: mix });
+    return {
+        'skill:addition:add_wp_change_unknown': lesson('story-join-change-unknown', 'addition:add_wp_change_unknown'),
+        'skill:subtraction:sub_wp_change_unknown': lesson('story-separate-change-unknown', 'subtraction:sub_wp_change_unknown'),
+        'skill:subtraction:sub_wp_compare_smaller': lesson('story-compare-smaller', 'subtraction:sub_wp_compare_smaller'),
+    };
+};
 const storyLessons = () => {
     const addFacts = (band) => ({ key: 'addition:add_facts', opts: { band, notation: ['stacked'] }, why: `The story is solved with an addition fact within ${band}.` });
     const subFacts = (band) => ({ key: 'subtraction:subtract', opts: { band, notation: ['stacked'] }, why: `The story is solved with a take-away fact within ${band}.` });
@@ -196,6 +265,9 @@ export const ROUTINES = Object.freeze({
     // so step n of the list IS panel n of the chart. The _plain twin (no picture row) is the same lesson.
     'story-add-part-whole': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_BASE, STORY_ADD),
     'story-sub-part-whole': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_BASE, STORY_SUB),
+    'story-join-change-unknown': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_STRUCT_BASE, STORY_JOIN_CHANGE),
+    'story-separate-change-unknown': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_STRUCT_BASE, STORY_SEPARATE_CHANGE),
+    'story-compare-smaller': Object.assign({ archetype: 'story', casesPending: STORY_CASES_PENDING }, STORY_STRUCT_BASE, STORY_COMPARE_SMALLER),
 
     // ------------------------------------------- Is it a fact family? (+ / −, grade 1)
     // Ported from master's prereqs.js (visual-quality lane 2026-10-31): the kit's `family-check` cell - the three
@@ -378,6 +450,7 @@ export const LESSONS = Object.freeze({
 
     // --------------------------------- One-step word problems within 10 / 20 (K-1), ported from master
     ...storyLessons(),
+    ...storyStructLessons(),
 
     // ------------------------------------------- Is it a fact family? (+ / −, grade 1), ported from master
     // The Warm-up deals the facts the check is made with.

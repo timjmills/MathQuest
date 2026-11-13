@@ -146,7 +146,8 @@ export function twoState(it, k, c) {
  */
 export const isWordSentence = (it) => { const cl = it && it.q && it.q.cell; return !!(cl && cl.template === 'word-work' && cl.payload && cl.payload.layout === 'sentence' && (cl.payload.steps || []).length === 1); };
 export function sentenceState(it, groups, k, c) {
-    // (the part-whole bar is drawn on every panel - WDS 18.1, critic r1 F13 - its boxes written as their step comes)
+    // (the part-whole bar is drawn on every panel - WDS 18.1, critic r1 F13 - its boxes written as their step comes; the
+    // compare story bar's boxes bar-big / bar-diff too, word-stories fix r2: never written before the step that finds them)
     const p = Object.assign({}, it.q.cell.payload, { pic: null, kb: false, bar: true });
     // (the story is printed in the chart's first row of panels only: the second row draws the bar and the sentence, so
     // the chart and its Say and Rule bands fit the page with the bar drawn - critic r1 F4, content never shrinks)
@@ -162,7 +163,7 @@ export function sentenceState(it, groups, k, c) {
     try { html = t.render(p, ctx); } catch (e) { html = ''; }
     const at = new Map();
     groups.forEach((g, gi) => (g.marks || []).forEach((m) => { if (m && m.slot && !at.has(m.slot)) at.set(m.slot, gi); }));
-    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
+    html = html.replace(/(<span[^>]*data-ws-slot="(fr0-a|fr0-b|op0|answer|bar-w|bar-a|bar-b|bar-big|bar-diff)"[^>]*>)([^<]*)(<\/span>)/g, (m, open, id, val, close) => {
         const g = at.has(id) ? at.get(id) : groups.length - 1;
         const bare = open.replace(/ data-ws-ink="[a-z]+"/, '');
         if (k < g) return bare + close;
