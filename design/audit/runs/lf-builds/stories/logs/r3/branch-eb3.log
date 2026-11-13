@@ -1,0 +1,72 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --vocab-ink --page-fill --no-baseline --json /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/branch-eb3.json  [367f41cfd]
+note: slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)
+note: addition:add_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 10 + hosts card, worksheet, quiz
+note: addition:add_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: addition:add_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_compare_smaller: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+EB-BAND  FAIL 108
+   addition:add_word_problems independent M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems independent M p1 cell 2: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems independent M p1 cell 4: empty band 40.4 mm under the ink of a 117.8 mm cell (34.3 %; limit 30 % = 35.3 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems more-practice M p1 cell 4: empty band 37.8 mm under the ink of a 109.6 mm cell (34.5 %; limit 30 % = 32.9 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 2: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 4: empty band 40.4 mm under the ink of a 117.8 mm cell (34.3 %; limit 30 % = 35.3 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems lesson L p2 cell 2: empty band 7.9 mm under the ink of a 26 mm cell (30.4 %; limit 30 % = 7.8 mm; the 2.0 mm top pad excluded) [fact]
+   addition:add_word_problems lesson L p2 cell 3: empty band 8.0 mm under the ink of a 26 mm cell (30.7 %; limit 30 % = 7.8 mm; the 2.0 mm top pad excluded) [fact]
+   addition:add_word_problems lesson L p2 cell 4: empty band 45.9 mm under the ink of a 123.9 mm cell (37.1 %; limit 30 % = 37.2 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems S p1 cell 1: empty band 37.7 mm under the ink of a 76.5 mm cell (49.3 %; limit 30 % = 22.9 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems S p1 cell 2: empty band 37.7 mm under the ink of a 76.5 mm cell (49.3 %; limit 30 % = 22.9 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems S p1 cell 3: empty band 37.2 mm under the ink of a 76.5 mm cell (48.6 %; limit 30 % = 22.9 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems M p1 cell 1: empty band 31.3 mm under the ink of a 76.5 mm cell (41.0 %; limit 30 % = 22.9 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems M p1 cell 2: empty band 31.4 mm under the ink of a 76.5 mm cell (41.0 %; limit 30 % = 22.9 mm; the 3.0 mm top pad excluded) [word-work]
+   ... 93 more
+EB-SIDE  FAIL 20
+   addition:add_word_problems_plain lesson S p2 cell 1: 51.8 mm empty beside the ink of a 137.6 mm wide cell interior (37.6 %; limit 30 %) [word-work]
+   addition:add_word_problems_plain lesson M p2 cell 1: 51.8 mm empty beside the ink of a 137.6 mm wide cell interior (37.6 %; limit 30 %) [word-work]
+   subtraction:sub_word_problems scripted-model S p1 cell 2: 34.2 mm empty beside the ink of a 92.3 mm wide cell interior (37.1 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model S p1 cell 4: 55.7 mm empty beside the ink of a 92.3 mm wide cell interior (60.3 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model S p2 cell 2: 56.4 mm empty beside the ink of a 92.3 mm wide cell interior (61.1 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model M p1 cell 4: 51.4 mm empty beside the ink of a 92.3 mm wide cell interior (55.7 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model M p2 cell 4: 52.2 mm empty beside the ink of a 92.3 mm wide cell interior (56.5 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model L p1 cell 4: 47.2 mm empty beside the ink of a 92.3 mm wide cell interior (51.1 %; limit 30 %) []
+   subtraction:sub_word_problems scripted-model L p2 cell 4: 48.2 mm empty beside the ink of a 92.3 mm wide cell interior (52.2 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model S p1 cell 2: 34.2 mm empty beside the ink of a 92.3 mm wide cell interior (37.1 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model S p1 cell 4: 55.7 mm empty beside the ink of a 92.3 mm wide cell interior (60.3 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model S p2 cell 2: 56.4 mm empty beside the ink of a 92.3 mm wide cell interior (61.1 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model M p1 cell 4: 51.4 mm empty beside the ink of a 92.3 mm wide cell interior (55.7 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model M p2 cell 4: 52.2 mm empty beside the ink of a 92.3 mm wide cell interior (56.5 %; limit 30 %) []
+   subtraction:sub_word_problems_plain scripted-model L p1 cell 4: 47.2 mm empty beside the ink of a 92.3 mm wide cell interior (51.1 %; limit 30 %) []
+   ... 5 more
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-ROLE  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  FAIL 12
+   addition:add_word_problems scripted-model S p1: 34 % of the page body is empty under its last block (not the last page; limit 30 %)
+   addition:add_word_problems scripted-model L p1: 50 % of the page body is empty under its last block (not the last page; limit 30 %)
+   addition:add_word_problems_plain scripted-model S p1: 34 % of the page body is empty under its last block (not the last page; limit 30 %)
+   addition:add_word_problems_plain scripted-model L p1: 50 % of the page body is empty under its last block (not the last page; limit 30 %)
+   addition:add_word_problems_plain pre-skill-check L p1: 63 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_word_problems scripted-model M p2: 32 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_word_problems_plain scripted-model M p2: 32 % of the page body is empty under its last block (not the last page; limit 30 %)
+   addition:add_wp_change_unknown pre-skill-check L p1: 51 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_change_unknown pre-skill-check M p1: 56 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_change_unknown pre-skill-check L p1: 51 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_compare_smaller pre-skill-check M p1: 62 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_compare_smaller pre-skill-check L p1: 57 % of the page body is empty under its last block (not the last page; limit 30 %)
+EB-GDPCAP PASS
+EB-PARITY PASS
+EB-ITEMKEY PASS
+EB-ITEMPARITY PASS
+(7 skill(s), 602 renders, 2457 cells, 1093 s)
+ws-empty-band: FAIL (140)
+exit 1
