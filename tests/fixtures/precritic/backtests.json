@@ -5170,6 +5170,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r15-vones",
+  "check": "V-ONES: a run whose visible ones digits repeat, or whose step divides 10, reads as cycle; sequence 5, 10, 15 dealt with cycle in set 6 {product, sequence, cycle}: critic r14 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-ONES (lf-vocab r15)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r14 pass)"
+  },
+  "pass": {
+   "commit": "1758caca",
+   "state": "sequence 4, 7, 10; first term [30], 26, 22"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --only V-ONES 2>&1 | grep -q 'V-ONES set \"Find emergent features (units digit cycle)\": the \"sequence\" picture' && echo 'v-ones: FAIL' || echo 'v-ones: OK'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
