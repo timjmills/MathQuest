@@ -62,7 +62,14 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
 - F3 (lf-algebra r1, npr Model L 6 mm overrun): reproduced only in a PRINTED PDF at 47b1f2a86 (screen and emulated print media
   lay it out clean, so ws-cell-checks / ws-grade-render pass it); gone at this head (the Model is 2 pages, PDF checked). A
   check needs the PDF raster (as LP-RASTER does for lessons) - proposed to lf-checks via the lead.
-- Critic r6d running on the r11 pages.
+- Critic r6d (design/status/lf-roles/r6d/critic-r6d.md): FAIL on one counted defect - sub_word_problems RI L one item a page
+  (H5); D2 / D3 / F8 / word lines clean; 9 of 10 sets 8+. E1 (number line tell) and N1 (response row left) raised.
+- r12 (c42f7504, faeb7759): a story's response stands BESIDE the story, the A | B panels under both - sub / add_word_problems
+  RI 2 a page at S / M / L; the sentence stories (add / sub_wp_10 / _20 + plain, passed) take the same layout instead of the
+  A-over-B stack (add_wp_10 RI 1 -> 2; 17 capacity rises, no drop). Number lines hold the longer of right / wrong (E1);
+  the no-story response row centres (N1). Checks: LONE-PAGE (ws-cell-checks default: one item a page where the role holds
+  2+; it found add_wp_10), LINE-TELL extended; backtests lone-page, line-tell-number PASS.
+- Critic r6e running (before = df83248e).
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
