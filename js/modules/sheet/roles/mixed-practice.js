@@ -677,6 +677,7 @@ export function plan(input = {}) {
         }
         return g;
     })();
+    if (globalThis.__MQ_DBG) console.log('MQDBG', JSON.stringify({ budget: m.budget, cont: p.mCont.budget, strip: m.strip, used, spare, pages: p.pages, shelves: shelves.map((s) => ({ id: s.id, h: +s.h.toFixed(1), lift: s.lift, n: s.items.length })), packH: Object.fromEntries(p.ids.map((id) => [id, { h: +p.shelf[id].h.toFixed(1), n: p.shelf[id].n }])), packUsed: p.used, fill: fillShares }));
     for (const [i, sh] of shelves.entries()) {
         const grow = fillShares ? fillShares[i] : growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
