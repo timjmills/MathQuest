@@ -230,7 +230,7 @@ export const ROUTINES = Object.freeze({
         steps: [
             { icon: 'count', text: 'Count the digits.' },
             { icon: 'look', text: 'Find the first different digit.' },
-            { icon: 'write', text: 'Write <, > or =.' },
+            { icon: 'write', text: 'Write <,\u00a0>\u00a0or\u00a0=.' },   // (the sign list is one unit: critic compare r3 N9 / WRAP-SIGN)
         ],
         // (critic r1 F2: "More digits, bigger number." decided 8 of the lesson's 33 items - every other one has two numbers of one
         // length. The chant names both rules: the count first, then the first different digit; ws-lesson-unit chant-fit)
