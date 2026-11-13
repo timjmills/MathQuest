@@ -512,6 +512,14 @@ One line per finding: the rule, then the check.
 | caret still shows in a red slot after Check (moved card 1 -> card 3) | Wrong slots take caret-color: transparent; Check blurs every vocab slot on every card | NB9+: activeElement and caret-color probed on card AND worksheet, every card | y (when built) |
 | term 18,[14],10 weakly reads as a "take 4" rule | A constant-step run counts as "rule" unless rule is defined only as the operation box | V-FEAT rule definition | y (when built) |
 
+### lf-vocab round 12, narrow critic r12 (2026-11-13): FAIL min 7. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| row rings 2,4,6,8 and is dealt with "even" (set 0 pick3) | The numbers a picture rings or boxes are features too: all-even / all-odd maps to even / odd | V-NUM | y (when built) |
+| row / column (times-table cells) read as "product" | A times table implies product as it implies multiple | V-FEAT times-table rule | y (when built) |
+| first term ([30],25,20) still reads as "rule"; only term got the hand link | A clash fixed by hand is fixed for every picture with the same feature class in the same change | V-TWIN | y (when built) |
+| ROOT CAUSE: pick3 banks are drawn word-against-word from the WHOLE set, so the pairs a pupil can see are not the two vetted trios; every critic round samples new pairs | Every bank a skill can deal is enumerable and listed; the check and the critic judge that list, not samples | V7 over the enumerated pairs; dealt-pairs table in each set manifest | y (when built) |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
