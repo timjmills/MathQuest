@@ -22,6 +22,9 @@
 //   (d) the panel's controls leave the window (critic-panel-r1 F2): `.tv-sko-foot`'s bottom below innerHeight, or the
 //       Done button not wholly inside the window, or the panel itself outside it;
 //   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4);
+//   [slice] / [inside] (critic-panel-r3 N1) an SVG label or shape cut by a viewBox slice window, or any drawn leaf (SVG text
+//       and shapes, HTML words) not wholly inside the frame - or its scroll area, when the frame scrolls a drawing shown
+//       whole at the 9 px floor;
 //   [hit] (critic-panel-r3 P1) a visible option control whose centre does not take the pointer (document.elementFromPoint
 //       there is not the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click;
 //   (f) the drawing's scale is under 0.30 (its strokes are hairlines), or the frame ends shorter than its CSS height
@@ -82,7 +85,7 @@ const NO_SPOT = flag('no-spot');
 // show every block of the item, F1/F2), choices (the answer choices one lettered part of their own, F2), svgtext (SVG
 // labels at the floor, F3), parts (every part walked), summary (the clamped
 // option summary has a keyboard/touch expand control, F5), repeat (no sentence shown twice, F6).
-const FAMILIES = ['hit', 'inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
+const FAMILIES = ['hit', 'slice', 'inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
 const CHECKS = new Set(String(one('checks', FAMILIES.join(','))).split(',').map((x) => x.trim()).filter(Boolean));
 const BAD_CHECK = [...CHECKS].filter((c) => !FAMILIES.includes(c));
 if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (${FAMILIES.join(', ')})`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
@@ -215,7 +218,12 @@ function measure(page) {
             hid.forEach((e, i) => { e.style.display = was[i]; });
         }
         // what of it a teacher sees now: drawn, and wholly inside the frame and inside every clipping box around it
-        const fR = frame.getBoundingClientRect();
+        const fR0 = frame.getBoundingClientRect();
+        // (critic-panel-r3 N1: a drawing too wide to read whole at 9 px is drawn whole at the floor and the FRAME scrolls:
+        // what must be inside is then the frame's scroll area, which a teacher reaches by scrolling it)
+        const fcs = getComputedStyle(frame);
+        const scrolls = (/(auto|scroll)/.test(fcs.overflowX) && frame.scrollWidth > frame.clientWidth + 1) || (/(auto|scroll)/.test(fcs.overflowY) && frame.scrollHeight > frame.clientHeight + 1);
+        const fR = scrolls ? (() => { const l = fR0.left + frame.clientLeft - frame.scrollLeft, t = fR0.top + frame.clientTop - frame.scrollTop; return { left: l, top: t, right: l + Math.max(frame.scrollWidth, frame.clientWidth), bottom: t + Math.max(frame.scrollHeight, frame.clientHeight), width: Math.max(frame.scrollWidth, frame.clientWidth), height: Math.max(frame.scrollHeight, frame.clientHeight) }; })() : fR0;
         const within = (r, b) => r.left >= b.left - 1.5 && r.top >= b.top - 1.5 && r.right <= b.right + 1.5 && r.bottom <= b.bottom + 1.5;
         const clipOK = (from, r) => { for (let a = from; a && a !== frame; a = a.parentElement) { const cs = getComputedStyle(a); if ((cs.overflowX !== 'visible' || cs.overflowY !== 'visible') && !within(r, a.getBoundingClientRect())) return false; } return true; };
         const visible = (a) => { if (!seen(a.el)) return false; const r = rectOf(a); return !!r && within(r, fR) && clipOK(a.n.parentElement, r); };
@@ -223,6 +231,45 @@ function measure(page) {
         const visText = [];
         let qShown = false;
         if (stage) for (const a of atomsOf()) if (visible(a)) { vis.push(idOf(a.n)); if (a.n.nodeType === 3) { const inQ = !!a.el.closest(QLINE); visText.push([a.t, inQ]); if (inQ) qShown = true; } }
+        // N1 (critic-panel-r3): every drawn leaf of a drawing - each SVG text and shape - as the teacher sees it.
+        //   [slice] a leaf of a drawing paged by its viewBox (svg[data-sko-vb]) that is partly inside and partly outside the
+        //           slice window: a label or shape cut at the slice edge ("50" read as "5", "-11" as "11");
+        //   [inside] a drawn leaf (clipped to its own svg's viewport) that is not wholly inside the frame or its scroll area,
+        //           and an HTML word partly inside it: cut at the frame edge.
+        const sliceCut = [], outLeaves = [];
+        if (stage) {
+            const SH = 'text, rect, polygon, polyline, circle, ellipse, path, line, image, use';
+            const lab = (el) => (el.tagName.toLowerCase() === 'text' ? `"${String(el.textContent).replace(/\s+/g, ' ').trim().slice(0, 16)}"` : `<${el.tagName.toLowerCase()}>`);
+            const meet = (a, b) => ({ left: Math.max(a.left, b.left), top: Math.max(a.top, b.top), right: Math.min(a.right, b.right), bottom: Math.min(a.bottom, b.bottom) });
+            for (const svg of stage.querySelectorAll('svg')) {
+                if (svg.parentElement && svg.parentElement.closest('svg')) continue;
+                if (!svg.getClientRects().length || !seen(svg)) continue;
+                const sR = svg.getBoundingClientRect();
+                if (!(sR.width > 0 && sR.height > 0)) continue;
+                const sliced = svg.dataset.skoVb !== undefined;
+                const clipped = getComputedStyle(svg).overflow !== 'visible';
+                for (const el of svg.querySelectorAll(SH)) {
+                    if (el.closest('defs, clipPath, mask, pattern, marker, symbol')) continue;
+                    const cs = getComputedStyle(el);
+                    if (cs.display === 'none' || cs.visibility === 'hidden' || !el.getClientRects().length) continue;
+                    const r = el.getBoundingClientRect();
+                    if (!(r.width > 0 || r.height > 0)) continue;
+                    const part = r.right > sR.left + 0.5 && r.left < sR.right - 0.5 && r.bottom > sR.top + 0.5 && r.top < sR.bottom - 0.5;
+                    const whole = r.left >= sR.left - 1 && r.right <= sR.right + 1 && r.top >= sR.top - 1 && r.bottom <= sR.bottom + 1;
+                    if (sliced && part && !whole) sliceCut.push(lab(el));
+                    const q = clipped ? meet(r, sR) : r;
+                    if (q.right - q.left < 0.5 && q.bottom - q.top < 0.5) continue;   // (not drawn: outside its own viewport)
+                    if (!within(q, fR)) outLeaves.push(lab(el));
+                }
+            }
+            for (const a of atomsOf()) {
+                if (a.n.nodeType !== 3 || !seen(a.el)) continue;
+                const r = rectOf(a);
+                if (!r) continue;
+                const hits = r.right > fR.left + 0.5 && r.left < fR.right - 0.5 && r.bottom > fR.top + 0.5 && r.top < fR.bottom - 0.5;
+                if (hits && !within(r, fR)) outLeaves.push(`"${a.t.slice(0, 16)}"`);
+            }
+        }
         // F1: a box inside the stage that clips its own content (overflow not visible and content wider or taller than it)
         const clips = [];
         if (stage) for (const el of stage.querySelectorAll('*')) {
@@ -288,7 +335,7 @@ function measure(page) {
             f: box(frame), s: box(stage), cssH, frameH: frame.offsetHeight, pop: box(pop), foot: box(foot), done: box(done),
             vw: document.documentElement.clientWidth || window.innerWidth, vh: window.innerHeight,
             transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null, svgText,
-            hit: { n: hitN, blocked }, item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
+            hit: { n: hitN, blocked }, sliceCut, outLeaves, area: scrolls ? { x: fR.left, y: fR.top, w: fR.width, h: fR.height } : null, item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
             body: bodyEl ? { h: bodyEl.clientHeight, sh: bodyEl.scrollHeight } : null, sum: { clamped, moreOK },
             partBox: sR ? { x: Math.max(0, sR.left - fR.left), y: Math.max(0, sR.top - fR.top), w: Math.min(sR.right, fR.right) - Math.max(sR.left, fR.left), h: Math.min(sR.bottom, fR.bottom) - Math.max(sR.top, fR.top) } : null,
             part: part && !part.hidden ? String(part.querySelector('.tv-sko-part-n') ? part.querySelector('.tv-sko-part-n').textContent : part.textContent).replace(/\s+/g, ' ').trim() : '',
@@ -303,7 +350,10 @@ function judge(m, inkR) {
     const ink = inkR && typeof inkR === 'object' ? inkR.ink : inkR;
     const own = inkR && typeof inkR === 'object' ? inkR.own : null;
     if (m.noFrame) return ['[inside] no sample frame in the panel'];
-    const { f, s } = m;
+    const { s } = m;
+    const f = m.area || m.f;   // (a frame that scrolls: its scroll area - critic-panel-r3 N1)
+    if (!m.unavailable && m.sliceCut && m.sliceCut.length) fails.push(`[slice] ${m.sliceCut.length} label(s) or shape(s) cut by a viewBox slice: ${[...new Set(m.sliceCut)].slice(0, 6).join(', ')}`);
+    if (!m.unavailable && m.outLeaves && m.outLeaves.length) fails.push(`[inside] ${m.outLeaves.length} drawn label(s) or shape(s) not wholly inside the frame${m.area ? ' or its scroll area' : ''}: ${[...new Set(m.outLeaves)].slice(0, 6).join(', ')}`);
     if (s) {
         const inside = s.x >= f.x - 1 && s.y >= f.y - 1 && s.x + s.w <= f.x + f.w + 1 && s.y + s.h <= f.y + f.h + 1;
         if (!m.unavailable && !inside) fails.push(`[inside] stage (${Math.round(s.x - f.x)},${Math.round(s.y - f.y)}) ${Math.round(s.w)}×${Math.round(s.h)} is not inside the ${Math.round(f.w)}×${Math.round(f.h)} frame (${m.cropped ? 'is-cropped, ' : ''}transform ${m.transform})`);
