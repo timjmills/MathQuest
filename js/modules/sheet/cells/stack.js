@@ -352,8 +352,28 @@ function scaffoldOf(p, ctx) {
     const regroup = offHas(ctx, 'regroup') ? false : p.regroup !== undefined ? p.regroup : (level >= 1 && (p.op === '-' ? 'sub' : 'add'));
     return { level, heads, regroup };
 }
-/** True when the cell's skill turned support `id` off (the universal hidden option `off`, print-sheet.js / screen-cell.js). */
-const offHas = (ctx, id) => !!(ctx && Array.isArray(ctx.off) && ctx.off.includes(id));
+/**
+ * True when the cell's skill turned support `id` off (the universal hidden option `off`, print-sheet.js / screen-cell.js).
+ * With `ctx.offReserve` (the lesson sheet: its We Do band is as tall as its Steps, so its cells keep the standard geometry)
+ * the support is laid out and then hidden (hideOff), never dropped from the geometry.
+ */
+const offHas = (ctx, id) => !!(ctx && !ctx.offReserve && Array.isArray(ctx.off) && ctx.off.includes(id));
+/** lf-partopts B: a RESERVED support turned off - drawn invisibly in its own place, so the cell's geometry is the standard's. */
+function hideOff(html, ctx) {
+    if (!ctx || !ctx.offReserve || !Array.isArray(ctx.off) || typeof html !== 'string') return html;
+    let h = html;
+    if (ctx.off.includes('heads')) h = h.replace(/<span class="head">([^<]*)<\/span>/g, '<span class="head" style="visibility:hidden" aria-hidden="true">$1</span>');
+    if (ctx.off.includes('regroup')) {
+        h = h.replace(/<span class="rg([^"]*)" data-ws-seg="([^"]*)">/g, '<span class="rg$1" data-ws-seg-off="$2" style="visibility:hidden" aria-hidden="true">');
+        h = h.replace(/<svg class="ws-strike/g, '<svg style="visibility:hidden" class="ws-strike');
+    }
+    return h;
+}
+/** The stack template with its reserved-off supports hidden on every drawing it makes (render and stepState). */
+const withOffReserve = (t) => Object.assign({}, t, {
+    render(p, ctx) { return hideOff(t.render.call(this, p, ctx), ctx); },
+    stepState(p, steps, k, ctx) { return hideOff(t.stepState.call(this, p, steps, k, ctx), ctx); },
+});
 
 /**
  * One digit place of the answer row. DOM order stays left to right; SCC-T14 puts the FOCUS
@@ -377,7 +397,7 @@ const unknownSlotSpec = (u) => ({
     maxLength: 1, inputmode: 'numeric', scopes: ['full', 'answer-only'],
 });
 
-register('stack', {
+register('stack', withOffReserve({
     render(p, ctx) {
         const a = topsOf(p), b = bottomOf(p);
         const value = p.ans !== undefined ? p.ans : compute(p);
@@ -579,7 +599,7 @@ register('stack', {
             unknown: p.unknown || null,
         });
     },
-});
+}));
 
 /** The tab step a stacked section asks for at this digit size (CL-31). */
 export const stackTabStep = (digitPt) => factTab(digitPt);

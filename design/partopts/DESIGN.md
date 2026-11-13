@@ -344,3 +344,9 @@ Print screen's Parts table, on the Worksheet sheet and on the Quiz sheet. The ga
 - **B6 Default identity.** Every new path is skipped when a part has no delta: `off` is absent from every standard cell's
   context, `withSupDelta(opts, null)` returns the same object, the chart reserves its Say band and the Practice pages
   their strip exactly as before. `ws-lesson-baseline --all-lessons` (written on d34311d, checked on this branch) is the proof.
+- **B7 The lesson sheet keeps its geometry.** Found by PO-3 while building: the We Do band is as tall as its Steps list,
+  so a stack with its regroup boxes and place-value letters both off printed a 35 % empty band under its digits (L, cell 6:
+  23.9 mm of 67.6 mm). On the lesson sheet a structure turned off is therefore laid out and NOT drawn (`offReserve`,
+  stack.js `hideOff`: the marks are hidden in their own places, the key's cross-outs with them), so every lesson-sheet cell
+  has the standard packet's geometry and no band can grow. Practice, Mixed and the papers drop the marks from the geometry
+  (their cells are sized from the measured drawing), which PO-3 judges on every page.

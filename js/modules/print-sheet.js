@@ -1781,7 +1781,7 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         // (lf-partopts B: the skill's `off` - the role-drawn supports its part turned off - with any the role adds, read by the
         // template as ctx.off; absent when nothing is off, so every standard cell's context is exactly as before)
         const offC = offIds.length || (Array.isArray(c.off) && c.off.length) ? [...new Set([...(Array.isArray(c.off) ? c.off : []), ...offIds])] : null;
-        if (offC) ctx.off = offC;
+        if (offC) { ctx.off = offC; if (item.offReserve) ctx.offReserve = true; }
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
         // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
         // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
@@ -1891,6 +1891,8 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
     };
     // (lf-partopts B: the role draws some cells through a template's stepState directly - it reads the item's `off` too)
     if (offIds.length) item.off = offIds;
+    // (the lesson sheet's cells keep the standard geometry: a structure turned off there is drawn invisibly - DESIGN §B7)
+    if (offIds.length && g.skill && g.skill.offReserve) item.offReserve = true;
     return item;
 }
 
@@ -4973,7 +4975,10 @@ async function buildLesson(n, metaOf) {
         size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
     // (lf-partopts B: the lesson sheet's cells - We Do and rows, one measured pool - carry the sheet's structure delta)
-    const sheetSections = supOf('sheet') ? { sections: [Object.assign({}, nz.sections[0], { skills: [supSk(sk, 'sheet')] }), ...nz.sections.slice(1)] } : {};
+    // (its cells keep the standard geometry - `offReserve`: a structure turned off is laid out and not drawn, so the We Do band,
+    // as tall as its Steps, never shows a bigger empty band than the standard's - DESIGN §B7)
+    const sheetSk = supOf('sheet') ? Object.assign({}, supSk(sk, 'sheet'), { offReserve: true }) : sk;
+    const sheetSections = supOf('sheet') ? { sections: [Object.assign({}, nz.sections[0], { skills: [sheetSk] }), ...nz.sections.slice(1)] } : {};
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }, sheetSections), metaOf);
@@ -5216,7 +5221,7 @@ async function buildLesson(n, metaOf) {
         if (dx && !dx.core && typeof dx.build === 'function') res = await dx.build(Object.assign({}, partApi, { part: dx, seed: seeds[x], avoid }));
         else if (x === 'prereq') res = await buildPrereq(seeds.prereq, avoid);
         else if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
-            res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(x === 'sheet' ? supSk(sk, 'sheet') : sk)] }), ...nz.sections.slice(1)] });
+            res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(x === 'sheet' ? sheetSk : sk)] }), ...nz.sections.slice(1)] });
             if (x === 'chart') chart = res;
             if (x === 'sheet') teach = res;
         } else if (x === 'practice') {

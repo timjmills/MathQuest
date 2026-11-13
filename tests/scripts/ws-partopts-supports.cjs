@@ -42,6 +42,7 @@
 //             the Quiz sheet lists each skill's supports with its hints unticked by default and the hints line when ticked.
 //
 //   --only ID,...   count only these findings (a check id, e.g. PO-5, PO-3, PO-SIZE)
+//   --state '<json>'  PO-3 judges this one partOpts state (per lesson x size) instead of the sampler's states
 //   MQ_ROOT=<tree>  build and judge another checkout (ws-backtest commit-pair rows); this script is always today's.
 // A missing feature is a finding (FAIL), never an ERROR: on the tree before step B every check FAILS. A crash prints
 // `ws-partopts-supports: ERROR (...)` and exits 2.
@@ -63,6 +64,7 @@ const F = (id, msg) => { if (want(id)) fails.push(`${id} ${msg}`); };
 const ok = (id, cond, msg) => { if (!cond) F(id, msg); return !!cond; };
 const LESSONS = arg('lessons', 'subtraction:sub_100_regroup,addition:add_facts,placevalue:identify').split(',').map((x) => x.trim()).filter((x) => x && x !== 'none');   // ('none': no lesson - the paper and screen checks only)
 const SIZES = arg('sizes', 'M,L').split(',');
+const STATE = arg('state') ? JSON.parse(arg('state')) : null;
 const imp = (rel) => import(pathToFileURL(path.join(ROOT, rel)).href);
 const J = JSON.stringify;
 
@@ -196,7 +198,9 @@ async function browser() {
                     const cellsOut = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => c.getBoundingClientRect().bottom > pr.bottom + 1).length;
                     let h = 0; const s = pg.outerHTML; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
                     // (nothing given away: an answer slot written in solid ink on the pupil page)
-                    const inked = [...pg.querySelectorAll('[data-ws-slot]')].filter((e) => e.textContent.trim() && !e.closest('.ws-trace, [data-ws-ink="trace"]') && !e.querySelector('[data-ws-ink="trace"], .ws-trace') && e.getAttribute('data-ws-ink') !== 'trace' && !e.hasAttribute('data-ws-given')).length;
+                    // (a LEAF answer slot - a box, a line, a missing digit - written in solid ink; a container slot such as the stack's open
+                    // answer zone holds the problem's own digits and is not an answer)
+                    const inked = [...pg.querySelectorAll('[data-ws-slot]')].filter((e) => !e.querySelector('[data-ws-slot]') && e.getAttribute('data-ws-shape') !== 'open' && !e.classList.contains('ws-stack') && e.textContent.trim() && !e.closest('.ws-trace, [data-ws-ink="trace"]') && !e.querySelector('[data-ws-ink="trace"], .ws-trace') && e.getAttribute('data-ws-ink') !== 'trace' && !e.hasAttribute('data-ws-given')).length;
                     return { sheet: pg.getAttribute('data-ws-sheet') || '', over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, brr.bottom - last) / brr.height * 100), h, inked };
                 }));
                 return { cells, pages };
@@ -268,11 +272,14 @@ async function browser() {
                     }
                     states.push(best); cover(best);
                 }
-                console.log(`  PO-3 ${where}: ${states.length} states (${fac.length} factors)`);
-                for (const st of states) {
+                // (--state '<json>': judge ONE partOpts state with every PO-3 check, instead of the sampler's states)
+                const runStates = STATE ? [null] : states;
+                console.log(`  PO-3 ${where}: ${runStates.length} states (${fac.length} factors)`);
+                for (const st of runStates) {
                     let po = {};
                     const asked = [];
-                    fac.forEach((f, i) => {
+                    if (STATE) { po = JSON.parse(J(STATE)); for (const [p, d] of Object.entries(po)) for (const id of ((d.opts && d.opts.off) || [])) { const x = decls.find((y) => y.part === p && y.id === id); if (x) asked.push(x); } for (const [p, d] of Object.entries(po)) for (const b of Object.keys(d.bands || {})) { const x = decls.find((y) => y.part === p && y.id === b); if (x) asked.push(x); } }
+                    else fac.forEach((f, i) => {
                         if (f.name === 'practice.n') { if (st[i] !== null) po = merge(po, { practice: { n: st[i] } }); return; }
                         if (!st[i]) return;
                         po = merge(po, { [f.x.part]: deltaOf(f.x, stdTicks[f.x.part] && stdTicks[f.x.part][f.x.id]) });
@@ -309,7 +316,7 @@ async function browser() {
                     });
                     for (const c of m.cells) {
                         if (S.pages.has((m.pages[c.page - 1] || {}).h)) continue;
-                        judge([c], tag, (rule, w, msg) => { if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule) && !S.keys.has(cellKey(m, c, rule))) F('PO-3', `${rule} ${w}: ${msg}`); }, 'lesson');
+                        judge([c], `${tag} [${(m.pages[c.page - 1] || {}).sheet}]`, (rule, w, msg) => { if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule) && !S.keys.has(cellKey(m, c, rule))) F('PO-3', `${rule} ${w}: ${msg}`); }, 'lesson');
                     }
                     const inked = m.pages.reduce((o, p) => { o[p.sheet] = (o[p.sheet] || 0) + p.inked; return o; }, {});
                     for (const [sh, n] of Object.entries(inked)) ok('PO-3', n <= (S.inked[sh] || 0), `${tag}: ${sh} has ${n} answer slots inked on the pupil page (standard ${S.inked[sh] || 0}) - an answer given away`);

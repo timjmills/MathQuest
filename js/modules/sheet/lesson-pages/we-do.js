@@ -340,7 +340,7 @@ export function weDoRender(it, i0, first = true) {
     return (c0, o) => {
         // (lf-partopts B: the skill's own `off` - its structure turned off - reaches the templates this function draws through
         // stepState directly, not only through it.render)
-        const c = it.off && it.off.length ? Object.assign({}, c0, { off: [...new Set([...(Array.isArray(c0.off) ? c0.off : []), ...it.off])] }) : c0;
+        const c = it.off && it.off.length ? Object.assign({}, c0, { off: [...new Set([...(Array.isArray(c0.off) ? c0.off : []), ...it.off])] }, it.offReserve ? { offReserve: true } : {}) : c0;
         const answered = c.state && c.state !== 'blank';
         if (isRound(it)) {
             // Lessons r1: the chart's number line reaches the Guided cells - a blank 10-tick line
