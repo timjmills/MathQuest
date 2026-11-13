@@ -1,0 +1,117 @@
+{
+ "note": "ws-fact-cols-m PASS state: the live measurement on lf-tools-nos (9 / 10 picked at M, 16 pt; x facts at their own cap of 8)",
+ "cases": [
+  {
+   "tag": "add_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "add_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "add_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 10,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "add_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 10,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "sub_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "sub_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "sub_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 10,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "sub_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 10,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "mult_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 8,
+   "pt": 16,
+   "pages": 1,
+   "cap": 8
+  },
+  {
+   "tag": "mult_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 8,
+   "pt": 16,
+   "pages": 1,
+   "cap": 8
+  },
+  {
+   "tag": "mult_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 8,
+   "pt": 16,
+   "pages": 1,
+   "cap": 8
+  },
+  {
+   "tag": "mult_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 8,
+   "pt": 16,
+   "pages": 1,
+   "cap": 8
+  },
+  {
+   "tag": "div_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  },
+  {
+   "tag": "div_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 9,
+   "pt": 16,
+   "pages": 1,
+   "cap": null
+  }
+ ]
+}

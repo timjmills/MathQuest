@@ -454,3 +454,29 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
 - CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
   - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
   - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.
+
+### lf-tools-nos: print size S dropped (owner 2026-11-13, CLAUDE.md plan item 9) - builder, Opus medium
+- Guard first: `tests/scripts/ws-no-size-s.mjs` (node, < 1 s). APP-PICKER (a size control offers S), APP-RESTORE (a stored
+  size kept as S), APP-ALIAS (the kit's `offeredSize` reads S as M, `OFFERED_SIZES` = M,L, the S token kept so old settings
+  decode), GATE-DEFAULT (an arg default, literal size list, planned `--size(s)` or deploy line with S). A reasoned allow-list
+  (buildSheet's explicit-S bridge, kit-token unit tests, 9 dated lane scripts on no gate path); a stale entry fails. On every
+  ws-precritic run and in deploy session 1. Row `no-size-s-76bc` (76bc11c6 FAIL 52 -> a3b128cd1 OK, ws-backtest PASS).
+- App: teacher print, simple print, worksheet sheet (+ fact Columns row) and print settings offer M and L. A stored S
+  (print defaults, simple-print prefs, saved quick prints, recent printouts in buildAll, the legacy kit ctx, buildSimple)
+  prints at M. "All 12 tables on one page" still forces the kit S internally (12 rows fit only there); its locked Size
+  control now shows M / L with "Size fixed" - a lead decision whether that option should move to M.
+- Gates default to M,L (precritic S runs -> M with the M pin; empty-band, cell-checks, capacity-pin, fixit-words, slot-clip,
+  options-verify, lesson-samples/-hash/-check, coverage-matrix, simple-print, columns, sheet-*). Every backtest row that
+  relied on an old default now names it (`--sizes S,M,L` etc., 49 rows, text edits; none dropped).
+- Pins: capacity / empty-band S keys removed; lesson-baseline S keys RENAMED M (lesson at S always printed at M; the M
+  hashes equal the S keys, 30/30 checked), deploy session 4 runs `--sizes L,M`; print-lint.M.json gains the 22 lesson pages
+  from the S pin; print-lint.S.json kept for old `--baseline` rows.
+- Fact sheets: `ws-fact-cols-m` (FCM-COLS / FCM-PT / FCM-FIT: 9 and 10 picked columns at M, 16 pt, teacher + simple print),
+  on precritic's fact-skill path; row `fact-cols-m-fixture`.
+- Screenshots (before 76bc11c6 / after, dsf 2): design/status/lf-checks/no-size-s/.
+- Verified: ws-no-size-s OK (76bc11c6 FAIL 52); ws-code-snapshot OK (nothing moved); ws-boot-smoke OK; ws-content-audit
+  add_facts OK; ws-simple-print (default, now M,L) OK; ws-fact-cols-m OK (x facts at their own cap of 8 - the same at S on
+  76bc11c6); ws-precritic-plan OK + --checks-from-critics (15 old warnings, unchanged; none dropped); ws-print-lint kit
+  add_facts + combine at M and L OK; ws-backtest no-size-s-76bc and fact-cols-m-fixture PASS.
+- Open (not caused here): add_facts#lesson L-TOPSTART CL-4b 0 -> 32 against the M pin, identical on 76bc11c6 at S with the
+  S pin (a lesson at S is the M page) - the precritic lesson-M row will show it until lf-ops / lf-engine fixes or re-pins it.

@@ -6,98 +6,112 @@
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "add_facts M 9 cols (simple print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "add_facts M 10 cols (teacher print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "add_facts M 10 cols (simple print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "sub_facts M 9 cols (teacher print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "sub_facts M 9 cols (simple print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "sub_facts M 10 cols (teacher print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "sub_facts M 10 cols (simple print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "mult_facts M 9 cols (teacher print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": 8
   },
   {
    "tag": "mult_facts M 9 cols (simple print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": 8
   },
   {
    "tag": "mult_facts M 10 cols (teacher print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": 8
   },
   {
    "tag": "mult_facts M 10 cols (simple print)",
    "cols": 10,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": 8
   },
   {
    "tag": "div_facts M 9 cols (teacher print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   },
   {
    "tag": "div_facts M 9 cols (simple print)",
    "cols": 9,
    "got": 6,
    "pt": 24,
-   "pages": 1
+   "pages": 1,
+   "cap": null
   }
  ]
 }

@@ -1,5 +1,5 @@
 // ws-fact-cols-m — FACT SHEETS KEEP EVERYTHING when size S is dropped (owner 2026-11-13, CLAUDE.md plan item 9): a fact-rows
-// sheet with 9 or 10 columns PICKED prints at Size M with exactly those columns, at the 16 pt rung (FACT_LADDER 9 / 10:
+// sheet with 9 or 10 columns PICKED prints at Size M with exactly those columns (x facts: their own cap of 8, as at S), at the 16 pt rung (FACT_LADDER 9 / 10:
 // "the column count sets the digit size"), on the teacher print path (buildSheet, role fact-rows) and on the simple print path
 // (buildSimple, Columns Exactly n). ÷ facts go to 9 (the owner's ÷ maximum, 2026-11-05); + − × go to 10.
 //
@@ -20,6 +20,8 @@ const TOOL = 'ws-fact-cols-m';
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 const PT_WANT = 16;
+const SIZE = arg('size', 'M');   // (a comparison run on an older tree: --size S)
+const ONLY = arg('skills', '');
 
 /** Judge measured cases. Pure. */
 function judge(cases) {
@@ -27,7 +29,8 @@ function judge(cases) {
     for (const c of cases) {
         if (c.error) { f.push(`FCM-FIT ${c.tag}: did not build (${String(c.error).slice(0, 120)})`); continue; }
         if (!(c.pages >= 1)) f.push(`FCM-FIT ${c.tag}: no page printed`);
-        if (c.got !== c.cols) f.push(`FCM-COLS ${c.tag}: ${c.got} facts across, ${c.cols} picked`);
+        const want = Math.min(c.cols, c.cap || c.cols);
+        if (c.got !== want) f.push(`FCM-COLS ${c.tag}: ${c.got} facts across, ${want} expected (${c.cols} picked${c.cap ? `, the skill's own cap ${c.cap}` : ''})`);
         if (!(Math.abs(c.pt - PT_WANT) < 0.6)) f.push(`FCM-PT ${c.tag}: digits at ${c.pt} pt, the ${c.cols}-column rung is ${PT_WANT} pt`);
     }
     return f;
@@ -51,6 +54,9 @@ const CASES = [
     ['multiplication', 'mult_facts', [9, 10]],
     ['division', 'div_facts', [9]],
 ];
+// A skill's OWN cap, not a size cap: × facts print at most 8 across (the widest product, 12 × 12 = 144, fills the cell at
+// 16 pt). Measured the same at S on 76bc11c6 (the tree before S was dropped): 8 across at 9 and 10 picked.
+const CAP = { mult_facts: 8 };
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
@@ -59,18 +65,18 @@ const CASES = [
     const cases = [];
     try {
         await page.evaluate(() => (window.__mqLoadDeferred ? window.__mqLoadDeferred() : null));
-        for (const [categoryId, skillId, colsList] of CASES) for (const cols of colsList) for (const via of ['teacher', 'simple']) {
-            const tag = `${skillId} M ${cols} cols (${via} print)`;
-            const r = await page.evaluate(async ({ categoryId, skillId, cols, via }) => {
+        for (const [categoryId, skillId, colsList] of CASES.filter((c) => !ONLY || ONLY.split(',').includes(c[1]))) for (const cols of colsList) for (const via of ['teacher', 'simple']) {
+            const tag = `${skillId} ${SIZE} ${cols} cols (${via} print)`;
+            const r = await page.evaluate(async ({ categoryId, skillId, cols, via, SIZE }) => {
                 try {
                     let html;
                     let pages = 0;
                     if (via === 'teacher') {
-                        const b = await window.buildSheet({ role: 'fact-rows', sections: [{ skills: [{ categoryId, skillId }], columns: cols, pages: 1 }], size: 'M', paper: 'A4', seed: 4242, key: false });
+                        const b = await window.buildSheet({ role: 'fact-rows', sections: [{ skills: [{ categoryId, skillId }], columns: cols, pages: 1 }], size: SIZE, paper: 'A4', seed: 4242, key: false });
                         html = b.pupilHtml; pages = b.pageCount;
                     } else {
                         const m = await import('/js/modules/simple-print.js');
-                        const o = { how: 'pages', n: 1, sets: 1, size: 'M', cols, colsMode: 'exact', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
+                        const o = { how: 'pages', n: 1, sets: 1, size: SIZE, cols, colsMode: 'exact', key: false, arrange: 'sections', seed: 4242, title: true, paper: 'A4' };
                         const b = await m.buildSimple([{ categoryId, skillId, amt: '' }], o);
                         html = b.pupilHtml || b.html || (b.doc && b.doc.pupilHtml) || '';
                         pages = b.pages && b.pages.length != null ? b.pages.length : Number(b.pages) || (html.match(/class="ws-page[ "]/g) || []).length;
@@ -95,8 +101,8 @@ const CASES = [
                     host.remove();
                     return { got, pt: Math.round(px * 72 / 96 * 10) / 10, pages };
                 } catch (e) { return { error: (e && e.stack) || String(e) }; }
-            }, { categoryId, skillId, cols, via });
-            cases.push(Object.assign({ tag, cols }, r));
+            }, { categoryId, skillId, cols, via, SIZE });
+            cases.push(Object.assign({ tag, cols, cap: CAP[skillId] || null }, r));
         }
     } finally { await app.close(); }
     if (arg('json', null)) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ note: `${TOOL} measurement`, cases }, null, 1) + '\n');
