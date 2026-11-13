@@ -290,7 +290,7 @@ function planOnce(input = {}) {
     let secondShown = 0;
     let chartSizing = null;
     if (states.length && part !== 'sheet') {
-        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel));
+        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel), extrasList.filter((x) => x.lessonStateRow !== undefined));
         zoom = chart.zoom;
         secondShown = chart.second;
         chartSizing = chart.sizing;
