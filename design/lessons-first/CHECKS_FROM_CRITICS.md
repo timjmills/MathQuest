@@ -5,6 +5,10 @@ reaches 8/10 in fewer rounds. One row per finding. A finding with no check gives
 The lanes also record each row in `design/audit/LESSONS_LEARNED.md`, `design/status/speed-audit.md`
 and `metrics.md`; this file is the one place to read them all.
 
+**Blocks globally from: 2026-11-14 13:00 UTC** (lead ruling 2026-11-13, hybrid). A precritic `--skill` / `--role` run BLOCKS
+now on every row that names one of its skills (a lane cannot send a critic with its own gaps open). Deploy session 1 and the
+default plan run judge every row but only WARN until this time; from it on they block.
+
 **The sweep (owner rule 2026-11-13: a finding becomes an automatic check BEFORE its fix lands).** The "Backtest row" cell
 of every finding row names the `backtests.json` row id(s) that prove its check, in `backticks`, or carries a reasoned
 exemption: `exempt: <why>`, `not machine-measurable: <why>`, or a process rule (`— (process rule)` / `process rule: <rule>`).

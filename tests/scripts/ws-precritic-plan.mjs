@@ -138,7 +138,7 @@ export function parseLedger(text) {
         if (!/^\s*\|/.test(l)) return;
         const c = cells(l);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(c[0] || '')) { if (c.some((x) => /^backtest/i.test(x))) col = c.findIndex((x) => /^backtest/i.test(x)); return; }
-        rows.push({ n: i + 1, date: c[0], lane: c[1] || '', finding: c[2] || '', cell: col >= 0 ? (c[col] || '') : '' });
+        rows.push({ n: i + 1, date: c[0], lane: c[1] || '', finding: c[2] || '', cell: col >= 0 ? (c[col] || '') : '', raw: l });
     });
     return rows;
 }
@@ -208,7 +208,15 @@ function sweepSelfTest() {
     if (why('lane-g') !== 'row-good, row-good-2') bad.push(`"same row" read as ${why('lane-g')}`);
     if (!/lf-checks/.test(why('lane-i'))) bad.push(`free text not read as an unknown id: ${why('lane-i')}`);
     if (ownerLane(res[5].row) !== 'lane-f') bad.push('owner lane of "lane-f live-x"');
-    return { n: want.length + 7, bad };
+    // the hybrid scope (lead 2026-11-13): a row names a skill by its full key or bare id, never by a longer id; the header date
+    const sk = [['full key', rowNamesSkill({ finding: 'band on division:div_facts guided' }, ['division:div_facts']), true],
+        ['bare id', rowNamesSkill({ finding: 'div_facts guided band' }, ['division:div_facts']), true],
+        ['longer id is not it', rowNamesSkill({ finding: 'div_facts_long band' }, ['division:div_facts']), false],
+        ['another column (raw)', rowNamesSkill({ finding: 'x', raw: '| 2026-11-13 | lf-ops | x | div_facts |' }, ['division:div_facts']), true],
+        ['flip date read', +globalFlip('**Blocks globally from: 2026-11-14 13:00 UTC**'), Date.UTC(2026, 10, 14, 13, 0)],
+        ['no flip date', globalFlip('no header'), null]];
+    for (const [nm, got, w] of sk) if (got !== w) bad.push(`hybrid scope: ${nm}: ${got}, want ${w}`);
+    return { n: want.length + 7 + sk.length, bad };
 }
 
 /* ============================================================== the path verdict of one backtest row (shared) */
@@ -324,10 +332,31 @@ function idOnPath(id) {
     return inPre || inDeploy ? { ok: true, why: '' } : { ok: false, why: `${tool} is neither a ws-precritic gate nor a deploy gate` };
 }
 /** Run the sweep on the ledger: prints one line per failing row (grouped by owner lane) and a summary; returns the count. */
+// The ledger's scope rule (lead 2026-11-13, hybrid): `--skills a:b,c:d` (precritic --skill / --role passes the run's skills)
+// judges ONLY the rows that name one of those skills, and BLOCKS on them (a lane cannot send a critic with its own gaps open).
+// With no --skills (deploy session 1, the default plan run) every row is judged, but until the ledger header's
+// "Blocks globally from: <ISO>" time it only WARNS (prints the list, exit 0); from that time on it blocks.
+const SWEEP_SKILLS = (() => { const i = args.indexOf('--skills'); return i >= 0 && args[i + 1] ? args[i + 1].split(',').map((x) => x.trim()).filter(Boolean) : null; })();
+export function rowNamesSkill(row, keys) {
+    const text = `${row.finding || ''} ${row.lane || ''} ${row.raw || ''}`;
+    return keys.some((k) => { const id = k.includes(':') ? k.split(':')[1] : k; return [k, id].some((t) => new RegExp(`(^|[^A-Za-z0-9_])${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^A-Za-z0-9_])`).test(text)); });
+}
+export function globalFlip(text) { const m = /Blocks globally from:\s*(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})\s*UTC/.exec(text); return m ? new Date(`${m[1]}T${m[2]}:00Z`) : null; }
+let SWEEP_WARN_ONLY = false;
 function runSweep() {
     const C = ctx();
     const ids = new Set((C.table.rows || []).map((r) => r.id));
-    const rows = parseLedger(readFileSync(join(ROOT, LEDGER), 'utf8'));
+    const ledgerText = readFileSync(join(ROOT, LEDGER), 'utf8');
+    let rows = parseLedger(ledgerText);
+    if (SWEEP_SKILLS) {
+        const all = rows.length; rows = rows.filter((r) => rowNamesSkill(r, SWEEP_SKILLS));
+        console.log(`  checks-from-critics: scoped to ${SWEEP_SKILLS.join(', ')}: ${rows.length} of ${all} ledger rows name them (blocking)`);
+        if (!rows.length) return 0;
+    } else {
+        const flip = globalFlip(ledgerText), now = new Date(process.env.MQ_NOW || Date.now());
+        SWEEP_WARN_ONLY = !!flip && now < flip;
+        console.log(`  checks-from-critics: every ledger row; ${flip ? (SWEEP_WARN_ONLY ? `WARNING only until ${flip.toISOString()} (ledger header), blocking after` : `blocking (since ${flip.toISOString()})`) : 'blocking (no "Blocks globally from" in the ledger header)'}`);
+    }
     if (!rows.length) { console.log(`  checks-from-critics: no finding rows read from ${LEDGER}`); return 1; }
     const res = sweepLedger(rows, { known: (id) => ids.has(id), onPath: idOnPath });
     const failed = res.filter((r) => r.status === 'FAIL');
@@ -346,6 +375,7 @@ function runSweep() {
 if (args.includes('--self-test')) selfTest();
 else if (args.includes('--checks-from-critics')) {
     const bad = runSweep();
+    if (bad && SWEEP_WARN_ONLY) { console.log(`${TOOL}: OK (checks-from-critics WARNING: ${bad} ledger row(s) with no backtest id on precritic's path; blocking from the ledger header's date)`); process.exit(0); }
     console.log(bad ? `${TOOL}: FAIL (checks-from-critics: ${bad} ledger row(s) with no backtest id on precritic's path)` : `${TOOL}: OK (checks-from-critics)`);
     process.exit(bad ? 1 : 0);
 } else {
@@ -390,7 +420,7 @@ else if (args.includes('--checks-from-critics')) {
     }
     if (!checked) { console.log(`${TOOL}: FAIL (no row names a skill: nothing checked)`); process.exit(1); }
     // the ledger sweep rides along on the default run (its rows' path verdicts are the ones just computed); --no-sweep skips it
-    const sweepBad = args.includes('--no-sweep') ? 0 : runSweep();
+    const sweepBad = args.includes('--no-sweep') ? 0 : ((n) => (SWEEP_WARN_ONLY ? (n && console.log(`  checks-from-critics: ${n} row(s) - WARNING only (ledger header date)`), 0) : n))(runSweep());
     if (fails.length || sweepBad) {
         console.log(`${fails.map((f) => `  ${f}\n`).join('')}${TOOL}: FAIL (${fails.length} of ${checked} rows not on the lane's path${sweepBad ? `; checks-from-critics: ${sweepBad} ledger row(s) with no backtest id on precritic's path` : ''})`);
         process.exit(1);
