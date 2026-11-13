@@ -237,6 +237,22 @@ export function snapCount(n, lim) {
     return best;
 }
 
+/**
+ * The note under a stepper whose count the new limits no longer offer (teacher-print.js runBuild, DESIGN §8a). Critic A r3
+ * R2: the reason must be the true one - a count past the new MAXIMUM (a size change, or another part's change) is a clamp,
+ * "Now 30: the most size L holds", one under the MINIMUM likewise; only a count BETWEEN two offered values was rounded, and
+ * only for Practice / Mixed is that rounding "so no page is under half full". A sheet part between two values was refused
+ * by the fill test ("would leave the lesson sheet short").
+ */
+export function snapNote(part, asked, got, lim, size) {
+    const at = size ? `size ${size}` : 'this size';
+    const vals = offeredValues(lim);
+    const total = part === 'practice' || part === 'mixed';
+    if (vals.length && asked > vals[vals.length - 1]) return total ? `Now ${got}: the most ${at} holds` : `Now ${got}: ${asked} no longer fit on the lesson sheet at ${at}`;
+    if (vals.length && asked < vals[0]) return total ? `Now ${got}: the fewest ${at} prints` : `Now ${got}: the fewest the lesson sheet takes at ${at}`;
+    return total ? `Rounded to ${got} so no page is under half full` : `Now ${got}: ${asked} would leave the lesson sheet short`;
+}
+
 /** The range text under a stepper ("2 to 4 problems", "12 to 75 problems, in rows of 3"); a fixed count says it once. */
 export function rangeText(part, lim) {
     if (!lim) return '';
@@ -363,4 +379,4 @@ export function lessonPartN(po) {
     return Object.keys(o).length ? o : null;
 }
 
-export default { BAND_SLACK_MM, EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+export default { snapNote, BAND_SLACK_MM, EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

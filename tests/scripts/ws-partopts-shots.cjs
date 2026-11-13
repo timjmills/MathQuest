@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // ws-partopts-shots — screenshots and screen checks of lane lf-partopts (design/partopts/DESIGN.md §1.1-1.2, §8), device scale 1.
 //
-//   node tests/scripts/ws-partopts-shots.cjs [--lessons Y1.B2.S9,Y4.B1.S14,Y2.B2.S18] [--out design/partopts/shots-A2]
+//   node tests/scripts/ws-partopts-shots.cjs [--lessons Y1.B2.S9,Y4.B1.S14,Y2.B2.S18] [--out design/partopts/shots-A2] [--no-packets]
 //
 // For each library lesson (a fact lesson, a rounding / place-value lesson and a multi-digit lesson by default):
 //   <id>-1280.png    the real Print screen's Lesson parts at 1280 px (the full-width table under the preview, F9)
@@ -20,6 +20,10 @@
 //   F8  no Supports pill: the standard is plain text until step B
 //   F9  at 1280 the Parts are the full-width table, at most 700 px tall for a 7-part lesson; Remember shows no lone "-"
 //   F10 the lesson sheet's parts share ONE New numbers
+//   critic A r3: R1 a part that does not print (no tick, "Not on this lesson sheet", "Not added") shows no lock reason;
+//   R2 Y4.B1.S14 Practice / Mixed at their max at M, then Size L: a clamped count's note gives no "half full" rounding reason
+//   and says it is the most (fewest) at the size; R4 at 390 the whole page (not only the section) does not scroll sideways,
+//   on the standard packet and after the largest packet
 //   and every Parts control is at least 44 px.
 'use strict';
 const fs = require('fs');
@@ -47,6 +51,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         minus: !!(r.querySelector('.tv-part-many [data-dir="-1"]') || {}).disabled, plus: !!(r.querySelector('.tv-part-many [data-dir="1"]') || {}).disabled, hasStep: !!r.querySelector('.tv-part-many [data-dir="1"]'),
         refresh: !!r.querySelector('[data-act="part-new"]'),
         locked: !!r.querySelector('[data-act="part-on"][disabled]'),
+        lockWhy: [...r.querySelectorAll('.tv-part-lock')].filter((x) => x.offsetParent).map((x) => x.textContent.trim()).join(' | '),
+        note: [...r.querySelectorAll('.tv-part-note')].filter((x) => x.offsetParent).map((x) => x.textContent.replace(/\s+/g, ' ').trim()).join(' | '),
         tickOn: !!r.querySelector('[data-act="part-on"]:not([disabled])'),
         visText: [...r.querySelectorAll('.tv-part-range, .tv-part-note')].filter((x) => x.offsetParent && x.getBoundingClientRect().width > 0).map((x) => x.textContent.replace(/\s+/g, ' ').trim()).join(' | '),
     })));
@@ -71,6 +77,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const textLint = async (rows, where, phone) => {
         for (const r of rows) {
             if (r.locked) check(/needed|always/i.test(r.visText), `${where} ${r.part}: a locked tick with no visible reason ("${r.visText}") (N5)`);
+            // (critic A r3 R1, the converse of N5: a part that does not print - no tick, or "Not on this lesson sheet" / "Not added" -
+            // carries no lock reason; "Needed to fill the sheet" beside "Not on this lesson sheet (no room)" contradicts itself)
+            if (!r.tick || /Not on this lesson sheet|Not added/.test(r.visText)) check(!r.lockWhy, `${where} ${r.part}: "${r.lockWhy}" on a part that does not print ("${r.visText}") (R1)`);
             check(!/\d+ a page\b/.test(r.visText), `${where} ${r.part}: "${r.visText}" ("a page" on a total, N6)`);
             if (['vocab', 'wedo', 'rows', 'practice', 'mixed'].includes(r.part) && r.hasStep && r.tickOn) check(/or 0 to leave it off/.test(r.visText), `${where} ${r.part}: its stepper reaches 0, the text "${r.visText}" does not say "or 0 to leave it off" (N6)`);
         }
@@ -177,6 +186,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             check(!!(await page.$('.tv-section .tv-parts')), `${id} 390: the Parts are not in the section`);
             const wide = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.tv-section, .tv-section *')].filter((e) => e.offsetParent).map((e) => Math.round(e.getBoundingClientRect().right - window.innerWidth))));
             check(wide <= 0, `${id}: sideways scroll at 390: ${wide} px`);
+            // (critic A r3 R4: the whole page, not only the section - the preview's page tabs widen with each page)
+            const pageWide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            check(pageWide <= 0, `${id} 390: the page scrolls sideways by ${pageWide} px (R4)`);
             const ov3 = await overlaps(); check(!ov3.length, `${id} 390 overlaps: ${ov3.slice(0, 3).join('; ')}`);
             const sm3 = await small(true); check(!sm3.length, `${id} 390: controls under 44 px ${JSON.stringify(sm3.slice(0, 3))}`);
             lint(await rowsOf(), `${id} 390`);
@@ -208,11 +220,52 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             }
         }
 
+        // (critic A r3 R2 + R4) Y4.B1.S14 by steps: Practice and Mixed + to their last values at M (the largest packet); at 390 the
+        // whole page must not scroll sideways (R4); then Size L - a count over the new maximum is a clamp: its note may say
+        // "under half full" only when the asked count lay BETWEEN two offered values (it is then a rounding), never at the end
+        // of the range (R2: "Rounded to 30 so no page is under half full" for Mixed 42 > 30, the most at L)
+        {
+            const id = 'Y4.B1.S14';
+            await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+            await page.evaluate(({ id }) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith([{ role: 'lesson', lessonId: id }]); }, { id });
+            await sleep(500);
+            await click('[data-act="size"][data-v="M"]');
+            await idle();
+            const asked = {};
+            for (const p of ['practice', 'mixed']) {
+                for (let k = 0; k < 12; k++) { if (!await click(`#tvPartsWide .tv-part[data-part-row="${p}"] [data-dir="1"]`)) break; await idle(); }
+                asked[p] = Number((await rowsOf()).find((r) => r.part === p).val);
+            }
+            await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+            await sleep(900);
+            await idle();
+            const maxWide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            console.log(`R4 ${id} M Practice ${asked.practice} Mixed ${asked.mixed}: the page is ${maxWide} px wider than 390`);
+            check(maxWide <= 0, `${id} 390 (Practice ${asked.practice}, Mixed ${asked.mixed}): the page scrolls sideways by ${maxWide} px (R4)`);
+            await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+            await sleep(600);
+            await click('[data-act="size"][data-v="L"]');
+            await idle();
+            const rows = await rowsOf();
+            for (const p of ['practice', 'mixed']) {
+                const r = rows.find((x) => x.part === p);
+                const got = Number(r.val);
+                // (the asked count left the new range when the stepper sits at its end in the asked direction)
+                const outside = (asked[p] > got && r.plus) || (asked[p] < got && r.minus);
+                console.log(`R2 ${id} M ${p} ${asked[p]} -> L ${got}: "${r.note}"`);
+                if (outside) {
+                    check(!/half full/.test(r.note), `${id} M -> L ${p} ${asked[p]} -> ${got} (outside the range at L): "${r.note}" gives a rounding reason (R2)`);
+                    check(got === asked[p] || /\bmost\b|\bfewest\b/.test(r.note), `${id} M -> L ${p} ${asked[p]} -> ${got}: the note "${r.note}" does not say ${got} is the ${asked[p] > got ? 'most' : 'fewest'} at this size (R2)`);
+                }
+            }
+            await textLint(rows, `${id} 1280 L after Practice / Mixed at their max at M`, false);
+        }
+
         // packets at min and max, M and L - the values the screen offers (ws-partopts-unit's own loop: a value no longer
         // offered snaps), each pupil page
         const po = await page.evaluate(async () => import('./js/modules/sheet/part-opts.js'));
         void po;
-        for (const id of LESSONS) for (const size of ['M', 'L']) for (const which of ['min', 'max', 'combo']) {
+        if (!argv.includes('--no-packets')) for (const id of LESSONS) for (const size of ['M', 'L']) for (const which of ['min', 'max', 'combo']) {
             const html = await page.evaluate(async ({ id, size, which, sk }) => {
                 const P = await import('./js/modules/sheet/part-opts.js');
                 const lib = await import('./js/modules/lessons/library.js');

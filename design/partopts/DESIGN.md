@@ -270,3 +270,38 @@ fixed almost every count (F2). Resolved:
     routed to **lf-engine**. EB-ROWFIT excuses a sheet identical to the standard packet's. PO-NOROOM still judges that sheet's
     text, which is no print. Where a row would fit on the standard sheet, the text says "Not added: the standard sheet is kept",
     never "no room".
+
+### 8d follow-up (critic A r3)
+
+- **The FILL-BT `add_facts` assertion pins nothing (critic caveat).** FILL-BT's third assertion (add_facts M Vocabulary off,
+  planned 0.712, 31 % printed foot: stays refused) passes for *any* floor above 0.712, so it does not bound the floor. The
+  floor is pinned two-sided by the other two: the lower side by `0.70 + 0.052` (identify M We Do off, the largest near-floor
+  plan-to-print gap), the upper by add_wp_10_plain L (planned 0.762, prints well). The add_facts assertion is kept as a
+  *regression guard*, not a pin: it asserts the known-bad 0.712 sheet is still refused at the live floor, so a later change
+  that drops the floor below 0.712 fails here. Read it as "the worst swept foot stays out", not as a bound on 0.76.
+- **The 0.064 gap caveat.** The fill margin uses the largest gap *within reach of the floor* (0.052, planned 0.72-0.80). The
+  sweep's overall largest gap is **0.064**, on a sheet planned outside that band. A sheet that planned 0.76 with a 0.064 gap
+  would print a 30.4 % foot. The derivation assumes the gap does not depend on where the sheet sits; nothing in the sweep
+  tests that assumption directly. The backstop is the unit gate itself: **EB-PAGE** (PO-2d) runs on every walked state's every
+  page and fails a 30 %+ foot outright, whatever the plan predicted. No walked state in 815 (r3b) or in the r3 packet set
+  (20 packets / 200 pages) broke it. If a future sheet does, EB-PAGE catches it and the floor is re-derived from that case.
+- **R3 (EB-ROWFIT+): a planner-fixed row count can leave a row-sized foot.** fact_family_sort M, by steps Vocabulary 2,
+  Remember off, We Do 0, prints 1 Independent row and a **60.7 mm (~25 %)** foot; one more row of its own cells is 58.8 mm, so
+  a second row fits in print — but rows read "Fixed: 1", so the teacher cannot add it. This is the N1 class one row up:
+  `fillOk`'s EB-ROWFIT clause only refuses sheets with **zero** rows (`independent === 0`); it does not notice a foot that holds
+  one *more* row when some rows already print. The new check **EB-ROWFIT+** (`ws-partopts-unit` PO-2w, report-only) flags it:
+  a planner-fixed rows count (`lim.fixed`, or the count at the stepper's max) whose printed foot still holds one more row of
+  the rows' own cells (no head: the band exists). It flags 2 states today (both this fact_family_sort case).
+  - **Kept report-only, not gated. Why.** The foot is 25 %, under the 30 % EB-PAGE line, so it is not a failure the gate
+    forbids. Making it *gating* would require either (a) the planner to **add** the second row, or (b) the value **not to be
+    offered**. (b) is wrong — a Fixed:1 is already the only value; there is nothing to withdraw. (a) means packing one more
+    Independent row into the plan. The planner packs rows from its *planned* free height, which reads **1.5-15.9 mm less** than
+    print (the ROWFIT_SLACK_MM gap of §8d above). The 60.7 mm print foot is ~45 mm in plan — below the 58.8 mm row — so the
+    planner is correct *on its own figures*; the extra room is the plan-to-print slack. To pack the row, the row planner
+    (`planMain`) would have to budget with the print-matching height, i.e. add ~12 mm of slack to its row loop. That change
+    touches the row-packing of **every** lesson sheet and risks the 1556-hash baseline and, if the slack is miscalibrated in
+    the *fits* direction, a print **overflow** (a row the inflated plan accepts but print cannot hold). That is a lane-wide
+    engine change with a worse failure mode than a 25 % foot, out of proportion to a single sub-threshold case. It belongs with
+    the **lf-engine** row-packer work (the same place the identify M standard-sheet foot is routed), not bolted on here. The
+    report-only check stands as the tripwire: when the row-packer is reworked, flip EB-ROWFIT+ to gating (`--gate-rowfit-plus`)
+    and this case closes.

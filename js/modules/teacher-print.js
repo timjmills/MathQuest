@@ -22,7 +22,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack, lessonPartSeed } from './print-sheet.js';
-import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, totalPages } from './sheet/part-opts.js';
+import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, snapNote, totalPages } from './sheet/part-opts.js';
 import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -700,7 +700,8 @@ function partsHTML(s, i) {
         const id = `tvPart${i}_${p}`;
         const none = !!(lim && lim.none);
         // (F7: a part with no room on this sheet has no tick; a part whose page would not fill without it has a locked tick)
-        const locked = on && lim && lim.canOff === false;
+        // (critic A r3 R1: a part with no room is not printed - no tick, so no lock and no "Needed to fill the sheet")
+        const locked = on && lim && lim.canOff === false && !none;
         const tick = none ? '' : `<button type="button" class="tv-check tv-part-tick" role="checkbox" aria-checked="${on}" data-act="part-on" data-sec="${i}" data-part="${p}" aria-label="Print ${esc(name)}"${locked ? ` disabled aria-describedby="${id}_why"` : ''}><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
         // (N5: the reason a tick is locked is visible text under the part's name, in every row and at every width)
         const why = locked ? `<span class="tv-part-range tv-part-lock" id="${id}_why">${esc(LOCK_WHY)}</span>` : '';
@@ -1233,7 +1234,8 @@ async function runBuild() {
                     const lim = sectionLimits(s)[x];
                     const got = now && Number.isFinite(now.n) ? now.n : lim ? lim.dflt : v.n;
                     if (got === v.n) continue;
-                    s.partNote = Object.assign({}, s.partNote, { [x]: x === 'practice' || x === 'mixed' ? `Rounded to ${got} so no page is under half full` : `Now ${got}: ${v.n} would leave the lesson sheet short` });
+                    // (critic A r3 R2: a clamp to the new max / min says so - "so no page is under half full" only for a true rounding)
+                    s.partNote = Object.assign({}, s.partNote, { [x]: snapNote(x, v.n, got, lim, pr.size === 'S' ? 'M' : pr.size) });   // (a lesson asked for at S prints at M)
                 }
             }
             const box = root.querySelector(`#tvParts${si}`);

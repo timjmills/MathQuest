@@ -6,7 +6,7 @@
 //   node tests/scripts/ws-partopts-unit.cjs --full 3               #   ... plus EVERY offered value for the first 3 lessons
 //   node tests/scripts/ws-partopts-unit.cjs --lessons addition:add_facts --sizes L --parts practice
 //
-// PO-4 (unit): normalizePartOpts clamps min - 1 and max + 1 into the range and drops every default (a standard lesson stores
+// PO-4 (unit, + critic A r3 R2: a snapped count's note - "half full" only between two offered values): normalizePartOpts clamps min - 1 and max + 1 into the range and drops every default (a standard lesson stores
 //   {}); a section's partOpts survive a JSON save and load unchanged; a saved section's older `parts` list reads into partOpts;
 //   the parts list a partOpts asks for; offeredValues never leaves [min, max] and steps in whole rows on Practice.
 // PO-2 (browser): for every live lesson (lessons/prereqs.js LESSONS and the add sample) at M and L (S prints as M - print-sheet.js
@@ -89,6 +89,26 @@ async function unit() {
         if (!rl.none || rl.canOff !== false || Object.keys(po.normalizePartOpts({ rows: { on: false } }, { rows: rl })).length) F('PO-4', 'rows with no room is not "none" (F7)');
         if (/^\d+ · /.test(po.rangeText('rows', rl)) || !/^Fixed: /.test(po.rangeText('wedo', po.partLimits('wedo', { fit: { wedo: { fit: 3, values: [3] } } })))) F('PO-4', 'a fixed count is not written once as "Fixed: n (...)" (F6)');
     }
+    // critic A r3 R2: the note under a snapped count gives the true reason - a clamp past the new max / under the new min says
+    // "the most / fewest", only a count between two offered values is "rounded so no page is under half full". (An engine
+    // without po.snapNote: the 389a69c screen's one text for every snapped Practice / Mixed count - the state the critic failed.)
+    {
+        const note = po.snapNote || ((p, asked, got) => (p === 'practice' || p === 'mixed' ? `Rounded to ${got} so no page is under half full` : `Now ${got}: ${asked} would leave the lesson sheet short`));
+        const mx = po.partLimits('mixed', { fit: { mixed: { count: 15 } } });          // (Y4.B1.S14 at L: 15 or 30)
+        const pr = po.partLimits('practice', { fit: { practice: { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 1 } } });
+        const cases = [
+            ['mixed', 42, mx, false, /most/],                                           // (Mixed 42 at M, then L: the critic's case)
+            ['mixed', 6, mx, false, /fewest/],
+            ['practice', 27, pr, true, null],                                           // (between 24 and 30: a true rounding)
+            ['practice', 90, pr, false, /most/],
+        ];
+        for (const [p, asked, lim, between, want] of cases) {
+            const got = po.snapCount(asked, lim);
+            const t = note(p, asked, got, lim, 'L');
+            if (/half full/.test(t) !== between) F('PO-4', `${p} ${asked} -> ${got}: note "${t}" (R2: "half full" only for a count between two offered values)`);
+            if (want && !want.test(t)) F('PO-4', `${p} ${asked} -> ${got}: note "${t}" does not say ${want}`);
+        }
+    }
     // the save / load round trip: a section's partOpts as JSON, read back, normalised again
     const sec = { role: 'lesson', pages: 2, mixed: true, partOpts: po.normalizePartOpts({ prereq: { n: 2 }, wedo: { n: 2 }, rows: { n: 0 }, remember: { on: false }, practice: { n: 24 }, mixed: { n: 20 }, chart: { on: false } }, lims) };
     const back = JSON.parse(JSON.stringify(sec));
@@ -137,6 +157,7 @@ async function browser() {
     let builds = 0;
     const cover = { cases: 0, wedo: 0, practice: 0, list: [] };
     const walk = { cases: 0, states: 0 };
+    const rowfitPlus = [];   // (EB-ROWFIT+, report-only - critic A r3 R3)
     // (the lessons critic A r2 graded: always walked)
     const MUST_WALK = ['number_sense:nearest_10', 'addition:add_wp_10', 'subtraction:sub_10k_no_regroup', 'addition:add_facts'];
     try {
@@ -323,6 +344,16 @@ async function browser() {
             // standard packet's is the master state (routed to lf-engine): excused here, its text still judged in (c).
             const fits = lastSheet && rowNeed && po.rowFits(lastSheet.emptyMm, rowNeed, 0);
             if (fits && rowsPrinted === 0 && changed(lastSheet)) F('EB-ROWFIT', `${where} p${lastSheet.i + 1}: no lesson rows, yet ${lastSheet.emptyMm} mm of the foot is empty - one Independent row and its head is ${rowNeed} mm`);
+            // (b+) EB-ROWFIT+ (critic A r3 R3): lesson rows printed, the teacher may not add one (rows fixed by the planner, or at
+            // their stepper's last value), yet the printed foot holds one more row of the rows' own cells (no head: the band
+            // exists). REPORT-ONLY (--gate-rowfit-plus makes it gating): the planner sizes rows from its plan, which reads
+            // 1.5-15.9 mm less free height than the print (DESIGN §8d) - see DESIGN §8d "R3".
+            const rl = lims.rows;
+            if (rl && !rl.none && rowsPrinted >= 1 && lastSheet && rowH[perRow] && (rl.fixed || countOf(cur, 'rows', rl) >= rl.max) && po.rowFits(lastSheet.emptyMm, rowH[perRow], 0)) {
+                const msg = `${where} p${lastSheet.i + 1}: ${rowsPrinted} lesson row(s), "${rl.fixed ? 'Fixed' : 'at the most offered'}", yet ${lastSheet.emptyMm} mm of the foot is empty - one more row is ${rowH[perRow]} mm${changed(lastSheet) ? '' : ' (the standard sheet)'}`;
+                rowfitPlus.push(msg);
+                if (has('gate-rowfit-plus') && changed(lastSheet)) F('EB-ROWFIT+', msg);
+            }
             // (c) the rows' text is true, the standard packet included (the screen's text is no print: not in the print baseline):
             // "no room" only where a row does not fit; "the standard sheet is kept" only on a sheet identical to the standard's
             const rt = lims.rows && lims.rows.none ? po.partRowText('rows', lims.rows, 0) : '';
@@ -473,6 +504,9 @@ async function browser() {
             // 30 % foot (moved to 0.75: FAIL). (2) the lowest-planned good sheet over the floor, add_wp_10_plain L Vocabulary off
             // and rows 0 (plan 0.762, prints 24 % empty) - a floor over it refuses a good sheet (moved to 0.77: FAIL). (3) the
             // highest-planned bad sheet, add_facts M Vocabulary off (plan 0.712, prints 31 % empty) - refused (moved to 0.71: FAIL).
+            // (critic A r3: (3) pins nothing two-sided - any floor > 0.712 passes it, so the floor rests on (1)+(2). It is kept
+            //  as a REGRESSION GUARD: the worst swept foot (0.712) stays refused at the live floor, so a later drop below it
+            //  fails here. DESIGN §8d "8d follow-up" says this.)
             {
                 const g = await printed('placevalue:identify', 'M', { wedo: { on: false } });
                 const gap = g.b.error ? NaN : g.b.teach.fill[0] - (1 - g.last.emptyMm / g.last.bodyMm);
@@ -509,7 +543,9 @@ async function browser() {
             }
         }
     } finally { await app.close(); }
-    const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d', 'EB-ROWFIT', 'PO-NOROOM', 'PO-REM', 'PO-CAP', 'PO-VOC'];
+    const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d', 'EB-ROWFIT', 'EB-ROWFIT+', 'PO-NOROOM', 'PO-REM', 'PO-CAP', 'PO-VOC'];
+    console.log(`EB-ROWFIT+ (report-only${has('gate-rowfit-plus') ? ', gating changed sheets' : ''}): ${rowfitPlus.length} state(s) with a row-sized foot under rows the teacher cannot add to (${rowfitPlus.filter((x) => !/the standard sheet\)$/.test(x)).length} on changed sheets)`);
+    for (const x of rowfitPlus.slice(0, 12)) console.log(`  ${x}`);
     console.log(`PO-2w walk: ${walk.states} settled states beyond the standard packet in ${walk.cases} lesson x size cases (depth ${arg('walk-depth', 3)})`);
     for (const id of ids) { const f = fails.filter((x) => x.startsWith(id + ' ')); console.log(`${id} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, Number(arg('show', 25)))) console.log(`   ${x}`); }
     // F2 (critic A r1): how many lesson x size cases offer a real We Do range and a real Practice range (2 values or more)

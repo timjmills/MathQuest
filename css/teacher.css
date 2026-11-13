@@ -1007,3 +1007,11 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-part-many { flex-direction: row; align-items: center; gap: 4px 12px; }
     .tv-part-sup-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+/* Preview page tabs at phone width (lane lf-partopts, critic A r3 R4): more pages made the one-row segmented strip wider
+   than the screen, so the whole Print page scrolled sideways (10 px on master, 31 px with a 42-problem Mixed). The tabs
+   wrap inside their own box instead; additive, phone only. */
+@media (max-width: 640px) {
+    #tvPageTabs { display: flex; flex-wrap: wrap; align-content: flex-start; }
+    #tvPageTabs > button { flex: 1 1 auto; min-width: 0; }
+}
