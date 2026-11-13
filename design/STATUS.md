@@ -803,3 +803,6 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Gates: boot-smoke, precritic-plan (+ self-test, none dropped), backtest / empty-band self-tests, code-snapshot, redesign-passed, screen-answer, simple-print.
 ## 2026-11-13 ~18:00 UTC — Owner approves the fastest-implementation plan (all eight changes)
 - design/plans/FASTEST_PLAN_2026-11-13.md; summary in CLAUDE.md "Fastest-implementation plan". Unit order (round 1 first), copy-light review, batch critics, round cap 2, deploy train 11:00 / 19:00 UTC, six lanes, no phone width (390) — print + computer/Chromebook + tablet only, long lessons paused.
+
+## 2026-11-13 — Deploy conflict-marker gate (lf-hosts tool via lf-checks)
+- tests/scripts/ws-conflict-markers.mjs fails on merge markers in tracked files; runs on every precritic and deploy session 1 (row conflict-markers-3c7b). Closes the lead's own ledger row (markers committed to STATUS earlier today).
