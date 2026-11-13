@@ -1,0 +1,53 @@
+g1-oa1-bar-model-wp-20: 21 pages -> ../dl-master
+   T1:teacher T2:teacher T2b:teacher T3:teacher T4:teacher T5:teacher P0:pupil P1:pupil P2:pupil P3:pupil P4-1:pupil P5:pupil P6:pupil P0-key:key P1-key:key P2-key:key P3-key:key P4-1-key:key P5-key:key P6-key:key T6:teacher
+   note: Exit slip: a group of items does not fit two across a 132.5 mm half; printed one across.
+E1    PASS 19 portrait + 2 landscape of 21; 21 pages in the DOM
+E1b   PASS P6: 132.5 / 132.5; P6-key: 132.5 / 132.5
+E2    PASS 700/28px true, 400/15px true; other faces 0
+E3    PASS paints #000000, #5b2a86, #949494, #c2410c, #ffffff; out of place 0
+E4    PASS pupil-page paints: #000000, #5b2a86, #949494, #ffffff
+E5    PASS 0 found
+E6    PASS smallest 11.99 pt (P3 "19", P3-key "19")
+E7    PASS smallest 10 pt (T1 "#", T2 "#")
+E8    PASS the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit
+E9    FAIL min 88 %; overflow P6 +5 mm, P6-key +4 mm; under 50 %: none
+E9c   PASS T1 96, T2 96, T2b 93, T3 93, T4 88, T5 97, T6 90; continued under 92 %: none
+E9b   PASS max 4 %; over 8 %: none
+E10   PASS 76 cells; min free 49 %; below 40 %: none
+E11   PASS worst 29 %; 62 top cells; failing: none
+E12   PASS all grids equal; Practice cells 6, spread 0.0 × 0.0 mm
+E13   PASS underscores 0
+E14   PASS 0 outside a cut line
+E15   PASS 19 instructions; failing: none; in the kit library but missing from V22 C.1: "Write how many of each place.", "Read the story. Fill in the bar. Solve."
+E16c  PASS none
+E16   PASS 9 frames; blanks 0, 1
+E16b  PASS 12 rows; tallest 9 mm
+E17b  PASS P2: 0, P2-key: 0
+E17   PASS P0 8/8, P1 12/12, P2 0/0, P3 9/9, P4-1 24/24, P5 11/11, P6 16/16
+E18   PASS © 21/21; tab 0/21
+E19   PASS I Can solve stories with a bar
+E20   PASS none
+E21b  PASS T2 New rows 2 → Standard; T1 "Standard"
+E21   PASS 8 atoms: Fact, Conceptual, Fact, Category, Category, Conceptual, Category, Comparative; ★ false
+E22   PASS T3: 1, T4: 2, T5: 1
+E23   PASS 4/4
+E24   PASS 32 places (32 numbers), usable pool 46 (pool 70 keys, 46 facts, recomputed from its plus rule: matches; forbidden 7+5, 2+9); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a 
+E24b  PASS 1 Practice pages: last rows all edge cases (3 edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (15 + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); 0 × / ÷ items:
+E31   PASS put-together, add-to: modelled on P2, practised on P3–P6, assessed on P6
+E32   PASS 34 stories, every sentence on one line, at most 3 lines
+E33   PASS no Mixed page
+E34   PASS T2b /2, P6 2 items a half
+E35   FAIL How many cards in all?; Practice 1 Steps band not printed
+E36   PASS 8+7, 5+9: clean and fresh
+E37   PASS no tables
+E38   PASS none
+E40   PASS none
+E39   PASS 28 grids, none
+E30   PASS none declared: on no pupil page or key (14 pages)
+E29   PASS 16 quotes, all on their pages
+E41   PASS 0 statements, all true
+E28   PASS 2 Practice / Mixed pages; extra bands 0
+E27   PASS no counters
+E26   PASS P2 4 / 4 panels
+E25   PASS 7 pupil pages, 7 keys
+ws-detailed-lesson: FAIL
