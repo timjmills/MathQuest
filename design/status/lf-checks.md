@@ -292,6 +292,7 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 - precritic mention matcher (lf-vocab, 11-13): a skill key is bounded by space or list punctuation, so "a:b, c:d ... OK" on one line names both. `ws-precritic --self-test` holds 6 cases. precritic-plan OK.
 
 ### Next-round queue (lead, 11-13; cap next round)
+0. TOP (lead to all lanes, owner 11-13: "make sure you are saving everything to automatic checks as well"): every finding (critic / owner / lead ruling) becomes an automatic check BEFORE its fix lands: (1) FAIL on the bad commit, PASS on the fix; (2) a backtests.json row ws-backtest proves; (3) on precritic's path; (4) a row in design/lessons-first/CHECKS_FROM_CRITICS.md. lf-checks also builds the SWEEP that enforces it: ws-backtest (or ws-precritic-plan) FAILS when a CHECKS_FROM_CRITICS row has no backtest id or its id is not on precritic's path. Then list today's findings still missing a row.
 1. The practice card honours ?seed in the render tool, plus a check that the same seed gives the same card twice (lf-ops).
 2. Backtest rows name their check ids and run only those: the 12 rows red from check growth (lf-engine log on master).
 3. lf-algebra r1 speed reflection, L25: the precritic plan takes roles and hosts from each card's OFFERED roles and hosts (top
