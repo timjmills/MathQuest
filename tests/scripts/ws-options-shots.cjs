@@ -12,7 +12,8 @@
 //   (a) the stage `.tv-sko-frame > .tvp-stage` lies neither inside the frame (1 px tolerance) nor over at least 90 % of it
 //       — the F8/G11 defect: fit()'s `is-cropped` (origin top-left) under _tidySample's translate(-50%,-50%) put the stage
 //       at about (-183,-358) and the frame showed white; or
-//   (b) the frame's visible crop holds no ink: at most 0.5 % dark pixels (luma < 128) in a screenshot of the frame.
+//   (b) the frame's visible crop holds no ink: at most 0.5 % dark pixels (luma < 192: a number bond's hairline
+//       legs and 20 px digits count; an off-frame stage leaves 0.00 %) in a screenshot of the frame.
 // A skill whose sample is honestly unavailable (`.tvp-frame.is-unavailable`, its own message) is reported, not failed.
 // Prints `ws-options-shots: OK (n skills × w widths)` or `ws-options-shots: FAIL (n)`; exit 1 on FAIL.
 // --shots <dir> saves every frame crop; --fail-shots <dir> (default: scratch-free, off) saves only the failing ones;
@@ -48,7 +49,7 @@ async function inkOf(page, b64) {
         const g = c.getContext('2d'); g.drawImage(img, 0, 0);
         const d = g.getImageData(0, 0, c.width, c.height).data;
         let dark = 0;
-        for (let i = 0; i < d.length; i += 4) if (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2] < 128) dark++;
+        for (let i = 0; i < d.length; i += 4) if (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2] < 192) dark++;
         return dark / Math.max(1, c.width * c.height);
     }, b64);
 }

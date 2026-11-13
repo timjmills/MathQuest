@@ -1,0 +1,26 @@
+ws-options-shots backtest on lf-algebra d20c8a003 (scratch worktree served with MQ_ROOT), 2026-11-13
+node tests/scripts/ws-options-shots.cjs --skill patterns:pattern_features --skill patterns:growing_shape_patterns
+
+BEFORE (d20c8a003 as committed):
+FAIL patterns:pattern_features @1280: stage (-193,-205) 119x126 is neither inside the 398x140 frame nor over 90 % of it (covers 0.0 %; is-cropped, transform translate(-50%, -50%) scale(0.2979)); the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)
+FAIL patterns:growing_shape_patterns @1280: stage (-183,-358) 66x126 is neither inside the 398x140 frame nor over 90 % of it (covers 0.0 %; is-cropped, transform translate(-50%, -50%) scale(0.1726)); the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)
+FAIL patterns:pattern_features @390: stage (-193,-203) 120x126 ... 348x140 frame (covers 0.0 %; is-cropped, scale(0.2993)); 0.00 % dark pixels
+FAIL patterns:growing_shape_patterns @390: stage (-183,-355) 66x126 ... 348x140 frame (covers 0.0 %; is-cropped, scale(0.1738)); 0.00 % dark pixels
+ws-options-shots: FAIL (4)
+
+INTERMEDIATE (the suggested two-line patch only: fit() skips .tv-sko-sample, _tidySample removes is-cropped):
+ok   patterns:pattern_features @1280 / @390
+FAIL patterns:growing_shape_patterns @1280: the frame's visible crop holds 0.48 % dark pixels (placed inside the frame at scale 0.17)
+FAIL patterns:growing_shape_patterns @390: 0.50 %
+ws-options-shots: FAIL (2)   -> a legible-size floor added: the panel frame grows (cap 260 px / 28 % of the window) until the sample reaches 0.3
+
+AFTER (d20c8a003 + this branch's teacher-preview.js / skill-options-ui.js fix):
+ok   patterns:pattern_features @1280: ink 3.27 %, covers 26.7 %
+ok   patterns:growing_shape_patterns @1280: ink 0.96 %, covers 26.7 %
+ok   patterns:pattern_features @390: ink 4.00 %, covers 30.7 %
+ok   patterns:growing_shape_patterns @390: ink 1.35 %, covers 30.5 %
+ws-options-shots: OK (2 skills x 2 widths)
+
+Branch base 389a69c, full run before the fix (before-base-389a69c-full.log, dark = luma < 128 at the time):
+725 skills x 2 widths, 3 workers, 819 s: FAIL (410) = 330 the same off-frame stage (every sample whose fit is under 0.3),
+80 sparse but legible drawings (number bonds, long division) that luma < 128 under-counted -> dark = luma < 192.
