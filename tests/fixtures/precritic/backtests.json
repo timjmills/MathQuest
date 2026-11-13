@@ -6292,11 +6292,30 @@
    "state": "lf-algebra head: growing quiz 1280, 'Term 1' 11.0 px (8.3 pt) against 11 pt on paper"
   },
   "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/text-label-ok.pass.html",
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only TEXT-SIZE",
-   "state": "A FIXTURE, because no commit fixes G9 yet (the quiz host owns it): the Term labels at 15 px against 11 pt on paper. Replace with the fixing commit when it lands."
+   "commit": "5297534b5",
+   "state": "MOVED FROM A FIXTURE TO A COMMIT (lf-hosts, 2026-11-13; was the fixture text-label-ok.pass.html, which screen-ink-size-text-fixture still proves): 5297534b5 is 791c84183 plus the one screen-cell.js hunk master already carries (917807f41, lf-vocab r5: the k2 twin fit skips an element with no box). Root cause of G9: the quiz hides the growing pattern's given counts (display:none); their 0 x 0 rects at 0,0 read as 145 px of overflow each side at 1280 and the fit shrank --mq-k2 5.4 -> 2.4 px. After: quiz 'Term n' 24.3 px (18.2 pt) at 1280, 20.6 px at 820, 16.8 px at 390, against 11 pt on paper. Branch claude/sweet-newton-c8wrv1-lf-hosts-g9-probe."
   },
   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill patterns:growing_shape_patterns --hosts quiz --only TEXT-SIZE --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-cell-read",
+  "check": "CELL-READ (lf-hosts, 2026-11-13): ws-screen-ink-size FAILS a host render that read 0 [data-ws-cell] cells (not rendered, root missing, a card / quiz paper with no [data-ws-cell], a worksheet of 0 cards or a card with none) instead of passing it with nothing judged; never filtered by --only. The same rule as ws-screen-slots / ws-screen-answer / ws-phone-card (lf-checks 1fbdb8eca); --self-test holds 8 CELL-READ cases",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size CELL-READ",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "lf-checks before hand-off 1's fix: the mult_facts practice card draws no [data-ws-cell]; the old ws-screen-ink-size read 0 cells there and passed"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "lf-checks hand-off 1: the card paper carries data-ws-cell (the fix the cell-read-ss / -sa / -pc rows prove)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill multiplication:mult_facts --hosts card --widths 390 --only CELL-READ --no-baseline",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

@@ -30,6 +30,10 @@
 //               the cell's largest numeral is SCREEN-DIGIT's and is skipped. Anything else is LABEL text, held to the same
 //               item's print size (5 % tolerance; a word may match the same word anywhere on the page) and never under 8 pt.
 //               --dump-text prints every run read. Fixtures: --width W sets the host width (default 1280).
+//   CELL-READ   (lf-hosts, 2026-11-13; as ws-screen-slots / ws-screen-answer / ws-phone-card, lf-checks 1fbdb8eca) a host
+//               render that read 0 [data-ws-cell] cells - it did not render, its root is missing, the card / quiz paper holds
+//               no [data-ws-cell], the worksheet dealt 0 cards or a card holds none - is a FINDING, never a pass. It is not
+//               filtered by --only, and its keys are never pinned (a new key breaks the pin).
 // Worksheet items (queue 14): the worksheet deals its own items, so each card is also matched with the print cell of the item
 // it DEALT (the kit's renderCell at --size, [data-mq-dealt]; fixtures: [data-mq-print-dealt]) before any geometric fallback.
 // Pattern terms (queue 15): a drawing labelled "Term n" (or in [data-ws-term] / .mq-gp-term) is judged by its unit (SIZE-INK,
@@ -282,6 +286,23 @@ function sweepPinDrift(sweepText, pj) {
     return out;
 }
 
+/**
+ * CELL-READ (lf-hosts, 2026-11-13; the same rule as ws-screen-slots / ws-screen-answer / ws-phone-card, lf-checks 1fbdb8eca):
+ * a host render that read no [data-ws-cell] cell (the root, a card or the quiz paper) judged nothing, so it is a FINDING,
+ * never a pass. `r` is cellCountInPage's result (null: the host did not render). Pure: '' when the host holds its cells.
+ */
+function cellReadError(host, scope, r) {
+    if (!r) return `${scope} rendered nothing on the ${host} host (0 cells read)`;
+    if (r.error) return `${r.error} on the ${host} host (0 cells read)`;
+    if (host === 'worksheet') {
+        if (!(r.cards > 0)) return `the worksheet dealt 0 cards at ${scope} (0 cells read)`;
+        if (r.cardsWithout > 0) return `${r.cardsWithout} of ${r.cards} worksheet card(s) hold no [data-ws-cell] cell - its checks read nothing there`;
+        return '';
+    }
+    if (!(r.cells > 0)) return `0 [data-ws-cell] cells at ${scope} on the ${host} host - its checks read nothing (screen parity: the cell carries data-ws-cell)`;
+    return '';
+}
+
 function selfTest() {
     const bad = []; let n = 0;
     const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
@@ -414,6 +435,15 @@ function selfTest() {
     eq('G1 count-row 20 px at 390 fails', !!textFinding(g1.role, '12', 20, g1.floor, work), true);
     eq('G1 count-row 29 px at 390 holds', textFinding(g1.role, '12', 29, g1.floor, work), null);
     eq('text buckets', [textBucket('digit text', 40), textBucket('label text', 10.67), textBucket('label text', 13.9), textBucket('label text', 15), textBucket('label text', 22)], ['digit floor 40 px', 'label 8 pt floor', 'label print under 11 pt', 'label print 11-15 pt', 'label print 15 pt+']);
+    // CELL-READ (lf-hosts): a host that read 0 cells is a finding, never a pass
+    eq('CELL-READ host not rendered', /rendered nothing/.test(cellReadError('quiz', '#quizTakeView .mq-qtpaper', null)), true);
+    eq('CELL-READ root missing', /no #questionCard/.test(cellReadError('card', '#questionCard', { error: 'no #questionCard' })), true);
+    eq('CELL-READ card with 0 cells', /0 \[data-ws-cell\] cells/.test(cellReadError('card', '#questionCard', { cells: 0 })), true);
+    eq('CELL-READ quiz with 0 cells', /quiz host/.test(cellReadError('quiz', '.mq-qtpaper', { cells: 0 })), true);
+    eq('CELL-READ worksheet of 0 cards', /0 cards/.test(cellReadError('worksheet', '.mq-wspaper', { cells: 0, cards: 0, cardsWithout: 0 })), true);
+    eq('CELL-READ worksheet card without a cell', /1 of 4/.test(cellReadError('worksheet', '.mq-wspaper', { cells: 3, cards: 4, cardsWithout: 1 })), true);
+    eq('CELL-READ card with 1 cell reads', cellReadError('card', '#questionCard', { cells: 1 }), '');
+    eq('CELL-READ worksheet every card read', cellReadError('worksheet', '.mq-wspaper', { cells: 4, cards: 4, cardsWithout: 0 }), '');
     for (const b of bad) console.log('  ' + b);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
     console.log(`${NAME}: ${bad.length ? 'FAIL' : 'OK'}`);
@@ -425,6 +455,19 @@ if (require.main === module && has('self-test')) selfTest();
 
 // Run in the page: every drawing (svg with repeated marks, or the parent of repeated HTML marks) under `scope`, with its
 // cell, its mark groups (mark, count, median smaller side in mm), its INK extent, its free width and its item's signature.
+// CELL-READ, in the page: the visible [data-ws-cell] cells at or under `scope`; on the worksheet also its cards
+// (#ws_card_N) and how many of them hold no visible [data-ws-cell].
+function cellCountInPage({ scope, host }) {
+    const roots = [...document.querySelectorAll(scope)];
+    if (!roots.length) return { error: `no ${scope}` };
+    const vis = (e) => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+    const cellsIn = (el) => [el, ...el.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length;
+    const cells = roots.reduce((a, r) => a + cellsIn(r), 0);
+    if (host !== 'worksheet') return { cells };
+    const cards = [...document.querySelectorAll('#worksheetView [id^="ws_card_"]')].filter(vis);
+    return { cells, cards: cards.length, cardsWithout: cards.filter((c) => !cellsIn(c)).length };
+}
+
 function readDrawingsInPage({ scope, cellSel, withText = false }) {
     const MM = 96 / 25.4;
     const roots = [...document.querySelectorAll(scope)];
@@ -790,11 +833,18 @@ async function main() {
                                 return null;
                             } catch (e) { return 'ERR ' + String((e && e.message) || e).slice(0, 150); }
                         }, { c: cat, k: skill, host, s: SEED, i, opts: v.opts });
-                        if (!scope || /^ERR/.test(scope)) { notes.add(`${tag} ${host} ${w}: not rendered (${scope})`); continue; }
+                        if (!scope || /^ERR/.test(scope)) {
+                            notes.add(`${tag} ${host} ${w}: not rendered (${scope})`);
+                            findings.push({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cellReadError(host, host, null)}` });
+                            continue;
+                        }
                         await new Promise((r) => setTimeout(r, 450));
                         if (host === 'worksheet') await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
                         const sc = await page.evaluate(readDrawingsInPage, { scope, cellSel: '[data-ws-cell], .mq-scell, .problem-card', withText: true });
                         renders++;
+                        // CELL-READ (lf-hosts): a host that read 0 [data-ws-cell] cells judged nothing - a finding, never a pass
+                        const cr = cellReadError(host, scope, await page.evaluate(cellCountInPage, { scope, host }));
+                        if (cr) findings.push({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cr}` });
                         // queue 14: the print cells of the very items the worksheet dealt (the SAME word / item), drawn by the kit
                         let dealt = [];
                         if (host === 'worksheet' && !sc.error && sc.drawings.length) {
@@ -879,4 +929,4 @@ async function main() {
 
 if (require.main === module && !has('self-test')) main().catch((e) => { console.error(e); console.log(`${NAME}: FAIL`); process.exit(1); });
 
-module.exports = { median, inkFinding, widthFinding, textFloor, textFinding, textBucket, digitFloorPx, isTermDrawing, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, findingLines, pinScope, sweepPinDrift, supportPicture, inkBucket, widthBucket, NOUNS, PICTURES };
+module.exports = { cellReadError, median, inkFinding, widthFinding, textFloor, textFinding, textBucket, digitFloorPx, isTermDrawing, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, findingLines, pinScope, sweepPinDrift, supportPicture, inkBucket, widthBucket, NOUNS, PICTURES };
