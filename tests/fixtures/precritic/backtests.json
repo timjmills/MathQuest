@@ -4042,6 +4042,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "guided-tight-rows",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "EB-BAND 2 on expand / unit_form / combine guided"
+  },
+  "pass": {
+   "commit": "8307219c",
+   "state": "EB-BAND PASS"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

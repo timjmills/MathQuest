@@ -44,6 +44,10 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   lf-builds-stories branch; here add_wp_change_unknown deals a column sum). SIGNMATCH (RI + EA) 0 on the 5 story skills here;
   True or False? is not in SIGNMATCH's roles (a false statement may be any false sum) - lf-builds' wrongAnswer slots fix it at
   the source. F8 waits on a PT-RSN-4 ruling.
+- r10 guided (8307219c): a Guided page of tightRows items keeps rows at their measured height (compare precritic r2 item 1).
+  compare guided EB-BAND 46 -> 22 (rest: pv's measured height + its one-line hint row); expand / unit_form / combine guided
+  EB-BAND 2 -> 0 (9 passed pages change). Backtest guided-tight-rows PASS. compare EA S: 0 now. compare Model EB-SIDE 5 = its
+  beside step-text cells, which PT-MOD-5 excuses but ws-empty-band does not yet skip (lf-checks). Opener is not this lane's.
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
