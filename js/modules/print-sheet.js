@@ -53,7 +53,7 @@ import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
-import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups } from './sheet/index.js';
+import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups, stackCarryTop } from './sheet/index.js';
 const { tBand } = teacherParts;
 import { planItem as composePlanItem, operandsOf as composeOperandsOf, opOf as composeOpOf, opGlyphOf as composeGlyphOf, oralFrameOf as composeOralFrameOf, answerOf as composeAnswerOf, instructionKeyOf as composeInstrKeyOf, instructionText as composeInstrText } from './sheet/roles/compose.js';
 import {
@@ -1687,6 +1687,11 @@ function allocateHostSupports(items, n) {
  * function (the SAME one for the pupil page, the key and the measurement), the key, and the
  * class tokens the role writes onto the cell.
  */
+/** F7 (live-fix 2026-11-13): a rounding lesson's Practice cells centre their one line (print-sheet buildLesson tagSheets). */
+/** F5 (live-fix 2026-11-13): a lesson's Mixed / Practice fact and count cells centre down a row sized for a taller kind. */
+const MIXED_FACT_CSS = '<style data-mq-lmixfact>.ws-page:is([data-ws-sheet="lesson-mixed"],[data-ws-sheet="lesson-practice"]) .ws-grid>.ws-cell:is([data-ws-cell="fact"],[data-ws-cell="counters"]){justify-content:center !important}</style>';
+const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
+
 /**
  * CL-4b per SECTION (owner ruling 2026-10-24; VA-10, AX-4): when any stack of a section regroups,
  * every stack of the section is told so (`sectionWriteAbove`), and each one that draws a regroup
@@ -1696,7 +1701,10 @@ function allocateHostSupports(items, n) {
 export function markSectionWriteAbove(items) {
     const stacks = (items || []).filter((it) => it && it.q && it.q.cell && it.q.cell.template === 'stack' && it.q.cell.payload);
     const any = stacks.some((it) => stackRegroups(it.q.cell.payload));
-    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined });
+    // F6 (live-fix 2026-11-13, H15): the section's sums carry no higher than `carryTop`, so no stack of it draws a carry
+    // box over a place none of them reaches (the hundreds box over sums < 100 was a dead part the key never filled).
+    const carryTop = Math.max(0, ...stacks.map((it) => stackCarryTop(it.q.cell.payload)));
+    for (const it of stacks) it.q.cell.payload = Object.assign({}, it.q.cell.payload, { sectionWriteAbove: any || undefined }, carryTop > 0 && it.q.cell.payload.op === '+' ? { carryTop } : {});
     return items;
 }
 
@@ -5020,7 +5028,15 @@ async function buildLesson(n, metaOf) {
     // only ever compared with the pages of its own sheet.
     const tagSheets = (html, first, rest) => {
         let k = 0;
-        return String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
+        const out = String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
+        // F7 (lf-engine pc critic r3, live-fix 2026-11-13): a rounding Practice cell ("27 -> ___") is one short line in a
+        // row the page's fill made tall - drawn at the top it left a 49 % band under it in all 15 cells (H13). The cells of
+        // a rounding lesson's Practice sheet centre their line down the cell (additive: only these pages carry the rule).
+        if (first === 'lesson-practice' && rounding) return out.replace(/<main class="ws-body">/g, `<main class="ws-body">${ROUND_PRACTICE_CSS}`);
+        // F5 (same round): a Mixed row of vertical facts shares the page's row height with a taller kind (the bond row
+        // below), so its facts sat on a 55 % band; one-line facts and count rows centre down the cell instead (Mixed and
+        // Practice sheets that draw one - PM-H13 found the same 30 % band on the add S Practice and the L count row).
+        return (first === 'lesson-mixed' || first === 'lesson-practice') && /data-ws-cell="(fact|counters)"/.test(out) ? out.replace(/<main class="ws-body">/g, `<main class="ws-body">${MIXED_FACT_CSS}`) : out;
     };
     const sheetIds = (p) => (p.part === 'teach' ? ['lesson-sheet', 'lesson-sheet'] : [`lesson-${p.part}`, `lesson-${p.part}`]);
     // (LR-18: every part built, each with its own pupil and key HTML; only the printed ones go on paper, in packet order)
