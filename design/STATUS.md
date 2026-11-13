@@ -767,3 +767,6 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-13 — Deploy vocabulary (lf-vocab, narrow critic r14 PASS, min 8; both skills redesign-passed)
 - grade_pictures + pick3_words: r5 print, R-1 (highlight after answering, screen only), R-2 (spoken explanation on a wrong answer), O-1 blue next-answer box, O-2/O-3 unambiguous pictures that never fit a distractor, rounds r9–r14 (V-NUM, V-PLACE, V-TWIN, screen picture at print size). Known: 4 SIZE-REF gate-gap findings per lead ruling (same-word proof in the packet; gate fix with lf-checks).
 - Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, backtest self-test, capacity-pin (648), roles-unit (75), vocab-unit, empty-band self-test. Merged with master 70fa12c2 (EB-FOOT pairing; comment conflict resolved, backtests unioned 261 rows).
+
+## 2026-11-13 — Owner rule: lesson design at high effort
+- Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
