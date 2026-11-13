@@ -64,13 +64,23 @@ export const EB_BAND_MAX = 0.30;
 export const EB_MIN_CELL_MM = 10;
 /** True when a cell of hMm with belowMm empty under its ink fails EB-BAND. */
 export const bandFails = (belowMm, hMm) => hMm >= EB_MIN_CELL_MM && belowMm >= EB_BAND_MAX * hMm;
+/**
+ * The plan-to-print margin of the band prediction: a planned cell's band (its height less the bridge's measured needed height)
+ * reads up to 1.0 mm narrower than the printed cell's near the 30 % line (div_facts M, Vocabulary and Remember off: 26.8 %
+ * planned, 31.4 % printed), so the gate adds BAND_SLACK_MM before it judges (DESIGN §8d; ws-partopts-unit BAND-BT pins it:
+ * 0 mm lets that sheet through, 3 mm refuses div_facts M We Do 1, which prints 27 %).
+ */
+export const BAND_SLACK_MM = 2;
 
 /**
- * The plan-to-print margin of the row test (EB-ROWFIT). The planner's free height under the last band reads 9-16 mm less
- * than the printed foot measures (design/partopts/DESIGN.md §8d: the body prints 239 mm tall at M where the plan budgets
- * 232, and the bands print a little shorter than planned), so the planner's figure + ROWFIT_SLACK_MM stands for the printed
- * foot. ws-partopts-unit EB-ROWFIT-BT pins it: 6 mm lets a known sheet whose printed foot holds a row through, 18 mm
- * refuses a known sheet whose printed foot does not.
+ * The plan-to-print margin of the row test (EB-ROWFIT), design/partopts/DESIGN.md §8d. Over 600 swept lesson sheets the printed
+ * foot reads 1.5-15.9 mm (median 7.9) more than the planner's free height (the A4 body prints 239 mm where the plan budgets
+ * 232 at M, and bands print a little shorter than planned), and the planner's row height (with its two-line head) is no
+ * shorter than the printed one. A row fits in print on every sheet whose plan gap (row - free) is <= 10.2 mm; it does not on
+ * sheets from 3.7 mm up: the overlap is resolved to the safe side (a value refused, never a blank foot), so the margin is the
+ * largest must-refuse gap, 10.2, rounded up with 1.8 mm headroom - under the smallest gap seen beside it where no row fits,
+ * 13.2 mm. ws-partopts-unit ROWFIT-BT pins it: 10 mm lets placevalue:expand L Remember off through, 14 mm refuses
+ * placevalue:value L rows 0.
  */
 export const ROWFIT_SLACK_MM = 12;
 /** EB-ROWFIT: true when a foot of freeMm (+ marginMm) holds one Independent row and its band head (rowMm). */
@@ -353,4 +363,4 @@ export function lessonPartN(po) {
     return Object.keys(o).length ? o : null;
 }
 
-export default { EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+export default { BAND_SLACK_MM, EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

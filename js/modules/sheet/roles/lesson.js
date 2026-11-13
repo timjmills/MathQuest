@@ -64,7 +64,7 @@ import { warmShape } from '../lesson-pages/warm-up.js';
 import { pickWeDo, stepsItem } from '../lesson-pages/we-do.js';
 import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.js';
 import { sheetBands, lessonPart } from '../lesson-pages/index.js';
-import { VOCAB_MIN, ROWFIT_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
+import { VOCAB_MIN, ROWFIT_SLACK_MM, BAND_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
 
 // (The role's earlier exports, now homed in the builders.)
 export { reflowsAt, winShare, CASE_TESTS, pickExample, pickSecond, otherExamples, pickWeDo, stateGroups, hopsSvg, roundLineSvg, roundLineMm, roundLinePad };
@@ -287,7 +287,8 @@ function cellBandsOf(list) {
             const mm = it && it.measured && it.measured[bc.cols];
             if (!mm || !(mm.neededMm > 0)) continue;
             const below = H - mm.neededMm;
-            out.push({ tmpl: it.template || '', cols: bc.cols, hMm: +H.toFixed(1), belowMm: +below.toFixed(1), fails: bandFails(below, H) });
+            // (the printed band reads up to ~1 mm wider than planned near the line: BAND_SLACK_MM, DESIGN §8d)
+            out.push({ tmpl: it.template || '', cols: bc.cols, hMm: +H.toFixed(1), belowMm: +below.toFixed(1), fails: bandFails(below + BAND_SLACK_MM, H) });
         }
     }
     return out;

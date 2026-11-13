@@ -304,10 +304,12 @@ function weDoBandOwn(env) {
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
         // (lf-partopts A r3: the We Do cells, for the offer gate's EB-BAND prediction - roles/lesson.js cellBands)
-        env.weDoCells = { grid, items: weDo, cols: top.rows ? 1 : top.cols };
+        // (a rounding cell draws the chart's number line under its problem - weDoRender - which its measured cell has not: no
+        // prediction for it; its width is judged by weDoSideOk)
+        env.weDoCells = { grid, items: weDo.filter((it) => !isRound(it)), cols: top.rows ? 1 : top.cols };
     } else if (weDo.length) {
         groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
-        env.weDoCells = { grid: weBand.parts[0].content, items: weDo, cols: gcols };
+        env.weDoCells = { grid: weBand.parts[0].content, items: weDo.filter((it) => !isRound(it)), cols: gcols };
     }
     env.weDo = weDo;
     return env;

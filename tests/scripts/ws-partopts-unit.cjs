@@ -129,6 +129,7 @@ async function browser() {
         lessons = [{ id: 'addition:add_facts (sample)', skill: { categoryId: 'addition', skillId: 'add_facts', opts: { band: 10, constant: [1, 2, 3] } } }]
             .concat(lessons.map((k) => ({ id: k, skill: { categoryId: k.split(':')[0], skillId: k.split(':')[1] } })));
         if (arg('lessons')) lessons = lessons.filter((l) => arg('lessons').split(',').some((x) => l.id.startsWith(x)));
+        if (has('bt-only')) lessons = [];   // (only the threshold backtests)
         const sizes = arg('sizes', 'M,L').split(',');
         const onlyParts = arg('parts') ? arg('parts').split(',') : null;
         const onlyCombos = has('combos-only');
@@ -157,6 +158,7 @@ async function browser() {
                 return {
                     rowH, remTexts,
                     pupil: r.pupilHtml, doc: window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }), keyLen: (r.keyHtml || '').length, keyPages: r.keyPageCount, pages: r.pageCount,
+                    teach: r.lesson.teach ? { fill: r.lesson.teach.fill, freeMm: r.lesson.teach.freeMm, rowMm: r.lesson.teach.rowMm, independent: r.lesson.teach.independent, cellBands: r.lesson.teach.cellBands } : null,
                     fit: r.lesson.partFit, sizingOk: !r.chartSizing || r.chartSizing.ok !== false,
                     got: { prereq: r.lesson.prereqCheck ? r.lesson.prereqCheck.length : null, wedo: r.lesson.teach && r.lesson.teach.guided, rowsItems: r.lesson.teach && r.lesson.teach.independent, practice: prac.length || null, mixed: mixed.length || null },
                 };
@@ -184,7 +186,7 @@ async function browser() {
                     const sheet = pg.getAttribute('data-ws-sheet') || '';
                     const labels = [...pg.querySelectorAll('.ws-strip > b')].map((x) => x.textContent.trim());
                     return { sheet, over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, br.bottom - last) / br.height * 100), h,
-                        emptyMm: +(Math.max(0, br.bottom - last) / (96 / 25.4)).toFixed(1), stripMm: strips.length ? +(Math.max(...strips) / (96 / 25.4)).toFixed(1) : 0,
+                        emptyMm: +(Math.max(0, br.bottom - last) / (96 / 25.4)).toFixed(1), bodyMm: +(br.height / (96 / 25.4)).toFixed(1), stripMm: strips.length ? +(Math.max(...strips) / (96 / 25.4)).toFixed(1) : 0,
                         indep: labels.includes('Independent Practice:'), text: sheet === 'lesson-sheet' ? pg.textContent.replace(/\s+/g, ' ') : '' };
                 }));
                 // (each cell's own markup and size: a cell drawn exactly as in the standard packet carries the standard's findings)
@@ -429,6 +431,66 @@ async function browser() {
                 walk.states += walked; walk.cases++;
             }
             if (has('verbose')) console.log(`  [${((Date.now() - T0) / 1000).toFixed(0)} s] ${where0}: ${jobs.length} variants, ${walked} walked states`);
+        }
+        // ---------------------------------------------------------------- THRESHOLD BACKTESTS (A r3; DESIGN §8d)
+        // Each tuned plan-to-print threshold of the offer gate is pinned by fixed sheets on BOTH sides, so a move by the stated
+        // step fails here: the sheets are built as asked (no settle loop - some are values the gate refuses), printed and
+        // measured; the planner's figures (res.lesson.teach) and the printed page are read side by side.
+        if (!has('no-bt') && !arg('lessons')) {
+            const K = await page.evaluate(async () => { const L = await import('./js/modules/sheet/roles/lesson.js'); const P = await import('./js/modules/sheet/part-opts.js'); return { FILL: L.SHEET_FILL_MIN, ROW: P.ROWFIT_SLACK_MM, BAND: P.BAND_SLACK_MM }; });
+            const sk = (id) => ({ categoryId: id.split(':')[0], skillId: id.split(':')[1] });
+            const printed = async (id, size, partOpts) => {
+                const b = await build(sk(id), size, partOpts); builds++;
+                if (b.error) return { b };
+                const m = await measure(b.doc);
+                const sheets = m.pages.filter((x) => x.sheet === 'lesson-sheet');
+                const last = sheets[sheets.length - 1];
+                const perRow = (b.fit.rows && b.fit.rows.perRow) || 1;
+                const rowNeed = b.rowH[perRow] ? b.rowH[perRow] + last.stripMm : null;
+                const sheetPg = new Set(m.pages.map((x, i) => (x.sheet === 'lesson-sheet' ? i + 1 : 0)));
+                const bands = m.cells.filter((c) => sheetPg.has(c.page) && !/^lesson/.test(c.tmpl) && c.hMm >= 10).map((c) => c.belowMm / c.hMm);
+                return { b, last, rowNeed, maxBand: bands.length ? Math.max(...bands) : 0 };
+            };
+            const BT = (id, ok, msg) => { if (!ok) F(id, msg); };
+            // FILL-BT: SHEET_FILL_MIN 0.76. (1) the largest plan-to-print gap measured near the floor, placevalue:identify M We Do
+            // off (plan 0.797, printed 0.745: 0.052) - a floor under 0.70 + that gap lets a sheet planned at the floor print a
+            // 30 % foot (moved to 0.75: FAIL). (2) the lowest-planned good sheet over the floor, add_wp_10_plain L Vocabulary off
+            // and rows 0 (plan 0.762, prints 24 % empty) - a floor over it refuses a good sheet (moved to 0.77: FAIL). (3) the
+            // highest-planned bad sheet, add_facts M Vocabulary off (plan 0.712, prints 31 % empty) - refused (moved to 0.71: FAIL).
+            {
+                const g = await printed('placevalue:identify', 'M', { wedo: { on: false } });
+                const gap = g.b.error ? NaN : g.b.teach.fill[0] - (1 - g.last.emptyMm / g.last.bodyMm);
+                BT('FILL-BT', Number.isFinite(gap) && K.FILL >= 0.70 + gap - 1e-9, `identify M We Do off: plan ${g.b.teach && g.b.teach.fill} vs printed ${g.last && (1 - g.last.emptyMm / g.last.bodyMm).toFixed(3)} (gap ${gap.toFixed(3)}) - SHEET_FILL_MIN ${K.FILL} < 0.70 + the gap`);
+                const ok = await printed('addition:add_wp_10_plain', 'L', { vocab: { on: false }, rows: { n: 0 } });
+                BT('FILL-BT', !ok.b.error && ok.b.teach.fill[0] >= K.FILL && ok.last.empty < 30, `add_wp_10_plain L Vocabulary off, rows 0: plan ${ok.b.teach && ok.b.teach.fill}, printed ${ok.last && ok.last.empty} % empty - a good sheet the floor ${K.FILL} refuses`);
+                const bad = await printed('addition:add_facts', 'M', { vocab: { on: false } });
+                BT('FILL-BT', !bad.b.error && bad.b.teach.fill[0] < K.FILL && bad.last.empty >= 30, `add_facts M Vocabulary off: plan ${bad.b.teach && bad.b.teach.fill}, printed ${bad.last && bad.last.empty} % empty - a bad sheet the floor ${K.FILL} lets through`);
+                console.log(`FILL-BT ${fails.some((x) => x.startsWith('FILL-BT ')) ? 'FAIL' : 'PASS'}: gap ${gap.toFixed(3)} (floor >= ${(0.70 + gap).toFixed(3)}), good sheet planned ${ok.b.teach && ok.b.teach.fill[0]} (floor <=), bad sheet planned ${bad.b.teach && bad.b.teach.fill[0]} (floor >) - SHEET_FILL_MIN ${K.FILL}`);
+            }
+            // ROWFIT-BT: ROWFIT_SLACK_MM 12. (1) placevalue:expand L Remember off: no rows, plan free 21.7 / row 31.9 mm (10.2 apart),
+            // printed foot 31.1 >= one row and head 29.4 - the gate must refuse it (moved to 10 mm: FAIL). (2) placevalue:value L
+            // rows 0: plan free 30.6 / row 43.8 (13.2 apart), printed foot 33.2 < 47.1 - the gate must keep it (moved to 14: FAIL).
+            {
+                const a = await printed('placevalue:expand', 'L', { remember: { on: false } });
+                const aFits = a.rowNeed && a.last.emptyMm >= a.rowNeed;
+                BT('ROWFIT-BT', !a.b.error && !(a.b.teach.independent > 0) && aFits && po.rowFits(a.b.teach.freeMm, a.b.teach.rowMm, K.ROW), `expand L Remember off: plan free ${a.b.teach && a.b.teach.freeMm} / row ${a.b.teach && a.b.teach.rowMm} mm, printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed} - margin ${K.ROW} lets a sheet whose foot holds a row through`);
+                const v = await printed('placevalue:value', 'L', { rows: { n: 0 } });
+                const vFits = v.rowNeed && v.last.emptyMm >= v.rowNeed;
+                BT('ROWFIT-BT', !v.b.error && !vFits && !po.rowFits(v.b.teach.freeMm, v.b.teach.rowMm, K.ROW), `value L rows 0: plan free ${v.b.teach && v.b.teach.freeMm} / row ${v.b.teach && v.b.teach.rowMm} mm, printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed} - margin ${K.ROW} refuses a sheet whose foot holds no row`);
+                console.log(`ROWFIT-BT ${fails.some((x) => x.startsWith('ROWFIT-BT ')) ? 'FAIL' : 'PASS'}: must-refuse gap ${a.b.teach ? (a.b.teach.rowMm - a.b.teach.freeMm).toFixed(1) : '-'} mm (margin >=), must-keep gap ${v.b.teach ? (v.b.teach.rowMm - v.b.teach.freeMm).toFixed(1) : '-'} mm (margin <) - ROWFIT_SLACK_MM ${K.ROW}`);
+            }
+            // BAND-BT: BAND_SLACK_MM 2. (1) division:div_facts M Vocabulary and Remember off: We Do cells planned 24.6 mm with 6.6 mm
+            // under the ink (26.8 %), printed 31.4 % - the gate must flag them (moved to 0 mm: FAIL). (2) div_facts M We Do 1: its
+            // cell prints under 30 % - the gate must not flag it (moved to 3 mm: FAIL).
+            {
+                const f = await printed('division:div_facts', 'M', { vocab: { on: false }, remember: { on: false } });
+                const flagged = (b) => ((b.teach && b.teach.cellBands) || []).some((c) => po.bandFails(c.belowMm + K.BAND, c.hMm));
+                BT('BAND-BT', !f.b.error && f.maxBand >= 0.30 && flagged(f.b), `div_facts M Vocabulary + Remember off: printed band ${(f.maxBand * 100).toFixed(1)} %, planned ${JSON.stringify((f.b.teach && f.b.teach.cellBands || []).slice(0, 2))} - slack ${K.BAND} mm lets it through`);
+                const w = await printed('division:div_facts', 'M', { wedo: { n: 1 } });
+                BT('BAND-BT', !w.b.error && w.maxBand < 0.30 && !flagged(w.b), `div_facts M We Do 1: printed band ${(w.maxBand * 100).toFixed(1)} % - slack ${K.BAND} mm flags a good sheet`);
+                const tight = (b) => Math.min(...((b.teach && b.teach.cellBands) || []).filter((c) => c.hMm >= 10).map((c) => 0.30 * c.hMm - c.belowMm));
+                console.log(`BAND-BT ${fails.some((x) => x.startsWith('BAND-BT ')) ? 'FAIL' : 'PASS'}: must-flag needs slack >= ${tight(f.b).toFixed(1)} mm, must-keep needs slack < ${tight(w.b).toFixed(1)} mm - BAND_SLACK_MM ${K.BAND}`);
+            }
         }
     } finally { await app.close(); }
     const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d', 'EB-ROWFIT', 'PO-NOROOM', 'PO-REM', 'PO-CAP', 'PO-VOC'];
