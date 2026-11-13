@@ -5503,7 +5503,7 @@
    "commit": "72396d8a7",
    "state": "chartwindow footprint inkWMm -> reason-it UNDER layout, 2 a page"
   },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size L --rules LONE-PAGE --show 20",
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --roles reason-it --size L --rules LONE-PAGE --show 20",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
