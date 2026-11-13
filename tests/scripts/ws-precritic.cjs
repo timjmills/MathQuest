@@ -76,6 +76,8 @@
 //               scope's skills of that lane>, only when the scope holds them, so no other lane's run changes
 //   --role <role>     ws-grade-render --roles <role> --skills <the role sample> + ws-print-lint --source kit
 //             --roles <role> --skills <the role sample> --baseline. The sample is tests/fixtures/precritic/role-sample.json
+//             + ws-empty-band --roles <role> --hosts none on the lane's --skill skills (the role sample when none is given;
+//             critic eb-r3 D4: the role's empty-band rows were off this path); a Scripted Model run adds --model-states
 //   --lesson <id>     (without --teacher; with it, --lesson is ws-teacher-wrm's site lesson as before) a detailed lesson of
 //             js/modules/lessons/detailed/ (LESSONS_FIRST_PLAN §3 stage 3, §6.3; lane lf-checks 2026-11-07):
 //             ws-detailed-lesson --lesson <id> --check --repeats (the V22 E-checks + S2 repeats), ws-detailed-lesson --lp
@@ -326,13 +328,30 @@ const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output ($
 const listShort = (a, n = 6) => `${a.slice(0, n).join(', ')}${a.length > n ? `, … ${a.length - n} more` : ''}`;
 const fmtMin = (m) => String(+(+m).toFixed(3));
 
+// a skill key named in a tool's output: whole key, bounded by space, start/end, or list punctuation (lf-vocab 2026-11-13:
+// ws-screen-support-eq prints "no supports for a:b, c:d ... OK" on ONE line; the space-only boundary read a:b as absent)
+const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
+
+if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
+        ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
+        ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
+        ['in parentheses', mentioned('(addition:add_facts)', 'addition:add_facts'), true],
+        ['a longer id is not the key', mentioned('vocabulary:vocab_grade_pictures OK', 'vocabulary:vocab_grade'), false],
+        ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
+    const bad = t.filter(([, got, want]) => got !== want);
+    for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases)`}`);
+    process.exit(bad.length ? 1 : 0);
+}
+
 function generic(g, out, code) {
     const v = lastVerdict(out, g.script);
     if (!v) return unparsed(`no "${g.script}: OK" or "${g.script}: FAIL" line`, out);
     if (v[1] !== 'OK') return { result: 'FAIL', findings: v[0].slice(0, 160), detail: out.split('\n').filter((l) => /FAIL|NEW|Error|error|✗|^\s+- /.test(l) && !NOISE.test(l)).slice(0, 10), explainsExit: true };
     // a per-skill gate must name every skill in scope somewhere in its output, or it checked something else
     const mention = (g.expect && g.expect.mention) || [];
-    const miss = mention.filter((k) => !new RegExp(`(^|\\s)${reEsc(k)}(\\s|$)`, 'm').test(out));
+    const miss = mention.filter((k) => !mentioned(out, k));
     if (miss.length) return { result: 'FAIL', findings: `${miss.length} of ${mention.length} skill(s) in scope absent from the output (checked nothing for them): ${listShort(miss)}`, detail: tailLines(out), explainsExit: false };
     return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
 }
@@ -731,6 +750,21 @@ function applyOptIn(rows, keys) {
     }
 }
 
+// lf-checks 2026-11-12 (lead: fold the lane opt-ins into the default path): ws-empty-band runs on every --skill with EB-VOCAB
+// (--vocab-ink), EB-PAGE (--page-fill) and --margin 2 (a fix must clear 30 % by 2 points); flags the tree's script lacks are left out
+// keys: the skills of this run. --margin 2 (headroom under the 30 % limit) holds NEW work; a skill in the empty-band pin
+// was pinned at margin 0, so a run that touches a pinned skill keeps margin 0 and its pin stays the gate (lf-checks 2026-11-12)
+function emptyBandDefaults(keys) {
+    const f = scriptPath('ws-empty-band');
+    const out = [];
+    if (f && srcHas(f, 'vocab-ink')) out.push('--vocab-ink');
+    if (f && srcHas(f, 'page-fill')) out.push('--page-fill');
+    let pinned = [];
+    try { pinned = JSON.parse(fs.readFileSync(path.join(ROOT, 'design/audit/baselines/empty-band.json'), 'utf8')).skills || []; } catch (e) { /* no pin */ }
+    if (f && srcHas(f, 'margin') && !(keys || []).some((k) => pinned.includes(k))) out.push('--margin', '2');
+    return out;
+}
+
 function buildPlan(ctx) {
     const rows = [];
     const add = (g) => { if (!rows.some((r) => r.id === g.id)) rows.push(g); };
@@ -763,9 +797,15 @@ function buildPlan(ctx) {
         // the ONE shared empty-band check (lead 2026-11-08, LESSONS_LEARNED L25): every role the skill's signed card offers
         // at S / M / L, its option variants, and the screen hosts (card 390 / 820 / 1280, worksheet, quiz), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
-        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(',')], { missingMsg: 'ws-empty-band is not in this tree' }));
+        add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(','), ...emptyBandDefaults(keys)], { missingMsg: 'ws-empty-band is not in this tree' }));
+        // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
+        // prints the frame's own words, never the answer's singular
+        add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
+        // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
+        // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
+        add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
-        // elements at least their print size, a drawing wide before tall (pin: design/audit/baselines/screen-ink-size.json)
+        // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
@@ -907,7 +947,10 @@ function buildPlan(ctx) {
         if (ssFile && srcHas(ssFile, 'json')) ss.push('--json', path.join(ctx.logs, 'screen-slots.json'));
         // --uniform (Lane D restart critic r1 R1-16): one digit size per worksheet, equal paper cells per row of cards
         if (ssFile && srcHas(ssFile, 'uniform')) ss.push('--uniform');
-        add(gate('screen-slots', 'ws-screen-slots --skills', scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
+        // SCREEN-DIGIT on every skill (lead 2026-11-13: lf-ops and lf-algebra critics found sub-floor screen digits the default
+        // plan missed; was lf-placevalue's opt-in): 40 / 48 / 56 px at 390 / 820 / 1280. A red goes to the owning lane, never a pin.
+        if (ssFile && srcHas(ssFile, 'screen-digit')) ss.push('--screen-digit');
+        add(gate('screen-slots', `ws-screen-slots --skills${ss.includes('--screen-digit') ? ' --screen-digit' : ''}`, scope, 'browser', 'ws-screen-slots', ss, { parse: PARSE.screenSlots, needFlags: ['skills'], expect: { skills: keys.length, hosts: 4 } }));
         add(gate('screen-answer', 'ws-screen-answer --skills', scope, 'browser', 'ws-screen-answer', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys } }));
         // lf-ops div_facts screen critic r1 D1-D4: the screen supports are paper's (structure, cue size, one place a worksheet)
         add(gate('screen-support-eq', 'ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE, ARRAY-ORIENT, ARRAY-DOT-MIN, ARRAY-CAPTION)', scope, 'browser', 'ws-screen-support-eq', ['--skills', keys.join(',')], { needFlags: ['skills'], expect: { mention: keys }, missingMsg: 'ws-screen-support-eq is not in this tree' }));
@@ -1028,6 +1071,22 @@ function buildPlan(ctx) {
         const baseS = sizeBase('S');
         if (fs.existsSync(baseS)) plS.push('--baseline', rel(baseS));
         const unpS = sample.filter((k) => !pinnedIds(baseS).has(docId(k)));
+        // ws-empty-band on the role page (critic eb-r3 D4): the lane's skills (else the sample) x S/M/L on this role only; the
+        // screen hosts are the --skill gate's. A Scripted Model run judges its states too (MOD-*, EB-GAP, page fill).
+        {
+            const ebKeys = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
+            const f = scriptPath('ws-empty-band');
+            const extra = ctx.role === 'scripted-model' && f && srcHas(f, 'model-states') ? ['--model-states'] : [];
+            add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (S/M/L: EB-BAND, EB-SIDE, EB-EDGE, EB-READ${ctx.role === 'guided' ? ', EB-GDPCAP' : ''}${extra.length ? ', MOD-*, EB-GAP' : ''})`, `role ${ctx.role} × ${ebKeys.length} skill(s)`, 'browser', 'ws-empty-band',
+                ['--skill', ebKeys.join(','), '--roles', ctx.role, '--hosts', 'none', ...emptyBandDefaults(ebKeys), ...extra], { missingMsg: 'ws-empty-band is not in this tree' }));
+        }
+        // the role page's cell checks and capacity pin (lf-checks 2026-11-13: rows roles-ri-signmatch / capacity-no-drop ran
+        // `--roles <role>` and no --role plan held them): the lane's skills, else the sample, on this role only
+        {
+            const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
+            add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
+            add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
+        }
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
         // (lf-ops divarray r2, owner rule 2026-11-13 "every finding a check on precritic's path": a lane that touches role R
         // runs the empty-band check and the capacity pin on ITS skills' R pages - the Review stack side band, the Test
@@ -1082,6 +1141,9 @@ function buildPlan(ctx) {
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
     }
+    // (owner rule 2026-11-13, lf-checks) every finding row of design/lessons-first/CHECKS_FROM_CRITICS.md names a backtest id
+    // that is in backtests.json and on precritic's path, or a reasoned exemption - on EVERY precritic run (node, ~5 s)
+    add(gate('checks-from-critics', 'ws-precritic-plan --checks-from-critics (every critic / owner / lead finding has a backtest id on the path, or an exemption)', 'CHECKS_FROM_CRITICS.md', 'node', 'ws-precritic-plan', ['--checks-from-critics', ...((ctx.skills || []).length ? ['--skills', ctx.skills.map((x) => x.key).join(',')] : [])], { needFlags: ['checks-from-critics'], missingMsg: 'ws-precritic-plan has no --checks-from-critics' }));
     return rows;
 }
 
