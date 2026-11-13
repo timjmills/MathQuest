@@ -5,7 +5,7 @@
 //   node tests/scripts/ws-capacity-pin.cjs --write [--pin file]              # pin this tree (run on master)
 //   node tests/scripts/ws-capacity-pin.cjs --check [--pin file] [--skills a:b,..] [--roles r,..]
 //   default pin design/audit/baselines/capacity.json; skills: js/modules/redesign-passed.js; roles: EVERY grid role of
-//   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes S,M,L; seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
+//   sheet/roles/index.js (all but the lesson pack); --write --merge adds a new role's pages only; --roles-check: each grid role pinned; sizes M,L (S dropped 2026-11-13); seed: ws-cell-checks' (fnv of "cat__skill:role"). MQ_ROOT=<tree> measures another checkout.
 // Last line `ws-capacity-pin: OK (...)` / `FAIL - n drop(s)`; exit 1 on FAIL.
 const fs = require('fs');
 const path = require('path');
@@ -26,7 +26,7 @@ async function gridRoles(root) {
     return ['independent', 'more-practice', ...Object.keys(m.ROLE_MODULES)].filter((r, i, a) => a.indexOf(r) === i && !NOT_GRID.has(r));
 }
 let ROLES = list(arg('roles', ''));
-const SIZES = list(arg('sizes', 'S,M,L'));
+const SIZES = list(arg('sizes', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const ALLOW = new Set(list(arg('allow', '')));
 
 (async () => {
@@ -48,7 +48,10 @@ const ALLOW = new Set(list(arg('allow', '')));
     const ruledSkills = [...new Set(Object.keys(ruled).map((k) => k.split(' ')[0]))];
     const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
     const app = await H.open({});
-    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
+    // (lf-roles r8a, deploy: ONE evaluate over every skill x role x size ran past the DevTools protocol timeout on the full check -
+    // "Runtime.callFunctionOn timed out" - so the pages are built one skill a call; the keys come in the same order)
+    const now = {};
+    for (const one of skills) Object.assign(now, await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
         const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
         const out = {};
         for (const k of skills) for (const role of ROLES) for (const size of SIZES) {
@@ -61,7 +64,7 @@ const ALLOW = new Set(list(arg('allow', '')));
             } catch (e) { out[`${k} ${role} ${size}`] = { na: String((e && e.message) || e).slice(0, 80) }; }
         }
         return out;
-    }, { skills, ROLES, SIZES });
+    }, { skills: [one], ROLES, SIZES }));
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
@@ -104,7 +107,8 @@ const ALLOW = new Set(list(arg('allow', '')));
     const fmt = (v) => (Number(v.pages) > 1 ? `${v.items} over ${v.pages} pages` : `${v.items}`);
     for (const [k, v] of Object.entries(now)) { if (v.na) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v; }
     for (const [g, z] of Object.entries(groups)) {
-        if (z.S && z.M && perPage(z.S) < perPage(z.M)) order.push(`${g}: S ${fmt(z.S)} < M ${fmt(z.M)} items a page (SIZE-ORDER)`);
+        // Size S is dropped (owner, 2026-11-13; CLAUDE.md fastest plan item 9): SIZE-ORDER compares M >= L only; the S keys are removed from the pin (no-size-S)
+        // for CAPACITY-NO-DROP but no longer order against M.
         if (z.M && z.L && perPage(z.M) < perPage(z.L)) order.push(`${g}: M ${fmt(z.M)} < L ${fmt(z.L)} items a page (SIZE-ORDER)`);
     }
     drops.push(...order);

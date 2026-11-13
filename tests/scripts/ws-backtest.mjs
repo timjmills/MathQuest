@@ -16,6 +16,8 @@
 //   node tests/scripts/ws-backtest.mjs --quiet             # no per-row streaming lines (the final table only)
 //   node tests/scripts/ws-backtest.mjs --self-test         # the TIMEOUT path on a sleeping fixture row (no browser, ~5 s)
 //   node tests/scripts/ws-backtest.mjs --runner-orphan R   # OK when a child outliving runner R's command holds no slot lock
+//   node tests/scripts/ws-backtest.mjs --help              # this usage (exit 0; runs no row - lf-hosts hand-over: --help
+//                                                          # used to fall through and run every row)
 //
 // Each row's result line is printed AS SOON AS THE ROW FINISHES ("ws-backtest row <id>: PASS|FAIL|TIMEOUT|ERROR|PENDING ..."),
 // and the table follows at the end (lf-engine 2026-11-12: a full run hung 7,000 s with no output at all).
@@ -26,6 +28,12 @@
 //                dir; removed afterwards); the command runs from the CURRENT tree with {root} = that checkout and
 //                MQ_ROOT set to it, so the check under test is always today's script. A row with browser: true runs
 //                through /tmp/mq-browser-run.sh (the two-slot browser runner).
+// A state may carry `args`: the text that replaces {args} in the command for that state. It is how a check is pinned when
+// the two states are not two commits of the app - a tuned threshold judged as moved, a ratchet asked for a lower floor, or a
+// REPORT-ONLY check proved to DETECT its case (fail state: the flag that makes it gate; pass state: the default, which only
+// reports). Such a row names the same commit on both sides and says so in its `state` text.
+// A row with `reportOnly: true` pins a check that does not gate the lane: it must still PASS here (the check must detect its
+// case and stay quiet by default), and the table marks it so a reader does not take it for a gate.
 //                A state of a commit-pair row may instead name a `fixture` (and its own `command`, default the row's):
 //                it runs on the current tree with {fixture} filled, for a real fail commit whose fix has not landed
 //                (the row's state text says why; ws-screen-ink-size D6).
@@ -52,6 +60,15 @@ const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args
 const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? String(args[i + 1]).split(',') : [])).map((s) => s.trim()).filter(Boolean);
 const BROWSER_RUN = '/tmp/mq-browser-run.sh';
 
+// --help / -h: print the usage block at the top of this file and exit 0, before any row can start (lf-hosts hand-over: an
+// unknown flag such as --help fell through to the full table, a 1-2 hour browser run).
+if (has('--help') || has('-h')) {
+    const src = readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n');
+    const end = src.findIndex((l) => !l.startsWith('//'));
+    console.log('usage: ' + src.slice(0, end).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+    process.exit(0);
+}
+
 /** How many browser-slot lock fds a child that OUTLIVES `runner`'s command holds (must be 0), or null when both slots stayed
  *  busy for 30 s. (An orphaned, detached Chrome held both slots and every later browser row waited without end: lf-engine
  *  2026-11-12.) */
@@ -73,10 +90,13 @@ if (has('--self-test')) {
     const out = `${r.stdout}${r.stderr}`;
     const left = spawnSync('pgrep', ['-f', '^ws-backtest-selftest-sleeper'], { encoding: 'utf8' }).stdout.trim();
     const okLine = /ws-backtest row sleeper: TIMEOUT/.test(out), okTail = /selftest tail line 3/.test(out), okTot = /1 TIMEOUT/.test(out), okOk = /ws-backtest row instant: PASS/.test(out);
+    // --help prints the usage and exits 0 at once, running no row (lf-hosts hand-over)
+    const h = spawnSync(process.execPath, [fileURLToPath(import.meta.url), '--help'], { cwd: ROOT, encoding: 'utf8', timeout: 10000 });
+    const okHelp = h.status === 0 && /^usage: ws-backtest/.test(h.stdout) && /--row/.test(h.stdout) && !/^ws-backtest: (OK|FAIL)/m.test(h.stdout);
     const orphanHolds = runnerOrphan('tests/scripts/mq-browser-run.sh');
     const secs = (Date.now() - t0) / 1000;
     const fails = [!okLine && 'no streamed TIMEOUT line', !okTail && 'no output tail', !okTot && 'totals do not count the TIMEOUT', !okOk && 'the instant row did not PASS',
-        left && `sleeper still running (pids ${left})`, orphanHolds !== null && orphanHolds !== 0 && `an orphan of mq-browser-run.sh holds ${orphanHolds} slot lock fd(s)`, secs > 30 && `took ${secs.toFixed(0)} s`, r.status === 0 && 'exit 0 on a TIMEOUT'].filter(Boolean);
+        left && `sleeper still running (pids ${left})`, orphanHolds !== null && orphanHolds !== 0 && `an orphan of mq-browser-run.sh holds ${orphanHolds} slot lock fd(s)`, secs > 30 && `took ${secs.toFixed(0)} s`, r.status === 0 && 'exit 0 on a TIMEOUT', !okHelp && `--help did not print the usage and exit 0 (exit ${h.status})`].filter(Boolean);
     if (fails.length) console.log(out);
     if (orphanHolds === null) console.log('ws-backtest --self-test: the runner orphan case was skipped (both browser slots busy for 30 s)');
     console.log(fails.length ? `ws-backtest --self-test: FAIL (${fails.join('; ')})` : `ws-backtest --self-test: OK (${secs.toFixed(1)} s)`);
@@ -104,7 +124,7 @@ const fixtureSide = (r) => (r.kind === 'commit-pair' ? ['fail', 'pass'].filter((
 if (has('--list')) {
     console.log(`${pad('row', 28)}${pad('kind', 13)}${pad('fail state', 46)}${pad('pass state', 46)}status`);
     for (const r of rows) {
-        console.log(`${pad(r.id, 28)}${pad(r.kind, 13)}${pad(stateName(r.fail), 46)}${pad(stateName(r.pass), 46)}${r.pending ? 'PENDING (no command yet)' : r.browser ? 'ready (browser)' : 'ready'}${fixtureSide(r).length ? `; ${fixtureSide(r).join(' + ')} side is a fixture: re-point when a fix lands` : ''}`);
+        console.log(`${pad(r.id, 28)}${pad(r.kind, 13)}${pad(stateName(r.fail), 46)}${pad(stateName(r.pass), 46)}${r.pending ? 'PENDING (no command yet)' : r.browser ? 'ready (browser)' : 'ready'}${r.reportOnly ? ' [report-only check]' : ''}${fixtureSide(r).length ? `; ${fixtureSide(r).join(' + ')} side is a fixture: re-point when a fix lands` : ''}`);
     }
     process.exit(0);
 }
@@ -250,21 +270,24 @@ try {
         if (placeholder && !r.pending) { results.push({ r, fail: 'PENDING', pass: 'PENDING', verdict: 'PENDING' }); say(`ws-backtest row ${r.id}: PENDING (placeholder commit ${placeholder})`); continue; }
         if (r.pending || !r.command) { results.push({ r, fail: 'PENDING', pass: 'PENDING', verdict: 'PENDING' }); say(`ws-backtest row ${r.id}: PENDING${r.reason ? ` (${r.reason})` : ''}`); continue; }
         let fail, pass;
+        // a state's own `args` replaces {args} (a threshold judged as moved, a lower floor asked of a ratchet, the flag that
+        // makes a report-only check gate); a command with no {args} is unchanged
+        const withArgs = (cmd, st) => cmd.replaceAll('{args}', (st && st.args) || '');
         const rowT0 = Date.now();
         const budget = () => Math.max(1000, (Number(r.timeoutS) > 0 ? Number(r.timeoutS) * 1000 : r.browser ? BROWSER_TIMEOUT : ROW_TIMEOUT) - (Date.now() - rowT0));   // (a row's own `timeoutS` wins: a whole-library proof)
         const timedOut = { result: 'TIMEOUT', ms: 0, line: 'not run: the row timed out on its fail state', tail: [] };
         if (r.kind === 'fixture') {
             const file = (s) => (isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture));
-            fail = await runCheck(r.command.replaceAll('{fixture}', file(r.fail)), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (fail state)` });
-            pass = fail.result === 'TIMEOUT' ? timedOut : await runCheck(r.command.replaceAll('{fixture}', file(r.pass)), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (pass state)` });
+            fail = await runCheck(withArgs(r.command.replaceAll('{fixture}', file(r.fail)), r.fail), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (fail state)` });
+            pass = fail.result === 'TIMEOUT' ? timedOut : await runCheck(withArgs(r.command.replaceAll('{fixture}', file(r.pass)), r.pass), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (pass state)` });
         } else if (r.kind === 'commit-pair') {
             mkdirSync(tmpBase, { recursive: true });
             const state = async (s, label) => {
-                if (!s.commit && s.fixture) return Object.assign(await runCheck((s.command || r.command).replaceAll('{fixture}', isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture)).replaceAll('{root}', ROOT), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (${label})` }), { fixture: true });
+                if (!s.commit && s.fixture) return Object.assign(await runCheck(withArgs((s.command || r.command).replaceAll('{fixture}', isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture)).replaceAll('{root}', ROOT), s), { browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (${label})` }), { fixture: true });
                 let dir;
                 try { dir = addWorktree(s.commit, tmpBase, `${r.id}-${label}`); } catch (e) { return { result: 'ERROR(checkout)', ms: 0, line: e.message }; }
                 made.push(dir);
-                const res = await runCheck(r.command.replaceAll('{root}', dir), { env: { MQ_ROOT: dir }, browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (${label} state)` });
+                const res = await runCheck(withArgs(r.command.replaceAll('{root}', dir), s), { env: { MQ_ROOT: dir }, browser: !!r.browser, timeoutMs: budget(), label: `${r.id} (${label} state)` });
                 // (lf-engine landing r2: each checkout is ~600 MB; ~80 commit-pair rows kept to the end filled the disk and
                 // turned every later row into ERROR(checkout) - a checkout goes as soon as its state has run)
                 if (!has('--keep')) { git(['worktree', 'remove', '--force', dir], true); made.splice(made.indexOf(dir), 1); }
@@ -301,7 +324,7 @@ console.log('');
 console.log(`${pad('row', 28)}${pad('kind', 13)}${pad('fail state', 20)}${pad('pass state', 20)}verdict`);
 for (const x of results) {
     const t = (run) => (run ? `${run.fixture ? ' (fixture)' : ''} ${(run.ms / 1000).toFixed(1)}s` : '');
-    console.log(`${pad(x.r.id, 28)}${pad(x.r.kind, 13)}${pad(x.fail + t(x.failRun), 20)}${pad(x.pass + t(x.passRun), 20)}${x.verdict}`);
+    console.log(`${pad(x.r.id, 28)}${pad(x.r.kind, 13)}${pad(x.fail + t(x.failRun), 20)}${pad(x.pass + t(x.passRun), 20)}${x.verdict}${x.r.reportOnly ? ' (report-only check: it detects its case, it does not gate)' : ''}`);
 }
 for (const x of results.filter((y) => fixtureSide(y.r).length)) console.log(`  ${x.r.id}: ${fixtureSide(x.r).join(' + ')} side is a fixture: re-point when a fix lands`);
 const bad = results.filter((x) => x.verdict !== 'PASS');

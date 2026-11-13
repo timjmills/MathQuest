@@ -788,3 +788,59 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-13 — Deploy shared page roles deploy-5 (lf-roles, critic r7a PASS, 0 counted defects)
 - npr Error Analysis S: the Correct / Fix it column keeps its own width (was flex-grow, judgement at 69.5 vs 131.5 mm); EA redo work left-aligned like its copy (G2, EA-REDO-ALIGN); owner rule batch: 11 backtest rows, ws-cell-checks --fixture, ws-precritic --overflow-fixture, per-role precritic plans (duplicate per-role gate removed so --model-states stays); teacher-preview F8 ledger row closed against options-panel-sample. r17 (widened capacity pin) NOT included - ships with the Guided S round.
 - Gates: boot-smoke, roles-unit (80), precritic-plan (156 on path; no row dropped), capacity-pin, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, empty-band self-test. 0 passed EA pages change.
+
+## 2026-11-13 ~16:45 UTC — Weekly usage limit reached (resets 2026-11-19 22:00 UTC)
+- Lane builders hit HTTP 429 (weekly limit). Owner had lifted the budget limits ("let things be"); the CLAUDE.md 80 % rule was suspended by owner and the account reached 100 %.
+- Nothing lost; every lane pushed its work with resume points in design/status/<lane>.md. Do NOT deploy: lf-engine -pc (79ea333b8, WIP), -roles (a8ec3f2ac, pre re-critic), -g7; lf-partopts -deploy (2d008dfb3, gates not re-run; §8d 12 mm margin reason needs a re-read after the ROWFIT-BT re-pin).
+- Live today: vocabulary (both skills redesign-passed), Reason It deploy-4, roles deploy-3/-5, pixel empty-band + ledger sweep + no-dropped-row guard (+ merge-base hotfix), EB-FOOT item pairing, lesson-baseline deploy gate.
+- On reset: each lane resumes its builders where they stopped (no fresh starts); first deploy in line is lf-partopts step A.
+
+## 2026-11-13 ~17:00 UTC — Owner: usage back at 0 %; cap 70 % for now
+- All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.
+
+## 2026-11-13 — Deploy lf-checks -r2 (narrow critic PASS 9/8/8/8)
+- Checker minors (FOCUS-GAP per line, EB-SIDE between, slot-ink / EB-FOOT notes, EB-ITEMKEY / EB-ITEMPARITY), LP-RASTER on role pages (ws-grade-render --raster-fit), no-dropped-row merge-base fix. Checks only; 50/50 builds byte-identical.
+- Gates: boot-smoke, precritic-plan (+ self-test, none dropped), backtest / empty-band self-tests, code-snapshot, redesign-passed, screen-answer, simple-print.
+## 2026-11-13 ~18:00 UTC — Owner approves the fastest-implementation plan (all eight changes)
+- design/plans/FASTEST_PLAN_2026-11-13.md; summary in CLAUDE.md "Fastest-implementation plan". Unit order (round 1 first), copy-light review, batch critics, round cap 2, deploy train 11:00 / 19:00 UTC, six lanes, no phone width (390) — print + computer/Chromebook + tablet only, long lessons paused.
+
+## 2026-11-13 — Deploy conflict-marker gate (lf-hosts tool via lf-checks)
+- tests/scripts/ws-conflict-markers.mjs fails on merge markers in tracked files; runs on every precritic and deploy session 1 (row conflict-markers-3c7b). Closes the lead's own ledger row (markers committed to STATUS earlier today).
+
+## 2026-11-13 — Deploy lesson part settings, step A (lf-partopts, critic r4 PASS: 8+ everywhere)
+- Per-part settings for lessons, practice and quiz: how many problems per part and which supports, with the screen only offering settings the page checks pass. Default identity: all 1,732 default lesson pages byte-identical to master.
+- Gates: boot-smoke, code-snapshot, redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, capacity-pin, roles-unit, precritic-plan (none dropped), conflict-markers.
+- 2026-11-13 ~18:45 UTC owner: drop print size S; keep M and L (plan item 9 in CLAUDE.md). S settings / codes fall back to M.
+
+## 2026-11-13 — Deploy-6: shared roles Guided round (lf-roles, critic r8b + r8c PASS)
+- Guided Practice: the 7 subtraction stack skills at M/L; expand M/L, unit_form M/L, combine L (9/8/9/8-9). Tight rows refilled, side band capped, Model-height try rows fixed; each finding has a check + backtest row.
+- Capacity pin now covers every grid role (r17); SIZE-ORDER compares M >= L only (size S dropped).
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot (734), redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, vocab-unit, roles-unit (87), backtest + empty-band self-tests, capacity-pin (1178 pages, 0 drops), precritic-plan (189 rows), checks-from-critics; 1732 lesson hashes identical.
+
+## 2026-11-13 — Deploy lf-tools (lf-checks): no phone width (critic r3 PASS 8/8/9/8) + review tools with copy-light ADVISORY
+- Screen gates, briefs and RUBRIC hosts run at 1280 / 1366 / 820 / 1024 (owner rule); ws-no-phone-width on precritic. Teacher phone steps stay allow-listed (lead added the teacher lesson-parts panel in ws-partopts-shots).
+- Copy-light sample / batch / --sample render / brief lint / ws-drawing-key; eligibility is ADVISORY (every skill still gets the full critic).
+- Gates: conflict-markers, boot-smoke, code-snapshot (734), backtest self-test, precritic self-test, precritic-plan (193), checks-from-critics, no-phone-width, copy-light self-test. No app code changed.
+
+## 2026-11-13 — Hotfix: option rows with a "?" tip took every click as the tip (critic-panel-r3 P1)
+- One additive CSS line (css/teacher.css): the tip button is its own containing block again, so tick boxes, All / None and selects work by mouse and touch. Its [hit] check and backtest row options-panel-hit land with the lf-partopts panel deploy.
+
+## 2026-11-13 — Deploy no size S (lf-checks; critic r3 C1 9 / C3 9 / C4 9, C2 7 on doc phrasing only -> NOS-DOCS-ADVISORY)
+- Print and screen size pickers offer M and L only; any stored or shared S setting restores as M (codes still decode, 734). Compact simple print shows no dead picker.
+- Gates stop running S; the browser visibility gate (73 checks) and the code guard block; the docs token rule is advisory. CLAUDE.md tokens line now reads "sizes M/L; S is an alias of M".
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot, redesign-passed, simple-print, screen-answer, pdf-preview (one 0.08 % pixel diff on a set-cover page under 13-way load, then 3 clean runs on this head and master: load flake), roles-unit, teacher-wrm, no-size-s --browser, precritic-plan, backtest self-test; lane: capacity-pin (0 drops), lesson baseline 1732 identical.
+
+## 2026-11-13 — Deploy compare (lf-placevalue w2; placevalue:compare critic r4 PASS) — 30 skills redesign-passed
+- placevalue:compare passes the 8/10 redesign on every page type and screen host; also number_word_form (earlier pass), the pv debt fixes, the CL-2c / CL-4d / PT-ENG-6 rulings with their checks, identify-heads off on the Prerequisite Check, screen text sizes.
+- Lead fixes at the deploy merge: ws-pv-identify-heads defaults to M,L (no size S); ws-screen-ink-size kept as master's copy (w2 had carried an unchecked WIP copy with 390 lines); backtest row pv-screen-text-size set PENDING until lf-hosts lands TEXT-SIZE.
+- Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, roles-unit, empty-band self-test, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan (234) + checks-from-critics, capacity-pin (0 drops), lesson baseline M,L 4242,1 (1772 identical).
+
+## 2026-11-13 — Content hotfix P-WP-19: story pronouns agree with the name (lf-algebra)
+- Six story templates (tape_diagram, tape_diagram_plain, write_equation, write_equation_story, multi_step_word +/- path) now repeat the name instead of a fixed he / she. ws-story-pronouns on precritic (727 skills, 21,810 items OK); backtest story-pronouns-p-wp-19 PASS; lesson baseline 1772 identical.
+- ws-tape-diagram.mjs (unwired, defaulted to size S) left out of this deploy; lf-algebra brings it with M,L.
+
+## 2026-11-13 — Deploy screen fixes (lf-hosts critic r3 PASS 8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366) + TOUCH-HIT de-flake (lf-checks critic PASS 9/9/8/8)
+- Word-problem answer boxes: a 48 px touch area owned by its own box (drawn boxes unchanged); add_wp_20 bottom-edge taps land; the practice card carries [data-ws-cell].
+- Checks: CELL-READ in 4 tools; TOUCH-TARGET / TOUCH-UNIQUE / TOUCH-HIT (real taps; now re-reads the tap point after 2 rAF and fails only a repeated miss) / FOCUS-RING; ws-worksheet-reflow (WS-REFLOW 1.5 px x tolerance); ws-screen-widths-plan; ink-size TEXT-SIZE; ws-touch-diff.
+- pv-screen-text-size un-pended (TEXT-SIZE present; row PASS).
+- Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, screen-widths-plan, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test + touch / reflow rows, precritic self-test, precritic-plan + checks-from-critics, capacity-pin (0 drops), lesson baseline 1772 identical.

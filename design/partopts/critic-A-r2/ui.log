@@ -1,0 +1,133 @@
+
+===== Y4.B1.S14
+default:
+   {"part":"chart","val":"4","many":"4 1 to 4 worked examples","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"vocab","val":"3","many":"3 3, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+   {"part":"remember","val":"","many":"Needed to fill the lesson sheet","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"","many":"Fixed: 3 (fills the band)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"rows","val":"","many":"Fixed: 2 (fills the page)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"15","many":"15 15 to 75 problems, in rows of 3 · 1 page of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+   {"part":"mixed","val":"15","many":"15 15 to 30 problems, 15 a page · 1 page of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+preview pages 5 lesson-chart,lesson-sheet,lesson-sheet,lesson-practice,lesson-mixed
+  walk chart: 4 -> -3 -2 -1 +2 +3 +4
+    end {"part":"chart","val":"4","many":"4 1 to 4 worked examples","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+  walk vocab: 3 -> -0 +3
+    end {"part":"vocab","val":"3","many":"3 3, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+  walk practice: 15 -> -0 +15 +30 +45 +60 +75
+    end {"part":"practice","val":"75","many":"75 15 to 75 problems, in rows of 3 · 5 pages of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+  walk mixed: 15 -> -0 +15 +30
+    end {"part":"mixed","val":"30","many":"30 15 to 30 problems, 15 a page · 2 pages of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+reset clicked true reset link now 0
+  New numbers chart: changed pages 1:lesson-chart
+  New numbers sheet: changed pages 2:lesson-sheet 3:lesson-sheet
+  New numbers practice: changed pages 4:lesson-practice
+  New numbers mixed: changed pages 5:lesson-mixed
+combo (vocab/wedo/rows min, remember off, practice max):
+   {"part":"chart","val":"4","many":"4 1 to 4 worked examples","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 3, or 0 to leave it off","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"false","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"2","many":"2 2 to 3 problems","tick":true,"on":"true","tickDisabled":true,"minus":true,"plus":false,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"75","many":"75 15 to 75 problems, in rows of 3 · 5 pages of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"15","many":"15 15 to 30 problems, 15 a page · 1 page of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+preview pages after combo 8 lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed
+390 sideways {"sx":0,"over":0}
+390 rows:
+   {"part":"chart","val":"4","many":"4 1 to 4 worked examples","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 3, or 0 to leave it off","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"false","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"2","many":"2 2 to 3 problems","tick":true,"on":"true","tickDisabled":true,"minus":true,"plus":false,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"75","many":"75 15 to 75 problems, in rows of 3 · 5 pages of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"15","many":"15 15 to 30 problems, 15 a page · 1 page of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+390 overlaps []
+before swap [{"part":"vocab","val":"0","many":"0 3, or 0 to leave it off","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false},{"part":"practice","val":"30","many":"30 15 to 75 problems, in rows of 3 · 2 pages of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}] reset 1
+picked Subtract within 100 (With Regrouping)Level 2 · Subtraction
+after swap [{"part":"vocab","val":"3","many":"3 1 to 3 words","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false},{"part":"practice","val":"6","many":"6 6 to 30 problems, in rows of 2 · 1 page of 6","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}] reset 0
+reopened [{"part":"vocab","val":"3","many":"3 3, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false},{"part":"practice","val":"15","many":"15 15 to 75 problems, in rows of 3 · 1 page of 15","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}] reset 0
+
+===== skill:addition:add_wp_10
+default:
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"3","many":"3 1 to 3 words","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"","many":"Fixed: 1 (fills the band)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"4","many":"4 4 to 20 problems, in rows of 2 · 1 page of 4","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+   {"part":"mixed","val":"10","many":"10 10, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+preview pages 5 lesson-chart,lesson-sheet,lesson-practice,lesson-mixed,lesson-mixed
+  walk vocab: 3 -> -2 -1 -0 +1 +2 +3
+    end {"part":"vocab","val":"3","many":"3 1 to 3 words","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+  walk practice: 4 -> -0 +4 +8 +12 +16 +20
+    end {"part":"practice","val":"20","many":"20 4 to 20 problems, in rows of 2 · 5 pages of 4","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+  walk mixed: 10 -> -0 +10
+    end {"part":"mixed","val":"10","many":"10 10, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+reset clicked true reset link now 0
+  New numbers chart: changed pages 1:lesson-chart
+  New numbers sheet: changed pages 2:lesson-sheet
+  New numbers practice: changed pages 3:lesson-practice
+  New numbers mixed: changed pages 4:lesson-mixed 5:lesson-mixed
+combo (vocab/wedo/rows min, remember off, practice max):
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 1 to 3 words","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"Needed to fill the lesson sheet","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"","many":"Fixed: 1 (fills the band)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"20","many":"20 4 to 20 problems, in rows of 2 · 5 pages of 4","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"10","many":"10 10, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+preview pages after combo 9 lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed,lesson-mixed
+390 sideways {"sx":0,"over":0}
+390 rows:
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 1 to 3 words","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"Needed to fill the lesson sheet","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"","many":"Fixed: 1 (fills the band)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"20","many":"20 4 to 20 problems, in rows of 2 · 5 pages of 4","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"10","many":"10 10, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+390 overlaps []
+
+===== Y4.B2.S5
+default:
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"3","many":"3 1 to 3 words","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"2","many":"2 2, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+   {"part":"rows","val":"","many":"Not on this lesson sheet (no room)","tick":false,"on":null,"tickDisabled":null,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"6","many":"6 6 to 30 problems, in rows of 2 · 1 page of 6","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+   {"part":"mixed","val":"8","many":"8 8 to 16 problems, 8 a page · 1 page of 8","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+preview pages 4 lesson-chart,lesson-sheet,lesson-practice,lesson-mixed
+  walk vocab: 3 -> -2 -1 -0 +1 +2 +3
+    end {"part":"vocab","val":"3","many":"3 1 to 3 words","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+  walk wedo: 2 -> -0 +2
+    end {"part":"wedo","val":"2","many":"2 2, or 0 to leave it off","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":false}
+  walk practice: 6 -> -0 +6 +12 +18 +24 +30
+    end {"part":"practice","val":"30","many":"30 6 to 30 problems, in rows of 2 · 5 pages of 6","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+  walk mixed: 8 -> -0 +8 +16
+    end {"part":"mixed","val":"16","many":"16 8 to 16 problems, 8 a page · 2 pages of 8","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+reset clicked true reset link now 0
+  New numbers chart: changed pages 1:lesson-chart
+  New numbers sheet: changed pages 2:lesson-sheet
+  New numbers practice: changed pages 3:lesson-practice
+  New numbers mixed: changed pages 4:lesson-mixed
+combo (vocab/wedo/rows min, remember off, practice max):
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 1 to 3 words","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"false","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"0","many":"0 2, or 0 to leave it off","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"rows","val":"","many":"Fixed: 2 (fills the page)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"30","many":"30 6 to 30 problems, in rows of 2 · 5 pages of 6","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"8","many":"8 8 to 16 problems, 8 a page · 1 page of 8","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+preview pages after combo 8 lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed
+390 sideways {"sx":0,"over":0}
+390 rows:
+   {"part":"chart","val":"","many":"Fixed: 1 (the chart's design)","tick":true,"on":"true","tickDisabled":false,"minus":null,"plus":null,"refresh":true}
+   {"part":"vocab","val":"0","many":"0 1 to 3 words","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"remember","val":"","many":"","tick":true,"on":"false","tickDisabled":false,"minus":null,"plus":null,"refresh":false}
+   {"part":"wedo","val":"0","many":"0 2, or 0 to leave it off","tick":true,"on":"false","tickDisabled":false,"minus":true,"plus":false,"refresh":false}
+   {"part":"rows","val":"","many":"Fixed: 2 (fills the page)","tick":true,"on":"true","tickDisabled":true,"minus":null,"plus":null,"refresh":false}
+   {"part":"practice","val":"30","many":"30 6 to 30 problems, in rows of 2 · 5 pages of 6","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":true,"refresh":true}
+   {"part":"mixed","val":"8","many":"8 8 to 16 problems, 8 a page · 1 page of 8","tick":true,"on":"true","tickDisabled":false,"minus":false,"plus":false,"refresh":true}
+390 overlaps []
+
+errors: []

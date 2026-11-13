@@ -604,3 +604,5 @@ lessons 1596 hashes identical.
 
 All-skill Opener sweep (M, L; 1454 builds) master 4cdadb3d9 vs branch: 260 changed (160 skills), 103 now print the practice on
 page 2, no item count fell (mixed_placevalue M: same 4 items, Guided 1 -> 2, Independent 1 -> 0, PT-OPN-6).
+| 2026-11-13 | lf-placevalue | compare r1 | critic FAIL (6 holding) | builder ~$30 + critic ~$12 | 2 builder passes cleared machine reds but not teaching: chant / M6 / deal depth are not machine-checked yet |
+| 2026-11-13 | lf-placevalue | placevalue:compare | 4 critic rounds (r4 PASS) | session +$33 of the $170 allocation since the reset (earlier rounds before the reset) | the wrap class recurred because the fix was keyed to one string and the check to the default band: fix the class (one helper), check every option band |

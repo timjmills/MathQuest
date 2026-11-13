@@ -18,12 +18,12 @@
 // --verbose prints each build with its time. Prints `ws-lesson-baseline: OK (n hashes identical)` / `FAIL (n differ)`.
 //
 // THE DEPLOY GATE (lead ruling 2026-11-13, LESSONS_LEARNED process rule 0c; ws-deploy-gates.sh session 4, ≈ 13 min):
-//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned \
+//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned \
 //        --check design/audit/baselines/lesson-baseline.json
 // The pinned baseline design/audit/baselines/lesson-baseline.json holds every page of every lesson master prints. No lesson
 // page changes unseen: a tree whose lesson pages differ from the pin FAILS the deploy.
 // RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the baseline in the same deploy commit,
-//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson \
+//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson \
 //        --write design/audit/baselines/lesson-baseline.json
 // and that commit's message names the changed lessons / pages (the CHANGED / NEW / MISSING / UNPINNED lines of the failing
 // --check, e.g. "lesson pages re-pinned: number_sense:nearest_10 L/S pupil-p2, key-p2 (vocab zoom, critic r3 PASS)").

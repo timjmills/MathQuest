@@ -53,13 +53,18 @@
 // An empty run is a FAIL, never OK (critic r1 D3): an unknown --skills key, a retired skill, an unknown --category,
 // a sweep sample that names a skill that is not live, a selection of 0 skills, or a run of 0 host renders each
 // FAIL and name what was wrong.
+// CELL-READ (lf-checks queue 20, lead 2026-11-13; the mult_facts practice card drew no [data-ws-cell], so every card-host
+// check read nothing there and passed): every host render must READ a cell - the host rendered, and its B&W cell carries
+// [data-ws-cell] (card #questionPaper, worksheet .ws-card-visual on EVERY card, quiz .qt-cell; MAP has no cell by design).
+// A miss is the finding "host:read" ("card:read"), counted as ", U unread host(s)" in the summary line.
 //   node tests/scripts/ws-screen-slots.cjs --self-test         # the selection rules on a fixture list (no browser)
 //
 // OPT-IN SCREEN-DIGIT (--screen-digit; lf-placevalue critic r1 F7, lead ruling D1 2026-11-07; default off, so every pin
 // and deploy shard reads as before): after the host checks, each skill's practice card, online worksheet (card 1) and
-// quiz question are rendered again at 1280 x 900, 820 x 1180 and 390 x 844, and the item's numeral - the largest-type
-// text run of digits in the cell (tabs, labels, the instruction and screen-only chrome excluded) - must be at least
-// 56 / 48 / 40 px at those widths, in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
+// quiz question are rendered again at 1280 x 900, 1366 x 768, 820 x 1180 and 1024 x 768 (owner 2026-11-13: no phone width;
+// --widths 390 still runs on request), and the item's numeral - the largest-type text run of digits in the cell (tabs, labels,
+// the instruction and screen-only chrome excluded) - must be at least the host's floor (tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR: card and quiz 56 / 56 / 48 / 48 px at those
+// widths; the online worksheet grid 29 px, the SP table's worksheet size; critic lf-tools r1 A3), in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
 // kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
 //   node tests/scripts/ws-screen-slots.cjs --digit-fixture file.html --viewport 1280   # the measure on a saved cell
 //                              ([data-mq-digit-root] or the body): OK / FAIL (a backtest fixture)
@@ -143,19 +148,47 @@ function selectSkills(all, { only = [], categories = [], sample = null, from = 0
 // ---- SCREEN-DIGIT (opt-in): the targets and the in-page measure
 const SCREEN_DIGIT = has('screen-digit');
 const RULE_SKILLS = (arg('rule-skills', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-const DIGIT_VIEWPORTS = [{ w: 1280, h: 900, px: 56 }, { w: 820, h: 1180, px: 48 }, { w: 390, h: 844, px: 40 }];
+// Owner rule 2026-11-13 (CLAUDE.md "Fastest-implementation plan" 7): the screens are computer / Chromebook (1280-1366 px)
+// and tablet (820-1024 px); there is no phone width. The SP digit floors (WORKSHEET_DESIGN_STANDARD SP table: 40 / 48 / 56
+// px at 375 / 768 / 1440) map 1280 and 1366 to the 56 px floor and 820 and 1024 to the 48 px floor (the standard names no
+// 1024 or 1366 row; each takes the floor of the bracket it falls in). 390 stays known so `--widths 390` still runs on request.
+// The floors come from ONE table, tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR (critic lf-tools r1 A3, lead ruling
+// 2026-11-13): card and quiz 56 / 56 / 48 / 48 px at 1280 / 1366 / 820 / 1024; the online WORKSHEET grid 29 px (the SP
+// table's worksheet size) at every width. DIGIT_FLOORS keeps the card floor per width (the viewport list and --digit-fixture).
+const SW = require('../lib/ws-screen-widths.cjs');
+const DIGIT_FLOORS = Object.fromEntries(Object.keys(SW.DIGIT_FLOOR).map((w) => [w, { h: SW.heightOf(+w), px: SW.digitFloor('card', +w) }]));
+const DIGIT_DEFAULT_WIDTHS = [...SW.SCREEN_WIDTHS];
+const DIGIT_VIEWPORTS = (arg('widths', '') ? arg('widths', '').split(',').map((x) => parseInt(x, 10)) : DIGIT_DEFAULT_WIDTHS)
+    .filter((w) => DIGIT_FLOORS[w]).map((w) => ({ w, h: DIGIT_FLOORS[w].h, px: DIGIT_FLOORS[w].px }));
 /** The verdict on one measured numeral {px, weight, family} at a viewport width: null when it passes, else why. */
 // Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
 // bold - the place-value numerals (`bold`, true for placevalue:*). add_facts and other non-bold skills are exempt.
 const BOLD_NUMERAL = (key) => /^placevalue:/.test(String(key || ''));
-function digitVerdict(m, width, bold = true) {
-    const vp = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
+// Lead ruling 2026-11-13 (lf-hosts critic r1 F1): the online worksheet's floor is 29 px at every width - now ONE table
+// (tests/lib/ws-screen-widths.cjs WORKSHEET_DIGIT_PX / HOST_DIGIT_FLOOR).
+const WORKSHEET_DIGIT_PX = SW.WORKSHEET_DIGIT_PX;
+function digitVerdict(m, width, bold = true, host = 'card') {
+    const px = SW.digitFloor(host, width);
+    const vp = px ? { w: width, px } : { w: 1280, px: SW.digitFloor(host, 1280) || 56 };
     if (!m || !(m.px > 0)) return 'no numeral found in the cell';
     const why = [];
-    if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w})`);
+    if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px on the ${host} at ${vp.w})`);
     if (bold && !(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
     if (!/andika/i.test(String(m.family || '').split(',')[0])) why.push(`font ${String(m.family || '').split(',')[0].trim() || '?'} (want Andika)`);
     return why.length ? `the numeral "${m.text}" is ${why.join(', ')}` : null;
+}
+/**
+ * CELL-READ (lf-checks queue 20; lf-ops divarray critic, lead 2026-11-13: the mult_facts practice card drew no [data-ws-cell],
+ * so every card-host check read nothing there and passed). A host render reads as checked only when the host rendered and
+ * its B&W cell carries [data-ws-cell] (the worksheet's .ws-card-visual, the quiz's .qt-cell, the card's #questionPaper).
+ * MAP borrows the card with the paper wrapper off (no cell by design): there only a missing drawing is a finding.
+ * r: DETECT's result (null when the host did not render). Returns null when the render was read, else why not.
+ */
+function readVerdict(host, r) {
+    if (!r) return 'the host rendered nothing (0 cells read)';
+    if (r.error) return `${r.error} (0 cells read)`;
+    if (host !== 'map' && !(r.cells > 0)) return `0 [data-ws-cell] cells on the ${host} host: its checks read nothing (the worksheet and quiz cells carry it; screen parity)`;
+    return null;
 }
 /** In the page: the largest-type run of digits under `rootSel` (labels, tabs, the instruction, screen-only chrome out). */
 function MEASURE_DIGIT(rootSel) {
@@ -175,6 +208,9 @@ function MEASURE_DIGIT(rootSel) {
     return best;
 }
 
+// --print-widths (ws-screen-widths-plan, lf-hosts critic r2 F2): the widths the SCREEN-DIGIT pass renders (--screen-digit), else
+// the one host-check width, then exit
+if (has('print-widths')) { console.log(`widths: ${SCREEN_DIGIT ? DIGIT_VIEWPORTS.map((v) => v.w).join(',') : (has('bigboard') ? 1366 : 1280)}`); process.exit(0); }
 if (has('self-test')) {
     const L = [
         { categoryId: 'measurement', skillId: 'time_5min', label: 'Time' }, { categoryId: 'measurement', skillId: 'reading_ruler_hard', label: 'Ruler' },
@@ -200,12 +236,43 @@ if (has('self-test')) {
         ['SCREEN-DIGIT 56 px Andika 700 at 1280', { px: 56, weight: '700', family: 'Andika, sans-serif', text: '403' }, 1280, null],
         ['SCREEN-DIGIT 44 px at 390 (target 40)', { px: 44, weight: '700', family: '"Andika", sans-serif', text: '7' }, 390, null],
         ['SCREEN-DIGIT 47 px at 820 (target 48)', { px: 47, weight: '700', family: 'Andika', text: '7' }, 820, /47 px/],
+        ['SCREEN-DIGIT 47 px at 1024 (the 820 floor, 48)', { px: 47, weight: '700', family: 'Andika', text: '7' }, 1024, /47 px.*1024/],
+        ['SCREEN-DIGIT 52 px at 1366 (the 1280 floor, 56)', { px: 52, weight: '700', family: 'Andika', text: '7' }, 1366, /52 px.*1366/],
+        ['SCREEN-DIGIT 48 px at 1024 passes', { px: 48, weight: '700', family: 'Andika', text: '7' }, 1024, null],
         ['SCREEN-DIGIT T2: a regular numeral passes where the paper is not bold', { px: 60, weight: '400', family: 'Andika', text: '7', bold: false }, 1280, null],
         ['SCREEN-DIGIT a fallback face', { px: 60, weight: '700', family: 'Arial, sans-serif', text: '7' }, 1280, /font Arial/],
         ['SCREEN-DIGIT no numeral', null, 1280, /no numeral/],
+        // A3 (critic lf-tools r1; lead: the worksheet floor is the SP table's 29 px): unit_form's 29 px worksheet numeral
+        // FAILED at f3ae7acca (held to the card's 56 / 48) and passes now; 28 px still fails; the card keeps its floor
+        ['SCREEN-DIGIT worksheet 29 px at 1280 passes (unit_form)', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 1280, null],
+        ['SCREEN-DIGIT worksheet 29 px at 1366 passes', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 1366, null],
+        ['SCREEN-DIGIT worksheet 29 px at 820 passes', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 820, null],
+        ['SCREEN-DIGIT worksheet 29 px at 1024 passes', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 1024, null],
+        ['SCREEN-DIGIT worksheet 28 px at 1280 fails (29)', { px: 28, weight: '700', family: 'Andika', text: '403', host: 'worksheet' }, 1280, /28 px \(want >= 29 px on the worksheet at 1280\)/],
+        ['SCREEN-DIGIT card 29 px at 1280 still fails (56)', { px: 29, weight: '700', family: 'Andika', text: '403', host: 'card' }, 1280, /want >= 56 px on the card/],
+        ['SCREEN-DIGIT quiz 40 px at 820 fails (48)', { px: 40, weight: '700', family: 'Andika', text: '45', host: 'quiz' }, 820, /want >= 48 px on the quiz/],
+        ['SCREEN-DIGIT worksheet 40 px at 1280 passes (div_facts)', { px: 40, weight: '700', family: 'Andika', text: '45', host: 'worksheet' }, 1280, null],
     ];
+    // the one table: every default width has a floor on every host
+    for (const h of ['card', 'quiz', 'worksheet']) for (const w of SW.SCREEN_WIDTHS) if (!SW.digitFloor(h, w)) { bad++; console.log(`  FAIL HOST_DIGIT_FLOOR has no ${h} floor at ${w}`); }
+    // CELL-READ (lf-checks queue 20): a host that rendered no cell, or a cell with no [data-ws-cell], is a finding, never a pass
+    const rcases = [
+        ['CELL-READ card render failed', 'card', null, /rendered nothing/],
+        ['CELL-READ worksheet cell missing', 'worksheet', { error: 'no cell (#ws_card_0 .mq-wspaper is not on the page)' }, /no cell/],
+        ['CELL-READ card with 0 [data-ws-cell]', 'card', { cells: 0, doubled: false }, /0 \[data-ws-cell\] cells on the card host/],
+        ['CELL-READ quiz with 0 [data-ws-cell]', 'quiz', { cells: 0 }, /quiz host/],
+        ['CELL-READ card with 1 cell', 'card', { cells: 1 }, null],
+        ['CELL-READ map (no cell by design)', 'map', { cells: 0 }, null],
+        ['CELL-READ map with no drawing', 'map', { error: 'no cell' }, /no cell/],
+    ];
+    for (const [name, host, r, want] of rcases) {
+        const v = readVerdict(host, r);
+        const ok = want ? !!v && want.test(v) : v === null;
+        if (!ok) bad++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'read'}`);
+    }
     for (const [name, m, wpx, want] of dcases) {
-        const v = digitVerdict(m, wpx, !(m && m.bold === false));
+        const v = digitVerdict(m, wpx, !(m && m.bold === false), (m && m.host) || 'card');
         const ok = want ? !!v && want.test(v) : v === null;
         if (!ok) bad++;
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'passes'}`);
@@ -221,7 +288,7 @@ if (has('self-test')) {
 }
 
 // In the page: does this cell draw answer places, and is a separate host field visible?
-function DETECT(cellSel, hostSel, textSel) {
+function DETECT(cellSel, hostSel, textSel, cellRootSel) {
     const vis = (el) => {
         if (!el || !el.isConnected) return false;
         const cs = getComputedStyle(el);
@@ -230,7 +297,10 @@ function DETECT(cellSel, hostSel, textSel) {
         return r.width > 0 && r.height > 0 && !el.closest('[hidden], .mq-sr');
     };
     const cell = document.querySelector(cellSel);
-    if (!cell) return { error: 'no cell' };
+    if (!cell) return { error: `no cell (${cellSel} is not on the page)` };
+    // CELL-READ (lf-checks queue 20, lead 2026-11-13): the host's B&W cell carries [data-ws-cell] (the root itself or inside it)
+    const cRoot = cellRootSel ? document.querySelector(cellRootSel) : cell;
+    const wsCells = cRoot ? [cRoot, ...cRoot.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length : 0;
     const host = hostSel ? Array.from(document.querySelectorAll(hostSel)).find(vis) : null;
     const hostInput = host ? (host.matches('input') ? host : host.querySelector('input:not([type=hidden])')) : null;
     // the host's own answer area is still there, with its input showing (an input adopted into the
@@ -285,7 +355,7 @@ function DETECT(cellSel, hostSel, textSel) {
             if (m) paper.push((t.nodeValue || '').trim().slice(0, 50));
         }
     }
-    return { hostVisible, drawn: drawn.length, under, inputs: inputs.length, suspects, paper,
+    return { hostVisible, drawn: drawn.length, under, inputs: inputs.length, suspects, paper, cells: wsCells,
         doubled: hostVisible && (drawn.length > 0 || inputs.length > 0 || under > 0),
         suspect: hostVisible && !(drawn.length > 0 || inputs.length > 0 || under > 0) && suspects > 0 };
 }
@@ -420,8 +490,8 @@ async function prep(page, role) {
 if (arg('digit-fixture', null)) {
     (async () => {
         const width = parseInt(arg('viewport', '1280'), 10);
-        const vp = DIGIT_VIEWPORTS.find((v) => v.w === width);
-        if (!vp) fail(`--viewport takes ${DIGIT_VIEWPORTS.map((v) => v.w).join(', ')}`);
+        const vp = DIGIT_FLOORS[width] ? { w: width, h: DIGIT_FLOORS[width].h, px: DIGIT_FLOORS[width].px } : null;
+        if (!vp) fail(`--viewport takes ${Object.keys(DIGIT_FLOORS).join(', ')}`);
         const app = await open({ seed: 1, viewport: { width: vp.w, height: vp.h, deviceScaleFactor: 1 } });
         try {
             await app.page.setContent(fs.readFileSync(path.resolve(arg('digit-fixture')), 'utf8').replace(/https?:\/\/(?:127\.0\.0\.1|localhost):\d+\//g, '/'), { waitUntil: 'networkidle0' });
@@ -448,6 +518,7 @@ if (arg('digit-fixture', null)) {
     const suspects = [];
     const paperVerbs = [];
     const contrast = [];
+    const unread = [];     // CELL-READ: a host render that read 0 cells (lf-checks queue 20)
     const errors = [];
     const findings = [];   // {key, id: "host:kind", line}
     let mapOn = false;
@@ -467,9 +538,11 @@ if (arg('digit-fixture', null)) {
                 await prep(page, role);
             }
             if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
-            const note = (host, r, leg) => {
+            const note = (host, r, leg, readR = r) => {
                 checked++;
                 const h = tagOf(host);
+                const rv = readVerdict(host, readR);
+                if (rv) { const l = `${key.padEnd(44)} ${h.padEnd(10)} CELL-READ ${rv}`; unread.push(l); findings.push({ key, id: `${h}:read`, line: l }); }
                 if (r && r.paper && r.paper.length) { const l = `${key.padEnd(44)} ${h.padEnd(10)} paper verb on screen: "${r.paper[0]}"`; paperVerbs.push(l); findings.push({ key, id: `${h}:paper`, line: l }); }
                 if (r && r.doubled) { const l = `${key.padEnd(44)} ${h.padEnd(10)} host field + ${r.drawn} drawn place(s), ${r.under} underscore blank(s), ${r.inputs} cell input(s)${r.seedNote || ''}`; doubled.push(l); findings.push({ key, id: `${h}:doubled`, line: l }); }
                 else if (r && r.suspect) suspects.push(`${key.padEnd(44)} ${h.padEnd(10)} host field + ${r.suspects} empty drawn box(es) (check by eye)`);
@@ -496,9 +569,10 @@ if (arg('digit-fixture', null)) {
                     }, c, k, BIGBOARD, seed);
                     if (ok === 'board') throw new Error('the Board display did not engage (#gameView is not the fixed board frame)');
                     if (ok === 'none') throw new Error(`card: the generator dealt no item${seed == null ? '' : ` for seed ${seed}`}`);
+                    if (!ok) note('card', null, null);
                     if (ok) {
                         await sleep(350);
-                        const r = await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionPaper');
+                        const r = await page.evaluate(DETECT, '#visualAid', '#answerInputArea', '#questionPaper', '#questionPaper');
                         if (seed != null) {
                             if (!seen.has(ok.ans)) seen.set(ok.ans, `${key} seed ${seed}`);
                             if (r && r.doubled) r.seedNote = ` [seed ${seed}, answer ${ok.ans}, answerType ${ok.type}]`;
@@ -530,18 +604,21 @@ if (arg('digit-fixture', null)) {
                             window.initWorksheet(); return true;
                         } catch (e) { return false; }
                     }, c, k);
+                    if (!ok) note('worksheet', null, null);
                     if (ok) {
                         await sleep(450);
                         const nq = await page.evaluate(() => (window.state.worksheetQs || []).length);
                         let worst = null;
                         let leg = null;
+                        let unreadR = nq ? null : { error: 'the worksheet dealt 0 cards' };   // CELL-READ: every card must read
                         for (let i = 0; i < nq; i++) {
                             const r = await page.evaluate(DETECT, `#ws_card_${i} .mq-wspaper`, `#ws_card_${i} .mq-answerrow`);
                             if (SWEEP && !leg) leg = await legible('#worksheetView');
+                            if (!unreadR && readVerdict('worksheet', r)) unreadR = Object.assign({}, r || {}, { error: r && r.error ? `card ${i + 1}: ${r.error}` : undefined, cells: r ? r.cells : 0 });
                             if (r && r.doubled) { worst = r; break; }
                             worst = worst || r;
                         }
-                        note('worksheet', worst, leg);
+                        note('worksheet', worst, leg, unreadR || worst);
                         if (UNIFORM) {
                             const u = await page.evaluate(async (c, k) => {
                                 const st = window.state; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 6;
@@ -584,6 +661,7 @@ if (arg('digit-fixture', null)) {
                             window.startQuizTest(); return true;
                         } catch (e) { return false; }
                     }, c, k);
+                    if (!ok) note('quiz', null, null);
                     if (ok) { await sleep(400); note('quiz', await page.evaluate(DETECT, '#quizTakeView .mq-qtpaper', '#quizTakeView .qt-answer-area'), await legible('#quizTakeView')); }
                     await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                 }
@@ -610,7 +688,7 @@ if (arg('digit-fixture', null)) {
                 if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
                 const judge = (host, m) => {
                     checked++;
-                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key));
+                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host);
                     if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
                 };
                 try {
@@ -639,15 +717,16 @@ if (arg('digit-fixture', null)) {
                 } catch (e) { const l = `${key} ERR SCREEN-DIGIT @${vp.w} ${String(e.message || e).split('\n')[0]}`; errors.push(l); console.log(l); }
             }
         }
-        console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, worksheet, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}: ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
+        console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}, worksheet (>= ${WORKSHEET_DIGIT_PX} px): ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
     }
     await app.close();
     doubled.forEach((l) => console.log(l));
     paperVerbs.forEach((l) => console.log(l));
     contrast.forEach((l) => console.log(l));
+    unread.forEach((l) => console.log(l));
     if (suspects.length) { console.log('\nsuspects (an empty drawn box beside a visible host field; not failed):'); suspects.forEach((l) => console.log('  ' + l)); }
     const what = `${MODE ? `${MODE} sweep (${ROLES.join(', ')}), ` : ''}${SHARD ? `shard ${SHARD.i}/${SHARD.n}, ` : ''}`;
-    console.log(`\n${what}${skills.length} skills, ${checked} host renders, ${doubled.length} doubled answer area(s), ${paperVerbs.length} paper verb(s) on screen${SWEEP ? `, ${contrast.length} low-contrast host(s)` : ''}${SCREEN_DIGIT && !SWEEP ? `, ${findings.filter((f) => /:digit$/.test(f.id)).length} screen-digit miss(es)` : ''}`);
+    console.log(`\n${what}${skills.length} skills, ${checked} host renders, ${doubled.length} doubled answer area(s), ${paperVerbs.length} paper verb(s) on screen${SWEEP ? `, ${contrast.length} low-contrast host(s)` : ''}${SCREEN_DIGIT && !SWEEP ? `, ${findings.filter((f) => /:digit$/.test(f.id)).length} screen-digit miss(es)` : ''}${unread.length ? `, ${unread.length} unread host(s)` : ''}`);
     if (arg('json', null)) {
         const bySkill = {};
         for (const f of findings) (bySkill[f.key] = bySkill[f.key] || []).push(f.id);

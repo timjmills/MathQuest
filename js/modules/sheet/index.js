@@ -14,7 +14,7 @@
 export {
     INK, LESSON_ACCENT, STROKE, STROKE_WIDTHS, DASH, HATCH,
     PAPER, DEFAULT_PAPER, PAGE_CHROME,
-    SIZES, SIZE_IDS, DEFAULT_SIZE,
+    SIZES, SIZE_IDS, DEFAULT_SIZE, OFFERED_SIZES, offeredSize, COMPACT_LABEL,
     LOOKS, LOOK_IDS, DEFAULT_LOOK,
     FACT_TRACK_EM, FACT_TRACKS,
     MINUS, TIMES, DIV, opGlyph,
@@ -31,7 +31,7 @@ export {
 export {
     esc, label, defaultLabelStyle, tabStepFor, tabSideMm,
     cell, cutLine, blank, line, box, circle, check, unknownBox,
-    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE,
+    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE, ebItemOf,
 } from './cell.js';
 
 /* --------------------------------------------------------------------------- frame */
@@ -66,7 +66,7 @@ export {
     CONTRACT_MEMBERS, OPTIONAL_MEMBERS,
     INSTRUCTION_LIBRARY, JUDGE_LABELS, PRINT_VERBS, BANNED_INSTRUCTION_WORDS,
     instructionFor, instructionKeyOf, isLibraryInstruction, toScreenInstruction, lintInstruction,
-    registerSkill, getProvider, hasProvider, listProviders,
+    registerSkill, getProvider, hasProvider, listProviders, roleOptions,
     installDefaultAdapters, defaultAdapters, adaptersInstalled,
     QUALITY, coverageFor, summariseCoverage, worstOffenders,
 } from './contract.js';
@@ -208,6 +208,13 @@ export {
     REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
     columnAdd, lineSteps, longDivision,
 } from './providers/index.js';
+
+/* ------------------------------------------- part options (lane lf-partopts, design/partopts/DESIGN.md) */
+export {
+    PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount,
+    rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN,
+    PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages,
+} from './part-opts.js';
 
 /* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
 export { applySheetTags, shortCcss } from './sheet-tags.js';

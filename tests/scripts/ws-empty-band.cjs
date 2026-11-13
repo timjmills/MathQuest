@@ -10,11 +10,15 @@
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --roles independent,guided --opts '{"band":20}'
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --json out.json --report-only
 //   node tests/scripts/ws-empty-band.cjs --html <page.html>                   # measure a saved page as is (fixtures, no pin)
+//   opt-in flags (each described below): --vocab-ink --page-fill --screen-parity --model-states --rule-skills a:b --margin N
+//                                         --grid-foot --columns N
+//                                         --slot-ink off --only R1,R2 --baseline f --no-baseline --write-baseline f
 //
 // WHAT IS RENDERED (the plan): the roles the skill's SIGNED spec card offers (tests/lib/ws-card-plan.mjs, lf-ops: §7a
 // "offered" page roles minus "hidden"), each at sizes S, M and L with the skill's defaults; the card's option variants on the
-// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 390,
-// 820 and 1280 px wide, the online worksheet and the quiz at 1280 px. No card: the default role list below. A role buildSheet
+// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 1280,
+// 1366, 820 and 1024 px wide (owner 2026-11-13: no phone width; --widths 390 still runs on request), the online worksheet
+// and the quiz at 1280 px. No card: the default role list below. A role buildSheet
 // cannot compose for the skill is listed as "not composed", never passed.
 //
 // WHAT IS MEASURED, per kit cell ([data-ws-cell], top-level; print pupil pages; the B&W screen cell on a host):
@@ -32,21 +36,35 @@
 //   EB-SIDE   the empty band BESIDE the ink (left or right of the ink box): FAIL at >= 30 % of the cell width (RUBRIC H13). On a
 //             SCREEN cell only when the content is pinned to one side (>= 30 % one side, <= 10 % the other): a centred fact in a
 //             wide card is not a band.
+//             Also BETWEEN two pieces of ink, side to side (critic eb-r7 m5: a 95 mm screen slot with only its right edge drawn
+//             left an 85 mm hole between the written digit and that edge): the widest run of columns with no ink from top to bottom
+//             of the cell, between its first and last inked column, at >= 30 % of the cell width (read on the pixels; a gap that
+//             other ink above or below covers is not a band, so the spaces of one text line never count).
 //   EB-ROLE   a role the signed card offers that buildSheet cannot compose for the skill (critic eb-r1 D3).
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
 //             more-practice, test, review, mixed-practice). EVERY cell is judged against the items it holds (the kit writes
 //             data-eb-item: one index, or the list for a cell holding several; lead ruling 2026-11-13), on any page shape
-//             (several sections, a Review drawing 16 of 28 dealt). A multi-item cell is judged against the bridge's measure of
-//             that combination; where the bridge gives none, or a cell has no index, it is a NOTE, never a silent pass. With no
-//             index on the page, the old one-to-one position pairing. A role that draws its own cell (fact-probe rows,
-//             word-problems stories, the guided model) is not judged by it.
+//             (several sections, a Review drawing 16 of 28 dealt). LIMIT (critic eb-r7 m4): a MULTI-ITEM cell (data-eb-item="3,4")
+//             is NOTED, NOT JUDGED - the bridge measures items one by one and emits no measure of a combination (`b.combo` has no
+//             writer today), and no live grid role draws one (the facts pin raises no such note). So is a cell matched to only
+//             part of its items (data-eb-partial, critic ebitem-r1 m2), a cell with no index, an index out of range and an item
+//             with no measure at the cell's own column count (no fallback to the page's first fit, critic ebitem-r1 m1). Each is a
+//             NOTE, never a silent pass. With no index on the page, the old one-to-one position pairing. A role that draws its own
+//             cell (fact-probe rows, word-problems stories, the guided model) is not judged by it.
+//   EB-ITEMKEY  on the grid roles: the pupil page's sequence of data-eb-item equals its key's (the key answers the item the pupil
+//             sees in that place), and no index appears twice on one pupil page (critic ebitem-r1 m3, its "key leak" probe).
+//   EB-ITEMPARITY on the grid roles: the pupil page and key, with data-eb-item / data-eb-partial removed, are byte-identical to the
+//             same sheet built with no tags (buildSheet `ebItem: false`): the tags change nothing a pupil sees (critic ebitem-r1
+//             m3, its parity probe). With --html: the fixture's <template id="eb-key"> / <template id="eb-plain">.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
 //             its size: 10 / 8 / 6 at S / M / L, plus the Model(s) (lead ruling 2026-11-12, lf-ops facts-roles option b: the fact
 //             pages had lifted it to 31 / 23 / 19 to fill the page). Read from buildSheet's plan.meta.scoreOutOf. --self-test checks it.
+//   EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1) a one-page Guided page whose next whole row of tries keeps it within
+//             its tries ceiling, with at least one drawn row (the grid's last) white under its grid: the fit counts rows as drawn.
 //   EB-EDGE   ink within EDGE_MM (1.5 mm) of, or across, the cell's own border (a cell divider or the page frame), on every
 //             row of every role and host (lf-ops facts-roles critic r1 G1: Guided S add / sub facts, the hinted row 1's dot tiles
 //             ran onto the divider and the fifth cell's tile across the frame; EB-SIDE reads the band beside the ink, never a
@@ -68,9 +86,18 @@
 //             critic r1 S3: 23-42 % used; lead ruling 2026-11-12: a second worked example fills it). Guided is EXEMPT from
 //             EB-PAGE (lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1: the white under a Guided grid is accepted; the tries
 //             stay at the 10 / 8 / 6 ceiling, EB-GDPCAP).
+//   EB-GRIDFOOT (opt-in --grid-foot, --rule-skills; lead-approved lf-placevalue compare round F1): a ONE-page Test or Review whose
+//             white under the grid (the body's bottom less its last block's) is more than one row's height (the median cell
+//             height on the page) AND whose grid stands in more columns than the Independent page at that size (buildSheet's
+//             plan.meta.fits[0].cols, both). combine Test S, 4 across against the Independent page's 3, left about 45 % of the
+//             page white under its grid. --self-test checks it.
+//             With --columns N (a TEACHER-chosen, non-default column count; lead ruling 2026-11-13, WORKSHEET_DESIGN_STANDARD
+//             CL-2c) the rule judges one-page Independent / More practice / Test / Review renders by the tolerance instead: the
+//             white under the grid may be up to 25 % of the page body (one-line in-place items; compare 2 columns at S, 24 %).
 //   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
 //             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
-//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
+//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab), or a
+//             vocabulary cell 35 % or more white above + below its ink, to its drawn edge (see measureVocabCells).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
 // PIN (--baseline <file>, default design/audit/baselines/empty-band.json when it exists; --no-baseline for raw): the counts of
@@ -84,13 +111,28 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const SW = require('../lib/ws-screen-widths.cjs');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
+// The opt-in flags, spelled out for ws-precritic's srcHas (it reads a flag from `'--flag'` or the first 80 lines; the master merge
+// of 2026-11-13 pushed EB-PARITY / EB-VOCAB's lines past line 80, so the lf-placevalue opt-in row silently ran without them)
+// ONE literal for both lanes' opt-in flags (lf-checks' header list + lf-placevalue's --grid-foot / --columns), merged 2026-11-13
+const OPT_IN_FLAGS = ['--vocab-ink', '--page-fill', '--screen-parity', '--model-states', '--rule-skills', '--margin', '--slot-ink', '--only', '--baseline', '--no-baseline', '--write-baseline', '--grid-foot', '--columns'];   // eslint-disable-line no-unused-vars
 
 const argv = process.argv.slice(2);
 // EB-GDPCAP: the Guided tries ceiling (PAGE_TYPES §12.1), and its verdict on one Guided render (null = within it)
 const GDP_CAP = { S: 10, M: 8, L: 6 };
 const gdpCap = (role, size, tries) => (role === 'guided' && GDP_CAP[size] != null && Number.isFinite(tries) && tries > GDP_CAP[size]
     ? `${tries} scored tries on the Guided page(s) at ${size}; the §12.1 ceiling is ${GDP_CAP[size]} plus the Model` : null);
+// EB-GRIDFOOT (opt-in --grid-foot): the verdict on one Test / Review render (null = fine). pages: its page count; whiteMm: the white
+// under the grid on its page; rowMm: one row's height (the median cell); cols / indCols: its columns and the Independent page's.
+// teacherFootBad: the --columns tolerance (CL-2c): white under the grid over 25 % of the body on a one-page practice / Test / Review.
+const teacherFootBad = (role, pages, whiteMm, bodyMm) => (/^(independent|more-practice|test|review)$/.test(role) && pages === 1
+    && Number.isFinite(whiteMm) && Number.isFinite(bodyMm) && bodyMm > 0 && whiteMm / bodyMm > 0.25
+    ? `${Math.round(whiteMm / bodyMm * 1000) / 10} % of the body white under the grid at the teacher's columns (CL-2c tolerance 25 %)` : null);
+const gridFootBad = (role, pages, whiteMm, rowMm, cols, indCols) => ((role === 'test' || role === 'review') && pages === 1
+    && Number.isFinite(whiteMm) && Number.isFinite(rowMm) && rowMm > 0 && whiteMm > rowMm + 0.5
+    && Number.isFinite(cols) && Number.isFinite(indCols) && cols > indCols
+    ? `${Math.round(whiteMm * 10) / 10} mm white under the grid (one row is ${Math.round(rowMm * 10) / 10} mm) in ${cols} columns; the Independent page stands in ${indCols} (use its columns, or fill the page)` : null);
 // PT-MOD-3 (lead ruling 2026-11-12, lf-ops facts-roles r2): a Scripted Model state's room kept for later marks is not an empty band
 // when ALL hold - the role is scripted-model, the state is not its example's last, the band is <= 35 % of the cell, and a LATER
 // state of the same example draws ink in that band (reserved, not just white). cells: measureCells' list in page order (step =
@@ -118,7 +160,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-PARITY'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -126,7 +168,19 @@ const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-G
 // The default stays on (a print slot is its whole box, the writing room). Screen slots are unchanged (drawn edges + one digit).
 const SLOT_INK = (() => { const i = process.argv.indexOf('--slot-ink'); return i < 0 || process.argv[i + 1] !== 'off'; })();
 const LEGACY_NOTES = [];
-const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)'];
+// the run's slot-ink mode, printed on every run (critic eb-r7 m3: the pixel port dropped master's per-run "slot ink on/off" note).
+// Under off the kit's top pad STAYS EXCLUDED from the band above, as under on (the DOM tool counted the padding); documented here.
+function slotInkNote(on) {
+    return on ? 'slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)'
+        : 'slot ink off: an empty PRINT answer slot counts only the pixels it draws (its line or box edges); a legacy cell is noted with its band, not judged; the kit\'s top pad stays excluded from the band above (as with slot ink on; the old DOM tool counted the padding)';
+}
+// a legacy cell skipped by --slot-ink off, with its measured band (critic eb-r7 m3: the port lost master's %)
+function legacyNote(where, c) {
+    const b = [['under', c.belowMm], ['between the blocks of', c.betweenMm], ['above', c.aboveMm]].map(([w, v]) => [w, Number(v) || 0]).sort((x, y) => y[1] - x[1])[0];
+    const pct = c.noInk ? 'no ink' : `largest band ${b[1].toFixed(1)} mm ${b[0]} the ink, ${(b[1] / (c.hRaw || c.hMm) * 100).toFixed(1)} %`;
+    return `${where} p${c.page} cell ${c.label || c.cell}: legacy cell not judged by --slot-ink off (${pct})`;
+}
+const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)', 'EB-SIDE (between)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
 // compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
 const RULE_EXEMPT = {
@@ -154,15 +208,18 @@ function footCols(c, cells) { return c.gridCols || cells.filter((d) => d.page ==
 const idsOf = (c) => (Array.isArray(c.items) && c.items.length ? c.items : (Number.isInteger(c.item) && c.item >= 0 ? [c.item] : []));
 function footFindings(cells, m, cols, sections, FOOT = 0.10, combo = () => null) {   // FOOT: the EB-FOOT limit (the const below)
     const out = [], notes = [];
-    const fpOf = (mi, k) => (mi ? (mi[k] != null ? mi[k] : mi[cols]) : null);
+    // the measure at the cell's OWN column count, never the page's first fit (critic ebitem-r1 m1: the silent fallback to mi[cols])
+    const fpOf = (mi, k) => (mi && mi[k] != null ? mi[k] : null);
+    const unmeasured = (i, k) => `item ${i + 1} fallback (unmeasured at ${k} across; measured at ${Object.keys(m[i] || {}).filter((x) => m[i][x] != null).join(', ') || 'none'}), footprint not judged`;
     const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
     if (cells.some((c) => idsOf(c).length)) {
         for (const c of cells) {
             const ids = idsOf(c), k = footCols(c, cells), nm = `p${c.page} cell ${c.label || c.cell}`;
             if (!ids.length) { notes.push(`${nm}: no item index on an indexed page, footprint not judged`); continue; }
+            if (c.partial) { notes.push(`${nm}: partly indexed (${c.partial} of its questions matched a bridge item: ${ids.map((i) => i + 1).join('+')}), footprint not judged`); continue; }
             if (ids.some((i) => !Number.isInteger(i) || i < 0 || i >= m.length)) { notes.push(`${nm}: item index ${ids.join(',')} outside the ${m.length} measured items, footprint not judged`); continue; }
             const fp = ids.length === 1 ? fpOf(m[ids[0]], k) : combo(ids, k);
-            if (fp == null) { notes.push(ids.length > 1 ? `${nm}: holds items ${ids.map((i) => i + 1).join('+')}; the bridge gives no measure for that combination at ${k} across, footprint not judged` : `${nm}: item ${ids[0] + 1} has no measure at ${k} across, footprint not judged`); continue; }
+            if (fp == null) { notes.push(ids.length > 1 ? `${nm}: holds items ${ids.map((i) => i + 1).join('+')}; the bridge gives no measure for that combination at ${k} across (multi-item cells are noted, not judged), footprint not judged` : `${nm}: ${unmeasured(ids[0], k)}`); continue; }
             if (off(c, fp)) out.push({ c, fp, k, ids });
         }
         // critic eb-r6 m1: a partly judged index page says so in one line naming the mode, beside the per-cell notes
@@ -177,9 +234,32 @@ function footFindings(cells, m, cols, sections, FOOT = 0.10, combo = () => null)
     const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
     const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpOf(m[y], cols) || 0) - (fpOf(m[x], cols) || 0));
     const byH = sortedPages && cells.some((c, i) => off(c, fpOf(m[i], footCols(c, cells)))) && !cs2.some((c, q) => off(c, fpOf(m[ord[q]], footCols(c, cells))));
-    if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k, ids: [i] }); });
+    if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (fp == null) notes.push(`p${c.page} cell ${c.label || c.cell}: ${unmeasured(i, k)}`); if (off(c, fp)) out.push({ c, fp, k, ids: [i] }); });
     notes.push(`pairing mode 'position' (fallback): no cell carries an item index, so cells are paired with items ${byH ? 'BY HEIGHT (the page sorts its rows tallest first)' : 'by dealt order'}`);
     return { mode: 'position', byH, out, notes };
+}
+// EB-ITEMKEY / EB-ITEMPARITY (critic ebitem-r1 m3: the parity and key-order probes made gates). Pure, on the HTML strings.
+const EB_ATTR = / data-eb-(?:item|partial)="[^"]*"/g;
+/** The data-eb-item values of an HTML string, page by page (a page starts at an element of class ws-page). */
+function ebPages(html) {
+    return String(html || '').split(/(?=<[a-z]+ class="ws-page[\s"])/).map((pg) => [...pg.matchAll(/ data-eb-item="([^"]*)"/g)].map((m) => m[1])).filter((l) => l.length);
+}
+/** Findings (strings) of the key-order rule: the pupil sequence equals the key's; no index twice on one pupil page. */
+function itemKeyFindings(pupilHtml, keyHtml) {
+    const out = [], pp = ebPages(pupilHtml), p = pp.flat(), k = ebPages(keyHtml).flat();
+    if (keyHtml != null && p.join('|') !== k.join('|')) {
+        const i = p.findIndex((v, j) => v !== k[j]); const at = i < 0 ? p.length : i;
+        out.push(`the key's item order differs from the pupil page's at cell ${at + 1} (pupil item ${p[at] != null ? p[at].split(',').map((x) => +x + 1).join('+') : '-'}, key item ${k[at] != null ? k[at].split(',').map((x) => +x + 1).join('+') : '-'}; ${p.length} pupil / ${k.length} key cells): the key answers another item in that place`);
+    }
+    pp.forEach((l, pi) => { const ids = l.flatMap((v) => v.split(',')); const d = ids.find((v, j) => ids.indexOf(v) !== j); if (d != null) out.push(`pupil page ${pi + 1} draws item ${+d + 1} twice`); });
+    return out;
+}
+/** The parity rule: `tagged` with its data-eb-* attributes removed is byte-identical to `plain` ('' when it is). */
+function itemParityFinding(tagged, plain, what) {
+    const a = String(tagged || '').replace(EB_ATTR, ''), b = String(plain || '').replace(EB_ATTR, '');
+    if (a === b) return '';
+    let i = 0; while (i < a.length && a[i] === b[i]) i++;
+    return `the ${what} with its data-eb-item tags removed differs from the same sheet built with no tags at byte ${i} ("${a.slice(Math.max(0, i - 30), i + 30).replace(/\s+/g, ' ')}" vs "${b.slice(Math.max(0, i - 30), i + 30).replace(/\s+/g, ' ')}"): the tags changed what is drawn`;
 }
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
@@ -259,23 +339,77 @@ if (argv.includes('--self-test')) {
         for (const [n, , want] of mbad) console.log(`self-test FAIL: PT-MOD-3 ${n} should ${want ? 'be excused' : 'fail'}`);
         if (mbad.length) { console.log(`ws-empty-band self-test: FAIL (PT-MOD-3)`); process.exit(1); }
     }
+    {   // EB-GRIDFOOT: combine Test S on a837b8d4 (4 across, ~45 % white) FAILS; the Independent page's 3 across, or a full page, PASS
+        const fc = [['combine Test S, 4 vs 3 across, 110 mm white', gridFootBad('test', 1, 110, 25, 4, 3), true],
+            ['3 across like the Independent page', gridFootBad('test', 1, 110, 25, 3, 3), false],
+            ['4 across, white under one row', gridFootBad('test', 1, 20, 25, 4, 3), false],
+            ['two pages', gridFootBad('review', 2, 110, 25, 4, 3), false], ['independent', gridFootBad('independent', 1, 110, 25, 4, 3), false],
+            ['review M, 3 vs 2 across', gridFootBad('review', 1, 60, 30, 3, 2), true]];
+        const fbad = fc.filter(([, got, want]) => !!got !== want);
+        for (const [n, , want] of fbad) console.log(`self-test FAIL: EB-GRIDFOOT ${n} should ${want ? 'fail' : 'pass'}`);
+        const tc = [['compare 2 cols S at 1.2 x, 31 %', teacherFootBad('independent', 1, 79, 255), true], ['compare 2 cols S at 1.3 x, 24 %', teacherFootBad('independent', 1, 61, 255), false],
+            ['two pages', teacherFootBad('independent', 2, 120, 255), false], ['guided not judged', teacherFootBad('guided', 1, 120, 255), false]];
+        for (const [n, v, want] of tc) if (!!v !== want) fbad.push([n, v, want]);
+        for (const [n, , want] of fbad.slice(fc.filter(([, v, w]) => !!v !== w).length)) console.log(`self-test FAIL: EB-GRIDFOOT teacher ${n} should ${want ? 'fail' : 'pass'}`);
+        if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-GRIDFOOT)`); process.exit(1); }
+    }
+    {   // critic ebitem-r1 m1 / m2 / m3 and eb-r7 m3 (pure parts; the kit's ebItemOf is checked async below)
+        const mk = (item, needed, cell, x) => Object.assign({ page: 1, cell, topPx: 10, hMm: 45, neededMm: needed, gridCols: 2, item }, x || {});
+        const m1 = [{ 2: 20 }, { 2: 40 }];
+        const at3 = [mk(0, 20, 1, { gridCols: 3 }), mk(1, 40, 2)];
+        const part = [mk(0, 20, 1, { items: [0], partial: '1/2' }), mk(1, 40, 2)];
+        const pg = (ids) => `<section class="ws-page x">${ids.map((v) => `<div class="ws-cell" data-eb-item="${v}">a</div>`).join('')}</section>`;
+        const xc = [['m1 unmeasured at k: noted as a fallback', footFindings(at3, m1, 2, 1).notes.filter((n) => /fallback \(unmeasured at 3 across/.test(n)).length, 1],
+            ['m1 unmeasured at k: not judged against the first fit', footFindings([mk(0, 90, 1, { gridCols: 3 })], m1, 2, 1).out.length, 0],
+            ['m1 position mode unmeasured: noted', footFindings([mk(-1, 20, 1, { gridCols: 3 }), mk(-1, 40, 2, { gridCols: 3 })], m1, 2, 1).notes.filter((n) => /unmeasured at 3 across/.test(n)).length, 2],
+            ['m2 partly indexed cell: noted', footFindings(part, m1, 2, 1).notes.filter((n) => /partly indexed \(1\/2/.test(n)).length, 1],
+            ['m2 partly indexed cell: not judged', footFindings([mk(1, 90, 1, { items: [1], partial: '1/2' })], m1, 2, 1).out.length, 0],
+            ['m3 key order equal', itemKeyFindings(pg([2, 0, 1]), pg([2, 0, 1])).length, 0],
+            ['m3 key order swapped', itemKeyFindings(pg([2, 0, 1]), pg([0, 2, 1])).length, 1],
+            ['m3 index twice on a page', itemKeyFindings(pg([2, 2]), pg([2, 2])).length, 1],
+            ['m3 parity: tags only', itemParityFinding(pg([1, 0]), '<section class="ws-page x"><div class="ws-cell">a</div><div class="ws-cell">a</div></section>', 'page'), ''],
+            ['m3 parity: a style moved', !!itemParityFinding(pg([1, 0]), '<section class="ws-page x"><div class="ws-cell" style="x">a</div><div class="ws-cell">a</div></section>', 'page'), true],
+            ['eb-r7 m3 slot ink off note names the mode and the top pad', /slot ink off/.test(slotInkNote(false)) && /top pad stays excluded/.test(slotInkNote(false)), true],
+            ['eb-r7 m3 slot ink on note', /slot ink on/.test(slotInkNote(true)), true],
+            ['eb-r7 m3 legacy note gives its %', /legacy cell not judged by --slot-ink off \(largest band 12\.0 mm under the ink, 30\.0 %\)/.test(legacyNote('x', { page: 1, cell: 2, belowMm: 12, betweenMm: 3, aboveMm: 1, hRaw: 40, hMm: 40 })), true]];
+        const xbad = xc.filter(([, got, want]) => got !== want);
+        for (const [n, got, want] of xbad) console.log(`self-test FAIL: ${n}: ${got}, want ${want}`);
+        if (xbad.length) { console.log(`ws-empty-band self-test: FAIL (ebitem / slot-ink notes)`); process.exit(1); }
+    }
     const cases = [['guided', 'S', 10, false], ['guided', 'S', 11, true], ['guided', 'M', 8, false], ['guided', 'M', 23, true], ['guided', 'L', 6, false],
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases; EB-FOOT pairing 21 + columns 3)`);
-    process.exit(bad.length ? 1 : 0);
+    // the kit's ebItemOf (critic ebitem-r1 m2): a plan item matched in part carries ebPartial "k/n"; cell() writes data-eb-partial
+    import(require('url').pathToFileURL(path.join(ROOT, 'js', 'modules', 'sheet', 'index.js')).href).then(({ ebItemOf, cell }) => {
+        const q = [{}, {}, {}], idx = new Map([[q[0], 4], [q[1], 7]]);
+        const kc = [['one question', JSON.stringify(ebItemOf({ q: q[0] }, idx)), '{"ebItem":4}'],
+            ['all of several', JSON.stringify(ebItemOf({ qs: [q[0], q[1]] }, idx)), '{"ebItem":[4,7]}'],
+            ['two of three: partial', JSON.stringify(ebItemOf({ qs: [q[0], q[1], q[2]] }, idx)), '{"ebItem":[4,7],"ebPartial":"2/3"}'],
+            ['one of two: partial, not judged as item 5 alone', JSON.stringify(ebItemOf({ q: q[0], qs: [q[0], q[2]] }, idx)), '{"ebItem":[4],"ebPartial":"1/2"}'],
+            ['none matched', JSON.stringify(ebItemOf({ qs: [q[2]] }, idx)), '{}'],
+            ['cell writes data-eb-partial', / data-eb-item="4" data-eb-partial="1\/2"/.test(cell('x', { ebItem: [4], ebPartial: '1/2' })), true],
+            ['cell without a partial writes none', /data-eb-partial/.test(cell('x', { ebItem: 4 })), false]];
+        const kbad = kc.filter(([, got, want]) => got !== want);
+        for (const [n, got, want] of kbad) console.log(`self-test FAIL: ebItemOf ${n}: ${got}, want ${want}`);
+        const n = bad.length + kbad.length;
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length})`);
+        process.exit(n ? 1 : 0);
+    }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
+    return;
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const HTML = arg('html', null);
-if (!HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
-const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
+if (require.main === module && !HTML && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-empty-band.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-empty-band: FAIL (usage)'); process.exit(2); }
+const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
 const OPTS = arg('opts', null) ? JSON.parse(arg('opts')) : null;
+// --columns N: the teacher's column count (buildSheet section `columns`) on every role render (lead ruling 2026-11-13, CL-2c)
+const TCOLS = arg('columns', null) ? Number(arg('columns')) : null;
 // (`--only R1,R2`: judge only these rules - a backtest row proves one rule alone)
 const ONLY = arg('only', null) ? arg('only').split(',') : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
@@ -363,10 +497,14 @@ function measureCells(scope) {
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
-                neededMm: +(((box.b - cr.top - ((() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })())) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
+                neededMm: +((c.matches('.ws-rowstretch') && c.querySelector(':scope > [data-ws-stretchmid]')
+                    // (CL-4d, lead 2026-11-13: a stretched one-line cell is CENTRED down its box - the white above its line is the row's
+                    // stretch, not height it needs: it needs its pads, the tab clearance it draws (::before) and its line's box, as measured)
+                    ? (inner.t - cr.top) + (() => { const bs = getComputedStyle(c, '::before'); return bs.content && bs.content !== 'none' ? parseFloat(bs.height) || 0 : 0; })() + c.querySelector(':scope > [data-ws-stretchmid]').getBoundingClientRect().height + (cr.bottom - inner.b)
+                    : (box.b - cr.top - (() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })()) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
                 screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN),
                 // the bridge's item index the kit wrote on the cell (critic eb-r5 m1): EB-FOOT pairs by it; -1 when absent
-                item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item').split(',')[0]) : -1, items: c.hasAttribute('data-eb-item') ? c.getAttribute('data-eb-item').split(',').map(Number) : [], inkMm: +((box.b - cr.top) / MM).toFixed(1),
+                item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item').split(',')[0]) : -1, items: c.hasAttribute('data-eb-item') ? c.getAttribute('data-eb-item').split(',').map(Number) : [], partial: c.getAttribute('data-eb-partial') || '', inkMm: +((box.b - cr.top) / MM).toFixed(1),
                 // the column count of the grid that LAYS this cell (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13): a lone cell
                 // on a 2-column grid's last row is still laid at 2 columns; a full-width problem in its own 1-column grid at 1
                 gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; const n = t && t !== 'none' ? t.trim().split(/\s+/).length : 0;
@@ -466,10 +604,12 @@ async function measurePix(arg) {
         const fr = rows.indexOf(1); if (fr < 0) { out[id] = { noInk: true }; continue; }
         const lr = rows.lastIndexOf(1), fc = cols.indexOf(1), lc = cols.lastIndexOf(1);
         let between = 0, run = 0; for (let y = fr; y <= lr; y++) { if (rows[y]) { between = Math.max(between, run); run = 0; } else run++; }
+        // side to side (critic eb-r7 m5): the widest run of columns with no ink anywhere in the cell, between its first and last ink
+        let betweenX = 0; run = 0; for (let x = fc; x <= lc; x++) { if (cols[x]) { betweenX = Math.max(betweenX, run); run = 0; } else run++; }
         // bands from the inside of the border stroke (the read window starts IN px inside it: those px are empty paper)
         const above = (y0 + fr) - (oy + bt), below = (oy + cr.height - bb) - (y0 + lr + 1);
         const gl = (x0 + fc) - (ox + bl), gr = (ox + cr.width - br) - (x0 + lc + 1);
-        out[id] = { aboveMm: Math.max(above, 0) / MM, belowMm: Math.max(below, 0) / MM, betweenMm: between / MM, gl: Math.max(gl, 0) / MM, gr: Math.max(gr, 0) / MM, innerW: (cr.width - bl - br) / MM };
+        out[id] = { aboveMm: Math.max(above, 0) / MM, belowMm: Math.max(below, 0) / MM, betweenMm: between / MM, betweenXMm: betweenX / MM, gl: Math.max(gl, 0) / MM, gr: Math.max(gr, 0) / MM, innerW: (cr.width - bl - br) / MM };
     }
     return out;
 }
@@ -478,7 +618,7 @@ function applyPix(cells, px) {
     for (const c of cells) {
         const p = px[`${c.page}:${c.cell}`]; if (!p) continue;
         if (p.noInk) { c.noInk = true; continue; }
-        c.pix = true; c.belowMm = p.belowMm; c.aboveMm = p.aboveMm; c.betweenMm = p.betweenMm; c.innerW = p.innerW;
+        c.pix = true; c.belowMm = p.belowMm; c.aboveMm = p.aboveMm; c.betweenMm = p.betweenMm; c.innerW = p.innerW; c.betweenXMm = p.betweenXMm || 0;
         // print cells: the wider gap beside the ink (RUBRIC H13); a SCREEN cell only when the content is pinned to one side
         c.sideMm = !c.screen || Math.min(p.gl, p.gr) <= 0.10 * p.innerW ? Math.max(p.gl, p.gr) : 0;
     }
@@ -570,6 +710,30 @@ function measureModel(scope) {
 // less than 70 % of its own picture box, up and down or across (a picture of 4 ones drawn in a ten-rod's height left the
 // vocabulary cell 43 % empty above it). Reads every `.mq-lvpic-in svg` on the page: its drawn content (getBBox of its
 // children, scaled from the viewBox) against the svg's own box. Additive: absent the flag nothing is read.
+// EB-VOCAB cell (same flag; lf-placevalue checks pass 2026-11-13, critic r5 N-r5-2 / ledger line 21): the lesson's vocabulary CELL
+// (.mq-lvocabcell) that grew into the height another part freed - lesson.js capIfEmpty - leaves its white split above AND below
+// its ink, which no single-band rule sees (r5: 24 % the larger band, ~43 % in all by the critic's pixel rows). Read to the
+// cell's drawn edge (pads included, the critic's convention): white above + below the ink at or over 35 % of the cell fails (r5 38.5 %; the
+// lane's lessons on 2026-11-13 at most 32 %, placevalue:value S).
+function measureVocabCells(scope) {
+    const out = [];
+    const MM = 96 / 25.4;
+    [...document.querySelectorAll(scope)].forEach((rt, pi) => {
+        [...rt.querySelectorAll('.mq-lvocabcell')].forEach((c, i) => {
+            const cr = c.getBoundingClientRect(); if (!cr.height) return;
+            let t = Infinity, b = -Infinity;
+            for (const d of c.querySelectorAll('*')) {
+                const ink = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img)$/i.test(d.tagName);
+                if (!ink) continue;
+                const r = d.getBoundingClientRect(); if (!r.height) continue;
+                t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+            }
+            if (t === Infinity) return;
+            out.push({ page: pi + 1, cell: i + 1, hMm: +(cr.height / MM).toFixed(1), aboveMm: +((t - cr.top) / MM).toFixed(1), belowMm: +((cr.bottom - b) / MM).toFixed(1), white: +(((t - cr.top) + (cr.bottom - b)) / cr.height).toFixed(3) });
+        });
+    });
+    return out;
+}
 function measureVocab(scope) {
     const out = [];
     [...document.querySelectorAll(scope)].forEach((rt, pi) => {
@@ -593,7 +757,7 @@ function measureVocab(scope) {
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
         // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)
-        if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(`${where} p${c.page} cell ${c.label || c.cell}: legacy cell not judged by --slot-ink off`); return; }
+        if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(legacyNote(where, c)); return; }
         // a cell with no ink at all (critic eb-r3 D2: it was dropped, so a blank cell beside a good one read OK)
         if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with no pixel darker than the ink threshold 225 of 255: blank, or only ink too faint to count, e.g. #eee) [${c.tmpl}]`); return; }
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
@@ -608,6 +772,7 @@ function judge(cells, where, F, role) {
         const [where2, band] = bands[0];
         if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / hJ * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm${pad > 0.05 ? `; the ${pad.toFixed(1)} mm top pad excluded` : ''}) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
+        if (c.pix && c.betweenXMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.betweenXMm.toFixed(1)} mm empty BETWEEN two pieces of ink, side to side (no ink above or below it), in a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.betweenXMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
         if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.sideMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
     });
 }
@@ -628,6 +793,15 @@ async function htmlMain() {
         const cells = await pixRead(sh, await sh.evaluate(measureCells, scope), screen);
         if (!cells.length) F('EB-READ', HTML, 'no kit cell and no screen cell (.mq-scell) on the page (markup changed?)');
         judge(cells, path.basename(HTML), F, screen ? 'host:fixture' : undefined);
+        // EB-ITEMKEY / EB-ITEMPARITY on a fixture: <template id="eb-pupil">, "eb-key", "eb-plain", "eb-plain-key" (the file's text)
+        const src = fs.readFileSync(path.resolve(process.cwd(), HTML), 'utf8');
+        const tpl = (id) => { const m = new RegExp(`<template id="${id}">([\\s\\S]*?)</template>`).exec(src); return m ? m[1] : null; };
+        if (tpl('eb-pupil') != null) {
+            if (tpl('eb-key') != null) for (const msg of itemKeyFindings(tpl('eb-pupil'), tpl('eb-key'))) F('EB-ITEMKEY', path.basename(HTML), msg);
+            for (const [what, t, pl] of [['pupil page', tpl('eb-pupil'), tpl('eb-plain')], ['key', tpl('eb-key'), tpl('eb-plain-key')]]) { if (t == null || pl == null) continue; const msg = itemParityFinding(t, pl, what); if (msg) F('EB-ITEMPARITY', path.basename(HTML), msg); }
+        }
+        console.log(`note: ${slotInkNote(SLOT_INK)}`);
+        for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
         for (const x of findings) console.log(`${x.rule} ${x.where}: ${x.msg}`);
         console.log(`(${cells.length} cells${ONLY ? `; --only ${ONLY.join(',')}` : ''})`);
         if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ html: HTML, findings, cells }, null, 1));
@@ -650,25 +824,33 @@ async function main() {
             const step = vlist.length > NVAR ? vlist.length / NVAR : 1;
             const variants = Array.from({ length: Math.min(NVAR, vlist.length) }, (_, i) => vlist[Math.floor(i * step)]);
             const jobs = [];
-            for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
-            const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
+            for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, cols: TCOLS, tag: `${role} ${size}${TCOLS ? ` cols ${TCOLS}` : ''}` });
+            const vSize = ['L', 'M'].find((z) => SIZES.includes(z)) || SIZES[0];
             if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
-            notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
+            notes.push(`${key}: slot ink ${SLOT_INK ? 'on' : 'off'}; card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
-                const b = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
+                const grid = GRID_ROLES.has(j.role);
+                const b = await page.evaluate(async ({ categoryId, skillId, j, SEED, grid }) => {
                     try {
-                        const r = await window.buildSheet({ role: j.role, sections: [{ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }], size: j.size, paper: 'A4', seed: SEED, key: false });
+                        // a grid role is built with its key (EB-ITEMKEY) and a second time with no data-eb-item tags (EB-ITEMPARITY)
+                        const req = { role: j.role, sections: [Object.assign({ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }, j.cols ? { columns: j.cols } : {})], size: j.size, paper: 'A4', seed: SEED, key: grid };
+                        const r = await window.buildSheet(req);
+                        const plain = grid ? await window.buildSheet(Object.assign({}, req, { ebItem: false })) : null;
                         const cols = r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
                         const sections = new Set((r.items || []).map((it) => it.section)).size;
                         const tries = r.plan && r.plan.meta ? Number(r.plan.meta.scoreOutOf) : NaN;
-                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), cols, sections, tries, measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
+                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), pupilHtml: grid ? r.pupilHtml : null, keyHtml: grid ? r.keyHtml : null, plainPupil: plain ? plain.pupilHtml : null, plainKey: plain ? plain.keyHtml : null, cols, sections, tries, measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).map(([k, v]) => [k, v && v.hMm])) : null)) };
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
-                }, { categoryId, skillId, j, SEED });
+                }, { categoryId, skillId, j, SEED, grid });
                 // a role the signed card OFFERS that the app cannot compose is a failure, not a note (critic eb-r1 D3); with no
                 // card (the default role list) it is a note
                 if (b.error) { if (plan.cards.length && plan.cards[0] !== '--roles') F('EB-ROLE', `${key} ${j.tag}`, `the card offers it, the app does not compose it: ${b.error}`); else notes.push(`${key} ${j.tag}: not composed (${b.error})`); continue; }
                 { const cap = gdpCap(j.role, j.size, b.tries); if (cap) F('EB-GDPCAP', `${key} ${j.tag}`, cap); }
+                if (grid) {   // critic ebitem-r1 m3: the key-order and parity probes as gates
+                    for (const msg of itemKeyFindings(b.pupilHtml, b.keyHtml)) F('EB-ITEMKEY', `${key} ${j.tag}`, msg);
+                    for (const [what, t, pl] of [['pupil page', b.pupilHtml, b.plainPupil], ['key', b.keyHtml, b.plainKey]]) { const msg = itemParityFinding(t, pl, what); if (msg) F('EB-ITEMPARITY', `${key} ${j.tag}`, msg); }
+                }
                 const sh = await app.browser.newPage();
                 try {
                     await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
@@ -694,6 +876,27 @@ async function main() {
                         cells.forEach((c, i) => { if (gapBad(j.role, cells, i, BAND)) F('EB-GAP', `${key} ${j.tag} p${c.page} cell ${c.cell} (state ${c.step})`, `empty band ${c.gapMm} mm between the step text and the problem in a ${c.hMm} mm cell (${(c.gapMm / c.hMm * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} %, RUBRIC H13; critic r3 S5)`); });
                         mo.used.forEach((v, i) => { if (v < 70) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the Scripted Model page body used (limit 70 %)`); });
                     }
+                    // EB-REFILL (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1): a one-page Guided page under its §12.1 tries ceiling leaves
+                    // white under its grid of at least one drawn row of tries (the grid's last row) - the fit counted rows at a taller
+                    // height than the page draws them (tight rows held to their ink AFTER the fit), so more tries fit and were never dealt.
+                    // White under a page AT the ceiling is accepted (PT-ENG-3), as is white under a Guided page in general (EB-PAGE note).
+                    if (j.role === 'guided' && GDP_CAP[j.size] != null && Number.isFinite(b.tries) && b.tries < GDP_CAP[j.size]) {
+                        const rf = await sh.evaluate((scope) => {
+                            const mm = 96 / 25.4;
+                            const pgs = [...document.querySelectorAll(scope)];
+                            if (pgs.length !== 1) return null;
+                            const body = pgs[0].querySelector('.ws-body'); const grids = [...pgs[0].querySelectorAll('.ws-grid')];
+                            if (!body || !grids.length) return null;
+                            const g = grids[grids.length - 1]; const gr = g.getBoundingClientRect();
+                            const cells = [...g.children].filter((c) => c.classList.contains('ws-cell') && !c.classList.contains('blankrun'));
+                            const lastTop = Math.max(...cells.map((c) => c.getBoundingClientRect().top));
+                            const row = cells.filter((c) => Math.abs(c.getBoundingClientRect().top - lastTop) < 0.5).map((c) => c.getBoundingClientRect().height);
+                            return { spare: (body.getBoundingClientRect().bottom - gr.bottom) / mm, row: Math.max(...row) / mm };
+                        }, 'body > section.ws-page, body > .ws-page');
+                        // (a row adds `cols` tries: only a page the next whole row keeps within the ceiling can be refilled - a 4-column fact
+                        // page at 5 of 6 is trimmed to whole rows, not under-filled)
+                        if (rf && rf.spare >= rf.row && b.tries + Math.max(1, Number(b.cols) || 1) <= GDP_CAP[j.size]) F('EB-REFILL', `${key} ${j.tag}`, `${rf.spare.toFixed(1)} mm white under the grid holds another ${rf.row.toFixed(1)} mm row of tries, but the page prints ${b.tries} of the ${GDP_CAP[j.size]} the ceiling allows (the fit counted rows taller than they are drawn)`);
+                    }
                     // (Guided is exempt from EB-PAGE: lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1 - white under its grid is accepted)
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate((scope) => [...document.querySelectorAll(scope)].map((pg) => {
@@ -704,9 +907,35 @@ async function main() {
                         }), 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
                     }
+                    if (has('grid-foot') && (j.cols ? /^(independent|more-practice|test|review)$/.test(j.role) : (j.role === 'test' || j.role === 'review')) && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
+                        const gf = await sh.evaluate((scope) => {
+                            const MM = 96 / 25.4;
+                            const pgs = [...document.querySelectorAll(scope)];
+                            const pg = pgs[0]; if (!pg) return { pages: 0 };
+                            const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
+                            const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
+                            const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
+                            const hs = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')).map((c) => c.getBoundingClientRect().height).filter((h) => h > 0).sort((a, b) => a - b);
+                            return { pages: pgs.length, bodyMm: br.height / MM, whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN };
+                        }, 'body > section.ws-page, body > .ws-page');
+                        if (j.cols) { const why = teacherFootBad(j.role, gf.pages, gf.whiteMm, gf.bodyMm); if (why) F('EB-GRIDFOOT', `${key} ${j.tag} p1`, why); }
+                        else if (gf.pages === 1 && gf.whiteMm > gf.rowMm + 0.5) {
+                            const ind = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
+                                try {
+                                    const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }], size: j.size, paper: 'A4', seed: SEED, key: false });
+                                    return r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
+                                } catch (e) { return null; }
+                            }, { categoryId, skillId, j, SEED });
+                            const why = gridFootBad(j.role, gf.pages, gf.whiteMm, gf.rowMm, Number(b.cols), Number(ind));
+                            if (why) F('EB-GRIDFOOT', `${key} ${j.tag} p1`, why);
+                        }
+                    }
                     // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
                     if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
                         if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
+                    }
+                    if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocabCells, 'body > section.ws-page, body > .ws-page')) {
+                        if (v.white >= 0.35) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab cell ${v.cell}`, `${Math.round(v.white * 100)} % of the ${v.hMm} mm vocabulary cell is white above (${v.aboveMm} mm) and below (${v.belowMm} mm) its ink, to its drawn edge (limit 35 %: the cell grew into freed height, critic r5 N-r5-2)`);
                     }
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
@@ -718,12 +947,13 @@ async function main() {
                 } finally { await sh.close(); }
             }
             // screen hosts
-            const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
+            // owner 2026-11-13: no phone width; the card at the computer / Chromebook and tablet widths (--widths overrides)
+            const widths = { card: SW.widthsArg(process.argv), worksheet: [1280], quiz: [1280] };
             // every host at the skill's defaults AND at each sampled option variant (lf-checks hosts lane 2026-11-12: unit_form's
             // worksheet band appeared only at rename=more, an option no host run had rendered)
             const hostOpts = [{ tag: '', opts: OPTS }, ...variants.map((v) => ({ tag: ` {${v.option}: ${v.value}}`, opts: Object.assign({}, OPTS || {}, v.opts) }))];
             for (const ho of hostOpts) for (const host of HOSTS) for (const w of widths[host] || []) {
-                await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
+                await page.setViewport({ width: w, height: w < 500 ? 844 : (w === 1366 || w === 1024) ? 768 : 900, deviceScaleFactor: 1 });
                 const ok = await page.evaluate(async ({ c, k, host, SEED, OPTS }) => {
                     try {
                         const st = window.state;
@@ -794,6 +1024,7 @@ async function main() {
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
     const rules = RULES;
+    console.log(`note: ${slotInkNote(SLOT_INK)}`);
     for (const n of notes) console.log(`note: ${n}`);
     for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
@@ -803,4 +1034,6 @@ async function main() {
     console.log(`ws-empty-band: ${bad ? `FAIL (${findings.length || 'nothing rendered'})` : 'OK'}`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
-(HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+// (lf-partopts: the measure and the judge are shared - ws-partopts-unit.cjs judges every part count by these same rules)
+if (require.main === module) (HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
+module.exports = { measureCells, judge };
