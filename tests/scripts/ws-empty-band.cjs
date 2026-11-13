@@ -10,6 +10,8 @@
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --roles independent,guided --opts '{"band":20}'
 //   node tests/scripts/ws-empty-band.cjs --skill a:b --json out.json --report-only
 //   node tests/scripts/ws-empty-band.cjs --html <page.html>                   # measure a saved page as is (fixtures, no pin)
+//   opt-in flags (each described below): --vocab-ink --page-fill --screen-parity --model-states --rule-skills a:b --margin N
+//                                         --slot-ink off --only R1,R2 --baseline f --no-baseline --write-baseline f
 //
 // WHAT IS RENDERED (the plan): the roles the skill's SIGNED spec card offers (tests/lib/ws-card-plan.mjs, lf-ops: §7a
 // "offered" page roles minus "hidden"), each at sizes S, M and L with the skill's defaults; the card's option variants on the
