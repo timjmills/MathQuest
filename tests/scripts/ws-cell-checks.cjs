@@ -30,7 +30,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -71,6 +71,8 @@ function selfTest() {
         { name: 'grey pupil work under "Sam wrote:" (PUPILTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div style="position:relative"><span class="mq-pupiltag" style="display:block;font:10pt sans-serif;line-height:1">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:2mm;font:20pt sans-serif;line-height:1;color:#949494">48</span></div></div></div>')), want: null, rules: ['PUPILTAG'] },
         { name: 'a "Sam wrote:" label 20 mm over its work (PUPILTAG distance)', html: page(cell({ h: 60, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:20mm;color:#949494">48</span></div></div></div>')), want: 'PUPILTAG' },
         { name: 'an added answer under the minus sign (SIGNMATCH)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 13</div></div></div>')), want: 'SIGNMATCH', role: 'reason-it' },
+        { name: 'Reason It panels A and B show the same work (RI-DISTINCT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 29</div></div></div>')), want: 'RI-DISTINCT', role: 'reason-it' },
+        { name: 'Reason It panels differ (RI-DISTINCT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 39</div></div></div>')), want: null, role: 'reason-it', rules: ['RI-DISTINCT'] },
         { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)

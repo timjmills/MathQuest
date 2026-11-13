@@ -2596,6 +2596,18 @@
   }
  },
  "ruled": {
+  "subtraction:sub_100k_no_regroup reason-it L": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
+  },
+  "subtraction:sub_1m_no_regroup reason-it M": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 3 overflowed the cell)"
+  },
+  "subtraction:sub_1m_no_regroup reason-it L": {
+   "items": 1,
+   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
+  },
   "algebra:function_table_easy true-false L": {
    "items": 2,
    "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
