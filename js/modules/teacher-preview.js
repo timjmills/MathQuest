@@ -188,8 +188,8 @@ function tidySample(cell) {
 const MIN_LEGIBLE = 0.3;
 const CROP_SCALE = 0.45;
 
-/** Fit the stage inside its frame: scale down (never up), centred. */
-function fit(frame) {
+/** Fit the stage inside its frame: scale down (never up), centred. Shared (window.tvFitSample): the options popover re-fits with it. */
+export function fit(frame) {
     const stage = frame.querySelector(':scope > .tvp-stage');
     if (!stage) return;
     stage.style.transform = 'translate(-50%, -50%)';

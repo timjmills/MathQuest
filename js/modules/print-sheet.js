@@ -33,6 +33,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
+import { applySheetTags } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -367,6 +368,8 @@ function normaliseRequest(req = {}) {
         latticeN: [4, 6, 8, 10].includes(Number(req.latticeN)) ? Number(req.latticeN) : 0,
         // A lesson's Mixed page (lessons r3): its first skill holds at least half the placed items.
         leadHalf: !!req.leadHalf,
+        // (live-pm r2: a library lesson's Mixed page - band-safe fill, no lone continuation shelf; mixed-practice.js)
+        ...(req.lessonFit === true ? { lessonFit: true } : {}),
         // (the detailed lesson maker, lesson 2 r4: `leadHalf` may drop a partner's only shelf or narrow it)
         leadDrop: !!req.leadDrop,
         // The detailed lesson maker: no Steps strip on the lesson's Mixed page (critic D18).
@@ -1690,6 +1693,21 @@ function allocateHostSupports(items, n) {
 /** F7 (live-fix 2026-11-13): a rounding lesson's Practice cells centre their one line (print-sheet buildLesson tagSheets). */
 /** F5 (live-fix 2026-11-13): a lesson's Mixed / Practice fact and count cells centre down a row sized for a taller kind. */
 const MIXED_FACT_CSS = '<style data-mq-lmixfact>.ws-page:is([data-ws-sheet="lesson-mixed"],[data-ws-sheet="lesson-practice"]) .ws-grid>.ws-cell:is([data-ws-cell="fact"],[data-ws-cell="counters"]){justify-content:center !important}</style>';
+/** live-pm r2 (critic lf-engine-live-pm findings 1, 2, 4, 5): EVERY cell of a lesson's Practice / Mixed page centres its
+ *  content down a row sized for a taller kind - equation and missing-factor cells (53 % band), word problems at S (37 %),
+ *  rounding cells on Mixed (not reached by the Practice-only rule above), fact cells at S Practice (47 %). `safe` keeps a
+ *  full cell top-anchored; a library lesson's pages only (a detailed lesson keeps its own, byte-identical). */
+const LESSON_PM_SEL = '.ws-page:is([data-ws-sheet="lesson-mixed"],[data-ws-sheet="lesson-practice"]) .ws-grid>.ws-cell';
+// (a fact over its answer line - `.ws-eq-below`, div_facts in a tall row - takes the owner's "under" look, 2026-11-08: the
+// line at the foot of the cell, the room above it the writing room, no empty band: S Practice 47 %)
+const LESSON_PM_CENTRE_CSS = `<style data-mq-lpmcentre>${LESSON_PM_SEL}:not(.blankrun){justify-content:safe center !important}`
+    + `${LESSON_PM_SEL}>.ws-eq-below[data-ws-across]:not([data-ws-notation]){flex:1 1 auto;align-self:stretch}`
+    + `${LESSON_PM_SEL}>.ws-eq-below[data-ws-across]:not([data-ws-notation])>[data-ws-slot]{margin-top:auto}`
+    // (TAB-CLEAR, finding 4: the number tab >= 2 mm clear of the ink. A Mixed row is sized to its content, and at L the
+    // place-value cells ("T|O 78 -> __" runs the cell's width; the T O heads of an identify cell sit in the tab's corner) start
+    // under the tab - at M / S they clear it sideways, and a 22 mm row has no room to drop them. Practice rows are tall:
+    // their centred content clears the tab already.)
+    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
 const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
 
 /**
@@ -2706,6 +2724,8 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
+    // (Q-A: an item that carries its own standards - a vocabulary page dealt from one lesson's word set - prints them)
+    applySheetTags(meta, q);
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
     if (sk.skillId === 'count_by_tables') {
@@ -3077,6 +3097,31 @@ function numberLineRequest(n) {
  * Round 9 (critic r7 D7-2): every deal starts in a task of its own, so a sheet that is dealt
  * several times never blocks the page for the whole search, and the work is counted (`stats`).
  */
+/**
+ * Each grid cell of a plan carries its item's index in the bridge's returned `items` (critic eb-r5 m1): `ebItem` on the plan
+ * item, written by the kit's grid as data-eb-item on the cell. ws-empty-band EB-FOOT pairs each cell with ITS OWN item's
+ * measured footprint by it (a page that reorders its items is never judged against another item's footprint). Matched by the
+ * item's question object; a plan item with no match carries nothing. Nothing draws from it.
+ */
+function tagItemIndex(plan, items) {
+    const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
+    const walk = (s) => {
+        if (!s || typeof s !== 'object') return;
+        // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        if (s.kind === 'grid') for (const pi of s.items || []) {
+            if (!pi) continue;
+            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
+            if (many.length > 1) pi.ebItem = many;
+            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
+            else if (many.length) pi.ebItem = many[0];
+        }
+        if (Array.isArray(s.contents)) s.contents.forEach(walk);
+        if (s.content) walk(s.content);
+        if (Array.isArray(s.parts)) s.parts.forEach(walk);
+    };
+    for (const sh of (plan && plan.sheets && plan.sheets.length ? plan.sheets : [plan || {}])) for (const pg of (sh.pages && sh.pages.length ? sh.pages : [{ sections: sh.sections || [] }])) (pg.sections || []).forEach(walk);
+}
+
 const BUILD_STATS = { deals: 0, dealMs: 0, checks: 0, checkMs: 0, measured: 0, measureHits: 0, measureMs: 0, layouts: 0 };
 const nowMs = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
 /** Resolve in a NEW macrotask (the page paints and answers input in between). */
@@ -3451,6 +3496,26 @@ async function buildSheetDeal(req = {}) {
                     left -= give;
                 }
             }
+            // (`wholeRows` on a template's footprint, opt-in so no other template's page changes - lf-vocab r9, print-lint
+            // sections L-DENSITY DN-2 / LONE at S and L: a one-column member whose share held ONE row and a half took
+            // the page's whole share as one tall cell, so a two-skill sheet printed one Match 3 alone on page 1. Such a
+            // member takes one more whole row from the others' spare room, when they keep the rows they had.)
+            members.forEach((si, k) => {
+                const its = probesOf(si) || [];
+                if (!its.length || !its.every((it) => it && it.footprint && it.footprint.wholeRows)) return;
+                const row = layouts[si].hMin;
+                if (!(row > 0)) return;
+                const rowsNow = Math.max(1, Math.floor((h[k] - 1 - band(si)) / row + 1e-6));
+                const want = (rowsNow + 1) * row + 1 + band(si) - h[k];
+                if (want <= 0) return;
+                const rowsOf = (j) => { const r = layouts[members[j]].hMin; return r > 0 ? Math.max(1, Math.floor((h[j] - 1 - band(members[j])) / r + 1e-6)) : 1; };
+                const keep = (j) => rowsOf(j) * layouts[members[j]].hMin + 1 + band(members[j]);
+                const spare = members.reduce((a, _, j) => a + (j === k ? 0 : Math.max(0, h[j] - Math.max(need[j], keep(j)))), 0);
+                if (spare + 1e-6 < want) return;
+                let left = want;
+                members.forEach((_, j) => { if (j === k || left <= 0) return; const give = Math.min(left, Math.max(0, h[j] - Math.max(need[j], keep(j)))); h[j] -= give; left -= give; });
+                h[k] += want;
+            });
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
@@ -3898,6 +3963,7 @@ async function buildSheetDeal(req = {}) {
         const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
         plan = t.plan; trimmed = t.trimmed;
     }
+    tagItemIndex(plan, hostItems);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -4225,6 +4291,7 @@ async function buildRoleSheet(n, metaOf) {
         latticeN: n.latticeN || 0,
         leadHalf: !!n.leadHalf,
         leadDrop: !!n.leadDrop || undefined,
+        lessonFit: n.lessonFit === true || undefined,
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
@@ -4652,6 +4719,7 @@ async function buildRoleSheet(n, metaOf) {
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
+    tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
@@ -4986,7 +5054,7 @@ async function buildLesson(n, metaOf) {
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
             mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed,
-            stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab,
+            stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab, lessonFit: !n.lessonData,
         }));
     };
     if (built.includes('mixed')) {
@@ -5042,6 +5110,11 @@ async function buildLesson(n, metaOf) {
     // is a sheet apart from the lesson pages: `data-ws-sheet` says so on every page, so a page is
     // only ever compared with the pages of its own sheet.
     const tagSheets = (html, first, rest) => {
+        const out0 = tagSheets0(html, first, rest);
+        // live-pm r2 (findings 1, 2, 4, 5): a library lesson's Practice / Mixed pages centre every cell kind (additive)
+        return !n.lessonData && (first === 'lesson-mixed' || first === 'lesson-practice') && /<main class="ws-body">/.test(out0) ? out0.replace(/<main class="ws-body">/g, `<main class="ws-body">${LESSON_PM_CENTRE_CSS}`) : out0;
+    };
+    const tagSheets0 = (html, first, rest) => {
         let k = 0;
         const out = String(html || '').replace(/<section class="ws-page/g, (m) => `<section data-ws-sheet="${k++ === 0 ? first : rest}" class="ws-page`);
         // F7 (lf-engine pc critic r3, live-fix 2026-11-13): a rounding Practice cell ("27 -> ___") is one short line in a

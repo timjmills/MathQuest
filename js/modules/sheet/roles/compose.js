@@ -336,10 +336,12 @@ export function answerListOf(v) {
  * commas) or 'none' for a sentence (the frame row is left out; the judgement is the answer). `slots` are its key entries.
  */
 // (inline, not in the engine stylesheet: the stylesheet travels on every page, and a page with no list stays byte-identical)
-export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list'
+export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list' || place.word
     ? `mq-frame mq-framelist" style="flex-wrap:wrap;row-gap:3mm;white-space:normal${maxMm ? `;max-width:${maxMm}mm` : ''}` : 'mq-frame');
-export function answerPlace(id, correct, it = null) {
-    const width = (v) => Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2));
+export function answerPlace(id, correct, it = null, others = []) {
+    // (a WORD answer - "hundreds", "tens" - takes the widest line, the same for every word so the line never tells which; it was 2
+    // digits wide and the key's "hundreds" ran past it: lf-roles r10, identify Reason It key)
+    const width = (v) => (/[0-9]/.test(String(v)) || !/[a-z]/i.test(String(v)) ? Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2)) : 6);
     if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
     const parts = answerListOf(correct);
     // numbers joined by unit words ("2 hundreds 9 tens 7 ones"): a line a number, its word printed after it - one value a
@@ -355,7 +357,10 @@ export function answerPlace(id, correct, it = null) {
         const plural = (w) => w.split(' ').map((x, k, a) => (k === a.length - 1 && !/s$/i.test(x) ? `${x}s` : x)).join(' ');
         return { kind: 'list', slots, parts: nums, digits: nums.map(width), words: glue.slice(1).map((g) => plural(g.trim())) };
     }
-    if (!parts) return { kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) };
+    // (a word answer's line may drop under "The answer is" in a narrow response column - identify Reason It at L)
+    // (a number line holds the longer of the right and the wrong answer - sized to the right one, a 2-digit line ruled out a shown
+    // 141 against 29: critic r6d E1; ws-roles-unit LINE-TELL)
+    if (!parts) return Object.assign({ kind: 'one', slots: { [id]: correct }, parts: null, digits: Math.max(width(correct), ...(others || []).filter((v) => v !== undefined && v !== null && v !== '').map(width)) }, width(correct) === 6 && !/[0-9]/.test(String(correct)) ? { word: true } : {});
     const slots = {};
     parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
     // LIST-HOMOGENEOUS (lf-roles critic r2 N1): a list whose LAST part is another kind - a count row's rule after its missing
@@ -403,6 +408,18 @@ export function wrongOf(it) {
     else v = String(w.value);
     const norm = (t) => String(t).replace(/\s+/g, '').toLowerCase();
     if (!v.trim() || norm(v) === norm(answerOf(it))) return null;
+    // ONE error an item (lead ruling N9, 2026-11-13; ws-roles-unit FIX-MINIMAL): a several-part wrong answer that differs from the
+    // right one in more than one part keeps its FIRST error only - the later parts follow the correct rule, so the pupil's fix is
+    // one part, never a rewrite of every term after it. Its own slots no longer match, so they are dropped.
+    const cParts = answerListOf(answerOf(it));
+    const wParts = cParts ? answerListOf(v) : null;
+    if (cParts && wParts && wParts.length === cParts.length) {
+        const at = wParts.findIndex((x, i) => x !== cParts[i]);
+        if (at >= 0 && wParts.some((x, i) => i > at && x !== cParts[i])) {
+            const one = cParts.map((x, i) => (i === at ? wParts[i] : x)).join(', ');
+            return Object.assign({}, w, { value: one, display: one, slots: undefined, oneError: true });
+        }
+    }
     return Object.assign({}, w, { value: v, display: w.display !== undefined ? String(w.display) : v });
 }
 

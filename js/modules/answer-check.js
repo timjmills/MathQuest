@@ -11,7 +11,8 @@ import {
 } from './widget-retry.js';
 import { ftAnswerMatches } from './sheet/index.js';
 import { practiceLadderWrong, markTried, ladderWillHelp, ladderOf } from './support-ladder.js';
-import { markBoxSubmitted, itemWasHelped, markMissingDigits, clearBoxMark } from './screen-cell.js';
+import { markBoxSubmitted, itemWasHelped, markMissingDigits, clearBoxMark, markVocabFeedback } from './screen-cell.js';
+import { speakExplanation } from './hints-speech.js';
 
 // Expose per-skill calculator gate so #calcBtn show/hide logic in other
 // modules (question-render, etc.) can consult it. Default is no calc.
@@ -1159,6 +1160,9 @@ export function checkAnswer(userAns, btnElement) {
     try { if (!(q.options && q.options.length)) markBoxSubmitted(document.getElementById('answerInput'), isCorrect); } catch (_) { /* optional */ }
     // Wave 1 / A3: a digit box left empty in a wrong answer is a missing digit
     try { if (!isCorrect) markMissingDigits(document.getElementById('questionCard')); } catch (_) { /* optional */ }
+    // owner R-1 / R-2 (lf-vocab r7): a vocabulary cell shows its focal part and the right word, and a wrong answer its
+    // explanation, read aloud once (the sound toggle mutes it)
+    try { markVocabFeedback(document.getElementById('questionCard'), q, isCorrect, { speak: speakExplanation }); } catch (_) { /* optional */ }
 
     if (isCorrect) {
         state.lastAnswerCorrect = true;

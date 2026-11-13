@@ -3902,6 +3902,1496 @@
   }
  },
  {
+  "id": "lesson-pm-h13-spot",
+  "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-cont",
+  "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-CONT",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-tab-clear",
+  "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples TAB-CLEAR",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-sheet-2pg",
+  "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples SHEET-2PG",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
+  },
+  "pending": true,
+  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-fix-minimal",
+  "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit FIX-MINIMAL",
+  "browser": false,
+  "fail": {
+   "commit": "0e37c854",
+   "state": "'12, 15, 19, 22' kept (2 errors)"
+  },
+  "pass": {
+   "commit": "020cdba3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only FIX-MINIMAL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "model-marks-ink",
+  "check": "a Scripted Model state draws only its own new marks in trace grey; earlier steps' marks are black (PT-MOD-1, P-LC-9; lf-roles critic r5b D2)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit MOD-MARKS-INK",
+  "browser": false,
+  "fail": {
+   "commit": "3b324bcc",
+   "state": "states carry no new-mark list: every traceSlots value drawn grey"
+  },
+  "pass": {
+   "commit": "88032a8a",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-MARKS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-div-facts",
+  "check": "ws-empty-band EB-FOOT: div_facts Independent at S / M / L draws each cell within 10 % of the footprint the bridge measured for it (lf-checks L25: the supports-off rows were stretched past the measured height). Its fail commit predates data-eb-item, so the row also exercises the position-pairing fallback (its NOTE); the pass commit pairs by index",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "commit": "537c2275",
+   "state": "EB-FOOT 156 on independent (rows stretched past the facts' measured footprint)"
+  },
+  "pass": {
+   "commit": "48e24daa6",
+   "state": "rows of 1.1 x the measured height (noStretch, de8e7531) on every offered role, each cell judged by its own data-eb-item: EB-FOOT within the pin (the 10 mixed-practice L findings are pinned facts debt)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --hosts none --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-reorder-arrays-groups",
+  "check": "ws-empty-band EB-FOOT pairs each cell with ITS OWN item by the kit's data-eb-item (critic eb-r5 m1): arrays_groups lays its items tallest first, so dealt-order pairing judged each cell against another item's footprint",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (index pairing, critic eb-r5 m1)",
+  "browser": true,
+  "fail": {
+   "commit": "4474a995",
+   "state": "no data-eb-item: position pairing, EB-FOOT 35 false findings on independent / more-practice / test / review (drawn heights are other items' footprints)"
+  },
+  "pass": {
+   "commit": "48e24daa6",
+   "state": "the kit writes data-eb-item: every cell judged against its own item, EB-FOOT 0, no fallback note"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:arrays_groups --hosts none --no-baseline --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-sets-split",
+  "check": "Every lesson word set splits into two clash-free Match 3 trios (ws-vocab-unit V7; lane lf-vocab build 1: the G4 remainder set repeated a word on a Match 3 page)",
+  "kind": "fixture",
+  "rule": "ws-vocab-unit V7",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/vocab-sets.fail.mjs",
+   "state": "remainder, round up and equal groups in one set: they all read as each other (notWith)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/vocab-sets.pass.mjs",
+   "state": "equation for equal groups: two clash-free trios"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-vocab-match3-guided",
+  "check": "Match 3 pictures on the GUIDED page: 32-35 % empty bands under the ink at S and L (lf-vocab critic r3)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+  "browser": true,
+  "fail": {
+   "commit": "bebf5b36",
+   "state": "lf-vocab critic r3 FAIL head; ws-empty-band FAIL 4 (guided S Model 35.0 %, cell 2 32.4 %; guided L Model 33.5 %), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v11r-score-roles",
+  "check": "The per-word Score (Match 3: 3 a cell) on guided, more-practice, test and error-analysis too (critic r3 #2: guided /5 and /4 for 15 and 12 words)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V11R",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V11R",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v14-hint-unique",
+  "check": "A Guided cue hint picks out exactly one bank word (critic r3 #5: \"starts with c\" with column and commutative in the bank)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V14",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V14",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v15-writeline",
+  "check": "The 1 picture, 3 words answer line >= 1.2 x the widest bank word; grades 4-5 >= 55 mm (critic r3 #7: ~36 mm for \"times as many\")",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V15",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V15",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v16-base10-unit",
+  "check": "one, ten and hundred print one unit square (critic r3 #8: a \"one\" bigger than a unit of the ten)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V16",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v17-lookalikes",
+  "check": "Every critic-found look-alike pair is notWith, append-only (critic r3 #9: grow with sequence in the bank)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V17",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v18-guided-rows",
+  "check": "1 picture, 3 words Guided rows equal at S, M and L (critic r3 #6: 379 / 291 px at L)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V18",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v19-ws-tiles",
+  "check": "One worksheet-1280 tile layout per template (critic r1 #10, r2 #7, r3 #4: 2 + 1 words, pills wrapping, line y varying)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V19",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V19",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v16-base10-per-item",
+  "check": "Base-ten one / ten print a >= 5 mm unit when no hundred is in the item, one unit within an item (owner OQ-1; critic r4: a 2.5 mm \"one\" on grade 2)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V16",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-vocab-pick3-ea-s-critic",
+  "check": "1 picture, 3 words error analysis at S: 30.1-30.2 % empty while ws-empty-band passed (critic r4 #1); the critic-aligned band (--slot-ink off)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band --slot-ink off EB-BAND",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_pick3_words --roles error-analysis --sizes S --hosts none --slot-ink off",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v18-rendered-rows",
+  "check": "1 picture, 3 words Guided rows unequal at L, 377 / 290 px, measured on the rendered row boxes (critic r4 #2, 4th round)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V18",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v20-ea-s-height",
+  "check": "Match 3 error analysis at S drawn in L's 76 mm cell, 24-28 % empty (critic r4 #3): S cell <= 0.9 x L when its content is smaller",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V20",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v17-printed-text",
+  "check": "\"number name\" offered with \"hundred\" while its picture prints \"three hundred forty-seven\" (critic r4 #4)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V17",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v21-referent",
+  "check": "The \"left\" picture marks what goes, not what stays (critic r4 #5): a declared referent carries the heavy mark",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V21",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V21",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v22-focal",
+  "check": "Owner R-1: every picture declares a focal part, drawn targetable on the key (single grey) and screen (hidden halo), never on the pupil page",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V22",
+  "browser": false,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v24-explain",
+  "check": "Owner R-2: every bank word has an explain naming its word, no notWith word, <= 14 words",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V24",
+  "browser": false,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "b4a249b6",
+   "state": "lf-vocab r7 build, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V24",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v23-v25-screen-feedback",
+  "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V23 + V25",
+  "browser": true,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v23-painted",
+  "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V23",
+  "browser": true,
+  "fail": {
+   "commit": "b4a249b6",
+   "state": "lf-vocab r7 first build (key orange, screen halo grey), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-o1-next-box-blue",
+  "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB1-NB5",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 start: the 2026-10-04 yellow next box, no switch"
+  },
+  "pass": {
+   "commit": "5d8fe328",
+   "state": "lf-vocab r8 step A: the O-1 switch"
+  },
+  "command": "node tests/scripts/ws-next-box.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v25plus-v26-v27",
+  "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V25+ V26 V27",
+  "browser": true,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v22plus-v24plus",
+  "check": "critic r6 #6, #7: the key's grey highlight never strokes a glyph or a dot (unstroked underlays); an explanation uses no hard word (figure(s), amount ...) and is at least 6 words",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V22+ V24+",
+  "browser": false,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22,V24",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v-ambig",
+  "check": "owner O-2 / O-3: every library picture and lesson-band picture declares alsoShows; a picture that could show another word of its bank, Match 3 cell or lesson band fails (the staircase step with column; the identify band's H T O beside ones and four cubes beside place)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG",
+  "browser": false,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-v26-preskills",
+  "check": "lf-vocab r9 item 1 (precritic render-gate / cell-checks): the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below (provider preSkills), never the Grade 6 definition-matching skills before it in data.js (legacy cells overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V26",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base: master pre-skill-check role offered for the vocab skills"
+  },
+  "pass": {
+   "commit": "6e140668",
+   "state": "lf-vocab r9 item 1"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V26",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-guided-s-set8",
+  "check": "lf-vocab r9 item 2 (precritic cell-checks): the Match 3 Guided page at S with vocabSet 8 gives every row one share (footprint evenRows), so no row of flat pictures is shorter than its cell draws",
+  "kind": "commit-pair",
+  "rule": "ws-grade-render --gate (guided S vocabSet 8)",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "002e071f",
+   "state": "lf-vocab r9 item 2"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-grade-render.cjs --skills vocabulary:vocab_grade_pictures --roles guided --size S --opts '{\"vocabSet\":8}' --gate --no-screen --out /tmp/mq-bt-guided-s8 | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-sections-density",
+  "check": "lf-vocab r9 item 3 (precritic print-lint-sections S / L): a two-skill Sections sheet of Match 3 + 1 picture 3 words never prints one Match 3 alone on a page (DN-2, LONE, PAGEFILL): Match 3 takes whole rows of a shared page (footprint wholeRows, print-sheet.js shareRows)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint --kind sections L-DENSITY",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "bbd73b28",
+   "state": "lf-vocab r9 item 3"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-gdpcap",
+  "check": "lf-vocab r9 item 3b (precritic ws-empty-band EB-GDPCAP, master's rule): the Match 3 Guided page holds at most the 10 / 8 / 6 scored tries (3 a cell) plus the Model at S / M / L",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GDPCAP",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master d34311d5 merge (EB-GDPCAP arrived with it)"
+  },
+  "pass": {
+   "commit": "b28f3960",
+   "state": "lf-vocab r9 item 3b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-nb6-quiz-red",
+  "check": "lf-vocab r9 item 4: critic r7 #1: the quiz, Match 3 answered wrong (instant feedback) - every wrong letter box red, none with the blue next ring",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB6",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+  },
+  "pass": {
+   "commit": "69564628",
+   "state": "lf-vocab r9 items 4 + 4b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB6 ' && echo 'nb6: FAIL' || echo 'nb6: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-nb7-pick3-line",
+  "check": "lf-vocab r9 item 4b: lead default for critic r7 note 2: the pick3 answer line carries the next outline before an answer on card / worksheet / quiz, none after a tap",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB7",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+  },
+  "pass": {
+   "commit": "69564628",
+   "state": "lf-vocab r9 items 4 + 4b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB7 ' && echo 'nb7: FAIL' || echo 'nb7: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-v-ambig-plus",
+  "check": "lf-vocab r9 item 5: critic r7 #6 (O-3): alsoShows derived from each picture's drawing; every same-grade pair compatible() allows fails",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "b52eb44c",
+   "state": "lf-vocab r9 items 5 + 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\)\" picture reads as \"\\(pattern\\|multiple\\)\"\\|the \"array\" picture reads as \"\\(row\\|column\\)\"' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: V-AMBIG+ (the derived-rule list) was replaced by V-FEAT; the row judges the same r7 cases through V-FEAT"
+ },
+ {
+  "id": "vocab-r9-v27-minors",
+  "check": "lf-vocab r9 item 6: critic r7 #3-#5: no two key dot underlays overlap (one per group); the pick3 'Here is how' uses the screen verb (Tap); no broken comparison in an explanation",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V27",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "b52eb44c",
+   "state": "lf-vocab r9 items 5 + 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V27",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-minitems-answers",
+  "check": "lead ruling 2026-11-12 (precritic vocab-unit): the Guided MIN_ITEMS counts SCORED ANSWERS per cell (footprint points, the EB-GDPCAP count), so the Match 3 Guided page at L (Model + ONE try = 3 answers) meets 'Model + 3 tries'; a single-answer page still needs the Model + 3 tries",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V28",
+  "browser": false,
+  "fail": {
+   "commit": "08d0a5ce",
+   "state": "lf-vocab r9 base: MIN_ITEMS counts cells, Match 3 Guided L = Model + 1 try held short"
+  },
+  "pass": {
+   "commit": "d7f708a0",
+   "state": "guided.js minMet counts answers"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V28",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-rule-machine",
+  "check": "lf-vocab r10 item 1: critic r9 #2: a picture with an arrow into and out of a box and a number at both ends (2 -> [+3] -> 5) derives input and output; rule may not share a bank with them",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+ (function machine)",
+  "browser": false,
+  "fail": {
+   "commit": "605fa9f0",
+   "state": "lf-vocab r10 base (r9 + master merge): rule drawn 2 -> [+3] -> 5"
+  },
+  "pass": {
+   "commit": "0c3d4c59",
+   "state": "rule drawn as the box and arrows only"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"rule\" picture reads as \"\\(input\\|output\\)\"' && echo 'rule-machine: FAIL' || echo 'rule-machine: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
+ },
+ {
+  "id": "vocab-r10-cycle-loop",
+  "check": "lf-vocab r10 item 2: critic r9 #3: a loop of three or more numbers derives sequence and pattern; cycle may not share a bank with sequence",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+ (loop of numbers)",
+  "browser": false,
+  "fail": {
+   "commit": "0c3d4c59",
+   "state": "cycle drawn as a 2, 4, 8, 6 ring"
+  },
+  "pass": {
+   "commit": "856aba09",
+   "state": "cycle drawn as a loop of four shapes"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"cycle\" picture reads as' && echo 'cycle-loop: FAIL' || echo 'cycle-loop: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
+ },
+ {
+  "id": "vocab-r10-v-fit",
+  "check": "lf-vocab r10 items 3 + 5: critic r9 #4 (rule 5 root cause): every core word's picture teaches its set's standard (ccss / op); total's additive 5 + 3 bar fails the 4.OA.A.1 times-as-many core",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FIT",
+  "browser": false,
+  "fail": {
+   "commit": "6ae462d1",
+   "state": "lf-vocab r9: times as many = times as many, total, factor, ..."
+  },
+  "pass": {
+   "commit": "4200e2c0",
+   "state": "times as many = times as many, factor, product, compare, multiple, unknown"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-v-fit6",
+  "check": "lf-vocab r10 item 4: critic r9 #5: a set's other words teach its standard too (pinned misfits apart): output (input-output tables) in follow a rule and total (additive bar) in growing patterns fail",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FIT6",
+  "browser": false,
+  "fail": {
+   "commit": "4200e2c0",
+   "state": "r9 sets 7 / 8 with total and output"
+  },
+  "pass": {
+   "commit": "6adc77cb",
+   "state": "growing patterns takes odd, follow a rule takes grow"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-nb8-wrong-focus-tick",
+  "check": "lf-vocab r10 item 6: critic r9 #1: a focused wrong Match 3 letter box keeps its red dashed edge and no next ring (worksheet); the quiz right box is green with the card's tick badge, wrong boxes their cross",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB8",
+  "browser": true,
+  "fail": {
+   "commit": "b502c983",
+   "state": "lf-vocab r10 before item 6"
+  },
+  "pass": {
+   "commit": "bae5c32e",
+   "state": "lf-vocab r10 item 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB8 ' && echo 'nb8: FAIL' || echo 'nb8: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-lesson-render",
+  "check": "lf-vocab r10 item 7: critic r9 #6: a lesson render handed to a critic carries the NAMED lesson's title and a body that is not nearly empty, and its vocabulary band holds ink",
+  "kind": "fixture",
+  "rule": "ws-lesson-render LR-TITLE / LR-BODY / LR-BAND",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/lesson-render.fail.html",
+   "state": "the r9 evidence: another lesson's page (expand, 'I Can write a number in expanded form') with an empty body, judged as placevalue:identify"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/lesson-render.pass.html",
+   "state": "the placevalue:identify lesson's band page"
+  },
+  "command": "node tests/scripts/ws-lesson-render.cjs --lesson placevalue:identify --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r7-row-pattern",
+  "check": "V-FEAT: the r7 look-alikes (row / column read as pattern and multiple; array as row / column) are clashes: critic r7 #6",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start: row, column, array dealt with pattern / multiple / row"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "V-FEAT, the r11 notWith and redraws"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\|array\\)\" picture reads as' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r9-rule-cycle",
+  "check": "V-FEAT: the r9 cases, rule (2 -> [+3] -> 5) read as input / output and cycle (2, 4, 8, 6 ring) as sequence: critic r9 #2, #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "6ae462d1",
+   "state": "lf-vocab r9 head"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "V-FEAT"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(rule\\|cycle\\)\" picture reads as \"\\(input\\|output\\|sequence\\)\"' && echo 'r9-rule-cycle: FAIL' || echo 'r9-rule-cycle: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r10-term",
+  "check": "V-FEAT: the r10 cases, term / first term (4, [7], 10 / [3], 7, 11) read as grow and term as rule: critic r10 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "term 18, [14], 10 and first term [30], 25, 20"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(term\\|first term\\)\" picture reads as \"\\(grow\\|rule\\)\"' && echo 'r10-term: FAIL' || echo 'r10-term: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-hatch",
+  "check": "V-HATCH / V7: a set whose words cannot split into two clash-free trios is legal once a word is dropped from its PICTURE items (noPicture), instead of one more redraw (lead ruling, lf-vocab r11 item 2)",
+  "kind": "fixture",
+  "rule": "vocab-words.js pictureWords; ws-vocab-unit V6 / V7 / V5 judge the picture words, V-HATCH: a noPicture word is never drawn",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/vocab-hatch.fail.mjs",
+   "state": "term, first term and rule mutually notWith in one set, no hatch"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/vocab-hatch.pass.mjs",
+   "state": "the same set with noPicture: ['first term']"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture} --only V7",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-vref",
+  "check": "V-REF: every mark a wrong-answer explanation points at is drawn in its own picture and in no picture dealt with it: critic r10 R-2 #2 (cycle's 'ones digits' beside shapes), #3 (unknown's 'the one in the box' beside factor's boxed 4 and 3)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-REF (lf-vocab r11 item 3)",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "7c8fee58",
+   "state": "cycle and unknown explains reworded; factor / divisor / dividend / first term point at boxed marks"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-REF 2>&1 | grep -q '\"cycle\": its explanation points at \"ones digits\"\\|\"unknown\".s explanation points at \"the one in the box\", and the \"factor\"' && echo 'vref: FAIL' || echo 'vref: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-nb9-blur",
+  "check": "NB9: after Check on the worksheet, the active element is not a vocab slot (no caret in a red box): critic r10 Match 3 #4",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "screen-cell.js markVocabFeedback blurs the vocab slots; ws-next-box NB9",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "7c8fee58",
+   "state": "Check blurs the vocab slots"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-vstd-product-multiple",
+  "check": "V-STD: a set's standards text (3.OA.C.7 / 4.OA.B.4) names product and multiple together, and the product picture reads as multiple: critic r11 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-STD (lf-vocab r12 item 1)",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "fe6dfdaa",
+   "state": "product / multiple notWith; sets 0 and 6 re-picked"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-STD 2>&1 | grep -q 'V-STD .*\"product\" and \"multiple\"\\|V-STD .*\"multiple\" and \"product\"' && echo 'vstd: FAIL' || echo 'vstd: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-feat-term-rule",
+  "check": "V-AMBIG: the term picture (18, [14], 10) could also show the rule 'take 4', and the two may share a bank: critic r11 #3",
+  "kind": "commit-pair",
+  "rule": "vocab-pictures.js VOCAB_ALSO_SHOWS term +rule; term / rule notWith",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "b3d5d9f4",
+   "state": "term / rule notWith; set 7 re-picked"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG 2>&1 | grep -q 'V-AMBIG \"term\": its picture could also show \"rule\"' && echo 'termrule: FAIL' || echo 'termrule: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-nb9-every-card",
+  "check": "NB9: on the Match 3 worksheet, every card focused in turn, and the card: after Check no vocab slot holds the focus and no wrong slot shows a caret: critic r11 #4",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "screen-cell.js blurVocabSlots + caret-color transparent; ws-next-box NB9",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "20f00492",
+   "state": "Check blurs every vocab slot; wrong slots have no caret"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-v7all",
+  "check": "V7-ALL: every bank a set can deal is judged; set 0 deals row with even, sets 7/8 first term with rule: critic r12 root cause",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V7-ALL (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "pick3 deals only vetted trios"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V7-ALL 2>&1 | grep -q 'V7-ALL set \\(0\\|7\\) ' && echo 'v7-all: FAIL' || echo 'v7-all: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-vnum",
+  "check": "V-NUM: the row picture rings 2, 4, 6, 8 (all even) and is dealt with even: critic r12 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-NUM (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "row rings 3, 6, 9, 12"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"row\"' && echo 'v-num: FAIL' || echo 'v-num: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-feat-product-row",
+  "check": "V-FEAT: a times table reads as product, row/column dealt with product: critic r12 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "product notWith row, column; set 0 product -> factor"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'V-FEAT .*\"row\" picture reads as \"product\"' && echo 'v-feat: FAIL' || echo 'v-feat: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-vtwin",
+  "check": "V-TWIN: term and first term draw one feature class, only term notWith rule: critic r12 #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-TWIN (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "first term notWith rule"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*first term' && echo 'v-twin: FAIL' || echo 'v-twin: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vnum-one",
+  "check": "V-NUM one mark: a single ringed or boxed number is a parity feature; ones digit 47[3] dealt with odd in set 8: critic r13 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-NUM (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "8506cbaa",
+   "state": "ones digit boxes 47[6]; even / product, odd / quotient, odd / dividend notWith"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"ones digit\".*one mark' && echo 'v-num-one: FAIL' || echo 'v-num-one: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vplace",
+  "check": "V-PLACE: a ringed or boxed digit inside a number reads as one / ten / hundred; digit 4(7)2 dealt with ten in set 5: critic r13 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-PLACE (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "b57960c6",
+   "state": "digit notWith one, ten, hundred"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-PLACE 2>&1 | grep -q 'V-PLACE .*\"digit\"' && echo 'v-place: FAIL' || echo 'v-place: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vtwin-run",
+  "check": "V-TWIN run: every run picture (grow's 1, 3, 5 squares read from its drawing) reads as rule; grow dealt with rule in sets 7 and 8: critic r13 #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-TWIN (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "2e8a59a3",
+   "state": "grow / rule, sequence / rule notWith"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*\"grow\" draws a run' && echo 'v-twin-run: FAIL' || echo 'v-twin-run: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-sis-pick3",
+  "check": "pick3 screen twin draws equal groups' rings and dots at 81 % of print (card 390 / 820 / 1280)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+  "browser": true,
+  "fail": {
+   "commit": "9c83c24f",
+   "state": "lf-vocab r14 status head"
+  },
+  "pass": {
+   "commit": "75b0e131",
+   "state": "twin fits the paper box, printFloor"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-sis-match3-tile",
+  "check": "Match 3 online worksheet draws the row / column table cells at 94 % of print",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+  "browser": true,
+  "fail": {
+   "commit": "9c83c24f",
+   "state": "lf-vocab r14 status head"
+  },
+  "pass": {
+   "commit": "75b0e131",
+   "state": "worksheet picture slot 104 px"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-overflow-stack",
+  "check": "Reason It A / B work never leaves its cell: work wider than half the room stands A over B (lead ruling 2026-11-13; word-stories critic r1 F2, compare F1)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "b25479c5",
+   "state": "34 OVERFLOW on sub/add_word_problems + sub_1m_no_regroup RI S/M/L"
+  },
+  "pass": {
+   "commit": "244a84b6",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_word_problems,subtraction:sub_1m_no_regroup --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-tight-rows",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "EB-BAND 2 on expand / unit_form / combine guided"
+  },
+  "pass": {
+   "commit": "8307219c",
+   "state": "EB-BAND PASS"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-one-answer",
+  "check": "a Reason It item asks for the answer once: circle A or B, 'The answer is __.' (lead ruling F8, PT-RSN-4)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-ONEANSWER",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'__ is correct.' + ri-who on every item"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-ONEANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-layout",
+  "check": "Reason It work within half the cell keeps A and B side by side over a full-width response row; only wider work stacks, from the top (critic r6c D1 / D3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "85 mm work stacked (one item a page)"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell",
+  "check": "a word answer's line is one width whatever the word (no tell; holds 'hundreds')",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'no' 2 digits, 'yes' 6"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "key-fit",
+  "check": "a key's written answer stays inside its slot (identify's 'hundreds' on a 2-digit line)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks KEYFIT",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "KEYFIT on identify RI S/M/L, TF"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:identify --roles reason-it,true-false --size S,M,L --rules KEYFIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lone-page",
+  "check": "a role page never holds ONE item where its ceiling is 2+ (H5; critic r6c / r6d D1: a Grade 2 story one a sheet)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks LONE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "df83248e",
+   "state": "sub_word_problems RI L 1 item"
+  },
+  "pass": {
+   "commit": "faeb7759",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_wp_10 --roles reason-it --size L --rules LONE-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell-number",
+  "check": "a number answer line holds the longer of the right and the wrong answer (critic r6d E1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "df83248e",
+   "state": "29 against 141: a 2-digit line"
+  },
+  "pass": {
+   "commit": "c42f7504",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-countrow-overflow",
+  "check": "a Reason It count-row train never leaves its A / B panel (lf-algebra critic r2 G4 area; npr overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "c5235768",
+   "state": "npr RI OVERFLOW 18"
+  },
+  "pass": {
+   "commit": "7b33c7e3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-stack-band",
+  "check": "a stacked Reason It pair leaves no 30 % band under its work: the A / B tag stands in a gutter at S / M (critic r6f F1, H13)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "39213c4b",
+   "state": "npr RI S: 33 % under each cell"
+  },
+  "pass": {
+   "commit": "87b0c18c",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-ink-inner",
+  "check": "Reason It holds a true ink width (inkWMm) to the panel's inner width: 61 mm of compare ink goes under, not beside (lf-placevalue 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "d8baca1e",
+   "state": "61.2 mm ink laid out beside a 57.5 mm panel"
+  },
+  "pass": {
+   "commit": "8d757936",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
   "id": "pv-gridfoot-combine-test-s",
   "check": "placevalue:combine one-page Test / Review: the white under the grid is at most one row, or the page stands in no more columns than the Independent page (lead-approved F1, lf-placevalue compare round: combine Test S 4 across against the Independent page's 3, about 45 % of the page white under the grid)",
   "kind": "commit-pair",

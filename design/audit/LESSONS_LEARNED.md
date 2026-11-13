@@ -304,6 +304,79 @@ grades them by eye; when the critic passes the family, its skills are added to `
 second family on the template is machine-compared. Applied to pv (lf-placevalue) and arrays / arrays-turn (lf-ops).
 A card that offers every §7a option and has no `notOffered` entry reads card-not-offered as N/A, not a failure.
 
+## lf-vocab (vocabulary pictures) precritic r1-r5 and critics r1-r2 (2026-11-07): one line per finding, the check that catches it
+| Finding | Rule | Check |
+|---|---|---|
+| A picture's word could be read off a second picture in the same item (row/column, term/sequence, round up/quotient) | Words whose pictures share a mark are `notWith`; every word set splits into two clash-free trios | ws-vocab-unit V3-V7; backtest row `vocab-sets-split` |
+| Pictures too small to teach (ten rod 3.4 mm, lone 12 mm square, 10 pt text) | A picture's marks span >= 50 % of its drawing area both ways; picture text >= 7 canvas units | ws-vocab-unit V8 |
+| K-1 number strips at 11 pt | Printed picture text >= 16 pt for K-1, >= 14 pt for grades 2-5, at every host, grade and size | ws-vocab-unit V9 |
+| Footer named the skill's grade-3 tags on grade 1, 2, 4 pages | A page dealt from one word set carries that set's grade and CCSS (items carry `q.sheetTags`) | ws-vocab-unit V10 |
+| Match 3 page scored /4 for 12 words | A template declares its points (`footprint().points`); the page Score sums them | ws-vocab-unit V11 |
+| Guided hint repeated the instruction; error-analysis wrong word not a real mistake | A hint names the cue; a wrong word is a look-alike or a misspelling | ws-vocab-unit V12, V13 |
+| A role the card offers declined the skill (a 'choice' slot) / drew the key as the wrong work | Every role on the card's §7a renders the skill; a Fix item's shown work differs from its key | critic-caught; run every offered role in the local loop (ws-grade-render --roles <card's offered roles>) |
+| Match 3 guided at S overflows (r3 render) while precritic is green | precritic's render gate (lesson, test, independent) does not draw guided / more-practice / error-analysis: render EVERY role the card offers before calling a page clean | proposed: ws-precritic --skill runs ws-grade-render --gate on the card's offered roles (lead) |
+
+### lf-vocab critic r3 (2026-11-07, FAIL min 6): each finding, its rule, its check (check FIRST on the next vocabulary page)
+| Finding | Rule | Check |
+|---|---|---|
+| H13 empty bands of 30-40 % in Match 3 guided (S, L), both error-analysis pages, and worksheet-1280 tiles, with every precritic gate green | An empty band of 30 % or more in any cell fails, on EVERY role the card offers and on every screen host. The critic's row-ink scan is the measure, so the lane runs it before the critic. | NEW: a row-ink empty-band scan (>= 30 % of a cell's height with no ink) per cell on every role page and worksheet/quiz host that ws-grade-render writes. It goes on precritic's path for the card's offered roles. Backtest row: the critic4 renders FAIL, the fix PASSes. |
+| r4 fixed guided overflow with a static `hMm` (47 mm at S), which made the guided cells too EMPTY at S and L | A footprint `hMm` is the height the cell DRAWS in that role, ±10 %, never a cap picked to stop overflow. Overflow and emptiness are two sides of one number. | NEW: the drawn cell height (browser) vs `footprint().hMm` per role and size, within ±10 %. |
+| The guided page Score stays /5 (and /4) while independent is /12 (Q-C) | The per-word score holds on every role the card offers, not only the role the check was written on | Extend ws-vocab-unit V11 to guided, more-practice, test and error-analysis |
+| "grow" left out of `notWith` on purpose (to keep 4 Match 3 cells a page) and the critic read grow as sequence again | A known look-alike is ALWAYS `notWith`. If that breaks a set's split, change the set's words, never the clash list. | V3-V7 run against a list of critic-found look-alike pairs (append-only), so a removed pair FAILs |
+| Grade 4 write lines (~36 mm) shorter than the bank's longest word ("times as many") | An answer line is at least as long as the widest bank word at the answer font, plus 20 % | NEW lint: line length vs the measured text width of every bank word |
+| A first-letter hint ("starts with c") is ambiguous when two bank words share the letter | Use a cue hint only if it picks out exactly one bank word. Otherwise give the meaning. | ws-vocab-unit: the hint's cue matches exactly one bank word |
+| one / ten / hundred drawn at three scales | Base-ten pictures in one set share one unit square | V8: the base-ten ids' unit size is equal |
+| Pick 3 guided rows unequal at L only (S and M fixed): r1 #6, r2 #4 and r3 #6 is the third round | Row equality is checked at every size | The guided row-equality check runs at S, M and L (it ran at one size) |
+| The worksheet-1280 tile layout differs between tiles (2 + 1 vs one a row): r1 #10, r2 #7 and r3 #4, three rounds | A screen tile's layout is fixed per template, never left to the flex-wrap of its content | NEW: worksheet-1280 tiles of one template have equal slot x-positions and the same word-row structure |
+| The grade 1 and 4 lesson renders showed the pilot lesson's title and footer | Render each word set inside its own BUILD lesson, never in a borrowed host | The render harness takes the set's own lesson id |
+
+### lf-vocab critic r4 (2026-11-08, FAIL min 6): the checks passed what the critic failed
+| Finding | Rule | Check |
+|---|---|---|
+| Pick 3 error analysis at S: the critic measured 30.1-30.2 % empty bands while ws-empty-band PASSed | A check and the critic must measure the SAME band. If they differ, the check is wrong until it is aligned (a 0.2 % margin is not a pass). | ws-empty-band: state which ink counts (empty answer slots, text, rules) and match the critic's column-aware row-ink scan. Add a backtest row on 31bee0fb for pick3 error-analysis S (lf-checks owns it). |
+| Pick 3 guided rows unequal at L (377 vs 290 px) in the 4th round (r1 #6, r2 #4, r3 #6, r4 #2) while V18 PASSed | A row-equality check measures the rendered ROW boxes on the printed page, at every size, with no "when there is room" exemption. | V18: measure the page's row boxes in px from the print render that ws-grade-render writes, not the cell's planned height |
+| Match 3 error analysis at S drawn at L's height (24-28 %, a near-miss) | A cell at S that draws less is shorter than at L | NEW: cell height at S <= 0.9 x height at L when its content shrinks |
+| "number name" offered with "hundred" while the picture prints "three hundred forty-seven" | A bank word that appears in the picture's printed text is a look-alike | NEW: no bank word in the picture's text (V17 extension) |
+| The "left" picture reads as take away (it marks what goes, not what stays) | A picture marks its referent with a heavy mark | NEW: each picture declares its referent, and a test checks that the referent carries the heavy mark |
+
+### lf-vocab round 6 and critic r5 (2026-11-09): PASS min 8. Findings-to-checks
+| Finding | Check | Backtest | On precritic? | Would have saved |
+|---|---|---|---|---|
+| OQ-1: base-ten "one" a 2.5 mm speck | V16 extended: one unit per item, >= 5 mm with no hundred | vocab-v16-base10-per-item | y | 1 |
+| pick3 error analysis at S: 30.1 % band | ws-empty-band --slot-ink off (critic-aligned) | eb-vocab-pick3-ea-s-critic | y (empty-band-critic) | 1 |
+| pick3 guided rows unequal at L (4 rounds) | V18: rendered row boxes at S/M/L, no exemption | vocab-v18-rendered-rows | y (vocab-unit-browser) | 3 |
+| Match 3 error analysis at S drawn at L height | V20: S cell <= 0.9 x L when S ink is smaller | vocab-v20-ea-s-height | y (vocab-unit-browser) | 1 |
+| "number name" with "hundred" in one bank | V17 extended: no bank word in the picture's printed text | vocab-v17-printed-text | y | 1 |
+| "left" read as take-away | V21: a required referent, which carries the heavy mark | vocab-v21-referent | y | 1 |
+| ws-empty-band counted empty slots as ink | --slot-ink off (opt-in; the default is unchanged; lf-checks decides the re-pin: 299 -> 2057 on the add_facts / mult_facts pins) | eb-vocab-pick3-ea-s-critic | y (vocab only) | 1 |
+| r5 nits, no score effect: Match 3 guided rows 15-18 % apart; guided answer line height differs within a row (VQ-7); letter anchor; card-390 box alignment; a repeated pupil name on error analysis; caption sizes within a row; lone "one" could be larger; a stale provider header comment | NOT built yet: row-spread at 10 % on every guided template; answer-place height within 2 mm across a row; letter-offset check; 390 box x alignment; distinct pupil names a page; one caption size a slot; provider header vs wrongAnswer ids lint. Reason: they are nits under the 8 bar and the round was capped; they go to the next vocabulary round | - | n | 0 (no score effect) |
+
+### lf-vocab round 7, owner R-1 / R-2, narrow critic (2026-11-09): FAIL min 7 (a near-miss); findings to checks
+| Finding | Rule | Check (to build next round) | On precritic? |
+|---|---|---|---|
+| Match 3 wrong line "The answer is input!" when the answer is a letter; all three pictures glow; the letter never shows | Feedback names the RESPONSE the pupil gives: on Match 3 "<Word> is picture <L>!". Only the pictures of the wrongly matched words glow, each with its letter. | V25 extended: on Match 3 the wrong line contains the right LETTER; the glow count equals the number of wrong words | y (vocab-unit-browser) |
+| The "Here is how" ladder repeats the explanation, or gives a weaker hint after it (first letter; Type "____") | When an explanation is shown, a ladder rung never repeats it or hints at less; step 3 names the word | V26: the ladder text after .mq-vexplain shares no sentence with it and has no first-letter rung | y |
+| Wrong cards on one worksheet show different feedback blocks | Every wrong card shows the same feedback blocks | V27: the set of feedback blocks is equal on every wrong card after Check all | y |
+| A pick3 wrong word left on the line with no wrong mark | A wrong answer carries the slot's wrong outline (box-wrong) | V25 extended: a wrong slot has the wrong class | y |
+| The grey key halo stroked round glyphs blurs the labels | A highlight never strokes text: a box behind it, or no halo on glyphs | V22 extended: no halo stroke on a text element in the key | y |
+| Hard words in explanations ("figure(s)", vague "times as many", the too-short "equal groups") | An explanation uses the grade's word list, no word above it, and is at least 6 words | V24 extended: a banned-hard-word list and a minimum length | y |
+| Evidence gaps: the answered-wrong-1280 shot cut off at 900 px; no quiz answered render | Answered states are rendered full-page, on every host incl. the quiz | the render harness: full-page answered shots + a quiz answered state | n (harness) |
+| Owner question: yellow means both "your active box" (the 2026-10-04 pulse) and "correct" (R-1) | - | none: an owner decision | n |
+### lf-vocab round 8 (builder, 2026-11-12): critic r6 findings and owner O-1 / O-2 / O-3, each a check that FAILs on d17f8d6a
+| Finding / ruling | Check | Backtest row | On precritic? |
+|---|---|---|---|
+| O-1: the next answer box blue, one switch, wrong stays red, reduced motion static (every skill) | ws-next-box NB1-NB5 (new, browser) | vocab-o1-next-box-blue | y (next-box, vocab scope) |
+| r6 #1 Match 3 line names the word, all pictures glow | V25+ (letter in the line; glow count = wrong words; letters lit) | vocab-r8-v25plus-v26-v27 | y (vocab-unit-browser) |
+| r6 #2 / #3 ladder repeats the explanation / weaker hint after it | V26 | vocab-r8-v25plus-v26-v27 | y |
+| r6 #4 wrong cards show different blocks (only reproduces on a fresh page with the per-card ladder climbed while current) | V27 | vocab-r8-v25plus-v26-v27 | y |
+| r6 #5 pick3 wrong word unmarked | V25+ (box-wrong on the line) | vocab-r8-v25plus-v26-v27 | y |
+| r6 #6 key halo strokes glyphs and dots | V22+ (no text in the key halo; filled dots unstroked) | vocab-r8-v22plus-v24plus | y (vocab-unit) |
+| r6 #7 hard words / vague explanations | V24+ (HARD_WORDS list, >= 6 words) | vocab-r8-v22plus-v24plus | y |
+| O-2 / O-3 a picture fits another bank / band word (staircase = column; H T O beside ones; four cubes beside place) | V-AMBIG (alsoShows declared for the 47 pictures and every lesson-band picture) | vocab-r8-v-ambig | y (vocab-unit) |
+| r6 evidence gaps (cut-off shots, no quiz answered render) | ws-vocab-answered (full page, card / worksheet / quiz) | - | n (harness) |
+- Speed: a check that needs a reproduced UI state (V27) must start from a fresh page; a state left by earlier cases in the same page
+  hid the defect on the base commit and the first version of the check passed there.
+
 ## lf-placevalue critic r2 (2026-11-07): one line per finding, the check that now catches it (or PROPOSED)
 - N1 identify True or False? key marks the right answer False (writeValue joined string) -> `ws-providers-unit --pv-r2 N1` WRONG-DIFFERS per slot (L27).
 - N2 identify instruction misses the value task on paper -> `ws-providers-unit --pv-r2 N2` PRINTED-INSTRUCTION (L28).
@@ -413,6 +486,56 @@ One line per finding: the rule, then the check.
   **Lesson:** a critic fix made on a sample lesson goes in as a flag on that lesson's record, not as a branch keyed on a
   property many lessons share ("has prereqs", "is a rounding cell").
 
+### lf-vocab round 8, narrow critic r7 (2026-11-12): FAIL min 6. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| O-3 not met: row/column/input/output/array/odd/cycle/factor/product/quotient/unknown/term each fit another same-grade bank word; the hand-written `alsoShows` lists missed them | The ambiguity list is DERIVED from what a picture draws, never written by hand: "=" adds equation; a number run adds pattern, sequence and multiple; a column drawn round adds column; a crossed or lone mark adds left; a loop of arrows adds pattern. Every derived pair in the same grade becomes notWith, or the picture is redrawn. | V-AMBIG+: derive the marks from the SVG; FAIL any same-grade pair compatible() allows | y |
+| Quiz: wrong Match 3 slots not red; the blue next ring on a wrong box | Red (wrong) always wins over the next ring, on every host incl. the quiz | ws-next-box NB6: quiz answered-wrong, every wrong slot red, none ringed | y |
+| pick3 has no next-answer cue on any host | Owner question: is the pick3 line or word row the O-1 "box"? | none until ruled | n |
+| Key dot halos fuse into a blob | A group of marks gets one underlay, never overlapping rings | V22++: no two halos overlap | y |
+| "Type even" when the instruction says "Tap its word" | A hint uses the instruction's verb | V26+: verb match | y |
+| "like 4 dots", "one bar is 3 of the other bar" | An explanation is grammatical and concrete | V24++: a bad-phrasing list | y |
+### lf-vocab rounds 9-10, narrow critics r9 (FAIL min 7) and r10 (FAIL min 7), 2026-11-13: findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| r9: rule 2->[+3]->5 reads as input/output; cycle's number loop reads as sequence | A box with arrows and numbers at both ends derives input/output; a loop of 3 or more numbers derives sequence and pattern | V-AMBIG+ (function machine, loop of numbers) | y |
+| r9: a swapped-in word ("total" = the 5+3 bar) taught addition in a 4.OA.A.1 set | Every core word's picture teaches its set's standard or operation | V-FIT (core) and V-FIT6 (all six; pinned misfits only shrink) | y |
+| r9: the critic's lesson band render was blank (wrong lesson file) | The render step names its lesson and fails on a wrong title or an empty body | ws-lesson-render LR-TITLE / LR-BODY | n (render tool) |
+| r10: term (4,[7],10) and first term ([3],7,11) read as "grow" and term reads as "rule" (+3) | ROOT CAUSE (rule 5, 4th round of the class): each derived rule is written after a critic finds its case. Replace them with a FEATURE model: every picture declares the features it draws (rising run, step d, loop, arrow-box, "=", boxed number ...), every word declares the features that define it, and a clash is any picture whose features satisfy another dealt word's definition | V-FEAT: derive the features from the SVG and test every same-set word, not only the hand-written rule list | y (when built) |
+| r10: the explain line points at a mark the picture no longer draws (cycle, "ones digits"), or at a mark another dealt picture also draws (unknown, "the one in the box") | An explain line names only marks drawn in its own picture, and none drawn in a co-dealt picture | V-REF: referent lint | y (when built) |
+| r10: caret stays in a red vocab slot after Check | Check blurs the vocab slots | NB9: active element after Check is not a vocab slot | y (when built) |
+
+### lf-vocab round 11, narrow critic r11 (2026-11-13): FAIL min 7. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| product (4 x 3 = [12]) can be named "multiple" (4.OA.B.4's own words); dealt together in sets 0, 6, 9 | A word's definition covers every way its standard defines it: a set's CCSS text is read for pairs of its own bank words before the set ships | V-FEAT: multiple also = boxed-answer + times-sign; V-STD: a pair of bank words named together in the set's standard text must be notWith | y (when built) |
+| caret still shows in a red slot after Check (moved card 1 -> card 3) | Wrong slots take caret-color: transparent; Check blurs every vocab slot on every card | NB9+: activeElement and caret-color probed on card AND worksheet, every card | y (when built) |
+| term 18,[14],10 weakly reads as a "take 4" rule | A constant-step run counts as "rule" unless rule is defined only as the operation box | V-FEAT rule definition | y (when built) |
+
+### lf-vocab round 12, narrow critic r12 (2026-11-13): FAIL min 7. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| row rings 2,4,6,8 and is dealt with "even" (set 0 pick3) | The numbers a picture rings or boxes are features too: all-even / all-odd maps to even / odd | V-NUM | y (when built) |
+| row / column (times-table cells) read as "product" | A times table implies product as it implies multiple | V-FEAT times-table rule | y (when built) |
+| first term ([30],25,20) still reads as "rule"; only term got the hand link | A clash fixed by hand is fixed for every picture with the same feature class in the same change | V-TWIN | y (when built) |
+| ROOT CAUSE: pick3 banks are drawn word-against-word from the WHOLE set, so the pairs a pupil can see are not the two vetted trios; every critic round samples new pairs | Every bank a skill can deal is enumerable and listed; the check and the critic judge that list, not samples | V7 over the enumerated pairs; dealt-pairs table in each set manifest | y (when built) |
+
+### lf-vocab round 13, narrow critic r13 (2026-11-13): FAIL min 7, all 234 banks graded; 8 of 11 sets clean
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| ones digit boxes the 3 in 473 and is dealt with "odd" (set 8) | A threshold check is tested at its boundary: ONE marked number is a parity feature too | V-NUM marked-even / marked-odd | y (when built) |
+| digit rings the tens digit of 4(7)2 and is dealt with "ten" (set 5) | A marked digit inside a number draws its place | V-PLACE place:<ones/tens/hundreds> | y (when built) |
+| grow (towers 1,3,5) reads as "rule" (sets 7, 8) | Every run picture, including towers, declares its run and step; a run with a constant step implies rule | V-TWIN over every run picture | y (when built) |
+| (process) the enumerated banks made the review COMPLETE: one round found every remaining clash, in 3 named sets | Enumerate what a pupil can be dealt before any critic | V7-ALL + dealt-banks table | y |
+
+### lf-vocab round 14, narrow critic r14 (2026-11-13): PASS min 8. Minor findings to checks (follow-ups)
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| sequence 5, 10, 15 read as "cycle" (ones digits 5, 0, 5) in set 6 | A run whose visible ones digits repeat draws a ones-cycle | V-TWIN ones-cycle | follow-up |
+| hundred chart key: underlays overflow cells, white specks, whole chart grey (focal: 'all') | An underlay sits inside its focal outline; focal: 'all' over 60 % is flagged | key underlay lint | follow-up |
+| set 5 Match 3 repeats a trio with the same pictures in the same letters | A repeated trio shuffles its pictures too | page repeat lint | follow-up |
+| (process) enumerating every dealt bank (r13) made the review complete; r14 closed it in one round | Enumerate what a pupil can see before grading it | V7-ALL + dealt-banks table | y |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
@@ -480,3 +603,21 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+
+### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+
+Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
+touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem
+cells of the critic's spot lessons were never read; the rounding fix reached Practice and not Mixed. ws-lesson-samples
+--check now carries the four spot lessons, and precritic runs PM-CONT / SHEET-2PG over every library lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| 1 div_facts Mixed equation / missing-factor cells top-anchored: 53 % (L), 54 % and 40 % (S) bands | ws-lesson-samples PM-H13 on the spot lessons (every cell kind) | lesson-pm-h13-spot (9135190b FAIL 6 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 2 sub_wp_10 / add_wp_20 S Mixed word problem 37 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 3 fact_family_sort L Mixed: one 6-cell row alone on a continuation page 72 % blank | ws-lesson-samples PM-CONT (new: no Practice / Mixed continuation page >= 50 % blank) | lesson-pm-cont (9135190b FAIL → 709605bb OK) | precritic lesson-samples-check + lesson-samples-all | 1 round |
+| 4 nearest_10 L Mixed rounding cells not centred, item number on the "T" head | PM-H13 + ws-lesson-samples TAB-CLEAR (new: tab >= 2 mm from ink; 1 mm for an across fact, CL-40) | lesson-tab-clear (9135190b FAIL 2 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
+| 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+| 6 (re-critic lf-engine-live-pm2) re-flow of a sheet fixed one measure (pages used) and broke another (tab clearance): number tab over the T head on sheet items 10-12, pages 27-35 % blank; 709605bb reverted | gate every page rule on the page you change: TAB-CLEAR on sheet Guided / Independent blocks; SHEET-2PG fails when a page >= 30 % blank while any row is below design height; pages balanced within 15 % (proposed, not yet built) | lesson-sheet-2pg PENDING (item 6 redone separately) | precritic lesson-samples-all | 1 round lost |
