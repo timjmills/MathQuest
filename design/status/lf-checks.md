@@ -440,3 +440,12 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 
 ### Queue moved to lf-hosts (lead, 11-13, session_013pHDnQ4fgVajj5vZ6fwpwV)
 lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 touch targets (10); G9 quiz labels (16/17); the two-step host items (23); SIZE-REF same-word (14); and SIZE-WIDTH by unit (15). Builders A and B were already mid-way on these; their commits are offered to lf-hosts as a hand-off, pending the lead's ruling. lf-checks keeps: the checker tools, LP-RASTER for role pages (13: done, ws-grade-render --raster-fit), the -r2 narrow critic, and tool support for lf-hosts.
+- 2026-11-13 queue 13 DONE (builder, Opus medium): LP-RASTER on role pages = `ws-grade-render --raster-fit` (a mode, not a new
+  script: grade-render already builds each role through buildSheet and prints it to a real PDF; the reader is
+  tests/lib/ws-role-raster.cjs). RR-PAGES (PDF pages = plan pageCount / keyPageCount), RR-EDGE (ink within 5 mm of the paper
+  edge), RR-CLIP (each text span's tall glyphs inked at cap and foot: F3's Say band cut by the frame never left the page, so
+  edge/page alone would miss it). `--raster-pdf <pdf> [--expect-pages N]` and `--raster-self-test` (6 cases, no browser, ~1 s).
+  Precritic: --skill runs scripted-model + guided at S/M/L (`raster-fit`, ~10 s a sheet); --role R runs R on its sample at L
+  only (`raster-fit-role-R`). ws-precritic-plan carries `--raster-fit` as a required flag (GR_FLAGS). Row `rr-clip-npr-model-l`:
+  FAIL 47b1f2a86 (RR-CLIP x2) -> OK 7c1e3dbb4 (master; lf-roles' Model re-plan, 2 pages; lf-algebra had no fix of its own).
+  False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.

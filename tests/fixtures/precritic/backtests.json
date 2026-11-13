@@ -5958,6 +5958,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "rr-clip-npr-model-l",
+  "check": "ws-grade-render --raster-fit (LP-RASTER on role pages, tests/lib/ws-role-raster.cjs): a role sheet printed to a real PDF and rasterised - RR-PAGES the PDF's pages = the plan's, RR-EDGE no ink within 5 mm of the paper's edge, RR-CLIP every text span's tall glyphs inked at top and foot. lf-algebra critic F3: the number_patterns_rule Scripted Model at L ran its Say band 6 mm past the panel frame and the frame cut the text in half - clean on screen and in emulated print, visible only in the PDF",
+  "kind": "commit-pair",
+  "rule": "ws-grade-render --raster-fit RR-CLIP (lf-checks queue 13; lf-algebra critic F3, via lf-roles)",
+  "browser": true,
+  "fail": {
+   "commit": "47b1f2a86",
+   "state": "lf-algebra r7: npr Scripted Model L on one page, the Say band ('Say: The rule is count on by 10...') clipped by the frame: RR-CLIP x2"
+  },
+  "pass": {
+   "commit": "7c1e3dbb4",
+   "state": "master (lf-roles' Scripted Model re-plan, 35c881b64 / 24cbb0678, merged): the same Model laid on 2 pages, every text span inked; lf-algebra made no fix of its own (F3 handed to lf-roles)"
+  },
+  "command": "node tests/scripts/ws-grade-render.cjs --skills patterns:number_patterns_rule --roles scripted-model --size L --no-screen --raster-fit --out tests/audit-runs/rr-clip-npr",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

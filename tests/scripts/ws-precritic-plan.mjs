@@ -73,6 +73,9 @@ export function planHasLesson(planText, { lesson, mode }) {
 
 // the ws-empty-band flags that switch rules ON: a row run with one is on the path only where the plan runs it too
 export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
+// the ws-grade-render modes that switch a check on (lf-checks queue 13: --raster-fit is LP-RASTER on role pages; a plain
+// render of the same role is not that check)
+export const GR_FLAGS = ['--raster-fit'];
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
  *  comma list, or - `cardRoles` given - the line has no --roles and so renders every role the signed card offers, R among
  *  them), carrying every flag of `flags`. Pure. */
@@ -111,6 +114,8 @@ function selfTest() {
     eq('a role the card does not offer', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'stretch', cardRoles: ['guided'] }).length, 0);
     eq('flag carried', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 1);
     eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
+    eq('grade-render raster flag carried', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model,guided --raster-fit', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 1);
+    eq('grade-render raster flag missing', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model --gate', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     // the CHECKS_FROM_CRITICS sweep on planted ledger rows: missing id, unknown id, off-path id, exempt, good (+ legacy forms)
     const sw = sweepSelfTest(); n += sw.n; bad.push(...sw.bad.map((b) => `checks-from-critics: ${b}`));
@@ -288,7 +293,8 @@ function rowPathRaw(row, C) {
     // a row on several roles (`--roles a,b`, critic eb-r3 D4) is on the path when EACH role is: lesson / independent through
     // the --skill plan, any other role R through `ws-precritic --skill X --role R` (a lane that touches R runs it). A
     // ws-empty-band line with no --roles renders every role the signed card offers; the row's rule flags must be carried.
-    const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
+    const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command))
+        : c.tool === 'ws-grade-render' ? GR_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
     const cr = c.tool === 'ws-empty-band' ? cardRolesOf(c.skills) : null;
     const per = (c.roles ? c.roles.split(',') : [null]).map((r) => {
         const role = r && r !== 'lesson' && r !== 'independent' ? r : null;
