@@ -187,9 +187,9 @@ function geometry(pools, input) {
     // on mixed time): 20-45% when whole rows allow it, else any share up to 45% with one mixed
     // row, else no mixed row. The most items win; then the share nearest a third; then the
     // skill's own rows (main rows rank first).
-    const search = (lo, needE) => {
+    const search = (lo, needE, opts = eOpts) => {
         let best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: -1, d: 9 };
-        for (const eo of (bands === 2 ? eOpts : [{ c: E.cols, h: E.h, hw: 0, nMax: Infinity, wMax: 0 }])) {
+        for (const eo of (bands === 2 ? opts : [{ c: E.cols, h: E.h, hw: 0, nMax: Infinity, wMax: 0 }])) {
             for (let mr = 1; mr <= Math.min(20, maxMr); mr++) {
                 const a = mainAt(mr);
                 for (let er = 0; er <= (bands === 2 ? 10 : 0); er++) {
@@ -214,6 +214,19 @@ function geometry(pools, input) {
     if (best.n < 0 && bands === 2) best = search(0, true);
     if (best.n < 0) best = search(0, false);
     if (best.n < 0) best = { mRows: 1, eRows: 0, eWide: 0, eCols: E.cols, eh: E.h, ehw: 0, n: M.cols };
+    // lf-ops r-review: at S a static-width earlier step (stacks) may take a 5th column - narrower cells round the same ink, as
+    // layout.js lets the Independent page (L1) - but only when that prints MORE problems (mult_facts touch Review S: 10 facts
+    // + 5 stacks, where its own 4 columns held one row of 4 under the ceiling and the 3 it used to narrow to left 32 % beside
+    // every stack). An equal count keeps the step's own columns.
+    if (bands === 2 && !split && eStatic && ctx.size === 'S' && E.cols === AUTO_COLS.S && fitsAt(earlier, 5, ctx)) {
+        const h5 = hMinAt(earlier, 5, ctx);
+        if (Number.isFinite(h5) && h5 > 0) {
+            const o5 = [{ c: 5, h: h5, hw: 0, nMax: Infinity, wMax: 0 }];
+            let b5 = search(0.2, true, o5);
+            if (b5.n < 0) b5 = search(0, true, o5);
+            if (b5.n > best.n) best = b5;
+        }
+    }
     const kb = mainAt(best.mRows).bands;
     const avail = availOf(kb);
     return { cols: M.cols, eCols: best.eCols, mRows: best.mRows, eRows: best.eRows, eWide: best.eWide || 0, eSplit: split ? eSplit : null,
