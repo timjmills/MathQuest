@@ -770,3 +770,8 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-13 — Owner rule: lesson design at high effort
 - Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
+
+## 2026-11-13 — Deploy shared page roles deploy-4: Reason It (lf-roles, critics r6e + r6g PASS, 0 counted defects)
+- Reason It: work wider than half the room stands A over B (never shrunk); work that fits half a cell keeps A | B with the response as a full-width row under them; a column word story prints once over A and B; "__ is correct." dropped (PT-RSN-4: "Circle A or B. The answer is __."); one answer line length for every word answer (LINE-TELL); KEYFIT (a letter answer takes the word line); Guided tightRows; LONE-PAGE. Checks: RI-LAYOUT, RI-ONEANSWER, RI-DISTINCT, LINE-TELL, KEYFIT, ABTAG, LONE-PAGE, ri-overflow-stack / ri-countrow-overflow / ri-stack-band backtests; overflow non-pinnable in precritic.
+- Passed skills: all 81 RI pages change (F8), TF identify + fact_family_sort (word lines), 9 guided pages; capacity 0 drops, 17 rises, 1 ruled pin (sub_1m RI M = 2). Vocab Guided 6/6 identical. Lessons identical.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit (78), backtest self-test, capacity-pin, empty-band self-test.
