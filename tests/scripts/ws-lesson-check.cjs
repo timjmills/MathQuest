@@ -9,6 +9,7 @@
 //                                                              #   (the gate must then FAIL on it)
 //   node tests/scripts/ws-lesson-check.cjs --force-check       # the packets with their Prerequisite Check forced on
 //   node tests/scripts/ws-lesson-check.cjs --report-only       # print, never exit 1
+//   node tests/scripts/ws-lesson-check.cjs --dump f.json --all # every finding to a file / printed
 //
 // What it checks (rule numbers are LESSON_RULES.md's):
 //   data    LR-3 one icon per step, distinct; LR-1 declared cases; LR-9 Mixed partners are earlier
@@ -342,8 +343,11 @@ async function renderDoc(app, html) {
 
     const byRule = {};
     for (const f of fails) { const r = (/: (LR-\d+|BUILD)/.exec(f) || [])[1] || '?'; byRule[r] = (byRule[r] || 0) + 1; }
-    for (const f of fails.slice(0, 60)) console.log(`  FAIL ${f}`);
-    if (fails.length > 60) console.log(`  ... and ${fails.length - 60} more`);
+    // --dump <file>: every finding as JSON (lf-engine PC r3 triage: forced vs unforced, rule by rule)
+    if (arg('dump', '')) require('fs').writeFileSync(arg('dump', ''), JSON.stringify({ fails, softs }, null, 1));
+    const SHOWN = has('all') ? 1e9 : 60;
+    for (const f of fails.slice(0, SHOWN)) console.log(`  FAIL ${f}`);
+    if (fails.length > SHOWN) console.log(`  ... and ${fails.length - 60} more`);
     if (softs.length) console.log(`  (${softs.length} soft: a turnaround of another page's item in a skill too small to avoid it, e.g. ${softs[0]})`);
     const tail = `${LESSONS.length} lesson(s), ${builds} builds (${SEED_LIST.length} seeds x ${SIZES.join('/')}), layout on ${Math.min(LAYOUT, SEED_LIST.length)} seed(s)${RULE_OFF.length ? `, RULE OFF: ${RULE_OFF.join(',')}` : ''}, ${Math.round((Date.now() - t0) / 1000)} s`;
     if (fails.length) {

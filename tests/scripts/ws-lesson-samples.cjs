@@ -20,7 +20,8 @@
 //     PC-SLOTS   (D1, D6) on the check page and its key: every writing slot filled on the key, the key no answer
 //                outside a slot, the same writing slots on pupil and key
 //     PC-SCAFFOLD (D8) no scaffold (trace, grey ink, regroup / exchange box, Say, Steps) and one response a check cell
-//     PC-LR6     (LR-6, lf-engine PC 2026-11-12) no two cells of the check page print the same given numbers (drawn text)
+//     PC-LR6     (LR-6, lf-engine PC 2026-11-12) no two cells of the check page print the same given numbers (drawn text),
+//                nor near twins (critic r3 F13: one number different, that pair reordered / one place different / within 2)
 //     PC-H13     (D4, D9, D11) at every size: the check page has no cell band >= 30 % and no gap > 15 mm between its
 //                cells; the check page and the lesson sheet have a blank foot <= 8 % (sheetCheck, now blocking; the sheet's
 //                cell bands stay print-lint's L-DENSITY H13 / H13-ROW)
@@ -138,6 +139,16 @@ print(json.dumps(pages))
 
 /** LIVE-PART (F6): per key page, the carry / regroup boxes (a stack's `.rg[data-ws-seg]`, counted from the ones) that NO
  *  stack of their section (`.ws-grid`) fills - a dead part (H15). One message per (section, box place). */
+/** LR-6 near twins on drawn check cells (critic r3 F13): keys of sorted numbers that differ in ONE number, a near pair:
+ *  reordered or within 2 anywhere on the page; one place different (shared digit not 0) inside one question. */
+function nearKeyPair(k1, k2, sameQ) {
+    const near = (x, y) => { if (!(x >= 10 && y >= 10) || x === y) return false; if (Math.abs(x - y) <= 2) return true; const a = String(x), b = String(y);
+        if (a.length !== b.length) return false; if ([...a].sort().join('') === [...b].sort().join('')) return true; if (!sameQ) return false; let d = 0, z = true; for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; else if (a[i] !== '0') z = false; } return d === 1 && !z; };
+    const a = String(k1).split(',').filter(Boolean).map(Number), b = String(k2).split(',').filter(Boolean).map(Number);
+    if (!a.length || a.length !== b.length) return false;
+    for (let i = a.length - 1; i >= 0; i--) { const j = b.indexOf(a[i]); if (j >= 0) { b.splice(j, 1); a.splice(i, 1); } }
+    return a.length === 1 && b.length === 1 && near(a[0], b[0]);
+}
 function carryMeasure() {
     return [...document.querySelectorAll('.ws-page')].map((pg) => {
         const dead = [];
@@ -393,7 +404,7 @@ async function checkMain() {
             // layout: seed 4242 at every size
             for (const size of SIZES) {
                 const built = await page.evaluate(async ({ skill, size, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
+                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -458,8 +469,12 @@ async function checkMain() {
                 // PC-LR6 (lf-engine PC 2026-11-12; LR-6): no two check cells print the same given numbers (the sub check printed
                 // 11 - 3 twice and a place item's 39 twice). Read from the drawn cell (a place item's 39 is drawn, not in q.text);
                 // a cell with no numbers (a count, a picture compare) is not compared.
-                { const seenK = new Map(); pp.cells.forEach((c, i) => { const k = [...new Set(nums(c.text))].sort((x, y) => x - y).join(',');
-                    if (!k) return; if (seenK.has(k)) F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `the same numbers (${k}) as Q${seenK.get(k)}`); else seenK.set(k, c.letter || i + 1); }); }
+                { const seenK = new Map(); const qOf = []; (built.qs || []).forEach((len, q) => { for (let j = 0; j < len; j++) qOf.push(q); }); pp.cells.forEach((c, i) => { const k = [...new Set(nums(c.text))].sort((x, y) => x - y).join(',');
+                    if (!k) return; if (seenK.has(k)) F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `the same numbers (${k}) as Q${seenK.get(k).n}`); else {
+                        // (critic r3 F13: near twins too - 77 / 27 / 71, round 75 / 45: one number different, and that pair the
+                        // same digits reordered, one place different, or within 2; both 10 or more. Independent of the dealer's copy.)
+                        for (const [k2, q2] of seenK) if (nearKeyPair(k2, k, qOf[i] !== undefined && qOf[i] === qOf[q2.i])) { F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `near twin of Q${q2.n} (${k2} / ${k})`); break; }
+                        seenK.set(k, { n: c.letter || i + 1, i }); } }); }
                 if (has('debug')) console.log(JSON.stringify(pp.cells.map((c) => [c.letter, c.text])));
                 pp.cells.forEach((c, i) => {
                     const kc = kp.cells[i]; const q = `${l.id} ${size} check Q${c.letter || i + 1}`;

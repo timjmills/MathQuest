@@ -62,9 +62,37 @@ const poolItems = (input, id) => {
     // too: round S printed "27 is between __ and __" under "27: circle the tens")
     const k0 = Number(String(id).replace(/\D/g, ''));
     const seen = new Set();
-    for (let j = 0; j < k0; j++) for (const it of poolItems(input, `q${j}`)) { const k = itemNumberKey(it); if (k) seen.add(k); }
-    return its.filter((it) => { const k = itemNumberKey(it); if (!k) return true; if (seen.has(k)) return false; seen.add(k); return true; });
+    for (let j = 0; j < k0; j++) for (const it of poolItems(input, `q${j}`).slice(0, PER_QUAD)) { const k = itemNumberKey(it); if (k) seen.add(k); }
+    const earlier = [...seen];
+    const kept = its.filter((it) => { const k = itemNumberKey(it); if (!k) return true; if (seen.has(k)) return false; seen.add(k); return true; });
+    // (critic r3 F13: near twins too - sub S printed 77 / 27 / 71, round 75 / 45. A near twin of an item already taken, on
+    // this question or an earlier one, is left out; exact repeats stay dropped)
+    const took = [], first = [], later = [];
+    for (const it of kept) { const k = itemNumberKey(it); if (k && (earlier.some((t) => nearKeys(t, k)) || took.some((t) => nearKeys(t, k, true)))) later.push(it); else { first.push(it); if (k) took.push(k); } }
+    // (a near twin is printed only to keep a question at ROUTE_ITEMS: the pool can hold no more clean items - sub S dealt
+    // 77, 27, 71, 72 for one question - and a third twin is never laid to fill a row)
+    return first.length >= ROUTE_ITEMS ? first : first.concat(later.slice(0, ROUTE_ITEMS - first.length));
 };
+/** Two numbers a pupil would do the same way (LR-6 near twins, critic r3 F13): both 10 or more and the same digits
+ *  reordered (27 / 72) or within 2 - anywhere on the check page; and, inside ONE question (`sameQ`), the same digit count
+ *  with only ONE place different and a shared digit that is not 0 (77 / 27, 77 / 71, 75 / 45; not 30 / 90). */
+export function nearNumbers(x, y, sameQ = false) {
+    if (!(x >= 10 && y >= 10) || x === y) return false;
+    if (Math.abs(x - y) <= 2) return true;
+    const a = String(x), b = String(y);
+    if (a.length !== b.length) return false;
+    if (a.split('').sort().join('') === b.split('').sort().join('')) return true;
+    if (!sameQ) return false;
+    let d = 0, z = true; for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; else if (a[i] !== '0') z = false; }
+    return d === 1 && !z;
+}
+export function nearKeys(k1, k2, sameQ = false) {
+    const A = String(k1).split(',').filter(Boolean).map(Number), B = String(k2).split(',').filter(Boolean).map(Number);
+    if (!A.length || A.length !== B.length) return false;
+    const a = A.slice(), b = B.slice();
+    for (let i = a.length - 1; i >= 0; i--) { const j = b.indexOf(a[i]); if (j >= 0) { b.splice(j, 1); a.splice(i, 1); } }
+    return a.length === 1 && b.length === 1 && nearNumbers(a[0], b[0], sameQ);
+}
 const PER_QUAD = 4;
 
 export function sources(skills, { earlier }) {
@@ -255,7 +283,10 @@ export function routePlan(input, rows) {
 
 // (a lesson's routed check is dealt a whole row's worth - up to PER_QUAD - and `plan` keeps what one page holds)
 const routedCheck = (input) => !!(input && input.perQuestion && Array.isArray(input.routes) && input.routes.some(Boolean));
-export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, routedCheck(input) ? PER_QUAD : perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
+/** (critic r3 F13) A routed check deals this many items a question, so poolItems has non-twins to put first; the planner
+ *  still lays at most PER_QUAD of them. */
+export const ROUTE_DEAL = 2 * PER_QUAD;
+export const counts = (pools, input) => Object.fromEntries(Object.keys(pools).map((id) => [id, routedCheck(input) ? ROUTE_DEAL : perQuad(input, Number(String(id).replace(/\D/g, '')) || 0)]));
 
 export function plan(input = {}) {
     if (!(Array.isArray(input.routes) && input.routes.some(Boolean))) return planCheck(input, 1);
@@ -594,4 +625,4 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
     return { units, used, foot: +(Math.max(0, m.budget - used) / m.budget).toFixed(3), fits: used <= m.budget + 0.5 };
 }
 
-export default { ROLE_ID, sources, measureCols, prepare, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };
+export default { ROLE_ID, nearNumbers, nearKeys, sources, measureCols, prepare, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };

@@ -281,6 +281,19 @@ function planOnce(input = {}) {
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
         }
+        // (lf-engine PC r3, check on: the Prerequisite Check takes the Warm-up's place, so a sheet WITH Independent rows can
+        // still end on a blank foot - add S printed 9 %, PC-H13. What the bands above left is given to a band that grows only
+        // on a page with no rows (the Vocabulary match, cap 0), up to its capIfEmpty. A packet without a live check prints as
+        // before.)
+        const checkOn = !!(data && Array.isArray(data.prereqs) && data.prereqs.length && data.prereqsLive !== false);
+        if (checkOn && !wide && left > 2) {
+            for (const g of pg.grows.filter((x) => x.grid && !(x.cap > 0) && x.capIfEmpty > 0 && !x.box)) {
+                const add = Math.min(left, g.h * g.capIfEmpty);
+                if (add <= 0) continue;
+                left -= add;
+                for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
+            }
+        }
     }
 
     const score = warmCount + indep.length;
