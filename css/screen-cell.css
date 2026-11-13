@@ -2104,17 +2104,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
 
-/* lf-checks queue 11 / 18 / 21 (lead 2026-11-13; SCREEN-DIGIT 40 / 48 / 56 px at 390 / 820 / 1280, RUBRIC C3): the online
-   worksheet's per-cell digit FLOOR. The grid's 29 px digit (rule .mq-scell.mq-grid-cell above) and the 40 px touch floor sat
-   under the screen host's floor, and worksheet.js _wsOneDigit copied ONE size to every card of a sheet, so number_patterns_rule,
-   count_by_tables and mult_properties (arrays-turn) drew 29 px numerals on the worksheet while the card and quiz drew 40-56.
-   Every grid cell of the worksheet now takes AT LEAST the host's floor at its width (the card's own 40 / 48 / 56 px at the
-   card's breakpoints), so every card of a sheet still shares one size; the grid then drops a column when a card no longer fits
-   (layoutWorksheetGrid). The digit inputs grow with the digits, as on the card. ADDITIVE (the 29 px rule stays for the other
-   grid hosts: teacher preview, explorer thumbs); ws-screen-slots --screen-digit is the check. */
-html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 40px; --ws-hw: max(48px, calc(var(--mq-digit) * 1.2)); --ws-answer: calc(var(--ws-hw) + 14px); }
-@media (min-width: 600px) { html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 48px; } }
-@media (min-width: 1200px) { html body #worksheetView .mq-scell.mq-grid-cell { --mq-digit: 56px; } }
+/* (lf-hosts critic r1 F1, lead ruling 2026-11-13: hand-off 1's worksheet digit raise to 40 / 48 / 56 px was removed before it
+   shipped - it reflowed the online worksheet (placevalue:expand 2 -> 1 column at 1280, answer boxes stretched, fact cards
+   28-56 px taller). The worksheet keeps master's grid digit, which holds the contract's 29 px floor (SP table; TY-10b count
+   rows on a phone). ws-worksheet-reflow WS-REFLOW is the ratchet: columns never fall, cards never grow, against master.) */
 
 /* lf-checks queue 10 (lf-builds word-stories critic F3, lead 2026-11-13): a word-work answer digit box (.mq-wwans, the column
    row of a story's answer) drew a 44 px box whose input was 40 x 44 px at 390 (card, quiz) and 44 x 44 on the worksheet, under
@@ -2131,9 +2124,21 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
     background-clip: content-box !important; background-origin: content-box !important;
     box-shadow: none !important; outline: none;
 }
-html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot:is(:focus, :focus-visible) {
-    box-shadow: none !important; outline: 3px solid #000 !important; outline-offset: calc(-3px - var(--mq-tp)) !important;
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot:is(:focus, :focus-visible):not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
+    box-shadow: none !important; background-color: var(--mq-next-fill, #fff) !important;
+    outline: var(--mq-next-w, 4px) solid var(--mq-next-color, #1565d8) !important; outline-offset: calc(0px - var(--mq-next-w, 4px) - var(--mq-tp)) !important;
 }
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwans.mq-wwans[data-mq-cell] > input.mq-cellslot.mq-cellslot.mq-active-box:not(.mq-live-wrong):not(.mq-wd-empty):not(.mq-wrong-digit) {
-    box-shadow: none !important; outline: 3px solid #f2c200 !important; outline-offset: calc(-3px - var(--mq-tp)) !important;
+    box-shadow: none !important; background-color: var(--mq-next-fill, #fff) !important;
+    outline: var(--mq-next-w, 4px) solid var(--mq-next-color, #1565d8) !important; outline-offset: calc(0px - var(--mq-next-w, 4px) - var(--mq-tp)) !important;
+}
+/* lf-hosts critic r1 F3 / F4: (F3) the focused answer box above took a yellow #f2c200 outline (about 1.6:1 on white, under
+   AX-6's 3:1), a look no other answer box has. The focused / next answer box now draws master's O-1 ring for a focused next
+   answer box - the one the column stacks' digits and the other answer boxes draw (the --mq-next-* switch: blue 4 px, or the
+   html.mq-next-yellow set) - as an outline set back by the padding onto the drawn edge. The working boxes keep master's 3 px
+   black focus outline, as a column stack's carry boxes do. (F4) the 44 px boxes sat on a 47 px pitch, so the 48 px touch boxes overlapped 1 px and a tap on a box's right edge
+   focused its neighbour: a column-work grid that holds answer boxes on a screen host opens its column gap to >= 4 px (pitch
+   >= 48). The drawn boxes keep their size. ws-phone-card FOCUS-RING and TOUCH-UNIQUE are the checks. ADDITIVE. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-wwcols:has(> * > .mq-wwans[data-mq-cell]) {
+    column-gap: max(4px, var(--mq-wwgap, 0px)) !important;
 }

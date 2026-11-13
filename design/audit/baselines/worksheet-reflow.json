@@ -1,0 +1,224 @@
+{
+ "tool": "ws-worksheet-reflow",
+ "about": "The online worksheet layout as master prints it (lf-hosts critic r1 F1): per skill@width the grid column count, tallest card, largest answer place and worst card numeral. Re-pin only from master, or in the change that moves the layout on purpose.",
+ "pinnedFrom": "77f0acad2",
+ "cards": 6,
+ "keys": {
+  "placevalue:expand@820": {
+   "cards": 6,
+   "cols": 1,
+   "cardH": 234.8,
+   "cardW": 756,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18
+  },
+  "subtraction:sub_100_no_regroup@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 387.4,
+   "cardW": 370,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40
+  },
+  "multiplication:mult_facts@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 345.4,
+   "cardW": 370,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "addition:add_facts@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 345.4,
+   "cardW": 370,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "subtraction:sub_word_problems@820": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 769.4,
+   "cardW": 370,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2
+  },
+  "placevalue:expand@1024": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 312.1,
+   "cardW": 478,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18
+  },
+  "subtraction:sub_100_no_regroup@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 313.3,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40
+  },
+  "multiplication:mult_facts@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 313.3,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "addition:add_facts@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 313.3,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "subtraction:sub_word_problems@1024": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 875.3,
+   "cardW": 313.3,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2
+  },
+  "placevalue:expand@1280": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 231.2,
+   "cardW": 560,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18
+  },
+  "subtraction:sub_100_no_regroup@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 368,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40
+  },
+  "multiplication:mult_facts@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 368,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "addition:add_facts@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 368,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "subtraction:sub_word_problems@1280": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 769.4,
+   "cardW": 368,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2
+  },
+  "placevalue:expand@1366": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 231.2,
+   "cardW": 566,
+   "boxW": 101.1,
+   "boxH": 75.3,
+   "digit": 18
+  },
+  "subtraction:sub_100_no_regroup@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 387.4,
+   "cardW": 372,
+   "boxW": 48,
+   "boxH": 48,
+   "digit": 40
+  },
+  "multiplication:mult_facts@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 372,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "addition:add_facts@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 345.4,
+   "cardW": 372,
+   "boxW": 86.4,
+   "boxH": 48,
+   "digit": 40
+  },
+  "subtraction:sub_word_problems@1366": {
+   "cards": 6,
+   "cols": 3,
+   "cardH": 769.4,
+   "cardW": 372,
+   "boxW": 48.3,
+   "boxH": 48.3,
+   "digit": 25.2
+  },
+  "patterns:number_patterns_rule@820": {
+   "cards": 6,
+   "cols": 1,
+   "cardH": 359.3,
+   "cardW": 756,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5
+  },
+  "patterns:number_patterns_rule@1024": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 382.6,
+   "cardW": 478,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.2
+  },
+  "patterns:number_patterns_rule@1280": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 359.3,
+   "cardW": 560,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5
+  },
+  "patterns:number_patterns_rule@1366": {
+   "cards": 6,
+   "cols": 2,
+   "cardH": 359.3,
+   "cardW": 566,
+   "boxW": 67.4,
+   "boxH": 48.5,
+   "digit": 26.5
+  }
+ }
+}

@@ -28,6 +28,12 @@
 //   TOUCH-TARGET every visible typed answer place (input, textarea) has a touch box (its border box, padding included) of
 //             >= 48 x 48 px, an optional working box (carry, regroup, working row) >= 44 x 44 (lf-checks queue 10; word-stories
 //             critic F3: the card's column inputs were 40 x 44 px at 390). The drawn box may be smaller (transparent padding).
+//   TOUCH-UNIQUE every typed answer place owns its whole touch box: elementFromPoint 1 px inside each edge's middle returns
+//             that input, never another typed box (lf-hosts critic r1 F4: 44 px boxes on a 47 px pitch, 48 px touch boxes
+//             overlapping 1 px, so a tap on a box's right edge focused its neighbour). Card, worksheet and quiz.
+//   FOCUS-RING in each [data-ws-cell] cell every focused answer place draws ONE ring, and every focused working box one ring
+//             (outline, else the first inset shadow; same colour and width), with contrast >= 3:1 against its fill (AX-6) (lf-hosts critic r1 F3: the focused answer box
+//             outlined in yellow #f2c200, 1.6:1, beside blue-ringed working boxes). Card and quiz.
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
 //   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
 //             once per skill and width as well, and judged on CELL-READ and TOUCH-TARGET (CLIP-X / FOCUS are the card's).
@@ -189,6 +195,8 @@ function PROBE() {
     if (!cellN) findings.push({ rule: 'CELL-READ', msg: paper ? '0 [data-ws-cell] cells on the card (#questionPaper): the card-host checks read nothing (screen parity with the worksheet and quiz)' : 'no #questionPaper on the card (0 cells read)' });
     // TOUCH-TARGET (lf-checks queue 10)
     for (const t of TARGETS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
+    // TOUCH-UNIQUE (lf-hosts critic r1 F4); FOCUS-RING (F3) moves the focus, so main() runs it after this probe
+    if (window.UNIQUE) for (const t of window.UNIQUE('#questionCard')) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
 }
 
@@ -220,6 +228,98 @@ function TARGETS(rootSel) {
     return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
 }
 
+/* In the page: TOUCH-UNIQUE (lf-hosts critic r1 F4: the word-work answer boxes drew 44 px on a 47 px pitch, so their 48 px
+   touch boxes overlapped by 1 px and a tap on one box's right edge focused its neighbour). Every visible typed answer place
+   under `rootSel` owns its whole touch box: document.elementFromPoint 1 px inside (Chrome hit-tests whole px) the middle of each of its four edges
+   returns the input itself, never ANOTHER typed answer place (a hit on something else - a sticky bar, a label - is not this
+   rule's). An input outside the viewport is scrolled to the centre first. Returns one message per (class, edge) group. */
+function UNIQUE(rootSel) {
+    const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
+    const typed = (el) => !!el && el.matches && el.matches('input, textarea, [contenteditable="true"]') && !(el.tagName === 'INPUT' && SKIP.has((el.type || '').toLowerCase()));
+    const cls = (el) => (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '');
+    const groups = new Map();
+    const sx = scrollX, sy = scrollY;
+    for (const rt of document.querySelectorAll(rootSel)) {
+        for (const el of rt.querySelectorAll('input, textarea, [contenteditable="true"]')) {
+            if (!typed(el) || !vis(el) || el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup')) continue;
+            let r = el.getBoundingClientRect();
+            if (r.top < 0 || r.left < 0 || r.bottom > innerHeight || r.right > innerWidth) { el.scrollIntoView({ block: 'center', inline: 'center' }); r = el.getBoundingClientRect(); }
+            const pts = { left: [r.left + 1, r.top + r.height / 2], right: [r.right - 1, r.top + r.height / 2], top: [r.left + r.width / 2, r.top + 1], bottom: [r.left + r.width / 2, r.bottom - 1] };
+            for (const [edge, [x, y]] of Object.entries(pts)) {
+                const hit = document.elementFromPoint(x, y);
+                if (!hit || hit === el || el.contains(hit)) continue;
+                const other = typed(hit) ? hit : hit.closest && hit.closest('input, textarea, [contenteditable="true"]');
+                if (!other || other === el || !typed(other)) continue;
+                const k = `${el.tagName.toLowerCase()}${cls(el)} ${Math.round(r.width)} x ${Math.round(r.height)} px: a tap on its ${edge} edge lands on ${other.tagName.toLowerCase()}${cls(other)} (the touch boxes overlap; want each hit area its own box's)`;
+                groups.set(k, (groups.get(k) || 0) + 1);
+            }
+        }
+    }
+    scrollTo(sx, sy);
+    return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
+}
+
+/* In the page: FOCUS-RING (lf-hosts critic r1 F3: the focused word-work answer box drew a yellow #f2c200 outline, about
+   1.6:1 on white, while the other answer boxes drew master's blue next-box ring). In every [data-ws-cell] cell under `rootSel`
+   each visible typed box is focused in turn, the page's focus handlers settle (two frames), and its ring is read: the outline
+   (style not none, width >= 1 px), else the first inset box-shadow with a spread >= 1 px. Every focused ANSWER PLACE of one
+   cell draws ONE ring (same colour and width), and every focused WORKING box (carry, regroup, working row) one ring - master
+   rings a focused answer box as the next box and a carry / working box with the plain focus outline - and every ring
+   has a contrast >= 3:1 (AX-6) against the box's fill (white when the fill is transparent). A box judged wrong (red) is
+   skipped. The focus is put back where it was. Returns one message per finding. */
+async function RINGS(rootSel) {
+    const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
+    const rgb = (s) => { const m = /rgba?\(([^)]+)\)/.exec(String(s || '')); if (!m) return null; const v = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: v[0], g: v[1], b: v[2], a: v.length > 3 ? v[3] : 1 }; };
+    const lum = (c) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+    const over = (c, bg) => ({ r: c.r * c.a + bg.r * (1 - c.a), g: c.g * c.a + bg.g * (1 - c.a), b: c.b * c.a + bg.b * (1 - c.a), a: 1 });
+    const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const split = (v) => { const out = []; let d = 0, cur = ''; for (const ch of String(v)) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { out.push(cur.trim()); cur = ''; } else cur += ch; } if (cur.trim()) out.push(cur.trim()); return out; };
+    const ring = (el) => {
+        const cs = getComputedStyle(el);
+        if (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) >= 1) return { by: 'outline', color: cs.outlineColor, w: Math.round(parseFloat(cs.outlineWidth)) };
+        for (const sh of split(cs.boxShadow)) {
+            if (!/inset/.test(sh)) continue;
+            const col = (/rgba?\([^)]*\)/.exec(sh) || [''])[0];
+            const nums = sh.replace(/rgba?\([^)]*\)/, '').replace('inset', '').trim().split(/\s+/).map(parseFloat);
+            if (nums.length >= 4 && nums[3] >= 1) return { by: 'inset shadow', color: col, w: Math.round(nums[3]) };
+        }
+        return { by: 'none', color: 'none', w: 0 };
+    };
+    const fillOf = (el) => { const c = rgb(getComputedStyle(el).backgroundColor); return c && c.a > 0.05 ? over(c, { r: 255, g: 255, b: 255, a: 1 }) : { r: 255, g: 255, b: 255, a: 1 }; };
+    const before = document.activeElement;
+    const out = [];
+    const cells = new Set();
+    for (const rt of document.querySelectorAll(rootSel)) for (const c of [rt, ...rt.querySelectorAll('[data-ws-cell]')]) if (c.hasAttribute('data-ws-cell')) cells.add(c);
+    for (const cell of cells) {
+        if (cell.parentElement && cell.parentElement.closest('[data-ws-cell]') && cells.has(cell.parentElement.closest('[data-ws-cell]'))) continue;   // the outer cell reads its inner ones
+        const boxes = Array.from(cell.querySelectorAll('input, textarea')).filter((el) => !(el.tagName === 'INPUT' && SKIP.has((el.type || '').toLowerCase())) && vis(el) && !el.readOnly && !el.disabled
+            && !/mq-live-wrong|mq-wd-empty|mq-wrong-digit|box-wrong/.test(String(el.className)) && !el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup'));
+        if (boxes.length < 1) continue;
+        const looks = { 'answer place': new Map(), 'working box': new Map() };
+        const OPT = '.mq-carry, .column-carry-input, .mq-opswork, .mq-wwork, [data-mq-work], [data-ws-slot^="regroup"], .mq-regroup';
+        for (const el of boxes) {
+            el.focus({ preventScroll: true });
+            // the page's focusin handlers settle on the next frames (active-box.js marks the next box on rAF)
+            await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+            if (document.activeElement !== el) continue;
+            const role = el.matches(OPT) || /carry|regroup/i.test(String(el.className)) ? 'working box' : 'answer place';
+            const g = ring(el);
+            const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '';
+            const par = el.parentElement && typeof el.parentElement.className === 'string' && el.parentElement.className.trim() ? ` in .${el.parentElement.className.trim().split(/\s+/)[0]}` : '';
+            const sig = g.by === 'none' ? 'no ring' : `${g.color} ${g.w} px`;
+            if (!looks[role].has(sig)) looks[role].set(sig, new Set());
+            looks[role].get(sig).add(`${el.tagName.toLowerCase()}${cls}${par}`);
+            const c = rgb(g.color);
+            if (c) { const k = ratio(over(c, fillOf(el)), fillOf(el)); if (k < 3) out.push(`a focused ${el.tagName.toLowerCase()}${cls}${par} rings in ${g.color} (${g.by}), ${k.toFixed(2)}:1 against its fill (want >= 3:1, AX-6)`); }
+        }
+        for (const [role, m] of Object.entries(looks)) if (m.size > 1) out.push(`${m.size} focus looks among the ${role}s of one ${cell.getAttribute('data-ws-cell')} cell: ${[...m.entries()].map(([sig, who]) => `${sig} (${[...who].join(', ')})`).join(' vs ')} (want one ring for every focused ${role})`);
+    }
+    if (before && before.focus) before.focus({ preventScroll: true }); else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    return [...new Set(out)];
+}
+
 /* In the page, on the worksheet / quiz host: CELL-READ and TOUCH-TARGET only (CLIP-X and FOCUS are the card's). */
 function HOST_PROBE(host) {
     const sel = host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper';
@@ -230,6 +330,7 @@ function HOST_PROBE(host) {
     const bare = cards.filter((c) => ![c, ...c.querySelectorAll('[data-ws-cell]')].some((e) => e.hasAttribute('data-ws-cell') && vis(e)));
     if (bare.length) findings.push({ rule: 'CELL-READ', msg: `${bare.length} of ${cards.length} ${host} cell(s) carry no [data-ws-cell] (0 cells read there)` });
     for (const t of TARGETS(sel)) findings.push({ rule: 'TOUCH-TARGET', msg: t });
+    if (window.UNIQUE) for (const t of window.UNIQUE(sel)) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
     return { cards: cards.length, findings };
 }
 
@@ -264,7 +365,7 @@ async function selfTest() {
     try {
         const page = await browser.newPage();
         await page.setViewport({ width: 390, height: 844 });
-        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
+        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
         const good = await run('good');
         if (good.findings.length || good.focus !== 'ok') fails.push(`good fixture: ${JSON.stringify(good)}`);
         const f = await run('focus');
@@ -284,23 +385,62 @@ async function selfTest() {
         await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
         const ht = await page.evaluate(TARGETS, '#h');
         if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`); return page.evaluate(PROBE); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
         const br = await runB('bare-right');
         if (br.focus !== 'ok') fails.push(`r1 twin, ones box focused: must be ok (${JSON.stringify(br.findings)})`);
+        // TOUCH-UNIQUE (lf-hosts critic r1 F4): 48 px touch boxes of 44 px drawn boxes on a 47 px pitch overlap by 1 px (FAIL);
+        // on a 48 px pitch each owns its own (OK)
+        const uq = (pitch) => `<!doctype html><style>body{margin:0}#h{display:flex;gap:${pitch - 44}px;padding:20px}#h span{width:44px;height:44px;border:2px solid #000;box-sizing:border-box;display:flex}#h input{box-sizing:border-box;width:48px;height:48px;margin:-4px;padding:4px;border:0;background-clip:content-box;flex:none}</style><div id="h" data-ws-cell="words"><span><input class="mq-cellslot"></span><span><input class="mq-cellslot"></span><span><input class="mq-cellslot"></span></div>`;
+        await page.setContent(uq(47)); await page.evaluate(`window.UNIQUE = ${UNIQUE}`);
+        const u47 = await page.evaluate(() => window.UNIQUE('#h'));
+        if (!u47.length || !/right edge lands on input\.mq-cellslot/.test(u47[0])) fails.push(`47 px pitch: a TOUCH-UNIQUE finding naming the right edge (${JSON.stringify(u47)})`);
+        await page.setContent(uq(48)); await page.evaluate(`window.UNIQUE = ${UNIQUE}`);
+        const u48 = await page.evaluate(() => window.UNIQUE('#h'));
+        if (u48.length) fails.push(`48 px pitch: no TOUCH-UNIQUE finding (${JSON.stringify(u48)})`);
+        // FOCUS-RING (lf-hosts critic r1 F3): the answer box outlined in yellow #f2c200 beside blue-ringed working boxes FAILS
+        // (two looks, 1.6:1); every answer box in the one blue ring (inset shadow or an outline of the same colour / width), a carry
+        // box in the plain black focus outline, is OK
+        const fr = (ans) => `<!doctype html><style>body{margin:0}input{width:48px;height:48px;outline:none;border:2px solid #000}input:focus{box-shadow:inset 0 0 0 4px #1565d8}input.mq-carry:focus{box-shadow:none;outline:3px solid #000}${ans}</style><div id="c" data-ws-cell="words"><input class="mq-carry"><input class="w"><input class="w"><input class="ans"></div>`;
+        await page.setContent(fr('input.ans:focus{box-shadow:none;outline:3px solid #f2c200;outline-offset:-7px}')); await page.evaluate(`window.RINGS = ${RINGS}`);
+        const ry = await page.evaluate(() => window.RINGS('#c'));
+        if (!ry.some((t) => /2 focus looks among the answer places/.test(t)) || !ry.some((t) => /1\.\d+:1 against its fill/.test(t))) fails.push(`yellow answer ring beside blue working rings: FOCUS-RING findings for two looks and the contrast (${JSON.stringify(ry)})`);
+        await page.setContent(fr('input.ans:focus{box-shadow:none;outline:4px solid #1565d8;outline-offset:-8px}')); await page.evaluate(`window.RINGS = ${RINGS}`);
+        const rb = await page.evaluate(() => window.RINGS('#c'));
+        if (rb.length) fails.push(`one blue 4 px ring (inset shadow and outline): no FOCUS-RING finding (${JSON.stringify(rb)})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 11 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 15 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
+
+/* Readiness waits (lf-hosts critic r1 F5: the fixed 900 + 400 ms sleeps measured a card whose word-work twin had not mounted
+   yet on a slow run). Ready = the host's [data-ws-cell] cell is on the page, every boxed slot ([data-mq-cell]) holds its input
+   (the twin has mounted), and a typed input sits in a cell - or, for an item with no typed answer (choices), 1.5 s have passed
+   with the cell mounted. Each wait gives up after 10 s and the probe measures anyway (a missing cell is CELL-READ's finding). */
+async function waitCells(page, rootSel) {
+    await page.waitForFunction((sel, t0) => {
+        const roots = Array.from(document.querySelectorAll(sel));
+        if (!roots.length) return false;
+        for (const rt of roots) {
+            if (!(rt.matches('[data-ws-cell]') || rt.querySelector('[data-ws-cell]'))) return false;
+            if (Array.from(rt.querySelectorAll('[data-mq-cell]')).some((b) => !b.querySelector('input, textarea') && !b.matches('input, textarea'))) return false;
+        }
+        return roots.some((rt) => rt.querySelector('[data-ws-cell] input:not([type=hidden]), [data-ws-cell] textarea, input:not([type=hidden])')) || Date.now() - t0 > 1500;
+    }, { timeout: 10000, polling: 50 }, rootSel, Date.now()).catch(() => {});
+}
+const cardReady = (page) => waitCells(page, '#questionPaper');
+const hostReady = (page, sel) => waitCells(page, sel);
+/** Two animation frames: layout and the late re-ink pass settle before the probe reads. */
+const settle = (page) => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 50)))));
 
 async function main() {
     if (has('self-test')) return selfTest();
@@ -357,11 +497,15 @@ async function main() {
                             window.skillQueue.push({ categoryId: c, skillId: k, skillLabel: k });
                             window.playSelectedSkills('practice');
                         }, c, k, hash(`${s}:phone:${it}`));
-                        await sleep(900);
+                        // flake hardening (lf-hosts critic r1 F5): wait for the card's cell and its mounted inputs, not a fixed 900 + 400 ms
+                        await cardReady(page);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
-                        await sleep(400);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}`);
-                        m = keep(await page.evaluate(PROBE));
+                        await settle(page);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`);
+                        m = await page.evaluate(PROBE);
+                        // FOCUS-RING moves the focus, so it runs after PROBE (and puts it back)
+                        if (!m.error) for (const t of await page.evaluate(() => window.RINGS('#questionCard'))) m.findings.push({ rule: 'FOCUS-RING', msg: t });
+                        m = keep(m);
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
@@ -395,9 +539,12 @@ async function main() {
                         if (ok !== true) throw new Error(`the ${host} host did not render (${ok})`);
                         if (host === 'worksheet') await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 15000 }).catch(() => {});
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
-                        await sleep(900);
-                        await page.evaluate(`window.TARGETS = ${TARGETS}`);
-                        m = keep(await page.evaluate(HOST_PROBE, host));
+                        await hostReady(page, host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper');
+                        await settle(page);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS};`);
+                        m = await page.evaluate(HOST_PROBE, host);
+                        if (host === 'quiz') for (const t of await page.evaluate((sel) => window.RINGS(sel), '#quizTakeView .mq-qtpaper')) m.findings.push({ rule: 'FOCUS-RING', msg: t });
+                        m = keep(m);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);

@@ -975,6 +975,9 @@ function buildPlan(ctx) {
         cl.after = 'sibling-compare';
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
+        // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
+        // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
+        add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 390 / 820 / 1280', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
         add(gate('phone-card', 'ws-phone-card (practice card at 390 px: clip, first-box focus)', `${scope} × 390x844, 390x664`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));

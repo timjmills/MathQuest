@@ -63,7 +63,8 @@
 // and deploy shard reads as before): after the host checks, each skill's practice card, online worksheet (card 1) and
 // quiz question are rendered again at 1280 x 900, 820 x 1180 and 390 x 844, and the item's numeral - the largest-type
 // text run of digits in the cell (tabs, labels, the instruction and screen-only chrome excluded) - must be at least
-// 56 / 48 / 40 px at those widths, in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
+// 56 / 48 / 40 px at those widths on the card and the quiz, and >= 29 px on the online worksheet at every width (the SP table;
+// lead ruling 2026-11-13, lf-hosts critic r1 F1), in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
 // kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
 //   node tests/scripts/ws-screen-slots.cjs --digit-fixture file.html --viewport 1280   # the measure on a saved cell
 //                              ([data-mq-digit-root] or the body): OK / FAIL (a backtest fixture)
@@ -152,11 +153,16 @@ const DIGIT_VIEWPORTS = [{ w: 1280, h: 900, px: 56 }, { w: 820, h: 1180, px: 48 
 // Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
 // bold - the place-value numerals (`bold`, true for placevalue:*). add_facts and other non-bold skills are exempt.
 const BOLD_NUMERAL = (key) => /^placevalue:/.test(String(key || ''));
-function digitVerdict(m, width, bold = true) {
+// Lead ruling 2026-11-13 (lf-hosts critic r1 F1): the ONLINE WORKSHEET's floor is the contract's 29 px at every width (the
+// WORKSHEET_DESIGN_STANDARD SP table; TY-10b count rows on a phone), as ws-screen-ink-size b7d4f7eb5 judges it. Hand-off 1's raise
+// of the worksheet to 40 / 48 / 56 px reflowed the sheet and was removed; the card and the quiz keep 40 / 48 / 56.
+const WORKSHEET_DIGIT_PX = 29;
+function digitVerdict(m, width, bold = true, host = 'card') {
     const vp = DIGIT_VIEWPORTS.find((v) => v.w === width) || DIGIT_VIEWPORTS[0];
     if (!m || !(m.px > 0)) return 'no numeral found in the cell';
     const why = [];
-    if (m.px < vp.px - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w})`);
+    const floor = host === 'worksheet' ? WORKSHEET_DIGIT_PX : vp.px;
+    if (m.px < floor - 0.5) why.push(`${Math.round(m.px * 10) / 10} px (want >= ${floor} px ${host === 'worksheet' ? 'on the online worksheet, the SP table' : `at ${vp.w}`})`);
     if (bold && !(Number(m.weight) >= 700)) why.push(`weight ${m.weight} (want >= 700)`);
     if (!/andika/i.test(String(m.family || '').split(',')[0])) why.push(`font ${String(m.family || '').split(',')[0].trim() || '?'} (want Andika)`);
     return why.length ? `the numeral "${m.text}" is ${why.join(', ')}` : null;
@@ -220,6 +226,10 @@ if (has('self-test')) {
         ['SCREEN-DIGIT T2: a regular numeral passes where the paper is not bold', { px: 60, weight: '400', family: 'Andika', text: '7', bold: false }, 1280, null],
         ['SCREEN-DIGIT a fallback face', { px: 60, weight: '700', family: 'Arial, sans-serif', text: '7' }, 1280, /font Arial/],
         ['SCREEN-DIGIT no numeral', null, 1280, /no numeral/],
+        // lead ruling 2026-11-13 (lf-hosts critic r1 F1): the online worksheet's floor is 29 px at every width
+        ['SCREEN-DIGIT worksheet 29 px at 1280 (the SP table)', { px: 29, weight: '700', family: 'Andika', text: '7', host: 'worksheet' }, 1280, null],
+        ['SCREEN-DIGIT worksheet 24 px at 390', { px: 24, weight: '700', family: 'Andika', text: '7', host: 'worksheet' }, 390, /24 px \(want >= 29 px on the online worksheet/],
+        ['SCREEN-DIGIT card 29 px at 1280 still fails', { px: 29, weight: '700', family: 'Andika', text: '7', host: 'card' }, 1280, /want >= 56 px/],
     ];
     // CELL-READ (lf-checks queue 20): a host that rendered no cell, or a cell with no [data-ws-cell], is a finding, never a pass
     const rcases = [
@@ -238,7 +248,7 @@ if (has('self-test')) {
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'read'}`);
     }
     for (const [name, m, wpx, want] of dcases) {
-        const v = digitVerdict(m, wpx, !(m && m.bold === false));
+        const v = digitVerdict(m, wpx, !(m && m.bold === false), (m && m.host) || 'card');
         const ok = want ? !!v && want.test(v) : v === null;
         if (!ok) bad++;
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${v || 'passes'}`);
@@ -654,7 +664,7 @@ if (arg('digit-fixture', null)) {
                 if (OPTS) await page.evaluate((c, k, o) => { window.clearSetOptions({ silent: true }); window.setSetOptions(c, k, o, { silent: true }); }, c, k, OPTS);
                 const judge = (host, m) => {
                     checked++;
-                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key));
+                    const v = digitVerdict(m, vp.w, BOLD_NUMERAL(key), host);
                     if (v) { const l = `${key.padEnd(44)} ${`${host}@${vp.w}`.padEnd(14)} SCREEN-DIGIT ${v}`; findings.push({ key, id: `${host}@${vp.w}:digit`, line: l }); console.log(l); }
                 };
                 try {
@@ -683,7 +693,7 @@ if (arg('digit-fixture', null)) {
                 } catch (e) { const l = `${key} ERR SCREEN-DIGIT @${vp.w} ${String(e.message || e).split('\n')[0]}`; errors.push(l); console.log(l); }
             }
         }
-        console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, worksheet, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}: ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
+        console.log(`SCREEN-DIGIT: ${judged.length} skill(s) x card, quiz x ${DIGIT_VIEWPORTS.map((v) => `${v.w} (>= ${v.px} px)`).join(', ')}, worksheet (>= ${WORKSHEET_DIGIT_PX} px): ${findings.filter((f) => /:digit$/.test(f.id)).length} miss(es)`);
     }
     await app.close();
     doubled.forEach((l) => console.log(l));
