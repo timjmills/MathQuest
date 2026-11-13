@@ -755,6 +755,7 @@ async function checkMain() {
         { rule: 'PM-FOOT', lesson: 'addition:add_wp_10', size: 'L', note: 'master live state (16 %), not changed by r6' },
         { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'L', note: 'master live state: a 3-page Mixed (17 / 24 / 72 %) - vocab lane' },
         { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_pick3_words', size: 'L', note: 'master live state (27 %) - vocab lane' },
+        { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'M', note: 'master live state (19 %, was its S) - vocab lane' },
     ];
     const known = findings.filter((x) => KNOWN.some((k) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `)));
     { const keep = findings.filter((x) => !known.includes(x)); findings.length = 0; findings.push(...keep); }
