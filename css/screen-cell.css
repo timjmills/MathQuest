@@ -2103,3 +2103,20 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
+
+/* lf-builds chart_120 (SCREEN-DIGIT, LEAD_DECISIONS 2026-11-13: the practice card and the quiz floor 48 px at 820 / 1024, 56 px
+   at 1280 / 1366; the online worksheet's 29 px floor already holds): a chart WINDOW (the 3 x 5 of the 1-100 and 1-120 charts;
+   not the ten-column chart above) drew its numbers at the shared min(--mq-k2 x 6.4, 4vw) = 29-34 px in squares of the paper's
+   size. On the card and the quiz its squares are sized from the digits instead - a three-digit number (100 ... 120) at 0.58 em
+   a digit plus 10 px wide, 1.4 em (>= 56 px) tall - so 5 squares of 56 px numerals are 535 px, of 48 px 459 px. Scoped to the
+   chart window on those two hosts; the shared min(..., 4vw) rule is unchanged. Additive (saved quizzes keep their HTML). */
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) {
+    --mq-cwfs: 56px; --mq-cww: calc(3 * 0.58 * var(--mq-cwfs) + 10px);
+    width: auto !important; max-width: none !important; table-layout: fixed;
+}
+@media (max-width: 1100px) { html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) { --mq-cwfs: 48px; } }
+@media (max-width: 480px) { html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten), html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) { --mq-cwfs: 40px; } }
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td, html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td {
+    width: var(--mq-cww) !important; min-width: var(--mq-cww) !important; height: max(56px, calc(var(--mq-cwfs) * 1.4)) !important; font-size: var(--mq-cwfs) !important;
+}
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot, html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot { font-size: var(--mq-cwfs) !important; }
