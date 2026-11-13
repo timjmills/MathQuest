@@ -3560,6 +3560,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "options-panel-slice",
+  "check": "critic-panel-r3 N1: no SVG label or shape of the panel sample is cut - by a viewBox slice window, by its own drawing's clipped edge, or by the frame edge: every drawn leaf (SVG text and shapes, HTML words) lies wholly inside the frame or its scroll area",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [slice], [inside]",
+  "browser": true,
+  "fail": {
+   "commit": "6de83995",
+   "state": "round-3 tree: nl_mult and add_int paged in overlapping viewBox slices - the axis cut on every slice, \"50\" / \"60\" and \"-11\" ... \"-14\" cut at the frame edge, \"-7\" at the slice edge"
+  },
+  "pass": {
+   "commit": "9126cb62",
+   "state": "the slicer removed: each number line shown whole, scaled to the frame (a drawing too wide to read at 9 px is drawn at that floor in a frame that scrolls)"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:nl_mult,integers:add_int --checks slice,inside",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
