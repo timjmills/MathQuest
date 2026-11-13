@@ -466,3 +466,42 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
 - CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
   - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
   - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.
+- CRITIC lf-tools r1 FIXES (builder, Opus medium, rebuild after FAIL A 8/7/8/8, B 6/7/7/7; commits 27545964d, 4dc89d89f, 270a832ea + this note):
+  - B1 (major): ws-copy-light keys eligibility on the DRAWING = kit template + every payload discriminator it draws by
+    (kind / task / layout / mode / type / form): `pv/kind=compare` is not `pv/kind=expand`. placevalue:compare is NOT ELIGIBLE
+    ("pv passed only as pv/kind=expand, expand-line, blanks, value, frame, place, place-bank"). A batch still shares ONE
+    template, with every drawing of every skill anchored. Re-check: add_sub_10s ELIGIBLE (fact via add_facts); time_5min
+    NOT (clock/kind=read / draw / words never passed); compare NOT; batch compare + more_less_10 + more_less_100 FAIL; the mixed
+    batch compare + add_sub_10s + more_less_10 FAIL; batch more_less_10 + more_less_100 + place_value_10x OK on pv (sample
+    byte-identical over two runs). Self-test 8 drawing cases. Rows `copy-light-drawing-batch`, `copy-light-eligibility`.
+  - B5: `copy-light-eligibility` re-pointed: FAIL f3ae7acca (its own tool reads compare ELIGIBLE) → OK 27545964d. PASS.
+  - B2: the sample shows every SCREEN_WIDTHS width (1280, 1366, 820, 1024), single and batch (widths dealt across the batch;
+    screen pages added until there are four). Self-test 5 cases; row `copy-light-sample-widths` PASS.
+  - B3: `ws-grade-render --sample <copy-light json>` renders exactly the sampled pages (role, size, seed, host, width, opts; one
+    directory per page, meta.json `sampleSeed` / `sampleWidth`). `--sample-self-test` 5 cases. Real run: a 3-page add_sub_10s
+    sample (guided S seed 20001, card 1024, worksheet 1366) → ws-grade-render OK, 4 pages. The worksheet / quiz view has no box
+    at 1366 x 768 and 1024 x 768 ("Node is either not visible"): the page is shot instead, as the card already was.
+  - B4: critic-copy-light.md and critic-batch.md name C1 Ease of use, C2 Educational value, C3 Spacing and layout, C4 Standard
+    fidelity. `ws-copy-light --brief-lint` (also on every --skill / --batch run): FAIL on f3ae7acca (12 names), OK now. Self-test
+    4; row `copy-light-brief-names` PASS.
+  - B6: every option value is scanned 8 items, +8 while the last half still brought a new drawing (max 24). Self-test: a drawing
+    dealt at item 5 and 13 is found (2 items miss it). A no-card skill held to every role now also reads "no signed card §7a
+    ... sign its card first" (only when the role miss is why). Ledger: exempt (self-test; no commit pair separates it).
+  - A1: ws-grade-render --gate (and --tablet-hosts) renders the online worksheet and the quiz at 820 and 1024 too, and
+    TOUCH-TARGET judges card, worksheet and quiz there (answer box 48 px, other controls 44 px). `--touch-self-test` 9 cases.
+    Real run: **placevalue:unit_form FAILs (24 findings: `input.mq-cellslot` 50 x 46 px on worksheet-820 and worksheet-1024)** -
+    a REAL RED, routed to lf-hosts (not fixed here). division:div_facts: no tablet target finding.
+  - A2: ws-no-phone-width scans every script ws-precritic.cjs, ws-deploy-gates.sh or opt-in-rules.json names (73 derived) plus
+    the per-skill screen gates; ALLOW carries a reason per file. Allowed: ws-teacher-wrm, -shell, -library, -preview,
+    ws-pdf-preview, ws-simple-print, ws-share-options (TEACHER screens: their 390 steps test the teacher's own phone layout on
+    purpose; dropping them is an owner / lead call) and the check itself. FIXED: ws-student-explorer (a PUPIL screen) now runs
+    1366 / 1024 / 820, ROOM and THUMB touch at 820. Its run: FAIL (1) `THUMB legible (S): placevalue:unit_form NODUP` - the same
+    single fault at f3ae7acca (its 390 version, run from a f3ae7acca worktree): pre-existing, routed to lf-placevalue / lf-hosts.
+    Self-test 26 (6 new); rows `no-phone-width-derived` (new) and `no-phone-width-default` (pass re-pointed 29ef1eb21 →
+    27545964d: that commit still had student-explorer at 390) PASS.
+  - A3: SCREEN-DIGIT floors come from ONE table, tests/lib/ws-screen-widths.cjs HOST_DIGIT_FLOOR / digitFloor(host, width):
+    card and quiz 56 / 56 / 48 / 48 at 1280 / 1366 / 820 / 1024, the online worksheet 29 px (SP table). Self-test 8 cases + table
+    coverage. Real run `--skills placevalue:unit_form,division:div_facts --screen-digit`: OK (0 misses; unit_form's 29 px and
+    div_facts' 40 px worksheet numerals pass). NOTE for `screen-digit-npr-worksheet` (PENDING, lf-ops): its fail state cited
+    number_patterns_rule's 29 px worksheet digits, which now pass by the lead's ruling; it also named count_by_tables' 26-29 px
+    arcs train. lf-ops: re-run its fail side with today's tool before the pass commit lands (it may need a new fail state).

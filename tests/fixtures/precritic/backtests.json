@@ -4425,7 +4425,7 @@
  },
  {
   "id": "vocab-v23-v25-screen-feedback",
-  "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9",
+  "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9 [lf-tools r1 A4, 2026-11-13: scoped to V23 with --no-pupil-pin. Today's V25 was tightened by r8 (letter named, only wrong pictures glow) and the pupil pin was re-pinned since, so df31bcb3 could not pass them at ANY width; V25 is proven by vocab-r8-v25plus-v26-v27]",
   "kind": "commit-pair",
   "rule": "ws-vocab-unit V23 + V25",
   "browser": true,
@@ -4437,7 +4437,7 @@
    "commit": "df31bcb3",
    "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25 --no-pupil-pin",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4445,7 +4445,7 @@
  },
  {
   "id": "vocab-v23-painted",
-  "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours",
+  "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours [lf-tools r1 A4: scoped to V23 with --no-pupil-pin, as vocab-v23-v25-screen-feedback]",
   "kind": "commit-pair",
   "rule": "ws-vocab-unit V23",
   "browser": true,
@@ -4457,7 +4457,7 @@
    "commit": "df31bcb3",
    "state": "lf-vocab r7 render fixes, 2026-11-09"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25 --no-pupil-pin",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4465,7 +4465,7 @@
  },
  {
   "id": "vocab-o1-next-box-blue",
-  "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring",
+  "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring [lf-tools r1 A4: the verdict counts NB1-NB5 only (ws-next-box --rules): NB6-NB9 were built after 5d8fe328]",
   "kind": "commit-pair",
   "rule": "ws-next-box NB1-NB5",
   "browser": true,
@@ -4477,7 +4477,7 @@
    "commit": "5d8fe328",
    "state": "lf-vocab r8 step A: the O-1 switch"
   },
-  "command": "out=$(node tests/scripts/ws-next-box.cjs 2>&1); echo \"$out\" | grep -q '^ws-next-box: \\(OK\\|FAIL\\)' || { echo 'nb1-5: FAIL (no ws-next-box result)'; exit 0; }; echo \"$out\" | grep -qE ' - NB[1-5] ' && echo 'nb1-5: FAIL' || echo 'nb1-5: OK'",
+  "command": "node tests/scripts/ws-next-box.cjs --rules NB1,NB2,NB3,NB4,NB5",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4485,7 +4485,7 @@
  },
  {
   "id": "vocab-r8-v25plus-v26-v27",
-  "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks",
+  "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks [lf-tools r1 A4: scoped to V25 with --no-pupil-pin: today's V26 / V27 are the r9 pre-skill check and key underlays, built after 3127258f]",
   "kind": "commit-pair",
   "rule": "ws-vocab-unit V25+ V26 V27",
   "browser": true,
@@ -4497,7 +4497,7 @@
    "commit": "3127258f",
    "state": "lf-vocab r8 steps B + C"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27 --no-pupil-pin",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
