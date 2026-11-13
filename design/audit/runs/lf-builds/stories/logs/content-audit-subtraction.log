@@ -1,0 +1,194 @@
+note subtraction/sub_facts  "Subtraction Facts (within 20)"
+       . [variety] 83 distinct items in 240; a page of 6 is likely to repeat one
+note subtraction/subtract  "Basic Subtraction"
+       . [variety] 82 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems  "Subtraction Word Problems"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_word_problems_plain  "Subtraction Word Problems (No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+ ok  subtraction/missing_add_sub  "Missing Numbers (+/−)"
+note subtraction/sub_5_pictures  "Subtract Within 5 with Pictures (Visual)"
+       . [variety] 15 distinct items in 240; a page of 6 is likely to repeat one
+       . [misfiled] sits in the subtraction category but its generator is the counting_cardinality one (skillCategoryOverride in generate-question.js). Report only - moving it would re-point every saved share code.
+note subtraction/unknown_start_wp  "Unknown Start Word Problems (Visual)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_no_regroup  "Subtract within 10 (No Regrouping)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_regroup  "Subtract — Bridging Ten (minuends 11–18)"
+       . [variety] 36 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10_mixed  "Subtract within 10"
+       . [variety] 45 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_no_regroup  "Subtract within 20 (No Regrouping)"
+       . [variety] 103 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_regroup  "Subtract within 20 (With Regrouping)"
+       . [variety] 56 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_20_mixed  "Subtract within 20"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_50_no_regroup  "Subtract within 50 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_50_regroup  "Subtract within 50 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_50_mixed  "Subtract within 50"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100_no_regroup  "Subtract within 100 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_100_regroup  "Subtract within 100 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100_mixed  "Subtract within 100"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1k_no_regroup  "Subtract within 1,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_1k_regroup  "Subtract within 1,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1k_mixed  "Subtract within 1,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10k_no_regroup  "Subtract within 10,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_10k_regroup  "Subtract within 10,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_10k_mixed  "Subtract within 10,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100k_no_regroup  "Subtract within 100,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_100k_regroup  "Subtract within 100,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_100k_mixed  "Subtract within 100,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1m_no_regroup  "Subtract within 1,000,000 (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [ragged] operands are always the same length in 240 items (no 4-digit + 2-digit)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_1m_regroup  "Subtract within 1,000,000 (With Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_1m_mixed  "Subtract within 1,000,000"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10  "Subtraction Word Problems (within 10)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 45 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10_plain  "Subtraction Word Problems (within 10, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 44 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_20  "Subtraction Word Problems (within 20)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_20_plain  "Subtraction Word Problems (within 20, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_50  "Subtraction Word Problems (within 50)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_50_plain  "Subtraction Word Problems (within 50, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100  "Subtraction Word Problems (within 100)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100_plain  "Subtraction Word Problems (within 100, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1k  "Subtraction Word Problems (within 1,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1k_plain  "Subtraction Word Problems (within 1,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10k  "Subtraction Word Problems (within 10,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_10k_plain  "Subtraction Word Problems (within 10,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100k  "Subtraction Word Problems (within 100,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_100k_plain  "Subtraction Word Problems (within 100,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1m  "Subtraction Word Problems (within 1,000,000)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_1m_plain  "Subtraction Word Problems (within 1,000,000, No Pictures)"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/nl_sub  "Subtraction Number Line (Visual)"
+       . [variety] 111 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/number_line_sub  "Number Line Subtraction (B&W)"
+       . [variety] 112 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/mixed_add_sub  "Mixed Addition & Subtraction"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 53 sibling skills in subtraction, whose names together declare + −
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/mixed_subtraction  "Mixed Subtraction"  [mixed pool]
+       . [mixed-pool] deliberately mixed: draws from 52 sibling skills in subtraction, whose names together declare − +
+       . [cell-shape] mixed practice, so 4 different cell shapes on one page: column 53%, word 2%, model 2%, numberline 3%, across 1% (column-sub, story-work, unknown-start-wp, sub-5-pictures, sub-check-judge, sub-facts-vertical, number-line-visual, missing-number)
+       . [notation-mix] writes the same item stacked AND across: column 53%, across 1%
+       . [unknown-format] print formats this audit has no cell shape for: story-work, sub-check-judge (add them to SHAPE_OF)
+note subtraction/sub_across_zeros  "Subtract Across Zeros"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_missing_digit  "Find the Missing Digit (Subtraction)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_check_by_adding  "Check a Subtraction by Adding"
+       . [unknown-format] print formats this audit has no cell shape for: sub-check-judge (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_compare  "Subtraction Word Problems: How Many More?"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_start_unknown  "Subtraction Word Problems: Find the Start"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_2d_1d  "Subtract a 1-Digit Number from a 2-Digit Number (No Regrouping)"
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+       . [card-rulings] 5 of 5 spec-card ruling(s) hold over 120 items (design/cards/chartwindow/chartwindow.md, design/cards/facts/facts.md, design/cards/family-check/family-check.md, design/cards/partition/partition.md, design/cards/pv/pv.md, design/cards/subtraction/subtraction.md, design/cards/times-as-many/times-as-many.md, design/cards/word-stories/word-stories.md)
+note subtraction/sub_wp_change_unknown  "Subtraction Word Problems: How Many Went?"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 118 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+note subtraction/sub_wp_compare_smaller  "Compare Stories: Find the Smaller Amount"
+       . [unknown-format] print formats this audit has no cell shape for: story-work (add them to SHAPE_OF)
+       . [variety] 119 distinct items in 240; a page of 6 is likely to repeat one
+       . [zero-facts] no zero operand in 240 items (fine unless this step teaches the zero case)
+
+Failures by class:
+     0  (none)
+
+Notes by class:
+    55  zero-facts
+    24  unknown-format
+    14  variety
+     7  card-rulings
+     5  ragged
+     2  mixed-pool
+     1  misfiled
+     1  cell-shape
+     1  notation-mix
+
+By family:
+  operations   59 skills, 0 failing
+
+Coverage: 0 skills where NOTHING could be checked against the name; 0 more with at least one check that could not be applied.
+
+MC-ALL (P-29 / RM-P-01, every live skill): 59 skills, 60 items each
+baseline: design/audit/baselines/content-audit-mc.json (27 pinned (skill, kind) pairs)
+ws-content-audit --mc-all: OK (59 skills, 60 items each: 0 with production items as buttons (0 pinned), 0 new, 0 label-bank notes)
+
+ws-content-audit: OK (59 subtraction skills, 240 items each, Max Number 100, 0 failing, 2 mixed pools held to their pool union, 110 notes)
