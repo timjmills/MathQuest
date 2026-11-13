@@ -218,6 +218,32 @@ export function plan(input = {}) {
     return p;
 }
 
+/**
+ * The stacked Pre-skill Check's pages (lead ruling R13, 2026-11-13): whole bands in order, every prerequisite kept. One page
+ * when the bands fit it; otherwise every page has the full body (each page prints the full header) and two pages split as
+ * evenly as the bands allow (2 + 2 for four prerequisites), never leaving one page a single item. `bands` [{h, n, sec}].
+ */
+export function paginateBands(bands, budget, gap = 0) {
+    const hOf = (bs) => bs.reduce((t, b, i) => t + b.h + (i ? gap : 0), 0);
+    const nOf = (bs) => bs.reduce((t, b) => t + b.n, 0);
+    const page = (bs) => ({ sections: bs.map((b) => b.sec), used: hOf(bs), budget, fullHeader: true });
+    if (hOf(bands) <= budget) return [Object.assign(page(bands), { fullHeader: false })];
+    let best = null;
+    for (let k = 1; k < bands.length; k++) {
+        const a = bands.slice(0, k), b = bands.slice(k);
+        if (hOf(a) > budget || hOf(b) > budget) continue;
+        const score = [nOf(a) < 2 || nOf(b) < 2 ? 1 : 0, Math.abs(a.length - b.length), Math.abs(hOf(a) - hOf(b))];
+        const d = best ? score.findIndex((v, i) => v !== best.score[i]) : -1;
+        if (!best || (d > -1 && score[d] < best.score[d])) best = { k, score };
+    }
+    if (best) return [page(bands.slice(0, best.k)), page(bands.slice(best.k))];
+    const out = [];
+    let cur = [];
+    for (const b of bands) { if (cur.length && hOf(cur.concat([b])) > budget) { out.push(page(cur)); cur = []; } cur.push(b); }
+    if (cur.length) out.push(page(cur));
+    return out;
+}
+
 function planCheck(input, cut) {
     const ctx = ctxOf(input);
     const form = String(input.form || 'A').toUpperCase() === 'B' ? 'B' : 'A';
@@ -293,6 +319,8 @@ function planCheck(input, cut) {
         // keeps the whole rows its share of one page holds (at least one row), so four wide
         // pictures print one page of four one-row bands instead of four pages.
         let cur = { sections: [], used: 0, budget: m.budget };
+        // (the stacked Pre-skill Check's bands, paginated below - lead ruling R13)
+        const stacked = [];
         // `perQuestion` (the detailed lesson's Prerequisite Check, V22 §9.1): the bands fill the body
         // (flex weights by content), each cell growing to at most 1.45 x its content so no empty band
         // reaches 30 % (H13). Absent on every other check.
@@ -331,12 +359,15 @@ function planCheck(input, cut) {
             kept += q.length;
             const rows = Math.ceil(q.length / cols);
             const bandH = m.strip + TAG + rows * h;
+            if (!input.perQuestion) { stacked.push({ h: bandH, n: q.length, sec: band(q, cols, rows, h, cols) }); continue; }
             if (cur.sections.length && cur.used + bandH > cur.budget) { pages.push(cur); cur = { sections: [], used: 0, budget: mCont.budget }; }
             // (the detailed lesson's check never lays a band out in more columns than it has items: one item in a two-up
             // band left an empty bordered half - lesson 4 critic r2 D9; the item keeps its measured size, centred)
             cur.sections.push(band(q, input.perQuestion ? Math.max(1, Math.min(cols, q.length)) : cols, rows, h, cols));
             cur.used += bandH;
         }
+        // (gap 0: the bands stand edge to edge, as the one-page sum always counted them)
+        if (stacked.length) pages.push(...paginateBands(stacked, m.budget, 0));
         if (cur.sections.length) pages.push(cur);
         // The detailed lesson's check: the last band takes the page's spare height (one unruled
         // trailing area inside the frame, V22 §8.12.4), so the body is not blank at its foot.
@@ -348,7 +379,8 @@ function planCheck(input, cut) {
     const finalFrame = n === all.length ? frame : frameOf({ skills: skillsOn.length ? skillsOn : input.skills || [], input: Object.assign({}, input, { form }),
         tabId: `Check ${form}`, title: titleOf(), score: n, twoLine: false });
     const rp = routed ? routePlan(input, routeRows) : null;
-    return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p) => ({ sections: p.sections })), {
+    // (lead ruling R13: a check that runs to a second page prints the FULL header on every page - name, date, score, title)
+    return assemble(ROLE_ID, Object.assign({}, input, { form }), finalFrame, pages.map((p, i) => (p.fullHeader && i > 0 ? { header: finalFrame.header, sections: p.sections } : { sections: p.sections })), {
         scaffoldLevel: 0,
         meta: Object.assign({ foot: routedFoot, units: routedUnits, fitsPage: routedFits, items: n, scoreOutOf: n, form, quadrants: quadFits && pages.length === 1, fits: [{ cols: quadFits ? 2 : 4, rows: 2, line: `Fits: ${quads.length} prerequisite skills, ${all.length} items.` }] },
             rp ? { routePlan: rp, routes: routeRows } : {}),

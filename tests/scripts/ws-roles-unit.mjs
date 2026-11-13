@@ -38,6 +38,7 @@ const EA = await mod('roles/error-analysis.js');
 const RV = await mod('roles/review.js');
 const CO = await mod('roles/compose.js');
 const SM = await mod('roles/scripted-model.js');
+const PSC = await mod('roles/pre-skill-check.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -173,6 +174,25 @@ if (on('MOD-MARKS')) {
     const mm2 = typeof SM.marksFor === 'function' ? SM.marksFor(it2, steps5) : null;
     const fresh = mm2 ? mm2.map((x) => JSON.stringify(x.__new || null)) : [];
     if (fresh.join('|') !== '[]|["o0"]|["o1"]|["o2"]|["o3"]') findings.push(`MOD-MARKS-INK: each Model state must name only its own new marks (grey; the earlier ones black) - got ${fresh.join(' ')}`);
+}
+if (on('PSC-2PG-BALANCE')) {
+    // lead ruling R13 (2026-11-13): a Pre-skill Check at L may run to 2 pages - balanced (2 + 2 for four prerequisites), never a
+    // page of one item, no prerequisite dropped, the FULL header (name, date, score, title) on every page, the key the same pages
+    checks++;
+    for (const hMm of [56, 62, 70]) {
+        const items = [];
+        for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) items.push(Object.assign(itemOf('one'), { pool: `q${i}`, footprint: { wMm: 150, hMm, maxCols: 1 } }));
+        let pl = null;
+        try { pl = PSC.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can add', grade: 2 }], items, seed: 1 }); }
+        catch (e) { findings.push(`PSC-2PG-BALANCE: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); continue; }
+        const pages = pl.pages || [];
+        const bandsOf = (pg) => (pg.sections || []).filter((x) => x.kind === 'band' || x.kind === 'row').length;
+        const counts = pages.map(bandsOf);
+        if (counts.reduce((a, b) => a + b, 0) !== 4) findings.push(`PSC-2PG-BALANCE: h ${hMm} - ${counts.reduce((a, b) => a + b, 0)} of 4 prerequisites printed`);
+        if (pages.length === 2 && Math.abs(counts[0] - counts[1]) > 0) findings.push(`PSC-2PG-BALANCE: h ${hMm} - two pages split ${counts.join(' + ')} (want 2 + 2)`);
+        if (pages.length > 2) findings.push(`PSC-2PG-BALANCE: h ${hMm} - ${pages.length} pages (want at most 2)`);
+        pages.slice(1).forEach((pg, i) => { const h = pg.header || {}; if (!h.title || h.score === false || h.date === false) findings.push(`PSC-2PG-BALANCE: h ${hMm} - page ${i + 2} prints the short header (title "${h.title || ''}", date ${h.date}, score ${h.score}); every page gets the full header`); });
+    }
 }
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
