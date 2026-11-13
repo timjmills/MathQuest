@@ -33,6 +33,12 @@
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
 //             more-practice, test, review, mixed-practice) where the page's cells and its measured items pair one to one; a
 //             role that draws its own cell (fact-probe rows, word-problems stories, the guided model) is not judged by it.
+//   --slot-ink off (opt-in, lf-vocab r6, critic r4 #1): an EMPTY answer slot that draws nothing (no text, no stroke, no
+//             drawing) does NOT count as ink - the band is measured as the critic's row-ink scan of the PNG sees it (the
+//             critic measured pick3 error analysis S at 30.1 % while the default rule passed it), and EB-BAND reads the
+//             LONGEST blank run of rows between the cell's rules (padding included, above, between or under the ink), as
+//             the critic's per-cell scan does. A `legacy` cell (another skill's old print HTML) is printed as a note, not
+//             judged. The default stays on.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
@@ -151,6 +157,8 @@ const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
 const OPTS = arg('opts', null) ? JSON.parse(arg('opts')) : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
+const SLOT_INK = arg('slot-ink', 'on') !== 'off';
+const LEGACY_NOTES = [];
 // (`--margin N`, lf-placevalue critic r4 N-r4-1, owner 2026-11-09 "every finding a check": a fix that clears the 30 % limit by under
 // N points is fragile - G2 passed at 29.9 % - so the band and side limits are judged at 30 - N %; absent, 30 % as before)
 const MARGIN = Math.max(0, Number((process.argv.includes('--margin') && process.argv[process.argv.indexOf('--margin') + 1]) || 0)) / 100;
@@ -171,7 +179,7 @@ function planOf(key) {
 
 /* ------------------------------------------------------------------ in the page */
 // Serialisable. scope: a CSS selector of the containers to read (print: the pupil pages; screen: the host's paper).
-function measureCells(scope) {
+function measureCells(scope, slotInk = true) {
     const MM = 96 / 25.4;
     const visible = (e) => { const cs = getComputedStyle(e); return cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity || '1') > 0.05; };
     const out = [];
@@ -182,23 +190,43 @@ function measureCells(scope) {
             const cr = c.getBoundingClientRect(); if (cr.height < 10 * MM || cr.width < 10 * MM) return;
             const cs = getComputedStyle(c);
             const inner = { t: cr.top + parseFloat(cs.paddingTop) + parseFloat(cs.borderTopWidth), b: cr.bottom - parseFloat(cs.paddingBottom) - parseFloat(cs.borderBottomWidth), l: cr.left + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth), r: cr.right - parseFloat(cs.paddingRight) - parseFloat(cs.borderRightWidth) };
-            let box = null;
-            const take = (r) => { if (!r.width || !r.height) return; box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
+            let box = null; const runs = [];
+            const take = (r) => { if (!r.width || !r.height) return; runs.push([r.top, r.bottom]); box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right }; };
             for (const d of c.querySelectorAll('*')) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab') || !visible(d)) continue;
                 const st = getComputedStyle(d);
                 const ownText = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
                 const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
                 const drawn = d instanceof SVGElement ? /^(svg)$/i.test(d.tagName) : /^(img|canvas|input)$/i.test(d.tagName);
-                const slot = d.hasAttribute('data-ws-slot');
-                if (ownText) { const rg = document.createRange(); rg.selectNodeContents(d); for (const r of rg.getClientRects()) take(r); continue; }
+                const slot = slotInk && d.hasAttribute('data-ws-slot');
+                if (ownText) {
+                    const rg = document.createRange(); rg.selectNodeContents(d);
+                    // slot ink off: a text line's INK, not its line box - the half-leading and the descender room are blank
+                    // pixels in the critic's scan (the glyphs run from about 0.05 em under the em box top to the baseline,
+                    // 0.2 em above its bottom)
+                    const fs = parseFloat(st.fontSize) || 0;
+                    for (const r of rg.getClientRects()) {
+                        if (slotInk || !fs || r.height <= fs * 0.5) { take(r); continue; }
+                        const lead = Math.max((r.height - fs) / 2, 0);
+                        take({ width: r.width, height: 1, left: r.left, right: r.right, top: r.top + lead + 0.05 * fs, bottom: r.bottom - lead - 0.2 * fs });
+                    }
+                    continue;
+                }
                 if (drawn || stroked || slot) take(d.getBoundingClientRect());
             }
             if (!box) return;
             const H = inner.b - inner.t, W = inner.r - inner.l;
             const hwVar = parseFloat(getComputedStyle(c).getPropertyValue('--ws-hw')) || 0;
             const hw = /mm/.test(getComputedStyle(c).getPropertyValue('--ws-hw')) ? hwVar * MM : hwVar;
-            const below = Math.max(inner.b - box.b, 0);
+            // slot ink off: the critic's row-ink scan - the longest blank run of rows between the cell's own rules (its
+            // border's inner edges, the padding included), anywhere in the cell, as a share of the cell height
+            let below = Math.max(inner.b - box.b, 0);
+            if (!slotInk) {
+                const top = cr.top + parseFloat(cs.borderTopWidth), bot = cr.bottom - parseFloat(cs.borderBottomWidth);
+                let y = top, gap = 0;
+                for (const [a, b] of runs.sort((p, q) => p[0] - q[0])) { if (a > y) gap = Math.max(gap, a - y); y = Math.max(y, b); }
+                below = Math.max(gap, bot - y, 0);
+            }
             const side = Math.max(box.l - inner.l, inner.r - box.r, 0);
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
@@ -300,6 +328,9 @@ function measureVocab(scope) {
 
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
+        // (--slot-ink off judges the lane's KIT cells: a `legacy` cell - another skill's old print HTML, e.g. a pre-skill check's
+        // prerequisite items - is listed as a note, never passed silently; its band belongs to that skill's family)
+        if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(`${where} p${c.page} cell ${c.label || c.cell}: legacy cell not judged by --slot-ink off (${(c.belowMm / c.hMm * 100).toFixed(1)} %)`); return; }
         const lim = BAND * c.hMm;
         if (c.belowMm >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${c.belowMm} mm under the ink of a ${c.hMm} mm cell (${(c.belowMm / c.hMm * 100).toFixed(1)} %; limit 30 % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
         if (Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
@@ -325,7 +356,7 @@ async function main() {
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
             for (const v of variants) jobs.push({ role: 'independent', size: 'L', opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent L {${v.option}: ${v.value}}` });
-            notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
+            notes.push(`${key}: slot ink ${SLOT_INK ? 'on' : 'off'}; card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
                 const b = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
                     try {
@@ -345,7 +376,7 @@ async function main() {
                     await sh.setContent(b.html, { waitUntil: 'networkidle0', timeout: 60000 });
                     await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    const cells = await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page');
+                    const cells = await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page', SLOT_INK);
                     renders++; cellsRead += cells.length;
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
                     judge(cells, `${key} ${j.tag}`, F, j.role);
@@ -407,7 +438,7 @@ async function main() {
                 }, { c: categoryId, k: skillId, host, SEED, OPTS });
                 if (!ok || /^ERR/.test(ok)) { notes.push(`${key} ${host} ${w}: not rendered (${ok})`); continue; }
                 await new Promise((r) => setTimeout(r, 450));
-                const cells = await page.evaluate(measureCells, ok);
+                const cells = await page.evaluate(measureCells, ok, SLOT_INK);
                 renders++; cellsRead += cells.length;
                 // EB-PARITY (opt-in --screen-parity; lf-placevalue critic nwf r1 N9, lead ruling: screen parity is a contract rule): a
                 // skill whose print cell is a kit template draws THAT cell on every screen host ([data-ws-cell="<template>"]), never a
@@ -456,7 +487,7 @@ async function main() {
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
     const rules = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
-    for (const n of notes) console.log(`note: ${n}`);
+    for (const n of notes.concat(LEGACY_NOTES)) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes, renders, cells: cellsRead }, null, 1));

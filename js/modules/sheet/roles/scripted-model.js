@@ -303,7 +303,9 @@ export function plan(input = {}) {
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     let steps = stepsFor(it);
     let marks = marksFor(it, steps);
-    const cols = fitsAt([it], 2, ctx) ? 2 : 1;
+    // (a 1 picture, 3 words state is drawn full width, its picture beside its bank, the step text over it: beside a half-width
+    // state the one-line step text left its cell 70-79 % empty - lf-vocab r5, ws-empty-band EB-BAND)
+    const cols = it.template !== 'vocab-pick3' && fitsAt([it], 2, ctx) ? 2 : 1;
     const textH2 = 2 * (m.pitch + 1.5) + 6, textH1 = (m.pitch + 1.5) + 6;
     // A state too wide for the half-width state column (a word problem, a wide picture) takes the
     // full width, with its step text over it in the same row (PT-MOD-2 cannot hold it beside).
@@ -405,7 +407,7 @@ export function plan(input = {}) {
     const stateItem = (i) => planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
-            + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
+            + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, it.template === 'vocab-pick3' && cols === 1 ? { payload: Object.assign({}, o && o.payload, { wideState: true }) } : {},
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
     });
