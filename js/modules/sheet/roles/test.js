@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, measuredH } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 
 export const ROLE_ID = 'test';
@@ -277,6 +277,18 @@ export function plan(input = {}) {
     if (form === 'B') items = shuffle(rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'test', 'B')), items);
     // RUBRIC H13: problems of one height together, so each row is sized for what it holds.
     items = groupByHeight(items, L.cols);
+    // (lf-ops-props r4b: the rows' own heights - each row its tallest problem - must fit the grid the count was chosen for;
+    // an order that pairs short problems with tall ones can sum past it - arrays_groups Test M ran 2.6 mm off its body - so
+    // the problems are then set short to tall, which gives the smallest sum of row heights. Same problems, same count.)
+    {
+        const hs = items.map((it) => measuredH(it, L.cols));
+        const rowSum = (ord) => { let t = 0; for (let r = 0; r < ord.length; r += L.cols) t += Math.max(...ord.slice(r, r + L.cols).map((i) => hs[i])); return t; };
+        const idx = items.map((_, i) => i);
+        if (L.cols > 1 && hs.every((h) => h > 0) && Number(L.gridH) > 0 && rowSum(idx) > L.gridH - SAFETY_H_MM) {
+            const byH = idx.slice().sort((a, b) => hs[a] - hs[b] || a - b);
+            if (rowSum(byH) < rowSum(idx)) items = byH.map((i) => items[i]);
+        }
+    }
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
     const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
