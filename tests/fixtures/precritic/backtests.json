@@ -3161,145 +3161,145 @@
     "pass": "OK"
    }
   },
-  {
-   "id": "model-grid-facts",
-   "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
-   "kind": "commit-pair",
-   "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
-   "browser": true,
-   "fail": {
-    "commit": "f960e549",
-    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
-   },
-   "pass": {
-    "commit": "966292ff",
-    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
-   },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
+ {
+  "id": "model-grid-facts",
+  "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+  "browser": true,
+  "fail": {
+   "commit": "f960e549",
+   "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
   },
-  {
-   "id": "model-interior-band-facts",
-   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
-   "kind": "commit-pair",
-   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
-   "browser": true,
-   "fail": {
-    "commit": "9f7983dd",
-    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
-   },
-   "pass": {
-    "commit": "04683166",
-    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
-   },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
+  "pass": {
+   "commit": "966292ff",
+   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
   },
-  {
-   "id": "screen-support-eq-divfacts",
-   "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
-   "kind": "commit-pair",
-   "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
-   "browser": true,
-   "fail": {
-    "commit": "1428a84c",
-    "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
-   },
-   "pass": {
-    "commit": "d377e32b",
-    "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
-   },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "screen-cue-size-divfacts",
-   "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
-   "kind": "commit-pair",
-   "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
-   "browser": true,
-   "fail": {
-    "commit": "1428a84c",
-    "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
-   },
-   "pass": {
-    "commit": "d377e32b",
-    "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
-   },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "screen-support-place-divfacts",
-   "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
-   "kind": "commit-pair",
-   "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
-   "browser": true,
-   "fail": {
-    "commit": "1428a84c",
-    "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
-   },
-   "pass": {
-    "commit": "d377e32b",
-    "state": "0 findings: every ÷ card under once one wraps"
-   },
-   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "screen-ink-size-ink",
-   "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
-   "kind": "fixture",
-   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
-   "browser": true,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
-    "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-    "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
-   },
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
-  },
-  {
-   "id": "screen-ink-size-width",
-   "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
-   "kind": "fixture",
-   "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
-   "browser": true,
-   "fail": {
-    "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
-    "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
-   },
-   "pass": {
-    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-    "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
-   },
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
- ]
+  },
+ {
+  "id": "model-interior-band-facts",
+  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+  "browser": true,
+  "fail": {
+   "commit": "9f7983dd",
+   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+  },
+  "pass": {
+   "commit": "04683166",
+   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-eq-divfacts",
+  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-cue-size-divfacts",
+  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-place-divfacts",
+  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: every ÷ card under once one wraps"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-ink",
+  "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
+   "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-width",
+  "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
+   "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ }
+]
 }

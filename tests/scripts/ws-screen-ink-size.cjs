@@ -33,6 +33,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const ROOT_DIR = path.resolve(__dirname, '..', '..');   // the pin is read from this checkout (MQ_ROOT serves another tree)
 
 const NAME = 'ws-screen-ink-size';
 const argv = process.argv.slice(2);
@@ -334,8 +335,25 @@ async function main() {
     for (const x of findings) console.log(`${x.rule} ${x.where}: ${x.msg}`);
     console.log(`(${SKILLS.length} skill(s)${HTML ? ' + fixture' : ''}, ${renders} renders, ${((Date.now() - T0) / 1000).toFixed(0)} s)`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes: [...notes], renders }, null, 1));
-    const bad = findings.length || (!renders ? 1 : 0);
-    console.log(`${NAME}: ${bad ? `FAIL (${findings.length || 'nothing rendered'})` : 'OK'}`);
+    // the PIN (lead 2026-11-13): findings counted per (skill {option} host width, rule), card seeds and items folded in; a key
+    // the pin does not hold, or a count above the pin, FAILS. --write-baseline <file> writes it; --no-baseline judges raw.
+    const pkey = (x) => `${String(x.where).replace(/ \[[^\]]*\]$/, '').replace(/ seed \d+$/, '')}|${x.rule}`;
+    const counts = {}; for (const x of findings) counts[pkey(x)] = (counts[pkey(x)] || 0) + 1;
+    const PIN = HTML || has('no-baseline') ? null : path.resolve(ROOT_DIR, arg('baseline', 'design/audit/baselines/screen-ink-size.json'));
+    if (arg('write-baseline', null)) {
+        fs.writeFileSync(path.resolve(process.cwd(), arg('write-baseline')), JSON.stringify({ note: 'ws-screen-ink-size pin: findings per (skill {option} host width, rule) accepted on 2026-11-13 (lead ruling); the owning lane shrinks it. Re-pin only with a STATUS note.', written: new Date().toISOString().slice(0, 10), skills: SKILLS, counts }, null, 1) + '\n');
+        console.log(`wrote ${arg('write-baseline')}: ${Object.keys(counts).length} keys`);
+    }
+    let judged = findings;
+    if (PIN && fs.existsSync(PIN) && !arg('write-baseline', null)) {
+        const pin = JSON.parse(fs.readFileSync(PIN, 'utf8')).counts || {};
+        const over = Object.keys(counts).filter((k) => counts[k] > (pin[k] || 0));
+        judged = findings.filter((x) => over.includes(pkey(x)));
+        for (const k of over) console.log(`  over the pin: ${k} ${counts[k]} > ${pin[k] || 0}`);
+        console.log(`(${findings.length - judged.length} finding(s) within the pin ${path.relative(ROOT_DIR, PIN)})`);
+    }
+    const bad = judged.length || (!renders ? 1 : 0);
+    console.log(`${NAME}: ${bad ? `FAIL (${judged.length || 'nothing rendered'})` : 'OK'}`);
     process.exit(bad && !has('report-only') ? 1 : 0);
 }
 
