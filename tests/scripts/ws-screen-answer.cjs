@@ -13,6 +13,8 @@
 //        passed through) and prints `ws-screen-answer --stress: K/N passes`; exit 1 unless K = N.
 //        Run it as: /tmp/mq-browser-run.sh --exclusive node tests/scripts/ws-screen-answer.cjs --stress 10
 //   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
+//   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
+//                         only the kit's answer slots (input.mq-slot)
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
@@ -281,8 +283,8 @@ function PLAN(rootSel, which) {
 // outline: the border box grown by outline-offset + outline-width) must keep >= 4 px from every text box of the cell beside it
 // on its line (a text line box that overlaps the ring vertically by >= 30 % of its height). 0f1a0bda's kit LINE slot pulled the
 // next word under the ring (0 px to "tens" on unit_form). Returns a message, or '' when the ring is clear or no ring is drawn.
-function FOCUS_GAP(e, rootSel) {
-    if (document.activeElement !== e) return '';
+function FOCUS_GAP(e, rootSel, all) {
+    if (document.activeElement !== e || (!all && !e.matches('input.mq-slot'))) return '';
     const cs = getComputedStyle(e);
     const w = parseFloat(cs.outlineWidth) || 0;
     if (!w || /^(none|hidden)$/.test(cs.outlineStyle)) return '';
@@ -338,7 +340,9 @@ async function run(page, sel, which) {
         try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
         await el.evaluate(e => { e.value = ''; });
         // FOCUS-GAP (critic eb-r5 D2): the focused box's ring keeps >= 4 px from the nearest word
-        const fg = await el.evaluate(FOCUS_GAP, sel);
+        // (default: the kit's answer slots, input.mq-slot; --focus-gap-all judges every box: 11-13 it finds arrays_groups
+        // -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px, routed to their lanes)
+        const fg = await el.evaluate(FOCUS_GAP, sel, process.argv.includes('--focus-gap-all'));
         if (fg) (r.focusGap = r.focusGap || []).push(fg);
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));

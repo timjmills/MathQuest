@@ -141,7 +141,10 @@ function footFindings(cells, m, cols, sections, FOOT = 0.10) {   // FOOT: the EB
     const out = [];
     const fpOf = (mi, k) => (mi ? (mi[k] != null ? mi[k] : mi[cols]) : null);
     const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
-    if (cells.length && cells.every((c) => Number.isInteger(c.item) && c.item >= 0 && c.item < m.length)) {
+    // (the position rule's scope: one section, cells and items one to one. A Review page draws fewer cells than it deals - 16
+    // of 28 - and was never paired; widening EB-FOOT to it is a scope change for the lead, not part of m1: by index add_facts
+    // review reads 17-23 % over its footprint, eb-r5 builder note, routed)
+    if (sections <= 1 && m.length === cells.length && cells.length && cells.every((c) => Number.isInteger(c.item) && c.item >= 0 && c.item < m.length)) {
         for (const c of cells) { const k = footCols(c, cells); const fp = fpOf(m[c.item], k); if (off(c, fp)) out.push({ c, fp, k }); }
         return { mode: 'index', byH: false, out };
     }
@@ -180,7 +183,7 @@ if (argv.includes('--self-test')) {
         const m = [{ 2: 20 }, { 2: 40 }];
         const swapped = [mk(0, 40, 1), mk(1, 20, 2)], noIdx = swapped.map((c) => Object.assign({}, c, { item: -1 })), right = [mk(1, 40, 1), mk(0, 20, 2)];
         const pc = [['index: swapped footprints', footFindings(swapped, m, 2, 1).out.length, 2], ['index: own footprints', footFindings(right, m, 2, 1).out.length, 0],
-            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: fallback', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).mode, 'position']];
+            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: fallback', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).mode, 'position'], ['two sections: not paired', footFindings(swapped, m, 2, 2).mode, ''], ['fewer cells than items: not paired', footFindings([mk(1, 40, 1)], m, 2, 1).mode, '']];
         const pbad = pc.filter(([, got, want]) => got !== want);
         for (const [n, got, want] of pbad) console.log(`self-test FAIL: EB-FOOT pairing ${n}: ${got}, want ${want}`);
         if (pbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT pairing)`); process.exit(1); }

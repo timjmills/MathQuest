@@ -330,3 +330,13 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     the facts lane.
 - r5 D3, ruled by the lead: KEEP the centring branch; recorded in WORKSHEET_DESIGN_STANDARD CL-4b (it rarely fires under the cap). Top-aligned boxes with unequal bottoms are fine (lead default, put to the owner).
 - SCREEN-INK-SIZE critic sis-r3 (138f43d9): PASS, 9 · 9 · 9 · 8. Deploy branch claude/sweet-newton-c8wrv1-lf-checks-inksize @ fd7b4cc2 (master ebd565c8 merged). Its gates are green; precritic-plan's 21 failing rows are master's own. Sent to the lead. Queued: r3 D1 (the SIZE-REF wording for a screen-only ring), m1-m4.
+- eb-r5 fix round (builder, Opus medium, 11-13; commits 2af22377, dc75d1d9 + this one):
+  - D1: a screen slot's edge counts only when it is darker than the 225 threshold. Row eb-fixture-faint-slot (probe p3: OK before, FAIL 35.0 % now; a black box passes).
+  - D2: additive css/screen-cell.css gives the kit LINE slot 9 px side margins beyond the drawn box. ws-screen-answer FOCUS-GAP checks that the focused `input.mq-slot` ring is >= 4 px from the nearest word. Row sa-focus-gap-unit-form: 0f1a0bda FAIL (0.5 px to "tens"), 2af22377 OK.
+    - `--focus-gap-all` judges every box. It finds arrays_groups -0.2 px (.mq-cellslot / .ib-cell), function_table_hard 1.4 px and elapsed_find_duration 3.3 px. Route these to their lanes.
+  - m1: the kit writes data-eb-item on each grid cell (buildSheet tagItemIndex -> answer-key gridPart -> grid -> cell()). EB-FOOT pairs by that index (pure footFindings, self-test "EB-FOOT pairing"); by-height and position pairing stay only as the fallback. The scope is unchanged: one section, cells = items.
+    - For the lead: a Review page deals 28 items and draws 16 cells. By index, add_facts review S/M/L reads 17-23 % over its footprint (12 cells). It is not judged; widening the rule needs a ruling.
+  - eb-foot-gridcols-patterns stays PENDING, because pattern_features is still not on master (8a7c5d43).
+  - The pv rows are re-pointed (fail 16014137, pass 668f6a8c / 1f18505d) and PASS. Both EB-PARITY rows PASS.
+  - Backtests: 27 of 28 live rows PASS. eb-fact-roles is still red (facts lane). Self-test, precritic-plan, ws-screen-answer, ws-phone-card, boot-smoke and the facts pin are OK (no re-pin).
+  - The pv debt (combine, unit_form, expand): EB-BAND 205, EB-SIDE 16 (221 in all; the shown lines are combine and expand).
