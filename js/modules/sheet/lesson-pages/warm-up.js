@@ -226,7 +226,7 @@ export function warmUpBand(env) {
             const inkOf = (id, it) => { const mm = it.measured && it.measured[shape[id].cols]; return mm && mm.inkMm > 0 ? mm.inkMm : NaN; };
             const everyInk = halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id)).map((it) => inkOf(id, it)));
             const uniformRow = everyInk.length > 0 && everyInk.every((v) => Number.isFinite(v)) && (Math.max(...everyInk) - Math.min(...everyInk)) <= 0.2 * Math.max(...everyInk);
-            const LS_WARM_BAND = 0.30;
+            const LS_WARM_BAND = 0.27;   // (LS-WARM fails at 30 %; the measuring root reads ink ~1 mm higher than the page, so the cap keeps 3 points of margin)
             const room = halves.map((id) => {
                 const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
                 const hs = its.map((it) => hOf(it, shape[id].cols));

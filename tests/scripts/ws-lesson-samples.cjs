@@ -49,6 +49,7 @@
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   --layout-seeds a,b  the packet seeds the layout rules build (default 4242).
+//   --practice-pages 1,2  the Practice pages option values the layout rules build (default 1; the gate sweeps 1,2: M2).
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
 const fs = require('fs');
@@ -66,6 +67,9 @@ const PRACTICE = parseInt(arg('pages', '1'), 10);
 const CHECK = has('check');
 const NSEEDS = Math.max(1, parseInt(arg('seeds', '8'), 10));
 // the layout rules' packet seeds (default 4242; lf-engine G7: --layout-seeds 973079 is the seed the lf-algebra critic r2 graded)
+// the packet option sets the layout rules build: Practice pages (master's plain control, 1..n; lf-partopts critic r4 M2 - the
+// fact_family_sort L Mixed last page 72 % empty printed with Practice pages 2 + Mixed on; default 1)
+const PRACTICE_SETS = String(arg('practice-pages', '1')).split(',').map((x) => Math.max(0, Math.floor(Number(x.trim())))).filter((x) => Number.isFinite(x));
 const LAYOUT_SEEDS = String(arg('layout-seeds', '4242')).split(',').map((x) => Number(x.trim())).filter((x) => Number.isFinite(x));
 const LP = require('../lib/ws-lesson-lp.cjs');
 // the route step's title and its block's name, by step id (Y1.B1.S6 -> "Count on from any number", "Place value (within 10)")
@@ -354,10 +358,10 @@ async function checkMain() {
                 }
             }
             // layout: seed 4242 (or --layout-seeds a,b: the seed a critic graded, e.g. ws-grade-render's) at every size
-            for (const lseed of LAYOUT_SEEDS) for (const size0 of SIZES) {
+            for (const lseed of LAYOUT_SEEDS) for (const ppages of PRACTICE_SETS) for (const size0 of SIZES) {
                 const size = size0;
-                const built = await page.evaluate(async ({ skill, size, lseed }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: lseed, key: true, practicePages: 1, mixed: true });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, lseed });
+                const built = await page.evaluate(async ({ skill, size, lseed, ppages }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: lseed, key: true, practicePages: ppages, mixed: true });
+                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, lseed, ppages });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -367,7 +371,7 @@ async function checkMain() {
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
                 const pm = map(false), km = map(true);
-                const where = (k, n) => `${l.id} ${size} ${k}-p${n + 1}${lseed !== 4242 ? ` [layout s${lseed}]` : ''}`;
+                const where = (k, n) => `${l.id} ${size} ${k}-p${n + 1}${lseed !== 4242 ? ` [layout s${lseed}]` : ''}${ppages !== 1 ? ` [practice pages ${ppages}]` : ''}`;
                 // the sheetCheck rows, per page (page N of the doc)
                 const bandsOf = (sc, n) => sc.bands.filter((x) => x.startsWith(`page ${n + 1} `) || x.startsWith(`page ${n + 1}:`));
                 pm.forEach((m, n) => {

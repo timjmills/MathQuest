@@ -4044,6 +4044,26 @@
    }
   },
   {
+   "id": "lesson-ffs-mixed-pp2",
+   "check": "a Mixed continuation page is never >= 50 % blank under the Practice pages option values (lf-partopts critic r4 M2: fact_family_sort L, Practice pages 2 + Mixed on, Mixed p6 72 % empty on d34311d - lf-partopts' base, before master's live-pm2 Mixed fix de8eec183)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PM-CONT over --practice-pages 1,2 (lf-engine M2)",
+   "browser": true,
+   "fail": {
+    "commit": "d34311d57",
+    "state": "d34311d (lf-partopts' base): ffs L packet seed 130359, Practice pages 2: Mixed continuation p6 72 % blank"
+   },
+   "pass": {
+    "commit": "1db0e3309",
+    "state": "master (has de8eec183): the same packet's Mixed prints 96 % / 87.5 %"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only ffs --sizes L --practice-pages 2 --layout-seeds 130359 --rules PM-CONT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "roles-fix-minimal",
    "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
    "kind": "commit-pair",
