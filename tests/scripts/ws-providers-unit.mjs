@@ -1007,10 +1007,20 @@ if (chartInScope.length) {
     if (!G.window) G.window = G;
     if (!G.localStorage) { const st = {}; G.localStorage = { getItem: (k) => (k in st ? st[k] : null), setItem: (k, v) => { st[k] = String(v); }, removeItem: (k) => { delete st[k]; } }; }
     if (!G.document) G.document = { cookie: '', getElementById: () => null, querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => ({ style: {} }) };
+    // (MQ_ROOT: judge another checkout's generator and providers - ws-backtest commit-pair rows; default this tree)
+    const { pathToFileURL } = await import('node:url');
+    const at = (rel) => (process.env.MQ_ROOT ? pathToFileURL(`${process.env.MQ_ROOT.replace(/\/$/, '')}/${rel}`).href : `../../${rel}`);
     const _log = console.log; console.log = () => {};
-    let gq = null;
-    try { gq = await import('../../js/modules/generate-question.js'); } catch (e) { gq = null; } finally { console.log = _log; }
-    const { workLinesOf } = await import('../../js/modules/sheet/roles/guided.js');
+    let gq = null, kit = null, guidedM = null, optsM = null;
+    try {
+        gq = await import(at('js/modules/generate-question.js'));
+        kit = await import(at('js/modules/sheet/index.js'));
+        guidedM = await import(at('js/modules/sheet/roles/guided.js'));
+        optsM = await import(at('js/modules/skill-options.js'));
+    } catch (e) { gq = null; } finally { console.log = _log; }
+    const getProviderC = kit ? kit.getProvider : getProvider;
+    const workLinesOf = guidedM && guidedM.workLinesOf ? guidedM.workLinesOf : () => [];
+    const offeredFor = optsM && optsM.offeredOptionsFor ? optsM.offeredOptionsFor : offeredOptionsFor;
     ok(!!gq, 'CHART: generate-question.js does not load in node');
     const sentence = /^[A-Z][^.!?]*[.!?](?: [A-Z][^.!?]*[.!?])*$/;
     for (const key of chartInScope) {
@@ -1018,7 +1028,7 @@ if (chartInScope.length) {
         CHECKED_ONLY.add(key); CHECKED_ONLY.add(skill);
         if (!gq) continue;
         const host = skill === 'chart_to_120' ? 'hundreds_chart_fill' : skill;
-        const offered = (id) => { const o = (offeredOptionsFor(cat, skill) || []).find((x) => x.id === id); return o && Array.isArray(o.values) ? o.values.map((v) => v.v) : [undefined]; };
+        const offered = (id) => { const o = (offeredFor(cat, skill) || []).find((x) => x.id === id); return o && Array.isArray(o.values) ? o.values.map((v) => v.v) : [undefined]; };
         const bands = skill === 'chart_to_120' ? [120] : offered('band');
         const sets = [];
         for (const band of bands) for (const grid of (skill === 'number_chart_fill' ? [undefined] : offered('grid'))) for (const tiles of offered('tiles')) for (const gaps of offered('gaps')) {
@@ -1031,7 +1041,7 @@ if (chartInScope.length) {
             try { q = gq.generateQuestionFor({ category: cat, skill: host, opts: o, seed: 9001 + i * 31 + sets.indexOf(o) * 7, itemIndex: i }); } catch (e) { continue; }
             if (!q || !q.chartWindow) continue;
             q.categoryId = q.categoryId || cat; q.skillId = q.skillId || host;
-            const p = getProvider(cat, host);
+            const p = getProviderC(cat, host);
             const gaps = (Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : [q.ans]).map((x) => Number(String(x).replace(/,/g, '')));
             n++; counts.add(gaps.length);
             const tag = `${JSON.stringify(o)} [${gaps.join(', ')}]`;
@@ -1070,6 +1080,9 @@ if (chartInScope.length) {
     }
 }
 
+// --only-rules WRONG-MULTI,SAY-AGREE (backtests, chart_120 r2): judge only failures of these rule ids.
+const ONLY_RULES = ARGV.flatMap((a, i) => (a === '--only-rules' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
+if (ONLY_RULES.length) { const keep = failures.filter((f) => ONLY_RULES.some((id) => f.startsWith(`${id} `))); failures.length = 0; failures.push(...keep); }
 // --pv-r1 F3,F11 (backtests, lf-placevalue r1): judge only these critic-finding rules (the other checks still run).
 const PV_R1_ONLY = ARGV.flatMap((a, i) => (a === '--pv-r1' && i + 1 < ARGV.length ? String(ARGV[i + 1]).split(',') : [])).map((x) => x.trim()).filter(Boolean);
 if (PV_R1_ONLY.length) { const keep = failures.filter((f) => PV_R1_ONLY.some((id) => f.startsWith(`${id} `))); failures.length = 0; failures.push(...keep); }

@@ -1096,7 +1096,9 @@ function buildPlan(ctx) {
         add(gate('text-misconception', 'ws-text-misconception (a text-only misconception reaches the screen card and Reason It; no chart square holds more digits than its window)', `${scope} × reason-it, error-analysis, true-false × S/L`, 'browser', 'ws-text-misconception', ['--skills', keys.join(',')], { missingMsg: 'ws-text-misconception is not in this tree' }));
         // ---- lf-roles critic r8b on chart_120 (D5, n5): no Guided try shows the Model's own picture (GUIDED-MODEL-ECHO), and
         // a page's Score equals the answer places of its scored cells (SCORE-SLOTS; chartwindow, the template that scores slots)
-        add(gate('guided-echo', 'ws-guided-echo (GUIDED-MODEL-ECHO: no try repeats the Model; SCORE-SLOTS: Score = answer places)', `${scope} × guided + scored roles × M/L × 6 seeds`, 'browser', 'ws-guided-echo', ['--skills', keys.join(','), '--seeds', '6'], { missingMsg: 'ws-guided-echo is not in this tree' }));
+        // (chart_120 critic r1, 2026-11-13: + TF-FALSE, EA-PATTERN, STRIP-NUMBERS, SCORE-SLOTS on every scored role, and
+        // CROSS-GIVEAWAY over the chart's band x grid values - `--variants`)
+        add(gate('guided-echo', 'ws-guided-echo (GUIDED-MODEL-ECHO: no try repeats the Model; SCORE-SLOTS: Score = answer places on every scored role; TF-FALSE; EA-PATTERN; CROSS-GIVEAWAY; STRIP-NUMBERS)', `${scope} × guided + scored roles × M/L × 6 seeds + band x grid values`, 'browser', 'ws-guided-echo', ['--skills', keys.join(','), '--seeds', '6', '--variants'], { missingMsg: 'ws-guided-echo is not in this tree' }));
         // ---- lane S1 (2026-10-24): dealer uniformity, and the lesson-data / option-help / wrong-answer-fit node rules
         add(gate('dealer-uniform', 'ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position)', scope, 'node', 'ws-dealer-uniform', ['--skill', keys.join(',')], { parse: PARSE.dealerUniform, keys }));
         // ---- the visual-quality lane (2026-10-31, design/audit/VISUAL_QUALITY.md §4.2): the visual CHOICE rules VQ-REP,

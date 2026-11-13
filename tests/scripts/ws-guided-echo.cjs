@@ -22,6 +22,8 @@
 //                      grid=rows - one window, three items copying each other's answers; F9: band 10). With --variants it also
 //                      runs hundreds_chart_fill's band x grid values on independent / more-practice. Overlapping (not identical)
 //                      windows that share an answer are counted and reported (OVERLAP-INFO), not failed.
+//   CHART-SQUARE       on Reason It / True or False? / Error analysis, laid out at its printed size, no chart square is narrower
+//                      than the 14 mm writing floor (F10: band 100 Reason It L squeezed A | B beside the response to 10.4 mm squares).
 //   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
 //                      cell on its page (F5: "The number before is 109 ... Write 110." beside windows with no 109 or 110).
 //
@@ -41,7 +43,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const sizes = list(arg('sizes', 'M,L'));
     const only = arg('only', null) ? list(arg('only')) : null;
     const scoreTpl = list(arg('score-templates', 'chartwindow'));
-    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false'));
+    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false,reason-it'));
     const variants = argv.includes('--variants');
     const H = require('../lib/ws-harness.cjs');
     const app = await H.open({});
@@ -49,6 +51,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     try {
         res = await app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, variants }) => {
             const on = (id) => !only || only.includes(id);
+            const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE'].some(on);
             const out = []; let pages = 0;
             // a cell's PICTURE with its answers taken out. A chart window (table.k2-chart): its shape and the number its first
             // square stands for, read from any printed square (across +1, down +10) - so two windows with other blanks are one
@@ -120,7 +123,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
             };
             for (const key of keys) {
                 const [categoryId, skillId] = key.split(':');
-                if (variants && on('CROSS-GIVEAWAY')) {
+                if (variants && on('CROSS-GIVEAWAY') && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(skillId)) {
                     const base = skillId === 'chart_to_120' ? { band: 120 } : {};
                     // (the chart's option values, card chartwindow §7a: "Numbers to" and the grid)
                     const bands = skillId === 'chart_to_120' ? [120] : skillId === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : [undefined];
@@ -133,8 +136,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     }
                 }
                 for (const size of sizes) for (let s = 1; s <= N; s++) {
-                    for (const role of on('SCORE-SLOTS') ? scoreRoles : ['guided']) {
-                        if (role !== 'guided' && !on('SCORE-SLOTS')) continue;
+                    for (const role of pageRule ? scoreRoles : ['guided']) {
+                        if (role !== 'guided' && !pageRule) continue;
                         let r;
                         try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId }] }], size, paper: 'A4', seed: s, key: false }); } catch (e) { out.push(`${key} ${role} ${size} seed ${s}: not composed (${String(e && e.message || e).slice(0, 120)})`); continue; }
                         pages++;
@@ -148,7 +151,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         const scoredItems = pp.flatMap((pg) => pg.items).filter((it) => !it.nolabel && !it.anchor && it.q);
                         if (on('SCORE-SLOTS') && Number.isFinite(Number(meta.scoreOutOf)) && scoredItems.some((it) => it.q.cell && scoreTpl.includes(it.q.cell.template))) {
                             // (Error analysis and True or False?: ONE judgement a cell - the shown work's squares are not the pupil's)
-                            const one = role === 'error-analysis' || role === 'true-false';
+                            const one = role === 'error-analysis' || role === 'true-false' || role === 'reason-it';
                             const want = scoredItems.reduce((a, it) => a + (!one && it.q.cell && scoreTpl.includes(it.q.cell.template) ? Math.max(1, (Array.isArray(it.q.keyParts) && it.q.keyParts.length) || 1) : 1), 0);
                             if (Number(meta.scoreOutOf) !== want) out.push(`SCORE-SLOTS ${key} ${role} ${size} seed ${s}: Score /${meta.scoreOutOf} but its ${scoredItems.length} scored cell(s) hold ${want} answer places`);
                         }
@@ -164,6 +167,18 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             }
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
+                        if (on('CHART-SQUARE') && ['reason-it', 'true-false', 'error-analysis'].includes(role) && /chartwindow/.test(r.pupilHtml)) {
+                            // laid out on the page at its printed size: no square of a chart window narrower than the 14 mm writing floor (H9)
+                            const host = document.createElement('div');
+                            host.style.cssText = 'position:absolute;left:0;top:0;visibility:hidden';
+                            host.innerHTML = r.pupilHtml;
+                            document.body.appendChild(host);
+                            const PX = 96 / 25.4;
+                            const tds = [...host.querySelectorAll('table.k2-chart td')];
+                            const min = tds.length ? Math.min(...tds.map((td) => td.getBoundingClientRect().width / PX)) : Infinity;
+                            host.remove();
+                            if (min < 14) out.push(`CHART-SQUARE ${key} ${role} ${size} seed ${s}: a chart square is ${min.toFixed(1)} mm wide (floor 14 mm, H9) - the window is squeezed beside its work`);
+                        }
                         if (on('STRIP-NUMBERS') && role === 'lesson') pp.forEach((pg, pi) => {
                             // (the step names only: the strip's and the zone's list items, their step numerals left out)
                             const doc = new DOMParser().parseFromString(`<div>${pg.htmls.join(' ')}</div>`, 'text/html');
@@ -184,7 +199,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS) /.test(f));
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS|CHART-SQUARE) /.test(f));
     const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
