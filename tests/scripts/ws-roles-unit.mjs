@@ -39,6 +39,7 @@ const RV = await mod('roles/review.js');
 const CO = await mod('roles/compose.js');
 const SM = await mod('roles/scripted-model.js');
 const PSC = await mod('roles/pre-skill-check.js');
+const TS = await mod('roles/test.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -258,6 +259,13 @@ if (on('EA-REDO-ALIGN')) {
         if (!m) findings.push('EA-REDO-ALIGN: no pupil-work block rendered');
         else if (/align-items:center/.test(m[1])) findings.push(`EA-REDO-ALIGN: a redo item's widened work is centred (${m[1].slice(0, 80)}) - its copy starts at the left`);
     }
+}
+if (on('TEST-LEVEL')) {
+    // lf-algebra r8 (via the lead): a Test lays its items out at scaffold level 0, so the bridge measures them at level 0 - measured at
+    // level 1 (the default), a function table's heights were the guided ones and the Test page planned the wrong rows
+    checks++;
+    const lv = typeof TS.MEASURE_LEVEL === 'function' ? TS.MEASURE_LEVEL() : TS.MEASURE_LEVEL;
+    if (lv !== 0) findings.push(`TEST-LEVEL: the Test role measures its items at level ${lv} (want 0, the level it lays them out at)`);
 }
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
