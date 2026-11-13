@@ -203,11 +203,14 @@ else {
             console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
             if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
         }
-        const other = [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
+        // the probe skill is in NO lane's opt-in (lf-checks 2026-11-13: add_facts is lf-ops' own opt-in skill, so its
+        // --rule-skills addition:add_facts was read as lf-placevalue's leak); a leak is a --rule-skills line naming THIS lane's skills
+        const anyLane = new Set(((optIn && optIn.lanes) || []).flatMap((l) => l.skills || []));
+        const other = [...live].find((k) => !anyLane.has(k) && k.startsWith('addition:'));
         if (other) {
             checked++;
             const q = plan([other], null);
-            const leak = q.text.split('\n').some((l) => l.includes('--rule-skills'));
+            const leak = q.text.split('\n').some((l) => l.includes('--rule-skills') && ((lane.skills || []).some((k) => l.includes(k)) || l.includes(`--rule-skills ${other}`)));
             console.log(`  ${leak ? 'FAIL' : 'OK  '} opt-in ${lane.lane}: not on another skill's plan (${other})`);
             if (leak) fails.push(`opt-in ${lane.lane}: ws-precritic --skill ${other} --dry-run carries --rule-skills (the lane's rules leak onto another skill)`);
         }

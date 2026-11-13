@@ -207,3 +207,9 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 - CL-4b (lead request): `--skill placevalue:unit_form --roles none --hosts worksheet --no-baseline` FAILs 3 at 35df47d7 (the pixels
   see what the DOM missed: rename=more p2 36.6 % above, p3 46.3 % above, p5 46.3 % under). At 451207ab it STILL FAILs 3: p2 and p3
   are unchanged, and p5 moves from under to above (47.2 %). So row eb-wsheet-cl4b-stretch was NOT added: its pass state does not pass.
+- D4 closed (lf-checks 11-13): ws-precritic-plan OK (111 rows on the path).
+  - precritic --skill now runs ws-cell-checks --card --card-opts (the 7 cc-* rows). It is a no-op on a skill no signed card lists.
+  - At head it is RED for lf-ops: SIZE-S 2, mult_properties independent and arrays_groups independent (S = M layout). This is real,
+    not pinned, and routed to lf-ops.
+  - The "opt-in leak" probe was wrong: it picked add_facts, which is lf-ops' own opt-in skill. It now picks a skill in no lane's
+    opt-in, and a leak is a --rule-skills line naming the lane's skills.

@@ -762,6 +762,9 @@ function buildPlan(ctx) {
         // FIX-WORDS on every skill (folded from lf-placevalue's opt-in, lf-checks 2026-11-12): the error-analysis Fix-it frame
         // prints the frame's own words, never the answer's singular
         add(gate('fixit-words', 'ws-fixit-words (FIX-WORDS: the error-analysis Fix-it frame prints its own words)', scope, 'browser', 'ws-fixit-words', ['--skills', keys.join(',')], { missingMsg: 'ws-fixit-words is not in this tree' }));
+        // ws-cell-checks on every --skill run (lf-checks 2026-11-13, critic eb-r3 D4: the cc-* rows were backtested but off the
+        // path): the signed card's roles and option values at S/M/L; a skill no signed card lists is a no-op
+        add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own
