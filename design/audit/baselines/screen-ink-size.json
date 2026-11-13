@@ -1,6 +1,11 @@
 {
- "note": "ws-screen-ink-size pin: findings per (skill {option} host width, rule) accepted on 2026-11-13 (lead ruling); the owning lane shrinks it. Re-pin only with a STATUS note.",
+ "note": "ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note.",
  "written": "2026-11-13",
+ "commit": "719fd1e0",
+ "totals": {
+  "keys": 38,
+  "findings": 99
+ },
  "skills": [
   "addition:add_facts",
   "subtraction:sub_facts",
@@ -29,44 +34,158 @@
   "placevalue:combine",
   "division:div_facts"
  ],
- "counts": {
-  "addition:add_facts {support touch} card 390px|SIZE-INK": 1,
-  "addition:add_facts {support touch} worksheet 1280px|SIZE-INK": 1,
-  "addition:add_facts {support tile} card 390px|SIZE-INK": 3,
-  "addition:add_facts {support tile} card 820px|SIZE-INK": 3,
-  "addition:add_facts {support tile} card 1280px|SIZE-INK": 3,
-  "addition:add_facts {support tile} worksheet 1280px|SIZE-INK": 4,
-  "addition:add_facts {support tile} quiz 1280px|SIZE-INK": 1,
-  "addition:add_facts {support frame} card 390px|SIZE-INK": 3,
-  "addition:add_facts {support frame} card 820px|SIZE-INK": 3,
-  "addition:add_facts {support frame} card 1280px|SIZE-INK": 3,
-  "addition:add_facts {support frame} worksheet 1280px|SIZE-INK": 4,
-  "addition:add_facts {support frame} quiz 1280px|SIZE-INK": 1,
-  "multiplication:mult_facts {support touch} card 390px|SIZE-INK": 2,
-  "multiplication:mult_facts {support touch} worksheet 1280px|SIZE-INK": 2,
-  "multiplication:mult_facts {support skip} card 390px|SIZE-INK": 3,
-  "multiplication:mult_facts {support skip} card 820px|SIZE-INK": 3,
-  "multiplication:mult_facts {support skip} card 1280px|SIZE-INK": 3,
-  "multiplication:mult_facts {support skip} worksheet 1280px|SIZE-INK": 4,
-  "multiplication:mult_facts {support skip} quiz 1280px|SIZE-INK": 1,
-  "multiplication:mult_facts {support array} card 390px|SIZE-INK": 3,
-  "multiplication:mult_facts {support array} card 390px|SIZE-WIDTH": 1,
-  "multiplication:mult_facts {support array} card 820px|SIZE-INK": 3,
-  "multiplication:mult_facts {support array} card 820px|SIZE-WIDTH": 1,
-  "multiplication:mult_facts {support array} card 1280px|SIZE-INK": 3,
-  "multiplication:mult_facts {support array} card 1280px|SIZE-WIDTH": 3,
-  "multiplication:mult_facts {support array} worksheet 1280px|SIZE-INK": 4,
-  "multiplication:mult_facts {support array} worksheet 1280px|SIZE-WIDTH": 2,
-  "multiplication:mult_facts {support array} quiz 1280px|SIZE-INK": 1,
-  "division:div_facts {support array} card 390px|SIZE-INK": 3,
-  "division:div_facts {support array} card 390px|SIZE-WIDTH": 3,
-  "division:div_facts {support array} card 820px|SIZE-INK": 3,
-  "division:div_facts {support array} card 820px|SIZE-WIDTH": 3,
-  "division:div_facts {support array} card 1280px|SIZE-INK": 3,
-  "division:div_facts {support array} card 1280px|SIZE-WIDTH": 3,
-  "division:div_facts {support array} worksheet 1280px|SIZE-INK": 4,
-  "division:div_facts {support array} worksheet 1280px|SIZE-WIDTH": 4,
-  "division:div_facts {support array} quiz 1280px|SIZE-INK": 1,
-  "division:div_facts {support array} quiz 1280px|SIZE-WIDTH": 1
+ "keys": {
+  "addition:add_facts {support tile} card 390px|SIZE-INK|dot|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support tile} card 820px|SIZE-INK|dot|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support tile} card 1280px|SIZE-INK|dot|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support tile} worksheet 1280px|SIZE-INK|dot|1.5-2.5 mm": {
+   "n": 4,
+   "worst": 88
+  },
+  "addition:add_facts {support tile} quiz 1280px|SIZE-INK|dot|1.5-2.5 mm": {
+   "n": 1,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 390px|SIZE-INK|dot|2.5-4 mm": {
+   "n": 5,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 820px|SIZE-INK|dot|2.5-4 mm": {
+   "n": 5,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 1280px|SIZE-INK|dot|2.5-4 mm": {
+   "n": 5,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} worksheet 1280px|SIZE-INK|dot|2.5-4 mm": {
+   "n": 5,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} quiz 1280px|SIZE-INK|dot|2.5-4 mm": {
+   "n": 1,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support skip} card 390px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 3,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support skip} card 820px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 3,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support skip} card 1280px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 3,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support skip} worksheet 1280px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 4,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support skip} quiz 1280px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 1,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support array} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} card 390px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 11
+  },
+  "multiplication:mult_facts {support array} card 390px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 46
+  },
+  "multiplication:mult_facts {support array} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} card 820px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 5
+  },
+  "multiplication:mult_facts {support array} card 820px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 18
+  },
+  "multiplication:mult_facts {support array} card 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} card 1280px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 5
+  },
+  "multiplication:mult_facts {support array} card 1280px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 18
+  },
+  "multiplication:mult_facts {support array} worksheet 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 4,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} worksheet 1280px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 13
+  },
+  "multiplication:mult_facts {support array} worksheet 1280px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 29
+  },
+  "multiplication:mult_facts {support array} quiz 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 1,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 390px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 3,
+   "worst": 46
+  },
+  "division:div_facts {support array} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 820px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 3,
+   "worst": 10
+  },
+  "division:div_facts {support array} card 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 1280px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 3,
+   "worst": 11
+  },
+  "division:div_facts {support array} worksheet 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 4,
+   "worst": 90
+  },
+  "division:div_facts {support array} worksheet 1280px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 4,
+   "worst": 13
+  },
+  "division:div_facts {support array} quiz 1280px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 1,
+   "worst": 90
+  },
+  "division:div_facts {support array} quiz 1280px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 12
+  }
  }
 }
