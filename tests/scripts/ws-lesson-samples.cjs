@@ -586,7 +586,7 @@ async function checkMain() {
                 b.pre.forEach((pre, k) => { for (const m of namePartsCheck((b.printed && b.printed.length ? b.printed : b.items).filter((it) => Number(String(it.pool).replace(/\D/g, '')) === k), pre)) F('PC-NAME', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m); });
             }
             // layout: seed 4242 at every size
-            for (const size of (ONLY_RULES0.length && ONLY_RULES0.every((r) => CONTENT_RULES.includes(r) && !['PC-RANGE', 'PC-NAME', 'PG-LR6'].includes(r)) ? [] : SIZES)) {
+            for (const size of (ONLY_RULES0.length && ONLY_RULES0.every((r) => CONTENT_RULES.includes(r) && !['PC-RANGE', 'PC-NAME', 'PG-LR6', 'PG-LR67'].includes(r)) ? [] : SIZES)) {
                 const built = await page.evaluate(async ({ skill, size, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
                     const placed = []; let pgN = 0; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, page: pgN, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
                     for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pgN++; (pg.sections || []).forEach((sc) => walk(sc, pp.part)); }
