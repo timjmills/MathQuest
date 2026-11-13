@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Part options mock</title>
+<style>
+:root{--page:#EFECE8;--surface:#fff;--surface-2:#E5E1DB;--text:#1A1614;--text-2:#4A423B;--text-3:#6B6158;--line:#D6D0C8;--warn:#8A4B00;--warn-bg:#FFF4E0;--ring:#1A1614;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.view{display:none;padding:24px}
+.view.on{display:block}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--text-3);margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 20px}
+.lbl{font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2);margin:0 0 8px}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-align:left;color:var(--text-3);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.offrow td{color:var(--text-3)}
+.cb{width:20px;height:20px;border:2px solid var(--text);border-radius:4px;display:inline-grid;place-items:center;font-size:13px;font-weight:700;vertical-align:middle}
+.cb.x::after{content:"✓"}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden;height:36px}
+.step b{width:36px;height:36px;display:grid;place-items:center;background:var(--surface-2);font-size:18px}
+.step span{min-width:40px;text-align:center;font-weight:700;font-size:16px}
+.rng{display:block;font-size:12px;color:var(--text-3);margin-top:2px}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);font-size:13px}
+.chip.custom{border-color:var(--text);font-weight:600}
+.chip .car{font-size:10px}
+.ico{width:36px;height:36px;border:1px solid var(--line);border-radius:8px;display:inline-grid;place-items:center;font-size:16px}
+.panel td{background:#FAF8F5}
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:4px 4px 8px}
+.pgrid h4{margin:0 0 6px;font-size:13px}
+.opt{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px}
+.opt.off{color:var(--text-3)}
+.tag{font-size:11px;color:var(--text-3);margin-left:4px}
+.warn{display:flex;gap:8px;align-items:flex-start;background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:13px;margin:6px 4px 4px}
+.reset{color:var(--text);text-decoration:underline;font-size:13px;margin-top:12px;display:inline-block}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg span{padding:6px 12px;font-size:13px}
+.seg span.on{background:var(--text);color:#fff}
+/* mobile */
+#mobile{width:390px;padding:16px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.pc .l1{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.pc .l1 .ico{margin-left:auto;width:44px;height:44px}
+.pc .l2{display:flex;align-items:center;gap:10px;margin:10px 0}
+.pc .step{height:44px}.pc .step b{width:44px;height:44px}
+.pc .chip{width:100%;justify-content:space-between;padding:10px 12px}
+.pc.offrow{opacity:.6}
+.acc{border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
+.acc h4{margin:6px 0 2px;font-size:13px}
+.opt{min-height:28px}
+.mobile .opt{min-height:44px}
+/* quiz row */
+.skrow{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.skn{font-weight:600}.sks{font-size:12px;color:var(--text-3)}
+</style></head><body>
+
+<!-- 1. Lesson, desktop -->
+<section class="view" id="lesson">
+  <h1>Section A · Lesson: Add two 2-digit numbers with regrouping</h1>
+  <p class="sub">Size M · A4 · answer key at the end</p>
+  <div class="card">
+    <p class="lbl">Parts</p>
+    <table>
+      <tr><th style="width:56px">Print</th><th>Part</th><th style="width:170px">How many</th><th>Supports</th><th style="width:60px">New numbers</th></tr>
+      <tr><td><span class="cb x"></span></td><td>Prerequisite Check</td><td><span class="step"><b>−</b><span>4</span><b>+</b></span><span class="rng">1 to 4 questions</span></td><td><span class="chip">Standard: structure only <span class="car">▾</span></span></td><td><span class="ico">↻</span></td></tr>
+      <tr><td><span class="cb x"></span></td><td>Anchor chart</td><td><span class="step"><b>−</b><span>1</span><b>+</b></span><span class="rng">1 worked example (fixed by the chart)</span></td><td><span class="chip">Standard: everything shown <span class="car">▾</span></span></td><td><span class="ico">↻</span></td></tr>
+      <tr><td><span class="cb x"></span></td><td>Vocabulary</td><td><span class="step"><b>−</b><span>3</span><b>+</b></span><span class="rng">0 to 3 words</span></td><td><span class="chip">None to choose</span></td><td></td></tr>
+      <tr><td><span class="cb x"></span></td><td>Remember</td><td><span class="rng">—</span></td><td><span class="chip">None to choose</span></td><td></td></tr>
+      <tr><td><span class="cb x"></span></td><td>We Do</td><td><span class="step"><b>−</b><span>3</span><b>+</b></span><span class="rng">1 to 4 problems</span></td><td><span class="chip custom">Custom: 1 off <span class="car">▴</span></span></td><td><span class="ico">↻</span></td></tr>
+      <tr class="panel"><td colspan="5">
+        <div class="pgrid">
+          <div><h4>Structure <span class="tag">stays at every level</span></h4>
+            <div class="opt"><span class="cb x"></span>Digit grid</div>
+            <div class="opt off"><span class="cb"></span>Regroup boxes</div>
+            <div class="opt"><span class="cb x"></span>Place-value letters (T, O)</div>
+          </div>
+          <div><h4>Hints <span class="tag">fade</span></h4>
+            <div class="opt"><span class="cb x"></span>First problem traced in grey</div>
+            <div class="opt"><span class="cb x"></span>First step started (ones column)</div>
+            <div class="opt"><span class="cb"></span>Start arrow over the ones</div>
+            <div class="opt"><span class="cb"></span>Step checklist</div>
+          </div>
+          <div><h4>On the page</h4>
+            <div class="opt"><span class="cb x"></span>Steps strip</div>
+            <div class="opt"><span class="cb x"></span>Say band</div>
+            <p class="rng" style="margin-top:10px">Standard for We Do: hints and structure.</p>
+          </div>
+        </div>
+        <div class="warn">⚠ <span>This step teaches with the regroup boxes. Without them, pupils must hold the carried ten in their head. The page still prints.</span></div>
+      </td></tr>
+      <tr><td><span class="cb x"></span></td><td>Lesson practice rows</td><td><span class="step"><b>−</b><span>1</span><b>+</b></span><span class="rng">0 to 2 rows (4 a row)</span></td><td><span class="chip">Standard: structure + first-problem cue <span class="car">▾</span></span></td><td><span class="ico">↻</span></td></tr>
+      <tr><td><span class="cb x"></span></td><td>Practice <span class="tag">2 pages</span></td><td><span class="step"><b>−</b><span>12</span><b>+</b></span><span class="rng">8 to 16 a page, in rows of 4</span></td><td><span class="chip">Standard: structure + first-problem cue <span class="car">▾</span></span></td><td><span class="ico">↻</span></td></tr>
+      <tr class="offrow"><td><span class="cb"></span></td><td>Mixed</td><td><span class="step"><b>−</b><span>8</span><b>+</b></span><span class="rng">6 to 10</span></td><td><span class="chip">Standard <span class="car">▾</span></span></td><td><span class="ico">↻</span></td></tr>
+    </table>
+    <a class="reset">Reset all parts to the standard</a>
+  </div>
+</section>
+
+<!-- 2. Lesson, phone 390 -->
+<section class="view mobile" id="mobile">
+  <h1 style="font-size:18px">Lesson · Add with regrouping</h1>
+  <p class="sub">Parts</p>
+  <div class="pc"><div class="l1"><span class="cb x"></span>Prerequisite Check<span class="ico">↻</span></div>
+    <div class="l2"><span class="step"><b>−</b><span>4</span><b>+</b></span><span class="rng">1 to 4 questions</span></div>
+    <span class="chip">Standard: structure only <span class="car">▾</span></span></div>
+  <div class="pc"><div class="l1"><span class="cb x"></span>We Do<span class="ico">↻</span></div>
+    <div class="l2"><span class="step"><b>−</b><span>3</span><b>+</b></span><span class="rng">1 to 4 problems</span></div>
+    <span class="chip custom">Custom: 1 off <span class="car">▴</span></span>
+    <div class="acc">
+      <h4>Structure</h4>
+      <div class="opt"><span class="cb x"></span>Digit grid</div>
+      <div class="opt off"><span class="cb"></span>Regroup boxes</div>
+      <div class="opt"><span class="cb x"></span>Place-value letters</div>
+      <h4>Hints</h4>
+      <div class="opt"><span class="cb x"></span>First problem traced in grey</div>
+      <div class="opt"><span class="cb x"></span>First step started</div>
+      <h4>On the page</h4>
+      <div class="opt"><span class="cb x"></span>Steps strip</div>
+      <div class="opt"><span class="cb x"></span>Say band</div>
+      <div class="warn" style="margin:6px 0 0">⚠ <span>This step teaches with the regroup boxes. The page still prints.</span></div>
+    </div></div>
+  <div class="pc"><div class="l1"><span class="cb x"></span>Practice · 2 pages<span class="ico">↻</span></div>
+    <div class="l2"><span class="step"><b>−</b><span>12</span><b>+</b></span><span class="rng">8 to 16 a page</span></div>
+    <span class="chip">Standard: structure + cue <span class="car">▾</span></span></div>
+</section>
+
+<!-- 3. Quiz paper, supports -->
+<section class="view" id="quiz">
+  <h1>Make quiz · 3 skills</h1>
+  <p class="sub">Each skill's supports go with it to paper, the online quiz and its share code.</p>
+  <div class="card" style="max-width:900px">
+    <div class="skrow"><div><div class="skn">Add two 2-digit numbers, regrouping</div><div class="sks">Numbers to 100</div></div><span class="step"><b>−</b><span>6</span><b>+</b></span><span class="chip">Quiz standard: structure only <span class="car">▾</span></span></div>
+    <div class="skrow"><div><div class="skn">Subtract within 100, regrouping</div><div class="sks">Numbers to 100</div></div><span class="step"><b>−</b><span>6</span><b>+</b></span><span class="chip custom">Custom: hints on <span class="car">▴</span></span></div>
+    <div style="background:#FAF8F5;border-radius:8px;padding:8px 12px;margin:8px 0">
+      <div class="pgrid">
+        <div><h4>Structure</h4>
+          <div class="opt"><span class="cb x"></span>Digit grid</div>
+          <div class="opt"><span class="cb x"></span>Regroup boxes</div>
+          <div class="opt"><span class="cb x"></span>Place-value letters</div></div>
+        <div><h4>Hints <span class="tag">off on a quiz by default</span></h4>
+          <div class="opt"><span class="cb x"></span>Start arrow over the ones</div>
+          <div class="opt"><span class="cb"></span>Step checklist</div>
+          <div class="opt"><span class="cb"></span>Number line</div></div>
+        <div><h4>Which problems</h4>
+          <div class="seg"><span>Every</span><span class="on">Need it</span><span>Fade</span></div>
+          <p class="rng" style="margin-top:8px">Only problems that regroup get the arrow.</p></div>
+      </div>
+      <div class="warn" style="margin:4px 0 0">ⓘ <span>Hints are on for this quiz. The key marks it "with hints".</span></div>
+    </div>
+    <div class="skrow"><div><div class="skn">Number bonds to 20</div><div class="sks">Numbers to 20</div></div><span class="step"><b>−</b><span>4</span><b>+</b></span><span class="chip">Quiz standard: structure only <span class="car">▾</span></span></div>
+  </div>
+</section>
+<script>const v=(location.hash||'#lesson').slice(1);document.getElementById(v).classList.add('on');</script>
+</body></html>

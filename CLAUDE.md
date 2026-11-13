@@ -566,6 +566,8 @@ Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC
    critic briefs and RUBRIC hosts drop 390; answer boxes keep 48 px touch targets for tablets.
 8. **Long (atomised) lessons stay paused**; shared-tool work only when a skill in the current round is blocked on it.
 
+9. **Two print sizes: M and L (owner, 2026-11-13). Size S is dropped**: no new S work, gates / critic briefs / pins drop S;
+   an S setting or share code falls back to M (codes must still decode); skills already passed stay passed.
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 
 - **Builders and fixers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
