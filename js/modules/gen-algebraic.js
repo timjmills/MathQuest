@@ -5009,7 +5009,11 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 // 'addmult' / 'adddiv' (3.OA.D.8, brackets): a + or − step first, then × or ÷ -
                 // (5 red + 3 blue) in each of 4 bags; (12 + 18) shared by 5; (30 − 6) shared by 4.
                 if (msOpsOpt === 'addmult' || msOpsOpt === 'adddiv') {
-                    let a1, b1, op1, s1v, n2, fin, guard = 0;
+                    let a1, b1, op1, s1v, n2, fin;
+                    // (dealt FRESH on the page - ws-dealer-uniform PAGE, precritic two-step r11: the small Step 1 domain printed the same
+                    // first number 3-4 times and the same Step 1 pair twice on a page of 6)
+                    const msAddDraw = () => {
+                    let guard = 0;
                     for (;;) {
                         guard++;
                         op1 = pick(['+', '-']);
@@ -5027,6 +5031,10 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                             && inBand(a1, b1, s1v, fin);
                         if (ok || guard > 400) break;
                     }
+                    return [a1, b1, op1, s1v, n2, fin];
+                    };
+                    [a1, b1, op1, s1v, n2, fin] = freshDeal(`msa:${msOpsOpt}:${msBand}`, msAddDraw,
+                        { sig: (v) => `${v[0]},${v[1]}`, tags: (v) => [String(v[0]), `${v[2]}${v[0]},${v[1]}`, String(v[5])], caps: [2, 1, 3] });
                     const G1 = op1 === '+' ? '+' : '\u2212', G2 = msOpsOpt === 'addmult' ? '\u00d7' : '\u00f7';
                     q._variant = `${op1 === '+' ? 'add' : 'sub'}_then_${msOpsOpt === 'addmult' ? 'mult' : 'div'}`;
                     q.msOps = { first: op1 === '+' ? 'add' : 'sub', second: msOpsOpt === 'addmult' ? 'mult' : 'div', a: a1, b: b1, step1: s1v, c: n2 };
@@ -5045,13 +5053,18 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     return;
                 }
                 if (msOpsOpt === 'mult' || msOpsOpt === 'div' || msOpsOpt === 'multdiv') {
-                    const first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    let first;
                     // msChoose (lesson 7 r3, critic rule: the board Check Question's A-D online): a take-away Step 2, and the
                     // three two-step errors (ms-stop-step1 / ms-story-number / ms-one-op, providers/word-work.js
                     // wordWorkWrongs) are three different whole numbers with the answer neither the biggest nor the
                     // smallest of the four - an add Step 2 makes the answer the biggest, so the set would give it away.
                     const msChoose = !!(state.skillOptions && state.skillOptions.msChoose === true);
-                    let s1a, s1b, p1, c2, op2, fin, guard = 0;
+                    let s1a, s1b, p1, c2, op2, fin;
+                    // (dealt FRESH on the page - ws-dealer-uniform PAGE, precritic two-step r11: a x / ÷ fact's first number up to 4
+                    // times and the same fact twice on a page of 6)
+                    const msMulDraw = () => {
+                    first = msOpsOpt === 'multdiv' ? pick(['mult', 'div']) : msOpsOpt;
+                    let guard = 0;
                     for (;;) {
                         guard++;
                         op2 = msChoose ? '-' : pick(['+', '-']);
@@ -5072,6 +5085,10 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                         }
                         if ((ok && okChoose) || guard > 2000) break;
                     }
+                    return [first, s1a, s1b, p1, c2, op2, fin];
+                    };
+                    [first, s1a, s1b, p1, c2, op2, fin] = freshDeal(`msm:${msOpsOpt}:${msBand}:${msChoose ? 1 : 0}`, msMulDraw,
+                        { sig: (v) => `${v[1]},${v[2]}`, tags: (v) => [String(v[1]), `${v[0]}${v[1]},${v[2]}`, String(v[6])], caps: [2, 1, 3] });
                     const G1 = first === 'mult' ? '×' : '÷', G2 = op2 === '+' ? '+' : '−';
                     q._variant = `${first}_then_${op2 === '+' ? 'add' : 'sub'}`;
                     q.msOps = { first, op2, a: s1a, b: s1b, step1: p1, c: c2 };
