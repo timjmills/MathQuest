@@ -1,0 +1,34 @@
+ws-print-lint: source kit, 7 skill(s)
+  addition:add_word_problems#lesson: 8+4 pages, 0 finding(s)
+  addition:add_word_problems_plain#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems_plain#lesson: 8+4 pages, 0 finding(s)
+  addition:add_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller#lesson: 6+3 pages, 0 finding(s)
+
+document                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_word_problems#lesson               8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_word_problems_plain#lesson         8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems#lesson            8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems_plain#lesson      8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_wp_change_unknown#lesson           6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller#lesson       6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                                   .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+addition:add_word_problems#lesson (Addition Word Problems (lesson))
+
+addition:add_word_problems_plain#lesson (Addition Word Problems (No Pictures) (lesson))
+
+subtraction:sub_word_problems#lesson (Subtraction Word Problems (lesson))
+
+subtraction:sub_word_problems_plain#lesson (Subtraction Word Problems (No Pictures) (lesson))
+
+addition:add_wp_change_unknown#lesson (Addition Word Problems: How Many Were Added? (lesson))
+
+subtraction:sub_wp_change_unknown#lesson (Subtraction Word Problems: How Many Went? (lesson))
+
+subtraction:sub_wp_compare_smaller#lesson (Compare Stories: Find the Smaller Amount (lesson))
+
+ws-print-lint: OK (ratchet against design/audit/baselines/print-lint.json: nothing rose; 7 document(s), source kit; 0 finding(s) in 0 document(s))

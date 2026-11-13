@@ -112,7 +112,9 @@ const STORY_COMPARE_SMALLER = {
         { word: 'difference', meaning: 'how many more or fewer', picture: { kind: 'text', text: '9 − 4 = 5' } },
     ],
     steps: STORY_COMPARE_STEPS,
-    chant: 'Bigger − difference = smaller.',
+    // (no-break spaces: a narrow Steps strip at L may wrap it only before the '=' - print-lint WRAP-OP, a line never ends
+    // in an operator)
+    chant: 'Bigger\u00a0−\u00a0difference =\u00a0smaller.',
 };
 const STORY_STRUCT_PENDING = 'Word-stories presets (2026-11-12): the Warm-up deals the take-away facts the story is solved with until the Prerequisite Check is written (LR-17).';
 const storyStructLessons = () => {
