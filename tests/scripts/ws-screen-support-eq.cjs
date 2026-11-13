@@ -15,6 +15,10 @@
 //                        screen host and on the paper Independent page at S, M and L (0 ÷ n: the empty frame too).
 //   ARRAY-DOT-MIN        (same ruling) the screen array dot stands to the fact digit at >= paper's ratio (CUE-SIZE's
 //                        convention, paper measured on the Independent page at M): never smaller than the print dot.
+//   ARRAY-CAPTION        (facts card §5.10, lead ruling C) an array's caption (its aria-label, what is read out) names the
+//                        rows x columns DRAWN (the dots' distinct rows and columns); a × array is drawn the smaller factor's
+//                        rows of the larger and its caption names the fact it supports ("3 rows of 7, for 7 × 3").
+// ARRAY-ORIENT, ARRAY-DOT-MIN and ARRAY-CAPTION judge every dot array a support draws: the ÷ framed array and the × array.
 //
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
 //   node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ,CUE,PLACE,ORIENT,DOTMIN
@@ -59,13 +63,29 @@ function cueFinding(id, paperRatio, screenRatio) {
 }
 /** ORIENT: a framed array of 2 or more rows (the item's divisor) is drawn landscape (width >= height). */
 function orientFinding(id, sig, item) {
-    if (!sig || sig.kind !== 'frame-array' || !item || !(item.b >= 2) || !(sig.wPx > 0)) return null;
-    return sig.wPx + 0.5 < sig.hPx ? `${id}: ${item.a} ÷ ${item.b} array ${sig.wPx.toFixed(0)} x ${sig.hPx.toFixed(0)} px is portrait (want width >= height)` : null;
+    if (!sig || !item || !(sig.wPx > 0)) return null;
+    // the rows the array must lay across: ÷ the divisor; × the smaller factor (a single row is free)
+    const rows = item.op === '×' ? Math.min(item.a, item.b) : item.b;
+    if (!(rows >= 2)) return null;
+    return sig.wPx + 0.5 < sig.hPx ? `${id}: ${item.a} ${item.op || '÷'} ${item.b} array ${sig.wPx.toFixed(0)} x ${sig.hPx.toFixed(0)} px is portrait (want width >= height)` : null;
 }
 /** DOTMIN: the screen dot (diameter / fact digit) against paper's. */
 function dotFinding(id, paperRatio, screenRatio) {
     if (!(paperRatio > 0) || !(screenRatio > 0)) return null;
     return screenRatio < 0.98 * paperRatio ? `${id}: array dot ${screenRatio.toFixed(3)} x the fact digit, paper ${paperRatio.toFixed(3)} (never smaller than the print dot)` : null;
+}
+/** CAPTION: the caption's rows x cols against the drawn grid; a × fact's array is min rows of max and names the fact. */
+function captionFinding(id, arr, item) {
+    if (!arr || !item) return null;
+    const m = /(\d+) rows of (\d+)/.exec(arr.label || '');
+    if (!m) return arr.dots ? `${id}: ${item.a} ${item.op} ${item.b} array caption "${arr.label}" names no rows` : null;
+    const R = Number(m[1]), C = Number(m[2]);
+    if (arr.dots && (R !== arr.rows || C !== arr.cols)) return `${id}: caption "${arr.label}" but ${arr.rows} rows of ${arr.cols} drawn`;
+    if (item.op === '×') {
+        const want = `${Math.min(item.a, item.b)} rows of ${Math.max(item.a, item.b)}, for ${item.a} × ${item.b}`;
+        if (Math.min(item.a, item.b) > 0 && arr.label !== want) return `${id}: ${item.a} × ${item.b} caption "${arr.label}", want "${want}" (the smaller factor's rows, the fact named)`;
+    }
+    return null;
 }
 /** PLACE: one place across a worksheet's cards. */
 function placeFinding(id, places) {
@@ -84,12 +104,16 @@ function selfTest() {
     eq('array empty frame on 0', eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, { kind: 'frame-array', frame: '12.0x34.6', label: 'no dots' }, { a: 0, b: 2 }), null);
     eq('array wrong rows', !!eqFinding('array', { kind: 'frame-array', frame: 'f' }, { kind: 'frame-array', frame: 'f', label: 'array, 2 rows of 4' }, { a: 12, b: 4 }), true);
     eq('array portrait rows (old)', !!eqFinding('array', { kind: 'frame-array', frame: 'f' }, { kind: 'frame-array', frame: 'f', label: 'array, 3 rows of 4' }, { a: 12, b: 4 }), true);
-    eq('orient portrait', !!orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 28, b: 4 }), true);
+    eq('orient portrait', !!orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 28, b: 4, op: '÷' }), true);
     eq('orient landscape', orientFinding('array', { kind: 'frame-array', wPx: 160, hPx: 50 }, { a: 28, b: 4 }), null);
     eq('orient empty frame portrait', !!orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 0, b: 3 }), true);
     eq('orient 1 row free', orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 7, b: 1 }), null);
     eq('dot small', !!dotFinding('array', 0.33, 0.15), true);
     eq('dot ok', dotFinding('array', 0.33, 0.40), null);
+    eq('caption ok ×', captionFinding('array', { label: '3 rows of 7, for 7 × 3', rows: 3, cols: 7, dots: 21 }, { a: 7, b: 3, op: '×' }), null);
+    eq('caption portrait × (old)', !!captionFinding('array', { label: '7 rows of 3', rows: 7, cols: 3, dots: 21 }, { a: 3, b: 7, op: '×' }), true);
+    eq('caption lies', !!captionFinding('array', { label: 'array, 4 rows of 7', rows: 7, cols: 4, dots: 28 }, { a: 28, b: 4, op: '÷' }), true);
+    eq('caption ÷ ok', captionFinding('array', { label: 'array, 4 rows of 7', rows: 4, cols: 7, dots: 28 }, { a: 28, b: 4, op: '÷' }), null);
     eq('tally count', !!eqFinding('touch', { kind: 'tally', n: 12 }, { kind: 'tally', n: 10 }), true);
     eq('cue small (D3)', !!cueFinding('skip', 0.38, 0.20), true);
     eq('cue ok', cueFinding('skip', 0.38, 0.36), null);
@@ -116,8 +140,10 @@ function readCellsInPage({ sel, cellSel }) {
         if (!eqEl || seen.has(eqEl)) continue;
         seen.add(eqEl);
         const label = (eqEl && eqEl.getAttribute('aria-label')) || '';
-        const m = /(\d+) divided by (\d+)/.exec(label) || /(\d+)\s*÷\s*(\d+)/.exec(eqEl ? eqEl.textContent : '');
-        const item = m ? { a: Number(m[1]), b: Number(m[2]) } : null;
+        const txt = eqEl ? eqEl.textContent : '';
+        const m = /(\d+) divided by (\d+)/.exec(label) || /(\d+)\s*÷\s*(\d+)/.exec(txt);
+        const mx = !m && (/(\d+) times (\d+)/.exec(label) || /(\d+)\s*[×x]\s*(\d+)/.exec(txt));
+        const item = m ? { a: Number(m[1]), b: Number(m[2]), op: '÷' } : mx ? { a: Number(mx[1]), b: Number(mx[2]), op: '×' } : null;
         const digitPx = eqEl ? parseFloat(getComputedStyle(eqEl.querySelector('span') || eqEl).fontSize) : 0;
         const sups = {};
         for (const s of cell.querySelectorAll('.ws-support[data-ws-support-on]')) {
@@ -154,7 +180,18 @@ function readCellsInPage({ sel, cellSel }) {
                 const a = pb.getBoundingClientRect(), b = s.getBoundingClientRect();
                 place = b.top >= a.bottom - 2 ? 'under' : 'beside';
             }
-            sups[id] = { sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: sig.dotPx && digitPx ? sig.dotPx / digitPx : 0, place };
+            // any dot array (÷ frame or × array): its drawn box, dot, caption and the dots' distinct rows / columns
+            let arr = null;
+            const asvg = [...s.querySelectorAll('svg')].find((v) => /rows of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+            if (asvg) {
+                const vb = (asvg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+                const br = asvg.getBoundingClientRect(), k = br.width / (vb[2] || 1);
+                const cs = [...asvg.querySelectorAll('circle')];
+                const xs = new Set(cs.map((c) => Number(c.getAttribute('cx')).toFixed(1))), ys = new Set(cs.map((c) => Number(c.getAttribute('cy')).toFixed(1)));
+                arr = { label: asvg.getAttribute('aria-label'), wPx: br.width, hPx: br.height, dotPx: cs.length ? 2 * Number(cs[0].getAttribute('r')) * k : 0,
+                    dots: cs.length, rows: ys.size, cols: xs.size };
+            }
+            sups[id] = { arr, sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: arr && arr.dotPx && digitPx ? arr.dotPx / digitPx : 0, place };
         }
         out.push({ item, sups, digitPx });
     }
@@ -165,7 +202,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -204,12 +241,14 @@ function readCellsInPage({ sel, cellSel }) {
                 };
                 const paper = await paperAt('M');
                 // ARRAY-ORIENT on paper: the Independent page at S, M and L
-                if (ONLY.includes('ORIENT') && sup === 'array') {
+                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION')) && sup === 'array') {
                     for (const size of ['S', 'M', 'L']) {
                         const pr = size === 'M' ? paper : await paperAt(size);
                         for (const c of (pr.cells || []).filter((x) => x.item && x.sups[sup])) {
-                            const f = orientFinding(sup, c.sups[sup].sig, c.item);
-                            if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                            const f = ONLY.includes('ORIENT') ? orientFinding(sup, c.sups[sup].arr, c.item) : null;
+                            if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                            const g = ONLY.includes('CAPTION') ? captionFinding(sup, c.sups[sup].arr, c.item) : null;
+                            if (g) findings.push(`ARRAY-CAPTION ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${g}`);
                         }
                     }
                 }
@@ -283,19 +322,23 @@ function readCellsInPage({ sel, cellSel }) {
                         const s = c.sups[sup];
                         if (ONLY.includes('EQ')) {
                             const f = eqFinding(sup, pSig, s ? s.sig : null, c.item);
-                            if (f) findings.push(`SCREEN-SUPPORT-EQ ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                            if (f) findings.push(`SCREEN-SUPPORT-EQ ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                         if (ONLY.includes('ORIENT') && s) {
-                            const f = orientFinding(sup, s.sig, c.item);
-                            if (f) findings.push(`ARRAY-ORIENT ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                            const f = orientFinding(sup, s.arr, c.item);
+                            if (f) findings.push(`ARRAY-ORIENT ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
+                        if (ONLY.includes('CAPTION') && s && s.arr) {
+                            const f = captionFinding(sup, s.arr, c.item);
+                            if (f) findings.push(`ARRAY-CAPTION ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                         if (ONLY.includes('DOTMIN') && s && s.dotRatio) {
                             const f = dotFinding(sup, pDot, s.dotRatio);
-                            if (f) findings.push(`ARRAY-DOT-MIN ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                            if (f) findings.push(`ARRAY-DOT-MIN ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                         if (ONLY.includes('CUE') && s && s.ratio) {
                             const f = cueFinding(sup, pRatio, s.ratio);
-                            if (f) findings.push(`SCREEN-CUE-SIZE ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                            if (f) findings.push(`SCREEN-CUE-SIZE ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
                     }
                     if (ONLY.includes('PLACE') && h.worksheet) {
@@ -318,4 +361,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding };

@@ -1020,22 +1020,31 @@ export function layoutWorksheetGrid(grid) {
  * screen wraps under it when the card is too narrow; when any card of the sheet wraps, every ÷ card puts it under.
  * `reset` clears the choice before the columns are measured again.
  */
+/** A card's ÷ or × fact (the ÷ sentence's .ws-eq "divided by"; a × fact's .ws-fact / .ws-eq naming "times" or ×). */
+function _wsDivOrTimes(c) {
+    const d = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+    if (d) return d;
+    return [...c.querySelectorAll('.ws-card-visual .ws-fact, .ws-card-visual .ws-eq')].find((e) => /times/.test(e.getAttribute('aria-label') || '') || /×/.test(e.textContent || '')) || null;
+}
 function _wsOneSupportPlace(cards, reset = false) {
     const wps = cards.map((c) => {
-        const eq = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+        // (facts card §5.10: the × array, landscape, wraps too - one place for × cards as for ÷)
+        const eq = _wsDivOrTimes(c);
         return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="beside"]') : null;
     }).filter(Boolean);
+    // (a card whose support the kit already put UNDER its fact - a wide landscape array - counts as wrapped)
+    const under0 = cards.some((c) => _wsDivOrTimes(c) && c.querySelector('.ws-card-visual .ws-with-pane[data-ws-pane-place="under"]'));
     if (reset) {
         wps.forEach((wp) => { if (wp.dataset.mqOnePlace) { delete wp.dataset.mqOnePlace; wp.style.flexDirection = ''; wp.style.alignItems = ''; } });
         return;
     }
-    if (wps.length < 2) return;
+    if (wps.length < (under0 ? 1 : 2)) return;
     const wrapped = (wp) => {
         const prob = wp.querySelector(':scope > .ws-pane-problem');
         const pane = prob && prob.nextElementSibling;
         return !!pane && pane.getBoundingClientRect().height > 0 && pane.getBoundingClientRect().top >= prob.getBoundingClientRect().bottom - 2;
     };
-    if (!wps.some(wrapped)) return;
+    if (!under0 && !wps.some(wrapped)) return;
     wps.forEach((wp) => { wp.dataset.mqOnePlace = 'under'; wp.style.flexDirection = 'column'; wp.style.alignItems = 'center'; });
 }
 

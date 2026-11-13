@@ -104,7 +104,7 @@ export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (li
  *   frame  ten frames (+: a solid then b open; −: a with the last b crossed out)
  *   line   a number line 0 to 20 (or to the answer's decade), the start marked
  *   skip   a skip-count strip: the first five multiples of the table number (÷: the divisor)
- *   array  a dot array, b rows of a (÷: rows of the divisor)
+ *   array  a dot array, landscape: × the smaller factor's rows of the larger (facts card §5.10), ÷ the divisor's rows (§5.9)
  *   think  the think box of a ÷ fact: b × [ ] = a
  * `px` > 0 draws it for a screen host at that many CSS px per mm; 0 is paper (mm).
  */
@@ -209,7 +209,9 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
         // LANDSCAPE (facts card §5.9, owner 2026-11-13: "arrays landscape so they can be bigger"): the divisor is the
         // number of ROWS, the quotient's dots across each (28 ÷ 4 = 4 rows of 7); the frame (`p.frame`) is the band's top
         // quotient's columns by the largest divisor's rows, so it is wider than tall, and 0 ÷ n is a short wide frame.
-        const cols = div ? (b ? a / b : 0) : a, rows = div ? b : b;
+        // mult_facts (facts card §5.10, lead ruling C 2026-11-13): always landscape too - the SMALLER factor is the rows, the
+        // larger across (7 x 3 and 3 x 7 are both 3 rows of 7); the caption names what is drawn and the fact it supports.
+        const cols = div ? (b ? a / b : 0) : Math.max(a, b), rows = div ? b : Math.min(a, b);
         if (div && p.frame && Number(p.frame.cols) > 0 && Number(p.frame.rows) > 0) {
             const fc = Number(p.frame.cols), fr = Number(p.frame.rows), pitch = Number(p.frame.pitch) || 2.6, r = pitch * 0.377, pad = 0.8;   // (r: 0.98 mm at the old 2.6 pitch)
             // WDS RP-81 (critic r5 R5-3): a 1.5 mm subitising gap after every 5th row and column of an array over 5
@@ -223,9 +225,12 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
         }
         if (!cols || !rows) return '';
         const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
+        // WDS RP-81: the 1.5 mm subitising gap after every 5th row and column of an array over 5
+        const gap = (n) => Math.floor(n / 5) * ARRAY_GAP_MM;
+        const span = (n) => n * pitch + (n > 5 ? gap(n - 1) : 0);
         let body = '';
-        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(0.5 + x * pitch + pitch / 2, 0.5 + y * pitch + pitch / 2, r, false);
-        return wrap(cols * pitch + 1, rows * pitch + 1, body, `${rows} rows of ${cols}`);
+        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(0.5 + x * pitch + pitch / 2 + (cols > 5 ? gap(x) : 0), 0.5 + y * pitch + pitch / 2 + (rows > 5 ? gap(y) : 0), r, false);
+        return wrap(span(cols) + 1, span(rows) + 1, body, `${rows} rows of ${cols}${div ? '' : `, for ${a} × ${b}`}`);
     }
     if (kind === 'think') {
         // (critic r2 R2-4: "= 108" ran over the 36 mm box's border and the box touched the "x". The box is
