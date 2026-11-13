@@ -4288,7 +4288,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const item = pick(items);
                     const gave = rng(2, Math.floor(eqMax / 3));
                     const left = rng(2, Math.floor(eqMax / 2));
-                    wordProblem = `${name} has ${varName} ${item}. After giving away ${gave}, he has ${left} left. Write the equation.`;
+                    wordProblem = `${name} has ${varName} ${item}. After giving away ${gave}, ${name} has ${left} left. Write the equation.`;
                     eqAnswer = `${varName} - ${gave} = ${left}`;
                     eqHint = `Starts with ${varName}, gives away ${gave} (subtract), has ${left} left (equals). So: ${varName} \u2212 ${gave} = ${left}`;
                 } else {
@@ -4298,7 +4298,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const rate = pick([3, 4, 5, 6, 7, 8, 9, 10]);
                     const hours = rng(2, Math.max(2, Math.floor(eqMax / rate)));
                     const total = rate * hours;
-                    wordProblem = `${name} earns $${rate} per hour. After ${varName} hours, she has $${total}. Write the equation.`;
+                    wordProblem = `${name} earns $${rate} per hour. After ${varName} hours, ${name} has $${total}. Write the equation.`;
                     eqAnswer = `${rate}${varName} = ${total}`;
                     eqHint = `$${rate} per hour for ${varName} hours is ${rate} \u00d7 ${varName}. Total is $${total}. So: ${rate}${varName} = ${total}`;
                 }
@@ -4959,9 +4959,9 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const knownPart = rng(5, whole - 5);
                     const missingPart = whole - knownPart;
                     const actions = [
-                        `${tdName} had ${whole} ${tdItem}. He gave ${knownPart} away. How many are left?`,
-                        `${tdName} had ${whole} ${tdItem}. She used ${knownPart}. How many remain?`,
-                        `${tdName} needs ${whole} ${tdItem}. He already has ${knownPart}. How many more does he need?`
+                        `${tdName} had ${whole} ${tdItem}. ${tdName} gave ${knownPart} away. How many are left?`,
+                        `${tdName} had ${whole} ${tdItem}. ${tdName} used ${knownPart}. How many remain?`,
+                        `${tdName} needs ${whole} ${tdItem}. ${tdName} already has ${knownPart}. How many more does ${tdName} need?`
                     ];
 
                     q.text = pick(actions);
@@ -5203,7 +5203,7 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     { sig: (v) => `${v[0]},${v[1]},${v[2]}`, tags: (v) => [String(v[0]), `${v[0]},${v[1]}`, String(v[4])], caps: [2, 1, 2] });
                 step1Text = { add_then_sub: `bought ${step1Val} more`, sub_then_add: `lost ${step1Val}`, add_then_add: `earned ${step1Val} more`, sub_then_sub: `used ${step1Val}` }[problemType];
                 step2Text = { add_then_sub: `gave ${step2Val} to a friend`, sub_then_add: `found ${step2Val} more`, add_then_add: `received ${step2Val} more`, sub_then_sub: `gave away ${step2Val}` }[problemType];
-                q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
+                q.text = `${msName} had ${startVal} ${msItem}. ${msName} ${step1Text}, then ${step2Text}. How many ${msItem} does ${msName} have now?`;
                 q.ans = finalVal;
 
                 const msStep1Op = (problemType === "add_then_sub" || problemType === "add_then_add") ? '+' : '-';
