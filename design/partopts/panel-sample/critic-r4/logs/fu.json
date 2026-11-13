@@ -1,0 +1,6 @@
+[
+ {"tag":"fu-ffs-MLM-1280","id":"skill:addition:fact_family_sort","size":"M","width":1280,"tabShot":true,"steps":[["max","practice"],["size","L"],["size","M"]]},
+ {"tag":"fu-ffs-MLM-820","id":"skill:addition:fact_family_sort","size":"M","width":820,"steps":[["max","practice"],["size","L"],["size","M"]]},
+ {"tag":"fu-r14-MLM-1280","id":"Y4.B1.S14","size":"M","width":1280,"tabShot":true,"steps":[["max","practice"],["max","mixed"],["size","L"],["size","M"]]},
+ {"tag":"fu-r14-MLM-820","id":"Y4.B1.S14","size":"M","width":820,"steps":[["max","practice"],["max","mixed"],["size","L"],["size","M"]]}
+]

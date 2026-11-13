@@ -1,0 +1,15 @@
+histogram_read frames 149 below50%: 3 from 954ms to 987ms
+   56 1 translate(-50%, -50%) scale(1)
+   274 0.93 scale(1.6)
+   954 0.28 translate(-50%, -50%) scale(1)
+   1020 0.93 scale(1.6)
+coordinates_read_all frames 150 below50%: 4 from 942ms to 992ms
+   51 1 translate(-50%, -50%) scale(1)
+   266 0.97 scale(1.1579)
+   942 0.25 translate(-50%, -50%) scale(0.96)
+   1013 0.97 scale(1.1579)
+mult_facts frames 152 below50%: 0 
+   29 1 translate(-50%, -50%) scale(0.6923)
+pie_chart frames 152 below50%: 0 
+   27 1 translate(-50%, -50%) scale(1)
+   239 1 translate(-50%, -50%) scale(0.5153)

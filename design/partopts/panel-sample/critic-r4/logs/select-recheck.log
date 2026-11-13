@@ -1,0 +1,6 @@
+count_objects { label: 'Count to', val: '2', idx: 2, opts: [ '0', '1', '2' ] }
+  after ArrowUp 1 Count to: 10
+compare_groups { label: 'Compare by', val: '3', idx: 3, opts: [ '0', '1', '2', '3' ] }
+  after ArrowUp 2 Compare by: Same or not the same?
+subtract { label: 'Numbers to', val: '1', idx: 1, opts: [ '0', '1' ] }
+  after ArrowUp 0 Numbers to: 10

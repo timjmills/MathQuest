@@ -1,0 +1,25 @@
+ok   multiplication:nl_mult @1280: ink 0.61 % (own box 7.1 %), scale 1, text >= 18.1 px, frame 140 px, options 613/961 px, part 1 of 3
+ok   multiplication:nl_mult @1280 part 2: ink 2.16 % (own box 4.8 %), scale 0.9857, text >= - px (svg text 9.0 px), frame 140 px, options 613/961 px, part 2 of 3
+ok   multiplication:nl_mult @1280 part 3: ink 1.68 % (own box 3.3 %), scale 1, text >= 29.0 px, frame 140 px, options 613/961 px, part 3 of 3
+ok   multiplication:nl_mult @1280 (all parts): 3 reading(s), choices -
+ok   multiplication:nl_mult @1280 changed +50ms: ink 0.61 % (own box 7.1 %), scale 1, text >= 18.1 px, frame 140 px, options 613/961 px, part 1 of 3
+ok   multiplication:nl_mult @1280 changed +1.5s: ink 0.61 % (own box 7.1 %), scale 1, text >= 18.1 px, frame 140 px, options 613/961 px, part 1 of 3
+ok   integers:add_int @1280: ink 0.81 % (own box 7.5 %), scale 1, text >= 18.1 px, frame 140 px, options 613/741 px, part 1 of 3
+ok   integers:add_int @1280 part 2: ink 2.62 % (own box 5.6 %), scale 0.9857, text >= - px (svg text 9.0 px), frame 140 px, options 613/741 px, part 2 of 3
+ok   integers:add_int @1280 part 3: ink 2.41 % (own box 3.7 %), scale 1, text >= 29.0 px, frame 140 px, options 613/741 px, part 3 of 3
+ok   integers:add_int @1280 (all parts): 3 reading(s), choices -
+ok   integers:add_int @1280 changed +50ms: ink 0.81 % (own box 7.5 %), scale 1, text >= 18.1 px, frame 140 px, options 613/741 px, part 1 of 3
+ok   integers:add_int @1280 changed +1.5s: ink 0.81 % (own box 7.5 %), scale 1, text >= 18.1 px, frame 140 px, options 613/741 px, part 1 of 3
+ok   multiplication:nl_mult @1280x720: ink 0.61 % (own box 7.1 %), scale 1, text >= 18.1 px, frame 140 px, options 333/961 px, part 1 of 3
+ok   multiplication:nl_mult @1280x720 part 2: ink 2.16 % (own box 4.8 %), scale 0.9857, text >= - px (svg text 9.0 px), frame 140 px, options 333/961 px, part 2 of 3
+ok   multiplication:nl_mult @1280x720 part 3: ink 1.68 % (own box 3.3 %), scale 1, text >= 29.0 px, frame 140 px, options 333/961 px, part 3 of 3
+ok   multiplication:nl_mult @1280x720 (all parts): 3 reading(s), choices -
+ok   integers:add_int @1280x720: ink 0.81 % (own box 7.5 %), scale 1, text >= 18.1 px, frame 140 px, options 333/741 px, part 1 of 3
+ok   integers:add_int @1280x720 part 2: ink 2.62 % (own box 5.6 %), scale 0.9857, text >= - px (svg text 9.0 px), frame 140 px, options 333/741 px, part 2 of 3
+ok   integers:add_int @1280x720 part 3: ink 2.41 % (own box 3.7 %), scale 1, text >= 29.0 px, frame 140 px, options 333/741 px, part 3 of 3
+ok   integers:add_int @1280x720 (all parts): 3 reading(s), choices -
+ok   multiplication:nl_mult @1280x1000>720: ink 0.61 % (own box 7.1 %), scale 1, text >= 18.1 px, frame 140 px, options 333/961 px, part 1 of 3
+ok   integers:add_int @1280x1000>720: ink 0.81 % (own box 7.5 %), scale 1, text >= 18.1 px, frame 140 px, options 333/741 px, part 1 of 3
+  2 skills × 1 widths (1280 px); spot passes on 2 skill(s): 1280x720, a resize to 720, an option change at 1280, 22 readings, 1 worker(s), 22 s
+ws-options-shots: OK (2 skills × 1 widths)
+exit 0

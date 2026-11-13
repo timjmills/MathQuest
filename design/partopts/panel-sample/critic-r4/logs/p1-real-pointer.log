@@ -1,0 +1,66 @@
+1280 mouse multiplication:mult_chart_easy rows 7
+  row0 SELECT:select-one "5 × 56 × 6" hit=ok state |3 -> |3 focus=true tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 INPUT:checkbox "on" hit=ok state 111111111111| -> 011111111111|  tipsOpen=[]
+  row1 BUTTON:button "All" hit=ok state 011111111111| -> 111111111111|  tipsOpen=[]
+  row1 BUTTON:button "None" hit=ok state 111111111111| -> 000000000000|  tipsOpen=[]
+  row1 "?" tap -> expanded=true line=true
+  row2 SELECT:select-one "Fill in th" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row2 "?" tap -> expanded=true line=true
+  row3 INPUT:checkbox "on" hit=ok state 100| -> 000|  tipsOpen=[]
+  row3 BUTTON:button "All" hit=ok state 000| -> 111|  tipsOpen=[]
+  row3 BUTTON:button "None" hit=ok state 111| -> 000|  tipsOpen=[]
+  row3 "?" tap -> expanded=true line=true
+  row4 SELECT:select-one "As the sup" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row4 "?" tap -> expanded=true line=true
+  row5 "?" tap -> expanded=gone
+  row gone 6 false
+1280 mouse coordinates:geo_translate rows 3
+  row0 INPUT:checkbox "on" hit=ok state 1111| -> 0111|  tipsOpen=[]
+  row0 BUTTON:button "All" hit=ok state 0111| -> 1111|  tipsOpen=[]
+  row0 BUTTON:button "None" hit=ok state 1111| -> 0000|  tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 "?" tap -> expanded=gone
+  row gone 2 false
+1280 mouse fractions:fraction_of_set rows 4
+  row0 INPUT:checkbox "on" hit=ok state 111| -> 011|  tipsOpen=[]
+  row0 BUTTON:button "All" hit=ok state 011| -> 111|  tipsOpen=[]
+  row0 BUTTON:button "None" hit=ok state 111| -> 000|  tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 SELECT:select-one "Use the Ma" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row1 "?" tap -> expanded=true line=true
+  row2 "?" tap -> expanded=gone
+  row gone 3 false
+820 touch multiplication:mult_chart_easy rows 7
+  row0 SELECT:select-one "5 × 56 × 6" hit=ok state |3 -> |3 focus=true tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 INPUT:checkbox "on" hit=ok state 111111111111| -> 011111111111|  tipsOpen=[]
+  row1 BUTTON:button "All" hit=ok state 011111111111| -> 111111111111|  tipsOpen=[]
+  row1 BUTTON:button "None" hit=ok state 111111111111| -> 000000000000|  tipsOpen=[]
+  row1 "?" tap -> expanded=true line=true
+  row2 SELECT:select-one "Fill in th" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row2 "?" tap -> expanded=true line=true
+  row3 INPUT:checkbox "on" hit=ok state 100| -> 000|  tipsOpen=[]
+  row3 BUTTON:button "All" hit=ok state 000| -> 111|  tipsOpen=[]
+  row3 BUTTON:button "None" hit=ok state 111| -> 000|  tipsOpen=[]
+  row3 "?" tap -> expanded=true line=true
+  row4 SELECT:select-one "As the sup" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row4 "?" tap -> expanded=true line=true
+  row5 "?" tap -> expanded=gone
+  row gone 6 false
+820 touch coordinates:geo_translate rows 3
+  row0 INPUT:checkbox "on" hit=ok state 1111| -> 0111|  tipsOpen=[]
+  row0 BUTTON:button "All" hit=ok state 0111| -> 1111|  tipsOpen=[]
+  row0 BUTTON:button "None" hit=ok state 1111| -> 0000|  tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 "?" tap -> expanded=gone
+  row gone 2 false
+820 touch fractions:fraction_of_set rows 4
+  row0 INPUT:checkbox "on" hit=ok state 111| -> 011|  tipsOpen=[]
+  row0 BUTTON:button "All" hit=ok state 011| -> 111|  tipsOpen=[]
+  row0 BUTTON:button "None" hit=ok state 111| -> 000|  tipsOpen=[]
+  row0 "?" tap -> expanded=true line=true
+  row1 SELECT:select-one "Use the Ma" hit=ok state |0 -> |1 focus=false tipsOpen=[]
+  row1 "?" tap -> expanded=true line=true
+  row2 "?" tap -> expanded=gone
+  row gone 3 false
