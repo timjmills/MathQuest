@@ -557,7 +557,7 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 - **PT-ERR-1.** 40 to 60% of the shown answers are wrong, each from `wrongAnswer(q)` (a real misconception, never a random number).
 - **PT-ERR-2.** The fix slot has the skill's answer-slot shape and is scored only on wrong items; a correct item left unfixed scores its point from the check mark alone.
 - **PT-ERR-3.** Counts offered: 2 (1 x 2, long algorithms with shown working), 4 or 6, never above the design-standard ceiling for the size (6 / 4 / 4).
-- **PT-ERR-6** (lead ruling N10, 2026-11-13). The other pupil's work prints in the single grey (#949494), ALWAYS under a printed
+- **PT-ERR-4** (lead ruling N10, 2026-11-13). The other pupil's work prints in the single grey (#949494), ALWAYS under a printed
   "<Name> wrote:" label ("chose:" / "drew:" / "marked:" by the item's shape). The grey is the design, not a trace prompt; the label is
   what keeps it from reading as "trace me". Check: ws-cell-checks PUPILTAG (default rule, + self-test). Critics score the grey work
   with its label as correct (C4).
