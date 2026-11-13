@@ -809,7 +809,7 @@ function pvRenderBody(p, ctx0) {
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 // (lf-placevalue compare r2, critic r1 F2: a step state - stepState below, `_marks` - draws each step's own mark: the
                 // digit count over each number, the two deciding digits boxed, the bigger number underlined; the newest mark grey,
-                // earlier ones black (P-LC-9). Every state keeps the room of the last, so the problem stands still, AK-1)
+                // earlier ones black, as every step state is. Every state keeps the room of the last, so the problem stands still)
                 if (p._marks) {
                     const mk = p._marks;
                     const col = (ink) => (ink === 'trace' ? '#949494' : '#000');
@@ -833,7 +833,7 @@ function pvRenderBody(p, ctx0) {
                 }
                 // (lf-placevalue compare r2, pixel ws-empty-band EB-BAND 40 % at S: the one line sat at the top of a row the
                 // practice spread grows - its white all under it. css/sheet-kit.css centres a compare cell's content in its row,
-                // the white split above and below, as the Reason It panels are, CL-4b)
+                // the white split above and below, as the Reason It panels are)
                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
@@ -1050,7 +1050,7 @@ register('pv', {
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
     /**
-     * Step states (P-LC-9, steps.js) for the compare item only (lf-placevalue compare r2, critic r1 F2): its marks `count`,
+     * Step states (steps.js) for the compare item only (lf-placevalue compare r2, critic r1 F2): its marks `count`,
      * `digits`, `win` and `answer` (placevalue:compare workedSteps) drawn up to step k, step k's grey. Every other pv kind
      * keeps the anchor's whole-cell fallback (anchors.js stepTemplateOf reads `hasStepState`).
      */
