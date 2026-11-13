@@ -267,7 +267,7 @@ Each runs as `node tests/scripts/<script> …`.
 4. **Owner rule 2026-10-17: are `divForm` long and fraction distinct enough to be preset skills ("Divide: long-division form", "Divide: fraction form")?** Recommended: Yes for long division (4.NBT.6 / WRM Y4 short division uses the bracket); fraction form stays an option (6.NS / 5.NF.3 is taught by the fraction skills). **ANSWER — Owner 2026-10-31: YES - "Divide: long-division form" becomes a preset skill; the fraction form stays an option.**
 5. **Independent page at L keeps 3 x 4 = 12 facts in 57 mm rows (33 % under the answer zone) because the L ceiling of standard problems is 12 (12.1). Raise the facts' class to "short" (L 16: 3 x 5) in print-sheet's footprintClass?** Recommended: Yes, in the layout lane (print-sheet.js / layout.js are not this lane's files): facts are one-symbol answers, which 12.1 lets reach 16. **ANSWER — Owner 2026-10-31: YES - facts take the "short" class (L 3 x 5 = 15) in the layout lane's files.**
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-13
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
