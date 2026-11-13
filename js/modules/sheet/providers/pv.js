@@ -1229,6 +1229,34 @@ const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey:
 const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
+/** Every named wrong answer of a words-to-numeral item (`fits`: in H T O boxes, the claim has the boxes' digit count). */
+function wordsWrongs(q) {
+    const p = pvOf(q);
+    const n = num(p.n);
+    if (!Number.isFinite(n) || p.way === 'to_words') return [];
+    const h = Math.floor(n / 100), r = n % 100;
+    const c = [];
+    if (h && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0)) c.push({ value: Number(String(n).replace(/0/g, '')) || h, misconception: 'M-Z1', explain: 'Left out the 0 place.' });
+    if (h) c.push({ value: Number(`${h * 100}${r || ''}`), misconception: 'M-V9', explain: 'Wrote the hundred and the rest side by side.' });
+    const s = swapTeen(n); if (s) c.push({ value: s, misconception: 'M-L3', explain: 'Heard the teen as a ty word.' });
+    // (critic nwf r1 N1: a 2-digit name had no wrong answer, so True or False? was all True and Reason It one item a page:
+    // "forty-one" written as the parts side by side, 401 (M-V9), or with the digits swapped, 14)
+    if (!h && r >= 20 && r % 10) { c.push({ value: Number(`${Math.floor(r / 10) * 10}${r % 10}`), misconception: 'M-V9', explain: 'Wrote the ty word and the one side by side.' });
+        c.push({ value: (r % 10) * 10 + Math.floor(r / 10), misconception: 'M-L3', explain: 'Wrote the digits the other way round.' }); }
+    if (!h && r >= 20 && !(r % 10)) c.push({ value: r / 10, misconception: 'M-Z1', explain: 'Left out the 0 in the ones.' });
+    // (critic nwf r1 N2: in the H T O boxes a claim is written one digit a box, so it has the boxes' own digit count - 3005
+    // cannot be written in three boxes. The box errors: the ones digit put in the empty tens box (305 -> 350), the tens and
+    // ones the other way round (452 -> 425).)
+    const hto = !!(q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto');
+    if (hto) {
+        const t = Math.floor(r / 10), o = r % 10;
+        if (h && !t && o) c.push({ value: h * 100 + o * 10, misconception: 'M-Z1', explain: 'Put the ones digit in the tens box.' });
+        if (h && t > 1 && o && t !== o) c.push({ value: h * 100 + o * 10 + t, misconception: 'M-L3', explain: 'Wrote the tens and ones the other way round.' });
+        return c.filter((x) => x.value !== n).map((x) => Object.assign(x, { fits: String(x.value).length === String(n).length }));
+    }
+    return c.filter((x) => x.value !== n);
+}
+
 registerSkill('composing:number_word_form', {
     strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? NUMBER_TO_WORDS : Number(pvOf(q).n) < 100 ? WORDS_TO_NUMBER_2 : null), WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
@@ -1261,29 +1289,10 @@ registerSkill('composing:number_word_form', {
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
     wrongAnswer: (q) => {
-        const p = pvOf(q);
-        const n = num(p.n);
-        if (!Number.isFinite(n) || p.way === 'to_words') return null;
-        const h = Math.floor(n / 100), r = n % 100;
-        const c = [];
-        if (h && (Math.floor(n / 10) % 10 === 0 || n % 10 === 0)) c.push({ value: Number(String(n).replace(/0/g, '')) || h, misconception: 'M-Z1', explain: 'Left out the 0 place.' });
-        if (h) c.push({ value: Number(`${h * 100}${r || ''}`), misconception: 'M-V9', explain: 'Wrote the hundred and the rest side by side.' });
-        const s = swapTeen(n); if (s) c.push({ value: s, misconception: 'M-L3', explain: 'Heard the teen as a ty word.' });
-        // (critic nwf r1 N1: a 2-digit name had no wrong answer, so True or False? was all True and Reason It one item a page:
-        // "forty-one" written as the parts side by side, 401 (M-V9), or with the digits swapped, 14)
-        if (!h && r >= 20 && r % 10) { c.push({ value: Number(`${Math.floor(r / 10) * 10}${r % 10}`), misconception: 'M-V9', explain: 'Wrote the ty word and the one side by side.' });
-            c.push({ value: (r % 10) * 10 + Math.floor(r / 10), misconception: 'M-L3', explain: 'Wrote the digits the other way round.' }); }
-        if (!h && r >= 20 && !(r % 10)) c.push({ value: r / 10, misconception: 'M-Z1', explain: 'Left out the 0 in the ones.' });
-        // (critic nwf r1 N2: in the H T O boxes a claim is written one digit a box, so it has the boxes' own digit count - 3005
-        // cannot be written in three boxes. The box errors: the ones digit put in the empty tens box (305 -> 350), the tens and
-        // ones the other way round (452 -> 425).)
+        // (a claim in the H T O boxes is written one digit a box: only a wrong answer with the boxes' digit count, critic nwf r1 N2)
         const hto = !!(q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto');
-        if (hto) {
-            const t = Math.floor(r / 10), o = r % 10;
-            if (h && !t && o) c.push({ value: h * 100 + o * 10, misconception: 'M-Z1', explain: 'Put the ones digit in the tens box.' });
-            if (h && t > 1 && o && t !== o) c.push({ value: h * 100 + o * 10 + t, misconception: 'M-L3', explain: 'Wrote the tens and ones the other way round.' });
-            return choose(q, c.filter((x) => x.value !== n && String(x.value).length === String(n).length));
-        }
-        return choose(q, c.filter((x) => x.value !== n));
+        return choose(q, wordsWrongs(q).filter((x) => !hto || x.fits !== false));
     },
+    // (every misconception's form, the box-unfit ones too: the detailed lesson quotes "3005 for 305" in its mistake rows)
+    wrongAnswers: (q) => wordsWrongs(q).map((x) => ({ value: x.value, display: String(x.value), misconception: x.misconception, explain: x.explain })),
 });

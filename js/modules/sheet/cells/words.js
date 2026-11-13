@@ -80,7 +80,9 @@ function nameHtml(p, under) {
 }
 // (critic nwf r1 N7: the two-line name box is a flex box, so a bare text run and an underlined span inside it were two flex
 // items and the space between them was dropped - "one hundredthirteen". The name is ONE inner span: one flex item, its spaces kept.)
-const nameSpan = (p, textPt, inner) => `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${p.inPlace === false ? '' : nameBox(p, textPt)}"><span data-ws-name style="max-width:100%;">${inner}</span></span>`;
+// (only the flex name box takes the inner span: a plain name is one inline run already, and an inner span there re-measured the
+// detailed lesson's practice cells narrower - three across, names wrapped, ws-detailed-lesson E9b)
+const nameSpan = (p, textPt, inner) => { const box = p.inPlace === false ? '' : nameBox(p, textPt); return `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${box}">${box ? `<span data-ws-name style="max-width:100%;">${inner}</span>` : inner}</span>`; };
 function htoCell(p, ctx, valueOf, inkOf, under) {
     const m = ctx.metrics || {};
     return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:4mm;">`
