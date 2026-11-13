@@ -801,6 +801,11 @@ function pvRenderBody(p, ctx0) {
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${fr}</div>`;
             }
             case 'compare': {
+                // (the gap between each number and the circle: 4 mm; lf-placevalue compare r2 - F9: three across at L the digits
+                // stood 4 mm from the cell rules, so 3 mm there; pixel EB-SIDE: a full-width row at L - band 9,999, one column -
+                // left 30.6 % each side of the ink, so 10 mm there, the problem spread over its row, never enlarged)
+                const cols = Number(ctx.columns) || 0;
+                const gapMm = ctx.mode !== 'screen' && cols === 1 ? 10 : ctx.size === 'L' && cols >= 3 ? 3 : 4;
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
                 // (lf-placevalue compare r2, critic r1 F2: a step state - stepState below, `_marks` - draws each step's own mark: the
                 // digit count over each number, the two deciding digits boxed, the bigger number underlined; the newest mark grey,
@@ -823,10 +828,13 @@ function pvRenderBody(p, ctx0) {
                         return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
                             + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.8mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
                     };
-                    return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;align-items:flex-end;">`
+                    return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;align-items:flex-end;">`
                         + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
                 }
-                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
+                // (lf-placevalue compare r2, pixel ws-empty-band EB-BAND 40 % at S: the one line sat at the top of a row the
+                // practice spread grows - its white all under it. css/sheet-kit.css centres a compare cell's content in its row,
+                // the white split above and below, as the Reason It panels are, CL-4b)
+                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
             case 'order':
