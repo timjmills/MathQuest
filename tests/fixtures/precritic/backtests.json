@@ -7900,7 +7900,9 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "pending": true,
+   "reason": "lead 2026-11-13 (compare deploy): needs TEXT-SIZE in ws-screen-ink-size; w2 carried an unchecked WIP copy, master keeps its own until lf-hosts lands TEXT-SIZE, then this row is re-run and un-pended"
   },
   {
    "id": "pv-compare-wrap-sign-bands",
