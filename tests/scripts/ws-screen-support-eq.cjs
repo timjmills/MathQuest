@@ -18,6 +18,9 @@
 //   ARRAY-CAPTION        (facts card §5.10, lead ruling C) an array's caption (its aria-label, what is read out) names the
 //                        rows x columns DRAWN (the dots' distinct rows and columns); a × array is drawn the smaller factor's
 //                        rows of the larger and its caption names the fact it supports ("3 rows of 7, for 7 × 3").
+//   SUPPORT-NOT-SLOT     (critic divarray r1 D1) a support draws no empty closed box the size/shape of the answer slot
+//                        (±40 %), and a frame drawn on only some cells of a band (the × zero frame, the lone framed support)
+//                        is a finding - on paper and on every screen host. ARRAY-CAPTION also fails "1 rows" for one row.
 //   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
 //                        with a zero factor (4 × 0, 0 × n) the short empty landscape frame, as 0 ÷ n does (no dots, at
 //                        most half as tall as wide) - never nothing, so no row is sized round an absent array.
@@ -88,7 +91,27 @@ function captionFinding(id, arr, item) {
         const want = `${Math.min(item.a, item.b)} rows of ${Math.max(item.a, item.b)}, for ${item.a} × ${item.b}`;
         if (Math.min(item.a, item.b) > 0 && arr.label !== want) return `${id}: ${item.a} × ${item.b} caption "${arr.label}", want "${want}" (the smaller factor's rows, the fact named)`;
     }
+    // (critic divarray r1 N1) a one-row array reads out "1 rows of n"; the caption is spoken, so a single row is "1 row of n"
+    if (/\b1 rows of \b|\b1 rows of \d/.test(arr.label || '')) return `${id}: caption "${arr.label}" says "1 rows" (one row is "1 row of ...")`;
     return null;
+}
+/** SUPPORT-NOT-SLOT (critic divarray r1 D1): a support draws no empty closed box the size/shape of the answer slot,
+ *  and is not the only framed support in a band whose other supports are unframed. `arr` is the support's drawn box
+ *  ({wPx, hPx, dots, framed}); `slot` the cell's graded answer slot ({w, h}). */
+function slotLikeFinding(id, arr, slot) {
+    if (!arr || !arr.framed || arr.dots > 0 || !slot || !(slot.w > 0) || !(slot.h > 0)) return null;
+    const rw = arr.wPx / slot.w, rh = arr.hPx / slot.h;
+    // an empty closed box within +/- 40 % of the answer slot in both dimensions reads as a second slot
+    if (rw >= 0.6 && rw <= 1.4 && rh >= 0.6 && rh <= 1.4) return `${id}: empty support frame ${arr.wPx.toFixed(0)} x ${arr.hPx.toFixed(0)} px is within +/-40% of the answer slot ${slot.w.toFixed(0)} x ${slot.h.toFixed(0)} (reads as a second answer box)`;
+    return null;
+}
+/** The band rule: among a render's cells that draw an array support, framed and unframed must not coexist (a frame on
+ *  only the zero facts is the lone framed support in its band). `framedFlags` is the per-cell `arr.framed` of array cells. */
+function bandFrameFinding(id, framedFlags) {
+    const f = framedFlags.filter((x) => x !== null && x !== undefined);
+    if (f.length < 2) return null;
+    const framed = f.filter(Boolean).length, bare = f.length - framed;
+    return framed > 0 && bare > 0 ? `${id}: ${framed} framed and ${bare} unframed array support(s) in one band (a frame drawn on only some cells reads as the lone slot-like box)` : null;
 }
 /** FRAME: an array-support fact cell draws an array or frame; a × zero fact the short empty frame. */
 function frameFinding(id, sup, item) {
@@ -137,6 +160,16 @@ function selfTest() {
     eq('frame tall × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
     eq('frame other support', frameFinding('touch', {}, { a: 4, b: 0, op: '×' }), null);
     eq('place one', placeFinding('touch', ['beside', 'beside', null]), null);
+    // caption grammar (N1): one row is "1 row", not "1 rows"
+    eq('caption 1 rows (N1)', !!captionFinding('array', { label: '1 rows of 1, for 1 × 1', rows: 1, cols: 1, dots: 1 }, { a: 1, b: 1, op: '×' }), true);
+    eq('caption 7 rows ok', captionFinding('array', { label: '7 rows of 11, for 11 × 7', rows: 7, cols: 11, dots: 77 }, { a: 11, b: 7, op: '×' }), null);
+    // SUPPORT-NOT-SLOT (D1): an empty closed frame ~ the slot size, or the lone framed support in a band
+    eq('slot-like empty frame (D1)', !!slotLikeFinding('array', { framed: true, dots: 0, wPx: 270, hPx: 50 }, { w: 300, h: 50 }), true);
+    eq('slot-like dotted array ok', slotLikeFinding('array', { framed: true, dots: 12, wPx: 270, hPx: 50 }, { w: 300, h: 50 }), null);
+    eq('slot-like far from slot ok', slotLikeFinding('array', { framed: true, dots: 0, wPx: 270, hPx: 10 }, { w: 300, h: 50 }), null);
+    eq('band mix framed/unframed (D1)', !!bandFrameFinding('array', [true, false, false, false]), true);
+    eq('band all framed ok (÷)', bandFrameFinding('array', [true, true, true]), null);
+    eq('band all unframed ok', bandFrameFinding('array', [false, false]), null);
     for (const b of bad) console.log('  ' + b);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
     console.log(`${NAME}: ${bad.length ? 'FAIL' : 'OK'}`);
@@ -206,12 +239,18 @@ function readCellsInPage({ sel, cellSel }) {
                 const br = asvg.getBoundingClientRect(), k = br.width / (vb[2] || 1);
                 const cs = [...asvg.querySelectorAll('circle')];
                 const xs = new Set(cs.map((c) => Number(c.getAttribute('cx')).toFixed(1))), ys = new Set(cs.map((c) => Number(c.getAttribute('cy')).toFixed(1)));
+                // framed: the support draws a closed box (a <rect>) round / behind the dots (the ÷ section frame, the × zero frame)
+                const framed = !!asvg.querySelector('rect');
                 arr = { label: asvg.getAttribute('aria-label'), wPx: br.width, hPx: br.height, dotPx: cs.length ? 2 * Number(cs[0].getAttribute('r')) * k : 0,
-                    dots: cs.length, rows: ys.size, cols: xs.size };
+                    dots: cs.length, rows: ys.size, cols: xs.size, framed };
             }
             sups[id] = { arr, sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: arr && arr.dotPx && digitPx ? arr.dotPx / digitPx : 0, place };
         }
-        out.push({ item, sups, digitPx });
+        // the cell's graded answer slot (print span or screen input), for SUPPORT-NOT-SLOT
+        let slot = null;
+        const slotEl = cell.querySelector('[data-ws-slot="answer"]') || cell.querySelector('[data-ws-slot]:not([data-ws-slot$="-label"])') || cell.querySelector('input, [data-ws-slot]');
+        if (slotEl) { const r = slotEl.getBoundingClientRect(); if (r.width > 0 && r.height > 0) slot = { w: r.width, h: r.height }; }
+        out.push({ item, sups, digitPx, slot });
     }
     return { cells: out };
 }
@@ -220,7 +259,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -271,6 +310,14 @@ function readCellsInPage({ sel, cellSel }) {
                             if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                             const g = ONLY.includes('CAPTION') ? captionFinding(sup, c.sups[sup].arr, c.item) : null;
                             if (g) findings.push(`ARRAY-CAPTION ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${g}`);
+                            if (ONLY.includes('NOTSLOT')) {
+                                const s = slotLikeFinding(sup, c.sups[sup].arr, c.slot);
+                                if (s) findings.push(`SUPPORT-NOT-SLOT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${s}`);
+                            }
+                        }
+                        if (ONLY.includes('NOTSLOT')) {
+                            const bf = bandFrameFinding(sup, (pr.cells || []).filter((x) => x.item && x.sups[sup] && x.sups[sup].arr).map((x) => x.sups[sup].arr.framed));
+                            if (bf) findings.push(`SUPPORT-NOT-SLOT ${key} paper ${size}: ${bf}`);
                         }
                     }
                 }
@@ -284,17 +331,22 @@ function readCellsInPage({ sel, cellSel }) {
                 await page.evaluate(({ cat, skill, opts }) => { window.clearSetOptions({ silent: true }); window.setSetOptions(cat, skill, opts, { silent: true }); }, { cat, skill, opts });
                 // the card: the zero item (0 ÷ n) first when the set deals one, then two more
                 const cardItems = await page.evaluate(({ cat, skill, opts }) => {
-                    const qs = []; let zero = null;
+                    const qs = []; let zero = null, oneRow = null;
                     // (the dealt question is kept and rendered as dealt: a dealer that avoids repeats does not deal the same
                     // item twice for one seed, so re-generating seed 10 drew 11 x 10 where the scan had found 0 - ARRAY-FRAME)
+                    // A one-row fact (a factor of 1) is sought too, so ARRAY-CAPTION judges its "1 row of n" grammar (N1).
                     window.__sseqQs = {};
-                    for (let s = 1; s <= 200 && (!zero || qs.length < 2); s++) {
+                    const facs = (t) => { const m = /(\d+)\s*[×x÷]\s*(\d+)/.exec(t || ''); return m ? [Number(m[1]), Number(m[2])] : null; };
+                    for (let s = 1; s <= 300 && (!zero || !oneRow || qs.length < 2); s++) {
                         const q = window.generateQuestionFor({ category: cat, skill, opts, seed: s });
                         if (!q) continue;
                         window.__sseqQs[s] = q;
-                        if (Number(q.ans) === 0 && !zero) zero = s; else if (qs.length < 2) qs.push(s);
+                        const f = facs(q.text);
+                        if (Number(q.ans) === 0 && !zero) zero = s;
+                        else if (f && Math.min(f[0], f[1]) === 1 && !oneRow) oneRow = s;
+                        else if (qs.length < 2) qs.push(s);
                     }
-                    return [zero, ...qs].filter(Boolean);
+                    return [zero, oneRow, ...qs].filter(Boolean);
                 }, { cat, skill, opts });
                 for (const [w, h] of [[1280, 900], [820, 1180], [390, 844]]) {
                     await page.setViewport({ width: w, height: h, deviceScaleFactor: 1 });
@@ -370,10 +422,19 @@ function readCellsInPage({ sel, cellSel }) {
                             const f = cueFinding(sup, pRatio, s.ratio);
                             if (f) findings.push(`SCREEN-CUE-SIZE ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
+                        if (ONLY.includes('NOTSLOT') && s) {
+                            const f = slotLikeFinding(sup, s.arr, c.slot);
+                            if (f) findings.push(`SUPPORT-NOT-SLOT ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
                     }
                     if (ONLY.includes('PLACE') && h.worksheet) {
                         const f = placeFinding(sup, cells.map((c) => (c.sups[sup] ? c.sups[sup].place : null)));
                         if (f) findings.push(`SCREEN-SUPPORT-PLACE ${key} ${h.host}: ${f}`);
+                    }
+                    if (ONLY.includes('NOTSLOT')) {
+                        // the band rule: a worksheet / page of cells where a frame on only some reads as the lone slot-like box
+                        const bf = bandFrameFinding(sup, cells.filter((c) => c.sups[sup] && c.sups[sup].arr).map((c) => c.sups[sup].arr.framed));
+                        if (bf) findings.push(`SUPPORT-NOT-SLOT ${key} ${h.host}: ${bf}`);
                     }
                 }
                 const sDots = hosts.flatMap((h) => ((h.r && h.r.cells) || []).map((c) => (c.sups[sup] && c.sups[sup].dotRatio) || 0)).filter((x) => x > 0);
@@ -391,4 +452,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding };

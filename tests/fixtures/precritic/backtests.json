@@ -3161,1006 +3161,1046 @@
     "pass": "OK"
    }
   },
- {
-  "id": "model-grid-facts",
-  "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
-  "browser": true,
-  "fail": {
-   "commit": "f960e549",
-   "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
+  {
+   "id": "model-grid-facts",
+   "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+   "browser": true,
+   "fail": {
+    "commit": "f960e549",
+    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
+   },
+   "pass": {
+    "commit": "966292ff",
+    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "966292ff",
-   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
+  {
+   "id": "model-interior-band-facts",
+   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+   "browser": true,
+   "fail": {
+    "commit": "9f7983dd",
+    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+   },
+   "pass": {
+    "commit": "04683166",
+    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "screen-support-eq-divfacts",
+   "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-cue-size-divfacts",
+   "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+   },
+   "pass": {
+    "commit": "d377e32b",
+    "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-support-place-divfacts",
+   "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+   },
+   "pass": {
+    "commit": "d377e32b",
+    "state": "0 findings: every ÷ card under once one wraps"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "runner-orphan-slot",
+   "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
+   "kind": "fixture",
+   "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
+    "state": "master 7e0c074b runner: the command inherits the slot fd"
+   },
+   "pass": {
+    "fixture": "tests/scripts/mq-browser-run.sh",
+    "state": "lf-engine-bt: \"$@\" {fd}>&-"
+   },
+   "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-ink",
+   "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
+    "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-width",
+   "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
+    "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-inkbox",
+   "check": "SIZE-WIDTH measures the drawing's INK (the union of its painted shapes), not its svg box (critic sis-r1 D1: a tall viewBox in a width:100% svg drew a centred strip and passed)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/strip-in-box.fail.html",
+    "state": "a 6 rows of 2 viewBox in a full-width svg 30 mm tall: the box is 182 mm wide, the ink a 10 x 30 mm strip"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "3 rows of 4 laid across, 24 x 18 mm"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-sameitem",
+   "check": "SIZE-INK compares a screen item with ITS OWN print item (the same fact), never a median over the page (critic sis-r1 D2: a miss and a false alarm by construction)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/same-item-miss.fail.html",
+    "state": "print 2 x 3 at 4 mm and 10 x 10 at 1 mm dots; the screen 2 x 3 at 2.6 mm (65 % of its own item; the old page median 2.5 mm passed it)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/same-item-ok.pass.html",
+    "state": "the same print page; the screen 10 x 10 at 1 mm and the 2 x 3 at 4 mm, each at its own print size (the old median raised \"40 %\" on the 10 x 10)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-relabel",
+   "check": "a screen picture labelled differently from print is still judged, by geometry (the same marks, the same count) (critic sis-r1 D3: \"dots for 12\" at 50 % passed with a note)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/relabelled.fail.html",
+    "state": "the screen \"dots for 12\" (print \"array, 3 rows of 4\"), 1 mm dots against 2 mm, no fact text to match the item"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/relabelled.pass.html",
+    "state": "the same relabelled picture at 2 mm dots"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-noref",
+   "check": "a screen mark group with NO print counterpart FAILS as SIZE-REF, never a note only (critic sis-r1 D3)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/no-print-ref.fail.html",
+    "state": "the screen draws 5 tiles; paper holds only a 12-dot array"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "the screen array matches its print item"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-spacer",
+   "check": "an empty block (no ink) beside a drawing does not cut its cell's free width (critic sis-r1 D4: a flex:1 spacer read the free width as 20 mm of 181.5 mm)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.fail.html",
+    "state": "a 19 x 57 mm strip beside the fact and an empty flex:1 spacer (free width 141 mm, 12 %; the old reading 31 mm passed it at 61 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.pass.html",
+    "state": "the same cell and spacer, the array laid across 40 x 30 mm"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-divfacts",
+   "check": "the owner's case on the real tree: division:div_facts screen arrays of small dots in tall strips (critic sis-r1 D6)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size SIZE-INK + SIZE-WIDTH (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "commit": "73e96fc1",
+    "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
+   },
+   "pass": {
+    "commit": "393db090",
+    "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-pm-h13",
+   "check": "every Practice and Mixed page of a short lesson has no cell band >= 30 % (lf-engine-pc critic r3 F5: add L Mixed Addition row 55 %; F7: round L / S Practice 49 % in all 15 cells)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PM-H13 (H13 on Practice / Mixed, blocking)",
+   "browser": true,
+   "fail": {
+    "commit": "cf1e5abe",
+    "state": "PM-H13 FAIL 4: add L Mixed 52 %, add S Practice 30 %, round L / S Practice 49 %"
+   },
+   "pass": {
+    "commit": "ce1d96f5",
+    "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-halo",
+   "check": "SIZE-INK sizes INK marks only: a white halo / keyline circle (white or no fill, no dark stroke) is not a mark, so a small ink dot still FAILS beside its halo and an ink dot at print size passes (lf-ops 2026-11-13: pooled halos read add_facts / mult_facts touch dots at 1.64 vs 1.76 mm; ink-only they are 1.69 vs 1.58 mm single, 2.30 vs 1.97 mm ring, 0.85 vs 0.79 mm centre)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/halo-small-ink.fail.html",
+    "state": "touch dots of 1.6 mm ink on screen against 2.0 mm on paper (80 %), each on a white halo circle"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/halo-ink-ok.pass.html",
+    "state": "the ink dots 2.0 mm on both, a hairline halo on screen and a 0.4 mm halo on paper (the old pooled reading 2.13 vs 2.40 mm = 89 % FAILED it)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-ring",
+   "check": "a ring is its own mark: a screen ring group paper does not draw FAILS as SIZE-REF and is never paired with the print dots (critic sis-r2 D1: 12 rings of 0.8 mm read as \"dot (array) 40 %\")",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/ring-extra.fail.html",
+    "state": "the screen array at 3 mm dots plus 12 small black rings (0.8 mm); paper draws the array only"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "the screen array matches its print item, no rings"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-ring-large",
+   "check": "a screen ring group LARGER than the print dots, which paper does not draw, FAILS as SIZE-REF instead of passing silently; a ring paper draws too is matched to the print ring (critic sis-r2 D1)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/ring-extra-large.fail.html",
+    "state": "the screen array plus 12 grey keyline rings of 3.5 mm; paper draws the array only"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/ring-matched.pass.html",
+    "state": "paper and screen both draw the 12 rings of 3.5 mm under the array"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-live-carry",
+   "check": "every carry / regroup box a lesson key page draws is filled by >= 1 stack of its section (lf-engine-pc critic r3 F6: sub / round Mixed, add_100_regroup partner, a hundreds carry box no sum < 100 reaches)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples LIVE-PART (H15 dead part)",
+   "browser": true,
+   "fail": {
+    "commit": "cf1e5abe",
+    "state": "LIVE-PART FAIL 4: sub L / S, round L / S Mixed, the hundreds box filled on none"
+   },
+   "pass": {
+    "commit": "ce1d96f5",
+    "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-provider",
+   "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
+   "kind": "commit-pair",
+   "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
+   "browser": false,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
+   },
+   "pass": {
+    "commit": "1e3b128e",
+    "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
+   },
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-parity",
+   "check": "composing:number_word_form on the practice card / worksheet / quiz draws the kit words cell with its answer place inside it, and no empty legacy box beside it (critic nwf r1 N9, lead ruling: screen parity is a contract rule)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --screen-parity EB-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the legacy place chart: no [data-ws-cell=words] on the card, empty tens / ones boxes beside the input"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "the kit words cell on every host, the input in its line"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-claim",
+   "check": "composing:number_word_form True or False? with answerSlot hto prints the claimed number in its boxes (critic nwf r1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules CLAIM-INK",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "every H T O box empty on the pupil page; the key marks False against nothing"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "the claim one digit a box"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-model",
+   "check": "composing:number_word_form Scripted Model / Guided / opener write the Model's answer (critic nwf r1 N5)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules MODEL-ANSWER",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the traced state drew an empty answer line on every Model"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "the answer traced in grey"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-text",
+   "check": "composing:number_word_form: every word space of a printed name is visible (critic nwf r1 N7, 'one hundredthirteen' in the lesson's Guided model)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules WORDS-TEXT",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the two-line name box was a flex box: the space between the text run and the underlined span dropped"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "the name one inner span"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-break",
+   "check": "composing:number_word_form: a name over two lines breaks after 'hundred' (critic nwf r1 N8)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules WORDS-BREAK",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "'seven / hundred eight', 'seven / hundred nine' at band 1000"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "'seven hundred' kept on one line"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-rowy",
+   "check": "composing:number_word_form: the answer places of one grid row sit within 1 mm up and down (critic nwf r1 N4)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "'one hundred' in a two-line box, its line 5 mm under its row (test S)"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "only a name long enough to wrap takes the two-line box"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-chant",
+   "check": "a routine's chant that names boxes holds for every item its lessons deal (critic nwf r1 N6: 'Three boxes, three digits.' over 2-digit items and 'one thousand')",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit chant-box",
+   "browser": false,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the default deal had no boxes; the practice deal gave 1000 four boxes"
+   },
+   "pass": {
+    "commit": "35bc76fe",
+    "state": "'Every box gets a digit.', the lesson deals its practice options"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-box",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-rowy-1000",
+   "check": "composing:number_word_form band 1,000 with zeroPlace always: answer places of one grid row within 1 mm, lesson and guided rows included (critic nwf r2 N10 / N10b: 'one thousand' 7 mm high)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+   "browser": true,
+   "fail": {
+    "commit": "706d940a",
+    "state": "one thousand's boxes 6.6-7.2 mm above its row"
+   },
+   "pass": {
+    "commit": "5a4ca828",
+    "state": "twoLine on every band-1,000 name"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-towords-side",
+   "check": "composing:number_word_form numeral to words: no side band of 30 % (critic nwf r2 N11: one across, half the page empty)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "706d940a",
+    "state": "one across at S"
+   },
+   "pass": {
+    "commit": "5a4ca828",
+    "state": "two across at S where the 70 mm line fits"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --opts '{\"wordform\":[\"to_words\"]}' --roles independent --sizes S --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-keyjoin-frame",
+   "check": "a shared role writes ONE value a slot: a list answer one part a box, a sentence answer never on a write line (lf-roles; lf-algebra KEYJOIN 340 class)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit KEYJOIN-ROLE",
+   "browser": false,
+   "fail": {
+    "commit": "eef75f5",
+    "state": "24 findings: tf-ans / ri-ans hold the list and the sentence; EA splits the sentence into parts"
+   },
+   "pass": {
+    "commit": "aa200514",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-review-title",
+   "check": "a Review budgets its body under the title it prints, measured (growing_shape_patterns Review L body 1.3 mm over)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit REVIEW-TITLE",
+   "browser": false,
+   "fail": {
+    "commit": "eef75f5",
+    "state": "2 findings: topicOf drawing and count; titleLinesOf never asked"
+   },
+   "pass": {
+    "commit": "2a3ecb9c",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only REVIEW-TITLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-model-across",
+   "check": "a tall-state Scripted Model that needs 2 pages beside its text lays 2 + 2 on one page (fte Model M EB-BAND / EB-SIDE)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit MOD-ACROSS",
+   "browser": false,
+   "fail": {
+    "commit": "eef75f5",
+    "state": "1 finding: 2 pages"
+   },
+   "pass": {
+    "commit": "35c881b6",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-ACROSS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "capacity-no-drop",
+   "check": "a page never prints fewer items than the pinned master page, per skill x role x size (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3; unit_form Reason It S 4 -> 3 found by it)",
+   "kind": "fixture",
+   "rule": "ws-capacity-pin CAPACITY-NO-DROP",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/capacity/fail.json",
+    "state": "the pin holds one item more than the page prints"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/capacity/pass.json",
+    "state": "the pin as master prints it"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --pin {fixture} --skills placevalue:unit_form --roles reason-it --sizes S",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-ri-band-passed",
+   "check": "Reason It cells on passed skills leave no empty band under short work (critic r1/r2 R11): the A/B block centres in the stretched cell",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "5947159d",
+    "state": "4 EB-BAND findings (value / unit_form Reason It)"
+   },
+   "pass": {
+    "commit": "ce4c3eed",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-list-rule-named",
+   "check": "a count row's rule part in a role's list frame is named ('Rule: add [ ] each time'), never a sixth unlabelled blank (critic r2 N1)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit LIST-HOMOGENEOUS",
+   "browser": false,
+   "fail": {
+    "commit": "c93de259",
+    "state": "6 findings"
+   },
+   "pass": {
+    "commit": "3df2b556",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-key-true-blank",
+   "check": "a True statement's key leaves the True or False? frame empty (PT-TOF-2; critic r1/r2 R5)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit KEY-TRUE-BLANK",
+   "browser": false,
+   "fail": {
+    "commit": "c93de259",
+    "state": "the key fills the frame"
+   },
+   "pass": {
+    "commit": "3df2b556",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only KEY-TRUE-BLANK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-ri-signmatch",
+   "check": "a Reason It wrong panel keeps the wrong answer's own operation (add_wp_10 printed '6 + 2 = 4'); lf-builds word-stories",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks SIGNMATCH",
+   "browser": true,
+   "fail": {
+    "commit": "6a1dce95",
+    "state": "SIGNMATCH on add_wp_10 / add_wp_10_plain Reason It S/M/L"
+   },
+   "pass": {
+    "commit": "7a463602",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-pm-h13-spot",
+   "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
+   "browser": true,
+   "fail": {
+    "commit": "9135190b",
+    "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
+   },
+   "pass": {
+    "commit": "709605bb",
+    "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-pm-cont",
+   "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PM-CONT",
+   "browser": true,
+   "fail": {
+    "commit": "9135190b",
+    "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
+   },
+   "pass": {
+    "commit": "709605bb",
+    "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-tab-clear",
+   "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples TAB-CLEAR",
+   "browser": true,
+   "fail": {
+    "commit": "9135190b",
+    "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
+   },
+   "pass": {
+    "commit": "709605bb",
+    "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-sheet-2pg",
+   "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples SHEET-2PG",
+   "browser": true,
+   "fail": {
+    "commit": "9135190b",
+    "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
+   },
+   "pass": {
+    "commit": "709605bb",
+    "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
+   },
+   "pending": true,
+   "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "roles-fix-minimal",
+   "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit FIX-MINIMAL",
+   "browser": false,
+   "fail": {
+    "commit": "0e37c854",
+    "state": "'12, 15, 19, 22' kept (2 errors)"
+   },
+   "pass": {
+    "commit": "020cdba3",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only FIX-MINIMAL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-marks-ink",
+   "check": "a Scripted Model state draws only its own new marks in trace grey; earlier steps' marks are black (PT-MOD-1, P-LC-9; lf-roles critic r5b D2)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit MOD-MARKS-INK",
+   "browser": false,
+   "fail": {
+    "commit": "3b324bcc",
+    "state": "states carry no new-mark list: every traceSlots value drawn grey"
+   },
+   "pass": {
+    "commit": "88032a8a",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-MARKS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-divfacts",
+   "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-dot-min-divfacts",
+   "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
+   },
+   "pass": {
+    "commit": "fc04ba58",
+    "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-multfacts",
+   "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
+   },
+   "pass": {
+    "commit": "393db090",
+    "state": "0 findings: \"3 rows of 7, for 7 × 3\" on paper S / M / L and every screen host"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-orient-multfacts",
+   "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
+   "browser": true,
+   "fail": {
+    "commit": "88753326",
+    "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
+   },
+   "pass": {
+    "commit": "393db090",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-stack-side-multfacts-array",
+   "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
+   "browser": true,
+   "fail": {
+    "commit": "55e7d0f2f",
+    "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+   },
+   "pass": {
+    "commit": "4e2e4c988",
+    "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "review-zero-row-multfacts-array",
+   "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
+   "browser": true,
+   "fail": {
+    "commit": "05875e169",
+    "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings: \"4 × 0\" draws the empty frame"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-frame-multfacts",
+   "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "669c41cea",
+    "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
+   },
+   "pass": {
+    "commit": "792e5ca30",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "support-not-slot-multfacts-array",
+   "check": "on an array-support band no support draws an empty closed box the size/shape of the answer slot, and a frame on only some cells (the x 0 frame, the lone framed support in a band of unframed arrays) is a finding - on paper and every screen host (critic divarray r1 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-NOT-SLOT; ws-print-lint SUPPORT-NOT-SLOT",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 paper findings (S/M/L): 1 framed and 9 unframed array supports in one band - the x 0 frame reads as the lone slot-like box"
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "0 findings: the x 0 support no longer draws a closed slot-like box"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only NOTSLOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "array-caption-grammar-multfacts",
+   "check": "a one-row array caption reads \"1 row of n\", never \"1 rows of n\" (it is spoken aloud) (critic divarray r1 N1, fact.js:242)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq ARRAY-CAPTION (row/rows grammar)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "3 findings (card 1280/820/390): caption \"1 rows of 1, for 1 x 1\" says \"1 rows\""
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "0 findings: the one-row caption says \"1 row of 1\""
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
-  },
- {
-  "id": "model-interior-band-facts",
-  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
-  "browser": true,
-  "fail": {
-   "commit": "9f7983dd",
-   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
-  },
-  "pass": {
-   "commit": "04683166",
-   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-support-eq-divfacts",
-  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
-  },
-  "pass": {
-   "commit": "fc04ba58",
-   "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-cue-size-divfacts",
-  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
-  },
-  "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-support-place-divfacts",
-  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
-  },
-  "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: every ÷ card under once one wraps"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "runner-orphan-slot",
-  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
-  "kind": "fixture",
-  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
-  "fail": {
-   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
-   "state": "master 7e0c074b runner: the command inherits the slot fd"
-  },
-  "pass": {
-   "fixture": "tests/scripts/mq-browser-run.sh",
-   "state": "lf-engine-bt: \"$@\" {fd}>&-"
-  },
-  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-ink",
-  "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
-   "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-   "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-width",
-  "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
-   "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-   "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-inkbox",
-  "check": "SIZE-WIDTH measures the drawing's INK (the union of its painted shapes), not its svg box (critic sis-r1 D1: a tall viewBox in a width:100% svg drew a centred strip and passed)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/strip-in-box.fail.html",
-   "state": "a 6 rows of 2 viewBox in a full-width svg 30 mm tall: the box is 182 mm wide, the ink a 10 x 30 mm strip"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-   "state": "3 rows of 4 laid across, 24 x 18 mm"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-sameitem",
-  "check": "SIZE-INK compares a screen item with ITS OWN print item (the same fact), never a median over the page (critic sis-r1 D2: a miss and a false alarm by construction)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/same-item-miss.fail.html",
-   "state": "print 2 x 3 at 4 mm and 10 x 10 at 1 mm dots; the screen 2 x 3 at 2.6 mm (65 % of its own item; the old page median 2.5 mm passed it)"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/same-item-ok.pass.html",
-   "state": "the same print page; the screen 10 x 10 at 1 mm and the 2 x 3 at 4 mm, each at its own print size (the old median raised \"40 %\" on the 10 x 10)"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-relabel",
-  "check": "a screen picture labelled differently from print is still judged, by geometry (the same marks, the same count) (critic sis-r1 D3: \"dots for 12\" at 50 % passed with a note)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.fail.html",
-   "state": "the screen \"dots for 12\" (print \"array, 3 rows of 4\"), 1 mm dots against 2 mm, no fact text to match the item"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.pass.html",
-   "state": "the same relabelled picture at 2 mm dots"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-noref",
-  "check": "a screen mark group with NO print counterpart FAILS as SIZE-REF, never a note only (critic sis-r1 D3)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/no-print-ref.fail.html",
-   "state": "the screen draws 5 tiles; paper holds only a 12-dot array"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-   "state": "the screen array matches its print item"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-spacer",
-  "check": "an empty block (no ink) beside a drawing does not cut its cell's free width (critic sis-r1 D4: a flex:1 spacer read the free width as 20 mm of 181.5 mm)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.fail.html",
-   "state": "a 19 x 57 mm strip beside the fact and an empty flex:1 spacer (free width 141 mm, 12 %; the old reading 31 mm passed it at 61 %)"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.pass.html",
-   "state": "the same cell and spacer, the array laid across 40 x 30 mm"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-divfacts",
-  "check": "the owner's case on the real tree: division:div_facts screen arrays of small dots in tall strips (critic sis-r1 D6)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-ink-size SIZE-INK + SIZE-WIDTH (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "commit": "73e96fc1",
-   "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
-  },
-  "pass": {
-   "commit": "393db090",
-   "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-pm-h13",
-  "check": "every Practice and Mixed page of a short lesson has no cell band >= 30 % (lf-engine-pc critic r3 F5: add L Mixed Addition row 55 %; F7: round L / S Practice 49 % in all 15 cells)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples PM-H13 (H13 on Practice / Mixed, blocking)",
-  "browser": true,
-  "fail": {
-   "commit": "cf1e5abe",
-   "state": "PM-H13 FAIL 4: add L Mixed 52 %, add S Practice 30 %, round L / S Practice 49 %"
-  },
-  "pass": {
-   "commit": "ce1d96f5",
-   "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
-  },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-halo",
-  "check": "SIZE-INK sizes INK marks only: a white halo / keyline circle (white or no fill, no dark stroke) is not a mark, so a small ink dot still FAILS beside its halo and an ink dot at print size passes (lf-ops 2026-11-13: pooled halos read add_facts / mult_facts touch dots at 1.64 vs 1.76 mm; ink-only they are 1.69 vs 1.58 mm single, 2.30 vs 1.97 mm ring, 0.85 vs 0.79 mm centre)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/halo-small-ink.fail.html",
-   "state": "touch dots of 1.6 mm ink on screen against 2.0 mm on paper (80 %), each on a white halo circle"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/halo-ink-ok.pass.html",
-   "state": "the ink dots 2.0 mm on both, a hairline halo on screen and a 0.4 mm halo on paper (the old pooled reading 2.13 vs 2.40 mm = 89 % FAILED it)"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-ring",
-  "check": "a ring is its own mark: a screen ring group paper does not draw FAILS as SIZE-REF and is never paired with the print dots (critic sis-r2 D1: 12 rings of 0.8 mm read as \"dot (array) 40 %\")",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra.fail.html",
-   "state": "the screen array at 3 mm dots plus 12 small black rings (0.8 mm); paper draws the array only"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
-   "state": "the screen array matches its print item, no rings"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-REF",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-ink-size-ring-large",
-  "check": "a screen ring group LARGER than the print dots, which paper does not draw, FAILS as SIZE-REF instead of passing silently; a ring paper draws too is matched to the print ring (critic sis-r2 D1)",
-  "kind": "fixture",
-  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra-large.fail.html",
-   "state": "the screen array plus 12 grey keyline rings of 3.5 mm; paper draws the array only"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/ring-matched.pass.html",
-   "state": "paper and screen both draw the 12 rings of 3.5 mm under the array"
-  },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-live-carry",
-  "check": "every carry / regroup box a lesson key page draws is filled by >= 1 stack of its section (lf-engine-pc critic r3 F6: sub / round Mixed, add_100_regroup partner, a hundreds carry box no sum < 100 reaches)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples LIVE-PART (H15 dead part)",
-  "browser": true,
-  "fail": {
-   "commit": "cf1e5abe",
-   "state": "LIVE-PART FAIL 4: sub L / S, round L / S Mixed, the hundreds box filled on none"
-  },
-  "pass": {
-   "commit": "ce1d96f5",
-   "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
-  },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-provider",
-  "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
-  "kind": "commit-pair",
-  "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
-  "browser": false,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
-  },
-  "pass": {
-   "commit": "1e3b128e",
-   "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
-  },
-  "command": "node tests/scripts/ws-words-checks.mjs --root {root}",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-parity",
-  "check": "composing:number_word_form on the practice card / worksheet / quiz draws the kit words cell with its answer place inside it, and no empty legacy box beside it (critic nwf r1 N9, lead ruling: screen parity is a contract rule)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band --screen-parity EB-PARITY",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "the legacy place chart: no [data-ws-cell=words] on the card, empty tens / ones boxes beside the input"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "the kit words cell on every host, the input in its line"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-claim",
-  "check": "composing:number_word_form True or False? with answerSlot hto prints the claimed number in its boxes (critic nwf r1 N2)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules CLAIM-INK",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "every H T O box empty on the pupil page; the key marks False against nothing"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "the claim one digit a box"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-model",
-  "check": "composing:number_word_form Scripted Model / Guided / opener write the Model's answer (critic nwf r1 N5)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules MODEL-ANSWER",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "the traced state drew an empty answer line on every Model"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "the answer traced in grey"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-text",
-  "check": "composing:number_word_form: every word space of a printed name is visible (critic nwf r1 N7, 'one hundredthirteen' in the lesson's Guided model)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules WORDS-TEXT",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "the two-line name box was a flex box: the space between the text run and the underlined span dropped"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "the name one inner span"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-break",
-  "check": "composing:number_word_form: a name over two lines breaks after 'hundred' (critic nwf r1 N8)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules WORDS-BREAK",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "'seven / hundred eight', 'seven / hundred nine' at band 1000"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "'seven hundred' kept on one line"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-rowy",
-  "check": "composing:number_word_form: the answer places of one grid row sit within 1 mm up and down (critic nwf r1 N4)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
-  "browser": true,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "'one hundred' in a two-line box, its line 5 mm under its row (test S)"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "only a name long enough to wrap takes the two-line box"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-chant",
-  "check": "a routine's chant that names boxes holds for every item its lessons deal (critic nwf r1 N6: 'Three boxes, three digits.' over 2-digit items and 'one thousand')",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-unit chant-box",
-  "browser": false,
-  "fail": {
-   "commit": "2ccd5b21",
-   "state": "the default deal had no boxes; the practice deal gave 1000 four boxes"
-  },
-  "pass": {
-   "commit": "35bc76fe",
-   "state": "'Every box gets a digit.', the lesson deals its practice options"
-  },
-  "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-box",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-rowy-1000",
-  "check": "composing:number_word_form band 1,000 with zeroPlace always: answer places of one grid row within 1 mm, lesson and guided rows included (critic nwf r2 N10 / N10b: 'one thousand' 7 mm high)",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
-  "browser": true,
-  "fail": {
-   "commit": "706d940a",
-   "state": "one thousand's boxes 6.6-7.2 mm above its row"
-  },
-  "pass": {
-   "commit": "5a4ca828",
-   "state": "twoLine on every band-1,000 name"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "pv-words-towords-side",
-  "check": "composing:number_word_form numeral to words: no side band of 30 % (critic nwf r2 N11: one across, half the page empty)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-SIDE",
-  "browser": true,
-  "fail": {
-   "commit": "706d940a",
-   "state": "one across at S"
-  },
-  "pass": {
-   "commit": "5a4ca828",
-   "state": "two across at S where the 70 mm line fits"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --opts '{\"wordform\":[\"to_words\"]}' --roles independent --sizes S --hosts none --no-baseline --only EB-SIDE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-keyjoin-frame",
-  "check": "a shared role writes ONE value a slot: a list answer one part a box, a sentence answer never on a write line (lf-roles; lf-algebra KEYJOIN 340 class)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit KEYJOIN-ROLE",
-  "browser": false,
-  "fail": {
-   "commit": "eef75f5",
-   "state": "24 findings: tf-ans / ri-ans hold the list and the sentence; EA splits the sentence into parts"
-  },
-  "pass": {
-   "commit": "aa200514",
-   "state": "0 findings"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-review-title",
-  "check": "a Review budgets its body under the title it prints, measured (growing_shape_patterns Review L body 1.3 mm over)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit REVIEW-TITLE",
-  "browser": false,
-  "fail": {
-   "commit": "eef75f5",
-   "state": "2 findings: topicOf drawing and count; titleLinesOf never asked"
-  },
-  "pass": {
-   "commit": "2a3ecb9c",
-   "state": "0 findings"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only REVIEW-TITLE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-model-across",
-  "check": "a tall-state Scripted Model that needs 2 pages beside its text lays 2 + 2 on one page (fte Model M EB-BAND / EB-SIDE)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit MOD-ACROSS",
-  "browser": false,
-  "fail": {
-   "commit": "eef75f5",
-   "state": "1 finding: 2 pages"
-  },
-  "pass": {
-   "commit": "35c881b6",
-   "state": "0 findings"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-ACROSS",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "capacity-no-drop",
-  "check": "a page never prints fewer items than the pinned master page, per skill x role x size (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3; unit_form Reason It S 4 -> 3 found by it)",
-  "kind": "fixture",
-  "rule": "ws-capacity-pin CAPACITY-NO-DROP",
-  "browser": true,
-  "fail": {
-   "fixture": "tests/fixtures/precritic/capacity/fail.json",
-   "state": "the pin holds one item more than the page prints"
-  },
-  "pass": {
-   "fixture": "tests/fixtures/precritic/capacity/pass.json",
-   "state": "the pin as master prints it"
-  },
-  "command": "node tests/scripts/ws-capacity-pin.cjs --check --pin {fixture} --skills placevalue:unit_form --roles reason-it --sizes S",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-ri-band-passed",
-  "check": "Reason It cells on passed skills leave no empty band under short work (critic r1/r2 R11): the A/B block centres in the stretched cell",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-BAND (RUBRIC H13)",
-  "browser": true,
-  "fail": {
-   "commit": "5947159d",
-   "state": "4 EB-BAND findings (value / unit_form Reason It)"
-  },
-  "pass": {
-   "commit": "ce4c3eed",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-list-rule-named",
-  "check": "a count row's rule part in a role's list frame is named ('Rule: add [ ] each time'), never a sixth unlabelled blank (critic r2 N1)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit LIST-HOMOGENEOUS",
-  "browser": false,
-  "fail": {
-   "commit": "c93de259",
-   "state": "6 findings"
-  },
-  "pass": {
-   "commit": "3df2b556",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-key-true-blank",
-  "check": "a True statement's key leaves the True or False? frame empty (PT-TOF-2; critic r1/r2 R5)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit KEY-TRUE-BLANK",
-  "browser": false,
-  "fail": {
-   "commit": "c93de259",
-   "state": "the key fills the frame"
-  },
-  "pass": {
-   "commit": "3df2b556",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only KEY-TRUE-BLANK",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-ri-signmatch",
-  "check": "a Reason It wrong panel keeps the wrong answer's own operation (add_wp_10 printed '6 + 2 = 4'); lf-builds word-stories",
-  "kind": "commit-pair",
-  "rule": "ws-cell-checks SIGNMATCH",
-  "browser": true,
-  "fail": {
-   "commit": "6a1dce95",
-   "state": "SIGNMATCH on add_wp_10 / add_wp_10_plain Reason It S/M/L"
-  },
-  "pass": {
-   "commit": "7a463602",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-pm-h13-spot",
-  "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
-  "browser": true,
-  "fail": {
-   "commit": "9135190b",
-   "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
-  },
-  "pass": {
-   "commit": "709605bb",
-   "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
-  },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-pm-cont",
-  "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples PM-CONT",
-  "browser": true,
-  "fail": {
-   "commit": "9135190b",
-   "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
-  },
-  "pass": {
-   "commit": "709605bb",
-   "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
-  },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-tab-clear",
-  "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples TAB-CLEAR",
-  "browser": true,
-  "fail": {
-   "commit": "9135190b",
-   "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
-  },
-  "pass": {
-   "commit": "709605bb",
-   "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
-  },
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "lesson-sheet-2pg",
-  "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
-  "kind": "commit-pair",
-  "rule": "ws-lesson-samples SHEET-2PG",
-  "browser": true,
-  "fail": {
-   "commit": "9135190b",
-   "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
-  },
-  "pass": {
-   "commit": "709605bb",
-   "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
-  },
-  "pending": true,
-  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
-  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "roles-fix-minimal",
-  "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit FIX-MINIMAL",
-  "browser": false,
-  "fail": {
-   "commit": "0e37c854",
-   "state": "'12, 15, 19, 22' kept (2 errors)"
-  },
-  "pass": {
-   "commit": "020cdba3",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only FIX-MINIMAL",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "model-marks-ink",
-  "check": "a Scripted Model state draws only its own new marks in trace grey; earlier steps' marks are black (PT-MOD-1, P-LC-9; lf-roles critic r5b D2)",
-  "kind": "commit-pair",
-  "rule": "ws-roles-unit MOD-MARKS-INK",
-  "browser": false,
-  "fail": {
-   "commit": "3b324bcc",
-   "state": "states carry no new-mark list: every traceSlots value drawn grey"
-  },
-  "pass": {
-   "commit": "88032a8a",
-   "state": "0"
-  },
-  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-MARKS",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "array-orient-divfacts",
-  "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
-  "browser": true,
-  "fail": {
-   "commit": "88753326",
-   "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
-  },
-  "pass": {
-   "commit": "fc04ba58",
-   "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "array-dot-min-divfacts",
-  "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
-  "browser": true,
-  "fail": {
-   "commit": "88753326",
-   "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
-  },
-  "pass": {
-   "commit": "fc04ba58",
-   "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "array-caption-multfacts",
-  "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
-  "browser": true,
-  "fail": {
-   "commit": "88753326",
-   "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
-  },
-  "pass": {
-   "commit": "393db090",
-   "state": "0 findings: \"3 rows of 7, for 7 × 3\" on paper S / M / L and every screen host"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "array-orient-multfacts",
-  "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
-  "browser": true,
-  "fail": {
-   "commit": "88753326",
-   "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
-  },
-  "pass": {
-   "commit": "393db090",
-   "state": "0 findings"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "review-stack-side-multfacts-array",
-  "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
-  "browser": true,
-  "fail": {
-   "commit": "55e7d0f2f",
-   "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
-  },
-  "pass": {
-   "commit": "4e2e4c988",
-   "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
-  },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "review-zero-row-multfacts-array",
-  "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
-  "kind": "commit-pair",
-  "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
-  "browser": true,
-  "fail": {
-   "commit": "05875e169",
-   "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
-  },
-  "pass": {
-   "commit": "792e5ca30",
-   "state": "0 findings: \"4 × 0\" draws the empty frame"
-  },
-  "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "array-frame-multfacts",
-  "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
-  "browser": true,
-  "fail": {
-   "commit": "669c41cea",
-   "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
-  },
-  "pass": {
-   "commit": "792e5ca30",
-   "state": "0 findings"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- }
  ]
 }
