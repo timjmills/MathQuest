@@ -543,6 +543,17 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
         return out;
     }
 
+    // MAX-NUMBER BAND (word-stories critic r1 F9, 2026-11-13): a skill whose `band` option offers "no limit" (null) and is
+    // dealt with it unset bounds its ANSWER by the Max Number - "No limit: the Max Number decides" (owner ruling 2026-09-19:
+    // "within N" bounds the answer). The cap is read from the skill's own option schema, so it cannot rot.
+    let maxNumCap = null;
+    try {
+        const bd = (typeof window.optionsFor === 'function' ? window.optionsFor(categoryId, skillId) || [] : []).find((d) => d && d.id === 'band');
+        if (bd && (bd.values || []).some((v) => v && v.v === null)) {
+            const cur = opts && Object.prototype.hasOwnProperty.call(opts, 'band') ? opts.band : bd.default;
+            if (cur === null || cur === undefined) maxNumCap = Math.max(10, Number(range) || 100);
+        }
+    } catch (e) { maxNumCap = null; }
     const out = [];
     for (let i = 0; i < n; i++) {
         let q = null;
@@ -617,6 +628,7 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
             fmt: q.printFormat || '(none)', type: q.answerType || '(none)',
             text: text.slice(0, 120),
         };
+        if (maxNumCap !== null) item.maxNumCap = maxNumCap;
         // P8: what the KEY-COMPLETENESS, ONE-RIGHT-ANSWER and GIVEAWAY rules read (see
         // p8Rules). Each is the item's own declaration, never a reading of its picture's style.
         const blanks = (String(q.text || '').match(/_{3,}/g) || []).length;
@@ -2163,6 +2175,12 @@ function audit(skill, items) {
             if (blanks[2] && !blanks[0] && !blanks[1] && (o === '+' || o === '×')) plain.push(String(it.text).trim());
         }
         if (plain.length) F('missing-unknown', `its name promises a missing factor or addend, but ${plain.length} items ask only for the ${plain[0].includes('+') ? 'sum' : 'product'}: ${plain.slice(0, 4).join('; ')}`);
+    }
+    // MAX-NUMBER BAND (critic r1 F9): an unset "no limit" band bounds the answer by the Max Number
+    {
+        const capped = items.filter((it) => !it.error && !it.empty && it.maxNumCap);
+        const over = capped.filter((it) => { const v = asNumber(it.ans); return v !== null && Math.abs(v) > it.maxNumCap; });
+        if (over.length) F('max-number-band', `${over.length} of ${capped.length} items answer past the Max Number ${capped[0].maxNumCap} with the band unset ("No limit: the Max Number decides"): ${over.slice(0, 4).map((it) => `${asNumber(it.ans)} (${String(it.text).slice(0, 44)})`).join('; ')}`);
     }
     p8Rules(items, F);
     if (id === 'number_bonds') bondRules(items, F);

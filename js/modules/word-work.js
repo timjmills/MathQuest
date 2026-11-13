@@ -50,7 +50,10 @@ function skillTracks(skill, op) {
     const m = /_wp_(10|20|50|100|1k|10k|100k|1m)(_plain)?$/.exec(skill);
     const BAND = { 10: 10, 20: 20, 50: 50, 100: 100, '1k': 1000, '10k': 10000, '100k': 100000, '1m': 1000000 };
     const o = state.skillOptions;
-    const band = o && Number(o.band) > 0 ? Number(o.band) : m ? BAND[m[1]] : 0;
+    // (the four general + / − story hosts, unset band: the Max Number IS the band - word-stories card Q2, critic r1 F4:
+    // a 3-track grid for a two-digit difference left a dead hundreds track)
+    const host = /^(add|sub)_word_problems(_plain)?$/.test(String(skill || ''));
+    const band = o && Number(o.band) > 0 ? Number(o.band) : m ? BAND[m[1]] : host ? Math.max(10, Number(state.range) || 100) : 0;
     // a difference never needs the band's own extra digit (the number taken from is rarely the band itself)
     if (band) return String(op === '-' ? Math.max(9, band - 1) : band).length;
     const R = Math.max(10, Number(state.range) || 100);
