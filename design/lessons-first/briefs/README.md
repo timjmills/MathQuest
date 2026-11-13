@@ -54,6 +54,10 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
 > A page or host carrying one does not pass. (Owner, 2026-11-13; LESSONS_LEARNED process rule 10; RUBRIC "How a page counts as
 > graded".)
 
+> **Screen hosts.** Grade the practice card at 1280 (computer), 1366 × 768 (Chromebook), 820 and 1024 (tablets), the online
+> worksheet at 1280 and the quiz at 1280. There is no phone width: do not render, grade or cite 390 px. Answer boxes are 48 px
+> touch targets on the tablets. (Owner rule, 2026-11-13; CLAUDE.md "Fastest-implementation plan" item 7; RUBRIC "Screen".)
+
 ## Briefs in wave 1
 
 | Brief | Lane id (status file) | Where |
@@ -67,3 +71,12 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
 
 **Sizes (owner, 2026-11-13).** Every brief grades the print sizes **M and L**. Size S is dropped: no brief asks for it, and
 `ws-no-size-s` fails a picker or a gate default that still offers it (RUBRIC "Every size").
+
+## Critic brief templates (owner rule 2026-11-13, fastest plan 2-3)
+
+| Brief | When |
+|---|---|
+| `critic-copy-light.md` | a later skill on an already-passed template (`ws-precritic --skill X --copy-light`: ELIGIBLE, anchor named) — narrow critic on its own content, on the run's page sample |
+| `critic-batch.md` | 3–6 copy-light skills on ONE passed template (`ws-precritic --batch k1,k2,…`) — one run, per-skill verdicts, one shared sample |
+
+Neither applies to a template's FIRST skill (full critic); any layout defect they find escalates to a full critic.

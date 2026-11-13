@@ -38,7 +38,7 @@
 # ("acceptedNotYet"). Only NOT YET gates can be accepted; an unknown name is an error. SKIPPED is never acceptable.
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
-#            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
+#            ws-code-snapshot, ws-no-phone-width (no 390 px screen-gate default; owner 2026-11-13), ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
 #            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
@@ -89,7 +89,7 @@
 #            The matrix's exit 2 within the budget (rows selected, none checkable) is NOTHING RUN.
 #            Flake re-run (N7): only the rows the first inline run found red (--rows), never the whole budget.
 #            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
-# Session 4  ws-lesson-baseline --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --unpinned --check
+# Session 4  ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check
 #            design/audit/baselines/lesson-baseline.json (lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c, which
 #            was a lane rule and is now a deploy gate): every page of every lesson master prints (the three samples, every
 #            key of lessons/prereqs.js LESSONS, every detailed lesson; L and M, seeds 4242 and 1) is byte-identical to the
@@ -98,7 +98,7 @@
 #            (Owner 2026-11-13, size S dropped: the pin's S keys were renamed M - a lesson asked for at S always printed at
 #            M, and the M render hashes equal the S keys, checked on the samples 30/30 - so the pin stays whole.)
 #            RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the pin in the same deploy commit
-#            (ws-lesson-baseline.cjs --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --write <the pin>) and the
+#            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
 #            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
@@ -872,6 +872,7 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
   node_gate 1 ws-search-terms ws-search-terms.cjs
@@ -926,9 +927,9 @@ build_list() {
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
   # session 4 (lead ruling 2026-11-13, process rule 0c as a deploy gate): every lesson page master prints vs the pin
   # (≈ 13 min, one slot). RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes $LESSON_BASE in the same
-  # deploy commit (ws-lesson-baseline.cjs --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --write $LESSON_BASE) and the
+  # deploy commit (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write $LESSON_BASE) and the
   # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
-  if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes L,M --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
+  if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
   else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
 }
 

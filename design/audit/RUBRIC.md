@@ -38,9 +38,13 @@ type: it is a missing version, not an exempt one.
 
 | Host | Widths |
 |---|---|
-| Practice card (the single-question game card) | 1280 desktop, 820 tablet, 390 phone |
+| Practice card (the single-question game card) | 1280 computer, 1366 × 768 Chromebook, 820 tablet, 1024 tablet |
 | Online worksheet grid (`worksheetView`) | 1280 |
 | Quiz-taking view | 1280 |
+
+The screens are print, computer / Chromebook (1280–1366 px) and tablet (820–1024 px). **There is no phone width (390 px)**
+(owner rule, 2026-11-13; CLAUDE.md "Fastest-implementation plan" item 7): no gate default, critic brief or graded host uses it,
+and answer boxes keep 48 px touch targets for tablets. The SP screen-digit floors: 56 px at 1280 and 1366, 48 px at 820 and 1024.
 
 Each graded **version** (one page type, or one host) gets four scores.
 
@@ -76,7 +80,8 @@ Print checks:
 
 Screen checks:
 - The input is obvious and in the same place the paper slot is; it accepts what the item asks for.
-- Touch targets ≥ 44 × 44 px on tablet and phone; digit inputs ≥ 48 px tall.
+- Answer boxes ≥ 48 × 48 px on the tablets (820, 1024; owner 2026-11-13); every other target (buttons, choices, regroup
+  boxes) ≥ 44 × 44 px (SP-10).
 - No horizontal page scroll; the whole item (picture + input + Check) is reachable without it.
 - Screen verbs on screen, print verbs on paper (BD-11 swap map).
 - Chrome (XP, Skip, Hint, speaker) does not crowd, cover, or compete with the question.
@@ -115,11 +120,11 @@ Print checks:
 - The answer key has the **same geometry** as the pupil page (a facsimile), not a list.
 
 Screen checks:
-- The question is the visual centre of the card: digits large (practice card 40 / 48 / 56 px at
-  phone / tablet / desktop; online worksheet 29 px), the visual big enough to read and count.
+- The question is the visual centre of the card: digits large (practice card 48 / 56 px at
+  tablet (820, 1024) / computer and Chromebook (1280, 1366); online worksheet 29 px), the visual big enough to read and count.
 - The online worksheet grid has even cells, a consistent layout for every item of one skill, and
   no card that is a different "type" from its neighbours.
-- Nothing overflows its card; nothing is cut off at 390 px.
+- Nothing overflows its card; nothing is cut off at 820 px or 1024 px (the tablets).
 
 ### C4 · Standard fidelity — does it look like the owner's workbooks?
 
@@ -174,7 +179,7 @@ A cap sets the **maximum** for the criterion named, whatever else is right.
 | H3 | An item contradicts the skill's name | C2 ≤ 4 |
 | H4 | Colour, gradient, shadow, emoji or a non-Andika face inside a printed sheet or the on-screen cell | C4 ≤ 5 |
 | H5 | A page wasted: a page < 50 % used while its role expects more, a lone item on a page, a split cell, a mid-page footer | C3 ≤ 5 |
-| H6 | Screen: horizontal page scroll, an input off-screen, a touch target < 44 px on tablet/phone | C1 ≤ 5 |
+| H6 | Screen: horizontal page scroll, an input off-screen, an answer box < 48 px (other targets < 44 px) on a tablet (820 / 1024) | C1 ≤ 5 |
 | H7 | A screen verb on paper or a paper verb on screen | C1 ≤ 6 |
 | H8 | A production item turned into multiple choice on screen (SP-3), or a doubled answer slot | C4 ≤ 6 |
 | H9 | No room to write or draw the answer | C1 ≤ 5 |
@@ -217,7 +222,7 @@ The bar does not change: 8 or more on all four criteria, on every page and every
 read, cramped, faint or thin is a SCORED defect, filed and capped like any other. It is never an "unscored note", and a page
 carrying one does not pass (LESSONS_LEARNED process rule 10; the div_facts screen array case).
 What changes is how a page reaches that bar (`design/IMPROVEMENT_PLAN.md` §1.3, §1.6.3, §1.6.4). A page counts as
-graded in one of two ways:
+graded in one of four ways:
 
 1. **Graded directly** by an independent critic.
 2. **Inherited** from a certified (template, kind of worksheet) pair. Then all of these must hold:
@@ -225,6 +230,22 @@ graded in one of two ways:
      (batch reading, §1.6.3 step 3);
    - 1 in 5 of the instance's pages is graded in full on all four criteria;
    - every machine gate for the instance is green.
+
+3. **Copy-light route** (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" item 2). A skill whose every kit
+   template was already passed by another skill (its ANCHOR in `js/modules/redesign-passed.js`), with every page role and
+   screen host the skill's signed card offers on the anchor's own card, takes the machine gates (`ws-precritic --skill X
+   --copy-light --strict`: all of them, nothing skipped; its `ws-copy-light` row decides eligibility and names the anchor)
+   plus a NARROW critic (`design/lessons-first/briefs/critic-copy-light.md`) on the skill's OWN content only — answers,
+   ladder / one new thing, words and instruction strings, option behaviour — on the deterministic page sample that run
+   writes (every offered role, host and option value at least once). Layout and drawing are inherited from the anchor.
+4. **Batch route** (owner rule 2026-11-13, item 3). 3–6 copy-light skills on ONE passed template share one narrow critic run
+   (`design/lessons-first/briefs/critic-batch.md`; `ws-precritic --batch k1,k2,… --strict` FAILS a batch that is not on one
+   passed template): one report with a per-skill verdict table, one shared sample budget, and a skill that fails does not
+   fail the others.
+
+Routes 3 and 4 **never apply to a template's FIRST skill**: the first skill on a template (no anchor) gets the full critic
+(route 1). The bar is the same (8 or more on all four criteria on every sampled page; legibility is scored), and **any layout
+or drawing defect a narrow or batch critic finds sends that skill to a full critic**.
 
 Limits:
 - There is no inheritance across pairs. A pair nobody certified gives nothing.

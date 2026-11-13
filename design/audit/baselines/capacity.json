@@ -2,6 +2,1752 @@
  "note": "ws-capacity-pin: items a page per skill x role x size (CAPACITY-NO-DROP); rewrite only on master or with a ruling Owner 2026-11-13 (plan item 9): size S dropped - its S keys removed; M / L keys untouched.",
  "written": "2026-11-13",
  "pages": {
+  "addition:add_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "multiplication:mult_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "multiplication:mult_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts_long stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts_long stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_10k_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_100k_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_100k_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_1m_no_regroup stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_1m_no_regroup stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "subtraction:sub_2d_1d stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "addition:fact_family_sort stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "addition:add_wp_20_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_grade_pictures stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_pick3_words stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "vocabulary:vocab_pick3_words stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:expand stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:expand stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:identify stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:identify stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:unit_form stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:unit_form stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "composing:number_word_form stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "composing:number_word_form stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:value stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:value stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:combine stretch M": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "placevalue:combine stretch L": {
+   "na": "No Stretch for this skill yet: it has no open problem of its own. Choose Reason "
+  },
+  "division:div_facts stretch M": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts stretch L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "addition:add_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice M": {
+   "items": 30,
+   "pages": 1
+  },
+  "multiplication:mult_facts mixed-practice L": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts_long mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice M": {
+   "items": 9,
+   "pages": 1
+  },
+  "addition:fact_family_sort mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10 mixed-practice L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "addition:add_wp_20 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice M": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures mixed-practice L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice M": {
+   "items": 6,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words mixed-practice L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:expand mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice M": {
+   "items": 12,
+   "pages": 1
+  },
+  "placevalue:identify mixed-practice L": {
+   "items": 8,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:unit_form mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:value mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "placevalue:combine mixed-practice L": {
+   "items": 5,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "division:div_facts mixed-practice L": {
+   "items": 10,
+   "pages": 1
+  },
+  "addition:add_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "addition:add_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts_long fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_100_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_1k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_1k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_10k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_10k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_100k_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 2
+  },
+  "subtraction:sub_100k_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 4
+  },
+  "subtraction:sub_1m_no_regroup fact-probe M": {
+   "items": 20,
+   "pages": 3
+  },
+  "subtraction:sub_1m_no_regroup fact-probe L": {
+   "items": 20,
+   "pages": 4
+  },
+  "subtraction:sub_2d_1d fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-probe L": {
+   "items": 20,
+   "pages": 3
+  },
+  "addition:fact_family_sort fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:fact_family_sort fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_10_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "addition:add_wp_20 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10 fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10 fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_10_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20_plain fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "subtraction:sub_wp_20_plain fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_grade_pictures fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_grade_pictures fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_pick3_words fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "vocabulary:vocab_pick3_words fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:expand fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:expand fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:identify fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:identify fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:unit_form fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:unit_form fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "composing:number_word_form fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "composing:number_word_form fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:value fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:value fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:combine fact-probe M": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "placevalue:combine fact-probe L": {
+   "na": "The fact probe needs a fact or a one-step computation (add, subtract, multiply o"
+  },
+  "division:div_facts fact-probe M": {
+   "items": 20,
+   "pages": 1
+  },
+  "division:div_facts fact-probe L": {
+   "items": 20,
+   "pages": 1
+  },
+  "addition:add_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "addition:add_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "multiplication:mult_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "division:div_facts_long fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "division:div_facts_long fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup fact-rows M": {
+   "items": 36,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup fact-rows M": {
+   "items": 20,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup fact-rows L": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup fact-rows M": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup fact-rows L": {
+   "items": 15,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "addition:fact_family_sort fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:fact_family_sort fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_10_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "addition:add_wp_20 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10 fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10 fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_10_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20_plain fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "subtraction:sub_wp_20_plain fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_grade_pictures fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_grade_pictures fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_pick3_words fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "vocabulary:vocab_pick3_words fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:expand fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:expand fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:identify fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:identify fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:unit_form fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:unit_form fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "composing:number_word_form fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "composing:number_word_form fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:value fact-rows M": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:value fact-rows L": {
+   "na": "Fact rows need a fact or a one-step computation (add, subtract, multiply or divi"
+  },
+  "placevalue:combine fact-rows M": {
+   "na": "Fact rows print one fact per cell: two numbers and one sign. This skill adds thr"
+  },
+  "placevalue:combine fact-rows L": {
+   "na": "Fact rows print one fact per cell: two numbers and one sign. This skill adds thr"
+  },
+  "division:div_facts fact-rows M": {
+   "items": 30,
+   "pages": 1
+  },
+  "division:div_facts fact-rows L": {
+   "items": 25,
+   "pages": 1
+  },
+  "addition:add_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "multiplication:mult_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "multiplication:mult_facts word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts_long word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts_long word-problems L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:fact_family_sort word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "addition:fact_family_sort word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "addition:add_wp_20_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain word-problems L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_grade_pictures word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_pick3_words word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "vocabulary:vocab_pick3_words word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:expand word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:expand word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:identify word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:identify word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:unit_form word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:unit_form word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "composing:number_word_form word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "composing:number_word_form word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:value word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:value word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:combine word-problems M": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "placevalue:combine word-problems L": {
+   "na": "Word problems need a story skill (a word-problem generator or provider stories)."
+  },
+  "division:div_facts word-problems M": {
+   "items": 3,
+   "pages": 1
+  },
+  "division:div_facts word-problems L": {
+   "items": 2,
+   "pages": 1
+  },
+  "addition:add_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "addition:add_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "multiplication:mult_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "multiplication:mult_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "division:div_facts_long guided M": {
+   "items": 8,
+   "pages": 1
+  },
+  "division:div_facts_long guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup guided M": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:fact_family_sort guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:fact_family_sort guided L": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_10 guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_wp_10 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "addition:add_wp_20 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "addition:add_wp_20 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain guided M": {
+   "items": 7,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain guided L": {
+   "items": 6,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures guided M": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures guided L": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words guided M": {
+   "items": 4,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words guided L": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:expand guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:expand guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:identify guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:identify guided L": {
+   "items": 5,
+   "pages": 1
+  },
+  "placevalue:unit_form guided M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:unit_form guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "composing:number_word_form guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "placevalue:value guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:value guided L": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:combine guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "placevalue:combine guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "division:div_facts guided M": {
+   "items": 9,
+   "pages": 1
+  },
+  "division:div_facts guided L": {
+   "items": 6,
+   "pages": 1
+  },
+  "addition:add_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "addition:add_facts scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_facts scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "multiplication:mult_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "multiplication:mult_facts scripted-model L": {
+   "items": 2,
+   "pages": 2
+  },
+  "division:div_facts_long scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts_long scripted-model L": {
+   "items": 2,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_1m_no_regroup scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_2d_1d scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:fact_family_sort scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_10_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "addition:add_wp_20 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10 scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_10_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "subtraction:sub_wp_20_plain scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_grade_pictures scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_pick3_words scripted-model M": {
+   "items": 1,
+   "pages": 2
+  },
+  "vocabulary:vocab_pick3_words scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "placevalue:expand scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:expand scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:identify scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:identify scripted-model L": {
+   "items": 1,
+   "pages": 2
+  },
+  "placevalue:unit_form scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:unit_form scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "composing:number_word_form scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "composing:number_word_form scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:value scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:value scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:combine scripted-model M": {
+   "items": 1,
+   "pages": 1
+  },
+  "placevalue:combine scripted-model L": {
+   "items": 1,
+   "pages": 1
+  },
+  "division:div_facts scripted-model M": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts scripted-model L": {
+   "items": 2,
+   "pages": 2
+  },
+  "addition:add_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "addition:add_facts opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_facts opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "multiplication:mult_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "multiplication:mult_facts opener L": {
+   "items": 8,
+   "pages": 1
+  },
+  "division:div_facts_long opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "division:div_facts_long opener L": {
+   "items": 11,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_50_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_100_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_1k_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "subtraction:sub_10k_no_regroup opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "subtraction:sub_100k_no_regroup opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup opener M": {
+   "items": 5,
+   "pages": 1
+  },
+  "subtraction:sub_1m_no_regroup opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d opener M": {
+   "items": 8,
+   "pages": 1
+  },
+  "subtraction:sub_2d_1d opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "addition:fact_family_sort opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "addition:fact_family_sort opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_10_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "addition:add_wp_20 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10 opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_10_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "subtraction:sub_wp_20_plain opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures opener M": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_grade_pictures opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words opener M": {
+   "items": 3,
+   "pages": 1
+  },
+  "vocabulary:vocab_pick3_words opener L": {
+   "items": 3,
+   "pages": 1
+  },
+  "placevalue:expand opener M": {
+   "items": 2,
+   "pages": 1
+  },
+  "placevalue:expand opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "placevalue:identify opener M": {
+   "items": 7,
+   "pages": 1
+  },
+  "placevalue:identify opener L": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:unit_form opener M": {
+   "items": 4,
+   "pages": 1
+  },
+  "placevalue:unit_form opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "composing:number_word_form opener M": {
+   "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form opener L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:value opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "placevalue:value opener L": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine opener M": {
+   "items": 10,
+   "pages": 1
+  },
+  "placevalue:combine opener L": {
+   "items": 2,
+   "pages": 1
+  },
+  "division:div_facts opener M": {
+   "items": 11,
+   "pages": 1
+  },
+  "division:div_facts opener L": {
+   "items": 10,
+   "pages": 1
+  },
   "addition:add_facts true-false M": {
    "items": 6,
    "pages": 1

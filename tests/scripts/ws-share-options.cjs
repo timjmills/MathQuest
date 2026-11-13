@@ -409,10 +409,11 @@ async function e2e() {
     const cardText = await p1.page.evaluate(() => [...document.querySelectorAll('.quick-skill-card')].map(c => c.innerText.replace(/\s+/g, ' ')).find(t => /Times/.test(t)) || '');
     check(/Times: 7, 8/.test(cardText), `Quick Start card should show "Times: 7, 8", got "${cardText}"`);
     if (SHOTS) {
-        await p1.page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+        // the pupil's tablet (owner 2026-11-13: no phone width for pupil screens; critic lf-tools r2 D2)
+        await p1.page.setViewport({ width: 1024, height: 768, deviceScaleFactor: 1 });
         await new Promise(r => setTimeout(r, 400));
         const g = await p1.page.$('#quickSkillsGrid');
-        if (g) await g.screenshot({ path: path.join(SHOT_DIR, 'pupil-quickstart-cards-390.png') });
+        if (g) await g.screenshot({ path: path.join(SHOT_DIR, 'pupil-quickstart-cards-1024.png') });
         await p1.page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
     }
     await p1.page.evaluate(() => { window.state.problemCount = 50; window.playSelectedSkills('practice'); });
@@ -431,7 +432,8 @@ async function e2e() {
 
     // ---- pupil 3: the Direct Play link through the landing modal ----
     const dPath = '/index.html' + directLink.slice(directLink.indexOf('?'));
-    const p3 = await open({ pagePath: dPath, viewport: { width: 390, height: 844, deviceScaleFactor: 1 } });
+    // the Direct Play landing and twelve practice-card answers on the pupil's tablet (critic lf-tools r2 D2: this ran at 390)
+    const p3 = await open({ pagePath: dPath, viewport: { width: 1024, height: 768, deviceScaleFactor: 1 } });
     await p3.page.evaluate(() => { window.state.adaptiveModeEnabled = false; });
     await waitFor(p3.page, () => typeof window.startFromLanding === 'function' && document.getElementById('studentLandingOverlay'), 10000, 'landing modal');
     await p3.page.evaluate(() => {
