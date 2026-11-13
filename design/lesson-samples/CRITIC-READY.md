@@ -15,8 +15,8 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p5 / key-p6 | Mixed |
 
 ## r6 pass (lf-engine PC r6, 2026-11-13, builder after critic r5 FAIL): every r5 finding, its check, its live pages
-Tree: branch `claude/sweet-newton-c8wrv1-lf-engine-pc`, merged with origin/master 76bc11c61 (twice this round: 453 then 82
-commits; P1). **Sizes M and L only** (owner 2026-11-13: print size S dropped) - the packet's second size is now `M/`, every
+Tree: branch `claude/sweet-newton-c8wrv1-lf-engine-pc`, merged with origin/master 636afcd84 (four times this round: 453, 82,
+64 commits, then lf-placevalue w2; P1). **Sizes M and L only** (owner 2026-11-13: print size S dropped) - the packet's second size is now `M/`, every
 gate and proof runs `--sizes M,L`. The Prerequisite Check packet is rendered forced on (seed 4242); the LIVE pages (check off)
 are proved against a pin of master written at M,L on a detached master worktree.
 
@@ -34,14 +34,22 @@ are proved against a pin of master written at M,L on a detached master worktree.
 Near-misses from r5: round sheet Independent ones digits, round L Mixed 61 / 51 / 71 and add Independent answers were not re-dealt
 on purpose beyond the rules above; the critic's reading of them on the r6 pages is welcome.
 
+**After the w2 merge (own packet / proof read, each its check first):** (1) identify's support is now none on the pre-skill-check
+role (lead ruling, lf-placevalue), so the check's place items came as `pv-support` cells and skipped the side bank, the place
+order and mixOrder - sub / round printed the words under the digits again and round read T O T, while PC-PV read no cell at all.
+PC-PV now reads any place cell with a ring row; a routed check draws the plain pv-support place item as the plain place cell
+(lesson-r6-check-pvsupport). (2) compare's Mixed printed 715 in a compare item and in the place partner: the page's once-only
+set takes a compare item's two numbers (lesson-r6-compare-cross).
+
 **Also found and checked this round (own build):** an empty Mixed page passed a rule-scoped run (PC-BUILD now counts an empty
 Practice / Mixed page, lesson-r6-empty-part); a CSS selector edit changed every Practice / Mixed page's html (the lesson CSS is
 inlined) - replaced by a per-cell inline style, so pages that do not change keep their hash.
 
 ### LIVE pages changed (check off; `ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check`
-against master 76bc11c61's pin written at M,L): 468 of 1,856 keys (pupil and key pages and the whole-document hashes)
+against master 636afcd84's own pin (M,L; it re-pinned round, nearest_10, value, the new `compare` and the detailed lessons for
+w2): 492 of 1,772 keys - the 468 of the earlier diffs plus the new lesson `compare`)
 **No part prints more pages anywhere** (no PARTPAGES / NEW / MISSING line); div_facts, the vocabulary lessons, add_facts,
-sub_1k ... sub_1m, sub_wp_* and all 7 detailed lessons are identical to master. Changed, by lesson / part / size (both seeds
+sub_1k ... sub_1m, sub_wp_* and all 7 detailed lessons are identical to master (w2's detailed-lesson changes included). Changed, by lesson / part / size (both seeds
 unless named), and why:
 - add_wp_10, add_wp_10_plain, add_wp_20, add_wp_20_plain, fact_family_sort: **Mixed** M, L - the partners' page rules (R2):
   the subtraction partner is re-dealt without near twins / an answer twice. Practice unchanged.
@@ -54,9 +62,11 @@ unless named), and why:
 - identify, value, expand: **chart, sheet, Mixed** M, L; unit_form the same (chart seed 1 only); number_word_form also
   **Practice**; combine **sheet, Mixed** - the deeper one-number sheet pool (charts / sheets), Mixed: own heads and instruction
   (identify), place pattern, page rules, one-item rows centred and grown by measured content (L), pageUnique.
+- compare (new on master, w2): **sheet** (p2) and **Mixed** (p4) M, L - the near-ruled sheet and the Mixed page rules / pageUnique.
 
 ### Proof PNGs, before (master 76bc11c61) / after (this branch), M and L, pupil and key (`design/lessons/proof/pc-r6/<lesson>/{before,after}/`,
-files `<size>-<part>-<pupil|key>-pN.png`) - a SPREAD (lead condition): at least one Practice AND one Mixed page per affected family
+files `<size>-<part>-<pupil|key>-pN.png`; before = master 636afcd84 for nearest_10, value and compare, which w2 re-pinned, and master
+76bc11c61 for the rest, whose pages w2 did not change - the pins agree) - a SPREAD (lead condition): at least one Practice AND one Mixed page per affected family
 | Family | Lesson | Parts (M and L) | Why it is here |
 |---|---|---|---|
 | number_sense | nearest_10 | chart, teach, practice, mixed | R1, R2, "78 twice" (named by the critic) |
@@ -64,6 +74,7 @@ files `<size>-<part>-<pupil|key>-pN.png`) - a SPREAD (lead condition): at least 
 | placevalue | value | chart, teach, practice, mixed | named |
 | placevalue | combine | teach, practice, mixed | R5 (named) |
 | placevalue | expand, unit_form | chart, teach, practice, mixed | biggest pv diffs |
+| placevalue | compare | chart, teach, practice, mixed | new on master (w2); its sheet and Mixed change |
 | composing | number_word_form | chart, teach, practice, mixed | biggest diff (0-4 of 44 identical) |
 | subtraction | sub_2d_1d, sub_50_no_regroup, sub_100_no_regroup | chart, teach, practice, mixed | R4 (named) |
 | subtraction | sub_100_regroup | chart, teach, practice, mixed | chart N3, Practice seed-1 page rules |
