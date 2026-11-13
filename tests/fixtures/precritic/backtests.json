@@ -5842,13 +5842,13 @@
  },
  {
   "id": "screen-digit-npr-worksheet",
-  "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: screen digits >= 40 / 48 / 56 px at 390 / 820 / 1280 on every host",
+  "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: card / quiz digits >= 40 / 48 / 56 px, the online worksheet >= 29 px (lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master). CORRECTED (lf-hosts critic r1 F1): under the ruling the fail state no longer misses SCREEN-DIGIT (the worksheet's 29 px holds); it FAILs on the card's CELL-READ (0 [data-ws-cell] on the card), which the cell-read-* rows now prove. Kept (never drop a row); it cannot re-point to WS-REFLOW because the raise left npr's worksheet unchanged at 3c7b548a",
   "kind": "commit-pair",
   "rule": "ws-screen-slots SCREEN-DIGIT (default since lead 2026-11-13)",
   "browser": true,
   "fail": {
    "commit": "8d7343c0f",
-   "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
+   "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px [under the 2026-11-13 ruling these 29 px pass; this state now FAILs only on the card CELL-READ: 0 [data-ws-cell] on the card]"
   },
   "pass": {
    "commit": "b6107d339",
@@ -6202,19 +6202,19 @@
  },
  {
   "id": "screen-digit-mult-facts-worksheet",
-  "check": "ws-screen-slots SCREEN-DIGIT on the online worksheet: grid cell digits >= 40 / 48 / 56 px at 390 / 820 / 1280 (a per-cell host floor)",
+  "check": "RE-POINTED (lf-hosts critic r1 F1, lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master): the premise 'worksheet grid digits >= 40 / 48 / 56 px' was overturned, and 1fbdb8eca now passes ws-screen-slots --screen-digit (worksheet 40 px >= 29). The row now proves ws-worksheet-reflow WS-REFLOW / WS-DIGIT on mult_facts: the worksheet holds master's columns, card heights, answer places and numerals at 820 / 1024 / 1280 / 1366",
   "kind": "commit-pair",
-  "rule": "ws-screen-slots SCREEN-DIGIT (lf-checks queue 11 / 18 / 21)",
+  "rule": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT (re-pointed from ws-screen-slots SCREEN-DIGIT, lf-checks queue 11 / 18 / 21)",
   "browser": true,
   "fail": {
-   "commit": "1fbdb8eca",
-   "state": "mult_facts worksheet fact cells at the 40 px touch floor (one --mq-digit per sheet): worksheet@1280 and @820 miss"
+   "commit": "3c7b548a",
+   "state": "hand-off 1's raise of the worksheet to 40 / 48 / 56 px: mult_facts cards 345 -> 373 px, answer place 86 x 48 -> 104 x 58 px at every width (before the ruling this row failed 1fbdb8eca on SCREEN-DIGIT)"
   },
   "pass": {
-   "commit": "46a7c3c45",
-   "state": "screen-cell.css: every #worksheetView grid cell takes the host floor 40 / 48 / 56 px"
+   "commit": "f6a014a1a",
+   "state": "the raise removed: mult_facts holds master's worksheet layout and 40 px numerals"
   },
-  "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:mult_facts --screen-digit --hosts worksheet",
+  "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -6376,6 +6376,66 @@
    "state": "the g9 merge resolved the ledger: no marker line in any tracked file"
   },
   "command": "node tests/scripts/ws-conflict-markers.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ws-reflow-raise-3c7b",
+  "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: at 820 / 1024 / 1280 / 1366 the online worksheet's column count never falls, its tallest card and largest answer place grow <= 6 px, and its worst card's numeral never falls below master's (baseline pinned from 77f0acad)",
+  "kind": "commit-pair",
+  "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r1 F1; lead ruling 2026-11-13: the online worksheet's digit floor is 29 px (the SP table); hand-off 1's raise to 40 / 48 / 56 px was replaced by a no-regression ratchet against master)",
+  "browser": true,
+  "fail": {
+   "commit": "3c7b548a",
+   "state": "hand-off 1's #worksheetView 40 / 48 / 56 px digit raise: placevalue:expand 2 -> 1 column at 1024, cards +84-101 px, answer places to 251 x 111; sub_100_no_regroup / mult_facts / add_facts cards +28-32 px"
+  },
+  "pass": {
+   "commit": "f6a014a1a",
+   "state": "the raise removed: every sample skill holds master's columns, cards, answer places and numerals"
+  },
+  "command": "node tests/scripts/ws-worksheet-reflow.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "focus-ring-sub-wp-tablet",
+  "check": "ws-phone-card FOCUS-RING: in each [data-ws-cell] cell every focused answer place draws one ring and every focused working box one ring (after the page's focus handlers settle), each >= 3:1 against its fill (AX-6); card and quiz at 820 / 1024",
+  "kind": "commit-pair",
+  "rule": "ws-phone-card FOCUS-RING (lf-hosts critic r1 F3)",
+  "browser": true,
+  "fail": {
+   "commit": "3c7b548a",
+   "state": "sub_word_problems: the focused .mq-wwans answer box outlined in yellow #f2c200, 1.68:1 on white, beside master's ring on the other boxes"
+  },
+  "pass": {
+   "commit": "f6a014a1a",
+   "state": "screen-cell.css: the focused / next .mq-wwans box draws master's O-1 next-box ring (--mq-next-*, blue 4 px) on the drawn edge"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only FOCUS-RING --no-siblings-check",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "touch-unique-sub-wp-tablet",
+  "check": "ws-phone-card TOUCH-UNIQUE: elementFromPoint 1 px inside each edge of every typed answer place returns that input, never another typed box; card, worksheet and quiz at 820 / 1024",
+  "kind": "commit-pair",
+  "rule": "ws-phone-card TOUCH-UNIQUE (lf-hosts critic r1 F4)",
+  "browser": true,
+  "fail": {
+   "commit": "3c7b548a",
+   "state": "sub_word_problems .mq-wwans: 44 px drawn boxes on a 47 px pitch with 48 px touch boxes overlap 1 px; a tap on a box's right edge focuses its neighbour (card, worksheet, quiz)"
+  },
+  "pass": {
+   "commit": "f6a014a1a",
+   "state": "screen-cell.css: a column-work grid holding answer boxes opens its column gap to >= 4 px on screen (pitch >= 48); the drawn boxes keep their size"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 820x1180,1024x768 --only TOUCH-UNIQUE --no-siblings-check",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
