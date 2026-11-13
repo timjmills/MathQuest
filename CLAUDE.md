@@ -564,7 +564,7 @@ Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC
 - **Lesson design runs at HIGH (owner, 2026-11-13):** the builders and fixers of the lesson design work (lf-engine lesson pages and
   checks, lf-partopts lesson part settings) use `mq-opus-high`. Their critics stay at medium; every other lane stays at medium.
 
-Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher). If the same
+Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling for every lane except lesson design, which runs at high; never higher without the owner). If the same
 defect survives two rounds at medium, stop the loop: find the root cause, make it a machine check, and re-brief a fresh builder (§1.7).
 
 How to call them:
