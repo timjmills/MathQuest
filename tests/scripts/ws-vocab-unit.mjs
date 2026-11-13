@@ -18,7 +18,9 @@
 //     with its halo (.mq-vhalo) in the single grey on the key and hidden on the screen until answered; the pupil page has neither
 // V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
 //     at most 14 words
-// V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails
+// V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails;
+//     (r10) the rules are this checkout's, read over the checked tree's drawings: + a function machine with numbers at both
+//     ends derives input / output (critic r9 #2), + a loop of three or more numbers derives sequence / pattern (critic r9 #3)
 // V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
 //     a single-answer page still needs the Model + 3 tries (guided.js minMet)
 // V27 (r9) key dot underlays never overlap; the pick3 "Here is how" uses the screen verb; no broken comparison in an explain
@@ -145,12 +147,17 @@ const ambig = [];
     // equation; a number run -> pattern, sequence, multiple; a column drawn round -> column; a crossed or lone mark -> left;
     // a loop of arrows -> pattern). Every same-grade pair that compatible() lets share a bank FAILS: add it to notWith, or
     // redraw the picture.
+    // (r10: the derivation rules are THIS checkout's - vocabDerivedFromBody - read over the checked tree's drawings, so a
+    // backtest row judges an old drawing by today's rules: the 2 -> [+3] -> 5 machine derives input / output, critic r9 #2)
+    const HERE_P = await import(pathToFileURL(path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', 'js/modules/sheet/graphics/vocab-pictures.js')).href);
+    const derivedOf = (id) => [...new Set([...(typeof P.vocabPictureDerived === 'function' ? P.vocabPictureDerived(id) : []),
+        ...(typeof HERE_P.vocabDerivedFromBody === 'function' ? HERE_P.vocabDerivedFromBody(P.vocabPictureSVG({}, id, { wMm: 46 })) : [])])].filter((w) => w !== id);
     if (typeof P.vocabPictureDerived !== 'function') fail('V-AMBIG+: the library derives no alsoShows from its drawings (vocabPictureDerived)');
     else for (const g of W.VOCAB_GRADES) {
         const ws = W.gradeWords(g);
         for (const id of ws) {
             if (!P.hasVocabPicture(id)) continue;
-            for (const b of P.vocabPictureDerived(id)) if (b !== id && ws.includes(b) && W.compatible([id, b])) fail(`V-AMBIG+ grade ${g} "${id}": its drawing also shows "${b}" (derived), and the two may share a bank (make them notWith or redraw)`);
+            for (const b of derivedOf(id)) if (b !== id && ws.includes(b) && W.compatible([id, b])) fail(`V-AMBIG+ grade ${g} "${id}": its drawing also shows "${b}" (derived), and the two may share a bank (make them notWith or redraw)`);
         }
     }
     // (a lesson set's Match 3 cells are clash-free trios - lesson-pages/vocab-pages.js trios() by compatible - so the pair rule

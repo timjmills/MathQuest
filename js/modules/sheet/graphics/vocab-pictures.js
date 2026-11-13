@@ -162,9 +162,11 @@ const PICS = {
         draw: () => table([['In', 'Out'], [2, 5], [4, 7]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 1 } }),
     },
     rule: {
-        alt: 'two goes in, add three, five comes out; the add three in a box',
-        draw: () => tx(5, 20, 0, '2', { size: 9 }) + arrow(9, 20, 17, 20) + rect(18, 12, 22, 16, W.heavy) + tx(29, 20, 0, '+3', { size: 9 })
-            + arrow(41, 20, 49, 20) + tx(54, 20, 0, '5', { size: 9 }),
+        // (r10, critic r9 #2: the 2 -> [+3] -> 5 machine's ends ARE an input and an output; the picture now shows only what is
+        // done - an arrow in, the "+3" box, an arrow out, no number at either end; V-AMBIG+ derives input / output from ends)
+        alt: 'an arrow going into a box that says add three, and an arrow coming out of it; the box drawn heavy',
+        draw: () => arrow(3, 20, 17, 20) + rect(18, 11, 24, 18, W.heavy) + tx(30, 20, 0, '+3', { size: 10 })
+            + arrow(43, 20, 57, 20),
     },
     pattern: {
         alt: 'two, four, six, eight, each one two more, with a hop of plus two between',
@@ -465,6 +467,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
  *   a heavy outline round two or more numbers, taller than wide   -> column (wider than tall: row)
  *   a crossed mark (two strokes across each other), or a ring round one lone dot -> left
  *   three or more arrow heads round a centre (a loop of arrows)   -> pattern
+ *   an arrow INTO a box and an arrow OUT of it, a number at both ends -> input, output (r10, critic r9 #2: 2 -> [+3] -> 5)
  * vocabPictureAlsoShows() is these plus the hand list (VOCAB_ALSO_SHOWS), which stays only as an extra.
  */
 const num_ = (s) => Number(s);
@@ -513,8 +516,23 @@ function derivedFromBody(body) {
         const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
         if (w > 4 && h > 4 && Math.min(w, h) / Math.max(w, h) > 0.5) words.add('pattern');
     }
+    // 6. a function machine: a box with a line arriving at its left side and one leaving its right side (on the box's
+    // height), a number before the first and after the second -> input, output (r10, critic r9 #2)
+    const numT = texts.filter((t) => /\d/.test(t.t));
+    for (const r of rects) {
+        if (r.fill !== 'none') continue;
+        const onBox = (y) => y > r.y && y < r.y + r.h;
+        const ins = lines.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.max(l.x1, l.x2) <= r.x + 0.5 && Math.max(l.x1, l.x2) >= r.x - 5);
+        const outs = lines.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.min(l.x1, l.x2) >= r.x + r.w - 0.5 && Math.min(l.x1, l.x2) <= r.x + r.w + 5);
+        for (const a of ins) for (const b of outs) {
+            const x0 = Math.min(a.x1, a.x2), x1 = Math.max(b.x1, b.x2);
+            if (numT.some((t) => t.x < x0 && Math.abs(t.y - a.y1) < r.h / 2) && numT.some((t) => t.x > x1 && Math.abs(t.y - b.y1) < r.h / 2)) { words.add('input'); words.add('output'); }
+        }
+    }
     return [...words];
 }
+/** The V-AMBIG+ reading of any drawn picture body (svg markup, canvas units): the words its marks show. */
+export const vocabDerivedFromBody = (body) => derivedFromBody(String(body || ''));
 /** The words a library picture's drawing shows, other than its own word (derived; [] for no picture). */
 export function vocabPictureDerived(id) {
     if (!Object.prototype.hasOwnProperty.call(PICS, String(id))) return [];
@@ -724,4 +742,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, vocabDerivedFromBody, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
