@@ -100,3 +100,47 @@ template: they are the engine's own panels around the chart drawing). Measured o
   cells 1, 2, 4 and lesson L p1 cells 1, 2, 4 (S out of scope). Suggested root fixes for the engine: size each row to its
   tallest panel without the 25 % growth when the panels of a row differ, or let the spare go to the chant / Say band, or
   top-align shorter panels with a shared drawing baseline so the white is not counted as one band per panel.
+
+## r8 2026-11-13: merged origin/master e76e0815f (merge a0ca6e221), HEAD after this section
+
+**Merge.** Conflicts kept from both sides: ws-empty-band (master's pixel read + the lane's centred-band rule, now RULE_CASES
+`EB-BAND (centred)` with row eb-centred-band and `--judge-fixture`; the centred band = the row's stretch above the flow, read
+in the DOM inside the padding, + the white under the ink: the pixel band above ran over the letter label's rows), ws-card-plan
+self-test (both cases), backtests.json (union by id), CHECKS_FROM_CRITICS (both sides' rows). Every merged JS file passes
+`node --check`; ws-conflict-markers OK.
+
+**lf-roles critic r8b items (coordinator), fixed at the root (280161c7e):**
+- D5 GUIDED-MODEL-ECHO (not on master; built here, `tests/scripts/ws-guided-echo.cjs`): the generator's `dupKey` is the chart
+  window, so no page deals a window twice while another is left. Backtest c120-guided-echo (a0ca6e221 FAIL: guided L seeds 3,
+  7 → 280161c7e OK).
+- n5 SCORE-SLOTS (same tool): chartwindow footprint `points` = its empty squares (`slotPoints`); `error-analysis.js` keeps one
+  judgement a cell for a `slotPoints` template (one additive line in a shared role: lf-roles please review). Backtest
+  c120-score-slots (a0ca6e221 FAIL → 280161c7e OK). Both on precritic's path (gate `guided-echo`), ledger rows added.
+- The card-plan ledger row now carries backtest c120-card-plan-preset (each tree's own planner, f80dfd9d6 FAIL → a810a6cbc
+  OK) with a reasoned exemption (a planner fix: precritic always runs today's planner). ws-backtest: 12 lane rows PASS
+  (`logs/backtest-r8.log`, `logs/backtest-card-plan.log`); ws-precritic-plan OK.
+
+**Gates on the merged head:** boot-smoke OK; code-snapshot OK (735 codes, 35 categories); lesson-baseline `--all-lessons
+--sizes M,L --seeds 4242,1 --per-lesson --check` against a FRESH baseline written on origin/master e76e0815f: **1732 hashes
+identical** (no lesson page moves); spec-card `--check-signed` chartwindow: **FAIL** (master changed rule CL-4b at
+WORKSHEET_DESIGN_STANDARD.md:368 since the card was signed, so the card must be re-generated with `--resign` and re-signed by
+the owner; not done by the builder).
+
+**Precritic r8 (`logs/pc-c120-r8.txt`, `logs/pc-hcf-r8.txt`) + empty-band re-run at M/L after the centred-band read
+(`logs/empty-band-r8-ML.log`). Size S and 390 px lines are out of scope (owner plan).**
+
+| Gate | chart_to_120 | hundreds_chart_fill | Verdict |
+|---|---|---|---|
+| empty-band EB-BAND independent / more-practice M,L | PASS (after 7ed8e48ac) | PASS | — |
+| EB-BAND lesson p1 cells 1, 2, 4 (M, L) | 6 | — | **ROUTED lf-engine** (diagnosis above: chartPage row sizing) |
+| EB-BAND lesson L p2 chart cells (28.6-30.5 %) | 2 | 3 (+1 counters 28.7 %) | **ROUTED lf-engine**: the lesson packet's practice rows stretch a centred window (84.7 mm row, window about 59 mm); 28-30 % lines fail only under precritic's `--margin 2` |
+| EB-BAND guided M / L cell 2 (46 % / 41 %), hcf guided M Model 32.6 % | 2 | 2 | **ROUTED lf-roles** (ruling 2). GUIDED-MODEL-ROW is on lf-roles' branch, NOT on master e76e0815f (`git grep` finds it only on origin/...-lf-roles), so the merge does not clear it |
+| EB-GDPCAP guided L: 7 scored answers > ceiling 6 | 1 | — | **ROUTED lf-roles**: new with SCORE-SLOTS - the page always held 7 answers, but the Score counted 3 windows. guided.js `ceilFor` counts answers only when EVERY item scores > 1 (`pointsOf`); a chart page mixes 1-3 squares. The ceiling in answers belongs to the Guided plan |
+| EB-ROLE stretch M, L (card offers it; the app cannot compose it) | 2 | 2 | **for the lead / owner**: a card decision (stretch → out of scope), which needs the re-sign anyway (CL-4b) |
+| EB-PAGE pre-skill-check p1 42-55 % empty (M, L) | 2 | 2 | **ROUTED lf-roles** (pre-skill-check page fill, `--page-fill` now on precritic's path) |
+| screen-slots SCREEN-DIGIT 820 / 1280 (numerals 29-34 px, want 48 / 56) | 6 | 6 | **LANE-OWNED, OPEN** (lead 2026-11-13, 11867f3f3: on by default, "a red goes to the owning lane, never a pin"): the chart window's screen numerals are capped by `css/screen-cell.css` `min(..., 4vw)` and drawn at weight 400. Not fixed in this round: blocks the critic |
+| sibling-compare NO-SIBLING | FAIL | FAIL | SKIPPED by ruling 4 |
+| spec-card-signed | N/A (preset) | FAIL | owner re-sign (CL-4b changed on master) |
+| checks-from-critics | FAIL → OK after the card-plan row | OK | fixed |
+| guided-echo (new) | PASS | PASS | — |
+| every other gate | PASS | PASS | — |
