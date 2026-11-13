@@ -286,6 +286,8 @@ export const WW_THINGS = Object.freeze([
 ]);
 /** Money: a count of dollars (P-WP-22: plain amounts, no currency sign). */
 export const WW_MONEY = N('dollar', 'dollars');
+/** Money told as a number of generic coins (P-WP-22), the + / − story hosts. */
+export const WW_COINS = N('coin', 'coins');
 /** Containers for equal groups, grouping and full-groups stories. */
 export const WW_CONTAINERS = Object.freeze([
     N('bag', 'bags'), N('box', 'boxes'), N('jar', 'jars'), N('plate', 'plates'), N('basket', 'baskets'), N('pack', 'packs'),
@@ -358,7 +360,7 @@ export function schemaOf(text, st, ans) {
  * The story's sentences for one schema, from the step's numbers. Returns
  * {lines: [...sentences, question], unit: {one, many} | null, ans}. `k` varies names and nouns.
  */
-export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, times = null, variant = null } = {}) {
+export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, times = null, variant = null, coins = false } = {}) {
     let k = k0;
     // the schema's telling (join: put together / gets more; separate: gives / takes out): the SET's, drawn once from the
     // seeded rng (`variant`, PEDAGOGY P-21 "a set uses one schema"), else - stories outside the sentence band, as
@@ -371,7 +373,8 @@ export function tellStory(schema, st, k0 = 0, { ans = st.ans, money = false, tim
     const big = (st.op === '+' || st.op === '-') && Math.max(a, b, ans) >= 1000;
     const n1 = big ? pickAt(WW_PLACES, k) : pickAt(WW_NAMES, k);
     const n2 = big ? pickAt(WW_PLACES, k + 1) : pickAt(WW_NAMES, k + 5);
-    const T = money || big ? WW_MONEY : pickAt(WW_THINGS, k * 7 + 3);
+    // (`coins`, the + / − story hosts: P-WP-22 money stories are plain amounts of "coins", never a currency - critic r1 F12)
+    const T = money && coins && !big ? WW_COINS : money || big ? WW_MONEY : pickAt(WW_THINGS, k * 7 + 3);
     const C = pickAt(WW_CONTAINERS, k * 5 + 1);
     // a place is "The shop" at the start of a sentence and "the shop" inside one
     const S = (lines, unit, answer = ans) => ({ lines: big ? lines.map((l) => l.replace(/(.)\bThe (shop|school|club|farm|library|museum)\b/g, '$1the $2')) : lines, unit, ans: answer });
@@ -513,7 +516,7 @@ export function wordWorkPayload(q, o = {}) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
         const told = steps.length > 1 ? tellTwoStep(steps[0], steps[1], k)
-            : tellStory(schema, last, k, { variant: Number.isInteger(o.variant) ? o.variant : null, ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some', 'add-some', 'part-part', 'compare-more-smaller'].includes(schema), times: tm ? Number(tm[1].replace(/,/g, '')) : null });
+            : tellStory(schema, last, k, { variant: Number.isInteger(o.variant) ? o.variant : null, ans, money: /\b(dollars?|cents?|coins?)\b/i.test(q.text) && ['join', 'compare-more', 'start-sub', 'separate', 'compare', 'change', 'start-add', 'compare-fewer', 'take-some', 'add-some', 'part-part', 'compare-more-smaller'].includes(schema), coins: !!o.coins, times: tm ? Number(tm[1].replace(/,/g, '')) : null });
         if (told && told.ans === ans) {
             lines = told.lines;
             if (Array.isArray(told.who)) who = told.who;
@@ -1046,6 +1049,9 @@ function unitBlock(ctx, p, unitShown, top = false) {
             + '</div>'
         : '';
     if (isTwin(ctx)) return `<div class="mq-wwanswer" style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:${L(ctx, 2)};">${line}${bank}</div>`;
+    // (`bankBeside`, the + / − story hosts: their bank holds the story's own noun only, so it stands BESIDE the label line on
+    // one row - stacked over the line, the narrow 2-track work left a 31-39 % band beside the ink of a 2-column cell)
+    if (p.bankBeside && bank) return `<div class="mq-wwanswer" style="display:flex;flex-direction:row;align-items:flex-end;gap:${L(ctx, 2)};">${line}${bank}</div>`;
     return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 1.2)};">${top ? line + bank : bank + line}</div>`;
 }
 
@@ -1299,7 +1305,7 @@ function colBar(ctx, p, put, narrow) {
         // (`barInk`, a lesson chart's panel - lesson-arch/story.js columnPanel: the known numbers written grey ('trace', the
         // newest marks) or black ('solid', written on an earlier panel) while the work under it is still blank)
         const show = !twin && (put || p.barInk === 'trace' || p.barInk === 'solid');
-        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show, ink: !show ? null : p.barInk || inkOf(ctx) })}</div>`;
+        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: twin ? 52 : 64, digits, show, ink: !show ? null : p.barInk || inkOf(ctx) })}</div>`;
     }
     return p.bar ? barModel(ctx, p) : '';
 }

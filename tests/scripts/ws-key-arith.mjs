@@ -19,6 +19,7 @@
 //   error-analysis both flags. On the right flag the pupil's work line printed in the cell ("a ∘ b = v") and the drawn work
 //                  are true.
 //   reason-it      A right / B right. The panel keyed right draws a true sentence, and A and B draw different work.
+//   story          P-WP-22 (critic r1 F12): a money story counts coins; it never names a currency (dollars, cents ...).
 // A sentence is read from the kit's slot attributes (the number-sentence boxes fr0-a / op0 / fr0-b / answer, the column
 // rows w0-top-* / w0-sign / w0-bottom-* / ans-*, the neutral row w0-a / w0-sign / w0-b / answer); a cell with none of them
 // (a two-step story, a picture) is not judged.
@@ -154,6 +155,9 @@ async function main() {
                 const where = `${key} ${tag} item ${i}`;
                 const bad = (role, msg) => { findings.push({ key, opts: tag, item: i, role, msg }); per[key].findings++; };
                 const ctxB = { mode: 'print', size: 'M', state: 'blank' };
+                // ---- P-WP-22 (critic r1 F12): money is a plain number of coins, never a currency word
+                const cur = /\b(dollars?|cents?|pounds?|euros?)\b/i.exec(String(q.text || ''));
+                if (cur) bad('story', `P-WP-22: the story names a currency ("${cur[0]}"): "${String(q.text).slice(0, 70)}" (${where})`);
                 // ---- True or False?
                 for (const wrong of [false, true]) {
                     let p = null;

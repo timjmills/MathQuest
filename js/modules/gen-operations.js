@@ -5584,8 +5584,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Scale with range setting; the `band` option (word-stories card Q2) bounds the ANSWER and every story number.
                 const _wpBandN = state.skillOptions && Number(state.skillOptions.band) > 0 ? Number(state.skillOptions.band) : 0;
                 const maxNum = _wpBandN || Math.max(10, range);
-                // (critic r1 F4, L13: past 20 the page is worked in columns, so every whole is past 20 too)
+                // (critic r1 F4, L13: past 20 the page is worked in columns, so every whole is past 20 too; and the number taken
+                // from stays inside the band's digits - 100 alone would need a hundreds track no other story of the page uses)
                 const _wpLo = maxNum > 20 ? 21 : 5;
+                const _wpTop = maxNum > 20 && String(maxNum - 1).length < String(maxNum).length ? maxNum - 1 : maxNum;
                 // The kind of story: each "What is missing" value deals what its label says (_wpStoryKind).
                 const roll = _wpStoryKind('sub_word_problems', 3, ['take_away', 'compare', 'start_unknown', 'change_unknown', 'compare_fewer', 'compare_more_bigger'], [0, 1, 3, 4, 5, 2]);
                 q._variant = roll;
@@ -5593,7 +5595,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (roll === 'take_away') {
                     // Type 1: Take away (result-unknown) — "Had X, removed Y, how many left?"
-                    total = rng(_wpLo, maxNum);
+                    total = rng(_wpLo, _wpTop);
                     taken = rng(2, total - 1);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
@@ -5635,7 +5637,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Take away: ${total} − ${taken} = ?`;
                 } else if (roll === 'compare') {
                     // Type 2: Compare difference — "Team A scored X. Team B scored Y. How many more?"
-                    total = rng(_wpLo, maxNum);
+                    total = rng(_wpLo, _wpTop);
                     taken = rng(1, total - 1);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
@@ -5672,7 +5674,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Note: even though this is in the SUBTRACTION generator, the
                     // start-unknown structure is solved by ADDING (start = remaining + away),
                     // which mirrors the bar-model thinking the spec emphasizes.
-                    const start = rng(_wpLo, maxNum);
+                    const start = rng(_wpLo, _wpTop);
                     const away = rng(1, start - 1);
                     const remaining = start - away;
                     answer = start;
@@ -5703,7 +5705,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else if (roll === 'change_unknown') {
                     // Type 4: Change unknown, told in the PAST tense (label 'How many went?', forms value 3; build list
                     // map_change_unknown_story) - "had 15, gave some away, now has 9; how many did X give away?"
-                    [total, answer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[1]]);
+                    [total, answer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[1]]);
                     taken = answer; // the unknown
                     const remaining = total - answer;
                     q.text = `${name1} had ${total} ${scenario.unit}. ${name1} gave some away. Now ${name1} has ${remaining} ${scenario.unit}. How many ${scenario.unit} did ${name1} give away?`;
@@ -5712,7 +5714,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 } else if (roll === 'compare_fewer') {
                     // Type 5: Compare, the smaller amount unknown, consistent language (forms value 4; build list
                     // map_compare_smaller_unknown) - "Maya has 14. Tom has 6 fewer than Maya. How many does Tom have?"
-                    const [t4, fewer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
+                    const [t4, fewer] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
                     total = t4;
                     taken = fewer;
                     answer = total - fewer;
@@ -5724,7 +5726,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Type 6: Compare, the smaller amount unknown, told with "more than" about the BIGGER, known amount
                     // (forms value 5, the language trap, PEDAGOGY P-WP-3) - "Maya has 14. Maya has 6 more than Tom. How many
                     // does Tom have?" Solved by subtracting: Tom has fewer.
-                    const [t5, more] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, maxNum); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
+                    const [t5, more] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(2, t - 2)]; }, (p) => [p[0], p[0] - p[1]]);
                     total = t5;
                     taken = more;
                     answer = total - more;

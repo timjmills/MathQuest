@@ -112,6 +112,8 @@ export function applyWordWork(q) {
             divFirst: /^remainder_/.test(skill) || /^remainder_/.test(outer),
             // the K picture story keeps its own (already controlled) words
             retell: !(/^add_wp_10(_plain)?$/.test(skill) || wp), seed: k,
+            // (the + / − story hosts tell money as coins, P-WP-22; word-stories critic r1 F12)
+            coins: /^(add|sub)_word_problems(_plain)?$|^(add|sub)_wp_(change_unknown|compare_smaller)$/.test(skill) || /^(add|sub)_word_problems(_plain)?$|^(add|sub)_wp_(change_unknown|compare_smaller)$/.test(outer),
         });
         if (payload && !two && payload.steps.length === 1 && payload.steps[0].op !== '/') {
             payload.tracks = skillTracks(skill === outer ? skill : (isWordWorkSkill(skill) ? skill : outer), payload.steps[0].op);
@@ -143,6 +145,7 @@ export function applyWordWork(q) {
         payload.signSet = ['+', '-'];
         const said = ` ${payload.lines.join(' ').toLowerCase().replace(/[^a-z ]+/g, ' ')} `;
         if (Array.isArray(payload.bank)) payload.bank = payload.bank.filter((w) => said.includes(` ${String(w).toLowerCase()} `));
+        payload.bankBeside = true;
     }
     // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
     if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';

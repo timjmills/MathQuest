@@ -52,6 +52,8 @@ function providerTask(q, size) {
     if (!p || !Array.isArray(p.real) || !p.real.includes('open') || typeof p.open !== 'function') return undefined;
     let t = null;
     try { t = p.open(q, { size }); } catch (e) { t = null; }
+    // (undefined: the provider has no open problem for THIS kind of item - the on-topic default below stands; null: none)
+    if (t === undefined) return undefined;
     if (!t || !Array.isArray(t.prompt) || !t.prompt.length || !Array.isArray(t.columns) || !t.columns.length) return null;
     return {
         prompt: t.prompt.map(String), columns: t.columns.map(String),

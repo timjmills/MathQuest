@@ -300,7 +300,35 @@ function storyHostProvider(op) {
         return out;
     };
     fn.def = cols.strings.def;
-    return Object.assign({}, cols, { strings: fn, misconceptions: STORY_MISCONCEPTIONS.slice() });
+    return Object.assign({}, cols, { strings: fn, misconceptions: STORY_MISCONCEPTIONS.slice(), open: compareOpen });
+}
+
+/**
+ * Stretch's open problem of a compare story with the smaller amount unknown (word-stories critic r1 F11, L6: the role's
+ * default "two numbers have a difference of 8" table had no story and no smaller amount). The story stays: the bigger amount
+ * is known, the difference is open - "How many could Tom have? How many fewer is that?" - and the check column adds them
+ * back to the bigger amount. Undefined for every other kind of story (the role's on-topic default stands).
+ */
+export function compareOpen(q) {
+    const p = payloadOf(q);
+    if (!p || !p.steps || p.steps.length !== 1 || !/^compare-(fewer|more-smaller)$/.test(p.schema || '')) return undefined;
+    const st = p.steps[0];
+    const B = st.top, S = st.ans, d = st.bottom;
+    const who = Array.isArray(p.who) && p.who.length >= 2 ? p.who : ['Maya', 'Tom'];
+    const things = p.unitMany || p.unit || 'things';
+    if (!(B >= 4)) return undefined;
+    const rows = [];
+    for (let s = B - 1; s >= 1 && rows.length < 8; s -= Math.max(1, Math.round(B / 7))) if (s !== S) rows.push([s, B - s, B]);
+    return {
+        prompt: [`${who[0]} has ${B} ${things}.`, `${who[1]} has fewer ${things} than ${who[0]}.`, `How many could ${who[1]} have? How many fewer is that?`],
+        columns: [`${who[1]} has`, 'Fewer', `Check: ${who[1]} + fewer`],
+        example: [S, d, B],
+        keyRows: rows,
+        rule: `+ = ${B}`, glyph: '+',
+        // every smaller amount from 1 to B - 1 is an answer
+        total: B - 1,
+        basic: false,
+    };
 }
 for (const [key, op] of [['addition:add_word_problems', '+'], ['subtraction:sub_word_problems', '-']]) {
     const def = storyHostProvider(op);

@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, IN_PLACE_FILL } from '../layout.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
 const isMixItem = (it) => !!(it && it.q && it.q.divMix);
@@ -998,7 +998,10 @@ export function plan(input = {}) {
         // Model and Guided; at level 1 the division template writes on the open vinculum).
         // A story in the sentence layout keeps its part-whole bar on every guided try (level 2; WDS 18.1, critic r1 F13 -
         // the bar is the teaching pages' drawing, faded on the practice pages), so every row holds what it was sized for.
-        const sentence = it.template === 'word-work' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.layout === 'sentence';
+        // (and a column story with its own labelled bar - change / compare, story-bar.js - keeps it on every guided try too:
+        // its row is measured with the bar, and a try drawn without it left a 35-39 % band; word-stories critic r1 F5)
+        const wpl = it.template === 'word-work' && it.q && it.q.cell && it.q.cell.payload;
+        const sentence = !!(wpl && (wpl.layout === 'sentence' || wpl.storyBar));
         const level = stage === 'model' || it.template === 'stack' ? 3 : stage === 'partial' || it.template === 'division' || sentence ? 2 : 1;
         // Round-3 re-grade: the Model tab overprinted the first line of a story, a sentence or a
         // tile row. Every model cell but a column stack (whose grid already starts below the tab)
@@ -1042,8 +1045,15 @@ export function plan(input = {}) {
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
-        const w = Array.from({ length: rows }, (_, r) => Math.max(1, ...hsOf(r)) + add(r));
-        const mins = Array.from({ length: rows }, (_, r) => Math.max(1, Math.min(...hsOf(r))) + add(r));
+        // Each cell's OWN height (word-stories critic r1 F5, H13 judged absolutely): in a row that holds the Model beside its
+        // first try, the Model's trace (`extra`: tab clearance + worked lines) is the Model's and the grey hint the try's -
+        // adding both to every cell of the row let a try be stretched to the Model's height (a 35-46 % band beside it).
+        const own = (r) => {
+            if (!(pi === 0 && r === 0 && nModels === 1 && !facts && !spanHere && (pg.extra || 0) > 0)) return null;
+            return hsOf(0).map((h, j) => h + (j === 0 ? pg.extra || 0 : (r === hintRow ? fit.hint : 0)));
+        };
+        const w = Array.from({ length: rows }, (_, r) => (own(r) ? Math.max(1, ...own(r)) : Math.max(1, ...hsOf(r)) + add(r)));
+        const mins = Array.from({ length: rows }, (_, r) => (own(r) ? Math.max(1, Math.min(...own(r))) : Math.max(1, Math.min(...hsOf(r))) + add(r)));
         const sumW = w.reduce((x, y) => x + y, 0);
         // A row stretches no further than its shortest problem allows (layout.js rowShape).
         // Guided rows stretch at most GUIDED_STRETCH (H13); the rest of the page stays under the band.
@@ -1055,7 +1065,13 @@ export function plan(input = {}) {
         const tF = w.map((x, r) => (pi === 0 && (r === 0 || r === hintRow) ? x : Math.max(x, FACT_STRETCH * Math.max(1, mins[r] - CELL_PAD_MM))));
         const sumT = tF.reduce((x, y) => x + y, 0);
         const lam = sumT > sumW ? Math.max(0, Math.min(1, (room - sumW) / (sumT - sumW))) : 0;
-        const Hr = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        // (a row of cells answered IN PLACE - the sentence-layout story, and any story whose columns are its boxes: no working
+        // space - stops just past its tallest cell,
+        // as on every practice page (layout.js IN_PLACE_FILL), and the Model's row AT its tallest cell (the Model's trace
+        // already makes it taller than the try beside it); word-stories critic r1 F5: stretched to fill the page, the Guided
+        // rows of the story presets left 35-46 % bands. The spare height stays under the grid (Guided is exempt from EB-PAGE).)
+        const inPlaceRow = (r) => { const its = rowItems(r); return its.length > 0 && its.every((it) => (it.footprint && it.footprint.inPlace) || it.template === 'word-work'); };
+        const Hr = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : inPlaceRow(r) ? x * Math.min(kPage, r === 0 && own(0) ? 1 : IN_PLACE_FILL) : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];
