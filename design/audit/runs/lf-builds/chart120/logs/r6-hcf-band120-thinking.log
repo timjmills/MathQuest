@@ -1,0 +1,53 @@
+ws-cell-checks: 51 page(s) - composing:hundreds_chart_fill (card plan + option values)
+  ok   composing:hundreds_chart_fill independent S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill independent M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill independent L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill more-practice S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill more-practice M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill more-practice L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test S: 1p 2x? per 8
+  ok   composing:hundreds_chart_fill test M: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill test L: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill lesson S: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson M: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill lesson L: 3p 1x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill scripted-model L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill guided L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill opener L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill error-analysis S: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis M: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis L: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill review S: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review M: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill review L: 1p 2x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check S: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check M: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill pre-skill-check L: 2p 4x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice S: 1p 8x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice M: 1p 6x? per undefined
+  ok   composing:hundreds_chart_fill mixed-practice L: 1p 4x? per undefined
+  ok   composing:hundreds_chart_fill true-false S: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill true-false M: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill true-false L: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill reason-it S: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill reason-it M: 1p 1x? per 3
+  ok   composing:hundreds_chart_fill reason-it L: 1p 1x? per 2
+  n/a  composing:hundreds_chart_fill stretch S: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  n/a  composing:hundreds_chart_fill stretch M: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  n/a  composing:hundreds_chart_fill stretch L: No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False?
+  ok   composing:hundreds_chart_fill reason-it S {"band":120}: 1p 1x? per 2
+  ok   composing:hundreds_chart_fill reason-it M {"band":120}: 1p 1x? per 2
+  ok   composing:hundreds_chart_fill reason-it L {"band":120}: 1p 1x? per 2
+  ok   composing:hundreds_chart_fill error-analysis S {"band":120}: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis M {"band":120}: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill error-analysis L {"band":120}: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill true-false S {"band":120}: 1p 2x? per 6
+  ok   composing:hundreds_chart_fill true-false M {"band":120}: 1p 2x? per 4
+  ok   composing:hundreds_chart_fill true-false L {"band":120}: 1p 2x? per 4
+ws-cell-checks: OK (48 page(s), no finding; 33s)
