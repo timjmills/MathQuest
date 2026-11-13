@@ -99,10 +99,12 @@ function geometry(items, input, cap = {}) {
     while (iRows < iMax && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
     // the L label-wrap reserve is for the Independent band's label: with no Independent band drawn it is not held (critic r5 N13a)
     const held = iRows ? hand : 0;
-    // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a page of count rows - each a full-width line - takes a second
-    // Guided row where the page would otherwise end in a blank band; the Independent rows are fitted first, so none is lost
+    // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a one-column page - each Guided cell a full-width row - takes a
+    // second Guided row where the budget holds it; the Independent rows are fitted first, so none is lost
+    // (lf-engine-roles critic B1: this was built for count rows only, so expand / unit_form / combine printed a "We do" of ONE
+    // cell; any one-column practice now takes it, and when it does not fit the plan says so - ws-print-lint L-DENSITY OPN-6)
     let gRows = 1;
-    if (first && first.template === 'count-row' && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
+    if (first && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
     const spare = Math.max(0, m.budget - used - held);
     const rowsThatGrow = gRows + iRows;
     const tight = tightRows(practice);
@@ -213,6 +215,7 @@ export function plan(input = {}) {
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
+    if (g.gc === 1 && guided.length < 2) notes.push(g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
