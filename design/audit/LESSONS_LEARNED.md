@@ -529,3 +529,13 @@ commit `2d7a7f158` and PASSES on the fix:
 Page use after B1: expand S 56 %, M 68 %, L 89 %; unit_form S 53 %, M 64 %, L 85 %; combine S 57 %, M 71 %, L 85 % — all
 one-column pv openers now Guided 2 + Independent 2 (master dropped every Independent row on expand/combine L and sized the
 Model Infinity mm). Lesson pages byte-identical (ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson).
+
+### lf-engine roles MIX-S (lead 2026-11-13): Mixed practice at S held fewer problems a page than M
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| Single-skill Mixed practice S < M on 8 passed skills. Two root causes: (1) a shelf takes the widest divisor (<= 6) of the size's lattice, Daily 8 / 6 / 4, so a fact shelf was 4 across at S and 6 at M; (2) the grow shares summed to the spare EXACTLY, so a full page's last shelf landed a float hair over the budget and spilled alone to page 2 (value / combine S 8 + 1) | ws-capacity-pin SIZE-ORDER per page (lf-roles' widened pin) on the mixed-practice pins. Fix: a one-page sheet also tries each larger size's lattice at THIS size's metrics and keeps the most problems (one lattice a page; fixed latticeN and lesson pages keep theirs); shelf budget compares within 1e-6 mm | roles-mixed-size-order (8df014ab7 FAIL → 01cfd07e3 OK) | ws-precritic --skill X --role mixed-practice (new capacity-pin-role gate) | 1 round per Mixed lane |
+
+Rules: a height compare against a budget that shares are computed to fill exactly takes an epsilon; a choice that changes the
+page count is taken only where the packing's page model is the plan's (one-page sheets) - the first cut added a page on 14 multi-
+skill sheets, caught by the sweep's pages-rose / per-page-fell columns before commit.

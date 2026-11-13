@@ -1030,3 +1030,10 @@ backtest FAIL-on-2d7a7f158 / PASS-on-fix, all on ws-precritic's `--role opener` 
 catches a one-cell Guided band before a critic round. Lost time: none beyond the one critic round; the rebuild reused the
 r0 browser harness (lesson baseline, sweep, use.cjs). Rule added: a page-role capacity rule (PT-OPN-6, PT-ENG-3) is gated
 by a print-lint rule on the role, not only by the empty-band renderer, so a band that is short rather than stretched is caught.
+
+### lf-engine roles MIX-S (lead 2026-11-13): Mixed practice S < M (8 passed skills), check first then fix
+
+The lead added it mid-round. Check (lf-roles' SIZE-ORDER pin + the mixed pins) brought over and shown FAIL on master before the
+fix. Lost time: the first lattice fix passed the pin but added a page on 14 multi-skill sheets (the packing's page model omits
+the strip a continued skill repeats); caught by the hash sweep's pages-rose / per-page-fell columns, ~20 min. Rule: a sweep
+reports pages rose and items-per-page fell, not only "changed".

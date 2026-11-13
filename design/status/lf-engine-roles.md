@@ -17,7 +17,12 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
   GUARD on finding 3: on a sections sheet DN-2 measures page FILL, so a mid-sheet page under half used fails at any
   --count (self-tests CC1/CC2). N3 proof README re-done (sweep re-run base vs head, every changed page listed, opener
   PNGs re-rendered). N4 (tape_diagram) not this lane - routed by the lead.
-- Findings 1-3 (r0) and B1/N2/GUARD each a check FAIL-on-bad / PASS-on-fix; backtests all PASS.
+- MIX-S (lead add): Mixed practice at S held fewer problems a page than M on 8 passed skills (master). Check: lf-roles'
+  ws-capacity-pin SIZE-ORDER + mixed pins (FAIL on 8df014ab7); fix: a one-page sheet also tries each larger size's lattice
+  at this size's metrics, and the shelf budget compare takes an epsilon (value / combine S 8 + 1 spill). Pin OK, 0 drops.
+- Known, not this round: coordinates:coordinate_q1 opener L overflows (Model + one Guided taller than the page; master hid
+  it as a text collision inside the squashed Model). Lead ruling wanted (RULED capacity or a side-by-side layout).
+- Findings 1-3 (r0), B1/N2/GUARD and MIX-S each a check FAIL-on-bad / PASS-on-fix; backtests all PASS.
 
 ## Owner go
 

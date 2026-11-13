@@ -45,6 +45,31 @@ sub_10k_no_regroup, sub_1k_no_regroup, sub_1m_no_regroup, sub_2d_1d, sub_50_no_r
 sub_wp_10_plain, sub_wp_20, sub_wp_20_plain`. In every one the page count is unchanged and the item count rose or stayed
 (a spilled start now fills the pages it takes, PG-23).
 
+**Mixed practice, one skill a page (MIX-S, lead 2026-11-13; the capacity pin's request): 16 of 81 builds changed**, each
+the skill alone on Mixed practice at the pin's seed, anchors off (items / pages, master -> branch):
+
+| Skill | Size | Before | After |
+|---|---|---|---|
+| `addition:add_facts` | S | 20 on 1 | 30 on 1 |
+| `subtraction:sub_facts` | S | 20 on 1 | 30 on 1 |
+| `multiplication:mult_facts` | S | 20 on 1 | 30 on 1 |
+| `subtraction:sub_2d_1d` | S | 20 on 1 | 30 on 1 |
+| `subtraction:sub_2d_1d` | M | 12 on 1 | 16 on 1 |
+| `subtraction:sub_50_no_regroup` | S | 20 on 1 | 30 on 1 |
+| `subtraction:sub_50_no_regroup` | M | 12 on 1 | 16 on 1 |
+| `subtraction:sub_100_no_regroup` | S | 20 on 1 | 30 on 1 |
+| `subtraction:sub_100_no_regroup` | M | 12 on 1 | 16 on 1 |
+| `subtraction:sub_1k_no_regroup` | M | 12 on 1 | 16 on 1 |
+| `subtraction:sub_100k_no_regroup` | S | 10 on 1 | 15 on 1 |
+| `subtraction:sub_1m_no_regroup` | S | 10 on 1 | 15 on 1 |
+| `addition:fact_family_sort` | S | 8 on 1 | 12 on 1 |
+| `placevalue:value` | S | 36 on 2 (8 shelves + 1 alone) | 36 on 1 |
+| `placevalue:value` | M | 21 on 1 | 28 on 1 |
+| `placevalue:combine` | S | 36 on 2 (8 shelves + 1 alone) | 36 on 1 |
+
+No item count fell and no page was added. The 4-skill Mixed sweep above is unchanged by MIX-S (the larger lattice is taken on
+one-page sheets only). PNGs: `mixed-<skill>-S-<before|after>-pupil-p<n>.png` for add_facts, value, sub_100k_no_regroup.
+
 **Lessons:** byte-identical — `ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson`, 1596 hashes
 written on `8df014ab7`, checked on this branch.
 
@@ -53,6 +78,8 @@ written on `8df014ab7`, checked on this branch.
 Opener, every changed page, before (master `8df014ab7`) and after (this branch), pupil and key:
 `opener-<skill>-<size>-<before|after>-<pupil|key>-p1.png` for skill `expand`, `unit_form`, `combine` at size `S`, `M`, `L`
 (36 files).
+
+Mixed MIX-S: `mixed-add_facts-S-*`, `mixed-value-S-*` (before: 2 pages), `mixed-sub_100k_no_regroup-S-*`.
 
 Mixed (finding 2, from r1): `mix-addfacts-M-{before,after}-p1,p2.png` (page 2 held 2 perimeter cells; now 6) and
 `mix-value-L-{before,after}-p1,p2.png`.

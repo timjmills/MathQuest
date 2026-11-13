@@ -563,3 +563,12 @@ Proof passed skills unharmed: render-hash sweep master vs branch — opener 9 pv
 
 Page use after B1 (opener, % of body): expand S 56 / M 68 / L 89; unit_form S 53 / M 64 / L 85; combine S 57 / M 71 / L 85.
 Master dropped every Independent row on expand/combine/unit_form L (Model sized Infinity mm). Lesson pages byte-identical.
+
+### lf-engine roles MIX-S (lead 2026-11-13)
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| Mixed practice S < M items a page (8 passed skills on master) | ws-capacity-pin SIZE-ORDER (mixed-practice pins) | roles-mixed-size-order | precritic --role mixed-practice | 1 round per Mixed lane |
+
+Single-skill Mixed: 16 of 81 builds changed, 14 item rises, value / combine S 2 pages -> 1; 4-skill sweep unchanged by MIX-S;
+lessons 1596 hashes identical.
