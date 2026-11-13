@@ -217,7 +217,8 @@ export function plan(input = {}) {
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
-    if (g.gc === 1 && guided.length < 2) notes.push(g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
+    // (PT-OPN-6, ws-print-lint OPN-6: a Guided band of one cell says why - the row did not fit, or the skill dealt too few items)
+    if (guided.length < 2) notes.push(g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
     return assemble(ROLE_ID, input, frame, [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
