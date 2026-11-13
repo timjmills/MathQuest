@@ -55,6 +55,10 @@ const SCREEN_PX_PER_MM = 3.2;
 // play has none and falls back to its own cursor. Fixed once per question (see gen-counting.js
 // _kBeginItem for why a per-deal cursor goes wrong).
 let _liveCursor = -1;
+// (lf-placevalue compare r2, critic r1 F4: live play has no item seed, and a fixed `run` of 0 put the compare "=" item on
+// item 1 of EVERY session - card, worksheet and quiz all opened on "897 = 897". The live mixing turns on a value drawn
+// once per session, so no dealt case has a fixed live position; a seeded page still reprints the same.)
+const _liveRun = randInt(0, 9972);
 let _at = 0;
 function beginItem() { _at = Number.isFinite(state.itemIndex) ? state.itemIndex : ++_liveCursor; }
 const slot = (n) => ((_at % n) + n) % n;
@@ -67,7 +71,7 @@ function blockOrder(L) {
     // L10 (lessons r3): the order also turns on the PAGE's seed (the item's seed less its index),
     // so a page holding one block - two place-value items on a Mixed page - does not ask tens then
     // ones on every sheet. Live play has no seed and keeps the fixed mixing.
-    const run = Number.isFinite(state.itemSeed) ? (((state.itemSeed - _at) % 9973) + 9973) % 9973 : 0;
+    const run = Number.isFinite(state.itemSeed) ? (((state.itemSeed - _at) % 9973) + 9973) % 9973 : _liveRun;
     const key = (i) => ((i + 1) * 7919 + (block + 3 + run) * 104729 + (i + 1) * (block + 5 + run) * 31) % 257;
     return Array.from({ length: L }, (_, i) => i).sort((a, b) => key(a) - key(b) || a - b);
 }
@@ -871,13 +875,84 @@ function comparableSet(count, cap, o) {
     return [...arr];
 }
 
+/** `len` random digits, the first never 0 (a number of exactly that length). */
+const digitsOfLen = (len) => Array.from({ length: len }, (_, i) => randInt(i === 0 ? 1 : 0, 9));
+
+/**
+ * The pair a compare item deals (lf-placevalue compare r2, critic r1 F3 / F5 / F6), or null (the caller falls back to
+ * comparableSet). `ord` is the item's place in its block of six (blockOrder), so each case is DEALT, never rolled:
+ *  - ord 5, equal lengths: the "=" item (CP-9), one in six.
+ *  - same length, close: the numbers share their first `k` digits and differ at place k + 1, k spread over 1 .. nd - 1
+ *    (F5: every close 6-digit pair was decided at the 2nd digit - 534,826 / 534,862 never came).
+ *  - same length, far: different first digits.
+ *  - M6 (the card's "compares the last digits"): on every unequal same-length item but one a block (ord 4, drawn freely)
+ *    the last digits point the OTHER way from the deciding digits (47 / 62: 7 > 2 but 47 < 62), so a pupil who compares the
+ *    last digits gets it wrong - the error the thinking pages show (F3). Not when the last place itself decides.
+ *  - mixed lengths (F6): the longer number has every digit the band allows, the shorter one digit fewer; one item a block
+ *    (ord 0) two fewer (at band 999, a 1-digit number: at most one item in six). Far items put the BIGGER first digit on the
+ *    SHORTER number (89 / 312: the card's M6 "89 > 312 because 8 > 3") on all but ord 4; close items keep the classic trap,
+ *    the shorter number starting with the longer one's digits (345 / 34).
+ */
+function comparePair(cap, o, ord, close) {
+    const [lo, hi] = digitSpan(cap);
+    const nd = String(hi).length;
+    if (nd < 2) return null;
+    const ok = (v) => Number.isFinite(v) && v >= lo && v <= hi;
+    const mixed = o.lengths === 'mixed';
+    for (let t = 0; t < 80; t++) {
+        if (!mixed) {
+            if (ord === 5) { const v = fromDigits(digitsOfLen(nd)); if (ok(v)) return [v, v]; continue; }
+            const A = digitsOfLen(nd), B = A.slice();
+            // the deciding place: 0 for a far item; 1 .. nd - 1 for a close one, turning item to item (F5)
+            const k = close ? 1 + blockOrder(nd - 1)[slot(nd - 1)] : 0;
+            for (let i = k; i < nd; i++) B[i] = randInt(i === 0 ? 1 : 0, 9);
+            if (A[k] === B[k]) continue;
+            if (ord !== 4 && k < nd - 1) {
+                // M6: the last digits disagree with the deciding ones
+                const up = A[k] > B[k];
+                const x = randInt(0, 8), y = randInt(x + 1, 9);
+                A[nd - 1] = up ? x : y; B[nd - 1] = up ? y : x;
+            }
+            const a = fromDigits(A), b = fromDigits(B);
+            if (ok(a) && ok(b) && a !== b) return [a, b];
+            continue;
+        }
+        const lb = Math.max(1, nd - (ord === 0 && nd >= 3 ? 2 : 1));
+        const A = digitsOfLen(nd);
+        let B;
+        if (close) {
+            // the shorter number starts with the longer one's digits (345 / 34)
+            B = A.slice(0, lb);
+            B[lb - 1] = randInt(lb === 1 ? 1 : 0, 9);
+            // (M6: the shorter number's last digit is the bigger one - 345 / 37 - so comparing the last digits gets it wrong)
+            if (ord !== 4) {
+                if (A[nd - 1] === 9) continue;
+                B[lb - 1] = randInt(A[nd - 1] + 1, 9);
+            }
+        } else {
+            B = digitsOfLen(lb);
+            if (ord !== 4) {
+                if (A[0] === 9) continue;
+                B[0] = randInt(A[0] + 1, 9);
+            }
+        }
+        const a = fromDigits(A), b = fromDigits(B);
+        // (the shorter number is below the band's floor by design: 89 against a 3-digit band)
+        if (ok(a) && b >= 1 && b <= hi) return [a, b];
+    }
+    return null;
+}
+
 function genCompare(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
-    let [a, b] = comparableSet(2, cap, o);
+    const ord = blockOrder(6)[slot(6)];
+    // (the closeness pattern comparableSet deals: 'some' makes every other item close, not strictly alternate)
+    const close = o.closeness === 'close' || (o.closeness === 'some' && [0, 1, 1, 0, 1, 0][slot(6)] === 1);
+    let [a, b] = comparePair(cap, o, ord, close) || comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
     // (lf-placevalue compare round: at a place that turns from block to block - blockOrder - never every sixth item, where
     // 6, 12, 18, 24 and 30 were "=" on every page and a pupil could read the answer off the item number)
-    if (blockOrder(6)[slot(6)] === 5 && o.lengths !== 'mixed') b = a;
+    if (ord === 5 && o.lengths !== 'mixed') b = a;
     if (slot(2) === 1 && a !== b) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
@@ -891,6 +966,9 @@ function genCompare(q, skill, o) {
         + `<div style="font-size:2rem;font-weight:700;">${fmt(a)}</div>`
         + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
         + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
+    // (critic r1 F4: "=" is never a worked model - the Scripted Model and the Opener skip an item that carries `noModel` for
+    // their Model; the Guided Model is the item with the most worked steps, which an "=" item never has)
+    if (a === b) q.noModel = true;
     q.pv = { kind: 'compare', a, b, closeness: String(a)[0] === String(b)[0] && String(a).length === String(b).length ? 'close' : 'far', lengths: o.lengths || 'equal' };
     // (`inPlace`, lf-placevalue compare round: the sign is written in the circle - no working room - so the rows are held to the
     // ink: ws-empty-band read 35-40 % of every Independent, More practice and Test cell empty under the one line)

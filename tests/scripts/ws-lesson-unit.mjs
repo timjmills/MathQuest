@@ -11,6 +11,7 @@
 //                                                                        # chart-sizing (lesson 7 D1)
 //   MQ_ROOT=<checkout> node tests/scripts/ws-lesson-unit.mjs --only ... # run them on another tree (ws-backtest commit-pair)
 //   node tests/scripts/ws-lesson-unit.mjs --only chant-box               # a chant naming boxes holds for every dealt item (nwf r1 N6)
+//   node tests/scripts/ws-lesson-unit.mjs --only chant-fit               # a chant decides at least half its lesson's items (compare r1 F2)
 // The engine checks also run in the full gate.
 import fs from 'fs';
 import path from 'path';
@@ -67,6 +68,46 @@ const LATE = {
                 ok(!bad.length, `chant-box: lesson ${id} chant "${chant}" ${want !== null ? `names ${want} boxes` : 'names boxes'}, but the ${opts ? 'practice-option' : 'default'} deal has ${bad.slice(0, 3).join('; ')}${bad.length > 3 ? ` (+${bad.length - 3})` : ''}`);
             }
         }
+    },
+    // (lf-placevalue compare r2, critic r1 F2: the compare lesson's chant "More digits, bigger number." decided 8 of the 33 items the
+    // lesson dealt - every other item has two numbers of one length. A routine's chant must DECIDE at least half the items its
+    // lesson's practice deals, judged where the skill's decision rules are known (CHANT_DECIDES: which rule a chant names, and
+    // which items that rule decides). The deal: each practiceBlocks block (its opts over the practice opts), weighted by its
+    // count, else the practice deal; generateQuestionFor, seeded, 60 an option set.)
+    async 'chant-fit'() {
+        const { loadApp } = await import(pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), 'ws-card-rulings.mjs')).href);
+        const app = await loadApp(ROOT);
+        const CHANT_DECIDES = {
+            'placevalue:compare': (chant, q) => {
+                const a = String(q.pv && q.pv.a), b = String(q.pv && q.pv.b);
+                if (a.length !== b.length) return /more digits|longer|digit count/i.test(chant);
+                if (a === b) return /\bsame\b|=|equal/i.test(chant) && /first different|left/i.test(chant);
+                return /first different|from the left|left to right/i.test(chant);
+            },
+        };
+        let judged = 0;
+        for (const [id, l] of Object.entries(LIB.LESSONS)) {
+            const r = LIB.ROUTINES[l.routine];
+            const judge = l.practice && CHANT_DECIDES[l.practice.skill];
+            if (!judge || !r || !String(r.chant || '').trim()) continue;
+            judged++;
+            const [category, skill] = String(l.practice.skill).split(':');
+            const blocks = Array.isArray(r.practiceBlocks) && r.practiceBlocks.length ? r.practiceBlocks : [{ shape: [12, 1] }];
+            let dec = 0, all = 0;
+            blocks.forEach((bk, bi) => {
+                const w = Number((bk.shape || [])[0]) || 1;
+                const opts = Object.assign({}, l.practice.opts || {}, bk.opts || {});
+                for (let i = 0; i < 60; i++) {
+                    const sv = {}; for (const k of ['log', 'warn', 'info', 'debug']) { sv[k] = console[k]; console[k] = () => {}; }
+                    let q = null;
+                    try { q = app.gq.generateQuestionFor({ category, skill, opts, seed: 9001 + bi * 100 + i, itemIndex: i, itemCount: 60 }); } catch (e) { q = null; } finally { Object.assign(console, sv); }
+                    if (!q || !q.pv) continue;
+                    all += w; if (judge(String(r.chant), q)) dec += w;
+                }
+            });
+            ok(all > 0 && dec >= all / 2, `chant-fit: lesson ${id} chant "${r.chant}" decides ${all ? Math.round((100 * dec) / all) : 0} % of the items its practice deals (want at least half)`);
+        }
+        ok(judged > 0, 'chant-fit: no lesson with a known decision rule was judged (CHANT_DECIDES)');
     },
     // (P1d r3, lesson 3a critic: {p4.last} counted a Practice k a PAGE - "Practice 3" for Practice 1's second page. A
     // practiceSheets sheet over two pages is ONE unit whose last row is on its last page; a plan without `sheet`, one a page)

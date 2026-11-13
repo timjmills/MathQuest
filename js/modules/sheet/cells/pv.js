@@ -802,6 +802,30 @@ function pvRenderBody(p, ctx0) {
             }
             case 'compare': {
                 const slot = blank({ id: 'answer', kind: 'sign', shape: 'circle', graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, kv);
+                // (lf-placevalue compare r2, critic r1 F2: a step state - stepState below, `_marks` - draws each step's own mark: the
+                // digit count over each number, the two deciding digits boxed, the bigger number underlined; the newest mark grey,
+                // earlier ones black (P-LC-9). Every state keeps the room of the last, so the problem stands still, AK-1)
+                if (p._marks) {
+                    const mk = p._marks;
+                    const col = (ink) => (ink === 'trace' ? '#949494' : '#000');
+                    const sd = (n) => String(Math.trunc(Math.abs(Number(n))));
+                    const side = (n, who) => {
+                        let di = 0;
+                        const body = [...fmt(n)].map((ch) => {
+                            if (!/\d/.test(ch)) return esc(ch);
+                            const i = di++;
+                            const on = mk.digits && (mk.digits.value === 'all' || Number(mk.digits.value) === i);
+                            return on ? `<span data-pv-mark="digit" style="display:inline-block;line-height:1;outline:1.5pt solid ${col(mk.digits.ink)};outline-offset:0.5mm;border-radius:0.8mm;">${ch}</span>` : ch;
+                        }).join('');
+                        const len = sd(n).length;
+                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:1.2mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
+                        const win = mk.win && mk.win.value === who;
+                        return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
+                            + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.8mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
+                    };
+                    return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;align-items:flex-end;">`
+                        + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
+                }
                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:4mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
@@ -1007,6 +1031,25 @@ register('pv', {
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },
     inputs() { return [{ id: 'answer', kind: 'number', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
+    /**
+     * Step states (P-LC-9, steps.js) for the compare item only (lf-placevalue compare r2, critic r1 F2): its marks `count`,
+     * `digits`, `win` and `answer` (placevalue:compare workedSteps) drawn up to step k, step k's grey. Every other pv kind
+     * keeps the anchor's whole-cell fallback (anchors.js stepTemplateOf reads `hasStepState`).
+     */
+    hasStepState(p) { return !!p && p.kind === 'compare'; },
+    /** State k as a payload variant (`_marks`) and the answer's ink ('trace' | 'solid' | null): the Scripted Model draws it. */
+    statePayload(p, steps, k) {
+        const mk = {};
+        (steps || []).forEach((s, i) => {
+            if (i > k) return;
+            for (const x of (s && s.marks) || []) if (x && x.slot) mk[x.slot] = { value: String(x.value), ink: i < k ? 'solid' : 'trace' };
+        });
+        return { payload: { _marks: mk }, answer: mk.answer ? mk.answer.ink : null };
+    },
+    stepState(p, steps, k, ctx) {
+        const st = this.statePayload(p, steps, k);
+        return pvRender(Object.assign({}, p, st.payload), Object.assign({}, ctx, { state: st.answer ? (st.answer === 'trace' ? 'traced' : 'answered') : 'blank' }));
+    },
     layout(p) {
         const wide = p && (p.kind === 'sort' || p.kind === 'disks' || p.kind === 'build' || p.kind === 'table' || p.kind === 'line-mark'
             || p.kind === 'chart' || p.support === 'line');

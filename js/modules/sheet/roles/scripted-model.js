@@ -18,6 +18,7 @@ import {
     generalSteps, oralFrameOf, assemble, poolItems, answerOf, instructionText, esc, factRows, operandsOf,
 } from './compose.js';
 import { isWideRow } from '../cells/count-row.js';
+import { stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueRow } from './guided.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -83,7 +84,29 @@ function sentenceFrameAt(html, writtenAt, k) {
     });
 }
 
-export function prepare(it) {
+/**
+ * A template that draws this item's step states as payload variants (`statePayload`, lf-placevalue compare r2 - the pv compare
+ * item: critic r1 F2, "States 1 and 2 draw the same picture"): state k draws the marks of steps 1..k, step k's grey. null for
+ * every other template (they keep the blank states and the traced last one).
+ */
+function statesOf(it) {
+    const t = stepTemplateOf(it);
+    return t && typeof t.statePayload === 'function' ? t : null;
+}
+
+export function prepare(it, info = {}) {
+    // (lf-placevalue compare r2, critic r1 F4: an item its generator marks `noModel` - the compare "=" item, which decides
+    // nothing - is never the worked example; the host deals the next one)
+    if (it && it.q && it.q.noModel && !(info && info.index)) return null;
+    // (a template that draws its step states: the cell is measured as its LAST state - every mark drawn - so each state fits
+    // the row the plan sizes from that measure)
+    const st = statesOf(it);
+    if (st) {
+        const ws = providerWorkedSteps(it, 6);
+        const fin = st.statePayload(it.q.cell.payload || {}, ws, ws.length - 1).payload;
+        const render = (c, o = {}) => it.render(c, Object.assign({}, o, { payload: Object.assign({}, fin, o.payload) }));
+        return Object.assign({}, it, { render, measured: null });
+    }
     // (a sentence story's frames draw no story: it is printed once over them - measured that way, so the rows fit)
     if (isSentenceStory(it)) {
         const render = (c, o = {}) => it.render(c, Object.assign({}, o, { payload: Object.assign({}, o.payload, { lines: [] }) }));
@@ -390,12 +413,17 @@ export function plan(input = {}) {
     const writtenAt = new Map();
     if (story) providerWorkedSteps(it, 6).forEach((st, g) => (st.marks || []).forEach((mk) => { if (mk && mk.slot && !writtenAt.has(mk.slot)) writtenAt.set(mk.slot, g); }));
     const stepText = (i) => `<div class="mq-steptext"><em>${i + 1}</em><span>${esc(steps[i])}</span></div>`;
+    // (a template that draws its step states: state i's payload and, on the step that writes it, the traced answer)
+    const stT = !marks && !story ? statesOf(it) : null;
+    const stWs = stT ? providerWorkedSteps(it, 6) : [];
+    const stAt = (i) => (stT && stWs.length === steps.length ? stT.statePayload(it.q.cell.payload || {}, stWs, i) : null);
     const stateItem = (i) => planItem(it, {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
                 marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
-                    : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
+                    : stAt(i) ? Object.assign({ payload: Object.assign({}, o && o.payload, stAt(i).payload) }, stAt(i).answer && ans ? { shown: ans, ink: 'trace' } : {})
+                        : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
     });
     const textItem = (i) => ({
         render: () => stepText(i),

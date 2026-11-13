@@ -218,15 +218,21 @@ export const ROUTINES = Object.freeze({
             { word: 'less than', meaning: 'smaller', picture: { kind: 'text', text: '3 < 7' } },
             { word: 'equal to', meaning: 'the same', picture: { kind: 'text', text: '5 = 5' } },
         ],
-        // (one step a worked step: Compare a and b / why / write the sign - workedSteps of placevalue:compare)
+        // (one step a worked step - workedSteps of placevalue:compare on an item the first different digit decides: count the
+        // digits / the first different place, its two digits boxed / the bigger digit, the bigger number underlined / the sign.
+        // lf-placevalue compare r2, critic r1 F2: the r1 steps "Compare 419 and 470." and an unmarked "1 and 7" drew the same
+        // picture twice; each state now draws its own mark - the template's stepState)
         steps: [
-            { icon: 'look', text: 'Count the digits.' },
-            { icon: 'decide', text: 'Find the first different digit.' },
+            { icon: 'count', text: 'Count the digits.' },
+            { icon: 'look', text: 'Find the first different digit.' },
+            { icon: 'decide', text: 'The bigger digit wins.' },
             { icon: 'write', text: 'Write <, > or =.' },
         ],
-        chant: 'More digits, bigger number.',
-        format: { kind: 'numbered steps with icons + a chant', why: 'The error is comparing the wrong digits (M6); the chant puts the digit count first.' },
-        example: { match: 'Compare' },
+        // (critic r1 F2: "More digits, bigger number." decided 8 of the lesson's 33 items - every other one has two numbers of one
+        // length. The chant names both rules: the count first, then the first different digit; ws-lesson-unit chant-fit)
+        chant: 'More digits wins. Then first different digit.',
+        format: { kind: 'numbered steps with icons + a chant', why: 'The error is comparing the wrong digits (M6); the chant puts the digit count first, then the first different digit.' },
+        example: { match: 'first different' },
         // (two blocks, the card's step 5 in order: same length, then different lengths. The rows are held to the ink
         // (tightRows), so one 12-item grid left 42-54 % of the page white - ws-print-lint PAGEFILL; 20 in two blocks fill it,
         // DN-1's ceiling at L)

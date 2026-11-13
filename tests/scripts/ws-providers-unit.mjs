@@ -380,7 +380,17 @@ const PV_MAKERS = {
     'placevalue:pv_digit_drag': (r, i) => { const n = i % 2 ? int(r, 10, 99) * 1000 + int(r, 1, 9) : int(r, 10000, 99999); return { pv: { kind: 'chart', n, places: [10000, 1000, 100, 10, 1], source: 'expanded', sourceText: String(n) }, ans: n }; },
     'placevalue:place_value_10x': (r, i) => { const power = pick(r, [10, 100, 1000]); const k = i % 3 === 0 ? int(r, 101, 909) : int(r, 2, 99); const op = i % 2 ? '/' : 'x'; return { pv: { kind: 'x10', n: op === 'x' ? k : k * power, op, power, support: 'shift' }, ans: op === 'x' ? k * power : k }; },
     'placevalue:number_word_names': (r) => { const n = int(r, 1000, 99999); return { text: `Which is the word name for ${n}?`, ans: 'the name', options: ['the name', 'a swapped name', 'a dropped name'], answerType: 'choice' }; },
-    'placevalue:compare': (r) => { const a = int(r, 100, 999); const b = int(r, 100, 999); return { pv: { kind: 'compare', a, b }, ans: a > b ? '>' : a < b ? '<' : '=' }; },
+    // (lf-placevalue compare r2, critic r1 F3: compare names only the card's M6 - an item M6 gets right, "=" or a pair the ones
+    // decide, has no wrong answer and is not dealt to a thinking page - so the sample is the pairs a thinking page deals: the
+    // same length with the last digits pointing the other way (M-C2), and 2 digits against 3 with the bigger first digit on
+    // the shorter number (M-C3))
+    'placevalue:compare': (r, i) => {
+        let a, b;
+        if (i % 2) { const h = int(r, 1, 8); const x = int(r, 1, 9); a = h * 100 + int(r, 0, 9) * 10 + x; b = int(r, h + 1, 9) * 100 + int(r, 0, 9) * 10 + int(r, 0, x - 1); }
+        else { const h = int(r, 1, 8); a = h * 100 + int(r, 0, 99); b = int(r, h + 1, 9) * 10 + int(r, 0, 9); }
+        if (i % 3 === 0) [a, b] = [b, a];
+        return { pv: { kind: 'compare', a, b }, ans: a > b ? '>' : a < b ? '<' : '=' };
+    },
     'placevalue:order_least_to_greatest': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'asc' }, ans: nums.slice().sort((a, b) => a - b).join(',') }; },
     'placevalue:order_greatest_to_least': (r) => { const nums = [int(r, 10, 99), int(r, 100, 499), int(r, 500, 999)]; return { pv: { kind: 'order', nums, dir: 'desc' }, ans: nums.slice().sort((a, b) => b - a).join(',') }; },
     'number_sense:rounding_visual': (r) => { const n = nonMultiple(r, 11, 99, 10); return { pv: { kind: 'round', n, place: 10, line: [Math.floor(n / 10) * 10, Math.floor(n / 10) * 10 + 10] }, ans: rnd(n, 10) }; },

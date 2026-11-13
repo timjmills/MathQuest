@@ -659,11 +659,38 @@ registerSkill('placevalue:number_word_names', {
 
 /* =============================================================================== compare / order */
 
+// lf-placevalue compare r2 (critic r1 F2): the steps name and MARK the deciding place. Step 1 counts the digits (the count in
+// words when both are alike, so the Guided page's fading cue - hintOf, the first step that names a number - is step 2, the
+// decision, never "Compare 924 and 998" again); a same-length item names the first different place and boxes its two digits
+// (mark `digits`), then says which digit is bigger and so which number (mark `win`), then writes the sign. An "=" item works
+// three steps and a different-length item three, so the Guided Model - the item with the most steps - is always an item the
+// first different digit decides (F4: the only Model was "691 = 691"). Marks: `count` (a grey dot under every digit), `digits`
+// (the index, from the left, of the deciding digit - or `all`), `win` ('a' | 'b', the bigger number underlined), `answer`.
+const COUNT_WORD = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+const PLACE_FROM_LEFT = (len, i) => PLACE_WORD[10 ** (len - 1 - i)] || '';
+/** The compare item's decision: kind 'length' | 'place' | 'equal', the deciding index and digits. */
+export function compareDecision(a, b) {
+    const sa = String(Math.trunc(Math.abs(Number(a)))), sb = String(Math.trunc(Math.abs(Number(b))));
+    if (sa.length !== sb.length) return { kind: 'length', la: sa.length, lb: sb.length, sa, sb };
+    const i = [...sa].findIndex((d, k) => d !== sb[k]);
+    if (i < 0) return { kind: 'equal', la: sa.length, lb: sb.length, sa, sb };
+    return { kind: 'place', la: sa.length, lb: sb.length, sa, sb, i, da: Number(sa[i]), db: Number(sb[i]), place: PLACE_FROM_LEFT(sa.length, i) };
+}
+/** The M6 sign a pupil writes by comparing the last digits (M-C2) or, lengths differing, the first digits (M-C3). */
+export function compareM6(a, b) {
+    const sa = String(a), sb = String(b);
+    const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+    return {
+        last: cmp(Number(sa.slice(-1)), Number(sb.slice(-1))),
+        first: sa.length !== sb.length ? cmp(Number(sa[0]), Number(sb[0])) : null,
+    };
+}
+
 registerSkill('placevalue:compare', {
     strings: strings({
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
-        steps: ['Count the digits: more digits is bigger.', 'Same length: compare from the left place.', 'The first different digit decides.'],
+        steps: ['Count the digits: more digits is bigger.', 'Same count: find the first different digit from the left.', 'The bigger digit is the bigger number.'],
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
@@ -671,31 +698,40 @@ registerSkill('placevalue:compare', {
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
-        const la = String(p.a).length, lb = String(p.b).length;
-        let why;
-        if (la !== lb) why = `${f(la > lb ? p.a : p.b)} has more digits.`;
-        else if (p.a === p.b) why = 'Every digit is the same.';
-        else {
-            const sa = String(p.a), sb = String(p.b);
-            const i = [...sa].findIndex((d, k) => d !== sb[k]);
-            why = `The first different digits are ${sa[i]} and ${sb[i]}.`;
+        const d = compareDecision(p.a, p.b);
+        const A = f(p.a), B = f(p.b);
+        const write = step(`Write ${A} ${q.ans} ${B}.`, [{ slot: 'answer', value: String(q.ans) }]);
+        const count = { slot: 'count', value: `${d.la},${d.lb}` };
+        if (d.kind === 'length') {
+            const big = d.la > d.lb ? A : B;
+            return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb} digit${d.lb === 1 ? '' : 's'}.`, [count]),
+                step(`More digits is bigger: ${big} is greater.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
+                write];
         }
-        return [step(`Compare ${f(p.a)} and ${f(p.b)}.`), step(why), step(`${f(p.a)} ${q.ans} ${f(p.b)}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        if (d.kind === 'equal') {
+            return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+                step('Every digit is the same.', [{ slot: 'digits', value: 'all' }]),
+                write];
+        }
+        return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+            step(`The first different digits are in the ${d.place} place: ${d.da} and ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            step(`${d.da} is ${d.da > d.db ? 'greater' : 'less'} than ${d.db}, so ${A} is ${d.da > d.db ? 'greater' : 'less'} than ${B}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }]),
+            write];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return null;
-        const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
-        const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
-        const sa = String(p.a), sb = String(p.b);
-        const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;
-        // A named place error first (critic round 3: every shown mistake was the reversed sign);
-        // the reversed sign only when no place error gives a wrong sign.
-        const place = [
-            firstDigits ? { value: firstDigits, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
-            { value: lastDigits, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' },
+        const m6 = compareM6(p.a, p.b);
+        // (critic r1 F3: the thinking pages show the card's M6 - "89 > 312 because 8 > 3" - and nothing else. Different lengths:
+        // the first-digit form whenever it gives a wrong sign, else the last digits; same length: the last digits. An item M6
+        // gets RIGHT - "=", or a pair the last place decides (775 / 778) - has no named error and returns none, so the role
+        // skips it: it is never dealt to a True or False?, Reason It or Error analysis page. The reversed sign (M-C1) the r1
+        // pages showed instead - 509 < 508, 418 < 418 - was not the card's error.)
+        const named = [
+            m6.first && m6.first !== '=' ? { value: m6.first, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
+            m6.last !== '=' ? { value: m6.last, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' } : null,
         ].filter((c) => c && c.value !== String(q.ans));
-        return choose(q, place.length ? place : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
+        return named.length ? choose(q, named.slice(0, 1)) : null;
     },
 });
 

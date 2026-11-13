@@ -133,7 +133,11 @@ export function stepTemplateOf(it) {
     const id = q.cell && q.cell.template;
     if (!id || id === 'legacy' || !hasCell(id)) return null;
     const t = getCell(id);
-    return typeof t.stepState === 'function' ? t : null;
+    if (typeof t.stepState !== 'function') return null;
+    // (a template that draws step states for SOME of its kinds says which: `hasStepState(payload)`; the pv template draws the
+    // compare item's - lf-placevalue compare r2 - and every other pv kind keeps the whole-cell fallback below)
+    if (typeof t.hasStepState === 'function' && !t.hasStepState(q.cell.payload || {})) return null;
+    return t;
 }
 
 /**
