@@ -253,7 +253,8 @@ export const SHEET_ENGINE_CSS = `
 :is(.ws-page,.ws-sheet) .mq-frac>span+span{border-top:1.5pt solid currentColor;padding-top:.3mm}
 :is(.ws-page,.ws-sheet) .mq-slottag,:is(.ws-page,.ws-sheet) .mq-pupil .mq-slottag{position:absolute;top:.4mm;left:.8mm;font-size:var(--ws-zone);font-style:normal;font-weight:700;line-height:1;color:#000!important}
 /* chart_120 fix (ws-cell-checks TAGINK, error analysis L): a lettered chart square keeps its written number under the letter, not behind it */
-:is(.ws-page,.ws-sheet) .k2-chartwindow [data-ws-tagged]{padding-top:calc(var(--ws-zone) + .8mm)}
+:is(.ws-page,.ws-sheet) .k2-chartwindow [data-ws-tagged]{padding-top:calc(var(--ws-zone) + 1.8mm)}
+:is(.ws-page,.ws-sheet) .k2-chartwindow [data-ws-tagged]>.mq-slottag{top:0;left:.6mm}
 :is(.ws-page,.ws-sheet) .mq-fixsign .ws-circle{display:inline-flex;align-items:center;justify-content:center;font-size:var(--ws-digit);font-weight:700;line-height:1;vertical-align:middle}
 :is(.ws-page,.ws-sheet) .mq-eatask{font-size:var(--ws-text);line-height:1.2;margin:0 0 1mm;align-self:flex-start}
 :is(.ws-page,.ws-sheet) .mq-fixcols>.ws-box+.ws-box{margin-left:-.75pt}

@@ -396,7 +396,7 @@ function chartTo120(ref = {}) {
 
 registerSkill('composing:hundreds_chart_fill', {
     strings: stringsBy((t, ref) => (chartTo120(ref) ? HC_DEF_120 : null), HC_DEF),
-    misconceptions: ['wrong-row', 'reversed-digits', 'one-less', 'writes-ten-ten'],
+    misconceptions: ['wrong-row', 'reversed-digits', 'one-less'],
     workedSteps: chartSteps,
     wrongAnswer: (q) => {
         const t = num(q.ans);
@@ -404,9 +404,9 @@ registerSkill('composing:hundreds_chart_fill', {
         const c = [{ value: t <= 90 ? t + 10 : t - 10, misconception: 'wrong-row', explain: 'Read the number from the wrong row.' }];
         const rev = num(String(t).split('').reverse().join(''));
         if (t >= 10 && t < 100 && t % 10 && rev !== t) c.push({ value: rev, misconception: 'reversed-digits', explain: `Wrote the digits of ${t} the wrong way round.` });
-        // chart_120 (card M-C1): a number past 100 written as it is said, ten by ten: 110 as 1010,
-        // 101 as 1001, 100 as 1000.
-        if (t >= 100 && t <= 120) c.push({ value: num('10' + String(t - 100).padStart(2, '0')), misconception: 'writes-ten-ten', explain: `Wrote ${t} as it is said, 100 then ${String(t - 100).padStart(2, '0')}: four digits, not three.` });
+        // (chart_120, card M-C1 'writes-ten-ten' - 110 written 1010 - is NOT dealt in a chart square: four digits at the
+        // working size are 17.7 mm at L, wider than the 17 mm square, and printed '1,011' over the next square on True or
+        // False? L (ws-empty-band EB-EDGE, lf-builds chart_120 fix). Open for the lead: the card's §3 / §7a line.)
         c.push({ value: t - 1, misconception: 'one-less', explain: 'Wrote the number before, not the missing number.' });
         return chooseWrong(q, c);
     },
