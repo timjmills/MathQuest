@@ -128,3 +128,52 @@ the lead.
   column change in one step.
 
 Renders: `/tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/divarray-renders/mult_facts-review-{array,touch}-{S,M,L}-{p1,key-p1}.png`.
+
+## Lead rulings 2026-11-13: the × 0 frame, and Review S touch 15 (builder Opus medium)
+
+**1. A × 0 fact with the array support draws a short empty landscape frame** (`sheet/cells/fact.js`), as 0 ÷ n does.
+- This applies to 4 × 0 and 0 × n.
+- The frame is one row tall and as wide as the larger factor's dots (at least a five-group). It holds no dots.
+- Caption: "0 rows of 4, for 4 × 0".
+- It draws on paper and on every screen host (card, worksheet, quiz).
+
+**The check came first:** ws-screen-support-eq **ARRAY-FRAME**.
+- On an array-support band every fact draws its array or frame.
+- A × 0 fact draws the empty frame, at most half as tall as it is wide.
+- The card and quiz now render the item the scan dealt. Before, they re-generated it, and the dealer avoids repeats, so the 0 item was never drawn.
+
+On 669c41cea it FAILs 11 times (8 × 0 on paper S / M / L; 10 × 0 on the card at 1280 / 820 / 390 and on the quiz). On 792e5ca30 it is OK.
+
+| Backtest row | FAIL state | PASS state | Command |
+|---|---|---|---|
+| `array-frame-multfacts` | 669c41cea | 792e5ca30 | ws-screen-support-eq --only FRAME,EQ |
+| `review-zero-row-multfacts-array` | 05875e169 (H13-ROW "4 × 0", 32 %) | 792e5ca30 | print-lint array Review S --lints L-DENSITY |
+
+Both rows PASS, run directly.
+
+**2. Re-pin, ruled** (`design/audit/baselines/capacity.json` "ruled"):
+
+| Page | Before | After | Reason |
+|---|---|---|---|
+| mult_facts Review S `{"support":["touch"]}` | 16 | 15 | Lead ruling 2026-11-13: master's 16 relied on defective 32 % side bands (3-column Mixed Review stacks) |
+| mult_facts Review S `{"support":["array"]}` | 12 | 13 | A gain, pinned so it never falls |
+
+- The default-option pages are unchanged: mult_facts Review S is 16.
+- ws-capacity-pin had no supports dimension. It now measures a ruled page whose key names options as JSON after the size.
+- Those option pages are left out of SIZE-ORDER.
+- This note is the re-pin's status note (the pin file says: rewrite only on master or with a ruling).
+
+**Merge:** origin/master is merged in (b1bf118e6).
+- `review.js`: master's tightRows and this lane's supported-fact FACT_ROOM are both kept.
+- `backtests.json`: the union of both sides by row id. This lane's re-pointed rows win.
+
+**Gates, after the merge:**
+- print-lint --supports array S, the 4 roles × div / mult: **0**
+- ws-capacity-pin --check: OK (648 pinned pages, 0 drops; the ruled touch page is 15, the array page 13)
+- ws-screen-support-eq div + mult: OK
+- ws-boot-smoke: OK
+- `node --input-type=module --check`, every changed module: OK
+
+Renders: `/tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/divarray-renders/` (`mult_facts-review-array-S-p1.png`
+and `-key-p1.png` show 0 × 1 with its frame; `mult_facts-card-1280-zero.png` is 6 × 0, `mult_facts-card-390-zero.png` is 10 × 0, and
+`mult_facts-worksheet-1280-zero.png` is 11 × 0 among 12 cards).
