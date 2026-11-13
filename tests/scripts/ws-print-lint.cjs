@@ -1535,6 +1535,25 @@ function wsLintPage(cfg) {
     };
     const slotWeightOk = s => { for (const d of [s, ...s.querySelectorAll('*')]) { const t = ownText(d); if (t && !d.matches('.op, .head') && parseInt(getComputedStyle(d).fontWeight, 10) < 700 && s.getAttribute('data-ws-shape') !== 'open') return false; } return true; };
     const oneSymbolShapes = new Set(['circle', 'check', 'choice']);
+    /* L-OVERLAP RULE (lf-engine-roles critic N2: a two-Model Opener at S held its Model grid to its own height inside a band the
+       Steps column made taller, and the vertical rule between the two Model cells stopped 2.5 mm above the band's bottom rule:
+       a broken rule). Inside a kit band, a grid of two or more columns that ends the band carries its column rules down to the
+       band's bottom rule (within 0.5 mm). All roles' kit grids. */
+    if (!isLegacy) {
+        for (const band of document.querySelectorAll('.ws-page .ws-band')) {
+            const g = band.lastElementChild;
+            if (!g || !g.matches('.ws-grid') || !visible(g)) continue;
+            const cols = (getComputedStyle(g).gridTemplateColumns || '').split(/\s+/).filter(Boolean).length;
+            if (cols < 2) continue;
+            const br = band.getBoundingClientRect(), gr = g.getBoundingClientRect();
+            const inner = br.bottom - (parseFloat(getComputedStyle(band).borderBottomWidth) || 0);
+            const gap = inner - gr.bottom;
+            if (gap > 0.5 * PX) {
+                const lab = ((band.querySelector('.ws-strip > b') || {}).textContent || '').trim();
+                F('L-OVERLAP', 'RULE', 'minor', g, `the column rules of the ${cols}-column grid in the "${lab || 'band'}" band stop ${mm(gap)} mm above the band's bottom rule: a broken rule (the grid is held shorter than its band; RUBRIC C4)`, 'broken column rule');
+            }
+        }
+    }
     const out = { findings, tags, counters, fontsLoaded, andikaLoaded, andikaFaces: andikaFaces.map(f => `${f.family} ${f.weight} ${f.status}`), google, pages: [], legacy: null };
     const ITEM_BANDS = /^(Model|Guided Practice|Steps|Say|What's New|Vocabulary|Rule|Remember|Warm-up)\s*:/i;
     if (!isLegacy) {
