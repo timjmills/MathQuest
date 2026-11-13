@@ -4142,6 +4142,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lone-page",
+  "check": "a role page never holds ONE item where its ceiling is 2+ (H5; critic r6c / r6d D1: a Grade 2 story one a sheet)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks LONE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "df83248e",
+   "state": "sub_word_problems RI L 1 item"
+  },
+  "pass": {
+   "commit": "faeb7759",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_wp_10 --roles reason-it --size L --rules LONE-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell-number",
+  "check": "a number answer line holds the longer of the right and the wrong answer (critic r6d E1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "df83248e",
+   "state": "29 against 141: a 2-digit line"
+  },
+  "pass": {
+   "commit": "c42f7504",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
