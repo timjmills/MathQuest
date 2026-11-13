@@ -1,0 +1,9 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems,subtraction:sub_wp_compare_smaller --roles scripted-model --size S,L --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg5b; cd /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/../r2/master && tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems --roles scripted-model --size S --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg5m  [09802d0c4]
+ws-grade-render: 2 skills -> ../../../../../../tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg5b
+  [1/2] addition:add_word_problems  scripted-model-S 2p+2k 2x6  scripted-model-L 3p+3k 2x6  16s
+  [2/2] subtraction:sub_wp_compare_smaller  scripted-model-S 1p+1k 2x4  scripted-model-L 2p+2k 2x4  27s
+ws-grade-render: done, 2 units, 16 pages, 27s
+ws-grade-render: 1 skills -> ../../r3/dbg5m
+  [1/1] addition:add_word_problems  scripted-model 2p+2k 2x5  10s
+ws-grade-render: done, 1 units, 4 pages, 10s
+exit 0

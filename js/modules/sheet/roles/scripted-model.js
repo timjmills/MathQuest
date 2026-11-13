@@ -377,8 +377,15 @@ export function plan(input = {}) {
     // A SENTENCE STORY over two pages (word-stories precritic r3, critic r1 F10: two states a page, each step text beside its
     // frame 65-75 % empty, page 1 half empty): its frames stand side by side too, each with its step text over it, under the
     // story printed once - one page when that grid fits it.
-    const storyAcross = !!story && cols === 2 && steps.length >= 2 && steps.length <= 4 && deal.length > 1;
-    const acrossOk = (a, em = 0.5) => {
+    // (and a ONE-STEP column story - the + / − story hosts at band "No limit": six states beside one-line step texts left every
+    // text cell 78-83 % empty, master's class, word-stories r3)
+    const pl0 = (it.q && it.q.cell && it.q.cell.template === 'word-work' && it.q.cell.payload) || null;
+    const colStory = !story && !rowMarks && !!pl0 && Array.isArray(pl0.steps) && pl0.steps.length === 1 && steps.length <= 6;
+    const storyAcross = (!!story || colStory) && cols === 2 && steps.length >= 2 && steps.length <= 6 && deal.length > 1;
+    // (a story's step sentences are Andika text: about 0.45 em a character, measured on the L Model - 0.5 em counted a third
+    // line no step printed and sent the four frames to two pages)
+    const emA = storyAcross ? 0.45 : 0.5;
+    const acrossOk = (a, em = emA) => {
         if (!tallBeside && !storyAcross) return true;
         const colW = 186 / a - 6 - 9.5;
         const charMm = em * m.textPt * (25.4 / 72);
@@ -397,7 +404,7 @@ export function plan(input = {}) {
     if (acrossAt) {
         across = acrossAt;
         const colW = 186 / across - 6 - 9.5;
-        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const charMm = emA * m.textPt * (25.4 / 72);
         const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
         textMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
         H = hMinAt([it], across, ctx) + textMm;
@@ -407,7 +414,7 @@ export function plan(input = {}) {
         // still stands them two across, a row of two a page: beside its step text each frame left the text cell 65-75 %
         // empty; the pages are dealt by whole rows, the Say band on the last)
         const colW = 186 / 2 - 6 - 9.5;
-        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const charMm = emA * m.textPt * (25.4 / 72);
         const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
         const tMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
         const H2 = hMinAt([it], 2, ctx) + tMm;

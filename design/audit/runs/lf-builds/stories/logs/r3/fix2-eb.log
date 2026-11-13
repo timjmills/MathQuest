@@ -1,0 +1,9 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --json /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/fix2-eb.json  [09802d0c4]
+Terminated
+exit 143
+ConnectionClosedError: Connection closed.
+    at Connection._rawSend (/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Connection.js:106:35)
+    at Connection.send (/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Connection.js:99:21)
+    at CdpPage.close (/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Page.js:916:34)
+    at async main (/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-empty-band.cjs:490:29)
+ws-empty-band: FAIL

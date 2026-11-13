@@ -125,7 +125,9 @@ export function wordWorkSteps(q) {
         out.push(step(`Write ${fmt(st.top)} and ${fmt(st.bottom)} in the boxes.`));
         out.push(step(workLine(st)));
     });
-    out.push(step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
+    // (a one-step story's last step names the label it writes, as the lesson's "Say the answer and its label": "Write the answer:
+    // 6 coins." left its Model text cell 32 % empty beside it at S - word-stories r3, EB-SIDE)
+    out.push(step(`Write the answer${p.unit && p.steps.length === 1 ? ' and its label' : ''}: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
     return clampSteps(out);
 }
 

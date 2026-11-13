@@ -1,0 +1,59 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles scripted-model --hosts none; tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems,subtraction:sub_wp_compare_smaller --roles scripted-model --size S,L --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg6  [09802d0c4]
+note: addition:add_word_problems: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: addition:add_word_problems_plain: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: subtraction:sub_word_problems: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: subtraction:sub_word_problems_plain: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: addition:add_wp_change_unknown: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: subtraction:sub_wp_change_unknown: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+note: subtraction:sub_wp_compare_smaller: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+EB-BAND  FAIL 30
+   subtraction:sub_word_problems scripted-model S p1 cell 2: empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []
+   subtraction:sub_word_problems scripted-model S p1 cell 4: empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []
+   subtraction:sub_word_problems scripted-model S p1 cell 6: empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []
+   subtraction:sub_word_problems scripted-model S p2 cell 2: empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []
+   subtraction:sub_word_problems scripted-model S p2 cell 4: empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []
+   subtraction:sub_word_problems scripted-model M p1 cell 2: empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []
+   subtraction:sub_word_problems scripted-model M p1 cell 4: empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []
+   subtraction:sub_word_problems scripted-model M p2 cell 2: empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []
+   subtraction:sub_word_problems scripted-model M p2 cell 4: empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []
+   subtraction:sub_word_problems scripted-model M p3 cell 2: empty band 66.2 mm under the ink of a 80.8 mm cell (81.9 %; limit 30 % = 24.2 mm) []
+   subtraction:sub_word_problems scripted-model L p1 cell 2: empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []
+   subtraction:sub_word_problems scripted-model L p1 cell 4: empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []
+   subtraction:sub_word_problems scripted-model L p2 cell 2: empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []
+   subtraction:sub_word_problems scripted-model L p2 cell 4: empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []
+   subtraction:sub_word_problems scripted-model L p3 cell 2: empty band 82.3 mm under the ink of a 98 mm cell (84.0 %; limit 30 % = 29.4 mm) []
+   ... 15 more
+EB-SIDE  FAIL 16
+   subtraction:sub_word_problems scripted-model S p1 cell 2: empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   subtraction:sub_word_problems scripted-model S p1 cell 4: empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []
+   subtraction:sub_word_problems scripted-model S p2 cell 2: empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []
+   subtraction:sub_word_problems scripted-model S p2 cell 4: empty band 27.3 mm beside the ink of a 92.3 mm wide cell (32 %) []
+   subtraction:sub_word_problems scripted-model M p1 cell 4: empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []
+   subtraction:sub_word_problems scripted-model M p2 cell 4: empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []
+   subtraction:sub_word_problems scripted-model L p1 cell 4: empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []
+   subtraction:sub_word_problems scripted-model L p2 cell 4: empty band 44.7 mm beside the ink of a 92.3 mm wide cell (52 %) []
+   subtraction:sub_word_problems_plain scripted-model S p1 cell 2: empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   subtraction:sub_word_problems_plain scripted-model S p1 cell 4: empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []
+   subtraction:sub_word_problems_plain scripted-model S p2 cell 2: empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []
+   subtraction:sub_word_problems_plain scripted-model S p2 cell 4: empty band 27.3 mm beside the ink of a 92.3 mm wide cell (32 %) []
+   subtraction:sub_word_problems_plain scripted-model M p1 cell 4: empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []
+   subtraction:sub_word_problems_plain scripted-model M p2 cell 4: empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []
+   subtraction:sub_word_problems_plain scripted-model L p1 cell 4: empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []
+   ... 1 more
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(7 skill(s), 21 renders, 132 cells, 54 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (46)
+ws-grade-render: 2 skills -> ../../../../../../tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg6
+  [1/2] addition:add_word_problems  scripted-model-S 2p+2k 2x6  scripted-model-L 2p+2k 2x6  15s
+  [2/2] subtraction:sub_wp_compare_smaller  scripted-model-S 1p+1k 2x4  scripted-model-L 1p+1k 2x4  26s
+ws-grade-render: done, 2 units, 12 pages, 26s
+exit 0

@@ -696,7 +696,10 @@ export function prepare(it, info = {}) {
         const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
         const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // (a word-work COLUMN story starts its ink at the work's top - the story's first line, no top pad as the sentence layout
+        // keeps - so its label sat 1.8 mm over it at M, under PT-ERR-4's 2 mm: lifted 0.5 mm, word-stories r3 PUPILTAG)
+        const wwLift = it.template === 'word-work' && !(((it.q || {}).cell || {}).payload || {}).layout ? 0.5 : 0;
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0) + wwLift}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
