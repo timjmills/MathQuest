@@ -615,3 +615,15 @@
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun) {
     padding-left: var(--fp, 3mm) !important; padding-top: calc(var(--ws-tab, 6mm) + 1.3mm) !important; --ws-koin: 0mm; --mq-fx: 0mm !important; }
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }
+/* CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): a ONE-LINE cell answered in place whose row stretches
+   it by 30 % or more is centred down its box, the white split above and below the line, instead of all of it under the line
+   (CL-4b's top of the box). Opt-in twice: a template marks its root `data-ws-stretchmid` (placevalue:compare's "a ( ) b" line
+   only) and the page plan marks the cell `ws-rowstretch` when its row is at least 1.3 x its measured height
+   (sheet/roles/practice.js). An unstretched row keeps the top of the box (CL-4b): centred there is an L-TOPSTART fail. Additive. */
+.ws-page .ws-grid > .ws-cell.ws-rowstretch[data-ws-cell]:has(> [data-ws-stretchmid]):not([data-ws-writeabove]):not(.blankrun) { justify-content: safe center !important; }
+/* (CL-4d, the line's place: its centre 1.5 mm below the centre of the padded box - the middle of the paper from the top pad to the
+   cell's edge, as the pupil sees it - whether or not the CL-40 tab spacer stands above it: the spacer's half is taken back by an
+   equal and opposite pair of margins, so the cell's measured height never changes) */
+.ws-page .ws-grid > .ws-cell.ws-rowstretch[data-ws-cell]:not([data-ws-writeabove]):not(.blankrun) > [data-ws-stretchmid] { margin-top: 1.5mm !important; margin-bottom: -1.5mm !important; }
+.ws-page .ws-grid > .ws-cell.ws-rowstretch[data-ws-cell]:has(> :is(.ws-tab, .ws-letter)):not([data-ws-writeabove]):not(.blankrun) > [data-ws-stretchmid]:not(.pv-nospacer):has(> .ws-eq:first-child) {
+    margin-top: calc(1.5mm - max(0mm, calc(var(--ws-tab, 5mm) - 2mm)) / 2) !important; margin-bottom: calc(max(0mm, calc(var(--ws-tab, 5mm) - 2mm)) / 2 - 1.5mm) !important; }

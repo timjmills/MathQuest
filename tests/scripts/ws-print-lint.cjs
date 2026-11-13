@@ -192,7 +192,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'TOPSTART-STRETCH'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -1020,7 +1020,28 @@ function wsLintPage(cfg) {
                     inkTop = Math.min(inkTop, r.top); inkBot = Math.max(inkBot, r.bottom);
                 }
                 if (inkTop === Infinity) { inkTop = box.t; inkBot = box.b; }
-                if (judged && fits && wa) {
+                /* CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): the CL-4b stretch exception. A one-line
+                   cell answered in place that opts in (data-ws-stretchmid on its template root) is centred down its box when its
+                   row stretches it by 30 % or more (the room inside the pads at least 1.3 x its content), within 2 mm; a row that
+                   stretches it less keeps the top of the box (the top rule below, 3 mm). OPT-IN rule TOPSTART-STRETCH
+                   (--rules, --rule-skills) judges every ONE-LINE cell of the named skills the same way, marked or not, so a
+                   stretched one-line cell left at the top of its box is found before the attribute exists. */
+                const smMark = c.hasAttribute('data-ws-stretchmid') || !!c.querySelector('[data-ws-stretchmid]');
+                let smLine = false;
+                if (!smMark && optOn('TOPSTART-STRETCH') && inkTop < Infinity) {
+                    let fs = 0;
+                    for (const d of c.querySelectorAll('*')) {
+                        if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                        if ([...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) fs = Math.max(fs, parseFloat(getComputedStyle(d).fontSize) || 0);
+                    }
+                    smLine = fs > 0 && (inkBot - inkTop) <= 1.8 * fs;
+                }
+                const smCell = judged && fits && !wa && (smMark || smLine);
+                const stretch = (inner.b - inner.t) / Math.max(1, box.b - box.t);
+                if (smCell && stretch >= 1.3) {
+                    const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);
+                    if (Math.abs(off) > 2 * PX) F('L-TOPSTART', smMark ? 'CL-4d' : 'TOPSTART-STRETCH', 'major', c, `a one-line cell in a row that stretches it ${Math.round((stretch - 1) * 100)} % is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre, ${mm(Math.max(inner.b - box.b, 0))} mm (${Math.round((Math.max(inner.b - box.b, 0) / H) * 100)} %) empty under it: a row that stretches a one-line cell by 30 % or more centres it down the box (CL-4d, lead 2026-11-13)`, 'stretched one-line cell not centred');
+                } else if (judged && fits && wa) {
                     const off = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);   // the laid-out problem, answer zone included
                     if (Math.abs(off) > 2 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `write-above cell is ${mm(Math.abs(off))} mm ${off < 0 ? 'above' : 'below'} the cell's centre: the pupil writes above this problem, so it is centred down the box (CL-4b)`, 'write-above not centred');
                 } else if (judged && fits) {
@@ -1028,7 +1049,14 @@ function wsLintPage(cfg) {
                     const lab = c.querySelector(':scope > .ws-tab, :scope > .ws-letter, :scope > .ws-modeltab, :scope > [data-ws-label]');
                     if (lab) top = Math.max(top, lab.getBoundingClientRect().bottom + 1 * PX);   // CL-40 / CL-41: just below the tab
                     const gap = inkTop - top;
-                    if (gap > 3 * PX) F('L-TOPSTART', 'CL-4b', 'major', c, `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, 'not at top of box');
+                    // (CL-4d: an unstretched one-line cell CENTRED down its box fails even inside the 3 mm - its line sits
+                    // visibly down (over 1.5 mm) with as much white above as below, which the lead ruled is the top's place)
+                    const smOff = ((box.t + box.b) / 2) - ((inner.t + inner.b) / 2);
+                    if (smCell && gap <= 3 * PX && gap > 1.5 * PX && Math.abs(smOff) <= 1 * PX) F('L-TOPSTART', smMark ? 'CL-4d' : 'TOPSTART-STRETCH', 'major', c,
+                        `a one-line cell its row stretches only ${Math.round((stretch - 1) * 100)} % (under 30 %) is centred down its box, ${mm(gap)} mm below the top pad: an unstretched cell keeps the top of the box (CL-4b, CL-4d)`, 'unstretched one-line cell centred');
+                    if (gap > 3 * PX) F('L-TOPSTART', smCell ? (smMark ? 'CL-4d' : 'TOPSTART-STRETCH') : 'CL-4b', 'major', c, smCell
+                        ? `first printed row starts ${mm(gap)} mm below the top pad of a one-line cell its row stretches only ${Math.round((stretch - 1) * 100)} % (under 30 %): an unstretched cell keeps the top of the box (CL-4b, CL-4d)`
+                        : `first printed row starts ${mm(gap)} mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)`, smCell ? 'unstretched one-line cell centred' : 'not at top of box');
                 }
                 // CL-4b: under a top cell the band below the problem is writing room, not a sizing error.
                 // (a cell answered IN PLACE - data-ws-inplace: the sentence-layout story, the fact-family check - holds no
@@ -2945,6 +2973,72 @@ const SELF_TESTS = [
         c.setAttribute('data-ws-writeabove', '1');
         c.style.justifyContent = 'flex-start';
         c.closest('.ws-grid').style.gridTemplateRows = `${80 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    // CL-4d (lead 2026-11-13): a one-line cell that opts in (data-ws-stretchmid) is centred when its row stretches it by 30 % or
+    // more, keeps the top of the box when it does not; the opt-in TOPSTART-STRETCH judges an unmarked one-line cell the same way.
+    { name: 'stretched one-line cell centred (CL-4d)', expect: [], absent: ['L-TOPSTART', 'CL-4d'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'stretched one-line cell at the top of its box (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /stretches it/, fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'unstretched cell centred (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /only \d+ %/, fn: () => {
+        // 30 mm of content in a row whose room inside the pads is 1.25 x it: centred, it starts 3.75 mm down
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());   // no tab: the top rule reads from the top pad
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:30mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${30 * 1.25 * MM + pads}px repeat(20, auto)`;
+    } },
+    // ... and inside the 3 mm too: 32 mm of content centred in a row 1.17 x it starts 2.7 mm down (the neighbour cells keep the row)
+    { name: 'unstretched one-line cell centred within 3 mm (CL-4d)', expect: ['L-TOPSTART', 'CL-4d'], msg: /is centred down its box/, fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:32mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'center', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${32 * 1.17 * MM + pads}px repeat(20, auto)`;
+    } },
+    { name: 'the same unstretched one-line cell at the top (CL-4d control)', expect: [], absent: ['L-TOPSTART', 'CL-4d'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => k.remove());
+        c.insertAdjacentHTML('beforeend', '<div data-ws-stretchmid="1" style="text-align:center"><div style="height:32mm;width:20mm;margin:0 auto;border:0.75pt solid #000"></div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        const cs = getComputedStyle(c), MM = 96 / 25.4;
+        const pads = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+        c.closest('.ws-grid').style.gridTemplateRows = `${32 * 1.17 * MM + pads}px repeat(20, auto)`;
+    } },
+    { name: 'stretched one-line cell at the top, unmarked (TOPSTART-STRETCH opt-in)', rules: ['TOPSTART-STRETCH'], expect: ['L-TOPSTART', 'TOPSTART-STRETCH'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
+    } },
+    { name: 'the same cell with the rule off (TOPSTART-STRETCH opt-in control)', expect: [], absent: ['L-TOPSTART', 'TOPSTART-STRETCH'], fn: () => {
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        c.setAttribute('data-ws-cell', 'pv');
+        [...c.children].forEach(k => { if (!k.matches('.ws-tab, .ws-letter, [data-ws-label]')) k.remove(); });
+        c.insertAdjacentHTML('beforeend', '<div style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>');
+        c.style.setProperty('justify-content', 'flex-start', 'important');
+        c.closest('.ws-grid').style.gridTemplateRows = `${60 * 96 / 25.4}px repeat(20, auto)`;
     } },
     // CL40-INK (CL-40, critic 2026-10-24 D1): a top-started across fact whose first digit sits on the number tab's
     // bottom-right corner. The plant puts a digit-size glyph where "48 ÷ 12" put its "4": just right of the tab, its

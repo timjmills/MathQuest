@@ -839,7 +839,9 @@ function pvRenderBody(p, ctx0) {
                     return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;align-items:flex-end;">`
                         + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
                 }
-                return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
+                // (`data-ws-stretchmid`, lead 2026-11-13: the one line is centred down a row that stretches it by 30 % or more -
+                // css/sheet-kit.css, ws-print-lint L-TOPSTART - the white split above and below it, never all under it)
+                return `<div class="pv-cell" data-ws-stretchmid="1" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
             case 'order':
