@@ -3994,7 +3994,7 @@
     "state": "lf-algebra growing lesson as critic r2 graded it: Warm-up cells 32.5 % empty (uniform row), Practice 4 + 2 on two half-used pages"
    },
    "pass": {
-    "commit": "5e5bbe73f",
+    "commit": "5d022c783",
     "state": "the lf-engine G7 fix on top of d20c8a003 (proof branch): Warm-up sized to ink, Practice trimmed to the engine's perPage"
    },
    "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only patterns:growing_shape_patterns --sizes L,M,S --layout-seeds 4242,973079 --rules LS-WARM,LS-FILL,PM-CONT",
