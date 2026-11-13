@@ -1006,3 +1006,16 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
 | 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
 | 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+
+### lf-engine roles (2026-11-13): three shared-role findings handed off by lf-placevalue, each turned into a check before the critic
+
+Process note: these three defects (opener empty band, Mixed spill, Sections sub-section density) were found by ONE skill's
+critic (lf-placevalue compare) but live on every skill on those roles. The engine lane turned each into a machine check
+(ws-empty-band EB-BAND on the opener, ws-print-lint PG-23 on Mixed, ws-print-lint DN-2/PG-23 by sub-section) with a backtest
+that FAILs on master and PASSes on the fix, so the next skill-lane's precritic catches them before a critic round is spent.
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| Opener empty band on tightRows rows + one-column Model | ws-empty-band EB-BAND (every role) | roles-opener-tightrows-band | ws-precritic --skill | ~1 round per pv/in-place skill on the opener |
+| Mixed practice spilled start leaves a lone short page | ws-print-lint PG-23 | roles-mixed-spill-pg23 | precritic → coverage-matrix mixed | ~1 round per multi-skill Mixed page |
+| Sections sheet of mixed cell heights flagged DN-2/PG-23 wrongly | ws-print-lint DN-2/PG-23 by sub-section | roles-sections-subsection-density | precritic → coverage-matrix sections | ~1 false critic finding per Sections sheet |

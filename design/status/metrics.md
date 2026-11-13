@@ -540,3 +540,15 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+
+### lf-engine roles (2026-11-13): three shared-role findings from lf-placevalue compare r2, each a check FAIL-on-master / PASS-on-fix
+
+| Finding | Check that catches it | Backtest row | On precritic's path | Rounds saved |
+|---|---|---|---|---|
+| 1 Opener EB-BAND: tightRows rows grown 8 mm + a one-column Model stretched to the Steps column, 30-67 % white under the ink (pv expand / unit_form / combine) | ws-empty-band EB-BAND (every offered role): the Opener holds tightRows rows to IN_PLACE_FILL and a one-column Model to its ink | roles-opener-tightrows-band (8df014ab7 FAIL → 53732be32 OK; expand,unit_form) | ws-precritic --skill (ws-empty-band renders every role) | 1 round |
+| 2 Mixed practice PG-23: a spilled one-shelf-per-skill start left a lone short last page (fill loop gated behind lessonFit) | ws-print-lint PG-23 (coverage-matrix mixed rows): every spilled Mixed page fills the pages it takes | roles-mixed-spill-pg23 (8df014ab7 FAIL → 77bfb1786 OK) | ws-precritic --skill → coverage-matrix mixed/* | 1 round |
+| 3 Sections DN-2 / PG-23 compared sub-sections of different cell heights with the whole sheet | ws-print-lint DN-2 / PG-23 now compare each page with its own sub-section (cells attributed, >1 skill); Mixed is one section | roles-sections-subsection-density (fixture) | ws-precritic --skill → coverage-matrix sections/* | 1 round |
+
+Proof passed skills unharmed: render-hash sweep master vs branch — opener 9 pv pages changed (items 2→4), mixed 242 pages
+(items rose, pages never dropped), 0 independent-sections changed (finding 3 is check-only); ws-lesson-baseline
+--all-lessons 1596 hashes identical. Before/after PNGs: design/audit/runs/lf-engine-roles/proof/.

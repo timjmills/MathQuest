@@ -498,3 +498,19 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
 | 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
 | 6 (re-critic lf-engine-live-pm2) re-flow of a sheet fixed one measure (pages used) and broke another (tab clearance): number tab over the T head on sheet items 10-12, pages 27-35 % blank; 709605bb reverted | gate every page rule on the page you change: TAB-CLEAR on sheet Guided / Independent blocks; SHEET-2PG fails when a page >= 30 % blank while any row is below design height; pages balanced within 15 % (proposed, not yet built) | lesson-sheet-2pg PENDING (item 6 redone separately) | precritic lesson-samples-all | 1 round lost |
+
+## lf-engine roles (2026-11-13): the three shared role layouts lf-placevalue flagged, each a check that FAILS on master and PASSES on the fix
+
+Findings from lf-placevalue on `placevalue:compare`; (2) and (3) were pre-existing on master `8df014ab7` and hit every skill
+on those roles (not compare-specific). Each is a machine check on ws-precritic's path for every skill on that role.
+
+| Finding | Check that catches it | Backtest row | On precritic's path | Rounds saved |
+|---|---|---|---|---|
+| 1 Opener EB-BAND: a `tightRows` section's Guided / Independent rows grown 8 mm (PT-ENG-3) and the Model stretched to the Steps column left 30-67 % white under the ink (pv expand S 61 %, unit_form L 35 %, combine L). A one-column Model (hMinAt Infinity at 2) was sized Infinity mm and dropped every Independent row | ws-empty-band EB-BAND on `--roles opener` (already on every `--skill` run): the Opener now holds tightRows rows to IN_PLACE_FILL and a one-column Model to its half-width measurement (DN-10) or full-width with Steps underneath (L11) | roles-opener-tightrows-band (8df014ab7 FAIL → 53732be32 OK; placevalue:expand,unit_form) | ws-precritic --skill (ws-empty-band renders every offered role) | 1 round |
+| 2 Mixed practice PG-23: a page whose one-shelf-per-skill start spills to page 2 left a lone short last page (compare+add_facts+tape_diagram+perimeter L: page 2 held 2 of 10) — the fill-by-weight-gap loop was gated behind the lesson-only `lessonFit` flag | ws-print-lint L-DENSITY PG-23 (on the coverage-matrix mixed rows): every Mixed page whose start spills now fills the pages it takes (`multi` = anchors OR start > page 1) | roles-mixed-spill-pg23 (8df014ab7 FAIL → 77bfb1786 OK) | ws-precritic --skill → ws-coverage-matrix mixed/* | 1 round |
+| 3 Sections DN-2 / PG-23: a `--kind sections` sheet prints sub-sections of different cell heights (compare lines p1, tape diagrams p2, perimeter p3, each page full of its OWN skill), and the whole-sheet item count read pages 2-3 as half-empty / short | ws-print-lint DN-2 / PG-23 now compare each page with its own sub-section's pages when every cell is attributed and the sheet holds > 1 skill (PG-23 is "rebalanced across the SECTION's pages"); Mixed practice stays one section | roles-sections-subsection-density (fixture: one-section.fail → subsections.pass) | ws-precritic --skill → ws-coverage-matrix sections/* | 1 round |
+
+Proof the passed skills are not harmed: a render-hash sweep of every `redesign-passed.js` skill, master vs this branch,
+changed exactly the opener pages of the three pv skills (items rose 2 → 4) and the Mixed pages whose start spilled (items
+rose, pages never dropped); 0 independent-sections pages changed (finding 3 is a check-only change); lesson pages
+byte-identical (ws-lesson-baseline --all-lessons, 1596 hashes). Before/after PNGs: `design/audit/runs/lf-engine-roles/proof/`.
