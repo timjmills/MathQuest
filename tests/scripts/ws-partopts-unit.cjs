@@ -259,7 +259,11 @@ async function unit() {
         const z = src.indexOf('renderParts(si', a);
         const seg = src.slice(a, z < 0 ? a + 2000 : z);
         const sched = /scheduleBuild\(/.test(seg);
-        const guarded = /if\s*\([^)]*(?:JSON\.stringify|changed|!==)[^)]*\)\s*\{?[^;]*scheduleBuild\(/.test(seg);
+        // (guarded: `if (<cond>) scheduleBuild()` where the condition, or the name it reads, is a before / after compare)
+        const g = /if\s*\(([^)]*)\)\s*\{?\s*scheduleBuild\(/.exec(seg);
+        const cond = g ? g[1].trim() : '';
+        const cmp = /!==|!=|JSON\.stringify/;
+        const guarded = !!g && (cmp.test(cond) || (/^!?\w+$/.test(cond) && new RegExp(`\\b(?:const|let|var)\\s+${cond.replace(/^!/, '')}\\s*=[^;]*(?:!==|!=)`).test(src.slice(a, a + 3000))));
         if (!sched) F('PO-4', 'teacher-print.js re-snaps s.partOpts after a build without scheduling a build: the packet keeps the count built at the size before (FU-1)');
         else if (!guarded) F('PO-4', 'teacher-print.js schedules a build after every re-snap, not only one that changed partOpts: a build loop (FU-1)');
         console.log(`PO-4 FU-1: the re-snap after a build ${sched ? (guarded ? 'schedules a build when it changes partOpts' : 'schedules a build unguarded') : 'schedules NO build'}`);
