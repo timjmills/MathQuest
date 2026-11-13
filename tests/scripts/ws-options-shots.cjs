@@ -176,7 +176,9 @@ function judge(m, ink) {
         const inside = s.x >= f.x - 1 && s.y >= f.y - 1 && s.x + s.w <= f.x + f.w + 1 && s.y + s.h <= f.y + f.h + 1;
         if (!m.unavailable && !inside) fails.push(`[inside] stage (${Math.round(s.x - f.x)},${Math.round(s.y - f.y)}) ${Math.round(s.w)}×${Math.round(s.h)} is not inside the ${Math.round(f.w)}×${Math.round(f.h)} frame (${m.cropped ? 'is-cropped, ' : ''}transform ${m.transform})`);
     } else if (!m.unavailable) fails.push('[inside] no .tvp-stage in the frame');
-    if (!m.unavailable && ink <= INK_MIN) fails.push(`[ink] the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > 0.5 %)`);
+    // (a part of a sample shown in parts that holds legible words, "Plot: A(-4,4)", is not blank: it needs some ink, not 0.5 %)
+    const inkMin = m.part && m.minPx != null ? 0.0003 : INK_MIN;
+    if (!m.unavailable && ink <= inkMin) fails.push(`[ink] the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > ${(inkMin * 100).toFixed(2)} %)`);
     if (!m.unavailable && s && m.minPx != null && m.minPx < TEXT_MIN - 0.05) fails.push(`[text] text drawn at ${m.minPx.toFixed(1)} px ("${m.minText}"; needs >= ${TEXT_MIN} px; ${m.transform})`);
     const k = Number(scaleOf(m.transform));
     if (!m.unavailable && s && k < 0.2995) fails.push(`[scale] drawn at scale ${k} (needs >= 0.30: below it a sample's strokes are hairlines)`);

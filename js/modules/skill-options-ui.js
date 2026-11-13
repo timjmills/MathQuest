@@ -518,8 +518,8 @@ function _tidySample(frame) {
     // shorter than its CSS height and the drawing reaches the scale it was grown for (critic-panel-r1 F3).
     const border = frame.offsetHeight - frame.clientHeight;
     const vh = (typeof window !== 'undefined' && window.innerHeight) || 800;
-    // (the frame grows up to 32 % of the window and 300 px: room for a whole step or answer choice at 9 px text)
-    const cap = Math.max(base, Math.min(300, Math.round(vh * 0.32)) - border - SAMPLE_PAD);
+    // (the frame grows up to 36 % of the window and 300 px: room for a whole step, answer choice or matching table at 9 px)
+    const cap = Math.max(base, Math.min(300, Math.round(vh * 0.36)) - border - SAMPLE_PAD);
     const setInner = (inner, max = cap) => {
         const px = Math.max(base, Math.min(max, Math.ceil(inner)));
         if (px > base) frame.style.height = `${px + SAMPLE_PAD + border}px`;
@@ -533,7 +533,7 @@ function _tidySample(frame) {
     const whole = _sampleSize(stage);
     // The scale at which the sample is legible: its strokes reach 0.3 (teacher-preview's MIN_LEGIBLE) and its smallest
     // word or digit is drawn at 9 px (critic-panel-r1 F1). A sample that reaches it whole is shown whole, the frame grown
-    // (up to 32 % of the window and 300 px) only as far as it needs.
+    // (up to 36 % of the window and 300 px) only as far as it needs.
     const need = _sampleNeed(stage);
     if (Math.min(1, fw / whole.w, cap / whole.h) >= need - 0.001) {
         _samplePartUI(frame, 0, 1);
@@ -544,7 +544,7 @@ function _tidySample(frame) {
     // (the question; then the drawing; then the answer choices, ...), each part legible, with "1 of N" and arrows. A part
     // is a whole block of the item, never a crop through it.
     const pages = _samplePages(stage, fw, cap);
-    if (pages.length < 2) {   // nothing to split along: the whole item, as large as the capped frame allows
+    if (!pages.length) {   // nothing to split along: the whole item, as large as the capped frame allows
         _samplePartUI(frame, 0, 1);
         place(whole.w, whole.h, setInner(cap));
         return;
@@ -604,9 +604,30 @@ function _sampleDrawn(el) { return _sampleShown(el) && el.getBoundingClientRect(
  */
 function _sampleLeaves(el, fits, splits) {
     if (fits(el)) return [el];
+    // A table (a times-table chart) splits by its rows, its first row (the headings) kept on every part.
+    if (el.tagName === 'TABLE' && !el.closest('svg')) {
+        const rows = [...el.rows].filter(_sampleDrawn);
+        if (rows.length >= 3) {
+            splits.push(el);
+            for (const sec of new Set(rows.map((r) => r.parentElement))) if (sec !== el) splits.push(sec);
+            rows[0].dataset.skoSticky = '1';
+            return rows.slice(1);
+        }
+    }
     const kids = [...el.children].filter(_sampleDrawn);
     const cs = getComputedStyle(el);
     const loose = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    // A grid (a place-value mat: its labels over its mats) splits by its columns, each column whole, read left to right.
+    if (/grid/.test(cs.display) && kids.length >= 2 && !loose && !el.closest('svg, table')) {
+        const lefts = [...new Set(kids.map((k) => Math.round(k.offsetLeft)))].sort((a, b) => a - b);
+        if (lefts.length >= 2) {
+            splits.push(el);
+            el.dataset.skoGridSplit = '1';
+            kids.forEach((k) => { k.dataset.skoCol = String(lefts.indexOf(Math.round(k.offsetLeft))); });
+            const order = kids.slice().sort((a, b) => (+a.dataset.skoCol - +b.dataset.skoCol) || (a.offsetTop - b.offsetTop));
+            return order.flatMap((k) => _sampleLeaves(k, fits, splits));
+        }
+    }
     const column = /^(block|flex|flow-root|list-item)$/.test(cs.display) && !(cs.display === 'flex' && /row/.test(cs.flexDirection) && cs.flexWrap === 'nowrap');
     if (!kids.length || loose || !column || el.closest('svg, table')) return [el];
     splits.push(el);
@@ -622,6 +643,8 @@ function _samplePages(stage, fw, cap) {
         _sampleShowAll(stage);
         for (let a = el; a && a !== cell && a.parentElement; a = a.parentElement) {
             for (const sib of a.parentElement.children) if (sib !== a && _sampleShown(sib)) _sampleHide(sib);
+            const g = a.parentElement;
+            if (g.dataset.skoGridSplit && !g.dataset.skoGrid) { g.dataset.skoGrid = g.style.gridTemplateColumns || '-'; g.style.gridTemplateColumns = 'repeat(1, auto)'; }
         }
         const s = _sampleSize(stage);
         const ok = Math.min(1, fw / s.w, cap / s.h) >= Math.max(SAMPLE_PART_MIN, _sampleNeed(stage)) - 0.001;
@@ -631,7 +654,7 @@ function _samplePages(stage, fw, cap) {
     const splits = [];
     const leaves = _sampleLeaves(cell, fits, splits);
     if (leaves.length < 2) return [];
-    const tree = { leaves, splits };
+    const tree = { leaves, splits, sticky: splits.flatMap((t) => (t.tagName === 'TABLE' ? [...t.rows].filter((r) => r.dataset.skoSticky) : [])) };
     // (a part of drawings only is packed to half size, not to the strokes' 0.3 floor: one part is never a column of specks)
     const fitsPage = (page, floor = SAMPLE_PART_MIN) => {
         _sampleApply(stage, tree, page);
@@ -651,11 +674,14 @@ function _samplePages(stage, fw, cap) {
     for (let i = pages.length - 1; i >= 0 && pages.length > 1; i--) {
         if (!slotOnly(pages[i])) continue;
         const to = [0, ...pages.keys()].find((j) => j !== i && !slotOnly(pages[j]) && fitsPage([...pages[j], ...pages[i]].sort((x, y) => leaves.indexOf(x) - leaves.indexOf(y)), SAMPLE_MIN_LEGIBLE));
-        if (to === undefined) continue;
+        // (an empty slot that fits on no part is left out: the teacher sees the question and its drawing, never a part
+        // that is one blank box)
+        if (to === undefined) { pages.splice(i, 1); continue; }
         pages[to] = [...pages[to], ...pages[i]].sort((x, y) => leaves.indexOf(x) - leaves.indexOf(y));
         pages.splice(i, 1);
     }
-    if (pages.length < 2) { _sampleShowAll(stage); return []; }
+    // (one part left once an empty slot is left out: the item without its blank box, shown legibly, with no "1 of 1")
+    if (!pages.length) { _sampleShowAll(stage); return []; }
     const out = pages.map((page) => { _sampleApply(stage, tree, page); return { leaves: page, tree, ..._sampleSize(stage) }; });
     _sampleShowAll(stage);
     return out;
@@ -664,12 +690,25 @@ function _samplePages(stage, fw, cap) {
 /** Show only `page`'s parts (and the blocks that hold them). */
 function _sampleApply(stage, tree, page) {
     _sampleShowAll(stage);
-    for (const el of tree.splits) if (!page.some((l) => el.contains(l))) _sampleHide(el);
+    // (a table's heading row shows with any of its rows)
+    const shown = [...page, ...(tree.sticky || []).filter((h) => page.some((l) => h.closest('table').contains(l)))];
+    for (const el of tree.splits) if (!shown.some((l) => el.contains(l))) _sampleHide(el);
     for (const el of tree.leaves) if (!page.includes(el)) _sampleHide(el);
+    // a split grid shows only some of its columns: it lays out that many (auto-placement keeps each label over its mat)
+    for (const g of tree.splits) {
+        if (!g.dataset.skoGridSplit || g.dataset[_SKO_HIDE]) continue;
+        const cols = new Set([...g.children].filter((k) => k.dataset.skoCol !== undefined && !k.dataset[_SKO_HIDE]).map((k) => k.dataset.skoCol));
+        g.dataset.skoGrid = g.style.gridTemplateColumns || '-';
+        g.style.gridTemplateColumns = `repeat(${Math.max(1, cols.size)}, auto)`;
+    }
 }
 function _sampleHide(el) { if (el.dataset[_SKO_HIDE]) return; el.dataset[_SKO_HIDE] = el.style.display || '-'; el.style.display = 'none'; }
 function _sampleShowPage(stage, pages, at) { _sampleApply(stage, pages[at].tree, pages[at].leaves); }
 function _sampleShowAll(stage) {
+    for (const g of stage.querySelectorAll('[data-sko-grid]')) {
+        g.style.gridTemplateColumns = g.dataset.skoGrid === '-' ? '' : g.dataset.skoGrid;
+        delete g.dataset.skoGrid;
+    }
     for (const el of stage.querySelectorAll('[data-sko-hide]')) {
         const was = el.dataset[_SKO_HIDE];
         el.style.display = was === '-' ? '' : was;
@@ -914,7 +953,7 @@ function _renderTeacherPopover(el) {
     el.setAttribute('aria-labelledby', 'tvSkoTitle');
     el.removeAttribute('aria-label');
     el.innerHTML = `<div class="tv-sko-head">
-            <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum">${escHTML(summary)}</p></div>
+            <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum" title="${escHTML(summary)}">${escHTML(summary)}</p></div>
             <button type="button" class="tv-icon-btn" onclick="closeSkillOptionsPanel()" aria-label="Close options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
         </div>
         ${canSample ? `<div class="tv-sko-sample is-pinned"><div class="tv-sko-samplehead"><span class="tv-label" id="tvSkoSampleL">Sample question</span><span class="tv-sko-part" hidden><button type="button" class="tv-icon-btn" data-sko-part="-1" aria-label="Previous part of the sample"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><span class="tv-sko-part-n" aria-live="polite"></span><button type="button" class="tv-icon-btn" data-sko-part="1" aria-label="Next part of the sample"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></span></div><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
