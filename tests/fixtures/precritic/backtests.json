@@ -3491,7 +3491,7 @@
    "state": "combine Test S 4 x 5 (102 mm white), Review S 4 across (89 mm white); the Independent page 3 across"
   },
   "pass": {
-   "commit": "PENDING",
+   "commit": "81aac843",
    "state": "a ghost frame at S held to three across (hardCap) on every role"
   },
   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles test,review --hosts none --no-baseline --grid-foot --only EB-GRIDFOOT",

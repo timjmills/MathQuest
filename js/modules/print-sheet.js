@@ -3933,6 +3933,8 @@ async function buildSheetDeal(req = {}) {
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
+            // (`keepCols`, additive: the re-seat below reads it - a pv compare page keeps its columns)
+            ...(it.footprint && it.footprint.keepCols ? { keepCols: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -6502,7 +6504,11 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
                     // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
-                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    // (nor a section whose footprints say `keepCols` - pv compare, lf-placevalue compare round: "408 ( ) 666" at S in
+                    // rows held to its ink fills 3 x 10 to about 80 %, and the re-lay to 2 x 14 left a 31 % band each side of every
+                    // cell; the spare height stays under the grid, as `tightRows` keeps it on every role)
+                    const keepCols = (best.items || []).length > 0 && best.items.every((it) => !!(it && it.keepCols));
+                    const cMin = divFactsPlainSection(s) || keepCols ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;

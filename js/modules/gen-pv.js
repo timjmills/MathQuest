@@ -875,7 +875,9 @@ function genCompare(q, skill, o) {
     const cap = capOf('placevalue', skill, o, 999);
     let [a, b] = comparableSet(2, cap, o);
     // One item in six is equal (the "=" case; CP-9), dealt, never rolled.
-    if (slot(6) === 5 && o.lengths !== 'mixed') b = a;
+    // (lf-placevalue compare round: at a place that turns from block to block - blockOrder - never every sixth item, where
+    // 6, 12, 18, 24 and 30 were "=" on every page and a pupil could read the answer off the item number)
+    if (blockOrder(6)[slot(6)] === 5 && o.lengths !== 'mixed') b = a;
     if (slot(2) === 1 && a !== b) [a, b] = [b, a];
     q.text = `Compare: ${fmt(a)} ___ ${fmt(b)}`;
     q.printText = 'Write <, > or = in the circle.';
@@ -890,7 +892,9 @@ function genCompare(q, skill, o) {
         + `<div style="width:2.2rem;height:2.2rem;border:1.5pt solid #000;border-radius:50%;"></div>`
         + `<div style="font-size:2rem;font-weight:700;">${fmt(b)}</div></div>`;
     q.pv = { kind: 'compare', a, b, closeness: String(a)[0] === String(b)[0] && String(a).length === String(b).length ? 'close' : 'far', lengths: o.lengths || 'equal' };
-    setCell(q, { kind: 'compare', a, b, keyValue: q.ans });
+    // (`inPlace`, lf-placevalue compare round: the sign is written in the circle - no working room - so the rows are held to the
+    // ink: ws-empty-band read 35-40 % of every Independent, More practice and Test cell empty under the one line)
+    setCell(q, { kind: 'compare', a, b, keyValue: q.ans, inPlace: true });
 }
 
 function genOrder(q, skill, o) {

@@ -970,7 +970,13 @@ register('pv', {
             // (and expand's rows, combine's Mixed Review band: one line of boxes in 19.6 mm rows, 40 % empty under it; and unit
             // form's standard row "119 = [ ] hundreds [ ] tens [ ] ones", 12 rows flexed to 19 mm on its Test at S, 39 %)
             const tight = (p.kind === 'frame' && (!!p.ghost || !!p.rowOnly)) || p.kind === 'expand' || (p.kind === 'blanks' && !!p.words)
-                ? { tightRows: true } : {};
+                || p.kind === 'compare' ? { tightRows: true } : {};
+            // (compare, lf-placevalue compare round: "408 ( ) 666" is one line answered in its circle - held to its ink on every role
+            // (tightRows), at most three across (hardCap: at S a fourth column put the numbers against the cell's edges), fewer where
+            // the measured line is wider - band 999,999 - so a Test never stands wider than its Independent page, EB-GRIDFOOT;
+            // `keepCols`: the page is never re-laid in fewer, wider columns to fill it - print-sheet's re-seat put it 2 x 14 at S,
+            // a 31 % band each side)
+            if (p.kind === 'compare') return { wMm: 62, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, ...tight };
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
             // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
