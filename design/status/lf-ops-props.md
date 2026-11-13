@@ -194,3 +194,58 @@ Other red rows on those pages:
 | array dot in the label keep-out (mult_properties more-practice L) | ws-print-lint L-OVERLAP CL40-INK (--roles more-practice; not on precritic's --skill path) | add more-practice to precritic's print-lint roles |
 | count_by_tables has no lesson record | ws-node-lint LESSON-DATA | - |
 | count_by_tables phone 390 px clip / focus | ws-phone-card | - |
+
+## Round r3b (2026-11-13, resumed builder, Opus medium) - on the merge of origin/master 79aaacf4 (ab5ee3ef)
+Logs: /tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/props-r3b/
+
+### The killed builder's WIP (1c6766cd4), judged
+- arrays-turn width test (colW from `ctx.columns`, else 2 columns): measured with a buildSheet probe (scratchpad tools/probe.cjs) on
+  mult_properties more-practice L: the first dot stayed at 6.8 mm across, 4.8 mm down - the spacer never applied (CL40-INK 4 kept).
+  Making it unconditional (as arrays does) fixed the dot but cost 4 mm a cell: the page fell from 6 pairs to 4 in 106-118 mm rows (a band).
+  Both dropped; replaced by c1c54b5c (below).
+- layout.js (groupByHeight 1.2 x for `noStretch`; rowShape cap at 1.25 x the shortest problem for `noStretch` rows): no measured
+  effect on the arrays_groups H13-ROW at L (print-lint before and after: the same x2 at 38-39 %). Kept (harmless, a sound rule), not credited.
+
+### Step 1 - re-measure after the centring drop (932a9cda)
+- print-lint kit, independent / guided / more-practice / test, three skills: L-TOPSTART 0 at S, M and L (was every page).
+  Left: L CL40-INK 4 (mult_properties more-practice), L H13-ROW 2 + 2 (arrays_groups independent / test p1 cell 2: a 2-row array
+  beside a 5-row one, 38-39 %), S H13-ROW 2 + 4 (arrays_groups guided / test); M clean.
+
+### Fixes (r3b)
+| Fix | Commit | Before -> after |
+|---|---|---|
+| merge origin/master 79aaacf4 (cell-checks TITLE + words-rules kept; buildLesson optionLesson + dealPracticeOpts kept) | ab5ee3ef | - |
+| arrays-turn CL-40: a pair whose first array is the taller is set in from the left by --ws-koin + 0.5 mm (no width test; cell height unchanged) | c1c54b5c | mult_properties more-practice L CL40-INK 4 -> 0 (first dot 6.8 -> 10.2 mm across); print-lint kit L / M four grid roles 0 |
+| backtest row pl-cl40-arrays-turn-mp | 584c43ac | FAIL fc981d0c7, OK c1c54b5c: PASS |
+| Reason It: a count-row TRAIN wider than half the cell wraps to its own panel (pair form + cellLiveMm), replacing lf-algebra's interim revert 2cfeb1d7; an arcs row keeps `full` | 77187c6e | number_patterns_rule Reason It L 1 -> 2 items a page; a first try that wrapped arcs rows too: count_by_tables Reason It S TY-21 60 / TY-12 52 (reverted to trains only) |
+| Reason It A/B panels start at --ws-koin | 77187c6e | print-lint reason-it L CL40-INK 4 (count_by_tables 2, number_patterns_rule 2) -> 0; four skills S / L 0 |
+| count-row slot width from the band's widest number (payload.bandDigits, number patterns) | 77187c6e | independent S / L of count_by_tables and number_patterns_rule: 0 findings (not measured per row) |
+
+### Not reached (budget $28)
+Step 2 overflows (arrays_groups test M +2.6 mm; mult_properties cell-checks OVERFLOW forms 1 / mixed lesson, test S mixed, pre-skill-check
+L key; SIZE-S 5; options-render forms=1 / task=1 at L); count_by_tables phone-card 390, lesson TY-12 / PAGEFILL / PG-23, options-verify
+capacity; the screen train (lf-algebra F2) - unmeasured; arrays_groups H13-ROW at L (independent / test p1 cell 2) and S (guided / test);
+EB-FOOT re-measure on the guarded tool (lf-checks e5aa5ae1 is not on master); step 4; the 8 TBD-lf-ops-fix4 backtest rows (not filled:
+no -props commit has been run against them; cc-title / cc-title-cbt still need their check or row fixed).
+
+### Findings -> checks (r3b)
+| Finding | Check that catches it | Backtest |
+|---|---|---|
+| arrays-turn dot in the label keep-out (a width test on ctx.columns, which a grid role does not carry) | ws-print-lint L-OVERLAP CL40-INK --roles more-practice | pl-cl40-arrays-turn-mp (PASS) |
+| Reason It panel corner in the keep-out | ws-print-lint --roles reason-it L-OVERLAP | - (add: fail ab5ee3ef, pass 77187c6e) |
+| wrapping an arcs count row in a narrow panel shrinks its boxes | ws-print-lint L-ANSAREA TY-21 / L-OVERFLOW TY-12 on reason-it | - |
+| Speed: a backtest run under mq-browser-run deadlocks (it wraps its own commands) - run ws-backtest and ws-precritic directly | - | - |
+| Speed: a 40-line buildSheet probe (scratchpad tools/probe.cjs: cell size, ink bottom, first-dot position) settled the WIP in one run | - | - |
+
+### Gates on 77187c6e (r3b final, logs in the scratchpad props-r3b/)
+- ws-boot-smoke OK; ws-code-snapshot OK (732 codes); node --input-type=module --check OK on arrays-turn.js, layout.js, reason-it.js,
+  count-row.js, gen-mult-patterns.js, print-sheet.js; ws-backtest --row pl-cl40-arrays-turn-mp PASS.
+- precritic --skill mult_properties --strict: FAIL 7 / PASS 23 (was 11 FAIL / 17 PASS): empty-band (EB-BAND 70, EB-FOOT 28, EB-SIDE 2),
+  screen-ink-size (22, a master gate new to this branch), sibling-compare (no approved sibling), print-lint lesson L, render-gate other
+  roles, cell-checks (OVERFLOW / SIZE-S 5), options-render (forms=1 at L: 4 items where the default prints 6). print-lint kit S/M/L PASS.
+- precritic --skill arrays_groups --strict: FAIL 6 / PASS 24 (was 11 / 18): empty-band (EB-BAND 42, EB-SIDE 13, EB-FOOT 43 - master's
+  tool), screen-ink-size, print-lint lesson S, render-gate (test M overflow), cell-checks, sibling-compare. print-lint kit S/M/L PASS.
+- precritic --skill count_by_tables and --role lesson: started after the above (precritic-count_by_tables.log / precritic-lesson.log);
+  not read before the budget stop.
+- EB-BAND rose on both skills after 932a9cda (the centring drop, owner rule CL-4b): a top-started cell in a row sized for a taller one
+  now shows its band at the foot. The cure is the row sizing (step 2 / H13-ROW), not centring.
