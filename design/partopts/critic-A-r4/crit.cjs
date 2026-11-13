@@ -118,8 +118,8 @@ const SEED = `(() => { let a = 1; Math.random = function () { a |= 0; a = a + 0x
         log(`  page tabs (${tabsL.length}): ${tabsL.join(' | ')}`);
         if (s.tabShot && W >= 1000) { const tb = page.locator('#tvPageTabs'); await tb.scrollIntoViewIfNeeded(); await tb.screenshot({ path: path.join(OUT, `${s.tag}-tabs.png`) }); }
         if (W >= 1000) {
-            const el = page.locator('#tvPartsWide'); await el.scrollIntoViewIfNeeded();
-            await el.screenshot({ path: path.join(OUT, `${s.tag}-ui.png`) });
+            const el = page.locator('#tvPartsWide'); if (!process.env.NOPARTS) { await el.scrollIntoViewIfNeeded();
+            await el.screenshot({ path: path.join(OUT, `${s.tag}-ui.png`) }); }
         } else {
             const el = page.locator('.tv-section .tv-parts-wrap').first(); await el.scrollIntoViewIfNeeded();
             await el.screenshot({ path: path.join(OUT, `${s.tag}-ui.png`) });
