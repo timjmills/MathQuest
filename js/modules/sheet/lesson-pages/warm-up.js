@@ -216,10 +216,16 @@ export function warmUpBand(env) {
             // The page's spare height may grow these cells only while each one's own item still
             // fills all but WARM_BAND of it (critic SU-C r2 N2: at L the grown row left a short
             // fact 39-40 % of a 65 mm cell empty); what it cannot take passes to the bands after it.
+            // (lf-engine G7, lf-algebra critic r2: a Warm-up cell starts its item at the top (CL-4b), so what it leaves empty
+            // is read from the item's measured INK - its lowest text, drawing, stroked box or answer slot, `inkMm` - not from
+            // its footprint, whose pad and answer room are already paper the pupil sees: the footprint rule grew a stacked
+            // fact to 56 mm with 32 % of it blank under the answer row. An item measured without ink keeps the footprint rule.)
             const room = halves.map((id) => {
                 const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
                 const hs = its.map((it) => hOf(it, shape[id].cols));
                 if (!hs.length || hs.some((h) => !(h > 0))) return Infinity;
+                const inks = its.map((it) => { const mm = it.measured && it.measured[shape[id].cols]; return mm && mm.inkMm > 0 ? mm.inkMm : NaN; });
+                if (inks.every((v) => Number.isFinite(v))) return rowsOf(id) * Math.min(...inks) / (1 - WARM_BAND) - hW;
                 return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
             });
             const maxAdd = Math.max(0, Math.min(...room));

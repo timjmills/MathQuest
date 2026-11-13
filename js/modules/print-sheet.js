@@ -2397,6 +2397,9 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         let contentBottom = r.top;
         let stampH = 0;
         let slackPx = Infinity;
+        // (lf-engine G7: the item's lowest INK - text, a drawing, a stroked box, an answer slot - from the cell's top, so a
+        // planner that grows a top-started cell knows how much of it the item leaves empty; ws-lesson-samples LS-WARM)
+        let inkBottom = r.top;
         const pics = [];
         const leaves = [];
         for (const el of cell.querySelectorAll('*')) {
@@ -2409,6 +2412,8 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             }
             if (el.closest('.ws-legacy-answer')) continue;
             contentBottom = Math.max(contentBottom, er.bottom);
+            if (!el.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab') && ([...el.childNodes].some((x) => x.nodeType === 3 && x.textContent.trim()) || /^(svg|img|canvas)$/i.test(el.tagName) || el.hasAttribute('data-ws-slot')
+                || ['Top', 'Bottom', 'Left', 'Right'].some((k) => parseFloat(ecs[`border${k}Width`]) > 0 && ecs[`border${k}Style`] !== 'none'))) inkBottom = Math.max(inkBottom, er.bottom);
             // CL-8: how near the drawing comes to the cell's side borders (its leaves,
             // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
             if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
@@ -2459,7 +2464,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
             }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx };
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkBottom - r.top };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -2498,7 +2503,8 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
         best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
-            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM) });
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM),
+            inkMm: Math.max(b0.inkMm || 0, m.inkPx / PX_PER_MM) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -2525,6 +2531,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits && !divFactTooWide(it, size, inner) };
                 if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
+                if (b.inkMm > 0) it.measured[c].inkMm = Math.ceil(b.inkMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
@@ -5025,12 +5032,31 @@ async function buildLesson(n, metaOf) {
     }
     const buildPractice = async (seed, sec) => {
         let res = null;
+        let lastTry = null;
         for (const shape of facts || blocks ? [null] : stackShapes) {
             const r = await buildSheetInner(practiceReq(practicePages, true, shape || undefined, seed, sec));
             const f0 = r.fits && r.fits.sections && r.fits.sections[0];
             const whole = f0 ? f0.clamped !== true : true;
             practiceTried.push({ shape, pages: r.pageCount, clamped: !whole, hMin: f0 && f0.hMin, cellH: f0 && f0.cellH, stripH: +stripH.toFixed(1) });
             if (r.pageCount <= practicePages && whole) { res = r; break; }
+            lastTry = { r, shape: shape || stackShapes[stackShapes.length - 1] };
+        }
+        // (lf-engine G7, lf-algebra critic r2: six growing patterns on a page that holds four printed 4 + 2 - the second page
+        // 51-55 % blank (PM-CONT) - because the shape's count was dealt whatever the page holds. A shape that spills past the
+        // pages asked prints what those pages hold, in whole rows, with its strip: the engine's own capacity of the last shape
+        // tried (`fits.perPage`), never a count the planner guesses. ws-lesson-samples PM-CONT / LS-FILL.)
+        if (!res && !facts && !blocks && lastTry && lastTry.r.pageCount > practicePages) {
+            const per = Number(lastTry.r.fits && lastTry.r.fits.perPage);
+            if (per > 0 && per < lastTry.shape[0]) {
+                const shape = [per, lastTry.shape[1]];
+                const r = await buildSheetInner(practiceReq(practicePages, true, shape, seed, sec));
+                const f0 = r.fits && r.fits.sections && r.fits.sections[0];
+                // `per` is the engine's own capacity, so the cells fit their column; a remaining clamp is the column reduction
+                // a wide cell asks for (columns 2 -> 1), not an overflow (which carries "wider than its cell even in 1 column").
+                const overflow = !!(f0 && f0.clamped === true && /wider than its cell/.test(String(f0.reason || '')));
+                practiceTried.push({ shape, pages: r.pageCount, clamped: !!(f0 && f0.clamped), perPage: per, stripH: +stripH.toFixed(1) });
+                if (r.pageCount <= practicePages && !overflow) res = r;
+            }
         }
         // The strip never pushes a page overleaf: without room for it the page prints without it.
         if (!res) res = await buildSheetInner(practiceReq(practicePages, false, undefined, seed, sec));

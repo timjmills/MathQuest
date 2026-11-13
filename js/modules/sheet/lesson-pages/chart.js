@@ -173,9 +173,7 @@ export function stateItems(example, data) {
         // A panel lays itself out per column count on purpose (its heading wraps): not a collapse.
         colsLayout: true,
     };
-    const panels = groups.map((g, k) => Object.assign({}, base, {
-        lessonState: k,
-        cellCls: `mq-cstatecell mq-cstate-${variant}cell`,
+    const panelOf = (g, k, variant) => ({
         render: (c, o) => {
             const z = Number(c.chartZoom) > 0 ? Number(c.chartZoom) : 1;
             // Lessons r2: a 3-column chart (the panels share the grid with the other examples)
@@ -197,7 +195,15 @@ export function stateItems(example, data) {
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;
         },
-    }));
+    });
+    const panels = groups.map((g, k) => Object.assign({}, base, { lessonState: k, cellCls: `mq-cstatecell mq-cstate-${variant}cell` }, panelOf(g, k, variant)));
+    // (lf-engine DIV, lf-partopts critic r3 P4: a 2 x 2 chart of a one-line drawing - div_facts' "120 ÷ 12 = __" - ended its
+    // panels half way down the page, 49 % of it blank. Each panel's full-width twin - the step head over the drawing, as a
+    // `chartWide` chart draws it - is measured too, so chartPage can lay the four steps one under the other, the drawing
+    // enlarged to the full width (PT-ANC-1's poster exception, 1.6 x at most as on the 2 x 2), when the 2 x 2 leaves the
+    // page under its floor: never a smaller drawing and never a panel stretched past a quarter.)
+    const rowTwins = variant === 'col' && groups.length >= 4 && !(data && data.chartWide)
+        ? groups.map((g, k) => Object.assign({}, base, { lessonStateRow: k, cellCls: 'mq-cstatecell mq-cstate-colcell', footprint: { wMm: 186, hMm: null, measure: true, maxCols: 1 } }, panelOf(g, k, 'col'))) : [];
     const draws = groups.map((g, k) => Object.assign({}, base, {
         lessonDraw: k, cellCls: 'mq-cdrawcell',
         render: (c) => `<div class="mq-cdraw">${drawing(k, c)}</div>`,
@@ -227,7 +233,7 @@ export function stateItems(example, data) {
                 + `${words.length ? `<div class="mq-cwords">${words.map((w) => `<div>${esc(w)}</div>`).join('')}</div>` : ''}</div>`;
         },
     })] : [];
-    return panels.concat(draws, tails, tailPanels);
+    return panels.concat(draws, tails, tailPanels, rowTwins);
 }
 
 /**
@@ -330,7 +336,11 @@ export function sameFactForms(ex) {
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
-export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
+/** The share of its body below which a 2 x 2 chart tries its steps as full-width rows (lf-engine DIV; ws-lesson-samples
+ *  LS-FILL's 70 % page-use floor). */
+export const CHART_FILL = 0.7;
+
+export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null, rowTwins = []) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
     const f = frameOf({ skills: target, input, tabId: 'Anchor chart', score: 0, footerLeft: lesson.tagLine });
@@ -413,11 +423,45 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         if (z1) z = z1;
         else { fallback = true; z = tailItem ? solve((q) => lay.rows * H(q), availP, 0.7, 1) || 0.7 : 1; }
     }
+    // ROWS (lf-engine DIV, lf-partopts critic r3 P4: the div_facts 2 x 2 chart left 49 % of its page blank): when the 2 x 2
+    // panels at their largest (zMax, grown a quarter at most) leave the chart under CHART_FILL of its body, the steps are laid
+    // one under the other as full-width rows - the step head over its drawing, the drawing enlarged up to 1.6 x or the
+    // row's width - provided the rows hold the drawing at least as large as the 2 x 2 did and fill the page better. Rows are
+    // measured (`rowTwins`), grown a quarter at most like the panels, never stretched.
+    let rowsMode = null;
+    if (mode === 'one' && !fallback && !tailItem && rowTwins.length === n && n >= 4) {
+        const fixedH = m.say + chantH + 2;
+        const rowH2 = Math.max(H(z), Math.min(availP / lay.rows, H(z) * 1.25));
+        const fill2 = (lay.rows * rowH2 + fixedH) / m.body;
+        const baseR = rowTwins.map((x) => hOf(x, 1) + 1);
+        const zWR = states.map((st, k) => {
+            const d = draws[k];
+            const fitCols = [4, 3, 2, 1].find((c) => d && d.measured && d.measured[c] && d.measured[c].fits !== false) || 1;
+            return (186 - 8) / ((isRound(example) ? 84 : 186 / fitCols - 6));
+        });
+        const zMaxR = Math.max(1, Math.min(1.6, ...zWR));
+        const HR = (q) => Math.max(...rowTwins.map((x, k) => baseR[k] + (q - 1) * dH[k]));
+        const zR = baseR.every((v) => v > 1) ? solve((q) => n * HR(q), availP, Math.max(1, z), zMaxR) : 0;
+        if (fill2 < CHART_FILL && zR >= z) {
+            const rowHR = Math.max(HR(zR), Math.min(availP / n, HR(zR) * 1.25));
+            const fillR = (n * rowHR + fixedH) / m.body;
+            if (fillR > fill2) rowsMode = { z: zR, rowH: rowHR };
+        }
+    }
+    if (rowsMode) { mode = 'rows'; z = rowsMode.z; }
     const withZoom = (x, c) => Object.assign(planItem(Object.assign({}, x, { render: (cc, o) => x.render(Object.assign({}, cc, { chartZoom: z }), o) }), { cols: c, nolabel: true }), { cls: x.cellCls });
     const sections = [];
     let rowH;
     let room;
-    if (mode === 'grid3') {
+    if (rowsMode) {
+        room = availP;
+        rowH = rowsMode.rowH;
+        // Content-sized rows (grown a quarter at most, like the panels): the drawing is enlarged to the row's width and the
+        // steps read top to bottom, so the one-line chart uses ~2/3 of its body instead of ~1/2 (critic P4), but a tiny
+        // drawing is never STRETCHED to fill (that would leave a 40 % band inside each cell): PT-ANC-1 lets a poster keep
+        // spare height below. The chart's page-use floor (ws-lesson-samples LS-FILL) is 60 %, not the sheet's 70 %.
+        sections.push(gridPart(rowTwins.map((x) => withZoom(x, 1)), { cols: 1, rows: n, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' }));
+    } else if (mode === 'grid3') {
         room = availAll;
         const hr = rowsAt(z);
         const tot = sum(hr);
