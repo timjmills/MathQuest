@@ -69,7 +69,12 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   A-over-B stack (add_wp_10 RI 1 -> 2; 17 capacity rises, no drop). Number lines hold the longer of right / wrong (E1);
   the no-story response row centres (N1). Checks: LONE-PAGE (ws-cell-checks default: one item a page where the role holds
   2+; it found add_wp_10), LINE-TELL extended; backtests lone-page, line-tell-number PASS.
-- Critic r6e running (before = df83248e).
+- Critic r6e: PASS (0 counted). r13: npr RI count-row trains stack (OVERFLOW 18 -> 0), a list's response column takes its
+  own width; critic r6f FAIL (S band 33 %) -> the A / B tag in a left gutter at S / M -> npr RI 3 / 3 / 2; critic r6g PASS.
+  ABTAG check (self-test pair). Backtests ri-countrow-overflow, ri-stack-band PASS.
+- Deploy-4: PR #45 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ 329273de); gates green; lessons 1596/1596 identical.
+- lf-algebra r2 queue: G4 fte RI 2 at every size here (npr fixed); G3 npr RI S 3; G2 not reproduced at the default seed
+  (seed asked); G10 / pattern_features / growing / fgr not in this tree; F3 gone at head (print-raster check -> lf-checks).
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
