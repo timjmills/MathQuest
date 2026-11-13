@@ -7219,8 +7219,8 @@
    "state": "every screen gate defaulted to card 390 (ws-empty-band, ws-screen-ink-size, ws-screen-slots, ws-grade-render, ws-phone-card 390x844, ws-next-box card-390 ...), RUBRIC listed '390 phone': 21 findings"
   },
   "pass": {
-   "commit": "27545964d",
-   "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts (re-pointed from 29ef1eb21 by critic lf-tools r1 A2: the derived scan also reads ws-student-explorer, still 390 there)"
+   "commit": "fdc35fb99",
+   "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts (re-pointed from 29ef1eb21 by critic lf-tools r1 A2: the derived scan also reads ws-student-explorer, still 390 there) (re-pointed from 27545964d by lf-tools r3: NP-PUPIL, critic r2 D2, finds the pupil 390 steps ws-share-options and ws-simple-print still ran there)"
   },
   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
   "expect": {
@@ -7289,6 +7289,86 @@
   }
  },
  {
+  "id": "drawing-key-complete",
+  "check": "critic lf-tools r2 D1 (round cap, the r1 B1 class twice): ws-drawing-key mutates one payload field at a time (values from the live corpus) for every registered sheet template and FAILs when the rendered skeleton changes but ws-copy-light's drawing key does not; fac8e03a0 keyed the drawing on a hand-kept field list (kind / task / layout / mode / type / form), so stack op / unknown / regroup / operands (and 111 more fields on 38 templates) changed the drawing but not the key",
+  "kind": "commit-pair",
+  "rule": "ws-drawing-key DRAWING-KEY (tests/lib/ws-drawing-skeleton.mjs)",
+  "browser": false,
+  "fail": {
+   "commit": "fac8e03a0",
+   "state": "115 fields on 38 templates change the skeleton but not the key (stack.op '+' -> '-', stack.unknown, stack.regroup, ...)"
+  },
+  "pass": {
+   "commit": "fdc35fb99",
+   "state": "the key is template + the skeleton hash: 0 findings on 46 judged templates"
+  },
+  "command": "node tests/scripts/ws-drawing-key.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-stack-batch",
+  "check": "critic lf-tools r2 D1: the batch add_column_multi + add_missing_digit + sub_missing_digit (stack: four addend rows, a carry row, the missing-digit box) read BATCH OK on stack at fac8e03a0, anchored by sub_50_no_regroup (op '-', two rows), and mult_2by1_column (stack op '*') read ELIGIBLE; both refused now, while add_sub_10s stays ELIGIBLE",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light --batch / --skill --require, eligibility per rendered drawing",
+  "browser": false,
+  "fail": {
+   "commit": "fac8e03a0",
+   "state": "BATCH OK on template stack; mult_2by1_column ELIGIBLE"
+  },
+  "pass": {
+   "commit": "fdc35fb99",
+   "state": "BATCH FAIL (each of the three never-passed stack drawings); mult_2by1_column NOT ELIGIBLE; add_sub_10s ELIGIBLE"
+  },
+  "command": "! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch addition:add_column_multi,addition:add_missing_digit,subtraction:sub_missing_digit > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill multiplication:mult_2by1_column --require > /dev/null && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require > /dev/null && echo 'stack-batch: OK' || echo 'stack-batch: FAIL'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-sample-widths-per-skill",
+  "check": "critic lf-tools r2 D3: several skills in one copy-light run (precritic --skill a --skill b --copy-light) each get their own narrow critic brief, so EACH skill's sample must hold 1280, 1366, 820 and 1024; fac8e03a0 dealt the widths across the skills, so each skill missed one",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light buildSample (copy-light mode: per skill; a batch still deals across the batch)",
+  "browser": false,
+  "fail": {
+   "commit": "fac8e03a0",
+   "state": "each skill has 3 of the 4 widths"
+  },
+  "pass": {
+   "commit": "fdc35fb99",
+   "state": "every skill has all four widths"
+  },
+  "command": "f=$(mktemp) && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup --sample-out $f > /dev/null && node -e \"const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const bad=j.skills.filter(s=>{const w=new Set(s.pages.filter(p=>p.host!=='print').map(p=>p.width));return ![1280,1366,820,1024].every(x=>w.has(x))}).map(s=>s.skill);console.log(j.skills.length>=2&&!bad.length?'widths-per-skill: OK':'widths-per-skill: FAIL ('+(bad.join(',')||'fewer than 2 skills')+')')\" $f; rm -f $f",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-phone-width-pupil-allow",
+  "check": "critic lf-tools r2 D2: ALLOW is per file and said 'no pupil screen host at 390', but ws-share-options played twelve pupil practice-card questions at 390 x 844 (pupil 3) and shot the pupil Quick Start grid at 390; ws-simple-print checked the pupil home at 390. NP-PUPIL: a 390 line in an allowed file with a pupil / student step within 6 lines is a finding; the pupil steps now run at 1024 x 768",
+  "kind": "commit-pair",
+  "rule": "ws-no-phone-width NP-PUPIL",
+  "browser": false,
+  "fail": {
+   "commit": "fac8e03a0",
+   "state": "NP-PUPIL ws-share-options.cjs (2), ws-simple-print.cjs (1)"
+  },
+  "pass": {
+   "commit": "fdc35fb99",
+   "state": "no pupil 390 step; the teacher 390 steps stay allowed with a true reason"
+  },
+  "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
   "id": "no-phone-width-derived",
   "check": "critic lf-tools r1 A2: ws-no-phone-width scans EVERY script precritic, the deploy gates or the opt-in rules name (derived, not a hand list), with an allow-list carrying reasons; at f3ae7acca the pupil gate ws-student-explorer (deploy session 1) still rendered 390 x 844 and 360 x 740 and the hand list never read it",
   "kind": "commit-pair",
@@ -7299,10 +7379,30 @@
    "state": "ws-student-explorer.cjs: [390, 844] / [360, 740] loops and a 390 touch viewport (3 findings)"
   },
   "pass": {
-   "commit": "27545964d",
-   "state": "ws-student-explorer runs at 1366 / 1024 / 820; teacher phone tests allow-listed with a reason"
+   "commit": "fdc35fb99",
+   "state": "ws-student-explorer runs at 1366 / 1024 / 820; teacher phone tests allow-listed with a reason (re-pointed from 27545964d by lf-tools r3: NP-PUPIL, critic r2 D2, finds the pupil 390 steps ws-share-options and ws-simple-print still ran there)"
   },
   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-advisory-mult-div",
+  "check": "lead decision COPYLIGHT-ADVISORY (2026-11-13; evidence critic lf-tools r3 E1: the skeleton key masks x and divide, so division:div_facts anchors multiplication:mult_facts on fact@2f11fa): a planted mult/div anchor pair must still route to the FULL critic; at b99cf0bde the tool printed the anchor and no critic route (a narrow critic could follow an ELIGIBLE verdict)",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light ADVISORY / criticRoute(): every skill takes the FULL critic",
+  "browser": false,
+  "fail": {
+   "commit": "b99cf0bde",
+   "state": "mult_facts shows anchor division:div_facts and no 'critic: FULL' route"
+  },
+  "pass": {
+   "commit": "fd85daebf",
+   "state": "mult_facts shows anchor division:div_facts AND 'critic: FULL (COPYLIGHT-ADVISORY ...)'"
+  },
+  "command": "o=$(node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill multiplication:mult_facts 2>&1); echo \"$o\" | grep -q 'anchor: division:div_facts' && echo \"$o\" | grep -q 'critic: FULL (COPYLIGHT-ADVISORY' && echo 'advisory: OK' || echo 'advisory: FAIL'",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
