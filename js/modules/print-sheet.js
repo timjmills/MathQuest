@@ -5014,8 +5014,13 @@ async function buildLesson(n, metaOf) {
     if (built.includes('mixed')) {
         // (LR-5: the Mixed page never repeats a Prerequisite Check item - its partners are the same earlier skills; a lesson
         // without a check avoids exactly what it did before)
-        const preTexts = (((parts.find((p) => p.part === 'prereq') || {}).res || {}).items || []).map(refText).filter(Boolean);
-        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), undefined, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts);
+        const preRes = (parts.find((p) => p.part === 'prereq') || {}).res;
+        const preTexts = ((preRes || {}).items || []).map(refText).filter(Boolean);
+        // (lf-engine PC r3 triage, ws-lesson-check --force-check: the soft text avoid let "? + 2 = 6" print on the check and on
+        // Mixed - add L seeds 1407 / 1481. The check's PRINTED fact keys are a hard avoid of the partners too.)
+        const preHard = preRes ? planKeys(preRes) : [];
+        const avoidPre = preHard.length ? (r) => (r ? Object.assign({}, r, { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...preHard] }) : r) : undefined;
+        const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), avoidPre, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts);
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
     }
     // A part the registry adds (lesson-pages/index.js registerLessonPart, role 'lesson'): drawn by the lesson role.
