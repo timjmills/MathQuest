@@ -1,13 +1,18 @@
-// ws-phone-card — the practice card at phone width (390 px): nothing a pupil needs is cut off sideways, and typing
-// goes where the pupil writes first. (pilot-su-c critic r1 D5: at 390 px the 6-digit stack lost its ones column, rule
-// and ones box at the cell edge, and from 4 digits the first focused box was the leftmost, not the ones box. No gate
-// looked at 390 px: ws-chromebook-fit measures 1366 / 1280 heights, ws-screen-slots never focuses.)
+// ws-phone-card — THE TABLET CARD CHECK (owner rule 2026-11-13, CLAUDE.md "Fastest-implementation plan" 7: the screens are
+// print, computer / Chromebook 1280-1366 px and tablet 820-1024 px; there is NO phone width). The name is kept so ws-precritic,
+// the deploy gates and the backtests that call it keep working; its DEFAULT sizes are now the tablets, 820 x 1180 and
+// 1024 x 768, and an explicit `--sizes 390x844,390x664` still runs the old phone check on request (backtest fixtures).
+// The practice card at a tablet width: nothing a pupil needs is cut off sideways, typing goes where the pupil writes first,
+// and every answer box is a 48 px touch target. (History: pilot-su-c critic r1 D5 found, at 390 px, a 6-digit stack that lost
+// its ones column, rule and ones box at the cell edge, and from 4 digits the first focused box was the leftmost, not the
+// ones box; ws-chromebook-fit measures 1366 / 1280 heights, ws-screen-slots never focuses.)
 //
 //   node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_1m_no_regroup,subtraction:sub_100_no_regroup
-//   node tests/scripts/ws-phone-card.cjs --skills a:b --sizes 390x844,390x664 --items 3 --shots <dir>
+//   node tests/scripts/ws-phone-card.cjs --skills a:b --sizes 820x1180,1024x768 --items 3 --shots <dir>
+//   node tests/scripts/ws-phone-card.cjs --skills a:b --sizes 390x844,390x664     # the old phone check, on request only
 //   node tests/scripts/ws-phone-card.cjs --self-test           # the entry-order and clip rules on a fixture page
 //
-// For every skill, size and seeded item (default 390x844 and 390x664, 3 items: a fresh page each, the card opened as a
+// For every skill, size and seeded item (default 820x1180 and 1024x768, 3 items: a fresh page each, the card opened as a
 // pupil opens it, playSelectedSkills('practice'), seeded) it checks, at scrollY as the app leaves it after load:
 //   CLIP-X    the page does not scroll sideways (documentElement.scrollWidth <= innerWidth), and none of the question
 //             text, the drawn problem (every visible element inside #questionPaper), the answer inputs and Check / Next
@@ -45,6 +50,9 @@
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
 //   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
 //             once per skill and width as well, and judged on CELL-READ and TOUCH-TARGET (CLIP-X / FOCUS are the card's).
+//   TOUCH     (owner 2026-11-13) every visible answer box (input, textarea, contenteditable in the card) is at least 48 x 48 px
+//             at a tablet width (>= 600 px; SP-10, RUBRIC H6); at an explicit phone width (< 600 px) the old 44 px floor. A
+//             regroup / carry box is scratch, not an answer (SP-23): it keeps SP-10's 44 x 44 floor at every width.
 // Every finding names the skill, size, item and the element. Page errors raised while a skill rendered are its own.
 //   A14       "siblings clean": after the lane's skills, the probe runs on the approved skills pinned in
 //             tests/fixtures/precritic/phone-card-siblings.json (--siblings-file; two legacy column twins, a kit stack
@@ -208,6 +216,12 @@ function PROBE() {
     for (const t of TARGETS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
     // TOUCH-UNIQUE (lf-hosts critic r1 F4); FOCUS-RING (F3) moves the focus, so main() runs it after this probe
     if (window.UNIQUE) for (const t of window.UNIQUE('#questionCard')) findings.push({ rule: 'TOUCH-UNIQUE', msg: t });
+    // TOUCH (owner 2026-11-13): answer boxes are 48 px touch targets on a tablet (44 px at an explicit phone width)
+    // (a regroup / carry box is scratch, never an answer: SP-10's 44 x 44 floor, SP-23)
+    const FLOOR = W >= 600 ? 48 : 44;
+    const floorOf = (el) => (isOptional(el) ? 44 : FLOOR);
+    const small = inputs.filter((el) => { const r = el.getBoundingClientRect(); return Math.min(r.width, r.height) < floorOf(el) - 0.5; });
+    if (small.length) findings.push({ rule: 'TOUCH', msg: `${small.length} box(es) under the touch floor at ${W} px (answer boxes ${FLOOR} px, regroup / carry boxes 44 px); e.g. ${small.slice(0, 3).map((el) => { const r = el.getBoundingClientRect(); return `${name(el)} ${Math.round(r.width)} x ${Math.round(r.height)} (floor ${floorOf(el)})`; }).join(', ')}` });
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
 }
 
@@ -456,8 +470,12 @@ async function selfTest() {
     const fails = [];
     try {
         const page = await browser.newPage();
-        await page.setViewport({ width: 390, height: 844 });
-        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        // the tablet default (owner 2026-11-13). The fixtures below predate TOUCH; their CLIP-X / FOCUS cases judge every
+        // rule but TOUCH (noTouch), and TOUCH has its own cases at the end.
+        await page.setViewport({ width: 820, height: 1180 });
+        const run0 = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        const noTouch = (r) => Object.assign({}, r, { findings: r.findings.filter((x) => x.rule !== 'TOUCH') });
+        const run = async (v) => noTouch(await run0(v));
         const good = await run('good');
         if (good.findings.length || good.focus !== 'ok') fails.push(`good fixture: ${JSON.stringify(good)}`);
         const f = await run('focus');
@@ -488,13 +506,13 @@ async function selfTest() {
         await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
         const ht = await page.evaluate(TARGETS, '#h');
         if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return page.evaluate(PROBE); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return noTouch(await page.evaluate(PROBE)); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
@@ -519,9 +537,15 @@ async function selfTest() {
         await page.setContent(fr('input.ans:focus{box-shadow:none;outline:4px solid #1565d8;outline-offset:-8px}')); await page.evaluate(`window.RINGS = ${RINGS}`);
         const rb = await page.evaluate(() => window.RINGS('#c'));
         if (rb.length) fails.push(`one blue 4 px ring (inset shadow and outline): no FOCUS-RING finding (${JSON.stringify(rb)})`);
+        // TOUCH (owner 2026-11-13): 40 px answer boxes FAIL at 820 and 1024; 48 px boxes pass; at an explicit 390 the floor is 44
+        const touchAt = async (w, px) => { await page.setViewport({ width: w, height: 900 }); await page.setContent(BARE('bare-right').replace('input{width:48px;height:48px}', `input{width:${px}px;height:${px}px;box-sizing:border-box}`)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}; window.UNIQUE = ${UNIQUE}; window.RINGS = ${RINGS}; window.CELL_EMPTY = ${CELL_EMPTY};`); return (await page.evaluate(PROBE)).findings.filter((x) => x.rule === 'TOUCH'); };
+        if (!(await touchAt(820, 40)).length) fails.push('TOUCH: 40 px answer boxes at 820 must FAIL');
+        if (!(await touchAt(1024, 46)).length) fails.push('TOUCH: 46 px answer boxes at 1024 must FAIL');
+        if ((await touchAt(1024, 48)).length) fails.push('TOUCH: 48 px answer boxes at 1024 must pass');
+        if ((await touchAt(390, 45)).length) fails.push('TOUCH: 45 px answer boxes at an explicit 390 pass (44 px floor)');
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 18 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 22 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
@@ -581,7 +605,7 @@ async function main() {
     }
     const skills = String(arg('skills', '')).split(',').map((s) => s.trim()).filter(Boolean);
     if (!skills.length) { say(`${TOOL}: give --skills cat:skill,...`); say(`${TOOL}: FAIL - usage (an empty run checks nothing)`); process.exit(2); }
-    const sizes = String(arg('sizes', '390x844,390x664')).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
+    const sizes = String(arg('sizes', '820x1180,1024x768')).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
     if (sizes.some((s) => !s)) { say(`${TOOL}: --sizes takes WxH,...`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const ITEMS = Math.max(1, +arg('items', '3'));
     // --only R1,R2 (a backtest row runs the rule it proves): findings of other rules are dropped

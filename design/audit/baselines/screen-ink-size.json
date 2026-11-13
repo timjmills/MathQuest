@@ -1,10 +1,10 @@
 {
- "note": "ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note. Re-pinned 2026-11-13 (critic sis-r2 D1/D3): add_facts marks renamed only (\"dot\" -> \"counter (ten frame)\" / \"ring (ten frame)\" / \"dot (dot tile)\"), same findings and worst %.",
+ "note": "ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note. Re-pinned 2026-11-13 (critic sis-r2 D1/D3): add_facts marks renamed only (\"dot\" -> \"counter (ten frame)\" / \"ring (ten frame)\" / \"dot (dot tile)\"), same findings and worst %. Re-pinned 2026-11-13 (owner rule: no phone width, CLAUDE.md Fastest-implementation plan 7): the 9 card 390px keys removed and the 18 new card 1366px / 1024px keys appended (ws-screen-ink-size --passed --widths 1366,1024); every other key unchanged. The new keys are the owning lane's (lf-ops, the fact supports) to shrink. Merged 2026-11-13 into lf-hosts (critic r2 F2): the union of lf-hosts' TEXT-SIZE keys and lf-tools' keys, the card 390px keys dropped.",
  "written": "2026-11-13",
  "commit": "f7377b76",
  "totals": {
-  "keys": 71,
-  "findings": 154
+  "keys": 73,
+  "findings": 163
  },
  "skills": [
   "addition:add_facts",
@@ -35,10 +35,6 @@
   "division:div_facts"
  ],
  "keys": {
-  "addition:add_facts {support tile} card 390px|SIZE-INK|dot (dot tile)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
   "addition:add_facts {support tile} card 820px|SIZE-INK|dot (dot tile)|1.5-2.5 mm": {
    "n": 3,
    "worst": 90
@@ -53,14 +49,6 @@
   },
   "addition:add_facts {support tile} quiz 1280px|SIZE-INK|dot (dot tile)|1.5-2.5 mm": {
    "n": 1,
-   "worst": 90
-  },
-  "addition:add_facts {support frame} card 390px|SIZE-INK|ring (ten frame)|2.5-4 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "addition:add_facts {support frame} card 390px|SIZE-INK|counter (ten frame)|2.5-4 mm": {
-   "n": 2,
    "worst": 90
   },
   "addition:add_facts {support frame} card 820px|SIZE-INK|ring (ten frame)|2.5-4 mm": {
@@ -91,10 +79,6 @@
    "n": 1,
    "worst": 90
   },
-  "multiplication:mult_facts {support skip} card 390px|SIZE-INK|box (skip-count strip)|4 mm+": {
-   "n": 3,
-   "worst": 92
-  },
   "multiplication:mult_facts {support skip} card 820px|SIZE-INK|box (skip-count strip)|4 mm+": {
    "n": 3,
    "worst": 92
@@ -110,18 +94,6 @@
   "multiplication:mult_facts {support skip} quiz 1280px|SIZE-INK|box (skip-count strip)|4 mm+": {
    "n": 1,
    "worst": 92
-  },
-  "multiplication:mult_facts {support array} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "multiplication:mult_facts {support array} card 390px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 1,
-   "worst": 11
-  },
-  "multiplication:mult_facts {support array} card 390px|SIZE-WIDTH|array|taller than wide": {
-   "n": 1,
-   "worst": 46
   },
   "multiplication:mult_facts {support array} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
    "n": 3,
@@ -163,14 +135,6 @@
    "n": 1,
    "worst": 90
   },
-  "division:div_facts {support array} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm": {
-   "n": 3,
-   "worst": 90
-  },
-  "division:div_facts {support array} card 390px|SIZE-WIDTH|array|strip 3:1+": {
-   "n": 3,
-   "worst": 46
-  },
   "division:div_facts {support array} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm": {
    "n": 3,
    "worst": 90
@@ -203,14 +167,6 @@
    "n": 1,
    "worst": 12
   },
-  "addition:add_facts {support line} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
-   "n": 2,
-   "worst": 95
-  },
-  "addition:add_facts {support line} card 390px|TEXT-SIZE|label text|label 8 pt floor": {
-   "n": 1,
-   "worst": 96
-  },
   "addition:add_facts {support line} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
    "n": 2,
    "worst": 95
@@ -238,14 +194,6 @@
   "addition:add_facts {support line} quiz 1280px|TEXT-SIZE|label text|label print under 11 pt": {
    "n": 1,
    "worst": 95
-  },
-  "subtraction:sub_facts {support line} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
-   "n": 1,
-   "worst": 95
-  },
-  "subtraction:sub_facts {support line} card 390px|TEXT-SIZE|label text|label 8 pt floor": {
-   "n": 2,
-   "worst": 96
   },
   "subtraction:sub_facts {support line} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
    "n": 1,
@@ -275,10 +223,6 @@
    "n": 1,
    "worst": 95
   },
-  "multiplication:mult_facts {support skip} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
-   "n": 2,
-   "worst": 96
-  },
   "multiplication:mult_facts {support skip} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
    "n": 2,
    "worst": 96
@@ -290,10 +234,6 @@
   "multiplication:mult_facts {support skip} quiz 1280px|TEXT-SIZE|label text|label print under 11 pt": {
    "n": 1,
    "worst": 96
-  },
-  "placevalue:identify {defaults} card 390px|TEXT-SIZE|digit text|digit floor 40 px": {
-   "n": 3,
-   "worst": 76
   },
   "placevalue:identify {defaults} card 820px|TEXT-SIZE|digit text|digit floor 48 px": {
    "n": 3,
@@ -315,9 +255,77 @@
    "n": 4,
    "worst": 92
   },
-  "division:div_facts {support boxsign} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
+  "addition:add_facts {support tile} card 1366px|SIZE-INK|dot (dot tile)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support tile} card 1024px|SIZE-INK|dot (dot tile)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 1366px|SIZE-INK|ring (ten frame)|2.5-4 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 1366px|SIZE-INK|counter (ten frame)|2.5-4 mm": {
    "n": 2,
-   "worst": 94
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 1024px|SIZE-INK|ring (ten frame)|2.5-4 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "addition:add_facts {support frame} card 1024px|SIZE-INK|counter (ten frame)|2.5-4 mm": {
+   "n": 2,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support skip} card 1366px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 3,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support skip} card 1024px|SIZE-INK|box (skip-count strip)|4 mm+": {
+   "n": 3,
+   "worst": 92
+  },
+  "multiplication:mult_facts {support array} card 1366px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} card 1366px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 5
+  },
+  "multiplication:mult_facts {support array} card 1366px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 18
+  },
+  "multiplication:mult_facts {support array} card 1024px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "multiplication:mult_facts {support array} card 1024px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 1,
+   "worst": 5
+  },
+  "multiplication:mult_facts {support array} card 1024px|SIZE-WIDTH|array|taller than wide": {
+   "n": 1,
+   "worst": 18
+  },
+  "division:div_facts {support array} card 1366px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 1366px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 3,
+   "worst": 11
+  },
+  "division:div_facts {support array} card 1024px|SIZE-INK|dot (array)|1.5-2.5 mm": {
+   "n": 3,
+   "worst": 90
+  },
+  "division:div_facts {support array} card 1024px|SIZE-WIDTH|array|strip 3:1+": {
+   "n": 3,
+   "worst": 10
   }
  },
  "status": "2026-11-13 lf-checks queue 14-17 re-pin: the old 42 keys kept as they were; 29 NEW keys from the new TEXT-SIZE rule only (real findings, routed to the owning lanes in design/status/lf-checks.md: add_facts / sub_facts line labels, mult_facts skip labels, div_facts boxsign label -> lf-ops; placevalue identify / unit_form / value -> lf-placevalue). Owning lanes shrink them."
