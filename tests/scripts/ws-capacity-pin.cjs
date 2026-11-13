@@ -26,10 +26,14 @@ const ALLOW = new Set(list(arg('allow', '')));
     // RULED capacities (lead rulings): a page whose items are taller than the page allows is pinned by design with its reason; the
     // critic treats it as by design. Measured when the skill is in this tree (lf-algebra's skills join on their merge).
     const ruled = has('check') && fs.existsSync(PIN) ? (JSON.parse(fs.readFileSync(PIN, 'utf8')).ruled || {}) : {};
-    const ruledSkills = [...new Set(Object.keys(ruled).map((k) => k.split(' ')[0]))];
+    const ruledSkills = [...new Set(Object.keys(ruled).filter((k) => !/ \{/.test(k)).map((k) => k.split(' ')[0]))];
+    // A ruled page may name the skill's options after its size, as JSON ('cat:skill review S {"support":["touch"]}', lf-ops
+    // 2026-11-13): it is measured with those options (a support page's count is not the default page's).
+    const ruledOpts = Object.keys(ruled).map((k) => /^(\S+) (\S+) ([SML]) (\{.*\})$/.exec(k)).filter(Boolean)
+        .map((m) => ({ key: m[0], skill: m[1], role: m[2], size: m[3], opts: JSON.parse(m[4]) }));
     const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
     const app = await H.open({});
-    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
+    const now = await app.page.evaluate(async ({ skills, ROLES, SIZES, ruledOpts }) => {
         const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
         const out = {};
         for (const k of skills) for (const role of ROLES) for (const size of SIZES) {
@@ -41,8 +45,16 @@ const ALLOW = new Set(list(arg('allow', '')));
                 out[`${k} ${role} ${size}`] = { items, pages: r.pageCount };
             } catch (e) { out[`${k} ${role} ${size}`] = { na: String((e && e.message) || e).slice(0, 80) }; }
         }
+        for (const j of ruledOpts) {
+            const [cat, id] = j.skill.split(':');
+            try {
+                const r = await window.buildSheet({ role: j.role, sections: [{ skills: [{ categoryId: cat, skillId: id, opts: j.opts }], columns: 'auto' }], size: j.size, look: 'auto', paper: 'A4', seed: hash(`${cat}__${id}:${j.role}`) % 1000000, form: 'A', key: true, anchors: 'off' });
+                const m = r.plan && r.plan.meta;
+                out[j.key] = { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (r.items || []).length, pages: r.pageCount, opts: true };
+            } catch (e) { out[j.key] = { na: String((e && e.message) || e).slice(0, 80) }; }
+        }
         return out;
-    }, { skills, ROLES, SIZES });
+    }, { skills, ROLES, SIZES, ruledOpts });
     await app.close();
     if (has('write')) {
         fs.mkdirSync(path.dirname(PIN), { recursive: true });
@@ -72,7 +84,7 @@ const ALLOW = new Set(list(arg('allow', '')));
     // SIZE-ORDER (critic r2 N2, "Size S ignored" L1): a smaller size never prints FEWER items than a larger one (S >= M >= L)
     const order = [];
     const groups = {};
-    for (const [k, v] of Object.entries(now)) { if (v.na) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v.items; }
+    for (const [k, v] of Object.entries(now)) { if (v.na || v.opts) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v.items; }
     for (const [g, z] of Object.entries(groups)) {
         if (z.S !== undefined && z.M !== undefined && z.S < z.M) order.push(`${g}: S ${z.S} < M ${z.M} items (SIZE-ORDER)`);
         if (z.M !== undefined && z.L !== undefined && z.M < z.L) order.push(`${g}: M ${z.M} < L ${z.L} items (SIZE-ORDER)`);

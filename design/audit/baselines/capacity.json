@@ -2596,6 +2596,14 @@
   }
  },
  "ruled": {
+  "multiplication:mult_facts review S {\"support\":[\"touch\"]}": {
+   "items": 15,
+   "reason": "RE-PIN 16 -> 15: lead ruling 2026-11-13: master's 16 relied on defective 32 % side bands (3-column Mixed Review stacks); 10 facts + 5 stacks (lf-ops-divarray, status note in design/status/lf-ops-divarray.md)"
+  },
+  "multiplication:mult_facts review S {\"support\":[\"array\"]}": {
+   "items": 13,
+   "reason": "GAIN 12 -> 13 (lf-ops-divarray: landscape arrays; 8 facts + 5 stacks), pinned so it never falls (lead ruling 2026-11-13)"
+  },
   "algebra:function_table_easy true-false L": {
    "items": 2,
    "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
