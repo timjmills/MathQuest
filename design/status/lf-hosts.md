@@ -16,7 +16,10 @@ Critic rounds: 0, none
 ## Owner go
 
 ## Open questions
-- none
+- none (worksheet digit floor ruled by the lead 15:35Z, see Log)
+
+## To do after critic r1
+- If the worksheet 40/48/56 raise passes r1 with no layout breakage: pin it as a no-regression ratchet (gate fails when a worksheet digit falls below what it prints after the raise); the contract floor stays 29 px.
 
 ## Times
 Times: critic r1 hand-off 1, start 2026-11-13T15:34Z, end —, profile mq-opus-medium
@@ -24,5 +27,6 @@ Times: builder items 1-3 (stopped, superseded by lf-checks hand-off), start 2026
 Times: builder item 4, start 2026-11-13T15:23Z, end —, profile mq-opus-medium
 
 ## Log
+- 2026-11-13: lead ruling: worksheet contract floor = 29 px (SP table, TY-10b count rows); card/quiz 40/48/56; hand-off 1's worksheet raise kept + ratcheted if r1 passes. Hand-off 2 cherry-picked (not merged: -r2 under its own critic) on claude/sweet-newton-c8wrv1-lf-hosts-g9 with the G9 fix + ink-size CELL-READ (builder running).
 - 2026-11-13: merged lf-checks hand-off 1 (0b862753) into 3c7b548a; backtests.json conflict resolved as a union (313 rows, none dropped). touch-target-sub-wp-390 read FAIL on its pass state once in a 6-row batch, PASS alone: flakiness under critic review.
 - 2026-11-13: lane opened by the lead; branch cut from origin/master 77f0aca.
