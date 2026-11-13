@@ -31,8 +31,14 @@
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
-//             more-practice, test, review, mixed-practice) where the page's cells and its measured items pair one to one; a
-//             role that draws its own cell (fact-probe rows, word-problems stories, the guided model) is not judged by it.
+//             more-practice, test, review, mixed-practice). PAIRING (critic eb-r5 m1): the kit writes data-eb-item on each grid
+//             cell (the bridge's item index, or the list "3,4" for a cell holding several), and EVERY indexed cell is judged
+//             against ITS OWN item's measure at the column count of the grid that lays it - a page that reorders its items by
+//             height (arrays_groups) is never judged against another item's footprint. Fallbacks, each printed as a NOTE naming
+//             its mode, never a silent pass: no index on the page -> POSITION pairing (dealt order, only where cells and measured
+//             items are one to one); a multi-item cell with no bridge measure, an index outside the items, an unmeasured item or
+//             an unindexed cell on an indexed page -> not judged. A role that draws its own cell (fact-probe rows, word-problems
+//             stories, the guided model) is not judged by it.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
@@ -108,7 +114,67 @@ function gapBad(role, cells, i, lim) {
     }
     return true;
 }
+// EB-FOOT's column count for a cell: the column count of the grid that lays it (a lone last-row cell of a 2-column grid is
+// still at 2; a full-width problem in its own 1-column grid at 1); with no grid read, the cells across its row.
+function footCols(c, cells) { return c.gridCols || cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length; }
+// EB-FOOT pairing, pure (critic eb-r5 m1). m: per item, its measured hMm by column count ({2: 41.4, 1: 30}) or null; cols: the
+// page's first fit's column count (the position fallback's default). combo(ids, k): the bridge's measure of a multi-item cell
+// (none today). Returns { mode: 'index' | 'position' | '', out: [{c, fp, k, ids}], notes } - every fallback writes a note.
+const idsOf = (c) => (Array.isArray(c.items) ? c.items : []);
+function footFindings(cells, m, cols, sections, lim = 0.10, combo = () => null) {
+    const out = [], notes = [];
+    const fpOf = (mi, k) => (mi ? (mi[k] != null ? mi[k] : mi[cols]) : null);
+    const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > lim * fp;
+    if (cells.some((c) => idsOf(c).length)) {
+        for (const c of cells) {
+            const ids = idsOf(c), k = footCols(c, cells), nm = `p${c.page} cell ${c.label || c.cell}`;
+            if (!ids.length) { notes.push(`EB-FOOT fallback (unindexed cell): ${nm} has no data-eb-item on an indexed page, footprint not judged`); continue; }
+            if (ids.some((i) => !Number.isInteger(i) || i < 0 || i >= m.length)) { notes.push(`EB-FOOT fallback (index out of range): ${nm} item index ${ids.join(',')} outside the ${m.length} measured items, footprint not judged`); continue; }
+            const fp = ids.length === 1 ? fpOf(m[ids[0]], k) : combo(ids, k);
+            if (fp == null) { notes.push(ids.length > 1 ? `EB-FOOT fallback (multi-item cell, no measure): ${nm} holds items ${ids.map((i) => i + 1).join('+')}; the bridge gives no measure for that combination at ${k} across, footprint not judged` : `EB-FOOT fallback (unmeasured item): ${nm} item ${ids[0] + 1} has no measure at ${k} across, footprint not judged`); continue; }
+            if (off(c, fp)) out.push({ c, fp, k, ids });
+        }
+        return { mode: 'index', out, notes };
+    }
+    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) {
+        notes.push(`EB-FOOT not paired: no data-eb-item on the page and no one-to-one position pairing (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured, ${sections} section(s))`);
+        return { mode: '', out, notes };
+    }
+    notes.push(`EB-FOOT fallback (position pairing): no data-eb-item on the page, cells paired with the items in dealt order (a page that reorders its items reads false findings)`);
+    cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k, ids: [i] }); });
+    return { mode: 'position', out, notes };
+}
 if (argv.includes('--self-test')) {
+    {   // EB-FOOT pairing (critic eb-r5 m1): by the kit's index on a reordered page; a real footprint error still fails; every
+        // fallback prints a note naming its mode (critic eb-r6 m1)
+        const mk = (items, needed, cell, extra) => Object.assign({ page: 1, cell, topPx: cell <= 2 ? 10 : 300, hMm: 60, neededMm: needed, gridCols: 2, items }, extra || {});
+        const m = [{ 2: 41.4 }, { 2: 61.4 }, { 2: 46.4 }, { 2: 51.8 }];
+        // arrays_groups-like: the page draws the items tallest first (1, 3, 2, 0), each cell at its own item's footprint
+        const reordered = [mk([1], 61.4, 1), mk([3], 51.8, 2), mk([2], 46.4, 3), mk([0], 41.4, 4)];
+        const realErr = [mk([1], 61.4, 1), mk([3], 60.0, 2), mk([2], 46.4, 3), mk([0], 41.4, 4)];      // item 4 drawn 16 % over
+        const noIdx = reordered.map((c) => Object.assign({}, c, { items: [] }));
+        const has = (r, re) => r.notes.some((n) => re.test(n));
+        const r = {
+            reordered: footFindings(reordered, m, 2, 1), realErr: footFindings(realErr, m, 2, 1), pos: footFindings(noIdx, m, 2, 1),
+            multi: footFindings([mk([0, 1], 50, 1), mk([2], 46.4, 2)], m, 2, 1), multiM: footFindings([mk([0, 1], 50, 1)], m, 2, 1, 0.10, (ids, k) => (ids.join() === '0,1' && k === 2 ? 60 : null)),
+            range: footFindings([mk([9], 50, 1), mk([1], 70, 2)], m, 2, 1), unIdx: footFindings([mk([0], 41.4, 1), mk([], 90, 2)], m, 2, 1),
+            none: footFindings(noIdx.slice(0, 3), m, 2, 1), cols1: footFindings([mk([2], 36, 1, { gridCols: 1 })], [{ 1: 30, 2: 46.4 }, null, { 1: 30, 2: 46.4 }], 2, 2),
+        };
+        const fc = [['reordered page, by index: no finding', r.reordered.out.length, 0], ['reordered page: mode index', r.reordered.mode, 'index'], ['reordered page: no note', r.reordered.notes.length, 0],
+            ['real footprint error: FAIL', r.realErr.out.map((x) => x.ids.join()).join(), '3'],
+            ['no index: position fallback', r.pos.mode, 'position'], ['no index: position note', has(r.pos, /fallback \(position pairing\)/), true], ['no index on a reordered page: false findings by position', r.pos.out.length > 0, true],
+            ['multi-item, no measure: note', has(r.multi, /fallback \(multi-item cell, no measure\)/), true], ['multi-item, no measure: the other cell judged', r.multi.out.length, 0],
+            ['multi-item, measured combination: judged', r.multiM.out.length, 1],
+            ['index out of range: note', has(r.range, /fallback \(index out of range\)/), true], ['index out of range: the other cell judged', r.range.out.length, 1],
+            ['unindexed cell on an indexed page: note', has(r.unIdx, /fallback \(unindexed cell\)/), true],
+            ['no index, not one to one: not paired, noted', r.none.mode + '|' + has(r.none, /not paired/), '|true'],
+            ['own grid column count', r.cols1.out.map((x) => `${x.fp}@${x.k}`).join(), '30@1']];
+        const fbad = fc.filter(([, got, want]) => got !== want);
+        for (const [n, got, want] of fbad) console.log(`self-test FAIL: EB-FOOT pairing ${n}: ${got}, want ${want}`);
+        if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT pairing)`); process.exit(1); }
+        for (const k of ['pos', 'multi', 'range', 'unIdx', 'none']) for (const n of r[k].notes) console.log(`  note (${k}): ${n}`);
+        console.log(`EB-FOOT pairing: ${fc.length} cases OK`);
+    }
     {   // EB-GAP: 30.5 % never inked (FAIL, the div_facts r3 state) / 27 % (OK) / reserved and inked later (OK) / not the Model (OK)
         const g = (step, gapAtMm, gapMm, iv) => ({ step, gapAtMm, gapMm, hMm: 81.2, iv });
         const div = [g(1, 10, 24.8, [[3, 10], [34.8, 50]]), g(2, 10, 24.8, [[3, 10], [34.8, 56]]), g(3, 10, 24.8, [[3, 10], [34.8, 62]]), g(4, 10, 24.8, [[3, 10], [34.8, 62]])];
@@ -138,7 +204,7 @@ if (argv.includes('--self-test')) {
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases)`);
+    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 15 EB-FOOT pairing cases)`);
     process.exit(bad.length ? 1 : 0);
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -205,7 +271,13 @@ function measureCells(scope) {
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1), edgeMm: +(edge / MM).toFixed(1),
                 neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
-                step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
+                step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1),
+                // EB-FOOT (critic eb-r5 m1): the bridge's item index(es) the kit wrote on the cell ([] when absent), the cell's top
+                // (its row), and the column count of the grid that LAYS it (a re-laid grid, grid.js PG-15, is cut into lcm tracks:
+                // its columns are the tracks over a full row's span)
+                items: c.hasAttribute('data-eb-item') ? c.getAttribute('data-eb-item').split(',').map(Number) : [], topPx: Math.round(cr.top),
+                gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; const n = t && t !== 'none' ? t.trim().split(/\s+/).length : 0;
+                    if (!n || !g.classList.contains('relaid')) return n; const f = g.querySelector(':scope > [data-ws-cell]'); const sp = f && /span\s+(\d+)/.exec(f.style.gridColumn || f.getAttribute('style') || ''); return sp && +sp[1] > 0 ? Math.round(n / +sp[1]) : n; })() });
         });
     });
     return out;
@@ -333,7 +405,7 @@ async function main() {
                         const cols = r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
                         const sections = new Set((r.items || []).map((it) => it.section)).size;
                         const tries = r.plan && r.plan.meta ? Number(r.plan.meta.scoreOutOf) : NaN;
-                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), cols, sections, tries, measured: (r.items || []).map((it) => (it.measured && cols && it.measured[cols] ? it.measured[cols].hMm : null)) };
+                        return { html: window.sheetDocument(r.pupilHtml, r.title || 'x', { paper: 'A4' }), cols, sections, tries, measured: (r.items || []).map((it) => (it.measured ? Object.fromEntries(Object.entries(it.measured).filter(([, v]) => v && v.hMm != null).map(([k, v]) => [k, v.hMm])) : null)) };
                     } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
                 }, { categoryId, skillId, j, SEED });
                 if (b.error) { notes.push(`${key} ${j.tag}: not composed (${b.error})`); continue; }
@@ -377,11 +449,13 @@ async function main() {
                     if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
                         if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
                     }
-                    // EB-FOOT: pairs only where the page's cells and the measured items are one to one
-                    const m = b.measured;
-                    if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
-                        cells.forEach((c, i) => { const fp = m[i]; if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${b.cols} columns (${Math.round((c.neededMm - fp) / fp * 100)} %)`); });
-                    } else if (j.role === 'independent' && !j.opts) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
+                    // EB-FOOT: each cell against ITS OWN item(s) by the kit's data-eb-item (critic eb-r5 m1); fallbacks are notes
+                    const m = (b.measured || []).map((x) => (x && Object.keys(x).length ? x : null));
+                    if (GRID_ROLES.has(j.role)) {
+                        const fr = footFindings(cells, m, b.cols, b.sections, FOOT);
+                        for (const n of fr.notes) notes.push(`${key} ${j.tag}: ${n}`);
+                        for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} columns${fr.mode === 'index' ? `, item ${x.ids.map((i) => i + 1).join('+')}` : ' (position pairing)'} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %)`);
+                    }
                 } finally { await sh.close(); }
             }
             // screen hosts

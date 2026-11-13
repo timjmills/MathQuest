@@ -3094,6 +3094,31 @@ function numberLineRequest(n) {
  * Round 9 (critic r7 D7-2): every deal starts in a task of its own, so a sheet that is dealt
  * several times never blocks the page for the whole search, and the work is counted (`stats`).
  */
+/**
+ * Each grid cell of a plan carries its item's index in the bridge's returned `items` (critic eb-r5 m1): `ebItem` on the plan
+ * item, written by the kit's grid as data-eb-item on the cell. ws-empty-band EB-FOOT pairs each cell with ITS OWN item's
+ * measured footprint by it (a page that reorders its items is never judged against another item's footprint). Matched by the
+ * item's question object; a plan item with no match carries nothing. Nothing draws from it.
+ */
+function tagItemIndex(plan, items) {
+    const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
+    const walk = (s) => {
+        if (!s || typeof s !== 'object') return;
+        // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        if (s.kind === 'grid') for (const pi of s.items || []) {
+            if (!pi) continue;
+            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
+            if (many.length > 1) pi.ebItem = many;
+            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
+            else if (many.length) pi.ebItem = many[0];
+        }
+        if (Array.isArray(s.contents)) s.contents.forEach(walk);
+        if (s.content) walk(s.content);
+        if (Array.isArray(s.parts)) s.parts.forEach(walk);
+    };
+    for (const sh of (plan && plan.sheets && plan.sheets.length ? plan.sheets : [plan || {}])) for (const pg of (sh.pages && sh.pages.length ? sh.pages : [{ sections: sh.sections || [] }])) (pg.sections || []).forEach(walk);
+}
+
 const BUILD_STATS = { deals: 0, dealMs: 0, checks: 0, checkMs: 0, measured: 0, measureHits: 0, measureMs: 0, layouts: 0 };
 const nowMs = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
 /** Resolve in a NEW macrotask (the page paints and answers input in between). */
@@ -3915,6 +3940,7 @@ async function buildSheetDeal(req = {}) {
         const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
         plan = t.plan; trimmed = t.trimmed;
     }
+    tagItemIndex(plan, hostItems);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -4668,6 +4694,7 @@ async function buildRoleSheet(n, metaOf) {
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
+    tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
