@@ -22,7 +22,8 @@
 //   (d) the panel's controls leave the window (critic-panel-r1 F2): `.tv-sko-foot`'s bottom below innerHeight, or the
 //       Done button not wholly inside the window, or the panel itself outside it;
 //   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4);
-//   [slice] / [inside] (critic-panel-r3 N1) an SVG label or shape cut by a viewBox slice window, or any drawn leaf (SVG text
+//   [slice] / [inside] (critic-panel-r3 N1) an SVG label or shape cut by a viewBox slice window (an SVG label cut by its own
+//       drawing's clipped edge too), or any drawn leaf (SVG text
 //       and shapes, HTML words) not wholly inside the frame - or its scroll area, when the frame scrolls a drawing shown
 //       whole at the 9 px floor;
 //   [hit] (critic-panel-r3 P1) a visible option control whose centre does not take the pointer (document.elementFromPoint
@@ -257,6 +258,8 @@ function measure(page) {
                     const part = r.right > sR.left + 0.5 && r.left < sR.right - 0.5 && r.bottom > sR.top + 0.5 && r.top < sR.bottom - 0.5;
                     const whole = r.left >= sR.left - 1 && r.right <= sR.right + 1 && r.top >= sR.top - 1 && r.bottom <= sR.bottom + 1;
                     if (sliced && part && !whole) sliceCut.push(lab(el));
+                    // (a word cut by its drawing's OWN edge - "minutes" read "inutes" - is the same cut: a label is whole or absent)
+                    else if (clipped && part && !whole && el.tagName.toLowerCase() === 'text') sliceCut.push(`${lab(el)} (its drawing's edge)`);
                     const q = clipped ? meet(r, sR) : r;
                     if (q.right - q.left < 0.5 && q.bottom - q.top < 0.5) continue;   // (not drawn: outside its own viewport)
                     if (!within(q, fR)) outLeaves.push(lab(el));
