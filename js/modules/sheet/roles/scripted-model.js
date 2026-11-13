@@ -53,8 +53,10 @@ export function marksFor(it, steps) {
     if (worked.length !== steps.length || !worked.some((s) => s.marks.length)) return null;
     const acc = {};
     return worked.map((s) => {
-        s.marks.forEach((m) => { if (m && m.slot !== undefined) acc[String(m.slot).replace(/^blank(\d+)$/, 'b$1')] = String(m.value); });
-        return Object.assign({}, acc);
+        const fresh = [];
+        s.marks.forEach((m) => { if (m && m.slot !== undefined) { const id = String(m.slot).replace(/^blank(\d+)$/, 'b$1'); if (acc[id] !== String(m.value)) fresh.push(id); acc[id] = String(m.value); } });
+        // (this step's own marks: drawn grey, the earlier ones black - PT-MOD-1; not enumerable, so traceSlots stays a plain map)
+        return Object.defineProperty(Object.assign({}, acc), '__new', { value: fresh, enumerable: false });
     });
 }
 
@@ -404,7 +406,7 @@ export function plan(input = {}) {
         cols: across || cols, level: 3, nolabel: true,
         render: (c, o) => (across ? `<div class="mq-steptop" style="height:${textMm.toFixed(1)}mm">${stepText(i)}</div>` : cols === 1 ? `<div class="mq-steptop">${stepText(i)}</div>` : '')
             + (story ? sentenceFrameAt(it.render(Object.assign({}, c, { state: 'answered' }), o), writtenAt, i) : it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o,
-                marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i] }) } : {})
+                marks ? (Object.keys(marks[i]).length ? { payload: Object.assign({}, o && o.payload, { traceSlots: marks[i], traceNew: marks[i].__new || [] }) } : {})
                     : i === steps.length - 1 && ans ? { shown: ans, ink: 'trace' } : {}))),
     });
     const textItem = (i) => ({

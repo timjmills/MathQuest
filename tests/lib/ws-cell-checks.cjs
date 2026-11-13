@@ -194,6 +194,8 @@ function cellChecksInPage(opts) {
                 sib.forEach(function (e) {
                     capTop(e).forEach(function (t) { if (t < inkTop) inkTop = t; });
                     e.querySelectorAll('svg, img, .ws-box, .ws-line, .ws-check').forEach(function (g) { var r = g.getBoundingClientRect(); if (r.height > 0 && shownEl(g) && r.top < inkTop) inkTop = r.top; });
+                    // a drawn box edge is ink too (a count row's train boxes are bordered divs)
+                    e.querySelectorAll('*').forEach(function (g) { var cs = getComputedStyle(g); if (cs.borderTopStyle !== 'none' && parseFloat(cs.borderTopWidth) > 0) { var r = g.getBoundingClientRect(); if (r.width > 0 && r.height > 0 && shownEl(g) && r.top < inkTop) inkTop = r.top; } });
                 });
                 var tfs = parseFloat(getComputedStyle(tg).fontSize) || 0;
                 // the label's foot: its baseline, about 0.2 em over the line box's bottom

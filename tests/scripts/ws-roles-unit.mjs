@@ -165,6 +165,14 @@ if (on('MOD-MARKS')) {
     const mm = typeof SM.marksFor === 'function' ? SM.marksFor(it, steps5) : null;
     const sizes = mm ? mm.map((x) => Object.keys(x).length) : [];
     if (sizes.join(',') !== '0,1,2,3,4') findings.push(`MOD-MARKS: the states do not carry the marks of steps 1..k (traceSlots sizes ${JSON.stringify(sizes)})`);
+    // MOD-MARKS-INK (critic r5b D2, PT-MOD-1 / P-LC-9): earlier steps' marks print black, ONLY the newest step's are trace grey,
+    // so each state names its own new slots - and a final "fill in every row" that re-marks the earlier answers adds only the new one
+    const mk2 = mk.slice(0, 4).concat([[{ slot: 'o0', value: '2' }, { slot: 'o1', value: '7' }, { slot: 'o2', value: '15' }, { slot: 'o3', value: '19' }]]);
+    try { registerSkill('rolesunit:ftmod2', { workedSteps: () => steps5.map((text, i) => ({ text, marks: mk2[i] })) }); } catch (e) { /* re-run */ }
+    const it2 = Object.assign({}, it, { q: Object.assign({}, it.q, { skillId: 'ftmod2' }) });
+    const mm2 = typeof SM.marksFor === 'function' ? SM.marksFor(it2, steps5) : null;
+    const fresh = mm2 ? mm2.map((x) => JSON.stringify(x.__new || null)) : [];
+    if (fresh.join('|') !== '[]|["o0"]|["o1"]|["o2"]|["o3"]') findings.push(`MOD-MARKS-INK: each Model state must name only its own new marks (grey; the earlier ones black) - got ${fresh.join(' ')}`);
 }
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix

@@ -258,6 +258,9 @@ export function intoAnswerColumn(html, extra) {
 
 /** Templates whose several answers sit in a strip or chart: the fix is the strip again, clean. */
 const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
+// A template whose ink starts flush with its box (a count row's tiles) lifts the "<Name> wrote:" label a little more,
+// so the label's foot stays 2-4 mm over the ink (PT-ERR-4; ws-cell-checks PUPILTAG; lead order 5, 2026-11-13)
+const TAG_LIFT = { 'count-row': 0.5, 'function-table': 0.5 };
 
 /**
  * What names each part when the parts are a plain list inside a picture (critic round 3: "1st
@@ -689,7 +692,7 @@ export function prepare(it, info = {}) {
         const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
         const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
         const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1.25 : 0.75}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
