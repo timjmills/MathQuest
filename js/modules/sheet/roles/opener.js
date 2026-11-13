@@ -110,7 +110,9 @@ function geometry(items, input, cap = {}) {
     const tight = tightRows(practice);
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first), tight ? tightCapMm(gH) : Infinity);
     // (the Model cell of a tightRows page: its own height plus the same cap, never the Steps column's height)
-    const modelTight = tightRows(items.slice(0, twoModels ? 2 : 1)) ? modelH + tightCapMm(modelH) : null;
+    // (lf-engine-roles critic N2: ONE Model only - two Model cells side by side keep the band's height, so the rule between
+    // them runs down to the band's bottom rule; held short, it stopped 2.5 mm above it: ws-print-lint L-OVERLAP RULE)
+    const modelTight = !twoModels && tightRows(items.slice(0, 1)) ? modelH + tightCapMm(modelH) : null;
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
 }
 
