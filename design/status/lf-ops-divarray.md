@@ -188,3 +188,26 @@ Report design/audit/runs/lf-ops/critic-divarray-r1.md (renders in the session sc
 | D4 (H13, C3 6) x arrays unframed: a small array in a cell sized for 10-12 rows (Test S cell 4 38 %, worksheet 1280 cards 36-44 %) | empty-band below the support on Test cells and on the screen worksheet |
 | nit: "1 rows of 1" caption (fact.js:242) | ARRAY-CAPTION grammar (row/rows) |
 Open question to the lead: does Test count = Independent count (2026-11-09, div_facts) extend to mult_facts?
+
+## r2 checks (CHECKS FIRST; builder Opus medium) - the 6 checks the critic's findings become
+
+Each check is written and backtested BEFORE the defect fix (the lead is still ruling on the fix design). Every check FAILs on
+e3aa95d32 (the critic's tree) and is on precritic's path. Branch head after these commits: see git log. Backtest pass commit
+is left `TBD-divarray-r2` (filled when the fix lands), so these rows read PENDING in a full ws-backtest run meanwhile.
+
+| # | Check (rule, file) | On e3aa95d32 | On master | Backtest row |
+|---|---|---|---|---|
+| 1 | SUPPORT-NOT-SLOT - no support draws an empty closed box ~ the answer slot (±40 %), and a frame on only some cells of an array band (the × 0 frame) is the lone slot-like box. `ws-screen-support-eq` (paper Independent + every screen host) + `ws-print-lint` L-SUPPORT NOT-SLOT (all paper roles) | FAIL: screen-support-eq 3 (paper S/M/L band-mix: 1 framed + 9 unframed array supports). print-lint NOT-SLOT fires on the review/test/independent supports pages | OK (no × 0 empty frame on master: ARRAY-FRAME is this lane's) | `support-not-slot-multfacts-array` |
+| 2 | PAGEFILL / PG-23 orphan run on Review + Test roles for fact skills with supports (`--fill-roles`). `ws-print-lint` L-DENSITY | FAIL: PAGEFILL fires on mult_facts Review S touch (empty strip ~30 % of the problem area) | (support page exists on master; same strip) - see run below | `pagefill-review-multfacts-touch` |
+| 3 | SIZE-ORDER-OPT - the ruled OPTION pages are judged by SIZE-ORDER; an option page whose cells measure smaller at S must fit more at S (strict S > L). `ws-capacity-pin` | FAIL 3: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12). div_facts array (36/24/18) PASSES | FAIL (pre-existing: mult array 10/10/10). div array passes | `size-order-opt-multfacts-array` |
+| 4 | EB-SUPBAND - the empty band directly UNDER the support drawing (not only under the item), in Test cells + screen worksheet/card/quiz. `ws-empty-band` | FAIL 12: mult_facts array Test S/M/L (cell ~38 %); worksheet host also fires. div_facts array PASSES | FAIL (pre-existing unframed × array) | `supband-below-support-multfacts-array` |
+| 5 | ARRAY-CAPTION grammar - a one-row array caption is "1 row of n", never "1 rows". `ws-screen-support-eq` | FAIL 3: card 1280/820/390 "1 rows of 1, for 1 × 1" | CAPTION fails on master too, but for the pre-lane PORTRAIT convention ("12 rows of 2"), not the grammar | `array-caption-grammar-multfacts` |
+| 6 | TEST-EQ-IND (Q1) - a fact skill's Test count follows its Independent count on each support. DISABLED behind `--test-eq-ind`, pending the lead's ruling. `ws-capacity-pin` | FAIL (flag on): mult array Test 12 != Ind 10 (S/M/L); touch Test 20/16 != Ind 25/20 (S/M) | FAIL (flag on): touch 20 != 25 (pre-existing). div array Test == Ind (no finding) | `test-eq-ind-multfacts` (pending the ruling) |
+
+Notes:
+- Checks 3 and 6 share `ws-capacity-pin`; the pin now carries `sizeOrderOpts` and `testEqOpts`. SIZE-ORDER-OPT is live by
+  default (it is the D3 fix check); TEST-EQ-IND stays OFF unless `--test-eq-ind` (Q1 is still the lead's to rule).
+- Check 2: PAGEFILL on review/test is wired into precritic by adding `--fill-roles` to the fact-support print-lint gates.
+- Check 1 (print-lint) and check 4 (EB-SUPBAND) run on the existing fact-support / empty-band precritic gates (no new gate).
+- Could not be checked automatically: the practice CARD host renders no `[data-ws-cell]` for mult_facts, so EB-SUPBAND and
+  the screen slot-rule read nothing there (a screen-parity gap, not this check's). The worksheet and quiz hosts are covered.

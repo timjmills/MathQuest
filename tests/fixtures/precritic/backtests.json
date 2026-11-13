@@ -4241,6 +4241,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pagefill-review-multfacts-touch",
+   "check": "print-lint's PAGEFILL (and the PG-23 orphan) run on the Review / Test roles for fact skills with supports (--fill-roles), so a support page that leaves a 30% blank strip under the grid is caught (critic divarray r1 D2: mult_facts Review S touch at the ruled 15 left a 71 mm, 30% strip)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL on review/test (--fill-roles)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "PAGEFILL fires on mult_facts Review S touch: an empty strip ~30% of the problem area under the grid"
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "0 PAGEFILL findings: the Review page fills (4-column 16, or spread rows)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports touch --size S --roles review --fill-roles review --skills multiplication:mult_facts --lints L-DENSITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "supband-below-support-multfacts-array",
+   "check": "ws-empty-band measures the empty band directly UNDER the support drawing (EB-SUPBAND), not only under the item, in Test cells and on the screen worksheet/card/quiz - an unframed x array in a cell sized for a 10-12-row one leaves 36-44% empty below it (critic divarray r1 D4)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SUPBAND (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "EB-SUPBAND fires 12 on mult_facts array Test S/M/L (Test S cell 4 ~38%); div_facts array PASSes (the frame fills). master also fails (pre-existing unframed x array)"
+   },
+   "pass": {
+    "commit": "TBD-divarray-r2",
+    "state": "0 findings: the x array gets a band frame (or the rows size to the items)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles test --sizes S,M,L --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -191,6 +191,11 @@ const has = k => curArgv().includes('--' + k);
 // --size S|M|L: the kit preset size (default L; LESSONS_LEARNED L1 asks for S and L). Read per
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
+// --fill-roles: the roles the Auto-count density lints (PAGEFILL, the PG-23 orphan) run on. Default the practice roles
+// (independent, more-practice); critic divarray r1 D2 asks to run PAGEFILL on review / test too, where a support page
+// (mult_facts Review S touch at 15) left a 30 % blank strip under the grid that no gate measured.
+const fillRoles = (arg('fill-roles', 'independent,more-practice') || '').split(',').map((r) => r.trim()).filter(Boolean);
+const isFillRole = (role) => fillRoles.includes(role);
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
 const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
 const optRules = () => {
@@ -1577,6 +1582,19 @@ function wsLintPage(cfg) {
                         const inner = cr.height - padT - padB;
                         return b > t && inner > 0 ? { h: mm(b - t), inner: mm(inner) } : null;
                     })(),
+                    // SUPPORT-NOT-SLOT (critic divarray r1 D1): the cell's array support drawing (÷ frame or × array), whether
+                    // it is a closed box (a <rect>), its dot count and drawn size; and the cell's graded answer slot box.
+                    supArr: (() => {
+                        const asvg = [...c.querySelectorAll('[data-ws-support-on] svg, [data-ws-supports] svg')].find(v => /rows of \d+|^no dots$/.test(v.getAttribute('aria-label') || ''));
+                        if (!asvg) return null;
+                        const br = asvg.getBoundingClientRect();
+                        return { framed: !!asvg.querySelector('rect'), dots: asvg.querySelectorAll('circle').length, wMm: mm(br.width), hMm: mm(br.height) };
+                    })(),
+                    slotBox: (() => {
+                        const se = c.querySelector('[data-ws-slot="answer"]') || [...c.querySelectorAll('[data-ws-slot]')].find(s => !/-label$/.test(s.getAttribute('data-ws-slot') || ''));
+                        if (!se) return null; const r = se.getBoundingClientRect();
+                        return r.width > 0 && r.height > 0 ? { wMm: mm(r.width), hMm: mm(r.height) } : null;
+                    })(),
                 };
             });
             let role = pg.getAttribute('data-ws-role') || '';
@@ -2218,13 +2236,28 @@ function lintKitGeometry(dom, pdf, info, F) {
             // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
             if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
                 F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && isFillRole(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
                 // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
                 // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)
                 const body = p.footRect[1] - p.gridTop;
                 const strip = p.footRect[1] - p.gridBottom;
                 if (body > 0 && strip > 0.2 * body) F('L-DENSITY', 'PAGEFILL', 'major', { page: p.idx }, `page ${p.idx}: an empty strip ${Math.round(strip)} mm tall under the problems (${Math.round((strip / body) * 100)}% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)`, 'empty strip under grid');
+            }
+            // L-SUPPORT NOT-SLOT (critic divarray r1 D1): a support draws no empty closed box the size/shape of the answer
+            // slot, and a frame drawn on only some cells of an array band (the × zero empty frame, the lone framed support)
+            // reads as the one slot-like box. Judged on a pupil page's item cells.
+            if (!pt.key) {
+                const arrCells = p.cells.filter(c => c.item && c.supArr);
+                const framedN = arrCells.filter(c => c.supArr.framed).length, bareN = arrCells.length - framedN;
+                if (framedN > 0 && bareN > 0) F('L-SUPPORT', 'NOT-SLOT', 'major', { page: p.idx }, `page ${p.idx}: ${framedN} framed and ${bareN} unframed array support(s) in one band: a frame drawn on only some cells reads as the lone slot-like box (D1)`, 'support frame reads as slot');
+                for (const c of arrCells) {
+                    const a = c.supArr, s = c.slotBox;
+                    if (a.framed && a.dots === 0 && s && s.wMm > 0 && s.hMm > 0) {
+                        const rw = a.wMm / s.wMm, rh = a.hMm / s.hMm;
+                        if (rw >= 0.6 && rw <= 1.4 && rh >= 0.6 && rh <= 1.4) F('L-SUPPORT', 'NOT-SLOT', 'major', { page: p.idx }, `page ${p.idx} ${c.tag}: an empty support frame ${a.wMm.toFixed(1)} x ${a.hMm.toFixed(1)} mm is within +/-40% of the answer slot ${s.wMm.toFixed(1)} x ${s.hMm.toFixed(1)} mm (reads as a second answer box, D1)`, 'empty frame ~ answer slot');
+                    }
+                }
             }
             // L-DENSITY HOLE (critic r4 D-B): an empty bordered run of cells after the last problem
             // reads as a missing problem; a page deals whole rows or spans its last problem.
@@ -2238,7 +2271,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             // of the page but not when the items differ in height). With the problem count on Auto,
             // the LAST page of a multi-page practice sheet may be short, but its problems must fill
             // at least a third of the page body: under that, the pages were not rebalanced.
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && last && pt.pages.length > 1
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && isFillRole(p.role) && last && pt.pages.length > 1
                 && p.footRect && p.gridBottom !== null && p.gridTop !== null) {
                 const body = p.footRect[1] - (p.padT || 0);
                 const used = p.gridBottom - p.gridTop;
