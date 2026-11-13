@@ -1884,8 +1884,8 @@
     "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+    "commit": "63b26321a",
+    "state": "lf-ops-props r5 A4 (master merged 5d0a75342): precritic --skill count_by_tables cell-checks --card --card-opts PASS"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --rules OVERFLOW --show 20",
    "expect": {
@@ -1984,8 +1984,8 @@
     "state": "lf-ops critic r1 FAIL tree (build #4): mult_properties / arrays_groups / count_by_tables"
    },
    "pass": {
-    "commit": "TBD-lf-ops-fix4",
-    "state": "the lf-ops fix4 commit (filled when the fixes land)"
+    "commit": "63b26321a",
+    "state": "lf-ops-props r5 A4 (master merged 5d0a75342): precritic --skill count_by_tables cell-checks --card --card-opts PASS"
    },
    "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson,independent --size M --rules TITLE,LESSON-OPT --show 20",
    "expect": {
@@ -5450,6 +5450,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
- }
+ },
+  {
+   "id": "eb-edge-ri-countrow-cbt",
+   "check": "A stacked Reason It count row is drawn at its PANEL's width and wraps inside it - never across the panel's rules (lf-ops-props r5: the merge took master's reason-it.js and lost r3b's panel width; count_by_tables Reason It S/M/L ink 52 mm across the border)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (reason-it, card roles)",
+   "browser": true,
+   "fail": {
+    "commit": "5d0a75342",
+    "state": "lf-ops-props r5 merge of origin/master: the stacked arcs row at the page's width, past its panel (cell-checks / grade-render OVERFLOW on reason-it L)"
+   },
+   "pass": {
+    "commit": "df612c358",
+    "state": "lf-ops-props r5 A3: cellLiveMm = the panel's width for a stacked count row"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-lesson-chart-cbt",
+   "check": "The count_by_tables anchor chart draws its count row full width (chartWide): in a half-page 2 x 2 panel the row shrank its boxes to 2.6 mm and clipped their numbers (lf-ops-props r5, print-lint TY-12 16)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERFLOW TY-12 (lesson)",
+   "browser": true,
+   "fail": {
+    "commit": "5d0a75342",
+    "state": "lf-ops-props r5: the new lesson record's 2 x 2 chart"
+   },
+   "pass": {
+    "commit": "df612c358",
+    "state": "lf-ops-props r5 A3: chartWide"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --lints L-OVERFLOW --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-lesson-practice-cbt",
+   "check": "The count_by_tables lesson Practice is ONE full page of count rows, one a line (practiceShapes densest first): the default 6 x 2 shape fell back to 4 + 2 rows over two pages with no step strip (lf-ops-props r5, print-lint PAGEFILL / PG-23)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY PAGEFILL / PG-23 (lesson)",
+   "browser": true,
+   "fail": {
+    "commit": "5d0a75342",
+    "state": "lf-ops-props r5: the default practice shape"
+   },
+   "pass": {
+    "commit": "df612c358",
+    "state": "lf-ops-props r5 A3: practiceShapes [[8,1] .. [3,1]]"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --lints L-DENSITY --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cc-lesson-chart-opts-cbt",
+   "check": "The count_by_tables anchor chart fits its page on every offered option (times each / given, 15 jumps): the check step is the tail line under three panels, not a fourth full-width panel (lf-ops-props r5, ws-cell-checks OVERFLOW 16-18 a size)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (lesson, card option values)",
+   "browser": true,
+   "fail": {
+    "commit": "df612c358",
+    "state": "lf-ops-props r5 A3: four full-width panels"
+   },
+   "pass": {
+    "commit": "63b26321a",
+    "state": "lf-ops-props r5 A4: tailLast"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills multiplication:count_by_tables --card --card-opts --opt-roles lesson --size L --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
  ]
 }
