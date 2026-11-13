@@ -127,6 +127,28 @@ Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-m
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
 
+## Precritic two-step r11 (2026-11-13; the 7 two-step skills, --strict --browser-jobs 1; HEAD 32ab8ffce BEFORE the master merge; logs /tmp/mq-precritic/20261113-174158-29946; stopped at 38 of 53 gates on the lead's re-order: merge master + lf-hosts-twostep, then re-run at M / L only - see "Precritic two-step r12")
+Unit gates on 32ab8ffce: ws-boot-smoke OK, ws-code-snapshot OK (736 codes), ws-two-step OK, ws-spec-card --check-signed OK on two-step,
+function-table, patterns; ws-backtest (the lane's 12 rows) 12 PASS. S is dropped (owner rule, CLAUDE.md plan item 9): S-only findings
+are recorded "S dropped (owner rule)", not red.
+
+| Gate | Result | Whose |
+|---|---|---|
+| roles-unit, precritic-clean, node-lint x2, patterns-cells, two-step, code-snapshot, card-rulings x2, visual-quality (baseline), spec-card, lessonfit, capacity-pin, presets-unit, screen-ink-size, print-lint kit M / L, coverage-matrix, slot-clip | PASS | - |
+| providers-unit, content-audit --skill | N/A (comma list) | tool |
+| ws-dealer-uniform | FAIL: x / ÷ / add-first presets repeat a Step 1 pair, a first number 3-4 times, an answer 4-6 times on a page of 20 | ours: fixed in r12 (freshDeal on the msOps deals), check ws-two-step PAGE-FRESH first; the + / − skills INCOMPLETE ("no single operation"): tool |
+| ws-options-verify --skill | FAIL 2: band=50 on two_step_add_then_div / two_step_letter_equation identical to the default in the sample (only ~6 % of items pass 50: 37 / 600, 38 / 600) | ours / lead ruling (keep band 50 on those two presets or hide it) |
+| ws-empty-band | FAIL 551 (EB-BAND 104, EB-SIDE 392, EB-EDGE 38 opener, EB-FOOT 17); 603 in the first two-step run, 707 on 0e119f312 | as before: one-row practice stretch / guided / opener -> lf-roles; re-measured at M / L in r12 |
+| ws-two-step --print (CAP-BAND) | FAIL 10 BAND (multi_step_word (Visual) M 41 % / L 32 %; letter + wpBar L 41-45 %) | lf-roles (R1 / R4a role change, routed) |
+| ws-sibling-compare | FAIL: 130 unproven, no approved sibling | first family on the template |
+| print-lint --roles lesson M? / L, grade-render --gate, cell-checks --card --card-opts | FAIL | lesson chart routing (lf-engine), guided / opener / reason-it (lf-roles); re-measured in r12 |
+| print-lint sections --pages 2 L | FAIL (LONE / PAGEFILL on the section sheet) | section engine (lf-engine) |
+| not run (stopped): phone-card, screen-slots, screen-answer, screen-support-eq, chromebook-fit, boot-smoke, options-verify --render, render-gate rest | - | r12 |
+
+Clean for the critic: none (r11 was stopped before the screen gates; the lesson / guided / practice-band reds stand on all seven).
+
+Red, by owner (r11): as in "Red, by owner (round 2)", plus ours: dealer-uniform PAGE (fixed in r12) and the band=50 sample (ruling).
+
 ## Round 2 (lead rulings R1-R4, 2026-11-13, mq-opus-medium)
 
 **R1 capacity of multi_step_word (Visual) at M / L: (c) probed, cannot reach 2 at M -> (a).** Probe (scratch probe2/probe3, widest
