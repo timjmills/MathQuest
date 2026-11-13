@@ -9,6 +9,10 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-13 two-step card (mq-opus-medium, first card on a new drawing part): design/cards/two-step/{card.json,two-step.md} written,
+  UNSIGNED, validates (--check-coverage OK; --check-signed: only the signature missing, 0 undecided, 22 PROPOSED lines). 7 skills
+  (multi_step_word(_plain) + the five two_step_* presets) on the live word-work drawing (a copy) + one NEW part, the two-step bar
+  model. 12 open questions with recommended answers in §9 for the lead to sign. No build yet.
 - 2026-11-13 fix r10 (mq-opus-medium, rebuild after critic r2): ours fixed - G5 (pattern_features Fix-it letters), G6 (feature tiles
   at the card's 10 / 11.5 / 13 mm), G8 (growing two across at S: 10 a page, was 5). G11 / F8 traced to lf-partopts' two transforms
   (repro + patch below). New checks: ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S) and ws-precritic-clean (the lead's rule: a
@@ -88,6 +92,7 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: two-step spec card (research, card.json, generate + coverage check), start 2026-11-13T09:30Z, end 2026-11-13T10:15Z, profile mq-opus-medium (first card on a new drawing part)
 Times: fix r10 (critic r2 G5 Fix-it letters, G6 card feature tiles, G8 growing two across at S; ws-patterns-cells + ws-precritic-clean + backtests; precritic r10 the two skills), start 2026-11-13T10:10Z, end 2026-11-13T13:20Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r9 (merge master, revert + cherry-pick lf-ops 77187c6e8, precritic r9, count-row + notice fixes), start 2026-11-13T05:40Z, end 2026-11-13T09:00Z, profile mq-opus-low
 Times: fix r8 (critic r1 findings F1 F5 F6 F6b F7 + lead items + minors; precritic r8), start 2026-11-13T02:25Z, end 2026-11-13T04:55Z, profile mq-opus-medium (rebuild after a failed critic)
@@ -1010,6 +1015,13 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 two-step card (spec card only, no code): design/cards/two-step/card.json + generated two-step.md (`ws-spec-card.mjs
+  --family two-step`). Found: the seven skills exist (presets of multi_step_word_plain, skill-presets.js); drawing = word-work
+  two-step columns / frames / letter / estimate (a copy, visual-quality lane's cell) + a NEW two-step bar model (wpBar is a no-op on
+  two-step today). Defects for the build, sampled 300 items each with generateQuestionFor: default answers to 127 (Step 1 to 145)
+  against Max Number 100; band 50 lets Step 1 reach 73; answer = a story number on ~0.7 % of + / − items; multi_step_word (Visual)
+  deals the same items as _plain; keyword supports offered (proposed hidden, P-21). Research reached: IXL public skill names, MW4K
+  public pages (grade 3-4 two-step pages not found; no login), K5 Learning; Math-Drills 403; lesson 7 RESEARCH.md reused.
 - 2026-11-13 r10 (mq-opus-medium, rebuild after critic r2): OURS fixed, in lane files only.
   (1) G5 pattern_features Error analysis: each feature sentence now prints its letter A / B / C (sheet/cells/notice.js sentenceList,
   `mq-nt-letter` / `data-ws-letter`); the letter hangs in the item-tab keep-out on paper (no width lost: a letter column inside the
