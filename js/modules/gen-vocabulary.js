@@ -667,7 +667,9 @@ function _genPictureTask(q) {
         q.selfAnswering = true;
         q.skillLabel = 'Match 3 Pictures';
         q.hint = `Look at each picture. ${trio.map((w) => `${w}: ${VOCAB_WORDS[w].meaning}.`).join(' ')}`;
-        q.dupKey = `vocab-match3:${trio.slice().sort().join('|')}`;
+        // (r12: a set with ONE clash-free split - sets 0 and 6 once product / multiple went notWith - deals each trio again in
+        // its other rotation, so an independent page still holds four cells, not two stretched ones: ws-empty-band EB-FOOT)
+        q.dupKey = `vocab-match3:${trio.slice().sort().join('|')}:${order.join('')}`;
         q.vocabWords = trio.slice();
         return;
     }
