@@ -42,6 +42,7 @@ import { mountCropped, refitCropped, croppedReady, openChipSheet } from './teach
 import { savedSets, writeSets } from './teacher-ui.js';
 import { REDESIGN_PASSED } from './redesign-passed.js';
 import { mountQuickPrints } from './simple-print.js';   // owner 2026-11-03 item 5: Quick prints on the Skills page
+import { offeredSize } from './sheet/tokens.js';   // owner 2026-11-13: a set saved at S is labelled M
 
 // Standards (owner request 2026-09-25): the detail panel tags each skill with its CCSS standards
 // and Essential Elements, the search finds skills by a standard code (3.OA.7, EE.3.OA.6), and a
@@ -1157,13 +1158,13 @@ if (typeof document !== 'undefined') {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && setMenu) { e.stopPropagation(); closeSetMenu(true); } }, true);
     document.addEventListener('pointerdown', (e) => { if (setMenu && !(e.target.closest && e.target.closest('.ts-set-menu, [data-act="setmenu"]'))) closeSetMenu(false); }, true);
 }
-/** "2 sets · Size S · Short key": the print settings a set keeps, in words. */
+/** "2 sets · Size M · Short key": the print settings a set keeps, in words. */
 function setPrintWords(o) {
     const w = [];
     const m = o.mode || 'pages';
     w.push(m === 'pages' ? plural2(Number(o.pages) || 1, 'page') : m === 'each' ? `${o.nEach} of each skill` : `${o.nTotal} problems`);
     if (Number(o.versions) > 1) w.push(`${o.versions} sets${o.setsSame === true ? ' (same)' : ''}`);
-    if (o.size) w.push(`Size ${o.size}`);
+    if (o.size) w.push(`Size ${offeredSize(o.size, 'M')}`);   // owner 2026-11-13: a set saved at S reads (and prints) as M
     if (o.keyStyle === 'short') w.push('Short key');
     return w.join(' · ');
 }

@@ -838,6 +838,7 @@ first_of() { local f; for f in "$@"; do [ -f "tests/scripts/$f" ] && { echo "$f"
 build_list() {
   # session 1: browser gates first in rough longest-first order (the two browser workers take them in this order)
   browser_gate 1 ws-content-audit ws-content-audit.cjs
+  browser_gate 1 "ws-no-size-s --browser" ws-no-size-s.mjs --browser   # critic nos r1 F1: S seeded in every restore path reads M (saved set, &set= link, stores)
   if [ -f "$PRINT_BASE" ]; then browser_gate 1 "ws-print-lint --source kit --baseline" ws-print-lint.cjs --source kit --baseline "$PRINT_BASE"
   else add 1 fn "ws-print-lint --source kit (limit $PRINT_LINT_LIMIT)" "print_lint_limit"; fi
   browser_gate 1 ws-teacher-wrm ws-teacher-wrm.cjs

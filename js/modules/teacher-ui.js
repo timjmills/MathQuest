@@ -210,7 +210,11 @@ export function decodeSetParam(text) {
         if (o.l && typeof o.l === 'object') rec.locks = o.l;
         if (Array.isArray(o.g)) rec.groups = o.g;
         if (Array.isArray(o.ls)) rec.lessons = o.ls;
-        if (o.p && typeof o.p === 'object') rec.print = o.p;
+        if (o.p && typeof o.p === 'object') {
+            rec.print = o.p;
+            // owner 2026-11-13: a link made when S was offered keeps decoding; its size is read as M (critic nos r1 F1)
+            if (rec.print.opts && typeof rec.print.opts === 'object' && rec.print.opts.size != null) rec.print.opts.size = offeredSize(rec.print.opts.size, 'M');
+        }
         return rec;
     } catch (e) { return null; }
 }

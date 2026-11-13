@@ -2088,7 +2088,7 @@ Work top to bottom. Each line is a pass / fail check; the rule ids in brackets s
 
 **I. Verify**
 
-27. Print at S, M and L, in grey and in Photocopy-safe, on A4 and on US Letter. Photocopy the grey version once and check that shaded parts and trace digits survive.
+27. Print at M and L (S dropped 2026-11-13), in grey and in Photocopy-safe, on A4 and on US Letter. Photocopy the grey version once and check that shaded parts and trace digits survive.
 28. Run the compliance lints: ink, emoji, font, label style for the look, slot shape, overflow, no cell split across pages, no CCSS inside cells, facsimile answer key count.
 28a. Run `node tests/scripts/ws-visual-quality.mjs --skill <cat:skill>` (VQ-REP, VQ-ONEANSWER, VQ-LIVE, VQ-TITLE,
      VQ-NOLEGACY) and look at the drawing against VQ-1 … VQ-10 (`WORKSHEET_DESIGN_STANDARD.md` §18).

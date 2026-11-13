@@ -216,6 +216,13 @@ export function normaliseFamilies(v) {
     return v === true || /^(allow|on|true|yes|1)$/i.test(String(v === undefined || v === null ? '' : v).trim()) ? 'allow' : 'off';
 }
 
+/** True when a list of skill refs prints the count_by_tables "All rows on one page" sheet, which buildSheet draws in the
+ *  compact layout (COMPACT_LABEL) whatever size is asked: every size control shows that one label instead of M / L. */
+export function printsCompactOnePage(skills) {
+    return (skills || []).some((k) => {
+        try { return !!k && !k.leftOut && k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
+    });
+}
 function normaliseRequest(req = {}) {
     const asked = ROLE_ALIASES[req.role] || req.role;
     const role = ROLES.has(asked) ? asked : 'independent';
@@ -298,7 +305,7 @@ function normaliseRequest(req = {}) {
         }
     }
     // Owner 2026-10-02: a count-by section with "All 12 tables on one page" is exactly twelve rows on ONE
-    // page in one column, drawn at the smallest print size (the page holds twelve rows only at S).
+    // page in one column, drawn at the compact S token (COMPACT_LABEL; lead ruling 2026-11-13: at M, Letter holds 11 rows).
     let onePage = false;
     for (const sec of sections) {
         let rowCount = ONE_PAGE_ITEMS;

@@ -33,7 +33,7 @@ import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
 import { normalizeOptions } from './skill-options.js';
-import { getProvider, offeredSize } from './sheet/index.js';
+import { getProvider, offeredSize, COMPACT_LABEL } from './sheet/index.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 // The detailed lesson maker (V22, 2026-10-16): its lessons, picked by name (no skill choice).
 import { detailedLessonList, detailedLessonFor } from './lessons/detailed/index.js';
@@ -489,7 +489,7 @@ function sectionHTML(s, i) {
     const colsField = onePage ? lockedSelect(`tvCols${i}`, 'Columns', '1') : `<label class="tv-label" for="tvCols${i}">Columns</label><select id="tvCols${i}" class="tv-select" data-cols="${i}">${cols}</select>`;
     const pagesField = onePage && s.role !== 'more-practice' && s.role !== 'lesson' ? `
   <div>${lockedSelect(`tvPages${i}`, 'Pages', '1')}<p class="tv-cap" style="margin-top:4px;">12 rows (× 1 to × 12, in order, 12 jumps each), one page and its key.</p></div>`
-        : onePage ? `${pagesPart}<p class="tv-cap" id="tvOnePageNote${i}">${ONE_PAGE_WHY} Each page: 12 rows (× 1 to × 12, in order, 12 jumps each) on one page, Small, one column.</p>` : pagesPart;
+        : onePage ? `${pagesPart}<p class="tv-cap" id="tvOnePageNote${i}">${ONE_PAGE_WHY} Each page: 12 rows (× 1 to × 12, in order, 12 jumps each) on one page, one column. Size: ${COMPACT_LABEL}.</p>` : pagesPart;
     const skills = s.skills.map((k, idx) => {
         const hit = findSkill(k.categoryId, k.skillId);
         const label = hit ? hit.label : k.skillId;
@@ -932,13 +932,13 @@ function openOptions(si, idx, anchor) {
 }
 
 /** True when the section prints "All 12 tables on one page" (count_by_tables onePage): print-sheet.js
- *  normaliseRequest then forces size S, twelve rows, one page and one column (critic round 4, G). */
+ *  normaliseRequest then forces the compact layout (COMPACT_LABEL), twelve rows, one page and one column (critic round 4, G). */
 function onePageSection(s) {
     return !!(s && s.skills.some((k) => {
         try { return k.skillId === 'count_by_tables' && !!normalizeOptions(k.categoryId, k.skillId, k.opts || {}).onePage; } catch (e) { return false; }
     }));
 }
-const ONE_PAGE_WHY = 'Set by "All 12 tables on one page".';
+const ONE_PAGE_WHY = 'Set by "All rows on one page".';   // the option's own label (skill-options.js onePage)
 function lockedSelect(id, label, text) {
     return `<label class="tv-label" for="${id}">${label}</label><select id="${id}" class="tv-select" disabled aria-describedby="${id}Why"><option selected>${text}</option></select><p class="tv-cap" id="${id}Why" style="margin-top:4px;">${ONE_PAGE_WHY}</p>`;
 }
@@ -965,7 +965,7 @@ function renderSetup() {
   <div style="padding:24px;display:flex;flex-direction:column;gap:16px;">
     <h2 class="tv-h2" id="tvSetupH">Page setup</h2>
     <div><span class="tv-label">Size</span>${pr.sections.some(onePageSection)
-        ? `<div class="tv-seg" role="radiogroup" aria-label="Size" aria-describedby="tvSizeOnePage">${[['M', 'Medium'], ['L', 'Large']].map(([v, l]) => `<button type="button" role="radio" aria-checked="false" aria-label="${l}" aria-disabled="true" tabindex="-1" disabled>${v}</button>`).join('')}</div><p class="tv-cap" id="tvSizeOnePage" style="margin-top:6px;">Size fixed. ${ONE_PAGE_WHY} Twelve rows fit on one page only with smaller digits.</p>`
+        ? `<p class="tv-cap" id="tvSizeOnePage" data-size-fixed="compact" style="margin-top:6px;"><strong>${COMPACT_LABEL}</strong>. ${ONE_PAGE_WHY}</p>`
         : seg('size', pr.size, [['M', 'M', 'Medium'], ['L', 'L', 'Large']], 'Size')}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>

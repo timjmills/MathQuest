@@ -32,7 +32,7 @@
 // loads the deferred half on the first press). Styles: css/simple-print.css (.sp-*), self-contained tokens, so it
 // looks the same on the student page and the teacher site.
 
-import { buildSheet as buildSheetRaw, sheetDocument } from './print-sheet.js';
+import { buildSheet as buildSheetRaw, sheetDocument, printsCompactOnePage } from './print-sheet.js';
 import * as printSheetNS from './print-sheet.js';
 // every request this dialog sends, last few kept for the gate (ws-simple-print reads lastSimpleRequests)
 const REQS = [];
@@ -42,7 +42,7 @@ import { printHtml } from './teacher-print.js';
 import { openPdfPreview } from './teacher-pdf-preview.js';
 import { generateQuestionFor } from './generate-question.js';
 import { isFact as isFactItem } from './sheet/roles/fact-rows.js';
-import { offeredSize } from './sheet/tokens.js';
+import { offeredSize, COMPACT_LABEL } from './sheet/tokens.js';
 import { SKILLS } from './data.js';
 import { mergedSkillFor } from './skill-aliases.js';
 import { optionsFor, offeredOptionsFor, describeOptions } from './skill-options.js';
@@ -1367,7 +1367,9 @@ function render() {
     <div class="sp-row sp-sets"><span class="sp-lbl" id="spSetsLbl">Sets</span><div class="sp-stepper"><button type="button" class="sp-sb" data-sp="sdec" aria-label="Fewer sets">−</button><input id="spSets" class="sp-n" type="number" inputmode="numeric" min="1" max="${MAX_SETS}" value="${P.sets}" aria-labelledby="spSetsLbl"><button type="button" class="sp-sb" data-sp="sinc" aria-label="More sets">+</button></div><span class="sp-hint">${P.sets > 1 ? 'each set has different problems' : ''}</span></div></section>`;
 
     // 3 Size
-    h += `<section class="sp-step">${stepHead(3, 'Size')}<div class="sp-sizes sp-sizes-${SIZES.length}" role="radiogroup" aria-label="Size">`;
+    // lead ruling 2026-11-13 (critic nos r1 F3): "All rows on one page" prints compact whatever is asked: one label, no picker
+    const compact = printsCompactOnePage(S.list);
+    h += `<section class="sp-step">${stepHead(3, 'Size')}${compact ? `<p class="sp-hint" data-size-fixed="compact">${COMPACT_LABEL}. Set by "All rows on one page".</p>` : ''}<div class="sp-sizes sp-sizes-${SIZES.length}" role="radiogroup" aria-label="Size"${compact ? ' hidden' : ''}>`;
     for (const [v, l] of SIZES) {
         const c = S.probes[v];
         h += `<button type="button" role="radio" class="sp-size sp-size-${v}" data-sp="size" data-v="${v}" aria-checked="${P.size === v}"><span class="sp-size-glyph" aria-hidden="true">7</span><span class="sp-size-name">${l}</span><span class="sp-size-cols">${c ? sizeColsText(v) : '…'}</span></button>`;

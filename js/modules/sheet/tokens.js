@@ -136,6 +136,11 @@ export function offeredSize(v, fallback = 'M') {
     if (u === 'S') return 'M';
     return OFFERED_SIZES.includes(u) ? u : fallback;
 }
+// The ONE layout that still prints at the compact S token (lead ruling 2026-11-13, owner informed; critic nos r1 F3):
+// count_by_tables "All rows on one page". Measured: at M, A4 holds exactly 12 rows (22 pt) but Letter holds 11 (2 pages),
+// so twelve rows on one page need the compact token. Every screen names it with this ONE label: never "Size S" or "Small",
+// and never an M / L picker with nothing checked.
+export const COMPACT_LABEL = 'Compact (12 tables on one page)';
 
 /* --------------------------------------------------------- the two looks (section 1.2) */
 

@@ -52,7 +52,7 @@ custom score per problem / type of problem and the tagging of problems."
   teacher key (and in the score summary), never on the pupil page (HD-6: codes only in the footer / key).
 - **Scoring:** a default score per question (1), a **custom score per question**, or a **score per type of question**
   (e.g. all 2-step word problems = 3 points); the total and a per-standard subtotal print on the key and the score box.
-- Versions A / B… with new numbers; size S / M / L (floors §8a).
+- Versions A / B… with new numbers; size M / L (floors §8a; S dropped 2026-11-13).
 - The key adds a **standards breakdown**: points per CCSS / EE / WRM step, so the teacher sees which standards a pupil
   missed.
 
@@ -91,7 +91,7 @@ use thumbnail view as well. Don't do this now. Just record."
 
 - The Print screen shows the three paper cards (Practice, Quiz, Lesson) with their options — `LESSON_LIBRARY_PLAN.md` §8e.
 - Practice options: skills (one or more, each with a **weight**, default equal), **mix in prerequisite skills** (lists
-  every prerequisite, none ticked), versions A / B / C…, fact columns 5–10, timed check, size S / M / L.
+  every prerequisite, none ticked), versions A / B / C…, fact columns 5–10, timed check, size M / L (S dropped 2026-11-13).
 - Quiz: scored, versions, size. Lesson: all parts required; tick parts to print; "New numbers" per part.
 
 ## Quality bar
