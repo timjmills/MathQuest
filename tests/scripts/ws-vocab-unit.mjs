@@ -28,6 +28,7 @@
 //     beside factor's boxed 4 and 3
 // V-HATCH (r11, the escape hatch) a set's noPicture words are never drawn for it (Match 3, the 1 picture, 3 words picture);
 //     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
+// V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
 // V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
@@ -43,6 +44,7 @@
 
 import { pathToFileURL } from 'url';
 import path from 'path';
+import fs from 'fs';
 
 // (MQ_ROOT: check another checkout - ws-backtest's commit-pair rows run today's checks on the failed head)
 const ROOT = process.env.MQ_ROOT ? path.resolve(process.env.MQ_ROOT) : path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
@@ -198,6 +200,28 @@ const ambig = [];
             if (seenClash.has(k)) continue;
             seenClash.add(k);
             fail(`V-FEAT ${pl.name}: the "${a}" picture reads as "${b}" (${featOf(a).join(' ')}), and the two may be dealt together (notWith, redraw or the hatch)`);
+        }
+    }
+    // V-STD (r12, critic r11 #2 root cause): the standards say which words go together. For every set, read the text (and the
+    // Wisconsin wording and level descriptors) of its CCSS codes and of its pictures' codes (data/standards/ccss-math.json): any
+    // two of the set's words named in ONE sentence there must be notWith, or kept apart by V-FEAT (neither picture satisfies the
+    // other word's definition, by today's VOCAB_DEFS). 4.OA.B.4 / 3.OA.C.7 name product and multiple together.
+    {
+        const J = JSON.parse(fs.readFileSync(path.join(here, 'data/standards/ccss-math.json'), 'utf8'));
+        const byCode = new Map(J.standards.map((x) => [x.code, x]));
+        const sentences = (c) => { const x = byCode.get(c); if (!x) return []; return [x.text, ...(x.wi || []).flatMap((w) => [w.text, w.levelDescriptors || ''])].join(' ').toLowerCase().split(/(?<=[.;!?\n])\s+/); };
+        const named = (w) => new RegExp(`\\b${w.replace(/ /g, '[ -]')}s?\\b`);
+        const reads = (a, b) => P.hasVocabPicture(a) && HERE_W.featuresSatisfy(featOf(a), b);
+        for (const s of W.VOCAB_SETS) {
+            const codes = new Set(s.ccss || []);
+            for (const w of s.words) { const t = P.vocabPictureTeaches && P.vocabPictureTeaches(w); if (t) t.ccss.forEach((c) => codes.add(c)); }
+            const sens = [...codes].flatMap((c) => sentences(c).map((t) => [c, t]));
+            for (let i = 0; i < s.words.length; i++) for (let j = i + 1; j < s.words.length; j++) {
+                const a = s.words[i], b = s.words[j];
+                if (!W.compatible([a, b])) continue;
+                const hit = sens.find(([, t]) => named(a).test(t) && named(b).test(t));
+                if (hit && (reads(a, b) || reads(b, a))) fail(`V-STD set "${s.title}": ${hit[0]} names "${a}" and "${b}" together, and the "${reads(a, b) ? a : b}" picture reads as "${reads(a, b) ? b : a}": make them notWith`);
+            }
         }
     }
     // V-REF (r11, critic r10 R-2 #2 / #3): every mark an explanation POINTS at ("the 12 in the box", "the one in the box",
