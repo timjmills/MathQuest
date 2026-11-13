@@ -93,7 +93,9 @@ function htoCell(p, ctx, valueOf, inkOf, under) {
 // line taller than its neighbours; every such name keeps two lines, bottom-aligned, so the answer lines of a row line up and no
 // one-line cell carries an empty band under its line. Names under 100 are one line and keep their own height.)
 // (critic nwf r1 N4: "one hundred" is one line - only a name long enough to wrap takes the two-line box)
-const nameBox = (p, textPt) => (Number(p.n) > 100 && String(p.words || numberWords(p.n)).length >= 15 ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-end;justify-content:center;` : '');
+// (lesson print-lint CL-4b: a one-line name at the FOOT of its two-line box started the cell 6-7 mm under the top pad; the name
+// sits at the top of the box - the box's fixed height still puts every answer place of the row at one y)
+const nameBox = (p, textPt) => (Number(p.n) > 100 && String(p.words || numberWords(p.n)).length >= 15 ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-start;justify-content:center;` : '');
 const keyOf = (p) => String(p.ans !== undefined ? p.ans : (toWords(p) ? (p.words || numberWords(p.n)) : p.n));
 
 register('words', {
