@@ -5704,6 +5704,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-cl4d-twin-row",
+  "check": "H13 / H13-ABS exempt the white above and below a CL-4d centred one-line cell (data-ws-stretchmid, its own line) whose row's height a taller SIBLING's measured ink sets (compare's ex-each worked twin), each band <= 40 % of the cell; a band over 40 % or a page-fill row with no taller sibling still counts (lead ruling (a) 2026-11-13 13:35, CL-4b / CL-4d). The command runs each state's OWN ws-print-lint: the ruling changes the check, not the page",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-DENSITY H13 / H13-ABS (CL-4d twin row exemption)",
+  "browser": true,
+  "fail": {
+   "commit": "fb05bcb1",
+   "state": "single ex-each: 14 H13 at S, 10 at L - the compare line centred by CL-4d beside the worked twin (3.3 x the line), each band 33-34 %"
+  },
+  "pass": {
+   "commit": "38667589",
+   "state": "the twin-sized centred line exempt (bands 33-34 % <= 40 %): H13 0 at S and L; sections/pages-2 L (page fill, no taller sibling) still counted"
+  },
+  "command": "node {root}/tests/scripts/ws-print-lint.cjs --source kit --size S --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-S.json && tests/scripts/mq-browser-run.sh node {root}/tests/scripts/ws-print-lint.cjs --source kit --size L --anchors side --skills placevalue:compare --lints L-DENSITY --report-only --json {root}/exeach-L.json && node -e \"const n={};for(const z of ['S','L'])n[z]=require('{root}/exeach-'+z+'.json').documents.flatMap(d=>d.findings||[]).filter(f=>f.rule==='H13'||f.rule==='H13-ABS').length;console.log('ex-each-h13: '+(n.S+n.L?'FAIL':'OK')+' (H13 S '+n.S+', L '+n.L+')')\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
