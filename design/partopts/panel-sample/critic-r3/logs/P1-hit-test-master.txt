@@ -1,0 +1,6 @@
+1280 geo_translate {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":7,"tot":7,"ex":["BUTTON All -> sko-tip","BUTTON None -> sko-tip","INPUT Right and up -> sko-tip"]}
+1280 mult_chart_easy {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":20,"tot":20,"ex":["SELECT Chart size\n        5 ×  -> sko-tip","BUTTON All -> sko-tip","BUTTON None -> sko-tip"]}
+1280 fraction_of_set {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":7,"tot":7,"ex":["BUTTON All -> sko-tip","BUTTON None -> sko-tip","INPUT Halves, quarters, eighth -> sko-tip"]}
+820 geo_translate {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":8,"tot":8,"ex":["BUTTON All -> sko-tip","BUTTON None -> sko-tip","INPUT Right and up -> sko-tip"]}
+820 mult_chart_easy {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":22,"tot":22,"ex":["SELECT Chart size\n        5 ×  -> sko-tip","BUTTON All -> sko-tip","BUTTON None -> sko-tip"]}
+820 fraction_of_set {"tipPos":"static","cb":"tv-sko-row sko-has-tip","blocked":8,"tot":8,"ex":["BUTTON All -> sko-tip","BUTTON None -> sko-tip","INPUT Halves, quarters, eighth -> sko-tip"]}

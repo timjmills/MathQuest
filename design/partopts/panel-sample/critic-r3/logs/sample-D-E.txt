@@ -1,0 +1,88 @@
+integers:number_line_int 1280x1000 reads 3 parts 0 minH 12.1 minS 9 chg[INPUT:checkbox click]  
+fractions:order_frac_numline 1280x1000 reads 5 parts 3 minH 16.2 minS 9 chg[INPUT:checkbox click]  
+addition:nl_add 1280x1000 reads 5 parts 2 minH 18.1 minS 9.1 chg[select 3->0]  
+decimals:decimal_nl_drag 1280x1000 reads 3 parts 0 minH 9.2 minS 9.1 chg[INPUT:checkbox click]  
+conversions:ratio_tables 1280x1000 reads 3 parts 0 minH 8.9 minS - chg[select 0->1]  
+   open html 8.9"2"
+   chg50 html 8.9"2"
+   chg1500 html 8.9"2"
+measurement:elapsed_mixed 1280x1000 reads 5 parts 2 minH 12.9 minS 9.4 chg[select 1->0]  
+conversions:double_num_line 1280x1000 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+   part2 SLICECUT minutes
+   chgpart2 SLICECUT minutes
+multiplication:count_by_tables 1280x1000 reads 3 parts 0 minH 9.8 minS 15.2 chg[select 0->1]  
+graphs:pictograph 1280x1000 reads 3 parts 0 minH 9 minS 11.5 chg[INPUT:checkbox click]  
+graphs:build_bar_graph 1280x1000 reads 5 parts 2 minH 9.5 minS - chg[select 0->1]  
+   part2 fill 0.04
+   chgpart2 fill 0.04
+measurement:elapsed_hour 1280x1000 reads 3 parts 0 minH 16.4 minS 9 chg[select 2->0]  
+composing:number_chart_fill 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+number_theory:factor_tchart_hard 1280x1000 reads 5 parts 2 minH 9 minS - chg[select 0->1]  
+algebra:combine_like_terms 1280x1000 reads 3 parts 0 minH 18 minS - chg[INPUT:checkbox click]  
+placevalue:place_value_disks 1280x1000 reads 3 parts 0 minH 14.5 minS 9 chg[select 1->0]  
+composing:base10_build_hundreds 1280x1000 reads 5 parts 2 minH 12.8 minS - chg[select 1->0]  
+integers:number_line_int 1366x768 reads 3 parts 0 minH 12.1 minS 9 chg[INPUT:checkbox click]  
+fractions:order_frac_numline 1366x768 reads 5 parts 3 minH 16.2 minS 9 chg[INPUT:checkbox click]  
+addition:nl_add 1366x768 reads 5 parts 2 minH 18.1 minS 9.1 chg[select 3->0]  
+decimals:decimal_nl_drag 1366x768 reads 3 parts 0 minH 9.2 minS 9.1 chg[INPUT:checkbox click]  
+conversions:ratio_tables 1366x768 reads 3 parts 0 minH 8.9 minS - chg[select 0->1]  
+   open html 8.9"2"
+   chg50 html 8.9"2"
+   chg1500 html 8.9"2"
+measurement:elapsed_mixed 1366x768 reads 5 parts 2 minH 12.9 minS 9.4 chg[select 1->0]  
+conversions:double_num_line 1366x768 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+   part2 SLICECUT minutes
+   chgpart2 SLICECUT minutes
+multiplication:count_by_tables 1366x768 reads 3 parts 0 minH 9.8 minS 15.2 chg[select 0->1]  
+graphs:pictograph 1366x768 reads 3 parts 0 minH 9 minS 11.5 chg[INPUT:checkbox click]  
+graphs:build_bar_graph 1366x768 reads 5 parts 2 minH 9.9 minS - chg[select 0->1]  
+measurement:elapsed_hour 1366x768 reads 3 parts 0 minH 16.4 minS 9 chg[select 2->0]  
+composing:number_chart_fill 1366x768 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+number_theory:factor_tchart_hard 1366x768 reads 5 parts 2 minH 9.1 minS - chg[select 0->1]  
+algebra:combine_like_terms 1366x768 reads 3 parts 0 minH 18 minS - chg[INPUT:checkbox click]  
+placevalue:place_value_disks 1366x768 reads 3 parts 0 minH 14.5 minS 9 chg[select 1->0]  
+composing:base10_build_hundreds 1366x768 reads 5 parts 2 minH 12.7 minS - chg[select 1->0]  
+integers:number_line_int 1024x768 reads 3 parts 0 minH 12.1 minS 9 chg[INPUT:checkbox click]  
+fractions:order_frac_numline 1024x768 reads 5 parts 3 minH 16.2 minS 9 chg[INPUT:checkbox click]  
+addition:nl_add 1024x768 reads 5 parts 2 minH 18.1 minS 9.1 chg[select 3->0]  
+decimals:decimal_nl_drag 1024x768 reads 3 parts 0 minH 9.2 minS 9.1 chg[INPUT:checkbox click]  
+conversions:ratio_tables 1024x768 reads 3 parts 0 minH 8.9 minS - chg[select 0->1]  
+   open html 8.9"2"
+   chg50 html 8.9"2"
+   chg1500 html 8.9"2"
+measurement:elapsed_mixed 1024x768 reads 5 parts 2 minH 12.9 minS 9.4 chg[select 1->0]  
+conversions:double_num_line 1024x768 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+   part2 SLICECUT minutes
+   chgpart2 SLICECUT minutes
+multiplication:count_by_tables 1024x768 reads 3 parts 0 minH 9.8 minS 15.2 chg[select 0->1]  
+graphs:pictograph 1024x768 reads 3 parts 0 minH 9 minS 11.5 chg[INPUT:checkbox click]  
+graphs:build_bar_graph 1024x768 reads 5 parts 2 minH 9.9 minS - chg[select 0->1]  
+measurement:elapsed_hour 1024x768 reads 3 parts 0 minH 16.4 minS 9 chg[select 2->0]  
+composing:number_chart_fill 1024x768 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+number_theory:factor_tchart_hard 1024x768 reads 5 parts 2 minH 9.1 minS - chg[select 0->1]  
+algebra:combine_like_terms 1024x768 reads 3 parts 0 minH 18 minS - chg[INPUT:checkbox click]  
+placevalue:place_value_disks 1024x768 reads 3 parts 0 minH 14.5 minS 9 chg[select 1->0]  
+composing:base10_build_hundreds 1024x768 reads 5 parts 2 minH 12.7 minS - chg[select 1->0]  
+integers:number_line_int 820x1180 reads 3 parts 0 minH 12.1 minS 9 chg[INPUT:checkbox click]  
+fractions:order_frac_numline 820x1180 reads 5 parts 3 minH 16.2 minS 9 chg[INPUT:checkbox click]  
+addition:nl_add 820x1180 reads 5 parts 2 minH 18.1 minS 9.1 chg[select 3->0]  
+decimals:decimal_nl_drag 820x1180 reads 3 parts 0 minH 9.2 minS 9.1 chg[INPUT:checkbox click]  
+conversions:ratio_tables 820x1180 reads 3 parts 0 minH 8.9 minS - chg[select 0->1]  
+   open html 8.9"2"
+   chg50 html 8.9"2"
+   chg1500 html 8.9"2"
+measurement:elapsed_mixed 820x1180 reads 5 parts 2 minH 12.9 minS 9.4 chg[select 1->0]  
+conversions:double_num_line 820x1180 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+   part2 SLICECUT minutes
+   chgpart2 SLICECUT minutes
+multiplication:count_by_tables 820x1180 reads 3 parts 0 minH 9.8 minS 15.2 chg[select 0->1]  
+graphs:pictograph 820x1180 reads 3 parts 0 minH 9 minS 11.5 chg[INPUT:checkbox click]  
+graphs:build_bar_graph 820x1180 reads 5 parts 2 minH 9.5 minS - chg[select 0->1]  
+   part2 fill 0.04
+   chgpart2 fill 0.04
+measurement:elapsed_hour 820x1180 reads 3 parts 0 minH 16.4 minS 9 chg[select 2->0]  
+composing:number_chart_fill 820x1180 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+number_theory:factor_tchart_hard 820x1180 reads 5 parts 2 minH 9 minS - chg[select 0->1]  
+algebra:combine_like_terms 820x1180 reads 3 parts 0 minH 18 minS - chg[INPUT:checkbox click]  
+placevalue:place_value_disks 820x1180 reads 3 parts 0 minH 14.5 minS 9 chg[select 1->0]  
+composing:base10_build_hundreds 820x1180 reads 5 parts 2 minH 12.8 minS - chg[select 1->0]  

@@ -1,0 +1,32 @@
+integers:add_int 1280x1000 reads 2 parts 2 minH 18.1 minS 9.1 chg[no control]  
+   part2 CUT −11
+   part2 SLICECUT −7
+shapes_classify:hotspot_quads 1280x1000 reads 3 parts 3 minH 13.6 minS 9 chg[no control]  
+   open fill 0.09
+   part2 SLICECUT rhombus/parallelogram/kite
+   part3 SLICECUT kite/isosceles trian/regular hexagon
+data_analysis:histogram_read 1280x1000 reads 3 parts 3 minH 16.9 minS 9 chg[no control]  
+   part2 SLICECUT Frequency/Value
+   part3 SLICECUT 40-50
+multiplication:nl_mult 1280x1000 reads 2 parts 2 minH 18.1 minS 9.1 chg[no control]  
+   open CUT 50
+coordinates:coordinates_read_all 1280x1000 reads 6 parts 6 minH 16 minS 9 chg[no control]  
+   part5 SLICECUT x
+fractions:fraction_of_set_hard 1280x1000 reads 2 parts 2 minH 12.3 minS 9.5 chg[no control]  
+   part2 CUT 3
+integers:add_int 820x1180 reads 2 parts 2 minH 18.1 minS 9.1 chg[no control]  
+   part2 CUT −11
+   part2 SLICECUT −7
+shapes_classify:hotspot_quads 820x1180 reads 3 parts 3 minH 13.6 minS 9 chg[no control]  
+   open fill 0.09
+   part2 SLICECUT rhombus/parallelogram/kite
+   part3 SLICECUT kite/isosceles trian/regular hexagon
+data_analysis:histogram_read 820x1180 reads 3 parts 3 minH 16.9 minS 9 chg[no control]  
+   part2 SLICECUT Frequency/Value
+   part3 SLICECUT 40-50
+multiplication:nl_mult 820x1180 reads 2 parts 2 minH 18.1 minS 9.1 chg[no control]  
+   open CUT 50
+coordinates:coordinates_read_all 820x1180 reads 6 parts 6 minH 16 minS 9 chg[no control]  
+   part5 SLICECUT x
+fractions:fraction_of_set_hard 820x1180 reads 2 parts 2 minH 12.3 minS 9.5 chg[no control]  
+   part2 CUT 3

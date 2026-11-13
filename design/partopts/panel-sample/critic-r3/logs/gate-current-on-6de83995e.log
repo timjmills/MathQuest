@@ -1,0 +1,124 @@
+ok   multiplication:mult_chart_easy @1280: ink 9.19 % (own box 13.0 %), scale 0.6545, text >= 11.8 px, frame 300 px, options 453/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @1280 part 2: ink 10.53 % (own box 13.8 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @1280 part 3: ink 10.17 % (own box 13.3 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @1280 part 4: ink 11.17 % (own box 14.6 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 453/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @1280 (all parts): 4 reading(s), choices -
+ok   multiplication:mult_chart_easy @1280 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 582/1016 px
+ok   multiplication:mult_chart_easy @1280 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 582/1016 px
+ok   multiplication:mult_chart_easy @1280 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @1280: ink 8.66 % (own box 9.3 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @1280 part 2: ink 12.90 % (own box 18.6 %), scale 0.701, text >= 12.6 px, frame 300 px, options 375/375 px, part 2 of 2
+ok   coordinates:geo_translate @1280 (all parts): 2 reading(s), choices 0123
+ok   coordinates:geo_translate @1280 changed +50ms: ink 8.84 % (own box 9.5 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @1280 changed +1.5s: ink 8.84 % (own box 9.5 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   algebra:multi_step_word @1280: ink 5.52 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 300 px, options 453/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1280 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1280 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1280 (all parts): 3 reading(s), choices -
+ok   algebra:multi_step_word @1280 changed +50ms: ink 6.17 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 300 px, options 435/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1280 changed +1.5s: ink 6.17 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 300 px, options 435/1407 px, part 1 of 3
+ok   conversions:double_num_line @1280: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1280 part 2: ink 1.56 % (own box 3.4 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 2 of 3
+ok   conversions:double_num_line @1280 part 3: ink 1.91 % (own box 2.6 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 3 of 3
+ok   conversions:double_num_line @1280 (all parts): 3 reading(s), choices -
+ok   conversions:double_num_line @1280 changed +50ms: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1280 changed +1.5s: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   multiplication:mult_chart_easy @1366: ink 8.51 % (own box 13.2 %), scale 0.5995, text >= 10.8 px, frame 276 px, options 245/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @1366 part 2: ink 10.68 % (own box 15.3 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @1366 part 3: ink 10.36 % (own box 14.8 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @1366 part 4: ink 11.25 % (own box 16.1 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @1366 (all parts): 4 reading(s), choices -
+ok   multiplication:mult_chart_easy @1366 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1366 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1366 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @1366: ink 8.18 % (own box 9.7 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   coordinates:geo_translate @1366 part 2: ink 13.36 % (own box 21.1 %), scale 0.6422, text >= 11.6 px, frame 276 px, options 245/375 px, part 2 of 2
+ok   coordinates:geo_translate @1366 (all parts): 2 reading(s), choices 0123
+ok   coordinates:geo_translate @1366 changed +50ms: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   coordinates:geo_translate @1366 changed +1.5s: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   algebra:multi_step_word @1366: ink 6.01 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 276 px, options 245/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1366 part 2: ink 4.32 % (own box 6.7 %), scale 0.8086, text >= 10.5 px, frame 276 px, options 245/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1366 part 3: ink 4.38 % (own box 7.9 %), scale 0.736, text >= 9.6 px, frame 276 px, options 245/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1366 (all parts): 3 reading(s), choices -
+ok   algebra:multi_step_word @1366 changed +50ms: ink 6.72 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 276 px, options 227/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1366 changed +1.5s: ink 6.72 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 276 px, options 227/1407 px, part 1 of 3
+ok   conversions:double_num_line @1366: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1366 part 2: ink 1.56 % (own box 3.4 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 2 of 3
+ok   conversions:double_num_line @1366 part 3: ink 1.91 % (own box 2.6 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 3 of 3
+ok   conversions:double_num_line @1366 (all parts): 3 reading(s), choices -
+ok   conversions:double_num_line @1366 changed +50ms: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1366 changed +1.5s: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   multiplication:mult_chart_easy @1024: ink 8.51 % (own box 13.2 %), scale 0.5995, text >= 10.8 px, frame 276 px, options 245/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @1024 part 2: ink 10.68 % (own box 15.3 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @1024 part 3: ink 10.36 % (own box 14.8 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @1024 part 4: ink 11.25 % (own box 16.1 %), scale 0.6501, text >= 14.4 px, frame 276 px, options 245/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @1024 (all parts): 4 reading(s), choices -
+ok   multiplication:mult_chart_easy @1024 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1024 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1024 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @1024: ink 8.18 % (own box 9.7 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   coordinates:geo_translate @1024 part 2: ink 13.36 % (own box 21.1 %), scale 0.6422, text >= 11.6 px, frame 276 px, options 245/375 px, part 2 of 2
+ok   coordinates:geo_translate @1024 (all parts): 2 reading(s), choices 0123
+ok   coordinates:geo_translate @1024 changed +50ms: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   coordinates:geo_translate @1024 changed +1.5s: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 2
+ok   algebra:multi_step_word @1024: ink 6.01 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 276 px, options 245/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1024 part 2: ink 4.32 % (own box 6.7 %), scale 0.8086, text >= 10.5 px, frame 276 px, options 245/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1024 part 3: ink 4.38 % (own box 7.9 %), scale 0.736, text >= 9.6 px, frame 276 px, options 245/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1024 (all parts): 3 reading(s), choices -
+ok   algebra:multi_step_word @1024 changed +50ms: ink 6.72 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 276 px, options 227/1407 px, part 1 of 3
+ok   algebra:multi_step_word @1024 changed +1.5s: ink 6.72 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 276 px, options 227/1407 px, part 1 of 3
+ok   conversions:double_num_line @1024: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1024 part 2: ink 1.56 % (own box 3.4 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 2 of 3
+ok   conversions:double_num_line @1024 part 3: ink 1.91 % (own box 2.6 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 3 of 3
+ok   conversions:double_num_line @1024 (all parts): 3 reading(s), choices -
+ok   conversions:double_num_line @1024 changed +50ms: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1024 changed +1.5s: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   multiplication:mult_chart_easy @820: ink 9.19 % (own box 13.0 %), scale 0.6545, text >= 11.8 px, frame 300 px, options 633/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @820 part 2: ink 10.53 % (own box 13.8 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @820 part 3: ink 10.17 % (own box 13.3 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @820 part 4: ink 11.17 % (own box 14.6 %), scale 0.7097, text >= 15.8 px, frame 300 px, options 633/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @820 (all parts): 4 reading(s), choices -
+ok   multiplication:mult_chart_easy @820 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 762/1016 px
+ok   multiplication:mult_chart_easy @820 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 762/1016 px
+ok   multiplication:mult_chart_easy @820 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @820: ink 8.66 % (own box 9.3 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @820 part 2: ink 12.90 % (own box 18.6 %), scale 0.701, text >= 12.6 px, frame 300 px, options 375/375 px, part 2 of 2
+ok   coordinates:geo_translate @820 (all parts): 2 reading(s), choices 0123
+ok   coordinates:geo_translate @820 changed +50ms: ink 8.84 % (own box 9.5 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   coordinates:geo_translate @820 changed +1.5s: ink 8.84 % (own box 9.5 %), scale 0.9828, text >= 15.7 px (svg text 9.8 px), frame 300 px, options 375/375 px, part 1 of 2
+ok   algebra:multi_step_word @820: ink 5.52 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 300 px, options 633/1407 px, part 1 of 3
+ok   algebra:multi_step_word @820 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/1407 px, part 2 of 3
+ok   algebra:multi_step_word @820 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/1407 px, part 3 of 3
+ok   algebra:multi_step_word @820 (all parts): 3 reading(s), choices -
+ok   algebra:multi_step_word @820 changed +50ms: ink 6.17 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 300 px, options 615/1407 px, part 1 of 3
+ok   algebra:multi_step_word @820 changed +1.5s: ink 6.17 % (own box 9.9 %), scale 0.96, text >= 24.2 px, frame 300 px, options 615/1407 px, part 1 of 3
+ok   conversions:double_num_line @820: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @820 part 2: ink 1.56 % (own box 3.4 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 2 of 3
+ok   conversions:double_num_line @820 part 3: ink 1.91 % (own box 2.6 %), scale 1.6, text >= - px (svg text 9.0 px), frame 269 px, options 202/202 px, part 3 of 3
+ok   conversions:double_num_line @820 (all parts): 3 reading(s), choices -
+ok   conversions:double_num_line @820 changed +50ms: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @820 changed +1.5s: ink 3.99 % (own box 10.1 %), scale 1, text >= 16.8 px, frame 269 px, options 202/202 px, part 1 of 3
+ok   multiplication:mult_chart_easy @1280x720: ink 7.97 % (own box 13.3 %), scale 0.5606, text >= 10.1 px, frame 259 px, options 214/1016 px, part 1 of 4
+ok   multiplication:mult_chart_easy @1280x720 part 2: ink 9.39 % (own box 14.4 %), scale 0.6079, text >= 13.5 px, frame 259 px, options 214/1016 px, part 2 of 4
+ok   multiplication:mult_chart_easy @1280x720 part 3: ink 9.02 % (own box 13.8 %), scale 0.6079, text >= 13.5 px, frame 259 px, options 214/1016 px, part 3 of 4
+ok   multiplication:mult_chart_easy @1280x720 part 4: ink 9.86 % (own box 15.1 %), scale 0.6079, text >= 13.5 px, frame 259 px, options 214/1016 px, part 4 of 4
+ok   multiplication:mult_chart_easy @1280x720 (all parts): 4 reading(s), choices -
+ok   coordinates:geo_translate @1280x720: ink 2.70 % (own box 10.5 %), scale 1, text >= 18.0 px, frame 259 px, options 214/375 px, part 1 of 3
+ok   coordinates:geo_translate @1280x720 part 2: ink 8.49 % (own box 17.9 %), scale 1, text >= 16.0 px (svg text 10.0 px), frame 259 px, options 214/375 px, part 2 of 3
+ok   coordinates:geo_translate @1280x720 part 3: ink 12.48 % (own box 21.1 %), scale 0.6005, text >= 10.8 px, frame 259 px, options 214/375 px, part 3 of 3
+ok   coordinates:geo_translate @1280x720 (all parts): 3 reading(s), choices 0123
+ok   algebra:multi_step_word @1280x720: ink 6.42 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 259 px, options 214/1407 px, part 1 of 4
+ok   algebra:multi_step_word @1280x720 part 2: ink 3.98 % (own box 6.6 %), scale 0.7562, text >= 9.8 px, frame 259 px, options 214/1407 px, part 2 of 4
+ok   algebra:multi_step_word @1280x720 part 3: ink 0.83 % (own box 3.8 %), scale 1, text >= 13.0 px, frame 259 px, options 214/1407 px, part 3 of 4
+ok   algebra:multi_step_word @1280x720 part 4: ink 4.32 % (own box 6.9 %), scale 0.8305, text >= 10.8 px, frame 259 px, options 214/1407 px, part 4 of 4
+ok   algebra:multi_step_word @1280x720 (all parts): 4 reading(s), choices -
+ok   conversions:double_num_line @1280x720: ink 6.27 % (own box 6.8 %), scale 1, text >= 16.8 px, frame 179 px, options 202/202 px, part 1 of 3
+ok   conversions:double_num_line @1280x720 part 2: ink 2.38 % (own box 3.4 %), scale 1.6, text >= - px (svg text 9.0 px), frame 179 px, options 202/202 px, part 2 of 3
+ok   conversions:double_num_line @1280x720 part 3: ink 1.91 % (own box 2.7 %), scale 1.6, text >= - px (svg text 9.0 px), frame 179 px, options 202/202 px, part 3 of 3
+ok   conversions:double_num_line @1280x720 (all parts): 3 reading(s), choices -
+ok   multiplication:mult_chart_easy @1280x1000>720: ink 7.97 % (own box 13.3 %), scale 0.5606, text >= 10.1 px, frame 259 px, options 214/1016 px, part 1 of 4
+ok   coordinates:geo_translate @1280x1000>720: ink 2.70 % (own box 10.5 %), scale 1, text >= 18.0 px, frame 259 px, options 214/375 px, part 1 of 3
+ok   algebra:multi_step_word @1280x1000>720: ink 6.42 % (own box 8.8 %), scale 0.96, text >= 24.2 px, frame 259 px, options 214/1407 px, part 1 of 4
+ok   conversions:double_num_line @1280x1000>720: ink 6.27 % (own box 6.8 %), scale 1, text >= 16.8 px, frame 179 px, options 202/202 px, part 1 of 3
+  4 skills × 4 widths (1280, 1366, 1024, 820 px); spot passes on 4 skill(s): 1280x720, a resize to 720, an option change at 1280 and 1366 and 1024 and 820, 122 readings, 1 worker(s), 123 s
+ws-options-shots: OK (4 skills × 4 widths)

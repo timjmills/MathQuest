@@ -1,0 +1,18 @@
+addition:nl_add  1 of 2 ; 2 of 2
+addition:number_line_add  1 of 2 ; 2 of 2
+subtraction:nl_sub  1 of 2 ; 2 of 2
+subtraction:number_line_sub  1 of 2 ; 2 of 2
+multiplication:nl_mult  1 of 2 frame-cut[50] ; 2 of 2
+division:nl_div  1 of 2 cut[40] ; 2 of 2
+integers:add_int  1 of 2 ; 2 of 2 cut[−7] frame-cut[−11]
+integers:sub_int  1 of 2 cut[14] ; 2 of 2 cut[11] frame-cut[4]
+integers:add_negative  1 of 2 cut[7] ; 2 of 2
+integers:sub_negative  1 of 2 ; 2 of 2
+fractions:fraction_of_set_hard  1 of 2 ; 2 of 2 frame-cut[3]
+conversions:double_num_line  1 of 3 ; 2 of 3 cut[minutes] ; 3 of 3
+shapes_classify:hotspot_quads  1 of 3 ; 2 of 3 cut[rhombus/parallelogram/kite] ; 3 of 3 cut[kite/isosceles trian/regular hexagon]
+coordinates:coordinates_read_all  1 of 6 ; 2 of 6 ; 3 of 6 ; 4 of 6 ; 5 of 6 cut[x] ; 6 of 6
+graphs:line_plot  1 of 3 ; 2 of 3 ; 3 of 3
+data_analysis:box_plot_intro  1 of 3 ; 2 of 3 ; 3 of 3
+data_analysis:histogram_read  1 of 3 ; 2 of 3 cut[Frequency/Value] ; 3 of 3 cut[40-50]
+data_analysis:box_plot_quartiles  1 of 3 ; 2 of 3 ; 3 of 3

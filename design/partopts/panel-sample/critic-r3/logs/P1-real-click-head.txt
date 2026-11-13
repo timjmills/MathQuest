@@ -1,0 +1,4 @@
+head 1280 click checkbox "1" true -> true tips open: [ 'What is Tables with blanks?' ] summary: Standard settings
+   label "2" click -> true
+head 820 tap checkbox "1" true -> true tips open: [ 'What is Tables with blanks?' ] summary: Standard settings
+   label "2" click -> true

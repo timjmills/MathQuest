@@ -1,0 +1,90 @@
+FAIL multiplication:mult_chart_easy @1280: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+ok   multiplication:mult_chart_easy @1280 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 582/1016 px
+ok   multiplication:mult_chart_easy @1280 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 582/1016 px
+ok   multiplication:mult_chart_easy @1280 changed +1.5s (all parts): 1 reading(s), choices -
+FAIL coordinates:geo_translate @1280: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @1280 part 2: [choices] answer choice(s) B, C shown with no letter or label
+FAIL coordinates:geo_translate @1280 part 3: [choices] answer choice(s) D shown with no letter or label
+FAIL coordinates:geo_translate @1280 (all parts): [choices] the 4 answer choices are spread over 3 parts (A | BC | D)
+FAIL coordinates:geo_translate @1280 changed +50ms: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @1280 changed +1.5s: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL algebra:multi_step_word @1280: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @1280 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1280 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1280 (all parts): 3 reading(s), choices -
+FAIL algebra:multi_step_word @1280 changed +50ms: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL algebra:multi_step_word @1280 changed +1.5s: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL multiplication:mult_chart_easy @1366: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1366 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1366 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+ok   multiplication:mult_chart_easy @1366 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1366 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1366 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @1366: ink 8.18 % (own box 9.7 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+FAIL coordinates:geo_translate @1366 part 2: [choices] answer choice(s) A, B shown with no letter or label
+FAIL coordinates:geo_translate @1366 part 3: [choices] answer choice(s) C, D shown with no letter or label
+FAIL coordinates:geo_translate @1366 (all parts): [choices] the 4 answer choices are spread over 2 parts (AB | CD)
+ok   coordinates:geo_translate @1366 changed +50ms: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+ok   coordinates:geo_translate @1366 changed +1.5s: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+FAIL algebra:multi_step_word @1366: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @1366 part 2: ink 4.32 % (own box 6.7 %), scale 0.8086, text >= 10.5 px, frame 276 px, options 245/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1366 part 3: ink 4.38 % (own box 7.9 %), scale 0.736, text >= 9.6 px, frame 276 px, options 245/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1366 (all parts): 3 reading(s), choices -
+FAIL algebra:multi_step_word @1366 changed +50ms: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL algebra:multi_step_word @1366 changed +1.5s: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL multiplication:mult_chart_easy @1024: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1024 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1024 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+ok   multiplication:mult_chart_easy @1024 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1024 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 350/1016 px
+ok   multiplication:mult_chart_easy @1024 changed +1.5s (all parts): 1 reading(s), choices -
+ok   coordinates:geo_translate @1024: ink 8.18 % (own box 9.7 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+FAIL coordinates:geo_translate @1024 part 2: [choices] answer choice(s) A, B shown with no letter or label
+FAIL coordinates:geo_translate @1024 part 3: [choices] answer choice(s) C, D shown with no letter or label
+FAIL coordinates:geo_translate @1024 (all parts): [choices] the 4 answer choices are spread over 2 parts (AB | CD)
+ok   coordinates:geo_translate @1024 changed +50ms: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+ok   coordinates:geo_translate @1024 changed +1.5s: ink 8.33 % (own box 9.8 %), scale 0.9003, text >= 14.4 px (svg text 9.0 px), frame 276 px, options 245/375 px, part 1 of 3
+FAIL algebra:multi_step_word @1024: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @1024 part 2: ink 4.32 % (own box 6.7 %), scale 0.8086, text >= 10.5 px, frame 276 px, options 245/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1024 part 3: ink 4.38 % (own box 7.9 %), scale 0.736, text >= 9.6 px, frame 276 px, options 245/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1024 (all parts): 3 reading(s), choices -
+FAIL algebra:multi_step_word @1024 changed +50ms: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL algebra:multi_step_word @1024 changed +1.5s: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL multiplication:mult_chart_easy @820: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @820 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @820 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+ok   multiplication:mult_chart_easy @820 changed +50ms: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 762/1016 px
+ok   multiplication:mult_chart_easy @820 changed +1.5s: ink 7.41 % (own box 16.1 %), scale 0.5014, text >= 9.0 px, frame 199 px, options 762/1016 px
+ok   multiplication:mult_chart_easy @820 changed +1.5s (all parts): 1 reading(s), choices -
+FAIL coordinates:geo_translate @820: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @820 part 2: [choices] answer choice(s) B, C shown with no letter or label
+FAIL coordinates:geo_translate @820 part 3: [choices] answer choice(s) D shown with no letter or label
+FAIL coordinates:geo_translate @820 (all parts): [choices] the 4 answer choices are spread over 3 parts (A | BC | D)
+FAIL coordinates:geo_translate @820 changed +50ms: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @820 changed +1.5s: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL algebra:multi_step_word @820: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @820 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/1407 px, part 2 of 3
+ok   algebra:multi_step_word @820 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/1407 px, part 3 of 3
+ok   algebra:multi_step_word @820 (all parts): 3 reading(s), choices -
+FAIL algebra:multi_step_word @820 changed +50ms: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL algebra:multi_step_word @820 changed +1.5s: [repeat] the sample says its question line twice: "lena had 89 cards lena gave away 18 then"
+FAIL multiplication:mult_chart_easy @1280x720: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280x720 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280x720 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+FAIL coordinates:geo_translate @1280x720: [svgtext] SVG text drawn at 8.4 px ("original"; needs >= 9 px)
+FAIL coordinates:geo_translate @1280x720 part 2: [choices] answer choice(s) A, B shown with no letter or label
+FAIL coordinates:geo_translate @1280x720 part 3: [choices] answer choice(s) C, D shown with no letter or label
+FAIL coordinates:geo_translate @1280x720 (all parts): [choices] the 4 answer choices are spread over 2 parts (AB | CD)
+FAIL algebra:multi_step_word @1280x720: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @1280x720 part 2: ink 3.98 % (own box 6.6 %), scale 0.7562, text >= 9.8 px, frame 259 px, options 214/1407 px, part 2 of 4
+ok   algebra:multi_step_word @1280x720 part 3: ink 0.83 % (own box 3.8 %), scale 1, text >= 13.0 px, frame 259 px, options 214/1407 px, part 3 of 4
+ok   algebra:multi_step_word @1280x720 part 4: ink 4.32 % (own box 6.9 %), scale 0.8305, text >= 10.8 px, frame 259 px, options 214/1407 px, part 4 of 4
+ok   algebra:multi_step_word @1280x720 (all parts): 4 reading(s), choices -
+FAIL multiplication:mult_chart_easy @1280x1000>720: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL coordinates:geo_translate @1280x1000>720: [svgtext] SVG text drawn at 8.4 px ("original"; needs >= 9 px)
+FAIL algebra:multi_step_word @1280x1000>720: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+FAIL coordinates:geo_translate @widths: [choices] the answer choices are split differently by width (1280: 0|12|3; 1366: 01|23; 1024: 01|23; 820: 0|12|3; 1280x720: 01|23)
+  3 skills × 4 widths (1280, 1366, 1024, 820 px); spot passes on 3 skill(s): 1280x720, a resize to 720, an option change at 1280 and 1366 and 1024 and 820, 88 readings, 1 worker(s), 81 s
+ws-options-shots: FAIL (54)

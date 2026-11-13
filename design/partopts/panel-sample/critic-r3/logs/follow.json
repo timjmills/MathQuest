@@ -1,0 +1,10 @@
+[
+ {"tag":"f-tabs-L-max-1280","id":"Y4.B1.S14","size":"L","width":1280,"noPrint":true,"tabShot":true,"clickLast":true,"steps":[["max","practice"],["max","mixed"]]},
+ {"tag":"f-tabs-L-max-820","id":"Y4.B1.S14","size":"L","width":820,"noPrint":true,"steps":[["max","practice"],["max","mixed"]]},
+ {"tag":"f-tabs-M-60-1280","id":"Y4.B1.S14","size":"M","width":1280,"noPrint":true,"tabShot":true,"steps":[["step","practice",1],["step","practice",1],["step","practice",1],["step","mixed",1]]},
+ {"tag":"f-ffs-MLM-1280","id":"skill:addition:fact_family_sort","size":"M","width":1280,"noPrint":true,"steps":[["max","practice"],["size","L"],["size","M"]]},
+ {"tag":"f-ffs-MLM-820","id":"skill:addition:fact_family_sort","size":"M","width":820,"noPrint":true,"steps":[["max","practice"],["size","L"],["size","M"]]},
+ {"tag":"f-r14-MLM-1280","id":"Y4.B1.S14","size":"M","width":1280,"noPrint":true,"steps":[["max","practice"],["max","mixed"],["size","L"],["size","M"]]},
+ {"tag":"f-wp10-L-1280","id":"skill:addition:add_wp_10","size":"L","width":1280,"noPrint":false,"steps":[["max","practice"]]},
+ {"tag":"f-r14-M-1280","id":"Y4.B1.S14","size":"M","width":1280,"noPrint":false,"steps":[]}
+]

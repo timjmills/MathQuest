@@ -1,0 +1,223 @@
+multiplication:mult_chart_easy 1280x1000 reads 6 parts 4 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart_shade 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+composing:hundreds_chart_fill 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 5->0]  
+coordinates:geo_translate 1280x1000 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+coordinates:geo_reflect 1280x1000 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+coordinates:rotate_quarter_turn 1280x1000 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+fractions:fraction_of_set 1280x1000 reads 5 parts 3 minH 15 minS 9.2 chg[INPUT:checkbox click]  
+   open fill 0.13
+   part3 fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+algebra:multi_step_word 1280x1000 reads 5 parts 3 minH 9.6 minS - chg[INPUT:checkbox click]  
+algebra_mixed:algebra_all 1280x1000 reads 5 parts 3 minH 9.7 minS - chg[INPUT:checkbox click]  
+measurement:elapsed_find_duration 1280x1000 reads 5 parts 2 minH 13.9 minS 9.4 chg[select 1->0]  
+measurement:elapsed_visual_hard 1280x1000 reads 5 parts 2 minH 13.7 minS 9.4 chg[select 0->1]  
+vocabulary:vocab_grade_3 1280x1000 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+vocabulary:vocab_grade_6 1280x1000 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+addition:add_wp_100 1280x1000 reads 4 parts 2 minH 10.4 minS - chg[select 2->0]  
+subtraction:sub_wp_compare 1280x1000 reads 4 parts 2 minH 10.3 minS - chg[INPUT:checkbox click]  
+multiplication:mult_facts 1280x1000 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+addition:add_facts 1280x1000 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+fractions:compare_fractions_nl 1280x1000 reads 3 parts 0 minH 9.2 minS 9 chg[INPUT:checkbox click]  
+graphs:bar_graph 1280x1000 reads 3 parts 0 minH 9.3 minS 9 chg[INPUT:checkbox click]  
+graphs:line_plot_fractions 1280x1000 reads 5 parts 3 minH 17.3 minS 9 chg[INPUT:checkbox click]  
+   open fill 0.09
+   part3 fill 0.07
+   chg50 fill 0.07
+   chg1500 fill 0.07
+graphs:tally_chart 1280x1000 reads 4 parts 2 minH 13.5 minS 19.4 chg[INPUT:checkbox click]  
+graphs:pie_chart 1280x1000 reads 5 parts 3 minH 9 minS 10.9 chg[INPUT:checkbox click]  
+   part3 fill 0.08
+   chg50 fill 0.08
+   chg1500 fill 0.08
+division:long_div_2digit 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+placevalue:pv_digit_drag 1280x1000 reads 3 parts 0 minH 9 minS - chg[select 2->0]  
+   chg50 fill 0.11
+   chg1500 fill 0.11
+conversions:double_num_line 1280x1000 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+shapes_early:shape_attributes 1280x1000 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+multiplication:mult_chart_easy 1366x768 reads 6 parts 4 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart 1366x768 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart_shade 1366x768 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+composing:hundreds_chart_fill 1366x768 reads 3 parts 0 minH 9 minS - chg[select 5->0]  
+coordinates:geo_translate 1366x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+coordinates:geo_reflect 1366x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+coordinates:rotate_quarter_turn 1366x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+fractions:fraction_of_set 1366x768 reads 4 parts 2 minH 12.3 minS 10 chg[INPUT:checkbox click]  
+algebra:multi_step_word 1366x768 reads 5 parts 3 minH 9.5 minS - chg[INPUT:checkbox click]  
+algebra_mixed:algebra_all 1366x768 reads 5 parts 3 minH 9.6 minS - chg[INPUT:checkbox click]  
+measurement:elapsed_find_duration 1366x768 reads 5 parts 2 minH 13.9 minS 9.4 chg[select 1->0]  
+measurement:elapsed_visual_hard 1366x768 reads 5 parts 2 minH 13.7 minS 9.4 chg[select 0->1]  
+vocabulary:vocab_grade_3 1366x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+vocabulary:vocab_grade_6 1366x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+addition:add_wp_100 1366x768 reads 4 parts 2 minH 9.6 minS - chg[select 2->0]  
+subtraction:sub_wp_compare 1366x768 reads 4 parts 2 minH 9.5 minS - chg[INPUT:checkbox click]  
+multiplication:mult_facts 1366x768 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+addition:add_facts 1366x768 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+fractions:compare_fractions_nl 1366x768 reads 3 parts 0 minH 9.2 minS 9 chg[INPUT:checkbox click]  
+graphs:bar_graph 1366x768 reads 3 parts 0 minH 9.3 minS 9 chg[INPUT:checkbox click]  
+graphs:line_plot_fractions 1366x768 reads 5 parts 3 minH 17.3 minS 9 chg[INPUT:checkbox click]  
+   open fill 0.09
+   part3 fill 0.07
+   chg50 fill 0.07
+   chg1500 fill 0.07
+graphs:tally_chart 1366x768 reads 4 parts 2 minH 12.4 minS 17.8 chg[INPUT:checkbox click]  
+graphs:pie_chart 1366x768 reads 6 parts 4 minH 12 minS 13.8 chg[INPUT:checkbox click]  
+   part3 fill 0.12
+   part4 fill 0.09
+   chg50 fill 0.09
+   chg1500 fill 0.09
+division:long_div_2digit 1366x768 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+placevalue:pv_digit_drag 1366x768 reads 3 parts 0 minH 9 minS - chg[select 2->0]  
+   chg50 fill 0.11
+   chg1500 fill 0.11
+conversions:double_num_line 1366x768 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+shapes_early:shape_attributes 1366x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+multiplication:mult_chart_easy 1024x768 reads 6 parts 4 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart 1024x768 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart_shade 1024x768 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+composing:hundreds_chart_fill 1024x768 reads 3 parts 0 minH 9 minS - chg[select 5->0]  
+coordinates:geo_translate 1024x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+coordinates:geo_reflect 1024x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+coordinates:rotate_quarter_turn 1024x768 reads 4 parts 2 minH 11.6 minS 9 chg[INPUT:checkbox click]  
+fractions:fraction_of_set 1024x768 reads 4 parts 2 minH 12.3 minS 10 chg[INPUT:checkbox click]  
+algebra:multi_step_word 1024x768 reads 5 parts 3 minH 9.5 minS - chg[INPUT:checkbox click]  
+algebra_mixed:algebra_all 1024x768 reads 5 parts 3 minH 9.6 minS - chg[INPUT:checkbox click]  
+measurement:elapsed_find_duration 1024x768 reads 5 parts 2 minH 13.9 minS 9.4 chg[select 1->0]  
+measurement:elapsed_visual_hard 1024x768 reads 5 parts 2 minH 13.7 minS 9.4 chg[select 0->1]  
+vocabulary:vocab_grade_3 1024x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+vocabulary:vocab_grade_6 1024x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+addition:add_wp_100 1024x768 reads 4 parts 2 minH 9.6 minS - chg[select 2->0]  
+subtraction:sub_wp_compare 1024x768 reads 4 parts 2 minH 9.5 minS - chg[INPUT:checkbox click]  
+multiplication:mult_facts 1024x768 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+addition:add_facts 1024x768 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+fractions:compare_fractions_nl 1024x768 reads 3 parts 0 minH 9.2 minS 9 chg[INPUT:checkbox click]  
+graphs:bar_graph 1024x768 reads 3 parts 0 minH 9.3 minS 9 chg[INPUT:checkbox click]  
+graphs:line_plot_fractions 1024x768 reads 5 parts 3 minH 17.3 minS 9 chg[INPUT:checkbox click]  
+   open fill 0.09
+   part3 fill 0.07
+   chg50 fill 0.07
+   chg1500 fill 0.07
+graphs:tally_chart 1024x768 reads 4 parts 2 minH 12.4 minS 17.8 chg[INPUT:checkbox click]  
+graphs:pie_chart 1024x768 reads 6 parts 4 minH 12 minS 13.8 chg[INPUT:checkbox click]  
+   part3 fill 0.12
+   part4 fill 0.09
+   chg50 fill 0.09
+   chg1500 fill 0.09
+division:long_div_2digit 1024x768 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+placevalue:pv_digit_drag 1024x768 reads 3 parts 0 minH 9 minS - chg[select 2->0]  
+   chg50 fill 0.11
+   chg1500 fill 0.11
+conversions:double_num_line 1024x768 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+shapes_early:shape_attributes 1024x768 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+multiplication:mult_chart_easy 820x1180 reads 6 parts 4 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart 820x1180 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart_shade 820x1180 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+composing:hundreds_chart_fill 820x1180 reads 3 parts 0 minH 9 minS - chg[select 5->0]  
+coordinates:geo_translate 820x1180 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+coordinates:geo_reflect 820x1180 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+coordinates:rotate_quarter_turn 820x1180 reads 4 parts 2 minH 12.7 minS 9.8 chg[INPUT:checkbox click]  
+fractions:fraction_of_set 820x1180 reads 5 parts 3 minH 15 minS 9.2 chg[INPUT:checkbox click]  
+   open fill 0.13
+   part3 fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+algebra:multi_step_word 820x1180 reads 5 parts 3 minH 9.6 minS - chg[INPUT:checkbox click]  
+algebra_mixed:algebra_all 820x1180 reads 5 parts 3 minH 9.7 minS - chg[INPUT:checkbox click]  
+measurement:elapsed_find_duration 820x1180 reads 5 parts 2 minH 13.9 minS 9.4 chg[select 1->0]  
+measurement:elapsed_visual_hard 820x1180 reads 5 parts 2 minH 13.7 minS 9.4 chg[select 0->1]  
+vocabulary:vocab_grade_3 820x1180 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+vocabulary:vocab_grade_6 820x1180 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+addition:add_wp_100 820x1180 reads 4 parts 2 minH 10.4 minS - chg[select 2->0]  
+subtraction:sub_wp_compare 820x1180 reads 4 parts 2 minH 10.3 minS - chg[INPUT:checkbox click]  
+multiplication:mult_facts 820x1180 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+addition:add_facts 820x1180 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+fractions:compare_fractions_nl 820x1180 reads 3 parts 0 minH 9.2 minS 9 chg[INPUT:checkbox click]  
+graphs:bar_graph 820x1180 reads 3 parts 0 minH 9.3 minS 9 chg[INPUT:checkbox click]  
+graphs:line_plot_fractions 820x1180 reads 5 parts 3 minH 17.3 minS 9 chg[INPUT:checkbox click]  
+   open fill 0.09
+   part3 fill 0.07
+   chg50 fill 0.07
+   chg1500 fill 0.07
+graphs:tally_chart 820x1180 reads 4 parts 2 minH 13.5 minS 19.4 chg[INPUT:checkbox click]  
+graphs:pie_chart 820x1180 reads 5 parts 3 minH 9 minS 10.9 chg[INPUT:checkbox click]  
+   part3 fill 0.08
+   chg50 fill 0.08
+   chg1500 fill 0.08
+division:long_div_2digit 820x1180 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+placevalue:pv_digit_drag 820x1180 reads 3 parts 0 minH 9 minS - chg[select 2->0]  
+   chg50 fill 0.11
+   chg1500 fill 0.11
+conversions:double_num_line 820x1180 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+shapes_early:shape_attributes 820x1180 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+multiplication:mult_chart_easy 1280x720 reads 6 parts 4 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart 1280x720 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+multiplication:mult_chart_shade 1280x720 reads 3 parts 0 minH 9 minS - chg[select 3->0]  
+composing:hundreds_chart_fill 1280x720 reads 3 parts 0 minH 9 minS - chg[select 5->0]  
+coordinates:geo_translate 1280x720 reads 5 parts 3 minH 10.9 minS 10 chg[INPUT:checkbox click]  
+coordinates:geo_reflect 1280x720 reads 5 parts 3 minH 10.9 minS 10 chg[INPUT:checkbox click]  
+coordinates:rotate_quarter_turn 1280x720 reads 5 parts 3 minH 10.9 minS 10 chg[INPUT:checkbox click]  
+fractions:fraction_of_set 1280x720 reads 4 parts 2 minH 11.5 minS 9.3 chg[INPUT:checkbox click]  
+algebra:multi_step_word 1280x720 reads 6 parts 4 minH 9.8 minS - chg[INPUT:checkbox click]  
+   part3 fill 0.09
+algebra_mixed:algebra_all 1280x720 reads 6 parts 4 minH 9.8 minS - chg[INPUT:checkbox click]  
+   part3 fill 0.09
+measurement:elapsed_find_duration 1280x720 reads 5 parts 2 minH 13.9 minS 9.4 chg[select 1->0]  
+measurement:elapsed_visual_hard 1280x720 reads 5 parts 2 minH 13.7 minS 9.4 chg[select 0->1]  
+vocabulary:vocab_grade_3 1280x720 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+vocabulary:vocab_grade_6 1280x720 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  
+addition:add_wp_100 1280x720 reads 4 parts 2 minH 10.8 minS - chg[select 2->0]  
+subtraction:sub_wp_compare 1280x720 reads 4 parts 2 minH 10.7 minS - chg[INPUT:checkbox click]  
+multiplication:mult_facts 1280x720 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+addition:add_facts 1280x720 reads 3 parts 0 minH 12.4 minS - chg[INPUT:checkbox click]  
+   open fill 0.11
+   chg50 fill 0.11
+   chg1500 fill 0.11
+fractions:compare_fractions_nl 1280x720 reads 3 parts 0 minH 9.2 minS 9 chg[INPUT:checkbox click]  
+graphs:bar_graph 1280x720 reads 4 parts 2 minH 17.4 minS 10.1 chg[INPUT:checkbox click]  
+graphs:line_plot_fractions 1280x720 reads 5 parts 3 minH 17.3 minS 9 chg[INPUT:checkbox click]  
+   open fill 0.09
+   part3 fill 0.07
+   chg50 fill 0.07
+   chg1500 fill 0.07
+graphs:tally_chart 1280x720 reads 4 parts 2 minH 11.6 minS 16.6 chg[INPUT:checkbox click]  
+graphs:pie_chart 1280x720 reads 6 parts 4 minH 12 minS 13 chg[INPUT:checkbox click]  
+   part3 fill 0.13
+   part4 fill 0.1
+   chg50 fill 0.1
+   chg1500 fill 0.1
+division:long_div_2digit 1280x720 reads 3 parts 0 minH 9 minS - chg[select 0->1]  
+placevalue:pv_digit_drag 1280x720 reads 3 parts 0 minH 9 minS - chg[select 2->0]  
+   chg50 fill 0.11
+   chg1500 fill 0.11
+conversions:double_num_line 1280x720 reads 7 parts 3 minH 16.8 minS 9 chg[select 0->1]  
+shapes_early:shape_attributes 1280x720 reads 3 parts 0 minH 9 minS - chg[INPUT:checkbox click]  

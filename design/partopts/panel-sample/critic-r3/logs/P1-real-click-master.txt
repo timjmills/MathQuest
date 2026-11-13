@@ -1,0 +1,4 @@
+master 1280 click checkbox "1" true -> true tips open: [ 'What is Tables with blanks?' ] summary: undefined
+   label "2" click -> true
+master 820 tap checkbox "1" true -> true tips open: [ 'What is Tables with blanks?' ] summary: undefined
+   label "2" click -> true

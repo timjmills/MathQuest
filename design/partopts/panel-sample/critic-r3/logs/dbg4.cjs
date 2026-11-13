@@ -1,0 +1,14 @@
+const { chromium } = require('playwright'); const http=require('http'),fs=require('fs'),path=require('path');
+const ROOT='/home/user/wt-critic-r3';
+const MIME={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.ttf':'font/ttf'};
+const srv=http.createServer((q,r)=>{let p=decodeURIComponent(q.url.split('?')[0]);if(p.endsWith('/'))p+='index.html';fs.readFile(path.join(ROOT,p),(e,b)=>{if(e){r.writeHead(404);return r.end();}r.writeHead(200,{'Content-Type':MIME[path.extname(p)]||'application/octet-stream'});r.end(b);});});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+(async()=>{await new Promise(r=>srv.listen(0,'127.0.0.1',r));const base=`http://127.0.0.1:${srv.address().port}`;const b=await chromium.launch();
+ const ctx=await b.newContext({viewport:{width:1280,height:1000}});const page=await ctx.newPage();
+ await page.goto(base+'/index.html');await page.waitForFunction(()=>window.UnifiedSkills&&window.tvGo);await sleep(800);
+ const [c,s]=['coordinates','geo_translate'];
+ await page.evaluate(({c,s})=>{ if(!document.body.classList.contains('teacher-mode'))window.toggleUserRole();const k=window.SKILLS[c].find(x=>x.v===s);window.UnifiedSkills.clear();window.UnifiedSkills.add({domainId:'x',categoryId:c,skillId:s,skillLabel:k.l,categoryIcon:'',categoryName:c,domainColor:'#8b5cf6'});window.UnifiedSkills._syncAllImmediate();window.tvGo('sets');},{c,s});
+ await page.locator(`.tv-opt-btn[data-key="${c}|${s}"]`).first().click(); await sleep(1500);
+ await page.locator('#skillOptionsPopover .tv-sko-part:not([hidden]) [data-sko-part="1"]').first().click(); await sleep(400);
+ console.log(await page.evaluate(()=>{const st=document.querySelector('#skillOptionsPopover .tvp-stage');return [...st.querySelectorAll('svg')].filter(v=>v.getBoundingClientRect().width>20).map(v=>{const vb=v.viewBox.baseVal;const sh=[...v.querySelectorAll('polygon,path')].map(p=>{const bb=p.getBBox();return [bb.x,bb.y,bb.width,bb.height].map(Math.round)});return {vb:vb?[vb.x,vb.y,vb.width,vb.height]:null,vbo:v.dataset.skoVb||'',shapes:sh.slice(-2)}})}));
+ await b.close();srv.close();})();

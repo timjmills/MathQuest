@@ -1,0 +1,379 @@
+
+=== f-tabs-L-max-1280 (Y4.B1.S14) size L width 1280
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: two pages Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 2 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=15 [true] okok "Mixed 15 15 to 30 problems, or 0 to leave it off · 1 page of 15 Supports: Standard: structure"
+  max practice -> 4 clicks | practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+  max mixed -> 1 clicks | mixed=30 [true] okx "Mixed 30 15 to 30 problems, or 0 to leave it off · 2 pages of 15 Supports: Standard: structure"
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: two pages Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 2 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+    mixed=30 [true] okx "Mixed 30 15 to 30 problems, or 0 to leave it off · 2 pages of 15 Supports: Standard: structure"
+  section sub: Lesson · 5 practice pages + mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed,lesson-mixed
+  page tabs (11): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8 | Page 9 | Page 10 | Answer keys
+  tab boxes: 768,28 88x44 ; 860,28 91x44 ; 955,28 91x44 ; 1050,28 91x44 ; 1145,28 91x44 ; 768,76 89x44 ; 861,76 88x44 ; 954,76 89x44 ; 1047,76 89x44 ; 1140,76 96x44 ; 768,124 468x44 vw 1280
+  after last tab: none-selected
+
+=== f-tabs-L-max-820 (Y4.B1.S14) size L width 820
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: two pages Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 2 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=15 [true] okok "Mixed 15 15 to 30 problems, or 0 to leave it off · 1 page of 15 Supports: Standard: structure"
+  max practice -> 4 clicks | practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+  max mixed -> 1 clicks | mixed=30 [true] okx "Mixed 30 15 to 30 problems, or 0 to leave it off · 2 pages of 15 Supports: Standard: structure"
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: two pages Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 2 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+    mixed=30 [true] okx "Mixed 30 15 to 30 problems, or 0 to leave it off · 2 pages of 15 Supports: Standard: structure"
+  section sub: Lesson · 5 practice pages + mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed,lesson-mixed
+  page tabs (11): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8 | Page 9 | Page 10 | Answer keys
+  390 sideways: scrollWidth-innerWidth 0 px, scrollX after scrollTo(2000) 0 px, tabs 548/548 px
+
+=== f-tabs-M-60-1280 (Y4.B1.S14) size M width 1280
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=21 [true] okok "Mixed 21 21 to 42 problems, or 0 to leave it off · 1 page of 21 Supports: Standard: structure"
+  step practice 1 -> true | practice=30 [true] okok "Practice 30 15 to 75 problems, in rows of 3, or 0 to leave it off · 2 pages of 15 Supports: Standard: page bands"
+  step practice 1 -> true | practice=45 [true] okok "Practice 45 15 to 75 problems, in rows of 3, or 0 to leave it off · 3 pages of 15 Supports: Standard: page bands"
+  step practice 1 -> true | practice=60 [true] okok "Practice 60 15 to 75 problems, in rows of 3, or 0 to leave it off · 4 pages of 15 Supports: Standard: page bands"
+  step mixed 1 -> true | mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=60 [true] okok "Practice 60 15 to 75 problems, in rows of 3, or 0 to leave it off · 4 pages of 15 Supports: Standard: page bands"
+    mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  section sub: Lesson · 4 practice pages + mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed,lesson-mixed
+  page tabs (9): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8 | Answer keys
+  tab boxes: 768,28 88x44 ; 860,28 91x44 ; 955,28 91x44 ; 1050,28 91x44 ; 1145,28 91x44 ; 768,76 104x44 ; 876,76 103x44 ; 983,76 104x44 ; 1091,76 145x44 vw 1280
+
+=== f-ffs-MLM-1280 (skill:addition:fact_family_sort) size M width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  size L -> true
+  size M -> true
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+
+=== f-ffs-MLM-820 (skill:addition:fact_family_sort) size M width 820
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  size L -> true
+  size M -> true
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+  390 sideways: scrollWidth-innerWidth 0 px, scrollX after scrollTo(2000) 0 px, tabs 548/548 px
+
+=== f-r14-MLM-1280 (Y4.B1.S14) size M width 1280
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=21 [true] okok "Mixed 21 21 to 42 problems, or 0 to leave it off · 1 page of 21 Supports: Standard: structure"
+  max practice -> 4 clicks | practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+  max mixed -> 1 clicks | mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  size L -> true
+  size M -> true
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+    mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  section sub: Lesson · 5 practice pages + mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed
+  page tabs (9): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8 | Answer keys
+
+=== f-wp10-L-1280 (skill:addition:add_wp_10) size L width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=1 [true] okx "We Do 1 1 problem, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=4 [true] okok "Practice 4 4 to 20 problems, in rows of 2, or 0 to leave it off · 1 page of 4 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=20 [true] okx "Practice 20 4 to 20 problems, in rows of 2, or 0 to leave it off · 5 pages of 4 Supports: Standard: page bands"
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=1 [true] okx "We Do 1 1 problem, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=20 [true] okx "Practice 20 4 to 20 problems, in rows of 2, or 0 to leave it off · 5 pages of 4 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice
+  page tabs (8): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Answer keys
+  page 1 lesson-chart cells 4 empty 0% (0 mm) strips[Say:]
+  page 2 lesson-sheet cells 5 empty 1% (2.6 mm) strips[Vocabulary:|Remember:|Warm-up:|Guided Practice:|Steps:]
+  page 3 lesson-practice cells 4 empty 0% (0 mm) strips[]
+  page 4 lesson-practice cells 4 empty 6% (14.6 mm) strips[]
+  page 5 lesson-practice cells 4 empty 6% (14.6 mm) strips[]
+  page 6 lesson-practice cells 4 empty 6% (14.6 mm) strips[]
+  page 7 lesson-practice cells 4 empty 6% (14.6 mm) strips[]
+  page 8 lesson-chart KEY cells 4 empty 0% (0 mm) strips[Say:]
+  page 9 lesson-sheet KEY cells 5 empty 1% (2.6 mm) strips[Vocabulary:|Remember:|Warm-up:|Guided Practice:|Steps:]
+  page 10 lesson-practice KEY cells 4 empty 0% (0 mm) strips[]
+  page 11 lesson-practice KEY cells 4 empty 6% (14.6 mm) strips[]
+  page 12 lesson-practice KEY cells 4 empty 6% (14.6 mm) strips[]
+  page 13 lesson-practice KEY cells 4 empty 6% (14.6 mm) strips[]
+  page 14 lesson-practice KEY cells 4 empty 6% (14.6 mm) strips[]
+  cell findings: 0
+
+=== f-r14-M-1280 (Y4.B1.S14) size M width 1280
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=21 [true] okok "Mixed 21 21 to 42 problems, or 0 to leave it off · 1 page of 21 Supports: Standard: structure"
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=21 [true] okok "Mixed 21 21 to 42 problems, or 0 to leave it off · 1 page of 21 Supports: Standard: structure"
+  section sub: Lesson · 1 practice page + mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-mixed
+  page tabs (5): Page 1 | Page 2 | Page 3 | Page 4 | Answer keys
+  page 1 lesson-chart cells 7 empty 0% (0 mm) strips[Say:]
+  page 2 lesson-sheet cells 9 empty 7% (15.6 mm) strips[Vocabulary:|Rule:|Warm-up:|Guided Practice:|Independent Practice:]
+  page 3 lesson-practice cells 15 empty 0% (0 mm) strips[]
+  page 4 lesson-mixed cells 21 empty 4% (10.7 mm) strips[Number Sense|Place Value|Addition]
+  page 5 lesson-chart KEY cells 7 empty 0% (0 mm) strips[Say:]
+  page 6 lesson-sheet KEY cells 9 empty 7% (15.6 mm) strips[Vocabulary:|Rule:|Warm-up:|Guided Practice:|Independent Practice:]
+  page 7 lesson-practice KEY cells 15 empty 0% (0 mm) strips[]
+  page 8 lesson-mixed KEY cells 21 empty 4% (10.7 mm) strips[Number Sense|Place Value|Addition]
+  cell findings: 2
+    1x EB-SIDE p2 lesson-sheet pv: 28.1 mm empty beside the ink of a 85.7 mm wide cell interior (32.8 %; limit 30 %) [pv]
+    1x EB-SIDE p6 lesson-sheet pv: 28.1 mm empty beside the ink of a 85.7 mm wide cell interior (32.8 %; limit 30 %) [pv]
+
+=== g-ffs-MLM-1280 (skill:addition:fact_family_sort) size M width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  size L -> true
+  size M -> true
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages (now): lesson-chart,lesson-sheet,lesson-practice
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+  tab boxes: 768,28 114x44 ; 886,28 114x44 ; 1004,28 114x44 ; 1122,28 114x44 vw 1280
+
+=== g-ffs-M-1280 (skill:addition:fact_family_sort) size M width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages (now): lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice
+  page tabs (8): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Answer keys
+  tab boxes: 768,28 55x44 ; 827,28 55x44 ; 886,28 55x44 ; 945,28 55x44 ; 1004,28 55x44 ; 1063,28 55x44 ; 1122,28 55x44 ; 1181,28 55x44 vw 1280
+
+=== g-r14-MLM-1280 (Y4.B1.S14) size M width 1280
+  START 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=15 [true] okok "Practice 15 15 to 75 problems, in rows of 3, or 0 to leave it off · 1 page of 15 Supports: Standard: page bands"
+    mixed=21 [true] okok "Mixed 21 21 to 42 problems, or 0 to leave it off · 1 page of 21 Supports: Standard: structure"
+  max practice -> 4 clicks | practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+  max mixed -> 1 clicks | mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  size L -> true
+  size M -> true
+  END 
+    chart=4 [true] okx "Anchor chart 4 1 to 4 worked examples Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=3 [true] okx "We Do 3 2 to 3 problems, or 0 to leave it off Supports: Standard: hints"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Set on the Lesson sheet row"
+    practice=75 [true] okx "Practice 75 15 to 75 problems, in rows of 3, or 0 to leave it off · 5 pages of 15 Supports: Standard: page bands"
+    mixed=42 [true] okx "Mixed 42 21 to 42 problems, or 0 to leave it off · 2 pages of 21 Supports: Standard: structure"
+  section sub: Lesson · 5 practice pages + mixed
+  preview pages (now): lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed
+  preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed
+  page tabs (9): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8 | Answer keys
+  tab boxes: 768,28 88x44 ; 860,28 91x44 ; 955,28 91x44 ; 1050,28 91x44 ; 1145,28 91x44 ; 768,76 104x44 ; 876,76 103x44 ; 983,76 104x44 ; 1091,76 145x44 vw 1280
+
+=== h-ffs-MLM-1280 (skill:addition:fact_family_sort) size M width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  size L -> true
+  size M -> true
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages (now): lesson-chart,lesson-sheet,lesson-practice
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+  page 1 lesson-chart cells 3 empty 0% (0 mm) strips[Say:]
+  page 2 lesson-sheet cells 6 empty 9% (22 mm) strips[Vocabulary:|Remember:|Warm-up:|Guided Practice:|Steps:]
+  page 3 lesson-practice cells 9 empty 6% (14.3 mm) strips[]
+  page 4 lesson-chart KEY cells 3 empty 0% (0 mm) strips[Say:]
+  page 5 lesson-sheet KEY cells 6 empty 9% (22 mm) strips[Vocabulary:|Remember:|Warm-up:|Guided Practice:|Steps:]
+  page 6 lesson-practice KEY cells 9 empty 6% (14.3 mm) strips[]
+  cell findings: 0
+
+=== h-ffs-MLM-820 (skill:addition:fact_family_sort) size M width 820
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  max practice -> 4 clicks | practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+  size L -> true
+  size M -> true
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard: page bands"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page Supports: None to choose"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: None to choose"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=45 [true] okx "Practice 45 9 to 45 problems, in rows of 3, or 0 to leave it off · 5 pages of 9 Supports: Standard: page bands"
+    mixed= [false]  "Mixed Supports: None to choose"
+  section sub: Lesson · 5 practice pages
+  preview pages (now): lesson-chart,lesson-sheet,lesson-practice
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+  390 sideways: scrollWidth-innerWidth 0 px, scrollX after scrollTo(2000) 0 px, tabs 548/548 px
