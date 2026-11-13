@@ -44,6 +44,9 @@ import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 
 export const ROLE_ID = 'error-analysis';
+// The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
+// white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
+const CENTRE = 'flex:0 0 auto;margin-top:auto;margin-bottom:auto';
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
 // predates the ceiling; the standard is law for capacity).
 const CEILING = { S: 6, M: 4, L: 4 };
@@ -673,7 +676,9 @@ export function prepare(it, info = {}) {
                 body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag">${'ABCDEF'[i]}</i>`);
             });
         }
-        const shownWork = `<div class="mq-judge-work"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}">${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
+        // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
+        // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
+        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ' style="top:-4.6mm;left:0"'}>${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -745,7 +750,7 @@ export function prepare(it, info = {}) {
         const ask = (Number(o.cols) || 1) >= 2 ? ' mq-askunder' : ' mq-askside';
         if (modal && (o.judge === 'incol' || !o.judge)) {
             const inCol = intoAnswerColumn(shownWork, `<div class="mq-judgecol">${judge}</div>`);
-            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol${ask}" data-judge-mode="incol">${inCol}</div>`;
+            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol${ask}" data-judge-mode="incol" style="${CENTRE}">${inCol}</div>`;
         }
         // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
         // decision boxes always come before the fix. The page decides ONE place for every cell
@@ -754,7 +759,7 @@ export function prepare(it, info = {}) {
         // unset (the host's first measure, an unmeasured page): 'stack', which always fits the cell
         const mode = !modal ? '' : ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : 'stack';
         const modeCls = mode === 'stack' ? ' mq-jbelow mq-jstack' : mode ? ` mq-j${mode}` : '';
-        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}">`
             + shownWork
             + judge
             + (below ? fix : '')

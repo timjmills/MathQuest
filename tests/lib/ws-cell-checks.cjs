@@ -160,6 +160,14 @@ function cellChecksInPage(opts) {
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {
                 out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': grey pupil work with no "<Name> wrote:" label (PT-ERR-4: the grey must never read as trace)' });
             }
+            // ...and right over it: a label left at the cell's top while the work centres lower reads as a page note (lf-roles r5)
+            var tg = c.querySelector('.mq-pupiltag');
+            var sib = tg && tg.parentElement ? [].filter.call(tg.parentElement.children, function (e) { return e !== tg && e.getBoundingClientRect().height > 0; }) : [];
+            if (tg && c.querySelector('.mq-pupil') && sib.length) {
+                var top = Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
+                var gap = top - tg.getBoundingClientRect().bottom;
+                if (gap > 8 * PX || gap < -2 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, <= 8 mm)' });
+            }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
