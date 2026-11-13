@@ -438,7 +438,9 @@ function pcMeasure() {
             out.ink.push({ text: (tag.textContent || '').trim().slice(0, 40), over: Math.round((gb - tr.top) / MM * 10) / 10, shown: shown && gb <= tr.top + 1 });
         }
         pg.querySelectorAll('.ws-cell').forEach((c, k) => {
-            const tracks = c.querySelector('.pv-tracks'); const ring = c.querySelector('.pv-ring-row');
+            // (r6, after the w2 merge: identify's support is none on the pre-skill-check role, so a check place item is a pv-support
+            // cell - a plain numeral, no .pv-tracks - and was not read at all: a cell with a ring row of words is read on its own)
+            const ring = c.querySelector('.pv-ring-row'); const tracks = c.querySelector('.pv-tracks') || (ring && !c.querySelector('.ws-cell') ? c : null);
             if (!tracks) return;
             const rows = tracks.querySelectorAll('tr').length;
             const lab = c.querySelector('[data-ws-label], .ws-letter');
