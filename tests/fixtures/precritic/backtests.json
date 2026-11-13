@@ -5570,6 +5570,186 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "inplace-rows-m-word-stories",
+   "check": "an in-place (sentence) story page is never spread past IN_PLACE_FILL x its rows: the compare preset Independent at M keeps no 30 % band (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "16 H13: every 3-line row spread to 28 mm (30 %), the rows counted for the one 4-line story"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "0 findings: the spread stops at IN_PLACE_FILL x each row, rows counted from the items' own heights"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --size M --skills subtraction:sub_wp_compare_smaller",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "inplace-rows-l-word-stories",
+   "check": "an in-place row stretches no further than its SHORTEST story x IN_PLACE_FILL: a 3-line story beside a 4-line one at L keeps no 33 % band (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY H13 (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "H13 0 -> 2 above the L pin (cell 1 / 5: 22.7 mm in a 69.8 mm cell)"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "0 findings above the pin"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --skills subtraction:sub_wp_compare_smaller --baseline design/audit/baselines/print-lint.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "model-across-word-stories",
+   "check": "a one-step story Model (sentence or column) stands its frames two across with the step text over each, by whole rows a page: no 65-84 % text-cell band (word-stories critic r1 F10, precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND / EB-SIDE on scripted-model (RUBRIC H13, PT-MOD-2)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "the presets 4 + 2 a size, the add host 3 + 1 a size (text cells 65-83 % empty, 2-3 pages)"
+   },
+   "pass": {
+    "commit": "408288dd5",
+    "state": "0 findings: 2 x 2 on one page at S / M, a row of two a page at L; the add host 4 + 2"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles scripted-model --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "wp-bar-word-stories",
+   "check": "a sentence story on the Word problems page draws its bar in the work space (blank on the pupil page, worked on the key): no 37-67 % band under three in-place stories (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND on word-problems (RUBRIC H13, PAGE_TYPES 3.7)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "26 findings on the 3 presets (S / M / L)"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles word-problems --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "stretch-cell-word-stories",
+   "check": "the Stretch cell is as tall as its problem, never stretched to the page body (39-53 % band at M / L) (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND on stretch (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "4 findings: the sub host and the compare preset at M and L"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill subtraction:sub_word_problems,subtraction:sub_wp_compare_smaller --roles stretch --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "lesson-guided-centre-word-stories",
+   "check": "a lesson's lone Guided story with its change / compare bar is centred across its 2/3-page cell (37 % side band) (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE on lesson (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "4 findings: the add and compare presets' lesson at S and M"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "0 findings"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles lesson --hosts none",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-pad-unit-word-stories",
+   "check": "a unit word wider than its answer box hangs from the box's right edge, so an Error analysis cell keeps its 3 mm padding (CL-8) (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-PAD (CL-8)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "EA-PAD 2: \"stickers\" 1.9 mm from the cell rule at L"
+   },
+   "pass": {
+    "commit": "09802d0c4",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_change_unknown --roles error-analysis --size S,M,L",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupiltag-column-word-stories",
+   "check": "the \"<Name> wrote:\" label stands 2-4 mm over a column story's ink on Error analysis (PT-ERR-4) (word-stories precritic r3; master sub host 4 too)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG (PT-ERR-4)",
+   "browser": true,
+   "fail": {
+    "commit": "f8afbb142",
+    "state": "PUPILTAG 4 + 4: 1.8 mm at M on add_word_problems_plain and sub_word_problems"
+   },
+   "pass": {
+    "commit": "408288dd5",
+    "state": "OK"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_word_problems_plain,subtraction:sub_word_problems --roles error-analysis --size M",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-pin-hosts-word-stories",
+   "check": "the 4 + / - story hosts' empty-band findings never rise above their pin (master 1db0e3309's class, every key at or under master): the sub host's Model text cell EB-SIDE 3 -> 4 at S when 'coins' shortened its last step (word-stories precritic r3)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band pin (design/audit/baselines/empty-band.json, L23: a rise is the lane's)",
+   "browser": true,
+   "fail": {
+    "commit": "09802d0c4",
+    "state": "scripted-model S EB-SIDE 4 on sub_word_problems / _plain (pin 3): 'Write the answer: 6 coins.' left 32 % beside it"
+   },
+   "pass": {
+    "commit": "408288dd5",
+    "state": "OK: the last step names its label; the add hosts' Model two across"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain --roles scripted-model --hosts none --baseline \"$PWD/design/audit/baselines/empty-band.json\"",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -4,7 +4,11 @@
  "skills": [
   "addition:add_facts",
   "multiplication:mult_facts",
-  "division:div_facts"
+  "division:div_facts",
+  "addition:add_word_problems",
+  "addition:add_word_problems_plain",
+  "subtraction:sub_word_problems",
+  "subtraction:sub_word_problems_plain"
  ],
  "counts": {
   "addition:add_facts scripted-model S|EB-SIDE": 0,
@@ -86,11 +90,52 @@
   "division:div_facts mixed-practice L|EB-FOOT": 10,
   "division:div_facts reason-it L|EB-BAND": 2,
   "division:div_facts stretch M|EB-BAND": 1,
-  "division:div_facts stretch L|EB-BAND": 1
+  "division:div_facts stretch L|EB-BAND": 1,
+  "addition:add_word_problems independent M|EB-BAND": 1,
+  "addition:add_word_problems lesson L|EB-BAND": 1,
+  "addition:add_word_problems more-practice M|EB-BAND": 1,
+  "addition:add_word_problems test M|EB-BAND": 1,
+  "addition:add_word_problems word-problems M|EB-BAND": 3,
+  "addition:add_word_problems word-problems S|EB-BAND": 3,
+  "addition:add_word_problems_plain independent M|EB-BAND": 1,
+  "addition:add_word_problems_plain lesson M|EB-SIDE": 1,
+  "addition:add_word_problems_plain lesson S|EB-SIDE": 1,
+  "addition:add_word_problems_plain more-practice M|EB-BAND": 1,
+  "addition:add_word_problems_plain review M|EB-BAND": 1,
+  "addition:add_word_problems_plain test M|EB-BAND": 1,
+  "addition:add_word_problems_plain word-problems M|EB-BAND": 3,
+  "addition:add_word_problems_plain word-problems S|EB-BAND": 3,
+  "subtraction:sub_word_problems independent M|EB-BAND": 1,
+  "subtraction:sub_word_problems more-practice M|EB-BAND": 1,
+  "subtraction:sub_word_problems scripted-model L|EB-BAND": 5,
+  "subtraction:sub_word_problems scripted-model L|EB-SIDE": 2,
+  "subtraction:sub_word_problems scripted-model M|EB-BAND": 5,
+  "subtraction:sub_word_problems scripted-model M|EB-SIDE": 2,
+  "subtraction:sub_word_problems scripted-model S|EB-BAND": 5,
+  "subtraction:sub_word_problems scripted-model S|EB-SIDE": 3,
+  "subtraction:sub_word_problems test M|EB-BAND": 1,
+  "subtraction:sub_word_problems word-problems M|EB-BAND": 3,
+  "subtraction:sub_word_problems word-problems S|EB-BAND": 3,
+  "subtraction:sub_word_problems_plain independent M|EB-BAND": 1,
+  "subtraction:sub_word_problems_plain more-practice M|EB-BAND": 1,
+  "subtraction:sub_word_problems_plain review M|EB-BAND": 1,
+  "subtraction:sub_word_problems_plain scripted-model L|EB-BAND": 5,
+  "subtraction:sub_word_problems_plain scripted-model L|EB-SIDE": 2,
+  "subtraction:sub_word_problems_plain scripted-model M|EB-BAND": 5,
+  "subtraction:sub_word_problems_plain scripted-model M|EB-SIDE": 2,
+  "subtraction:sub_word_problems_plain scripted-model S|EB-BAND": 5,
+  "subtraction:sub_word_problems_plain scripted-model S|EB-SIDE": 3,
+  "subtraction:sub_word_problems_plain test M|EB-BAND": 1,
+  "subtraction:sub_word_problems_plain word-problems M|EB-BAND": 3,
+  "subtraction:sub_word_problems_plain word-problems S|EB-BAND": 3
  },
  "skillNotes": {
   "division:div_facts": "lead ruling 2026-11-08: the lesson / opener / guided / fact-probe / scripted-model / mixed-practice rows (and reason-it L, stretch M / L, the same shared-role bands pinned on add_facts / mult_facts) are shared fact roles, graded in the facts-roles task, not the support-aid round; pinned at live master's counts (23 keys, 162 findings, identical on origin/master 5cbe360). Every other div_facts render must be clean; a rise or a new render FAILs. lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
   "addition:add_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
-  "multiplication:mult_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles."
+  "multiplication:mult_facts": "lf-ops facts-roles task 2026-11-12: the guided and scripted-model pins of add_facts, mult_facts and div_facts are lowered to 0 (were add_facts guided 24 / scripted-model 27, mult_facts 12 / 32, div_facts 13 / 7); the fact cells on those roles must be clean. Backtest eb-fact-roles.",
+  "addition:add_word_problems": "lf-builds word-stories r3 (2026-11-13): the host's findings at the word-stories branch 408288dd5, every (render, rule) count at or under master 1db0e3309 (190 findings on the 4 hosts; branch 85) - the column-story Scripted Model text cells, guided / independent / more-practice / test / review word-problems bands of the master class. Evidence design/audit/runs/lf-builds/stories/logs/r3/master-eb.json vs fix3-eb.json; precritic-diff.md r3.",
+  "addition:add_word_problems_plain": "lf-builds word-stories r3 (2026-11-13): the host's findings at the word-stories branch 408288dd5, every (render, rule) count at or under master 1db0e3309 (190 findings on the 4 hosts; branch 85) - the column-story Scripted Model text cells, guided / independent / more-practice / test / review word-problems bands of the master class. Evidence design/audit/runs/lf-builds/stories/logs/r3/master-eb.json vs fix3-eb.json; precritic-diff.md r3.",
+  "subtraction:sub_word_problems": "lf-builds word-stories r3 (2026-11-13): the host's findings at the word-stories branch 408288dd5, every (render, rule) count at or under master 1db0e3309 (190 findings on the 4 hosts; branch 85) - the column-story Scripted Model text cells, guided / independent / more-practice / test / review word-problems bands of the master class. Evidence design/audit/runs/lf-builds/stories/logs/r3/master-eb.json vs fix3-eb.json; precritic-diff.md r3.",
+  "subtraction:sub_word_problems_plain": "lf-builds word-stories r3 (2026-11-13): the host's findings at the word-stories branch 408288dd5, every (render, rule) count at or under master 1db0e3309 (190 findings on the 4 hosts; branch 85) - the column-story Scripted Model text cells, guided / independent / more-practice / test / review word-problems bands of the master class. Evidence design/audit/runs/lf-builds/stories/logs/r3/master-eb.json vs fix3-eb.json; precritic-diff.md r3."
  }
 }

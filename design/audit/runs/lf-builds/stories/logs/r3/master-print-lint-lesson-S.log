@@ -1,1 +1,72 @@
 $ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain --baseline design/audit/baselines/print-lint.S.json  [1db0e3309]
+ws-print-lint: source kit, 4 skill(s)
+  addition:add_word_problems#lesson: 8+4 pages, 20 finding(s)
+  addition:add_word_problems_plain#lesson: 8+4 pages, 16 finding(s)
+  subtraction:sub_word_problems#lesson: 8+4 pages, 20 finding(s)
+  subtraction:sub_word_problems_plain#lesson: 8+4 pages, 24 finding(s)
+
+document                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_word_problems#lesson               8+4k    4     .    .    .        2     .       .    .     .       .     .    .      .       .       12       2    .  FAIL
+addition:add_word_problems_plain#lesson         8+4k    .     .    .    .        2     .       .    .     .       .     .    .      .       .       12       2    .  FAIL
+subtraction:sub_word_problems#lesson            8+4k    4     .    .    .        2     .       .    .     .       .     .    .      .       .       12       2    .  FAIL
+subtraction:sub_word_problems_plain#lesson      8+4k    4     .    .    .        2     .       4    .     .       .     .    .      .       .       12       2    .  FAIL
+TOTAL                                                  12     .    .    .        8     .       4    .     .       .     .    .      .       .       48       8    .
+
+addition:add_word_problems#lesson (Addition Word Problems (lesson))
+  [L-INK ILLEGIBLE critical] x4 (p1,5 cells 1,1,1,1) ILLEGIBLE: text "boxes" in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+      e.g. <span> "boxes" | <span> "days"
+  [L-OVERFLOW PG-12 major] x2 (p1,5 cells 1,1) sticks out of its cell by 22.5 mm (cell 92.3 x 114.5 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Read the story two times. ..."
+  [L-TOPSTART CL-4b major] x12 (p3,4,7,8 cells 1,2,3,4,1,2,1,2...) first printed row starts 17.3 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "1 Sam has 85 pencils. Sam wa..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "2 Leo has 34 apples. Mia has..."
+  [L-OVERLAP SECTION major] x2 (p1,5) printed page 1: a fill printed after the heading "Say:" (at 15.5, 267.5 mm) covers it (92.3 x 114.6 mm at 12.4, 175.2 mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)
+      e.g. strip "Say:"
+
+addition:add_word_problems_plain#lesson (Addition Word Problems (No Pictures) (lesson))
+  [L-OVERFLOW PG-12 major] x2 (p1,5 cells 1,1) sticks out of its cell by 16.1 mm (cell 92.3 x 114.5 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Read the story two times. ..."
+  [L-TOPSTART CL-4b major] x12 (p3,4,7,8 cells 1,2,3,4,1,2,1,2...) first printed row starts 14.5 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "1 Sam had some cookies. Sam ..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "2 Leo has 70 buttons. Mia ha..."
+  [L-OVERLAP SECTION major] x2 (p1,5) printed page 1: a fill printed after the heading "Say:" (at 15.5, 267.5 mm) covers it (92.3 x 114.6 mm at 12.4, 168.8 mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)
+      e.g. strip "Say:"
+
+subtraction:sub_word_problems#lesson (Subtraction Word Problems (lesson))
+  [L-INK ILLEGIBLE critical] x4 (p1,5 cells 1,1,1,1) ILLEGIBLE: text "crayons" in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+      e.g. <span> "crayons" | <span> "boxes"
+  [L-OVERFLOW PG-12 major] x2 (p1,5 cells 1,1) sticks out of its cell by 23.8 mm (cell 92.3 x 114.5 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Read the story two times. ..."
+  [L-TOPSTART CL-4b major] x12 (p3,4,7,8 cells 1,2,3,4,1,2,1,2...) first printed row starts 17.3 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "1 Kofi had some cards. Kofi ..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "2 Ben had some marbles. Ben ..."
+  [L-OVERLAP SECTION major] x2 (p1,5) printed page 1: a fill printed after the heading "Say:" (at 15.5, 267.5 mm) covers it (92.3 x 114.6 mm at 12.4, 176.5 mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)
+      e.g. strip "Say:"
+
+subtraction:sub_word_problems_plain#lesson (Subtraction Word Problems (No Pictures) (lesson))
+  [L-INK ILLEGIBLE critical] x4 (p1,5 cells 1,1,1,1) ILLEGIBLE: text "marbles" in #000000 on #000000 (contrast 1.00:1) - the pupil cannot read it (INK-5, AX-1)
+      e.g. <span> "marbles" | <span> "boxes"
+  [L-OVERFLOW PG-12 major] x2 (p1,5 cells 1,1) sticks out of its cell by 23.8 mm (cell 92.3 x 114.5 mm) (PG-12, CL-1)
+      e.g. <div.mq-cstate.mq-cstate-col> "1 Read the story two times. ..."
+  [L-DENSITY H13 major] x4 (p2,6 cells 2,3,2,3) one empty band 30.9 mm wide in a 91.8 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "2 1 2 − 6" | <div.ws-cell.fact[data-ws-cell="fact"]> "3 2 0 − 1 3"
+  [L-TOPSTART CL-4b major] x12 (p3,4,7,8 cells 1,2,3,4,1,2,1,2...) first printed row starts 14.5 mm below the top pad: top of the box is the default (CL-4b, owner ruling 2026-10-23)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "1 Mia had some cookies. Mia ..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "2 Ana has 39 buttons. Noor h..."
+  [L-OVERLAP SECTION major] x2 (p1,5) printed page 1: a fill printed after the heading "Say:" (at 15.5, 267.5 mm) covers it (92.3 x 114.6 mm at 12.4, 176.5 mm): the section above runs into the next section's heading strip and clips it (H2, C3, PG-12)
+      e.g. strip "Say:"
+
+ws-print-lint: FAIL - ratchet: 16 count(s) rose above design/audit/baselines/print-lint.S.json
+  - addition:add_word_problems#lesson L-INK ILLEGIBLE: 0 -> 4
+  - addition:add_word_problems#lesson L-OVERFLOW PG-12: 0 -> 2
+  - addition:add_word_problems#lesson L-TOPSTART CL-4b: 0 -> 12
+  - addition:add_word_problems#lesson L-OVERLAP SECTION: 0 -> 2
+  - addition:add_word_problems_plain#lesson L-OVERFLOW PG-12: 0 -> 2
+  - addition:add_word_problems_plain#lesson L-TOPSTART CL-4b: 0 -> 12
+  - addition:add_word_problems_plain#lesson L-OVERLAP SECTION: 0 -> 2
+  - subtraction:sub_word_problems#lesson L-INK ILLEGIBLE: 0 -> 4
+  - subtraction:sub_word_problems#lesson L-OVERFLOW PG-12: 0 -> 2
+  - subtraction:sub_word_problems#lesson L-TOPSTART CL-4b: 0 -> 12
+  - subtraction:sub_word_problems#lesson L-OVERLAP SECTION: 0 -> 2
+  - subtraction:sub_word_problems_plain#lesson L-INK ILLEGIBLE: 0 -> 4
+  - subtraction:sub_word_problems_plain#lesson L-OVERFLOW PG-12: 0 -> 2
+  - subtraction:sub_word_problems_plain#lesson L-DENSITY H13: 0 -> 4
+  - subtraction:sub_word_problems_plain#lesson L-TOPSTART CL-4b: 0 -> 12
+  - subtraction:sub_word_problems_plain#lesson L-OVERLAP SECTION: 0 -> 2
+exit 1
