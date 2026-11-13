@@ -12,7 +12,11 @@
 //                 input.titleLinesOf), never under a one-line "Review" (lf-algebra growing_shape_patterns Review L: the body
 //                 ran 1.3 mm over under a two-line title). Also: "draw and count" titles as "drawing and counting".
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE]
+//   MOD-ACROSS    a Scripted Model of a TALL state (a 74 mm function table) whose beside-text layout needs two pages lays its
+//                 states 2 + 2 on one page, each step text over its state (fte Model M: two half-empty pages, text cells 60-80 %
+//                 empty; EB-BAND / EB-SIDE). A one-page beside model keeps its layout.
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -26,6 +30,7 @@ const RI = await mod('roles/reason-it.js');
 const EA = await mod('roles/error-analysis.js');
 const RV = await mod('roles/review.js');
 const CO = await mod('roles/compose.js');
+const SM = await mod('roles/scripted-model.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -103,6 +108,21 @@ if (on('REVIEW-TITLE')) {
         RV.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [it, it, it, it, it, it].map((x) => Object.assign({}, x)), titleLinesOf: (txt) => { asked.push(txt); return 2; } });
     } catch (e) { findings.push(`REVIEW-TITLE: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); }
     if (!asked.some((x) => /^Review: /.test(x))) findings.push(`REVIEW-TITLE: the Review never measured its printed title "Review: <topic>" (asked: ${JSON.stringify(asked).slice(0, 80)})`);
+}
+
+if (on('MOD-ACROSS')) {
+    const steps = ['The rule is n + 1: add 1.', '1 + 1 = 2. Write 2.', '6 + 1 = 7. Write 7.', 'Fill in every row the same way.'];
+    try { registerSkill('rolesunit:tall', { workedSteps: () => steps.map((text) => ({ text })) }); } catch (e) { /* re-run */ }
+    for (const [id, hMm, want] of [['tall', 74, 1], ['short', 30, 1]]) {
+        checks++;
+        const it = Object.assign(itemOf('one'), { pool: 'main', footprint: { wMm: 70, hMm, maxCols: 2 } });
+        it.q = Object.assign({}, it.q, { skillId: 'tall' });
+        try {
+            const pl = SM.plan({ ctx: { size: 'M' }, skills: [{ categoryId: 'rolesunit', skillId: 'tall', iCan: 'I Can use a rule', grade: 4 }], items: [it] });
+            const pages = (pl.pages || []).length;
+            if (pages !== want) findings.push(`MOD-ACROSS ${id} (${hMm} mm state): the 4-state Model takes ${pages} pages (want ${want})`);
+        } catch (e) { findings.push(`MOD-ACROSS ${id}: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+    }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);
