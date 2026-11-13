@@ -144,3 +144,37 @@ the owner; not done by the builder).
 | checks-from-critics | FAIL → OK after the card-plan row | OK | fixed |
 | guided-echo (new) | PASS | PASS | — |
 | every other gate | PASS | PASS | — |
+
+## r9 2026-11-13: merged origin/master b9414a659 (deploy-6 GUIDED-MODEL-ROW / EB-REFILL, lf-tools hosts, P1 hotfix)
+
+- Merge 34419f4d1: backtests.json (union by id) and CHECKS_FROM_CRITICS (both sides) were the only conflicts; node --check clean.
+- **SCREEN-DIGIT fixed** (d50a77239, worksheet held at 30 px; e94189a02 worksheet squares 56 px tall for the 48 px answer target):
+  additive CSS scoped to the chart window (`.k2-chart:not(.k2-chart-ten)`) on the practice card / quiz (48 px at 820 / 1024, 56 px at
+  1280 / 1366) and the online worksheet (30 px; its fit pass shrank it to 24.7 px at 1024). The window stays inside its paper with no
+  page scroll at 820 / 1024 / 1280 / 1366 (probe: 469 px in a 720 px paper at 820). Backtest c120-screen-digit (34419f4d1 FAIL →
+  d50a77239 OK), on precritic's path (screen-slots --screen-digit), ledger row. screen-slots --screen-digit OK, screen-answer OK,
+  render-gate OK for both skills (`logs/screen-slots-digit-fix.log`, `logs/screen-answer-r9.log`, `logs/render-gate-c120-r9b.log`).
+- **Card**: role:stretch OUT OF SCOPE (lead ruling 2026-11-13, as count_by_tables) in card.json + ownerRulings; `--resign` run once
+  (picks up master's CL-4b): `--check-coverage` OK, `--check-signed` "needs owner signature (everything else green)". bodySha
+  385333cf1d9d32a8, configSha be4221cad0c8 (ce3682cc6). EB-ROLE cleared.
+
+**Precritic r9 --strict (`logs/pc-c120-r9.txt`, `logs/pc-hcf-r9.txt`) + empty-band at M/L on the head and on master b9414a659
+with the SAME tool (MQ_ROOT, `logs/empty-band-master-b9414-hcf-ML-branchtool.log`):**
+
+| Gate | chart_to_120 | hundreds_chart_fill | Verdict |
+|---|---|---|---|
+| empty-band EB-BAND lesson p1 cells 1, 2, 4 (M, L) | 6 | — | ROUTED lf-engine (chartPage, unchanged from master; ledger row) |
+| EB-BAND lesson L p2 centred window 30.3-30.5 % (+ legacy / counters 28.6-28.7 %, margin only) | 2 | 3 | ROUTED lf-engine; hcf identical on master (3 lines, same mm) |
+| EB-BAND guided M / L try beside the Model 32-33 % (was 46 / 41 % before GUIDED-MODEL-ROW) | 2 | 2 | ROUTED lf-roles; hcf identical on master (same mm) |
+| EB-PAGE pre-skill-check p1 42-55 % (M, L) | 2 | 2 | ROUTED lf-roles; hcf identical on master |
+| EB-GDPCAP guided L 7 answers > 6 | 1 | — | ROUTED lf-roles (lane-caused visibility via SCORE-SLOTS; guided.js ceilFor) |
+| EB-ROLE stretch | cleared | cleared | card ruling |
+| screen-slots SCREEN-DIGIT | PASS | PASS | fixed |
+| render-gate | PASS (re-run after e94189a02) | PASS | the worksheet TARGET (60 x 43 px) of d50a77239 fixed in e94189a02 |
+| copy-light (report) | NOT ELIGIBLE | NOT ELIGIBLE | expected: a new drawing → FULL critic |
+| sibling-compare NO-SIBLING | FAIL | FAIL | SKIPPED by ruling 4 |
+| spec-card-signed | N/A (preset) | INCOMPLETE (unsigned) | owner signature only |
+| every other gate | PASS | PASS | — |
+
+chart_to_120 is not on master (no band 120), so its routed lines cannot be byte-compared there: they come from the same unchanged
+files (lesson-pages/chart.js, roles/guided.js, roles/pre-skill-check.js identical to master b9414a659) and match the hcf lines in kind.
