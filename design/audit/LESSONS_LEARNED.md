@@ -110,6 +110,15 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    reading the full standards and RUBRIC.
    *Check:* `ws-spec-card --check-signed` passes before any build. `--check-coverage` (every rule id a critic has cited
    for the family is on the card) runs again at each build start, so a rule added after signing is caught.
+3a. **Delegated approval (owner, 2026-11-12: "I always approve the designs — I can always go back and ask you to change
+   something if I don't like it").** The lead approves designs and signs spec cards on the RECOMMENDED answers without
+   asking the owner first. The signature keeps the form `Signed: owner, <date>`; the commit message says "delegated
+   approval (owner rule 2026-11-12)" and lists the answers taken. Every delegated decision gets one line in
+   `design/decisions/LEAD_DECISIONS.md` (date, card or design, the answers taken, the commit), and the owner sees the
+   result as screenshots when it passes. The lead STILL asks the owner first when a choice: contradicts an earlier owner
+   ruling or the design / pedagogy standards; has no clear recommended answer (options are a matter of taste); changes
+   the weekly budget or pass bar; is hard to reverse (deleting or retiring a skill, changing share codes); or touches
+   anything outside the app (accounts, money, other people). A lane never self-signs; it sends the card to the lead.
 4. **The order of checks is fixed** (§1.7):
    1. machine checks in node;
    2. machine checks in the browser;
