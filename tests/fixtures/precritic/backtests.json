@@ -3300,6 +3300,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "array-caption-multfacts",
+  "check": "a × array's caption names the rows x columns drawn - the smaller factor's rows of the larger - and the fact it supports (facts card §5.10, lead ruling C 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-CAPTION (facts card 5.10, PEDAGOGY Read an Array / Switch the Factors)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
+  },
+  "pass": {
+   "commit": "393db090",
+   "state": "0 findings: \"3 rows of 7, for 7 × 3\" on paper S / M / L and every screen host"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-orient-multfacts",
+  "check": "every mult_facts array with 2 or more rows is landscape on paper S / M / L and on every screen host (facts card §5.10)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.10, RP-81)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "24 findings: 7 × 10 drawn 10 rows of 7, 75 x 105 px"
+  },
+  "pass": {
+   "commit": "393db090",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only ORIENT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
