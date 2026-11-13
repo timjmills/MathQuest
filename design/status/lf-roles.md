@@ -6,7 +6,7 @@ Owner of files: js/modules/sheet/roles/{true-false,reason-it,error-analysis,revi
 State: fix (critic r1 FAIL; r2 fixes in, critic r2 waits on lead rulings)
 Updated: 2026-11-13
 Builder profile: lane session (no sub-agent builder)
-Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
+Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
 
 ## Now
 - 5 fixes pushed, each with its check first (FAIL on master eef75f5, OK on the fix); 780 passed-skill pages (26 skills x 10 roles x
@@ -16,6 +16,8 @@ Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4
 - Proofs: ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --check vs master eef75f5: 1556/1556 identical;
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
+
+## Deploy (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy): 8823e9a9 (critic r3) + SIGNMATCH d54d2850 + D6/N2/D7 5a46c6ee (critic r4 PASS)
 
 ## Round 6 (2026-11-13, +$35) - after the deploy branch (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy @ 8823e9a9)
 - D6: the "<Name> wrote:" label's foot 2 mm over its work at every size; PUPILTAG asks 1.5-8 mm (fired 144x on the fixed offset).
