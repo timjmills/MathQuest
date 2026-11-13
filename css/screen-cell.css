@@ -2120,3 +2120,13 @@ html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td, html body .qt
     width: var(--mq-cww) !important; min-width: var(--mq-cww) !important; height: max(56px, calc(var(--mq-cwfs) * 1.4)) !important; font-size: var(--mq-cwfs) !important;
 }
 html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot, html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot { font-size: var(--mq-cwfs) !important; }
+/* ... and on the online worksheet (floor 29 px, LEAD_DECISIONS 2026-11-13): the worksheet's fit pass shrank a chart window's
+   numerals to 24.7 px at 1024 (critic gate SCREEN-DIGIT, lf-tools hosts). Its numerals are held at 30 px in squares sized
+   from the digits (5 x 62 px), and a worksheet card holding a chart window takes the grid's whole row, as the ten-column
+   chart's card does, so the window never runs past its card. Additive. */
+html body .online-edition .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten), html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) {
+    --mq-cwfs: 30px; --mq-cww: calc(3 * 0.58 * var(--mq-cwfs) + 10px); width: auto !important; max-width: none !important; table-layout: fixed;
+}
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td { width: var(--mq-cww) !important; min-width: var(--mq-cww) !important; height: max(44px, calc(var(--mq-cwfs) * 1.5)) !important; font-size: var(--mq-cwfs) !important; }
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td input.mq-cellslot { font-size: var(--mq-cwfs) !important; }
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-chart:not(.k2-chart-ten)) { grid-column: 1 / -1; }
