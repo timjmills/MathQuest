@@ -1,0 +1,61 @@
+ws-backtest row c120-wrong-fits: PASS  fail state FAIL 0.4s, pass state OK 0.5s
+ws-backtest: c120-tagink (fail state) has waited 120 s for a browser slot; holders:
+    queue: pid 12812 (up 163 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-HxU4ir/jobs-2.json 
+    queue: pid 12814 (up 163 s) flock 10
+    queue: pid 13648 (up 147 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-HxU4ir/jobs-3.json 
+    queue: pid 13650 (up 147 s) flock 10
+    queue: pid 14031 (up 141 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --seed 1 --out /tmp/claude-0/-hom
+    queue: pid 14033 (up 141 s) flock 10
+    queue: pid 16943 (up 72 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.
+    queue: pid 16945 (up 72 s) flock 10
+    queue: pid 19202 (up 33 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 19204 (up 33 s) flock 10
+    queue: pid 20121 (up 0 s) sleep 1
+    slot.1: pid 7482 (up 259 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-empty-band.
+    slot.2: pid 8881 (up 218 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 9077 (up 213 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-options-verify.cjs --skill hundreds_chart_fill --cate
+    queue: pid 9390 (up 205 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-presets-unit.mjs
+    queue: pid 9392 (up 205 s) flock 10
+ws-backtest: c120-tagink (pass state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 20723 (up 250 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill
+    queue: pid 20969 (up 243 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-ink-size.cjs --skill composing:hundreds_chart_
+    queue: pid 21729 (up 210 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-HxU4ir/jobs-4.json 
+    queue: pid 21731 (up 210 s) flock 10
+    queue: pid 22908 (up 163 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --seed 1 --out /tmp/claude-0/-hom
+    queue: pid 22910 (up 163 s) flock 10
+    queue: pid 24237 (up 101 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.
+    queue: pid 24239 (up 101 s) flock 10
+    queue: pid 25339 (up 49 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 25341 (up 49 s) flock 10
+    queue: pid 26274 (up 6 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 26276 (up 6 s) flock 10
+    queue: pid 26535 (up 1 s) sleep 1
+    slot.1: pid 7482 (up 536 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-empty-band.
+ws-backtest row c120-tagink: PASS  fail state FAIL 265.4s, pass state OK 339.7s
+ws-backtest: c120-lesson-wide (fail state) has waited 120 s for a browser slot; holders:
+    queue: pid 1094 (up 44 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 1096 (up 44 s) flock 10
+    queue: pid 1454 (up 33 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --size M --skills composi
+    queue: pid 1456 (up 33 s) flock 10
+    queue: pid 1804 (up 22 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills c
+    queue: pid 1810 (up 22 s) flock 10
+    queue: pid 2359 (up 0 s) sleep 1
+    slot.2: pid 30334 (up 176 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-YX7Zqt/jobs-0.jso
+    queue: pid 30335 (up 176 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-YX7Zqt/jobs-1.jso
+    queue: pid 32205 (up 96 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.
+    queue: pid 32207 (up 96 s) flock 10
+    queue: pid 32700 (up 78 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 32702 (up 78 s) flock 10
+    slot.1: pid 7482 (up 883 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-empty-band.
+ws-backtest row c120-lesson-wide: PASS  fail state FAIL 213.9s, pass state OK 128.5s
+ws-backtest row eb-centred-band: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest: 4 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-wrong-fits             commit-pair  FAIL 0.4s           OK 0.5s             PASS
+c120-tagink                 commit-pair  FAIL 265.4s         OK 339.7s           PASS
+c120-lesson-wide            commit-pair  FAIL 213.9s         OK 128.5s           PASS
+eb-centred-band             fixture      FAIL 0.2s           OK 0.2s             PASS
+
+4 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 997.3 s
+ws-backtest: OK
