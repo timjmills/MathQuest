@@ -8390,7 +8390,7 @@
     "state": "wrongAnswer null on every 2- and 3-gap window"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "chartWrong: one gap written wrong per candidate, the others kept"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
@@ -8409,7 +8409,7 @@
     "state": "the second and third gaps never named"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
@@ -8428,7 +8428,7 @@
     "state": "'The missing number is 101, 104.'"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "sayValues: chartSay"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
@@ -8447,7 +8447,7 @@
     "state": "work lines name the first gap only"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "one relation line per gap"
    },
    "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
@@ -8467,7 +8467,7 @@
     "state": "4 of 4 True on chart_to_120 pages"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "per-slot wrong answers deal False on multi-gap windows"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
@@ -8487,7 +8487,7 @@
     "state": "every multi-gap window Correct"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "per-slot wrong answers"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
@@ -8507,7 +8507,7 @@
     "state": "opener / review / mixed / pre-skill-check / lesson count windows"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "paginate.js slotScore on those roles"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
@@ -8527,7 +8527,7 @@
     "state": "band 120 rows and band 10 pages give answers away item to item"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "the dealer never deals a window of squares already on the sheet"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
@@ -8547,7 +8547,7 @@
     "state": "the strip walks the example, not on the page"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
@@ -8567,7 +8567,7 @@
     "state": "hundreds_chart_fill reason-it L 10.4 mm"
    },
    "pass": {
-    "commit": "5bc02de7e",
+    "commit": "8ba7d77a5",
     "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
    },
    "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
