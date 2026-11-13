@@ -155,6 +155,19 @@ function cellChecksInPage(opts) {
                     if (lim > 0 && below >= lim) out.findings.push({ rule: 'H13-ABS', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': an empty band ' + mm(below) + ' mm under the lowest ink of a ' + mm(cr.height) + ' mm cell (' + Math.round((below / cr.height) * 100) + '%; limit 30 % of the cell = ' + mm(lim) + ' mm): size the row to the item (RUBRIC H13, H13-ABS; critic lf-placevalue r2 N6)' });
                 }
             }
+            // ---- SIGNMATCH (lf-builds via the lead, 2026-11-13): a shown number sentence "a +/- b = c" whose c is what the OTHER sign
+            // gives (11 - 2 = 13: an "added" wrong answer printed under the minus sign) - the shown work must keep its own operation
+            if (role === 'reason-it' || role === 'error-analysis') {
+                var panes = c.querySelectorAll('.mq-abbox, .mq-judge-work');
+                [].forEach.call(panes.length ? panes : [c], function (pn) {
+                    var t = (pn.textContent || '').replace(/\s+/g, ' ').replace(/[\u2212\u2013]/g, '-');
+                    var re = /(\d+) ?([+-]) ?(\d+) ?= ?(\d+)/g, m;
+                    while ((m = re.exec(t))) {
+                        var a = +m[1], b = +m[3], r = +m[4], here = m[2] === '+' ? a + b : a - b, other = m[2] === '+' ? a - b : a + b;
+                        if (r !== here && r === other) out.findings.push({ rule: 'SIGNMATCH', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': "' + m[0] + '" - the answer is the other sign\'s (the wrong answer printed under the item\'s own sign; pass the wrong answer\'s slots)' });
+                    }
+                });
+            }
             // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
             // so the single grey never reads as "trace me"
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {

@@ -27,7 +27,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -59,6 +59,8 @@ function selfTest() {
         { name: 'grey pupil work with no label (PUPILTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span class="mq-pupil" style="color:#949494">48</span></div></div>')), want: 'PUPILTAG' },
         { name: 'grey pupil work under "Sam wrote:" (PUPILTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:2mm;color:#949494">48</span></div></div></div>')), want: null, rules: ['PUPILTAG'] },
         { name: 'a "Sam wrote:" label 20 mm over its work (PUPILTAG distance)', html: page(cell({ h: 60, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:20mm;color:#949494">48</span></div></div></div>')), want: 'PUPILTAG' },
+        { name: 'an added answer under the minus sign (SIGNMATCH)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 13</div></div></div>')), want: 'SIGNMATCH', role: 'reason-it' },
+        { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
