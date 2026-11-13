@@ -28,6 +28,11 @@
 //   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
 //                        with a zero factor (4 × 0, 0 × n) the band's EMPTY frame, as 0 ÷ n does (no dots, never portrait;
 //                        r2 ruling: one frame per band, so it is the frame its neighbours draw) - never nothing.
+//   SCREEN-ANSWER-PLACE  (critic divarray r2 D7) on one online worksheet, at 1366 / 1280 / 1024 / 820, every ÷ card's answer
+//                        place stands in ONE place relative to its sentence (beside the "=" or wrapped under it), and the kit
+//                        cells are one height (within 5 %): the 820 sheet put the line beside "=" on 1-digit dividends and
+//                        under it on 2-digit ones, in 212 / 255 / 269 px cells. Judged with the skill's default options and with
+//                        each support value (--only ANSWER for this rule alone).
 // ARRAY-ORIENT, ARRAY-DOT-MIN and ARRAY-CAPTION judge every dot array a support draws: the ÷ framed array and the × array.
 //
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
@@ -154,6 +159,30 @@ function placeFinding(id, places) {
     return set.length > 1 ? `${id}: worksheet places ${places.map((p, i) => `${i + 1}:${p}`).join(' ')}` : null;
 }
 
+/** ANSWER (critic divarray r2 D7): one answer place and one kit cell height (within 5 %) across a worksheet's cards.
+ *  cards: [{ place: 'beside' | 'under' | null, h: px }] */
+function answerPlaceFinding(id, cards) {
+    const out = [];
+    const places = cards.map((c) => c.place).filter(Boolean);
+    if (new Set(places).size > 1) out.push(`${id}: answer places ${cards.map((c, i) => `${i + 1}:${c.place || '-'}`).join(' ')}`);
+    const hs = cards.map((c) => c.h).filter((h) => h > 0);
+    if (hs.length > 1 && Math.max(...hs) > 1.05 * Math.min(...hs)) out.push(`${id}: kit cell heights ${[...new Set(hs.map((h) => Math.round(h)))].sort((a, b) => a - b).join(' / ')} px (want one height within 5 %)`);
+    return out.length ? out.join('; ') : null;
+}
+/** In the page: each worksheet card's answer place (the slot's top against the sentence's first token) and its kit cell height. */
+function readAnswerPlaces() {
+    const cards = [...document.querySelectorAll('#worksheetGrid > .problem-card')];
+    return cards.map((card) => {
+        const cell = card.querySelector('.ws-card-visual.mq-scell') || card.querySelector('.ws-card-visual');
+        const eq = card.querySelector('.ws-card-visual .ws-eq.mq-eq');
+        const slot = eq && eq.querySelector(':scope > .mq-eqslot');
+        const first = eq && eq.firstElementChild;
+        let place = null;
+        if (slot && first && slot !== first) { const fr = first.getBoundingClientRect(), sr = slot.getBoundingClientRect(); place = sr.top >= fr.bottom - 2 ? 'under' : 'beside'; }
+        return { place, h: cell ? cell.getBoundingClientRect().height : 0, t: eq ? eq.getAttribute('aria-label') : '' };
+    });
+}
+
 function selfTest() {
     const bad = []; let n = 0;
     const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
@@ -203,6 +232,10 @@ function selfTest() {
     eq('band all framed ok (÷)', bandFrameFinding('array', [true, true, true]), null);
     eq('band all unframed ok', bandFrameFinding('array', [false, false]), null);
     for (const b of bad) console.log('  ' + b);
+    // ANSWER (critic divarray r2 D7): the 820 sheet's mixed places and three heights fail; one place, one height passes
+    eq('answer mixed', !!answerPlaceFinding('x', [{ place: 'beside', h: 212 }, { place: 'under', h: 269 }, { place: 'beside', h: 255 }]), true);
+    eq('answer one', answerPlaceFinding('x', [{ place: 'under', h: 269 }, { place: 'under', h: 270 }]), null);
+    eq('answer heights', /heights/.test(answerPlaceFinding('x', [{ place: 'under', h: 212 }, { place: 'under', h: 269 }]) || ''), true);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
     console.log(`${NAME}: ${bad.length ? 'FAIL' : 'OK'}`);
     process.exit(bad.length ? 1 : 0);
@@ -304,7 +337,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT,GAP,LABEL') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT,GAP,LABEL,ANSWER') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -322,6 +355,24 @@ function readCellsInPage({ sel, cellSel }) {
             }, { cat, skill });
             if (!def) { console.log(`${key}: no supports (nothing to compare)`); continue; }
             if (def.error) { findings.push(`${key}: ${def.error}`); continue; }
+            // SCREEN-ANSWER-PLACE (critic divarray r2 D7): the worksheet at the four screen hosts, the skill's defaults and each support
+            if (ONLY.includes('ANSWER')) for (const sup of [null, ...def.render]) {
+                const opts = sup ? Object.assign({ support: [sup] }, (def.base && def.base[sup]) || {}) : null;
+                await page.evaluate(({ cat, skill, opts }) => { window.clearSetOptions({ silent: true }); if (opts) window.setSetOptions(cat, skill, opts, { silent: true }); }, { cat, skill, opts });
+                for (const w of [1366, 1280, 1024, 820]) {
+                    await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1 });
+                    await page.evaluate(({ cat, skill }) => { if (window.__wsReseed) window.__wsReseed(4242); const st = window.state; st.category = cat; st.skill = skill; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 12; window.initWorksheet(); }, { cat, skill });
+                    await sleep(400);
+                    await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
+                    await sleep(150);
+                    const cards = await page.evaluate(readAnswerPlaces);
+                    renders++;
+                    const f = answerPlaceFinding(sup || 'default', cards);
+                    if (f) findings.push(`SCREEN-ANSWER-PLACE ${key} worksheet@${w}: ${f}`);
+                }
+                await page.evaluate(() => { try { window.clearSetOptions({ silent: true }); } catch (e) {} });
+            }
+            if (ONLY.length === 1 && ONLY[0] === 'ANSWER') continue;
             for (const sup of def.render) {
                 const opts = Object.assign({ support: [sup] }, (def.base && def.base[sup]) || {});
                 const tag = `${key} ${sup}`;
@@ -511,4 +562,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding, labelFinding };
+module.exports = { answerPlaceFinding, placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding, labelFinding };
