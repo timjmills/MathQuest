@@ -120,7 +120,7 @@ function gapBad(role, cells, i, lim) {
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
 const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-PARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
-const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)'];
+const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
 // compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
 const RULE_EXEMPT = {
@@ -159,13 +159,20 @@ function footFindings(cells, m, cols, sections, FOOT = 0.10, combo = () => null)
             if (fp == null) { notes.push(ids.length > 1 ? `${nm}: holds items ${ids.map((i) => i + 1).join('+')}; the bridge gives no measure for that combination at ${k} across, footprint not judged` : `${nm}: item ${ids[0] + 1} has no measure at ${k} across, footprint not judged`); continue; }
             if (off(c, fp)) out.push({ c, fp, k, ids });
         }
+        // critic eb-r6 m1: a partly judged index page says so in one line naming the mode, beside the per-cell notes
+        if (notes.length) notes.unshift(`pairing mode 'index': ${notes.length} of ${cells.length} cells not judged (listed below)`);
         return { mode: 'index', byH: false, out, notes };
     }
-    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) return { mode: '', byH: false, out, notes };
+    // critic eb-r6 m1: the fallback is never silent - every non-index pairing names its mode
+    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) {
+        notes.push(`pairing mode '' (not paired): no cell carries an item index, and the page is not one to one (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured, ${sections} section(s)); footprint not judged`);
+        return { mode: '', byH: false, out, notes };
+    }
     const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
     const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpOf(m[y], cols) || 0) - (fpOf(m[x], cols) || 0));
     const byH = sortedPages && cells.some((c, i) => off(c, fpOf(m[i], footCols(c, cells)))) && !cs2.some((c, q) => off(c, fpOf(m[ord[q]], footCols(c, cells))));
     if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k, ids: [i] }); });
+    notes.push(`pairing mode 'position' (fallback): no cell carries an item index, so cells are paired with items ${byH ? 'BY HEIGHT (the page sorts its rows tallest first)' : 'by dealt order'}`);
     return { mode: 'position', byH, out, notes };
 }
 if (argv.includes('--self-test')) {
@@ -202,14 +209,21 @@ if (argv.includes('--self-test')) {
         const multi = [Object.assign(mk(0, 40, 1), { items: [0, 1] })];
         const unIdx = [mk(0, 20, 1), mk(-1, 90, 2)];
         const pc = [['index: swapped footprints', footFindings(swapped, m, 2, 1).out.length, 2], ['index: own footprints', footFindings(right, m, 2, 1).out.length, 0],
-            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: noted', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).notes.length, 1],
+            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: noted', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).notes.filter((n) => /outside/.test(n)).length, 1],
             ['index out of range: the other cell judged', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).out.length, 1],
             ['two sections: judged by index', footFindings(swapped, m, 2, 2).out.length, 2], ['fewer cells than items: judged by index', footFindings([mk(1, 48, 1)], m, 2, 1).out.length, 1],
             ['review 4 dealt 2 drawn', footFindings(review, m4, 2, 1).out.length, 1], ['two sections, own column count', footFindings(twoSec, m4, 2, 2).out.map((x) => x.fp).join(), '30'],
-            ['multi-item cell, no bridge measure: noted', footFindings(multi, m4, 2, 1).notes.length, 1], ['multi-item cell, no bridge measure: not passed silently', footFindings(multi, m4, 2, 1).out.length + footFindings(multi, m4, 2, 1).notes.length, 1],
+            ['multi-item cell, no bridge measure: noted', footFindings(multi, m4, 2, 1).notes.filter((n) => /combination/.test(n)).length, 1], ['multi-item cell, no bridge measure: not passed silently', footFindings(multi, m4, 2, 1).out.length + footFindings(multi, m4, 2, 1).notes.filter((n) => /combination/.test(n)).length, 1],
             ['multi-item cell, measured combination: judged', footFindings(multi, m4, 2, 1, 0.10, (ids, k) => (ids.join() === '0,1' && k === 2 ? 30 : null)).out.length, 1],
-            ['unindexed cell on an indexed page: noted', footFindings(unIdx, m4, 2, 1).notes.length, 1],
-            ['no index, two sections: not paired', footFindings(noIdx, m, 2, 2).mode, ''], ['no index, fewer cells: not paired', footFindings([mk(-1, 40, 1)], m, 2, 1).mode, '']];
+            ['unindexed cell on an indexed page: noted', footFindings(unIdx, m4, 2, 1).notes.filter((n) => /no item index/.test(n)).length, 1],
+            ['no index, two sections: not paired', footFindings(noIdx, m, 2, 2).mode, ''], ['no index, fewer cells: not paired', footFindings([mk(-1, 40, 1)], m, 2, 1).mode, ''],
+            // critic eb-r6 m1: never silent - every mode but a fully judged 'index' page prints a note naming its mode
+            ['position fallback: noted with its mode', footFindings(noIdx, m, 2, 1).notes.filter((n) => /mode 'position'/.test(n)).length, 1],
+            ['not paired: noted with its mode', footFindings(noIdx, m, 2, 2).notes.filter((n) => /mode '' \(not paired\)/.test(n)).length, 1],
+            ['unmeasured item, position mode: not paired, noted', footFindings([mk(-1, 40, 1), mk(-1, 20, 2)], [{ 2: 20 }, null], 2, 1).notes.filter((n) => /mode ''/.test(n)).length, 1],
+            ['unmeasured item, index mode: noted with its mode', footFindings([mk(0, 20, 1), mk(1, 20, 2)], [{ 2: 20 }, null], 2, 1).notes.filter((n) => /mode 'index': 1 of 2/.test(n)).length, 1],
+            ['some cells unindexed: noted with its mode', footFindings(unIdx, m4, 2, 1).notes.filter((n) => /mode 'index'/.test(n)).length, 1],
+            ['fully judged index page: silent', footFindings(right, m, 2, 1).notes.length, 0]];
         const pbad = pc.filter(([, got, want]) => got !== want);
         for (const [n, got, want] of pbad) console.log(`self-test FAIL: EB-FOOT pairing ${n}: ${got}, want ${want}`);
         if (pbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT pairing)`); process.exit(1); }
@@ -243,7 +257,7 @@ if (argv.includes('--self-test')) {
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases; EB-FOOT pairing 15 + columns 3)`);
+    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases; EB-FOOT pairing 21 + columns 3)`);
     process.exit(bad.length ? 1 : 0);
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -404,6 +418,7 @@ async function measurePix(arg) {
             const r = sl.getBoundingClientRect(); if (!r.width || !r.height) continue;
             const q = rel(r, 0);
             const spans = [];
+            let xs = [[q.l, q.r]];
             if (!screen) spans.push([q.t, q.b]);
             else {
                 // an edge counts only when it is drawn DARKER than the 225 pixel ink threshold (critic eb-r5 D1: a 1 px #eee closed
@@ -420,9 +435,27 @@ async function measurePix(arg) {
                     const mid = sl.tagName === 'INPUT' ? (ct + cb) / 2 : cb - hw / 2;
                     spans.push([Math.floor(mid - hw / 2), Math.ceil(mid + hw / 2)]);
                 }
+                // the WIDTH (critic eb-r6 D1, the horizontal twin of r5 D1): a slot is ink across its whole width only where it draws
+                // a dark top or bottom line (an underline or a closed box); a dark left / right edge is ink at that edge. Otherwise
+                // (no edge, or a faint #eee one) it counts as ONE written digit (Ww = 0.6 x its font size) where the slot writes its
+                // text: at the content box's start, centre or end by its computed text-align (an input writes at its start by
+                // default). A 95 mm borderless input is not ink across an empty side band.
+                xs = [];
+                const bl2 = ew('Left'), br2 = ew('Right');
+                if (bt || bb2) xs.push([q.l, q.r]);
+                else {
+                    if (bl2) xs.push([q.l, q.l + Math.ceil(bl2)]);
+                    if (br2) xs.push([q.r - Math.ceil(br2), q.r]);
+                    const ww = 0.6 * (parseFloat(cs2.fontSize) || 16);
+                    const cl = q.l + (parseFloat(cs2.borderLeftWidth) || 0) + (parseFloat(cs2.paddingLeft) || 0), cr2 = q.r - (parseFloat(cs2.borderRightWidth) || 0) - (parseFloat(cs2.paddingRight) || 0);
+                    const ta = cs2.textAlign, rtl = cs2.direction === 'rtl';
+                    const atEnd = ta === 'right' || (ta === 'end' && !rtl) || (ta === 'start' && rtl);
+                    const xa = ta === 'center' || ta === '-webkit-center' ? (cl + cr2) / 2 - ww / 2 : atEnd ? cr2 - ww : cl;
+                    xs.push([Math.floor(Math.max(cl, xa)), Math.ceil(Math.min(Math.max(cl, xa) + ww, Math.max(cr2, cl + ww)))]);
+                }
             }
             for (const [a, b] of spans) for (let y = Math.max(0, a); y < Math.min(h, b); y++) rows[y] = 1;
-            for (let x = Math.max(0, q.l); x < Math.min(w, q.r); x++) cols[x] = 1;
+            for (const [a, b] of xs) for (let x = Math.max(0, a); x < Math.min(w, b); x++) cols[x] = 1;
         }
         const fr = rows.indexOf(1); if (fr < 0) { out[id] = { noInk: true }; continue; }
         const lr = rows.lastIndexOf(1), fc = cols.indexOf(1), lc = cols.lastIndexOf(1);
@@ -672,9 +705,7 @@ async function main() {
                     // (every cell against the items it holds, any page shape: lead ruling 2026-11-13; b.combo: the bridge's measure of
                     // a multi-item cell, when it gives one - none today, so such a cell is a note, never a silent pass)
                     if (GRID_ROLES.has(j.role)) { const fr = footFindings(cells, m, b.cols, b.sections, FOOT, (ids, k) => (b.combo && b.combo[`${ids.join(',')}@${k}`]) || null);
-                        if (fr.byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page sorts its rows tallest first)`);
                         for (const n of fr.notes) notes.push(`${key} ${j.tag} EB-FOOT ${n}`);
-                        if (!fr.mode) notes.push(`${key} ${j.tag}: EB-FOOT footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured, no item index on the page)`);
                         for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} across${fr.mode === 'index' ? `, item ${x.ids.map((i) => i + 1).join('+')}` : ''} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %; limit ${FOOT * 100} %)`); }
                 } finally { await sh.close(); }
             }

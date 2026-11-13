@@ -4390,6 +4390,46 @@
   },
   "pending": true,
   "pendingReason": "no commit has fixed the add_facts review footprints yet (routed to lf-ops, pinned facts debt); arm with lf-ops' fix commit. The widened pairing itself is in --self-test 'EB-FOOT pairing' (15 cases: a Review dealing 4 / drawing 2, two sections at their own column counts, a multi-item cell with and without a bridge measure, an unindexed cell)"
+ },
+ {
+  "id": "eb-fixture-wide-slot-faint",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q5): a practice card with its content pinned left plus a 95 mm input with a 1 px #eee border to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-faint.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-wide-slot-invisible",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q6): a practice card with its content pinned left plus a 95 mm borderless white input to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-invisible.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
