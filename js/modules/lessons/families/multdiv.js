@@ -247,7 +247,7 @@ export const ROUTINES = Object.freeze({
         tailLast: true,
         casesPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): written from the count-row card (signed 2026-11-12) and the provider steps; its cases are declared when the lesson is carded (lessons-first).',
         concepts: [
-            { id: 'jump', text: 'Every jump is the same size: the number in the box.' },
+            { id: 'jump', text: 'Every jump is the same size: the number in the arrow.' },
             { id: 'add-jump', text: 'Add the jump to a number to get the next one.' },
             { id: 'table', text: 'Counting by a number says its times table.' },
         ],
@@ -271,6 +271,14 @@ export const ROUTINES = Object.freeze({
         // (one count row a line - the footprint's maxCols 1: the default 6 x 2 shape fell back to two pages, 4 + 2 with no step strip,
         // print-lint PAGEFILL / PG-23. Densest first: the page takes as many rows as print on it, LR-17's single Practice page)
         practiceShapes: [[8, 1], [7, 1], [6, 1], [5, 1], [4, 1], [3, 1]],
+        // (critic cbt r1 D8: a row with its times labels, or of 15 jumps, is taller - the chart draws two panels, not three,
+        // so its row keeps the working size instead of a zoom to 13 pt; prereqs.js optionLesson reads `byOption`)
+        byOption: {
+            times: { each: { chartMaxStates: 2 }, given: { chartMaxStates: 2 } },
+            // (critic cbt r1 D9: three-line Guided rows - two of them did not fit under the Warm-up, so the sheet's page 1 stood half
+            // empty and its page 2 held the Guided and ONE Independent row; one Guided row keeps the sheet on one page)
+            jumps: { 15: { chartMaxStates: 2, guidedRows: 1 } },
+        },
     },
 });
 
@@ -300,10 +308,11 @@ export const LESSONS = Object.freeze({
         practice: { skill: 'multiplication:count_by_tables' },
         prereqsPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): a Warm-up of the skip counts it extends until its Prerequisite Check is written (LR-17).',
         warmup: [
-            { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: a count-by row with the smallest jump.' },
-            { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: the count-by row most pupils know first.' },
+            // (critic cbt r1 m2: one writing shape - the count row's boxes - not the circle / hexagon mix of number_seq_fill's default)
+            { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward', shape: 'box' }, why: 'Skip counting by 2s: a count-by row with the smallest jump.' },
+            { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward', shape: 'box' }, why: 'Skip counting by 5s: the count-by row most pupils know first.' },
         ],
-        mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+        mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward', shape: 'box' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
     },
     'skill:multiplication:mult_properties': {
         routine: 'mult-turn-array',

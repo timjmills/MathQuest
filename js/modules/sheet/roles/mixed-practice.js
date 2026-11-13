@@ -672,6 +672,10 @@ export function plan(input = {}) {
         }
         return g;
     })();
+    // (critic cbt r1 D5, H5 / PG-23: a last page holding ONE shelf while an earlier page holds several - Mixed practice M
+    // printed 6 + 1 - is laid again with the shelves shared evenly over the same pages: 4 + 3, never a lone item)
+    const runShelves = (breaks) => {
+    pages.length = 0; cur = null; start = 1;
     for (const [i, sh] of shelves.entries()) {
         const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), sh.growCap === undefined ? Infinity : sh.growCap);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
@@ -679,7 +683,7 @@ export function plan(input = {}) {
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
         let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) {
+        if (!cur || cur.used + bandH > budget || breaks.has(i)) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
@@ -714,6 +718,19 @@ export function plan(input = {}) {
         cur.sections.push(band);
         start += pupil.length;
         cur.used += bandH;
+    }
+    };
+    runShelves(new Set());
+    {
+        const shelvesOn = (pg) => pg.sections.reduce((a, x) => a + (x.kind === 'band' ? (x.contents ? x.contents.filter((c) => c && c.kind === 'grid' && !/mq-anchorgrid/.test(c.cls || '')).length : 1) : 0), 0);
+        const P = pages.length, last = P > 1 ? shelvesOn(pages[P - 1]) : 0;
+        if (P > 1 && last === 1 && shelves.length >= 2 * P - 1) {
+            const per = Math.ceil(shelves.length / P);
+            const breaks = new Set(Array.from({ length: P - 1 }, (_, k) => (k + 1) * per));
+            const keep = pages.slice();
+            runShelves(breaks);
+            if (pages.length !== P) { pages.length = 0; pages.push(...keep); }
+        }
     }
     // `growLast` (the detailed lesson maker's Mixed page): the last band of each page takes the spare
     // height - one unruled trailing area inside the frame (V22 §8.12.4) - so the body never ends

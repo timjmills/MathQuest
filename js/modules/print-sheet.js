@@ -3242,6 +3242,26 @@ function evenMixedRows(plan, items, replan, n) {
     return { plan, swaps, stuck };
 }
 
+    // (critic cbt r1 m1: a count-by page is titled by the rows it DEALT, not the rows option - a one-page count of the default
+    // rows deals 2s to 7s and was titled "I Can count by 2s to 12s". The rows the page prints, in print order, title it.)
+function retitleByDealt(skills, hostItems, n) {
+    for (let si = 0; si < skills.length; si++) {
+        const m = skills[si];
+        if (!m || m.skillId !== 'count_by_tables' || n.sections.some((sec) => sec.skills.some((k) => k.skillId === 'count_by_tables' && k.iCan))) continue;
+        const its = hostItems.filter((it) => it && it.q && it.q.skillId === 'count_by_tables' && it.q.countBy);
+        if (!its.length) continue;
+        const rows = [];
+        for (const it of its) { const c = it.q.countBy; const dir = c.dir === 'down' ? 'down' : 'up'; if (!rows.some((r) => r.step === c.step && r.dir === dir)) rows.push({ step: c.step, start: 'step', dir }); }
+        rows.sort((a, b) => a.step - b.step);
+        try {
+            const sk0 = n.sections.flatMap((sec) => sec.skills).find((k) => k.skillId === 'count_by_tables') || {};
+            const no = Object.assign({}, normalizeOptions('multiplication', 'count_by_tables', sk0.opts || {}), { rows });
+            const w = skillWords(Object.assign({}, m, { iCan: undefined, opts: no }));
+            if (w && w.iCan) skills[si] = Object.assign({}, m, { iCan: w.iCan });
+        } catch (e) { /* keep the options' title */ }
+    }
+}
+
 function tagItemIndex(plan, items) {
     const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
     const walk = (s) => {
@@ -4072,6 +4092,7 @@ async function buildSheetDeal(req = {}) {
         numberLine = drawNumberLine(nline, hostItems.filter((it) => nline.sections.has(Number(it.section) || 0)), n.size, header);
         if (numberLine.warn) notes.push(numberLine.warn);
     }
+    retitleByDealt(skills, hostItems, n);
     const input = {
         items: hostItems,
         skills,
@@ -4323,7 +4344,14 @@ function settleMixedGrades(metas, items) {
     }
 }
 
+// (critic cbt r1 m4, PT-REV-3: an earlier step is one the skill BUILDS ON. Listed before count_by_tables in its category are the
+// multiply-by-10s skills - its Review mixed in 8 x 100 and 80 x 7. A skill named here takes these as its earlier steps.)
+const EARLIER_STEPS = Object.freeze({
+    'multiplication:count_by_tables': [{ categoryId: 'counting', skillId: 'number_seq_fill' }],
+});
 function earlierSkills(sk, count = 1, { fallback = false } = {}) {
+    const fixed = EARLIER_STEPS[`${sk.categoryId}:${sk.skillId}`];
+    if (fixed) return fixed.slice(0, count).map((x) => Object.assign({}, x));
     // An earlier step is never a HARDER one: a category lists its skills in groups (facts, then
     // columns, then word problems), so the skill just above a Level K word problem can be a
     // 5-digit sum. Only skills at the same level or below count.
@@ -4860,6 +4888,11 @@ async function buildRoleSheet(n, metaOf) {
         for (const list of bySec.values()) markSectionWriteAbove(list);
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
+    if (Array.isArray(input.skills) && n.role !== 'lesson') {
+        retitleByDealt(input.skills, items, n);
+        const t = input.targetSkill && input.skills.find((x) => x && x.categoryId === input.targetSkill.categoryId && x.skillId === input.targetSkill.skillId);
+        if (t && t.iCan) input.targetSkill = Object.assign({}, input.targetSkill, { iCan: t.iCan });
+    }
     let plan = mod.plan(input);
     // (lf-ops-props r5, lead ruling (b'): a mixed-class noStretch row has its boundary item(s) dealt again - evenMixedRows)
     const evenRows = evenMixedRows(plan, items, (its) => { input.items = its; return mod.plan(input); }, n);

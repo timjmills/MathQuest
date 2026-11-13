@@ -290,7 +290,8 @@ const FORBIDDEN = {
     'multiplication:area_model_mult_hard': [/regroup/i, /count by the second number/i],
     'multiplication:mult_facts': [/count by the second number/i],
     'counting:number_seq_fill': [/touch each/i],
-    'multiplication:count_by_tables': [/touch each/i, /count by the second number/i],
+    // (critic cbt r1 m3: the step tab is an ARROW; "the number in the box" named it with the word every answer place uses)
+    'multiplication:count_by_tables': [/touch each/i, /count by the second number/i, /number in the box/i],
     'patterns:number_patterns_rule': [/touch each/i],
     'multiplication:nl_mult': [/count by the second number/i],
     'division:nl_div': [/times fact/i],

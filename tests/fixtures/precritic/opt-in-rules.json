@@ -307,7 +307,7 @@
    "gates": {
     "print-lint-rowstretch-L": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review --size L --rules ROW-STRETCH,ROW-MIXED --lints ROW-STRETCH,ROW-MIXED (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size L --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -315,21 +315,21 @@
        "--source",
        "kit",
        "--roles",
-       "more-practice,test,guided,mixed-practice,review",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
        "--size",
        "L",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-rowstretch-S": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review --size S --rules ROW-STRETCH,ROW-MIXED --lints ROW-STRETCH,ROW-MIXED (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size S --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -337,21 +337,21 @@
        "--source",
        "kit",
        "--roles",
-       "more-practice,test,guided,mixed-practice,review",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
        "--size",
        "S",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-rowstretch-M": {
      "newRow": {
-      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review --size M --rules ROW-STRETCH,ROW-MIXED --lints ROW-STRETCH,ROW-MIXED (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
+      "name": "ws-print-lint --source kit --roles more-practice,test,guided,mixed-practice,review,reason-it --size M --rules ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS --lints ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP (opt-in lf-ops-props r4b: a noStretch row at most 1.25 x its content, 1.42 on a pageCap page; its shortest item's band at most 20 %)",
       "script": "ws-print-lint",
       "kind": "browser",
       "parse": "printLint",
@@ -359,46 +359,46 @@
        "--source",
        "kit",
        "--roles",
-       "more-practice,test,guided,mixed-practice,review",
+       "more-practice,test,guided,mixed-practice,review,reason-it",
        "--size",
        "M",
        "--lints",
-       "ROW-STRETCH,ROW-MIXED"
+       "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS,L-DENSITY,L-OVERLAP"
       ]
      },
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-lesson-L": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-lesson-S": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-kit": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-kit-S": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "print-lint-kit-M": {
      "args": [
       "--rules",
-      "ROW-STRETCH,ROW-MIXED"
+      "ROW-STRETCH,ROW-MIXED,SLOT-FIT,SHAPE-ONE,REVIEW-LADDER,TITLE-ROWS"
      ]
     },
     "screen-slots": {

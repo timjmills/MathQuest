@@ -437,7 +437,9 @@ function widePerRow(n, cands, boxFor, need) {
 
 function arcsGeom(p, ctx, c) {
     const { size, n, shape, tabBody, tab, baseH, live, lblPt: lblPt0, lblChars, hasLbl, lblH } = c;
-    let perRow = p.axis ? n : n >= 13 ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
+    let perRow = p.axis ? n : n >= 13 && !p.twoLines ? 5 : Math.ceil(n / 2);   // 12 -> 6 + 6; 15 -> 5 + 5 + 5; a number line is one line
+    // (critic cbt r1 D8: a lesson chart's full-width panel - payload `twoLines`, set by chart.js - holds a 15-jump row in TWO lines (8 + 7), so the
+    // chart's three panels fit their page at the working size; in three lines of five it was zoomed to 13 pt at 60 % of the width)
     let rows = Math.ceil(n / perRow);
     const chars = maxDigits(p);
     // critic skip-count r4 N10: a wide (6+ digit) paper row's numbers print at >= GIVEN_MIN_PT (11 pt, the rubric's reading floor;

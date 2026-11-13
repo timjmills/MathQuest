@@ -106,13 +106,25 @@ export function prepare(it, info = {}) {
     // to 32 % - ws-empty-band EB-BAND)
     const stackTagOf = (c) => (wide && !legacy && c && c.size !== 'L' ? ';padding:2.5mm 2mm 2.5mm 11mm;align-items:flex-start' : '');
     const boxAt = (c, col, row) => (stackTagOf(c) ? ` style="grid-column:${col};grid-row:${row}${stackTagOf(c)}"` : at(col, row));
+    // (critic cbt r1 D6: wrapToCell + a fractional column count make the row take MORE LINES at the size's own box width - it
+    // squeezed six boxes a line to 8-10 mm, two-digit numbers touching the box sides; count-row narrowLive caps at 186 / c - 14)
     // (lf-ops-props r5, the count-row Reason It wrap: a STACKED count row - an arcs row of 12-15 numbers is 150-170 mm - is drawn
     // at its PANEL's width, the cell less the response column, the gutters and the panel's pads, so it wraps to more lines inside
     // the panel and never runs past its rules - ws-empty-band EB-EDGE / ws-cell-checks OVERFLOW on count_by_tables Reason It S/M/L)
     const panelLive = (c) => LIVE_W_MM - 52 - 10 - (stackTagOf(c) ? 13 : 4) - 6;
     const work0 = work;
-    work = (c, o, v, slots) => work0(it.template === 'count-row' && wide && !legacy ? Object.assign({}, c, { cellLiveMm: panelLive(c) }) : c, o, v, slots);
-    const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}">`
+    work = (c, o, v, slots) => {
+        if (!(it.template === 'count-row' && wide && !legacy)) return work0(c, o, v, slots);
+        const colsF = 186 / (panelLive(c) + 14);
+        // (the host reads wrapToCell from its item, never the ctx: set for this one draw, then restored)
+        const was = it.wrapToCell;
+        it.wrapToCell = true;
+        try { return it.render(Object.assign({}, c, { state: 'blank', cellLiveMm: panelLive(c) }), Object.assign({}, o, { cols: colsF, shown: v, prompt: false }, slots ? { shownSlots: slots } : {})); } finally { it.wrapToCell = was; }
+    };
+    // (critic cbt r1 D7, CL-40: a count row's A / B panels start below the cell label's keep-out - the A panel's corner painted
+    // 3 mm across, 5 mm down at M / L; r3b's --ws-koin start was lost in the merge of master's three layouts)
+    const koTop = it.template === 'count-row' ? ';padding-top:max(0mm, var(--ws-koin, 0mm))' : '';
+    const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}${koTop}">`
         + `<div class="mq-abbox"${boxAt(c, 1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${boxAt(c, 1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
         // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under

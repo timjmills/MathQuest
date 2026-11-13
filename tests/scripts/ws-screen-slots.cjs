@@ -180,7 +180,7 @@ function MEASURE_TRAIN(rootSel) {
     if (!root) return null;
     const trains = [...root.querySelectorAll('.k2-countrow')].filter((t) => t.getBoundingClientRect().width > 0);
     if (!trains.length) return null;
-    let px = Infinity, scroll = 0, past = 0, text = '';
+    let px = Infinity, scroll = 0, past = 0, text = '', thin = Infinity, nLines = 0;
     for (const t of trains) {
         const cell = t.closest('[data-ws-cell]') || t.closest('.mq-scell') || root;
         const cr = cell.getBoundingClientRect();
@@ -195,8 +195,16 @@ function MEASURE_TRAIN(rootSel) {
             if (/^[\d,]+$/.test(own) && e.closest('.k2-shape, .k2-given')) { const f = parseFloat(cs.fontSize); if (f < px) { px = f; text = own; } }
         }
         if (t.scrollWidth > t.clientWidth + 1) scroll++;
+        // (critic cbt r1 D2: numbers a LINE - the worksheet's 250 px column stacked one number a line under arrows that point at
+        // nothing. Every line of the train holds >= 3 numbers / boxes, a short LAST line excepted)
+        const items = [...t.querySelectorAll('.k2-tile, .k2-given')].filter((e) => !e.parentElement.closest('.k2-tile, .k2-given') && e.getBoundingClientRect().width > 0);
+        const lines = [];
+        for (const e of items) { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; const ln = lines.find((l) => Math.abs(l.cy - cy) < Math.max(8, r.height / 2)); if (ln) ln.n++; else lines.push({ cy, n: 1 }); }
+        lines.sort((a, b) => a.cy - b.cy);
+        if (items.length >= 3) lines.forEach((l, i) => { if (l.n < 3 && !(i === lines.length - 1 && lines.length > 1)) thin = Math.min(thin, l.n); });
+        nLines = Math.max(nLines, lines.length);
     }
-    return { n: trains.length, px: px === Infinity ? 0 : px, text, scroll, past };
+    return { n: trains.length, px: px === Infinity ? 0 : px, text, scroll, past, thin: thin === Infinity ? 0 : thin, nLines };
 }
 /** The verdict on a measured train at a viewport: null when it passes. */
 function trainVerdict(m, width) {
@@ -206,6 +214,8 @@ function trainVerdict(m, width) {
     if (m.px && m.px < vp.px - 0.5) why.push(`its numeral "${m.text}" is ${Math.round(m.px * 10) / 10} px (want >= ${vp.px} px at ${vp.w}: the host shrank the train)`);
     if (m.scroll) why.push(`${m.scroll} part(s) scroll sideways (no horizontal scroll or swipe)`);
     if (m.past) why.push(`${m.past} part(s) run past the cell's edge`);
+    // (390 px is no longer a host - owner plan 2026-11-13, critic cbt r1 D10 out of scope: numbers a line judged at 820 / 1280)
+    if (m.thin && width >= 600) why.push(`a line holds ${m.thin} number(s) (want >= 3 a line, a short last line excepted; ${m.nLines} lines; critic cbt r1 D2)`);
     return why.length ? `the count-row train: ${why.join('; ')}` : null;
 }
 /** In the page: the largest-type run of digits under `rootSel` (labels, tabs, the instruction, screen-only chrome out). */

@@ -152,6 +152,10 @@
 //   ROW-STRETCH (lf-ops-props r4, lead ruling 2026-11-12 (b)) a row of `noStretch` templates (arrays, arrays-turn,
 //              count-row: answered in place, top-started) is at most 1.25 x its tallest item's height (1.42 on a pageCap
 //              page, grid class mq-pagecap, PT-GDP), and its shortest item's band is at most 20 % of the row (H13).
+//   TITLE-ROWS (critic cbt r1 m1) a count-by page's title names exactly the steps its rows print.
+//   REVIEW-LADDER (critic cbt r1 m4) the Review's Mixed Review numbers stay within the skill's own (key page).
+//   SHAPE-ONE  (critic cbt r1 m2) a lesson Warm-up cell writes in one shape.
+//   SLOT-FIT   (critic cbt r1 D6) a count-row answer box holds its key number with >= 1 mm clear each side.
 //   ROW-MIXED  (lf-ops-props r5, lead ruling (b')) a row of `noStretch` templates whose tallest item needs more than 1.25 x
 //              its shortest (mixed height classes) leaves no short-cell band over 20 % (the bridge re-deals the boundary item).
 //   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
@@ -198,7 +202,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED', 'SLOT-FIT', 'SHAPE-ONE', 'REVIEW-LADDER', 'TITLE-ROWS'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -987,7 +991,7 @@ function wsLintPage(cfg) {
                 if (cr.height < 12 * PX || cr.width < 12 * PX) continue;
                 const cs = getComputedStyle(c);
                 const inner = { t: cr.top + parseFloat(cs.paddingTop), b: cr.bottom - parseFloat(cs.paddingBottom), l: cr.left + parseFloat(cs.paddingLeft), r: cr.right - parseFloat(cs.paddingRight) };
-                let box = null;
+                let box = null, inkB = -Infinity;
                 for (const d of c.querySelectorAll('*')) {
                     if (!visible(d)) continue;
                     if (d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
@@ -1002,6 +1006,9 @@ function wsLintPage(cfg) {
                         if (!(parseFloat(bs.borderTopWidth) || parseFloat(bs.borderBottomWidth))) continue;
                     }
                     box = box ? { t: Math.min(box.t, r.top), b: Math.max(box.b, r.bottom), l: Math.min(box.l, r.left), r: Math.max(box.r, r.right) } : { t: r.top, b: r.bottom, l: r.left, r: r.right };
+                    // (critic cbt r1 D4: ROW-STRETCH reads the INK - text, a drawing, a stroked box - not an empty reserve block: the
+                    // Guided count rows carry an invisible support reserve under the row, which read as content, so 1.6 x rows passed)
+                    if (d instanceof SVGElement ? d.tagName.toLowerCase() === 'svg' : (/\S/.test([...d.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('')) || /^(img|canvas)$/i.test(d.tagName) || (() => { const bs = getComputedStyle(d); return (parseFloat(bs.borderTopWidth) || 0) + (parseFloat(bs.borderBottomWidth) || 0) > 0 && bs.borderTopStyle !== 'none'; })())) inkB = Math.max(inkB, r.bottom);
                 }
                 if (!box) continue;
                 const H = cr.height, W = cr.width;
@@ -1015,7 +1022,7 @@ function wsLintPage(cfg) {
                 // content's bottom less the cell's top, plus the bottom pad and border), judged per row after the loop
                 if ((optOn('ROW-STRETCH') || optOn('ROW-MIXED')) && c.hasAttribute('data-ws-cell')) {
                     const bb = parseFloat(cs.paddingBottom) + (parseFloat(cs.borderBottomWidth) || 0);
-                    stretchCells.push({ c, ri, n: ri.cells.indexOf(c), top: cr.top, H, need: Math.min(H, box.b - cr.top + bb), ns: NO_STRETCH_T.includes(tmpl), pc: !!c.closest('.mq-pagecap') });
+                    stretchCells.push({ c, ri, n: ri.cells.indexOf(c), top: cr.top, H, need: Math.min(H, (inkB > -Infinity ? inkB : box.b) - cr.top + bb), ns: NO_STRETCH_T.includes(tmpl) || (!!c.closest('.mq-lwarmcol') && ['k2kit', 'seqstrip', 'count-row', 'arrays', 'arrays-turn'].includes(tmpl)), pc: !!c.closest('.mq-pagecap') });
                 }
                 const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
                 const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
@@ -1392,6 +1399,71 @@ function wsLintPage(cfg) {
             if (k > lim + 0.03) F('L-DENSITY', 'ROW-STRETCH', 'major', tall.c, `row ${mm(a.H)} mm is ${k.toFixed(2)} x the tallest item it holds (${mm(tall.need)} mm): a row of items answered in place (noStretch) is at most ${lim} x its content (lead ruling 2026-11-12 (b)${lim > 1.25 ? ', PT-GDP' : ''}; ROW-STRETCH)`, 'noStretch row stretched');
             const band = (a.H - short.need) / a.H;
             if (a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-STRETCH', 'major', short.c, `the shortest item of its row needs ${mm(short.need)} mm of a ${mm(a.H)} mm row: a ${Math.round(band * 100)} % band under it (limit 20 % for a cell answered in place, RUBRIC H13; ROW-STRETCH)`, 'noStretch row band over 20 %');
+        }
+    }
+    /* TITLE-ROWS (OPT-IN, --rules TITLE-ROWS; critic cbt r1 m1): a count-by page's "I Can count by ..." title names exactly the
+       steps its rows print (the step tabs, data-ws-steptab) - a one-page count of the default rows dealt 2s to 7s under a title of
+       "2s to 12s". Pupil pages whose first page carries the title; a sheet's steps are read over all its pupil pages. */
+    if (optOn('TITLE-ROWS')) {
+        const pupil = rootInfo.filter(r => !r.key);
+        const titleEl = pupil.length ? pupil[0].el.querySelector('.ws-title') : null;
+        const t = titleEl ? titleEl.textContent : '';
+        const m = /\bcount(?: on| back| on and back)? by (.+)$/i.exec(t || '');
+        const tabs = new Set(pupil.flatMap(r => [...r.el.querySelectorAll('[data-ws-cell="count-row"] [data-ws-steptab]')].map(e => Number(String(e.getAttribute('data-ws-steptab')).replace(/[^\d]/g, ''))).filter(v => v > 0)));
+        // (a lesson's title is the LESSON's objective over all its pages - not judged)
+        if (m && tabs.size && !document.querySelector('.mq-chartgrid, .mq-lwarmcol, [data-mq-lesson-strip]')) {
+            const said = new Set();
+            const run = /(\d+)s to (\d+)s/.exec(m[1]);
+            if (run) for (let v = Number(run[1]); v <= Number(run[2]); v++) said.add(v);
+            else for (const x of m[1].matchAll(/(\d+)s\b/g)) said.add(Number(x[1]));
+            const miss = [...said].filter(v => !tabs.has(v)), extra = [...tabs].filter(v => !said.has(v));
+            if (said.size && (miss.length || extra.length)) F('L-DENSITY', 'TITLE-ROWS', 'major', titleEl, `the title "${t.trim()}" names ${[...said].join(', ')}; the rows print ${[...tabs].sort((a, b) => a - b).join(', ')} (critic cbt r1 m1: the title names the rows dealt)`, 'title vs rows');
+        }
+    }
+    /* SHAPE-ONE (OPT-IN, --rules SHAPE-ONE; critic cbt r1 m2): a lesson Warm-up cell writes in ONE shape - number_seq_fill's default
+       mixed circles and hexagons beside the lesson's boxes made the shape no cue for given / blank. Pupil pages, Warm-up cells. */
+    if (optOn('SHAPE-ONE')) {
+        for (const ri of rootInfo.filter(r => !r.key)) {
+            for (const c of ri.el.querySelectorAll('.mq-lwarmcol [data-ws-cell]')) {
+                const shapes = new Set([...c.querySelectorAll('[data-ws-shape]')].map(e => e.getAttribute('data-ws-shape')));
+                if (shapes.size > 1) F('L-ANSAREA', 'SHAPE-ONE', 'minor', c, `a Warm-up cell mixes writing shapes (${[...shapes].join(', ')}): one shape per cell (critic cbt r1 m2)`, 'mixed writing shapes');
+            }
+        }
+    }
+    /* REVIEW-LADDER (OPT-IN, --rules REVIEW-LADDER; critic cbt r1 m4): a Review's "Mixed Review:" items stay within the skill's own
+       ladder - on the KEY, no number in the Mixed Review band is larger than the largest number of the skill's own band (count_by_tables
+       mixed in 8 x 100 and 80 x 7 = 560 beside count rows that end at 132). */
+    if (optOn('REVIEW-LADDER')) {
+        const nums = (el) => (el.textContent.match(/\d[\d,]*/g) || []).map(t => Number(t.replace(/,/g, ''))).filter(Number.isFinite);
+        for (const ri of rootInfo.filter(r => r.key)) {
+            const bands = [...ri.el.querySelectorAll('.ws-band')].filter(b => b.querySelector('[data-ws-cell]'));
+            const isMix = (b) => /mixed review/i.test(((b.querySelector('.ws-strip b') || {}).textContent) || '');
+            const mix = bands.filter(isMix), own = bands.filter(b => !isMix(b));
+            if (!mix.length || !own.length) continue;
+            const cellNums = (bs) => bs.flatMap(b => [...b.querySelectorAll('[data-ws-cell]')].flatMap(c => nums(c)));
+            const ownMax = Math.max(0, ...cellNums(own)), mixMax = Math.max(0, ...cellNums(mix));
+            if (ownMax > 0 && mixMax > ownMax) F('L-DENSITY', 'REVIEW-LADDER', 'major', mix[0], `the Mixed Review band reaches ${mixMax} where the skill's own items end at ${ownMax}: a review mixes in EARLIER steps, never a harder one (PT-REV-3; critic cbt r1 m4)`, 'review beyond the ladder');
+        }
+    }
+    /* SLOT-FIT (OPT-IN, --rules SLOT-FIT; critic cbt r1 D6, SL-1 writing room): a count-row answer box holds its number with
+       at least 1 mm of clear room each side - read on the KEY pages, where every box carries its answer. The Reason It A / B rows
+       squeezed six boxes a line to 8-10 mm and the key's "14", "20", "22" touched the box sides. */
+    if (optOn('SLOT-FIT')) {
+        for (const ri of rootInfo.filter(r => r.key)) {
+            for (const t of ri.el.querySelectorAll('[data-ws-cell="count-row"] .k2-tile')) {
+                const tr = t.getBoundingClientRect();
+                if (!tr.width) continue;
+                let l = Infinity, r = -Infinity;
+                const w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT);
+                for (let n = w.nextNode(); n; n = w.nextNode()) {
+                    if (!/\d/.test(n.textContent)) continue;
+                    const rg = document.createRange(); rg.selectNodeContents(n);
+                    for (const q of rg.getClientRects()) { if (q.width) { l = Math.min(l, q.left); r = Math.max(r, q.right); } }
+                }
+                if (l === Infinity) continue;
+                const room = Math.min(l - tr.left, tr.right - r);
+                if (room < PX - 0.01) F('L-ANSAREA', 'SLOT-FIT', 'major', t, `a count-row box ${mm(tr.width)} mm wide leaves its number ${mm(Math.max(0, room))} mm of room (at least 1 mm each side; SL-1, critic cbt r1 D6)`, 'count-row box too tight');
+            }
         }
     }
     for (const el of textEls) {

@@ -2114,3 +2114,9 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 /* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
 html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
 html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }
+
+/* critic cbt r1 D2 (lf-ops-props r5): an online-worksheet card that holds a wrapping count row takes the whole grid row - in a
+   third of the 1280 grid (about 250 px) the row stacked ONE number a line under arrows pointing at nothing; paper prints two lines
+   of six. ADDITIVE. ws-screen-slots TRAIN-FIT counts the numbers a line (>= 3). */
+.online-edition .problems-grid.mq-wsgrid > .problem-card.mq-wscard:has(.k2-countrow-wrap),
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard:has(.k2-countrow-wrap) { grid-column: 1 / -1; }

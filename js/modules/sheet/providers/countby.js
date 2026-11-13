@@ -138,12 +138,12 @@ registerSkill('multiplication:count_by_tables', {
             iCan: `I Can ${verb} ${what}${from !== null ? ` from ${fmt(from)}` : ''}${jumps}`,
             instructionKey: key,
             steps: dir === 'up' ? [
-                'Read the number in the box. That is the jump.',
+                'Read the number in the arrow. That is the jump.',
                 'Add the jump to a number to get the next one.',
                 'Write each missing number in its box.',
                 'Check: every jump is the same size.',
             ] : dir === 'down' ? [
-                'Read the number in the box. That is the jump.',
+                'Read the number in the arrow. That is the jump.',
                 'Take the jump away from a number to get the next one.',
                 'Write each missing number in its box.',
                 'Check: each number is smaller than the one before.',

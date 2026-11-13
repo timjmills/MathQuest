@@ -113,6 +113,8 @@ export function stateDrawing(it, steps, groups, k, c) {
     if (t) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         if (it.q.cell.template === 'fact' && !payload.pt) payload.pt = ctx.metrics.digitPt;
+        // (critic cbt r1 D8: a count row in a full-width chart panel takes two lines - count-row arcsGeom `twoLines`)
+        if (it.q.cell.template === 'count-row' && c.chartTwoLines) payload.twoLines = true;
         let html = t.stepState(payload, merged, k, Object.assign({}, ctx, { step: k }));
         if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k, !!c.hops);
         return unslot(html);
@@ -127,7 +129,7 @@ export function stateDrawing(it, steps, groups, k, c) {
         const fresh = [];
         ((merged[k] || {}).marks || []).forEach((m) => { if (m && m.slot !== undefined) { const id = idOf(m); if (acc[id] !== String(m.value)) fresh.push(id); acc[id] = String(m.value); } });
         let html = '';
-        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc, traceNew: fresh }) }); } catch (e) { html = ''; }
+        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc, traceNew: fresh }, c && c.chartTwoLines ? { twoLines: true } : {}) }); } catch (e) { html = ''; }
         return unslot(html);
     }
     // A template with no step states: the problem blank, then answered in grey on the last state.
@@ -157,7 +159,9 @@ export function stateItems(example, data) {
     // writes nothing new - it is the line under the panels, not a panel of its own.
     const steps = data && data.tailLast ? ws.map((st, i) => (i === ws.length - 1 ? Object.assign({}, st, { marks: [] }) : st)) : ws;
     if (!steps.length) return [];
-    const groups = stateGroups(steps);
+    // (`chartMaxStates`, lesson data - critic cbt r1 D8: a count row with its times labels or 15 jumps draws in TWO panels, the
+    // look step joining the step it prepares, so the row keeps the chart's working size)
+    const groups = stateGroups(steps, data && Number(data.chartMaxStates) > 0 ? Number(data.chartMaxStates) : 4);
     const named = namedSteps(steps, data);
     const { variant } = chartLayout(groups.length, data);
     const drawing = (k, c) => stateDrawing(example, steps, groups, k, c);
@@ -195,8 +199,10 @@ export function stateItems(example, data) {
             const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
             // (lf-ops-props, EB-EDGE: the drawing is measured at the PANEL's own width - a count row in a 2 x 2 panel took the
             // page's 186 mm and ran 39 mm across the panel's border. `cellLiveMm`, read by count-row, is that width at zoom 1.)
-            const cellLiveMm = ((v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || 2) - 16)) / z;
-            const cz = Object.assign({}, c, { cellLiveMm }, v === 'row' ? {} : { hops: true });
+            // (critic cbt r1 D8: a `chartWide` panel is the page's full width - read as half (cols unset -> 2), the times=each and
+            // 15-jump rows wrapped into 77 mm at 13 pt, 60 % of the panel)
+            const cellLiveMm = ((v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || (data && data.chartWide ? 1 : 2)) - 16)) / z;
+            const cz = Object.assign({}, c, { cellLiveMm }, v === 'row' ? {} : { hops: true }, data && data.chartWide ? { chartTwoLines: true } : {});
             const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, cz)}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
@@ -443,6 +449,16 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // spreads).
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
+        // (`chartMaxStates` - critic cbt r1 D8: a merged panel holds two step heads, the next one; equal rows left a 38 % band
+        // under the shorter. Each one-column panel is as tall as ITS content, a quarter more at most, the rest under the grid)
+        if (cols === 1 && data && Number(data.chartMaxStates) > 0 && lay.rows === states.length) {
+            const own = states.map((_, k) => base[k] + (z - 1) * dH[k]);
+            const kk = Math.min(1.25, Math.max(1, room / own.reduce((a, b) => a + b, 0)));
+            const rowsMm = own.map((h) => h * kk);
+            grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
+            grid.height = `${Math.round(rowsMm.reduce((a, b) => a + b, 0) * 100) / 100}mm`;
+            sections.push(grid);
+        } else
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
         if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
