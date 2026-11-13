@@ -722,8 +722,10 @@ function judge(cells, where, F, role) {
         // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
         // pixels with PT-MOD-3; here a model state is judged under and above its ink only)
         const bands = [['under', c.belowMm], ['between the blocks of', role === 'scripted-model' ? 0 : c.betweenMm], ['above', aboveJ]];
-        // a CENTRED cell (centreMm > 0): its white above + under is one band (lf-builds chart_120 fix, backtest eb-centred-band)
-        if (c.centreMm > 0) bands.push(['around (above + under)', (c.belowMm || 0) + (c.aboveMm != null ? aboveJ : Math.max(0, c.centreMm - pad))]);
+        // a CENTRED cell (centreMm > 0): the row's stretch above its flow (centreMm, measured inside the padding, so the top pad
+        // and the letter label's rows are never in it) + the white under its ink is one band (lf-builds chart_120 fix, backtest
+        // eb-centred-band). The pixel band above is NOT used here: it runs over the label's rows, which a critic's scan inks.
+        if (c.centreMm > 0) bands.push(['around (above + under)', (c.belowMm || 0) + c.centreMm]);
         for (const b of bands) b[1] = Number(b[1]) || 0;   // (a fixture cell may lack a band: undefined broke the sort)
         bands.sort((a, b) => b[1] - a[1]);
         const [where2, band] = bands[0];
