@@ -249,3 +249,55 @@ no -props commit has been run against them; cc-title / cc-title-cbt still need t
   not read before the budget stop.
 - EB-BAND rose on both skills after 932a9cda (the centring drop, owner rule CL-4b): a top-started cell in a row sized for a taller one
   now shows its band at the foot. The cure is the row sizing (step 2 / H13-ROW), not centring.
+
+## Round r4 (2026-11-13, fresh builder, Opus medium) - step 1 feasibility probe of lead ruling (a): STOPPED before building
+
+Brief: group the dealt items by height class (1-2 rows vs 3-5 rows) so a row never mixes them; fallback (b) only if the probe
+proves (a) cannot get the bands under 20 %. No code changed in r4. Logs and tools (outside the repo):
+/tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/props-r4/ (eb-before.json / .log: master's
+ws-empty-band on 8f0e93e2a; rows-before.json: every kit cell's page / top / height / needed height and the items' measured heights,
+pupil and key, from tools/rowprobe.cjs; model-ABCD.txt, model-B2.txt, spread-1.25.txt: the models below).
+
+### Before (8f0e93e2a, master's ws-empty-band, both skills, every card role S/M/L + 6 variants + hosts)
+EB-BAND 113, EB-FOOT 71, EB-SIDE 15 (mult_properties BAND 70 / FOOT 28 / SIDE 2 is the r3b figure; this run counts per skill:
+mult_properties independent L 26 BAND (16 of them `forms: 3` equation cells at 30.1 %), lesson 15 (12 = p2 Warm-up fact cells),
+scripted-model 15; arrays_groups scripted-model 12, opener 6, pre-skill-check 6).
+Every EB-FOOT on arrays_groups and on the default mult_properties pages is a PAIRING artefact, not a drawn-height defect: the
+drawn heights of a page are a permutation of its items' footprints (independent S: drawn 63,63,48,39,39,46,36,46 vs footprints
+48,39,39,63,63,46,36,46) - groupByHeight reorders the page, ws-empty-band pairs cells with buildSheet's items in deal order.
+
+### The model (per grid page: independent, more-practice, test, mixed-practice; band = (row H - cell's needed height) / row H)
+Inputs measured in the browser (rows-before.json); the rows recomputed in node (tools/model.js, model2.js):
+| Scenario | cells >= 30 % (EB-BAND) | cells > 20 % | worst |
+|---|--:|--:|--:|
+| A  now (measured) | 16 | 53 | 45 % |
+| B2 (a) regrouped by height class, each page's current row stretch kept | 16 | 53 | 41 % |
+| B  (a) regrouped, today's practice SPREAD (k <= 1.7, a row <= 1.7 x its shortest) | 40 | 79 | 41 % |
+| D  deal order kept, a `noStretch` row never past 1.25 x its shortest (ruling 2026-11-12 (b), which the SPREAD skips) | 3 | 18 | 39 % |
+| C  (a) + that 1.25 cap | 4 | 18 | 34 % |
+
+So (a) alone does not move the count (B2 = A) and with today's spread makes it worse (B): once a row holds one height class the
+spread stretches it fully. The bands have two causes, and (a) addresses only the smaller:
+1. ROW STRETCH (the larger): practice.js `spreadRows` (SPREAD_CAP 1.7) stretches a lone page's rows to fill it and checks only the
+   SECTION's `noStretch`, not the footprint's; arrays / arrays-turn / count-row are top-started (CL-4b), so every stretched row is
+   a foot band. Measured: mult_properties independent L rows at 1.45 x their tallest (63.8 / 72.8 mm in 105.8 mm; 81.8 + 81.8 in
+   118.9 mm: 31 % with no height mix at all), independent S / more-practice S at 1.28 x, more-practice L 1.37 x; guided M 1.47 x;
+   lesson Practice p3 1.21 x. These are rows of ONE class: no regrouping reaches them.
+2. MIXED ROWS (the smaller): boundary rows that remain when a page's class counts are odd (mult_properties S/M 47+61, 56+72;
+   arrays_groups test S 38+38+54, 48+48+63; mixed-practice L 53+80). A 2-column page with 3 short + 3 tall items always keeps one.
+
+Even C / D are not under 20 % everywhere: a `noStretch` row at 1.25 x its shortest leaves that item exactly 20 %, and 18 cells
+remain at 20-34 % on rows whose items differ by more than 1.25 x.
+
+### What fallback (b) needs (a per-page height spread cap of 1.25 x; tools/spread.js)
+74 of 240 array cells (31 %) on these pages sit outside the best 1.25 x window of their page: mult_properties 1-2 a page
+(spread 1.28-1.30 at S/M/L; review S/M 3 of 7, spread 1.61-1.65), arrays_groups 2-4 a page (spread 1.52-1.77; test S 7 of 12).
+A 1.25 cap would re-deal a third of the items, i.e. cut the easy or the hard end of the ladder off every page (arrays_groups:
+2-row arrays and 5-row arrays could no longer share a page). For EB-BAND's 30 % gate the cap that suffices is about 1.4 x.
+
+### Decision needed from the lead (not built, per the brief)
+- Honouring ruling 2026-11-12 (b) in the practice SPREAD (and the guided / lesson Practice stretch) for footprint `noStretch` cells
+  is the lever that moves EB-BAND (16 -> 3 cells >= 30 % on the grid pages modelled), independent of (a).
+- (a) on top adds nothing measurable (C 4 vs D 3) unless the boundary rows are avoided (leave a cell empty, or let the deal even
+  the class counts), which the "nothing dropped, same count" rule forbids.
+- Strictly under 20 % needs (b) at 1.25 x (a third of the items re-dealt, the ladder cut per page) or a row room under 1.25 x.
