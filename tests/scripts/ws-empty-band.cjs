@@ -81,7 +81,8 @@
 //             white under the grid may be up to 25 % of the page body (one-line in-place items; compare 2 columns at S, 24 %).
 //   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
 //             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
-//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
+//   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab), or a
+//             vocabulary cell 35 % or more white above + below its ink, to its drawn edge (see measureVocabCells).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
 // PIN (--baseline <file>, default design/audit/baselines/empty-band.json when it exists; --no-baseline for raw): the counts of
@@ -419,6 +420,30 @@ function measureModel(scope) {
 // less than 70 % of its own picture box, up and down or across (a picture of 4 ones drawn in a ten-rod's height left the
 // vocabulary cell 43 % empty above it). Reads every `.mq-lvpic-in svg` on the page: its drawn content (getBBox of its
 // children, scaled from the viewBox) against the svg's own box. Additive: absent the flag nothing is read.
+// EB-VOCAB cell (same flag; lf-placevalue checks pass 2026-11-13, critic r5 N-r5-2 / ledger line 21): the lesson's vocabulary CELL
+// (.mq-lvocabcell) that grew into the height another part freed - lesson.js capIfEmpty - leaves its white split above AND below
+// its ink, which no single-band rule sees (r5: 24 % the larger band, ~43 % in all by the critic's pixel rows). Read to the
+// cell's drawn edge (pads included, the critic's convention): white above + below the ink at or over 35 % of the cell fails (r5 38.5 %; the
+// lane's lessons on 2026-11-13 at most 32 %, placevalue:value S).
+function measureVocabCells(scope) {
+    const out = [];
+    const MM = 96 / 25.4;
+    [...document.querySelectorAll(scope)].forEach((rt, pi) => {
+        [...rt.querySelectorAll('.mq-lvocabcell')].forEach((c, i) => {
+            const cr = c.getBoundingClientRect(); if (!cr.height) return;
+            let t = Infinity, b = -Infinity;
+            for (const d of c.querySelectorAll('*')) {
+                const ink = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img)$/i.test(d.tagName);
+                if (!ink) continue;
+                const r = d.getBoundingClientRect(); if (!r.height) continue;
+                t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+            }
+            if (t === Infinity) return;
+            out.push({ page: pi + 1, cell: i + 1, hMm: +(cr.height / MM).toFixed(1), aboveMm: +((t - cr.top) / MM).toFixed(1), belowMm: +((cr.bottom - b) / MM).toFixed(1), white: +(((t - cr.top) + (cr.bottom - b)) / cr.height).toFixed(3) });
+        });
+    });
+    return out;
+}
 function measureVocab(scope) {
     const out = [];
     [...document.querySelectorAll(scope)].forEach((rt, pi) => {
@@ -543,6 +568,9 @@ async function main() {
                     // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
                     if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
                         if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
+                    }
+                    if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocabCells, 'body > section.ws-page, body > .ws-page')) {
+                        if (v.white >= 0.35) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab cell ${v.cell}`, `${Math.round(v.white * 100)} % of the ${v.hMm} mm vocabulary cell is white above (${v.aboveMm} mm) and below (${v.belowMm} mm) its ink, to its drawn edge (limit 35 %: the cell grew into freed height, critic r5 N-r5-2)`);
                     }
                     // EB-FOOT: each cell against ITS OWN item(s) by the kit's data-eb-item (critic eb-r5 m1); fallbacks are notes
                     const m = (b.measured || []).map((x) => (x && Object.keys(x).length ? x : null));
