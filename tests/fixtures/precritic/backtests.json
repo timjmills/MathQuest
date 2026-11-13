@@ -3394,6 +3394,8 @@
    "commit": "709605bb",
    "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
   },
+  "pending": true,
+  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
   "expect": {
    "fail": "FAIL",
