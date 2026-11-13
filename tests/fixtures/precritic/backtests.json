@@ -7384,6 +7384,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-r6-empty-part",
+   "check": "A lesson Practice or Mixed page that prints no item fails the build read (PC-BUILD), whatever --rules asks",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PC-BUILD empty part; r6 builder own build",
+   "browser": true,
+   "fail": {
+    "commit": "97947d45c",
+    "state": "every lesson Mixed page printed empty (placePick took the pool for its count) and the 8-seed PG-LR6 run passed"
+   },
+   "pass": {
+    "commit": "baed9bc06",
+    "state": "placePick called with the count; the gate reads the pages"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules PG-LR6",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

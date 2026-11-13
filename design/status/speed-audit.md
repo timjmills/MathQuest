@@ -1124,6 +1124,8 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Lost time: the merge's `git stash` (to run master's unit gate in place) dropped MERGE_HEAD; the merge commit was rebuilt from the resolved tree. Speed-up: compare against a detached master worktree (MQ_ROOT), never stash mid-merge. | | | | |
 | Lost time: running EVERY rule on --all-lessons surfaced ~90 reds, most master's (LIVE-PART 40, PM-H13 18, vocab PM-FOOT / PM-CONT); a master run of the same rules was needed to attribute them (~25 min). Speed-up: when a rule joins a wider scope, run it on master's tree first (MQ_ROOT) and diff the two lists. | | | | |
 | Lost time: two passes at the one-line-row growth cap (a 12 mm guess, then the measuring cell's worst gap) before using the measured content height; the H13 reading sees ~8 mm of ink in a 22 mm row. Speed-up: compute a growth cap from what the gate measures (the same boxes), never from padding. | | | | |
+| Lost time: an engine edit printed every Mixed page empty and a quick rule-scoped run passed it; caught only by PM-FOOT's 100 % feet in the full queue (~25 min). Speed-up: a dealing rule never passes on an empty page (PC-BUILD always counted); after an engine edit, look at one rendered page before any gate. | | | | |
+| Lost time: the owner's S drop and a second master merge mid-round (lesson part settings) - the M,L master pin re-written (~15 min) and every gate re-run at M,L. Speed-up: none on the lane's side; merge master again just before the gates. | | | | |
 
 ### Lane lf-vocab r14 (2026-11-13)
 | Round | What was lost | Cause | Fix |
