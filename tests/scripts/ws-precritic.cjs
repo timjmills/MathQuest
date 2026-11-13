@@ -930,6 +930,9 @@ function buildPlan(ctx) {
         // (lf-algebra, lead ruling R1 2026-11-13: multi_step_word (Visual) practice pages hold the card's ruled capacity S 2 / M 1 / L 1
         // with no cell stretched past a 30 % band under its work; browser, OK (n/a) without multi_step_word)
         add(gate('two-step-print', 'ws-two-step --print (CAP-BAND: (Visual) capacity S 2 / M 1 / L 1, no 30 % band on independent / more-practice / test)', scope, 'browser', 'ws-two-step', ['--print', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        // (lf-algebra r13, precritic two-step r12 EB-ROLE / lead ruling D: the Error analysis page composes on every two-step skill
+        // at M / L - a wrong answer that does not fit the box made the role refuse two_step_add_then_div; browser, OK (n/a) off the card)
+        add(gate('two-step-ea', 'ws-two-step --ea (EA-COMPOSES: Error analysis composes on every two-step skill at M / L)', scope, 'browser', 'ws-two-step', ['--ea', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
         // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
         add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));

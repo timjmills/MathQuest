@@ -7591,6 +7591,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-ea-composes",
+   "check": "ws-two-step --ea EA-COMPOSES: the Error analysis page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an item",
+   "kind": "commit-pair",
+   "rule": "ws-two-step --ea (lf-algebra precritic two-step r12: EB-ROLE / ws-fixit-words on two_step_add_then_div; lead ruling D 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "698e2da97",
+    "state": "the ÷-last wrong operation (14 ÷ 2 read as 14 × 2 = 28) does not fit the one-digit quotient box: every add_then_div item is rejected and buildSheet refuses the skill"
+   },
+   "pass": {
+    "commit": "962887ce5",
+    "state": "wordWorkWrong gives the ÷-last story a wrong that fits the box (M-TS4 at Step 1 or M-TS3 a story number into Step 2) and the cell draws that work"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --ea --skill algebra:two_step_add_then_div",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
