@@ -2,7 +2,7 @@
  "about": "ws-node-lint pinned FINDING KEYS per skill (IMPROVEMENT_PLAN §1.4 S2; critic r1 D5). A key is rule|kind|#item|signature: the dealt item (seeded by hashSeed(category:skill) + index, so stable) and the normalised offending text. A run FAILS on any key not listed here, even when a pinned finding of the same skill and rule was fixed in the same change, and lists the pinned keys it no longer finds. Re-pin with node tests/scripts/ws-node-lint.mjs --write-baseline (a --skill / --category / --rules run merges into this file); never add a key by hand.",
  "format": "keys-v2",
  "key": "rule|kind|#item|signature",
- "generated": "2026-10-25",
+ "generated": "2026-11-07",
  "n": 30,
  "page": 12,
  "rules": [
@@ -16,7 +16,7 @@
  "skills": 716,
  "totals": {
   "NOTATION": 6407,
-  "L1": 90,
+  "L1": 91,
   "L3": 5,
   "L6": 111,
   "L10": 10,
@@ -7382,6 +7382,9 @@
    "NOTATION|minus|#30|6 -",
    "NOTATION|minus|#6|6 -",
    "NOTATION|minus|#9|6 -"
+  ],
+  "vocabulary:vocab_grade_pictures": [
+   "L1|grid|#1|S-not-more"
   ]
  }
 }

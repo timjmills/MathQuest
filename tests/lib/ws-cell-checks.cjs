@@ -177,6 +177,22 @@ function cellChecksInPage(opts) {
                     if (sig(boxes[0]) === sig(boxes[1])) out.findings.push({ rule: 'RI-DISTINCT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': panels A and B show the same work (PT-RSN-4: two different worked solutions)' });
                 }
             }
+            // ---- ABTAG (critic r6g): a Reason It panel's A / B tag stands clear of the work's ink - 2 mm at least where they share rows
+            if (role === 'reason-it') {
+                c.querySelectorAll('.mq-abbox').forEach(function (bx) {
+                    var tg = bx.querySelector('.mq-abtag'); if (!tg) return;
+                    var tr = tg.getBoundingClientRect(), hit = '';
+                    [].forEach.call(bx.querySelectorAll('*'), function (e) {
+                        if (hit || e === tg || tg.contains(e) || !shownEl(e)) return;
+                        var cs = getComputedStyle(e), own = [].some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
+                        var ink = own || (cs.borderTopStyle !== 'none' && parseFloat(cs.borderTopWidth) > 0) || /svg/i.test(e.tagName);
+                        if (!ink) return;
+                        var r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+                        if (r.top < tr.bottom - 0.5 && r.bottom > tr.top + 0.5 && r.left < tr.right + 2 * PX && r.right > tr.left) hit = (e.textContent || e.tagName).trim().slice(0, 12);
+                    });
+                    if (hit) out.findings.push({ rule: 'ABTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the A / B tag touches the work ("' + hit + '" within 2 mm)' });
+                });
+            }
             // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
             // so the single grey never reads as "trace me"
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {
@@ -186,9 +202,44 @@ function cellChecksInPage(opts) {
             var tg = c.querySelector('.mq-pupiltag');
             var sib = tg && tg.parentElement ? [].filter.call(tg.parentElement.children, function (e) { return e !== tg && e.getBoundingClientRect().height > 0; }) : [];
             if (tg && c.querySelector('.mq-pupil') && sib.length) {
-                var top = Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
-                var gap = top - tg.getBoundingClientRect().bottom;
-                if (gap > 8 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, 1.5-8 mm; critic r3 D6: 1 mm on the H T O heads read as one line)' });
+                // measured on INK (lead 2026-11-13, critic r4 n1): the top of the first text or drawing in the work, not its box (a
+                // stack's box starts with padding: the label floated 8 mm over the T O heads), from the label's text foot
+                var inkTop = Infinity;
+                // a text box's ink: its capitals (0.7 em) centred in the line box, not the line box's top (leading)
+                var capTop = function (node) {
+                    var o = [], tw = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+                    for (var n = tw.nextNode(); n; n = tw.nextNode()) {
+                        if (!n.nodeValue.trim() || !n.parentElement || n.parentElement.closest('.mq-pupiltag') || !shownEl(n.parentElement)) continue;
+                        var fs = parseFloat(getComputedStyle(n.parentElement).fontSize) || 0, rg = document.createRange();
+                        rg.selectNodeContents(n);
+                        [].forEach.call(rg.getClientRects(), function (r) { if (r.height > 0 && r.width > 0) o.push(r.top + Math.max(0, (r.height - 0.7 * fs) / 2)); });
+                    }
+                    return o;
+                };
+                sib.forEach(function (e) {
+                    capTop(e).forEach(function (t) { if (t < inkTop) inkTop = t; });
+                    e.querySelectorAll('svg, img, .ws-box, .ws-line, .ws-check').forEach(function (g) { var r = g.getBoundingClientRect(); if (r.height > 0 && shownEl(g) && r.top < inkTop) inkTop = r.top; });
+                    // a drawn box edge is ink too (a count row's train boxes are bordered divs)
+                    e.querySelectorAll('*').forEach(function (g) { var cs = getComputedStyle(g); if (cs.borderTopStyle !== 'none' && parseFloat(cs.borderTopWidth) > 0) { var r = g.getBoundingClientRect(); if (r.width > 0 && r.height > 0 && shownEl(g) && r.top < inkTop) inkTop = r.top; } });
+                });
+                var tfs = parseFloat(getComputedStyle(tg).fontSize) || 0;
+                // the label's foot: its baseline, about 0.2 em over the line box's bottom
+                var tagFoot = Math.max.apply(null, rectsOfText(tg).map(function (r) { return r.bottom - Math.max(0, (r.height - 0.7 * tfs) / 2); }).concat([tg.getBoundingClientRect().top]));
+                var top = isFinite(inkTop) ? inkTop : Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
+                // 2-4 mm (lead) with 0.5 mm for the cap-height estimate of the ink edge
+                var gap = top - tagFoot;
+                if (gap > 4.5 * PX || gap < 1.8 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
+            }
+            // ---- KEYFIT (lf-roles r10): a key's written answer stays inside its slot - "hundreds" on a 2-digit line ran past it
+            if (isKey) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    if (s.querySelector('[data-ws-slot]') || s.getAttribute('data-ws-shape') === 'open' || !shownEl(s)) return;
+                    var sr = s.getBoundingClientRect();
+                    if (!sr.width) return;
+                    var tr = rectsOfText(s, '.mq-slottag');
+                    var wide = tr.some(function (r) { return r.left < sr.left - 1.5 || r.right > sr.right + 1.5; });
+                    if (wide) out.findings.push({ rule: 'KEYFIT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + (s.textContent || '').trim().slice(0, 20) + '" past its slot (an answer never leaves its line or box)' });
+                });
             }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
@@ -202,6 +253,38 @@ function cellChecksInPage(opts) {
             }
         });
     });
+    // ---- EA-PAD (critic r5 D1, CL-8): an Error Analysis cell keeps its 3 mm padding - no label, work or fix box within 2.5 mm of
+    // the cell's left or right rule (the number tag excepted)
+    if (role === 'error-analysis') {
+        pages.forEach(function (pg, pi) {
+            [].forEach.call(pg.querySelectorAll('.ws-cell'), function (c, ci) {
+                var j = c.querySelector('.mq-judge'); if (!j) return;
+                var cr = c.getBoundingClientRect(), lo = Infinity, hi = -Infinity;
+                [].forEach.call(j.querySelectorAll('*'), function (e) { var r = e.getBoundingClientRect(); if (!r.width || !r.height || !shownEl(e) || e.closest(LABEL)) return; if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right; });
+                if (isFinite(lo) && (lo - cr.left < 2.5 * PX || cr.right - hi < 2.5 * PX)) out.findings.push({ rule: 'EA-PAD', page: pi + 1, cell: ci + 1, msg: 'page ' + (pi + 1) + ' cell ' + (ci + 1) + ': the work / judgement comes ' + mm(Math.min(lo - cr.left, cr.right - hi)) + ' mm from the cell rule (CL-8: 3 mm padding)' });
+            });
+        });
+    }
+    // ---- EA-ROWX (critic r1-r3 R15): on an Error Analysis page every cell of one grid column starts its Correct / Fix it judgement at
+    // the same x (within 4 mm: a work a few mm wider shifts its centred group by half that - word forms drift 3.5 mm; R15 was a
+    // 31 mm jump between judgement modes) - the same task in two places reads as two tasks (AX-4, C1)
+    if (role === 'error-analysis') {
+        pages.forEach(function (pg, pi) {
+            var cols = {};
+            [].forEach.call(pg.querySelectorAll('.ws-cell'), function (c) {
+                var j = c.querySelector('[data-ws-slot="ea-judge"]');
+                if (!j) return;
+                var cr = c.getBoundingClientRect(), jr = j.getBoundingClientRect();
+                var key = Math.round(cr.left / PX);
+                (cols[key] = cols[key] || []).push(jr.left - cr.left);
+            });
+            Object.keys(cols).forEach(function (k) {
+                var xs = cols[k]; if (xs.length < 2) return;
+                var lo = Math.min.apply(null, xs), hi = Math.max.apply(null, xs);
+                if (hi - lo > 4 * PX) out.findings.push({ rule: 'EA-ROWX', page: pi + 1, cell: 0, msg: 'page ' + (pi + 1) + ': the Correct / Fix it judgement starts at ' + mm(lo) + '-' + mm(hi) + ' mm into the cells of one column (one place a page, critic R15)' });
+            });
+        });
+    }
     return out;
 }
 

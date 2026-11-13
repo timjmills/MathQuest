@@ -378,6 +378,8 @@ export const FROZEN_SKILL_CODES = {
     // ---- 2026-11-12 word-stories card presets (add_word_problems / sub_word_problems forms 3, 3, [4, 5]). ZH, ZJ, ZK, the
     // next free codes after ZG (no I or O in the alphabet). APPEND ONLY. ----
     "addition:add_wp_change_unknown": "ZH", "subtraction:sub_wp_change_unknown": "ZJ", "subtraction:sub_wp_compare_smaller": "ZK",
+    "vocabulary:vocab_grade_pictures": "VS",
+    "vocabulary:vocab_pick3_words": "VZ",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

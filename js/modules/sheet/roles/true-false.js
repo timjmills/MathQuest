@@ -34,7 +34,7 @@ export function prepare(it, info = {}) {
     const shown = isFalse ? wrong.value : correct;
     // the frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one line a part of a list ("12, 15, 18"), or no frame row
     // for a sentence answer (PAGE_TYPES 6.1 number blanks only); a one-value answer prints exactly as before
-    const place = answerPlace('tf-ans', correct, it);
+    const place = answerPlace('tf-ans', correct, it, wrong ? [wrong.value] : []);
     // PT-TOF-2: a True statement needs no correction, so its key leaves the frame empty (critic r1/r2 R5: the key filled it,
     // telling the teacher to expect writing a pupil was never asked for); a False one writes the true answer there
     const frameKey = isFalse ? place.slots : Object.fromEntries(Object.keys(place.slots).map((k) => [k, '']));

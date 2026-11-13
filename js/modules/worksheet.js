@@ -14,10 +14,11 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
+import { speakExplanation } from './hints-speech.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
 // worksheet/print modes can show the grid without the live widget. Blank
@@ -2593,6 +2594,7 @@ export function checkWorksheetAnswer(idx, settled) {
         // a second-try correct; a worksheet awards no per-item XP or streak, so it is recorded on the item)
         if (itemWasHelped(card)) q._helped = true;
         input.disabled = true;
+        try { markVocabFeedback(card, q, true); } catch (e) { /* optional */ }   // owner R-1 (lf-vocab r7)
         wsRecordAnswer(idx, true);
 
         if (!worksheetConfettiTriggered.has(idx)) {
@@ -2606,6 +2608,8 @@ export function checkWorksheetAnswer(idx, settled) {
         const lad = worksheetLadderWrong(idx, q, value);
         if (lad && (lad.wait || !lad.spent)) {
             if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); try { markMissingDigits(card); } catch (e) { /* optional */ } }
+            // owner R-2 (lf-vocab r7): a judged wrong vocabulary answer shows its explanation on every try, ladder or not
+            if (!lad.wait) { try { markVocabFeedback(card, q, false, { speak: speakExplanation }); } catch (e) { /* optional */ } }
             input.style.borderColor = "";
             input.style.background = "";
             card.style.background = "";
@@ -2619,6 +2623,8 @@ export function checkWorksheetAnswer(idx, settled) {
         card.style.border = "2px solid var(--incorrect)";
         markBoxSubmitted(input, false);
         try { markMissingDigits(card); } catch (e) { /* optional */ }   // Wave 1 / A3
+        // owner R-1 / R-2 (lf-vocab r7): the focal part, the right word and the explanation, read aloud once
+        try { markVocabFeedback(card, q, false, { speak: speakExplanation }); } catch (e) { /* optional */ }
         wsRecordAnswer(idx, false);
     }
 }
@@ -2673,6 +2679,7 @@ export function checkAllWorksheet() {
     let skipped = 0;
     let helped = 0;
     const totalAll = state.worksheetQs.length;
+    let vocabSpoken = false;
 
     state.worksheetQs.forEach((q, idx) => {
         const card = document.getElementById(`ws_card_${idx}`);
@@ -3112,10 +3119,15 @@ export function checkAllWorksheet() {
             card.style.border = "2px solid var(--incorrect)";
         }
 
+        // owner R-1 / R-2 (lf-vocab r7): shown on every vocabulary card; the first wrong one's explanation is read aloud, once
+        // (several at once would talk over each other)
+        try { markVocabFeedback(card, q, isCorrect, { speak: vocabSpoken ? null : (t) => { vocabSpoken = true; speakExplanation(t); } }); } catch (e) { /* optional */ }
         if (isCorrect) correct++;
         if (isCorrect && q._helped) helped++;
         wsLogProgress(q, card, isCorrect, _pre);
     });
+    // lf-vocab r12 (critic r11 #4): Check leaves no caret in any card's vocab slot, a card judged or not
+    try { blurVocabSlots(document); } catch (e) { /* optional */ }
 
     // Skipped problems are excluded from the denominator so percent reflects
     // only attempted answers. They're surfaced separately as "Skipped: N".

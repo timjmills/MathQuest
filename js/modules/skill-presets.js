@@ -166,6 +166,7 @@ export const SKILL_PRESETS = Object.freeze({
     // 2026-11-12 (owner, chartwindow card §9.1): the chart to 120 (every window across 100) is its own lesson
     // (Count on to 120); band 120 stays an option of hundreds_chart_fill.
     'composing:chart_to_120': { skill: 'hundreds_chart_fill', opts: { band: 120 } },
+    'vocabulary:vocab_pick3_words': { skill: 'vocab_grade_pictures', opts: { vocabTask: 'pick3' } },
 });
 
 /** The host a preset opens, or null when the pair is not a preset. */

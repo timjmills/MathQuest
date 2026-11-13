@@ -61,9 +61,11 @@ export const ROUTINES = Object.freeze({
             { id: 'right-to-left', text: 'The ones place is on the right.' },
         ],
         vocab: [
-            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 0, ones: 4, compact: true } },
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'vocab', id: 'digit' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
+            // (lf-vocab r8, owner O-2: 472 with one digit ringed / an H T O chart with one heading shaded / a ten beside its ones drawn
+            // round: four cubes alone read as four empty boxes, a 'place'; ws-vocab-unit V-AMBIG)
+            { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 1, ones: 4, ring: true } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
@@ -91,8 +93,8 @@ export const ROUTINES = Object.freeze({
         ],
         vocab: [
             { word: 'value', meaning: 'how much it is worth', picture: { kind: 'text', text: '6 → 600' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'vocab', id: 'digit' } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
@@ -117,7 +119,7 @@ export const ROUTINES = Object.freeze({
         vocab: [
             { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
             { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '7 → 70' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
         ],
         steps: [
             { icon: 'look', text: 'Hundreds digit: its value.' },
@@ -140,7 +142,7 @@ export const ROUTINES = Object.freeze({
         vocab: [
             { word: 'standard form', meaning: 'the number in digits', picture: { kind: 'text', text: '472' } },
             { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
         ],
         steps: [
             { icon: 'write', text: 'Hundreds: write the digit.' },

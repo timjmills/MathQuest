@@ -10578,6 +10578,20 @@
       "band": 999
      },
      "why": "choosing the word name of a number to 1,000: the same reading as a choice"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 5
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 5
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Domain-test build lesson (W02, NBT unit). number_word_form both ways to 1,000 (491 = four hundred ninety-one; fifty-four = 54) and expand {band:999} (578 = 500 + 70 + 8) deal all three forms 2.NBT.A.3 names."

@@ -234,7 +234,11 @@ export const MULTI_KEYS = Object.freeze({
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
     wordSet: '6A',       // vocabulary: the first N words of the skill's list (the core words)
     most: '6B',          // graphs: the largest count one bar / row / mark may show
-    // NEXT FREE IN BLOCK 6: 6C.
+    // lane lf-vocab (2026-11-07): vocabulary:vocab_grade_pictures
+    vocabTask: '6C',     // the picture task: match3 / pick3
+    vocabGrade: '6D',    // the grade of the words (1-4)
+    vocabSet: '6E',      // one BUILD lesson's word set (an index, append-only), or every word of the grade
+    // NEXT FREE IN BLOCK 6: 6F.
     // Wave 1 lane A (sub-range 6X-6Z, pupil practice): the calculator button and the Skip rule.
     calculator: '6X',    // every skill: show the pupil a calculator button (default off)
     skipAfter: '6Y',     // every skill: wrong tries before Skip appears (default 5, 0 = off)
@@ -314,6 +318,8 @@ export const VALUE_TOKENS = Object.freeze({
         // block 1 P10 time + money (`all` reuses A)
         find: 'F', order: 'O', collection: 'D', words: 'W', missing: 'I', numerals: 'U', hands: 'B' }),
     zeroPlace: Object.freeze({ none: 'N', some: 'S', always: 'A' }),
+    // lane lf-vocab (2026-11-07)
+    vocabTask: Object.freeze({ match3: 'M', pick3: 'P' }),
     answerSlot: Object.freeze({ line: 'L', hto: 'H' }),
     op: Object.freeze({ x: 'M', '/': 'D', both: 'B' }),
     order: Object.freeze({ largest: 'L', scrambled: 'S',
@@ -462,6 +468,8 @@ export const SCALAR_ONLY = Object.freeze({
     hours: 'decimal',
     // block 6 (O2 ladders)
     wordSet: 'decimal', most: 'decimal',
+    // lane lf-vocab (2026-11-07)
+    vocabGrade: 'decimal', vocabSet: 'decimal',
     // block 7: rows × 10 + order (31 … 52); a member support level 0-2
     ftTable: 'decimal', poolSupport: 'decimal',
     members: 'def-tokens',   // two base-36 characters per member: its position (skill-options-pools.js)
