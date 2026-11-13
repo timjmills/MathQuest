@@ -4,8 +4,8 @@
 // drawn as tall narrow strips of tiny dots (a 12 x 36 frame in a 720 px card); the screen critic listed "array dots small on
 // screen" only as an unscored note, and no machine check compared the screen drawing with the paper one.
 //
-// Rules, judged on every screen cell of every host (practice card 390 / 820 / 1280, online worksheet .mq-wspaper and quiz
-// .mq-qtpaper at 1280, as ws-empty-band renders them):
+// Rules, judged on every screen cell of every host (practice card 1280 / 1366 / 820 / 1024 - owner 2026-11-13, no phone
+// width; --widths 390 on request - online worksheet .mq-wspaper and quiz .mq-qtpaper at 1280, as ws-empty-band renders them):
 //   SIZE-INK    every repeated picture mark (dots, counters, base-10 blocks, cubes, tiles: SVG circle / ellipse / rect / use /
 //               path / polygon groups of >= 3 like marks, and HTML leaf marks of one class) is at least its PRINT size in CSS
 //               mm (1 mm = 96 / 25.4 px), with a 5 % tolerance. The print size is read off THE SAME ITEM on the Independent
@@ -318,9 +318,9 @@ function selfTest() {
     eq('ref nearest count', matchRef({ sig: '', kind: 'array' }, { mark: 'circle', n: 90 }, prints), { printMm: 1, how: 'nearest print drawing' });
     eq('ref none', matchRef({ sig: '', kind: 'tiles' }, { mark: 'rect', n: 5 }, prints), null);
     // D5: the pin keys on the mark name and its size bucket and holds the worst %
-    const f = (pct, name = 'dot (array)', bucket = '1.5-2.5 mm') => ({ where: 'a:b {defaults} card 390px', rule: 'SIZE-INK', name, bucket, pct });
+    const f = (pct, name = 'dot (array)', bucket = '1.5-2.5 mm') => ({ where: 'a:b {defaults} card 820px', rule: 'SIZE-INK', name, bucket, pct });
     const pin = pinOf([f(90), f(92)]);
-    eq('pin entry', pin['a:b {defaults} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm'], { n: 2, worst: 90 });
+    eq('pin entry', pin['a:b {defaults} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm'], { n: 2, worst: 90 });
     eq('pin holds', judgePin(pin, [f(90), f(93)]).length, 0);
     eq('pin rounding slack', judgePin(pin, [f(89)]).length, 0);
     eq('pin worse 90 -> 50 fails', judgePin(pin, [f(50)]).map((o) => o.why), ['worst 50 % < 90 % pinned']);
@@ -374,9 +374,9 @@ function selfTest() {
     const lines = findingLines([fa, fb], judgePin(pin, [fa, fb]));
     eq('lines: pinned / OVER prefixes', lines.map((l) => l.slice(0, 6)), ['pinned', 'OVER  ']);
     eq('lines: no pin -> every line OVER', findingLines([fa], null).map((l) => l.slice(0, 6)), ['OVER  ']);
-    const pin2 = Object.assign({}, pin, { 'x:y {defaults} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm': { n: 7, worst: 80 } });
-    eq('totals: the keys judged here only', pinScope(pin2, new Set(['a:b {defaults} card 390px']), [fa]), { keys: 1, findings: 2, cleared: 0 });
-    eq('totals: a judged key with no finding now is clear', pinScope(pin2, new Set(['a:b {defaults} card 390px', 'x:y {defaults} card 390px']), [fa]), { keys: 2, findings: 9, cleared: 1 });
+    const pin2 = Object.assign({}, pin, { 'x:y {defaults} card 820px|SIZE-INK|dot (array)|1.5-2.5 mm': { n: 7, worst: 80 } });
+    eq('totals: the keys judged here only', pinScope(pin2, new Set(['a:b {defaults} card 820px']), [fa]), { keys: 1, findings: 2, cleared: 0 });
+    eq('totals: a judged key with no finding now is clear', pinScope(pin2, new Set(['a:b {defaults} card 820px', 'x:y {defaults} card 820px']), [fa]), { keys: 2, findings: 9, cleared: 1 });
     // D5: the committed sweep report agrees with the committed pin (totals and every key's row)
     const sweepFile = path.join(ROOT_DIR, 'design/status/lf-checks/screen-ink-size-sweep.md');
     const pinFile = path.join(ROOT_DIR, 'design/audit/baselines/screen-ink-size.json');
@@ -675,7 +675,7 @@ function sweepReport({ skills, findings, notes, renders, secs, pinFile, pin, ser
     L.push(`- **Commit:** ${servedAt} (the tree served and judged).`);
     L.push(`- **Pin:** \`${pinFile}\`: **${keys.length} keys, ${total} findings** (key = skill {option} host width | rule | mark name | size bucket; each holds its count and worst %).`);
     L.push(`- **Wiring:** ${wired.join('; ')}.`);
-    L.push(`- **Scope:** ${skills.length} skills, each with its defaults and every value of its supports-model \`support\` option; card 390 / 820 / 1280 (print items 0-2), worksheet 1280, quiz 1280 (print items 0-1): ${renders} renders, ${secs} s.`);
+    L.push(`- **Scope:** ${skills.length} skills, each with its defaults and every value of its supports-model \`support\` option; card 1280 / 1366 / 820 / 1024 (print items 0-2), worksheet 1280, quiz 1280 (print items 0-1): ${renders} renders, ${secs} s.`);
     L.push(`- **Result:** ${findings.length} findings on ${new Set(findings.map((x) => x.where.split(' ')[0])).size} skills. Nothing was fixed (report only).`, '');
     L.push('Rules: SIZE-INK (a mark >= 95 % of the same item\'s print size; a worksheet item also matched with the print cell of the item it dealt; a pattern term by its unit), SIZE-REF (a mark with no print counterpart), SIZE-WIDTH (ink width < 60 % of the free width and taller than wide; pattern terms exempt), TEXT-SIZE (a label >= its print size and >= 8 pt; non-slot digit text >= the digit floor: card / quiz 40 / 48 / 56 px, worksheet 29 px, count row on a phone 29 px).', '');
     L.push('## Skills hit, per rule', '', '| Rule | Skills |', '|---|---|');
@@ -702,7 +702,9 @@ async function main() {
     const SIZE = arg('size', 'M');
     const HOSTS = arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim()).filter(Boolean);
     const WIDTHS = arg('widths', null) ? arg('widths').split(',').map(Number) : null;
-    const hostWidths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
+    // owner 2026-11-13: no phone width. The card at 1280 / 1366 / 820 / 1024 by default; --widths picks widths (390 included,
+    // on request) and, as before, also filters the worksheet and quiz (1280 only)
+    const hostWidths = { card: WIDTHS || require('../lib/ws-screen-widths.cjs').SCREEN_WIDTHS, worksheet: [1280], quiz: [1280] };
     const SKILLS = has('passed') ? passedIds() : (arg('skill', '') || arg('skills', '')).split(',').map((s) => s.trim()).filter(Boolean);
     const HTML = arg('html', null);
     if (!HTML && !SKILLS.length) { console.error('usage: --skill cat:skill[,...] | --passed | --html file | --self-test'); process.exit(2); }
@@ -766,7 +768,7 @@ async function main() {
                 } finally { await sh.close(); }
                 // ---- screen hosts: the card deals print items 0-2, the quiz items 0-1 (the same seed and itemIndex)
                 for (const host of HOSTS) for (const w of (hostWidths[host] || []).filter((x) => !WIDTHS || WIDTHS.includes(x))) {
-                    await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
+                    await page.setViewport({ width: w, height: w < 500 ? 844 : (w === 1366 || w === 1024) ? 768 : 900, deviceScaleFactor: 1 });
                     const runs = host === 'card' ? [0, 1, 2] : [0];
                     for (const i of runs) {
                         const scope = await page.evaluate(({ c, k, host, s, i, opts }) => {

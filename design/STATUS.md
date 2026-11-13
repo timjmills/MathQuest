@@ -811,3 +811,13 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Per-part settings for lessons, practice and quiz: how many problems per part and which supports, with the screen only offering settings the page checks pass. Default identity: all 1,732 default lesson pages byte-identical to master.
 - Gates: boot-smoke, code-snapshot, redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, capacity-pin, roles-unit, precritic-plan (none dropped), conflict-markers.
 - 2026-11-13 ~18:45 UTC owner: drop print size S; keep M and L (plan item 9 in CLAUDE.md). S settings / codes fall back to M.
+
+## 2026-11-13 — Deploy-6: shared roles Guided round (lf-roles, critic r8b + r8c PASS)
+- Guided Practice: the 7 subtraction stack skills at M/L; expand M/L, unit_form M/L, combine L (9/8/9/8-9). Tight rows refilled, side band capped, Model-height try rows fixed; each finding has a check + backtest row.
+- Capacity pin now covers every grid role (r17); SIZE-ORDER compares M >= L only (size S dropped).
+- Gates: conflict-markers, stamp, boot-smoke, code-snapshot (734), redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, vocab-unit, roles-unit (87), backtest + empty-band self-tests, capacity-pin (1178 pages, 0 drops), precritic-plan (189 rows), checks-from-critics; 1732 lesson hashes identical.
+
+## 2026-11-13 — Deploy lf-tools (lf-checks): no phone width (critic r3 PASS 8/8/9/8) + review tools with copy-light ADVISORY
+- Screen gates, briefs and RUBRIC hosts run at 1280 / 1366 / 820 / 1024 (owner rule); ws-no-phone-width on precritic. Teacher phone steps stay allow-listed (lead added the teacher lesson-parts panel in ws-partopts-shots).
+- Copy-light sample / batch / --sample render / brief lint / ws-drawing-key; eligibility is ADVISORY (every skill still gets the full critic).
+- Gates: conflict-markers, boot-smoke, code-snapshot (734), backtest self-test, precritic self-test, precritic-plan (193), checks-from-critics, no-phone-width, copy-light self-test. No app code changed.
