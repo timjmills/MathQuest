@@ -241,6 +241,10 @@ export const ROUTINES = Object.freeze({
         // (a count-by row is a full-width drawing - two lines of six numbers: the anchor chart's panels one column, the step's
         // words under the row, LESSONS L11; in a half-page panel the row shrank its boxes to 2.6 mm, print-lint TY-12)
         chartWide: true,
+        // (the closing step - every gap filled, each jump checked - is the line under the panels, not a fourth panel: four
+        // full-width rows with the times labels under them - option times each / given, 15 jumps - ran past the page, ws-cell-checks
+        // OVERFLOW 16-18 on the lesson chart)
+        tailLast: true,
         casesPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): written from the count-row card (signed 2026-11-12) and the provider steps; its cases are declared when the lesson is carded (lessons-first).',
         concepts: [
             { id: 'jump', text: 'Every jump is the same size: the number in the box.' },
