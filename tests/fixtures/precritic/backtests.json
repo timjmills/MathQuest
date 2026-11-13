@@ -8001,6 +8001,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "screen-digit-worksheet-floor",
+   "check": "SCREEN-DIGIT holds the online worksheet to the shared table's 29 px floor (tests/lib/ws-screen-widths.cjs), not the card's 56 / 48: a 29 px worksheet numeral passes, 28 px still fails (lead ruling 2026-11-13 21:21 a; the ratchet pin design/audit/baselines/screen-digit-ratchet.json is proved by the --self-test case 'worksheet ratchet')",
+   "kind": "fixture",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (worksheet floor)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-28.html",
+    "state": "expand's worksheet sentence at 28 px, Andika 700: under the 29 px floor"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-digit/worksheet-29.html",
+    "state": "the same at 29 px: the worksheet floor, passes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --digit-fixture {fixture} --viewport 1280 --host worksheet",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-no-numeral-skip",
+   "check": "SCREEN-DIGIT SKIPS a screen cell with no numeral (a number-name skill's card or quiz) instead of failing it 'no numeral found' (lead ruling 2026-11-13 21:21 b). Each state runs its OWN ws-screen-slots on the same fixture: the ruling changes the check",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (no numeral: SKIP)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form's card (the name 'twenty-six', no numeral): 'no numeral found in the cell' FAIL"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "SKIP no numeral, OK"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --digit-fixture tests/fixtures/precritic/screen-digit/no-numeral.html --viewport 1280",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-digit-worksheet-chrome",
+   "check": "SCREEN-DIGIT never reads the worksheet card's chrome (the number badge .mq-wsbar, Nunito 16 px; the hint popup) as the item's numeral (lead ruling 2026-11-13 21:21 d: number_word_form's worksheet 'the numeral \"1\" is 16 px, font Nunito' was the badge). Each state runs its OWN ws-screen-slots on the live app",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (chrome excluded)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "number_word_form worksheet@1280 / 1366 / 820 / 1024: the badge '1' 16 px Nunito; card / quiz 'no numeral found'"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": ".mq-wsbar / .hint-popup excluded, a cell with no numeral SKIPPED: 0 misses"
+   },
+   "command": "node {root}/tests/scripts/ws-screen-slots.cjs --skills composing:number_word_form --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-card-numeral",
+   "check": "placevalue:expand's practice card sets its number sentence at the card's digit floor (56 / 48 px at 1280-1366 / 820-1024), bold, every operator with its box (lead ruling 2026-11-13 21:21 c: 24 px regular)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots --screen-digit SCREEN-DIGIT (card)",
+   "browser": true,
+   "fail": {
+    "commit": "02e15cbe",
+    "state": "expand card@1280 '552 =' 24 px weight 400 (and 22 / 20 px at the narrower widths)"
+   },
+   "pass": {
+    "commit": "37916f96",
+    "state": "question-render.js .mq-ibnum: 56 px Andika 700 at 1280, 48 at 820; worksheet 29, quiz 56: 0 misses"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills placevalue:expand --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
