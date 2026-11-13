@@ -5214,7 +5214,7 @@
  },
  {
   "id": "guided-tight-rows",
-  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its ink: no 30 % band under it (RUBRIC H13; lf-placevalue compare precritic r2 via the lead; re-pointed lf-roles r8a: lf-checks' pixel read found 34-37 % bands still on 8307219c, the rows sized with the measure's label keep-out)",
   "kind": "commit-pair",
   "rule": "ws-empty-band EB-BAND on guided",
   "browser": true,
@@ -5223,8 +5223,8 @@
    "state": "EB-BAND 2 on expand / unit_form / combine guided"
   },
   "pass": {
-   "commit": "8307219c",
-   "state": "EB-BAND PASS"
+   "commit": "ae8511168",
+   "state": "EB-BAND PASS (tries at most 26.4 %: keep-out dropped, try centred in its row)"
   },
   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
   "expect": {
@@ -6804,6 +6804,166 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "capacity-roles",
+  "check": "every role that draws a grid has pinned pages, so none sits outside CAPACITY-NO-DROP / SIZE-ORDER (lead 2026-11-13: Guided was, and printed fewer items at S than M on 12 passed pages)",
+  "kind": "fixture",
+  "rule": "ws-precritic-plan capacity-roles (ws-capacity-pin --roles-check)",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/capacity-roles.fail.json",
+   "state": "a pin with no guided page"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/capacity-roles.pass.json",
+   "state": "a page per grid role"
+  },
+  "command": "node tests/scripts/ws-precritic-plan.mjs --capacity-pin {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-span",
+  "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - a Guided page of narrow column stacks at S whose one-cell-Model grid the ceiling trims to Model + 7 lays the Model over two cells of row 1, its working beside it, and holds Model + 10 in 3 whole rows; at M the Model keeps one cell (lead ruling (e) 2026-11-13, lf-roles r8a)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-MODEL-SPAN",
+  "browser": false,
+  "fail": {
+   "commit": "a8303f6e4",
+   "state": "S page holds 8 cells, no two-cell Model"
+  },
+  "pass": {
+   "commit": "ae8511168",
+   "state": "S 11 cells, Model spans two with its working; M 9, one-cell Model"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-SPAN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-size-order-s",
+  "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - Guided SIZE-ORDER on the three subtraction stack pages: S prints at least as many items a page as M (lead 2026-11-13: S 8 < M 9 on sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d; fixed by the two-cell Model, ruling (e))",
+  "kind": "commit-pair",
+  "rule": "ws-capacity-pin SIZE-ORDER (guided)",
+  "browser": true,
+  "fail": {
+   "commit": "a8303f6e4",
+   "state": "3 x S 8 < M 9 items a page"
+  },
+  "pass": {
+   "commit": "ae8511168",
+   "state": "S 11 >= M 9"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --roles guided --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-stack-side",
+  "check": "the column-stack Guided pages of the 7 no-regroup subtraction skills pass ws-empty-band at S, M and L (lf-roles r8b via the lead: EB-SIDE 32.4 % at S / 31.7 % at M - a measured stack whose every offered grid left 30 % beside it now takes one column more; EB-BAND 34.8 % at L - stack cells centred; the Model spans the cells that complete the grid)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE / EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "ae8511168",
+   "state": "EB-SIDE 57 at S/M, EB-BAND 30 at L"
+  },
+  "pass": {
+   "commit": "85c322f50",
+   "state": "ws-empty-band OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --roles guided --hosts none --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-stack-side-unit",
+  "check": "a planted narrow column stack's Guided grid leaves under 30 % beside it, keeps S 11 / M 9 / L 6, fills every row and centres its cells (lf-roles r8b)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-STACK-SIDE",
+  "browser": false,
+  "fail": {
+   "commit": "ae8511168",
+   "state": "S 4 columns 32.4 %, M 3 columns 31.7 %, cells not centred"
+  },
+  "pass": {
+   "commit": "85c322f50",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-STACK-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-row",
+  "check": "a Model with worked lines under it never leaves the try beside it in a row stretched past what it fills to 70 % (lf-builds chart_to_120 Guided M / L EB-BAND 42 % / 36 %, lead via lf-roles r8b (a); verified on a worktree of e1389d1f3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-MODEL-ROW",
+  "browser": false,
+  "fail": {
+   "commit": "85c322f50",
+   "state": "the Model's row 124.7 / 124.9 mm beside a 61 mm try"
+  },
+  "pass": {
+   "commit": "4845f6b25",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-ROW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-row-wp",
+  "check": "the word-problem Guided S pages' first try no longer sits in the Model's stretched row (EB-BAND 40-42 % on add_wp / sub_wp row 1; the GUIDED-MODEL-ROW rule, lf-roles r8b (a))",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "85c322f50",
+   "state": "EB-BAND 40.4 % on add_wp_10 guided S cell 2"
+  },
+  "pass": {
+   "commit": "4845f6b25",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10,subtraction:sub_wp_10 --roles guided --sizes S --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-tight-refill",
+  "check": "a one-page Guided page whose next whole row of tries stays within the §12.1 ceiling never leaves a drawn try row white under its grid: the fit counts tightRows rows at their drawn height (lf-roles critic r8b D1: expand / unit_form M 6 tries with 42-54 mm under the grid, L 5; combine L 5)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-REFILL (GUIDED-TIGHT-REFILL)",
+  "browser": true,
+  "fail": {
+   "commit": "e62f1da34",
+   "state": "EB-REFILL 5 (expand M/L, unit_form M/L, combine L)"
+  },
+  "pass": {
+   "commit": "6cfa329ee",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --sizes M,L --hosts none --no-baseline --only EB-REFILL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }
