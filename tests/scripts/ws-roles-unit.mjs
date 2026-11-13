@@ -46,7 +46,7 @@
 //   OPENER-SPILL a two-step story whose Model runs out of the half-width Model cell (measured fits:false at 2 columns) takes the
 //                full width (PT-OPN-4), and when the Model and its Guided row cannot share the page (135 + 135 mm at M) the Guided
 //                row and the Independent rows go to page 2 - never a page over its budget (lf-roles r9 item 2: Opener OVERFLOW /
-//                EB-EDGE at M / L).
+//                EB-EDGE at M / L). PT-OPN-10: page 2's continuation header names its part(s), "Guided Practice" / "Your turn".
 //   RI-TWOSTEP   a two-step column story on Reason It prints its story once and stands A over B at the cell's full width (its
 //                step columns are 107-115 mm, wider than half the cell: side by side they ran out of it; r9 item 3, OVERFLOW).
 //
@@ -535,6 +535,12 @@ if (on('OPENER-SPILL')) {
             if (/taller than the page budget/.test(notes)) findings.push(`OPENER-SPILL ${size}: the Model and Guided bands run over the page budget (${pl.pages.length} page(s)) - OVERFLOW`);
             const mb = (pl.pages[0].sections || []).find((x) => x.kind === 'band' && x.label === 'Model:') || ((pl.pages[0].sections || []).find((x) => x.kind === 'row') || { parts: [] }).parts.find((x) => x.label === 'Model:');
             if (mb && (pl.pages[0].sections || []).some((x) => x.kind === 'row' && x.cls === 'mq-modelrow')) findings.push(`OPENER-SPILL ${size}: a Model measured over the half-width cell stays in the 93 mm Model zone`);
+            // PT-OPN-10 (lead 2026-11-13, r9): the spill page's continuation header names the part(s) it holds
+            if (pl.pages.length > 1) {
+                const t = String((pl.pages[1].header || {}).title || '');
+                const hasInd = (pl.pages[1].sections || []).some((x) => x.label === 'Independent Practice:');
+                if (!/Guided Practice/.test(t) || (hasInd && !/Your turn/.test(t))) findings.push(`OPENER-SPILL ${size}: page 2's header says "${t}" - it must name its part(s): "Guided Practice"${hasInd ? ' and "Your turn"' : ''} (PT-OPN-10)`);
+            }
         } catch (e) { findings.push(`OPENER-SPILL ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
 }

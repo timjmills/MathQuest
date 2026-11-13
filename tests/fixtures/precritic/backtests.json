@@ -7044,6 +7044,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lone-page-ruled",
+  "check": "ws-cell-checks LONE-PAGE reads design/audit/baselines/capacity.json `ruled`: a page ruled to hold 1 (the two-step Reason It pairs, multi_step_word test M / L; lead 2026-11-13 r9) passes with a note; an unruled lone page still FAILs",
+  "kind": "fixture",
+  "rule": "ws-cell-checks LONE-PAGE (ruled capacities)",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/lone-page/unruled.fail.json",
+   "state": "no ruling: one item a page where Reason It holds 3 - LONE-PAGE"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/lone-page/ruled.pass.json",
+   "state": "ruled 1: passes, the note names the ruling"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --lone-page-probe \"algebra:multi_step_word reason-it M\" --ruled {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

@@ -16,6 +16,7 @@
 //   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --words-rules [--rule-skills k]  # + the number-name rules
 //                                          CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y (opt-in, critic nwf r1)
 //   node tests/scripts/ws-cell-checks.cjs --self-test              # planted pages, each rule must fire / stay quiet
+//   node tests/scripts/ws-cell-checks.cjs --lone-page-probe "cat:skill role SIZE" [--ruled capacity.json]   # LONE-PAGE ruling probe
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows); the card plan is read from that tree.
 // Last line `ws-cell-checks: OK (...)` / `FAIL - n finding(s) ...`; exit 1 on FAIL (--report-only: 0).
 const fs = require('fs');
@@ -47,6 +48,21 @@ const SIZES = list(arg('size', 'S,M,L'));
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const optsKey = (o) => (o ? JSON.stringify(o) : '');
+
+// LONE-PAGE ruled capacities (lead 2026-11-13, r9): a page the lead ruled to hold fewer (design/audit/baselines/capacity.json
+// `ruled`, key "cat:skill role SIZE") passes LONE-PAGE with a note when it prints at least its ruled count; every other lone page
+// still fails. --ruled <file> reads another table (the backtest's fixtures).
+const RULED_FILE = path.resolve(arg('ruled', path.join(__dirname, '..', '..', 'design', 'audit', 'baselines', 'capacity.json')));
+let RULED = {};
+try { RULED = JSON.parse(fs.readFileSync(RULED_FILE, 'utf8')).ruled || {}; } catch (e) { RULED = {}; }
+const ruledNotes = [];
+/** The LONE-PAGE finding of a page printing `perPage` where its role holds `ceiling` ([] when none, or when ruled). */
+function lonePage(key, perPage, ceiling) {
+    if (!(Number(perPage) === 1 && Number(ceiling) >= 2)) return [];
+    const r = key && RULED[key];
+    if (r && Number(perPage) >= Number(r.items)) { ruledNotes.push(`${key}: ${perPage} item(s) a page, ruled ${r.items} (${r.reason})`); return []; }
+    return [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${ceiling} (H5)` }];
+}
 
 async function checkDoc(sheet, html, ctx) {
     await sheet.setContent(html, { waitUntil: 'load', timeout: 60000 });
@@ -102,6 +118,15 @@ function selfTest() {
         console.log(got.length ? `ws-cell-checks: FAIL - ${got.length} finding(s) on the fixture` : 'ws-cell-checks: OK (fixture, no finding)');
         await app.close();
         process.exit(got.length ? 1 : 0);
+    }
+    // --lone-page-probe "cat:skill role SIZE" [--ruled f]: LONE-PAGE on a planted one-item page of a role that holds 3 (no browser;
+    // the backtest's proof that a ruled page passes and an unruled one still fails)
+    if (arg('lone-page-probe', null)) {
+        const f = lonePage(arg('lone-page-probe'), 1, 3);
+        for (const n of ruledNotes) console.log(`  ruled ${n}`);
+        for (const x of f) console.log(`  FAIL ${x.rule} ${arg('lone-page-probe')}: ${x.msg}`);
+        console.log(f.length ? `ws-cell-checks: FAIL - ${f.length} finding(s) (LONE-PAGE probe)` : 'ws-cell-checks: OK (LONE-PAGE probe)');
+        process.exit(f.length ? 1 : 0);
     }
     if (has('self-test')) {
         const app = await H.open({});
@@ -175,8 +200,7 @@ function selfTest() {
             // LONE-PAGE (critic r6c / r6d D1, H5): a page that holds ONE item where its role's ceiling is 2 or more and 2 or more were
             // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
             // only the passed skills)
-            ...(Number(built.perPage) === 1 && Number(built.ceiling) >= 2
-                ? [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${built.ceiling} (H5)` }] : []),
+            ...lonePage(j.opts ? '' : `${j.k} ${j.role} ${j.size}`, built.perPage, built.ceiling),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
         runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
@@ -186,6 +210,7 @@ function selfTest() {
     await app.close();
     const by = {};
     for (const f of findings) by[f.rule] = (by[f.rule] || 0) + 1;
+    for (const n of ruledNotes) console.log(`  ruled ${n}`);
     for (const f of findings.slice(0, Number(arg('show', 60)))) console.log(`  FAIL ${f.rule} ${f.msg}`);
     const secs = Math.round((Date.now() - t0) / 1000);
     if (findings.length) console.log(`ws-cell-checks: FAIL - ${findings.length} finding(s) (${Object.entries(by).map(([k, v]) => `${k} ${v}`).join(', ')}) on ${runs.length} page(s), ${secs}s`);

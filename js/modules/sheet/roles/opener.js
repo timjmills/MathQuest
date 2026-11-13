@@ -96,7 +96,9 @@ function geometry(items, input, cap = {}) {
     // the Guided row - with the Independent rows that fit, each at the height it draws - goes to page 2 under the continuation
     // header (content never shrinks; PT-OPN-1's band order is kept across the two pages)
     if (modelFull && used > m.budget && halfOver) {
-        const m2 = bandMetrics(ctx, layoutHeader(frame.contHeader), { cont: true });
+        // (PT-OPN-10: page 2's continuation header names the part it holds - "Guided Practice", "Guided Practice and Your turn" - one
+        // title line, budgeted here)
+        const m2 = bandMetrics(ctx, layoutHeader(spillHeader(frame, true)), { cont: true });
         const p1 = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm;
         const lv1 = practice.every((it) => it.measured && it.measured[gc] && it.measured[gc].atLevel && Number(it.measured[gc].atLevel[1]) > 0)
             ? Math.max(...practice.map((it) => Number(it.measured[gc].atLevel[1]))) + 1 : gH;
@@ -130,6 +132,8 @@ function geometry(items, input, cap = {}) {
     return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used, stepPairs };
 }
 
+/** PT-OPN-10: the spill page's continuation header, titled with the part(s) it holds (lead ruling 2026-11-13, r9). */
+const spillHeader = (frame, yourTurn) => Object.assign({}, frame.contHeader, { title: yourTurn ? 'Guided Practice and Your turn' : 'Guided Practice', titleLines: 1 });
 const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
 const countRowFirst = (items) => !!(items[0] && items[0].template === 'count-row');
 
@@ -222,11 +226,16 @@ export function plan(input = {}) {
     // SPILL (lf-roles r9): page 2 holds the Guided row and the Independent rows, each row at the height it draws
     const page2 = [];
     if (g.spill) {
+        // (PT-OPN-10: each row as tall as the stories it PLACES - g.gH / g.iH are the tallest of the deal, spares included - so no
+        // cell is stretched; the white stays under page 2's last row)
+        const lv1 = (it) => { const m = it.measured && it.measured[g.gc]; const a = m && m.atLevel && Number(m.atLevel[1]); return a > 0 ? a + 1 : hMinAt([it], g.gc, ctx); };
+        const gCell = guided.length ? Math.min(g.gH, hMinAt(guided, g.gc, ctx)) : g.gH;
+        const iCell = indep.length ? Math.min(g.iH, Math.max(...indep.map(lv1))) : g.iH;
         page2.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
-            content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH, labels: 'none' }) });
+            content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: gCell, labels: 'none' }) });
         if (indep.length) {
             page2.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
-                content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.iH, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
+                content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: iCell, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
         }
     }
     if (!g.spill) sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
@@ -239,7 +248,7 @@ export function plan(input = {}) {
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
-    return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2 }] : [{ sections }], {
+    return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2, header: spillHeader(frame, indep.length > 0) }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
