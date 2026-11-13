@@ -5347,6 +5347,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r16-ebfoot-review-l",
+  "check": "EB-FOOT: the Match 3 cell at review L draws within 10 % of its footprint, with the r15 pin (97a5962d) removed from design/audit/baselines/empty-band.json: drawn 57.7 mm vs 50 mm (15 %) on the r15 head",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-empty-band EB-FOOT (lf-vocab r16 item 7)",
+  "fail": {
+   "commit": "7d720ad3",
+   "state": "lf-vocab r15 head, pin removed: 3 findings, drawn 57.7 mm vs footprint 50 mm"
+  },
+  "pass": {
+   "commit": "47100ca2",
+   "state": "the work grows to at most 50 mm at the top of the row; footprint L 48 mm"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles review --sizes L --hosts none --no-baseline --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
