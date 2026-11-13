@@ -3680,6 +3680,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "roles-ri-signmatch",
+  "check": "a Reason It wrong panel keeps the wrong answer's own operation (add_wp_10 printed '6 + 2 = 4'); lf-builds word-stories",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks SIGNMATCH",
+  "browser": true,
+  "fail": {
+   "commit": "6a1dce95",
+   "state": "SIGNMATCH on add_wp_10 / add_wp_10_plain Reason It S/M/L"
+  },
+  "pass": {
+   "commit": "7a463602",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
