@@ -249,3 +249,12 @@ Times: r8a, start 2026-11-13T13:45Z, end 2026-11-13T15:10Z, profile mq-opus-medi
   Hash vs r8a: 29 of 87 passed guided pages changed (the 7 subtraction skills' 17 pages; 8 word-problem S, vocab_pick3_words S,
   number_word_form S/M/L by the model-row rule); ws-lesson-baseline --all-lessons 1732 identical.
 Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8c (critic r8b D1; round cap: check first). GUIDED-TIGHT-REFILL = ws-empty-band EB-REFILL: a one-page Guided page
+  whose next whole row stays within the §12.1 ceiling fails when a drawn try row is white under its grid (FAIL 5 on e62f1da34:
+  expand M/L, unit_form M/L, combine L; no other passed M/L Guided page). Root cause fixed in the fit (sheetFitWith): a tightRows
+  page's plain try rows are counted at their drawn height (less koMm), as plan() draws them. expand / unit_form M 6 -> 8 tries,
+  L 5 -> 6; combine L 5 -> 6 (ceiling kept, M >= L). Hash: only those 5 M/L pages changed; lesson baseline 1732 identical.
+  Nits not taken (each would move a page the critic passed): n1 (working lines only on a spanning Model: sub_1k / sub_10k M) and
+  n2 (3-line cap drops "Check:" on sub_1k / sub_10k L).
+Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medium
