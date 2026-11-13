@@ -259,3 +259,15 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - arrays_groups on this tree: by-height pairing clears 3 renders. The remaining EB-FOOT findings are real (pages not sorted, or
     sizes that do not match), for lf-ops.
   - The --dump option was not taken (unreviewed convenience); lf-ops can propose it separately.
+
+### eb-r4 D1 rule-7 rebuild (fresh builder, Opus medium, 2026-11-13; resumed after a container restart), commit 0f1a0bda
+- (b) APP, css/screen-cell.css (additive): a kit LINE slot taken by the host input draws at 1.15em with its underline at the foot;
+  the 48 px touch target is transparent padding pulled out by an equal negative margin. Focus, next-box glow and checks are outlines
+  set back onto the drawn box. ws-screen-answer (24 skills + unit_form), ws-phone-card (4 skills) and ws-boot-smoke: OK.
+- (a) TOOL: a screen slot counts as its inked edges plus one written digit (0.75 x font size); print slots unchanged. Row
+  eb-fixture-screen-slot PASSes. Minor: the kit's top pad (3 mm, or label side + 1 mm) comes off the band above the ink; row
+  eb-fixture-toppad-real-band PASSes.
+- Facts pin re-pinned lower (no count rose): add_facts review S 16->14, M 10->6; dropped add_facts worksheet {across}, div_facts
+  pre-skill-check M/L, div_facts worksheet (6 keys). unit_form --skill: EB-BAND at S 302 -> 47 (86 findings in all).
+- eb-wsheet-cl4b-stretch STAYS PENDING: 1 EB-BAND left on the worksheet command (33.5 % under a one-line tile centred in a row
+  _wsEvenRows sizes for a two-line neighbour, 108 px for ~24 px of ink). That is the row height, option (c): it needs a ruling.

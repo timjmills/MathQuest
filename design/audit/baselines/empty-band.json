@@ -1,6 +1,6 @@
 {
  "note": "ws-empty-band pin: findings per (skill render, rule) accepted for skills that passed before the check existed. Re-pin only with a STATUS note.",
- "written": "2026-11-12",
+ "written": "2026-11-13",
  "skills": [
   "addition:add_facts",
   "multiplication:mult_facts",
@@ -12,8 +12,8 @@
   "addition:add_facts error-analysis S|EB-BAND": 6,
   "addition:add_facts error-analysis M|EB-SIDE": 4,
   "addition:add_facts error-analysis L|EB-SIDE": 4,
-  "addition:add_facts review S|EB-BAND": 16,
-  "addition:add_facts review M|EB-BAND": 10,
+  "addition:add_facts review S|EB-BAND": 14,
+  "addition:add_facts review M|EB-BAND": 6,
   "addition:add_facts review L|EB-BAND": 6,
   "addition:add_facts test M|EB-BAND": 16,
   "addition:add_facts test L|EB-BAND": 12,
@@ -35,7 +35,6 @@
   "addition:add_facts independent L {notation: across}|EB-BAND": 16,
   "addition:add_facts independent L {notation: across}|EB-FOOT": 16,
   "addition:add_facts independent L {support: touch}|EB-BAND": 12,
-  "addition:add_facts worksheet 1280px {notation: across}|EB-BAND": 5,
   "multiplication:mult_facts independent L|EB-BAND": 12,
   "multiplication:mult_facts more-practice L|EB-BAND": 12,
   "multiplication:mult_facts opener M|EB-BAND": 2,
@@ -82,8 +81,6 @@
   "division:div_facts review M|EB-BAND": 3,
   "division:div_facts test S|EB-SIDE": 26,
   "division:div_facts test M|EB-SIDE": 18,
-  "division:div_facts pre-skill-check M|EB-BAND": 4,
-  "division:div_facts pre-skill-check L|EB-BAND": 4,
   "division:div_facts fact-probe S|EB-BAND": 20,
   "division:div_facts fact-probe S|EB-SIDE": 20,
   "division:div_facts fact-probe M|EB-BAND": 20,
@@ -102,12 +99,6 @@
   "division:div_facts lesson M|EB-BAND": 28,
   "division:div_facts lesson M p1|EB-PAGE": 1,
   "division:div_facts lesson L|EB-BAND": 21,
-  "division:div_facts lesson L p1|EB-PAGE": 1,
-  "division:div_facts worksheet 1280px|EB-BAND": 5,
-  "division:div_facts worksheet 1280px {constant: 0+1+2+3+4+5+6+7+8+9+10+11+12+13}|EB-BAND": 5,
-  "division:div_facts worksheet 1280px {constant: 3}|EB-BAND": 5,
-  "division:div_facts worksheet 1280px {constant: 8}|EB-BAND": 5,
-  "division:div_facts worksheet 1280px {constant: 13}|EB-BAND": 5,
-  "division:div_facts worksheet 1280px {mix: problem}|EB-BAND": 5
+  "division:div_facts lesson L p1|EB-PAGE": 1
  }
 }
