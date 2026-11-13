@@ -178,3 +178,32 @@ and the measurement work is handed over:
 Speed: 3 rounds on one tool. Cause: every fix was proved on the defect's own probe, not on a fixture row FIRST. Rule for the next lane:
 a critic's "Check:" line becomes a red fixture row BEFORE the fix, and the fix commit flips it.
 Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2.7 % of the weekly limit for the whole session to date.
+
+### ws-empty-band rebuild after critic eb-r3 (fresh builder, Opus medium, rule 7), 2026-11-13
+- D1 FIXED: EB-BAND / EB-SIDE read the PIXELS (measurePix): the ink rows / columns darker than 225 inside the BORDER box (the stroke
+  and 2 px left out), the tab label masked, every answer slot's box added; the bands run from the border to the ink. Print pages: one
+  full-page capture; screen hosts: one capture per cell (no relayout). Row `eb-fixture-padding-leading` re-armed: 73.4 % → FAIL.
+- D2 FIXED: a cell with no ink is recorded and judged EB-READ "cell N has no ink". Row `eb-fixture-blank-cell` re-armed. Sweep
+  `--skill placevalue:unit_form,addition:add_facts --only EB-READ` (172 renders, 1290 cells): no blank cell, so no exemption.
+- D4: precritic `--role R` plans `ws-empty-band --roles R --hosts none` on the lane's skills (else the role sample), with
+  --model-states on scripted-model. ws-precritic-plan splits `--roles a,b` per role, takes a no-`--roles` ws-empty-band line as every
+  role the signed card offers, and needs the row's rule flags (--model-states, --vocab-ink, --page-fill) on the planned line. Every
+  ws-empty-band row is now on the path. Still FAIL there (other lanes, untouched): cc-card-overflow, cc-card-overflow-cbt, cc-tagink,
+  cc-keyjoin, cc-size-s, cc-title, cc-title-cbt (ws-cell-checks not planned) and the opt-in lf-placevalue leak onto add_facts.
+- D5: new fixture rows eb-fixture-band-above, eb-fixture-band-between, eb-fixture-screen-side; commit-pair eb-foot-div-facts
+  (537c2275 → de8e7531, EB-FOOT). EB-ROLE is exempt (it needs the app and a card offering a role the app cannot compose; no such
+  commit). `--self-test` now fails any rule of RULES or case of RULE_CASES that has no live row and no exemption.
+- Minors: a border is ink only in a colour that paints; fill-opacity / stroke-opacity 0 is not ink; --html honours --only, --json
+  and --report-only and reads a screen fixture (#gameView .mq-scell). `--roles none` runs the screen hosts only (with the card variants).
+- PIN RE-PINNED (add_facts, mult_facts, div_facts only): 358 → 906 findings. The pixel read is larger because the DOM read under-read
+  (padding and leading): rose EB-BAND add_facts +137, mult_facts +131, div_facts +154; EB-SIDE div_facts +160, mult_facts +4. Fell:
+  EB-SIDE on the screen card hosts (add_facts −16, mult_facts −22): centred content is no longer read as pinned. Real debt for the
+  facts lane, not a tool change to hide.
+- Backtest (21 rows): 17 PASS. 4 go RED because their PASS commits are over the limit on the pixels. This is not a tool bug: a
+  screenshot of combine S cell 1 at deb9e426 shows 46 of 121 px empty under the "= ____" line (38 %), where the DOM read 29 %:
+  pv-combine-side-band (deb9e426: EB-BAND 179, 30.3-40.1 %); pv-unit-form-rename-side (64f70063: 148);
+  pv-unit-form-rename-margin (a1c8d595: EB-SIDE 6, 28-31 % at --margin 2); eb-fact-roles (6e962016: 6). They need the pv / facts
+  lanes to fix, then a lead ruling to re-point each row's pass commit. Rows were left as they are (append-only).
+- CL-4b (lead request): `--skill placevalue:unit_form --roles none --hosts worksheet --no-baseline` FAILs 3 at 35df47d7 (the pixels
+  see what the DOM missed: rename=more p2 36.6 % above, p3 46.3 % above, p5 46.3 % under). At 451207ab it STILL FAILs 3: p2 and p3
+  are unchanged, and p5 moves from under to above (47.2 %). So row eb-wsheet-cl4b-stretch was NOT added: its pass state does not pass.

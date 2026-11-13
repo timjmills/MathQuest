@@ -111,7 +111,35 @@ function gapBad(role, cells, i, lim) {
     }
     return true;
 }
+// every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
+// the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
+const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)'];
+// a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
+// compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
+const RULE_EXEMPT = {
+    'EB-ROLE': 'needs the signed card and buildSheet (the app), not expressible as --html; every carded role composes today, so no fail commit exists',
+};
+/** The rules / cases with no backtest row (not pending) whose command runs this script and whose `rule` names it. Pure. */
+function uncovered(rows) {
+    const mine = (rows || []).filter((r) => /ws-empty-band\.cjs/.test(r.command || '') && !r.pending);
+    const names = (id) => mine.some((r) => (/\(/.test(id) ? String(r.rule || '').includes(id) : new RegExp(`(^|[^\\w-])${id}([^\\w-]|$)`).test(String(r.rule || ''))));
+    return [...RULES, ...RULE_CASES].filter((id) => !RULE_EXEMPT[id] && !names(id));
+}
 if (argv.includes('--self-test')) {
+    {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
+        const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
+            ['pending does not count', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs', rule: 'EB-READ', pending: true }]).includes('EB-READ'), true],
+            ['EB-GAP is not EB-GAPX', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs', rule: 'EB-GAPX' }]).includes('EB-GAP'), true]];
+        const tb = t.filter(([, got, want]) => got !== want);
+        for (const [n] of tb) console.log(`self-test FAIL: coverage reader: ${n}`);
+        let rows = [];
+        try { rows = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'backtests.json'), 'utf8')).rows; } catch (e) { console.log(`self-test FAIL: cannot read backtests.json (${e.message})`); process.exit(1); }
+        const miss = uncovered(rows);
+        for (const id of miss) console.log(`self-test FAIL: ${id} has no live backtest row (tests/fixtures/precritic/backtests.json, its \`rule\` field) and no exemption`);
+        if (tb.length || miss.length) { console.log(`ws-empty-band self-test: FAIL (rule coverage)`); process.exit(1); }
+        console.log(`rule coverage: ${RULES.length + RULE_CASES.length - Object.keys(RULE_EXEMPT).length} rules / cases with a row; exempt ${Object.entries(RULE_EXEMPT).map(([k, v]) => `${k} (${v})`).join('; ')}`);
+    }
     {   // EB-GAP: 30.5 % never inked (FAIL, the div_facts r3 state) / 27 % (OK) / reserved and inked later (OK) / not the Model (OK)
         const g = (step, gapAtMm, gapMm, iv) => ({ step, gapAtMm, gapMm, hMm: 81.2, iv });
         const div = [g(1, 10, 24.8, [[3, 10], [34.8, 50]]), g(2, 10, 24.8, [[3, 10], [34.8, 56]]), g(3, 10, 24.8, [[3, 10], [34.8, 62]]), g(4, 10, 24.8, [[3, 10], [34.8, 62]])];
@@ -154,6 +182,8 @@ const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts',
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
 const OPTS = arg('opts', null) ? JSON.parse(arg('opts')) : null;
+// (`--only R1,R2`: judge only these rules - a backtest row proves one rule alone)
+const ONLY = arg('only', null) ? arg('only').split(',') : null;
 const DEFAULT_ROLES = ['independent', 'more-practice', 'guided', 'error-analysis', 'review', 'test', 'true-false', 'reason-it', 'lesson'];
 // (`--margin N`, lf-placevalue critic r4 N-r4-1, owner 2026-11-09 "every finding a check": a fix that clears the 30 % limit by under
 // N points is fragile - G2 passed at 29.9 % - so the band and side limits are judged at 30 - N %; absent, 30 % as before)
@@ -164,13 +194,15 @@ const GRID_ROLES = new Set(['independent', 'more-practice', 'test', 'review', 'm
 
 /** The render plan of a skill from its signed card (lf-ops' ws-card-plan.mjs), or the default roles. */
 function planOf(key) {
-    if (arg('roles', null)) return { roles: arg('roles').split(','), variants: [], cards: ['--roles'] };
+    // (`--roles none`: no print page, only the screen hosts, at the defaults AND the card's option variants - a host row)
+    const none = arg('roles', null) === 'none';
+    if (arg('roles', null) && !none) return { roles: arg('roles').split(','), variants: [], cards: ['--roles'] };
     try {
         const out = execFileSync(process.execPath, [path.join(__dirname, '..', 'lib', 'ws-card-plan.mjs'), '--skill', key, '--root', ROOT], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
         const p = JSON.parse(out)[0];
-        if (p && p.cards && p.cards.length && p.roles.length) return p;
+        if (p && p.cards && p.cards.length && p.roles.length) return none ? Object.assign({}, p, { roles: [], cards: ["--roles"] }) : p;
     } catch (e) { /* no card plan in this tree, or no card */ }
-    return { roles: DEFAULT_ROLES, variants: [], cards: [] };
+    return { roles: none ? [] : DEFAULT_ROLES, variants: [], cards: none ? ["--roles"] : [] };
 }
 
 /* ------------------------------------------------------------------ in the page */
@@ -197,17 +229,25 @@ function measureCells(scope) {
                 if (d.closest('[data-ws-label], .ws-letter, .ws-tab') || !visible(d)) continue;
                 const st = getComputedStyle(d);
                 const ownText = !(d instanceof SVGElement) && [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
-                const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
                 // transparent only when its ALPHA is 0 (critic eb-r2 D7: the old pattern also matched rgb(0, 0, 0), so black
                 // SVG ink was invisible); white paints nothing on white paper
                 const paints = (v) => !!v && v !== 'none' && v !== 'transparent' && !/^rgba\([^)]*,\s*0(?:\.0+)?\)$/.test(v) && !/^(#fff(fff)?|white|rgb\(255,\s*255,\s*255\))$/i.test(v);
-                const svgInk = d instanceof SVGElement && SHAPES.test(d.tagName) && (d.tagName.toLowerCase() === 'text' || paints(st.stroke) || paints(st.fill));
+                // a border is ink only when it is drawn in a colour that paints (critic eb-r3 m1: a transparent or white border is not ink)
+                const edgeInk = (k) => parseFloat(st[`border${k}Width`]) > 0 && st[`border${k}Style`] !== 'none' && st[`border${k}Style`] !== 'hidden' && paints(st[`border${k}Color`]);
+                const stroked = edgeInk('Top') || edgeInk('Bottom') || edgeInk('Left') || edgeInk('Right');
+                // an SVG paint with fill-opacity / stroke-opacity 0 is not ink (critic eb-r3 m2)
+                const svgInk = d instanceof SVGElement && SHAPES.test(d.tagName) && (d.tagName.toLowerCase() === 'text' || (paints(st.stroke) && parseFloat(st.strokeOpacity || '1') > 0 && parseFloat(st.strokeWidth || '1') > 0) || (paints(st.fill) && parseFloat(st.fillOpacity || '1') > 0));
                 const drawn = !(d instanceof SVGElement) && /^(img|canvas|input)$/i.test(d.tagName);
                 const slot = d.hasAttribute('data-ws-slot');
                 if (ownText) { const rg = document.createRange(); rg.selectNodeContents(d); for (const r of rg.getClientRects()) take(r); continue; }
                 if (svgInk || drawn || stroked || slot) take(d.getBoundingClientRect());
             }
-            if (!box) return;
+            // the cell is marked for the pixel read (measurePix) under the same page:cell index
+            c.setAttribute('data-eb-i', `${pi + 1}:${ci + 1}`);
+            const label = ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim();
+            const tmpl = c.getAttribute('data-ws-cell') || (c.classList.contains('mq-scell') ? 'screen-cell' : '');
+            // a cell with no ink is recorded, never dropped (critic eb-r2 D7 / eb-r3 D2): judge() reports it as EB-READ
+            if (!box) { out.push({ page: pi + 1, cell: ci + 1, label, tmpl, noInk: true, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1), hRaw: cr.height / MM, topPx: Math.round(cr.top) }); return; }
             // the largest empty band BETWEEN blocks of ink (merged vertical intervals)
             rects.sort((a, b) => a.t - b.t); let between = 0, reach = rects.length ? rects[0].b : 0;
             for (const r of rects) { if (r.t > reach) between = Math.max(between, r.t - reach); reach = Math.max(reach, r.b); }
@@ -220,13 +260,95 @@ function measureCells(scope) {
             const side = !screen || Math.min(gl, gr) <= 0.10 * (inner.r - inner.l) ? Math.max(gl, gr) : 0;
             // EB-EDGE: the ink's nearest approach to the cell's own border, left or right (negative: across it)
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
-            out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            out.push({ page: pi + 1, cell: ci + 1, label, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl: c.getAttribute('data-ws-cell') || (c.classList.contains('mq-scell') ? 'screen-cell' : ''),
-                step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
+                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
+                screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
         });
     });
     return out;
+}
+
+// EB-BAND / EB-SIDE on the PIXELS (critic eb-r3 D1: the DOM read went from the padding box to the text LINE box, leading
+// included, and under-read the visible band by up to 18 points; RUBRIC H13 is the band the pupil sees). For every cell measureCells
+// marked (data-eb-i = "page:cell"): the rows and columns inside the cell's BORDER box (the border stroke and 2 px of its
+// anti-aliasing left out) that hold a pixel darker than 225 (the trace grey #949494 counts), the tab / letter label masked out,
+// plus every answer slot's own box (an empty slot is the item's writing room, as before). The bands run from the inside of the
+// border to the ink. png: a data URL of the whole document at 1 px = 1 CSS px (print pages); shots: {"page:cell": data URL of
+// that cell's own box} (screen hosts, where a full-page capture would relayout the app). Returns {"page:cell": {...} | {noInk}}.
+async function measurePix(arg) {
+    const { png, shots } = arg;
+    const MM = 96 / 25.4;
+    const load = async (src) => { const img = new Image(); img.src = src; await img.decode(); const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height; const g = cv.getContext('2d'); g.drawImage(img, 0, 0); return { g, w: img.width, h: img.height }; };
+    const full = png ? await load(png) : null;
+    const out = {};
+    for (const c of document.querySelectorAll('[data-eb-i]')) {
+        const id = c.getAttribute('data-eb-i');
+        const cr = c.getBoundingClientRect(), cs = getComputedStyle(c);
+        let im, ox, oy;
+        if (full) { im = full; ox = cr.left + window.scrollX; oy = cr.top + window.scrollY; } else if (shots && shots[id]) { im = await load(shots[id]); ox = 0; oy = 0; } else continue;
+        const bt = parseFloat(cs.borderTopWidth) || 0, bb = parseFloat(cs.borderBottomWidth) || 0, bl = parseFloat(cs.borderLeftWidth) || 0, br = parseFloat(cs.borderRightWidth) || 0;
+        const IN = 2;
+        const x0 = Math.max(0, Math.ceil(ox + bl + IN)), x1 = Math.min(im.w, Math.floor(ox + cr.width - br - IN));
+        const y0 = Math.max(0, Math.ceil(oy + bt + IN)), y1 = Math.min(im.h, Math.floor(oy + cr.height - bb - IN));
+        if (x1 <= x0 || y1 <= y0) continue;
+        const w = x1 - x0, h = y1 - y0;
+        const d = im.g.getImageData(x0, y0, w, h).data;
+        // image coords of a descendant's box (relative to this read window)
+        const rel = (r, pad) => ({ l: Math.floor(r.left - cr.left + ox - x0 - pad), r: Math.ceil(r.right - cr.left + ox - x0 + pad), t: Math.floor(r.top - cr.top + oy - y0 - pad), b: Math.ceil(r.bottom - cr.top + oy - y0 + pad) });
+        const masks = [...c.querySelectorAll('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab')].map((e) => e.getBoundingClientRect()).filter((r) => r.width && r.height).map((r) => rel(r, 1));
+        const rows = new Uint8Array(h), cols = new Uint8Array(w);
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+            const k = (y * w + x) * 4;
+            if ((d[k] + d[k + 1] + d[k + 2]) / 3 >= 225 || d[k + 3] < 32) continue;
+            if (masks.some((m) => x >= m.l && x < m.r && y >= m.t && y < m.b)) continue;
+            rows[y] = 1; cols[x] = 1;
+        }
+        for (const sl of c.querySelectorAll('[data-ws-slot]')) {
+            const cs2 = getComputedStyle(sl); if (cs2.display === 'none' || cs2.visibility === 'hidden') continue;
+            const r = sl.getBoundingClientRect(); if (!r.width || !r.height) continue;
+            const q = rel(r, 0);
+            for (let y = Math.max(0, q.t); y < Math.min(h, q.b); y++) rows[y] = 1;
+            for (let x = Math.max(0, q.l); x < Math.min(w, q.r); x++) cols[x] = 1;
+        }
+        const fr = rows.indexOf(1); if (fr < 0) { out[id] = { noInk: true }; continue; }
+        const lr = rows.lastIndexOf(1), fc = cols.indexOf(1), lc = cols.lastIndexOf(1);
+        let between = 0, run = 0; for (let y = fr; y <= lr; y++) { if (rows[y]) { between = Math.max(between, run); run = 0; } else run++; }
+        // bands from the inside of the border stroke (the read window starts IN px inside it: those px are empty paper)
+        const above = (y0 + fr) - (oy + bt), below = (oy + cr.height - bb) - (y0 + lr + 1);
+        const gl = (x0 + fc) - (ox + bl), gr = (ox + cr.width - br) - (x0 + lc + 1);
+        out[id] = { aboveMm: Math.max(above, 0) / MM, belowMm: Math.max(below, 0) / MM, betweenMm: between / MM, gl: Math.max(gl, 0) / MM, gr: Math.max(gr, 0) / MM, innerW: (cr.width - bl - br) / MM };
+    }
+    return out;
+}
+/** Merge measurePix's read into measureCells' records: the bands and the side are the pixels'; a cell with no pixel ink is noInk. */
+function applyPix(cells, px) {
+    for (const c of cells) {
+        const p = px[`${c.page}:${c.cell}`]; if (!p) continue;
+        if (p.noInk) { c.noInk = true; continue; }
+        c.pix = true; c.belowMm = p.belowMm; c.aboveMm = p.aboveMm; c.betweenMm = p.betweenMm; c.innerW = p.innerW;
+        // print cells: the wider gap beside the ink (RUBRIC H13); a SCREEN cell only when the content is pinned to one side
+        c.sideMm = !c.screen || Math.min(p.gl, p.gr) <= 0.10 * p.innerW ? Math.max(p.gl, p.gr) : 0;
+    }
+    return cells;
+}
+/** Read the pixels of the cells measureCells marked on page `pg` and merge them in. screen: per-cell captures (no relayout). */
+async function pixRead(pg, cells, screen) {
+    if (!cells.length) return cells;
+    let px;
+    if (screen) {
+        const shots = {};
+        for (const h of await pg.$$('[data-eb-i]')) {
+            const id = await h.evaluate((e) => e.getAttribute('data-eb-i'));
+            try { shots[id] = 'data:image/png;base64,' + await h.screenshot({ encoding: 'base64' }); } catch (e) { /* not capturable: the DOM read stands */ }
+        }
+        px = await pg.evaluate(measurePix, { shots });
+    } else {
+        const png = 'data:image/png;base64,' + await pg.screenshot({ fullPage: true, encoding: 'base64' });
+        px = await pg.evaluate(measurePix, { png });
+    }
+    await pg.evaluate(() => { for (const e of document.querySelectorAll('[data-eb-i]')) e.removeAttribute('data-eb-i'); });
+    return applyPix(cells, px);
 }
 
 // EB-GAP (critic r3 S5): measured on the PIXELS, as the critic measures (a text line box carries its leading: the DOM band read
@@ -318,6 +440,8 @@ function measureVocab(scope) {
 
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
+        // a cell with no ink at all (critic eb-r3 D2: it was dropped, so a blank cell beside a good one read OK)
+        if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with nothing drawn in it) [${c.tmpl}]`); return; }
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
         const lim = BAND * c.hRaw;
         // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
@@ -331,28 +455,31 @@ function judge(cells, where, F, role) {
 }
 
 async function htmlMain() {
-    const findings = []; const F = (rule, where, msg) => findings.push({ rule, where, msg });
+    // --html honours --only, --json and --report-only as a --skill run does (critic eb-r3 m3)
+    const findings = []; const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     const app = await open({ seed: 1 });
     try {
         const sh = await app.browser.newPage();
         await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
         await sh.goto(app.page.url(), { waitUntil: 'domcontentloaded' });
         await sh.setContent(fs.readFileSync(path.resolve(process.cwd(), HTML), 'utf8'), { waitUntil: 'networkidle0', timeout: 60000 });
-        await sh.emulateMediaType('print');
-        const cells = await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page');
-        if (!cells.length) F('EB-READ', HTML, 'no kit cell read');
-        judge(cells, path.basename(HTML), F);
+        // a screen fixture (critic eb-r3 D5): a B&W screen cell (.mq-scell) inside #gameView, read as a host reads it (no print media)
+        const screen = await sh.evaluate(() => !document.querySelector('.ws-page') && !!document.querySelector('#gameView .mq-scell, #worksheetView .mq-scell, #quizTakeView .mq-scell'));
+        if (!screen) await sh.emulateMediaType('print');
+        const scope = screen ? '#gameView, #worksheetView, #quizTakeView' : 'body > section.ws-page, body > .ws-page';
+        const cells = await pixRead(sh, await sh.evaluate(measureCells, scope), screen);
+        if (!cells.length) F('EB-READ', HTML, 'no kit cell and no screen cell (.mq-scell) on the page (markup changed?)');
+        judge(cells, path.basename(HTML), F, screen ? 'host:fixture' : undefined);
         for (const x of findings) console.log(`${x.rule} ${x.where}: ${x.msg}`);
-        console.log(`(${cells.length} cells)`);
+        console.log(`(${cells.length} cells${ONLY ? `; --only ${ONLY.join(',')}` : ''})`);
+        if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ html: HTML, findings, cells }, null, 1));
     } finally { await app.close(); }
     console.log(`ws-empty-band: ${findings.length ? `FAIL (${findings.length})` : 'OK'}`);
-    process.exit(findings.length ? 1 : 0);
+    process.exit(findings.length && !has('report-only') ? 1 : 0);
 }
 
 async function main() {
     const findings = []; const notes = []; let renders = 0, cellsRead = 0;
-    // (`--only R1,R2`: judge only these rules - a backtest row proves one rule alone)
-    const ONLY = arg('only', null) ? arg('only').split(',') : null;
     const F = (rule, where, msg) => { if (!ONLY || ONLY.includes(rule)) findings.push({ rule, where, msg }); };
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -367,7 +494,7 @@ async function main() {
             const jobs = [];
             for (const role of plan.roles) for (const size of SIZES) jobs.push({ role, size, opts: OPTS, tag: `${role} ${size}` });
             const vSize = ['L', 'M', 'S'].find((z) => SIZES.includes(z)) || SIZES[0];
-            for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
+            if (arg('roles', null) !== 'none') for (const v of variants) jobs.push({ role: 'independent', size: vSize, opts: Object.assign({}, OPTS || {}, v.opts), tag: `independent ${vSize} {${v.option}: ${v.value}}` });
             if (!plan.cards.length) notes.push(`${key}: no signed card - EB-ROLE not judged (default roles)`);
             notes.push(`${key}: card ${plan.cards.join(', ') || '(none: default roles)'}; ${plan.roles.length} roles x ${SIZES.join('/')} + ${variants.length} option variant(s) of ${vlist.length} + hosts ${HOSTS.join(', ') || 'none'}`);
             for (const j of jobs) {
@@ -391,7 +518,7 @@ async function main() {
                     await sh.setContent(b.html, { waitUntil: 'networkidle0', timeout: 60000 });
                     await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    const cells = await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page');
+                    const cells = await pixRead(sh, await sh.evaluate(measureCells, 'body > section.ws-page, body > .ws-page'), false);
                     renders++; cellsRead += cells.length;
                     if (!cells.length) { F('EB-READ', `${key} ${j.tag}`, 'no kit cell read on the page (markup changed?)'); continue; }
                     judge(cells, `${key} ${j.tag}`, F, j.role);
@@ -461,7 +588,7 @@ async function main() {
                 // a host that does not render is a failure, like a host that reads no cell (critic eb-r2 D9)
                 if (!ok || /^ERR/.test(ok)) { F('EB-READ', `${key} ${host} ${w}px${ho.tag}`, `the host did not render (${ok})`); continue; }
                 await new Promise((r) => setTimeout(r, 450));
-                const cells = await page.evaluate(measureCells, ok);
+                const cells = await pixRead(page, await page.evaluate(measureCells, ok), true);
                 renders++; cellsRead += cells.length;
                 // a host that reads no cell is a failure (critic eb-r1 D1: the card was silently unmeasured)
                 if (!cells.length) { F('EB-READ', `${key} ${host} ${w}px${ho.tag}`, 'no kit cell and no screen cell (.mq-scell) read on the host'); continue; }
@@ -486,7 +613,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
+    const rules = RULES;
     for (const n of notes) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);

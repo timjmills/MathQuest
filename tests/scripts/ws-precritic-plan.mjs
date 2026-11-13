@@ -61,11 +61,22 @@ export function planHasLesson(planText, { lesson, mode }) {
     return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
 }
 
-/** The plan lines of a dry run that run `tool` on every skill of `skills` (and with --roles R when given). Pure. */
-export function planHas(planText, { tool, skills, roles }) {
+// the ws-empty-band flags that switch rules ON: a row run with one is on the path only where the plan runs it too
+export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
+/** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
+ *  comma list, or - `cardRoles` given - the line has no --roles and so renders every role the signed card offers, R among
+ *  them), carrying every flag of `flags`. Pure. */
+export function planHas(planText, { tool, skills, roles, flags = [], cardRoles = null }) {
+    const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
         .filter((l) => skills.every((k) => l.includes(k) || l.includes(k.split(':')[1])))
-        .filter((l) => !roles || new RegExp(`--roles? ${roles}\\b`).test(l));
+        .filter((l) => {
+            if (!roles) return true;
+            const cmd = l.slice(l.indexOf(`tests/scripts/${tool}.`));
+            if (new RegExp(`--roles?[ =](?:[^\\s,]+,)*${esc(roles)}(?:,|\\s|$)`).test(cmd)) return true;
+            return !!cardRoles && cardRoles.includes(roles) && !/--roles?[ =]/.test(cmd);
+        })
+        .filter((l) => flags.every((f) => l.slice(l.indexOf(`tests/scripts/${tool}.`)).includes(f)));
 }
 
 function selfTest() {
@@ -83,6 +94,13 @@ function selfTest() {
     const lplan = '  [browser] x — tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --lp --out /tmp/x\n  [browser] y — node tests/scripts/ws-detailed-lesson.cjs --lesson g3-oa8-two-step-wp --check --repeats --out /tmp/y';
     eq('lesson lp planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'lp' }).length, 1);
     eq('lesson sweep not planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'sweep' }).length, 0);
+    const eb = '  [browser] eb — node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --vocab-ink --page-fill\n  [browser] ebr — node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles scripted-model --hosts none --model-states';
+    eq('role in a comma list', planHas('x node tests/scripts/ws-empty-band.cjs --skill a:b --roles guided,scripted-model', { tool: 'ws-empty-band', skills: ['a:b'], roles: 'scripted-model' }).length, 1);
+    eq('role not a prefix match', planHas('x node tests/scripts/ws-empty-band.cjs --skill a:b --roles guided-x', { tool: 'ws-empty-band', skills: ['a:b'], roles: 'guided' }).length, 0);
+    eq('card roles cover a line with no --roles', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'guided', cardRoles: ['guided'] }).length, 1);
+    eq('a role the card does not offer', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'stretch', cardRoles: ['guided'] }).length, 0);
+    eq('flag carried', planHas(eb, { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 1);
+    eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
@@ -104,6 +122,20 @@ else {
         }
         return plans.get(key);
     };
+    // the page roles a skill's signed card offers (tests/lib/ws-card-plan.mjs; ws-empty-band renders them all when given no --roles)
+    const cardCache = new Map();
+    const cardRolesOf = (skills) => {
+        const sets = skills.map((k) => {
+            if (!cardCache.has(k)) {
+                const r = spawnSync(process.execPath, [join(ROOT, 'tests/lib/ws-card-plan.mjs'), '--skill', k, '--root', ROOT], { cwd: ROOT, encoding: 'utf8', maxBuffer: 8 << 20 });
+                let roles = [];
+                try { const pl = JSON.parse(r.stdout)[0]; if (pl && pl.cards && pl.cards.length) roles = pl.roles || []; } catch (e) { roles = []; }
+                cardCache.set(k, roles);
+            }
+            return cardCache.get(k);
+        });
+        return sets.length ? sets[0].filter((r) => sets.every((s) => s.includes(r))) : [];
+    };
     const fails = []; const na = []; let checked = 0;
     const lplans = new Map();
     for (const row of table.rows || []) {
@@ -122,14 +154,31 @@ else {
         const c0 = readCommand(row.command || '');
         if (!c0) { na.push(row.id); continue; }
         const gone = c0.skills.filter((k) => !live.has(k));
-        const c = { ...c0, skills: c0.skills.filter((k) => live.has(k)) };
+        // `--roles none` (ws-empty-band: the screen hosts only) is the --skill plan's host run, not a page role
+        const c = { ...c0, skills: c0.skills.filter((k) => live.has(k)), roles: c0.roles === 'none' ? null : c0.roles };
         if (!c.skills.length) { na.push(`${row.id} (not live here: ${gone.join(',')})`); continue; }
         checked++;
-        const role = c.roles && c.roles !== 'lesson' && c.roles !== 'independent' ? c.roles : null;
-        const p = plan(c.skills, role);
-        const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
-        if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
-        let hit = planHas(p.text, c);
+        // a row on several roles (`--roles a,b`, critic eb-r3 D4) is on the path when EACH role is: lesson / independent through
+        // the --skill plan, any other role R through `ws-precritic --skill X --role R` (a lane that touches R runs it). A
+        // ws-empty-band line with no --roles renders every role the signed card offers; the row's rule flags must be carried.
+        const flags = c.tool === 'ws-empty-band' ? EB_FLAGS.filter((f) => new RegExp(`${f}(\\s|$)`).test(row.command)) : [];
+        const cr = c.tool === 'ws-empty-band' ? cardRolesOf(c.skills) : null;
+        const per = (c.roles ? c.roles.split(',') : [null]).map((r) => {
+            const role = r && r !== 'lesson' && r !== 'independent' ? r : null;
+            const p = plan(c.skills, role);
+            const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
+            return { r, role, p, via, hit: p.ok ? planHas(p.text, { ...c, roles: r, flags, cardRoles: cr }) : [] };
+        });
+        const broken = per.find((x) => !x.p.ok);
+        if (broken) { fails.push(`${row.id}: ${broken.via} --dry-run failed: ${broken.p.text.trim().split('\n').slice(-1)[0]}`); continue; }
+        const missing = per.filter((x) => !x.hit.length);
+        if (per.length > 1 || flags.length) {
+            console.log(`  ${missing.length ? 'FAIL' : 'OK  '} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''}${flags.length ? ` ${flags.join(' ')}` : ''} on ${c.skills.join(',')} (per role: ${per.map((x) => `${x.r || '-'}${x.role ? ' via --role' : ''}`).join(', ')})`);
+            if (missing.length) fails.push(`${row.id}: ${missing.map((x) => `${x.via} plans no ${c.tool} on role ${x.r}${flags.length ? ` with ${flags.join(' ')}` : ''}`).join('; ')} (the check is backtested but not on the lane's path)`);
+            continue;
+        }
+        const { role, p, via } = per[0];
+        let hit = per[0].hit;
         // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
         // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
         const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);

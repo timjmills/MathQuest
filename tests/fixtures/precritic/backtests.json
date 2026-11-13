@@ -3270,7 +3270,7 @@
    "browser": true,
    "fail": {
     "fixture": "tests/fixtures/precritic/empty-band/padding-leading.fail.html",
-    "state": "60 mm cell, padding-bottom 25 mm, line-height 2: the tool reads 28.5 %, the visible band is over 65 %"
+    "state": "60 mm cell, padding-bottom 25 mm, line-height 2: the tool reads 28.5 %, the visible band is over 65 % (before the pixel read); the pixels read 73 %"
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/empty-band/pass.html",
@@ -3281,8 +3281,7 @@
     "fail": "FAIL",
     "pass": "OK"
    },
-   "pending": true,
-   "pendingReason": "hand-over (rule 7, critic eb-r3 2026-11-12): the tool fix is outstanding; re-arm (pending: false) in the change that makes this fixture FAIL"
+   "pending": false
   },
   {
    "id": "eb-fixture-blank-cell",
@@ -3292,7 +3291,7 @@
    "browser": true,
    "fail": {
     "fixture": "tests/fixtures/precritic/empty-band/blank-cell.fail.html",
-    "state": "one good cell beside a blank cell: the tool reads OK"
+    "state": "one good cell beside a blank cell: the tool reads OK (before the D2 fix); now EB-READ \"cell 2 has no ink\""
    },
    "pass": {
     "fixture": "tests/fixtures/precritic/empty-band/pass.html",
@@ -3303,8 +3302,87 @@
     "fail": "FAIL",
     "pass": "OK"
    },
-   "pending": true,
-   "pendingReason": "hand-over (rule 7, critic eb-r3 2026-11-12): the tool fix is outstanding; re-arm (pending: false) in the change that makes this fixture FAIL"
+   "pending": false
+  },
+  {
+   "id": "eb-fixture-band-above",
+   "check": "ws-empty-band EB-BAND reads the band ABOVE the ink (critic eb-r3 D5: no row held it): ink at the bottom of a 50 mm cell with ~40 % empty above fails, a cell sized to its item passes",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (above) (critic eb-r3 D5)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/above.fail.html",
+    "state": "seeded: two 50 mm fact cells, the fact and its answer box at the bottom: 20.4 mm (41 %) above the ink"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "the same items in 36 mm cells"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-fixture-band-between",
+   "check": "ws-empty-band EB-BAND reads the band BETWEEN two blocks of ink (critic eb-r3 D5): the fact at the top and its answer box at the bottom of a 50 mm cell, ~39 % between them, fails",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-BAND (between) (critic eb-r3 D5)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/between.fail.html",
+    "state": "seeded: two 50 mm fact cells, 19.3 mm (39 %) between the fact and its answer box"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+    "state": "the same items in 36 mm cells"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-fixture-screen-side",
+   "check": "ws-empty-band EB-SIDE on a SCREEN cell (.mq-scell in #gameView): content pinned to one side of the card fails; the same content centred (a wide, even margin) passes (critic eb-r3 D5)",
+   "kind": "fixture",
+   "rule": "ws-empty-band EB-SIDE (screen) (critic eb-r3 D5)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/empty-band/screen-side.fail.html",
+    "state": "seeded: a 160 mm practice-card cell, the fact and its box pinned left: 103 mm (65 %) empty on the right"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+    "state": "the same content centred: about 53 mm each side, not pinned"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-foot-div-facts",
+   "check": "ws-empty-band EB-FOOT: div_facts Independent at S / M / L draws each cell within 10 % of the footprint the bridge measured for it (lf-checks L25: the supports-off rows were stretched past the measured height)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-FOOT (critic eb-r3 D5)",
+   "browser": true,
+   "fail": {
+    "commit": "537c2275",
+    "state": "EB-FOOT 156 on independent (rows stretched past the facts' measured footprint)"
+   },
+   "pass": {
+    "commit": "de8e7531",
+    "state": "rows of 1.1 x the measured height (noStretch): the drawn cell is the footprint"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --roles independent --hosts none --no-baseline --only EB-FOOT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
