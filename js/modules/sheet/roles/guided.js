@@ -942,8 +942,14 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
     // underscore characters (SL-6).
     const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
+    // (and every cell of such a template knows it is on a Guided page - `guidedRow` - so the tries of later rows anchor too)
+    const inside = it.footprint && it.footprint.hintInside ? (o) => Object.assign({}, o, { payload: Object.assign({}, (o && o.payload) || {}, { guidedRow: true, hintHtml: hintLine ? hintHtml : '' }) }) : null;
     return (c, o) => {
         if (c.state !== 'blank') {
+            // (`hintInside` on a template's footprint: the cell draws the hint itself, between its work and its answer place,
+            // so its answer place stays at the y of the row's other cells - lf-vocab r16, critic r5 nit 2: the pick3 hint cell's
+            // write line sat 45 px above the Model's; ws-vocab-unit V-GLINE)
+            if (inside) return cue(it.render(c, inside(o)));
             const html = it.render(c, o);
             if (hintLine) return withHint(cue(html));
             return cue(stage === 'model' && it.template === 'stack' ? traceCarries(html, it) : html);
@@ -964,6 +970,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true } = {}) {
             } catch (e) { part = null; }
             if (part) return traceCarries(part, it, 1);
         }
+        if (inside) return cue(it.render(c, inside(o)));
         if (hintLine) return withHint(cue(it.render(c, o)));
         return cue(it.render(c, o));
     };

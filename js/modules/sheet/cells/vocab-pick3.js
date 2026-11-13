@@ -118,23 +118,29 @@ register(PICK3_TEMPLATE, {
         const box = twin ? paperBox : beside ? { wMm: Math.max(picW, 76 - 3 - bankMm), hMm: eaS ? 28 : 24 } : { wMm: 72, hMm: picW * 2 / 3 - (ctx.state === 'wrong' ? 3.5 : 0) };   // (Error analysis: 3 a page at L, critic r3 #3)   // (76 stuck out 0.4 mm at S: precritic r4)
         // (the item is its one picture: a "one" or a "ten" alone prints at the ten rod's unit, owner ruling OQ-1)
         const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0, printFloor: twin, set: [p.word] }));
+        // (lf-vocab r16, critic r5 nit 2: on a Guided page the write line is anchored to the cell's bottom in EVERY cell - the
+        // free height shared above the picture, the bank and the line - and the try's hint (payload.hintHtml, guided.js
+        // hintInside) prints between the bank and the line, so the lines of a row stand at one y; ws-vocab-unit V-GLINE)
+        const guidedCell = !twin && !(ctx.chartZoom !== undefined && ctx.chartZoom !== null) && (Number(ctx.scaffoldLevel) >= 2 || !!p.guidedRow);
+        const hint = guidedCell && p.hintHtml ? `<div class="mq-hintline ws-trace" data-ws-ink="trace" style="margin-top:0">${p.hintHtml}</div>` : '';
+        const gl = guidedCell ? '<style>:is(.ws-page,.ws-sheet) .mq-vp[data-ws-guided] > :not(style):not(.mq-hintline){margin-top:auto}</style>' : '';
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
-        const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
+        const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}${guidedCell ? ' data-ws-guided' : ''}`;
         if (beside) {
             // the words one a line in the thin box, the writing line under the box
             const bankHtml = `<div class="mq-vp-bank" role="group" aria-label="word bank" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 0.8)};box-sizing:border-box;flex:none;`
                 + `border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1)} ${L(ctx, 2.5)};">${words}</div>`;
             // (the picture and the bank side by side, the writing line under both, as long as the longest word needs)
-            return `<div ${root} style="color:${INK};${FONT}width:100%;box-sizing:border-box;${minH}display:flex;flex-direction:column;align-items:center;justify-content:${just};gap:${L(ctx, ctx.state === 'wrong' ? 1 : 2)};${pad}">`
-                + `${style}<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-evenly;gap:${L(ctx, 3)};width:100%;">`
-                + `<span style="display:block;flex:0 1 auto;min-width:0;">${pic}</span>${bankHtml}</div>${line}</div>`;
+            return `<div ${root} style="color:${INK};${FONT}width:100%;box-sizing:border-box;${minH}display:flex;flex-direction:column;align-items:center;justify-content:${guidedCell ? 'flex-start' : just};gap:${L(ctx, ctx.state === 'wrong' ? 1 : 2)};${pad}">`
+                + `${style}${gl}<div style="display:flex;flex-direction:row;align-items:center;justify-content:space-evenly;gap:${L(ctx, 3)};width:100%;">`
+                + `<span style="display:block;flex:0 1 auto;min-width:0;">${pic}</span>${bankHtml}</div>${hint}${line}</div>`;
         }
         return `<div ${root} style="color:${INK};${FONT}width:100%;box-sizing:border-box;${minH}`
-            + `display:flex;flex-direction:column;align-items:center;justify-content:${just};gap:${L(ctx, ctx.state === 'wrong' ? 1 : 2.5)};${pad}">`
-            + `${style}${pic}`
+            + `display:flex;flex-direction:column;align-items:center;justify-content:${guidedCell ? 'flex-start' : just};gap:${L(ctx, ctx.state === 'wrong' ? 1 : 2.5)};${pad}">`
+            + `${style}${gl}${pic}`
             // (a bank too long for one line wraps to two balanced-looking lines, never one word a line: critic-ready r2)
             + `<div class="mq-vp-bank" role="group" aria-label="word bank" style="display:flex;flex-direction:${twin ? 'row' : 'column'};flex-wrap:${twin ? 'wrap' : 'nowrap'};align-items:center;justify-content:center;column-gap:${L(ctx, 4)};row-gap:${L(ctx, 1)};box-sizing:border-box;max-width:100%;`
-            + `${twin ? '' : `border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1)} ${L(ctx, 2.5)};`}">${words}</div>${line}</div>`;
+            + `${twin ? '' : `border:${B(ctx, 0.75)} solid ${INK};padding:${L(ctx, 1)} ${L(ctx, 2.5)};`}">${words}</div>${hint}${line}</div>`;
     },
     answerKey(p) {
         const w = String(p.word);
@@ -144,7 +150,8 @@ register(PICK3_TEMPLATE, {
     // (hardCap: two across even where a narrow grade-3 cell measures as fitting three at S - r2 render, 9 a page)
     // (`evenRows`: on the Guided page every row takes the same share - the cell spreads its picture, bank and line over its
     // height, so the Model row and the hinted row need no extra height of their own; critic r2 #4, guided.js)
-    footprint(p) { return { wMm: 88, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, inPlace: true, evenRows: true }; },
+    // (`hintInside`: the Guided try's hint is drawn inside the cell, above the anchored line - lf-vocab r16, guided.js fadeRender)
+    footprint(p) { return { wMm: 88, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, inPlace: true, evenRows: true, hintInside: true }; },
     // the paper response is a WORD WRITTEN ON A LINE (the screen taps a bank word into it): a text slot, so Error analysis
     // can write a wrong word in as finished work (critic r1 D3: the role declined a 'choice' slot)
     inputs() { return [{ id: 'answer', kind: 'text', shape: 'line', graded: true, order: 0, scopes: ['full', 'answer-only'] }]; },
