@@ -4044,6 +4044,48 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "fonts-late",
+  "check": "Font-load race (lf-engine 2026-11-13, ws-detailed-lesson E2 flakes on g2-nbt3 / g3-oa8 / g4-nbt1): a gate checks Andika only after loading it (tests/lib/ws-fonts.cjs, 3 tries over ~10 s, then fonts.ready)",
+  "kind": "commit-pair",
+  "rule": "ws-fonts awaitFonts (ws-detailed-lesson E2, ws-print-lint L-FONT, ws-grade-render, ws-pdf-preview, ws-touchdots-raster)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture} --old",
+   "state": "the old one-shot document.fonts.check after networkidle0 + fonts.ready, on a page whose Andika arrives 2.5 s late: a false page FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+   "state": "the same page through awaitFonts: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fonts-never",
+  "check": "A declared web font that never arrives is an environment ERROR, never a page FAIL (tests/lib/ws-fonts.cjs)",
+  "kind": "fixture",
+  "rule": "ws-fonts isEnvError",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-never.html",
+   "state": "Andika declared, its woff2 files 404: ERROR (exit 2), not FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "state": "Andika arrives late: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "ERROR(2)",
+   "pass": "OK"
+  }
  }
 ]
 }

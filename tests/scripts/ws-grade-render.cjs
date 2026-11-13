@@ -112,6 +112,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { ROOT, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
 const G = require('../lib/ws-golden.cjs');
+const FONTS = require('../lib/ws-fonts.cjs');
 // MQ_GOLDEN_DUMP=1 writes each hashed canonical DOM beside its PNG (<file>.canon.html), to see why a hash moved
 const hashOf = (html, file) => { if (process.env.MQ_GOLDEN_DUMP && file) fs.writeFileSync(file.replace(/\.png$/, '') + '.canon.html', html); return G.contentHash(html); };
 
@@ -414,6 +415,7 @@ async function renderPrinted(page, skill, dir) {
         await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });   // same origin, so relative assets resolve
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        await FONTS.awaitFonts(sheet);   // the PNGs the critic grades are drawn in Andika, not a fallback mid-load
         await sleep(250);
         const pdf = path.join(dir, 'print.pdf');
         await sheet.pdf({ path: pdf, format: 'A4', printBackground: false, preferCSSPageSize: true });
@@ -483,8 +485,10 @@ async function printDoc(page, html, pdfPath) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        const fontWait = await FONTS.awaitFonts(sheet, { faces: ['700 28px Andika', '400 28px Andika'] });   // before check.andika (font-load race)
         await sleep(200);
         const check = await sheetCheck(sheet);
+        if (FONTS.isEnvError(fontWait)) check.fontsEnvError = FONTS.describe(fontWait);   // the font never arrived: environment, not the page
         // S4: the content hash of each printed page (canonical DOM, not pixels) and its measured numbers
         check.pageHashes = (await sheet.evaluate(G.canonicalPagesInPage, '.ws-page')).map((h, i) => hashOf(h, pdfPath.replace(/\.pdf$/, `-p${i + 1}.png`)));
         check.measured = await sheet.evaluate(G.measurePagesInPage);
