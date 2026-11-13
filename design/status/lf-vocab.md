@@ -540,9 +540,12 @@ Judged per lesson set (--opts vocabSet 0-10, every set's words on the reference 
 in 75b0e131 (backtest rows vocab-r14-sis-pick3, vocab-r14-sis-match3-tile: 9c83c24f FAIL -> 75b0e131 OK):
 - pick3 screen twin: every picture 220 px wide while paper fits a flat picture to 72 x 25 mm - equal groups at 81 % of print on
   card 390 / 820 / 1280. The twin now fits the same item's paper box, never narrower than the paper width (printFloor).
-- Match 3 online worksheet: the 96 px slot drew the row / column table at 94 %; the slot is 104 px.
+- Match 3 online worksheet: the 96 px slot drew the row / column table at 94 %; the slot is 100 px (c0ea9b03: 104 px put the answer box 2 px under the 1280 x 600 fold, ws-chromebook-fit).
 After them: sets 0-3, 5-10 OK on both skills. Left, all SIZE-REF (coverage, not size): defaults - Match 3 distributive (21 dots),
 pick3 equal groups / pattern; set 4 pick3 hundred chart. Cause: the worksheet host deals its own 4 items (reseed 4242) from a pool
 of 20 grade-3 words, and the reference page holds only the words seed 7 dealt (6 or 8 of them). The same pictures pass SIZE-INK
 wherever the reference page holds them (sets 1-3). No change to a picture's size can clear this; it needs the gate to build the
 reference for an item paper does not hold (e.g. the same word on paper), or a lead ruling. Not pinned.
+Precritic --strict after the last fix (c0ea9b03 Match 3; 75b0e131 pick3): both skills FAIL 2, PASS 33 - sibling-compare (known) and
+ws-screen-ink-size (the default SIZE-REF coverage findings above, only). ws-vocab-unit --browser, ws-next-box, both ws-empty-band
+modes and ws-chromebook-fit green; no pupil page moved (screen-only changes, V23 pin holds), no picture changed (no new renders).
