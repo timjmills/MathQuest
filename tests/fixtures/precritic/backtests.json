@@ -8524,6 +8524,68 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "touch-hit-settle-retap",
+   "check": "ws-phone-card TOUCH-HIT de-flake: the tap point is read after two animation frames and once the scroll and the box's rect hold still, a miss is re-tapped the same way, and only a REPEATED miss is a finding (lf-hosts hand-over r3 m1: 2-3 random 'focuses nothing (body)' misses a run on untouched cells, all at 1280 x 900 bottom edges / corners: sub_100_no_regroup, placevalue:expand, add_facts; they never repeated)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "--no-retap",
+    "state": "the d23e42fa6 tap (--no-retap): the point read in the same task as the blur, one tap; the page's focusout moves the card 80 px on the next task, so the tap lands on a stale point and reports a miss that is not there (the 1280 x 900 flake class)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-settle.html",
+    "args": "",
+    "state": "the same page, today's tap: settled point, re-tap on a miss; nothing covers the box, so OK (3 of 3 runs)"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT {args}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "touch-hit-overlay-true-miss",
+   "check": "ws-phone-card TOUCH-HIT still FAILS a box that truly cannot be hit after the de-flake: a div painted over the bottom 12 px of the answer box swallows the bottom edge and corner taps, the settled re-tap misses again, and the finding is reported (every run)",
+   "kind": "fixture",
+   "rule": "ws-phone-card TOUCH-HIT (lf-checks de-flake, lf-hosts r3 m1)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.fail.html",
+    "state": "an overlay covers the answer box's bottom 12 px: 3 repeated misses (bottom, bottom-left, bottom-right), FAIL 3 of 3 runs"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/phone-card/touch-overlay.pass.html",
+    "state": "the same overlay 4 px below the box: every tap focuses it"
+   },
+   "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only TOUCH-HIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ws-reflow-slot-x",
+   "check": "ws-worksheet-reflow WS-REFLOW per-slot x: no typed answer place moves sideways inside its card by more than 1.5 px against the baseline's slotXs (the r1 F4 4 px gap moves a box by up to 1 px): 1 px holds, 2 px fails",
+   "kind": "fixture",
+   "rule": "ws-worksheet-reflow WS-REFLOW slot x (lf-hosts critic r3)",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-2px.fail.json",
+    "state": "card 1's second answer place 2 px right of master's (before: no per-slot x measure at all, so any sideways move under 6 px of card width passed)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/worksheet-reflow/slot-x-1px.pass.json",
+    "state": "the same place 1 px right (the r1 F4 gap's move): holds"
+   },
+   "command": "node tests/scripts/ws-worksheet-reflow.cjs --judge-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

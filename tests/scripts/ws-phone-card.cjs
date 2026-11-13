@@ -46,6 +46,9 @@
 //             cell's click handler focused the active box - division box 1 -> box 0 at 820 and 1280. TOUCH-UNIQUE missed it: it
 //             used elementFromPoint and skipped hits on elements that are not typed boxes). A rounded corner is probed 1 px
 //             inside the rounded edge on its diagonal (the box's own hit shape). Card, worksheet and quiz.
+//             A tap point is read after two frames and once the scroll and the box hold still; a miss is re-tapped once
+//             the same way and only a REPEATED miss is a finding (lf-checks de-flake; --no-retap = the old single tap,
+//             --touch-debug prints each miss that held on the re-tap).
 //   --print-widths  print the widths the run would render (`widths: 820,...`) and exit (ws-screen-widths-plan)
 //   --fixture FILE  the card checks (PROBE + the CELL-READ kind match) on a saved card page (backtest rows; lf-hosts r2 F3)
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
@@ -315,8 +318,18 @@ function UNIQUE(rootSel) {
 /* Node side: TOUCH-HIT (lf-hosts critic r2 F1). Real taps with page.mouse.click 1 px inside the 4 edge midpoints and 4 corners
    of every visible typed box's touch area (its border box) under `rootSel`; each tap must leave document.activeElement on that
    box. A box out of view is scrolled to the centre first; the focus is cleared before each tap. Returns one message per
-   (class, point, landed-on) group. */
+   (class, point, landed-on) group.
+   De-flake (lf-checks, lf-hosts hand-over r3 m1: 2-3 random misses a run on untouched cells - sub_100_no_regroup / expand
+   bottom edges, an add_facts quiz corner - that never repeated): the tap point used to be read in the same task as the blur
+   and the scrollIntoView, so a layout or scroll that settled on the next frames (the page's focusout / active-box handlers,
+   the scroll itself) moved the box under a stale point. Now the point is read only after two animation frames AND after the
+   scroll position and the box's rect hold still for two frames running; a miss is re-tapped once the same way, and only a
+   miss that REPEATS is reported (a box that truly cannot be hit misses every time and still FAILs: backtest
+   touch-hit-overlay-true-miss). `--no-retap` restores the old single unsettled tap (backtest touch-hit-settle-retap's fail
+   state). The misses that did not repeat are counted in the last line (TOUCH-HIT re-taps). */
+let RETAPS = 0;
 async function touchHit(page, rootSel) {
+    const NO_RETAP = has('no-retap');
     const n = await page.evaluate((sel) => {
         const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
         const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
@@ -329,35 +342,60 @@ async function touchHit(page, rootSel) {
         window.__mqTouchHit = list;
         return list.length;
     }, rootSel);
+    const pointOf = (i, pt, settle) => page.evaluate(async (i, pt, settle) => {
+        const el = window.__mqTouchHit[i];
+        if (!el || !el.isConnected) return null;
+        let r = el.getBoundingClientRect();
+        if (r.top < 2 || r.left < 2 || r.bottom > innerHeight - 2 || r.right > innerWidth - 2) { el.scrollIntoView({ block: 'center', inline: 'center' }); r = el.getBoundingClientRect(); }
+        if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+        if (settle) {
+            // two frames, then until the scroll position and the box's rect hold still across two frames (at most 20 x 2)
+            const frames = () => new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+            const keyNow = () => { const q = el.getBoundingClientRect(); return [scrollX, scrollY, q.left, q.top, q.width, q.height].join(','); };
+            let prev = keyNow();   // a page already still costs two frames only
+            for (let k = 0; k < 20; k++) {
+                await frames();
+                const key = keyNow();
+                if (key === prev) break;
+                prev = key;
+            }
+            if (!el.isConnected) return null;
+            r = el.getBoundingClientRect();
+        }
+        // a corner of a rounded box is probed on its 45-degree diagonal 1 px inside the rounded edge (the box's own
+        // shape: the browser hit-tests the rounded border box), i.e. inset 1 + r(1 - 1/sqrt 2); a square corner at 1 px
+        let ci = 1;
+        if (pt.includes('-')) { const cs = getComputedStyle(el); const rad = parseFloat(cs[{ 'top-left': 'borderTopLeftRadius', 'top-right': 'borderTopRightRadius', 'bottom-left': 'borderBottomLeftRadius', 'bottom-right': 'borderBottomRightRadius' }[pt]]) || 0; const rr = /%/.test(cs.borderTopLeftRadius) ? Math.min(r.width, r.height) * rad / 100 : Math.min(rad, r.width / 2, r.height / 2); ci = 1 + Math.ceil(rr * (1 - Math.SQRT1_2)); }
+        const x = /left/.test(pt) ? r.left + ci : /right/.test(pt) ? r.right - ci : r.left + r.width / 2;
+        const y = /top/.test(pt) ? r.top + ci : /bottom/.test(pt) ? r.bottom - ci : r.top + r.height / 2;
+        return [x, y];
+    }, i, pt, settle);
+    const missOf = (i) => page.evaluate((i) => {
+        const el = window.__mqTouchHit[i], a = document.activeElement, all = window.__mqTouchHit;
+        const cls = (e) => (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '');
+        if (a === el) return null;
+        const r = el.getBoundingClientRect();
+        const who = !a || a === document.body ? 'nothing (body)' : all.includes(a) ? `typed box ${all.indexOf(a)} (${a.tagName.toLowerCase()}${cls(a)})` : `${a.tagName.toLowerCase()}${cls(a)}`;
+        return [`${el.tagName.toLowerCase()}${cls(el)} ${Math.round(r.width)} x ${Math.round(r.height)} px (typed box ${i})`, who];
+    }, i);
     const groups = new Map();
     for (let i = 0; i < n; i++) {
         for (const pt of ['top', 'bottom', 'left', 'right', 'top-left', 'top-right', 'bottom-left', 'bottom-right']) {
-            const xy = await page.evaluate((i, pt) => {
-                const el = window.__mqTouchHit[i];
-                if (!el || !el.isConnected) return null;
-                let r = el.getBoundingClientRect();
-                if (r.top < 2 || r.left < 2 || r.bottom > innerHeight - 2 || r.right > innerWidth - 2) { el.scrollIntoView({ block: 'center', inline: 'center' }); r = el.getBoundingClientRect(); }
-                if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
-                // a corner of a rounded box is probed on its 45-degree diagonal 1 px inside the rounded edge (the box's own
-                // shape: the browser hit-tests the rounded border box), i.e. inset 1 + r(1 - 1/sqrt 2); a square corner at 1 px
-                let ci = 1;
-                if (pt.includes('-')) { const cs = getComputedStyle(el); const rad = parseFloat(cs[{ 'top-left': 'borderTopLeftRadius', 'top-right': 'borderTopRightRadius', 'bottom-left': 'borderBottomLeftRadius', 'bottom-right': 'borderBottomRightRadius' }[pt]]) || 0; const rr = /%/.test(cs.borderTopLeftRadius) ? Math.min(r.width, r.height) * rad / 100 : Math.min(rad, r.width / 2, r.height / 2); ci = 1 + Math.ceil(rr * (1 - Math.SQRT1_2)); }
-                const x = /left/.test(pt) ? r.left + ci : /right/.test(pt) ? r.right - ci : r.left + r.width / 2;
-                const y = /top/.test(pt) ? r.top + ci : /bottom/.test(pt) ? r.bottom - ci : r.top + r.height / 2;
-                return [x, y];
-            }, i, pt);
+            const xy = await pointOf(i, pt, !NO_RETAP);
             if (!xy) continue;
             await page.mouse.click(xy[0], xy[1]);
-            const got = await page.evaluate((i) => {
-                const el = window.__mqTouchHit[i], a = document.activeElement, all = window.__mqTouchHit;
-                const cls = (e) => (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '');
-                if (a === el) return null;
-                const r = el.getBoundingClientRect();
-                const who = !a || a === document.body ? 'nothing (body)' : all.includes(a) ? `typed box ${all.indexOf(a)} (${a.tagName.toLowerCase()}${cls(a)})` : `${a.tagName.toLowerCase()}${cls(a)}`;
-                return [`${el.tagName.toLowerCase()}${cls(el)} ${Math.round(r.width)} x ${Math.round(r.height)} px (typed box ${i})`, who];
-            }, i);
+            let got = await missOf(i);
+            if (got && !NO_RETAP) {
+                // the re-tap: the same point, read afresh after the page settles again; only a miss that repeats is a finding
+                const xy2 = await pointOf(i, pt, true);
+                if (!xy2) continue;
+                await page.mouse.click(xy2[0], xy2[1]);
+                const again = await missOf(i);
+                if (!again) { RETAPS++; if (has('touch-debug')) say(`    TOUCH-HIT re-tap held: ${got[0]} ${pt} first focused ${got[1]} at (${xy.map((v) => v.toFixed(1)).join(', ')}), re-tap at (${xy2.map((v) => v.toFixed(1)).join(', ')})`); }
+                got = again;
+            }
             if (!got) continue;
-            const k = `${got[0]}: a real tap 1 px inside its touch area's ${pt} ${pt.includes('-') ? 'corner' : 'edge'} focuses ${got[1]} (want that box)`;
+            const k = `${got[0]}: a real tap 1 px inside its touch area's ${pt} ${pt.includes('-') ? 'corner' : 'edge'} focuses ${got[1]} (want that box)${NO_RETAP ? '' : '; it repeats on a settled re-tap'}`;
             groups.set(k, (groups.get(k) || 0) + 1);
         }
     }
@@ -587,6 +625,8 @@ async function fixtureRun(file) {
         findings = m.findings;
         const ck = await page.evaluate(`(${CELL_KIND})(window.__MQ_KIND_MOD)`);
         if (ck) findings.push({ rule: 'CELL-READ', msg: ck });
+        // TOUCH-HIT on a fixture page (lf-checks: the planted overlay and the settling page) when --only names it
+        if (ONLY.includes('TOUCH-HIT')) for (const t of await touchHit(page, '#questionCard')) findings.push({ rule: 'TOUCH-HIT', msg: t });
         if (ONLY.length) findings = findings.filter((f) => ONLY.includes(f.rule));
     } finally { await browser.close(); }
     for (const f of findings) say(`  ${path.basename(file)}: ${f.rule} ${f.msg}`);
@@ -598,7 +638,7 @@ async function main() {
     if (has('self-test')) return selfTest();
     if (has('fixture')) { ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean); return fixtureRun(arg('fixture')); }
     const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
-    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths']);
+    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths', 'no-retap', 'touch-debug']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -757,7 +797,7 @@ async function main() {
     const byRule = {};
     for (const r of [...rows, ...laneHost]) for (const f of r.findings) byRule[f.rule] = (byRule[f.rule] || 0) + 1;
     const a14 = has('no-siblings-check') ? 'A14 siblings check skipped (--no-siblings-check)' : sibFails.length ? `A14 siblings NOT clean: ${sibFails.length} finding(s) on approved skill(s) ${[...new Set(sibFails.map((f) => f.split(' ')[2]))].join(', ')}` : `A14 siblings clean (${sibs.length} approved skill(s) × ${sizes.length} size(s) × ${SIB_ITEMS} item(s))`;
-    const tail = `${skills.length} skill(s) × ${sizes.length} size(s) × ${ITEMS} item(s): ${rows.length} of ${want} renders measured; ${HOSTS.length > 1 ? `${HOSTS.filter((h) => h !== 'card').join(' + ')} ${laneHost.length} of ${wantH} renders; ` : ''}${a14}; ${secs} s`;
+    const tail = `${skills.length} skill(s) × ${sizes.length} size(s) × ${ITEMS} item(s): ${rows.length} of ${want} renders measured; ${HOSTS.length > 1 ? `${HOSTS.filter((h) => h !== 'card').join(' + ')} ${laneHost.length} of ${wantH} renders; ` : ''}${a14}; ${!ONLY.length || ONLY.includes('TOUCH-HIT') ? (has('no-retap') ? 'TOUCH-HIT single unsettled taps (--no-retap); ' : `TOUCH-HIT re-taps that held ${RETAPS}; `) : ''}${secs} s`;
     let line;
     if (sibFails.length) line = `${TOOL}: FAIL - the probe misjudges approved skills (A14 siblings not clean), so its verdict cannot be trusted: ${sibFails.slice(0, 3).join(' | ').slice(0, 400)}${fails.length ? `; the lane's own: ${fails.length} finding(s)` : ''} (${tail})`;
     else if (fails.length) line = `${TOOL}: FAIL - ${fails.length} finding(s) (${Object.entries(byRule).map(([k, v]) => `${k} ${v}`).join(', ') || 'render errors'}) (${tail})`;
