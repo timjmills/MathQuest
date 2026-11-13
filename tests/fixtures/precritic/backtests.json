@@ -5764,6 +5764,70 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-vocab-cell-growth",
+  "check": "a lesson vocabulary CELL (.mq-lvocabcell) is under 35 % white above + below its ink, to its drawn edge: it never grows into the height another part freed (critic r5 N-r5-2, ledger line 21 part 3; EB-VOCAB alone read only the picture inside its own box)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-VOCAB (--vocab-ink, vocab cell)",
+  "browser": true,
+  "fail": {
+   "commit": "07634a75",
+   "state": "identify lesson S / M p2: the vocabulary cell 50.7 mm, 4.6 mm white above and 14.9 mm below its ink (38.5 %; the critic's pixel rows ~43 %)"
+  },
+  "pass": {
+   "commit": "43475c3d",
+   "state": "today: identify's vocabulary cell 71.8 mm at S / M, about 22 % white, all below its ink (the lane's lessons at most 32 %)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --hosts none --no-baseline --vocab-ink --only EB-VOCAB",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-identify-warmup-side-l",
+  "check": "identify's lesson page 2 at L: the Warm-up cells two across leave no side band of 30 % or more (critic r5 N-r5-1, ledger line 21 part 2; ENGINE-ROLES, lesson.js warm-up column count)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE (--roles lesson)",
+  "browser": true,
+  "fail": {
+   "commit": "43475c3d",
+   "state": "OPEN RED today: identify lesson L p2 cells 1-2, 26.7 mm beside the ink of a 91.8 mm cell (31 %)"
+  },
+  "pass": {
+   "commit": "",
+   "state": "the lf-engine fix (lesson.js warm-up column count; lead D3) - arm with its commit"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:identify --roles lesson --sizes L --hosts none --no-baseline --only EB-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": true,
+  "pendingReason": "open red, owner lf-engine (lead D3: ENGINE-ROLES, lesson.js warm-up two across). The check is on precritic's path (the default ws-empty-band row renders every offered role, lesson included); this row is armed with the fix commit when it lands."
+ },
+ {
+  "id": "pv-unit-form-ws-host-band",
+  "check": "unit_form rename=more on the online worksheet host: no cell with an empty band of 30 % or more under its ink (critic r5, ledger line 21 part 1; the legacy screen cell, hosts lane)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND (--hosts worksheet --opts rename=more)",
+  "browser": true,
+  "fail": {
+   "commit": "43475c3d",
+   "state": "OPEN RED today: unit_form worksheet 1280 px p1 cell 1, 10.4 mm under the ink of a 32.5 mm cell (32.0 %) [legacy]"
+  },
+  "pass": {
+   "commit": "",
+   "state": "the hosts-lane fix (the unit_form worksheet cell drawn by the kit, lead D3) - arm with its commit"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent --hosts worksheet --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": true,
+  "pendingReason": "open red, owner the hosts lane (lead D3: the worksheet host draws unit_form's legacy cell). NOT on precritic's path today: precritic's ws-empty-band renders the screen hosts with the default options only (option variants on hosts are not rendered); proposed for the hosts lane: hosts x option variants in ws-empty-band's precritic row."
  }
 ]
 }
