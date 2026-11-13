@@ -491,4 +491,41 @@ boot-smoke OK, 4 backtest rows PASS, precritic --strict: sibling-compare FAIL on
 sets; sets 4 and 5 unchanged by the tool's diff, their banks listed in manifest.json).
 
 ## r14 builder (Opus medium, rebuild after narrow critic r13 FAIL min 7; brief design/lanes/lf-vocab/r14-builder-brief.md), 2026-11-13
-Merged origin/master 8a7c5d43 first (838b9f76; backtests.json merged by row id), manifest re-applied. In progress.
+Merged origin/master 8a7c5d43 first (838b9f76; backtests.json merged by row id), manifest re-applied. One commit per item,
+each pushed; the three backtest rows in one commit after them (9efbe8a7).
+| item | check id | backtest row (fail 905528f2 -> pass) | on precritic's path | rounds saved |
+|---|---|---|---|---|
+| 1 one ringed or boxed number is a parity feature (marked-even / marked-odd; rings read as marks too); ones digit 47[3] -> 47[6], explain "the 6 in 476"; even / product, odd / quotient, odd / dividend notWith (grade pools; no set holds them) | ws-vocab-unit V-NUM (one mark) | vocab-r14-vnum-one -> 8506cbaa | y (vocab-unit) | 1 |
+| 2 a ringed or boxed digit inside a number adds place:ones / tens / hundreds, satisfying one / ten / hundred; digit notWith one, ten, hundred (set 5's only vetted split is its core {digit, expanded form, number name} / {hundred, ten, one}; words unchanged) | ws-vocab-unit V-PLACE | vocab-r14-vplace -> b57960c6 | y | 1 |
+| 3 figures of touching equal squares counted left to right are a run (grow: rising-run, step:2, declared); rule = any run with a constant step; every run picture dealt with rule fails; grow / rule and sequence / rule notWith (sets 7, 8: words unchanged, every vetted trio keeps grow and rule apart) | ws-vocab-unit V-TWIN (run) | vocab-r14-vtwin-run -> 2e8a59a3 | y | 1 |
+| 4 self-check of every picture's boundaries (below) | - | - | - | - |
+
+Item 4, the boundary of every feature check over all 47 pictures (today's reader):
+- one mark: product 12, before 104, after 106, term 14, first term 30, divisor 4, ones digit 6 read marked-even; digit (ringed 7),
+  quotient 3, dividend 13 read marked-odd. None is dealt with the parity word it reads (V-NUM, V7-ALL, V-FEAT green).
+- two marks: factor [4] x [3] (mixed parity: no reading); row / column / input / output rings hold 4 numbers of mixed parity.
+- a digit in a number: digit 4(7)2 (tens), ones digit 47[6] (ones). No other picture marks a single digit inside a number
+  (row / column rings round a whole table line were excluded: a place is read only for a mark holding ONE digit).
+- runs: row, column, multiple, pattern, count on, before, after, hundred chart, sequence, term, first term, grow. Every one is
+  notWith rule wherever both share a pool. Latent readings, never in one pool, so never dealt: row / column as sequence or grow;
+  multiple / pattern as one more, after; count on, before, after, hundred chart as rule, grow, sequence; before / after as even.
+Readings the model cannot express (the critic should judge these by eye):
+- parity of UNMARKED numbers (repeat 2, 4, 8 all even; sequence 5, 10, 15) - only ringed / boxed numbers carry parity;
+- a run that is not additive (repeat's 2, 4, 8 doubles - "times 2" as a rule; r13 critic judged it weak);
+- the place value of an unmarked part (expanded form 300 + 40 + 7 as hundred / ten / one; set 5 keeps them in different trios);
+- number WORDS (number name "three hundred forty-seven" names hundred: a hand pin, hundred / number name notWith);
+- tower HEIGHTS (grow's towers are 1, 2, 3 tall; the reader counts squares, 1, 3, 5, the drawn quantity);
+- the digit picture's arrow (it points, it adds no feature).
+V23: 12 pupil pages re-pinned (7956b2e5), all Error Analysis (both skills x S/M/L x seeds 7, 143869). Cause: the master merge
+(lf-roles 435052b9 / c36583fc, the Error Analysis judge block's layout); text identical to 905528f2's, no lf-vocab change moved
+a pinned page (905528f2 + manifest matches the old pin on all 60).
+Gates (one at a time, after the last fix): ws-vocab-unit OK, --browser OK (after the V23 re-pin); ws-next-box OK (19 hosts);
+ws-empty-band both skills OK, --slot-ink off OK; ws-boot-smoke OK; ws-backtest --row the three r14 rows: 3 PASS.
+precritic --strict, both skills: 33 PASS, FAIL sibling-compare (known: no approved sibling) AND ws-screen-ink-size (new gate from
+the master merge, lf-checks). Its findings are on the worksheet-1280 host at defaults: Match 3 "dot (array): 21 marks of 2.57 mm"
+(the distributive picture, which this seed's print page does not deal) and pick3 "[answer choices]" ring / picture marks (the
+screen-only word pills). Both fail identically on the merge commit 838b9f76 with the manifest applied, before any r14 change:
+not caused by this round, and not fixable by the lane without a pin or a gate ruling (the screen-ink-size pin is owned by the
+lead / lf-checks: "re-pin only with a STATUS note"). Not pinned; for the lead.
+Renders: scratchpad r14/sets (all 11 sets changed by the notWith additions; sets 5, 7, 8 included), manifest.json dealtBanks
+(180 banks; each bank and each set's pictureMarks carry the marked numbers, parity, places and runs).
