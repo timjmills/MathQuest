@@ -1281,7 +1281,7 @@ export const PV_PROVIDER_IDS = Object.freeze([
 // lesson's misconceptions: the 0 place dropped (305 -> 35), the parts written side by side
 // (305 -> 3005), teen / ty swapped (213 -> 230).
 const WORDS_TO_NUMBER = { iCan: 'I Can write a number from its name', instructionKey: 'standard-form',
-    steps: ['Read the hundreds word.', 'Read the last words as one number.', 'No tens or ones word? Write 0.', 'Write the digits.'],
+    steps: ['Read the hundreds word.', 'Read the last words as one number.', 'No tens or ones word? Write\u00a00.', 'Write the digits.'],   // ("Write 0." kept on one line: critic live1 r2 minor, "Write / 0." at L)
     say: '__ is __.', sayValues: (q) => { const p = pvOf(q); return p.n ? [p.words, p.n] : null; } };
 const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey: 'number-words',
     // (lf-placevalue critic live1 N2: "Say the hundreds: three hundred." - a literal from one example - printed over 53, 26, 99;
@@ -1378,7 +1378,8 @@ registerSkill('composing:number_word_form', {
             // number's places from its digits only - it holds no word of the answer, so it is the Guided hint as it stands)
             const t = Math.floor(r / 10), o = r % 10;
             const pl = (k, one, many) => `${k} ${k === 1 ? one : many}`;
-            if (!h) return clampSteps([step(n < 10 ? `${f(n)}: ${pl(o, 'one', 'ones')}.` : `${f(n)}: ${pl(t, 'ten', 'tens')}, ${pl(o, 'one', 'ones')}.`),
+            // (critic live1 r2 minor: "3: 3 ones." taught nothing over a one-word name; 0-10 are one word each - say it first)
+            if (!h) return clampSteps([step(n <= 10 ? `Say ${f(n)} out loud.` : `${f(n)}: ${pl(t, 'ten', 'tens')}, ${pl(o, 'one', 'ones')}.`),
                 step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);
             return clampSteps([step(`${f(n)}: ${pl(h, 'hundred', 'hundreds')}, then ${r ? `the rest, ${r}` : 'no tens or ones'}.`),
                 step(`So ${f(n)} is ${p.words}.`, [{ slot: 'answer', value: String(p.words) }])]);

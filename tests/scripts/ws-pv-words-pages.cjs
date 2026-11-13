@@ -118,7 +118,7 @@ function covered(steps) {
     if (/hundreds word/.test(s)) k.add('hundreds');
     if (/thousand/.test(s)) k.add('thousand');
     if (/tens word/.test(s) && /ones word/.test(s)) k.add('two-word');
-    if (/tens word/.test(s) && /no (tens or )?ones word|write 0/.test(s)) k.add('decade');
+    if (/tens word/.test(s) && /no (tens or )?ones word|write\s0/.test(s)) k.add('decade');
     return k;
 }
 /** The one-word Steps "Write its digit." cannot write ten (two digits). */
