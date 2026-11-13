@@ -509,27 +509,189 @@ function _tidySample(frame) {
     // The centred scale below is the panel's fit: a thumbnail crop (teacher-preview fit's `is-cropped`, origin top-left)
     // under it puts the stage off the frame (lf-algebra F8/G11), so it never survives a tidy.
     frame.classList.remove('is-cropped');
-    frame.style.height = '';   // each tidy starts from the panel's own frame height (re-runs are idempotent)
-    stage.style.transform = 'translate(-50%, -50%)';
-    const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
-    const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
-    const fw = frame.clientWidth - 12;
-    let fh = frame.clientHeight - 12;
-    if (fw <= 0 || fh <= 0) return;
-    // A tall sample (a growing pattern's four terms over a grid) fitted whole into the 140 px frame is drawn under
-    // 0.3 and reads as specks: the frame grows (never shrinks) until the drawing reaches 0.3, up to 28 % of the
-    // window and 260 px, so the whole problem stays in view at a legible size (lf-algebra F8/G11).
-    if (fh / h < SAMPLE_MIN_LEGIBLE && fw / w >= SAMPLE_MIN_LEGIBLE) {
-        const vh = (typeof window !== 'undefined' && window.innerHeight) || 800;
-        const cap = Math.max(fh + 12, Math.min(260, Math.round(vh * 0.28)));
-        const want = Math.min(cap, Math.ceil(h * SAMPLE_MIN_LEGIBLE) + 12);
-        if (want > fh + 12) { frame.style.height = `${want}px`; fh = frame.clientHeight - 12; }
+    _sampleShowAll(stage);     // each tidy starts from the whole item, at the panel's own frame height (re-runs are idempotent)
+    frame.style.height = '';
+    const fw = frame.clientWidth - SAMPLE_PAD;
+    const base = frame.clientHeight - SAMPLE_PAD;
+    if (fw <= 0 || base <= 0) return;
+    // The frame is border-box (`.tv-sko *`): a grown height is its inner height plus the border, so the frame never ends
+    // shorter than its CSS height and the drawing reaches the scale it was grown for (critic-panel-r1 F3).
+    const border = frame.offsetHeight - frame.clientHeight;
+    const vh = (typeof window !== 'undefined' && window.innerHeight) || 800;
+    // (the frame grows up to 32 % of the window and 300 px: room for a whole step or answer choice at 9 px text)
+    const cap = Math.max(base, Math.min(300, Math.round(vh * 0.32)) - border - SAMPLE_PAD);
+    const setInner = (inner, max = cap) => {
+        const px = Math.max(base, Math.min(max, Math.ceil(inner)));
+        if (px > base) frame.style.height = `${px + SAMPLE_PAD + border}px`;
+        return frame.clientHeight - SAMPLE_PAD;
+    };
+    const place = (w, h, fh) => {
+        const k = Math.min(1, fw / w, fh / h);
+        stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
+        return k;
+    };
+    const whole = _sampleSize(stage);
+    // The scale at which the sample is legible: its strokes reach 0.3 (teacher-preview's MIN_LEGIBLE) and its smallest
+    // word or digit is drawn at 9 px (critic-panel-r1 F1). A sample that reaches it whole is shown whole, the frame grown
+    // (up to 32 % of the window and 300 px) only as far as it needs.
+    const need = _sampleNeed(stage);
+    if (Math.min(1, fw / whole.w, cap / whole.h) >= need - 0.001) {
+        _samplePartUI(frame, 0, 1);
+        place(whole.w, whole.h, setInner(whole.h * need));
+        return;
     }
-    const k = Math.min(1, fw / w, fh / h);
-    stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
+    // Too big to read whole inside the capped frame: the panel shows what ONE item looks like one whole part at a time
+    // (the question; then the drawing; then the answer choices, ...), each part legible, with "1 of N" and arrows. A part
+    // is a whole block of the item, never a crop through it.
+    const pages = _samplePages(stage, fw, cap);
+    if (pages.length < 2) {   // nothing to split along: the whole item, as large as the capped frame allows
+        _samplePartUI(frame, 0, 1);
+        place(whole.w, whole.h, setInner(cap));
+        return;
+    }
+    const at = Math.max(0, Math.min(pages.length - 1, Number(frame.dataset.skoPart) || 0));
+    const fh = setInner(Math.max(...pages.map((p) => p.h * Math.min(1, fw / p.w, cap / p.h))), cap);
+    _sampleShowPage(stage, pages, at);
+    const now = _sampleSize(stage);
+    place(now.w, now.h, fh);
+    _samplePartUI(frame, at, pages.length);
 }
 // (teacher-preview's MIN_LEGIBLE: below it a sample's strokes are hairlines)
 const SAMPLE_MIN_LEGIBLE = 0.3;
+// The smallest word or digit of a sample, as drawn (ws-options-shots' legibility floor).
+const SAMPLE_MIN_TEXT_PX = 9;
+const SAMPLE_PAD = 12;
+// A page of parts is filled only while it is drawn at least at half size.
+const SAMPLE_PART_MIN = 0.5;
+const _SKO_HIDE = 'skoHide';
+
+/** The stage's layout size with nothing hidden or scaled; a drawing wider than the stage widens it (teacher-preview fit). */
+function _sampleSize(stage) {
+    stage.style.transform = 'translate(-50%, -50%)';
+    stage.style.width = ''; stage.style.maxWidth = '';
+    if (stage.scrollWidth > stage.offsetWidth + 1) { stage.style.maxWidth = 'none'; stage.style.width = `${stage.scrollWidth}px`; }
+    return { w: Math.max(stage.scrollWidth, stage.offsetWidth, 1), h: Math.max(stage.scrollHeight, stage.offsetHeight, 1) };
+}
+
+/** The scale at which everything visible in `root` is legible: 0.3 for strokes, 9 px for its smallest HTML word or digit. */
+function _sampleNeed(root) {
+    let min = Infinity;
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+        if (!n.textContent.trim()) continue;
+        const el = n.parentElement;
+        if (!el || el.closest('svg') || !el.getClientRects().length) continue;
+        const cs = getComputedStyle(el);
+        if (cs.visibility === 'hidden' || Number(cs.opacity) === 0) continue;
+        // (a drawing's own nested scale counts: bounding width / layout width, measured while the stage is unscaled)
+        // (a ratio within 3 % of 1 is the layout width's whole-pixel rounding, not a scale)
+        let own = el.offsetWidth >= 4 ? el.getBoundingClientRect().width / el.offsetWidth : 1;
+        if (!(own > 0) || Math.abs(own - 1) < 0.03) own = 1;
+        const px = (parseFloat(cs.fontSize) || 0) * own;
+        if (px > 0 && px < min) min = px;
+    }
+    return Math.max(SAMPLE_MIN_LEGIBLE, Number.isFinite(min) ? SAMPLE_MIN_TEXT_PX / min : 0);
+}
+
+function _sampleShown(el) { return el.getClientRects().length > 0 && getComputedStyle(el).display !== 'none'; }
+// (a block with no height draws nothing: it is never a part of its own)
+function _sampleDrawn(el) { return _sampleShown(el) && el.getBoundingClientRect().height > 0; }
+
+/**
+ * The item's whole parts, in reading order: a block that is legible on its own inside the capped frame is one part; a
+ * block that is not, and is a plain column of blocks (no loose words, not a table, grid or drawing), gives its own
+ * blocks instead. Returns the leaves and every block split along the way (the leaves' ancestors).
+ */
+function _sampleLeaves(el, fits, splits) {
+    if (fits(el)) return [el];
+    const kids = [...el.children].filter(_sampleDrawn);
+    const cs = getComputedStyle(el);
+    const loose = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    const column = /^(block|flex|flow-root|list-item)$/.test(cs.display) && !(cs.display === 'flex' && /row/.test(cs.flexDirection) && cs.flexWrap === 'nowrap');
+    if (!kids.length || loose || !column || el.closest('svg, table')) return [el];
+    splits.push(el);
+    if (kids.length === 1) return _sampleLeaves(kids[0], fits, splits);   // a wrapper (the visual's own box): look inside it
+    return kids.flatMap((k) => _sampleLeaves(k, fits, splits));
+}
+
+/** Pack the item's parts into pages, each legible inside the capped frame. Pages: [{leaves, w, h}]. */
+function _samplePages(stage, fw, cap) {
+    const cell = stage.querySelector('.tvp-cell') || stage;
+    // a block is legible on its own when the stage, showing only it (and the boxes around it), fits at its own scale
+    const fits = (el) => {
+        _sampleShowAll(stage);
+        for (let a = el; a && a !== cell && a.parentElement; a = a.parentElement) {
+            for (const sib of a.parentElement.children) if (sib !== a && _sampleShown(sib)) _sampleHide(sib);
+        }
+        const s = _sampleSize(stage);
+        const ok = Math.min(1, fw / s.w, cap / s.h) >= Math.max(SAMPLE_PART_MIN, _sampleNeed(stage)) - 0.001;
+        _sampleShowAll(stage);
+        return ok;
+    };
+    const splits = [];
+    const leaves = _sampleLeaves(cell, fits, splits);
+    if (leaves.length < 2) return [];
+    const tree = { leaves, splits };
+    // (a part of drawings only is packed to half size, not to the strokes' 0.3 floor: one part is never a column of specks)
+    const fitsPage = (page, floor = SAMPLE_PART_MIN) => {
+        _sampleApply(stage, tree, page);
+        const s = _sampleSize(stage);
+        return Math.min(1, fw / s.w, cap / s.h) >= Math.max(floor, _sampleNeed(stage)) - 0.001;
+    };
+    const pages = [];
+    let cur = [];
+    for (const leaf of leaves) {
+        if (!cur.length || fitsPage([...cur, leaf])) { cur = [...cur, leaf]; continue; }
+        pages.push(cur);
+        cur = [leaf];
+    }
+    if (cur.length) pages.push(cur);
+    // An empty answer slot is never a part of its own: it joins the question's part (or the nearest part it fits on).
+    const slotOnly = (page) => page.every((l) => l.matches('.tvp-answerrow, .mq-slot') && !l.textContent.trim());
+    for (let i = pages.length - 1; i >= 0 && pages.length > 1; i--) {
+        if (!slotOnly(pages[i])) continue;
+        const to = [0, ...pages.keys()].find((j) => j !== i && !slotOnly(pages[j]) && fitsPage([...pages[j], ...pages[i]].sort((x, y) => leaves.indexOf(x) - leaves.indexOf(y)), SAMPLE_MIN_LEGIBLE));
+        if (to === undefined) continue;
+        pages[to] = [...pages[to], ...pages[i]].sort((x, y) => leaves.indexOf(x) - leaves.indexOf(y));
+        pages.splice(i, 1);
+    }
+    if (pages.length < 2) { _sampleShowAll(stage); return []; }
+    const out = pages.map((page) => { _sampleApply(stage, tree, page); return { leaves: page, tree, ..._sampleSize(stage) }; });
+    _sampleShowAll(stage);
+    return out;
+}
+
+/** Show only `page`'s parts (and the blocks that hold them). */
+function _sampleApply(stage, tree, page) {
+    _sampleShowAll(stage);
+    for (const el of tree.splits) if (!page.some((l) => el.contains(l))) _sampleHide(el);
+    for (const el of tree.leaves) if (!page.includes(el)) _sampleHide(el);
+}
+function _sampleHide(el) { if (el.dataset[_SKO_HIDE]) return; el.dataset[_SKO_HIDE] = el.style.display || '-'; el.style.display = 'none'; }
+function _sampleShowPage(stage, pages, at) { _sampleApply(stage, pages[at].tree, pages[at].leaves); }
+function _sampleShowAll(stage) {
+    for (const el of stage.querySelectorAll('[data-sko-hide]')) {
+        const was = el.dataset[_SKO_HIDE];
+        el.style.display = was === '-' ? '' : was;
+        delete el.dataset[_SKO_HIDE];
+    }
+}
+
+/** The "1 of N" line over the frame (hidden when the sample is shown whole). */
+function _samplePartUI(frame, at, n) {
+    frame.dataset.skoPart = String(at);
+    const box = frame.closest('.tv-sko-sample');
+    const ui = box && box.querySelector('.tv-sko-part');
+    if (!ui) return;
+    ui.hidden = n < 2;
+    if (n < 2) return;
+    const label = ui.querySelector('.tv-sko-part-n');
+    if (label) label.textContent = `${at + 1} of ${n}`;
+    const prev = ui.querySelector('[data-sko-part="-1"]');
+    const next = ui.querySelector('[data-sko-part="1"]');
+    if (prev) prev.disabled = at === 0;
+    if (next) next.disabled = at === n - 1;
+}
 
 /** Apply one control change to a full option object. Shared by every host and the print dialog. */
 export function applyOptionEdit(next, defs, action, optId, raw) {
@@ -755,7 +917,7 @@ function _renderTeacherPopover(el) {
             <div><h2 class="tv-sko-title" id="tvSkoTitle">${escHTML(name)}</h2><p class="tv-sko-sum">${escHTML(summary)}</p></div>
             <button type="button" class="tv-icon-btn" onclick="closeSkillOptionsPanel()" aria-label="Close options"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
         </div>
-        ${canSample ? `<div class="tv-sko-sample is-pinned"><span class="tv-label" id="tvSkoSampleL">Sample question</span><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
+        ${canSample ? `<div class="tv-sko-sample is-pinned"><div class="tv-sko-samplehead"><span class="tv-label" id="tvSkoSampleL">Sample question</span><span class="tv-sko-part" hidden><button type="button" class="tv-icon-btn" data-sko-part="-1" aria-label="Previous part of the sample"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><span class="tv-sko-part-n" aria-live="polite"></span><button type="button" class="tv-icon-btn" data-sko-part="1" aria-label="Next part of the sample"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></span></div><div class="tvp-frame tv-sko-frame" aria-labelledby="tvSkoSampleL"></div></div>` : ''}
         <div class="tv-sko-body" style="overflow-x:hidden;">
             ${defs.length ? rows : '<p class="tv-sko-none">This skill has no options.</p>'}
         </div>
@@ -771,17 +933,67 @@ function _renderTeacherPopover(el) {
         const again = el.querySelectorAll(FOCUSABLE)[focusAt];
         if (again) { try { again.focus({ preventScroll: true }); } catch (e) { /* */ } }
     }
+    // Placed first, so the sample is fitted to the panel's real width; every later change of the panel's height (the
+    // tidies grow the frame, a choice line is revealed) re-clamps it inside the window (critic-panel-r1 F2).
+    _placeTeacherPopover(el);
     if (canSample) {
         const frame = el.querySelector('.tv-sko-frame');
         try {
             window.tvMountSample(frame, categoryId, skillId, _pop.opts);
             _tidySample(frame);
             // The preview re-fits itself once its styles settle; tidy again after it.
-            setTimeout(() => { if (frame.isConnected) _tidySample(frame); }, 950);
+            setTimeout(() => { if (frame.isConnected) { _tidySample(frame); _clampTeacherPopover(el); } }, 950);
         } catch (e) { /* a sample never breaks the editor */ }
+        for (const b of el.querySelectorAll('.tv-sko-part [data-sko-part]')) {
+            b.addEventListener('click', () => {
+                frame.dataset.skoPart = String((Number(frame.dataset.skoPart) || 0) + Number(b.dataset.skoPart));
+                try { _tidySample(frame); } catch (e) { /* */ }
+                _clampTeacherPopover(el);
+                if (b.disabled) { const other = el.querySelector(`.tv-sko-part [data-sko-part="${-Number(b.dataset.skoPart)}"]`); if (other) other.focus({ preventScroll: true }); }
+            });
+        }
     }
-    _placeTeacherPopover(el);
     revealOverflowingChoices(el);
+    _clampTeacherPopover(el);
+    _watchTeacherPopover(el);
+}
+
+/** Keep a floating panel inside the window after it grew (its placement measured it before the sample was tidied). */
+function _clampTeacherPopover(el) {
+    if (!el || !el.isConnected || el.classList.contains('is-sheet') || el.classList.contains('is-docked') || el.classList.contains('is-halfsheet')) return;
+    const vh = window.innerHeight;
+    const r = el.getBoundingClientRect();
+    if (r.bottom > vh - 12) el.style.top = Math.round(Math.max(12, vh - 12 - r.height)) + 'px';
+}
+
+// One watcher per open panel: its own size changes (ResizeObserver) re-clamp it; a window resize re-places it from the
+// button that opened it and re-fits the sample to the new frame.
+let _popWatch = null;
+function _watchTeacherPopover(el) {
+    if (_popWatch && _popWatch.el === el) return;
+    _unwatchTeacherPopover();
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => _clampTeacherPopover(el)) : null;
+    if (ro) ro.observe(el);
+    let t = 0;
+    const onResize = () => {
+        clearTimeout(t);
+        t = setTimeout(() => {
+            if (!_pop || !el.isConnected) return;
+            if (_pop.anchor && _pop.anchor.isConnected && _pop.anchor.getBoundingClientRect) _pop.rect = _pop.anchor.getBoundingClientRect();
+            _placeTeacherPopover(el);
+            const frame = el.querySelector('.tv-sko-frame');
+            try { if (frame) _tidySample(frame); } catch (e) { /* */ }
+            _clampTeacherPopover(el);
+        }, 100);
+    };
+    window.addEventListener('resize', onResize);
+    _popWatch = { el, ro, onResize };
+}
+function _unwatchTeacherPopover() {
+    if (!_popWatch) return;
+    if (_popWatch.ro) _popWatch.ro.disconnect();
+    window.removeEventListener('resize', _popWatch.onResize);
+    _popWatch = null;
 }
 
 function _placeTeacherPopover(el) {
@@ -997,6 +1209,7 @@ export function closeSkillOptionsPanel() {
     }
     if (hadFocus && target && target.isConnected && typeof target.focus === 'function') { try { target.focus({ preventScroll: true }); } catch (e) { /* */ } }
     const el = typeof document !== 'undefined' && document.getElementById('skillOptionsPopover');
+    if (typeof window !== 'undefined') _unwatchTeacherPopover();
     if (el) el.remove();
     if (typeof document !== 'undefined') {
         document.removeEventListener('mousedown', _popOutside, true);

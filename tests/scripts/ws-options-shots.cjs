@@ -17,10 +17,13 @@
 //   (c) the sample is illegible (critic-panel-r1 F1): the smallest visible HTML text of the sample (question, labels,
 //       answer choices), as drawn = computed font-size × its effective scale (bounding width / layout width), is under
 //       9 px. A sample that cannot be drawn whole at 9 px is shown one whole part at a time ("1 of N"): the visible
-//       part is what is measured, and it must be whole (inside the frame). The smallest SVG text is reported, not failed;
+//       part is what is measured, every part in turn (`@<w> part i`, Next arrow), and each must be whole (inside the
+//       frame). The smallest SVG text is reported, not failed;
 //   (d) the panel's controls leave the window (critic-panel-r1 F2): `.tv-sko-foot`'s bottom below innerHeight, or the
 //       Done button not wholly inside the window, or the panel itself outside it;
-//   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4).
+//   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4);
+//   (f) the drawing's scale is under 0.30 (its strokes are hairlines), or the frame ends shorter than its CSS height
+//       (critic-panel-r1 F3: a grown frame computed from clientHeight but written as a border-box height).
 // The main sweep is every skill at 1280×1000 and 390×844. The SPOT set (the critic's cases: the coordinates
 // transformation skills, the long algebra word problems, the skills whose footer fell off the window, ...) and every
 // --skill run also get: 1280×720 (`@1280x720`), a resize with the panel open from 1280×1000 to 1280×720
@@ -35,6 +38,9 @@
 // Prints `ws-options-shots: OK (n skills × w widths)` or `ws-options-shots: FAIL (n)`; exit 1 on FAIL.
 // --shots <dir> saves every frame crop; --fail-shots <dir> (default: scratch-free, off) saves only the failing ones;
 // --save-panels writes the whole panel to design/audit/options-panels/<cat>-<skill>.png (the old tool's P12 evidence).
+// --checks inside,ink,text,controls,pageerror,scale limits which families fail (each FAIL reason is tagged [family]);
+// --change gives every main check the option-change pass; --changed-only judges only the readings after it;
+// --inject <file.js> runs a backtest fixture script in the page (tests/fixtures/precritic/options-shots/).
 // --verbose prints an `ok` line (scale, smallest text, part) for every check of a full run too.
 // A full run is ~1.7 s a skill a width per worker; --workers (default 3) runs that many browsers side by side.
 'use strict';
@@ -46,7 +52,7 @@ const argv = process.argv.slice(2);
 const many = (k) => { const out = []; argv.forEach((a, i) => { if (a === '--' + k && argv[i + 1]) out.push(argv[i + 1]); }); return out; };
 const one = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const flag = (k) => argv.includes('--' + k);
-const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-shots', '--shard']);
+const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-shots', '--shard', '--checks', '--inject']);
 const bare = argv.filter((a, i) => /^[a-z0-9_]+:[a-z0-9_]+$/i.test(a) && !valued.has(argv[i - 1]));
 const ONLY = [...new Set([...many('skill').flatMap((v) => v.split(',')).map((v) => v.trim()).filter(Boolean), ...bare])];
 const WIDTHS = String(one('widths', '1280,390')).split(',').map(Number).filter(Boolean);
@@ -67,6 +73,18 @@ const HEIGHT = { 1280: 1000, 390: 844 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const INK_MIN = 0.005, TEXT_MIN = 9;
 const NO_SPOT = flag('no-spot');
+// --checks a,b: only these families fail a reading (the others are still measured and shown); a backtest row isolates its
+// own finding with it. inside (a), ink (b), text (c), controls (d), pageerror (e), scale (f).
+const CHECKS = new Set(String(one('checks', 'inside,ink,text,controls,pageerror,scale')).split(',').map((x) => x.trim()).filter(Boolean));
+const BAD_CHECK = [...CHECKS].filter((c) => !['inside', 'ink', 'text', 'controls', 'pageerror', 'scale'].includes(c));
+if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (inside, ink, text, controls, pageerror, scale)`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
+// --change: the option-change pass on every main check (a full run gives it to the spot set; a --skill run to every skill).
+const CHANGE_ALL = flag('change');
+// --changed-only: only the readings taken after the option change are judged (the backtest of that pass).
+const CHANGED_ONLY = flag('changed-only');
+// --inject <file.js>: a script run in the page after boot (a backtest fixture that models a regression: an oversize
+// stage, a page error while the panel draws). Never used by a gate run.
+const INJECT = one('inject', '') ? fs.readFileSync(path.resolve(one('inject')), 'utf8') : '';
 const VERBOSE = flag('verbose');
 // The critic's cases (critic-panel-r1): the transformation skills (k 0.17-0.23), the long algebra word problems, the skills
 // whose footer fell below the window at 1280, a grown frame that shrinks on an option change, and plain short samples.
@@ -122,39 +140,50 @@ function measure(page) {
                     if (px < svgPx) svgPx = px;
                     continue;
                 }
-                const eff = el.offsetWidth >= 4 ? el.getBoundingClientRect().width / el.offsetWidth : sk;
+                // (a ratio within 3 % of the stage's scale is the layout width's whole-pixel rounding: the stage's scale)
+                let eff = el.offsetWidth >= 4 ? el.getBoundingClientRect().width / el.offsetWidth : sk;
+                if (!(eff > 0) || Math.abs(eff - sk) < 0.03 * sk) eff = sk;
                 const px = fsz * eff;
                 if (px < minPx) { minPx = px; minText = t.slice(0, 24); }
             }
         }
+        // the frame's own CSS height (its inline grown height set aside for one synchronous read)
+        const grown = frame.style.height;
+        frame.style.height = '';
+        const cssH = frame.offsetHeight;
+        frame.style.height = grown;
         const foot = pop.querySelector('.tv-sko-foot');
         const done = foot && [...foot.querySelectorAll('button')].pop();
         const sample = frame.closest('.tv-sko-sample');
         const part = sample && sample.querySelector('.tv-sko-part');
         return {
             unavailable: frame.classList.contains('is-unavailable'), cropped: frame.classList.contains('is-cropped'),
-            f: box(frame), s: box(stage), pop: box(pop), foot: box(foot), done: box(done),
+            f: box(frame), s: box(stage), cssH, frameH: frame.offsetHeight, pop: box(pop), foot: box(foot), done: box(done),
             vw: document.documentElement.clientWidth || window.innerWidth, vh: window.innerHeight,
-            transform: stage ? stage.style.transform : '', minPx, minText, svgPx,
+            transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null,
             part: part && !part.hidden ? String(part.querySelector('.tv-sko-part-n') ? part.querySelector('.tv-sko-part-n').textContent : part.textContent).replace(/\s+/g, ' ').trim() : '',
         };
     });
 }
 
+const scaleOf = (t) => (/scale\(([\d.]+)\)/.exec(t || '') || [0, '1'])[1];
 // The verdict on one reading: (a) inside, (b) ink, (c) legible, (d) the controls in the window.
 function judge(m, ink) {
     const fails = [];
-    if (m.noFrame) return ['no sample frame in the panel'];
+    if (m.noFrame) return ['[inside] no sample frame in the panel'];
     const { f, s } = m;
     if (s) {
         const inside = s.x >= f.x - 1 && s.y >= f.y - 1 && s.x + s.w <= f.x + f.w + 1 && s.y + s.h <= f.y + f.h + 1;
-        if (!m.unavailable && !inside) fails.push(`stage (${Math.round(s.x - f.x)},${Math.round(s.y - f.y)}) ${Math.round(s.w)}×${Math.round(s.h)} is not inside the ${Math.round(f.w)}×${Math.round(f.h)} frame (${m.cropped ? 'is-cropped, ' : ''}transform ${m.transform})`);
-    } else if (!m.unavailable) fails.push('no .tvp-stage in the frame');
-    if (!m.unavailable && ink <= INK_MIN) fails.push(`the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > 0.5 %)`);
-    if (!m.unavailable && s && m.minPx < TEXT_MIN - 0.05) fails.push(`text drawn at ${m.minPx.toFixed(1)} px ("${m.minText}"; needs >= ${TEXT_MIN} px; ${m.transform})`);
-    if (m.foot && m.foot.y + m.foot.h > m.vh + 0.5) fails.push(`the panel footer's bottom is at ${Math.round(m.foot.y + m.foot.h)}, below the ${m.vh} px window`);
-    if (m.done && (m.done.x < -0.5 || m.done.y < -0.5 || m.done.x + m.done.w > m.vw + 0.5 || m.done.y + m.done.h > m.vh + 0.5)) fails.push(`the Done button (${Math.round(m.done.x)},${Math.round(m.done.y)} ${Math.round(m.done.w)}×${Math.round(m.done.h)}) is not inside the ${m.vw}×${m.vh} window`);
-    else if (m.pop && (m.pop.y < -0.5 || m.pop.y + m.pop.h > m.vh + 0.5)) fails.push(`the panel (top ${Math.round(m.pop.y)}, bottom ${Math.round(m.pop.y + m.pop.h)}) leaves the ${m.vh} px window`);
+        if (!m.unavailable && !inside) fails.push(`[inside] stage (${Math.round(s.x - f.x)},${Math.round(s.y - f.y)}) ${Math.round(s.w)}×${Math.round(s.h)} is not inside the ${Math.round(f.w)}×${Math.round(f.h)} frame (${m.cropped ? 'is-cropped, ' : ''}transform ${m.transform})`);
+    } else if (!m.unavailable) fails.push('[inside] no .tvp-stage in the frame');
+    if (!m.unavailable && ink <= INK_MIN) fails.push(`[ink] the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > 0.5 %)`);
+    if (!m.unavailable && s && m.minPx != null && m.minPx < TEXT_MIN - 0.05) fails.push(`[text] text drawn at ${m.minPx.toFixed(1)} px ("${m.minText}"; needs >= ${TEXT_MIN} px; ${m.transform})`);
+    const k = Number(scaleOf(m.transform));
+    if (!m.unavailable && s && k < 0.2995) fails.push(`[scale] drawn at scale ${k} (needs >= 0.30: below it a sample's strokes are hairlines)`);
+    if (!m.unavailable && m.frameH < m.cssH) fails.push(`[scale] the frame is ${m.frameH} px, shorter than its CSS height ${m.cssH} px (critic-panel-r1 F3: a grown frame never shrinks)`);
+    if (m.foot && m.foot.y + m.foot.h > m.vh + 0.5) fails.push(`[controls] the panel footer's bottom is at ${Math.round(m.foot.y + m.foot.h)}, below the ${m.vh} px window`);
+    if (m.done && (m.done.x < -0.5 || m.done.y < -0.5 || m.done.x + m.done.w > m.vw + 0.5 || m.done.y + m.done.h > m.vh + 0.5)) fails.push(`[controls] the Done button (${Math.round(m.done.x)},${Math.round(m.done.y)} ${Math.round(m.done.w)}×${Math.round(m.done.h)}) is not inside the ${m.vw}×${m.vh} window`);
+    else if (m.pop && (m.pop.y < -0.5 || m.pop.y + m.pop.h > m.vh + 0.5)) fails.push(`[controls] the panel (top ${Math.round(m.pop.y)}, bottom ${Math.round(m.pop.y + m.pop.h)}) leaves the ${m.vh} px window`);
     return fails;
 }
 
@@ -165,8 +194,7 @@ async function frameInk(page) {
     return { ink: await inkOf(page, b64), b64 };
 }
 
-const scaleOf = (t) => (/scale\(([\d.]+)\)/.exec(t || '') || [0, '1'])[1];
-const note = (m, ink) => (m.noFrame ? '' : `ink ${(ink * 100).toFixed(2)} %, scale ${scaleOf(m.transform)}, text >= ${Number.isFinite(m.minPx) ? m.minPx.toFixed(1) : '-'} px${Number.isFinite(m.svgPx) ? ` (svg text ${m.svgPx.toFixed(1)} px)` : ''}, frame ${Math.round(m.f.h)} px${m.part ? `, part ${m.part}` : ''}${m.unavailable ? ' (sample unavailable)' : ''}`);
+const note = (m, ink) => (m.noFrame ? '' : `ink ${(ink * 100).toFixed(2)} %, scale ${scaleOf(m.transform)}, text >= ${m.minPx != null ? m.minPx.toFixed(1) : '-'} px${m.svgPx != null ? ` (svg text ${m.svgPx.toFixed(1)} px)` : ''}, frame ${Math.round(m.f.h)} px${m.part ? `, part ${m.part}` : ''}${m.unavailable ? ' (sample unavailable)' : ''}`);
 
 // Change the panel's first option (the first select or tick box of its body).
 function changeFirstOption(page) {
@@ -211,17 +239,31 @@ async function checkSkill(app, ref, vp, mode = {}) {
         const { ink, b64 } = m.noFrame ? { ink: 0, b64: '' } : await frameInk(page);
         const fails = judge(m, ink);
         const errs = app.problems.filter((p) => p.type === 'pageerror');
-        if (errs.length > errs0) fails.push(`page error: ${errs.slice(errs0).map((e) => e.text.split('\n')[0]).join(' | ').slice(0, 200)}`);
+        if (errs.length > errs0) fails.push(`[pageerror] page error: ${errs.slice(errs0).map((e) => e.text.split('\n')[0]).join(' | ').slice(0, 200)}`);
+        const judged = !CHANGED_ONLY || /changed/.test(label);
+        const shown = fails.slice();
+        fails.length = 0;
+        if (judged) for (const f of shown) if (CHECKS.has((/^\[(\w+)\]/.exec(f) || [])[1])) fails.push(f);
         const tag = `${categoryId}-${skillId}-${label.replace(/[^\w]+/g, '_')}`;
         if (keep && SHOTS && b64) { fs.mkdirSync(SHOTS, { recursive: true }); fs.writeFileSync(path.join(SHOTS, tag + '.png'), Buffer.from(b64, 'base64')); }
         if (keep && FAIL_SHOTS && b64 && fails.length) { fs.mkdirSync(FAIL_SHOTS, { recursive: true }); fs.writeFileSync(path.join(FAIL_SHOTS, tag + '.png'), Buffer.from(b64, 'base64')); }
-        if (keep) out.push({ ref, width: label, fails, unavailable: !!m.unavailable, note: note(m, ink) });
+        const other = shown.filter((f) => !fails.includes(f));
+        if (keep) out.push({ ref, width: label, fails, unavailable: !!m.unavailable, note: note(m, ink) + (other.length ? `; not judged here: ${other.join('; ')}` : '') });
     };
     // (a resize check's reading before the resize is the main sweep's own: not reported twice)
     await read(vp.label, !mode.resizeTo);
     if (SAVE_PANELS && vp.label === '1280' && !mode.resizeTo) {
         const el = await page.$('#skillOptionsPopover');
         if (el) await el.screenshot({ path: path.join(ROOT, 'design', 'audit', 'options-panels', `${categoryId}-${skillId}.png`) });
+    }
+    // A sample shown one part at a time: every part is read, each must be whole, legible and inked (critic-panel-r1 F1).
+    if (!mode.resizeTo) {
+        for (let i = 2; i <= 12; i++) {
+            const moved = await page.evaluate(() => { const b = document.querySelector('#skillOptionsPopover .tv-sko-part:not([hidden]) [data-sko-part="1"]'); if (!b || b.disabled) return false; b.click(); return true; });
+            if (!moved) break;
+            await sleep(100);
+            await read(`${vp.label} part ${i}`);
+        }
     }
     if (mode.resizeTo) {
         await page.setViewport({ width: vp.w, height: mode.resizeTo, deviceScaleFactor: 1 });
@@ -262,18 +304,23 @@ async function checkSkill(app, ref, vp, mode = {}) {
     const spotGone = ONLY.length || NO_SPOT ? [] : SPOT.filter((r) => !all.includes(r));
     for (const r of spotGone) console.log(`  note: spot skill ${r} has no options panel now (not checked)`);
     const spotAll = SPOT.filter((r) => all.includes(r));
-    const spot = ONLY.length ? refs : NO_SPOT ? [] : SHARD ? spotAll.filter((_, k) => k % SHARD.n === SHARD.i - 1) : spotAll;
+    const spot = NO_SPOT ? [] : ONLY.length ? refs : SHARD ? spotAll.filter((_, k) => k % SHARD.n === SHARD.i - 1) : spotAll;
     const skipNote = skipped.length ? `; ${skipped.length} skipped, no options panel` : '';
     const shardNote = SHARD ? `; shard ${SHARD.i}/${SHARD.n} of ${all.length}` : '';
     const jobs = [];
-    for (const w of WIDTHS) for (const r of refs) jobs.push({ ref: r, vp: { w, h: HEIGHT[w] || 900, label: String(w) }, mode: { change: spot.includes(r) } });
+    for (const w of WIDTHS) for (const r of refs) jobs.push({ ref: r, vp: { w, h: HEIGHT[w] || 900, label: String(w) }, mode: { change: CHANGE_ALL || spot.includes(r) } });
     if (spot.length) {
         for (const r of spot) jobs.push({ ref: r, vp: { w: 1280, h: 720, label: '1280x720' } });
         for (const r of spot) jobs.push({ ref: r, vp: { w: 1280, h: 1000, label: '1280' }, mode: { resizeTo: 720 } });
     }
     const nWorkers = Math.min(WORKERS, Math.max(1, Math.ceil(jobs.length / 20)));
     const apps = [first];
-    for (let i = 1; i < nWorkers; i++) apps.push(await open({ seed: 1, viewport: { width: 1280, height: 1000, deviceScaleFactor: 1 } }));
+    if (INJECT) await first.page.evaluate(INJECT);
+    for (let i = 1; i < nWorkers; i++) {
+        const a = await open({ seed: 1, viewport: { width: 1280, height: 1000, deviceScaleFactor: 1 } });
+        if (INJECT) await a.page.evaluate(INJECT);
+        apps.push(a);
+    }
     const results = [];
     let next = 0;
     await Promise.all(apps.map(async (app) => {
@@ -297,7 +344,7 @@ async function checkSkill(app, ref, vp, mode = {}) {
     if (unavailable.length) console.log(`  sample unavailable (reported, not failed): ${unavailable.join(', ')}`);
     if (pageErrors.length) console.log(`  page errors (each FAILs the check it was thrown in): ${pageErrors.slice(0, 5).map((e) => e.text.split('\n')[0]).join(' | ')}`);
     const bad = results.filter((r) => r.fails.length);
-    const nBad = bad.length + (pageErrors.length && !bad.some((r) => r.fails.some((f) => /^page error/.test(f))) ? 1 : 0);
+    const nBad = bad.length + (CHECKS.has('pageerror') && pageErrors.length && !bad.some((r) => r.fails.some((f) => /^\[pageerror\]/.test(f))) ? 1 : 0);
     const secs = Math.round((Date.now() - t0) / 1000);
     const spotNote = spot.length ? `; spot passes on ${spot.length} skill(s): 1280x720, a resize to 720, an option change at ${WIDTHS.join(' and ')}` : '';
     console.log(`  ${refs.length} skills × ${WIDTHS.length} widths (${WIDTHS.join(', ')} px)${spotNote}, ${results.length} readings, ${apps.length} worker(s), ${secs} s${shardNote}`);

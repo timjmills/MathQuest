@@ -755,6 +755,14 @@ html.dark body.teacher-mode .tv-sko { box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
 .tv-sko select.tv-select { width: 100%; }
 @media (max-height: 640px) { .tv-sko-sample.is-pinned .tv-sko-frame { height: 110px; } }
 .tv-sko-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px 16px; border-top: 1px solid var(--tv-rule); background: var(--tv-surface); }
+/* critic-panel-r1 F1: a sample too big to read whole is shown one whole part at a time, "1 of N" with arrows beside
+   the "Sample question" label (skill-options-ui _tidySample). */
+.tv-sko-samplehead { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tv-sko-samplehead .tv-label { margin: 0; }
+.tv-sko-part { display: inline-flex; align-items: center; gap: 2px; }
+.tv-sko-part[hidden] { display: none; }
+.tv-sko-part-n { min-width: 48px; text-align: center; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text-2); font-variant-numeric: tabular-nums; }
+.tv-sko-part .tv-icon-btn:disabled { opacity: .35; cursor: default; }
 
 /* ---------------------------------------------------------------- board code overlay */
 .tv-boardcode {

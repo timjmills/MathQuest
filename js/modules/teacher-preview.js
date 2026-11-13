@@ -175,7 +175,8 @@ function tidySample(cell) {
         if (!el.children.length && /^\s*1\.\s*$/.test(el.textContent || '')) el.style.display = 'none';
     });
     cell.querySelectorAll('button').forEach((b) => {
-        if (/^\s*(check|submit|reset|clear|undo|start over|try again)\b/i.test(b.textContent || '')) b.style.display = 'none';
+        // (a widget's own "✓ Check Answers" too: its tick mark is not the item's)
+        if (/^\s*[✓✔]?\s*(check|submit|reset|clear|undo|start over|try again)\b/i.test(b.textContent || '')) b.style.display = 'none';
     });
     // A print header that held only the item number is an empty ruled line: drop it.
     cell.querySelectorAll('.tvp-printed .p-head, .tvp-printed .problem-header').forEach((h) => {
