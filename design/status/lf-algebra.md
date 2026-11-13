@@ -105,6 +105,7 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: two-step build (bar model, within N, Visual default, decisions 6-10, lesson data, tags, ws-two-step + backtest, precritic of the 7), start 2026-11-13T11:15Z, end 2026-11-13T13:55Z, profile mq-opus-medium (first build of a new drawing)
 Times: two-step spec card (research, card.json, generate + coverage check), start 2026-11-13T09:30Z, end 2026-11-13T10:15Z, profile mq-opus-medium (first card on a new drawing part)
 Times: fix r10 (critic r2 G5 Fix-it letters, G6 card feature tiles, G8 growing two across at S; ws-patterns-cells + ws-precritic-clean + backtests; precritic r10 the two skills), start 2026-11-13T10:10Z, end 2026-11-13T13:20Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r9 (merge master, revert + cherry-pick lf-ops 77187c6e8, precritic r9, count-row + notice fixes), start 2026-11-13T05:40Z, end 2026-11-13T09:00Z, profile mq-opus-low
@@ -584,6 +585,43 @@ clue). The notice hint is black on screen and grey on paper. Growing worksheet d
 6. **Waits:** each S/M/L role render took ~6 min for 6 skills. Most of the wait was the three sizes running one after another; with
    `--size S,M,L` in one browser session (the flag already takes a list in golden mode), the boot happens once.
 
+## Precritic two-step (2026-11-13; the 7 two-step skills, --strict; run on f99229484 with later commits landing while it ran - lessonfit, appliesTo, bar wrap, freshDeal fixed after it, see Log; logs /tmp/mq-precritic/20261113-114258-13932, wall 6948 s): 27 FAIL, 22 PASS, 2 N/A of 51
+Attribution: a red is "pre-existing" when the same gate is red on 0e119f312 (the signed card, pre-build), re-run there in a
+scratch worktree: ws-empty-band 707 findings on 0e119f312 (603 now: EB-SIDE 563 -> 395, EB-BAND 34 -> 104); ws-grade-render
+--gate opener S/M/L, reason-it M/L and lesson S/M/L OVERFLOW on 0e119f312 too (multi_step_word_plain, 90 findings).
+
+| Gate | Result | Whose |
+|---|---|---|
+| node-lint, roles-unit, capacity-pin, presets-unit, screen-ink-size, precritic-clean, patterns-cells, coverage-matrix, print-lint kit S / M / L (independent), screen-slots, screen-answer, chromebook-fit, code-snapshot, boot-smoke, slot-clip, card-rulings x2, visual-quality, node-lint s1, spec-card signed | PASS | - |
+| ws-two-step (new, after the run) | PASS (FAIL on 0e119f312) | - |
+| ws-lessonfit | FAIL -> fixed (Y4 G3 link said "numbers to 150", now 100) | ours, fixed |
+| ws-options-verify --skill | FAIL 31: forms / msCheck / wpFrames on presets they do not apply to (fixed after: appliesTo on SKILL_OPTIONS); band=100 identical to the default at Max Number 100 (by design: the no-band cap is the Max Number, 100); band=50 on adddiv / letter (a 6-item sample never passes 50) | ours fixed / ruling (band 100) / sample |
+| ws-dealer-uniform | FAIL: x / ÷ presets PAGE repeats (small facts domain; red on 0e119f312 too); + / − skills now judged (q.a / q.b) and their repeats fixed by freshDeal -> INCOMPLETE ("no single operation") | pre-existing (presets) / tool (INCOMPLETE) |
+| ws-empty-band | FAIL 603 (707 on 0e119f312) | EB-BAND on multi_step_word independent / more-practice / test at M (41 %) and L (32 %): ours (the bar default puts 1 story a page, card decision 9 says M 2) - RULING; the rest pre-existing (two-step guided, mixed-practice EB-FOOT, EB-SIDE) - lf-roles / engine |
+| print-lint --roles lesson S / L; ws-grade-render --gate lesson | FAIL (overflow, ILLEGIBLE, LONE) | lesson chart: + / − first, letter and estimate stories fall to the whole-cell fallback (sheet/lesson-pages/chart.js routes only x / ÷-first stories to story.js twoState) - lf-engine; lesson overflow red on 0e119f312 already |
+| ws-grade-render --gate other roles; cell-checks --card --card-opts | FAIL: opener S/M/L, reason-it M/L, lesson, guided 1 | opener / reason-it overflow pre-existing (0e119f312); lesson as above |
+| print-lint sections --pages 2 S / L | FAIL (LONE, PAGEFILL on a 7-skill section sheet) | section engine (lf-engine) |
+| ws-sibling-compare | FAIL (128 unproven: no approved sibling for a two-step family) | structural (first family on this drawing) |
+| ws-phone-card | FAIL focus on every skill, _plain too (first-box focus) | screen host / word-work twin (visual-quality lane) |
+| ws-screen-support-eq | gate FAIL, log OK ("no supports (nothing to compare)") | tool |
+| ws-options-verify --render | FAIL 12: layout values (msLetter=false, msCheck=false, msOps on presets) print fewer than the preset's compact default; letter + wpBar L PAGEFILL | card-level (layout values) / ours (letter + bar) |
+| providers-unit, content-audit --skill | N/A (comma list); run one by one: providers-unit OK x 7, content-audit algebra OK | - |
+
+Clean for the critic: none of the seven skills is clean on every page type (the lesson pages are red on all seven).
+
+Red, by owner:
+- RULING (lead): card decision 9 capacity with the bar model - measured S 2 / M 1 / L 1 (card: S 2 / M 2 / L 1); a one-story page at
+  M / L leaves a 32-41 % band (H13). Options: accept M 1 and let a one-row practice page not stretch (role), or the bar default only
+  at S on practice pages. Also band=100 equals "no band" at Max Number 100 (options-verify no-op).
+- lf-engine: chart.js stateDrawing routes only msOf (x / ÷ first) to twoState; + / − first, add-first, letter and estimate stories
+  take the whole-cell fallback at level 3 (bar + middle question) in 92 mm panels -> overflow 146 mm, ILLEGIBLE. Patch: route every
+  two-step word-work item (steps.length === 2) to twoState; twoStepPart already draws Step 1 / Step 2 for any signs; the letter and
+  estimate panels need a frames part (ours, next round). Section sheets LONE / PAGEFILL.
+- lf-roles: opener (Model in a half column) and reason-it M / L overflow (red on 0e119f312); two-step guided pages 1 story a page.
+- visual-quality lane / screen host: phone-card first-box focus on the word-work two-step twin; letter / estimate SCREEN scoring of
+  the second answer (paper grades the equation and the estimate; the screen marks them as typed, scores n / the answer only).
+- ours, open: twoStepPart frames parts for the letter / estimate chart; letter + wpBar L PAGEFILL.
+
 ## Precritic r10 (2026-11-13; pattern_features + growing_shape_patterns after the r10 cell fixes; HEAD 82e2cd927; --strict --browser-jobs 1; logs /tmp/mq-precritic/r10-lf-algebra)
 Scope: the two skills this round's fixes touched. ws-grade-render --gate (independent, test, error-analysis, more-practice,
 review, lesson, guided at S / M / L + card / worksheet / quiz) OK on both (no overflow, no sub-44 px target); ws-cell-checks
@@ -1028,6 +1066,18 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 two-step build (mq-opus-medium; resumed after a container restart: WIP 937a8c36b reviewed - kept the WDS 18.1 row,
+  the library entry, the generator guard loop and the wpBar default; reworked the bar drawing (the WIP printed the known numbers in
+  the pupil's boxes, put '?' as box content not a zone-label, never fit 6 equal groups and stacked to 68 mm) and found its wpBar
+  default dead in live play and its forms appliesTo written after the P12 merge). Within-N proof (generateQuestionFor, 300 items a
+  skill and band, scratch withinN.mjs): every skill and band 0 over the cap (Step 1 and answer), 0 answers = a story number or the
+  Step 1 answer; on 0e119f312 the same sample gave answers to 132-143 and Step 1 to 148-150 at Max Number 100, Step 1 to 44 at
+  band 30 (94 of 300), 1-2 % answers = a story number. Checks that caught findings in this build: ws-card-rulings (R-ADDSUB-MAX
+  unreadable: the + / − items carried no q.a / q.b), ws-options-verify (forms / msCheck / wpFrames on presets; appliesTo on the
+  wrong table), ws-lessonfit (Y4 link clause), ws-grade-render --gate lesson (bar wider than the Guided cell beside Steps -> wrap
+  row), ws-dealer-uniform (+ / − page repeats -> freshDeal), print-lint lesson + cell-checks (chart fallback: lf-engine). New:
+  ws-two-step (owner rule, before-fix check) + backtest two-step-card-d2-d6 + CHECKS_FROM_CRITICS rows (also today's r1 F1-F8,
+  r2 G5 / G6 / G8 / G11, precritic-clean).
 - 2026-11-13 two-step card (spec card only, no code): design/cards/two-step/card.json + generated two-step.md (`ws-spec-card.mjs
   --family two-step`). Found: the seven skills exist (presets of multi_step_word_plain, skill-presets.js); drawing = word-work
   two-step columns / frames / letter / estimate (a copy, visual-quality lane's cell) + a NEW two-step bar model (wpBar is a no-op on
