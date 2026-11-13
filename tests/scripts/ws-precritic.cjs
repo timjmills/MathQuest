@@ -159,6 +159,13 @@ function overflowOf(text) {
     }
     return '';
 }
+// --overflow-fixture <file>: a saved gate output that a baseline pins - FAIL when it names an overflow (it may not stay pinned)
+if (process.argv.includes('--overflow-fixture')) {
+    const f = process.argv[process.argv.indexOf('--overflow-fixture') + 1];
+    const hit = overflowOf(require('fs').readFileSync(f, 'utf8'));
+    process.stdout.write(hit ? `ws-precritic --overflow-fixture: FAIL (an overflow is never pinnable: ${hit})\n` : 'ws-precritic --overflow-fixture: OK\n');
+    process.exit(hit ? 1 : 0);
+}
 if (process.argv.includes('--overflow-self-test')) {
     const cases = [['  FAIL OVERFLOW a:b reason-it L: page 1 cell 1: <div> leaves the cell', true], ['meta: mq-ww leaves the cell x2', true],
         ['ws-cell-checks: FAIL - 14 finding(s) (OVERFLOW 14) on 24 page(s)', true], ['OVERFLOW  PASS', false], ['rules OVERFLOW,TAGINK: OK', false],
@@ -786,7 +793,7 @@ function buildPlan(ctx) {
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
         // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
-        add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
+        add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), ...(ctx.role ? ['--roles', ctx.role] : [])], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
         const ovJson = path.join(ctx.logs, 'options-verify.json');
         add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--deadline', OV_DEADLINE, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));

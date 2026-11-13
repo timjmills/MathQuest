@@ -353,7 +353,15 @@ function baselineIds() {
     const i = args.indexOf('--rows-before');
     let text = null, from = '';
     if (i >= 0 && args[i + 1]) { try { text = readFileSync(resolve(process.cwd(), args[i + 1]), 'utf8'); from = args[i + 1]; } catch (e) { return { ids: null, from: `${args[i + 1]} (unreadable)` }; } }
-    else { const r = spawnSync('git', ['show', 'origin/master:tests/fixtures/precritic/backtests.json'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); if (r.status !== 0) return { ids: null, from: 'origin/master (not readable here)' }; text = r.stdout; from = 'origin/master'; }
+    else {
+        // the baseline is the FORK POINT with origin/master, not master's tip (lf-checks 2026-11-13: a lane branch behind master read
+        // master's NEWER rows as "dropped"). A deploy tree has master merged in, so its merge base is master's tip: same check there.
+        const mb = spawnSync('git', ['merge-base', 'HEAD', 'origin/master'], { cwd: ROOT, encoding: 'utf8' });
+        const ref = mb.status === 0 && mb.stdout.trim() ? mb.stdout.trim() : 'origin/master';
+        const r = spawnSync('git', ['show', `${ref}:tests/fixtures/precritic/backtests.json`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+        if (r.status !== 0) return { ids: null, from: `${ref.slice(0, 9)} (not readable here)` };
+        text = r.stdout; from = ref === 'origin/master' ? 'origin/master' : `the fork point with origin/master (${ref.slice(0, 9)})`;
+    }
     try { const o = JSON.parse(text); return { ids: (Array.isArray(o) ? o : o.rows || []).map((x) => x.id), from }; } catch (e) { return { ids: null, from: `${from} (not JSON)` }; }
 }
 function dropSweep() {
