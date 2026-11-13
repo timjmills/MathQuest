@@ -35,3 +35,5 @@ Step A decisions:
   only counts with sizing.ok are offered; Remember that had already given way could not be toggled - the fit says so.
 - No live lesson prints a Prerequisite Check today (every `prereqs` record has prereqsLive false), so the prereq row is
   unit-tested (PO-4) but has no browser sample.
+
+| 2026-11-13 | A · critic r1 | FAIL (11 of 12 cells < 8): `design/partopts/critic-A-r1.md`. Defaults unchanged (baseline 1556 identical, ws-partopts-unit OK). ws-detailed-lesson: g1-oa1 E9/E35 and g3-oa8 E35 fail identically on master d34311d (not this lane). Main finding: lower counts leave the sheet foot blank (F1), so most counts are fixed (F2). Scope decision asked of the lead (total-count Practice, freed height returned, We Do re-flow); holding. Spend ≈ $55–60 (est.). |
