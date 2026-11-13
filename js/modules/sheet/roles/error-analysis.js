@@ -39,6 +39,7 @@ import {
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
@@ -282,6 +283,9 @@ function partLabels(it, parts, c) {
     if (it.template === 'coins' && every(/^n\d+$/) && Array.isArray(p.values) && p.values.length === n) {
         return p.values.map((v) => { try { return c ? { html: coinSVG(c, v, { compact: true }) } : { text: String(v) }; } catch (e) { return { text: String(v) }; } });
     }
+    // Match 3 pictures (lane lf-vocab, critic r1 D1): each fix box is named by its WORD, never A / B / C (those are the
+    // pictures' letters, so a lettered fix box read as the answer)
+    if (it.template === 'vocab-match3' && every(/^letter-\d+$/) && Array.isArray(p.words)) return (p.order || [0, 1, 2]).map((i) => ({ text: String(p.words[i]) }));
     if ((it.template === 'clock' || it.template === 'coins') && every(/^o\d+$/)) return parts.map((_, i) => ({ text: place(i) }));
     if (it.template === 'clock' && every(/^r\d+$/) && Array.isArray(p.given)) {
         const given = new Set(p.given.map(Number));
@@ -1040,7 +1044,8 @@ export function plan(input = {}) {
     // shape (critic regrade 5: a box on one item, a line on the next). Stable: deal order kept.
     const isPick = (it) => (it.thinking && it.thinking.kind === 'choice' ? 1 : 0);
     const items = (M ? M.items : balanced(all, L.perPage)).slice().sort((a, b) => isPick(a) - isPick(b));
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
+    // (Q-C: a per-word template scores its words; every other item 1 - paginate.js scorePoints; lf-vocab r5)
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: scorePoints(items) });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one fix width for every cell of the page: the widest item's (critic pv-r2)
     const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
@@ -1073,7 +1078,7 @@ export function plan(input = {}) {
     // some fixes are written and some checked (a graph page: "How many?" and "Which has the most?")
     const someChecked = items.some((it) => it.thinking && it.thinking.kind === 'choice');
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : someChecked ? 'check-fix-mixed' : 'check-fix-write'), grid] }], {
-        meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
+        meta: { items: items.length, scoreOutOf: scorePoints(items), wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }
 

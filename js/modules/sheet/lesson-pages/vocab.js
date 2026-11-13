@@ -10,6 +10,7 @@ import { planItem, gridPart, instructionText, esc } from '../roles/compose.js';
 import { factGridMini } from '../cells/mult-grid.js';
 import { barMini } from '../cells/word-work.js';
 import { PT_MM, band, hOf } from './common.js';
+import { vocabPictureSVG, hasVocabPicture, vocabPictureAlsoShows } from '../graphics/vocab-pictures.js';
 
 /** A picture of a vocabulary word: in-house line art or plain Andika (RP-20, INK-7). */
 export function vocabPicture(pic, c) {
@@ -60,8 +61,17 @@ export function vocabPicture(pic, c) {
             // (`compact`, lf-placevalue critic r3c E-A1: a picture of ones only is one cube tall, not a ten-rod's height - the
             // vocabulary cell was 43 % empty above it; opt-in, so every other picture draws as before)
             const low = !!pic.compact && !(pic.tens > 0);
+            // (`ring`, lf-vocab r8 / owner O-2: 'ones' beside a ten, its ones drawn round, so four cubes alone no longer read as
+            // four empty boxes - a 'place'; opt-in, every other picture draws as before)
+            const ring0 = x;
+            if (pic.ring) x += 1.5;
             for (let i = 0; i < (pic.ones || 0); i++) { parts.push(`<rect x="${x}" y="${low ? 0.5 : 0.5 + u * 9}" width="${u}" height="${u}"/>`); x += u + 1.5; }
-            const W = x + 0.5, H = low ? u + 1 : u * 10 + 1;
+            if (pic.ring && pic.ones > 0) {
+                const ry = (low ? 0.5 : 0.5 + u * 9) - 1.8, rw = x - ring0 + 0.3, rh = u + 3.6;
+                parts.push(`<rect x="${ring0 - 0.2}" y="${ry.toFixed(2)}" width="${rw.toFixed(2)}" height="${rh.toFixed(2)}" rx="${(rh / 2).toFixed(2)}" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`);
+                x += 1.2;
+            }
+            const W = x + 0.5, H = (low ? u + 1 : u * 10 + 1) + (pic.ring && pic.ones > 0 ? 2.4 : 0);
             return `<svg viewBox="0 0 ${W} ${H}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true"><g fill="none" stroke="#000" stroke-width="${(0.75 * PT_MM).toFixed(3)}">${parts.join('')}</g></svg>`;
         }
         case 'trade': {
@@ -100,6 +110,31 @@ export function vocabPicture(pic, c) {
             b += `<circle cx="${X(pic.mark).toFixed(2)}" cy="${axisY}" r="1.2" fill="#000"/>`;
             return `<svg viewBox="0 0 ${W} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true" style="font-family:'Andika',sans-serif">${b}</svg>`;
         }
+        // (lf-vocab r8, owner O-2 / O-3) a picture of the picture vocabulary library, so a lesson band and the vocabulary tasks
+        // draw a word the same way: {id: 'digit' | 'step' | ...}
+        case 'vocab': {
+            if (!hasVocabPicture(pic.id)) return `<span class="mq-lvpic-text">${esc(pic.id || '')}</span>`;
+            const wMm = { S: 30, M: 33, L: 36 }[c.size] || 36;
+            return vocabPictureSVG(Object.assign({}, c, { keyPage: false }), pic.id, { wMm });
+        }
+        // (lf-vocab r8, owner O-2) 'place': a hundreds-tens-ones chart, ONE column heading shaded in the single grey, an empty
+        // row under it: {heads: 'H T O', shade: 1}
+        case 'placechart': {
+            const hs = String(pic.heads || 'H T O').split(/\s+/).filter(Boolean);
+            const sh = Number.isInteger(pic.shade) ? pic.shade : 1;
+            const cw = { S: 8.5, M: 9.2, L: 10 }[c.size] || 10, hh = cw * 0.72, bh = cw * 0.9;
+            const W = hs.length * cw + 1, H = hh + bh + 1;
+            const f = ((m.textPt || 11) * PT_MM).toFixed(3), sw = (0.75 * PT_MM).toFixed(3);
+            let b = '';
+            hs.forEach((h, i) => {
+                const x = 0.5 + i * cw;
+                b += `<rect x="${x.toFixed(2)}" y="0.5" width="${cw.toFixed(2)}" height="${hh.toFixed(2)}" fill="${i === sh ? '#949494' : 'none'}" stroke="#000" stroke-width="${sw}"/>`;
+                b += `<rect x="${x.toFixed(2)}" y="${(0.5 + hh).toFixed(2)}" width="${cw.toFixed(2)}" height="${bh.toFixed(2)}" fill="none" stroke="#000" stroke-width="${sw}"/>`;
+                b += `<text x="${(x + cw / 2).toFixed(2)}" y="${(0.5 + hh / 2).toFixed(2)}" text-anchor="middle" dominant-baseline="central" font-size="${f}" font-weight="700">${esc(h)}</text>`;
+            });
+            b += `<rect x="0.5" y="0.5" width="${(W - 1).toFixed(2)}" height="${(H - 1).toFixed(2)}" fill="none" stroke="#000" stroke-width="${(1.5 * PT_MM).toFixed(3)}"/>`;
+            return `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" aria-hidden="true" style="font-family:'Andika',sans-serif">${b}</svg>`;
+        }
         // a small dot array (detailed lesson 3a): {rows, cols, mark: 'row' | 'turn'}
         case 'array': {
             // (dots at the arrays template's floor: at least 4 mm across - RP-21)
@@ -117,6 +152,48 @@ export function vocabPicture(pic, c) {
             return `<svg viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" width="${mm(W)}" height="${mm(H)}" data-per-row="${Math.max(C, pic.mark === 'turn' ? R : 0)}" aria-hidden="true">${b}</svg>`;
         }
         default: return `<span class="mq-lvpic-text">${esc((pic && pic.text) || '')}</span>`;
+    }
+}
+
+/**
+ * V-AMBIG (owner O-2 / O-3, lf-vocab r8): the OTHER words a lesson-band picture could be read as. A record may declare its
+ * own (`picture.alsoShows`); otherwise the picture's kind declares it from what it draws. A band whose other words include
+ * one fails ws-vocab-unit V-AMBIG ("H T O" with 'ones' beside it; four cubes alone beside 'place').
+ */
+export function lessonPictureAlsoShows(pic, word) {
+    const own = String(word || '').toLowerCase();
+    const out = (xs) => [...new Set(xs)].filter((x) => x !== own);
+    if (!pic) return [];
+    if (Array.isArray(pic.alsoShows)) return out(pic.alsoShows);
+    const t = String(pic.text || '');
+    switch (pic.kind) {
+        case 'vocab': return out(vocabPictureAlsoShows(pic.id) || []);
+        case 'placechart': return out(['tens', 'column', 'chart', 'place value']);
+        case 'heads': return out(['place', 'hundreds', 'tens', 'ones', 'column', 'place value']);
+        case 'blocks': {
+            if (pic.ring) return out(['tens', 'number', 'blocks']);
+            if ((pic.tens || 0) > 0 && !(pic.ones > 0)) return out(['ten', 'tens', 'rods']);
+            if (!((pic.tens || 0) > 0)) return out(['one', 'ones', 'cubes', 'boxes', 'place']);
+            return out(['tens', 'ones', 'number', 'blocks']);
+        }
+        case 'trade': return out(['exchange', 'change']);
+        case 'bar': return out(pic.mark === 'whole' ? ['total', 'all'] : pic.mark === 'parts' ? ['parts', 'piece'] : ['bar model', 'story']);
+        case 'fact': return out(['answer', 'times table', 'multiply']);
+        case 'line': return out(['number line', 'between', 'middle']);
+        // (the marks pick the word: the drawn-round row, the turn arrow; the bar's marked whole or parts - the same bar, three marks)
+        case 'array': return out(pic.mark === 'row' ? ['line', 'dots'] : pic.mark === 'turn' ? ['commutative', 'turn round'] : ['rows', 'equal groups', 'dots']);
+        case 'stack': return out(['column', 'add', 'subtract']);
+        case 'glyph': return out(/^\d+$/.test(t) ? ['number'] : ['sign']);
+        default: {
+            if (/^H\s+T\s+O$/.test(t.trim())) return out(['place', 'hundreds', 'tens', 'ones', 'column', 'place value']);
+            if (/^[\d\s]+$/.test(t)) return out(['number', 'digit', 'standard form']);
+            if (/[+]/.test(t)) return out(['add', 'plus', 'number sentence']);
+            if (/[×÷=]/.test(t)) return out(['number sentence', 'equation']);
+            if (/→/.test(t)) return out(['change', 'becomes']);
+            if (/,/.test(t)) return out(['count on', 'sequence', 'pattern']);
+            if (/●/.test(t)) return out(['pairs', 'dots']);
+            return out([]);
+        }
     }
 }
 
@@ -175,4 +252,4 @@ export function vocabBands({ vocab, data, m }) {
     return groups;
 }
 
-export default { vocabPicture, vocabOrder, vocabItem, vocabBands };
+export default { vocabPicture, vocabOrder, vocabItem, vocabBands, lessonPictureAlsoShows };

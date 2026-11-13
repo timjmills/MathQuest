@@ -14,25 +14,34 @@
   },
   "placevalue:expand": {
    "form": {
-    "values": ["notation"],
+    "values": [
+     "notation"
+    ],
     "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: S 10 vs 20, L 4 vs 12"
    }
   },
   "placevalue:combine": {
    "zeroPlace": {
-    "values": ["none"],
+    "values": [
+     "none"
+    ],
     "why": "owner ruling 2026-11-07 (lf-placevalue R3, \"Yes, accept 10\", via the lead): with no zero place every item has three parts and is wider than the mixed default page; the longer written answer is the form being taught. Measured r2: L 10 vs 11"
    }
   },
   "placevalue:value": {
    "form": {
-    "values": ["unit", "notation"],
+    "values": [
+     "unit",
+     "notation"
+    ],
     "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: unit S 12 vs 30, L 6 vs 12; notation S 16 vs 30, L 10 vs 12"
    }
   },
   "placevalue:identify": {
    "response": {
-    "values": ["bank"],
+    "values": [
+     "bank"
+    ],
     "why": "owner ruling 2026-11-07 (lf-placevalue Q4, \"Yes, accept all four\", via the lead): the longer written answer is the form being taught; the page stays full at its own column count. Measured r0: bank L 8 vs 10 (the word bank is a drawn box)"
    }
   },
@@ -42,7 +51,26 @@
      "15"
     ],
     "why": "count-row card §9 Q2(b) and §7a jumps (signed 2026-11-07, lane decision under owner rule 2026-11-07): 15 numbers (three lines of 5) fit fewer rows a page - an accepted cost while H13 holds. Measured (lf-ops 2026-11-07): S 6 vs 8, L 4 vs 6. The shape pages hold the default's rows since the shaped tiles keep the box pitch (lf-ops count-row fix)"
-   }
+    }
+   },
+   "vocabulary:vocab_pick3_words": {
+   "vocabTask": {
+    "values": [
+     "match3"
+    ],
+    "why": "owner ruling 2026-11-07 (Q2, via the lead; design/cards/vocabulary): Match 3 pictures prints 4 a page, the picture task 6 at grade 3 (the default)"
+   },
+   "vocabGrade": {
+    "values": [
+     "1"
+    ],
+    "why": "owner ruling 2026-10-25 / 2026-11-07 (Q2): 1 picture, 3 words prints 4 a page at K-1 (larger pictures), 6 at grades 2-3"
+   },
+   "vocabSet": {
+    "values": [
+     "4"
+    ],
+    "why": "owner ruling 2026-11-07 (Q2): set 4 is the grade 1 lesson (Count on to 120): 4 a page at K-1"   }
   }
  }
 }

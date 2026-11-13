@@ -29,6 +29,7 @@
 // Pure module (SCC-01).
 
 import { LESSON_ROUTE_CSS } from '../lesson-css.js';
+import { getProvider } from '../contract.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
@@ -42,7 +43,11 @@ export function sources(skills, { earlier }) {
     let list;
     if (skills.length >= 2) list = skills.slice(0, 4);
     else {
-        const prev = earlier(skills[0], 4);
+        // (a provider may name the skills to check - `preSkills`, nearest first; lf-vocab r9 - else the earlier skills)
+        const sk = skills[0] || {};
+        let own = null;
+        try { const pv = getProvider(sk.categoryId || '', sk.skillId || ''); own = typeof pv.preSkills === 'function' ? pv.preSkills(sk) : null; } catch (e) { own = null; }
+        const prev = Array.isArray(own) && own.length ? own.slice(0, 4) : earlier(skills[0], 4);
         list = prev.length ? prev.slice().reverse() : [skills[0]];
     }
     // One quadrant per prerequisite, up to four. A skill with fewer earlier skills checks fewer

@@ -19,6 +19,7 @@ import {
 } from './compose.js';
 import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, measuredH } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
+import { scorePoints } from '../paginate.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -245,7 +246,7 @@ function planSplit(input, sp, items) {
     const hsW = wideHs.map(grow);
     const sum = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
-    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: all.length });
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(all) });
     const labels = labelStyleOf(ctx.look, input.labels);
     const gN = gridPart(nar.map((it) => planItem(it, { cols: sp.cols, level: 0 })), { cols: sp.cols, rows: rowsN, labels, start: 1 });
     gN.rowsTpl = hsN.map((x) => `${x}fr`).join(' ');
@@ -258,7 +259,7 @@ function planSplit(input, sp, items) {
     const fits = Object.assign({}, sp.Ln, { cols: sp.cols, rows: rowsN + wid.length, perPage: all.length, count: all.length, split: true, line });
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
-        meta: { items: all.length, scoreOutOf: all.length, form, fits: [fits], notes: [`${nar.length} problems in ${sp.cols} columns, ${wid.length} full width.`] },
+        meta: { items: all.length, scoreOutOf: scorePoints(all), form, fits: [fits], notes: [`${nar.length} problems in ${sp.cols} columns, ${wid.length} full width.`] },
     });
 }
 
@@ -287,7 +288,7 @@ export function plan(input = {}) {
         }
     }
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
-    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(items) });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const instr = instructionPart(instructionKeyOf(items, input.skills), items);
     const sections = [
@@ -311,7 +312,7 @@ export function plan(input = {}) {
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
-        meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
+        meta: { items: items.length, scoreOutOf: scorePoints(items), form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });
 }
 
