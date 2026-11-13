@@ -3,12 +3,16 @@ Title: Lessons-first wave 1: the patterns and algebra skills of the CCSS BUILD l
 Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
-State: paused (week-2 cap reached after fix r8; critic r2 waits on lf-roles / lf-ops)
-Updated: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
+State: fix r9 done (merged master 8a7c5d43 + lf-ops' count-row fix); critic r2 grades the clean rows only (Precritic r9)
+Updated: 2026-11-13 r9 (merge master 8a7c5d43, drop 2cfeb1d7, cherry-pick 77187c6e8, precritic r9). Before: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
 Builder profile: mq-opus-medium
 Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
 
 ## Now
+- 2026-11-13 fix r9 (mq-opus-low): merged origin/master 8a7c5d438 (74bff0abb); dropped the interim revert (af74c6b04 = git revert
+  2cfeb1d7); cherry-picked lf-ops' 77187c6e8 onto master's reason-it (a2fecb0aa); count-row.js brought to -props' logic (b859e11a6:
+  the restored columns-keyed train wrap overflowed the npr / fgr lesson chart); notice ringed-word room (a6b1e8151, EB-EDGE).
+  Precritic r9 (below): every red is listed by owner; ours left: none fixed-able without a ruling (growing SIZE-WIDTH, see table).
 - 2026-11-13 STOP (week-2 cap): session cost_usd $179.31 (week 2 = $66.10 of the $75 cap, ~3.3 %; week 1 hand-over $113.21).
   Critic r2 not run: about $9 left, and it would fail again on rows owned elsewhere (F2 count-row train -> lf-ops; F3 / F4 /
   PT-MOD-1 marksFor / F5 npr-fgr chart -> lf-roles; F8 options panel; EB-FOOT pairing -> lf-checks; rule-check stepsBy -> lf-engine).
@@ -79,6 +83,7 @@ Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r9 (merge master, revert + cherry-pick lf-ops 77187c6e8, precritic r9, count-row + notice fixes), start 2026-11-13T05:40Z, end 2026-11-13T09:00Z, profile mq-opus-low
 Times: fix r8 (critic r1 findings F1 F5 F6 F6b F7 + lead items + minors; precritic r8), start 2026-11-13T02:25Z, end 2026-11-13T04:55Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r7 (function-table lesson chart states + precritic), start 2026-11-13T01:36Z, end 2026-11-13T02:20Z, profile mq-opus-low
 Times: fix r6 (KEYJOIN + lesson chart overflows + empty-band triage + precritic), start 2026-11-12T23:30Z, end 2026-11-13T01:35Z, profile mq-opus-low
@@ -280,6 +285,50 @@ clue). The notice hint is black on screen and grey on paper. Growing worksheet d
    `--out` and asserts nothing: give it `--out` and make it a gate (F8).
 6. **Waits:** each S/M/L role render took ~6 min for 6 skills. Most of the wait was the three sizes running one after another; with
    `--size S,M,L` in one browser session (the flag already takes a list in golden mode), the boot happens once.
+
+## Precritic r9 (2026-11-13; --strict --browser-jobs 1; run A 6 skills on a2fecb0aa, logs /tmp/mq-precritic/20261113-054906-3413; run B npr + fgr after b859e11a6, /tmp/mq-precritic/20261113-073410-26955; run C notice + pf, logs under /tmp/mq-precritic (third run), then the notice fix rechecked gate by gate)
+Run A: 34 PASS, 13 FAIL of 47 (npr / fgr rows superseded by run B). Run B: 29 PASS, 9 FAIL, 1 N/A of 39. Run C: 28 PASS, 8 FAIL, 3 N/A of 39
+(options-render notice patShow and the notice lesson L H13 x4 in run C came from a first try of the a6b1e8151 fix and are OK / gone
+on a6b1e8151: ws-options-verify --render OK, lesson L only PAGEFILL 1, EB-EDGE PASS).
+
+| Gate | ft_easy | npr | fgr | notice | pf | growing |
+|---|---|---|---|---|---|---|
+| node-lint, providers, roles-unit, capacity-pin, content-audit, options-verify, presets, lessonfit, coverage-matrix, card-rulings x2, dealer-uniform, visual-quality, node-lint rules, spec-card signed, code-snapshot, boot-smoke | PASS | PASS | PASS | PASS | PASS | PASS |
+| print-lint kit independent S / M / L | PASS | PASS | PASS | PASS | PASS | PASS |
+| grade-render --gate (lesson / test / independent S/M/L + screen) | PASS | PASS (A: 30 overflow, fixed b859e11a6) | PASS | PASS | PASS | PASS |
+| grade-render --gate every card role | PASS | PASS | PASS | PASS | PASS | PASS |
+| cell-checks --card --card-opts | FAIL 20 (rule-check lesson, mixed guided L) | FAIL 262 (lesson chart only) | FAIL 144 (lesson chart only) | PASS | PASS | PASS |
+| print-lint lesson S | PASS | PASS | FAIL PAGEFILL 1 | FAIL PAGEFILL 1 | FAIL DN-2 2, PAGEFILL 1, LONE 1 | PASS |
+| print-lint lesson L | PASS | PASS | PASS | FAIL PAGEFILL 1 | PASS | PASS |
+| print-lint sections pages-2 S / L | FAIL (one sheet of all six) | FAIL | FAIL | FAIL | FAIL | FAIL |
+| empty-band | FAIL (scripted-model L, guided S/M, pre-skill-check, quiz) | FAIL (lesson count-row EB-BAND, quiz) | FAIL (quiz) | FAIL (scripted-model, guided S Model 31 %, quiz) | FAIL (scripted-model, independent M EB-FOOT 5) | PASS |
+| screen-ink-size | PASS | PASS | PASS | PASS | PASS | FAIL SIZE-WIDTH 9 (worksheet 1280) |
+| screen-slots, screen-answer, chromebook-fit, slot-clip, phone-card | PASS | PASS | PASS | PASS | PASS | PASS |
+| screen-support-eq | FAIL absent | FAIL absent | PASS | FAIL absent | FAIL absent | PASS |
+| sibling-compare | FAIL (no siblings) | FAIL | FAIL | FAIL | FAIL | FAIL |
+| options-verify --render | PASS | FAIL pattern / shape @S, shape @L | FAIL shape | PASS | PASS | PASS |
+
+Clean for the critic (every gate on that page type / host green): independent, test, more-practice, error-analysis, true-or-false,
+reason-it and the screen card / worksheet on function_table_easy, notice_patterns, pattern_features, growing_shape_patterns (but the
+growing worksheet host); independent, test, reason-it, error-analysis, true-or-false and card / worksheet on npr and fgr at the
+default options. NOT clean: every lesson page of npr / fgr / notice / pf; scripted-model of ft / notice / pf; guided of ft and notice;
+the quiz host (EB-SIDE, legacy cell) of ft / npr / fgr / notice; growing worksheet host; npr / fgr shape / places>=100 option pages.
+
+Red, by owner:
+- lf-ops: npr / fgr lesson anchor-chart count-row overflow on places >= 100 and shape circle / hex / mixed (cell-checks 262 / 144,
+  options-render) - needs -props 6d61ff6b7 (chart.js / we-do.js hand count rows cellLiveMm) on master; npr lesson EB-BAND (count-row
+  chart cells 47 %). F2 screen train still theirs.
+- lf-roles: scripted-model EB-BAND / EB-SIDE (ft L, notice S/M/L, pf S); guided we-do cell height (ft guided S/M EB-BAND 38-42 %,
+  notice guided S Model 31 %); pre-skill-check word-work EB-SIDE (ft); F3 / F4 / PT-MOD-1 / F5 npr-fgr chart as in r8.
+- lf-engine: lesson.js chartWide packing (notice PAGEFILL, pf DN-2 / PAGEFILL / LONE, fgr PAGEFILL); ftTask=rule-check lesson chart
+  + mixed guided L (cell-checks ft 20).
+- section engine: sections pages-2 L-DENSITY (PAGEFILL / PG-23 / SPREAD on one sheet of all six).
+- lf-checks: EB-FOOT pairing (pf independent M: one drawn height paired with 3 footprints, unchanged with our change stashed);
+  screen-support-eq scope (4 skills have no support option: absent); sibling-compare (first family: no siblings);
+  ws-screen-ink-size SIZE-WIDTH on growing (each Term picture is the pattern's own shape - a 1-wide column is taller than wide by
+  the maths; proposed: exempt a term drawing as numeral drawings are, or pin it; widening it would change the pattern).
+- quiz host owner (lf-roles / screen-cell): EB-SIDE on the quiz 1280 legacy cell (ft, npr, fgr, notice: "[legacy]").
+- ours: none left that a fix in our files clears without a ruling (growing SIZE-WIDTH above).
 
 ## Precritic r8 (796952c0 + the notice level-0 line, on our branch merged with lf-roles 83bcbf32 and lf-checks' ws-empty-band 1bcfcb72 in a scratch worktree; 6 skills, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261113-030943-19618, wall ~5400 s): 32 PASS, 13 FAIL
 After the run: ws-spec-card --check-signed is OK (the FAIL row ran before the rule ids came out of the new comments, see Log);
@@ -656,6 +705,20 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 08:55 fix r9 (mq-opus-low): (1) merge origin/master 8a7c5d438 -> 74bff0abb: only backtests.json conflicted (rows unioned
+  by id, master's text + our dealer-declared-set row; checked: JSON parses, no duplicate id); no generated file changed on both sides.
+  boot-smoke OK, code-snapshot OK (736). (2) git revert 2cfeb1d7 -> af74c6b04; cherry-pick 77187c6e8 -> a2fecb0aa, reason-it.js resolved
+  on master's (answerPlace frames, wrongSlots, auto-margin centring, list row) plus lf-ops' pair / full (fix4 8586745a8, not on master),
+  crWrap + cellLiveMm and the --ws-koin keep-out as padding-top (auto margins still centre); equations keep master's wide rule; count-row
+  narrowLive takes the one-line cellLiveMm cap from -props 6d61ff6b7 (the wrap needs it). Not ported: fix4's wrong.frame stem (master's
+  answerPlace replaces it). (3) syntax, boot-smoke, code-snapshot, card-rulings (both cards), spec-card --check-signed x2, lesson-unit
+  (286), detailed-lesson --check: all OK. (4) Fixes, each with its check:
+  - b859e11a6 count-row.js: the revert of 2cfeb1d7 restored 3d8bca1's columns-keyed train wrap, which -props dropped; every multi-column
+    train (the lesson chart) wrapped and overflowed. CHECK: ws-grade-render --gate (npr lesson S/M 30 overflow -> 0) and ws-cell-checks
+    --card-opts (npr 1226 -> 262, fgr 1056 -> 144; the rest is the chart width, lf-ops). Lesson for the brief: "drop the interim revert"
+    meant "take -props' count-row", not "restore 3d8bca1" - diff the cell against the source branch after a revert-of-revert.
+  - a6b1e8151 notice.js: a ringed word keeps 2.2 mm beside it. CHECK: ws-empty-band EB-EDGE (notice guided M Model 0.8 mm -> PASS);
+    ws-options-verify --render and print-lint lesson L confirm the ringed-only form (an every-word margin raised H13).
 - 2026-11-12/13 lead notes: guidedRows key (lf-engine); next-skill order (above); lf-roles c93de259 cleared KEYJOIN on our six; lf-checks fdf3af0f EB-FOOT tool fix; +$15 for critic r2 (cap $75).
 - 2026-11-13 04:55: fix r8 (Opus medium: rebuild after critic r1 FAILED all six). Merged for precritic only: our branch + origin
   lf-roles (83bcbf32; backtests.json conflict resolved by keeping both rows) + lf-checks' ws-empty-band.cjs (1bcfcb72, EB-FOOT
