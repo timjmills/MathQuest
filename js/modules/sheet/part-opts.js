@@ -53,6 +53,37 @@ export const PRACTICE_GROW_CAP = 1.35;
 
 const int = (v) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : NaN);
 
+/* ---------------------------------------------------- the offer gate's predicates (shared with ws-partopts-unit) */
+
+/**
+ * EB-BAND (tests/scripts/ws-empty-band.cjs `BAND`): a cell whose empty band under its lowest ink is 30 % of its height or
+ * more fails; cells under 10 mm are not judged. roles/lesson.js sheetOffers refuses a value whose planned cells would fail
+ * it (the band predicted from the bridge's measured `neededMm`); ws-partopts-unit checks this constant against the judge's.
+ */
+export const EB_BAND_MAX = 0.30;
+export const EB_MIN_CELL_MM = 10;
+/** True when a cell of hMm with belowMm empty under its ink fails EB-BAND. */
+export const bandFails = (belowMm, hMm) => hMm >= EB_MIN_CELL_MM && belowMm >= EB_BAND_MAX * hMm;
+
+/**
+ * The plan-to-print margin of the row test (EB-ROWFIT). The planner's free height under the last band reads 9-16 mm less
+ * than the printed foot measures (design/partopts/DESIGN.md §8d: the body prints 239 mm tall at M where the plan budgets
+ * 232, and the bands print a little shorter than planned), so the planner's figure + ROWFIT_SLACK_MM stands for the printed
+ * foot. ws-partopts-unit EB-ROWFIT-BT pins it: 6 mm lets a known sheet whose printed foot holds a row through, 18 mm
+ * refuses a known sheet whose printed foot does not.
+ */
+export const ROWFIT_SLACK_MM = 12;
+/** EB-ROWFIT: true when a foot of freeMm (+ marginMm) holds one Independent row and its band head (rowMm). */
+export const rowFits = (freeMm, rowMm, marginMm = 0) => Number(rowMm) > 0 && Number.isFinite(Number(freeMm)) && Number(freeMm) + marginMm >= Number(rowMm);
+/** The shortest whole row of c problems across: the c-th shortest of their heights (a row is as tall as its tallest). */
+export const shortestRowMm = (hs, c) => {
+    const s = (hs || []).filter((h) => Number(h) > 0).map(Number).sort((a, b) => a - b);
+    return s.length >= c && c >= 1 ? s[c - 1] : null;
+};
+
+/** The rows' text where a row would fit on the standard sheet but the standard sheet prints none (A r3, routed to lf-engine). */
+export const NOT_ADDED_STD = 'Not added: the standard sheet is kept';
+
 /** The most Practice pages (and Mixed pages) a total may take. */
 export const PRACTICE_MAX_PAGES = 5;
 /** The fewest Vocabulary words a match prints (critic A r2 N4: one pair is not a matching task). */
@@ -138,7 +169,9 @@ export function partLimits(part, ctx = {}) {
             const per = Math.max(1, int(f.perRow) || 1);
             // (F7: no row fits on this sheet - the part is not on it: no tick, no New numbers)
             // (critic A r2 N1: "no room" only where no row fits - the engine's own room test, roles/lesson.js sheetOffers)
-            if (r === 0) return out({ min: 0, max: 0, dflt: 0, fixed: true, none: true, perRow: per, canOff: false, note: f.noRoom === false ? 'Not on this lesson sheet' : 'Not on this lesson sheet (no room)' });
+            // (lf-partopts A r3: a row that fits yet is not printed happens only on the STANDARD sheet - every changed sheet that
+            // does so is refused, roles/lesson.js fillOk - so the text says why truthfully: the standard sheet is kept as it is)
+            if (r === 0) return out({ min: 0, max: 0, dflt: 0, fixed: true, none: true, perRow: per, canOff: false, note: f.noRoom === false ? NOT_ADDED_STD : 'Not on this lesson sheet (no room)' });
             if (!Array.isArray(f.values)) return out({ min: 1, max: r, dflt: r, perRow: per, canOff: true });
             return listed(f.values, r, f.canOff, `Fixed: ${r} (fewer would leave the lesson sheet short)`, { perRow: per });
         }
@@ -320,4 +353,4 @@ export function lessonPartN(po) {
     return Object.keys(o).length ? o : null;
 }
 
-export default { VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+export default { EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

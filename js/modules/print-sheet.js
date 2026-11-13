@@ -2439,7 +2439,26 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
             }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkHi > inkLo ? inkHi - inkLo : 0 };
+        // (lf-partopts A r3: the pupil cell's NEEDED height - its lowest ink from the cell's top plus its bottom padding and border,
+        // read by ws-empty-band measureCells' own ink rule (text runs, a drawing, a stroked box, an answer slot; labels aside).
+        // A cell drawn H tall leaves H - neededMm empty under its ink: the lesson's offer gate predicts EB-BAND with it.)
+        let neededPx = 0;
+        if (state === 'blank') {
+            const isSvg = (d) => d.namespaceURI === 'http://www.w3.org/2000/svg';
+            let inkB = -Infinity;
+            for (const d of cell.querySelectorAll('*')) {
+                if (d.closest('[data-ws-label], .ws-letter, .ws-tab')) continue;
+                const st = getComputedStyle(d);
+                if (st.display === 'none' || parseFloat(st.opacity || '1') <= 0.05) continue;
+                const ownText = [...d.childNodes].some((nd) => nd.nodeType === 3 && nd.textContent.trim());
+                if (ownText) { const rg = d.ownerDocument.createRange(); rg.selectNodeContents(d); for (const q of rg.getClientRects()) if (q.width && q.height) inkB = Math.max(inkB, q.bottom); continue; }
+                const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
+                const drawn = isSvg(d) ? d.tagName.toLowerCase() === 'svg' : /^(img|canvas|input)$/i.test(d.tagName);
+                if (drawn || stroked || d.hasAttribute('data-ws-slot')) { const q = d.getBoundingClientRect(); if (q.width && q.height) inkB = Math.max(inkB, q.bottom); }
+            }
+            if (inkB > -Infinity) { const cs0 = getComputedStyle(cell); neededPx = (inkB - r.top) + parseFloat(cs0.paddingBottom || 0) + parseFloat(cs0.borderBottomWidth || 0); }
+        }
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkHi > inkLo ? inkHi - inkLo : 0, neededPx };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -2478,7 +2497,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
         best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
-            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM), inkMm: Math.max(b0.inkMm || 0, (m.inkPx || 0) / PX_PER_MM) });
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM), inkMm: Math.max(b0.inkMm || 0, (m.inkPx || 0) / PX_PER_MM), neededMm: Math.max(b0.neededMm || 0, (m.neededPx || 0) / PX_PER_MM) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -2508,6 +2527,8 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 // (lf-partopts: the widest the ink drew at this column width - the We Do and lesson rows read it before they
                 // offer fewer, wider cells: a cell much wider than its ink has an empty side, EB-SIDE)
                 if (b.inkMm > 0) it.measured[c].inkMm = Math.ceil(b.inkMm * 10) / 10;
+                // (lf-partopts A r3: the blank cell's needed height - its ink's bottom and bottom padding; the offer gate's EB-BAND)
+                if (b.neededMm > 0) it.measured[c].neededMm = Math.floor(b.neededMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
@@ -5165,7 +5186,10 @@ async function buildLesson(n, metaOf) {
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,
-            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk, freeMm: teach.plan.meta.sheetFreeMm, rowMm: teach.plan.meta.indepRowMm } : null,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk, freeMm: teach.plan.meta.sheetFreeMm, rowMm: teach.plan.meta.indepRowMm, cellBands: teach.plan.meta.cellBands,
+                // (lf-partopts A r3, ws-partopts-unit EB-ROWFIT: the bridge's measured heights, at 1-4 across, of the problems the
+                // lesson rows draw - the level-1 twins of the lesson's main pool - not the planner's figures)
+                indepH: Object.fromEntries([1, 2, 3, 4].map((c) => [c, (teach.extras || []).filter((x) => x && x.lessonIndepOf && x.measured && x.measured[c] && x.measured[c].fits !== false).map((x) => x.measured[c].hMm)])) } : null,
             // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
             // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
             partFit: (() => {

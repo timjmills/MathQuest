@@ -100,6 +100,16 @@ async function unit() {
         const t = po.partRowText ? po.partRowText('mixed', ml, 15) : po.rangeText('mixed', ml);
         if (/\d+ a page\b/.test(t)) F('PO-4', `N6: the Mixed range reads "${t}"`);
     }
+    // (A r3) the offer gate's EB-BAND predicate IS the judge's: part-opts.js bandFails agrees with ws-empty-band judge at its edges
+    {
+        const { judge } = require('./ws-empty-band.cjs');
+        const cases = [[20, 6], [20, 5.99], [40, 12], [40, 11.9], [9.9, 9], [10, 3]];
+        for (const [h, b] of cases) {
+            let j = false; judge([{ page: 1, cell: 1, hMm: h, belowMm: b, sideMm: 0, innerW: 100, wMm: 100 }], 'x', (rule) => { if (rule === 'EB-BAND') j = true; }, 'lesson');
+            const jj = h >= 10 && j;   // (the judge's cells come from measureCells, which drops cells under 10 mm)
+            if (jj !== po.bandFails(b, h)) F('PO-4', `EB-BAND predicate: part-opts bandFails(${b}, ${h}) = ${po.bandFails(b, h)}, ws-empty-band judge = ${jj}`);
+        }
+    }
     console.log(`PO-4 ${fails.length ? "FAIL" : "PASS"} (${n} counted parts, save/load, old sections, parts list)`); for (const x of fails) console.log(`   ${x}`);
 }
 
@@ -133,9 +143,14 @@ async function browser() {
                 const mixed = (r.items || []).filter((it) => it.part === 'mixed');
                 // (EB-ROWFIT: the shortest whole row of this lesson's own sheet items at c across - the ic shortest measured
                 // heights, the tallest of them - read from the bridge's measurements, not from the planner under test)
-                const teachIts = (r.items || []).filter((it) => it.part === 'teach' && it.measured && !/^lesson/.test(it.template || ''));
+                // (A r3: the problems the rows DRAW - the bridge's level-1 twins of the main pool, `lesson.teach.indepH`; the Warm-up
+                // pools' shorter items never print as lesson rows - identify's 30.5 mm Warm-up cells read a 36.5 mm row where its
+                // place-value rows are 49.3 mm. An engine without indepH: the main pool's own measured items.)
+                const PO = await import('./js/modules/sheet/part-opts.js');
+                const ih = r.lesson.teach && r.lesson.teach.indepH;
+                const mainIts = (r.items || []).filter((it) => it.part === 'teach' && it.pool === 'main' && it.measured && !/^lesson/.test(it.template || ''));
                 const rowH = {};
-                for (const c of [1, 2, 3, 4]) { const hs = teachIts.map((it) => it.measured[c] && it.measured[c].fits !== false ? it.measured[c].hMm : null).filter((h) => h > 0).sort((a, b) => a - b); if (hs.length >= c) rowH[c] = hs[c - 1]; }
+                for (const c of [1, 2, 3, 4]) { const hs = ih ? ih[c] || [] : mainIts.map((it) => it.measured[c] && it.measured[c].fits !== false ? it.measured[c].hMm : null); const h = PO.shortestRowMm(hs, c); if (h !== null) rowH[c] = h; }
                 const L = await import('./js/modules/lessons/prereqs.js');
                 const ld = L.lessonFor(skill.categoryId, skill.skillId) || {};
                 const remTexts = [ld.concepts && ld.concepts[0] && ld.concepts[0].text, ld.chant, r.lesson.chant].filter((x) => typeof x === 'string' && x.trim().length >= 6);
@@ -286,9 +301,15 @@ async function browser() {
             const rowNeed = rowH[perRow] ? +(rowH[perRow] + (lastSheet ? lastSheet.stripMm : 0)).toFixed(1) : null;
             const rowsPrinted = Math.round((b.got.rowsItems || 0) / perRow);
             // (b) EB-ROWFIT: no lesson rows (0, off, or "no room") yet the sheet's foot holds a whole Independent row and its band head
-            if (lastSheet && rowNeed && rowsPrinted === 0 && lastSheet.emptyMm >= rowNeed && changed(lastSheet)) F('EB-ROWFIT', `${where} p${lastSheet.i + 1}: no lesson rows, yet ${lastSheet.emptyMm} mm of the foot is empty - one Independent row and its head is ${rowNeed} mm`);
-            // (c) "no room" is true: the screen says the rows have no room only where a row does not fit
-            if (lims.rows && lims.rows.none && /no room/.test(po.rangeText('rows', lims.rows)) && lastSheet && rowNeed && lastSheet.emptyMm >= rowNeed) F('PO-NOROOM', `${where}: rows "${po.rangeText('rows', lims.rows)}", yet ${lastSheet.emptyMm} mm is empty at the sheet's foot and one row with its head is ${rowNeed} mm`);
+            // (part-opts.js rowFits - the offer gate's own predicate, here on the PRINTED foot, margin 0). A sheet identical to the
+            // standard packet's is the master state (routed to lf-engine): excused here, its text still judged in (c).
+            const fits = lastSheet && rowNeed && po.rowFits(lastSheet.emptyMm, rowNeed, 0);
+            if (fits && rowsPrinted === 0 && changed(lastSheet)) F('EB-ROWFIT', `${where} p${lastSheet.i + 1}: no lesson rows, yet ${lastSheet.emptyMm} mm of the foot is empty - one Independent row and its head is ${rowNeed} mm`);
+            // (c) the rows' text is true, the standard packet included (the screen's text is no print: not in the print baseline):
+            // "no room" only where a row does not fit; "the standard sheet is kept" only on a sheet identical to the standard's
+            const rt = lims.rows && lims.rows.none ? po.partRowText('rows', lims.rows, 0) : '';
+            if (/no room/.test(rt) && fits) F('PO-NOROOM', `${where}: rows "${rt}", yet ${lastSheet.emptyMm} mm is empty at the sheet's foot and one row with its head is ${rowNeed} mm`);
+            if (rt === po.NOT_ADDED_STD && lastSheet && changed(lastSheet)) F('PO-NOROOM', `${where}: rows "${rt}" on a lesson sheet that differs from the standard packet's`);
             // (d) Remember off: neither the Remember line nor the rule prints anywhere on the lesson sheet
             if (cur.remember && cur.remember.on === false) for (const t of b.remTexts) if (sheetPgs.some((x) => x.text.includes(t.replace(/\s+/g, ' ').trim()))) F('PO-REM', `${where}: Remember is off, yet the lesson sheet prints "${t}"`);
             // (f) N4: no one-pair match

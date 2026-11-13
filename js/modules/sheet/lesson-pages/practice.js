@@ -12,6 +12,7 @@ import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { winShare } from '../lesson-arch/grid.js';
 import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt, phase0On } from './common.js';
+import { shortestRowMm } from '../part-opts.js';
 
 export const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
@@ -130,8 +131,9 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (critic A r2 N1, EB-ROWFIT: the height ONE row and its band head take - roles/lesson.js offers no sheet whose foot holds
         // one and prints none, and says "no room" only where one does not fit)
         // (the SHORTEST row the pool could make - its ic shortest problems - as ws-partopts-unit EB-ROWFIT measures it)
-        const hsAll = indepPool.map((it) => hAt([twins.get(it) || it], ic)).filter((h) => Number.isFinite(h) && h > 0).sort((a, b) => a - b);
-        const hRowMin = hsAll.length >= ic ? Math.min(hRows(1), hsAll[ic - 1]) : hRows(1);
+        // (part-opts.js shortestRowMm: the one rule the unit gate measures the printed foot with)
+        const hShort = shortestRowMm(indepPool.map((it) => hAt([twins.get(it) || it], ic)), ic);
+        const hRowMin = hShort !== null ? Math.min(hRows(1), hShort) : hRows(1);
         cur.indepRowMm = +(hRowMin + m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + safety).toFixed(1);
         const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
         if (rN === 0 || inkShort) return indep;
@@ -147,10 +149,13 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             // (lf-partopts: on a sheet the teacher changed, the rows fill with whole rows, not taller cells - a grown one-number cell
             // passed a 30 % band, div_facts; the standard sheet keeps its fill)
             const cellH = Math.min(room / r, hTop * (freed ? 1.0 : 1.15));
+            const grid = gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter });
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
-                content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),
+                content: grid,
             });
+            // (lf-partopts A r3: the rows' cells, for the offer gate's EB-BAND prediction - roles/lesson.js cellBands)
+            (cur.bandCells || (cur.bandCells = [])).push({ grid, items: indep.map((it) => twins.get(it) || it), cols: ic });
             cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH + safety;
         }
     }
