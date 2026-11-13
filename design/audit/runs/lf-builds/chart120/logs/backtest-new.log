@@ -1,0 +1,10 @@
+ws-backtest row c120-role-hidden: PASS  fail state FAIL 28.3s, pass state OK 15.2s
+ws-backtest row c120-text-misc: PASS  fail state FAIL 35.5s, pass state OK 33.7s
+ws-backtest: 2 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-role-hidden            commit-pair  FAIL 28.3s          OK 15.2s            PASS
+c120-text-misc              commit-pair  FAIL 35.5s          OK 33.7s            PASS
+
+2 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 141.7 s
+ws-backtest: OK
