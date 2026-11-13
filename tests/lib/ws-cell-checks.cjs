@@ -201,7 +201,7 @@ function cellChecksInPage(opts) {
                 var top = isFinite(inkTop) ? inkTop : Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
                 // 2-4 mm (lead) with 0.5 mm for the cap-height estimate of the ink edge
                 var gap = top - tagFoot;
-                if (gap > 4.5 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
+                if (gap > 4.5 * PX || gap < 1.8 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
             }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
@@ -215,6 +215,18 @@ function cellChecksInPage(opts) {
             }
         });
     });
+    // ---- EA-PAD (critic r5 D1, CL-8): an Error Analysis cell keeps its 3 mm padding - no label, work or fix box within 2.5 mm of
+    // the cell's left or right rule (the number tag excepted)
+    if (role === 'error-analysis') {
+        pages.forEach(function (pg, pi) {
+            [].forEach.call(pg.querySelectorAll('.ws-cell'), function (c, ci) {
+                var j = c.querySelector('.mq-judge'); if (!j) return;
+                var cr = c.getBoundingClientRect(), lo = Infinity, hi = -Infinity;
+                [].forEach.call(j.querySelectorAll('*'), function (e) { var r = e.getBoundingClientRect(); if (!r.width || !r.height || !shownEl(e) || e.closest(LABEL)) return; if (r.left < lo) lo = r.left; if (r.right > hi) hi = r.right; });
+                if (isFinite(lo) && (lo - cr.left < 2.5 * PX || cr.right - hi < 2.5 * PX)) out.findings.push({ rule: 'EA-PAD', page: pi + 1, cell: ci + 1, msg: 'page ' + (pi + 1) + ' cell ' + (ci + 1) + ': the work / judgement comes ' + mm(Math.min(lo - cr.left, cr.right - hi)) + ' mm from the cell rule (CL-8: 3 mm padding)' });
+            });
+        });
+    }
     // ---- EA-ROWX (critic r1-r3 R15): on an Error Analysis page every cell of one grid column starts its Correct / Fix it judgement at
     // the same x (within 4 mm: a work a few mm wider shifts its centred group by half that - word forms drift 3.5 mm; R15 was a
     // 31 mm jump between judgement modes) - the same task in two places reads as two tasks (AX-4, C1)

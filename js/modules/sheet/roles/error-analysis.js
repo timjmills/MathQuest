@@ -684,8 +684,12 @@ export function prepare(it, info = {}) {
         // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
         // ONE work width a page (critic R15, ws-cell-checks EA-ROWX): every item's work is as wide as the page's widest, so the
         // Correct / Fix it judgement beside it starts at one x in every cell of a column
-        const workW = Number(o.workW) > 0 && !story ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
-        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1 : 0.5}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
+        // (only while the widened work, the 6 mm gap and the judgement column still keep the cell's 3 mm padding - CL-8; critic r5
+        // D1: div_facts_long S lost its padding and the label started 0.5 mm off the cell rule)
+        const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
+        const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
+        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${c.size === 'S' ? 1.25 : 0.75}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -766,7 +770,10 @@ export function prepare(it, info = {}) {
         // unset (the host's first measure, an unmeasured page): 'stack', which always fits the cell
         const mode = !modal ? '' : ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : 'stack';
         const modeCls = mode === 'stack' ? ' mq-jbelow mq-jstack' : mode ? ` mq-j${mode}` : '';
-        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}">`
+        // (a page whose items differ in width but cannot widen its work in this cell: the judgement stands against the cell's right
+        // padding instead, so it still starts at one x a column - R15 / EA-ROWX, CL-8 kept)
+        const spread = Number(o.workW) > 0 && !story && !widen && mode === 'beside' ? ';justify-content:space-between' : '';
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
             + shownWork
             + judge
             + (below ? fix : '')
