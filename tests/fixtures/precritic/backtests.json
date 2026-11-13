@@ -6303,7 +6303,7 @@
  },
  {
   "id": "screen-ink-size-cell-read",
-  "check": "CELL-READ (lf-hosts, 2026-11-13): ws-screen-ink-size FAILS a host render that read 0 [data-ws-cell] cells (not rendered, root missing, a card / quiz paper with no [data-ws-cell], a worksheet of 0 cards or a card with none) instead of passing it with nothing judged; never filtered by --only. The same rule as ws-screen-slots / ws-screen-answer / ws-phone-card (lf-checks 1fbdb8eca); --self-test holds 8 CELL-READ cases",
+  "check": "CELL-READ (lf-hosts, 2026-11-13): ws-screen-ink-size FAILS a host render that read 0 [data-ws-cell] cells (not rendered, root missing, a card / quiz paper with no [data-ws-cell], a worksheet of 0 cards or a card with none) instead of passing it with nothing judged; judged on every full run (an --only run judges it when it names CELL-READ). The same rule as ws-screen-slots / ws-screen-answer / ws-phone-card (lf-checks 1fbdb8eca); --self-test holds 8 CELL-READ cases",
   "kind": "commit-pair",
   "rule": "ws-screen-ink-size CELL-READ",
   "browser": true,

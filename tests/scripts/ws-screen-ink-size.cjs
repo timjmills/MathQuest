@@ -32,8 +32,9 @@
 //               --dump-text prints every run read. Fixtures: --width W sets the host width (default 1280).
 //   CELL-READ   (lf-hosts, 2026-11-13; as ws-screen-slots / ws-screen-answer / ws-phone-card, lf-checks 1fbdb8eca) a host
 //               render that read 0 [data-ws-cell] cells - it did not render, its root is missing, the card / quiz paper holds
-//               no [data-ws-cell], the worksheet dealt 0 cards or a card holds none - is a FINDING, never a pass. It is not
-//               filtered by --only, and its keys are never pinned (a new key breaks the pin).
+//               no [data-ws-cell], the worksheet dealt 0 cards or a card holds none - is a FINDING, never a pass. It runs on
+//               every full run (precritic passes no --only); a scoped --only run judges it only when it names CELL-READ (a
+//               backtest row of one rule on a pre-hand-off-1 tree stays that rule's proof). Its keys are never pinned.
 // Worksheet items (queue 14): the worksheet deals its own items, so each card is also matched with the print cell of the item
 // it DEALT (the kit's renderCell at --size, [data-mq-dealt]; fixtures: [data-mq-print-dealt]) before any geometric fallback.
 // Pattern terms (queue 15): a drawing labelled "Term n" (or in [data-ws-term] / .mq-gp-term) is judged by its unit (SIZE-INK,
@@ -835,7 +836,7 @@ async function main() {
                         }, { c: cat, k: skill, host, s: SEED, i, opts: v.opts });
                         if (!scope || /^ERR/.test(scope)) {
                             notes.add(`${tag} ${host} ${w}: not rendered (${scope})`);
-                            findings.push({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cellReadError(host, host, null)}` });
+                            F({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cellReadError(host, host, null)}` });
                             continue;
                         }
                         await new Promise((r) => setTimeout(r, 450));
@@ -844,7 +845,7 @@ async function main() {
                         renders++;
                         // CELL-READ (lf-hosts): a host that read 0 [data-ws-cell] cells judged nothing - a finding, never a pass
                         const cr = cellReadError(host, scope, await page.evaluate(cellCountInPage, { scope, host }));
-                        if (cr) findings.push({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cr}` });
+                        if (cr) F({ rule: 'CELL-READ', where: `${tag} ${host} ${w}px`, at: host === 'card' ? ` item ${i}` : '', name: 'host', bucket: 'read', pct: 0, msg: `CELL-READ ${cr}` });
                         // queue 14: the print cells of the very items the worksheet dealt (the SAME word / item), drawn by the kit
                         let dealt = [];
                         if (host === 'worksheet' && !sc.error && sc.drawings.length) {
