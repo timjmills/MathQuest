@@ -3215,7 +3215,7 @@
    "commit": "d7847568",
    "state": "the fix: 0 findings, both samples inside the frame at a legible scale"
   },
-  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1 --no-spot --checks inside,ink",
+  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks inside,ink",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3235,7 +3235,7 @@
    "commit": "cdf7a76d",
    "state": "the fix: the item one whole part at a time (1 of N), every part >= 9 px"
   },
-  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate,algebra:multi_step_word --skip-no-panel --workers 1 --no-spot --checks text",
+  "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate,algebra:multi_step_word --widths 1280,390 --skip-no-panel --workers 1 --no-spot --checks text",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3356,6 +3356,186 @@
    "state": "the panel as it is"
   },
   "command": "node tests/scripts/ws-options-shots.cjs --skill coordinates:geo_translate --widths 1280 --skip-no-panel --workers 1 --no-spot --checks pageerror --inject {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-inner-clip",
+  "check": "critic-panel-r2 F1: no box inside the panel sample's stage clips its own content (overflow not visible and scrollWidth/scrollHeight over its client size by more than 1 px), on every part",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [clip]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: the 12 x 12 chart's 765 px table in a 400 px overflow:auto box (div 765>400 wide) on both parts"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "the clipping box is opened (_sampleUnclip) and the table paged in tiles"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-cover",
+  "check": "critic-panel-r2 F1/F2, the new class: across all parts every block of the unpaged item (each word outside a drawing, each drawing) is wholly visible on some part",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [cover]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: 73 of 162 blocks on no part (columns 7-12 of the chart)"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "the chart in 4 tiles (rows 1-6 / 7-12 x columns 1-6 / 7-12, heading row and row labels on each): every cell on a part"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks cover",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-choices",
+  "check": "critic-panel-r2 F2: the answer choices are one part of their own (never with the question, never spread), each with its letter or label, and split the same way at every width",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [choices]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: 4 unlettered figures packed A | BC | D, A with the question"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "the four figures lettered A-D, two to a row, one part of their own"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks choices",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-svgtext",
+  "check": "critic-panel-r2 F3: SVG text in the panel sample is drawn at >= 9 px (font-size x its screen scale), every part",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [svgtext]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: geo_translate's 'original' tag 5.8 px; fraction_of_set's group numbers 8.6 px"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "SVG text counted in _sampleNeed: parts zoomed (<= 2) or sliced, an undividable drawing may grow the frame to 45 %"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate,fractions:fraction_of_set --checks svgtext",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-summary",
+  "check": "critic-panel-r2 F5: a two-line-clamped option summary has an expand control (a button with aria-expanded) reachable by touch and keyboard",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [summary]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: algebra_all's summary clamped after an option change, full text only in the title attribute"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "a 'Show all' button (aria-expanded, aria-controls) opens the summary"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra_mixed:algebra_all --change --changed-only --checks summary",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-repeat",
+  "check": "critic-panel-r2 F6: the panel sample shows no sentence of 20 or more characters twice",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [repeat]",
+  "browser": true,
+  "fail": {
+   "commit": "b1a46205",
+   "state": "round-2 tree: the story in the question line and again in the story block ('how many cards does lena have now')"
+  },
+  "pass": {
+   "commit": "71a055f4",
+   "state": "the preview hides a question line the visual already says (as live play's mq-dup does)"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill algebra:multi_step_word --checks repeat",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-inner-clip-fixture",
+  "check": "critic-panel-r2 F1 (fixture asked by the brief): a table clipped inside the stage fails [clip] though the stage box is inside the frame",
+  "kind": "fixture",
+  "rule": "ws-options-shots [clip]",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/options-shots/inner-clip.fail.js",
+   "state": "the box around the chart set to overflow:hidden at 200 px every 50 ms"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+   "state": "the panel as it is"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill multiplication:mult_chart_easy --checks clip --inject {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-parts-cap",
+  "check": "critic-panel-r2 soft spot: every part is walked (the old walk stopped at 12); more than 40 parts FAILs [parts]",
+  "kind": "fixture",
+  "rule": "ws-options-shots [parts]",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/options-shots/parts-endless.fail.js",
+   "state": "the Next arrow is never disabled"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+   "state": "the panel as it is"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks parts --inject {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "options-panel-part-ink",
+  "check": "critic-panel-r2 soft spot: a part needs 0.5 % ink in its OWN drawn box (the old floor was 0.03 % of the frame)",
+  "kind": "fixture",
+  "rule": "ws-options-shots [ink]",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/options-shots/part-sparse.fail.js",
+   "state": "part 2 replaced by one 14 px digit in a 380 x 260 box"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/options-shots/none.pass.js",
+   "state": "the panel as it is"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1280 --skill coordinates:geo_translate --checks ink --inject {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

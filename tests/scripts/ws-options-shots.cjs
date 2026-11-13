@@ -56,7 +56,7 @@ const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-s
 const bare = argv.filter((a, i) => /^[a-z0-9_]+:[a-z0-9_]+$/i.test(a) && !valued.has(argv[i - 1]));
 const ONLY = [...new Set([...many('skill').flatMap((v) => v.split(',')).map((v) => v.trim()).filter(Boolean), ...bare])];
 // The panel's widths (owner scope, 2026-11-13: 1280, 1366, 1024 and 820; 390 dropped). `--widths 1280,820` keeps their heights.
-const HEIGHT = { 1280: 1000, 1366: 768, 1024: 768, 820: 1180 };
+const HEIGHT = { 1280: 1000, 1366: 768, 1024: 768, 820: 1180, 390: 844 };   // (390: only when asked, for the round-1/2 backtest rows)
 const WIDTHS = String(one('widths', '1280,1366,1024,820')).split(',').map(Number).filter(Boolean);
 const WORKERS = Math.max(1, Number(one('workers', 3)) || 1);
 const SHOTS = one('shots', '') ? path.resolve(one('shots')) : '';

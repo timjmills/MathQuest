@@ -12,7 +12,8 @@
 #   bash tests/scripts/ws-deploy-gates.sh --session 2       # ws-screen-slots + ws-chromebook-fit, sharded over the two
 #                                                           # browser slots, + viewport, S9 and the board / dark sweeps
 #   bash tests/scripts/ws-deploy-gates.sh --session 3       # coverage matrix (budgeted), digests hook, owner go
-#   bash tests/scripts/ws-deploy-gates.sh --session 4       # ws-options-shots: every Options panel sample, sharded
+#   bash tests/scripts/ws-deploy-gates.sh --session 4       # ws-options-shots: every Options panel sample, shards 1-2 of 4
+#   bash tests/scripts/ws-deploy-gates.sh --session 5       # ws-options-shots: shards 3-4 of 4
 #   bash tests/scripts/ws-deploy-gates.sh --all             # sessions 1, 2, 3, 4 in sequence
 #   bash tests/scripts/ws-deploy-gates.sh --session 3 --accept-notyet digests
 #                                                           # the lead accepts a named NOT YET gate (logged)
@@ -94,6 +95,10 @@
 #            each, on the two slots). ≈ 2 s a skill a width = ≈ 2,850 slot-s (timed 1,426 + 1,418 s): sessions 1-3 are each predicted at 27-28 of
 #            30 min, so it has a session of its own (MQ_OPTSHOTS_SESSION moves it). A lane's own skills run in its
 #            precritic (`--skill ... --skip-no-panel`).
+# Session 5  ws-options-shots shards 3-4 of 4 (critic-panel-r2 rebuild, 2026-11-13): the owner's panel widths are 1280x1000,
+#            1366x768, 1024x768 and 820x1180 (390 dropped), twice the readings of 1280 + 390, plus the new clip / cover /
+#            choices / svgtext / parts / summary / repeat checks; one session cannot hold the sweep, so shards 1-2 run in
+#            session 4 and 3-4 here (timed: tests/fixtures/precritic/deploy/budget/timings-options-shots.jsonl).
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
 #
@@ -125,7 +130,7 @@ VIEWPORT_BASE=design/audit/baselines/viewport-check.json
 SLOTS_SHARDS=${MQ_SLOTS_SHARDS:-4}
 FIT_SHARDS=${MQ_FIT_SHARDS:-2}
 MATRIX_SHARDS=${MQ_MATRIX_SHARDS:-2}
-OPTSHOTS_SHARDS=${MQ_OPTSHOTS_SHARDS:-2}
+OPTSHOTS_SHARDS=${MQ_OPTSHOTS_SHARDS:-4}
 NODE_WORKERS=${MQ_NODE_WORKERS:-2}
 BROWSER_WORKERS=${MQ_BROWSER_WORKERS:-2}
 PRINT_LINT_LIMIT=${MQ_PRINT_LINT_LIMIT:-461/33}
@@ -907,7 +912,14 @@ build_list() {
   # session 4 (lf-partopts, from lf-algebra F8/G11, 2026-11-13): the Options panel sample of every skill with an options
   # panel (725 x 1280 / 390 px; ≈ 1.8 s a skill a width, ≈ 2,600 slot-s in all), sharded over the two browser slots, one
   # browser a shard (--workers 1: the runner's slot is one Chromium). No session 1-3 has room (27-28 of 30 min each).
-  for i in $(seq 1 "$OPTSHOTS_SHARDS"); do browser_gate "${MQ_OPTSHOTS_SESSION:-4}" "ws-options-shots --shard $i/$OPTSHOTS_SHARDS" ws-options-shots.cjs --shard "$i/$OPTSHOTS_SHARDS" --workers 1; done
+  # critic-panel-r2 rebuild (2026-11-13): the owner's four panel widths (1280x1000, 1366x768, 1024x768, 820x1180) double the
+  # sweep, so it is MQ_OPTSHOTS_SHARDS parts (default 4): the first half in session 4, the second half in session 5 (one
+  # session over 30 min otherwise), each pair side by side on the two slots. MQ_OPTSHOTS_SESSION moves both (base, base+1).
+  local os_base=${MQ_OPTSHOTS_SESSION:-4} os_half=$(( (OPTSHOTS_SHARDS + 1) / 2 ))
+  for i in $(seq 1 "$OPTSHOTS_SHARDS"); do
+    local os_s=$os_base; [ "$OPTSHOTS_SHARDS" -ge 3 ] && [ "$i" -gt "$os_half" ] && os_s=$(( os_base + 1 ))
+    browser_gate "$os_s" "ws-options-shots --shard $i/$OPTSHOTS_SHARDS" ws-options-shots.cjs --shard "$i/$OPTSHOTS_SHARDS" --workers 1
+  done
 }
 
 # --accept-notyet: every name must be the key of a NOT YET gate on the list
@@ -1088,7 +1100,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --session) SESSIONS+=("$2"); shift ;;
     --accept-notyet) IFS=', ' read -r -a _acc <<< "$2"; ACCEPT_NOTYET+=("${_acc[@]}"); shift ;;
-    --all) SESSIONS=(1 2 3 4) ;;
+    --all) SESSIONS=(1 2 3 4 5) ;;
     --list) MODE=list ;;
     --budget) MODE=budget ;;
     --timings) TIMINGS_READ=$2; shift ;;
