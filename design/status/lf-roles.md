@@ -40,7 +40,10 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   over A and B (word-work storyOnly / noStory, lf-builds' file); RI-DISTINCT; ws-precritic never pins an overflow; 3 ruled
   capacity pins. Backtest ri-overflow-stack PASS (34 OVERFLOW on b25479c5 -> 0). Passed RI pages: only the 3 that overflowed
   change. Compare at band 999999 stacks once pv supplies footprint.inkWMm (its wMm carries slack, so it is not trusted).
-  F7 (an added answer under -): SIGNMATCH 0 on the word-story RI / TF / EA pages here. F8 waits on a PT-RSN-4 ruling.
+  F7 (an added answer under -): not reproducible on master (the sentence-layout change_unknown stories are on the
+  lf-builds-stories branch; here add_wp_change_unknown deals a column sum). SIGNMATCH (RI + EA) 0 on the 5 story skills here;
+  True or False? is not in SIGNMATCH's roles (a false statement may be any false sum) - lf-builds' wrongAnswer slots fix it at
+  the source. F8 waits on a PT-RSN-4 ruling.
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
