@@ -218,3 +218,13 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   slot's data-ws-slot, so the pixel read saw ~28 px of "empty" input above the digits (p2/p3 82 px cells, p5 centred too).
   worksheet.js now keeps data-ws-slot="answer" on the input that took the slot. unit_form worksheet: OK; unit_form + div_facts
   card/worksheet/quiz vs head: 0 new, 3 gone. div_facts worksheet keeps 30 pre-existing [eq] bands (33.7 % above), not touched.
+- SCREEN-INK-SIZE (lead 11-13), ws-screen-ink-size.cjs, built by a medium builder (9dba365b, cherry-picked):
+  - SIZE-INK: pictures at least their print size, 5 % tolerance. SIZE-WIDTH: a drawing uses >= 60 % of the free width before it
+    grows taller.
+  - Rows screen-ink-size-ink and -width PASS. 73e96fc1 div_facts FAILs 28: dots 1.77 vs 1.96 mm; the array strip 10.8 x 32.3 mm at
+    10-47 % of the width.
+  - On precritic --skill; deploy gate `ws-screen-ink-size --passed`.
+  - The --passed sweep: 97 findings on 3 skills (add_facts, mult_facts, div_facts), in lf-checks/screen-ink-size-sweep.md. Not
+    fixed: the lead routes. The deploy gate is RED until they are fixed.
+- The CL-4b fixer's da17b9ba (the worksheet input that adopts a kit slot keeps data-ws-slot) is accepted: in print the slot is
+  writing room, not a band. Critic r4 is asked to judge it from a screenshot.
