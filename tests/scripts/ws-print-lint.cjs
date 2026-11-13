@@ -1715,6 +1715,8 @@ function wsLintPage(cfg) {
                 // a div_facts across fact (only div_facts' equation payload `fact` emits data-ws-across): its Test follows the
                 // Independent capacity (owner 2026-11-08, critic r6 R6-1)
                 divAcross: ri.cells.some(c => c.querySelector('.ws-eq[data-ws-across]')),
+                // a mult_facts page (its footer names the skill): its Test follows the Independent page's count (lead ruling 2026-11-13)
+                multFact: /(^|[\s·,])mult_facts([\s·,]|$)/.test(footParts[0] || ''),
                 // the supports the page's problems carry (a faded packet's stage)
                 supKey: [...new Set(ri.cells.map(c => { const e = c.querySelector('[data-ws-supports]'); return e ? e.getAttribute('data-ws-supports') : ''; }))].sort().join('|'),
             });
@@ -2204,6 +2206,9 @@ function lintKitGeometry(dom, pdf, info, F) {
             if (c && p.divUnder && p.size === 'S' && /^(independent|more-practice|review)$/.test(p.role)) c = { n: Math.max(c.n, 36), name: `${c.name} (div_facts supports-off at S, owner 2026-11-08)` };
             // owner 2026-11-08 (critic r6 R6-1, option a): a div_facts fact Test follows the Independent page's capacity (36 / 24 / 20)
             if (c && p.divAcross && /^test\b/.test(p.role)) c = { n: Math.max(c.n, { S: 36, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (div_facts fact Test = the Independent capacity, owner 2026-11-08)` };
+            // lead ruling 2026-11-13 (critic divarray r1 Q1): a mult_facts Test prints its Independent page's count on every support
+            // (25 / 20 / 12 facts at S / M / L with touch or none) - the Independent page's own ceiling (12.3 dense capacity) holds it
+            if (c && p.multFact && /^test\b/.test(p.role)) c = { n: Math.max(c.n, { S: 30, M: 24, L: 20 }[p.size] || 20), name: `${c.name} (mult_facts Test = the Independent count, lead ruling 2026-11-13)` };
             if (c && p.items > c.n) F('L-DENSITY', 'DN-1', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} items; the ${c.name} ceiling at size ${p.size} is ${c.n} (section 12.1)`, `over ceiling ${p.role}`);
             if (p.role && !c) info.notes.push(`page ${p.idx}: role "${p.role}" has no ceiling in this gate`);
             const last = j === pt.pages.length - 1;
