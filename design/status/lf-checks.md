@@ -317,3 +317,4 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - Noted: (c3) box bottoms in a row no longer line up at 820/1280. Honest, but ask whether the owner minds.
   - Verified: self-test, precritic-plan, ws-screen-answer, ws-phone-card OK. 11 of 12 eb-* rows PASS; eb-fact-roles is routed to
     the facts lane.
+- r5 D3, ruled by the lead: KEEP the centring branch; recorded in WORKSHEET_DESIGN_STANDARD CL-4b (it rarely fires under the cap). Top-aligned boxes with unequal bottoms are fine (lead default, put to the owner).

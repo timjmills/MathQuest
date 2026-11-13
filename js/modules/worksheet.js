@@ -1057,7 +1057,7 @@ function _wsEvenRows(cards) {
         const tgt = Math.max(Math.min(...hs), ...need);
         // (c3, lead ruling 2026-11-13): the bordered box is stretched to the row only up to the RUBRIC H13 limit - its content
         // to its bottom fills at least 78 % of it (its padding counts as white: under the 30 % band limit with room); the card keeps the row height and the rest stays white
-        // outside the box, as for a touch-numeral card above. CL-4b centring still applies inside the capped box.
+        // outside the box, as for a touch-numeral card above. CL-4b centring still applies inside the capped box (kept by lead ruling 2026-11-13; with the cap it rarely fires).
         vs.forEach((v, i) => {
             const h = Math.min(tgt, Math.max(need[i], (need[i] - sideY(v)) / 0.78));   // hs[i] is already the stretched row height; the box's own bottom padding is white too, so the content (to its bottom) fills >= 78 % of the box
             if (hs[i] > h + 0.5) v.style.maxHeight = `${h}px`;
