@@ -6578,6 +6578,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "support-label-facts",
+   "check": "every support text on screen (the sign box's word, the number line's labels, the skip strip's terms) is >= 8 pt and >= 95 % of the same text on paper (lf-checks TEXT-SIZE findings routed to lf-ops, lead 2026-11-13: add / sub number-line labels 7.6 pt, mult skip-strip terms, div \"divide\" 8.9 pt)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SUPPORT-LABEL",
+   "browser": true,
+   "fail": {
+    "commit": "850b686b5",
+    "state": "origin/master: number-line labels 10.2 px (7.6 pt) on add / sub, skip-strip terms 10.9 px (8.2 pt, print 8.9) on mult, the sign box at 89 % on the div 390 card"
+   },
+   "pass": {
+    "commit": "b92e5ab29",
+    "state": "0 findings: support cues at one CSS mm per paper mm (r1 SIZE-INK) and the sign box never shrinks on screen"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts --only LABEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
