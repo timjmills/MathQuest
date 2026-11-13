@@ -271,3 +271,14 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   pre-skill-check M/L, div_facts worksheet (6 keys). unit_form --skill: EB-BAND at S 302 -> 47 (86 findings in all).
 - eb-wsheet-cl4b-stretch STAYS PENDING: 1 EB-BAND left on the worksheet command (33.5 % under a one-line tile centred in a row
   _wsEvenRows sizes for a two-line neighbour, 108 px for ~24 px of ink). That is the row height, option (c): it needs a ruling.
+- (c3) lead ruling 11-13, done in 990e66a8: worksheet.js _wsEvenRows stretches a tile's bordered box to its row only while the
+  content (to its bottom) fills >= 78 % of it, since the box's padding is white too. The card keeps the row height.
+  - Before: a one-line unit_form tile (33 px of ink) was stretched to 108 px.
+  - Results: unit_form worksheet host OK; row eb-wsheet-cl4b-stretch re-armed (35df47d7 FAIL → 990e66a8 OK) and PASSES;
+    ws-screen-answer OK; ws-phone-card OK (unit_form, div_facts, add_facts); boot-smoke OK; facts pin OK.
+- Critic sis-r2 (126106c5): FAIL, C1 8 · C2 7 · C3 8 · C4 8 (lf-checks/critic-sis-r2.md).
+  - D1: the "same count, any mark" fallback pairs a ring with dots, which gives a false alarm or a miss.
+  - D2: pinned lines print the same as failing ones.
+  - D3: the tile/frame marks are a bare "dot".
+  - D4: a fixture pass side prints a plain OK.
+  - D5: the sweep is not tied to the pin.

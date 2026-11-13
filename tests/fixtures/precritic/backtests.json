@@ -3435,16 +3435,14 @@
     "state": "EB-BAND 3 on worksheet 1280px {rename: more}: 36.6 / 46.3 % above (82 px cells), 46.3 % under a stretched cell"
    },
    "pass": {
-    "commit": "da17b9ba",
-    "state": "0 findings: stretched cells centred (data-mq-stretched) and the adopted input keeps data-ws-slot"
+    "commit": "990e66a8",
+    "state": "kit line slot drawn at digit height (0f1a0bda) + the bordered box capped at its row only while content fills >= 78 % (c3, lead 2026-11-13)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true,
-   "pendingReason": "critic eb-r4 D1 (2026-11-13): the pass commit da17b9ba only re-labelled the 48 px underline-only input as a slot; 2 of 6 unit_form rename=more tiles are 47.9 % empty above the digits as a pupil sees them. The label was reverted. Rule-7 rebuild (lead ruling (b)+(a), 2026-11-13): the input is now drawn at the digit height (touch target as padding outside it) and the tool reads a screen slot by what it draws; the input part of the band is gone (EB-BAND 3 -> 1 on this command; 46-47 % -> 33.5-34.4 %). STILL PENDING: the one finding left is a one-line tile (\"691 = ___ tens 1 one\") centred in a row the equal-rows rule (_wsEvenRows, R1-16) sizes for a two-line neighbour (\"7 hundreds / 15 tens = ___\"): 108 px for 27 px of ink, so centred it leaves ~33 % above and under. That is the row height (option c), which needs a lead / owner ruling; re-arm once ruled"
+   }
   },
   {
    "id": "screen-ink-size-ink",
