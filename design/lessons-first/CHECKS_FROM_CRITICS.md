@@ -70,5 +70,5 @@ lf-partopts (2026-11-13): every row above now names its backtest row id and its 
 on the `--role lesson` path (which `--lesson` and `--unit` bring) and on `--teacher`:
 `partopts-unit` (`ws-partopts-unit --lessons nearest_10,add_wp_10,identify,div_facts,fact_family_sort --sizes M,L
 --walk-depth 1`, 10 min), `partopts-bt` (`--bt-only`, 25 s), `partopts-coverage` (`--coverage-only`, 60 s) and
-`partopts-shots` (`--no-packets --no-shots`, 90 s). `node tests/scripts/ws-backtest.mjs --row partopts-*` proves all 27
+`partopts-shots` (`--no-packets --no-shots`, 90 s). `node tests/scripts/ws-backtest.mjs --row partopts-*` proves all 27 backtest
 rows; `ws-precritic-plan` checks each one is planned (lane rows are matched by tool + scope flag, since they name no skill).
