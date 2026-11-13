@@ -33,7 +33,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && i + 1
 const SKILLS = (arg('skills', 'addition:add_facts,subtraction:sub_100_no_regroup,addition:add_wp_10')).split(',').map((s) => s.trim()).filter(Boolean);
 const ROLES_ARG = arg('roles', '');
 const SIZES = arg('sizes', 'M,L').split(',');
-const ONLY = new Set(arg('only', 'ident,geom,long').split(','));
+const ONLY = new Set(arg('only', 'ident,geom,long,api').split(','));
 const HOUT = arg('hashes-out', null);
 const HAGAINST = arg('hashes-against', null);
 const PNG_DIR = arg('png-dir', null);
@@ -160,7 +160,7 @@ function geomCheck(m, where, pos, expectText) {
         const roleIds = await page.evaluate(async () => (await import('./js/modules/sheet/roles/index.js')).ROLE_IDS.filter((r) => r !== 'answer-key'));
         const ROLES = ROLES_ARG ? ROLES_ARG.split(',') : roleIds;
         // TITLE-API (critic title r1 T8): the frame hook pageHeader(h) draws the header page() draws, with the same defaults
-        const api = await page.evaluate(async () => {
+        const api = !ONLY.has('api') ? [] : await page.evaluate(async () => {
             const k = await import('./js/modules/sheet/index.js');
             if (typeof k.pageHeader !== 'function') return ['sheet/index.js exports no pageHeader'];
             const out = [];

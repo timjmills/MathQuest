@@ -7024,6 +7024,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "title-ui-caret",
+  "check": "Critic title r1 T1 (and T4 / T5): in both print dialogs the Page title box keeps the cursor across the redraw that follows a keystroke (cursor at 5, X, a rebuild, Y: 'XY' at 5 - the simple print gave 'FractXions and more wordsY'); with Header Title unticked the title controls are disabled and say why; the simple print box is at least 400 px with a one-line label",
+  "kind": "commit-pair",
+  "rule": "ws-frame-title-ui UI-CARET / UI-TITLE-OFF / UI-WIDTH",
+  "browser": true,
+  "fail": {
+   "commit": "aaafcfb67",
+   "state": "critic r1 state: the simple print's render() put the cursor at the end; Title off left the controls live; the box 270 px"
+  },
+  "pass": {
+   "commit": "a2460c266",
+   "state": "render() keeps selectionStart / selectionEnd; syncTitleControls; .sp-ptitle full width"
+  },
+  "command": "node tests/scripts/ws-frame-title-ui.cjs --only caret,off,width",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
