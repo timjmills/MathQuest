@@ -526,3 +526,12 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
+
+### lf-vocab rounds 9-10 (2026-11-12 to 13)
+| Metric | Value |
+|---|---|
+| Narrow critic rounds | r9 FAIL min 7, r10 FAIL min 7 |
+| Builders | r9 (Opus medium, resumed), MIN_ITEMS follow-on (Opus low), r10 fresh (Opus medium) |
+| Rule 5 stops | 1 (r10: the look-alike class, 4th round) |
+| Checks added | V26, V27, V28, NB6, NB7, NB8, V-AMBIG+ (3 rules), V-FIT, V-FIT6, ws-lesson-render |
+| Backtest rows | 15 (8 r9, vocab-minitems-answers, 6 r10) |

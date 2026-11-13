@@ -495,6 +495,16 @@ One line per finding: the rule, then the check.
 | Key dot halos fuse into a blob | A group of marks gets one underlay, never overlapping rings | V22++: no two halos overlap | y |
 | "Type even" when the instruction says "Tap its word" | A hint uses the instruction's verb | V26+: verb match | y |
 | "like 4 dots", "one bar is 3 of the other bar" | An explanation is grammatical and concrete | V24++: a bad-phrasing list | y |
+### lf-vocab rounds 9-10, narrow critics r9 (FAIL min 7) and r10 (FAIL min 7), 2026-11-13: findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| r9: rule 2->[+3]->5 reads as input/output; cycle's number loop reads as sequence | A box with arrows and numbers at both ends derives input/output; a loop of 3 or more numbers derives sequence and pattern | V-AMBIG+ (function machine, loop of numbers) | y |
+| r9: a swapped-in word ("total" = the 5+3 bar) taught addition in a 4.OA.A.1 set | Every core word's picture teaches its set's standard or operation | V-FIT (core) and V-FIT6 (all six; pinned misfits only shrink) | y |
+| r9: the critic's lesson band render was blank (wrong lesson file) | The render step names its lesson and fails on a wrong title or an empty body | ws-lesson-render LR-TITLE / LR-BODY | n (render tool) |
+| r10: term (4,[7],10) and first term ([3],7,11) read as "grow" and term reads as "rule" (+3) | ROOT CAUSE (rule 5, 4th round of the class): each derived rule is written after a critic finds its case. Replace them with a FEATURE model: every picture declares the features it draws (rising run, step d, loop, arrow-box, "=", boxed number ...), every word declares the features that define it, and a clash is any picture whose features satisfy another dealt word's definition | V-FEAT: derive the features from the SVG and test every same-set word, not only the hand-written rule list | y (when built) |
+| r10: the explain line points at a mark the picture no longer draws (cycle, "ones digits"), or at a mark another dealt picture also draws (unknown, "the one in the box") | An explain line names only marks drawn in its own picture, and none drawn in a co-dealt picture | V-REF: referent lint | y (when built) |
+| r10: caret stays in a red vocab slot after Check | Check blurs the vocab slots | NB9: active element after Check is not a vocab slot | y (when built) |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of

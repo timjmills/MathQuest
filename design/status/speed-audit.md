@@ -970,3 +970,9 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
+
+### Lane lf-vocab rounds 9-10 (2026-11-12 to 13)
+| Round | What was lost | Cause | Fix before the next lane |
+|---|---|---|---|
+| r9 critic FAIL min 7 | 1 round | Word swaps were checked for look-alikes but not for lesson fit; the critic's band render was blank because the lead render step used the wrong lesson file | V-FIT / V-FIT6; ws-lesson-render with title and body checks |
+| r10 critic FAIL min 7 | 1 round | The look-alike class was closed rule by rule after each critic (r6, r7, r9, r10); the swap in "grow" was not run against every picture of its set in the same change | Rule 5 stop: replace the derived rules with a feature model (V-FEAT) and a referent lint (V-REF); render every changed set on both skills automatically |
