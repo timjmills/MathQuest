@@ -36,7 +36,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf,
+    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
 import { coinSVG } from '../cells/tmkit.js';
@@ -47,6 +47,13 @@ import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 const TAG_OUTSIDE = new Set(['arrays', 'arrays-turn']);
 
 export const ROLE_ID = 'error-analysis';
+// The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
+// white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
+const CENTRE = 'flex:0 0 auto;margin-top:auto;margin-bottom:auto';
+// The work's first element keeps no top margin (a stack's 5 mm): the "<Name> wrote:" label sits over the work's INK, not over an
+// empty margin (critic r4 n1, lead 2026-11-13: PUPILTAG measured on ink, 1.5-4 mm; the label floated 6-9 mm over stacks)
+const noLeadMargin = (html) => String(html).replace(/^(\s*<(?!svg)[a-z][a-z0-9]*\b)([^>]*)>/i, (m, tag, attrs) => (/\sstyle="/.test(attrs)
+    ? `${tag}${attrs.replace(/\sstyle="/, ' style="margin-top:0;')}>` : `${tag}${attrs} style="margin-top:0">`));
 // WORKSHEET_DESIGN_STANDARD 12.1: Error analysis 6 / 4 / 2-4 (the 04-E mock-up's 2 x 3 at L
 // predates the ceiling; the standard is law for capacity).
 const CEILING = { S: 6, M: 4, L: 4 };
@@ -254,6 +261,9 @@ export function intoAnswerColumn(html, extra) {
 
 /** Templates whose several answers sit in a strip or chart: the fix is the strip again, clean. */
 const REDO = new Set(['seqstrip', 'count-row', 'cloze-bank']);
+// A template whose ink starts flush with its box (a count row's tiles) lifts the "<Name> wrote:" label a little more,
+// so the label's foot stays 2-4 mm over the ink (PT-ERR-4; ws-cell-checks PUPILTAG; lead order 5, 2026-11-13)
+const TAG_LIFT = { 'count-row': 0.5, 'function-table': 0.5 };
 
 /**
  * What names each part when the parts are a plain list inside a picture (critic round 3: "1st
@@ -450,7 +460,10 @@ export function prepare(it, info = {}) {
     if (info.wrong && !wrong) return null;
     const isWrong = !!(wrong && info.wrong);
     const q = it.q || {};
-    let P = LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
+    // a SENTENCE answer (a pattern's feature) is never split into parts nor written on a line: the fix is the item
+    // again, clean, where the pupil marks the right sentence (ws-roles-unit KEYJOIN-ROLE, PAGE_TYPES 6.1)
+    const prose = isProseAnswer(correct0);
+    let P = prose || LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
     const correct = correct0;
     // A place-value line slot writes the number the way the key does ("80,000", never "80000"
     // beside a wrong "80,000" - critic round 4); a digit grid keeps its bare digits.
@@ -535,6 +548,10 @@ export function prepare(it, info = {}) {
     }
     // a multiple-choice item keeps its own choice even when it reads as a story (word names)
     const choice = !P && !redraw && (!story || (Array.isArray(q.options) && q.options.length >= 2)) ? choicesOf(it, correct, shown) : null;
+    // A sentence answer is fixed by CHECKING the right sentence among the item's own choices (q.options, or a word-choice
+    // payload's labels); with no choices the item has no low-writing fix shape and is skipped, never written on a line
+    // (PT-TOF-4; lf-roles critic r1 R6-R8: redrawing the item halved the page and asked for "write" where the pupil ticks)
+    if (prose && !choice) return null;
     // ONE number written a digit per box (a column sum's answer row, a quotient, a place-value
     // chart): the fix is that number, in one box - the work above already shows it split.
     const digitSplit = !!(P && glue && P.parts.every((x) => /^\d$/.test(x.value))
@@ -672,7 +689,16 @@ export function prepare(it, info = {}) {
                 body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag${out}">${'ABCDEF'[i]}</i>`);
             });
         }
-        const shownWork = `<div class="mq-judge-work"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}">${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
+        // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
+        // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
+        // ONE work width a page (critic R15, ws-cell-checks EA-ROWX): every item's work is as wide as the page's widest, so the
+        // Correct / Fix it judgement beside it starts at one x in every cell of a column
+        // (only while the widened work, the 6 mm gap and the judgement column still keep the cell's 3 mm padding - CL-8; critic r5
+        // D1: div_facts_long S lost its padding and the label started 0.5 mm off the cell rule)
+        const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
+        const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
+        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
+        const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
@@ -744,7 +770,7 @@ export function prepare(it, info = {}) {
         const ask = (Number(o.cols) || 1) >= 2 ? ' mq-askunder' : ' mq-askside';
         if (modal && (o.judge === 'incol' || !o.judge)) {
             const inCol = intoAnswerColumn(shownWork, `<div class="mq-judgecol">${judge}</div>`);
-            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol${ask}" data-judge-mode="incol">${inCol}</div>`;
+            if (inCol) return `<div class="mq-judge mq-judge3 mq-judge-incol${ask}" data-judge-mode="incol" style="${CENTRE}">${inCol}</div>`;
         }
         // The flow: the work, then the judgement, then a redraw zone across the whole cell. The
         // decision boxes always come before the fix. The page decides ONE place for every cell
@@ -753,7 +779,10 @@ export function prepare(it, info = {}) {
         // unset (the host's first measure, an unmeasured page): 'stack', which always fits the cell
         const mode = !modal ? '' : ['beside', 'below', 'stack'].includes(o.judge) ? o.judge : 'stack';
         const modeCls = mode === 'stack' ? ' mq-jbelow mq-jstack' : mode ? ` mq-j${mode}` : '';
-        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm">`
+        // (a page whose items differ in width but cannot widen its work in this cell: the judgement stands against the cell's right
+        // padding instead, so it still starts at one x a column - R15 / EA-ROWX, CL-8 kept)
+        const spread = Number(o.workW) > 0 && !story && !widen && mode === 'beside' ? ';justify-content:space-between' : '';
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
             + shownWork
             + judge
             + (below ? fix : '')
@@ -772,6 +801,7 @@ export function prepare(it, info = {}) {
         // the places the Correct / Fix-it block can take; the host measures each (AX-4)
         judgeModes: kind === 'draw' || kind === 'redo' ? undefined : JUDGE_MODES,
         fixRoom: room0,
+        workWMm: Number(fp0.wMm) || 0,
         // the fix's SHAPE (boxes / a sign circle / a stacked fraction / check boxes / a word line),
         // so a page keeps to one (critic EA r5, B: a line, "+" boxes and a sign circle on one page)
         fixSig: kind === 'value' && /^[<>=]$/.test(correct) ? 'sign' : fracFix ? 'frac' : kind === 'choice' ? 'check'
@@ -1014,7 +1044,11 @@ export function plan(input = {}) {
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one fix width for every cell of the page: the widest item's (critic pv-r2)
     const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
-    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom })) : undefined);
+    // one work width a page: the widest item's (critic R15)
+    const ws = items.map((it) => Number(it.workWMm) || 0).filter((w) => w > 0);
+    // (only where the items' planned widths differ, so a page of equal items prints as before)
+    const pageWork = ws.length > 1 && Math.max(...ws) - Math.min(...ws) > 1 ? Math.max(...ws) : 0;
+    const judged = (it) => (typeof it.render === 'function' ? (c, o) => it.render(c, Object.assign({}, o, L.mode ? { judge: L.mode } : {}, { room: pageRoom }, pageWork ? { workW: pageWork } : {})) : undefined);
     const grid = gridPart(items.map((it) => planItem(it, { cols: L.cols, render: judged(it) })), { cols: L.cols, rows, cellH: L.cellH, labels: labelStyleOf(ctx.look, input.labels), start: 1 });
     if (rows === L.rows && L.fill !== false) { grid.cls = ''; grid.height = ''; }
     // RUBRIC H13 (critic round 4): a row is as tall as what it holds (+10%), never the page's

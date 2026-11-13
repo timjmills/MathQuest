@@ -268,7 +268,7 @@ function machine(p, g, d, wMm) {
 /** A writing box for slot `s` (screen twin: an input; sign / rule slots say what they take). */
 function slotBox(g, s, d, vals, ink, extra = {}) {
     const shape = s.kind === 'sign' ? 'circle' : s.kind === 'rule' ? 'line' : 'box';
-    const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink, mark: 'cell', shape, ...extra };
+    const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink: typeof ink === 'function' ? ink(s.id) : ink, mark: 'cell', shape, ...extra };
     if (s.kind === 'sign') { o.wMm = d.signW; o.hMm = d.signW; o.extra = 'border-radius:50%;'; }
     let html = box(g, s.id, o);
     if (s.kind === 'rule') {
@@ -516,8 +516,12 @@ register('function-table', {
         const slots = ftSlots(p);
         const slotsById = Object.fromEntries(slots.map((s) => [s.id, s]));
         const key = keyMap(p);
-        const ink = inkOf(ctx);
-        const vals = slotValues(ctx, key, (w) => {
+        // a Scripted Model state (PT-MOD-1, lf-roles): the marks of steps 1..k written in trace (p.traceSlots, as count-row)
+        const traced = ctx.state === 'blank' && p.traceSlots && typeof p.traceSlots === 'object';
+        // (earlier steps' marks black, only this step's - p.traceNew - grey: PT-MOD-1, P-LC-9; lf-roles critic r5b D2)
+        const newIds = traced && Array.isArray(p.traceNew) ? new Set(p.traceNew.map(String)) : null;
+        const ink = traced ? (newIds ? (id) => (newIds.has(String(id)) ? 'trace' : 'solid') : 'trace') : inkOf(ctx);
+        const vals = traced ? Object.fromEntries(Object.entries(p.traceSlots).map(([id, v]) => [id, v === undefined || v === null ? '' : String(v)])) : slotValues(ctx, key, (w) => {
             const l = splitParts(w);
             const o = {};
             slots.forEach((s, n) => { if (l[n] !== undefined) o[s.id] = l[n]; });
@@ -538,7 +542,7 @@ register('function-table', {
             inner = `<div style="display:flex;align-items:center;justify-content:center;gap:${g.em(WIDE_GAP_MM)}">`
                 + `<div>${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
                 + `<div style="display:flex;flex-direction:column;align-items:center">${sideHtml}</div></div>`;
-            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+            return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
         }
         if (p.machine) inner += machine(p, g, d, wMm);
         else if (p.task !== 'rule') inner += `<div style="text-align:center;margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>`;
@@ -558,7 +562,7 @@ register('function-table', {
             if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(2.5)};text-align:center">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
-        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
+        return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {
         const slots = ftSlots(p);

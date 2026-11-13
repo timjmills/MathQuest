@@ -666,6 +666,9 @@ register('count-row', {
         const blanks = (p.blanks || []).map(Number);
         const shown = shownValues(p, ctx);
         const ink = ctx.state === 'blank' && p.traceSlots ? 'trace' : inkOf(ctx);
+        // a Model state (PT-MOD-1, P-LC-9; lf-roles critic r5b D2): earlier steps' marks in black, ONLY this step's (`traceNew`) in grey
+        const newIds = ctx.state === 'blank' && p.traceSlots && Array.isArray(p.traceNew) ? new Set(p.traceNew.map(String)) : null;
+        const inkAt = (id) => (newIds ? (newIds.has(id) ? 'trace' : 'solid') : ink);
         const plainGiven = g.look === 'arcs' && g.shape === 'box';
         // the widest written answer, in digits (no separators): the screen box takes that many (a count by 25,000 writes 6 digits).
         const keyDigits = Math.max(4, ...blanks.map((i) => String(values[i]).replace(/\D/g, '').length));
@@ -695,7 +698,7 @@ register('count-row', {
                 return tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: text, shown: over !== undefined, digits: twinDigits });
             }
             const val = over !== undefined ? String(over) : shown[k];
-            const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
+            const vInk = over !== undefined ? 'solid' : val !== '' ? inkAt(`b${k}`) : null;
             if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
             return twinFloor(ctx, tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax, digits: twinDigits }));
         });
@@ -741,7 +744,7 @@ register('count-row', {
         if (p.ruleBox) {
             const k = blanks.length;
             const val = shown[k];
-            const vInk = val !== '' ? ink : null;
+            const vInk = val !== '' ? inkAt('rule') : null;
             const rb = twinFloor(ctx, tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true, digits: g.look === 'arcs' ? 0 : Math.max(1, String(p.ruleBox.value).replace(/\D/g, '').length) }));
             // (lane lf-ops for lf-algebra: in a narrow cell - a Reason It panel - the rule line wraps round its box, never past the cell)
             const narrowRule = !isTwin(ctx) && Number(ctx && ctx.columns) > 1;

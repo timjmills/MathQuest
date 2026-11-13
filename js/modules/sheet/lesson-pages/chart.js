@@ -117,6 +117,19 @@ export function stateDrawing(it, steps, groups, k, c) {
         if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k, !!c.hops);
         return unslot(html);
     }
+    // A count row (F5, lf-algebra r8 via the lead): state k draws the marks of steps 1..k in trace (`traceSlots`, as the Scripted
+    // Model's states do, PT-MOD-1; a provider's mark `blankN` is the row's slot `bN`), never a blank row then the answer.
+    if (it.q && it.q.cell && it.q.cell.template === 'count-row' && merged.some((g) => (g.marks || []).length)) {
+        const acc = {};
+        const idOf = (m) => String(m.slot).replace(/^blank(\d+)$/, 'b$1');
+        merged.slice(0, k).forEach((g) => (g.marks || []).forEach((m) => { if (m && m.slot !== undefined) acc[idOf(m)] = String(m.value); }));
+        // (only what state k adds is grey, the earlier marks black - PT-MOD-1, critic r5b D2)
+        const fresh = [];
+        ((merged[k] || {}).marks || []).forEach((m) => { if (m && m.slot !== undefined) { const id = idOf(m); if (acc[id] !== String(m.value)) fresh.push(id); acc[id] = String(m.value); } });
+        let html = '';
+        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc, traceNew: fresh }) }); } catch (e) { html = ''; }
+        return unslot(html);
+    }
     // A template with no step states: the problem blank, then answered in grey on the last state.
     const ans = answerOf(it);
     const last = k === groups.length - 1;
