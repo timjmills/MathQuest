@@ -5595,8 +5595,8 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
 
                 if (roll === 'take_away') {
                     // Type 1: Take away (result-unknown) — "Had X, removed Y, how many left?"
-                    total = rng(_wpLo, _wpTop);
-                    taken = rng(2, total - 1);
+                    // (dealt fresh on the page with the other kinds - no number taken from three times a page; critic r2 dealer)
+                    [total, taken] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(2, t - 1)]; }, (p) => [p[0], p[0] - p[1]]);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
                     let takeTemplates;
@@ -5637,8 +5637,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.hint = `Take away: ${total} − ${taken} = ?`;
                 } else if (roll === 'compare') {
                     // Type 2: Compare difference — "Team A scored X. Team B scored Y. How many more?"
-                    total = rng(_wpLo, _wpTop);
-                    taken = rng(1, total - 1);
+                    [total, taken] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(1, t - 1)]; }, (p) => [p[0], p[0] - p[1]]);
                     if (state.decimalPlaces > 0) { total = applyDecimals(total); taken = applyDecimals(Math.floor(taken)); if (taken >= total) taken = parseFloat((total - 0.1).toFixed(state.decimalPlaces)); }
                     answer = state.decimalPlaces > 0 ? parseFloat((total - taken).toFixed(state.decimalPlaces)) : total - taken;
                     let compareTemplates;
@@ -5674,8 +5673,7 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // Note: even though this is in the SUBTRACTION generator, the
                     // start-unknown structure is solved by ADDING (start = remaining + away),
                     // which mirrors the bar-model thinking the spec emphasizes.
-                    const start = rng(_wpLo, _wpTop);
-                    const away = rng(1, start - 1);
+                    const [start, away] = _wpFresh(`wpk:sub:${maxNum}`, () => { const t = rng(_wpLo, _wpTop); return [t, rng(1, t - 1)]; }, (p) => [p[0] - p[1], p[0]]);
                     const remaining = start - away;
                     answer = start;
                     total = start; // bookkeeping for visual

@@ -170,7 +170,10 @@ async function main() {
                     const stem = fin ? /(\d[\d,]*)\s*([+\-−×÷])\s*(\d[\d,]*)\s*=\s*$/.exec(fin[1]) : null;
                     if (stem) {
                         sentences++;
-                        const s = { a: num(stem[1]), op: OPK[stem[2]], b: num(stem[3]), v: num(k['tf-ans'] && k['tf-ans'].value) };
+                        // (the frame's keyed answer; a True statement's key may leave the frame empty - PT-TOF-2 - and the frame
+                        // still asks for the item's own answer)
+                        const kv = num(k['tf-ans'] && k['tf-ans'].value);
+                        const s = { a: num(stem[1]), op: OPK[stem[2]], b: num(stem[3]), v: kv !== null ? kv : num(q.ans) };
                         if (truthOf(s) !== true) bad('true-false', `finish line "${fin[1].trim()} ${s.v}" is false (${where})`);
                     }
                     const work = drawnSentence(html);

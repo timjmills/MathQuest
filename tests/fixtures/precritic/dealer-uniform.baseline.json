@@ -22,12 +22,6 @@
   "division:div_facts": [
    "PAGE 4: ans = 6 6 times",
    "PAGE 6: ans = 10 6 times"
-  ],
-  "subtraction:sub_word_problems": [
-   "PAGE 2: a = 6 3 times"
-  ],
-  "subtraction:sub_word_problems_plain": [
-   "UNIFORM a tens digit"
   ]
  }
 }
