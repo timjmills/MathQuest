@@ -33,6 +33,10 @@
 //   BAND-BITES (lead ruling B 2026-11-13) every OFFERED band value changes >= 10 % of the items, each dealt alone (300 seeds),
 //              against the default; a band hidden on a preset (band 50 on add_then_div / letter_equation) reads an old code's value
 //              as the default
+//   EA-COMPOSES (--ea, browser; precritic two-step r12 EB-ROLE / ws-fixit-words, lead ruling D 2026-11-13) the Error analysis
+//              page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an
+//              item, so a wrong shown value fits the answer box it is written in (the ÷-last step's wrong operation, 27 x 3 = 81, did not fit
+//              the one-digit quotient box, so the role rejected every add_then_div item and the page came out empty)
 // Skills outside the card print OK (n/a).
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -45,6 +49,7 @@ const arg = (f, d) => { const i = args.indexOf(f); return i >= 0 && i + 1 < args
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(arg('--root', process.env.MQ_ROOT || join(HERE, '..', '..')));
 const N = Math.max(10, Number(arg('--n', 120)) || 120);
+const VERBOSE = args.includes('--verbose');
 const SCOPE = ['algebra:multi_step_word', 'algebra:multi_step_word_plain', 'algebra:two_step_mult_div_first', 'algebra:two_step_add_then_mult',
     'algebra:two_step_add_then_div', 'algebra:two_step_letter_equation', 'algebra:two_step_estimate_check'];
 const only = String(arg('--skill', arg('--skills', ''))).split(',').map((s) => s.trim()).filter(Boolean);
@@ -52,6 +57,7 @@ const mine = only.length ? SCOPE.filter((k) => only.includes(k) || only.includes
 if (!mine.length) { console.log(`${TOOL}: OK (n/a: no two-step skill in scope)`); process.exit(0); }
 
 if (args.includes('--print')) await printMode();
+if (args.includes('--ea')) await eaMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -326,5 +332,34 @@ async function printMode() {
     for (const r of ['CAP', 'BAND']) { const n = out.filter((x) => x.startsWith(r + ' ')).length; console.log(`CAP-BAND ${r.padEnd(5)} ${n ? `FAIL ${n}` : 'PASS'}`); }
     for (const f of out.slice(0, 30)) console.log(`  ${f}`);
     console.log(out.length ? `${TOOL}: FAIL (--print: ${out.length} finding(s))` : `${TOOL}: OK (--print: CAP-BAND, ${html ? 'fixture' : 'multi_step_word (Visual) / two_step_letter_equation wpBar L'})`);
+    process.exit(out.length ? 1 : 0);
+}
+
+async function eaMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const out = [];
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
+        for (const key of mine) for (const size of SIZES) for (const seed of [7, 11]) {
+            const sk = key.split(':')[1];
+            const r = await app.page.evaluate(async (a) => {
+                let s;
+                try { s = await window.buildSheet({ role: 'error-analysis', sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true, anchors: 'off' }); } catch (e) { return { err: String(e && e.message || e) }; }
+                const d = document.createElement('div'); d.innerHTML = s.pupilHtml || '';
+                const cells = [...d.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                const m = s.plan && s.plan.meta;
+                return { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : cells.length, cells: cells.length, wrong: (s.items || []).filter((x) => x && (x.wrong || x.isWrong || (x.ea && x.ea.wrong))).length, raw: (s.items || []).length };
+            }, { sk, size, seed });
+            if (r.err) { out.push(`EA-COMPOSES ${sk} ${size} seed ${seed}: buildSheet threw ${r.err}`); continue; }
+            if (r.items < 1) out.push(`EA-COMPOSES ${sk} ${size} seed ${seed}: the Error analysis page holds no item: the role rejected the skill's items`);
+            if (VERBOSE) console.log(`  ${sk} ${size} seed ${seed}: ${r.items} items, ${r.cells} cells, wrong ${r.wrong} / ${r.raw}`);
+        }
+    } finally { await app.close(); }
+    console.log(`EA-COMPOSES ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--ea: ${out.length} finding(s))` : `${TOOL}: OK (--ea: EA-COMPOSES, ${mine.length} skill(s))`);
     process.exit(out.length ? 1 : 0);
 }
