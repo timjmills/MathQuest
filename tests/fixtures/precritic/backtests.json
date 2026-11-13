@@ -4988,6 +4988,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r14-sis-pick3",
+   "check": "pick3 screen twin draws equal groups' rings and dots at 81 % of print (card 390 / 820 / 1280)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+   "browser": true,
+   "fail": {
+    "commit": "9c83c24f",
+    "state": "lf-vocab r14 status head"
+   },
+   "pass": {
+    "commit": "75b0e131",
+    "state": "twin fits the paper box, printFloor"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r14-sis-match3-tile",
+   "check": "Match 3 online worksheet draws the row / column table cells at 94 % of print",
+   "kind": "commit-pair",
+   "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+   "browser": true,
+   "fail": {
+    "commit": "9c83c24f",
+    "state": "lf-vocab r14 status head"
+   },
+   "pass": {
+    "commit": "75b0e131",
+    "state": "worksheet picture slot 104 px"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
