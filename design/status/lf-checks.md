@@ -358,3 +358,12 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - review L p1 cells 7, 8, 9, 10 (items 19-22): drawn 19.7 mm, footprint 16 mm (+23 %).
     - S cells 13-16 are the page's last four cells (the Mixed Review band comes last). The M and L bands are not yet confirmed: lf-ops should check them.
   - Re-pin (facts-lane debt, lead ruling): only `addition:add_facts review S|EB-FOOT`, `review M|EB-FOOT` and `review L|EB-FOOT`, at 4 each. The facts pin is then OK. Its "tighten the pin" notes were there before this change and are left alone.
+- Critic eb-r6 (8dc176e6): FAIL, C1 7 · C2 9 · C3 8 · C4 8 (lf-checks/critic-eb-r6.md).
+  - D1: a slot counts as ink across its WHOLE WIDTH even with no or a faint edge, so EB-SIDE misses a 103 mm side (probes q5/q6).
+    Fix: unless the slot draws a dark side edge or underline, count one digit's width.
+  - m1: the EB-FOOT fallback is silent. Print a note when the pairing is not by index.
+  - m2: FOCUS-GAP only looks along the line. Also measure text above and below.
+  - m3: the critic did not re-run backtests-empty-band.json.
+  - What holds: r5's D1/D2/m1; the index pairing is stated honestly; 28 of 31 rows pass.
+  - Lead plan for a FAIL unrelated to the pairing: port m1 (data-eb-item plus index pairing) to master's tool as a narrow deploy for
+    lf-ops.
