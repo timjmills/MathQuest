@@ -223,3 +223,16 @@ Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-
 - 2026-11-13: fixes 1-5, 3 backtest rows, ws-roles-unit (new, node, 40 checks, ~1 s).
 
 - 2026-11-13 deploy-5 hold: duplicate per-role precritic gates removed (747acce99); deploy head 3e3cfff70 merged with master, ws-precritic-plan OK (model-*-facts rows pass), roles-unit 80 OK. Awaiting the Guided SIZE-ORDER ruling.
+
+- 2026-11-13 r8a (lead: Guided SIZE-ORDER ruling (e); guided-tight-rows re-point; capacity-pin timeout). Used (e), not (c):
+  the two-cell Model draws cleanly for column stacks once its working is written beside it (sideLinesOf: "Ones: 8 − 3 = 5."
+  "Tens: 4 − 2 = 2." "Check: 25 + 23 = 48."), so S prints Model + 10 (11 >= M 9) on sub_50 / sub_100 / sub_1k / sub_10k /
+  sub_100k / sub_1m no regroup and sub_2d_1d. General rule (sheetFit): any one-page, one-Model Guided grid the ceiling trims,
+  where a two-cell Model completes the last row at exactly the ceiling; fact pages (ruled option b) and Mix pages excluded.
+  On those pages every cell sits centred in its row (the Model's row band was 35.7 %, now < 30 %). Tight rows: the try rows
+  drop the measure's label keep-out (koMm) and sit centred - expand / unit_form / combine Guided tries 37.4 % -> 26.4 % max.
+  ws-capacity-pin builds one skill an evaluate (full --check 182 s + ProtocolError -> 195 s, complete; output identical).
+  Checks: ws-roles-unit GUIDED-MODEL-SPAN; backtests guided-model-span, guided-size-order-s, guided-tight-rows (re-pointed),
+  all PASS. Debt seen, not changed: these stack Guided pages keep EB-SIDE 32.4 % at S / 31.7 % at M (stack in a 4- / 3-column
+  cell; 5 columns at S would hold 27.7 %) and EB-BAND 34.8 % at L - pre-existing on base, untouched pages.
+Times: r8a, start 2026-11-13T13:45Z, end 2026-11-13T15:10Z, profile mq-opus-medium (rebuild after a failed check)
