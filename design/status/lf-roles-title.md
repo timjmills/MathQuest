@@ -55,7 +55,7 @@ is unchanged; `pageTitle` gained an optional third argument only.
 | `ws-frame-title-ui` (dialog shots) | — | OK |
 
 **Hash proof:** `tests/fixtures/precritic/frame-title/master-hashes.json` — 196 pupil + key hashes rendered on origin/master
-`fdfddfdd2` (every buildSheet role of `roles/index.js` × addition:add_facts, subtraction:sub_100_no_regroup,
+(first pinned on `fdfddfdd2`; re-pinned after merging deploy-6 on `a6883082c`, whose Guided round changed 4 Guided pages) (every buildSheet role of `roles/index.js` × addition:add_facts, subtraction:sub_100_no_regroup,
 addition:add_wp_10 × M/L, seed 4242; 4 role/skill pairs skipped as unsupported fact layouts). On the feature: **196 of 196
 identical**, and the option at its defaults (below, empty text) is byte-identical too.
 
@@ -65,9 +65,11 @@ all PASS. On precritic's path: `ws-frame-title --skills <keys>` on every `--skil
 (registered in ws-precritic-plan `LANE_TOOLS`). Ledger: two lf-roles rows in `design/lessons-first/CHECKS_FROM_CRITICS.md`.
 
 ## Gates
+All on the tree MERGED with origin/master `a6883082c` (deploy-6, merge `8f6768e0f`; backtests.json / ledger taken as a union):
 syntax (`node --input-type=module --check`) on every changed module: OK · ws-boot-smoke OK · ws-code-snapshot OK (734
-codes) · ws-frame-title OK · ws-title-code OK · ws-roles-unit OK (80) · ws-precritic-plan OK (187 rows; the 15 ledger
-warnings are older rows of other lanes) · ws-lesson-baseline --all-lessons: see the report.
+codes) · ws-frame-title OK (690 builds, 196/196 hashes identical to a6883082c) · ws-title-code OK · ws-roles-unit OK (87) ·
+ws-precritic-plan OK (192 rows) · ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned
+--check: OK (1732 hashes identical) · backtests frame-title-place-long, frame-title-ident-planted, title-code-roundtrip PASS.
 
 ## PNGs (`design/status/lf-roles/title/`)
 `{independent,guided,test}-{M,L}-{default,above,below,two-line-above,long,long-above}.png` (page 1 of the pupil page,
