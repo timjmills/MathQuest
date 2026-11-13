@@ -3971,7 +3971,7 @@
     "commit": "814109016",
     "state": "two-step build: every computed number within the cap, answer guards, the two-step bar model drawn with the carried Step 1 answer, Visual draws it by default, middle question on teaching cells only"
    },
-   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60",
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
