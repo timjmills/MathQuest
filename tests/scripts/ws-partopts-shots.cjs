@@ -17,7 +17,7 @@
 //   F5  inside every part row no two visible controls or texts overlap, at 390 and 1280; no sideways scroll at 390
 //   F6  a fixed count is written once ("Fixed: ..."), never "15 · 15 a page"
 //   F7  a part with no room ("Not on this lesson sheet") has no tick and no New numbers
-//   F8  no Supports pill: the standard is plain text until step B
+//   F8  (step B) a Supports chip is a closed button reading Standard / Custom; a part with none says "None to choose"
 //   F9  at 1280 the Parts are the full-width table, at most 700 px tall for a 7-part lesson; Remember shows no lone "-"
 //   F10 the lesson sheet's parts share ONE New numbers
 //   critic A r3: R1 a part that does not print (no tick, "Not on this lesson sheet", "Not added") shows no lock reason;
@@ -177,7 +177,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             }
             const ph = await page.evaluate(() => { const e = document.querySelector('#tvPartsWide .tv-parts'); return e ? Math.round(e.getBoundingClientRect().height) : 0; });
             check(ph > 0 && ph <= 700, `${id} 1280: Parts ${ph} px tall (limit 700) (F9)`);
-            check(!(await page.$('.tv-part-chip')), `${id}: a Supports pill (F8)`);
+            // (F8, superseded by step B: the Supports cell is a chip that opens its panel - a button, closed, reading Standard - or plain text)
+            check(await page.evaluate(() => [...document.querySelectorAll('.tv-part-chip')].every((c) => c.tagName === 'BUTTON' && c.getAttribute('aria-expanded') === 'false' && /^(Supports: )?(Standard|Custom)/.test(c.textContent.trim()))), `${id}: a Supports chip that is not a closed button reading Standard / Custom (F8)`);
             check((await page.$$('[data-act="part-new"][data-part="sheet"]')).length === 1, `${id}: not one New numbers for the lesson sheet (F10)`);
             const ov = await overlaps(); check(!ov.length, `${id} 1280 overlaps: ${ov.slice(0, 3).join('; ')} (F5)`);
             const sm = await small(false); check(!sm.length, `${id} 1280: controls under 44 px ${JSON.stringify(sm.slice(0, 3))} (H6)`);

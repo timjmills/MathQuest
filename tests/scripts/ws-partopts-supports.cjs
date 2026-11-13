@@ -61,7 +61,7 @@ const fails = [];
 const errors = [];
 const F = (id, msg) => { if (want(id)) fails.push(`${id} ${msg}`); };
 const ok = (id, cond, msg) => { if (!cond) F(id, msg); return !!cond; };
-const LESSONS = arg('lessons', 'subtraction:sub_100_regroup,addition:add_facts,placevalue:identify').split(',').map((x) => x.trim()).filter(Boolean);
+const LESSONS = arg('lessons', 'subtraction:sub_100_regroup,addition:add_facts,placevalue:identify').split(',').map((x) => x.trim()).filter((x) => x && x !== 'none');   // ('none': no lesson - the paper and screen checks only)
 const SIZES = arg('sizes', 'M,L').split(',');
 const imp = (rel) => import(pathToFileURL(path.join(ROOT, rel)).href);
 const J = JSON.stringify;
@@ -409,10 +409,10 @@ async function ui() {
             const sheetChip = await page.evaluate(() => { const c = document.querySelector('.tv-part-group .tv-part-chip'); return c ? c.textContent.trim() : null; });
             ok('PO-UI', rows.some((r) => r.chip), `${where}: no part has a Supports chip`);
             for (const r of rows) {
-                if (r.chip) ok('PO-UI', r.chip.btn && r.chip.exp === 'false' && /^Standard/.test(r.chip.text), `${where} ${r.part}: chip ${J(r.chip)}`);
+                if (r.chip) ok('PO-UI', r.chip.btn && r.chip.exp === 'false' && /^(Supports: )?Standard/.test(r.chip.text), `${where} ${r.part}: chip ${J(r.chip)}`);
                 else ok('PO-UI', /None to choose|^\s*$/.test(r.sup), `${where} ${r.part}: no chip, yet "${r.sup}"`);
             }
-            ok('PO-UI', sheetChip && /^Standard/.test(sheetChip), `${where}: the lesson sheet's structure chip: ${sheetChip}`);
+            ok('PO-UI', sheetChip && /^(Supports: )?Standard/.test(sheetChip), `${where}: the lesson sheet's structure chip: ${sheetChip}`);
             // open the lesson sheet's panel; untick the regroup boxes
             const opened = await click('.tv-part-group .tv-part-chip');
             ok('PO-UI', opened, `${where}: the lesson sheet's chip does not open`);
@@ -457,8 +457,8 @@ async function ui() {
 (async () => {
     try {
         await unit();
-        if (!has('unit') && !has('ui')) await browser();
-        if (has('ui') || has('all')) await ui();
+        if (!has('unit') && !has('ui')) { await browser(); for (const id of ['PO-5', 'PO-3', 'PO-PS']) if (want(id)) console.log(`${id} ${fails.some((f) => f.startsWith(id + ' ')) ? 'FAIL' : 'PASS'}`); }
+        if (has('ui') || has('all')) { await ui(); if (want('PO-UI')) console.log(`PO-UI ${fails.some((f) => f.startsWith('PO-UI ')) ? 'FAIL' : 'PASS'}`); }
     } catch (e) { errors.push(String((e && e.stack) || e).split('\n').slice(0, 3).join(' ')); }
     for (const f of fails) console.log(`  FAIL ${f}`);
     if (errors.length) { for (const e of errors) console.log(`  ERROR ${e}`); console.log(`ws-partopts-supports: ERROR (${errors.length})`); process.exit(2); }

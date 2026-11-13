@@ -761,6 +761,13 @@ function addPartOpts(add, ctx) {
         ['--coverage-only'], { parse: PARSE.partOpts, needFlags: ['coverage-only'], expect: { must: ['PO-2e'] } }));
     add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
         ['--no-packets', '--no-shots'], { parse: PARSE.partOpts, needFlags: ['no-shots'] }));
+    // (step B, the supports: the pure checks, the declarations + sampler + paper = screen on the regroup lesson, the panels)
+    add(gate('partopts-supports-unit', 'ws-partopts-supports --unit (PO-SUP resolver and fade, PO-SUPN storage, PO-4S off codec, PO-SIZE per-size gate)', 'pure', 'node', 'ws-partopts-supports',
+        ['--unit'], { parse: PARSE.partOpts, needFlags: ['unit'], expect: { must: ['PO-SUP', 'PO-SUPN', 'PO-4S', 'PO-SIZE'] } }));
+    add(gate('partopts-supports', 'ws-partopts-supports (PO-5 declarations drawn, PO-3 sampler: asked = printed, key parity, pages on their own, nothing given away; PO-PS paper = screen)', 'sub_100_regroup x M / L', 'browser', 'ws-partopts-supports',
+        ['--lessons', 'subtraction:sub_100_regroup', '--sizes', 'M,L'], { parse: PARSE.partOpts, needFlags: ['lessons'], expect: { must: ['PO-5', 'PO-3', 'PO-PS'] } }));
+    add(gate('partopts-supports-ui', 'ws-partopts-supports --ui (the Supports chip and panel at 1280 and 390, the needs warning, the Quiz sheet hints off by default)', 'Print screen + Quiz sheet', 'browser', 'ws-partopts-supports',
+        ['--ui'], { parse: PARSE.partOpts, needFlags: ['ui'], expect: { must: ['PO-UI'] } }));
 }
 
 function buildPlan(ctx) {

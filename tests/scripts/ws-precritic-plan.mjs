@@ -63,6 +63,7 @@ export function readLessonCommand(cmd) {
 export const LANE_TOOLS = {
     'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
     'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
+    'ws-partopts-supports': { scope: ['--role', 'lesson'], flags: ['--unit', '--ui', '--lessons'] },
 };
 /** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
 export function readLaneCommand(cmd) {

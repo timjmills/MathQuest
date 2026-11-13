@@ -1,6 +1,6 @@
 # Part options — "which supports, and how many", per lesson part and per paper (lane lf-partopts)
 
-Status: **APPROVED 2026-11-12 (owner, via the lead). Building step A.**
+Status: **APPROVED 2026-11-12 (owner, via the lead). Step A passed (critic r4); step B built (§B).**
 Owner request (2026-11-12): "on the lesson pages can these too be customizable so for each part we can decide which
 types of supports are included or not? Like in the practice/quiz pages as well? ... and for how many of the problems as
 well." Approved to build: "OK lets build this" (after this design is signed).
@@ -305,3 +305,42 @@ fixed almost every count (F2). Resolved:
     the **lf-engine** row-packer work (the same place the identify M standard-sheet foot is routed), not bolted on here. The
     report-only check stands as the tripwire: when the row-packer is reworked, flip EB-ROWFIT+ to gating (`--gate-rowfit-plus`)
     and this case closes.
+
+## B. Step B, the supports: decisions the design left open (builder, 2026-11-13)
+
+What was built is §2 as written: the universal hidden option `off` (codec key `5X`, tokens R / H / F, append-only),
+`resolveSupports` / `supportsChip` / `supDeltaFromTicks` / `withSupDelta` in `sheet/part-opts.js`, the declarations measured
+from the built items (`res.lesson.partSup`, `print-sheet.js paperSupportDecl`), and the Supports chip and panel on the
+Print screen's Parts table, on the Worksheet sheet and on the Quiz sheet. The gate is `tests/scripts/ws-partopts-supports.cjs`.
+
+- **B1 The ids built.** `off` switches three role-drawn supports that are drawn today and can be turned off without a new
+  layout: `regroup` (the stack's regroup boxes, structural), `heads` (the stack's place-value letters, structural, drawn at
+  level 2 - so on We Do and a level-2 paper) and `firststep` (We Do cell 1 with its first step done in grey, a hint). The
+  option-backed hints are the S2 `support` values the part's items can draw (`canDraw`). Two page bands are switchable:
+  the anchor chart's **Say band** and the Practice pages' **Steps strip**. Not built (a layout change, not a switch):
+  We Do's Steps list (it is the We Do band's own column), a "digit grid" switch (the answer boxes are the level-2 answer
+  zone; on screen every answer is typed into one box per digit, SCC-T15, so it would be paper-only), the pv template's
+  place letters (on "name the place" items the letter IS the answer - a hint, not structure - so it stays with the skill's
+  own Support option), and a level-1 "first-cell cue" on rows / Practice (no such mark is drawn today). These are the
+  gap list of §6 D: a family lane declares more ids when its template draws them.
+- **B2 Where the lesson sheet's structure sits.** The We Do cells and the lesson rows are one pool of the lesson skill,
+  measured once, so their structure is ONE setting, on the **Lesson sheet** group row (`partOpts.sheet`). The We Do row
+  carries its hint (first step); the rows row says "Set on the Lesson sheet row". A per-band structure would need the pool
+  measured twice.
+- **B3 Declarations are measured.** A part lists only what its built items draw at its level (stack `regroup` /
+  `heads` from the payload and the level, the We Do first step by drawing cell 1 with and without it, the Say band and
+  Steps strip from the pages). `needs` is set on `regroup` wherever a part's problems regroup. PO-5 renders every
+  declared id flipped and fails when its part's pages do not change, when another sheet changes, or (structure and bands)
+  when the key does not follow.
+- **B4 Papers.** A paper's ticks are the skill's own options (`off`, `support`), so Practice and Quiz of the same skill
+  share them (§1.3 "written into the skill's own options"). A Quiz shows the hints unticked unless the skill ticks them
+  (no skill does by default): offered, off by default (owner answer 3). When one is ticked the Quiz sheet says so; the
+  key draws what the pupil page draws (no separate "with hints" stamp was built: the mock's key mark is left open).
+- **B5 The per-size offer gate (lead).** `SIZE_OFFERS` in `part-opts.js`; `offeredOptionsFor(c, s, {size})` (and the
+  screen's size, `setOfferSize`) leaves out a value offered at other sizes only; `gateBySize` puts a teacher's choice of
+  it back to the default on the Worksheet / Quiz sheets and on non-lesson Print sections. First user:
+  `multiplication:mult_properties` band 36, "offered at S only, pending re-measure". Lesson records are never gated
+  (lesson 3a deals band 36 at L by its own record).
+- **B6 Default identity.** Every new path is skipped when a part has no delta: `off` is absent from every standard cell's
+  context, `withSupDelta(opts, null)` returns the same object, the chart reserves its Say band and the Practice pages
+  their strip exactly as before. `ws-lesson-baseline --all-lessons` (written on d34311d, checked on this branch) is the proof.
