@@ -30,7 +30,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -74,6 +74,8 @@ function selfTest() {
         { name: 'Reason It panels A and B show the same work (RI-DISTINCT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 29</div></div></div>')), want: 'RI-DISTINCT', role: 'reason-it' },
         { name: 'Reason It panels differ (RI-DISTINCT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 39</div></div></div>')), want: null, role: 'reason-it', rules: ['RI-DISTINCT'] },
         { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
+        { name: 'a key word past its line (KEYFIT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:8mm;white-space:nowrap;overflow:visible">hundreds</span></div></div>')), want: 'KEYFIT', key: true },
+        { name: 'a key word on its line (KEYFIT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:40mm;white-space:nowrap">hundreds</span></div></div>')), want: null, key: true, rules: ['KEYFIT'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },

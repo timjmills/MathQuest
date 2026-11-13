@@ -194,6 +194,44 @@ if (on('PSC-2PG-BALANCE')) {
         pages.slice(1).forEach((pg, i) => { const h = pg.header || {}; if (!h.title || h.score === false || h.date === false) findings.push(`PSC-2PG-BALANCE: h ${hMm} - page ${i + 2} prints the short header (title "${h.title || ''}", date ${h.date}, score ${h.score}); every page gets the full header`); });
     }
 }
+if (on('RI-ONEANSWER')) {
+    // lead ruling F8 (2026-11-13, PT-RSN-4 "Circle A or B. The answer is __."): one Reason It item asks for the answer ONCE - the
+    // A / B choice plus at most one answer frame; no "__ is correct." line repeating the choice
+    checks++;
+    const ctx = resolveCtx({ size: 'M' });
+    for (const id of ['one', 'list', 'unit', 'prose']) {
+        const p = RI.prepare(itemOf(id), { seed: 1, index: 0 });
+        if (!p) continue;
+        const html = p.render(Object.assign({}, ctx, { state: 'key' }), { cols: 1 });
+        const frames = (html.match(/The answer is/g) || []).length;
+        if (/is correct\./.test(html)) findings.push(`RI-ONEANSWER: ${id} - the item still asks "__ is correct." after the A / B circle`);
+        if (frames > 1) findings.push(`RI-ONEANSWER: ${id} - ${frames} answer frames (want at most 1)`);
+        const slots = Object.keys((p.key && p.key.slots) || {}).filter((k) => !/^ri-[ab]$/.test(k) && !/^ri-ans/.test(k));
+        if (slots.length) findings.push(`RI-ONEANSWER: ${id} - extra answer slots ${slots.join(', ')}`);
+    }
+}
+if (on('RI-LAYOUT')) {
+    // critic r6c D1 / D3 (lead ruling 2026-11-13): Reason It work that fits half the cell keeps A and B SIDE BY SIDE (the response a
+    // full-width row under them) - stacking it held one item a page (H5); only work wider than half the cell stacks, from the top
+    checks++;
+    const ctx = resolveCtx({ size: 'M' });
+    const lay = (wMm) => {
+        const it = Object.assign(itemOf('one'), { template: 'stack', footprint: { wMm, hMm: 40, maxCols: 1 } });
+        const p = RI.prepare(it, { seed: 1, index: 0 });
+        const h = p ? p.render(Object.assign({}, ctx, { state: 'blank' }), { cols: 1 }) : '';
+        return /grid-template-columns:1fr 1fr/.test(h) ? 'under' : /grid-template-columns:1fr minmax\(52mm,auto\)/.test(h) ? (/margin-top:0/.test(h) ? 'stacked-top' : 'stacked') : 'beside';
+    };
+    const want = { 40: 'beside', 70: 'under', 85: 'under', 100: 'stacked-top' };
+    for (const [w, k] of Object.entries(want)) { const got = lay(Number(w)); if (got !== k) findings.push(`RI-LAYOUT: work ${w} mm lays out ${got} (want ${k})`); }
+}
+if (on('LINE-TELL')) {
+    // lf-roles r10 (a key's "hundreds" past a 2-digit line; then "no" on a short line beside "yes" on a long one): a word answer's
+    // line is one width, whatever the word, so its length never tells which word is right - and it holds the longest word
+    checks++;
+    const ws = ['no', 'yes', 'ones', 'tens', 'hundreds', 'thousands'].map((w) => CO.answerPlace('x', w).digits);
+    if (new Set(ws).size !== 1) findings.push(`LINE-TELL: word answers get lines of ${ws.join(' / ')} digits (want one width)`);
+    if (Math.min(...ws) < 6) findings.push(`LINE-TELL: a word answer's line is ${Math.min(...ws)} digits (want 6, the longest word)`);
+}
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
     // changes one part (a propagated wrong "12, 15, 19, 22" against "12, 15, 18, 21" made the pupil rewrite every later term)

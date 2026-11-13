@@ -214,6 +214,17 @@ function cellChecksInPage(opts) {
                 var gap = top - tagFoot;
                 if (gap > 4.5 * PX || gap < 1.8 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
             }
+            // ---- KEYFIT (lf-roles r10): a key's written answer stays inside its slot - "hundreds" on a 2-digit line ran past it
+            if (isKey) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    if (s.querySelector('[data-ws-slot]') || s.getAttribute('data-ws-shape') === 'open' || !shownEl(s)) return;
+                    var sr = s.getBoundingClientRect();
+                    if (!sr.width) return;
+                    var tr = rectsOfText(s, '.mq-slottag');
+                    var wide = tr.some(function (r) { return r.left < sr.left - 1.5 || r.right > sr.right + 1.5; });
+                    if (wide) out.findings.push({ rule: 'KEYFIT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + (s.textContent || '').trim().slice(0, 20) + '" past its slot (an answer never leaves its line or box)' });
+                });
+            }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {

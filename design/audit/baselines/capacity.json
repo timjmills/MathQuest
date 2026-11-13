@@ -2596,17 +2596,9 @@
   }
  },
  "ruled": {
-  "subtraction:sub_100k_no_regroup reason-it L": {
-   "items": 1,
-   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
-  },
   "subtraction:sub_1m_no_regroup reason-it M": {
-   "items": 1,
-   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 3 overflowed the cell)"
-  },
-  "subtraction:sub_1m_no_regroup reason-it L": {
-   "items": 1,
-   "reason": "the column work is wider than half the room, so A stands over B, never shrunk (lead ruling 2026-11-13, Reason It A over B; the pinned 2 overflowed the cell)"
+   "items": 2,
+   "reason": "7-digit column work is about 59 mm wide: A and B stand side by side over a full-width response row, never shrunk; the pinned 3 overflowed the cell (lead ruling 2026-11-13, critic r6c D3)"
   },
   "algebra:function_table_easy true-false L": {
    "items": 2,

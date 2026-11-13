@@ -3,11 +3,11 @@
 // adapters cover for every skill (section 10): two finished solutions labelled "A" and "B"
 // (never named characters, P-TH-14), side by side at the same size; one shows the right answer,
 // the other the misconception behind `wrongAnswer(q)`. The pupil circles A or B and completes
-// "__ is correct. The answer is __ ." (PT-RSN-4).
+// "The answer is __ ." once (PT-RSN-4, lead ruling F8 2026-11-13).
 //
 //   Grid       1 column x 4 / 3 / 2 rows (S / M / L), the ceiling of PT-RSN-1
 //   Title      "Reason It" (HD-13); tab "Reason It A"; letters from a.; Score /N
-//   Key        the right letter ringed (AK-2), both frame blanks written in
+//   Key        the right letter ringed (AK-2), the answer frame written in
 //
 // An item whose answer has no wrong answer cannot make an A / B pair: `prepare` returns null
 // and the host deals another item. Spot the mistake, odd one out and always / sometimes / never
@@ -40,7 +40,9 @@ export function prepare(it, info = {}) {
     // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
     const place0 = answerPlace('ri-ans', correct, it);
     const place = place0.kind === 'list' && !place0.words ? { kind: 'none', slots: {}, parts: null } : place0;
-    const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right }, place.slots), `${right}: ${correct}`);
+    // (lead ruling F8, 2026-11-13: the pupil circles A or B and writes the answer ONCE - "__ is correct." asked the same choice a
+    // second time; PT-RSN-4 "Circle A or B. The answer is __.")
+    const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B' }, place.slots), `${right}: ${correct}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
     // below, B under A, drawn as a half-page column so its unit word still sits beside the box; the story once on top)
@@ -54,7 +56,7 @@ export function prepare(it, info = {}) {
     // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
     // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
     const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
-    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
+    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence || column ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: column ? { storyOnly: true } : { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -65,18 +67,30 @@ export function prepare(it, info = {}) {
     // true width already, other templates' wMm carries slack (a pv item at 70 mm fits a 62 mm panel)
     const fp = it.footprint || {};
     const workW = Number(fp.inkWMm) || (TRUE_W.has(it.template) ? Number(fp.wMm) || 0 : 0);
-    const wide = sentence || column || workW > (LIVE_W_MM - 52 - 10) / 2;
+    // Three layouts (critic r6c D1 / D3): beside (A | B | response) when the work fits half of the room left of the response
+    // column; UNDER (A | B side by side at half the cell each, the response a full-width row under them) when it fits half the
+    // cell; STACKED (A over B, the response beside, top start) only when it does not. The sentence story and the across
+    // equation keep their stacked layout (passed pages).
+    const halfBeside = (LIVE_W_MM - 52 - 10) / 2;
+    const halfCell = (LIVE_W_MM - 5) / 2 - 4;
+    const legacy = sentence || (it.template === 'equation' && workW > halfBeside);
+    const under = !legacy && (column ? true : workW > halfBeside && workW <= halfCell);
+    const wide = legacy || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="margin-top:auto;margin-bottom:auto${wide ? ';grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm' : ''}">`
+    const abStyle = under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
+        : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm`
+            : 'margin-top:auto;margin-bottom:auto';
+    const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:flex-start;gap:10mm'
+        : wide ? 'grid-column:2;grid-row:1 / 3;justify-content:flex-start' : 'justify-content:flex-start';
+    const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="${abStyle}">`
         + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
         // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
         // the ring in a mostly empty column); inline, so only Reason It pages change
-        + `<div class="mq-abresp"${wide ? ` style="grid-column:2;grid-row:1 / 3;justify-content:flex-start"` : ' style="justify-content:flex-start"'}>`
+        + `<div class="mq-abresp" style="${respStyle}">`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
-        + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
         + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
         + `</div>`
         // a unit-form answer ("[2] hundreds [9] tens [7] ones") is wider than the response column: its frame is a full-width
@@ -84,7 +98,7 @@ export function prepare(it, info = {}) {
         // every LIST frame too (critic r3 D1 / D5: in the 56 mm column a 5-part list wrapped a blank a line and "Rule: subtract __
         // each time" ran out of the cell, costing the page an item); the row wraps at the cell's full width
         // a unit form keeps its frame, full width under A and B; a LIST (pattern terms, table outputs) prints none: the panel the
-        // pupil names in "__ is correct." already holds every part, so the frame only made them copy it (H16) and, at 5-6 parts,
+        // pupil circles already holds every part, so the frame only made them copy it (H16) and, at 5-6 parts,
         // cost the page an item or ran out of the cell (critic r3 D1 / D2 / D5; PT-TOF-4 extended to Reason It lists)
         + (place.kind === 'list' && place.words ? `<div class="mq-frame" style="grid-column:1 / -1;padding-left:2mm">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}</div>` : '')
         + `</div>`;
