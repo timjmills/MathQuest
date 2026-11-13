@@ -988,6 +988,11 @@ register('pv', {
             // (lf-placevalue r3 F2: held to 3 across at S, "10 + 4" / "= ____" in a 62 mm cell left 32-35 % each side; four
             // across, the two-line frame fills its 46 mm cell - the layout still takes fewer where the measured fit says so)
             if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
+            // (lf-placevalue compare round, F1 - ws-empty-band EB-GRIDFOOT: combine's Independent page stands its frames 3 across at S,
+            // rows held to their ink, but a Test and a Review dealt fewer packed them 4 across - the frames' maxCols is no hard cap -
+            // and left 102 / 89 mm white under the grid. A ghost frame at S is held to three across, its write line two digits
+            // longer there (wide3), on every role.)
+            if (p.kind === 'frame' && p.ghost && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
             return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}), ...tight };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };

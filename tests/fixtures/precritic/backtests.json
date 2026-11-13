@@ -3479,6 +3479,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-gridfoot-combine-test-s",
+  "check": "placevalue:combine one-page Test / Review: the white under the grid is at most one row, or the page stands in no more columns than the Independent page (lead-approved F1, lf-placevalue compare round: combine Test S 4 across against the Independent page's 3, about 45 % of the page white under the grid)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GRIDFOOT",
+  "browser": true,
+  "fail": {
+   "commit": "a837b8d4",
+   "state": "combine Test S 4 x 5 (102 mm white), Review S 4 across (89 mm white); the Independent page 3 across"
+  },
+  "pass": {
+   "commit": "PENDING",
+   "state": "a ghost frame at S held to three across (hardCap) on every role"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles test,review --hosts none --no-baseline --grid-foot --only EB-GRIDFOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

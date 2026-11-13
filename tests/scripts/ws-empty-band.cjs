@@ -59,6 +59,11 @@
 //             critic r1 S3: 23-42 % used; lead ruling 2026-11-12: a second worked example fills it). Guided is EXEMPT from
 //             EB-PAGE (lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1: the white under a Guided grid is accepted; the tries
 //             stay at the 10 / 8 / 6 ceiling, EB-GDPCAP).
+//   EB-GRIDFOOT (opt-in --grid-foot, --rule-skills; lead-approved lf-placevalue compare round F1): a ONE-page Test or Review whose
+//             white under the grid (the body's bottom less its last block's) is more than one row's height (the median cell
+//             height on the page) AND whose grid stands in more columns than the Independent page at that size (buildSheet's
+//             plan.meta.fits[0].cols, both). combine Test S, 4 across against the Independent page's 3, left about 45 % of the
+//             page white under its grid. --self-test checks it.
 //   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
 //             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
 //   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
@@ -82,6 +87,12 @@ const argv = process.argv.slice(2);
 const GDP_CAP = { S: 10, M: 8, L: 6 };
 const gdpCap = (role, size, tries) => (role === 'guided' && GDP_CAP[size] != null && Number.isFinite(tries) && tries > GDP_CAP[size]
     ? `${tries} scored tries on the Guided page(s) at ${size}; the §12.1 ceiling is ${GDP_CAP[size]} plus the Model` : null);
+// EB-GRIDFOOT (opt-in --grid-foot): the verdict on one Test / Review render (null = fine). pages: its page count; whiteMm: the white
+// under the grid on its page; rowMm: one row's height (the median cell); cols / indCols: its columns and the Independent page's.
+const gridFootBad = (role, pages, whiteMm, rowMm, cols, indCols) => ((role === 'test' || role === 'review') && pages === 1
+    && Number.isFinite(whiteMm) && Number.isFinite(rowMm) && rowMm > 0 && whiteMm > rowMm + 0.5
+    && Number.isFinite(cols) && Number.isFinite(indCols) && cols > indCols
+    ? `${Math.round(whiteMm * 10) / 10} mm white under the grid (one row is ${Math.round(rowMm * 10) / 10} mm) in ${cols} columns; the Independent page stands in ${indCols} (use its columns, or fill the page)` : null);
 // PT-MOD-3 (lead ruling 2026-11-12, lf-ops facts-roles r2): a Scripted Model state's room kept for later marks is not an empty band
 // when ALL hold - the role is scripted-model, the state is not its example's last, the band is <= 35 % of the cell, and a LATER
 // state of the same example draws ink in that band (reserved, not just white). cells: measureCells' list in page order (step =
@@ -134,11 +145,21 @@ if (argv.includes('--self-test')) {
         for (const [n, , want] of mbad) console.log(`self-test FAIL: PT-MOD-3 ${n} should ${want ? 'be excused' : 'fail'}`);
         if (mbad.length) { console.log(`ws-empty-band self-test: FAIL (PT-MOD-3)`); process.exit(1); }
     }
+    {   // EB-GRIDFOOT: combine Test S on a837b8d4 (4 across, ~45 % white) FAILS; the Independent page's 3 across, or a full page, PASS
+        const fc = [['combine Test S, 4 vs 3 across, 110 mm white', gridFootBad('test', 1, 110, 25, 4, 3), true],
+            ['3 across like the Independent page', gridFootBad('test', 1, 110, 25, 3, 3), false],
+            ['4 across, white under one row', gridFootBad('test', 1, 20, 25, 4, 3), false],
+            ['two pages', gridFootBad('review', 2, 110, 25, 4, 3), false], ['independent', gridFootBad('independent', 1, 110, 25, 4, 3), false],
+            ['review M, 3 vs 2 across', gridFootBad('review', 1, 60, 30, 3, 2), true]];
+        const fbad = fc.filter(([, got, want]) => !!got !== want);
+        for (const [n, , want] of fbad) console.log(`self-test FAIL: EB-GRIDFOOT ${n} should ${want ? 'fail' : 'pass'}`);
+        if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-GRIDFOOT)`); process.exit(1); }
+    }
     const cases = [['guided', 'S', 10, false], ['guided', 'S', 11, true], ['guided', 'M', 8, false], ['guided', 'M', 23, true], ['guided', 'L', 6, false],
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases)`);
+    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT cases)`);
     process.exit(bad.length ? 1 : 0);
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -373,6 +394,28 @@ async function main() {
                         }), 'body > section.ws-page, body > .ws-page');
                         pf.slice(0, -1).forEach((v, i) => { if (v >= 30) F('EB-PAGE', `${key} ${j.tag} p${i + 1}`, `${v} % of the page body is empty under its last block (not the last page; limit 30 %)`); });
                     }
+                    if (has('grid-foot') && (j.role === 'test' || j.role === 'review') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
+                        const gf = await sh.evaluate((scope) => {
+                            const MM = 96 / 25.4;
+                            const pgs = [...document.querySelectorAll(scope)];
+                            const pg = pgs[0]; if (!pg) return { pages: 0 };
+                            const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
+                            const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
+                            const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
+                            const hs = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]')).map((c) => c.getBoundingClientRect().height).filter((h) => h > 0).sort((a, b) => a - b);
+                            return { pages: pgs.length, whiteMm: Math.max(0, br.bottom - last) / MM, rowMm: hs.length ? hs[Math.floor(hs.length / 2)] / MM : NaN };
+                        }, 'body > section.ws-page, body > .ws-page');
+                        if (gf.pages === 1 && gf.whiteMm > gf.rowMm + 0.5) {
+                            const ind = await page.evaluate(async ({ categoryId, skillId, j, SEED }) => {
+                                try {
+                                    const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [Object.assign({ categoryId, skillId }, j.opts ? { opts: j.opts } : {})] }], size: j.size, paper: 'A4', seed: SEED, key: false });
+                                    return r.plan && r.plan.meta && r.plan.meta.fits && r.plan.meta.fits[0] ? r.plan.meta.fits[0].cols : null;
+                                } catch (e) { return null; }
+                            }, { categoryId, skillId, j, SEED });
+                            const why = gridFootBad(j.role, gf.pages, gf.whiteMm, gf.rowMm, Number(b.cols), Number(ind));
+                            if (why) F('EB-GRIDFOOT', `${key} ${j.tag} p1`, why);
+                        }
+                    }
                     // (`--rule-skills a:b,...`, ws-precritic opt-in: the opt-in rule judges only the opted-in lane's skills)
                     if (has('vocab-ink') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) for (const v of await sh.evaluate(measureVocab, 'body > section.ws-page, body > .ws-page')) {
                         if (v.fillH < 0.7 || v.fillW < 0.7) F('EB-VOCAB', `${key} ${j.tag} p${v.page} vocab picture ${v.pic}`, `the drawing fills ${Math.round(v.fillH * 100)} % of its ${v.hMm} mm picture box up and down, ${Math.round(v.fillW * 100)} % across (limit 70 %)`);
@@ -455,7 +498,7 @@ async function main() {
         for (const k of Object.keys(pin)) if (SKILLS.some((sk) => k.startsWith(sk + ' ')) && (counts[k] || 0) < pin[k]) notes.push(`pin ${k}: ${pin[k]} -> ${counts[k] || 0} (fixed: tighten the pin)`);
         for (let i = findings.length - 1; i >= 0; i--) if (!over.has(keyOf(findings[i]))) findings.splice(i, 1);
     }
-    const rules = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
+    const rules = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-GRIDFOOT'];
     for (const n of notes) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
