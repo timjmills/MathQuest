@@ -731,7 +731,7 @@ function supPanelHTML(s, i, p) {
     const groups = SUP_GROUPS.map(([kind, title, sub]) => {
         const list = decl.filter((x) => x.kind === kind);
         if (!list.length) return '';
-        return `<div class="tv-sup-group"><p class="tv-sup-group-h">${esc(title)}${sub ? ` <span class="tv-sup-group-s">${esc(sub)}</span>` : ''}</p>${list.map((x) => `<button type="button" class="tv-check tv-sup-tick" role="checkbox" aria-checked="${!!r.ticks[x.id]}" data-act="sup-tick" data-sec="${i}" data-part="${p}" data-sup="${esc(x.id)}" data-sup-kind="${x.kind}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span class="tv-sup-l">${esc(x.label)}${x.needs ? ' <span class="tv-sup-tag">the step teaches with it</span>' : ''}</span></button>`).join('')}</div>`;
+        return `<div class="tv-sup-group"><p class="tv-sup-group-h">${esc(title)}${sub ? ` <span class="tv-sup-group-s">${esc(sub)}</span>` : ''}</p>${list.map((x) => `<button type="button" class="tv-check tv-sup-tick" role="checkbox" aria-checked="${!!r.ticks[x.id]}" data-act="sup-tick" data-sec="${i}" data-part="${p}" data-sup="${esc(x.id)}" data-sup-kind="${x.kind}"${x.locked ? ' disabled' : ''}><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span class="tv-sup-l">${esc(x.label)}${x.needs ? ' <span class="tv-sup-tag">the step teaches with it</span>' : ''}${x.locked ? ` <span class="tv-sup-tag">${esc(x.locked)}</span>` : ''}</span></button>`).join('')}</div>`;
     }).join('');
     const optHinted = decl.some((x) => x.from && typeof x.from === 'object' && r.ticks[x.id]);
     const cover = optHinted ? (r.opts.cover || supBase(s).cover || 'whole') : null;
@@ -1301,6 +1301,12 @@ async function runBuild() {
             const sup = p.res && p.res.lesson && p.res.lesson.partSup;
             if (s && s.role === 'lesson' && sup && JSON.stringify(sup) !== JSON.stringify(s.partSup || null)) {
                 s.partSup = sup;
+                // (a band this size keeps - `locked` - cannot stay off: its delta goes and the page is built again, as a count
+                // the new limits no longer offer snaps)
+                const po0 = sectionPartOpts(s);
+                let snapped = false;
+                for (const [x, list] of Object.entries(sup)) for (const e of list || []) if (e.locked && po0[x] && po0[x].bands && po0[x].bands[e.id] === false) { delete po0[x].bands[e.id]; snapped = true; }
+                if (snapped) { setPartOpts(s, po0); scheduleBuild(); }
                 if (!fit || JSON.stringify(fit) === JSON.stringify(s.partFit || null)) { const box = root.querySelector(`#tvParts${si}`); const focus = box && box.contains(document.activeElement) ? document.activeElement : null; if (box) renderParts(si, focus && focus.dataset && focus.dataset.act ? focus : null); }
             }
             if (!s || s.role !== 'lesson' || !fit || JSON.stringify(fit) === JSON.stringify(s.partFit || null)) return;

@@ -201,16 +201,20 @@ async function browser() {
                     // (a LEAF answer slot - a box, a line, a missing digit - written in solid ink; a container slot such as the stack's open
                     // answer zone holds the problem's own digits and is not an answer)
                     const inked = [...pg.querySelectorAll('[data-ws-slot]')].filter((e) => !e.querySelector('[data-ws-slot]') && e.getAttribute('data-ws-shape') !== 'open' && !e.classList.contains('ws-stack') && e.textContent.trim() && !e.closest('.ws-trace, [data-ws-ink="trace"]') && !e.querySelector('[data-ws-ink="trace"], .ws-trace') && e.getAttribute('data-ws-ink') !== 'trace' && !e.hasAttribute('data-ws-given')).length;
-                    return { sheet: pg.getAttribute('data-ws-sheet') || '', over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, brr.bottom - last) / brr.height * 100), h, inked };
+                    const cellsN = pg.querySelectorAll('[data-ws-cell]').length;
+                    return { cellsN, sheet: pg.getAttribute('data-ws-sheet') || '', over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, brr.bottom - last) / brr.height * 100), h, inked };
                 }));
                 return { cells, pages };
             } finally { await sh.close(); }
         };
         const cellKey = (m, c, rule) => `${(m.pages[c.page - 1] || {}).sheet}|${rule}|${c.tmpl}|${Math.round(c.wMm)}`;
-        const stdOf = (m) => { const keys = new Set(); for (const c of m.cells) judge([c], '', (rule) => keys.add(cellKey(m, c, rule)), 'lesson'); return { keys, pages: new Set(m.pages.map((p) => p.h)), inked: m.pages.reduce((o, p) => { o[p.sheet] = (o[p.sheet] || 0) + p.inked; return o; }, {}) }; };
+        // (nothing given away: the inked answer slots per cell of each sheet - a count scales with the problems printed)
+        const rateOf = (m) => { const a = {}, c = {}; for (const p of m.pages) { a[p.sheet] = (a[p.sheet] || 0) + p.inked; c[p.sheet] = (c[p.sheet] || 0) + p.cellsN; } return Object.fromEntries(Object.keys(a).map((k) => [k, c[k] ? a[k] / c[k] : a[k]])); };
+        const stdOf = (m) => { const keys = new Set(); for (const c of m.cells) judge([c], '', (rule) => keys.add(cellKey(m, c, rule)), 'lesson'); return { keys, pages: new Set(m.pages.map((p) => p.h)), inked: rateOf(m) }; };
         // the support marks a sheet draws (key parity, and "asked = printed")
         const MARKS = { regroup: /class="rg[^"]*" data-ws-seg="/g, heads: /<span class="head">[A-Za-z]/g, say: /\bSay:/g, steps: /data-mq-lesson-strip/g };
         const marks = (html) => Object.fromEntries(Object.entries(MARKS).map(([k, re]) => [k, ((html || '').match(re) || []).length]));
+        const m0 = (po) => po;   // (the state as asked - compared with its settled form)
         const cellsN = (html) => ((html || '').match(/data-ws-cell="/g) || []).length;
         const SHEET_OF = { prereq: 'lesson-prereq', chart: 'lesson-chart', sheet: 'lesson-sheet', wedo: 'lesson-sheet', practice: 'lesson-practice', mixed: 'lesson-mixed' };
         const deltaOf = (x, stdTick) => (x.kind === 'band' ? { bands: { [x.id]: false } } : x.from && typeof x.from === 'object' ? { opts: { support: stdTick ? [] : [x.from.value] } } : { opts: { off: [x.id] } });
@@ -224,7 +228,8 @@ async function browser() {
                 const std = await build(skill, size, undefined); builds++;
                 if (std.error) { F('PO-5', `${where}: the standard packet does not build: ${std.error}`); continue; }
                 if (!std.partSup || !PO.has) { F('PO-5', `${where}: the build declares no supports (res.lesson.partSup) - step B not built`); F('PO-3', `${where}: nothing to sample (no res.lesson.partSup)`); continue; }
-                const decls = Object.entries(std.partSup).flatMap(([p, list]) => (list || []).map((x) => Object.assign({ part: p }, x)));
+                // (a support kept at this size - `locked`, its tick disabled with the reason - is not a choice: it is not flipped)
+                const decls = Object.entries(std.partSup).flatMap(([p, list]) => (list || []).filter((x) => !x.locked).map((x) => Object.assign({ part: p }, x)));
                 console.log(`${where}: declared ${decls.map((x) => `${x.part}.${x.id}${x.needs ? '!' : ''}`).join(' ') || '(none)'}`);
                 // every `needs` names a declared id; every declared id is a support the catalogue or the skill knows
                 for (const x of decls) ok('PO-5', ['structural', 'hint', 'band'].includes(x.kind) && x.label, `${where} ${x.part}.${x.id}: a declaration without a kind or label ${J(x)}`);
@@ -243,7 +248,8 @@ async function browser() {
                         ok('PO-5', r.sheets[sh] !== std.sheets[sh], `${where} ${x.part}.${x.id} ${J(d)}: its part's pupil pages (${sh}) did not change - the support is declared but not drawn`);
                         // (a structure or a band is drawn on the key too; a hint on a cell the key shows fully worked may leave the key as it was)
                         if (x.kind !== 'hint') ok('PO-5', r.keySheets[sh] !== std.keySheets[sh], `${where} ${x.part}.${x.id}: the key (${sh}) did not change - the key does not follow the pupil page`);
-                        for (const other of Object.keys(std.sheets)) if (other !== sh) ok('PO-5', r.sheets[other] === std.sheets[other], `${where} ${x.part}.${x.id}: another sheet (${other}) changed - a part's delta is its own`);
+                        // (Mixed deals AVOIDING the Practice problems - LR-5 - so a Practice support that changes how many print may change Mixed)
+                        for (const other of Object.keys(std.sheets)) if (other !== sh && !(x.part === 'practice' && other === 'lesson-mixed')) ok('PO-5', r.sheets[other] === std.sheets[other], `${where} ${x.part}.${x.id}: another sheet (${other}) changed - a part's delta is its own`);
                     }
                 }
 
@@ -286,7 +292,14 @@ async function browser() {
                         asked.push(f.x);
                     });
                     const tag = `${where} ${J(po)}`;
-                    const r = await build(skill, size, po); builds++;
+                    // (the Print screen's loop: the build returns its limits, the state's counts snap to them, it builds again - a state
+                    // the screen can reach, PO-2w's settle)
+                    let r = await build(skill, size, po); builds++;
+                    for (let k = 0; k < 3 && !r.error; k++) {
+                        const nx = await page.evaluate(async ({ po, fit }) => { const m = await import('./js/modules/sheet/part-opts.js'); return m.normalizePartOpts(po, m.allPartLimits(fit)); }, { po, fit: r.fit });
+                        if (J(nx) === J(m0(po))) break;
+                        po = nx; r = await build(skill, size, po); builds++;
+                    }
                     if (r.error) { F('PO-3', `${tag}: does not build: ${r.error}`); continue; }
                     // asked = printed
                     for (const x of asked) {
@@ -318,8 +331,8 @@ async function browser() {
                         if (S.pages.has((m.pages[c.page - 1] || {}).h)) continue;
                         judge([c], `${tag} [${(m.pages[c.page - 1] || {}).sheet}]`, (rule, w, msg) => { if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule) && !S.keys.has(cellKey(m, c, rule))) F('PO-3', `${rule} ${w}: ${msg}`); }, 'lesson');
                     }
-                    const inked = m.pages.reduce((o, p) => { o[p.sheet] = (o[p.sheet] || 0) + p.inked; return o; }, {});
-                    for (const [sh, n] of Object.entries(inked)) ok('PO-3', n <= (S.inked[sh] || 0), `${tag}: ${sh} has ${n} answer slots inked on the pupil page (standard ${S.inked[sh] || 0}) - an answer given away`);
+                    const inked = rateOf(m);
+                    for (const [sh, n] of Object.entries(inked)) ok('PO-3', n <= (S.inked[sh] || 0) + 1e-9, `${tag}: ${sh} has ${n.toFixed(2)} answer slots a cell inked on the pupil page (standard ${(S.inked[sh] || 0).toFixed(2)}) - an answer given away`);
                 }
             }
         }

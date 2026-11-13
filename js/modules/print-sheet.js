@@ -49,7 +49,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
-import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP, practiceSplit, OFF_IDS, withSupDelta, normalizeSupDelta, SUPPORT_CATALOGUE, BAND_LABELS } from './sheet/part-opts.js';
+import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP, PRACTICE_GROW_CAP_BARE, practiceSplit, OFF_IDS, withSupDelta, normalizeSupDelta, SUPPORT_CATALOGUE, BAND_LABELS, BAND_KEPT_TEXT } from './sheet/part-opts.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
@@ -4838,7 +4838,7 @@ function optionHintDecl(sk, items) {
  * on and off). Parts: prereq, chart (its Say band), sheet (the lesson sheet's structure: We Do at level 2, rows at 1), wedo
  * (cell 1's first step in grey), practice (structure at level 1, the Support option's hints, the Steps strip), mixed.
  */
-function lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml }) {
+function lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml, practiceTried, practiceFit, stripOff }) {
     const resOf = (part) => allParts.filter((p) => p.part === part).map((p) => p.res);
     const itemsOf = (part) => resOf(part).flatMap((r) => r.items || []);
     const out = {};
@@ -4854,7 +4854,13 @@ function lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, st
     if (prac.length) {
         out.practice = structuralDecl(prac, [1]).concat(optionHintDecl(practiceSk || sk, prac));
         const strip = resOf('practice').some((r) => /data-mq-lesson-strip/.test(r.pupilHtml || ''));
-        if (stripHtml && strip) out.practice.push({ id: 'steps', kind: 'band', label: BAND_LABELS.steps, from: 'band' });
+        // (the Steps strip may go only where its height, shared by the page's rows, keeps every cell within the strip-off
+        // growth cap - else it is listed, kept, with the reason: the page would print cells too tall for their problems)
+        const t = (practiceTried || []).filter((x) => x && x.hMin > 0 && x.cellH > 0).pop();
+        const rowsN = practiceFit && practiceFit.rows ? practiceFit.rows : 1;
+        const grows = t ? (t.cellH + (stripOff ? 0 : (t.stripH || 0)) / rowsN) / t.hMin : 0;
+        const kept = !!t && grows > PRACTICE_GROW_CAP_BARE;
+        if (stripHtml && (strip || stripOff)) out.practice.push(Object.assign({ id: 'steps', kind: 'band', label: BAND_LABELS.steps, from: 'band' }, kept ? { locked: BAND_KEPT_TEXT } : {}));
     }
     const mix = itemsOf('mixed');
     if (mix.length) out.mixed = structuralDecl(mix, [1]);
@@ -5118,7 +5124,8 @@ async function buildLesson(n, metaOf) {
         const cols = Math.max(1, Math.min(per || 1, Number(r.fits && r.fits.cols) || 1));
         const rows = Math.max(1, Math.ceil(per / cols));
         const G = f0 && Number(f0.cellH) > 0 ? rows * Number(f0.cellH) : 0;
-        const minRows = f0 && Number(f0.hMin) > 0 && G ? Math.min(rows, Math.max(1, Math.ceil(G / (Number(f0.hMin) * PRACTICE_GROW_CAP)))) : rows;
+        // (lf-partopts B: with the Steps strip off the cells may grow over its height too - the tighter cap, part-opts.js)
+        const minRows = f0 && Number(f0.hMin) > 0 && G ? Math.min(rows, Math.max(1, Math.ceil(G / (Number(f0.hMin) * (stepsOff ? PRACTICE_GROW_CAP_BARE : PRACTICE_GROW_CAP))))) : rows;
         return per > 0 ? { perPage: per, cols, rows, minRows } : null;
     };
     const buildPractice = async (seed, sec) => {
@@ -5309,7 +5316,7 @@ async function buildLesson(n, metaOf) {
             // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
             // lf-partopts B (sheet/part-opts.js resolveSupports): what each part's items really DRAW - read from the built items'
             // templates and payloads and the part's level, never typed - the Supports panels' ticks (lessonSupportDecl).
-            partSup: lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml }),
+            partSup: lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml, practiceTried, practiceFit, stripOff: stepsOff }),
             partFit: (() => {
                 const cm = (chart.plan && chart.plan.meta && chart.plan.meta.partFit) || {};
                 const tm = (teach.plan && teach.plan.meta && teach.plan.meta.partFit) || {};

@@ -50,6 +50,13 @@ export const PREREQ_WARN_BELOW = 3;
  * 1.35 keeps the margin a fix must clear, `--margin`). The fewest rows a page offers is the fewest whose cells stay under it.
  */
 export const PRACTICE_GROW_CAP = 1.35;
+/**
+ * lf-partopts B: the growth cap of a Practice page whose Steps strip is OFF (its height goes to the cells too). Measured by PO-3
+ * (ws-partopts-supports): add_facts M, strip off, 16 problems - planned within 1.35 x the measured needed height, printed a
+ * 30.0 % band, because the ink sits 1.057 x higher than the needed height's floor (its bottom padding): 1.35 x 1.057 = 1.43,
+ * past 1 / 0.7. At 1.30 the printed ratio is 1.37 (27 %). Only the strip-off page uses it; every standard range is unchanged.
+ */
+export const PRACTICE_GROW_CAP_BARE = 1.30;
 
 const int = (v) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : NaN);
 
@@ -446,6 +453,8 @@ export const NEEDS_TEXT = Object.freeze({
     regroup: 'This step teaches with the regroup boxes. Without them, pupils must hold the carried ten in their head. The page still prints.',
     heads: 'This step teaches with the place-value letters. Without them, pupils must name each column themselves. The page still prints.',
 });
+/** A band kept at this size (its tick disabled): turning it off would grow the page's cells past the cap (PRACTICE_GROW_CAP_BARE). */
+export const BAND_KEPT_TEXT = 'Kept at this size: without it the problems would stand in cells too tall for them.';
 /** The warning when every structural support of a part is ticked off (§2.4). */
 export const NO_STRUCTURE_TEXT = 'No structure left: the cell is the problem and the answer slot only.';
 /** The quiz paper's line when a hint is ticked (owner answer 3: offered, off by default). */
@@ -496,6 +505,7 @@ export function resolveSupports(decl, roleLevel, delta = null, base = {}) {
     const baseSupport = asList(base && base.support);
     const ticks = {}, std = {};
     for (const x of list) {
+        if (x.locked) { std[x.id] = true; ticks[x.id] = true; continue; }   // (kept at this size: the tick cannot be cleared)
         if (x.kind === 'band') { std[x.id] = true; ticks[x.id] = !(d.bands && d.bands[x.id] === false); continue; }
         if (isOptHint(x)) {
             std[x.id] = baseSupport.includes(x.from.value);
