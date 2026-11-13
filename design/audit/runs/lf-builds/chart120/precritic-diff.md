@@ -27,7 +27,9 @@ proves, the check on precritic's path, and a row in `design/lessons-first/CHECKS
 | Gate | master | branch | verdict |
 |---|---|---|---|
 | empty-band EB-SIDE 4 (review S, pre-skill-check S) | 4 | 4, line-identical | `counters` cells of the earlier skills (count_objects, 30.5 % of the width), not chartwindow; baseline |
-| cell-checks OVERFLOW/LONE-PAGE grid=whole on lesson/guided/test | n/a on master (no card) | surfaced by the branch's card | **OPEN** — the whole chart is one cell to a page by design (card §3). grid=whole on lesson/guided/test needs a lead §7a ruling (hide it there, or draw the window around the gaps). Not a size fix: content never shrinks |
+| cell-checks OVERFLOW grid=whole/grid=rows on lesson (24/18), guided (12) + LONE-PAGE grid=whole on test (3) | n/a on master (no card) | surfaced by the branch's card | **OPEN** — the whole chart (12 rows) and the three rows of ten are one cell to a page by design (card §3); on lesson/guided they share the page with the Steps and the anchor-chart states. Needs a lead §7a ruling: hide grid=whole/rows on lesson/guided/test, or draw the window around the gaps there. Not a size fix: content never shrinks |
+| empty-band EB-BAND 2 (guided M/L, Model-row try) | surfaced by THIS lane's centred-band measure | the Guided Model row is stretched to the Model's height; a short 3×5-window try centred in it leaves 42 %/36 % white | **OPEN** — shared Guided-role layout (any skill whose tries are shorter than its Model); the chart window cannot grow (content never shrinks). Routed to the shared-roles/engine lane (the fact roles have pins for the same pattern; a non-fact skill has none) |
+| empty-band EB-SIDE 4 (review S, pre-skill-check S) | master | line-identical on the branch | baseline: the `counters` cells of the earlier skills (count_objects, 30 % of the width), not chartwindow |
 | sibling-compare NO-SIBLING (13 matrix rows) | n/a | SKIPPED | first family on the chartwindow template (process rule 2026-11-07): the lane lists the pages, the critic grades them; passing adds them to siblings.json |
 
 ## Tool gaps found and fixed on the way

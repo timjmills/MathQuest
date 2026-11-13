@@ -1,0 +1,30 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill
+
+mq-browser-run: slot 1 after 37s
+note: composing:hundreds_chart_fill: slot ink on; card design/cards/chartwindow/chartwindow.md; 14 roles x S/M/L + 6 option variant(s) of 23 + hosts card, worksheet, quiz
+note: composing:hundreds_chart_fill stretch S: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill stretch M: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill stretch L: not composed (No Stretch for this skill yet: it has no open problem of its own. Choose Reason It or True or False? for a thinking page.)
+note: composing:hundreds_chart_fill card 390: no kit cell on the host (legacy screen item?)
+note: composing:hundreds_chart_fill card 820: no kit cell on the host (legacy screen item?)
+note: composing:hundreds_chart_fill card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  FAIL 2
+   composing:hundreds_chart_fill guided M p1 cell 2: empty band 48.4 mm around (24.5 mm above, 23.9 mm under) the ink of a 115.1 mm cell (42.1 %; limit 30 % = 34.5 mm) [chartwindow]
+   composing:hundreds_chart_fill guided L p1 cell 2: empty band 40.4 mm around (20.6 mm above, 19.8 mm under) the ink of a 111.1 mm cell (36.4 %; limit 30 % = 33.3 mm) [chartwindow]
+EB-SIDE  FAIL 4
+   composing:hundreds_chart_fill review S p1 cell 5: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill review S p1 cell 6: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill pre-skill-check S p2 cell 7: empty band 26.3 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+   composing:hundreds_chart_fill pre-skill-check S p2 cell 8: empty band 26.2 mm beside the ink of a 92.3 mm wide cell (30 %) [counters]
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(1 skill(s), 50 renders, 273 cells, 121 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (6)
