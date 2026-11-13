@@ -1,0 +1,5 @@
+  UI-TITLE-OFF teacher Print screen: Header Title unticked, but the Page title box is NOT disabled, Title place is NOT disabled, and the caption does NOT say the title is off
+  UI-WIDTH simple print at 1280: the Page title box is 270 px wide (at least 400)
+  UI-WIDTH simple print at 1280: the "Page title" label wraps to 2 lines
+  UI-CARET simple print: typed X at 5, a rebuild, then Y: the box reads "Fractions and more words" (want "FractXYions and more words")
+ws-frame-title-ui: FAIL (4)
