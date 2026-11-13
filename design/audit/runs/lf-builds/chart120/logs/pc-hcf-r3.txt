@@ -9,3 +9,100 @@ ws-precritic: 35 gate(s) (21 browser), logs /tmp/mq-precritic/20261113-084337-22
   PASS            ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) (1 s)
   PASS (baseline) ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) (1 s)
   PASS            ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) (1 s)
+  PASS            ws-lessonfit (WRM site lessons, every year) (26 s)
+  PASS            ws-content-audit --skill (103 s, waited 99 s for a slot)
+  PASS            ws-capacity-pin --check (items a page never fall against the pinned master page) (120 s, waited 103 s for a slot)
+  PASS            ws-options-verify --skill (260 s, waited 242 s for a slot)
+  PASS            ws-presets-unit (250 s, waited 243 s for a slot)
+  PASS            ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz) (243 s, waited 228 s for a slot)
+  FAIL            ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT) (273 s, waited 155 s for a slot)
+  PASS            ws-coverage-matrix --skills (653 s)
+  FAIL            ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) (1 s)
+  PASS            ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) (238 s, waited 228 s for a slot)
+  PASS            ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) (226 s, waited 216 s for a slot)
+  PASS            ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) (132 s, waited 121 s for a slot)
+  PASS            ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) (133 s, waited 121 s for a slot)
+  PASS            ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) (275 s, waited 262 s for a slot)
+  PASS            ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) (324 s, waited 261 s for a slot)
+  PASS            ws-grade-render --gate on every other role the signed card offers (chartwindow §7a; critic lf-ops r1 check 2) (444 s, waited 266 s for a slot)
+  FAIL            ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) (475 s, waited 244 s for a slot)
+  PASS            ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) (1329 s)
+  PASS            ws-screen-slots --skills (292 s, waited 283 s for a slot)
+  PASS            ws-screen-answer --skills (220 s, waited 201 s for a slot)
+  PASS            ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE) (182 s, waited 179 s for a slot)
+  PASS            ws-chromebook-fit --skills (345 s, waited 198 s for a slot)
+  PASS            ws-boot-smoke (187 s, waited 184 s for a slot)
+  PASS            ws-phone-card (practice card at 390 px: clip, first-box focus) (286 s, waited 217 s for a slot)
+  PASS            ws-options-verify --render (each offered appearance value at S / L vs the default page) (300 s, waited 213 s for a slot)
+
+### ws-precritic — --skill composing:hundreds_chart_fill
+
+commit `1648377152` + uncommitted changes (3 file(s)) (claude/sweet-newton-c8wrv1-lf-builds) · started 2026-11-13T08:43:37Z · finished 2026-11-13T09:28:01Z · wall 2664 s · logs `/tmp/mq-precritic/20261113-084337-22269`
+
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | composing:hundreds_chart_fill | PASS | 0 found, 0 pinned, 0 new | 0 |
+| ws-providers-unit --skill | composing:hundreds_chart_fill | PASS | 1 of 1 skills checked | 1 |
+| ws-roles-unit (shared page roles) | shared roles | PASS | - | 0 |
+| ws-capacity-pin --check (items a page never fall against the pinned master page) | composing:hundreds_chart_fill | PASS | - | 120 (103 waiting) |
+| ws-content-audit --skill | composing:hundreds_chart_fill | PASS | 1 skill(s) audited | 103 (99 waiting) |
+| ws-options-verify --skill | composing:hundreds_chart_fill | PASS | 22 value(s) checked; 0 failing, 0 pinned, 0 new | 260 (242 waiting) |
+| ws-presets-unit | 1 preset / host skill(s) | PASS | - | 250 (243 waiting) |
+| ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT) | composing:hundreds_chart_fill × card roles × S/M/L + hosts | FAIL | ws-empty-band: FAIL (6) | 273 (155 waiting) |
+| ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz) | composing:hundreds_chart_fill | PASS | - | 243 (228 waiting) |
+| ws-lessonfit (WRM site lessons, every year) | site lessons Y1, Y4, Y6 | PASS | - | 26 |
+| ws-coverage-matrix --skills | composing:hundreds_chart_fill × kinds × S/M/L | PASS | 8 of 33 row(s) run × S/M/L: OK 8, RED 0, ERROR 0; PENDING 19, N/A 6 | 653 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | composing:hundreds_chart_fill | PASS | 0 found (1 doc(s)) | 238 (228 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | composing:hundreds_chart_fill | PASS | 0 found (1 doc(s)) | 226 (216 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | composing:hundreds_chart_fill | PASS | 0 found (1 doc(s)) | 132 (121 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | composing:hundreds_chart_fill | PASS | 0 found (1 doc(s)) | 133 (121 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | composing:hundreds_chart_fill | PASS | 0 found (1 doc(s)) | 275 (262 waiting) |
+| ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) | composing:hundreds_chart_fill × lesson, test, independent × S/M/L + screen hosts | PASS | - | 324 (261 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (chartwindow §7a; critic lf-ops r1 check 2) | composing:hundreds_chart_fill × 11 roles × S/M/L | PASS | - | 444 (266 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | composing:hundreds_chart_fill × 14 roles + 23 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 158 finding(s) (OVERFLOW 158) on 384 page(s), 227s | 475 (244 waiting) |
+| ws-screen-slots --skills | composing:hundreds_chart_fill | PASS | 0 found, 0 pinned, 0 new (5 host renders, --baseline design/audit/baselines/screen-slots.json) | 292 (283 waiting) |
+| ws-screen-answer --skills | composing:hundreds_chart_fill | PASS | - | 220 (201 waiting) |
+| ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE) | composing:hundreds_chart_fill | PASS | - | 182 (179 waiting) |
+| ws-chromebook-fit --skills | composing:hundreds_chart_fill | PASS | - | 345 (198 waiting) |
+| ws-code-snapshot | all share codes | PASS | - | 1 |
+| ws-boot-smoke | app boot | PASS | - | 187 (184 waiting) |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | composing:hundreds_chart_fill: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 13 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 5 printed row(s) with findings (PENDING(no-baseline) 5; siblings per skill: hundreds_chart_fill: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | composing:hundreds_chart_fill × matrix rows × S/M/L + extras at S | PASS | 13 matrix row(s) × S/M/L + 2 extra document(s) (test, more-practice, supports on): 41 document(s), SLOT 0 / CLIP 0 finding(s), 1006 box segment(s) and 0 head(s) probed (SLOT-W N/A on 0, HEADS N/A on 41 document(s): no digit strip / no heads); every SLOT / CLIP count at or below the approved siblings | 1329 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | composing:hundreds_chart_fill × 390x844, 390x664 | PASS | - | 286 (217 waiting) |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | composing:hundreds_chart_fill | SKIPPED (no rulings) | no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card: not checked | 0 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | composing:hundreds_chart_fill | N/A | every §7a option offered; no notOffered entry in the card (lead ruling R2, 2026-11-07) | 0 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | composing:hundreds_chart_fill | N/A | no operand-dealt items (nothing to deal evenly): composing:hundreds_chart_fill | 1 |
+| ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) | composing:hundreds_chart_fill | PASS | 1 skill(s), 0 pinned finding(s), 0 stale pin(s), 0.7 s | 1 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | composing:hundreds_chart_fill | PASS (baseline) | 1 found, 1 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | composing:hundreds_chart_fill | PASS | design/cards/chartwindow/chartwindow.md: Signed: owner, 2026-11-12; body as generated; coverage green against the current rule index; card.json generates the same signed content; every host, role and  | 1 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | composing:hundreds_chart_fill × S/L | PASS | 24 value page(s) (1 skill(s) x S/L) against 2 default page(s) through ws-print-lint --source kit in 87 s; 0 n/a | 300 (213 waiting) |
+
+Failing rows (first lines; the full output is in the log):
+- **ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)** (exit 1, `/tmp/mq-precritic/20261113-084337-22269/empty-band.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill`
+  - `EB-BAND  FAIL 2`
+  - `EB-SIDE  FAIL 4`
+  - `ws-empty-band: FAIL (6)`
+- **ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)** (exit 1, `/tmp/mq-precritic/20261113-084337-22269/cell-checks-hundreds_chart_fill.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts`
+  - `ok   composing:hundreds_chart_fill error-analysis S: 1p 2x? per 4`
+  - `ok   composing:hundreds_chart_fill error-analysis M: 1p 2x? per 4`
+  - `ok   composing:hundreds_chart_fill error-analysis L: 1p 2x? per 4`
+  - `FAIL composing:hundreds_chart_fill lesson S {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)`
+  - `FAIL composing:hundreds_chart_fill lesson M {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)`
+  - `FAIL composing:hundreds_chart_fill lesson L {"grid":"rows"}: 5p 1x? per undefined - OVERFLOW (18)`
+  - `FAIL composing:hundreds_chart_fill lesson S {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)`
+  - `FAIL composing:hundreds_chart_fill lesson M {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)`
+  - `FAIL composing:hundreds_chart_fill lesson L {"grid":"whole"}: 9p 1x? per undefined - OVERFLOW (24)`
+  - `FAIL composing:hundreds_chart_fill guided S {"grid":"whole"}: 3p 1x? per undefined - OVERFLOW (8)`
+- **ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings)** (exit 1, `/tmp/mq-precritic/20261113-084337-22269/sibling-compare.log`); rerun alone: `node tests/scripts/ws-sibling-compare.cjs --run /tmp/mq-precritic/20261113-084337-22269/coverage-matrix.json --skills composing:hundreds_chart_fill --run-siblings --json /tmp/mq-precritic/20261113-084337-22269/sibling-compare.json`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/ex-each S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/ex-each at S`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/ex-group S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/ex-group at S`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L`
+  - `NO-SIBLING composing:hundreds_chart_fill|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L`
+
+ws-precritic: FAIL: 3 FAIL, 29 PASS (1 on the baseline), 2 N/A, 0 SKIPPED-NOT-BUILT, 1 SKIPPED / INCOMPLETE (no or partial rulings) of 35 (FAIL: empty-band, cell-checks-hundreds_chart_fill, sibling-compare; N/A (ran, nothing to check): card-not-offered, dealer-uniform; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): card-rulings)
