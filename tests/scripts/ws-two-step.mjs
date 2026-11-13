@@ -236,15 +236,12 @@ for (const key of mine) {
     const sig = (q) => (q ? `${q.text}|${JSON.stringify(q.ans)}` : 'none');
     const deal = (opts, i) => { try { return app.gq.generateQuestionFor({ category: 'algebra', skill: sk, opts, seed: (fnv(`bites:${sk}`) + i) >>> 0, itemIndex: 0 }); } catch (e) { return null; } };
     const M = 300;
-    // PENDING a lead ruling (lf-algebra r13, found by this rule): band 50 on these two presets also acts on under 10 % of items
-    // (5.7 % / 9.3 % at 300 seeds); ruling (a) named only add_then_div and letter_equation. Printed, not failed, until ruled.
-    const PENDING = new Set(['two_step_mult_div_first:50', 'two_step_add_then_mult:50']);
+    // Band 50 on mult_div_first / add_then_mult (5.7 % / 9.3 %) was PENDING a lead ruling; ruled hidden 2026-11-13 (step 0, r3b).
     const base = []; for (let i = 0; i < M; i++) base.push(sig(deal({}, i)));
     for (const val of band.values || []) {
         if (val.v === null || val.v === undefined || val.v === band.default) continue;
         let k = 0; for (let i = 0; i < M; i++) if (sig(deal({ band: val.v }, i)) !== base[i]) k++;
-        if (k < 0.1 * M && PENDING.has(`${sk}:${val.v}`)) console.log(`  PENDING (lead ruling) BAND-BITES ${sk}: band ${val.v} changes ${k} / ${M} items`);
-        else if (k < 0.1 * M) fail('BAND-BITES', `${sk}: band ${val.v} is offered but changes ${k} / ${M} items (${Math.round(1000 * k / M) / 10} %, under 10 %)`);
+        if (k < 0.1 * M) fail('BAND-BITES', `${sk}: band ${val.v} is offered but changes ${k} / ${M} items (${Math.round(1000 * k / M) / 10} %, under 10 %)`);
     }
     for (const hid of [50]) {
         if ((band.values || []).some((x) => x.v === hid)) continue;
