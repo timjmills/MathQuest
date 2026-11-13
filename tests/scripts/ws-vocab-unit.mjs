@@ -30,7 +30,7 @@
 //     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
 // V7-ALL (r13) every bank dealtBanks lists is judged (V-FEAT reading + today's notWith); V-NUM ringed/boxed numbers all
 //     even / all odd read as even / odd (r14: one ringed or boxed number too); V-TWIN pictures of one feature class share their
-//     notWith lists; V-PLACE (r14) a ringed or boxed
+//     notWith lists (r14: and every run picture, grow's squares included, is notWith rule); V-PLACE (r14) a ringed or boxed
 //     digit inside a number reads as one / ten / hundred
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
@@ -284,6 +284,17 @@ const ambig = [];
     {
         const cls = (id) => [...new Set(featOf(id).filter((f) => !['boxed-first-of-run', 'boxed-in-run', 'skip-count', 'all-even', 'all-odd', 'marked-even', 'marked-odd'].includes(f) && !f.startsWith('place:')).map((f) => (f.startsWith('step:') ? 'step' : f)))].sort().join(' ');
         const nw = (a, b) => ((W.VOCAB_WORDS[a] || {}).notWith || []).includes(b) || ((W.VOCAB_WORDS[b] || {}).notWith || []).includes(a);
+        // (r14, critic r13 #3: the class is EVERY run picture - grow's 1, 3, 5 squares included, read from its drawing by today's
+        // reader: a run with a constant step reads as the rule "add n" / "take n", so it may not be dealt with rule)
+        const seenR = new Set();
+        for (const pl of pools) for (const a of pl.pics) {
+            if (a === 'rule' || !P.hasVocabPicture(a) || !pl.words.includes('rule') || !W.compatible([a, 'rule'])) continue;
+            const st = [...new Set([...featOf(a), ...HERE_P.vocabReadFeatures(svgOf(P, a))])].filter((f) => /^step:\d+$/.test(f));
+            const k = `${pl.name}|${a}`;
+            if (!st.length || seenR.has(k)) continue;
+            seenR.add(k);
+            fail(`V-TWIN ${pl.name}: "${a}" draws a run with a constant step (${st.join(' ')}), which reads as "rule", and the two may be dealt together (run)`);
+        }
         const seenT = new Set();
         for (const pl of pools) for (let i = 0; i < pl.pics.length; i++) for (let j = i + 1; j < pl.pics.length; j++) {
             const a = pl.pics[i], b = pl.pics[j];

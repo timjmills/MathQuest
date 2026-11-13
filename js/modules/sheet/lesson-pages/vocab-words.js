@@ -31,7 +31,7 @@ export const VOCAB_WORDS = Object.freeze({
     multiple: { meaning: 'a number you land on counting in steps', explain: 'Multiple means a number you land on when you count in threes.', notWith: ['pattern', 'sequence', 'count on', 'rule', 'grow', 'product'] },
     input: { meaning: 'the number that goes in', explain: 'Input means the number that goes in, on the In side.', notWith: ['column'] },
     output: { meaning: 'the number that comes out', explain: 'Output means the number that comes out, on the Out side.', notWith: ['column'] },
-    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern', 'row', 'column', 'multiple', 'term', 'first term'] },
+    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern', 'row', 'column', 'multiple', 'term', 'first term', 'grow', 'sequence'] },
     pattern: { meaning: 'numbers that change the same way', explain: 'Pattern means numbers that change the same way, plus 2 each time.', notWith: ['multiple', 'sequence', 'rule', 'repeat'] },
     array: { meaning: 'things in equal rows', explain: 'Array means things in equal rows, like 3 rows of 4 dots.', notWith: ['equal groups', 'distributive', 'commutative', 'even', 'row', 'column'] },
     commutative: { meaning: 'turn it round, the answer stays the same', explain: 'Commutative means you can turn it round and the answer stays the same.', notWith: ['array', 'row', 'column'] },
@@ -56,11 +56,11 @@ export const VOCAB_WORDS = Object.freeze({
     'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, like forty-seven.', notWith: ['hundred'] },
     'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 6 in 476.', notWith: ['digit', 'factor', 'quotient'] },
     repeat: { meaning: 'the part comes back', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
-    sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term'] },
+    sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term', 'rule'] },
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round to the start again: circle, square, triangle, diamond, circle.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
-    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd', 'multiple'] },
+    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd', 'multiple', 'rule'] },
     term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 14 in the box.', notWith: ['first term', 'sequence', 'multiple', 'pattern', 'rule'] },
     'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 30 in the box.', notWith: ['term', 'sequence', 'multiple', 'pattern', 'rule'] },
     'times as many': { meaning: 'the same amount, again and again', explain: 'Times as many means one bar is 3 times as long as the other.', notWith: ['compare'] },
@@ -94,9 +94,9 @@ export const VOCAB_DEFS = Object.freeze({
     multiple: [['hops', 'number-line'], ['skip-count'], ['boxed-answer', 'times-sign'], ['table', 'skip-count']],
     input: [['arrow-into-box', 'numbers-at-ends'], ['in-ringed']],
     output: [['arrow-out-of-box', 'numbers-at-ends'], ['out-ringed']],
-    // (a run reads as THE rule when its step is the rule picture's own +3, or when its step is written on it, +2 hops; a bare
-    // run with another step does not - critic r10 #1's redraw of term and first term)
-    rule: [['step:3'], ['plus-sign', 'rising-run'], ['arrow-into-box'], ['op-box']],
+    // (r14, critic r13 #3: ANY run with a constant step reads as a rule - "add 2", "take 4" - rising or falling, of numbers
+    // or of shapes (grow's 1, 3, 5 squares); r11's "only the rule picture's own +3" was the hand pin that let grow through)
+    rule: [['rising-run', 'step:*'], ['falling-run', 'step:*'], ['arrow-into-box'], ['op-box']],
     pattern: [['rising-run'], ['falling-run'], ['loop-numbers'], ['repeated-block']],
     array: [['array']],
     commutative: [['turn-arrow']],
@@ -190,6 +190,9 @@ export const VOCAB_SETS = Object.freeze([
         // (r13, critic r12 #3: first term / rule notWith - the twin of term / rule, V-TWIN - so rule, term and first term all clash
         // and two trios cannot hold them: term gave way to repeat (4.OA.C.5 patterns); trios {grow, first term, repeat} (core) /
         // {rule, odd, equation}; edited in place, the set keeps its position - V7)
+        // (r14, critic r13 #3: grow's 1, 3, 5 squares are a run with step 2, so it read as the rule "add 2" - grow / rule notWith
+        // (V-TWIN run); the vetted trios keep grow and rule apart: {grow, first term, repeat} (core) / {rule, odd, equation}, or
+        // {grow, first term, equation} / {repeat, rule, odd}; the words stay, the set keeps its position - V7)
         words: ['grow', 'first term', 'repeat', 'rule', 'odd', 'equation'] },
     { lesson: 'G4|-|followagivenruletoextendanumberpattern', title: 'Follow a given rule to extend a number pattern', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         // (r9, critic r7 #6: pattern gave way to output (what a rule gives): pattern clashed with rule, term, first term and repeat (V-AMBIG+); edited in place, the set keeps its position - V7)
@@ -198,8 +201,9 @@ export const VOCAB_SETS = Object.freeze([
         // (r13, critic r12 #3: rule, term and first term all clash now (V-TWIN) - first term gave way to odd, named by the set's
         // standard (4.OA.C.5 "alternate between odd and even"); trios {rule, odd, ones digit} / {term, repeat, grow}; edited in
         // place, the set keeps its position - V7)
-        // (r14, critic r13 #1: ones digit now boxes an EVEN digit, 47[6], so it no longer reads as odd (V-NUM one mark); the
-        // words stay, the set keeps its position - V7)
+        // (r14, critic r13 #1 / #3: ones digit now boxes an EVEN digit, 47[6], so it no longer reads as odd (V-NUM one mark); grow /
+        // rule notWith (V-TWIN run), so the vetted trios keep them apart: {rule, odd, ones digit} (core) / {term, repeat, grow}, or
+        // {rule, odd, repeat} / {ones digit, term, grow}; the words stay, the set keeps its position - V7)
         words: ['rule', 'odd', 'ones digit', 'term', 'repeat', 'grow'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],
         // (r9, critic r7 #6: equation gave way to total: factor, product and unknown each draw a number sentence ("=", V-AMBIG+); edited in place, the set keeps its position - V7)

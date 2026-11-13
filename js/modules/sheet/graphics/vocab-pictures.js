@@ -509,7 +509,7 @@ const PIC_FEAT = Object.freeze({
     repeat: ['repeated-block', 'bracket'],
     sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
     cycle: ['loop-arrows', 'loop-shapes'],
-    grow: ['shapes-growing'],
+    grow: ['shapes-growing', 'rising-run', 'step:2'],
     term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
     'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count', 'marked-even'],
     'times as many': ['times-sign', 'times-bar', 'bar-pair', 'bracket'],
@@ -688,6 +688,30 @@ export function vocabReadFeatures(body) {
             for (const run of runs) {
                 const k = run.items.findIndex((it) => it.src === inside[0]);
                 if (k === 0) f.add('boxed-first-of-run'); else if (k > 0) f.add('boxed-in-run');
+            }
+        }
+    }
+    // (r14, critic r13 #3: a growing shape pattern is a run too) figures of equal squares that touch, counted left to right:
+    // three or more figures whose counts change by one constant step read as a run with that step
+    {
+        const sq = rects.filter((r) => r.fill === 'none' && !(r.sw >= 2) && r.w > 2 && Math.abs(r.w - r.h) < 0.05 && texts.every((t) => !inR(t, r)));
+        const u = sq.length ? sq[0].w : 0;
+        if (sq.length >= 3 && sq.every((r) => Math.abs(r.w - u) < 0.05)) {
+            const figs = [];
+            const touch = (a, b) => Math.abs(a.x - b.x) <= u + 0.05 && Math.abs(a.y - b.y) <= u + 0.05;
+            for (const r of sq) {
+                const hit = figs.filter((g) => g.some((q) => touch(q, r)));
+                const merged = [r, ...hit.flat()];
+                for (const g of hit) figs.splice(figs.indexOf(g), 1);
+                figs.push(merged);
+            }
+            if (figs.length >= 3 && figs.some((g) => g.length > 1)) {
+                const counts = figs.map((g) => ({ n: g.length, x: Math.min(...g.map((q) => q.x)) })).sort((a, b) => a.x - b.x).map((g) => g.n);
+                const d = counts[1] - counts[0];
+                if (d !== 0 && counts.every((n, i) => i === 0 || n - counts[i - 1] === d)) {
+                    f.add(d > 0 ? 'rising-run' : 'falling-run'); f.add(`step:${Math.abs(d)}`);
+                    if (Math.abs(d) > 1 && counts[0] % Math.abs(d) === 0) f.add('skip-count');
+                }
             }
         }
     }
