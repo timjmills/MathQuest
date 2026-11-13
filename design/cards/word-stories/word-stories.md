@@ -285,7 +285,7 @@ Each runs as `node tests/scripts/<script> …`.
 5. **Change stories: draw the part-whole bar (whole = Now or First, captions First / Then / Now, ? on the change) or the WP-02 change strip (three boxes in a row with arrows)?** Recommended: The part-whole bar: the two lessons are 'using bar models', the bar is the library graphic the signed sentence layout already draws, and one picture serves all four story kinds of the lesson. The WP-02 strip stays the within-10 picture strip of vis_story_strip (k2 lane).
 6. **Compare bars: the MAP spec shades the difference grey at Level 1 as a hint. Shade it?** Recommended: No: the single grey is for structure and traced numbers only, and the solid difference box already stands apart. The hint that fades is the traced known numbers in the bars on the guided page.
 
-Signed: (not yet signed)
+Signed: owner, 2026-11-13
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
