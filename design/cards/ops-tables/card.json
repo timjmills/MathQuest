@@ -426,12 +426,23 @@
         "option": "band",
         "values": [
           "25",
-          "36",
           "81"
         ],
         "d": "offered",
-        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off); band=36 lf-ops-props 2026-11-12, measured ws-empty-band --opts {band:36} --sizes S on a46344e1",
-        "why": "order facts: factors to 5 (pictured), 6 (pictured, 6 x 6) or 9 (facts alone). band=36: offered at S, pending the post-fix re-measure (must meet the PT-GDP / H13 caps; otherwise not offered) - lead ruling (b) 2026-11-12. Measured at S on a46344e1: EB-GDPCAP PASS, EB-EDGE PASS, EB-BAND 17 findings vs 21 for band=25 on the same pages, plus Reason It S p1 73 %",
+        "source": "skill-options.js; lane decision 2026-11-07 (owner: no sign-off)",
+        "why": "order facts: factors to 5 (pictured) or 9 (facts alone)",
+        "skills": [
+          "multiplication:mult_properties"
+        ]
+      },
+      {
+        "option": "band",
+        "values": [
+          "36"
+        ],
+        "d": "hidden",
+        "source": "lead ruling 2026-11-13; lf-ops-props re-measure ws-empty-band --opts {band:36} --sizes S on a384a0b4",
+        "why": "not offered: failed the post-fix re-measure at S (EB-BAND 10, EB-SIDE 2 on a384a0b4)",
         "skills": [
           "multiplication:mult_properties"
         ]
