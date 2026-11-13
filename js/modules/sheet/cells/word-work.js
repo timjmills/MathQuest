@@ -49,6 +49,7 @@ import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
 import { divisionSteps } from './long-division.js';
 import { partWholeBar } from '../graphics/part-whole-bar.js';
+import { twoStepBar } from '../graphics/two-step-bar.js';
 import { sentenceFrame, sentenceFrameWidthMm } from '../graphics/sentence-frame.js';
 
 export const WW_TEMPLATE = 'word-work';
@@ -510,7 +511,7 @@ export function wordWorkPayload(q, o = {}) {
         // the empty box told the pupil the answer was 1); the singular is for the spoken answer of 1
         unitMany: unit.many || unit.word || '', unitOne: unit.one || (unit.many ? singular(unit.many) : unit.word || ''),
         tracks: Number(o.tracks) > 0 ? Number(o.tracks) : 0,
-        hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, barKind,
+        hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, bar2: !!o.bar && steps.length === 2, barKind,
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
         pic: o.pic || null,
     };
@@ -1290,8 +1291,13 @@ function renderWork(p, ctx) {
     const innerW = 186 / cols - (cols > 1 ? 9 : 10);
     const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
     const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
+    // The two-step bar model (two-step card 2026-11-13, WDS 18.1): drawn above the two step columns on
+    // the teaching cells (scaffold level >= 2: model, guided, the lesson chart) and on a practice page
+    // with the `wpBar` option (`p.bar2`). Schematic (graphics/two-step-bar.js), one `?` per bar.
+    const teach2 = !twin && Number(ctx.scaffoldLevel) >= 2;
+    const ts2 = two && (p.bar2 || teach2) ? twoStepBar(ctx, { steps: p.steps, show: put, ink: inkOf(ctx) }) : '';
     const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
-        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
+        + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '') + ts2;
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
     // under it on the left, the columns and the answer on the right. The page then holds three
     // stories at L (the word-problem role's 12.1 ceiling) with no half-empty right side (H13).

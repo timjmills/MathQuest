@@ -5090,47 +5090,61 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                 q._variant = problemType;
                 let startVal, step1Val, step2Val, afterStep1, finalVal;
                 let step1Text, step2Text;
-                const msMax = Math.max(20, Math.min(algMax, 100));
+                // "Within N" (two-step card 2026-11-13, §9.2): the band caps EVERY computed number -
+                // the Step 1 result AND the answer (not the operands). Bands 30 / 50 / 100; with no
+                // band the Max Number is that cap. Ranges leave headroom so the computed numbers land
+                // within the band, and a guard loop rejects the rest (and the ~0.7 % whose answer
+                // equalled a story number, or equalled the Step 1 result, or cancelled Step 1).
+                const msMax = (state.skillOptions && Number(state.skillOptions.band) > 0)
+                    ? Number(state.skillOptions.band) : Math.max(20, Math.min(algMax, 100));
+                let msGuard = 0;
+                for (;;) {
+                msGuard++;
 
                 if (problemType === "add_then_sub") {
-                    startVal = rng(20, msMax);
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 2)));
-                    step2Val = rng(3, Math.min(Math.floor(msMax / 2), startVal + step1Val - 1));
+                    step1Val = rng(3, Math.max(3, Math.floor(msMax / 3)));
+                    startVal = rng(Math.max(10, Math.floor(msMax / 3)), Math.max(Math.floor(msMax / 3) + 1, msMax - step1Val));
                     afterStep1 = startVal + step1Val;
+                    step2Val = rng(3, Math.max(3, afterStep1 - 1));
                     finalVal = afterStep1 - step2Val;
                     step1Text = `bought ${step1Val} more`;
                     step2Text = `gave ${step2Val} to a friend`;
                 } else if (problemType === "sub_then_add") {
-                    startVal = rng(30, msMax);
-                    step1Val = rng(5, startVal - 5);
-                    step2Val = rng(3, Math.max(3, Math.floor(msMax / 2)));
+                    startVal = rng(Math.max(12, Math.floor(msMax / 2)), msMax);
+                    step1Val = rng(3, Math.max(3, startVal - 3));
                     afterStep1 = startVal - step1Val;
+                    step2Val = rng(3, Math.max(3, msMax - afterStep1));
                     finalVal = afterStep1 + step2Val;
                     step1Text = `lost ${step1Val}`;
                     step2Text = `found ${step2Val} more`;
                 } else if (problemType === "add_then_add") {
-                    startVal = rng(10, Math.max(10, Math.floor(msMax * 0.6)));
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
-                    step2Val = rng(5, Math.max(5, Math.floor(msMax / 3)));
+                    startVal = rng(5, Math.max(6, Math.floor(msMax / 2)));
+                    step1Val = rng(3, Math.max(3, Math.floor((msMax - startVal) / 2)));
                     afterStep1 = startVal + step1Val;
+                    step2Val = rng(3, Math.max(3, msMax - afterStep1));
                     finalVal = afterStep1 + step2Val;
                     step1Text = `earned ${step1Val} more`;
                     step2Text = `received ${step2Val} more`;
                 } else {
-                    startVal = rng(50, msMax);
-                    step1Val = rng(5, Math.max(5, Math.floor(msMax / 4)));
-                    step2Val = rng(3, Math.max(3, Math.min(Math.floor(msMax / 4), startVal - step1Val - 1)));
+                    startVal = rng(Math.max(14, Math.floor(msMax / 2)), msMax);
+                    step1Val = rng(3, Math.max(3, startVal - 4));
                     afterStep1 = startVal - step1Val;
+                    step2Val = rng(2, Math.max(2, afterStep1 - 1));
                     finalVal = afterStep1 - step2Val;
                     step1Text = `used ${step1Val}`;
                     step2Text = `gave away ${step2Val}`;
                 }
 
-                // (no cancel - lesson 7 research: "got 9 more, then lost 9" leaves the start, a one-step answer)
-                if ((problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val) {
-                    step2Val += step2Val > 3 ? -1 : 1;
-                    finalVal = problemType === "add_then_sub" ? afterStep1 - step2Val : afterStep1 + step2Val;
-                    step2Text = problemType === "add_then_sub" ? `gave ${step2Val} to a friend` : `found ${step2Val} more`;
+                // "Within N": every computed number (the Step 1 result and the answer) within [1, band];
+                // no cancel ("+9 then −9" leaves the start - a one-step answer); and the answer is no
+                // story number and not the Step 1 result (the ~0.7 % that used to leak this are rejected).
+                {
+                    const cancel = (problemType === "add_then_sub" || problemType === "sub_then_add") && step2Val === step1Val;
+                    const story = [startVal, step1Val, step2Val];
+                    const ok = afterStep1 >= 1 && afterStep1 <= msMax && finalVal >= 1 && finalVal <= msMax
+                        && finalVal !== afterStep1 && !story.includes(finalVal) && !cancel;
+                    if (ok || msGuard > 600) break;
+                }
                 }
                 q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
                 q.ans = finalVal;

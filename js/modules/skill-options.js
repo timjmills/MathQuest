@@ -3440,6 +3440,13 @@ for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
             appliesTo: (cur) => ['mult', 'div', 'multdiv'].includes(cur.msOps), appliesBase: { msOps: 'mult' },
             help: 'Multiply or divide first, then take away. The pupil checks one of four answers: the right one and the three two-step mistakes (stopped after Step 1, a story number in Step 2, one sign for both).' }];
 }
+// The two-step bar model (two-step card 2026-11-13, decision 5): multi_step_word is the "(Visual)" twin -
+// it draws the bar model by default (wpBar on); multi_step_word_plain keeps it off. The option stays editable.
+{
+    const k = 'algebra:multi_step_word';
+    const o = (SKILL_OPTIONS[k] || []).find((x) => x.id === 'wpBar');
+    if (o) o.default = true;
+}
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
 // design/audit/OPTIONS-RUBRIC.md §1 O6. Each control changes how an item LOOKS — never the numbers
