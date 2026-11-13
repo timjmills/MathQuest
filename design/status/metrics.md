@@ -494,6 +494,16 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | Critic rounds | — | 2 (r2 min 6, engine-held) |
 | simple-print-2 critic rounds | — | r1 FAIL (A C2 6, C3 7; B C2 7): 6 findings, each now a ws-simple-print check |
 
+### lf-vocab (2026-11-07 to 2026-11-09)
+| Metric | Value |
+|---|---|
+| Critic rounds to PASS | 5 (r1 min 1, r2 min 7, r3 min 6, r4 min 6, r5 PASS min 8) |
+| Builder rounds | 6 (build 1, r2, r3 fresh, r4 small, r5 fresh, r6 fresh) |
+| Rule 5 stops | 2 (r2: five survivors; r4: pick3 guided row equality survived 4 rounds) |
+| Rounds lost to a check that passed what the critic failed | 2 (r3: no empty-band check on guided / EA / worksheet; r4: ws-empty-band counted an empty slot as ink, V18 did not measure rendered rows) |
+| Checks added (ws-vocab-unit V1-V21 + vocab-unit-browser, vocab-roles-render, empty-band-critic) | 24 |
+| Backtest rows | 16 (vocab-sets-split, 8 r5 rows, 6 r6 rows, eb-vocab-match3-guided) |
+| Page counts (A4) | Match 3: 4 a page at S/M/L; 1 picture, 3 words: 4 / 6 / 8 a page (K-1 / 2-3 / 4-5) |
 ### lf-engine (lesson 2 P0 drift, 2026-11-09)
 
 | Finding | Check that now catches it | Backtest row | On precritic / ws-detailed-lesson path? | Would have saved |
@@ -516,3 +526,40 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L1 vocab zoom on live packets | `ws-lesson-baseline --all-lessons --check` (master baseline) + ws-lesson-unit LR-17b rows | lesson-baseline-phase0-optin (3bf3ef5c FAIL / f3c25413 OK, 49 s) | no: process rule 0c (every engine change, before hand-over) | 1 (landing r1 -> r2, no critic round spent) |
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
+| lf-placevalue number_word_form critic rounds | — | 3 (r1 9 findings, r2 3, r3 PASS); 11 findings now checks with backtests, 1 minor open, 2 engine |
+
+### lf-vocab rounds 9-10 (2026-11-12 to 13)
+| Metric | Value |
+|---|---|
+| Narrow critic rounds | r9 FAIL min 7, r10 FAIL min 7 |
+| Builders | r9 (Opus medium, resumed), MIN_ITEMS follow-on (Opus low), r10 fresh (Opus medium) |
+| Rule 5 stops | 1 (r10: the look-alike class, 4th round) |
+| Checks added | V26, V27, V28, NB6, NB7, NB8, V-AMBIG+ (3 rules), V-FIT, V-FIT6, ws-lesson-render |
+| Backtest rows | 15 (8 r9, vocab-minitems-answers, 6 r10) |
+
+### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| A full ws-backtest run hung 7,000 s with no output (leftover checkout pv-expand-card-kit-fail). The row itself passes in 263 s; cause: mq-browser-run.sh passed its slot flock fd to the command, so a child that outlived it (puppeteer's detached Chrome of a killed gate) held the slot for ever; with both slots held every browser row waited without end, and spawnSync with no timeout printed nothing | `ws-backtest --runner-orphan <runner>` (also in `--self-test`); ws-backtest `--timeout` / `--browser-timeout` (kills the tree, TIMEOUT + 20-line tail) and `--lock-warn` (prints the slot holders); runner now runs `"$@" {fd}>&-`; ws-precritic / ws-backtest refresh a stale /tmp runner | runner-orphan-slot (fixture: master runner FAIL / fixed runner OK) | ws-backtest (deploy gates); runner used by every browser gate | 1 full run (~2 h) per hang |
+| Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
+| 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
+| ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+| r11 | fresh Opus medium builder (V-FEAT, hatch, V-REF, NB9; finished by the lead session after a container restart); narrow critic r11 FAIL min 7 (product ≈ multiple; caret) |
+| r12 | Opus low builder (finished by the lead session after a container restart); narrow critic r12 FAIL min 7 (row ≈ even, row/column ≈ product, first term ≈ rule) |
+| r13 | Opus low builder (pick3 deals only vetted trios, V7-ALL, V-NUM, V-TWIN); narrow critic r13 FAIL min 7 (3 clashes in sets 5, 7, 8; 8 of 11 sets clean, all 234 banks graded) |
+| 2026-11-13 | lf-placevalue | pv debt (tightRows) | narrow critic 1 round PASS | builder ~$13 + critic ~$6 | F1 not held; checks for the pixel rows wait on lf-checks |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
+| r14 | Opus medium builder (V-NUM single, V-PLACE, V-TWIN runs, screen size fixes); narrow critic r14 PASS min 8. Narrow rounds after r5: r6-r14 = 9 (r6, r7, r9-r14), 1 pass |

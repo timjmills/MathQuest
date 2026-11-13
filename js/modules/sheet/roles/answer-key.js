@@ -364,6 +364,10 @@ function gridPart(part, ctx, report) {
             nolabel: !!item.nolabel,
             model: !!item.model,
             keyAttr: keyModel && !/\sdata-ws-key-model\b/.test(html) ? 'data-ws-key-model' : '',
+            // the item's index in the bridge's item list (buildSheet sets `ebItem`; critic eb-r5 m1): cell() writes it as
+            // data-eb-item, by which ws-empty-band EB-FOOT pairs each cell with ITS OWN item's footprint. Nothing draws from it.
+            ebItem: Number.isInteger(item.ebItem) || Array.isArray(item.ebItem) ? item.ebItem : undefined,
+            ebPartial: item.ebPartial,
         };
     });
     // CL-12: a label run continues across sections and across pages, so the counter lives on
@@ -446,6 +450,9 @@ export function renderPages(plan, opts = {}) {
     const pages = plan.pages && plan.pages.length ? plan.pages : [{ sections: plan.sections || [] }];
     const n = pages.length;
     const key = state === 'answered';
+    // (a key page says so to its cells: a vocabulary picture draws its focal part in the grey on the key only - owner R-1,
+    // lf-vocab r7; a model drawn answered on a PUPIL page has no keyPage and is unchanged)
+    if (key) ctx.keyPage = true;
     const report = { gaps: [], label: 1, cellNo: 0, page: 1, index: 0, key };
 
     const out = pages.map((pg, i) => {

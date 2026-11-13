@@ -86,8 +86,8 @@ export const BAND_SLACK_MM = 2;
  * shorter than the printed one. A row fits in print on every sheet whose plan gap (row - free) is <= 10.2 mm; it does not on
  * sheets from 3.7 mm up: the overlap is resolved to the safe side (a value refused, never a blank foot), so the margin is the
  * largest must-refuse gap, 10.2, rounded up with 1.8 mm headroom - under the smallest gap seen beside it where no row fits,
- * 13.2 mm. ws-partopts-unit ROWFIT-BT pins it: 10 mm lets placevalue:expand L Remember off through, 14 mm refuses
- * placevalue:value L rows 0.
+ * 13.2 mm. ws-partopts-unit ROWFIT-BT pins it: 10 mm lets placevalue:value M We Do 1 (11.4 mm) through, 14 mm refuses
+ * placevalue:combine L rows 0 (13.5 mm) - re-pinned on the deploy merge (2026-11-13), master's sheets moved the first pair.
  */
 export const ROWFIT_SLACK_MM = 12;
 /** EB-ROWFIT: true when a foot of freeMm (+ marginMm) holds one Independent row and its band head (rowMm). */

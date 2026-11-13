@@ -38,6 +38,11 @@ const VQ5_IDS = [
   'subtraction:sub_wp_10_plain',
   'subtraction:sub_wp_20_plain',
 ];
+const VOC = 'Lane lf-vocab, critic r5 PASS min 8 (independent, more-practice, test, guided, error-analysis at S/M/L + keys, 10 screen hosts, grades 1-4, 4 lesson vocab pages; design/lanes/lf-vocab/critic-r5.md, 2026-11-09) + narrow critic r14 PASS min 8 (screens, next box, keys, explanations, pictures, all 180 dealt banks of sets 0-10, lesson band; design/lanes/lf-vocab/critic-r14-narrow.md, 2026-11-13)';
+const VOC_IDS = [
+  'vocabulary:vocab_grade_pictures',
+  'vocabulary:vocab_pick3_words',
+];
 // lf-placevalue (lessons-first wave 1, CCSS BUILD lesson 1, 2.NBT.A.3): the first family on the pv template (lead ruling R1).
 const PV = 'Lane lf-placevalue, critic r3 + r3b PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md, 2026-11-08';
 const PV3C = 'Lane lf-placevalue, critic r3 + r3b grades for unchanged pages, critic r3c PASS for every changed page (independent Opus medium critics; every pv-owned page type at S / M / L, every §7a option value, card 1280 / 820 / 390, worksheet, quiz >= 8; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-r3.md + critic-r3b.md + critic-r3c.md, 2026-11-08';
@@ -49,9 +54,17 @@ const PV4_IDS = [
     'placevalue:identify',
     'placevalue:unit_form',
 ];
+const PVW = 'Lane lf-placevalue week 2, critic nwf r1 FAIL, r2 FAIL, r3 PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every option value of the signed pv card, card 1280 / 820 / 390, worksheet, quiz >= 8; the live detailed lesson 1 re-graded; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-nwf1.md + critic-nwf2.md + critic-nwf3.md, 2026-11-13';
+const PVW_IDS = [
+    'composing:number_word_form',
+];
 const PV3C_IDS = [
     'placevalue:value',
     'placevalue:combine',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4])]);
+const OPS_DF = 'Lane lf-ops, division:div_facts: support-aid print pages narrow critics r5-r7 + r8 re-check PASS (Independent / Test / Review / More practice x touch, skip, array, think, boxsign, supports off, fade packet, S / M / L; design/audit/runs/lf-ops/critic-divfacts-r8.md, 2026-11-09); shared fact roles guided + scripted-model critics factroles r2 / r3 / r4 PASS (critic-factroles-r4.md, 2026-11-12); screen hosts card 1280 / 820 / 390, worksheet, quiz x every support critic divfacts-screen r2 PASS (critic-divfacts-screen-r2.md, 2026-11-12); every page type and host >= 8 (independent Opus medium critics)';
+const OPS_DF_IDS = [
+    'division:div_facts',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW])]);

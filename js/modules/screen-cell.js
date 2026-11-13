@@ -28,13 +28,14 @@
 // No window writes; no state import.
 
 import { opGlyph, toScreenInstruction, factDigitTracks, factGridStyle, ftAnswerMatches, ftSlots, signOf, parseRule, applyRule, renderCell, resolveCtx, getProvider, roundingLineSVG } from './sheet/index.js';
-import { optionsFor } from './skill-options.js';
+import { optionsFor, normalizeOptions, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
 import { isOrderFreeFamily, familyBoxVerdict, familyValuesFromInputs, familyWant, familyComposedRight } from './number-family-check.js';
 import {
     supportsForItem, canDraw, supportNeeds, touchNumbers, touchColumns, touchNumberHTML, touchOpts, touchDigit,
     withSupports, supportOpKey as opKey,
 } from './sheet/index.js';
 import { SKILLS } from './data.js';
+import { VOCAB_WORDS, vocabExplainLine, vocabHowSteps } from './sheet/lesson-pages/vocab-words.js';
 
 export const INK = '#000000';
 export const PAPER = '#ffffff';
@@ -490,11 +491,21 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     try { def = optionsFor(q.categoryId || categoryId, q.requestedSkillId || q.skillId || skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def && skillId) try { def = optionsFor(categoryId, skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
     if (!def) return null;
-    const chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
+    let chosen = (Array.isArray(o.support) ? o.support : []).filter((v) => def.render.includes(v));
     if (!chosen.length) return null;
     const template = SCREEN_TEMPLATE[k.kind];
     if (!template) return null;
-    const p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
+    let p = { a: k.a, b: k.b, op: k.op, operands: k.operands };
+    // Facts card F2 on screen (lf-ops div_facts screen critic r1 D1 / D2): div_facts' array is the TRUE array paper draws
+    // (print-sheet.js supportPlanFor): the quotient's rows of the divisor's dots in the section's one frame - an empty
+    // frame on 0 ÷ n - and, past the options' reach (a dividend over 50), not drawn at all, as on paper.
+    const cat0 = q.categoryId || categoryId, sk0 = q.requestedSkillId || q.skillId || skillId;
+    const divArr = cat0 === 'division' && sk0 === 'div_facts' && opKey(k.op) === '/' && chosen.includes('array');
+    let no = o;
+    if (divArr) { try { no = normalizeOptions(cat0, sk0, o); } catch (e) { no = o; } }
+    if (divArr && divFactsMaxDividend(no) > DIV_ARRAY_MAX) { chosen = chosen.filter((x) => x !== 'array'); if (!chosen.length) return null; }
+    const arrayFrame = divArr && chosen.includes('array');
+    if (arrayFrame) p = Object.assign({}, p, { arrayFrame: true });
     const can = chosen.filter((id) => canDraw(id, p, template));
     if (!can.length) return null;
     const need = Object.fromEntries(can.map((id) => [id, supportNeeds(id, p, template)]));
@@ -502,6 +513,10 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     if (!r.on.length) return null;
     const out = { on: r.on };
     if (opKey(k.op) === '/') out.tally = Number(o.band) >= 144 ? 12 : 10;
+    if (arrayFrame) {
+        out.tally = Number(no.band) >= 144 ? 12 : 10;
+        out.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(no) / out.tally), rows: out.tally };
+    }
     if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
         const cs = o.constant;
         if (cs.includes(k.a) !== cs.includes(k.b)) out.table = cs.includes(k.a) ? k.a : k.b;
@@ -795,7 +810,8 @@ function _badgeSoon() {
 }
 function _badgeTrack(el) {
     if (typeof document === 'undefined' || !document.body) return;
-    const host = el.closest('#questionCard, .problem-card');
+    // (lf-vocab r10, critic r9 #1: a picture-vocabulary box in the quiz carries the card's tick / cross badge too)
+    const host = el.closest('#questionCard, .problem-card') || (el.closest('.mq-vm') && el.closest('.qt-question-card'));
     if (!host) return;
     pruneBadges();
     if (!BADGES.has(el)) {
@@ -1102,6 +1118,134 @@ function _liveBindFn(el, fn, group = [], want = null) {
     }
     _liveMark(el, false);
     return true;
+}
+
+/** lf-vocab r12 (critic r11 #4): blur the focused vocabulary slot, whichever card holds it, so Check leaves no caret in a box. */
+export function blurVocabSlots(doc) {
+    try {
+        const ae = doc && doc.activeElement;
+        if (ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line') && typeof ae.blur === 'function') ae.blur();
+    } catch (e) { /* no document */ }
+}
+
+/**
+ * THE VOCABULARY FEEDBACK (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). After the pupil's answer is judged on a
+ * screen host (the practice card, the online worksheet, the quiz with instant feedback), a twin vocabulary cell
+ * (vocab-pick3, vocab-match3):
+ *   - shows each picture's FOCAL part with a thick highlight (its halo, drawn hidden by vocab-pictures.js, is shown by the
+ *     class `mq-vfb` on the cell: css/screen-cell.css);
+ *   - makes the right word glow yellow (pick3: the bank word; Match 3: each word whose box holds its right letter);
+ *   - on a WRONG answer shows "The answer is <word>! <explain>" under the cell (Match 3, r8: "<Word> is picture <L>!
+ *     <explain>", one line a wrongly matched word, and only those pictures glow, each with its letter), then its own
+ *     "Here is how" (the same on every wrong card; the support ladder's worked box is hidden while it shows)
+ *     and hands that text once to `speak` (the host passes hints-speech.js speakExplanation, which the sound toggle mutes).
+ * Before the answer the cell is unchanged. Calling it again (a second try) replaces the earlier feedback. Every mark it shows
+ * carries `mq-v-feedback`, which FEEDBACK_RE keeps out of the cell's black-and-white ink pass (monoCell): feedback chrome.
+ * @returns {string} the explanation shown ('' for a right answer or a cell that is not a vocabulary cell)
+ */
+export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
+    if (!root || !q || !q.cell || !q.cell.payload) return '';
+    const tpl = q.cell.template;
+    if (tpl !== 'vocab-pick3' && tpl !== 'vocab-match3') return '';
+    const cell = root.querySelector(tpl === 'vocab-pick3' ? '.mq-vp' : '.mq-vm');
+    if (!cell) return '';
+    const p = q.cell.payload;
+    const norm = (s) => String(s == null ? '' : s).trim().toLowerCase();
+    const cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+    // (a second try replaces the earlier feedback: every mark this function adds is cleared first)
+    cell.querySelectorAll('.mq-vglow').forEach((el) => el.classList.remove('mq-vglow', 'mq-v-feedback'));
+    cell.querySelectorAll('.mq-vpic-on').forEach((el) => el.classList.remove('mq-vpic-on'));
+    cell.querySelectorAll('.mq-vglow-let').forEach((el) => el.classList.remove('mq-vglow-let', 'mq-v-feedback'));
+    cell.querySelectorAll('.mq-vp-line.box-wrong').forEach((el) => el.classList.remove('box-wrong', 'mq-v-feedback'));
+    cell.classList.remove('mq-vfb-some');
+    root.classList.remove('mq-vexplained');
+    const old = cell.parentElement && cell.parentElement.querySelector(':scope > .mq-vexplain');
+    if (old) old.remove();
+    cell.classList.add('mq-vfb');
+    const LET = ['A', 'B', 'C'];
+    let wrong = [];                     // [{word, letter}] (letter: Match 3 only)
+    if (tpl === 'vocab-pick3') {
+        const btn = Array.from(cell.querySelectorAll('button[data-mq-choice]')).find((b) => norm(b.getAttribute('data-mq-choice')) === norm(p.word));
+        if (btn) btn.classList.add('mq-vglow', 'mq-v-feedback');
+        if (!ok) {
+            wrong = [{ word: String(p.word) }];
+            // (r8, critic r6 #5: the wrong word on the line carries the slot's wrong outline)
+            const line = cell.querySelector('.mq-vp-line');
+            if (line) line.classList.add('box-wrong', 'mq-v-feedback');
+        }
+    } else {
+        const words = p.words || [];
+        const order = Array.isArray(p.order) && p.order.length === words.length ? p.order : words.map((_, i) => i);
+        const rows = Array.from(cell.querySelectorAll('.mq-vm-word'));
+        order.forEach((wi, n) => {
+            const row = rows[n];
+            if (!row) return;
+            const box = row.querySelector('.mq-vm-box');
+            const inp = box && box.querySelector('input');
+            const got = norm(inp ? inp.value : box ? box.textContent : '');
+            const right = got === norm(LET[wi]);
+            if (right || ok) {
+                const b = row.querySelector('b'); if (b) b.classList.add('mq-vglow', 'mq-v-feedback');
+                // (lf-vocab r10, critic r9 #1: a right letter box is marked right on every host - the quiz too, where the live
+                // marks are off - so it carries the card's green fill and tick; ws-next-box NB8)
+                if (inp && got) markBoxSubmitted(inp, true);
+            }
+            else {
+                wrong.push({ word: String(words[wi]), letter: LET[wi], pic: wi });
+                // (critic r7 #1, lf-vocab r9: EVERY wrong letter box is marked wrong on every host - the quiz too, where the
+                // live marks are off - so its red wins over the next-box ring; ws-next-box NB6)
+                if (inp) markBoxSubmitted(inp, false);
+            }
+        });
+        // (r8, critic r6 #1: after a wrong answer ONLY the pictures of the wrongly matched words glow, each with its letter;
+        // a right answer lights every picture)
+        if (!ok && wrong.length) {
+            cell.classList.add('mq-vfb-some');
+            const pics = Array.from(cell.querySelectorAll('.mq-vm-pic'));
+            for (const w of wrong) {
+                const pic = pics[w.pic];
+                if (!pic) continue;
+                pic.classList.add('mq-vpic-on');
+                const let_ = pic.querySelector('.mq-vm-let');
+                if (let_) let_.classList.add('mq-vglow-let', 'mq-v-feedback');
+            }
+        }
+    }
+    // (lf-vocab r11, critic r10 #4: Check leaves no caret in a vocab slot - a focused wrong box showed a text caret inside its
+    // red edge; ws-next-box NB9)
+    // (r12, critic r11 #4: the caret moved to card 3 - Check blurs a vocab slot on EVERY card, not only this one)
+    blurVocabSlots(cell.ownerDocument);
+    if (ok || !wrong.length) return '';
+    // the line names the RESPONSE the pupil gives: pick3 writes the word ("The answer is step!"), Match 3 writes the letter
+    // ("Input is picture C!"); then the word's explanation (R-2)
+    const lines = wrong.map((w) => {
+        const ex = VOCAB_WORDS[w.word] && VOCAB_WORDS[w.word].explain;
+        if (tpl === 'vocab-match3') return VOCAB_WORDS[w.word] ? `${cap(w.word)} is picture ${w.letter}!${ex ? ' ' + ex : ''}` : '';
+        return vocabExplainLine(w.word) || (VOCAB_WORDS[w.word] ? `The answer is ${w.word}!` : '');
+    }).filter(Boolean);
+    if (!lines.length) return '';
+    // "Here is how", written here so every wrong card on every host shows the same blocks (critic r6 #4): it never repeats
+    // the explanation and never hints at less than it (no first-letter rung, no blank: #2, #3); its last step names the
+    // answer. The support ladder's own worked box and "Not yet" line are hidden while the explanation shows (.mq-vexplained).
+    const how = vocabHowSteps(tpl, p.word, wrong);
+    const box = document.createElement('div');
+    box.className = 'mq-vexplain mq-v-feedback';
+    box.setAttribute('role', 'status');
+    for (const l of lines) { const para = document.createElement('p'); para.textContent = l; box.appendChild(para); }
+    const hw = document.createElement('div');
+    hw.className = 'mq-vhow';
+    const ht = document.createElement('div');
+    ht.className = 'mq-vhow-title';
+    ht.textContent = 'Here is how';
+    const ol = document.createElement('ol');
+    for (const h of how) { const li = document.createElement('li'); li.textContent = h; ol.appendChild(li); }
+    hw.appendChild(ht); hw.appendChild(ol);
+    box.appendChild(hw);
+    cell.insertAdjacentElement('afterend', box);
+    root.classList.add('mq-vexplained');
+    const text = lines.join(' ');
+    if (typeof speak === 'function') { try { speak(text); } catch (_) { /* sound is optional */ } }
+    return text;
 }
 
 /**
@@ -3622,6 +3766,9 @@ export function fitTwinRows(root) {
         const avail = Math.min(box.width, twin.parentElement ? twin.parentElement.clientWidth || box.width : box.width) - 8;
         const over = Array.from(twin.querySelectorAll('*')).reduce((m, el) => {
             const r = el.getBoundingClientRect();
+            // (an element with no box - a cell's own <style>, a hidden word waiting to drop onto vocab-pick3's line - reads as a
+            // 0,0 rect, i.e. as overflow, and shrank the drawing to 57 %: lf-vocab r5, critic r3 #4)
+            if (!r.width && !r.height) return m;
             return Math.max(m, r.right - box.right, box.left - r.left);
         }, 0);
         if (over > 1 || tw > avail + 1) {
@@ -3970,9 +4117,58 @@ function pvTimesTwin(q, categoryId) {
     return { mode: 'slots', html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: k + 1, kit: 'pv-times' };
 }
 
+/**
+ * The number-name cell on screen (composing:number_word_form; critic nwf r1 N9, lead ruling: screen parity is a contract rule):
+ * the kit's `words` cell, drawn as on paper, with ONE answer place - the name's answer line takes the host's own input (mode
+ * 'blank'), and the H T O boxes (option answerSlot) are one digit a box, joined left to right into the number (as the pv chart).
+ */
+function wordsTwin(q, categoryId) {
+    if (typeof document === 'undefined') return null;
+    const p = q.cell.payload;
+    if (!p || typeof p !== 'object') return null;
+    let html = '';
+    let digitPt = 28;
+    try {
+        const ctx = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' });
+        digitPt = (ctx.metrics && ctx.metrics.digitPt) || 28;
+        // (on screen the name keeps its own height: the paper's two-line box aligns a printed row, a card has one item)
+        html = renderCell(Object.assign({}, q, { cell: { template: 'words', payload: Object.assign({}, p, { inPlace: false }), v: 1 } }), ctx);
+    } catch (e) { return null; }
+    if (!html) return null;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = _screenSizes(html, digitPt);
+    const slots = Array.from(tpl.content.querySelectorAll('[data-ws-slot]')).filter((s) => s.getAttribute('data-ws-graded') !== '0');
+    if (!slots.length) return null;
+    let mode;
+    if (slots.length === 1) {
+        const b = document.createElement('span');
+        b.className = 'mq-kblank mq-kblank--line';
+        b.setAttribute('data-mq-blank', 'line');
+        slots[0].replaceWith(b);
+        mode = 'blank';
+    } else {
+        const row = tpl.content.querySelector('[data-ws-hto]');
+        if (!row) return null;
+        row.setAttribute('data-mq-join', '');
+        slots.forEach((s, k) => {
+            const t = document.createElement('template');
+            t.innerHTML = cellSlot(1, `digit ${k + 1} of ${slots.length}`, true);
+            const box = t.content.firstChild;
+            box.classList.add('mq-cellbox--chart');
+            s.replaceWith(box);
+        });
+        mode = 'slots';
+    }
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content);
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="words"><div data-ws-cell="words">${wrap.innerHTML}</div></div>`;
+    return { mode, html: body, instr: printInstructionFor(q, categoryId) || plainText(q.text), count: 0, kit: 'words' };
+}
+
 export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const c = q && q.cell;
     if (c && c.template === 'pv-times' && c.payload) return pvTimesTwin(q, categoryId);
+    if (c && c.template === 'words' && c.payload) return wordsTwin(q, categoryId);
     const eqTwin = equationKitTwin(q, categoryId);
     if (eqTwin !== undefined) return eqTwin;
     if (!c || c.template !== 'pv' || !c.payload || typeof c.payload !== 'object') return null;

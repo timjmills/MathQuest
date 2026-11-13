@@ -1290,7 +1290,10 @@ function renderWork(p, ctx) {
     const innerW = 186 / cols - (cols > 1 ? 9 : 10);
     const beside = (p.unit ? { S: 22, M: 25, L: 28 }[sizeOf(ctx)] : 0) + 3;
     const side = !twin && narrow && !two && blockWidthMm(ctx, p.steps[0], p) + (inRow ? beside : 5 + { S: 20, M: 22, L: 24 }[sizeOf(ctx)]) <= innerW;
-    const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
+    // (`storyOnly` / `noStory`: Reason It prints a column story ONCE over its A and B panels, each panel the work only -
+    // lf-roles, word-stories critic r1 F2: the story twice in two half-width panels ran the work out of the cell)
+    if (p.storyOnly) return `<div class="mq-ww" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${KO(ctx, 2.5)};">${storyHTML(ctx, p, true)}</div>`;
+    const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${p.noStory ? '' : storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
         + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '');
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row
     // under it on the left, the columns and the answer on the right. The page then holds three

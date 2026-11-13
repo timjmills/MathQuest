@@ -127,3 +127,25 @@ Report design/audit/runs/lf-ops/critic-factroles-r3.md; renders design/audit/run
 ## Critic factroles r4 (one-page re-check, b606e68a) - PASS, div_facts Scripted Model L 8 / 8 / 8 / 8 on both pages and keys
 Report design/audit/runs/lf-ops/critic-factroles-r4.md; renders design/audit/runs/lf-ops/factroles-r4-renders/. S5 fixed: step-text-to-problem band 25.9-26.9 % (r3 30.3-30.9 %); state 1 bottom band 34.4 % inside PT-MOD-3; mult_facts PNGs byte-identical to r3. No defect.
 Result of the facts-roles task (r1-r4): every graded Guided (S, M, L) and Scripted Model (S, M, L) page of add_facts, sub_facts, mult_facts, div_facts_long and div_facts scores >= 8 (r2 23 pages; r3 mult Model L; r4 div Model L).
+
+## Next week's order (lead, 2026-11-12 evening; cap $45; branch claude/sweet-newton-c8wrv1-lf-ops-divscreen from master d34311d5)
+1. division:div_facts screen hosts (practice card, online worksheet, quiz) for every support, critic >= 8 -> add div_facts to js/modules/redesign-passed.js with its evidence line.
+2. Stories / g3-oa8: E9b / E12 (the regression on the lane branch claude/sweet-newton-c8wrv1-lf-ops) and E35.
+3. MAIN ops skills of the next short lessons, in order: multiplication:mult_properties + arrays_groups + count_by_tables (Properties of multiplication; the #4 fresh-builder brief is in design/status/lf-ops.md on claude/sweet-newton-c8wrv1-lf-ops); multiplication:mult_chart; mult / div_word_problems_plain; addition:add_column_multi. Each: 8/10 critic, deploy branch with PNGs.
+
+## div_facts screen hosts, critic r1 fix round (builder, Opus medium, 2026-11-12)
+- Step 1 (checks): new tests/scripts/ws-screen-support-eq.cjs (SCREEN-SUPPORT-EQ D1/D2, SCREEN-CUE-SIZE D3, SCREEN-SUPPORT-PLACE D4; --self-test 12/12), on precritic's path (gate screen-support-eq). On 1428a84c: FAIL (68) = EQ 22 (array loose pane on every host, nothing on 0 ÷ n in the quiz), CUE 44 (skip 0.19-0.27, think 0.22-0.31 x the fact digit vs paper 0.37 / 0.46), PLACE 2 (touch worksheet 1280 / 820: beside and under mixed).
+- Step 2 (fix): screen-cell.js screenSupportsFor passes div_facts' arrayFrame + tally as print-sheet.js does (and drops the array past 50, as paper); 0 ÷ n draws the empty frame (D1, D2). fact.js factCue `digitMm` + support-draw.js: a ÷ skip strip / think box on screen is calc(var(--mq-digit) x w / 8.47 mm), never under the old px size (D3). worksheet.js _wsOneSupportPlace: when any ÷ card's beside support wraps, every ÷ card puts it under (D4). ws-screen-support-eq: OK (0).
+- Step 3 (gates): ws-screen-answer, ws-phone-card, ws-chromebook-fit, ws-screen-slots (--uniform --baseline), ws-support-ladder on division:div_facts OK; ws-boot-smoke OK; syntax OK. Print unchanged: div_facts Independent / Test x S/M/L x off/touch/skip/array/think/boxsign, 36 html + png hashes before = after.
+- Backtests: rows screen-support-eq-divfacts, screen-cue-size-divfacts, screen-support-place-divfacts (fail 1428a84c, pass d377e32b): 3 PASS; ws-precritic-plan puts all three on div_facts' path (the plan's other 21 misses are older rows of other lanes, unchanged). Ready for the critic's round 2 on the screen hosts.
+
+## div_facts screen hosts (2026-11-12/13) - critic r2 PASS (lowest 8); div_facts added to redesign-passed.js
+- Critic screen r1 FAIL 6 (D1 array drawn as loose counters on screen; D2 0 ÷ 2 empty; D3 cue numbers 0.20 of the digit vs paper 0.38; D4 touch dots placed two ways). Checks: ws-screen-support-eq.cjs (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE; 68 findings on 1428a84c, 0 on d377e32b; 3 backtest rows, on precritic). Fix d377e32b (screen-cell.js, fact.js, support-draw.js, worksheet.js); print hashes 36 / 36 unchanged; screen gates OK.
+- Critic screen r2 (3e8cf77e): PASS, lowest 8 on every host x support (card 1280 / 820 / 390, worksheet, quiz x off, touch, skip, array, think, boxsign). Notes, not scored: N1 array dots 0.15 of the digit on screen (paper 0.33); N2 think box spacing uneven with a one-digit divisor; N3 boxsign "divide" label ~13 px. Report design/audit/runs/lf-ops/critic-divfacts-screen-r2.md; renders divscreen-r2-renders/.
+- redesign-passed.js: division:div_facts added with its evidence line (print aids r8, shared roles factroles r4, screens r2); ws-redesign-passed OK (26).
+| Finding | Check | Backtest | On path |
+|---|---|---|---|
+| D1 screen array != paper | SCREEN-SUPPORT-EQ | yes (fail 1428a84c) | precritic |
+| D2 0 ÷ n empty on screen | SCREEN-SUPPORT-EQ (empty frame) | yes | precritic |
+| D3 cue type small on screen | SCREEN-CUE-SIZE | yes | precritic |
+| D4 support placed two ways | SCREEN-SUPPORT-PLACE | yes | precritic |

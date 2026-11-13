@@ -255,6 +255,11 @@ fixed almost every count (F2). Resolved:
     Remember off + rows 0). The two overlap, so the margin takes the safe side: a value refused, never a blank foot. It is
     10.2 rounded up with headroom, under the 13.2 mm of placevalue:value L rows 0, whose printed foot (33.2 mm) holds no
     47.1 mm row. Backtest **ROWFIT-BT**: 10 mm and 14 mm both FAIL.
+    *Deploy merge 2026-11-13:* master's lesson sheets moved that pair (expand L Remember off 10.2 -> 15.9 mm, its foot no
+    longer holds a row; value L rows 0 13.2 -> 26.4 mm). ROWFIT-BT is re-pinned on a 672-state sweep of the merged tree to
+    placevalue:value M We Do 1 (11.4 mm, foot 35.0 >= 33.7 row, no rows) and placevalue:combine L rows 0 (13.5 mm, foot 28.5 <
+    29.4). The same sweep shows one no-rows sheet whose foot holds a row at 12.4 mm (placevalue:identify L We Do off, foot 68.9
+    >= 64.8): over the 12 mm margin, so the safe-side claim above needs the lane to re-check the margin on master's sheets.
   - **`BAND_SLACK_MM` 2 mm** (`part-opts.js`, new in 3b). A planned cell's band is its height less the bridge's measured
     needed height (`measured[c].neededMm`: its lowest ink plus its bottom padding, read with `measureCells`' own ink rule).
     Near the 30 % line it reads up to 1.0 mm narrower than the printed band (div_facts M Vocabulary + Remember off: planned
