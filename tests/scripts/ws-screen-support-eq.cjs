@@ -10,9 +10,14 @@
 //                        >= 0.9 x paper's ratio (paper's ratio measured on the Independent page at M: about 0.38).
 //   SCREEN-SUPPORT-PLACE (D4) on one online worksheet the support stands at ONE place (beside or under the fact) in
 //                        every card.
+//   ARRAY-ORIENT         (owner 2026-11-13, "arrays landscape so they can be bigger") a ÷ fact's framed array whose item has
+//                        2 or more rows (the divisor) is drawn LANDSCAPE: its frame's drawn width >= its height, on every
+//                        screen host and on the paper Independent page at S, M and L (0 ÷ n: the empty frame too).
+//   ARRAY-DOT-MIN        (same ruling) the screen array dot stands to the fact digit at >= paper's ratio (CUE-SIZE's
+//                        convention, paper measured on the Independent page at M): never smaller than the print dot.
 //
 //   node tests/scripts/ws-screen-support-eq.cjs                          # division:div_facts
-//   node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ,CUE,PLACE
+//   node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ,CUE,PLACE,ORIENT,DOTMIN
 //   node tests/scripts/ws-screen-support-eq.cjs --self-test             # the pure rules, no browser
 // A skill with no supports model is reported "no supports" (nothing to compare). Prints one line per finding, then
 // `ws-screen-support-eq: OK` or `FAIL (n)`; exits 1 on FAIL.
@@ -41,7 +46,8 @@ function eqFinding(id, paper, screen, item) {
     const pk = sigKey(paper), sk = sigKey(screen);
     if (pk !== sk) return `${id}: screen draws "${sk}", paper "${pk}"`;
     if (screen && screen.kind === 'frame-array' && item) {
-        const want = item.a === 0 ? 'no dots' : `array, ${item.a / item.b} rows of ${item.b}`;
+        // (owner 2026-11-13: landscape - the divisor's rows of the quotient's dots)
+        const want = item.a === 0 ? 'no dots' : `array, ${item.b} rows of ${item.a / item.b}`;
         if (screen.label !== want) return `${id}: ${item.a} ÷ ${item.b} array "${screen.label}", want "${want}"`;
     }
     return null;
@@ -50,6 +56,16 @@ function eqFinding(id, paper, screen, item) {
 function cueFinding(id, paperRatio, screenRatio) {
     if (!(paperRatio > 0) || !(screenRatio > 0)) return null;
     return screenRatio < 0.9 * paperRatio ? `${id}: cue text ${screenRatio.toFixed(2)} x the fact digit, paper ${paperRatio.toFixed(2)} (needs >= ${(0.9 * paperRatio).toFixed(2)})` : null;
+}
+/** ORIENT: a framed array of 2 or more rows (the item's divisor) is drawn landscape (width >= height). */
+function orientFinding(id, sig, item) {
+    if (!sig || sig.kind !== 'frame-array' || !item || !(item.b >= 2) || !(sig.wPx > 0)) return null;
+    return sig.wPx + 0.5 < sig.hPx ? `${id}: ${item.a} ÷ ${item.b} array ${sig.wPx.toFixed(0)} x ${sig.hPx.toFixed(0)} px is portrait (want width >= height)` : null;
+}
+/** DOTMIN: the screen dot (diameter / fact digit) against paper's. */
+function dotFinding(id, paperRatio, screenRatio) {
+    if (!(paperRatio > 0) || !(screenRatio > 0)) return null;
+    return screenRatio < 0.98 * paperRatio ? `${id}: array dot ${screenRatio.toFixed(3)} x the fact digit, paper ${paperRatio.toFixed(3)} (never smaller than the print dot)` : null;
 }
 /** PLACE: one place across a worksheet's cards. */
 function placeFinding(id, places) {
@@ -62,11 +78,18 @@ function selfTest() {
     const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
     eq('under', placeOf({ top: 0, bottom: 50 }, { top: 60, bottom: 90 }), 'under');
     eq('beside', placeOf({ top: 0, bottom: 50 }, { top: 0, bottom: 90 }), 'beside');
-    eq('array same', eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, { kind: 'frame-array', frame: '12.0x34.6', label: 'array, 3 rows of 4' }, { a: 12, b: 4 }), null);
+    eq('array same', eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, { kind: 'frame-array', frame: '12.0x34.6', label: 'array, 4 rows of 3' }, { a: 12, b: 4 }), null);
     eq('array loose (D1)', !!eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, { kind: 'pane' }, { a: 12, b: 4 }), true);
     eq('array none on 0 (D2)', !!eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, null, { a: 0, b: 2 }), true);
     eq('array empty frame on 0', eqFinding('array', { kind: 'frame-array', frame: '12.0x34.6' }, { kind: 'frame-array', frame: '12.0x34.6', label: 'no dots' }, { a: 0, b: 2 }), null);
     eq('array wrong rows', !!eqFinding('array', { kind: 'frame-array', frame: 'f' }, { kind: 'frame-array', frame: 'f', label: 'array, 2 rows of 4' }, { a: 12, b: 4 }), true);
+    eq('array portrait rows (old)', !!eqFinding('array', { kind: 'frame-array', frame: 'f' }, { kind: 'frame-array', frame: 'f', label: 'array, 3 rows of 4' }, { a: 12, b: 4 }), true);
+    eq('orient portrait', !!orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 28, b: 4 }), true);
+    eq('orient landscape', orientFinding('array', { kind: 'frame-array', wPx: 160, hPx: 50 }, { a: 28, b: 4 }), null);
+    eq('orient empty frame portrait', !!orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 0, b: 3 }), true);
+    eq('orient 1 row free', orientFinding('array', { kind: 'frame-array', wPx: 40, hPx: 120 }, { a: 7, b: 1 }), null);
+    eq('dot small', !!dotFinding('array', 0.33, 0.15), true);
+    eq('dot ok', dotFinding('array', 0.33, 0.40), null);
     eq('tally count', !!eqFinding('touch', { kind: 'tally', n: 12 }, { kind: 'tally', n: 10 }), true);
     eq('cue small (D3)', !!cueFinding('skip', 0.38, 0.20), true);
     eq('cue ok', cueFinding('skip', 0.38, 0.36), null);
@@ -107,7 +130,10 @@ function readCellsInPage({ sel, cellSel }) {
             else if (skip) sig = { kind: 'skip', n: skip.querySelectorAll('[data-ws-term]').length };
             else if (svg && /^(array, \d+ rows of \d+|no dots)$/.test(svg.getAttribute('aria-label') || '') && svg.firstElementChild && svg.firstElementChild.tagName.toLowerCase() === 'rect') {
                 const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
-                sig = { kind: 'frame-array', frame: `${(vb[2] || 0).toFixed(1)}x${(vb[3] || 0).toFixed(1)}`, label: svg.getAttribute('aria-label') };
+                const br = svg.getBoundingClientRect(), k = br.width / (vb[2] || 1);
+                const c0 = svg.querySelector('circle');
+                sig = { kind: 'frame-array', frame: `${(vb[2] || 0).toFixed(1)}x${(vb[3] || 0).toFixed(1)}`, label: svg.getAttribute('aria-label'),
+                    wPx: br.width, hPx: br.height, dotPx: c0 ? 2 * Number(c0.getAttribute('r')) * k : 0 };
             } else if (svg && /^think/.test(svg.getAttribute('aria-label') || '')) sig = { kind: 'think' };
             else if (id === 'array' && s.querySelector('svg, [data-ws-pane]')) sig = { kind: 'pane' };
             else if (svg) sig = { kind: 'svg:' + ((svg.getAttribute('class') || '').split(/\s+/)[0] || 'svg') };
@@ -128,7 +154,7 @@ function readCellsInPage({ sel, cellSel }) {
                 const a = pb.getBoundingClientRect(), b = s.getBoundingClientRect();
                 place = b.top >= a.bottom - 2 ? 'under' : 'beside';
             }
-            sups[id] = { sig, ratio: textPx && digitPx ? textPx / digitPx : 0, place };
+            sups[id] = { sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: sig.dotPx && digitPx ? sig.dotPx / digitPx : 0, place };
         }
         out.push({ item, sups, digitPx });
     }
@@ -139,7 +165,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -161,22 +187,37 @@ function readCellsInPage({ sel, cellSel }) {
                 const opts = Object.assign({ support: [sup] }, (def.base && def.base[sup]) || {});
                 const tag = `${key} ${sup}`;
                 // ---- paper: the Independent page at M (one frame for the section, the section's tally / strip)
-                const paperDoc = await page.evaluate(async ({ cat, skill, opts }) => {
-                    const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: skill, opts }] }], size: 'M', paper: 'A4', seed: 7, key: false });
-                    return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' });
-                }, { cat, skill, opts });
-                const sh = await app.browser.newPage();
-                await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
-                await sh.goto(page.url());
-                await sh.setContent(paperDoc, { waitUntil: 'networkidle0' });
-                await sh.evaluate(() => document.fonts.ready);
-                const paper = await sh.evaluate(readCellsInPage, { sel: 'body', cellSel: '.ws-cell' });
-                await sh.close();
-                renders++;
+                const paperAt = async (size) => {
+                    const paperDoc = await page.evaluate(async ({ cat, skill, opts, size }) => {
+                        const r = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: cat, skillId: skill, opts }] }], size, paper: 'A4', seed: 7, key: false });
+                        return window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' });
+                    }, { cat, skill, opts, size });
+                    const sh = await app.browser.newPage();
+                    await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+                    await sh.goto(page.url());
+                    await sh.setContent(paperDoc, { waitUntil: 'networkidle0' });
+                    await sh.evaluate(() => document.fonts.ready);
+                    const r = await sh.evaluate(readCellsInPage, { sel: 'body', cellSel: '.ws-cell' });
+                    await sh.close();
+                    renders++;
+                    return r;
+                };
+                const paper = await paperAt('M');
+                // ARRAY-ORIENT on paper: the Independent page at S, M and L
+                if (ONLY.includes('ORIENT') && sup === 'array') {
+                    for (const size of ['S', 'M', 'L']) {
+                        const pr = size === 'M' ? paper : await paperAt(size);
+                        for (const c of (pr.cells || []).filter((x) => x.item && x.sups[sup])) {
+                            const f = orientFinding(sup, c.sups[sup].sig, c.item);
+                            if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                        }
+                    }
+                }
                 const pCells = (paper.cells || []).filter((c) => c.sups[sup]);
                 if (!pCells.length) { console.log(`${tag}: paper draws no ${sup} (nothing to compare)`); continue; }
                 const pSig = pCells[0].sups[sup].sig;
                 const pRatio = Math.max(...pCells.map((c) => c.sups[sup].ratio || 0));
+                const pDot = Math.max(...pCells.map((c) => c.sups[sup].dotRatio || 0));
                 // ---- screen hosts
                 const hosts = [];
                 await page.evaluate(({ cat, skill, opts }) => { window.clearSetOptions({ silent: true }); window.setSetOptions(cat, skill, opts, { silent: true }); }, { cat, skill, opts });
@@ -244,6 +285,14 @@ function readCellsInPage({ sel, cellSel }) {
                             const f = eqFinding(sup, pSig, s ? s.sig : null, c.item);
                             if (f) findings.push(`SCREEN-SUPPORT-EQ ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
                         }
+                        if (ONLY.includes('ORIENT') && s) {
+                            const f = orientFinding(sup, s.sig, c.item);
+                            if (f) findings.push(`ARRAY-ORIENT ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                        }
+                        if (ONLY.includes('DOTMIN') && s && s.dotRatio) {
+                            const f = dotFinding(sup, pDot, s.dotRatio);
+                            if (f) findings.push(`ARRAY-DOT-MIN ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
+                        }
                         if (ONLY.includes('CUE') && s && s.ratio) {
                             const f = cueFinding(sup, pRatio, s.ratio);
                             if (f) findings.push(`SCREEN-CUE-SIZE ${key} ${h.host} ${c.item.a} ÷ ${c.item.b}: ${f}`);
@@ -254,7 +303,8 @@ function readCellsInPage({ sel, cellSel }) {
                         if (f) findings.push(`SCREEN-SUPPORT-PLACE ${key} ${h.host}: ${f}`);
                     }
                 }
-                console.log(`${tag}: paper "${sigKey(pSig)}"${pRatio ? ` cue ratio ${pRatio.toFixed(2)}` : ''}; ${hosts.length} screen renders`);
+                const sDots = hosts.flatMap((h) => ((h.r && h.r.cells) || []).map((c) => (c.sups[sup] && c.sups[sup].dotRatio) || 0)).filter((x) => x > 0);
+                console.log(`${tag}: paper "${sigKey(pSig)}"${pRatio ? ` cue ratio ${pRatio.toFixed(2)}` : ''}${pDot ? ` dot ratio ${pDot.toFixed(3)}` : ''}${sDots.length ? ` (screen ${Math.min(...sDots).toFixed(3)}-${Math.max(...sDots).toFixed(3)})` : ''}; ${hosts.length} screen renders`);
             }
             await page.evaluate(() => { try { window.clearSetOptions({ silent: true }); } catch (e) {} });
         }
@@ -268,4 +318,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding };
