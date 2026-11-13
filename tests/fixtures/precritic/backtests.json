@@ -3340,6 +3340,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vq-live-bands-word-stories",
+   "check": "VQ-LIVE on every offered band value of the word-stories skills: no x / div sign choice on a + / - story, no unit-bank word the story never says, no column grid for a story whose numbers are all within 20 (word-stories critic r1 F4, lf-builds 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-LIVE @band (L13, VQ-3, L29)",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "the hosts at band none / 100 and the presets at band none / 100: sign row offers x div, bank 'boxes, days', 3-track grids for small stories (hosts pinned on the default page only)"
+   },
+   "pass": {
+    "commit": "adbd6a6c2",
+    "state": "0 findings on the 7 skills at every band value; the hosts unpinned (IN_SCOPE)"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
