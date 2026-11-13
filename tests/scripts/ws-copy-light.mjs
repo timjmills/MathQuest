@@ -132,6 +132,16 @@ export function eligibility(info, passed) {
     return { skill: info.key, eligible: !reasons.length, anchors, reasons };
 }
 
+/**
+ * COPYLIGHT-ADVISORY (lead decision 2026-11-13, design/lessons-first/LEAD_DECISIONS.md; evidence critic-lf-tools-r3.md):
+ * the drawing identity behind eligibility failed three critic rounds (r1 B1, r2 D1, r3 E1-E4), so the verdict is ADVISORY.
+ * The tool still prints ELIGIBLE / NOT ELIGIBLE and writes the sample, but the critic route of EVERY skill is FULL: no review
+ * is skipped on this tool's say-so until template-declared drawing keys land (QUEUE.md, parked under the FOCUS rule).
+ */
+export const ADVISORY = { on: true, id: 'COPYLIGHT-ADVISORY', why: 'lead 2026-11-13: eligibility is advisory; every skill takes the FULL critic' };
+/** The critic a skill takes: 'FULL' always while ADVISORY is on, else 'NARROW' when eligible. Pure. */
+export function criticRoute(v) { return ADVISORY.on ? 'FULL' : (v && v.eligible ? 'NARROW' : 'FULL'); }
+
 /** The batch verdict: {ok, template, reasons}. `verdicts` from eligibility(), `infos` the same skills' infos. Pure. */
 export function batchCheck(infos, verdicts) {
     const reasons = [];
@@ -265,6 +275,7 @@ async function selfTest() {
     const bad = [];
     let n = 0;
     const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
+    eq('COPYLIGHT-ADVISORY: an eligible verdict still routes to the FULL critic', [ADVISORY.on, criticRoute({ eligible: true }), criticRoute({ eligible: false })], [true, 'FULL', 'FULL']);
     const R3 = ['independent', 'guided', 'test'];
     const anchor = { key: 'addition:add_facts', templates: { fact: 8 }, roles: [...R3, 'fact-rows'], hosts: DEFAULT_HOSTS, hasCard: true };
     const stackA = { key: 'subtraction:sub_50_no_regroup', templates: { stack: 8 }, roles: R3, hosts: DEFAULT_HOSTS, hasCard: true };
@@ -522,6 +533,7 @@ async function main() {
         if (app.rp.REDESIGN_PASSED.has(v.skill)) console.log(`    note: ${v.skill} is already in redesign-passed.js (it is not its own anchor)`);
         for (const an of v.anchors) console.log(`    anchor: ${an.anchor} passed on template ${an.template} (${(app.rp.REDESIGN_EVIDENCE[an.anchor] || '').slice(0, 110)}…)`);
         for (const r of v.reasons) console.log(`    why not: ${r} -> FULL critic`);
+        console.log(`    critic: ${criticRoute(v)}${ADVISORY.on ? ` (${ADVISORY.id}: ${ADVISORY.why})` : ''}`);
     }
     let bv = null;
     if (batch.length) {
@@ -544,6 +556,8 @@ async function main() {
             page: 'role (null on a screen host), size (S / M / L; null on a screen host), seed (generateQuestionFor / buildSheet seed), host (print | practice-card | online-worksheet | quiz), width (screen px), option / value / opts (the option value this page shows; null = the defaults)',
             verdicts: verdicts.map((v, k) => ({ ...v, templates: infos[k].templates, roles: infos[k].roles, hosts: infos[k].hosts, rolesFrom: infos[k].rolesFrom, cards: infos[k].cards })),
             batch: bv,
+            advisory: ADVISORY.on ? ADVISORY : null,
+            critic: ADVISORY.on ? 'FULL' : 'NARROW',
             ...sample,
         };
         mkdirSync(dirname(resolve(out)), { recursive: true });
@@ -557,7 +571,7 @@ async function main() {
     const require = a.includes('--require') || batch.length > 0;
     const fail = briefBad.length > 0 || (batch.length ? !bv.ok : require && nNot > 0);
     const summary = briefBad.length ? `the critic brief names its criteria unlike RUBRIC.md (${briefBad.length}; --brief-lint)` : batch.length ? `batch of ${batch.length}${bv.ok ? ` on ${bv.template}` : ''}: ${bv.ok ? 'one passed template' : bv.reasons[0]}` : `${elig.length} eligible, ${nNot} need a full critic${require ? '' : ' (report)'}`;
-    console.log(`${TOOL}: ${fail ? 'FAIL' : 'OK'} (${summary})`);
+    console.log(`${TOOL}: ${fail ? 'FAIL' : 'OK'} (${summary}${ADVISORY.on ? `; ${ADVISORY.id}: every skill takes the FULL critic` : ''})`);
     process.exit(fail ? 1 : 0);
 }
 
