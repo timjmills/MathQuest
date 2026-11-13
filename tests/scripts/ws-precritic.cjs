@@ -755,11 +755,11 @@ function buildPlan(ctx) {
         add(gate('precritic-clean', 'ws-precritic-clean (the lane status clean list: no open critic finding, every claimed role page-fill linted)', scope, 'node', 'ws-precritic-clean', ['--skill', keys.join(',')], { missingMsg: 'ws-precritic-clean is not in this tree' }));
         // (lf-algebra r10, critic r2 G5 / G6 / G8: the patterns cells against the page - Fix-it letters printed in the item, the card's
         // feature tile size, the growing row two across at S; OK (n/a) for a skill outside the patterns card)
-        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
+        add(gate('patterns-cells', 'ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S, HINT-ON-TEST, STATE-PROGRESS)', scope, 'node', 'ws-patterns-cells', ['--skill', keys.join(',')], { missingMsg: 'ws-patterns-cells is not in this tree' }));
         // (lf-algebra two-step build 2026-11-13, owner rule "each finding a check before its fix": the two-step card's decisions
         // 2 / 4 / 5 / 6 - within N on every computed number, the answer no story number, both bars drawn and Step 2 carrying
         // the Step 1 answer, (Visual) differs from _plain, the middle question only on teaching cells; OK (n/a) off the card)
-        add(gate('two-step', 'ws-two-step (WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0)', scope, 'node', 'ws-two-step', ['--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
+        add(gate('two-step', 'ws-two-step (WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS)', scope, 'node', 'ws-two-step', ['--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));
         // (lf-algebra, lead ruling R1 2026-11-13: multi_step_word (Visual) practice pages hold the card's ruled capacity S 2 / M 1 / L 1
         // with no cell stretched past a 30 % band under its work; browser, OK (n/a) without multi_step_word)
         add(gate('two-step-print', 'ws-two-step --print (CAP-BAND: (Visual) capacity S 2 / M 1 / L 1, no 30 % band on independent / more-practice / test)', scope, 'browser', 'ws-two-step', ['--print', '--skill', keys.join(',')], { missingMsg: 'ws-two-step is not in this tree' }));

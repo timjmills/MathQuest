@@ -59,6 +59,11 @@
 //                   role-too-long) and a multi-slot cell may not print the whole statement in every slot (kind
 //                   whole-in-every-slot: "5 + 0 + 3" in each of three boxes).
 //                   --rule-skills a:b,c:d runs these two only on those skills (ws-precritic passes the opted-in lane's).
+//   STEPS-FOLLOW-PRESET (lf-algebra critic r1 F6, L28; opt-in) a PRESET skill's Guided / Model Steps band - the guided role's
+//                   own stepsOf() over the page's dealt items - prints no line of the HOST's default steps that none of the
+//                   preset's own items gives (pattern_features printed notice_patterns' parity steps over feature items: the
+//                   items' steps differed, so the band took the provider's item-less strings, which fell to the host default).
+//                   Judged on every preset skill (skill-presets.js) the run covers; any other skill: skipped.
 //
 // Baseline: design/audit/baselines/node-lint.json pins today's FINDING KEYS per skill (critic r1 D5), not counts. A key
 // is rule|kind|#item|signature: the dealt item (seed hashSeed(category:skill) + index, so stable) and the normalised
@@ -91,7 +96,7 @@ const argAll = (f) => args.flatMap((a, i) => (a === f && i + 1 < args.length ? S
 const ALL_RULES = ['NOTATION', 'L1', 'L3', 'L6', 'L10', 'REPEATS'];
 // Lane S1 rules: OPT-IN (run only when --rules names them), so the default sweep and its pinned baseline are unchanged;
 // ws-precritic runs them per skill against tests/fixtures/precritic/node-lint-s1.baseline.json.
-const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'WRONG-FITS-SLOTS', 'WRONG-FILL'];
+const EXTRA_RULES = ['LESSON-DATA', 'OPTION-HELP', 'WRONG-FITS', 'WRONG-FITS-SLOTS', 'WRONG-FILL', 'STEPS-FOLLOW-PRESET'];
 const RULE_CITES = {
     NOTATION: 'C4; WORKSHEET_DESIGN_STANDARD TY-6, TY-7; PEDAGOGY_STANDARD 10.1 (P-14)',
     L1: 'LESSONS_LEARNED L1; WORKSHEET_DESIGN_STANDARD DN-1a',
@@ -739,6 +744,14 @@ if (rules.includes('LESSON-DATA') || rules.includes('OPTION-HELP')) {
     } catch (e) { skillOptions = { loadError: String(e && e.message || e) }; }
     unmute();
 }
+// STEPS-FOLLOW-PRESET: the preset table and the guided role's Steps band (both pure)
+let presetsMod = null, guidedRole = null;
+if (rules.includes('STEPS-FOLLOW-PRESET')) {
+    mute();
+    try { presetsMod = await import(M('skill-presets.js')); } catch (e) { presetsMod = null; }
+    try { guidedRole = await import(M('sheet/roles/guided.js')); } catch (e) { guidedRole = null; }
+    unmute();
+}
 const LIVE_KEYS = new Set();
 for (const [cat, list] of Object.entries(data.SKILLS)) for (const s of list || []) if (s && s.v && !s.retired) LIVE_KEYS.add(`${cat}:${s.v}`);
 
@@ -1269,6 +1282,36 @@ function ruleRepeats(key, cells) {
     });
 }
 
+/** STEPS-FOLLOW-PRESET (see the header): a preset's Steps band never prints the host default's lines its items do not give. */
+function ruleStepsFollowPreset(key, cat, skill, cells) {
+    const R = 'STEPS-FOLLOW-PRESET';
+    const pre = presetsMod && typeof presetsMod.presetOf === 'function' ? presetsMod.presetOf(cat, skill) : null;
+    if (!pre) { skip(R, 'not a preset skill (skills)'); return; }
+    if (!guidedRole || typeof guidedRole.stepsOf !== 'function') { skip(R, 'no sheet/roles/guided.js stepsOf in this tree (skills)'); return; }
+    const lines = (raw) => (Array.isArray(raw) ? raw.map((x) => String(x && typeof x === 'object' ? x.text || '' : x || '').trim())
+        : typeof raw === 'string' ? raw.split(/\n|(?<=\.)\s+(?=[A-Z])/).map((x) => x.trim()) : []).filter(Boolean);
+    let p = null, host = null;
+    try { p = kit.getProvider(cat, skill); host = kit.getProvider(pre.categoryId, pre.skillId); } catch (e) { p = null; }
+    if (!p || !host) { skip(R, 'no provider (skills)'); return; }
+    const items = cells.slice(0, 12).map((c) => ({ q: Object.assign({ categoryId: cat, skillId: skill }, c.q) }));
+    if (!items.length) { skip(R, 'no items (skills)'); return; }
+    let page = [], hostDef = [];
+    const own = new Set();
+    mute();
+    try {
+        page = guidedRole.stepsOf(items) || [];
+        for (const it of items) {
+            const raw = typeof p.strings === 'function' ? p.strings({ categoryId: cat, skillId: skill, label: it.q.skillLabel, q: it.q }) : p.strings;
+            for (const l of lines(raw && raw.steps)) own.add(l);
+        }
+        const hr = typeof host.strings === 'function' ? host.strings({ categoryId: pre.categoryId, skillId: pre.skillId }) : host.strings;
+        hostDef = lines(hr && hr.steps);
+    } catch (e) { page = []; } finally { unmute(); }
+    tick(R, 1);
+    const stray = page.map((l) => String(l).trim()).filter((l) => !own.has(l) && hostDef.includes(l));
+    if (stray.length) find(key, R, 0, 'host-steps', `the Steps band prints ${stray.length} line(s) of the host ${pre.skillId}'s default steps that no ${skill} item gives (e.g. "${clip(stray[0], 60)}"): the page steps follow the host, not the preset`, stray.join('|'));
+}
+
 /* ============================================================================== run */
 
 const T1 = Date.now();
@@ -1293,6 +1336,7 @@ for (const subject of subjects) {
     const ruleSkillOk = !RULE_SKILLS.length || RULE_SKILLS.includes(subject.key);
     if (rules.includes('WRONG-FITS-SLOTS')) { if (ruleSkillOk) ruleWrongFitsSlots(subject.key, cat, skill, cells); else skip('WRONG-FITS-SLOTS', 'not in --rule-skills (skills)'); }
     if (rules.includes('WRONG-FILL')) { if (ruleSkillOk) ruleWrongFill(subject.key, cells); else skip('WRONG-FILL', 'not in --rule-skills (skills)'); }
+    if (rules.includes('STEPS-FOLLOW-PRESET')) { if (ruleSkillOk) ruleStepsFollowPreset(subject.key, cat, skill, cells); else skip('STEPS-FOLLOW-PRESET', 'not in --rule-skills (skills)'); }
 }
 const RUN_MS = Date.now() - T1;
 

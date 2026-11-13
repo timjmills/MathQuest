@@ -302,6 +302,32 @@
      ]
     }
    }
+  },
+  {
+   "lane": "lf-algebra",
+   "why": "critic r1 F6 / L28 (2026-11-13): a preset's Guided / Model Steps band followed the HOST's default steps (pattern_features printed notice_patterns' parity steps); ws-node-lint STEPS-FOLLOW-PRESET judges the lane's preset skills (and their hosts, which it skips as not presets). Backtest row steps-follow-preset-f6.",
+   "skills": [
+    "patterns:pattern_features",
+    "patterns:follow_given_rule",
+    "patterns:notice_patterns",
+    "patterns:number_patterns_rule",
+    "patterns:growing_shape_patterns",
+    "algebra:function_table_easy",
+    "algebra:multi_step_word",
+    "algebra:multi_step_word_plain",
+    "algebra:two_step_mult_div_first",
+    "algebra:two_step_add_then_mult",
+    "algebra:two_step_add_then_div",
+    "algebra:two_step_letter_equation",
+    "algebra:two_step_estimate_check"
+   ],
+   "gates": {
+    "node-lint-s1": {
+     "addRules": [
+      "STEPS-FOLLOW-PRESET"
+     ]
+    }
+   }
   }
  ]
 }
