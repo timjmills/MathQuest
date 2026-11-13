@@ -15,8 +15,9 @@ import {
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
-    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
+    familyScreenVisual, FAMILY_SCREEN_INSTRUCTION, markVocabFeedback,
 } from './screen-cell.js';
+import { speakExplanation } from './hints-speech.js';
 
 let quizTimerInterval = null;
 let quizStartTime = 0;
@@ -767,6 +768,9 @@ function refreshQuizFeedback(flatIdx) {
         if (old.className === fb.className && old.textContent === fb.textContent) return;
         old.replaceWith(fb);
     } else card.appendChild(fb);
+    // owner R-1 / R-2 (lf-vocab r7): a vocabulary cell's focal part, right word and explanation (spoken once, when the
+    // verdict changed; on every judged wrong try, ladder or not, as the card and the worksheet)
+    try { markVocabFeedback(cellEl, qd, !!answer.correct, { speak: answer.correct ? null : speakExplanation }); } catch (e) { /* optional */ }
     // the ladder message shows whole above the pinned Previous / Next bar (critic r5 Q5-2)
     if (!answer.correct) requestAnimationFrame(() => requestAnimationFrame(() => clearOfPinnedBar(fb)));
 }

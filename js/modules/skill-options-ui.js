@@ -506,6 +506,9 @@ function _tidySample(frame) {
     }
     const stage = frame.querySelector(':scope > .tvp-stage');
     if (!stage) return;
+    // ONE fit (teacher-preview F8, lf-algebra r8 via the lead): the preview's own fit() widens the stage or crops it; a second
+    // transform written here undid that (a cropped stage re-centred off the frame: the sample went blank)
+    if (typeof window.tvFitSample === 'function') { window.tvFitSample(frame); return; }
     stage.style.transform = 'translate(-50%, -50%)';
     const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
     const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);

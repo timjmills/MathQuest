@@ -340,6 +340,8 @@ export const CONCEPT_RULES = [
     [/number_sense_all|mixed_number_sense/, ['rounding', 'estimate', 'strategies']],
     [/estimate_sum|estimate_diff|estimate_sums/, ['addition', 'subtraction']], [/estimate_products/, ['multiplication']],
     [/estimate_quotient/, ['division']],
+    [/^vocabulary:vocab_grade_pictures$/, ['vocabulary']],
+    [/^vocabulary:vocab_pick3_words$/, ['vocabulary']],
 ];
 
 /* ================================================================= hand-written terms */
@@ -644,6 +646,8 @@ export const SKILL_TERMS = {
     'order_of_operations:exponents_simple': ['square numbers', 'square number', 'squared', 'cube numbers', 'cubed', 'powers'],
     'area_perimeter:composite_shapes': ['compound shapes', 'composite shapes', 'rectilinear shapes', 'l shapes', 'compound area', 'compound perimeter'],
     'decimals:decimal_nl_drag': ['decimals', 'decimal place value', 'tenths and hundredths', 'decimals on a number line'],
+    'vocabulary:vocab_grade_pictures': ['vocabulary pictures', 'match 3 pictures', 'match the word to the picture', 'write the letter of the picture', 'picture word match', 'lesson vocabulary', 'picture vocabulary', 'match words and pictures'],
+    'vocabulary:vocab_pick3_words': ['one picture three words', '1 picture 3 words', 'word bank picture', 'copy the word for the picture', 'name the picture vocabulary', 'which word is the picture'],
 };
 
 /* ================================================================= misspellings */

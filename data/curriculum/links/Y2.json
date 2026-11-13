@@ -9771,6 +9771,20 @@
       "band": 200
      },
      "why": "filling gaps in a chart from 101 on (to 200): the same counting on, past 120"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 4
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 4
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson in Y2.B1 (Place value within 100), W08 and W09; closes 1.NBT.A.1, which White Rose Year 2 does not teach past 100.",

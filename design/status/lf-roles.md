@@ -6,7 +6,7 @@ Owner of files: js/modules/sheet/roles/{true-false,reason-it,error-analysis,revi
 State: fix (critic r1 FAIL; r2 fixes in, critic r2 waits on lead rulings)
 Updated: 2026-11-13
 Builder profile: lane session (no sub-agent builder)
-Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
+Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
 
 ## Now
 - 5 fixes pushed, each with its check first (FAIL on master eef75f5, OK on the fix); 780 passed-skill pages (26 skills x 10 roles x
@@ -16,6 +16,91 @@ Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4
 - Proofs: ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --check vs master eef75f5: 1556/1556 identical;
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
+
+## Round 9 (2026-11-13; lead order 1-5)
+- Critic r5b D2 (PT-MOD-1, P-LC-9) fixed in 88032a8a: each Model state names its own new marks (`traceNew`); function-table and
+  count-row draw only those in trace grey and the earlier marks black; a last "fill in every row" re-mark adds only the new answer;
+  the lesson chart's F5 count-row states the same. Check ws-roles-unit MOD-MARKS-INK (FAIL on 3b324bcc, OK on 88032a8a; backtest
+  row model-marks-ink PASS).
+- Lead order 5 (PUPILTAG offsets on table / count-row work): function-table's inline-block wrapper is vertical-align:top (it sat
+  3.6 mm under the cell top on the line strut, so the label floated 5.5 mm over the table at L); error-analysis TAG_LIFT lifts the
+  label 0.5 mm over count-row / function-table work (ink flush with the box: 1.8 mm before). PUPILTAG counts a bordered box's top
+  edge as ink. ws-cell-checks PUPILTAG + OVERFLOW: 0 on function_table_easy / number_patterns_rule / function_table EA S/M/L.
+- Proofs: passed skills 810/810 role pages (27 skills x 10 roles x S/M/L, pupil + key) identical vs 3b324bcc; lesson baseline
+  --all-lessons vs master 8a7c5d43: see below.
+- R13 (lead ruling (a)): a Pre-skill Check that runs to 2 pages splits as evenly as its bands allow (2 + 2), never a page of
+  one item, every prerequisite kept, the FULL header on every page; check ws-roles-unit PSC-2PG-BALANCE (b7110b89). 36 of 81
+  passed PSC pages change - all 2-page checks; one-page checks byte-identical.
+- Critic r5c (design/status/lf-roles/r5c/critic-r5c.md): PASS, 0 counted defects; every changed set 8+ and better than before.
+  Nits N1 (fte step 5 text says "every row" while one mark is new), N2 (npr Model steps 1-2 add no mark; pre-existing).
+- Lesson baseline --all-lessons vs master 8a7c5d43: 1560/1596 identical; the 36 are g3-oa9-input-output-rule (the function
+  table's vertical-align attribute) and its 23 pages are pixel-identical.
+- Deploy-3: PR #43 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ b25479c5), gates green on the deploy tree.
+- r10 (244a84b6): Reason It A over B for any template whose true work width passes half the room; a column story prints once
+  over A and B (word-work storyOnly / noStory, lf-builds' file); RI-DISTINCT; ws-precritic never pins an overflow; 3 ruled
+  capacity pins. Backtest ri-overflow-stack PASS (34 OVERFLOW on b25479c5 -> 0). Passed RI pages: only the 3 that overflowed
+  change. Compare at band 999999 stacks once pv supplies footprint.inkWMm (its wMm carries slack, so it is not trusted).
+  F7 (an added answer under -): not reproducible on master (the sentence-layout change_unknown stories are on the
+  lf-builds-stories branch; here add_wp_change_unknown deals a column sum). SIGNMATCH (RI + EA) 0 on the 5 story skills here;
+  True or False? is not in SIGNMATCH's roles (a false statement may be any false sum) - lf-builds' wrongAnswer slots fix it at
+  the source. F8 waits on a PT-RSN-4 ruling.
+- r10 guided (8307219c): a Guided page of tightRows items keeps rows at their measured height (compare precritic r2 item 1).
+  compare guided EB-BAND 46 -> 22 (rest: pv's measured height + its one-line hint row); expand / unit_form / combine guided
+  EB-BAND 2 -> 0 (9 passed pages change). Backtest guided-tight-rows PASS. compare EA S: 0 now. compare Model EB-SIDE 5 = its
+  beside step-text cells, which PT-MOD-5 excuses but ws-empty-band does not yet skip (lf-checks). Opener is not this lane's.
+
+## Round 11 (2026-11-13; critic r6c FAIL -> fixes)
+- Critic r6c (design/status/lf-roles/r6c/critic-r6c.md): Guided tightRows PASS; Reason It A over B FAIL - D1 one item a page
+  (H5), D2 centred stack, D3 the stack fired on work that fits side by side. P1 (process): the pack's "before" (c8c81172)
+  already held the change - every RI pair identical. Fix to the process: "before" is the parent of the lane's earliest commit
+  in scope; a changed pair that is byte-identical stops the pack (r6d checked: 0 identical pairs).
+- r11 (df83248e): A | B side by side over a full-width response row when the work fits half the cell; stacking (top start)
+  only for wider work. F8 (lead ruling): "__ is correct." dropped, PT-RSN-4 amended. Word answers one 6-digit line (no
+  length tell; "hundreds" fits). Checks RI-ONEANSWER, RI-LAYOUT, LINE-TELL (ws-roles-unit), KEYFIT (ws-cell-checks default);
+  backtests ri-one-answer / ri-layout / line-tell / key-fit PASS. sub_1m RI M 2 (ruled; the pinned 3 overflowed), sub_100k /
+  sub_1m L back to 2.
+- F3 (lf-algebra r1, npr Model L 6 mm overrun): reproduced only in a PRINTED PDF at 47b1f2a86 (screen and emulated print media
+  lay it out clean, so ws-cell-checks / ws-grade-render pass it); gone at this head (the Model is 2 pages, PDF checked). A
+  check needs the PDF raster (as LP-RASTER does for lessons) - proposed to lf-checks via the lead.
+- Critic r6d (design/status/lf-roles/r6d/critic-r6d.md): FAIL on one counted defect - sub_word_problems RI L one item a page
+  (H5); D2 / D3 / F8 / word lines clean; 9 of 10 sets 8+. E1 (number line tell) and N1 (response row left) raised.
+- r12 (c42f7504, faeb7759): a story's response stands BESIDE the story, the A | B panels under both - sub / add_word_problems
+  RI 2 a page at S / M / L; the sentence stories (add / sub_wp_10 / _20 + plain, passed) take the same layout instead of the
+  A-over-B stack (add_wp_10 RI 1 -> 2; 17 capacity rises, no drop). Number lines hold the longer of right / wrong (E1);
+  the no-story response row centres (N1). Checks: LONE-PAGE (ws-cell-checks default: one item a page where the role holds
+  2+; it found add_wp_10), LINE-TELL extended; backtests lone-page, line-tell-number PASS.
+- Critic r6e: PASS (0 counted). r13: npr RI count-row trains stack (OVERFLOW 18 -> 0), a list's response column takes its
+  own width; critic r6f FAIL (S band 33 %) -> the A / B tag in a left gutter at S / M -> npr RI 3 / 3 / 2; critic r6g PASS.
+  ABTAG check (self-test pair). Backtests ri-countrow-overflow, ri-stack-band PASS.
+- Deploy-4: PR #45 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ 329273de); gates green; lessons 1596/1596 identical.
+- lf-algebra r2 queue: G4 fte RI 2 at every size here (npr fixed); G3 npr RI S 3; G2 not reproduced at the default seed
+  (seed asked); G10 / pattern_features / growing / fgr not in this tree; F3 gone at head (print-raster check -> lf-checks).
+
+## Round 7 (2026-11-13, +$40; owner: keep going)
+- R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
+- N9 FIX-MINIMAL (25d7bf2f): compose.wrongOf keeps a list's FIRST error only (later parts follow the correct rule); 0 passed pages
+  change; ws-roles-unit FIX-MINIMAL; backtest roles-fix-minimal.
+- PUPILTAG on ink (b0efa7ee): 2-4 mm +/- 0.5 from the label's foot to the work's first ink; the work's first element loses its top
+  margin and the label box sits 0.5 mm (S 1 mm) over it. 132 findings on deploy-2 -> 0 on 14 passed skills.
+- R15 EA-ROWX (2d958ba1): one work width a page where planned widths differ; judgement x per column within 4 mm. FAIL 8 before ->
+  0 on every passed skill. Word forms (number_word_form) still drift ~3.5 mm (text width on equal footprints) - under the 4 mm bar.
+- CORRECTION to 2d958ba1's message: ws-capacity-pin is NOT 0 drops - placevalue:combine Independent / More Practice S 28 -> 27.
+  The same drop is on master fb6528a9 (another lane's change since the pin on 5947159d; roles this lane does not touch) - routed
+  to the lead: a regression the check caught, or an intended change to re-pin.
+- Open: PUPILTAG still fires on function_table_easy EA M/L and number_patterns_rule EA (count-row / table first ink, lf-algebra
+  cells); R13 Pre-skill Check; lf-algebra r8 role items (F3/F4, marksFor function-table, F5 traceSlots, level 1 vs 0, F8).
+
+## Deploy (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy): 8823e9a9 (critic r3) + SIGNMATCH d54d2850 + D6/N2/D7 5a46c6ee (critic r4 PASS)
+
+## Round 6 (2026-11-13, +$35) - after the deploy branch (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy @ 8823e9a9)
+- D6: the "<Name> wrote:" label's foot 2 mm over its work at every size; PUPILTAG asks 1.5-8 mm (fired 144x on the fixed offset).
+- N2: True or False? one-column S takes a 5th row (unit_form / expand S 4 -> 5); ws-capacity-pin SIZE-ORDER (S >= M >= L) added.
+- D7: True / False boxes 10 mm off the statement's own tick column (pattern_features L, still 4 items).
+- mult_facts Review with supports (print-lint supports S, 12 x 32 % side band on Mixed Review stacks): looks like the supports
+  engine's reserved support room inside the earlier skill's stacks, not the Review grid - to verify with the S2 supports owner.
+- Queued (lead 2026-11-13): PUPILTAG measured on ink, 2-4 mm (critic r4 n1); R4 / N4 capacity pins (ruled by design); FIX-MINIMAL (N9 ruled: one error an item); lf-algebra r8 role items (F3, F4, PT-MOD-1 marksFor function-table, F5 traceSlots, measure level 1 vs test level 0, teacher-preview F8).
+- Open: R4 (fte TF L 2 items: tall table, likely a capacity ruling), R13 (Pre-skill Check strips / page 2), R15 (EA judgement x per
+  item), N4 (Review totals < 8 on tall items: ruling), N9 (fix-minimal: design), npr TF M 4 -> 3. These pages need critic r4.
 
 ## Round 5 (2026-11-13, +$40)
 - N3 (435052b9): Error Analysis item + judgement centred in a stretched cell; "<Name> wrote:" rides on its work. EB-BAND 16 -> 0 on
@@ -112,6 +197,7 @@ Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4
   the answer; on Reason It "__ is correct" names it); a list answer writes one line a part. Suggested: accept.
 
 ## Times
+Times: r6 (deploy branch, D6, N2, D7), start 2026-11-13T09:45Z, end 2026-11-13T10:50Z, profile lane session
 Times: r5 (N3, critic r3, D1-D5), start 2026-11-13T08:15Z, end 2026-11-13T09:40Z, profile lane session
 Times: critic r3, start 2026-11-13T09:05Z, end 2026-11-13T09:13Z, profile mq-opus-medium
 Times: r4 (N10, N1, R2, R5, N5, R10, R11), start 2026-11-13T06:45Z, end 2026-11-13T08:10Z, profile lane session

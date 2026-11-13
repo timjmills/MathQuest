@@ -36,7 +36,7 @@ import { renderMapScreen } from './teacher-map.js';
 import { renderWrmScreen, wrmHashActive, wrmOnHashChange, clearWrmHash, openWrmLesson, openWrmStep } from './teacher-wrm.js';
 import { renderTodoScreen, openTodo, todoHashActive, clearTodoHash, todoLessonFor, todoHashEntry } from './teacher-todo.js';
 import { mapHashActive, clearMapHash } from './teacher-map-tasks.js';
-import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample } from './teacher-preview.js';
+import { installPreview, tvpAttrs, infoButtonHTML, modeAttrs, mountSample, fit as fitSample } from './teacher-preview.js';
 
 const SCREENS = ['skills', 'home', 'sets', 'print', 'run', 'library', 'wrm', 'todo', 'quizzes', 'map', 'settings', 'progress'];
 // Legacy views a teacher is routed away from, to the teacher screen that replaces them
@@ -380,6 +380,8 @@ function start() {
     // Hooks for modules that must not import the teacher view: the skill options popover draws
     // a live sample, and the classic print entry points open the Print screen instead.
     window.tvMountSample = mountSample;
+    // (ONE fit for a sample: the popover's tidy pass re-fits with it, never with its own transform - teacher-preview F8)
+    window.tvFitSample = fitSample;
     window.tvOpenTodo = openTodo;
     window.tvOpenPrintWith = (skills) => { openPrintWith(skills); tvGo('print'); };
 
