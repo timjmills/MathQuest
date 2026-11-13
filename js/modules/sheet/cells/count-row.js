@@ -53,7 +53,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2, KEY_FEATURES } from './k2kit.js';
+import { L, P, B, D, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2, KEY_FEATURES } from './k2kit.js';
 import { tile, tileSize, shapeAt } from './shapes.js';
 
 /** The widest box pitch of an 'arcs' row (mm), and the narrowest box a size may print. */
@@ -672,6 +672,11 @@ register('count-row', {
         // small fixes item 1 (critic r2 N1/N2): on screen a box takes as many digits as the row's WIDEST number - the same for
         // every box, so it tells no box's answer; a digit typed past that goes on to the next box (active-box.js), never lost
         const rowMax = Math.max(1, ...values.map((x) => String(x).replace(/\D/g, '').length));
+        // (r4b, lf-algebra critic r2 G1: on screen a box train's numerals take the host's digit size and its boxes the 44 px
+        // input - number_patterns_rule's train read 15-28 px under 44 px inputs that ran onto its caption. The arcs train - the
+        // count-by row, six a line with its jump arrows and step tab, swiped on a phone - keeps its own sizes: at the floor its
+        // line ran 900 px into an 820 card and the host shrank the whole drawing to fit.)
+        const twinDigits = isTwin(ctx) && g.look !== 'arcs' ? rowMax : 0;
         const cells = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -680,14 +685,15 @@ register('count-row', {
                 const text = fmt(over !== undefined ? over : v);
                 if (plainGiven) {
                     return `<span class="k2-given"${over !== undefined ? ' data-ws-shown="1"' : ''} style="flex:none;display:inline-flex;align-items:center;justify-content:center;`
-                        + `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;">${esc(text)}</span>`;
+                        + (twinDigits ? `width:max(${L(ctx, g.gw || g.w)}, 44px, calc(var(--mq-digit, 40px) * ${(0.6 * rowMax + 0.7).toFixed(2)}));height:max(${L(ctx, g.h)}, 44px, calc(var(--mq-digit, 40px) * 1.35));font-size:${D(ctx, g.pt)};`
+                            : `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};`) + `font-weight:700;line-height:1;">${esc(text)}</span>`;
                 }
-                return tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: text, shown: over !== undefined });
+                return tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: text, shown: over !== undefined, digits: twinDigits });
             }
             const val = over !== undefined ? String(over) : shown[k];
             const vInk = over !== undefined ? 'solid' : val !== '' ? ink : null;
             if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
-            return twinFloor(ctx, tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax }));
+            return twinFloor(ctx, tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax, digits: twinDigits }));
         });
         if (g.hasLbl) {
             const lblInk = lvlOf(ctx) === 2 ? GREY : INK;
@@ -719,7 +725,7 @@ register('count-row', {
             const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
             rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};">${lineCells.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${isTwin(ctx) && g.look !== 'arcs' ? 'flex-wrap:wrap;justify-content:center;max-width:100%;' : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -730,7 +736,7 @@ register('count-row', {
             const k = blanks.length;
             const val = shown[k];
             const vInk = val !== '' ? ink : null;
-            const rb = twinFloor(ctx, tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true }));
+            const rb = twinFloor(ctx, tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true, digits: g.look === 'arcs' ? 0 : Math.max(1, String(p.ruleBox.value).replace(/\D/g, '').length) }));
             // (lane lf-ops for lf-algebra: in a narrow cell - a Reason It panel - the rule line wraps round its box, never past the cell)
             const narrowRule = !isTwin(ctx) && Number(ctx && ctx.columns) > 1;
             ruleFrame = `<div class="k2-rulebox" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};margin-top:${L(ctx, 3)};`
