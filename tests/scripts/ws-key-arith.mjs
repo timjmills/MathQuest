@@ -180,7 +180,16 @@ async function main() {
                     if (work) {
                         sentences++;
                         const keyedTrue = !!(k['tf-true'] && k['tf-true'].value);
-                        if (truthOf(work) !== keyedTrue) bad('true-false', `drawn work "${work.text}" is ${truthOf(work) ? 'true' : 'false'} but keyed ${keyedTrue ? 'True' : 'False'} (${where})`);
+                        // the work SOLVES the story when it is true arithmetic, in the story's solving sign, with the answer
+                        // (an "added" claim drawn as 61 + 3 = 64 is true arithmetic and a False claim: the wrong operation, F7)
+                        const solving = OPK[payload.steps[0].op] || payload.steps[0].op;
+                        const solves = truthOf(work) === true && work.op === solving && work.v === num(q.ans);
+                        if (solves !== keyedTrue) bad('true-false', `drawn work "${work.text}" ${solves ? 'solves' : 'does not solve'} the story but is keyed ${keyedTrue ? 'True' : 'False'} (${where})`);
+                        // SIGNMATCH (F7): a False claim's answer is never the OTHER sign's result printed under the story's sign
+                        if (!keyedTrue && work.op === solving && truthOf(work) === false) {
+                            const otherV = evalOp(work.a, solving === '+' ? '-' : '+', work.b);
+                            if ((solving === '+' || solving === '-') && (work.v === otherV || work.v === Math.abs(otherV))) bad('true-false', `"${work.text}": the other sign's answer printed under the story's sign (F7, SIGNMATCH) (${where})`);
+                        }
                     }
                 }
                 // ---- Error analysis (the right flag: the pupil's work is right, so every sentence it prints is true)

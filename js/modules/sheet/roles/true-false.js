@@ -49,7 +49,10 @@ export function prepare(it, info = {}) {
     // at L and cost the page an item (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3)
     const stem = ops.length >= 2 && glyph ? `${ops[0]} ${glyph} ${ops[1]} = ` : place.kind === 'list' ? 'Answer: ' : 'The answer is ';
     const render = (c, o = {}) => {
-        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }));
+        // (a False claim is drawn with its wrong answer's own slots - an "added" story answer under +, never under the item's
+        // − sign: word-stories critic r1 F7, SIGNMATCH; Reason It does the same)
+        const slots = isFalse && wrong && wrong.slots && typeof wrong.slots === 'object' ? { shownSlots: wrong.slots } : {};
+        const work = it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { shown, prompt: false }, slots));
         // no frame row (a sentence answer, PT-TOF-4): the True / False boxes stand BESIDE the statement (10 mm off any box column
         // the statement draws itself, critic r3 D7), one over the other, so
         // the cell is as tall as its statement (critic r2 R2: under it, the cell kept a frame row's height and L printed 3 of 4)
