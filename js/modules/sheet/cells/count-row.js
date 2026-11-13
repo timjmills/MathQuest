@@ -78,7 +78,9 @@ const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by column
  * one-page SHEET's layout, which only a full-width one-column cell holds.
  */
 const narrowCols = (p, ctx) => (ctx && ctx.wrapToCell && !p.noWrap && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
-const narrowLive = (p, ctx, live) => { const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
+// (`cellLiveMm`, lf-ops-props EB-EDGE 6d61ff6b7, the line Reason It's count-row wrap needs: a caller that knows the row's own
+// width - the Reason It panel, the lesson chart's panel - caps the line at it)
+const narrowLive = (p, ctx, live0) => { const live = ctx && Number(ctx.cellLiveMm) > 0 ? Math.min(live0, Number(ctx.cellLiveMm)) : live0; const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
 /** The fewest even lines whose numbers keep `boxW` mm each (and `gap` between) in `avail(rows)` mm. */
 function wrapRows(n, rows0, boxW, gap, avail) {
     for (let rows = rows0; rows <= n; rows++) {
@@ -109,7 +111,8 @@ const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
 const lineGapOf = (ctx, g) => (ctx && ctx.tightRows && !isTwin(ctx) && g && g.rows >= 3 ? (g.lines ? 1.5 : 2) : 2.5);   // a Lines row has no box tops
 const tabLineH = (g, ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? Math.min(g.h, tabPt(g) * PT_MM * 0.72 + 4.5) : g.h);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
-const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
+// (`bandDigits`, lf-ops-props r3b: a row sized from the widest number of its band, so a page keeps one slot width)
+const maxDigits = (p) => Math.max(1, Number(p.bandDigits) || 0, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
 /** The step tab this render draws: a hint tab (`tabHint`) is dropped at level 0. */
 const tabOf = (p, ctx) => (p.tabHint && lvlOf(ctx) < 1 ? '' : (p.tab || ''));
