@@ -2233,6 +2233,14 @@ function lintKitGeometry(dom, pdf, info, F) {
             const dnGroup = secOf((dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages).filter(q => fadeKey(q) === fadeKey(p)));
             const dnMax = Math.max(...dnGroup.map(q => q.items));
             const dnLast = dnGroup[dnGroup.length - 1] === p;
+            // (lf-engine-roles critic ruling on the loosening above, GUARD: on a sections sheet DN-2 measures how much of the page
+            // body the problems fill, not the item count, so a page that is not the sheet's last and is under half used fails at
+            // any --count - the count compare read sub-sections of different heights as half-empty, the fill compare does not)
+            if (subSec) {
+                const body = p.footRect ? p.footRect[1] - (p.padT || 0) : 0;
+                const fill = body > 0 && p.gridBottom !== null && p.gridTop !== null ? (p.gridBottom - p.gridTop) / body : null;
+                if (comparable && !last && fill !== null && fill < 0.5) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} of a sections sheet: its problems fill ${Math.round(fill * 100)}% of the page body while page ${pt.pages[pt.pages.length - 1].idx} follows: a page is never less than half used (PG-20, PG-23; sub-section fill)`, 'half-empty page');
+            } else
             if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : subSec ? 'sub-section' : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
             const secPages = secOf(pt.pages);
             const secMax = subSec ? Math.max(...secPages.map(q => q.items)) : max;
@@ -2972,6 +2980,32 @@ const SELF_TESTS = [
         top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
         top(p2).slice(1).forEach(c => c.remove()); top(p2).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
         top(p3).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
+    } },
+    // GUARD (lf-engine-roles critic ruling, CC1): a MID-sheet sub-section page holding one problem between two full ones is under
+    // half used; DN-2 reads a sections sheet by page fill, so it fails at a fixed --count too (PAGEFILL / SPREAD are off there)
+    { name: 'sections sheet: a mid-sheet one-cell sub-section page at --count 6 (DN-2 fill, CC1)', mode: 'kit', args: ['--count', '6'], expect: ['L-DENSITY', 'DN-2'], msg: /sub-section fill/, fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true), p3 = p1.cloneNode(true);
+        p1.after(p2); p2.after(p3);
+        [p1, p2, p3].forEach((p, i) => { p.setAttribute('data-ws-role', 'independent'); p.querySelector('.ws-foot b').textContent = `${i + 1}/3`; });
+        const top = (p) => [...p.querySelectorAll('[data-ws-cell]')].filter(c => !c.parentElement.closest('[data-ws-cell]'));
+        top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
+        top(p2).slice(1).forEach(c => c.remove()); top(p2).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
+        // (the one cell keeps its own height: the grid is not stretched over the body, so the page is a third used)
+        const g2 = p2.querySelector('.ws-grid'); g2.style.flex = 'none'; g2.style.height = 'auto'; g2.style.gridTemplateRows = 'auto';
+        top(p3).forEach(c => c.setAttribute('data-ws-skill', 'c:z'));
+    } },
+    // ... CC2 at a fixed --count: the LAST page holds the one cell of a one-page sub-section - DN-2 is for pages a page follows,
+    // so the fill compare stays off there (PG-23 ORPHAN and LONE judge a last page on Auto)
+    { name: 'sections sheet: the last page holds a one-cell sub-section at --count 6 (no DN-2, CC2)', mode: 'kit', args: ['--count', '6'], expect: [], absent: ['L-DENSITY', 'DN-2'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true), p3 = p1.cloneNode(true);
+        p1.after(p2); p2.after(p3);
+        [p1, p2, p3].forEach((p, i) => { p.setAttribute('data-ws-role', 'independent'); p.querySelector('.ws-foot b').textContent = `${i + 1}/3`; });
+        const top = (p) => [...p.querySelectorAll('[data-ws-cell]')].filter(c => !c.parentElement.closest('[data-ws-cell]'));
+        top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
+        top(p2).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
+        top(p3).slice(1).forEach(c => c.remove()); top(p3).forEach(c => c.setAttribute('data-ws-skill', 'c:z'));
     } },
     // L-DENSITY OPN-6 (lf-engine-roles critic B1, PT-OPN-6): an Opener whose Guided band holds one cell fails ...
     { name: 'opener with a one-cell Guided band (OPN-6)', mode: 'kit', expect: ['L-DENSITY', 'OPN-6'], fn: () => {
