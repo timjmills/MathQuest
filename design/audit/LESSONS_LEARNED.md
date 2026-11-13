@@ -505,6 +505,13 @@ One line per finding: the rule, then the check.
 | r10: the explain line points at a mark the picture no longer draws (cycle, "ones digits"), or at a mark another dealt picture also draws (unknown, "the one in the box") | An explain line names only marks drawn in its own picture, and none drawn in a co-dealt picture | V-REF: referent lint | y (when built) |
 | r10: caret stays in a red vocab slot after Check | Check blurs the vocab slots | NB9: active element after Check is not a vocab slot | y (when built) |
 
+### lf-vocab round 11, narrow critic r11 (2026-11-13): FAIL min 7. Findings to checks
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| product (4 x 3 = [12]) can be named "multiple" (4.OA.B.4's own words); dealt together in sets 0, 6, 9 | A word's definition covers every way its standard defines it: a set's CCSS text is read for pairs of its own bank words before the set ships | V-FEAT: multiple also = boxed-answer + times-sign; V-STD: a pair of bank words named together in the set's standard text must be notWith | y (when built) |
+| caret still shows in a red slot after Check (moved card 1 -> card 3) | Wrong slots take caret-color: transparent; Check blurs every vocab slot on every card | NB9+: activeElement and caret-color probed on card AND worksheet, every card | y (when built) |
+| term 18,[14],10 weakly reads as a "take 4" rule | A constant-step run counts as "rule" unless rule is defined only as the operation box | V-FEAT rule definition | y (when built) |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
