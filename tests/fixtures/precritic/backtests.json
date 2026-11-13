@@ -4132,6 +4132,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-part-frames",
+   "check": "ws-two-step PART-FRAMES: the lesson chart's two-step panel drawing (cells/word-work.js twoStepPart) of a letter story draws the equation on panels 1-3 and n = the answer on 3, of an estimate story the estimate row on 2-3 and the Yes / No ring on 3, and the four panels differ",
+   "kind": "commit-pair",
+   "rule": "ws-two-step PART-FRAMES (lf-algebra R4; precritic two-step lesson chart: letter / estimate panels drew the whole cell)",
+   "fail": {
+    "commit": "d88ab9aee",
+    "state": "twoStepPart drew the Step 1 / Step 2 column blocks for every story: no equation, no estimate"
+   },
+   "pass": {
+    "commit": "b5d9a9cc7",
+    "state": "letter: equation / + the two steps / n; estimate: the steps / + the estimate / the question ringed (frames rows, the newest grey)"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
