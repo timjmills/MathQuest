@@ -1,6 +1,6 @@
 <!-- spec-card
-{"card":"function-table","kind":"template","template":"function-table","families":["algebra"],"match":{"templates":["function-table"]},"config":"design/cards/function-table/card.json","indexSha":"9ad4eb57ab31f4193fcb2c0f8ffd3adbc6a4cc76","bodySha":"c4ee6bea1aa8efa6","format":2,"configSha":"2f3c021fc400"}
-{"cited":"AX-4 E36 H1 H5 H13 L1 L3 L11 LR-5 LR-6 P-1 P-3","rules":"AK-1 a0cc12 2 d4709f H13 36f579 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 9 0b5532 10 2ed85c CL-40 2a6dbb SL-6 7a1453 11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H9 fd82d1 10 fbd802 L1 799b66 3 901e56 6 6e19d8 10 d2ca35 11 9ebe19 AX-4 2eb6c1 P-3 833e8c INK-5 631a6d P-LC-9 bc47bd TY-2 510243","entries":"R%3AR-EASY-20 d0472c R%3AR-L5-ADD-100 50dce7 R%3AR-L5-MUL-20 730ee8 R%3AR-L5-FACTOR 789377 R%3AR-L20-OUT db1257 R%3AR-HARD-100 7b457d N%3AN-PICTURES-FUNCTION-TABLE-EASY 258e48 D%3AftTask%3Doutputs bcefeb D%3AftTask%3Drule bcefeb D%3AftTask%3Dinputs bcefeb D%3AftTask%3Dmixed bcefeb D%3AftTask%3Dmake bcefeb D%3AftTask%3Doutputs-check bcefeb D%3AftTask%3Drule-check bcefeb D%3AftTask%3Dinputs-check bcefeb D%3AftTask%3Dmixed-check bcefeb D%3AftRules%3D%2B bcefeb D%3AftRules%3D- bcefeb D%3AftRules%3Dx bcefeb D%3AftRules%3D%2F bcefeb D%3AftRules%3Dx%2B bcefeb D%3AftRules%3Dx- bcefeb D%3AftRules%3D%2F%2B bcefeb D%3AftRules%3D%2F- bcefeb D%3Aband%3D10 bcefeb D%3Aband%3D20 bcefeb D%3Aband%3D50 bcefeb D%3Aband%3D100 bcefeb D%3Aband%3D1000 bcefeb D%3AftTable%3D31 bcefeb D%3AftTable%3D32 bcefeb D%3AftTable%3D41 bcefeb D%3AftTable%3D42 bcefeb D%3AftTable%3D51 bcefeb D%3AftTable%3D52 bcefeb D%3AftTrap%3Dtrue bcefeb D%3AftTrap%3Dfalse bcefeb D%3AftFactors%3Dany bcefeb D%3AftFactors%3D2-5-10 bcefeb D%3AftFactors%3D2-3-5-10 bcefeb D%3Asupport%3Dframe bcefeb D%3Asupport%3Dframe-bare bcefeb D%3Asupport%3Dline bcefeb D%3Asupport%3Dline-bare bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
+{"card":"function-table","kind":"template","template":"function-table","families":["algebra"],"match":{"templates":["function-table"]},"config":"design/cards/function-table/card.json","indexSha":"0e09caae14100f991ce42d095837935c78df8e47","bodySha":"767663038f77268a","format":2,"configSha":"2f3c021fc400"}
+{"cited":"AX-4 E36 H1 H5 H13 L1 L3 L11 LR-5 LR-6 P-1 P-3","rules":"AK-1 a0cc12 2 d4709f H13 36f579 VQ-1 dea36a 2 f15b47 3 db17cc 6 cc6e7e 8 6d0278 9 0b5532 10 2ed85c CL-40 2a6dbb SL-6 7a1453 11 183e7a SP-1 87c2cc SCC-01 8aa70b P-1 5a3076 7 aa3040 H1@RUBRIC bf4b29 H2@RUBRIC f5bba0 H3@RUBRIC d7f21f H5@RUBRIC b3892d H9 fd82d1 10 fbd802 L1 799b66 3 901e56 6 6e19d8 10 d2ca35 11 9ebe19 AX-4 2eb6c1 P-3 833e8c INK-5 631a6d P-LC-9 bc47bd PT-MOD-1 45072b TY-2 510243","entries":"R%3AR-EASY-20 d0472c R%3AR-L5-ADD-100 50dce7 R%3AR-L5-MUL-20 730ee8 R%3AR-L5-FACTOR 789377 R%3AR-L20-OUT db1257 R%3AR-HARD-100 7b457d N%3AN-PICTURES-FUNCTION-TABLE-EASY 258e48 D%3AftTask%3Doutputs bcefeb D%3AftTask%3Drule bcefeb D%3AftTask%3Dinputs bcefeb D%3AftTask%3Dmixed bcefeb D%3AftTask%3Dmake bcefeb D%3AftTask%3Doutputs-check bcefeb D%3AftTask%3Drule-check bcefeb D%3AftTask%3Dinputs-check bcefeb D%3AftTask%3Dmixed-check bcefeb D%3AftRules%3D%2B bcefeb D%3AftRules%3D- bcefeb D%3AftRules%3Dx bcefeb D%3AftRules%3D%2F bcefeb D%3AftRules%3Dx%2B bcefeb D%3AftRules%3Dx- bcefeb D%3AftRules%3D%2F%2B bcefeb D%3AftRules%3D%2F- bcefeb D%3Aband%3D10 bcefeb D%3Aband%3D20 bcefeb D%3Aband%3D50 bcefeb D%3Aband%3D100 bcefeb D%3Aband%3D1000 bcefeb D%3AftTable%3D31 bcefeb D%3AftTable%3D32 bcefeb D%3AftTable%3D41 bcefeb D%3AftTable%3D42 bcefeb D%3AftTable%3D51 bcefeb D%3AftTable%3D52 bcefeb D%3AftTrap%3Dtrue bcefeb D%3AftTrap%3Dfalse bcefeb D%3AftFactors%3Dany bcefeb D%3AftFactors%3D2-5-10 bcefeb D%3AftFactors%3D2-3-5-10 bcefeb D%3Asupport%3Dframe bcefeb D%3Asupport%3Dframe-bare bcefeb D%3Asupport%3Dline bcefeb D%3Asupport%3Dline-bare bcefeb D%3Acalculator%3Dtrue 04b8b3 D%3Acalculator%3Dfalse 04b8b3 D%3AskipAfter%3D* 04b8b3 D%3Arole%3Aindependent bcefeb D%3Arole%3Amore-practice bcefeb D%3Arole%3Atest bcefeb D%3Arole%3Alesson bcefeb D%3Arole%3Ascripted-model bcefeb D%3Arole%3Aguided bcefeb D%3Arole%3Aopener bcefeb D%3Arole%3Aerror-analysis bcefeb D%3Arole%3Areview bcefeb D%3Arole%3Apre-skill-check bcefeb D%3Arole%3Amixed-practice bcefeb D%3Arole%3Atrue-false bcefeb D%3Arole%3Areason-it bcefeb D%3Arole%3Astretch bcefeb D%3Arole%3Aword-problems 04b8b3 D%3Arole%3Afact-rows 04b8b3 D%3Arole%3Afact-probe 04b8b3 D%3Ahost%3Apractice-card bcefeb D%3Ahost%3Aonline-worksheet bcefeb D%3Ahost%3Aquiz bcefeb D%3Ahost%3Aboss 04b8b3 D%3Ahost%3Arace 04b8b3 D%3Ahost%3Amap 04b8b3 D%3Ahost%3Amode-dark 04b8b3 D%3Ahost%3Amode-bigboard 04b8b3"}
 -->
 <!-- rulings
 {"v": 1, "card": "function-table",
@@ -88,7 +88,7 @@ Template `function-table` — `js/modules/sheet/cells/function-table.js`; also j
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `9ad4eb57ab31`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `0e09caae1410`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (3 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -98,7 +98,7 @@ From the rule-id index (`design/cards/rule-index.json`, sha `9ad4eb57ab31`). An 
 - **AK-2** (WDS) Answers are Andika **700**, black, at the slot's working size, placed exactly where a pupil would write. Working is shown where the page teaches it: regroup digits in carry boxes (on EVERY key - practice, mixed, independent - over VA-13's scratch rule, owner ruling 2026-09-25), partial products, division work rows, quotient and remainder, hands drawn on clocks, shaded parts shaded, plotted points …
 - **H13** (RUBRIC) Wasted space inside cells (owner ruling 2026-09-25): a cell whose content leaves an empty band of ≥ 30 % of the cell's height (or width), or a row/section of a mixed sheet sized for a taller item than it holds. Measure it; do not eyeball it past. — C3 ≤ 6
 
-### 4b. Also applies — ids only (30 rules)
+### 4b. Also applies — ids only (31 rules)
 
 Each id's full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:
 
@@ -111,6 +111,7 @@ Each id's full text is in `design/cards/rule-index.json` (look it up by id) and 
 - WDS · 18. Visual quality bar — `VQ-1` `VQ-2` `VQ-3` `VQ-6` `VQ-8` `VQ-9` `VQ-10`
 - PED · 2.1 The Opener: bands in fixed order — `P-LC-9`
 - PED · Sequencing — `P-1` `P-3` `P-7`
+- PAGE · 2.2 Scripted Model page — `PT-MOD-1`
 - SCC · 0.4 Module map and layers — `SCC-01`
 - RUBRIC · 4. Hard caps — `H1@RUBRIC` `H2@RUBRIC` `H3@RUBRIC` `H5@RUBRIC` `H9` `H10`
 - LL · The recurring failure classes — `L1` `L3` `L6` `L10` `L11`
@@ -210,7 +211,7 @@ Each runs as `node tests/scripts/<script> …`.
 
 (none)
 
-Signed: owner, 2026-11-07
+Signed: (not yet signed)
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
@@ -276,9 +277,9 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `role:fact-probe` — the skill's own items (all 2) [out of scope]
 - `role:mixed-practice` (also mixed) — provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered]
 - `role:true-false` — provider wrongAnswer: real 2/2 (all 2) [offered]
-- `role:reason-it` (also reason) — provider workedSteps: real 2/2; provider wrongAnswer: real 2/2 (all 2) [offered]
+- `role:reason-it` (also reason) — provider workedSteps: real 2/2; provider wrongAnswer: real 2/2; provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered]
 - `role:stretch` — the skill's own items (all 2) [offered]
-- `role:lesson` — lesson data: prereqs.js 1/2 (FALLBACK, warm-up from the earlier skills in data.js order, on function_table_hard); provider stories: real 0/2 (default on function_table_easy, function_table_hard) (all 2) [offered]
+- `role:lesson` — lesson data: prereqs.js 1/2 (FALLBACK, warm-up from the earlier skills in data.js order, on function_table_hard) (all 2) [offered]
 
 **Screen hosts** (8 lines; 0 undecided)
 
