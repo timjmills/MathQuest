@@ -319,3 +319,31 @@ Report design/audit/runs/lf-ops/critic-divarray-r2.md. r1 D1-D4 gone; div_facts 
 | D8 (major) mult / add worksheet digits 40 px vs 56 / 48 (brief) - LEAD_DECISIONS says 29 px floor: ruling needed | ws-screen-slots --digit-widths |
 | D9 (major) mult touch worksheet shrinks 2-digit facts (29 px, no dots) | SCREEN-DIGIT per card within a sheet |
 | minor: SCC-T10 mult Guided answer zone moves 26.7 -> 31.2 mm | existing SCC-T10 on guided |
+
+## divship (lead 2026-11-13): ship div_facts arrays + add_facts screen size WITHOUT mult_facts (branch claude/sweet-newton-c8wrv1-lf-ops-divship)
+Builder Opus medium. Base master fdfddfdd2; -divarray 62f5bec01 merged (b0a8d8e2c; CHECKS_FROM_CRITICS and backtests.json unioned by id).
+- **mult_facts parked, hash-equal to master (c5376f756).** Gated on the × op / mult_facts rather than reverted hunk by hunk: the × band
+  frame and × 0 frame (fact.js draws a × array as master: b rows of a), the × screen cue scale (3.4 px / mm kept for ×) and × skip-strip
+  / array digit scaling (support-draw.js), the mult_facts frame in screen-cell.js / print-sheet.js, Test = Independent for mult_facts
+  (test.js and its print-sheet.js hunks reverted), the supported-fact Review geometry (review.js: not for a mult_facts main band), the ×
+  worksheet wrap (worksheet.js) and the screen sign-box wrap for × (panes `wrapBefore`). capacity.json: the mult_facts ruled pins and
+  sizeOrderOpts / testEqOpts entries dropped. backtests.json: 12 mult_facts rows PENDING, "parked: mult_facts arrays (lead 2026-11-13)".
+  Proof (scratchpad/divship/proof.txt, hash.cjs): 17 card roles x M/L x 8 option sets (default, array, touch, skip, boxsign,
+  array + band 100, across, array+touch+skip mix problem cover fade), pupil + key = 272 pages, and card / worksheet / quiz x 1366 / 1280 /
+  1024 / 820 x the same 8 sets (full HTML + box geometry) = 96 renders: all identical to master.
+- **D6 (check 0a1eef247, fix 7bb99d3c1).** precritic render-gate-div_facts-sm-array: ws-grade-render --gate, scripted-model, array
+  support, 10s band (tables 2-5), M / L. 62f5bec01: 32 overflow findings at L; fix: a ÷ fact with its support drawn counts the state
+  body's 5 mm top pad and two 1.5 mm gaps in the continuation page's row need (scripted-model.js). Backtest sm-array-overflow-divfacts.
+- **D7 (check f2048ac43, fix 441e10189).** ws-screen-support-eq SCREEN-ANSWER-PLACE (in the default rule list, so on precritic's
+  screen-support-eq gate): on one ÷ worksheet at 1366 / 1280 / 1024 / 820, defaults and each support, one answer place and one kit cell
+  height within 5 %. 62f5bec01: 820 default 103 / 150 px, 820 array 212 / 255 / 269 px, and the boxsign sign box wrapped above 108 ÷ 12
+  only (110 / 204 px at 1366 / 1280 / 1024). Fix (worksheet.js `_wsOneAnswerPlace`): when one ÷ card's answer line wraps under its
+  sentence every ÷ card's does; when one sign box wraps above its sentence every one does. The 56 / 48 px digit floor is kept.
+  Backtest screen-answer-place-divfacts.
+- **Gates.** ws-backtest --row sm-array-overflow-divfacts, screen-answer-place-divfacts, screen-digit-ws-divfacts, array-orient-divfacts,
+  support-label-facts: 5 PASS. ws-boot-smoke OK. ws-code-snapshot OK (734 codes, 35 categories). node --check on every changed file.
+  ws-precritic --skill division:div_facts,addition:add_facts --strict: see the result line below.
+- **Renders:** scratchpad/divship-renders/ (D6 page and key, before / after; the div worksheet at 1366 / 1280 / 1024 / 820, default,
+  array 10s band, boxsign: one answer place and one cell height on each sheet).
+- **Not done here (parked or other lanes):** critic r2 D1-D5, D8, D9 (mult_facts / add_facts digit floor) are mult_facts or ruling items.
+  ws-print-lint DN-1 (the mult_facts Test ceiling) is moot while Test = Independent is parked.
