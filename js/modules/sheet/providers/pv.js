@@ -1245,6 +1245,8 @@ registerSkill('composing:number_word_form', {
             if (n === 1000) return clampSteps([step('"one thousand": 1 in the Th box.', [{ slot: 'pv-0', value: '1' }]),
                 step('No hundreds, tens or ones words: write 0, 0, 0.', [{ slot: 'pv-1', value: '0' }, { slot: 'pv-2', value: '0' }, { slot: 'pv-3', value: '0' }]), step('Read it: 1,000.')]);
             const t = Math.floor(r / 10), o = r % 10;
+            // (a number under 100 has T O boxes only: its steps write the tens box, then the ones box)
+            if (!h) return clampSteps([step(n >= 10 ? `"${p.words}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.` : `"${p.words}": ${o} one${o === 1 ? '' : 's'}.`, n >= 10 ? [{ slot: 'pv-0', value: String(t) }, { slot: 'pv-1', value: String(o) }] : [{ slot: 'pv-0', value: String(o) }]), step(`Read it: ${f(n)}.`)]);
             const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
             const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
                 : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`

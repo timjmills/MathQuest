@@ -39,7 +39,7 @@ export function numberWords(n) {
 
 const pt = (v) => `${Math.round(v * 100) / 100}pt`;
 const toWords = (p) => p.way === 'to_words';
-const PLACE_LETTERS = { 3: ['H', 'T', 'O'], 4: ['Th', 'H', 'T', 'O'] };
+const PLACE_LETTERS = { 1: ['O'], 2: ['T', 'O'], 3: ['H', 'T', 'O'], 4: ['Th', 'H', 'T', 'O'] };
 /** The digits of a shown wrong value, one a box, right-aligned in the item's boxes ('' where it wrote nothing). */
 function wrongDigits(p, wrong) {
     const n = htoDigits(p).length;
@@ -48,7 +48,9 @@ function wrongDigits(p, wrong) {
     const v = String(w.value === undefined || w.value === null ? '' : w.value).replace(/[^0-9]/g, '').slice(-n);
     return Array.from({ length: n }, (_, i) => { const j = i - (n - v.length); return j >= 0 ? v[j] : ''; });
 }
-const htoDigits = (p) => String(Math.trunc(Number(p.n))).padStart(3, '0').split('');
+// (critic nwf r2 CLAIM-INK: a number under 100 took THREE boxes - its key wrote a leading 0 (083) and a claimed 38 left the H
+// box empty; one box a digit of the number itself: T O for 83, H T O for 305, Th H T O for 1,000)
+const htoDigits = (p) => String(Math.trunc(Number(p.n))).split('');
 /** The place boxes row: `valueOf(i)` the digit shown in box i ('' = empty), `inkOf(i)` 'trace' | 'solid' | null. */
 function htoRow(p, ctx, valueOf, inkOf) {
     const m = ctx.metrics || {};
