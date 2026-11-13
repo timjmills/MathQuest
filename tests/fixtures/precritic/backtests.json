@@ -4019,6 +4019,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r10-lesson-render",
+   "check": "lf-vocab r10 item 7: critic r9 #6: a lesson render handed to a critic carries the NAMED lesson's title and a body that is not nearly empty, and its vocabulary band holds ink",
+   "kind": "fixture",
+   "rule": "ws-lesson-render LR-TITLE / LR-BODY / LR-BAND",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/lesson-render.fail.html",
+    "state": "the r9 evidence: another lesson's page (expand, 'I Can write a number in expanded form') with an empty body, judged as placevalue:identify"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/lesson-render.pass.html",
+    "state": "the placevalue:identify lesson's band page"
+   },
+   "command": "node tests/scripts/ws-lesson-render.cjs --lesson placevalue:identify --html {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
