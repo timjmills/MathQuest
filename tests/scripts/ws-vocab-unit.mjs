@@ -59,6 +59,7 @@ const fail = (m) => { if (!ONLY || ONLY.some((k) => String(m).startsWith(k + ' '
 const fxAt = process.argv.indexOf('--fixture');
 const FIXTURE = fxAt > 0 ? process.argv[fxAt + 1] : null;
 const W0 = await imp('js/modules/sheet/lesson-pages/vocab-words.js');
+const HAND_NOW = await import(pathToFileURL(path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', 'js/modules/sheet/graphics/vocab-pictures.js')).href);
 const P = await imp('js/modules/sheet/graphics/vocab-pictures.js');
 let W = W0;
 if (FIXTURE) {
@@ -157,7 +158,8 @@ const ambig = [];
         const xs = also(id);
         if (!Array.isArray(xs)) { fail(`V-AMBIG "${id}": the picture declares no alsoShows`); continue; }
         // (the hand list - VOCAB_ALSO_SHOWS - is an extra: any pair of it that may share a bank fails, in any grade)
-        const hand = (P.VOCAB_ALSO_SHOWS || {})[id] || [];
+        // (r12: today's hand list too, so a backtest row judges an old tree's deals by today's known readings)
+        const hand = [...new Set([...((P.VOCAB_ALSO_SHOWS || {})[id] || []), ...((HAND_NOW.VOCAB_ALSO_SHOWS || {})[id] || [])])];
         for (const b of hand) if (b !== id && W.VOCAB_WORDS[b] && W.compatible([id, b])) fail(`V-AMBIG "${id}": its picture could also show "${b}", and the two may share a bank (make them notWith)`);
     }
     // V-FEAT (r11, rule 5: the look-alike class failed r6, r7, r9 and r10, each time closed by one more derived rule). Today's

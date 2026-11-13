@@ -569,7 +569,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     sequence: ['pattern', 'multiple', 'count on', 'skip count'],
     cycle: ['repeat', 'circle'],
     grow: ['pattern', 'sequence', 'step'],
-    term: ['first term', 'sequence', 'number'],
+    term: ['first term', 'sequence', 'number', 'rule'],  // (r12, critic r11 #3: 18, [14], 10 reads as the rule "take 4")
     'first term': ['term', 'sequence'],
     'times as many': ['compare', 'bar', 'equal parts'],
     compare: ['times as many', 'difference'],
