@@ -15,6 +15,7 @@
 //   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
 //   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
 //                         only the kit's answer slots (input.mq-slot)
+//   --focus-gap-self-test FOCUS-GAP on synthetic pages, no app (critic eb-r6 m2: a word 1 px under or over the ring is a finding)
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
@@ -281,7 +282,8 @@ function PLAN(rootSel, which) {
 
 // FOCUS-GAP (critic eb-r5 D2, legibility): in the page, on the FOCUSED answer box: the outer edge of its focus ring (its
 // outline: the border box grown by outline-offset + outline-width) must keep >= 4 px from every text box of the cell beside it
-// on its line (a text line box that overlaps the ring vertically by >= 30 % of its height). 0f1a0bda's kit LINE slot pulled the
+// on its line (a text line box that overlaps the ring vertically by >= 30 % of its height), AND from every text box above or below
+// it that overlaps the ring horizontally (critic eb-r6 m2: "tens" 1 px under the ring passed). 0f1a0bda's kit LINE slot pulled the
 // next word under the ring (0 px to "tens" on unit_form). Returns a message, or '' when the ring is clear or no ring is drawn.
 function FOCUS_GAP(e, rootSel, all) {
     if (document.activeElement !== e || (!all && !e.matches('input.mq-slot'))) return '';
@@ -300,12 +302,14 @@ function FOCUS_GAP(e, rootSel, all) {
         const rg = document.createRange(); rg.selectNodeContents(n);
         for (const t of rg.getClientRects()) {
             if (!t.width || !t.height) continue;
-            if (Math.min(t.bottom, R.b) - Math.max(t.top, R.t) < 0.3 * t.height) continue;
-            const gap = Math.max(t.left - R.r, R.l - t.right);
-            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, word: n.textContent.trim().slice(0, 12) };
+            let gap, where;
+            if (Math.min(t.bottom, R.b) - Math.max(t.top, R.t) >= 0.3 * t.height) { gap = Math.max(t.left - R.r, R.l - t.right); where = 'beside'; }
+            else if (Math.min(t.right, R.r) - Math.max(t.left, R.l) > 0) { gap = Math.max(t.top - R.b, R.t - t.bottom); where = t.top >= R.t ? 'below' : 'above'; }
+            else continue;
+            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, where, word: n.textContent.trim().slice(0, 12) };
         }
     }
-    return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" (need >= 4 px)` : '';
+    return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" ${worst.where} it (need >= 4 px)` : '';
 }
 
 async function run(page, sel, which) {
@@ -420,7 +424,42 @@ async function liveGreen(page) {
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 // --stress N: one command that loads the CPU and repeats the whole run N times.
-if (has('stress')) {
+if (has('focus-gap-self-test')) (async () => {
+    // FOCUS-GAP on synthetic pages (no app): the critic eb-r6 probe set. A finding where a word touches the ring beside, under
+    // (1 px, m2) or over it; none for a lone box, a word on another line, or words 6+ px clear above / beside / below.
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const css = 'input.mq-slot{width:60px;height:40px;border:2px solid #000;font:24px sans-serif;margin:0}input.mq-slot:focus{outline:3px solid #1a73e8;outline-offset:2px}';
+    const W = 'font:24px sans-serif';
+    const cases = [
+        ['lone box', '<input class="mq-slot">', false],
+        ['word above, 10 px clear', `<div style="${W};margin-bottom:15px">Write the number</div><input class="mq-slot" style="display:block">`, false],
+        ['word 1 px below the ring', `<input class="mq-slot" style="display:block"><div style="${W};margin-top:-4px">tens</div>`, true],
+        ['word below, 10 px clear', `<input class="mq-slot" style="display:block"><div style="${W};margin-top:15px">tens</div>`, false],
+        ['word 1 px above the ring', `<div style="${W};line-height:1;margin-bottom:-4px">tens</div><input class="mq-slot" style="display:block">`, true],
+        ['word below, off to the side', `<input class="mq-slot" style="display:block"><div style="${W};margin:0 0 0 100px">tens</div>`, false],
+        ['word 20 px beside', `<span style="${W}">5 <input class="mq-slot" style="margin:0 20px"> tens</span>`, false],
+        ['word flush beside', `<span style="${W}">5<input class="mq-slot">tens</span>`, true],
+        // the critic's r6 "another line" probe: the wrapped next line's "tens" sits 5 px INSIDE the ring (a screenshot shows the ring
+        // on its ascenders), so under m2 it is a finding; the same words with line-height 2.2 clear the ring and are not
+        ['wrapped next line under the ring', `<div style="${W};width:120px">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, true],
+        ['wrapped lines, clear of the ring', `<div style="${W};width:120px;line-height:2.2">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, false],
+    ];
+    const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    const bad = [];
+    try {
+        const p = await b.newPage();
+        for (const [name, html, want] of cases) {
+            await p.setContent(`<style>${css}</style><div class="c" style="padding:40px">${html}</div>`);
+            await p.focus('input.mq-slot');
+            const msg = await (await p.$('input.mq-slot')).evaluate(FOCUS_GAP, '.c', false);
+            if (!!msg !== want) bad.push(`${name}: ${msg || 'no finding'} (want ${want ? 'a finding' : 'none'})`);
+        }
+    } finally { await b.close(); }
+    for (const x of bad) console.log(`self-test FAIL: FOCUS-GAP ${x}`);
+    console.log(`ws-screen-answer FOCUS-GAP self-test: ${bad.length ? 'FAIL' : 'OK'} (${cases.length} cases)`);
+    process.exit(bad.length ? 1 : 0);
+})();
+else if (has('stress')) {
     const { spawn, spawnSync } = require('child_process');
     const os = require('os');
     const n = Math.max(1, parseInt(arg('stress', '10'), 10) || 10);
