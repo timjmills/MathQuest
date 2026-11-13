@@ -20,6 +20,9 @@
 //              letter story draws ITS response - the equation (data-ws-slot="equation") on panels 1-3, n = the answer on
 //              panel 3 - and of an estimate story the estimate row ("Estimate:") on 2-3 and the Yes / No ring on 3; the
 //              four panels differ (the chart drew the whole cell four times). lf-engine routes those panels to it.
+//   PAGE-FRESH (precritic two-step r11) dealt as a printed run (seed base + i, itemIndex i, pages of 20): no Step 1 pair twice on a
+//              page, no first number more than twice, no answer more than 3 times (the x / ÷ / add-first presets repeated their
+//              small Step 1 facts; ws-dealer-uniform reads these skills INCOMPLETE, so this keeps the page judged)
 //   CAP-BAND   (--print, browser; lead ruling R1 2026-11-13, card decision 9 re-signed) multi_step_word (Visual) - the bar
 //              ABOVE the column work - holds its ruled capacity on the practice pages (independent / more-practice / test):
 //              at least S 2 / M 1 / L 1 stories a page (CAP), and no cell keeps an empty band of 30 % or more of its height
@@ -188,15 +191,39 @@ for (const key of mine) {
     }
 }
 
+// PAGE-FRESH (precritic two-step r11, ws-dealer-uniform PAGE on the x / ÷ / add-first presets): dealt as print-sheet deals a page
+// (generateQuestionFor, seed base + i, itemIndex i, pages of 20), no Step 1 pair (a, b) twice on a page, no first number more than
+// twice, no answer more than 3 times. ws-dealer-uniform itself reads these skills INCOMPLETE ("no single operation"), so this rule
+// keeps the page judged.
+for (const key of mine) {
+    const sk = short(key);
+    const base = fnv(`algebra:${sk}`);
+    const items = [];
+    for (let i = 0; i < 120; i++) {
+        let q; try { q = app.gq.generateQuestionFor({ category: 'algebra', skill: sk, seed: (base + i) >>> 0, itemIndex: i, itemCount: 120 }); } catch (e) { continue; }
+        const m = q && q.msOps;
+        if (!m) continue;
+        items.push({ page: Math.floor(i / 20), a: m.a, b: m.b, ans: q.ans });
+    }
+    if (!items.length) continue;
+    for (let pg = 0; pg < 6; pg++) {
+        const on = items.filter((x) => x.page === pg);
+        const count = (f) => { const c = new Map(); for (const x of on) c.set(f(x), (c.get(f(x)) || 0) + 1); return c; };
+        for (const [v, n] of count((x) => `${x.a},${x.b}`)) if (n > 1) fail('PAGE-FRESH', `${sk} page ${pg + 1}: Step 1 pair ${v} ${n} times (at most 1)`);
+        for (const [v, n] of count((x) => x.a)) if (n > 2) fail('PAGE-FRESH', `${sk} page ${pg + 1}: first number ${v} ${n} times (at most 2)`);
+        for (const [v, n] of count((x) => x.ans)) if (n > 3) fail('PAGE-FRESH', `${sk} page ${pg + 1}: answer ${v} ${n} times (at most 3)`);
+    }
+}
+
 // --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
 const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
 if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
