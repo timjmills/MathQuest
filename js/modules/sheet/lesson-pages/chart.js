@@ -425,9 +425,22 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // The panels take the body left over (by flex: the header's real height is only known to
         // the page) whenever they already use all of it, or when they are rows (the side column
         // spreads).
+        // (a one-step story in COLUMN work - story.js columnPanel, word-stories fix r3: each panel draws only the zones its step
+        // uses, so each ROW is as tall as its own tallest panel (L2 / L25: the cell is as tall as its content) - never
+        // stretched to the body, which left 30-35 % bands under the shorter panels; the white goes under the chart)
+        const own = mode === 'one' && !tailItem && lay.variant !== 'row' && cols === 2 && !!columnPanel(example, states, 0);
+        if (own) {
+            const hr = Array.from({ length: lay.rows }, (_, r) => Math.max(...states.slice(r * cols, r * cols + cols).map((st, j) => base[r * cols + j] + (z - 1) * dH[r * cols + j])));
+            rowH = Math.max(...hr);
+            const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, labels: 'none', cls: 'mq-chartgrid' });
+            grid.rowsTpl = hr.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
+            grid.height = `${Math.round(hr.reduce((a, v) => a + v, 0) * 100) / 100}mm`;
+            sections.push(grid);
+        } else {
         const fill = lay.variant === 'row' || lay.rows * rowH >= room - 2;
         const grid = gridPart(states.map((st) => withZoom(st, cols)), { cols, rows: lay.rows, cellH: rowH, labels: 'none', cls: 'mq-chartgrid' });
         sections.push(fill ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
+        }
         if (tailItem) sections.push(gridPart([Object.assign(planItem(tailItem, { cols: 1, nolabel: true }), { cls: tailItem.cellCls })], { cols: 1, rows: 1, cellH: tailH, labels: 'none', cls: 'mq-ctailgrid' }));
         // Height still spare after the panels: the other examples take it, up to a third more.
         const spare = Math.max(0, room - lay.rows * rowH);
