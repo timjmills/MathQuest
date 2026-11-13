@@ -163,7 +163,8 @@ function arraysPicture(g, p) {
     const m = 0.2;
     const W = (cols - 1) * pitch + d + 2 * m, H = (rows - 1) * pitch + d + 2 * m;
     for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) body += dot(m + r + j * pitch, m + r + i * pitch, r, false);
-    return { svg: svgMm(g, W, H, body, 'array of dots'), wMm: W, hMm: H };
+    // (the caption names the rows x columns DRAWN - ARRAY-CAPTION's convention, lf-ops-props r5)
+    return { svg: svgMm(g, W, H, body, `${rows} ${rows === 1 ? 'row' : 'rows'} of ${cols} dots`), wMm: W, hMm: H };
 }
 
 /** The kinds that carry the rows-of / groups-of sentence (arrays_groups). */
@@ -220,7 +221,9 @@ register('arrays', {
         // (critic lf-ops r1 D-AG-1: the shared picture box - as tall as the tallest picture the skill deals - left 40-54 %
         // of a cell empty between a short picture and its sentence. The sentence now stands right under its OWN picture;
         // each row is as tall as what it holds (layout rowShape) and the cell is answered in place (footprint inPlace).)
-        const picHtml = `${spacer}${pic.svg}`;
+        // (ARRAY-ORIENT, lf-ops-props r5: an item that asks for a specific "rows of" reading - payload.reading - is drawn as it
+        // reads, and says so on the drawing; every other array is landscape, the smaller factor its rows - the generator deals it)
+        const picHtml = p.reading ? `${spacer}<div data-mq-reading="${esc(String(p.reading))}">${pic.svg}</div>` : `${spacer}${pic.svg}`;
         return root(g, 'arrays', `${picHtml}${sent}`, 'text-align:center;', this.footprint(p, ctx).wMm);
     },
     answerKey(p) {

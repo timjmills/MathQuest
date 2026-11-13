@@ -4459,8 +4459,16 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // 2-3 or 4-5, the band of each block from the seeded deal, so a row of the page holds pictures of one height class.
                 const _agOneKind = !!_p12Narrowed('forms') && _p12Narrowed('forms').length === 1;
                 const _agBand = _agOneKind && Number.isFinite(state.itemIndex) ? blockPermutation('ag-band', 2, Math.floor(state.itemIndex / 6))[0] : -1;
-                const rows = _agBand === 0 ? rng(2, 3) : _agBand === 1 ? rng(4, arrMaxRows) : rng(2, arrMaxRows);
-                const cols = rng(2, arrMaxCols);
+                let rows = _agBand === 0 ? rng(2, 3) : _agBand === 1 ? rng(4, arrMaxRows) : rng(2, arrMaxRows);
+                let cols = rng(2, arrMaxCols);
+                // (owner 2026-11-13, "arrays landscape so they can be bigger"; lead ruling for arrays_groups, lf-ops-props r5): an
+                // ARRAY is drawn landscape - the smaller factor sets the rows - on paper and on every screen host. A one-kind page's
+                // height band then bands the smaller factor (2-3 or 4-5 rows), the other factor at least as large. The sentence the
+                // pupil answers is unchanged ("___ rows of ___", either order accepted). Ringed equal groups keep their deal.
+                if (questionType === 'write_mult') {
+                    if (_agBand >= 0) cols = rng(rows, arrMaxCols);
+                    else if (cols < rows) { const t = rows; rows = cols; cols = t; }
+                }
                 const total = rows * cols;
 
                 if (questionType === 'count_all') {
