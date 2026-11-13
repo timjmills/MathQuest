@@ -3261,6 +3261,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-check-pv-heads",
+  "check": "A sample lesson's Prerequisite Check (forced on) prints no place heads over a \"name the place\" numeral, and with two ring words the word nearest the underlined digit is not always the wrong one",
+  "kind": "commit-pair",
+  "rule": "PAGE_TYPES 2.10 (no supports); critic lf-engine-pc r3 F1",
+  "browser": true,
+  "fail": {
+   "commit": "316102081",
+   "state": "T O heads over every pv check item; words dealt \"ones tens\" (the word under the underlined digit always wrong)"
+  },
+  "pass": {
+   "commit": "88f20e544",
+   "state": "prepare(): routed pv place cells heads off, words in place order"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-PV",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-check-clip-ink",
+  "check": "On a sample lesson's Prerequisite Check and its key (forced on), every band's grid ink ends above its \"If missed\" tag and every tag is drawn",
+  "kind": "commit-pair",
+  "rule": "critic lf-engine-pc r3 F2; LR-17a (5)",
+  "browser": true,
+  "fail": {
+   "commit": "316102081",
+   "state": "sub S key: the \"15 - 6\" fact cells drew 38-40 mm in a 37.6 mm row, the tag had no ink"
+  },
+  "pass": {
+   "commit": "88f20e544",
+   "state": "a routed check measures 3 columns too (measureCols ctx.routed)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only sub --rules PC-CLIP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-frame-closure",
+  "check": "Every page of a sample lesson packet (forced on), pupil and key: no fixed grid row is shorter than its cells' natural height (the PDF draws the cell past the band's bottom rule)",
+  "kind": "commit-pair",
+  "rule": "critic lf-engine-pc r3 F3 (and F2); LESSONS_LEARNED frame closure",
+  "browser": true,
+  "fail": {
+   "commit": "316102081",
+   "state": "sub L sheet Independent cells need 68.7 mm in a 64.8 mm row; sub S check fact row 40.1 in 37.0"
+  },
+  "pass": {
+   "commit": "88f20e544",
+   "state": "Independent row at least a Guided cell's measured height (indepFrame); routed check measures 3 columns"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only sub --rules PC-FRAME",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-lr5-forced",
+  "check": "With the check forced on, no item placed on the sub lesson sheet is placed again on its Practice or Mixed page (LR-5)",
+  "kind": "commit-pair",
+  "rule": "LESSON_RULES LR-5; critic lf-engine-pc r3 F4",
+  "browser": true,
+  "fail": {
+   "commit": "316102081",
+   "state": "\"50 - 36\" on the sheet and on Practice at 7 of 8 seeds (and 60 - 33 on Mixed)"
+  },
+  "pass": {
+   "commit": "88f20e544",
+   "state": "buildLesson: the re-dealt sheet's fact keys hard-avoided by Practice and the Mixed partners (check on only)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 8 --sizes L --only sub --rules PC-LR5",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
