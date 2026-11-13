@@ -4072,7 +4072,7 @@
     "state": "lf-vocab r8 start: row, column, array dealt with pattern / multiple / row"
    },
    "pass": {
-    "commit": "TBD-r11-1",
+    "commit": "718740e4",
     "state": "V-FEAT, the r11 notWith and redraws"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\|array\\)\" picture reads as' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
@@ -4091,7 +4091,7 @@
     "state": "lf-vocab r9 head"
    },
    "pass": {
-    "commit": "TBD-r11-1",
+    "commit": "718740e4",
     "state": "V-FEAT"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(rule\\|cycle\\)\" picture reads as \"\\(input\\|output\\|sequence\\)\"' && echo 'r9-rule-cycle: FAIL' || echo 'r9-rule-cycle: OK')",
@@ -4110,7 +4110,7 @@
     "state": "lf-vocab r10 head"
    },
    "pass": {
-    "commit": "TBD-r11-1",
+    "commit": "718740e4",
     "state": "term 18, [14], 10 and first term [30], 25, 20"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(term\\|first term\\)\" picture reads as \"\\(grow\\|rule\\)\"' && echo 'r10-term: FAIL' || echo 'r10-term: OK')",
