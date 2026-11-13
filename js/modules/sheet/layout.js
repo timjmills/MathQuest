@@ -136,6 +136,8 @@ export const FILL_CAP = 1.8;
 export const CONTENT_FILL = 1.5;
 /** `noStretch` sections (div_facts' fade packet, owner 2026-11-08): a row takes its measured height and this much room. */
 export const NO_STRETCH_ROOM = 1.25;
+/** PT-GDP (design/PAGE_TYPES.md): a row is at most this multiple of its content where a page's shape is its count. */
+export const GDP_ROW_ROOM = 1.42;
 export const CELL_PAD_MM = 7;
 export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
@@ -884,8 +886,16 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // FILL_CAP x their measurement instead - the page is filled before a strip is left.
     let cellH = r3(capped ? Math.min(even, fillLimit(hMin)) : even);
     // (`noStretch`, owner 2026-11-08: div_facts' fade packet - a page under 80 % full keeps rows sized to what they hold)
-    if (capped && rows * cellH < 0.8 * G && !section.noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
-    if (capped && section.noStretch) cellH = r3(Math.min(even, hMin * (typeof section.noStretch === 'number' ? section.noStretch : NO_STRETCH_ROOM)));
+    // (lf-ops-props D-MP-1 / D-AG-1 / D-CB-4, lead ruling 2026-11-12 (b): a template whose footprint says `noStretch` - an
+    // array and its turn, an array and its sentence, a count row: answered in place, no working room - keeps rows sized to
+    // what they hold on every grid page, a lesson's `noCap` Practice page included; the spare height stays under the grid)
+    const fpNoStretch = hMin > 0 && cls !== 'long' && cls !== 'word' && infos.length > 0 && infos.every((i) => i.fp && i.fp.noStretch);
+    // (a page whose shape IS its count - `pageCap`, a detailed lesson's Practice sheet: the rows share the page, E9b - takes up
+    // to PT-GDP's 1.42 x what a row holds, never more)
+    const noStretch = section.noStretch || (fpNoStretch ? (Number(section.pageCap) > 0 ? GDP_ROW_ROOM : NO_STRETCH_ROOM) : 0);
+    if (fpNoStretch && !capped) cellH = r3(Math.min(even, fillLimit(hMin)));
+    if (capped && rows * cellH < 0.8 * G && !noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
+    if ((capped || fpNoStretch) && noStretch) cellH = r3(Math.min(even, hMin * (typeof noStretch === 'number' ? noStretch : NO_STRETCH_ROOM)));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
@@ -970,7 +980,13 @@ export function groupByHeight(items, cols) {
     if (!known.length || known.length < items.length / 2) return items;
     const hs = hs0.map((h) => h || Math.max(...known));
     const lo = Math.min(...hs), hi = Math.max(...hs);
-    if (!(hi > lo * 1.6)) return items;
+    // (lane lf-ops critic r1 D-MP-1 / D-AG-1: cells answered in place - footprint `inPlace`, an array and its turn, an
+    // array and its sentence - keep no writing room, so a short one beside a tall one is pure empty band: they are
+    // grouped by height from a 1.2 x spread, not 1.6 x)
+    // (lf-ops-props r3: a `noStretch` template - top-started, answered in its cell - is grouped the same way: a 2-row array
+    // beside a 5-row one left a 40 % band under the short one, print-lint H13-ROW, arrays_groups test L)
+    const inPlaceAll = items.every((it) => it && it.footprint && (it.footprint.inPlace || it.footprint.noStretch));
+    if (!(hi > lo * (inPlaceAll ? 1.2 : 1.6))) return items;
     // Wave 1 C2: a one-page count-by sheet is the teacher's row list, printed in the teacher's order (its title names that order).
     if (items.every((it) => it && it.q && it.q.countBy && it.q.countBy.onePage)) return items;
     // div_facts Mix (`divForm`, owner 2026-10-03): the page interleaves Standard, Long division and
@@ -981,7 +997,33 @@ export function groupByHeight(items, cols) {
     // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
     // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.
     const cls = (h) => Math.floor(Math.log(h / lo) / Math.log(1.35) + 1e-9);
-    return items.map((it, i) => ({ it, i, b: -cls(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
+    const tallFirst = items.map((it, i) => ({ it, i, b: -cls(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.i);
+    // (lf-ops-props r4b, lead ruling 2026-11-12 (a) on top of (b): a section of `noStretch` templates - answered in place,
+    // a row at most NO_STRETCH_ROOM x its shortest - takes the row order whose bands are lowest: the tallest-first classes
+    // above, the deal order, or height classes (a class spans NO_STRETCH_ROOM) SHORT to tall, i.e. easy to hard, each class
+    // in its dealt order. The deal decides which items appear; this decides only where. Nothing is dropped or re-dealt;
+    // a boundary row (an odd class count) stays mixed. An order is taken only when it is strictly better.)
+    if (items.every((it) => it && it.footprint && it.footprint.noStretch) && cols >= 2) {
+        const srt = hs.map((h, i) => [h, i]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+        const gc = []; let c = -1, base = 0;
+        for (const [h, i] of srt) { if (c < 0 || h > base * NO_STRETCH_ROOM) { c++; base = h; } gc[i] = c; }
+        const grouped = hs.map((_, i) => i).sort((a, b) => gc[a] - gc[b] || a - b);
+        const deal = hs.map((_, i) => i);
+        const score = (ord) => {
+            let n30 = 0, n20 = 0, worst = 0;
+            for (let r = 0; r < ord.length; r += cols) {
+                const row = ord.slice(r, r + cols).map((i) => hs[i]);
+                const H = Math.max(Math.max(...row), NO_STRETCH_ROOM * Math.min(...row));
+                for (const h of row) { const b = 1 - h / H; if (b >= 0.3) n30++; if (b > 0.2005) n20++; worst = Math.max(worst, b); }
+            }
+            return [n30, Math.round(worst * 1000), n20];
+        };
+        const less = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+        let best = tallFirst, bs = score(tallFirst);
+        for (const ord of [deal, grouped]) { const sc = score(ord); if (less(sc, bs) < 0) { best = ord; bs = sc; } }
+        return best.map((i) => items[i]);
+    }
+    return tallFirst.map((i) => items[i]);
 }
 
 /** A legacy cell's row height: its own measurement when it has one (never past cellH), else cellH. */
@@ -1028,6 +1070,15 @@ export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     // Each row stretches by the page's share (k) but no further than its own shortest problem
     // allows, and never below its tallest (1).
     const k = Math.max(1, Math.min((rows * cellH) / S, FILL_CAP));
+    // (lf-ops-props r3, CL-4b: a template answered in its cell - footprint `noStretch`: arrays, arrays-turn, count-row - is
+    // top-started with no writing room under it, so a row grows to at most NO_STRETCH_ROOM x its SHORTEST problem, never to
+    // the page's share: a 64 mm pair stood in a 106 mm row, 40 % empty, once the centring was gone)
+    const noStr = items.every((it) => it && it.footprint && it.footprint.noStretch);
+    if (noStr) {
+        const Hn = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, NO_STRETCH_ROOM * mins[r]))));
+        const tn = Hn.reduce((a, b) => a + b, 0);
+        return { rowsTpl: Hn.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(tn * 100) / 100 };
+    }
     let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]))));
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content

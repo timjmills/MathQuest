@@ -17,7 +17,7 @@
 // Pure module (SCC-01).
 
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, isTwin, KEY_FEATURES } from './k2kit.js';
+import { L, P, B, D, INK, GREY, isTwin, KEY_FEATURES } from './k2kit.js';
 
 export const TILE_SHAPES = Object.freeze(['box', 'circle', 'hex']);
 
@@ -37,9 +37,20 @@ export function tileSize(shape, baseW, baseH) {
  * number, or the key's / the pupil's written value); `ink` is 'trace' | 'solid' | null; `maxLen` the
  * most digits the screen box accepts (wave 1 C2: a count by 25,000 writes six-digit numbers); `full` the digits after which typing goes on to the next box.
  */
-export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, ink = null, heavy = false, shown = false, maxLen = 0, full = 0 } = {}) {
+// `digits` (lf-ops-props r4b, lf-algebra critic r2 G1 - the count-row screen train): in a screen twin the tile's numeral is never
+// under the host's digit size (k2kit D: --mq-digit, 40 / 48 / 56 px at 390 / 820 / 1280; it read 15-28 px) and the tile holds
+// `digits` numerals at that size and the 44 px touch input (it read 30-39 px tall under a 44 px input that ran onto the caption
+// under it). 0: as before. Paper is unchanged.
+export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, ink = null, heavy = false, shown = false, maxLen = 0, full = 0, digits = 0 } = {}) {
     const color = ink === 'trace' ? GREY : INK;
     const bw = B(ctx, heavy ? 1.5 : 0.75);
+    const floorOn = isTwin(ctx) && digits > 0;
+    // the floor box: the numerals at the digit size (0.6 em each, the pads and a hexagon's or circle's slant), 1.35 em tall
+    const fx = floorOn ? (0.6 * digits + 0.7) * (shape === 'hex' ? 1.25 : shape === 'circle' ? 1.2 : 1) : 0;
+    const fy = floorOn ? (shape === 'circle' ? Math.max(1.35, fx) : 1.35) : 0;
+    const fw = floorOn && shape === 'circle' ? Math.max(fx, fy) : fx;
+    const W = floorOn ? `max(${L(ctx, w)}, 44px, calc(var(--mq-digit, 40px) * ${fw.toFixed(2)}))` : L(ctx, w);
+    const Hh = floorOn ? `max(${L(ctx, h)}, 44px, calc(var(--mq-digit, 40px) * ${fy.toFixed(2)}))` : L(ctx, h);
     const outline = shape === 'hex'
         ? `<svg aria-hidden="true" viewBox="0 0 112 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;">`
             + `<polygon points="28,2 84,2 110,50 84,98 28,98 2,50" fill="none" stroke="${INK}" stroke-width="${heavy ? 3.2 : 1.8}" `
@@ -57,7 +68,7 @@ export function tile(ctx, { shape = 'box', w, h, pt, value = '', slot = null, in
     const size = shape === 'hex' ? 'width:72%;height:76%;margin:auto;' : 'width:100%;height:100%;';
     const inner = `<span class="k2-tile${slot ? ' k2-tile-slot' : ''}"${slotAttrs} style="position:relative;box-sizing:border-box;display:flex;`
         + `align-items:center;justify-content:center;overflow:hidden;${size}${border}background:${shape === 'hex' ? 'transparent' : '#fff'};`
-        + `font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${slot ? color : INK};${slot ? KEY_FEATURES : ''}">${esc(value)}</span>`;
+        + `font-size:${floorOn ? D(ctx, pt) : P(ctx, pt)};font-weight:700;line-height:1;color:${slot ? color : INK};${slot ? KEY_FEATURES : ''}">${esc(value)}</span>`;
     return `<span class="k2-shape k2-shape-${shape}" style="position:relative;display:inline-flex;flex:none;box-sizing:border-box;`
-        + `width:${L(ctx, w)};height:${L(ctx, h)};vertical-align:middle;">${inner}${outline}</span>`;
+        + `width:${W};height:${Hh};vertical-align:middle;">${inner}${outline}</span>`;
 }

@@ -1829,6 +1829,11 @@ html body .mq-scell [data-mq-swiperow][data-mq-wrapfit] .k2-swipe-cues > .k2-swi
     .k2-countrow-keys .k2-keys-type { display: none; }
     .k2-countrow-keys .k2-keys-touch { display: inline; }
 }
+/* (lane lf-ops critic r1 D-CB-9, BD-11: a phone-width screen is a touch screen - the tap wording, not the Space key) */
+@media (max-width: 480px) {
+    .k2-countrow-keys .k2-keys-type { display: none; }
+    .k2-countrow-keys .k2-keys-touch { display: inline; }
+}
 
 /* ---- Bracket hug (owner 2026-10-09; critic div-facts-forms R4 nit c, "7)  28", "2)  8"): the
    dividend's column is as wide as its digits, as on paper, so the arc and the vinculum hug them.
@@ -1962,6 +1967,12 @@ html body .online-edition .problem-card.mq-wscard .mq-scell .mq-multchart input.
 html body .online-edition .problem-card.mq-wscard .mq-scell input.ib-cell:focus,
 html body .mq-scell input.ib-cell:focus { outline-offset: -3px !important; }
 
+/* lf-ops-props r4b (lf-algebra critic r2 G1; SCREEN-DIGIT 40 / 48 / 56 px): a worksheet card that holds a count-row box train
+   (number_patterns_rule; count_by_tables' arcs train, lead ruling (a) 2026-11-13) keeps the host's own digit size, not the grid
+   cell's 29 px - its train wraps to the card's width. A train that still swipes (a number line under it: no k2-countrow-wrap) is excluded. */
+.mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 40px; }
+@media (min-width: 600px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 48px; } }
+@media (min-width: 1200px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 56px; } }
 /* Vocabulary feedback (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). Additive, scoped to the vocabulary
    cells. Before the answer nothing changes: the picture's halo (vocab-pictures.js) is drawn hidden. Once a host judges
    the answer, screen-cell.js markVocabFeedback adds .mq-vfb: the focal part's thick halo shows, the right word glows

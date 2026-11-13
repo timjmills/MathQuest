@@ -56,7 +56,7 @@ export function prepare(it, info = {}) {
     // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
     // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
     const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
-    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
+    let work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence || column ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence || column ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence || column ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: column ? { storyOnly: true } : { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -106,6 +106,12 @@ export function prepare(it, info = {}) {
     // to 32 % - ws-empty-band EB-BAND)
     const stackTagOf = (c) => (wide && !legacy && c && c.size !== 'L' ? ';padding:2.5mm 2mm 2.5mm 11mm;align-items:flex-start' : '');
     const boxAt = (c, col, row) => (stackTagOf(c) ? ` style="grid-column:${col};grid-row:${row}${stackTagOf(c)}"` : at(col, row));
+    // (lf-ops-props r5, the count-row Reason It wrap: a STACKED count row - an arcs row of 12-15 numbers is 150-170 mm - is drawn
+    // at its PANEL's width, the cell less the response column, the gutters and the panel's pads, so it wraps to more lines inside
+    // the panel and never runs past its rules - ws-empty-band EB-EDGE / ws-cell-checks OVERFLOW on count_by_tables Reason It S/M/L)
+    const panelLive = (c) => LIVE_W_MM - 52 - 10 - (stackTagOf(c) ? 13 : 4) - 6;
+    const work0 = work;
+    work = (c, o, v, slots) => work0(it.template === 'count-row' && wide && !legacy ? Object.assign({}, c, { cellLiveMm: panelLive(c) }) : c, o, v, slots);
     const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}">`
         + `<div class="mq-abbox"${boxAt(c, 1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
         + `<div class="mq-abbox"${boxAt(c, 1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`

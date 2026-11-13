@@ -8,6 +8,7 @@
 
 import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
+import { NO_STRETCH_ROOM } from '../layout.js';
 import { workedStepsOf, stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueOf, countCueRow } from '../roles/guided.js';
 import { stepIcon } from '../lesson-icons.js';
@@ -216,22 +217,27 @@ export function weDoBand(env) {
     // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
     // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
     const weInPlace = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.inPlace);
+    // (lf-ops-props r4b, lead ruling 2026-11-12 (b): a Guided cell of a `noStretch` template - a count row, an array and its
+    // turn: answered in place - is at most NO_STRETCH_ROOM x its content, not the Steps list's height beside it; a 35 mm count
+    // row stood in an 80 mm cell, 56 % empty (ws-empty-band EB-BAND, number_patterns_rule / count_by_tables lesson p2).
+    // The spare height stays under the grid, beside the Steps.)
+    const weNoSt = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.noStretch);
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
-    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i), nolabel: true }));
+    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, (186 - WEDO_W_MM - 10) / Math.max(1, stackRows ? 1 : weDo.length)), nolabel: true }));
     const zoneCtx = resolveCtx({ size: ctx.size, look: ctx.look, mode: 'print' });
     const weBand = {
         kind: 'row', cls: 'mq-modelrow mq-lwedorow', widths: ['1fr', `${WEDO_W_MM}mm`],
         parts: [
-            { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content: gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: weH / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: weH, labels: 'none' }) },
+            { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content: gridPart(weItems, stackRows ? { cols: 1, rows: stackRows, cellH: weH / stackRows, labels: 'none' } : { cols: weDo.length || 1, rows: 1, cellH: weNoSt ? Math.min(weH, gH * NO_STRETCH_ROOM) : weH, labels: 'none' }) },
             { kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-lstepsbox" style="height:${weH.toFixed(2)}mm">${stepsZone ? stepsZone.render(zoneCtx) : ''}</div>` },
         ],
     };
     // The Guided cells take little of the page's spare height: they are sized to their problems
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
-        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i), nolabel: true }));
+        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i, 186 / Math.max(1, top.rows ? 1 : weDo.length) - 10), nolabel: true }));
         const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the
@@ -242,8 +248,8 @@ export function weDoBand(env) {
         const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
-        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+        groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: weNoSt ? 0 : 0.1, capIfEmpty: weNoSt ? 0 : weInPlace ? 0.1 : 0.35 }));
+    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: weNoSt ? 0 : 0.1, capIfEmpty: weNoSt ? 0 : weInPlace ? 0.1 : 0.35 }));
     env.weDo = weDo;
     return env;
 }
@@ -254,8 +260,11 @@ export function weDoBand(env) {
  * cut underlined): the partial scaffold that fades across the row. A count-on fact keeps its dot
  * tile (the count cue) on every Guided cell.
  */
-export function weDoRender(it, i) {
-    return (c, o) => {
+// (`liveMm`, lf-ops-props EB-EDGE: the Guided cell's own width - beside the Steps it is 186 - 62 mm shared - so a count row wraps
+// to it instead of the page's 186 mm; read by count-row as `cellLiveMm`. Absent: as before.)
+export function weDoRender(it, i, liveMm) {
+    return (c0, o) => {
+        const c = Number(liveMm) > 0 && it && it.template === 'count-row' ? Object.assign({}, c0, { cellLiveMm: Number(liveMm) }) : c0;
         const answered = c.state && c.state !== 'blank';
         if (isRound(it)) {
             // Lessons r1: the chart's number line reaches the Guided cells - a blank 10-tick line

@@ -142,6 +142,11 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    runs `ws-stamp-assets`. The owner's go for a family is the line `Owner go: <family>, <YYYY-MM-DD>` in the lane file
    (§1.6.3 step 6).
    *Check:* the deploy is refused for a family with no go line.
+8a. **Never wrap ws-backtest or ws-precritic in mq-browser-run.sh (lf-ops-props r3b, 2026-11-13).** Both take the browser
+   slots themselves for every browser row they run; wrapped, the outer call holds a slot while its inner rows queue for one,
+   and with one or two slots the queue deadlocks. Run them directly; wrap only a single browser gate (ws-print-lint,
+   ws-empty-band, a probe).
+   *Check:* none yet (a runner guard that refuses a nested slot would make it one).
 9. **A lane's gate set includes every gate that reads what it ships (lessons 6-7 merge, 2026-10-31).** Detailed lessons
    6 and 7 merged with their own gates green (ws-detailed-lesson, precritic --role lesson), but ws-teacher-wrm, which
    decodes each detailed lesson's teacher Practice link, was not on the lessons lane's path and went red: the link was

@@ -3741,6 +3741,66 @@
    "pass": "OK"
   }
  },
+  {
+   "id": "pl-cl40-arrays-turn-mp",
+   "check": "An array dot never enters the cell label's 7 x 7 mm keep-out (CL-40; lf-ops-props precritic: mult_properties more-practice L, first dot 6.8 mm across, 4.8 mm down, cells 1 and 5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK (more-practice)",
+   "browser": true,
+   "fail": {
+    "commit": "fc981d0c7",
+    "state": "lf-ops-props precritic tree: the arrays-turn spacer keyed on ctx.columns"
+   },
+   "pass": {
+    "commit": "c1c54b5c4",
+    "state": "lf-ops-props r3b: the pair set in from the left by --ws-koin"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice --size L --lints L-OVERLAP --skills multiplication:mult_properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pl-row-stretch-mp-s",
+   "check": "A row of items answered in place (footprint noStretch: arrays, arrays-turn, count-row) is at most 1.25 x its content (1.42 on a pageCap page) and its shortest item's band at most 20 % (lead ruling 2026-11-12 (b); lf-ops-props r4 probe: practice.js spreadRows stretched a lone page's rows to 1.28-1.45 x, ignoring the footprint's noStretch)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint --rules ROW-STRETCH (more-practice)",
+   "browser": true,
+   "fail": {
+    "commit": "8f0e93e2a",
+    "state": "lf-ops-props r3b tree: the practice SPREAD ignores the footprint's noStretch (mult_properties more-practice S, 6 cells over 20 %)"
+   },
+   "pass": {
+    "commit": "228c2511a",
+    "state": "lf-ops-props r4b: spreadRows, guided and the lesson capFill hold noStretch rows to ruling (b)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice --size S --rules ROW-STRETCH --lints ROW-STRETCH --skills multiplication:mult_properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ss-train-fit-cbt",
+   "check": "A count-row screen train draws its numerals at the SCREEN-DIGIT floor (40 / 48 / 56 px at 390 / 820 / 1280) with no sideways scroll or swipe and no ink past its cell, on card 390 / 820 / 1280, worksheet and quiz (lead ruling (a) 2026-11-13; lf-algebra critic r2 G1)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots TRAIN-FIT",
+   "browser": true,
+   "fail": {
+    "commit": "8d7343c0f",
+    "state": "lf-ops-props r4b: the count_by_tables arcs train still a swipe row of 26-29 px numerals"
+   },
+   "pass": {
+    "commit": "c2ab95cc4",
+    "state": "lf-ops-props r4b: the arcs train wraps at the digit floor, pair-form arrows, no swipe"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:count_by_tables --train-fit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
  {
   "id": "roles-keyjoin-frame",
   "check": "a shared role writes ONE value a slot: a list answer one part a box, a sentence answer never on a write line (lf-roles; lf-algebra KEYJOIN 340 class)",

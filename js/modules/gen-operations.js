@@ -4454,7 +4454,12 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // Max Number (5 x 7 and 6 x 4 were dealt at range 100).
                 const arrMaxRows = 5;
                 const arrMaxCols = 5;
-                const rows = rng(2, arrMaxRows);
+                // (lane lf-ops, print-lint H13-ROW: a page of ONE kind - arrays only or groups only - has no common picture box, so a
+                // 2-row array stood beside a 5-row one) such a page deals its rows (or groups) in a band per block of six problems:
+                // 2-3 or 4-5, the band of each block from the seeded deal, so a row of the page holds pictures of one height class.
+                const _agOneKind = !!_p12Narrowed('forms') && _p12Narrowed('forms').length === 1;
+                const _agBand = _agOneKind && Number.isFinite(state.itemIndex) ? blockPermutation('ag-band', 2, Math.floor(state.itemIndex / 6))[0] : -1;
+                const rows = _agBand === 0 ? rng(2, 3) : _agBand === 1 ? rng(4, arrMaxRows) : rng(2, arrMaxRows);
                 const cols = rng(2, arrMaxCols);
                 const total = rows * cols;
 
@@ -4472,9 +4477,11 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     // R3: one sentence with no full stop between the blanks, so a wrapped line
                     // never starts with a stray '.' on screen; the screen instruction says what
                     // the three boxes are for (it was a bare "Solve.").
+                    // (lane lf-ops critic r1 D-AG-4: the paper frame's words - "[ ] groups of [ ]", "[ ] in all." - on screen
+                    // too; "make" was a screen-only word)
                     q.text = isGroups
-                        ? `___ groups of ___ make ___ in all.`
-                        : `___ rows of ___ make ___ in all.`;
+                        ? `___ groups of ___, ___ in all.`
+                        : `___ rows of ___, ___ in all.`;
                     q.screenInstr = isGroups
                         ? 'Write the groups, the number in each group, and the total.'
                         : 'Write the rows, the number in each row, and the total.';
@@ -4502,6 +4509,10 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                 // at any column count), equal groups ringed in a subitisable pattern, and one box
                 // per blank, all keyed. The screen twin draws the same picture.
                 const _agPayload = { kind: questionType, rows, cols };
+                // (lane lf-ops: a page mixing arrays and ringed groups draws every picture in one picture box - H13-ROW)
+                // (and a page of ringed groups alone: a ring layout's height turns on the group size as well as the count of groups)
+                // (critic lf-ops r1 D-AG-1: the shared picture box is gone - the sentence stands under its own picture - so no
+                // `picBox` is set; the template ignores it)
                 q.cell = { template: 'arrays', v: 1, payload: _agPayload };
                 q.visual = _kitTwin('arrays', _agPayload);
                 q.printFormat = 'arrays-groups';
@@ -4514,10 +4525,14 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
             // ========================================
             if (mappedSkill === "mult_properties") {
                 // P12: `forms` picks which properties are dealt (0 order, 1 distributive,
-                // 2 identity, 3 zero); untouched, one is picked at random as before.
+                // 2 identity, 3 zero). lf-ops (ops-tables card, one frame per section): the default is
+                // the order property alone (skill-options.js); the ticked forms are dealt in turn.
                 const _mpTypes = ['commutative', 'distributive', 'identity', 'zero'];
-                const _mpForms = _p12Narrowed('forms');
-                const propType = _mpForms ? _mpTypes[_mpForms[_dealRung(_mpForms.length)]] : pick(_mpTypes);
+                let _mpSet = _opt('forms');
+                if (typeof _mpSet === 'number') _mpSet = [_mpSet];
+                _mpSet = Array.isArray(_mpSet) ? [0, 1, 2, 3].filter(v => _mpSet.includes(v)) : [];
+                if (!_mpSet.length) _mpSet = [0];
+                const propType = _mpTypes[_mpSet[_dealRung(_mpSet.length)]];
 
                 if (propType === 'commutative') {
                     // Lesson 3a (P-A, RESEARCH g3-oa5-mult-properties): an array and the SAME array
@@ -4585,104 +4600,55 @@ function _generateOperationsQuestionInner(q, mappedSkill, helpers) {
                     q.skillLabel = 'Mult Properties';
                     return;
                 } else if (propType === 'distributive') {
-                    const a = rng(3, 8);
-                    const splitPart = rng(1, a - 1);
-                    const b = rng(2, 9);
-                    const missingPart = a - splitPart;
-                    const product = a * b;
-                    q.text = `${a} × ${b} = ${splitPart} × ${b} + ___ × ${b}. What is the missing number?`;
-                    q.ans = missingPart;
-                    q.printSlot = true;   // the ___ is the answer slot on paper (AK-4: key = pupil slots)
-                    q.hint = `Distributive property: ${a} × ${b} = (${splitPart} + ?) × ${b}. Since ${splitPart} + ${missingPart} = ${a}, the missing number is ${missingPart}`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(missingPart);
-
-                    // Array split into two parts with dotted line
-                    const dotR = 18;
-                    const gap = 48;
-                    const pad = 34;
-                    const totalCols = b;
-                    const svgW = pad * 2 + (totalCols - 1) * gap + dotR * 2;
-                    const svgH = pad * 2 + (a - 1) * gap + dotR * 2;
-
-                    let splitDots = '';
-                    for (let r = 0; r < a; r++) {
-                        for (let c = 0; c < totalCols; c++) {
-                            const color = r < splitPart ? 'var(--accent-green)' : 'var(--accent-orange)';
-                            splitDots += `<circle cx="${pad + dotR + c * gap}" cy="${pad + dotR + r * gap}" r="${dotR}" fill="${color}" stroke="var(--text-bright)" stroke-width="1"/>`;
-                        }
-                    }
-                    // Dotted line between the two sections
-                    const lineY = pad + splitPart * gap;
-                    splitDots += `<line x1="${pad - 5}" y1="${lineY}" x2="${svgW - pad + 5}" y2="${lineY}" stroke="var(--text-bright)" stroke-width="2" stroke-dasharray="6,4"/>`;
-
-                    q.visual = `<div style="text-align:center;">
-                                                <div style="margin-bottom:8px;font-size:1.1rem;">${a} × ${b} = <span style="color:var(--accent-green);">${splitPart} × ${b}</span> + <span style="color:var(--accent-orange);">? × ${b}</span></div>
-                        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="max-width:100%;height:22mm;width:auto;">
-                            <rect x="0" y="0" width="${svgW}" height="${svgH}" rx="8" fill="var(--bg-card)" stroke="var(--accent-cyan)" stroke-width="2"/>
-                            ${splitDots}
-                        </svg>
-                    </div>`;
-
-                } else if (propType === 'identity') {
-                    const num = rng(2, 12);
-                    const order = pick(['num_first', 'one_first']);
-                    if (order === 'num_first') {
-                        q.text = `What is ${num} × 1?`;
-                    } else {
-                        q.text = `What is 1 × ${num}?`;
-                    }
-                    q.ans = num;
-                    q.hint = `Identity property: Any number times 1 equals itself. ${num} × 1 = ${num}`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(num);
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Identity Property</div>
-                        <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
-                            <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">×</span>
-                            <span style="color:var(--accent-orange);font-weight:700;">1</span>
-                            <span style="margin:0 8px;">=</span>
-                            <span style="color:var(--accent-cyan);font-weight:700;">?</span>
-                        </div>
-                    </div>`;
-
+                    // lf-ops (ops-tables card §2 / §3, 3.OA.B.5): ONE array broken into two parts by a gap and a
+                    // bracket (never colour), drawn by the kit's `arrays-turn` cell (type 'split'); the pupil writes
+                    // each part's product and then the whole: "2 × 4 = [ ]", "3 × 4 = [ ]", "5 × 4 = [ ]". The old
+                    // item coloured the two parts green and orange and printed the rule. Rows 4-6 (each part at
+                    // least 2 rows; rows to 6 so two problems stand down a page at L), at most 5 in a row (RP-21); pictures off prints the three facts alone.
+                    const rows = rng(4, 6);
+                    const cols = rng(2, 5);
+                    const top = rng(2, rows - 2);
+                    const p1 = top * cols, p2 = (rows - top) * cols, product = rows * cols;
+                    const payload = { kind: 'turn', type: 'split', rows, cols, top, product };
+                    if (_opt('pictures') === false) payload.draw = 'none';
+                    q.a = rows; q.b = cols; q.op = '×';
+                    q.cell = { template: 'arrays-turn', v: 1, payload };
+                    q.text = 'Write the missing numbers.';
+                    q.screenInstr = q.text;
+                    q.instructionKey = 'missing-many';
+                    q.ans = `${p1}, ${p2}, ${product}`;
+                    q.keyParts = [String(p1), String(p2), String(product)];
+                    q.answerType = 'text';
+                    q.options = [];
+                    q.hint = `${rows} rows is ${top} rows and ${rows - top} rows. Add the two parts.`;
+                    q.visual = _kitTwin('arrays-turn', payload, { join: ', ' });
+                    q.printFormat = 'mult-properties';
+                    q.skillLabel = 'Mult Properties';
+                    return;
                 } else {
-                    // zero property
-                    const num = rng(1, 12);
-                    const order = pick(['num_first', 'zero_first']);
-                    if (order === 'num_first') {
-                        q.text = `What is ${num} × 0?`;
-                    } else {
-                        q.text = `What is 0 × ${num}?`;
-                    }
-                    q.ans = 0;
-                    q.hint = `Zero property: Any number times 0 equals 0. ${num} × 0 = 0`;
-                    q.answerType = "number";
-                    q.options = buildNumericOptions(0);
-
-                    q.visual = `<div style="text-align:center;">
-                        <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);">Zero Property</div>
-                        <div style="font-size:1.3rem;padding:15px;background:var(--bg-card);border-radius:10px;display:inline-block;">
-                            <span style="color:var(--accent-green);font-weight:700;">${num}</span>
-                            <span style="margin:0 8px;">×</span>
-                            <span style="color:var(--accent-orange);font-weight:700;">0</span>
-                            <span style="margin:0 8px;">=</span>
-                            <span style="color:var(--accent-cyan);font-weight:700;">?</span>
-                        </div>
-                    </div>`;
+                    // lf-ops (ops-tables card §2: 'n × 1 = [ ]', '0 × n = [ ]'): the identity and zero facts on the
+                    // kit's `equation` cell, black and white, nothing naming the rule (RP-1; the old cell headed
+                    // itself "Identity Property" in colour). The 1 or the 0 stands first or second, dealt.
+                    const one = propType === 'identity' ? 1 : 0;
+                    const n = rng(2, 12);
+                    const oneFirst = !!_dealRung(2, 'side');
+                    const a = oneFirst ? one : n, b = oneFirst ? n : one;
+                    const product = a * b;
+                    q.a = a; q.b = b; q.op = '×';
+                    q.text = `${a} × ${b} = ?`;
+                    q.ans = product;
+                    q.hint = propType === 'identity' ? `${a} × ${b}: ${oneFirst ? `1 group of ${n}` : `${n} groups of 1`}.` : `${a} × ${b}: ${oneFirst ? `0 groups of ${n}` : `${n} groups of 0`}.`;
+                    q.answerType = 'number';
+                    q.options = buildNumericOptions(product);
+                    const payload = { a, op: '×', b, unknown: 'result', result: product, digits: 2 };
+                    q.cell = { template: 'equation', v: 1, payload };
+                    q.visual = _kitTwin('equation', payload);
+                    q.screenInstr = 'Multiply.';
+                    q.instructionKey = 'multiply';
+                    q.printFormat = 'mult-properties';
+                    q.skillLabel = 'Mult Properties';
+                    return;
                 }
-
-                // Round 8 (critic r6 D6-2): the identity / zero cell no longer prints its rule line
-                // ("Any number × 0 = 0") under the question - it states the answer. The rule stays
-                // in q.hint, which the screen shows only when the pupil asks for help.
-                // P12: `pictures` off prints the question alone, without the arrays and the
-                // property's name (the name is a hint: it tells the pupil which rule to use).
-                if (_opt('pictures') === false) q.visual = '';
-                q.printFormat = 'mult-properties';
-                q.skillLabel = 'Mult Properties';
-                return;
             }
 
             // MULTIPLICATION CHART (mult_chart, mult_chart_easy and the retired _medium / _hard ids):

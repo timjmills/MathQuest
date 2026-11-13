@@ -44,6 +44,9 @@ import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
 
+/** Templates whose fix-it letters stand outside the answer box (critic lf-ops r1 D-MP-5 / D-AG-3). */
+const TAG_OUTSIDE = new Set(['arrays', 'arrays-turn']);
+
 export const ROLE_ID = 'error-analysis';
 // The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
 // white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
@@ -684,7 +687,10 @@ export function prepare(it, info = {}) {
         if (tagged) {
             tagged.forEach((id, i) => {
                 const re = new RegExp(`(<[a-z][a-z0-9]*\\b[^>]*\\sdata-ws-slot="${id}"[^>]*)>`, 'i');
-                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag">${'ABCDEF'[i]}</i>`);
+                // (lane lf-ops critic r1 D-MP-5 / D-AG-3: in an array's small answer boxes the letter printed over the grey
+                // made-up number; there it stands OUTSIDE the box, left of it, in room the box keeps for it)
+                const out = TAG_OUTSIDE.has(it.template) ? ' mq-tagout' : '';
+                body = body.replace(re, (m0, open) => `${open} data-ws-tagged="1"><i class="mq-slottag${out}">${'ABCDEF'[i]}</i>`);
             });
         }
         // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),

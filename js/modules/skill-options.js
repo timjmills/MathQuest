@@ -4171,3 +4171,28 @@ export function optionICan(categoryId, skillId, opts, baseICan) {
     const re = new RegExp(`\\bto ${tok(bandDef.default)}\\b`);
     return re.test(baseICan) ? baseICan.replace(re, `to ${tok(band)}`) : `${baseICan} (${bandPhrase})`;
 }
+
+// ============================ lane lf-ops (2026-11-07): mult_properties, ops-tables card ====================
+// Appended (skill-options is append-only for lanes): the card's "one frame per section" (P11, SCC-T10) - an
+// untouched page deals ONE property, the order property of lesson 3a (3.OA.B.5); ticking more mixes them. The
+// task help named "3 × 4" in a way the panel read as a value (node-lint OPTION-HELP); it now names no number.
+{
+    const _mp = SKILL_OPTIONS['multiplication:mult_properties'] || [];
+    const _mpForms = _mp.find((o) => o.id === 'forms');
+    if (_mpForms) {
+        _mpForms.default = [0];
+        _mpForms.help = 'One property to a page: the order property (an array and its turn) comes first. Tick more to mix them.';
+    }
+    const _mpTask = _mp.find((o) => o.id === 'task');
+    if (_mpTask) _mpTask.help = 'Order items only. One kind is one page instruction; tick more to mix them. The pictured arrays are at most 5 rows of 5.';
+}
+// lf-ops-props (2026-11-13, lead ruling on the ops-tables card): mult_properties band=36 is NOT offered - it failed the
+// post-fix re-measure at S (EB-BAND 10, EB-SIDE 2 on a384a0b4). The value is dropped from the panel, as the ranged
+// add/sub ids drop a band: normalizeOptions keeps only listed values, so an old code carrying 36 decodes to 25.
+{
+    const _mpBand = (SKILL_OPTIONS['multiplication:mult_properties'] || []).find((o) => o.id === 'band');
+    if (_mpBand) {
+        _mpBand.values = (_mpBand.values || []).filter((v) => v.v !== 36);
+        _mpBand.help = 'The largest factor of an Order item: the product is at most 25 or 81. The arrays stay at 5 × 5; 9 reaches the facts-only items.';
+    }
+}

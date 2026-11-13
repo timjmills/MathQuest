@@ -430,10 +430,10 @@ else if (args.includes('--checks-from-critics')) {
             console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
             if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
         }
-        // the probe skill is in NO lane's opt-in (lf-checks 2026-11-13: add_facts is lf-ops' own opt-in skill, so its
-        // --rule-skills addition:add_facts was read as lf-placevalue's leak); a leak is a --rule-skills line naming THIS lane's skills
+        // (lf-ops-props r5: the probe skill is in NO opted-in lane - add_facts is lf-ops's, so its own --rule-skills read as a
+        // leak of every other lane's rules)
         const anyLane = new Set(((optIn && optIn.lanes) || []).flatMap((l) => l.skills || []));
-        const other = [...live].find((k) => !anyLane.has(k) && k.startsWith('addition:'));
+        const other = [...live].find((k) => !anyLane.has(k) && k.startsWith('addition:')) || [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
         if (other) {
             checked++;
             const q = plan([other], null);

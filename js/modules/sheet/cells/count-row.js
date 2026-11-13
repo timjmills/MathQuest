@@ -53,7 +53,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2, KEY_FEATURES } from './k2kit.js';
+import { L, P, B, D, INK, GREY, root, digitPt, textPt, zonePt, sizeOf, inkOf, isTwin, S, SW, PT_MM, n2, KEY_FEATURES } from './k2kit.js';
 import { tile, tileSize, shapeAt } from './shapes.js';
 
 /** The widest box pitch of an 'arcs' row (mm), and the narrowest box a size may print. */
@@ -78,7 +78,8 @@ const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by column
  * one-page SHEET's layout, which only a full-width one-column cell holds.
  */
 const narrowCols = (p, ctx) => (ctx && ctx.wrapToCell && !p.noWrap && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
-const narrowLive = (p, ctx, live) => { const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
+// (`cellLiveMm`, lf-ops-props EB-EDGE: a caller that knows the row's own width - the lesson chart's panel - caps the line at it)
+const narrowLive = (p, ctx, live0) => { const live = ctx && Number(ctx.cellLiveMm) > 0 ? Math.min(live0, Number(ctx.cellLiveMm)) : live0; const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
 /** The fewest even lines whose numbers keep `boxW` mm each (and `gap` between) in `avail(rows)` mm. */
 function wrapRows(n, rows0, boxW, gap, avail) {
     for (let rows = rows0; rows <= n; rows++) {
@@ -96,6 +97,9 @@ const vpadOf = (p, ctx) => (ctx && ctx.tightRows ? 0 : Number(p.vpad) > 0 ? Numb
  * starts 1.5 mm in from the left: no height, and the one-page line, which fills its cell, gives the 1.5 mm out of its width.
  */
 const INSET_MM = 1.5;
+/** mm a compact (one-page) paper row keeps clear on its left for the cell's label keep-out (--ws-koin is at most 3 mm). */
+const KO_RESERVE_MM = 3;
+const koReserve = (p, ctx) => (p && p.compact && !isTwin(ctx) && !insetOf(ctx) ? KO_RESERVE_MM : 0);
 const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
 /**
  * critic r6 N15: on the Opener (the role sizes the cell to the row), a count row of three or more lines - the wide practice rows
@@ -106,7 +110,8 @@ const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
 const lineGapOf = (ctx, g) => (ctx && ctx.tightRows && !isTwin(ctx) && g && g.rows >= 3 ? (g.lines ? 1.5 : 2) : 2.5);   // a Lines row has no box tops
 const tabLineH = (g, ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? Math.min(g.h, tabPt(g) * PT_MM * 0.72 + 4.5) : g.h);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
-const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
+// (`bandDigits`, lf-ops-props r3b: a row sized from the widest number of its band, so a page keeps one slot width)
+const maxDigits = (p) => Math.max(1, Number(p.bandDigits) || 0, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
 /** The step tab this render draws: a hint tab (`tabHint`) is dropped at level 0. */
 const tabOf = (p, ctx) => (p.tabHint && lvlOf(ctx) < 1 ? '' : (p.tab || ''));
@@ -125,7 +130,19 @@ function labelAt(p, ctx, i) {
  * about ten tables); otherwise (L, or a shaped track) it wraps to two even lines of six, so no box
  * is ever squeezed below the size's writing width (RUBRIC H9: 14 mm at L).
  */
+/** The screen twin's least box width (mm at the twin's 3.4 px/mm): a typed box is at least 44 px wide (the rubric's touch-target floor). */
+const TWIN_MIN_BOX_MM = 44 / 3.4 + 0.1;
 function geom(p, ctx) {
+    const g = geomRaw(p, ctx);
+    // (lane lf-ops for lf-algebra 2026-11-07, grade-render card-390: count-row boxes were 40 px) the twin's tiles never fall under 44 px
+    if (g && isTwin(ctx) && g.w < TWIN_MIN_BOX_MM) {
+        const d = TWIN_MIN_BOX_MM - g.w;
+        g.w += d; g.pitch += d;
+        if (g.h < TWIN_MIN_BOX_MM && g.shape === 'circle') g.h = g.w;
+    }
+    return g;
+}
+function geomRaw(p, ctx) {
     const p0 = p;
     if (p.compact && narrowCols(p, ctx) > 1) p = Object.assign({}, p, { compact: false, fullPt: true });   // keeps the one-page sheet's digit size
     const size = sizeOf(ctx);
@@ -156,7 +173,9 @@ function geom(p, ctx) {
     // full 178 mm line), so 108 / 121 / 144 sit with clear space in the pupil's box and in the key.
     // owner 2026-10-03: the arcs are gone, so the one-page sheet gives their 3 mm to the boxes (the page stays as full as before)
     const baseH = S(ctx).writeMm + (p.compact ? 6.4 : 2.5);
-    const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM - insetOf(ctx) : LIVE_MM);
+    // (lane lf-ops, label keep-out: on the one-page sheet the step tab stood in the number tab's keep-out at 4 mm across, 2 mm down) a compact
+    // paper row starts right of the keep-out (--ws-koin, render) and keeps that much less line
+    const live = narrowLive(p, ctx, p.compact ? COMPACT_LIVE_MM - insetOf(ctx) - koReserve(p, ctx) : LIVE_MM);
     // THE ONE-PAGE SHEET (owner 2026-10-02 ruling): "All rows on one page" keeps its compact SINGLE line of 12 numbers at the
     // size's working digit size (16 pt at S), exactly as it was. A row whose widest number (> 3 characters) cannot be written
     // on one line at FLOOR_PT shrinks its digits down to the floor first (TY-10a) and otherwise takes two lines of six.
@@ -184,9 +203,18 @@ function geom(p, ctx) {
     }
     let boxW = 14 + wide;
     let perRow = n;
-    const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
+    // (lf-algebra options-verify --render, 2026-11-07: a circle / hexagon train tile grew past the box - S held 5 rows a page where
+    // the box page holds 8; as on the arcs row, a shaped tile keeps the box's height and pitch: a circle as wide as the box is tall)
+    const sz = shape === 'box' ? { w: boxW, h: baseH } : shape === 'circle' ? { w: Math.min(boxW, baseH), h: Math.min(boxW, baseH) } : { w: boxW, h: baseH };
     const pitch = sz.w + gap;
-    const fitN = Math.max(1, Math.floor((live - tab + gap) / pitch));
+    // (lane lf-ops for lf-algebra, 2026-11-07: a 'train' row in a cell narrower than the page - the Reason It page's A and B side by
+    // side - wraps to ITS cell's width, as wrapToCell rows do; it took the full 172 mm and overflowed at S, M and L)
+    // (lf-algebra regression 2026-11-07: keyed on ctx.columns, the train also wrapped inside FULL-WIDTH panels - the lesson anchor
+    // chart's 185 mm panel printed 8 tiles as 4 + 4 and overflowed. The wrap is decided on the room the row really has: the line's
+    // own live width. Reason It now gives a row wider than its panel a panel as wide as the row (reason-it.js pair / full), so no
+    // caller needs a narrower train.)
+    const liveT = live;
+    const fitN = Math.max(1, Math.floor((liveT - tab + gap) / pitch));
     if (fitN < perRow) perRow = Math.ceil(n / Math.ceil(n / fitN));
     if (isTwin(ctx) && perRow > TWIN_ROW) perRow = Math.ceil(n / Math.ceil(n / TWIN_ROW));
     const rows = Math.ceil(n / perRow);
@@ -416,7 +444,7 @@ function arcsGeom(p, ctx, c) {
     // S gave 16 x 0.64 = 10.2 pt). Its box is >= 5 mm a digit (D11), so 11 pt (about 2.2 mm a digit) never shrinks or wraps it
     const wideFloor = !p.axis && !isTwin(ctx) && !(ctx && ctx.tightRows) && wideNeedMm(p) ? GIVEN_MIN_PT : 0;
     const basePt = Math.max(wideFloor, Math.min(digitPt(ctx) * (p.compact || p.fullPt ? 1 : 0.64), 18));
-    const shapeK = shape === 'hex' || shape === 'mixed' ? 1.12 : 1;
+    const shapeK = 1;   // (lane lf-ops: a shaped tile keeps the box's width, so it wraps where the box row does)
     const glyphMm = chars * 0.56 * basePt * PT_MM + 2.4;
     const wideNeed = !p.axis && !isTwin(ctx) && !(ctx && ctx.tightRows) ? wideNeedMm(p) : 0;   // the Opener sizes its own rows (base r6 N15)
     if (narrowCols(p, ctx) > 1 && !p.axis) {
@@ -446,7 +474,11 @@ function arcsGeom(p, ctx, c) {
     const boxMin = Math.max(MIN_BOX[size], glyphMm, wideNeed);   // wide enough for today's digits (and a wide row's hand)
     const boxCap = PITCH[size] + 2;                             // a table's box stays near today's writing width
     let boxW = maxW >= boxMin ? Math.min(maxW, Math.max(boxMin, wideNeed ? boxMin : boxCap)) : maxW;
-    const sz = shape === 'box' ? { w: boxW, h: baseH } : tileSize(shape === 'mixed' ? 'hex' : shape, boxW, baseH);
+    // (lane lf-ops 2026-11-07, options-verify --render capacity: a circle grew to 14.5 mm and a hexagon to 14 mm tall at S, so a
+    // shape page held 5 rows where the box page holds 8-9) a shaped tile keeps the box tile's height and the row's pitch: a circle as
+    // wide as the box is tall, a hexagon the box's width; the line breaks exactly where the box row's does.
+    const sz = shape === 'box' ? { w: boxW, h: baseH }
+        : shape === 'circle' ? { w: Math.min(boxW, baseH), h: Math.min(boxW, baseH) } : { w: boxW, h: baseH };
     if (sz.w > pitch - 1) { sz.w = pitch - 1; }
     // the screen twin (critic C2 r6): the gap between columns is capped at TWIN_GAP_MM (about 24 px on a phone card), so four
     // columns fit the 322 px phone window; the arcs are drawn from this pitch, never restyled afterwards
@@ -617,6 +649,16 @@ function turnArrow(ctx, g, kind, w) {
         + `<path d="${path}" fill="none" stroke="${INK}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>${head}</svg>`;
 }
 
+/**
+ * (lane lf-ops for lf-algebra 2026-11-07, grade-render card-390 / 1280: the typed box was 40 px wide - the host scales --mq-k2 down
+ * and the tile's heavy outline takes its share) on screen a writing tile is never narrower than TWIN_TILE_PX, so its input keeps
+ * >= 44 px (the touch-target floor). Paper is untouched.
+ */
+const TWIN_TILE_PX = 50;
+const twinFloor = (ctx, html) => (isTwin(ctx)
+    ? html.replace(/^(<span class="k2-shape[^"]*" style="[^"]*?)width:(calc\([^;]*\));/, `$1width:max(${TWIN_TILE_PX}px, $2);`)
+    : html);
+
 register('count-row', {
     render(p, ctx) {
         const g = geom(p, ctx);
@@ -633,6 +675,15 @@ register('count-row', {
         // small fixes item 1 (critic r2 N1/N2): on screen a box takes as many digits as the row's WIDEST number - the same for
         // every box, so it tells no box's answer; a digit typed past that goes on to the next box (active-box.js), never lost
         const rowMax = Math.max(1, ...values.map((x) => String(x).replace(/\D/g, '').length));
+        // (r4b, lf-algebra critic r2 G1: on screen a box train's numerals take the host's digit size and its boxes the 44 px
+        // input - number_patterns_rule's train read 15-28 px under 44 px inputs that ran onto its caption. The arcs train - the
+        // count-by row, six a line with its jump arrows and step tab, swiped on a phone - keeps its own sizes: at the floor its
+        // line ran 900 px into an 820 card and the host shrank the whole drawing to fit.)
+        // (lead ruling (a) 2026-11-13: on screen the arcs train - no number line under it - is ONE wrapping line at the digit
+        // floor: as many numbers a line as fit (3-4), the jump arrow before each number carrying the count on to the next line
+        // as print's pair form does; no swipe row, no horizontal scroll, never shrunk under SCREEN-DIGIT. ws-screen-slots TRAIN-FIT)
+        const wrapTwin = isTwin(ctx) && g.look === 'arcs' && !g.axis;
+        const twinDigits = isTwin(ctx) && (g.look !== 'arcs' || wrapTwin) ? rowMax : 0;
         const cells = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -641,14 +692,15 @@ register('count-row', {
                 const text = fmt(over !== undefined ? over : v);
                 if (plainGiven) {
                     return `<span class="k2-given"${over !== undefined ? ' data-ws-shown="1"' : ''} style="flex:none;display:inline-flex;align-items:center;justify-content:center;`
-                        + `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};font-weight:700;line-height:1;">${esc(text)}</span>`;
+                        + (twinDigits ? `width:max(${L(ctx, g.gw || g.w)}, 44px, calc(var(--mq-digit, 40px) * ${(0.6 * rowMax + 0.7).toFixed(2)}));height:max(${L(ctx, g.h)}, 44px, calc(var(--mq-digit, 40px) * 1.35));font-size:${D(ctx, g.pt)};`
+                            : `width:${L(ctx, g.gw || g.w)};height:${L(ctx, g.h)};font-size:${P(ctx, g.pt)};`) + `font-weight:700;line-height:1;">${esc(text)}</span>`;
                 }
-                return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: text, shown: over !== undefined });
+                return tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: text, shown: over !== undefined, digits: twinDigits });
             }
             const val = over !== undefined ? String(over) : shown[k];
             const vInk = over !== undefined ? 'solid' : val !== '' ? inkAt(`b${k}`) : null;
             if (g.lines) return lineSlot(ctx, g, { id: `b${k}`, value: val === '' ? '' : fmt(val), ink: vInk, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
-            return tile(ctx, { shape: sh, w: g.w, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax });
+            return twinFloor(ctx, tile(ctx, { shape: sh, w: sh === 'circle' ? Math.min(g.w, g.h) : g.w, h: sh === 'circle' ? Math.min(g.w, g.h) : g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: `b${k}`, mark: 'cell' }, ink: vInk, heavy: true, shown: over !== undefined, maxLen: keyDigits, full: rowMax, digits: twinDigits }));
         });
         if (g.hasLbl) {
             const lblInk = lvlOf(ctx) === 2 ? GREY : INK;
@@ -660,27 +712,29 @@ register('count-row', {
             }
         }
         const rowsHtml = [];
-        const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab;
+        const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab && !wrapTwin;
+        const swipeRow = isTwin(ctx) && g.look === 'arcs' && !wrapTwin;
+        const nRows = wrapTwin ? 1 : g.rows, nPer = wrapTwin ? cells.length : g.perRow;
         const tabsCol = [];
         const lg = lineGapOf(ctx, g);
         if (g.tabAbove) rowsHtml.push(`<div class="k2-countrow-line k2-countrow-tabline" style="display:flex;margin-bottom:${L(ctx, lg)};">${stepTab(ctx, g, tabOf(p, ctx), p.tabHint && lvlOf(ctx) === 2 ? GREY : INK, tabLineH(g, ctx))}</div>`);
-        for (let r = 0; r < g.rows; r++) {
-            const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
+        for (let r = 0; r < nRows; r++) {
+            const part = cells.slice(r * nPer, (r + 1) * nPer);
             // skip_count_line keeps its hop arcs over a number line (owner 2026-10-09); every other row takes the short jump arrows
             const arcs = g.axis ? arcsSVG(ctx, g, part.length) + axisSVG(ctx, g, part.length) : '';
             const jumps = g.look === 'arcs' && !g.axis;
             const lineCells = jumps ? part.map((c, k) => (k ? `<span class="k2-jumpcell" style="position:relative;flex:none;display:block;">${jumpArrow(ctx, g, g.gap)}${c}</span>` : c)) : part;
-            const turns = g.look === 'arcs' && g.tab && g.rows > 1;
+            const turns = g.look === 'arcs' && g.tab && nRows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
             const tabCol = g.tab ? (r === 0 && !g.tabAbove ? stepTab(ctx, g, tabOf(p, ctx), p.tabHint && lvlOf(ctx) === 2 ? GREY : INK) : r === 0 ? `<span style="flex:none;width:${L(ctx, tabW)};"></span>` : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
             // screen twin (critic C2 r4): the step tab and the arrow column sit OUTSIDE the swiping row, in a fixed column beside it,
             // so no number or box can ever slide under them; wireSwipeRows (screen-cell.js) keeps each entry level with its line
             if (swipeTabs) { tabsCol.push(`<div data-mq-tabfor="${r}" style="display:flex;align-items:flex-end;${r ? `margin-top:${L(ctx, 2.5)};` : ''}">${tabCol}</div>`); }
-            const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
-            rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
+            const exitArrow = turns && r < nRows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
+            rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:${wrapTwin ? 'flex-start' : 'flex-end'};justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};">${lineCells.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${isTwin(ctx) && (g.look !== 'arcs' || wrapTwin) ? `flex-wrap:wrap;justify-content:${wrapTwin ? 'flex-start' : 'center'};max-width:100%;${wrapTwin ? `row-gap:${L(ctx, 3)};` : ''}` : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -691,9 +745,11 @@ register('count-row', {
             const k = blanks.length;
             const val = shown[k];
             const vInk = val !== '' ? inkAt('rule') : null;
-            const rb = tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true });
+            const rb = twinFloor(ctx, tile(ctx, { shape: 'box', w: 14 + Math.max(0, String(p.ruleBox.value).length - 3) * 3, h: g.h, pt: g.pt, value: val === '' ? '' : fmt(val), slot: { id: 'rule', mark: 'cell' }, ink: vInk, heavy: true, digits: g.look === 'arcs' ? 0 : Math.max(1, String(p.ruleBox.value).replace(/\D/g, '').length) }));
+            // (lane lf-ops for lf-algebra: in a narrow cell - a Reason It panel - the rule line wraps round its box, never past the cell)
+            const narrowRule = !isTwin(ctx) && Number(ctx && ctx.columns) > 1;
             ruleFrame = `<div class="k2-rulebox" style="display:flex;align-items:center;justify-content:center;gap:${L(ctx, 2)};margin-top:${L(ctx, 3)};`
-                + `font-size:${P(ctx, textPt(ctx))};font-weight:400;white-space:nowrap;">`
+                + `font-size:${P(ctx, textPt(ctx))};font-weight:400;${narrowRule ? 'flex-wrap:wrap;row-gap:1mm;max-width:100%;' : 'white-space:nowrap;'}">`
                 + `<span>${esc(p.ruleBox.pre || 'Rule:')}</span>${rb}${p.ruleBox.post ? `<span>${esc(p.ruleBox.post)}</span>` : ''}</div>`;
         }
         // screen only (critic r2 N1): how to move on between boxes - the caret never moves by itself
@@ -703,12 +759,12 @@ register('count-row', {
             : '';
         const align = g.tab ? 'left' : 'center';
         const vp = vpadOf(p, ctx), inset = insetOf(ctx);
-        return root(ctx, `k2-countrow k2-countrow-${g.look}`,
+        return root(ctx, `k2-countrow k2-countrow-${g.look}${isTwin(ctx) && !swipeRow ? ' k2-countrow-wrap' : ''}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
-            + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
+            + `${swipeRow ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
-            { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : ''}` });
+            + `${swipeRow ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
+            { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : koReserve(p, ctx) ? `padding-left:min(${KO_RESERVE_MM}mm, var(--ws-koin, 0mm));box-sizing:border-box;` : ''}` });
     },
     answerKey(p) {
         const parts = keyParts(p);
@@ -718,13 +774,15 @@ register('count-row', {
         return { value: parts.join(', '), display: parts.map(fmt).join(', '), slots };
     },
     footprint(p, ctx) {
-        const g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
+        let g = geom(p, Object.assign({}, ctx || {}, { columns: 1 }));   // item 7: the full-line geometry, so maxCols is unchanged
+        // (lane lf-ops for lf-algebra: a 'train' row in a narrow cell wraps to it (geom), so its height is the wrapped one)
+        // (the train no longer wraps on ctx.columns - lf-algebra regression - so its height is the full-line one)
         const w = g.tab + g.perRow * g.pitch - g.gap + 4 + insetOf(ctx);
         const lg = lineGapOf(ctx, g);
         const h = g.rows * (g.arcH + (g.axisH || 0) + g.h + g.lblH) + (g.rows - 1) * lg + (g.tight && g.tabAbove ? tabLineH(g, ctx) + g.lblH + lg : 0) + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
-        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
+        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1, noStretch: true };   // (noStretch: lf-ops-props ruling (b), D-CB-4/5)
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));

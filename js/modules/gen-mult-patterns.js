@@ -380,6 +380,9 @@ export function genNumberPatterns(q) {
             : 'Compare two numbers side by side. Is the next one double, half or ten times as big?';
     q.skillLabel = 'Number Pattern';
     const payload = { values, blanks, look: 'train', shape };
+    // (lf-ops-props r3b, lf-algebra minor: a slot grew to 3 digits on the rows that pass 100 - one page, two slot widths.
+    // Every row of the page is sized from the widest number its BAND can reach: the highest place ticked, capped by range.)
+    payload.bandDigits = fmt(pvCap(PLACE_CAP[places[places.length - 1]] || 99, state.range)).length;
     if (hideRule) payload.ruleBox = { pre: rule.pre, post: rule.post, value: String(rule.value) };
     else payload.rule = RULE_TEXT[row.kind](row);
     q.cell = { template: 'count-row', v: 1, payload };

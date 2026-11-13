@@ -50,7 +50,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
-import { lessonFor, skillRef } from './lessons/prereqs.js';
+import { lessonFor, optionLesson, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
@@ -228,7 +228,9 @@ function normaliseRequest(req = {}) {
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
     const sections = (Array.isArray(req.sections) ? req.sections : [])
         .map((s) => ({
-            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId),
+            // (`twoAcross`, lf-ops-props D-MP-1 / D-MP-3: the page's size and look travel on each ref, so the dealer can keep an
+            // array and its turn to a pair two of which stand across a row - turnFitsTwo)
+            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId).map((k) => Object.assign({}, k, { twoAcross: { size, look } })),
             count: s && s.count !== undefined && s.count !== null && s.count !== 'auto' ? clampInt(s.count, 1, MAX_ITEMS, null) : null,
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
@@ -616,6 +618,21 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
+/**
+ * lf-ops-props (critic lf-ops r1 D-MP-1 / D-MP-3; lead ruling 2026-11-12): an `arrays-turn` order pair (two arrays side by
+ * side) is dealt only when two such pairs stand across a row at the page's size - at L a 4 x 5 pair (93 mm) or 5 x 5
+ * (102 mm) is wider than a two-column cell (92.3 mm), so the page planned one-column rows for every pair and stretched them
+ * (27 empty bands at L). The split array, the facts-only item and a ref without `twoAcross` deal as before.
+ */
+export function turnFitsTwo(cand, sk) {
+    const ta = sk && sk.twoAcross;
+    const spec = cand && cand.cell;
+    if (!ta || !spec || spec.template !== 'arrays-turn') return true;
+    const p = spec.payload || {};
+    if (p.type === 'split' || p.draw === 'none' || p.type === 'missing') return true;
+    const fp = cellFootprint(cand, { size: ta.size, look: ta.look, mode: 'print' });
+    return !(Number(fp && fp.wMm) > cellWidthMm(2, LIVE_W_MM, ta.look).inner);
+}
 export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys) || Array.isArray(sk.hardAvoid));
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
@@ -1014,6 +1031,11 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
                 const strict = soft && !(relaxLast && k === tries);
                 if (hard && !refHardOk(skH, cand)) continue;
+                // (lf-ops-props D-MP-1 / D-MP-3: a pictured array and its turn too wide for two across a row is dealt again - the
+                // DEALT factor range is capped at the page's size, the drawing never shrinks; the last try keeps what it gets)
+                // (a detailed pack's sheet - `edgeLast` / `onlyKeys`: its places are solved for its edge case, the square that ends
+                // the page, E24b - keeps its own deal; the pack's rows are laid by its own shape)
+                if (k < tries && !sk.edgeLast && !Array.isArray(skH.onlyKeys) && !turnFitsTwo(cand, sk)) { if (!got) got = cand; continue; }
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
@@ -2126,8 +2148,8 @@ function measureSide2(pairs, { size, look, tpl = '', mdoc = null }) {
     if (typeof document === 'undefined' || !document.body || !pairs.length) return '';
     const { root, done } = measureHost(size, look, mdoc);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     try {
         if (!tpl) {
             // the pupil's column: the widest problem at its own width (a max-content column)
@@ -2172,8 +2194,8 @@ function measureSide4(pairs, { size, look, mdoc = null }) {
     const { root, done } = measureHost(size, look, mdoc);
     const getComputedStyle = (el) => el.ownerDocument.defaultView.getComputedStyle(el);
     const PX_PER_MM = 96 / 25.4;
-    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: lvl || 1, state: 'blank' });
-    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(x.measureLevel), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
+    const ctx = (lvl) => resolveCtx({ mode: 'print', look, size, paper: 'A4', scaffoldLevel: Number.isFinite(lvl) ? lvl : 1, state: 'blank' });
+    const cellHtml = (x) => { let b = ''; try { b = x.render(ctx(Number.isFinite(x.measureLevel) ? x.measureLevel : 1), { cols: 2 }); } catch (e) { b = ''; } return `<div class="ws-cell ${x.cellCls || ''}" style="height:auto;min-height:0;"><span class="ws-letter">m.</span>${b}</div>`; };
     // the content's ink extent in a cell, and whether it stays inside the cell's padding box
     const ink = (cell) => {
         const r = cell.getBoundingClientRect();
@@ -2281,7 +2303,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const bodies = new Map();
         for (const it of items) {
             bodies.set(it, cols.map((c) => MEASURE_STATES.map((state) => {
-                try { return it.render(ctxOf(state, (it.measureLevel ?? 1), it), { cols: c }); } catch (e) { return ''; }
+                try { return it.render(ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it), { cols: c }); } catch (e) { return ''; }
             })));
         }
         // a cell measured before Andika has loaded (fontsReady gives up after 3 s) is never
@@ -2291,7 +2313,7 @@ function measureItems(items, { size, look, colsList, serial = false, noCache = f
         const dpr = typeof window !== 'undefined' && window.devicePixelRatio ? window.devicePixelRatio : 1;
         const keyOf = (it) => {
             if (noCache || !faceReady || Array.isArray(it.judgeModes) || it.colsLayout) return null;
-            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (it.measureLevel ?? 1)].join('|');
+            const flags = [dpr, it.cellCls || '', it.legacy ? 1 : 0, it.scalesWithCols ? 1 : 0, it.supportsBox && it.supportsBox.plan ? 1 : 0, it.footprint && it.footprint.restacks ? 1 : 0, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1)].join('|');
             const text = `${size}|${look}|${cols.join(',')}|${flags}|${bodies.get(it).map((b) => b.join('\u0001')).join('\u0002')}`;
             return `${hash53(text)}:${text.length}`;
         };
@@ -2510,13 +2532,13 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (cells && !cells.every((el) => el && el.nodeType === 1 && el.classList.contains('ws-cell') && el.parentNode === root)) cells = null;
                 if (cells) {
                     BUILD_STATS.layouts++;
-                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
+                    const readings = items.map((it, i) => readCell(it, cells[i], c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     items.forEach((it, i) => fold(it, c, inner, readings[i]));
                 } else {
                     items.forEach((it, i) => {
                         root.innerHTML = list[i][1];
                         BUILD_STATS.layouts++;
-                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (it.measureLevel ?? 1), it)));
+                        fold(it, c, inner, readCell(it, root.firstChild, c, state, ctxOf(state, (Number.isFinite(it.measureLevel) ? it.measureLevel : 1), it)));
                     });
                 }
             });
@@ -2698,16 +2720,12 @@ function optionTitleBase(sk, baseICan) {
 
 /** The page title for the chosen options; a count-by row of 15 jumps says so; the tables stay 1 to 12 (wave 1 lane C). */
 function optionTitle(sk, baseICan) {
-    const t = optionTitleBase(sk, baseICan);
-    try {
-        if (sk.skillId === 'count_by_tables' && Number(normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {}).jumps) === 15) {
-            const base = t || baseICan || '';
-            return /\(15 jumps\)/.test(base) ? base : `${base} (15 jumps)`;   // the tables stay 1 to 12; the row is 15 jumps long
-        }
-    } catch (e) { /* keep the base title */ }
-    return t;
+    // (lane lf-ops critic r1 D-CB-2, count-row card §9 Q6: the 15-jump row no longer adds "(15 jumps)" - an option value is
+    // never part of the I Can line)
+    return optionTitleBase(sk, baseICan);
 }
 
+const TITLE_FROM_OPTS = new Set(['count_by_tables', 'mult_properties', 'arrays_groups']);
 /** Skill metadata the frame prints: label, level, and the strings the role reads. */
 function skillMeta(sk, q) {
     // A ranged + / − id whose band (or regrouping, on a _mixed id) is set below its own name
@@ -2728,7 +2746,9 @@ function skillMeta(sk, q) {
     applySheetTags(meta, q);
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
-    if (sk.skillId === 'count_by_tables') {
+    // (lane lf-ops critic r1 D-MP-8: mult_properties' title, Rule and vocabulary follow the property dealt - its `forms` -
+    // so its strings read the options as count_by_tables' do; arrays_groups names arrays or equal groups the same way)
+    if (TITLE_FROM_OPTS.has(sk.skillId)) {
         try {
             const no = normalizeOptions(sk.categoryId, sk.skillId, sk.opts || {});
             // the one-page sheet prints only the rows that fit: the title names those, in the order they print
@@ -4006,7 +4026,7 @@ async function buildSheetDeal(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q), ...(it.footprint && it.footprint.noStretch ? { noStretch: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -4411,7 +4431,7 @@ async function buildRoleSheet(n, metaOf) {
             if (!prepared) return false;
             prepared.pool = pool.id;
             // A role that draws Model / Guided cells measures them at their tallest level.
-            if (mod.MEASURE_LEVEL) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
+            if (mod.MEASURE_LEVEL !== undefined && mod.MEASURE_LEVEL !== null) prepared.measureLevel = typeof mod.MEASURE_LEVEL === 'function' ? mod.MEASURE_LEVEL(pool.id) : mod.MEASURE_LEVEL;
             // Item 7: a role whose Model cell is narrower than the line (Opener, Scripted Model) marks the item it draws there,
             // so a template that can wrap (count-row) wraps to that cell, measured and drawn alike; every other item is untouched.
             if (typeof mod.WRAP_TO_CELL === 'function' && mod.WRAP_TO_CELL(k, pool.id)) {
@@ -4817,7 +4837,7 @@ async function buildLesson(n, metaOf) {
     // id, or the skill's default lesson (lessons/library.js - the same record prereqs.js lessonFor reads, plus its
     // `prereqs`); else lessonFor (a skill with no library lesson).
     const libId = n.lessonData ? '' : (n.lessonId || ((defaultLessonForSkill(sk0.categoryId, sk0.skillId) || {}).id || ''));
-    const recordOf = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
+    const recordOf = (s1) => n.lessonData || optionLesson(libId ? libraryLessonData(libId) : null, s1.opts || null) || lessonFor(s1.categoryId, s1.skillId, s1.opts || null);
     // (opt-in `dealPracticeOpts` on a library lesson, lf-placevalue critic nwf r1 N6: a lesson asked for by its skill alone - no
     // options on the request - deals its OWN practice options (the LESSONS record's `practice.opts`), so its chant and steps
     // describe what the pages deal. Every other lesson keeps the request's options as before.)
@@ -6566,6 +6586,7 @@ async function buildSheetFill0(req = {}) {
             // A single-skill page never prints the same problem twice (round 4 D-B: add_sub_10s S
             // dealt 22 from a pool of 20 facts): the fill stops at the skill's distinct problems.
             const dup = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+            const noStretchPage = (x) => (x.items || []).length > 0 && x.items.every((it) => it && it.noStretch);
             const tried = [r];
             for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
                 const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
@@ -6593,7 +6614,11 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
                     // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
-                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    // (nor does a page of `noStretch` templates - arrays, arrays-turn, count-row, answered in place: lead ruling
+                    // 2026-11-12 (b) keeps its rows to what they hold and the spare height under the grid, so its fill is not
+                    // short; lf-ops-props r4b: arrays_groups independent L fell from 4 problems in 2 columns to 3 in 1, a 31 %
+                    // band beside each array)
+                    const cMin = divFactsPlainSection(s) || noStretchPage(best) ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;

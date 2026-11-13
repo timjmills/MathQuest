@@ -39,6 +39,7 @@ import {
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
+import { groupByHeight, measuredH, NO_STRETCH_ROOM } from '../layout.js';
 import { SIZES, FACT_LADDER, factCellHMm, factTab } from '../index.js';
 import { factWidthMm, factDigitTracks } from '../cells/fact.js';
 
@@ -618,7 +619,12 @@ export function plan(input = {}) {
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
         const sh = p.shelf[id];
-        const its = pools[id].slice(0, sh.n * sh.per);
+        // (lf-ops-props r4b, lead ruling 2026-11-12 (a) + (b): a pool of `noStretch` templates - answered in place, top-started -
+        // takes the height order with the lowest bands (layout.groupByHeight), so a shelf pairs items of one height class; the
+        // same items, the same count)
+        const its0 = pools[id].slice(0, sh.n * sh.per);
+        const noSt = its0.length > 0 && its0.every((it) => it && it.footprint && it.footprint.noStretch);
+        const its = noSt && sh.per > 1 && !sh.pairs ? groupByHeight(its0, Math.min(sh.k, 6)) : its0;
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
@@ -628,7 +634,10 @@ export function plan(input = {}) {
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
             const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
+            // (ruling (b): a noStretch shelf grows to at most NO_STRETCH_ROOM x its shortest item, never below its tallest)
+            const hs = noSt ? chunk.filter((it) => !it.anchor).map((it) => measuredH(it, Math.min(sh.k, 6))) : [];
+            const growCap = hs.length && hs.every((x) => x > 0) ? Math.max(0, NO_STRETCH_ROOM * Math.min(...hs) - h) : Infinity;
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, growCap });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -664,7 +673,7 @@ export function plan(input = {}) {
         return g;
     })();
     for (const [i, sh] of shelves.entries()) {
-        const grow = fillShares ? fillShares[i] : growOf(sh);
+        const grow = Math.min(fillShares ? fillShares[i] : growOf(sh), sh.growCap === undefined ? Infinity : sh.growCap);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
