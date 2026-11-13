@@ -3,12 +3,16 @@ Title: Lessons-first wave 1: the patterns and algebra skills of the CCSS BUILD l
 Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
-State: paused
+State: paused (week-2 cap reached after fix r8; critic r2 waits on lf-roles / lf-ops)
 Updated: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
 Builder profile: mq-opus-medium
 Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
 
 ## Now
+- 2026-11-13 STOP (week-2 cap): session cost_usd $179.31 (week 2 = $66.10 of the $75 cap, ~3.3 %; week 1 hand-over $113.21).
+  Critic r2 not run: about $9 left, and it would fail again on rows owned elsewhere (F2 count-row train -> lf-ops; F3 / F4 /
+  PT-MOD-1 marksFor / F5 npr-fgr chart -> lf-roles; F8 options panel; EB-FOOT pairing -> lf-checks; rule-check stepsBy -> lf-engine).
+  Resume: merge those fixes, precritic --strict, then critic r2 on all six.
 - 2026-11-13 fix r8 (after critic r1, all six FAIL): ours fixed - F1 hints off on Test / quiz, F5 function-table chart states,
   F6 / F6b steps follow the preset and the lesson, F7 growing title, pattern_features q.options, notice "40", screen grey,
   growing screen dots. Handed: F2 / slot width -> lf-ops; F3, F4, PT-MOD-1 (marksFor), F5 npr / fgr chart -> lf-roles; F8 ->
@@ -648,6 +652,7 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-12/13 lead notes: guidedRows key (lf-engine); next-skill order (above); lf-roles c93de259 cleared KEYJOIN on our six; lf-checks fdf3af0f EB-FOOT tool fix; +$15 for critic r2 (cap $75).
 - 2026-11-13 04:55: fix r8 (Opus medium: rebuild after critic r1 FAILED all six). Merged for precritic only: our branch + origin
   lf-roles (83bcbf32; backtests.json conflict resolved by keeping both rows) + lf-checks' ws-empty-band.cjs (1bcfcb72, EB-FOOT
   footCols), in a scratch worktree; nothing of theirs committed here. Each critic finding:
