@@ -13,6 +13,10 @@
 //              reads it) AND drawn at >= 29 px (font-size x the cell's digit-fit zoom), in Andika at weight >= 700 (the paper
 //              prints a place-value numeral bold).
 // WS-WRAP-OP   no line of the sentence ends in an operator (+ = − ×) with its box on the next line.
+// WS-ONE-LINE  (critic live1 N4) at 820 px and wider, a sentence of 4 or fewer parts keeps every answer box on ONE line (r1 split
+//              '+ [ ]' onto a second line in every card at 1280 / 1024 / 820 when the grid went to 3 columns).
+// WS-SLOT-SIZE (critic live1 N4, a ratchet) each answer box is at least the size the digit fit drew before the twin: 100 x 76 px
+//              at 820 px and wider (BEFORE ffcba24b at 1280: 103 x 76; r1 shrank them to 62 x 46).
 // Prints `ws-pv-screen-numeral: OK` / `FAIL (n)` last; exits 1 on FAIL.
 const H = require('../lib/ws-harness.cjs');
 
@@ -20,7 +24,8 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 const SKILLS = list(arg('skills', 'placevalue:expand'));
-const WIDTHS = list(arg('widths', '1280,820,390')).map(Number);
+const WIDTHS = list(arg('widths', '1280,1366,1024,820')).map(Number);
+const SLOT_MIN = { w: 100, h: 76 };   // the ratchet (see WS-SLOT-SIZE)
 const N = Number(arg('n', 4));
 const FLOOR = 29;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -59,7 +64,8 @@ function readCard(sel) {
             }
         }
     }
-    return { runs, wraps, text: (line || paper).textContent.replace(/\s+/g, ' ').trim().slice(0, 40) };
+    const boxes = line ? [...line.querySelectorAll('.mq-cellbox, input.ib-cell')].filter((b) => !b.parentElement.closest('.mq-cellbox')).map((b) => { const r = b.getBoundingClientRect(); return { top: r.top, w: r.width, h: r.height }; }) : [];
+    return { runs, wraps, boxes, text: (line || paper).textContent.replace(/\s+/g, ' ').trim().slice(0, 40) };
 }
 
 (async () => {
@@ -91,6 +97,12 @@ function readCard(sel) {
                     if (why.length) { bad.push(`WS-NUMERAL ${at}: "${x.t}" ${why.join(', ')} (want >= ${FLOOR} px, Andika 700)`); break; }
                 }
                 if (r.wraps.length) bad.push(`WS-WRAP-OP ${at}: "${r.wraps[0]}" ends a line, its box on the next`);
+                if (w >= 820 && r.boxes.length && r.boxes.length <= 4) {
+                    const tops = r.boxes.map((b) => b.top);
+                    if (Math.max(...tops) - Math.min(...tops) > 4) bad.push(`WS-ONE-LINE ${at}: its ${r.boxes.length} boxes sit on more than one line`);
+                    const small = r.boxes.find((b) => b.w < SLOT_MIN.w - 0.5 || b.h < SLOT_MIN.h - 0.5);
+                    if (small) bad.push(`WS-SLOT-SIZE ${at}: a box is ${Math.round(small.w)} x ${Math.round(small.h)} px (the ratchet: >= ${SLOT_MIN.w} x ${SLOT_MIN.h})`);
+                }
             }
         }
     }
