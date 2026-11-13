@@ -36,7 +36,7 @@ export function prepare(it, info = {}) {
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
     // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
-    const place = answerPlace('ri-ans', correct);
+    const place = answerPlace('ri-ans', correct, it);
     const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right }, place.slots), `${right}: ${correct}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form

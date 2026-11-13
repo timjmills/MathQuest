@@ -126,7 +126,8 @@ function reviewTitle(input, topic) {
     if (h0.title === false) return '';
     if (typeof h0.title === 'string' && h0.title.trim()) return h0.title.trim();
     const t = `Review: ${topic}`;
-    return typeof input.titleLinesOf === 'function' && input.titleLinesOf(t) > 1 ? 'Review' : t;
+    // decided at L, the widest title, so every size prints the SAME title (critic r2 N5, PT-FRM-6: L said "Review", S / M the topic)
+    return typeof input.titleLinesOf === 'function' && input.titleLinesOf(t, 'L') > 1 ? 'Review' : t;
 }
 
 function geometry(pools, input) {

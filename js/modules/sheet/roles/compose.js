@@ -338,7 +338,7 @@ export function answerListOf(v) {
 // (inline, not in the engine stylesheet: the stylesheet travels on every page, and a page with no list stays byte-identical)
 export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list'
     ? `mq-frame mq-framelist" style="flex-wrap:wrap;row-gap:3mm;white-space:normal${maxMm ? `;max-width:${maxMm}mm` : ''}` : 'mq-frame');
-export function answerPlace(id, correct) {
+export function answerPlace(id, correct, it = null) {
     const width = (v) => Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2));
     if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
     const parts = answerListOf(correct);
@@ -358,7 +358,12 @@ export function answerPlace(id, correct) {
     if (!parts) return { kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) };
     const slots = {};
     parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
-    return { kind: 'list', slots, parts, digits: parts.map(width) };
+    // LIST-HOMOGENEOUS (lf-roles critic r2 N1): a list whose LAST part is another kind - a count row's rule after its missing
+    // terms ("13, 15, 17, 19, 21, 2") - names that part with the item's own words ("Rule: add [ ] each time."), never a sixth
+    // unlabelled blank
+    const rb = it && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.ruleBox;
+    const tail = rb && parts.length >= 3 && String(rb.value) === parts[parts.length - 1] ? { pre: String(rb.pre || 'Rule:'), post: String(rb.post || '') } : null;
+    return { kind: 'list', slots, parts, digits: parts.map(width), tail };
 }
 
 /** The write line(s) of an `answerPlace` ('' for 'none'); a list carries its own closing full stop. */
@@ -367,6 +372,11 @@ export function answerPlaceHtml(place, id, ctx, key) {
     if (place.kind === 'one') return writeLine(id, ctx, key, place.digits);
     // a part and its comma never part; the list wraps under the frame's words in a narrow cell (.mq-framelist)
     const n = place.parts.length;
+    if (place.tail) {
+        const k = n - 1;
+        const terms = place.parts.slice(0, k).map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${i < k - 1 ? ',' : '.'}</span>`).join('');
+        return terms + `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:1mm;white-space:nowrap;margin-left:2mm">${esc(place.tail.pre)} ${writeLine(`${id}-${k}`, ctx, key, place.digits[k])}${place.tail.post ? ` ${esc(place.tail.post)}` : ''}.</span>`;
+    }
     const after = (i) => (place.words ? `<span style="margin-left:1mm">${esc(place.words[i])}${i < n - 1 ? '' : '.'}</span>` : (i < n - 1 ? ',' : '.'));
     return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap${place.words ? ';margin-right:1.5mm' : ''}">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${after(i)}</span>`).join('');
 }
