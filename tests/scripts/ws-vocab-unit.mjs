@@ -33,6 +33,8 @@
 //     notWith lists (r14: and every run picture, grow's squares included, is notWith rule); V-PLACE (r14) a ringed or boxed
 //     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
 //     reads as cycle
+// V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
+//     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
@@ -718,6 +720,45 @@ const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amo
         if (!G.minMet(m3, 2)) fail('V28: Model + one Match 3 try (3 answers) does not meet MIN_ITEMS');
         if (G.minMet(m3, 1)) fail('V28: the Model alone meets MIN_ITEMS');
         if (G.minMet(one, 3) || !G.minMet(one, 4)) fail('V28: a single-answer page no longer needs the Model + 3 tries');
+    }
+}
+// V-KEY (r15, critic r14 #2: the hundred chart's key grew grey lobes outside its grid, white specks in the cell corners, and
+// greyed the whole chart): every key underlay (an unstroked grey mark of the halo) lies inside the outline its mark sits in -
+// the smallest cell, box or ring of the drawing that holds its centre - within 0.5 mm; and a picture whose focal part is the
+// WHOLE drawing, drawn on a structure (a grid, cells, a track: rects, lines or paths), may not grey more than 60 % of its area
+// (it needs a focal part). A picture that is only words, numbers or dots IS its idea: it greys whole.
+{
+    const at = (t, k) => { const m = new RegExp(`\\s${k}="([^"]*)"`).exec(t); return m ? parseFloat(m[1]) : NaN; };
+    const shapes = (x) => [
+        ...[...x.matchAll(/<rect\b[^>]*>/g)].map(([t]) => ({ t, k: 'rect', x0: at(t, 'x'), y0: at(t, 'y'), x1: at(t, 'x') + at(t, 'width'), y1: at(t, 'y') + at(t, 'height') })),
+        ...[...x.matchAll(/<circle\b[^>]*>/g)].map(([t]) => { const r = at(t, 'r'); return { t, k: 'circle', cx: at(t, 'cx'), cy: at(t, 'cy'), r, x0: at(t, 'cx') - r, y0: at(t, 'cy') - r, x1: at(t, 'cx') + r, y1: at(t, 'cy') + r }; })];
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const key = P.vocabPictureSVG({ keyPage: true, state: 'answered' }, id, { wMm: 46 });
+        const pupil = P.vocabPictureSVG({}, id, { wMm: 46 });
+        const halo = (/<g class="mq-vhalo[^"]*"[^>]*>([\s\S]*?)<\/g>/.exec(key) || [])[1] || '';
+        const und = shapes(halo).filter((u) => /\sstroke="none"/.test(u.t));
+        if (!und.length) continue;
+        const outl = shapes(pupil).filter((o) => /\sfill="none"/.test(o.t));
+        const fit = P.vocabPictureFit(id, 46), tol = 0.5 / fit.scale;
+        for (const u of und) {
+            const cx = (u.x0 + u.x1) / 2, cy = (u.y0 + u.y1) / 2;
+            const c = outl.filter((o) => cx > o.x0 && cx < o.x1 && cy > o.y0 && cy < o.y1).sort((a, b) => (a.x1 - a.x0) * (a.y1 - a.y0) - (b.x1 - b.x0) * (b.y1 - b.y0))[0];
+            if (c && !(u.x0 >= c.x0 - tol && u.y0 >= c.y0 - tol && u.x1 <= c.x1 + tol && u.y1 <= c.y1 + tol)) {
+                const by = Math.max(c.x0 - u.x0, c.y0 - u.y0, u.x1 - c.x1, u.y1 - c.y1) * fit.scale;
+                fail(`V-KEY "${id}": a key underlay runs ${by.toFixed(1)} mm outside the outline it sits in (${u.t.slice(0, 60)})`);
+                break;
+            }
+        }
+        // (the focal part is the whole drawing when its focal segments make up the pupil drawing)
+        const body = (/<svg[^>]*>([\s\S]*)<\/svg>/.exec(pupil) || [])[1] || '';
+        const focalAll = typeof P.vocabPictureFocal === 'function' && P.vocabPictureFocal(id).join('') === body;
+        const structure = /<(rect|line|path)\b/.test(body);
+        if (!focalAll || !structure) continue;
+        const e = P.vocabPictureExtent(id);
+        let hit = 0, n = 0;
+        const inside = (u, x, y) => (u.k === 'circle' ? Math.hypot(x - u.cx, y - u.cy) <= u.r : x >= u.x0 && x <= u.x1 && y >= u.y0 && y <= u.y1);
+        for (let x = e.x + 0.125; x < e.x + e.w; x += 0.25) for (let y = e.y + 0.125; y < e.y + e.h; y += 0.25) { n++; if (und.some((u) => inside(u, x, y))) hit++; }
+        if (hit / n > 0.6) fail(`V-KEY "${id}": its focal part is the whole drawing and the key greys ${Math.round(100 * hit / n)} % of it (over 60 %: give it a focal part)`);
     }
 }
 // V27 (critic r7 #3, #4, #5; lf-vocab r9):

@@ -292,10 +292,14 @@ const PICS = {
     },
     'hundred chart': {
         ccss: ['1.NBT.A.1', '1.NBT.C.5', '2.NBT.A.2'], op: 'count',
-        focal: 'all',
         // (three rows, so it reads as a chart of rows of ten, not a two-row table - critic r1; three columns, digits 8.5 units - r3)
+        // (r15, critic r14 #2: `focal: 'all'` greyed the whole chart on the key - its focal part is ONE row, the middle one, drawn
+        // row by row so the pupil page is byte for byte the r14 table)
         alt: 'three rows of a number chart: 94 to 96, 104 to 106, 114 to 116, each number ten more than the one above',
-        draw: () => table([[94, 95, 96], [104, 105, 106], [114, 115, 116]], { x0: 7, y0: 3.5, cw: 15.5, ch: 11, size: 8.5 }),
+        draw: () => {
+            const o = { x0: 7, cw: 15.5, ch: 11, size: 8.5 };
+            return table([[94, 95, 96]], { ...o, y0: 3.5 }) + F(table([[104, 105, 106]], { ...o, y0: 14.5 })) + table([[114, 115, 116]], { ...o, y0: 25.5 });
+        },
     },
     /* ---- Grade 2: read and write numbers to 1,000 (2.NBT.A.3) */
     // (one, ten and hundred share ONE unit square, U canvas units, and are scaled together - BASE10_IDS, vocabPictureFit:
@@ -914,9 +918,32 @@ function mergeDotUnderlays(seg, ink) {
     }
     return seg;
 }
-function haloOf(seg, ink = 'currentColor', key = false) {
+/**
+ * The CELLS of a drawing (r15, critic r14 #2): unfilled rects that hold exactly one text. On the key a text in a cell is
+ * underlaid by its cell - the rect itself, filled grey - never by a font-sized box: the hundred chart's 3-digit boxes were wider
+ * than their cells, so grey lobes grew outside the grid and white specks showed in the cell corners (ws-vocab-unit V-KEY).
+ */
+function cellsOf(body) {
+    const rects = [...String(body).matchAll(/<rect\b([^>]*?)\/?>/g)].filter((m) => /\sfill="none"/.test(m[1]))
+        .map((m) => ({ src: m[0], x: num(m[1], 'x'), y: num(m[1], 'y'), w: num(m[1], 'width'), h: num(m[1], 'height') }));
+    const texts = [...String(body).matchAll(/<text\b([^>]*)>/g)].map((m) => ({ x: num(m[1], 'x'), y: num(m[1], 'y') }));
+    const inR = (t, r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h;
+    return rects.filter((r) => texts.filter((t) => inR(t, r)).length === 1);
+}
+const cellAt = (cells, x, y) => cells.filter((r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h).sort((a, b) => a.w * a.h - b.w * b.h)[0] || null;
+function haloOf(seg, ink = 'currentColor', key = false, cells = []) {
     if (key) {
-        seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => keyUnderlay('text', attrs, inner, ink))
+        // (r15: a text in a cell takes its cell as its underlay, and the cell's own halo stroke goes - the fill covers it, and a
+        // 6 px stroke would spill over the neighbouring rows)
+        const used = new Set();
+        seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => {
+            const c = cellAt(cells, num(attrs, 'x'), num(attrs, 'y'));
+            if (!c) return keyUnderlay('text', attrs, inner, ink);
+            used.add(c.src);
+            return `<rect data-vu-cell="1" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" fill="${ink}" stroke="none"/>`;
+        });
+        for (const src of used) seg = seg.split(src).join('');
+        seg = seg
             .replace(/<circle\b([^>]*?)\/?>/g, (m, attrs) => {
                 const f = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
                 return f !== undefined && f !== 'none' ? keyUnderlay('circle', attrs, '', ink).replace('<circle', '<circle data-vu="1"') : m;
@@ -942,7 +969,7 @@ function bodyFor(id, mode) {
     const segs = [...fb.matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]);
     // (screen: the class mq-v-feedback keeps the screen cell's black-and-white ink pass, screen-cell.js monoCell, off the
     // halo - it is feedback chrome, as the host's green and red are; the r7 render drew the yellow halo grey)
-    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor', mode === 'key')).join('')}</g>`;
+    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor', mode === 'key', mode === 'key' ? cellsOf(fb) : [])).join('')}</g>`;
     // (the key leaves the drawing itself exactly as the pupil page draws it: a key page paints every mark it does not share
     // with the pupil page in its key ink, so a wrapped focal part printed orange - r7 render. Its halo is the targeted mark.)
     if (mode === 'key') return halo + fb.replace(SENT, '');
