@@ -9,24 +9,25 @@ Builder profile: mq-opus-medium (first card on the chartwindow template)
 Critic rounds: 0, none
 
 ## Now
-- PAUSED at the $80 cap (cost_usd $62.93 at 2026-11-13T00:53Z; remaining budget too small for fix + critic). Two container restarts killed the builders' final gate runs.
-- chart_120 built on this branch (2b7749ba3 … e3733905c): band 120 (rows 91–120), preset composing:chart_to_120 (ZG), tags/links/search terms, PNGs. Precritic NOT clean: hundreds_chart_fill 4 FAIL (empty-band 84: EB-BAND 12 / EB-SIDE 12 …; cell-checks 236: OVERFLOW 224, KEYJOIN 8, TAGINK 4; node-lint OPTION-HELP/WRONG-FITS 1; sibling-compare no baseline); chart_to_120 3 FAIL (empty-band EB-FOOT 36, node-lint 1, sibling-compare). Not yet split: which FAILs are pre-existing on master (eb-master.txt / cc-master.txt in the scratchpad were being compared).
-- word-stories on claude/sweet-newton-c8wrv1-lf-builds-stories (0c985692a … 9681a9868): live What-is-missing bug repaired, forms 3/4/5, band 10/20/100, First/Then/Now + two-bar drawing (story-bar.js), 3 presets (ZH, ZJ, ZK), card-rulings backtest row. Precritic (pc2, before the last fixes) 11 FAIL: dealer-uniform, node-lint, options-verify, print-lint lesson S/L, print-lint sections S/L, empty-band, grade-render gate ×2, cell-checks. Not re-run after the restart.
-- Not started: times-as-many, partition (cards signed).
-- Next (fresh budget): fix builder on each branch from the precritic tables (medium: second round), separate master-baseline FAILs first, then critic. ws-detailed-lesson / ws-lesson-baseline results lost in the restarts: re-run.
+- PAUSED for rulings (cost_usd $104.50 at 2026-11-13T04:10Z of the $140 approved; weekly-limit warning showing).
+- word-stories fix round 2 done on claude/sweet-newton-c8wrv1-lf-builds-stories at e02c6cd66. Precritic r3 has 18 FAIL vs master's 22 on the hosts. Every FAIL left is at master's level or class, or pinned with evidence (design/audit/runs/lf-builds/stories/precritic-diff.md). Fixed: the hosts' lesson overflow (grade-render 48 → 0), preset lesson data. ws-lesson-baseline --all-lessons: 1556 hashes identical. g1-oa1 --check E9/E35 as master, --repeats OK; g3-oa8 OK. 6 PNGs committed.
+- Blocking a critic: (a) Reason It on the sentence-layout stories prints the "added" wrong answer under a − sign (11 − 2 = 13): reason-it.js does not pass shownSlots, a role-wide engine fix; (b) owner rulings: the band null default (re-sign or pin), and compare-preset capacity 9 vs 11 at S; (c) presets missing from the card's rulings block (card-rulings INCOMPLETE; needs a re-sign).
+- chart_120 still red (see the 2026-11-13 log); not resumed. times-as-many and partition are not started.
 ## Owner go
 
 ## Open questions
 - Lead: confirm the order above and the hand-off of patterns_notice / growing_shape_patterns / multi_step_four_ops to the algebra lane.
 
 ## Times
+Times: fix word-stories r2, start 2026-11-13T00:58Z, end 2026-11-13T04:05Z (one restart), profile mq-opus-medium
 Times: builder word-stories, start 2026-11-12T23:15Z, end 2026-11-13T00:50Z (killed by restart), profile mq-opus-medium
 Times: builder chart_120, start 2026-11-12T23:12Z, end 2026-11-13T00:50Z (killed by restart), profile mq-opus-low
 Times: builder cards partition / times-as-many / word-stories (parallel), start 2026-11-12T22:20Z, end 2026-11-12T22:35Z, profile mq-opus-medium
 Times: builder chartwindow card, start 2026-11-12T22:05Z, end 2026-11-12T22:12Z, profile mq-opus-medium
 
 ## Log
-- 2026-11-13: paused at budget; two container restarts lost the final gate runs; precritic red on both builds (see Now).
+- 2026-11-13: word-stories fix r2 brought precritic to master level; a critic is blocked on a Reason It engine defect and on owner rulings.
+- 2026-11-13: paused at budget (precritic red on both builds); two container restarts lost the final gate runs.
 - 2026-11-12: owner approved all four cards as recommended; lead signed them (9f2d3ea5); cap raised to $80.
 - 2026-11-12: four cards drafted and sent to the lead; lead confirmed the order and the algebra hand-off.
 - 2026-11-12: lane started from master d34311d; scope check sent to the lead.
