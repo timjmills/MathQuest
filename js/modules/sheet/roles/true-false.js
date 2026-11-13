@@ -74,7 +74,7 @@ function layout(items, input) {
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'True or False', title: 'True or False?', score: 1 });
     return resolveSectionLayout({
         role: ROLE_ID, columns: 'auto', count: items.length,
-        target: { cols: 2, rows: { S: 4, M: 3, L: 2 }, rowsByCols: { 1: 4 } }, ceiling: CEILING, floor: (input.floors || {}).main,
+        target: { cols: 2, rows: { S: 4, M: 3, L: 2 }, rowsByCols: { 1: { S: 5, M: 4, L: 4 } } }, ceiling: CEILING, floor: (input.floors || {}).main,
     }, items, ctx.paper, LIVE_W_MM, { size: ctx.size, look: ctx.look, header: layoutHeader(frame.header) });
 }
 
