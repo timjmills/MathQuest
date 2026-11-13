@@ -1136,6 +1136,28 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // score) and then its 3-4 problems; the labels run on across the blocks.
                 const list = (anchors.bySection[part.section] || []);
                 let at = start;
+                // (lf-placevalue compare r3, coverage single/ex-group L PAGEFILL: a lone section of example bands whose problems
+                // name `spreadMax` - the compare line - shares the page's spare height among its problem rows, each row no taller
+                // than spreadMax x its shortest problem (the band under the line stays under 30 %, CL-4d centres it). The stretch
+                // is the FIRST page's, so a cell keeps one height on every page of the section (PT-ENG-6). r2's whole example strip
+                // was 1.8 mm shorter a block than 16748cd8's, which left L's three blocks a 48 mm (21 %) strip.)
+                let blockRowMm = L.cellH;
+                {
+                    const secIts = sheetItems[part.section];
+                    const sm = lone && tightRows(secIts) && secIts.length && secIts.every((it) => Number((it.footprint || {}).spreadMax) > 1)
+                        ? Math.min(SPREAD_CAP, ...secIts.map((it) => Number(it.footprint.spreadMax))) : 0;
+                    const ch0 = (laidOut.chunksBySection[part.section] || [])[0];
+                    const c0 = ch0 && ch0.blocks ? ch0 : part.chunk;
+                    const rows0 = c0.blocks.reduce((a, b) => a + b.rows, 0);
+                    const base0 = c0.blocks.length * L.anchorMm + rows0 * L.cellH;
+                    const avail0 = L.gridH - c0.blocks.length * 2 * GRID_BORDERS_MM;
+                    if (sm && rows0 > 0 && base0 < 0.85 * avail0) {
+                        const hs = secIts.map((it) => measuredH(it, L.cols)).filter((h) => h > 0);
+                        const lo = hs.length ? Math.min(...hs) : 0;
+                        const want = L.cellH + (0.9 * avail0 - base0) / rows0;
+                        if (lo > 0) blockRowMm = Math.max(L.cellH, Math.min(want, sm * lo));
+                    }
+                }
                 for (const b of part.chunk.blocks) {
                     const bi = Math.floor(b.from / Math.max(1, L.blocks.perBlock));
                     const a = list[bi % list.length];
@@ -1145,8 +1167,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     });
                     sections.push({
                         kind: 'grid', cols: L.cols, rows: b.rows, labels: labelStyle, start: at, cls: 'fixed',
-                        height: `${Math.round(b.rows * L.cellH * 1000) / 1000}mm`,
+                        height: `${Math.round(b.rows * blockRowMm * 1000) / 1000}mm`,
                         items: sheetItems[part.section].slice(b.from, b.from + b.count).map((it) => planItem(it, level, L.cols)),
+                        _its: sheetItems[part.section].slice(b.from, b.from + b.count),
                     });
                     at += b.count;
                 }
