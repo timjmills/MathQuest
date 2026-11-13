@@ -578,10 +578,11 @@ const PARSE = {
         const v = lastVerdict(out, g.script);
         // "[<mode> sweep (...), ][shard i/n, ]N skills, R host renders, D doubled answer area(s), P paper verb(s) on screen[, C low-contrast host(s)]"
         // (", K screen-digit miss(es)": the opt-in SCREEN-DIGIT, opt-in-rules.json; its "host@width:digit" findings count with the rest)
-        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?$/m.exec(out);
+        // (", U unread host(s)": CELL-READ, lf-checks queue 20 - a host render that read 0 [data-ws-cell] cells; "host:read")
+        const sm = /(\d+) skills, (\d+) host renders, (\d+) doubled answer area\(s\), (\d+) paper verb\(s\) on screen(?:, (\d+) low-contrast host\(s\))?(?:, (\d+) screen-digit miss\(es\))?(?:, (\d+) unread host\(s\))?$/m.exec(out);
         if (!v) return unparsed(`no "${g.script}: OK|FAIL" line`, out);
         if (!sm) return unparsed('no "N skills, R host renders, ..." summary', out);
-        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0);
+        const nSk = +sm[1], renders = +sm[2], dbl = +sm[3], pv = +sm[4], lc = +(sm[5] || 0) + +(sm[6] || 0) + +(sm[7] || 0);
         const want = (g.expect && g.expect.skills) || 0, hosts = (g.expect && g.expect.hosts) || 4;
         const errs = out.split('\n').filter((l) => /^\S+:\S+\s+ERR /.test(l));
         if (nSk < want) return { result: 'FAIL', findings: `only ${nSk} of ${want} skill(s) in scope found by the script`, detail: tailLines(out), explainsExit: false };
@@ -600,8 +601,8 @@ const PARSE = {
         const found = [];
         for (const l of out.split('\n')) {
             // the pin's entries are "host:kind" (kinds doubled, paper, contrast), as ws-screen-slots --baseline reads them
-            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT )/.exec(l);
-            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
+            const m = /^(\S+:\S+)\s+(\S+)\s+(host field \+|paper verb on screen|\d+ low-contrast text|SCREEN-DIGIT |CELL-READ )/.exec(l);
+            if (m) found.push({ key: m[1], id: `${m[2]}:${m[3].startsWith('host') ? 'doubled' : m[3].startsWith('paper') ? 'paper' : m[3].startsWith('SCREEN') ? 'digit' : m[3].startsWith('CELL') ? 'read' : 'contrast'}`, line: l.replace(/\s+/g, ' ') });
         }
         if (found.length !== dbl + pv + lc) return unparsed(`${found.length} finding line(s) for a summary of ${dbl + pv + lc}`, out);
         const explainsExit = code === 0 || found.length > 0; // the script exits 1 on any doubled area or paper verb
@@ -902,7 +903,10 @@ function buildPlan(ctx) {
         add(gate('cell-checks', 'ws-cell-checks --card --card-opts (OVERFLOW, TAGINK, KEYJOIN, SIZE-S, TITLE, LESSON-OPT)', scope, 'browser', 'ws-cell-checks', ['--skills', keys.join(','), '--card', '--card-opts'], { missingMsg: 'ws-cell-checks is not in this tree' }));
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
-        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
+        // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
+        add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own
@@ -1074,7 +1078,10 @@ function buildPlan(ctx) {
         cl.after = 'sibling-compare';
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
-        add(gate('phone-card', 'ws-phone-card (the tablet card check: practice card at 820 / 1024 px: clip, first-box focus, 48 px answer boxes)', `${scope} × 820x1180, 1024x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        // lf-hosts critic r1 F1: the online worksheet's layout ratchet against master (columns, card heights, answer places,
+        // numerals); a fixed 5-skill sample, so it is planned once per --skill run whatever the lane's skills
+        add(gate('worksheet-reflow', 'ws-worksheet-reflow (WS-REFLOW / WS-DIGIT: the online worksheet holds master\'s columns, card heights and numerals)', 'worksheet sample × 820 / 1024 / 1280 / 1366', 'browser', 'ws-worksheet-reflow', [], { missingMsg: 'ws-worksheet-reflow is not in this tree' }));
+        add(gate('phone-card', 'ws-phone-card (the screen card check: practice card, worksheet and quiz at 820 / 1024 / 1280 / 1366 px: clip, first-box focus, 48 px answer boxes, real taps, focus ring, cell read)', `${scope} × 820x1180, 1024x768, 1280x900, 1366x768`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
@@ -1243,6 +1250,9 @@ function buildPlan(ctx) {
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
     // a tracked file holding one (node, < 1 s)
     add(gate('conflict-markers', 'ws-conflict-markers (no merge conflict markers in tracked files)', 'tracked files', 'node', 'ws-conflict-markers', []));
+    // lf-hosts critic r2 F2: every screen gate of the plan (phone-card, screen-slots --screen-digit, screen-ink-size, worksheet-reflow)
+    // renders at exactly the owner's set, read from tests/lib/ws-screen-widths.cjs (node, a few seconds)
+    add(gate('screen-widths-plan', 'ws-screen-widths-plan (every screen gate at 820 / 1024 / 1280 / 1366, the one table)', 'screen gates', 'node', 'ws-screen-widths-plan', [], { missingMsg: 'ws-screen-widths-plan is not in this tree' }));
     // owner 2026-11-13 (CLAUDE.md plan item 9: two print sizes, M and L; S dropped): no size picker offers S, no gate's default
     // run includes S, and the kit reads a stored S as M (node, < 1 s)
     add(gate('no-size-s', 'ws-no-size-s (no picker offers size S, no gate default runs S, S decodes as M)', 'js/modules, index.html, tests/scripts, tests/lib, live instruction docs', 'node', 'ws-no-size-s', ['--docs-advisory'], { needFlags: ['docs-advisory'] }));
