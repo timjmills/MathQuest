@@ -4156,6 +4156,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-cl4d-stretched-top",
+  "check": "CL-4d (lead ruling 2026-11-13, CL-4b stretch exception): a one-line compare cell whose row stretches it by 30 % or more is centred down its box; left at the top it leaves a band of 30 % under the line (compare r2 EB-BAND independent / more-practice 144)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (lf-placevalue print-lint-kit / -S / -M)",
+  "browser": true,
+  "fail": {
+   "commit": "023cafca",
+   "state": "compare L independent: 36 one-line cells at the top of rows that stretch them 111 %, 9.3 mm (30 %) white under each"
+  },
+  "pass": {
+   "commit": "cd47e0a5",
+   "state": "data-ws-stretchmid + ws-rowstretch: the stretched cells centred (L-TOPSTART 0, EB-BAND independent / more-practice M / L 0)"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --skills placevalue:compare --rules TOPSTART-STRETCH --rule-skills placevalue:compare --lints L-TOPSTART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-cl4d-unstretched-centred",
+  "check": "CL-4d (lead ruling 2026-11-13): a one-line cell its row stretches by LESS than 30 % keeps the top of the box; centred there is a fail (the ungated r3 centring CSS)",
+  "kind": "fixture",
+  "rule": "ws-print-lint L-TOPSTART CL-4d (unstretched one-line cell centred)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/cl4d-unstretched/fail.html",
+   "state": "the real compare L page, rows cut to 1.28 x the line (tabs off), every marked cell centred: 18 cells 4.2 mm down"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/cl4d-unstretched/pass.html",
+   "state": "the same page with no ws-rowstretch mark: the lines at the top of the box"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --doc-fixture {fixture} --lints L-TOPSTART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
