@@ -107,7 +107,6 @@ export const ALLOW = [
     // DOC (round-cap r3): CLAUDE.md is the owner's file - lanes do not edit it. Its two S lines are reported to the lead for the
     // owner; when the owner rewrites them these entries go stale and FAIL (ALLOW-STALE), so they cannot outlive the fix
     { file: 'CLAUDE.md', has: '(Size S ignored, wasted space,', rule: 'DOC', why: 'owner file, reported to the lead 2026-11-13: names failure class L1 by its old title' },
-    { file: 'CLAUDE.md', has: 'Tokens (sizes S/M/L, looks, ink,', rule: 'DOC', why: 'owner file, reported to the lead 2026-11-13: lists the kit tokens (S is the decode alias / compact token)' },
     // dated lane scripts on NO gate path (not planned by ws-precritic, not in ws-deploy-gates.sh, no backtest row): records of a
     // past lane's checks against the kit's S token, kept as written; a lane that revives one moves it to M / L first
     ...['ws-div-facts-forms.cjs', 'wave1-c2-dupes.cjs', 'wave1-c2-lines.cjs', 'wave1-c2-model.cjs', 'wave1-c2-sizes.cjs', 'key-options.cjs',
