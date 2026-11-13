@@ -1704,6 +1704,11 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 - **PT-TOF-1.** 40 to 60% of statements are false; each false statement comes from `wrongAnswer(q)`.
 - **PT-TOF-2.** The frame is scored only with the check mark: a correct "True" needs no correction; a "False" needs the frame's number.
 - **PT-TOF-3.** The check-box row and frame row sit at the same y in every cell of a row.
+- **PT-TOF-4** (lead, delegated approval 2026-11-13, lf-roles). The frame holds ONE value a line. A list answer (a number
+  pattern's terms, a function table's outputs: "12, 15, 18") writes one line a part, joined by commas, and wraps under the frame's
+  words in a narrow cell. A sentence answer ("The ones digits go 0, 2, 4, 6, 8.") prints no frame row: the judgement is the
+  answer. The same holds for Reason It's "The answer is ____." (its "__ is correct." names the sentence) and for an Error
+  Analysis fix (a sentence answer's fix is the item again, clean). Check: `ws-roles-unit` KEYJOIN-ROLE; ws-cell-checks KEYJOIN.
 
 **Teacher options.** Count; share false; frame on or off. **Skill supplies.** `renderCell` with `state: answered | wrong`, `wrongAnswer`, a frame id from `strings`. Default adapter: the generic frame "The answer is ____." **Screen.** Tap True or False; the frame input opens after "False"; feedback on Check.
 
