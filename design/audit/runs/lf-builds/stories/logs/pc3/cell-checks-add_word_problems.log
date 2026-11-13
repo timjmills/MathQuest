@@ -1,0 +1,216 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills addition:add_word_problems --card --card-opts
+
+mq-browser-run: slot 2 after 79s
+ws-cell-checks: 195 page(s) - addition:add_word_problems (card plan + option values)
+  ok   addition:add_word_problems independent S: 1p 2x? per 6
+  ok   addition:add_word_problems independent M: 1p 2x? per 4
+  ok   addition:add_word_problems independent L: 1p 2x? per 4
+  ok   addition:add_word_problems more-practice S: 1p 2x? per 6
+  ok   addition:add_word_problems more-practice M: 1p 2x? per 4
+  ok   addition:add_word_problems more-practice L: 1p 2x? per 4
+  ok   addition:add_word_problems test S: 1p 2x? per 6
+  ok   addition:add_word_problems test M: 1p 2x? per 4
+  ok   addition:add_word_problems test L: 1p 2x? per 4
+  ok   addition:add_word_problems lesson S: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L: 4p 1x? per undefined
+  ok   addition:add_word_problems scripted-model S: 2p 2x? per undefined
+  ok   addition:add_word_problems scripted-model M: 3p 2x? per undefined
+  ok   addition:add_word_problems scripted-model L: 3p 2x? per undefined
+  ok   addition:add_word_problems guided S: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L: 2p 2x? per undefined
+  ok   addition:add_word_problems opener S: 1p 2x? per undefined
+  ok   addition:add_word_problems opener M: 1p 2x? per undefined
+  ok   addition:add_word_problems opener L: 1p 2x? per undefined
+  ok   addition:add_word_problems error-analysis S: 1p 1x? per 4
+  ok   addition:add_word_problems error-analysis M: 1p 2x? per 4
+  ok   addition:add_word_problems error-analysis L: 1p 1x? per 2
+  ok   addition:add_word_problems review S: 1p 2x? per undefined
+  ok   addition:add_word_problems review M: 1p 2x? per undefined
+  ok   addition:add_word_problems review L: 1p 2x? per undefined
+  ok   addition:add_word_problems pre-skill-check S: 1p 4x? per undefined
+  ok   addition:add_word_problems pre-skill-check M: 1p 4x? per undefined
+  FAIL addition:add_word_problems pre-skill-check L: 1p 4x? per undefined - OVERFLOW (4)
+  ok   addition:add_word_problems mixed-practice S: 1p 8x? per undefined
+  ok   addition:add_word_problems mixed-practice M: 1p 6x? per undefined
+  ok   addition:add_word_problems mixed-practice L: 1p 4x? per undefined
+  ok   addition:add_word_problems true-false S: 1p 2x? per 4
+  ok   addition:add_word_problems true-false M: 1p 2x? per 4
+  ok   addition:add_word_problems true-false L: 1p 2x? per 2
+  FAIL addition:add_word_problems reason-it S: 1p 1x? per 2 - OVERFLOW (4)
+  FAIL addition:add_word_problems reason-it M: 1p 1x? per 2 - OVERFLOW (4)
+  FAIL addition:add_word_problems reason-it L: 1p 1x? per 2 - OVERFLOW (4)
+  ok   addition:add_word_problems stretch S: 1p 1x? per undefined
+  ok   addition:add_word_problems stretch M: 1p 1x? per undefined
+  ok   addition:add_word_problems stretch L: 1p 1x? per undefined
+  ok   addition:add_word_problems word-problems S: 1p 1x? per 3
+  ok   addition:add_word_problems word-problems M: 1p 1x? per 3
+  ok   addition:add_word_problems word-problems L: 1p 1x? per 3
+  ok   addition:add_word_problems lesson S {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"forms":[0,1,2]}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"forms":[0,1,2]}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"forms":[0,1,2]}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"forms":[0,1,2]}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"forms":[0]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"forms":[0]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"forms":[0]}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"forms":[0]}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"forms":[0]}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"forms":[0]}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"forms":[0]}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"forms":[0]}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided L {"forms":[0]}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"forms":[0]}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"forms":[0]}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"forms":[0]}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"forms":[0]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"forms":[0]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"forms":[0]}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"forms":[1]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"forms":[1]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"forms":[1]}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"forms":[1]}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"forms":[1]}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"forms":[1]}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"forms":[1]}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"forms":[1]}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"forms":[1]}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"forms":[1]}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"forms":[1]}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"forms":[1]}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"forms":[1]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"forms":[1]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"forms":[1]}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"forms":[2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"forms":[2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"forms":[2]}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"forms":[2]}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"forms":[2]}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"forms":[2]}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"forms":[2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"forms":[2]}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"forms":[2]}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"forms":[2]}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"forms":[2]}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"forms":[2]}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"forms":[2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"forms":[2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"forms":[2]}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"forms":[3]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"forms":[3]}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"forms":[3]}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"forms":[3]}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"forms":[3]}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"forms":[3]}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"forms":[3]}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided M {"forms":[3]}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"forms":[3]}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"forms":[3]}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"forms":[3]}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"forms":[3]}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"forms":[3]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"forms":[3]}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"forms":[3]}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"band":10}: 3p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"band":10}: 3p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"band":10}: 3p 1x? per undefined
+  ok   addition:add_word_problems independent S {"band":10}: 1p 2x? per 10
+  ok   addition:add_word_problems independent M {"band":10}: 1p 2x? per 8
+  ok   addition:add_word_problems independent L {"band":10}: 1p 2x? per 6
+  ok   addition:add_word_problems guided S {"band":10}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"band":10}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"band":10}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"band":10}: 1p 1x? per 8
+  ok   addition:add_word_problems test M {"band":10}: 1p 2x? per 8
+  ok   addition:add_word_problems test L {"band":10}: 1p 2x? per 6
+  ok   addition:add_word_problems review S {"band":10}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"band":10}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"band":10}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"band":20}: 3p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"band":20}: 3p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"band":20}: 3p 1x? per undefined
+  ok   addition:add_word_problems independent S {"band":20}: 1p 2x? per 10
+  ok   addition:add_word_problems independent M {"band":20}: 1p 2x? per 8
+  ok   addition:add_word_problems independent L {"band":20}: 1p 2x? per 6
+  ok   addition:add_word_problems guided S {"band":20}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"band":20}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"band":20}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"band":20}: 1p 1x? per 8
+  ok   addition:add_word_problems test M {"band":20}: 1p 2x? per 8
+  ok   addition:add_word_problems test L {"band":20}: 1p 2x? per 6
+  ok   addition:add_word_problems review S {"band":20}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"band":20}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"band":20}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"band":100}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"band":100}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"band":100}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"band":100}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"band":100}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"band":100}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"band":100}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"band":100}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"band":100}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"band":100}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"band":100}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"band":100}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"band":100}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"band":100}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"band":100}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"pictures":false}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"pictures":false}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"pictures":false}: 4p 1x? per undefined
+  ok   addition:add_word_problems independent S {"pictures":false}: 1p 2x? per 6
+  ok   addition:add_word_problems independent M {"pictures":false}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"pictures":false}: 1p 2x? per 4
+  ok   addition:add_word_problems guided S {"pictures":false}: 1p 2x? per undefined
+  ok   addition:add_word_problems guided M {"pictures":false}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"pictures":false}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"pictures":false}: 1p 2x? per 6
+  ok   addition:add_word_problems test M {"pictures":false}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"pictures":false}: 1p 2x? per 4
+  ok   addition:add_word_problems review S {"pictures":false}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"pictures":false}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"pictures":false}: 1p 2x? per undefined
+  ok   addition:add_word_problems lesson S {"wpBar":true}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson M {"wpBar":true}: 4p 1x? per undefined
+  ok   addition:add_word_problems lesson L {"wpBar":true}: 5p 1x? per undefined
+  ok   addition:add_word_problems independent S {"wpBar":true}: 1p 2x? per 4
+  ok   addition:add_word_problems independent M {"wpBar":true}: 1p 2x? per 4
+  ok   addition:add_word_problems independent L {"wpBar":true}: 1p 2x? per 2
+  ok   addition:add_word_problems guided S {"wpBar":true}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided M {"wpBar":true}: 2p 2x? per undefined
+  ok   addition:add_word_problems guided L {"wpBar":true}: 2p 2x? per undefined
+  ok   addition:add_word_problems test S {"wpBar":true}: 1p 2x? per 4
+  ok   addition:add_word_problems test M {"wpBar":true}: 1p 2x? per 4
+  ok   addition:add_word_problems test L {"wpBar":true}: 1p 2x? per 2
+  ok   addition:add_word_problems review S {"wpBar":true}: 1p 2x? per undefined
+  ok   addition:add_word_problems review M {"wpBar":true}: 1p 2x? per undefined
+  ok   addition:add_word_problems review L {"wpBar":true}: 1p 2x? per undefined
+  FAIL OVERFLOW addition:add_word_problems pre-skill-check L: pupil page 1 cell 9: content overflows its cell
+  FAIL OVERFLOW addition:add_word_problems pre-skill-check L: pupil page 1 cell 9: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems pre-skill-check L: key page 1 cell 9: content overflows its cell
+  FAIL OVERFLOW addition:add_word_problems pre-skill-check L: key page 1 cell 9: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it S: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it S: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it S: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it S: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it M: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it M: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it M: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it M: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it L: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it L: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it L: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW addition:add_word_problems reason-it L: key page 1 cell 2: <div> leaves the cell
+ws-cell-checks: FAIL - 16 finding(s) (OVERFLOW 16) on 195 page(s), 119s
