@@ -15,6 +15,7 @@
 //   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
 //   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
 //                         only the kit's answer slots (input.mq-slot)
+//   --focus-gap-html <f>  FOCUS-GAP on a saved page (backtest fixtures: tests/fixtures/precritic/focus-gap/), no app
 //   --focus-gap-self-test FOCUS-GAP on synthetic pages, no app (critic eb-r6 m2: a word 1 px under or over the ring is a finding)
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
@@ -432,8 +433,34 @@ async function liveGreen(page) {
 
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
+// --focus-gap-html <file>: FOCUS-GAP on a saved page, no app (the backtest fixtures, tests/fixtures/precritic/focus-gap/): every
+// visible text input is focused in turn and judged as --focus-gap-all judges it (the ring against the words of `.c`, else the
+// page body). Prints each finding and `ws-screen-answer: OK` / `FAIL`.
+if (arg('focus-gap-html', null)) (async () => {
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const file = require('path').resolve(process.cwd(), arg('focus-gap-html'));
+    const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    const found = []; let n = 0;
+    try {
+        const p = await b.newPage();
+        await p.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
+        await p.setContent(require('fs').readFileSync(file, 'utf8'), { waitUntil: 'load' });
+        const root = await p.evaluate(() => (document.querySelector('.c') ? '.c' : 'body'));
+        const ins = await p.$$('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])');
+        for (const h of ins) {
+            if (!(await h.evaluate((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }))) continue;
+            n++; await h.focus();
+            const msg = await h.evaluate(FOCUS_GAP, root, true);
+            if (msg) found.push(msg);
+        }
+    } finally { await b.close(); }
+    for (const m of found) console.log(`${require('path').basename(file)}: ${m}`);
+    console.log(`(${n} box(es) focused)`);
+    console.log(`ws-screen-answer: ${found.length || !n ? `FAIL (${found.length || 'no box'})` : 'OK'}`);
+    process.exit(found.length || !n ? 1 : 0);
+})();
 // --stress N: one command that loads the CPU and repeats the whole run N times.
-if (has('focus-gap-self-test')) (async () => {
+else if (has('focus-gap-self-test')) (async () => {
     // FOCUS-GAP on synthetic pages (no app): the critic eb-r6 probe set. A finding where a word touches the ring beside, under
     // (1 px, m2) or over it; none for a lone box, a word on another line, or words 6+ px clear above / beside / below.
     const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
