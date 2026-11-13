@@ -5227,6 +5227,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r16-vnames",
+  "check": "V-NAMES: no Error analysis page repeats a pupil name while an unused one remains (both skills, S / M / L, default and grade 2 / 4 pools, seed 7, 143869 and the render seed): Match 3 EA S \"Mia wrote\" twice, Pick 3 EA M \"Sam wrote\" twice, critic r5 nit 5",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit --browser V-NAMES (lf-vocab r16)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r5 pass): 16 repeated names"
+  },
+  "pass": {
+   "commit": "afca8041",
+   "state": "error-analysis.js pageNames: a name already on the page takes the next unused one"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-NAMES 2>&1 | grep -q \"  - V-NAMES \" && echo \"v-names: FAIL\" || echo \"v-names: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
