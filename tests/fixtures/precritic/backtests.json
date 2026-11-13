@@ -6804,6 +6804,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "no-size-s-76bc",
+  "check": "ws-no-size-s (owner 2026-11-13, CLAUDE.md plan item 9: two print sizes, M and L; size S dropped): no size picker offers S (APP-PICKER), no app module keeps a stored S as S (APP-RESTORE), the kit reads S as M (APP-ALIAS: offeredSize, OFFERED_SIZES), and no gate's default run includes S (GATE-DEFAULT); on every ws-precritic run and in deploy session 1",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s APP-PICKER / APP-RESTORE / APP-ALIAS / GATE-DEFAULT",
+  "browser": false,
+  "fail": {
+   "commit": "76bc11c6",
+   "state": "the owner's ruling commit: teacher print, simple print, worksheet sheet and print settings offer S; printDefaults keeps a stored S; no S -> M alias; precritic, empty-band, cell-checks, capacity-pin and the rest default to S,M,L (52 findings)"
+  },
+  "pass": {
+   "commit": "a3b128cd1",
+   "state": "lf-tools-nos: M and L pickers, offeredSize at every restore, gates default to M,L, each S kept on purpose on the reasoned allow-list"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fact-cols-m-fixture",
+  "check": "ws-fact-cols-m (owner 2026-11-13: fact sheets keep everything when S goes): a fact-rows sheet with 9 or 10 columns PICKED prints at Size M with exactly those columns (FCM-COLS) at the 16 pt rung (FCM-PT), on the teacher print (buildSheet fact-rows) and the simple print (Columns Exactly n); ÷ to 9",
+  "kind": "fixture",
+  "rule": "ws-fact-cols-m FCM-COLS / FCM-PT / FCM-FIT",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fact-cols-m/fail.json",
+   "state": "a naive S removal: the picked 9 / 10 clamped to M's Auto (6 across at 24 pt) - the 9-10 column sheets lost"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fact-cols-m/pass.json",
+   "state": "the live measurement on lf-tools-nos (ws-fact-cols-m --json): 9 / 10 across at 16 pt on both print paths"
+  },
+  "command": "node tests/scripts/ws-fact-cols-m.cjs --fixture {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

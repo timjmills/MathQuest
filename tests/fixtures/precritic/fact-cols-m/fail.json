@@ -1,0 +1,103 @@
+{
+ "note": "ws-fact-cols-m FAIL state: what a naive S removal prints - a picked 9 or 10 at Size M clamped to M's Auto (6 across at 24 pt), so the 9-10 column fact sheets that needed S are lost",
+ "cases": [
+  {
+   "tag": "add_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "add_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "add_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "add_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "sub_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "sub_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "sub_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "sub_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "mult_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "mult_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "mult_facts M 10 cols (teacher print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "mult_facts M 10 cols (simple print)",
+   "cols": 10,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "div_facts M 9 cols (teacher print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  },
+  {
+   "tag": "div_facts M 9 cols (simple print)",
+   "cols": 9,
+   "got": 6,
+   "pt": 24,
+   "pages": 1
+  }
+ ]
+}
