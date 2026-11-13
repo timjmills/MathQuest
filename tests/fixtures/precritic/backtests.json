@@ -5610,6 +5610,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ea-rowx-redo",
+  "check": "an Error Analysis redo item's Correct / Fix it stands at one x a column whatever its train's length (npr S 69.5 vs 131.5 mm)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks EA-ROWX",
+  "browser": true,
+  "fail": {
+   "commit": "c1f2879c2",
+   "state": "EA-ROWX 2 on npr EA S"
+  },
+  "pass": {
+   "commit": "cec8a53ce",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles error-analysis --size S --rules EA-ROWX",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
