@@ -1679,6 +1679,8 @@ function wsLintPage(cfg) {
                 extra: pg.classList.contains('ws-keyextra'),
                 shortItems: [...pg.querySelectorAll('[data-ws-short-page]')].map(e => `${e.getAttribute('data-ws-short-page')}:${e.getAttribute('data-ws-short-cell')}`),
                 labelled: ri.cells.filter(c => c.querySelector('[data-ws-label="letter"], [data-ws-label="tab"]')).length,
+                // L-DENSITY OPN-6: the boxed cells of the page's Guided Practice band (an Opener's "We do")
+                guidedCells: ri.cells.filter(c => { const b = c.closest('.ws-band'); return !!b && /^Guided Practice\s*:/i.test(((b.querySelector('.ws-strip > b') || {}).textContent || '').trim()); }).length,
                 idx: ri.idx + 1, tag: pg.id, key: ri.key, role, size, look: pg.getAttribute('data-ws-look') || '',
                 sheet: pg.getAttribute('data-ws-sheet') || '', tab, bands, foot: footParts,
                 // INK-30: a lesson page (or a practice page's lesson step strip) may print the accent.
@@ -2216,6 +2218,11 @@ function lintKitGeometry(dom, pdf, info, F) {
             const secPages = secOf(pt.pages);
             const secMax = subSec ? Math.max(...secPages.map(q => q.items)) : max;
             const secLast = subSec ? secPages[secPages.length - 1] === p : last;
+            // L-DENSITY OPN-6 (lf-engine-roles critic B1, PAGE_TYPES PT-OPN-6 "Guided holds 2 to 4 cells ... 1 column gives 2 rows"):
+            // an Opener's Guided band holding fewer than 2 cells fails, unless the plan's notes say the second Guided row did not
+            // fit the page budget (the role writes that note; a kit build hands its notes to the lint).
+            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && p.guidedCells < 2 && !(info.notes || []).some(t => /second Guided row did not fit/i.test(t)))
+                F('L-DENSITY', 'OPN-6', 'major', { page: p.idx }, `page ${p.idx}: the Opener's Guided band holds ${p.guidedCells} cell(s); Guided holds 2 to 4 cells (1 column gives 2 rows), or the plan notes that the second row did not fit (PT-OPN-6)`, 'one-cell Guided band');
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
             // print screen's default; --count N fixes it and turns this off), a practice page whose
@@ -2581,7 +2588,7 @@ function attributeCells({ items, anchors }) {
     return res;
 }
 
-async function lintHtmlInSheetPage(app, html, id, mode, items = null, { pool = false } = {}) {   // items: {items, anchors} (D1 fix r1); pool: lane D pool judge
+async function lintHtmlInSheetPage(app, html, id, mode, items = null, { pool = false, notes = [] } = {}) {   // items: {items, anchors} (D1 fix r1); pool: lane D pool judge
     const SAVE = arg('save-html', null);
     const saveTo = SAVE ? path.resolve(process.cwd(), SAVE, id.replace(/[^\w.-]+/g, '_') + '.html') : null;
     if (SAVE) { fs.mkdirSync(path.resolve(process.cwd(), SAVE), { recursive: true }); fs.writeFileSync(saveTo, html); }
@@ -2603,7 +2610,7 @@ async function lintHtmlInSheetPage(app, html, id, mode, items = null, { pool = f
             attribution = await sheet.evaluate(attributeCells, items);
             if (saveTo) fs.writeFileSync(saveTo, '<!doctype html>\n' + await sheet.evaluate(() => document.documentElement.outerHTML));
         }
-        const res = await lintDocument(sheet, { id, mode, pool });
+        const res = await lintDocument(sheet, { id, mode, pool, notes });
         if (attribution) res.info.attribution = attribution;
         if (mode === 'kit' && arg('supports', null)) {
             const sr = await sheet.evaluate(supportCheckInPage);
@@ -2680,7 +2687,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                         const items = (out.items || []).filter((it) => !it.part || it.part === 'practice' || it.part === 'mixed').map((it) => ({ skill: sk(it.skill), letter: it.letter == null ? '' : String(it.letter), text: String(it.text || '') }));
                         // ... and of every anchor (worked example) cell: matched by the numbers it draws
                         items.anchors = ((out.anchors && out.anchors.examples) || []).map((a) => ({ skill: sk(a.skill), text: String(a.text || '') }));
-                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml, items, anchorItems: items.anchors };
+                        return { doc: window.sheetDocument(body, LABEL), pupilHtml: out.pupilHtml, keyHtml: out.keyHtml, items, anchorItems: items.anchors, notes: (out.notes || []).map(String) };
                     }, { S: d.skills.map(k => ({ categoryId: k.categoryId, skillId: k.skillId })), seed, LETTERS: arg('letters', null) ? arg('letters', '').split(',').map(x => x.trim().toUpperCase()).filter(Boolean) : null, COUNT: arg('count', 'auto') === 'auto' ? undefined : parseInt(arg('count', '6'), 10), role, ANCHORS: flags.anchors, SUPPORTS: flags.supports, COVER: flags.coverage, MIX: arg('mix', null), OPTS: arg('opts', null) ? JSON.parse(arg('opts', '{}')) : null, KIT_SIZE: kitSize(), KEY_OPTS: arg('key-place', null) || arg('key-style', null) ? { on: true, placement: arg('key-place', 'end'), style: arg('key-style', 'copy') } : null, PAGES: flags.pages, COLUMNS: flags.columns, SECTIONS: flags.sectionsMode, LABEL: d.skills.length === 1 ? s.label : d.label });
                     if (html && html.doc) { kitHalves = html; html = html.doc; }
                 }
@@ -2689,7 +2696,7 @@ async function runAppDocs(app, source, skills, flags, results, jobId) {
                     if (jobId) NA_DOCS.push({ id, reason: html.unsupported });
                     continue;
                 }
-                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null, { pool: source === 'kit' && d.skills.length === 1 && poolSkill(s) });
+                r = await lintHtmlInSheetPage(app, html, id, source === 'legacy' ? 'legacy' : 'kit', kitHalves && d.skills.length > 1 ? { items: kitHalves.items, anchors: kitHalves.anchorItems || [] } : null, { pool: source === 'kit' && d.skills.length === 1 && poolSkill(s), notes: (kitHalves && kitHalves.notes) || [] });
                 if (kitHalves) r.findings.push(...anchorFindings(kitHalves.pupilHtml, kitHalves.keyHtml));
             } catch (e) {
                 r = { info: { id, mode: source, error: e.message }, findings: [{ lint: 'L-SPLIT', rule: 'RENDER', sev: 'critical', msg: `the sheet did not render: ${e.message}`, key: 'render error' }] };
@@ -2946,6 +2953,24 @@ const SELF_TESTS = [
         top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
         top(p2).slice(1).forEach(c => c.remove()); top(p2).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
         top(p3).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
+    } },
+    // L-DENSITY OPN-6 (lf-engine-roles critic B1, PT-OPN-6): an Opener whose Guided band holds one cell fails ...
+    { name: 'opener with a one-cell Guided band (OPN-6)', mode: 'kit', expect: ['L-DENSITY', 'OPN-6'], fn: () => {
+        const p = document.querySelector('.ws-page');
+        p.setAttribute('data-ws-role', 'opener');
+        const c = [...p.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]'))[0];
+        const band = document.createElement('div'); band.className = 'ws-band';
+        band.innerHTML = '<div class="ws-strip"><b>Guided Practice:</b> Write it.</div>';
+        c.before(band); band.appendChild(c);
+    } },
+    // ... unless the plan notes that the second Guided row did not fit the budget
+    { name: 'opener with a one-cell Guided band, noted (OPN-6 control)', mode: 'kit', notes: ['The second Guided row did not fit the page budget at this size.'], expect: [], absent: ['L-DENSITY', 'OPN-6'], fn: () => {
+        const p = document.querySelector('.ws-page');
+        p.setAttribute('data-ws-role', 'opener');
+        const c = [...p.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]'))[0];
+        const band = document.createElement('div'); band.className = 'ws-band';
+        band.innerHTML = '<div class="ws-strip"><b>Guided Practice:</b> Write it.</div>';
+        c.before(band); band.appendChild(c);
     } },
     // L-LONE (H5; skip-count critic r4 D12): the second page of a two-page sheet holds one cell alone
     { name: 'lone cell on the last page (L-LONE)', expect: ['L-DENSITY', 'LONE'], fn: () => {
@@ -3306,7 +3331,9 @@ async function selfTest() {
             const page = await prepare();
             await page.evaluate(t.fn);
             await sleep(50);
-            const r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool, rules: t.rules || null });
+            if (t.args) JOB_ARGV = argv.concat(t.args);   // a test's own flags (--count 6: the fixed-count guard)
+            let r;
+            try { r = await lintDocument(page, { id: `self-test ${t.name}`, mode: t.mode || 'pack', pool: !!t.pool, rules: t.rules || null, notes: t.notes || [] }); } finally { if (t.args) JOB_ARGV = null; }
             await page.close();
             if (t.absent) {
                 asserts++;
