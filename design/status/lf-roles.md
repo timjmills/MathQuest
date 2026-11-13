@@ -79,6 +79,12 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   takes the word line. Gates: roles-unit 78, vocab-unit, boot, code-snapshot, redesign-passed 29, capacity 0 drops / 17
   rises, cell-checks 0 on 696 passed pages; vocab Guided 6/6 identical to master. Also in: inkWMm vs the panel's INNER
   width (ri-ink-inner; no passed page changes).
+- Deploy-4 live on master e4d12d6a (PR #45 merged).
+- r15: lf-algebra G2 (EA L copy train 60 px left of the original, seen on their tree): a widened REDO work was centred while
+  its redraw zone starts at the left -> it starts at the left (EA-REDO-ALIGN, backtest ea-redo-align; 0 passed EA pages move).
+  OPEN, pre-existing: npr EA S EA-ROWX (judgement at 69.5 vs 131.5 mm beside a 4- vs 8-term train; count rows plan one
+  footprint so no page work width is set). Neither space-between, align-self:stretch nor margin-left:auto on the judgement
+  moved it - the cause is in the redo flex flow, not found yet; next round.
 - lf-algebra r2 queue: G4 fte RI 2 at every size here (npr fixed); G3 npr RI S 3; G2 not reproduced at the default seed
   (seed asked); G10 / pattern_features / growing / fgr not in this tree; F3 gone at head (print-raster check -> lf-checks).
 

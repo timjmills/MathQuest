@@ -5390,6 +5390,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ea-redo-align",
+  "check": "an Error Analysis redo item's widened work starts at the cell's left like the redraw zone under it (lf-algebra critic r2 G2)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit EA-REDO-ALIGN",
+  "browser": false,
+  "fail": {
+   "commit": "244849a9",
+   "state": "align-items:center on a redo work"
+  },
+  "pass": {
+   "commit": "f4fd737d",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only EA-REDO-ALIGN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
