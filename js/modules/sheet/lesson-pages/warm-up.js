@@ -218,19 +218,25 @@ export function warmUpBand(env) {
             // fact 39-40 % of a 65 mm cell empty); what it cannot take passes to the bands after it.
             // (lf-engine G7, lf-algebra critic r2: a UNIFORM Warm-up row - every cell the same short one-line item, e.g. the
             // growing lesson's two fact skills - was grown to its footprint (pad + answer room) and left 32 % blank under the
-            // answer row. For a uniform row the grow is capped by the item's measured INK (its lowest text / drawing / stroked
-            // box / answer slot, `inkMm`), not the footprint, so the row never over-grows. A MIXED row - a short fact beside a
-            // tall stack - keeps the footprint rule unchanged: its height is justified by the tall cell, and a short cell beside
-            // it is H13-ROW's, not the grow's. So every lesson but a uniform-row one prints byte-identical.)
+            // answer row. For a uniform row, the grow carries a second cap from the item's measured INK (its lowest text /
+            // drawing / stroked box / answer slot, `inkMm`) that keeps the grown cell under the LS-WARM 30 % band; it is a MIN
+            // with the footprint room, so a row already under 30 % keeps the footprint rule and prints byte-identical, and only
+            // a row the footprint would over-grow (growing) is held back. A MIXED row - a short fact beside a tall stack - is
+            // H13-ROW's, never capped by the grow.)
             const inkOf = (id, it) => { const mm = it.measured && it.measured[shape[id].cols]; return mm && mm.inkMm > 0 ? mm.inkMm : NaN; };
             const everyInk = halves.flatMap((id) => wPools[id].slice(0, shape[id].k * rowsOf(id)).map((it) => inkOf(id, it)));
             const uniformRow = everyInk.length > 0 && everyInk.every((v) => Number.isFinite(v)) && (Math.max(...everyInk) - Math.min(...everyInk)) <= 0.2 * Math.max(...everyInk);
+            const LS_WARM_BAND = 0.30;
             const room = halves.map((id) => {
                 const its = wPools[id].slice(0, shape[id].k * rowsOf(id));
                 const hs = its.map((it) => hOf(it, shape[id].cols));
                 if (!hs.length || hs.some((h) => !(h > 0))) return Infinity;
-                if (uniformRow) { const inks = its.map((it) => inkOf(id, it)); return rowsOf(id) * Math.min(...inks) / (1 - WARM_BAND) - hW; }
-                return rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
+                const fpRoom = rowsOf(id) * Math.max(20, Math.min(...hs)) / (1 - WARM_BAND) - hW;
+                if (!uniformRow) return fpRoom;
+                // the grown cell's ink band stays < 30 %: height <= minInk / (1 - 0.30); the cap is a MIN with fpRoom, so it
+                // only bites where fpRoom would over-grow past 30 %
+                const inkCap = rowsOf(id) * Math.min(...its.map((it) => inkOf(id, it))) / (1 - LS_WARM_BAND) - hW;
+                return Math.min(fpRoom, inkCap);
             });
             const maxAdd = Math.max(0, Math.min(...room));
             groups.push(band(m.strip + instrH + hW, { kind: 'band', label: 'Warm-up:', instr: sameInstr ? t0 : '', content }, Object.assign({ h: hW, grid: parts.map((p) => p.parts[p.parts.length - 1]), cap: 0, capIfEmpty: 0.45 }, Number.isFinite(maxAdd) ? { maxAdd } : {})));
