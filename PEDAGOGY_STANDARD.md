@@ -464,6 +464,14 @@ feedback state.
 | On tests | Off (OPTION "Hints on tests") | On (OPTION "Keep structural supports on tests") |
 | Print colour | The one flat 40% grey, or hatching / dotted outlines in Photocopy-safe mode | Black hairlines |
 
+**4.1a A structure that names the answer is a hint there (lead ruling, 2026-11-13; lf-engine PC critic r4 N9).** On any
+item whose answer IS a place name ("Circle the place of the underlined digit", tens / ones), the place letters over the
+numeral (H T O) give the answer away: the letter over the underlined digit is the key. So no page where support has faded -
+a lesson's Mixed page, Review, Test, the Prerequisite Check - prints place heads over a "name the place" numeral; Practice
+keeps them (the support). Elsewhere the letters stay a structural scaffold (they name the column the pupil works in, not the
+answer). Likewise a word bank under the number is never aligned with its digits ("tens" under the tens digit names the
+answer): the check's bank is a fixed column beside the whole number. Gate: `ws-lesson-samples --check` PC-PVHEADS and PC-PV.
+
 ### 4.2 The fixed fade order for hints
 
 A ladder removes its hints in this order, one per step, skipping any it never used. A hint that has been

@@ -80,7 +80,10 @@ function packing(poolsIn, input) {
         // SIDE: a shelf of [twin | problem] pairs needs an even count of cells the twins fit too.
         const pairK = twins.length ? divisorsDesc(N).find((d) => d <= 6 && d % 2 === 0 && fitsAt(its, d, ctx) && fitsAt(twins, d, ctx)) : 0;
         const k = pairK || divisorsDesc(N).find((d) => d <= 6 && fitsAt(its, Math.min(d, 6), ctx)) || 1;
-        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0);
+        // (lf-engine PC r5: a library lesson's Mixed page at L drops every place-value cell under its number tab - print-sheet.js
+        // LESSON_PM_CENTRE_CSS, margin-top tab - 0.5 mm, TAB-CLEAR - which the measuring cell does not carry: the shelf takes it,
+        // or a third rounding shelf drew 29.5 mm of cell in a 25.1 mm row - PC-FRAME, round L with the check on)
+        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0) + pvLiftOf(its, input, ctx);
         // The skill's anchor band (SECTIONS, or SIDE when no pair fits): measured by the host.
         const band = a && (A.mode === 'sections' || !pairK) && (a.band || []).length ? Math.max(0, ...a.band.map((x) => anchorHeightMm(x, 1))) : 0;
         shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0, pairs: !!pairK, band, per: pairK ? k / 2 : k };
@@ -170,6 +173,10 @@ function packing(poolsIn, input) {
     }
     return { ctx, m, mCont, N, ids, shelf, used, pages: basePages };
 }
+
+/** The drop a library lesson's Mixed page gives a place-value cell under its tab at L (print-sheet.js LESSON_PM_CENTRE_CSS,
+ *  TAB-CLEAR: margin-top tab - 0.5 mm), which the measuring cell does not carry (lf-engine PC r5). 0 elsewhere. */
+export const pvLiftOf = (its, input, ctx) => (input && input.lessonFit && ctx.size === 'L' && (its || []).some((it) => /^pv(-support)?$/.test(String((it && it.template) || '')) && !(it && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.tabFree)) ? ((ctx.s && ctx.s.tabMm) || 5) - 0.5 : 0);
 
 /* ============================================================ the MIXED arrangement (M1) */
 
@@ -626,9 +633,9 @@ export function plan(input = {}) {
             const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
             // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
-            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) : sh.h;
+            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) + pvLiftOf(chunk, input, ctx) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band });
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, lift: pvLiftOf(chunk, input, ctx) });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -650,7 +657,8 @@ export function plan(input = {}) {
     // less LESSON_FIT_PAD_MM (padding, tab clearance - an under-estimate), and a centred cell of height H holds content c
     // with bands under 30 % while H <= c / 0.42. A one-line fact shelf ("14 ÷ 7 = __") so stays at its own height; the
     // spare goes to the shelves that can take it (stacks, boxed equations, stories).
-    const capOf = (sh) => (input.lessonFit ? Math.max(LESSON_FIT_MIN_MM, Math.min(sh.h * 0.35, (sh.h - LESSON_FIT_PAD_MM) / 0.42 - sh.h)) : sh.h * 0.35);
+    // (a shelf's pv lift - pvLiftOf - is empty room above the content, not content: lf-engine PC r5)
+    const capOf = (sh) => (input.lessonFit ? Math.max(LESSON_FIT_MIN_MM, Math.min(sh.h * 0.35, (sh.h - LESSON_FIT_PAD_MM - (sh.lift || 0)) / 0.42 - sh.h)) : sh.h * 0.35);
     const fillShares = (() => {
         if (!(input.growLast || (input.lessonFit && input.fill)) || !shelves.length) return null;
         const g = shelves.map(() => 0);

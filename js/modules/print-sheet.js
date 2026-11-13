@@ -1154,6 +1154,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
             const qt = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, pl, { rows: pl.cols.slice(), cols: pl.rows.slice() }) }) });
             if (gridBlock(gridShownOf(q), shown) && !gridBlock(gridShownOf(qt), shown)) q = qt;
         }
+        // (`noPlaceHeads`, lead ruling 2026-11-13 - critic r4 N9: on a page whose support has faded - a lesson's Mixed page - a "name
+        // the place" item prints no place heads: the letter over the underlined digit IS its answer. Absent on every other ref.)
+        if (sk.noPlaceHeads && q.cell && q.cell.template === 'pv' && q.cell.payload && /^place/.test(String(q.cell.payload.kind || ''))) q = Object.assign({}, q, { cell: Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { heads: false, tabFree: true }) }) });
         if (sk.instructionKey && q) q = Object.assign({}, q, { instructionKey: sk.instructionKey });
         if (sk.shortQuestion) q = shortStoryQ(q);
         if (sk.check && q.cell && q.cell.template === 'stack') q.cell = Object.assign({}, q.cell, { payload: Object.assign({}, q.cell.payload, { check: true }) });
@@ -5129,10 +5132,11 @@ async function buildLesson(n, metaOf) {
     // skill its own section, the page filled in one frame per section.
     const buildMixed = (seed, avoid = (r) => r, avoidTexts = practiceTexts) => {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
+        // (lead ruling 2026-11-13, N9: the Mixed partners print no place heads over a "name the place" numeral - `noPlaceHeads`)
         // (critic r4 N4 / PG-LR6 at 64 seeds: with the check on, the partners keep the one-number near-twin rules on the page too -
         // the Place Value partner printed 78 / 87 and 63 64 65; `pageRules` with no caps; a lesson without the check: as before)
         const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(withSheetHard).map(avoid)
-            .map((w) => (w && sheetHard.length && !w.pageRules ? Object.assign({}, w, { pageRules: { caps: {} } }) : w));
+            .map((w) => (w ? Object.assign({}, w, { noPlaceHeads: true }, sheetHard.length && !w.pageRules ? { pageRules: { caps: {} } } : {}) : w));
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,

@@ -769,7 +769,9 @@ function pvRenderBody(p, ctx0) {
                     return `<div class="pv-cell"><div class="pv-side" style="display:flex;align-items:center;justify-content:center;column-gap:${tight ? 4 : 5}mm;">`
                         + `<div style="text-align:center;">${numeral({ underline: p.place, heads: nameHeads })}</div>${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight, true)}</div>${valueLine()}</div>`;
                 }
-                return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
+                // (`tabFree`, lead ruling 2026-11-13 N9: a lesson Mixed partner's place item prints no heads, so nothing sits in the
+                // tab's corner - the page's TAB-CLEAR drop under the tab, print-sheet.js LESSON_PM_CENTRE_CSS, is not taken)
+                return `<div class="pv-cell"${p.tabFree ? ' style="margin-top:0"' : ''}>${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
             case 'place-bank': {
                 const bank = `<div class="pv-bank" style="display:table;margin:0 auto ${tight ? 1 : 2}mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`
                     + `font-size:${pt(m.textPt + 1)};font-weight:700;">${(p.words || []).map(esc).join('&nbsp;&nbsp;&nbsp;')}</div>`;

@@ -317,6 +317,11 @@ export function sameFactForms(ex) {
  * panels fill the body left over, never above 2 x (rows) / 1.6 x (2 x 2) or the panel's width,
  * and a panel grows past its content by a quarter at most, the content centred in it (H13).
  */
+/** (lf-engine PC critic r4 N3) A grid3 panel whose measured content falls this share or more short of its row is centred in it.
+ *  Calibrated on the drawn page (the measure runs over the ink): sub_100_regroup's panels 5 / 6 measured 0.232 / 0.237 and
+ *  drew 33 % bands (H13 fail); g3-oa9-input-output-rule's final panel measured 0.215 and drew 25 % (kept top-started). */
+export const CHART_MID = 0.225;
+const CHART_MID_CSS = '<style data-mq-cmid>:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid>.ws-cell.mq-cmid{justify-content:safe center !important}</style>';
 export function chartPage(input, ctx, data, example, states, draws, second, tailItem, finals = [], tailPanel = null) {
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const lesson = input.lesson || {};
@@ -413,10 +418,15 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
         // (`chartEqualRows`, lesson data - the detailed lesson maker, lesson 5: every row of the grid one height, PG-11)
         const rowsMm = data && data.chartEqualRows ? hr.map(() => Math.max(...hr) * Math.min(1.25, room / (Math.max(...hr) * hr.length))) : hr.map((h) => h * k);
         rowH = Math.max(...rowsMm);
-        const grid = gridPart(cells3.map((x) => withZoom(x, 3)), { cols: 3, rows: rows3, labels: 'none', cls: 'mq-chartgrid' });
+        // (critic r4 N3: a panel whose measured content is CHART_MID or more short of its row - the sub chart's "Check: add back."
+        // beside the taller "Subtract the tens." panel, a 33 % band - is centred in its row, `mq-cmid`; every other panel as before)
+        const midOf = (x, i) => { const rh = rowsMm[Math.floor(i / 3)]; const c = hOf(x, 3) + 1 + (z - 1) * dOf(x); return rh > 0 && (rh - c) / rh >= CHART_MID; };
+        const grid = gridPart(cells3.map((x, i) => (midOf(x, i) ? Object.assign(withZoom(x, 3), { cls: `${x.cellCls || ''} mq-cmid`.trim() }) : withZoom(x, 3))), { cols: 3, rows: rows3, labels: 'none', cls: 'mq-chartgrid' });
         grid.rowsTpl = rowsMm.map((h) => `${Math.round(h * 10) / 10}fr`).join(' ');
         grid.height = `${Math.round(sum(rowsMm) * 100) / 100}mm`;
         sections.push(sum(rowsMm) >= room - 2 ? Object.assign(grid, { cls: 'mq-chartgrid', height: '' }) : grid);
+        // (its rule travels only with a chart that has such a panel: every other page's html is unchanged)
+        if (cells3.some(midOf)) sections.push({ kind: 'html', html: CHART_MID_CSS });
     } else {
         room = avail - (mode === 'row' ? band2 : mode === 'final' ? hF : 0);
         rowH = Math.max(H(z), Math.min(room / lay.rows, H(z) * 1.25));
