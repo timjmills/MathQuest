@@ -38,7 +38,9 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[
 const say = (...a) => console.log(...a);
 const BASE = path.resolve(__dirname, '..', '..', 'design/audit/baselines/worksheet-reflow.json');
 const SAMPLE = ['placevalue:expand', 'subtraction:sub_100_no_regroup', 'multiplication:mult_facts', 'addition:add_facts', 'subtraction:sub_word_problems', 'patterns:number_patterns_rule'];
-const WIDTHS = [{ w: 820, h: 1180 }, { w: 1024, h: 768 }, { w: 1280, h: 900 }, { w: 1366, h: 768 }];   // the screen targets (lead 2026-11-13: no phone width)
+// the screen targets (lead 2026-11-13: no phone width), from the one table (lf-hosts critic r2 F2)
+const SW = require('../lib/ws-screen-widths.cjs');
+const WIDTHS = [...SW.SCREEN_WIDTHS].sort((a, b) => a - b).map((w) => ({ w, h: SW.heightOf(w) }));
 const CARDS = 6;
 const TOL_H = 6;      // px a card / answer place may grow
 const TOL_D = 0.5;    // px a numeral may shrink (rounding)
@@ -138,12 +140,13 @@ function selfTest() {
 
 async function main() {
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'sample-only', 'baseline']), BOOL = new Set(['pin', 'self-test']);
+    const VALUE = new Set(['skills', 'sample-only', 'baseline']), BOOL = new Set(['pin', 'self-test', 'print-widths']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
         if (VALUE.has(m[1])) i++;
     }
+    if (has('print-widths')) { say(`widths: ${WIDTHS.map((v) => v.w).join(',')}`); return; }
     const basePath = path.resolve(arg('baseline', BASE));
     const pin = has('pin');
     const skills = String(arg('skills', arg('sample-only', SAMPLE.join(',')))).split(',').map((s) => s.trim()).filter(Boolean);

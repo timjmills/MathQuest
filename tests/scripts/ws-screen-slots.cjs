@@ -208,6 +208,9 @@ function MEASURE_DIGIT(rootSel) {
     return best;
 }
 
+// --print-widths (ws-screen-widths-plan, lf-hosts critic r2 F2): the widths the SCREEN-DIGIT pass renders (--screen-digit), else
+// the one host-check width, then exit
+if (has('print-widths')) { console.log(`widths: ${SCREEN_DIGIT ? DIGIT_VIEWPORTS.map((v) => v.w).join(',') : (has('bigboard') ? 1366 : 1280)}`); process.exit(0); }
 if (has('self-test')) {
     const L = [
         { categoryId: 'measurement', skillId: 'time_5min', label: 'Time' }, { categoryId: 'measurement', skillId: 'reading_ruler_hard', label: 'Ruler' },

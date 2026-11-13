@@ -418,23 +418,24 @@ function selfTest() {
     eq('term: "determine" is not a term', isTermDrawing({ label: 'determine the rule', cls: 'determine' }), false);
     eq('term: picture name', markName({ label: 'Term 2: 5 dots', cls: '' }, { mark: 'circle.ring' }), 'ring (pattern term)');
     // queue 16 / 17: TEXT-SIZE floors
-    eq('digit floors from ws-screen-slots', [390, 820, 1280].map((w) => digitFloorPx(w)), [40, 48, 56]);
+    eq('digit floors from ws-screen-slots', [820, 1024, 1280, 1366].map((w) => digitFloorPx(w)), [48, 48, 56, 56]);
     eq('count row on a phone: TY-10b 29 px', digitFloorPx(390, { countRow: true }), 29);
     eq('count row at 820: the card floor', digitFloorPx(820, { countRow: true }), 48);
     eq('the online worksheet: the SP table 29 px', digitFloorPx(1280, { host: 'worksheet' }), 29);
     const work = 22 * 96 / 72;
     eq('a working digit (print 22 pt) -> digit floor', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280 }), { role: 'digit text', floor: 56 });
     eq('a numeral inside a picture -> label', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280, inSvg: true }).role, 'label text');
-    eq('a small numeral (print 10 pt) -> label at print size', textFloor({ numeric: true, printPx: 10 * 96 / 72, workPx: work, width: 390 }), { role: 'label text', floor: 12.67 });
-    eq('a label with no print run -> 8 pt floor', textFloor({ numeric: false, printPx: NaN, workPx: work, width: 390 }), { role: 'label text', floor: 10.67 });
+    eq('a small numeral (print 10 pt) -> label at print size', textFloor({ numeric: true, printPx: 10 * 96 / 72, workPx: work, width: 820 }), { role: 'label text', floor: 12.67 });
+    eq('a label with no print run -> 8 pt floor', textFloor({ numeric: false, printPx: NaN, workPx: work, width: 820 }), { role: 'label text', floor: 10.67 });
     // G9 (lf-algebra critic r2): "Term 1" at 8.3 pt on the quiz, 11 pt on paper -> FAIL; at 11 pt -> holds
     const g9 = textFloor({ numeric: false, printPx: 11 * 96 / 72, workPx: work, width: 1280 });
     eq('G9 quiz label 8.3 pt fails', !!textFinding(g9.role, 'Term 1', 11.0, g9.floor, 11 * 96 / 72), true);
     eq('G9 label at print size holds', textFinding(g9.role, 'Term 1', 14.7, g9.floor, 11 * 96 / 72), null);
-    // G1 (lf-algebra critic r2 via lf-ops): count-row digits 20 px on the 390 card fail TY-10b's 29 px
-    const g1 = textFloor({ numeric: true, printPx: work, workPx: work, width: 390, countRow: true });
-    eq('G1 count-row 20 px at 390 fails', !!textFinding(g1.role, '12', 20, g1.floor, work), true);
-    eq('G1 count-row 29 px at 390 holds', textFinding(g1.role, '12', 29, g1.floor, work), null);
+    // G1 (lf-algebra critic r2 via lf-ops): count-row digits 20 px on the card fail (no phone width since the owner rule of
+    // 2026-11-13: at 820 a count row takes the card floor, 48 px; lf-hosts critic r2 F2 moved this case off 390)
+    const g1 = textFloor({ numeric: true, printPx: work, workPx: work, width: 820, countRow: true });
+    eq('G1 count-row 20 px at 820 fails', !!textFinding(g1.role, '12', 20, g1.floor, work), true);
+    eq('G1 count-row 48 px at 820 holds', textFinding(g1.role, '12', 48, g1.floor, work), null);
     eq('text buckets', [textBucket('digit text', 40), textBucket('label text', 10.67), textBucket('label text', 13.9), textBucket('label text', 15), textBucket('label text', 22)], ['digit floor 40 px', 'label 8 pt floor', 'label print under 11 pt', 'label print 11-15 pt', 'label print 15 pt+']);
     // CELL-READ (lf-hosts): a host that read 0 cells is a finding, never a pass
     eq('CELL-READ host not rendered', /rendered nothing/.test(cellReadError('quiz', '#quizTakeView .mq-qtpaper', null)), true);
@@ -719,7 +720,7 @@ function sweepReport({ skills, findings, notes, renders, secs, pinFile, pin, ser
     L.push(`- **Commit:** ${servedAt} (the tree served and judged).`);
     L.push(`- **Pin:** \`${pinFile}\`: **${keys.length} keys, ${total} findings** (key = skill {option} host width | rule | mark name | size bucket; each holds its count and worst %).`);
     L.push(`- **Wiring:** ${wired.join('; ')}.`);
-    L.push(`- **Scope:** ${skills.length} skills, each with its defaults and every value of its supports-model \`support\` option; card 1280 / 1366 / 820 / 1024 (print items 0-2), worksheet 1280, quiz 1280 (print items 0-1): ${renders} renders, ${secs} s.`);
+    L.push(`- **Scope:** ${skills.length} skills, each with its defaults and every value of its supports-model \`support\` option; card 1280 / 1366 / 820 / 1024 (print items 0-2), worksheet and quiz 1280 / 1366 / 820 / 1024 (print items 0-1): ${renders} renders, ${secs} s.`);
     L.push(`- **Result:** ${findings.length} findings on ${new Set(findings.map((x) => x.where.split(' ')[0])).size} skills. Nothing was fixed (report only).`, '');
     L.push('Rules: SIZE-INK (a mark >= 95 % of the same item\'s print size; a worksheet item also matched with the print cell of the item it dealt; a pattern term by its unit), SIZE-REF (a mark with no print counterpart), SIZE-WIDTH (ink width < 60 % of the free width and taller than wide; pattern terms exempt), TEXT-SIZE (a label >= its print size and >= 8 pt; non-slot digit text >= the digit floor: card / quiz 40 / 48 / 56 px, worksheet 29 px, count row on a phone 29 px).', '');
     L.push('## Skills hit, per rule', '', '| Rule | Skills |', '|---|---|');
@@ -748,7 +749,12 @@ async function main() {
     const WIDTHS = arg('widths', null) ? arg('widths').split(',').map(Number) : null;
     // owner 2026-11-13: no phone width. The card at 1280 / 1366 / 820 / 1024 by default; --widths picks widths (390 included,
     // on request) and, as before, also filters the worksheet and quiz (1280 only)
-    const hostWidths = { card: WIDTHS || require('../lib/ws-screen-widths.cjs').SCREEN_WIDTHS, worksheet: [1280], quiz: [1280] };
+    // lf-hosts critic r2 F2: every host at the owner's screen set (tests/lib/ws-screen-widths.cjs SCREEN_WIDTHS), the worksheet
+    // and the quiz too (they ran at 1280 only, so 1366 / 820 / 1024 never judged them)
+    const SET = require('../lib/ws-screen-widths.cjs').SCREEN_WIDTHS;
+    const hostWidths = { card: WIDTHS || SET, worksheet: WIDTHS || SET, quiz: WIDTHS || SET };
+    // --print-widths (ws-screen-widths-plan): the widths each host would render, then exit
+    if (has('print-widths')) { for (const h of HOSTS) console.log(`widths[${h}]: ${(hostWidths[h] || []).join(',')}`); process.exit(0); }
     const SKILLS = has('passed') ? passedIds() : (arg('skill', '') || arg('skills', '')).split(',').map((s) => s.trim()).filter(Boolean);
     const HTML = arg('html', null);
     if (!HTML && !SKILLS.length) { console.error('usage: --skill cat:skill[,...] | --passed | --html file | --self-test'); process.exit(2); }

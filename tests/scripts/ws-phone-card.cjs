@@ -46,6 +46,7 @@
 //             cell's click handler focused the active box - division box 1 -> box 0 at 820 and 1280. TOUCH-UNIQUE missed it: it
 //             used elementFromPoint and skipped hits on elements that are not typed boxes). A rounded corner is probed 1 px
 //             inside the rounded edge on its diagonal (the box's own hit shape). Card, worksheet and quiz.
+//   --print-widths  print the widths the run would render (`widths: 820,...`) and exit (ws-screen-widths-plan)
 //   --fixture FILE  the card checks (PROBE + the CELL-READ kind match) on a saved card page (backtest rows; lf-hosts r2 F3)
 //   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
 //   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
@@ -597,7 +598,7 @@ async function main() {
     if (has('self-test')) return selfTest();
     if (has('fixture')) { ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean); return fixtureRun(arg('fixture')); }
     const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
-    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check']);
+    const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check', 'print-widths']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
         if (!m || (!VALUE.has(m[1]) && !BOOL.has(m[1]))) { say(`${TOOL}: unknown argument ${argv[i]}`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
@@ -605,8 +606,12 @@ async function main() {
     }
     const skills = String(arg('skills', '')).split(',').map((s) => s.trim()).filter(Boolean);
     if (!skills.length) { say(`${TOOL}: give --skills cat:skill,...`); say(`${TOOL}: FAIL - usage (an empty run checks nothing)`); process.exit(2); }
-    const sizes = String(arg('sizes', '820x1180,1024x768')).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
+    // lf-hosts critic r2 F2: the default is the owner's screen set, from the one table (tests/lib/ws-screen-widths.cjs)
+    const SW = require('../lib/ws-screen-widths.cjs');
+    const DEFAULT_SIZES = [...SW.SCREEN_WIDTHS].sort((a, b) => a - b).map((w) => `${w}x${SW.heightOf(w)}`).join(',');
+    const sizes = String(arg('sizes', DEFAULT_SIZES)).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
     if (sizes.some((s) => !s)) { say(`${TOOL}: --sizes takes WxH,...`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
+    if (has('print-widths')) { say(`widths: ${sizes.map((z) => z.w).join(',')}`); process.exit(0); }
     const ITEMS = Math.max(1, +arg('items', '3'));
     // --only R1,R2 (a backtest row runs the rule it proves): findings of other rules are dropped
     ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean);
