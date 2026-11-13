@@ -325,8 +325,8 @@ export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf =
 // A ÷ fact's skip strip and think box on screen follow the cell's digit at paper's ratio (lf-ops div_facts screen critic
 // r1 D3): paper draws them beside a 24 pt (8.47 mm) fact digit.
 const SCREEN_CUE_DIGIT_MM = 24 * 25.4 / 72;
-// The ÷ landscape array on screen (facts card §5.9): its dots this many times paper's ratio to the fact digit.
-const SCREEN_ARRAY_SCALE = 1.5;
+// The ÷ landscape array on screen (facts card §5.9): its dots this many times paper's ratio to the fact digit (capped by the cell: max-width 100 %).
+const SCREEN_ARRAY_SCALE = 1.7;
 // The ÷ landscape array's dot pitch on paper by size (mm; facts card §5.9: "as large as the cell width allows", and never
 // under the old 2.6 mm print dot): its frame is 12 columns wide at most (the 12s band) - 35.8 / 43.0 / 57.4 mm at S / M / L.
 const ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 4.4 });
