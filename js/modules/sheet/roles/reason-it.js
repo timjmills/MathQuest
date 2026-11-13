@@ -73,8 +73,11 @@ export function prepare(it, info = {}) {
     // equation keep their stacked layout (passed pages).
     const halfBeside = (LIVE_W_MM - 52 - 10) / 2;
     const halfCell = (LIVE_W_MM - 5) / 2 - 4;
-    const legacy = sentence || (it.template === 'equation' && workW > halfBeside);
-    const under = !legacy && (column ? true : workW > halfBeside && workW <= halfCell);
+    // (a sentence story is a story too: its number sentence fits half the cell, so it lays out like a column story - it stacked,
+    // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)
+    const story1 = sentence || column;
+    const legacy = it.template === 'equation' && workW > halfBeside;
+    const under = !legacy && (story1 ? true : workW > halfBeside && workW <= halfCell);
     const wide = legacy || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
@@ -87,7 +90,7 @@ export function prepare(it, info = {}) {
     // (UNDER, the response row centres under the pair - critic r6d N1. A column STORY puts the response BESIDE the story instead:
     // the story takes two thirds of the line, and the row under the panels held a Grade 2 story to one item a page at L, critic
     // r6d D1 - the panels then follow both)
-    const topResp = under && column;
+    const topResp = under && story1;
     const resp = (c) => `<div class="mq-abresp" style="${topResp ? 'flex:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:3mm' : respStyle}">`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)

@@ -158,7 +158,7 @@ function selfTest() {
             // LONE-PAGE (critic r6c / r6d D1, H5): a page that holds ONE item where its role's ceiling is 2 or more and 2 or more were
             // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
             // only the passed skills)
-            ...(Number(built.perPage) === 1 && Number(built.ceiling) >= 2 && Number(built.count || 2) >= 2
+            ...(Number(built.perPage) === 1 && Number(built.ceiling) >= 2
                 ? [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${built.ceiling} (H5)` }] : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
