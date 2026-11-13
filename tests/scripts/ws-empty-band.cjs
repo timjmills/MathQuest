@@ -15,8 +15,9 @@
 //
 // WHAT IS RENDERED (the plan): the roles the skill's SIGNED spec card offers (tests/lib/ws-card-plan.mjs, lf-ops: §7a
 // "offered" page roles minus "hidden"), each at sizes S, M and L with the skill's defaults; the card's option variants on the
-// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 390,
-// 820 and 1280 px wide, the online worksheet and the quiz at 1280 px. No card: the default role list below. A role buildSheet
+// independent page at L (at most --variants, default 6, spread over the list); and the screen hosts: the practice card at 1280,
+// 1366, 820 and 1024 px wide (owner 2026-11-13: no phone width; --widths 390 still runs on request), the online worksheet
+// and the quiz at 1280 px. No card: the default role list below. A role buildSheet
 // cannot compose for the skill is listed as "not composed", never passed.
 //
 // WHAT IS MEASURED, per kit cell ([data-ws-cell], top-level; print pupil pages; the B&W screen cell on a host):
@@ -100,6 +101,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const SW = require('../lib/ws-screen-widths.cjs');
 const { ROOT, open } = require('../lib/ws-harness.cjs');
 
 const argv = process.argv.slice(2);
@@ -851,12 +853,13 @@ async function main() {
                 } finally { await sh.close(); }
             }
             // screen hosts
-            const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
+            // owner 2026-11-13: no phone width; the card at the computer / Chromebook and tablet widths (--widths overrides)
+            const widths = { card: SW.widthsArg(process.argv), worksheet: [1280], quiz: [1280] };
             // every host at the skill's defaults AND at each sampled option variant (lf-checks hosts lane 2026-11-12: unit_form's
             // worksheet band appeared only at rename=more, an option no host run had rendered)
             const hostOpts = [{ tag: '', opts: OPTS }, ...variants.map((v) => ({ tag: ` {${v.option}: ${v.value}}`, opts: Object.assign({}, OPTS || {}, v.opts) }))];
             for (const ho of hostOpts) for (const host of HOSTS) for (const w of widths[host] || []) {
-                await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
+                await page.setViewport({ width: w, height: w < 500 ? 844 : (w === 1366 || w === 1024) ? 768 : 900, deviceScaleFactor: 1 });
                 const ok = await page.evaluate(async ({ c, k, host, SEED, OPTS }) => {
                     try {
                         const st = window.state;
