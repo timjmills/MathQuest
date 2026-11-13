@@ -3,7 +3,7 @@
 // 110 written 1010, was dropped from the chart squares because four digits printed '1,011' over the next square on True or
 // False? L; the ruling re-scoped it to the screen practice card and Reason It's statements in words, not dropped).
 //
-//   node tests/scripts/ws-text-misconception.cjs --skill composing:chart_to_120 [--seeds 16] [--sizes S,L]
+//   node tests/scripts/ws-text-misconception.cjs --skill composing:chart_to_120 [--seeds 16] [--sizes M,L]
 //   MQ_ROOT=<tree> judges another checkout (ws-backtest commit-pair rows)
 //
 // WHICH SKILLS: a design/cards/*/card.json misconception with `"textOnly": {"skills": [...]}` names the skills that MUST
@@ -27,7 +27,7 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const keys = list(arg('skill', arg('skills', '')));
     if (!keys.length) { console.log(`${TOOL}: FAIL - usage: --skill cat:skill[,..]`); process.exit(2); }
     const N = Number(arg('seeds', '16'));
-    const sizes = list(arg('sizes', 'S,L'));
+    const sizes = list(arg('sizes', 'M,L'));   // (owner 2026-11-13: sizes M and L; ws-no-size-s GATE-DEFAULT)
     // which skills MUST teach a text-only misconception: a card misconception marked `textOnly` names them (read from THIS
     // tree's cards, so a backtest judges an old app against today's ruling); for any other skill, none dealt is N/A
     const fs = require('fs');
