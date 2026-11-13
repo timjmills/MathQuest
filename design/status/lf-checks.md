@@ -466,6 +466,43 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
 - CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
   - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
   - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.
+- CRITIC lf-tools r2 FIXES (fresh builder, Opus medium; round cap fired: the "drawing key" class failed r1 B1 and r2 D1; commit
+  fdc35fb99 + the rows / ledger / this note):
+  - ROOT CAUSE (checked): ws-copy-light decided "same drawing" by comparing a HAND-KEPT list of payload fields (r1: the template id;
+    r2: kind / task / layout / mode / type / form). A template picks its picture from whatever fields its render reads, so every
+    field off the list was invisible: r2's stack op, unknown, regroup and operand rows. Run on fac8e03a0, the new check finds 115
+    such fields on 38 of 46 templates (stack.op '+' -> '-', word-work.signRow, timeline.faces, pv.places ...). Adding names a third
+    time would have failed the same way.
+  - THE CHECK (step 1): `ws-drawing-key.mjs` (new). Corpus = every live skill, 4 seeded items (generateQuestionFor + kitCellSpec);
+    per registered template up to 4 base payloads (different skills, different skeletons); each field mutated to every other corpus
+    value (max 8, and absent); render print + screen blank; compare the normalised skeleton (tests/lib/ws-drawing-skeleton.mjs:
+    tags, class tokens, slot count and shape, SVG primitive kinds, operator glyphs; digits and words masked; a run of identical
+    siblings is one or many; an unclassed <g> in an <svg> is one icon). FAIL when the skeleton changes and the tree's drawingOf
+    key does not. fac8e03a0 FAIL (115), now OK (46 templates, 4166 mutations, ~4 s; 6 registered templates no live skill draws).
+    On precritic's path (every --skill plan + precritic --self-test).
+  - THE FIX (step 2): drawingOf = template + the skeleton hash (no field list anywhere); reasons show a readable label
+    ([op=* ...]). Verdicts: mult_2by1_column, add_column_multi, add_missing_digit, sub_missing_digit NOT ELIGIBLE (no passed skill
+    draws their skeletons); `--batch add_column_multi,add_missing_digit,sub_missing_digit` FAIL; add_sub_10s ELIGIBLE (its horiz
+    + / - fact drawings are anchored by add_facts / sub_facts option values); time_5min, placevalue:compare NOT ELIGIBLE.
+    Side effect, correct by the rule: more_less_10 / more_less_100 are no longer eligible (their word-frame and strip / hchart
+    support drawings never passed). Self-tests: copy-light 52 (stack op * vs -, missing digit, carry row, rows; pv compare vs
+    expand; clock read vs draw; the D1 batch FAIL), drawing-key 19.
+  - D3: copy-light mode (several skills, each its own narrow brief) gives EVERY skill 1280 / 1366 / 820 / 1024; a batch still
+    deals across the batch. Self-test 2.
+  - D2: ws-share-options' pupil steps (Quick Start grid shot, Direct Play landing + twelve practice answers) run at 1024 x 768
+    (re-run: ws-share-options OK); its allow reason now says only the teacher steps keep 390. NP-PUPIL (new in ws-no-phone-width):
+    a 390 line in an allowed file with a pupil / student step within 6 lines is a finding; it also found ws-simple-print's pupil
+    home TOAST / BAR loop at 390, moved to 1366 / 820 / 1024. Residue (routed to the lead / the size-S builder, who owns that file's
+    print-dialog steps): ws-simple-print COLSFIT / OPTKEY at [390, false] "student view" (line ~2006) - NP-ARRAY does not read
+    [w, bool] pairs, so it is not flagged yet.
+  - D5: the render-gate label names the card, worksheet and quiz at 820 / 1024.
+  - A4 residue: the `vocab-r11-nb9-blur` route to lf-vocab is now in the CHECKS_FROM_CRITICS A4 row.
+  - Backtests (ws-backtest --row): drawing-key-complete, copy-light-stack-batch, copy-light-sample-widths-per-skill,
+    no-phone-width-pupil-allow (new), copy-light-eligibility, copy-light-drawing-batch, copy-light-sample-widths,
+    copy-light-brief-names PASS; no-phone-width-default and no-phone-width-derived went red at 27545964d under NP-PUPIL (the
+    pupil steps were still at 390 there) and were re-pointed to fdc35fb99: PASS. ws-precritic-plan OK (160 on path);
+    --checks-from-critics none dropped (314 → 324), 79 pass / 31 exempt / 15 fail (none lf-tools). ws-no-phone-width OK.
+    ws-boot-smoke OK.
 - CRITIC lf-tools r1 FIXES (builder, Opus medium, rebuild after FAIL A 8/7/8/8, B 6/7/7/7; commits 27545964d, 4dc89d89f, 270a832ea + this note):
   - B1 (major): ws-copy-light keys eligibility on the DRAWING = kit template + every payload discriminator it draws by
     (kind / task / layout / mode / type / form): `pv/kind=compare` is not `pv/kind=expand`. placevalue:compare is NOT ELIGIBLE
