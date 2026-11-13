@@ -84,8 +84,16 @@ const blk = (tag, fn) => {
         if (counts('PO-4', m)) errors.push(`PO-4 ${m}`); else console.log(`  (not judged: PO-4 ${m})`);
     }
 };
-// PO-2e's We Do floor (lead ruling 2026-11-13): the measured 7 of 52 lesson x size cases, a RATCHET - raised only, never lowered
+// PO-2e's We Do floor (lead ruling 2026-11-13): the measured 7 of 52 lesson x size cases, a RATCHET - raised only, never
+// lowered. A run asked for a lower floor FAILS at once (PO-2e-RATCHET), whatever else it was going to check: a floor that
+// can be argued down on the day is no floor.
 const WEDO_FLOOR = 7 / 52;
+const askedFloorW = arg('floor-wedo') === undefined ? null : Number(arg('floor-wedo'));
+if (askedFloorW !== null && !(askedFloorW >= WEDO_FLOOR - 1e-9)) {
+    console.log(`PO-2e-RATCHET FAIL: --floor-wedo ${arg('floor-wedo')} is under the ratchet ${WEDO_FLOOR.toFixed(4)} (7 of 52, lead 2026-11-13); the We Do floor may only rise`);
+    console.log('ws-partopts-unit: FAIL (1)');
+    process.exit(1);
+}
 const STATE = arg('state') ? JSON.parse(arg('state')) : arg('state-file') ? JSON.parse(require('fs').readFileSync(path.resolve(arg('state-file')), 'utf8')) : null;
 
 /** The engine's part-opts.js (MQ_ROOT's), with the judge predicates it shares with the offer gate filled from today's
@@ -638,7 +646,6 @@ async function browser() {
     // F2 (critic A r1): how many lesson x size cases offer a real We Do range and a real Practice range (2 values or more)
     // PO-2e We Do floor = the measured 7/52 (lead, 2026-11-13): a ratchet, raise it only (a wider We Do layout is its own entry).
     const floorW = Number(arg('floor-wedo', WEDO_FLOOR)), floorP = Number(arg('floor-practice', 0.9));
-    if (floorW < WEDO_FLOOR - 1e-9) errors.push(`--floor-wedo ${floorW}: the We Do floor is a ratchet at ${WEDO_FLOOR.toFixed(4)} (7/52, lead 2026-11-13) - it may only rise`);
     const cw = cover.cases ? cover.wedo / cover.cases : 1, cp = cover.cases ? cover.practice / cover.cases : 1;
     if (has('verbose')) for (const x of cover.list) console.log(`   ${x}`);
     const covOk = !cover.cases || arg('lessons') || (cw >= floorW && cp >= floorP);
