@@ -179,7 +179,7 @@ function cellChecksInPage(opts) {
             if (tg && c.querySelector('.mq-pupil') && sib.length) {
                 var top = Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
                 var gap = top - tg.getBoundingClientRect().bottom;
-                if (gap > 8 * PX || gap < -2 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, <= 8 mm)' });
+                if (gap > 8 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, 1.5-8 mm; critic r3 D6: 1 mm on the H T O heads read as one line)' });
             }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {

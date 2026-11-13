@@ -678,7 +678,7 @@ export function prepare(it, info = {}) {
         }
         // the "<Name> wrote:" label rides on the work (absolute to it, in the room above it where the cell's label used to hold it),
         // so a centred item keeps its label right over it (PT-ERR-4) at no extra height
-        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ' style="top:-4.6mm;left:0"'}>${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
+        const shownWork = `<div class="mq-judge-work" style="position:relative"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ' style="top:auto;bottom:calc(100% + 2mm);left:0"'}>${esc(who)} ${verb}:</span>${task}${kind === 'draw' ? body : pupilInk(body)}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
         let fix = '';
