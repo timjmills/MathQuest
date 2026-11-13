@@ -12498,7 +12498,7 @@
    "partial": [
     {
      "key": "algebra:multi_step_word",
-     "missing": "two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with numbers to 150 (most below 110); never a × or ÷ step and never a letter for the unknown"
+     "missing": "two-step stories that only add and subtract (add twice, add then take away, take away then add, take away twice), with every number, the Step 1 result and the answer to 100; never a × or ÷ step and never a letter for the unknown"
     },
     {
      "key": "number_ops_mixed:word_problems_mixed",
