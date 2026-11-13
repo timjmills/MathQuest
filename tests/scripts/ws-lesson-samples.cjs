@@ -523,7 +523,7 @@ async function collectReads({ skill }) {
     const cross = new Map(); for (const [k, its] of one) { const pgk = k.split('|')[0]; if (!cross.has(pgk)) cross.set(pgk, []); for (const x of its) cross.get(pgk).push(Object.assign({ skill: k.split('|')[1] }, x)); }
     for (const [pgk, its] of cross) { const by = new Map(); for (const x of its) { if (!by.has(x.n)) by.set(x.n, new Set()); by.get(x.n).add(x.skill); }
         for (const [n, sk] of by) if (sk.size > 1) lr6x.push({ part: pgk, msg: `${n} printed by ${sk.size} skills on one page (${[...sk].join(', ')})` }); }
-    return { lr67, oneNum: [...one.entries()], pvpat, pages, own, lr6x };
+    return { lr67, oneNum: [...one.entries()], pvpat, pages, own, lr6x, partList: ((r.lesson && r.lesson.parts) || []).map((p) => p.part) };
 }
 const ONLY_RULES0 = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 
@@ -570,6 +570,7 @@ async function checkMain() {
                 // (r6 own build: a Mixed band that took nothing passed every dealing rule vacuously - an empty Practice / Mixed page is a
                 // build failure, whatever --rules asks)
                 for (const pt of ['practice', 'mixed']) for (const [i, rows] of ((b.pages || {})[pt] || []).entries()) if (!rows.length) F('PC-BUILD', `${l.id} seed ${seed} ${pt} p${i + 1}`, `the ${pt} page prints no item`);
+                for (const pt of ['practice', 'mixed']) if ((b.partList || []).includes(pt) && !(((b.pages || {})[pt] || []).length)) F('PC-BUILD', `${l.id} seed ${seed} ${pt}`, `the lesson lists ${pt} but it has no page`);
                 // PC-LR5 (critic r3 F4; LR-5): no item of the lesson sheet printed again on Practice or Mixed
                 { const sheet = new Set((b.placed || []).filter((x) => x.part === 'teach' && /\d/.test(x.t)).map((x) => x.t));
                     for (const x of b.placed || []) if (['practice', 'mixed'].includes(x.part) && sheet.has(x.t)) F('PC-LR5', `${l.id} seed ${seed} ${x.part}`, `"${x.t}" is on the lesson sheet and on ${x.part}`); }
@@ -610,6 +611,7 @@ async function checkMain() {
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 Object.assign(built, await page.evaluate(collectReads, { skill: l.skill }));
                 for (const pt of ['practice', 'mixed']) for (const [i, rows] of ((built.pages || {})[pt] || []).entries()) if (!rows.length) F('PC-BUILD', `${l.id} ${size} ${pt} p${i + 1}`, `the ${pt} page prints no item`);
+                for (const pt of ['practice', 'mixed']) if ((built.partList || []).includes(pt) && !(((built.pages || {})[pt] || []).length)) F('PC-BUILD', `${l.id} ${size} ${pt}`, `the lesson lists ${pt} but it has no page`);
                 for (const x of built.pvpat || []) for (const m of NT.placeRunBad(x.seq)) F('PC-PV', `${l.id} ${size} seed 4242 ${x.part.replace(/^teach/, 'sheet')} p${x.page} band ${x.band}`, m);
                 // (r6, critic r5 R2: PG-LR67 on the spot / --all-lessons lessons too - they have no --seeds builds; check on or off)
                 if (l.spot) for (const m of built.lr67 || []) F('PG-LR67', `${l.id} ${size} seed 4242 ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
