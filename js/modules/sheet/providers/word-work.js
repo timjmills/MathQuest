@@ -134,7 +134,9 @@ function twoStepSteps(p) {
         step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
         step(`Step 1: ${add ? `circle ${GLYPH[s1.op]}. ` : ''}${stepText(s1)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
         step(`Step 2: use ${fmt(s1.op === '/' ? s1.q : s1.ans)}. ${stepText(s2)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
-        step(`Write the answer: ${fmt(p.ans)}${unit}.`, [{ slot: 'answer', value: String(p.ans) }]),
+        // (no marks, as the x / ÷-first moves: the unit word is written in the Step 2 panel - the chart's closing line, three
+        // panels; sheet/lesson-arch/story.js twoState draws the parts)
+        step(`Write the answer: ${fmt(p.ans)}${unit}.`),
     ];
 }
 
