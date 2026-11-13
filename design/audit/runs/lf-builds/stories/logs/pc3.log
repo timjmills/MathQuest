@@ -19,3 +19,5 @@ ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktre
   FAIL            ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) (122 s, waited 83 s for a slot)
   FAIL            ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT) (701 s, waited 31 s for a slot)
   FAIL            ws-print-lint --source kit --kind sections --pages 2 --size S --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) (77 s, waited 66 s for a slot)
+  FAIL            ws-print-lint --source kit --kind sections --pages 2 --size L --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) (95 s, waited 83 s for a slot)
+  FAIL            ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) (445 s, waited 59 s for a slot)

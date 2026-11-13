@@ -1,0 +1,25 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles lesson,test,independent --size S,M,L --gate --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate
+
+mq-browser-run: slot 2 after 59s
+ws-grade-render: 7 skills -> design/audit/runs/lf-builds/stories/logs/pc3/render-gate
+  [1/7] addition:add_word_problems  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  test-S 1p+1k 2x3  test-M 1p+1k 2x2  test-L 1p+1k 2x2  independent-S 1p+1k 2x3  independent-M 1p+1k 2x2  independent-L 1p+1k 2x2  60s
+  [2/7] addition:add_word_problems_plain  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  test-S 1p+1k 2x3  test-M 1p+1k 2x2  test-L 1p+1k 2x2  independent-S 1p+1k 2x3  independent-M 1p+1k 2x2  independent-L 1p+1k 2x2  116s
+  [3/7] addition:add_wp_change_unknown  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  test-S 1p+1k 1x8  test-M 1p+1k 1x8  test-L 1p+1k 2x3  independent-S 1p+1k 1x9  independent-M 1p+1k 1x8  independent-L 1p+1k 2x3  169s
+  [4/7] subtraction:sub_word_problems  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  test-S 1p+1k 2x3  test-M 1p+1k 2x2  test-L 1p+1k 2x2  independent-S 1p+1k 2x3  independent-M 1p+1k 2x2  independent-L 1p+1k 2x2  223s
+  [5/7] subtraction:sub_word_problems_plain  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  test-S 1p+1k 2x3  test-M 1p+1k 2x2  test-L 1p+1k 2x2  independent-S 1p+1k 2x3  independent-M 1p+1k 2x2  independent-L 1p+1k 2x2  278s
+  [6/7] subtraction:sub_wp_change_unknown  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  test-S 1p+1k 1x8  test-M 1p+1k 2x4  test-L 1p+1k 2x3  independent-S 1p+1k 1x9  independent-M 1p+1k 2x4  independent-L 1p+1k 2x3  330s
+  [7/7] subtraction:sub_wp_compare_smaller  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  test-S 1p+1k 1x10  test-M 1p+1k 1x8  test-L 1p+1k 2x3  independent-S 1p+1k 1x11  independent-M 1p+1k 1x10  independent-L 1p+1k 2x3  383s
+ws-grade-render: done, 7 units, 269 pages, 383s
+  FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems_plain card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+  FAIL TARGET subtraction:sub_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)
+ws-grade-render: FAIL - 12 finding(s) (0 overflow, 12 small target) in 7 unit(s)
