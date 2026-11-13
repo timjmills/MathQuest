@@ -122,7 +122,16 @@ export const FULL_W_MM = 186;
 export const HALF_W_MM = 93;
 /** A routed row grows at most this much past its measured height: the measured cell is already up to ~15 % taller
  *  than what it draws, and an item starts at the top of its box (CL-4b), so more growth is an empty band (H13). */
-export const ROUTE_GROW = 1.05;
+export const ROUTE_GROW = 1.15;
+/** (lf-engine PC 2026-11-12) The routed cells are centred (`mq-lprectr`), so a row may grow past its measured height -
+ *  up to ROUTE_GROW - while every item's centred empty band stays under ROUTE_BAND (H13 is 30 %): a row never grows past
+ *  its shortest content / (1 - 2 x ROUTE_BAND). Was 1.05 with CL-4b's top start (the growth all went under the item). */
+export const ROUTE_BAND = 0.29;
+/** Templates that keep CL-40's (tab - 2 mm) spacer above their content (sheet-kit.css; pv by its own rule). */
+const SPACER_T = /^(pv|seqstrip|word-work|words|counters|remainder)$/;
+/** An item's drawn content height at `c` columns (mm): its measured height less the pads and the spacer. */
+export const contentMm = (it, c, ctx) => { const m = it && it.measured && (it.measured[c] || it.measured[4]); if (!m || !Number.isFinite(m.hMm)) return Infinity;
+    return m.hMm - 6 - (SPACER_T.test(String(it.template || '')) ? Math.max(0, ((ctx && ctx.s && ctx.s.tabMm) || 5) - 2) : 0); };
 /** Two single-item questions pair two-up when the shorter is at least this share of the taller. */
 export const PAIR_ALIKE = 0.6;
 /** The default items a routed question deals, and its FLOOR (LESSON_RULES LR-17a (2): two, so one slip is not a route). */
@@ -337,7 +346,24 @@ function planCheck(input, cut) {
         // in a row measured 5-15 % taller than it draws left a 31-37 % band under it (PC-H13); a check cell has no writing
         // lines under its item, so CL-4b's top start buys nothing there)
         const centre = !!input.perQuestion;
-        const grid = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
+        // (lf-engine PC 2026-11-12, PC-H13: `mq-lvcenter` lost to CL-4b's top start, and a pv / strip cell keeps a CL-40
+        // spacer of (tab - 2 mm) above its content - a one-line item in its measured row sat 7 of 22 mm down (31 %). On a
+        // routed check (route CSS only): every cell is centred (`mq-lprectr`); a cell drops the spacer (`mq-lprefree`) when its
+        // content clears the tab sideways (its side slack >= the keep-out + 0.3 mm) or downwards (half the row's spare
+        // height >= the tab + 0.3 mm).)
+        const cellCls = (it) => {
+            if (!(centre && routed)) return centre ? 'mq-lvcenter' : '';
+            const tab = (ctx.s && ctx.s.tabMm) || 5;
+            const mm = it.measured && it.measured[pageCols];
+            const slack = mm && Number.isFinite(mm.slackMm) ? mm.slackMm : 0;
+            const ch = contentMm(it, pageCols, ctx);
+            // (a w2 tab - numbers past 9 - is 1.4 tab sides wide)
+            const koW = (start + its.length - 1 > 9 ? tab * 1.4 : tab) + 1;
+            const side = slack >= koW + 0.3;
+            const down = (cellH - ch) / 2 >= tab + 0.3;
+            return ['mq-lvcenter', 'mq-lprectr', side || down ? 'mq-lprefree' : ''].filter(Boolean).join(' ');
+        };
+        const grid = gridPart(its.map((it) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', cellCls(it)].join(' ').trim() }) : it, { cols: pageCols, level: 0 })), { cols, rows, cellH, labels, start });
         const r = routed ? routeOf(input, qi) : null;
         const b = {
             // (a routed question carries its own score, __/n - P-25, critic r2 N3: the routing table reads it)
@@ -468,7 +494,8 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
         u.h0 = Math.max(...hs);
         // (a legacy cell is measured taller than it draws - its own text and answer line: it keeps its measured height)
         const legacy = u.qs.some((q) => q.some((it) => it.legacy));
-        u.cap = legacy ? u.h0 : u.h0 * ROUTE_GROW;
+        const chMin = Math.min(...u.qs.flat().map((it) => contentMm(it, u.cols, ctx)));
+        u.cap = legacy ? u.h0 : Math.max(u.h0, Math.min(u.h0 * ROUTE_GROW, Number.isFinite(chMin) ? chMin / (1 - 2 * ROUTE_BAND) : u.h0 * ROUTE_GROW));
         u.tagLines = Math.max(...u.qi.map((qi, x) => routeTagLines(routeOf(input, qi), two ? (x ? FULL_W_MM - w : w) : FULL_W_MM)));
         u.stripMm = m.strip + Math.max(0, ...u.qs.map((q, x) => extraLines(q, two ? (x ? FULL_W_MM - w : w) : FULL_W_MM))) * em * 1.25;
         u.fixed = u.stripMm + routeTagMm(u.tagLines);

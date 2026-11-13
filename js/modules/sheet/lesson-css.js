@@ -122,6 +122,10 @@ export const LESSON_ROUTE_CSS = [
     // (P1c: the names column gives 16 mm to the words columns - the sub L routing page's four long rows ran 11 mm into
     // its footer; 26 mm still holds three names a row)
     ':is(.ws-page,.ws-sheet) .mq-lroute td.mq-lroute-names{width:26mm}',
+    // (lf-engine PC 2026-11-12, PC-H13: a routed check cell is centred in its row - CL-4b's top start won over mq-lvcenter -
+    // and drops the CL-40 tab spacer where its content clears the tab; pre-skill-check.js band() decides per cell)
+    '.ws-page .mq-lprecol .ws-grid>.ws-cell.mq-lprectr:not(.blankrun){justify-content:safe center !important}',
+    '.ws-page .mq-lprecol .ws-grid>.ws-cell.mq-lprefree:not(.blankrun)::before{content:none !important;display:none !important}',
 ].join('');
 
 export default { LESSON_CSS, LESSON_ROUTE_CSS };
