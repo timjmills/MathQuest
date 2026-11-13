@@ -387,4 +387,4 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - m3: the 4 rows of backtests-empty-band.json are still PENDING (no fix commits). Their fail sides, re-run with today's tool via
     MQ_ROOT: vocab bebf5b36 FAIL 4, pv value b28a0867 FAIL 12, pv unit_form b28a0867 FAIL 16, div_facts b23e418d FAIL (361, --no-baseline, all roles).
   - Gates: self-tests OK; precritic-plan OK (136); ws-screen-answer OK; --focus-gap-all OK; ws-phone-card OK (12/12); boot-smoke OK;
-    the facts pin OK (no count rose, no re-pin, no EB-FOOT mode note).
+    the facts pin OK (no count rose, no re-pin, no EB-FOOT mode note). Backtests: 35 rows calling ws-empty-band or ws-screen-answer: 32 PASS (both new rows included), eb-fact-roles FAIL (facts lane, as before), 2 PENDING.
