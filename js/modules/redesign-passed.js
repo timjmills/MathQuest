@@ -38,7 +38,7 @@ const VQ5_IDS = [
   'subtraction:sub_wp_10_plain',
   'subtraction:sub_wp_20_plain',
 ];
-const VOC = 'Lane lf-vocab, critic r5 PASS min 8 (independent, more-practice, test, guided, error-analysis at S/M/L + keys, 10 screen hosts, grades 1-4, 4 lesson vocab pages); design/lanes/lf-vocab/critic-r5.md, 2026-11-09';
+const VOC = 'Lane lf-vocab, critic r5 PASS min 8 (independent, more-practice, test, guided, error-analysis at S/M/L + keys, 10 screen hosts, grades 1-4, 4 lesson vocab pages; design/lanes/lf-vocab/critic-r5.md, 2026-11-09) + narrow critic r14 PASS min 8 (screens, next box, keys, explanations, pictures, all 180 dealt banks of sets 0-10, lesson band; design/lanes/lf-vocab/critic-r14-narrow.md, 2026-11-13)';
 const VOC_IDS = [
   'vocabulary:vocab_grade_pictures',
   'vocabulary:vocab_pick3_words',

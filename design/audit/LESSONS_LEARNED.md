@@ -528,6 +528,14 @@ One line per finding: the rule, then the check.
 | grow (towers 1,3,5) reads as "rule" (sets 7, 8) | Every run picture, including towers, declares its run and step; a run with a constant step implies rule | V-TWIN over every run picture | y (when built) |
 | (process) the enumerated banks made the review COMPLETE: one round found every remaining clash, in 3 named sets | Enumerate what a pupil can be dealt before any critic | V7-ALL + dealt-banks table | y |
 
+### lf-vocab round 14, narrow critic r14 (2026-11-13): PASS min 8. Minor findings to checks (follow-ups)
+| Finding | Rule | Check | On precritic? |
+|---|---|---|---|
+| sequence 5, 10, 15 read as "cycle" (ones digits 5, 0, 5) in set 6 | A run whose visible ones digits repeat draws a ones-cycle | V-TWIN ones-cycle | follow-up |
+| hundred chart key: underlays overflow cells, white specks, whole chart grey (focal: 'all') | An underlay sits inside its focal outline; focal: 'all' over 60 % is flagged | key underlay lint | follow-up |
+| set 5 Match 3 repeats a trio with the same pictures in the same letters | A repeated trio shuffles its pictures too | page repeat lint | follow-up |
+| (process) enumerating every dealt bank (r13) made the review complete; r14 closed it in one round | Enumerate what a pupil can see before grading it | V7-ALL + dealt-banks table | y |
+
 ### PT-MOD-3 (lead ruling, 2026-11-12, lf-ops facts-roles r2): reserved mark room on a Scripted Model is not an empty band
 A Model state keeps the room its later marks need, so the problem stands still from state to state (AK-1). That room is NOT an
 empty band (H13) only when ALL hold: the role is scripted-model; the state is not its example's last; the band is <= 35 % of
