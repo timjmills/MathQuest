@@ -1,0 +1,1243 @@
+{
+ "tool": "ws-sibling-compare",
+ "root": "/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee",
+ "skills": [
+  "addition:add_word_problems",
+  "addition:add_word_problems_plain",
+  "subtraction:sub_word_problems",
+  "subtraction:sub_word_problems_plain",
+  "addition:add_wp_change_unknown",
+  "subtraction:sub_wp_change_unknown",
+  "subtraction:sub_wp_compare_smaller"
+ ],
+ "siblings": {
+  "addition:add_word_problems": [],
+  "addition:add_word_problems_plain": [],
+  "subtraction:sub_word_problems": [],
+  "subtraction:sub_word_problems_plain": [],
+  "addition:add_wp_change_unknown": [],
+  "subtraction:sub_wp_change_unknown": [],
+  "subtraction:sub_wp_compare_smaller": []
+ },
+ "templates": {
+  "addition:add_word_problems": "word-work",
+  "addition:add_word_problems_plain": "word-work",
+  "subtraction:sub_word_problems": "word-work",
+  "subtraction:sub_word_problems_plain": "word-work",
+  "addition:add_wp_change_unknown": "word-work",
+  "subtraction:sub_wp_change_unknown": "word-work",
+  "subtraction:sub_wp_compare_smaller": "word-work",
+  "placevalue:expand": "pv",
+  "placevalue:value": "pv",
+  "placevalue:combine": "pv",
+  "placevalue:identify": "pv",
+  "placevalue:unit_form": "pv",
+  "addition:add_facts": "fact",
+  "subtraction:sub_facts": "fact",
+  "multiplication:mult_facts": "fact",
+  "division:div_facts_long": "division",
+  "addition:add_100_regroup": "stack",
+  "subtraction:sub_100_regroup": "stack",
+  "addition:add_1k_regroup": "stack",
+  "subtraction:sub_1k_regroup": "stack",
+  "addition:add_10k_regroup": "stack",
+  "subtraction:sub_10k_regroup": "stack",
+  "subtraction:sub_100k_regroup": "stack",
+  "subtraction:sub_1m_regroup": "stack",
+  "subtraction:sub_100_no_regroup": "stack",
+  "subtraction:sub_50_no_regroup": "stack"
+ },
+ "sources": [
+  "pins (design/audit/matrix/baseline.json)"
+ ],
+ "rowsCompared": 34,
+ "byStatus": {
+  "PENDING(no-baseline)": 34
+ },
+ "red": 0,
+ "noBaseline": 34,
+ "above": [],
+ "noSibling": [
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems_plain|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "addition:add_wp_change_unknown|single/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems_plain|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_word_problems|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/more-cols2+nline+afterpage",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|single/more-cols2+nline+short",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY DN-2",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PAGEFILL",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY PG-23",
+   "n": 3,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 2,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY SPREAD",
+   "n": 1,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 8,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/pages-3",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 16,
+   "sibs": []
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|single/pages-3",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "sibs": []
+  }
+ ],
+ "engine": [],
+ "errors": [],
+ "partner": [
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 4,
+   "skills": [
+    "addition:add_facts",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems_plain|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 6,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems|mixed/defaults",
+   "size": "S",
+   "rule": "L-OVERLAP TEXT-FRAME",
+   "n": 2,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems|mixed/defaults",
+   "size": "M",
+   "rule": "L-OVERLAP TEXT-FRAME",
+   "n": 2,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems|mixed/defaults",
+   "size": "L",
+   "rule": "L-OVERLAP TEXT-FRAME",
+   "n": 2,
+   "skills": [
+    "algebra:tape_diagram"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 4,
+   "skills": [
+    "addition:add_facts",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "addition:add_word_problems"
+   ]
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "addition:add_word_problems"
+   ]
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "skills": [
+    "addition:add_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 10,
+   "skills": [
+    "addition:add_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "addition:add_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "addition:add_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_word_problems|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 6,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 2,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_change_unknown|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/defaults",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/defaults",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 6,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "addition:add_facts",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "S",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 6,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "addition:add_facts",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "M",
+   "rule": "L-WRAP WRAP-OP",
+   "n": 4,
+   "skills": [
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY GRID-EVEN",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "addition:add_facts"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-each",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-group",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-group",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/ex-group",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 2,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "S",
+   "rule": "L-DENSITY H13",
+   "n": 10,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "M",
+   "rule": "L-DENSITY H13",
+   "n": 6,
+   "skills": [
+    "subtraction:sub_word_problems",
+    "area_perimeter:perimeter_intro"
+   ]
+  },
+  {
+   "id": "subtraction:sub_wp_compare_smaller|sections/pages-2",
+   "size": "L",
+   "rule": "L-DENSITY H13",
+   "n": 4,
+   "skills": [
+    "subtraction:sub_word_problems"
+   ]
+  }
+ ],
+ "rowsAboveSiblings": [
+  "addition:add_word_problems_plain|sections/ex-each",
+  "addition:add_word_problems_plain|sections/ex-group",
+  "addition:add_word_problems_plain|sections/pages-2",
+  "addition:add_word_problems_plain|single/ex-each",
+  "addition:add_word_problems|sections/ex-each",
+  "addition:add_word_problems|sections/ex-group",
+  "addition:add_word_problems|sections/pages-2",
+  "addition:add_wp_change_unknown|sections/pages-2",
+  "addition:add_wp_change_unknown|single/ex-each",
+  "addition:add_wp_change_unknown|single/ex-group",
+  "subtraction:sub_word_problems_plain|sections/ex-each",
+  "subtraction:sub_word_problems_plain|sections/ex-group",
+  "subtraction:sub_word_problems_plain|sections/pages-2",
+  "subtraction:sub_word_problems|sections/ex-each",
+  "subtraction:sub_word_problems|sections/ex-group",
+  "subtraction:sub_word_problems|sections/pages-2",
+  "subtraction:sub_word_problems|single/ex-each",
+  "subtraction:sub_wp_change_unknown|sections/pages-2",
+  "subtraction:sub_wp_change_unknown|single/ex-each",
+  "subtraction:sub_wp_change_unknown|single/ex-group",
+  "subtraction:sub_wp_change_unknown|single/more-cols2+nline+afterpage",
+  "subtraction:sub_wp_change_unknown|single/more-cols2+nline+short",
+  "subtraction:sub_wp_compare_smaller|sections/ex-each",
+  "subtraction:sub_wp_compare_smaller|sections/pages-2",
+  "subtraction:sub_wp_compare_smaller|single/ex-each",
+  "subtraction:sub_wp_compare_smaller|single/ex-group",
+  "subtraction:sub_wp_compare_smaller|single/pages-3"
+ ],
+ "seconds": 0.6
+}

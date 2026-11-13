@@ -1,0 +1,16 @@
+{
+ "mode": "default",
+ "roles": [],
+ "shard": null,
+ "hosts": [
+  "card",
+  "map",
+  "worksheet",
+  "quiz"
+ ],
+ "skillsChecked": 7,
+ "hostRenders": 35,
+ "skills": {},
+ "findings": [],
+ "errors": []
+}

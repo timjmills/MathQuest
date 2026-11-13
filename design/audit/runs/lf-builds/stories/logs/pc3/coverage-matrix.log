@@ -1,0 +1,162 @@
+$ node tests/scripts/ws-coverage-matrix.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --baseline design/audit/matrix/baseline.json --slots 2 --out design/audit/runs/lf-builds/stories/logs/pc3/coverage-matrix.json
+
+ws-coverage-matrix: 238 row(s) (single 112, sections 70, mixed 35, quiz 21) for 7 skill(s) of 729 live; partners from tests/fixtures/precritic/matrix-partners.json; 250 print-input files hashed (42adae269b1a)
+  RUN 112 · PENDING 98 · N/A 28 · documents to run 336
+ws-coverage-matrix: running 112 row(s) = 336 document(s) on 2 slot(s), 9 document(s) a browser start
+  batch 1/38: 9 document(s) in 50.4 s (4 s of it waiting for a slot)
+  batch 2/38: 9 document(s) in 89.9 s (50 s of it waiting for a slot)
+  batch 3/38: 9 document(s) in 32.6 s (7 s of it waiting for a slot)
+  batch 4/38: 9 document(s) in 75.8 s (43 s of it waiting for a slot)
+  batch 5/38: 9 document(s) in 69.9 s (33 s of it waiting for a slot)
+  batch 6/38: 9 document(s) in 105.9 s (66 s of it waiting for a slot)
+  batch 7/38: 9 document(s) in 116.3 s (69 s of it waiting for a slot)
+  batch 8/38: 9 document(s) in 116.1 s (77 s of it waiting for a slot)
+  batch 9/38: 9 document(s) in 87.1 s (69 s of it waiting for a slot)
+  batch 10/38: 9 document(s) in 80.9 s (48 s of it waiting for a slot)
+  batch 11/38: 9 document(s) in 108.9 s (73 s of it waiting for a slot)
+  batch 12/38: 9 document(s) in 119.8 s (76 s of it waiting for a slot)
+  batch 13/38: 9 document(s) in 126.4 s (86 s of it waiting for a slot)
+  batch 14/38: 9 document(s) in 98.9 s (82 s of it waiting for a slot)
+  batch 15/38: 9 document(s) in 193.7 s (162 s of it waiting for a slot)
+  batch 16/38: 9 document(s) in 209.7 s (177 s of it waiting for a slot)
+  batch 17/38: 9 document(s) in 89.9 s (46 s of it waiting for a slot)
+  batch 18/38: 9 document(s) in 95.5 s (58 s of it waiting for a slot)
+  batch 19/38: 9 document(s) in 83.3 s (51 s of it waiting for a slot)
+  batch 20/38: 9 document(s) in 75.6 s (45 s of it waiting for a slot)
+  batch 21/38: 9 document(s) in 72.4 s (37 s of it waiting for a slot)
+  batch 22/38: 9 document(s) in 84.8 s (43 s of it waiting for a slot)
+  batch 23/38: 9 document(s) in 168.1 s (122 s of it waiting for a slot)
+  batch 24/38: 9 document(s) in 211.7 s (165 s of it waiting for a slot)
+  batch 25/38: 9 document(s) in 136.9 s (120 s of it waiting for a slot)
+  batch 26/38: 9 document(s) in 169.2 s (137 s of it waiting for a slot)
+  batch 27/38: 9 document(s) in 105.6 s (71 s of it waiting for a slot)
+  batch 28/38: 9 document(s) in 116.9 s (74 s of it waiting for a slot)
+  batch 29/38: 9 document(s) in 173.6 s (132 s of it waiting for a slot)
+  batch 30/38: 9 document(s) in 146.9 s (130 s of it waiting for a slot)
+  batch 31/38: 9 document(s) in 50.4 s (19 s of it waiting for a slot)
+  batch 32/38: 9 document(s) in 67.2 s (34 s of it waiting for a slot)
+  batch 33/38: 9 document(s) in 220.9 s (177 s of it waiting for a slot)
+  batch 34/38: 9 document(s) in 191.4 s (153 s of it waiting for a slot)
+  batch 35/38: 9 document(s) in 58.9 s (28 s of it waiting for a slot)
+  batch 36/38: 9 document(s) in 78.9 s (55 s of it waiting for a slot)
+  batch 37/38: 9 document(s) in 43.4 s (12 s of it waiting for a slot)
+  batch 38/38: 3 document(s) in 41.0 s (23 s of it waiting for a slot)
+  294 document(s) linted in 2093.6 s: 0.140 documents/s (7.12 s a document, browser starts included; 2854 s of batch time spent waiting for a slot another session held)
+
+row                                                             S          M          L          status
+addition:add_word_problems_plain|mixed/defaults                 4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems_plain|sections/defaults              4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems_plain|sections/ex-each               6+3k .     4+2k 12    8+4k 2     PENDING(no-baseline)
+addition:add_word_problems_plain|sections/ex-group              6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems_plain|sections/pages-2               10+5k 8    10+5k 7    12+6k 10   PENDING(no-baseline)
+addition:add_word_problems_plain|single/defaults                2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/ex-each                 2+1k .     2+1k 2     2+1k .     PENDING(no-baseline)
+addition:add_word_problems_plain|single/ex-group                2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/layout-fact-rows        n/a        n/a        n/a        N/A
+addition:add_word_problems_plain|single/layout-timed            n/a        n/a        n/a        N/A
+addition:add_word_problems_plain|single/layout-todays-number    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+nline+short  2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems_plain|single/pages-3                 6+3k .     6+3k .     6+3k .     OK
+addition:add_word_problems|mixed/defaults                       4+2k 2     4+2k 2     4+2k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/defaults                    4+2k .     4+2k .     4+2k .     OK
+addition:add_word_problems|sections/ex-each                     4+2k 10    6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/ex-group                    6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+addition:add_word_problems|sections/pages-2                     10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+addition:add_word_problems|single/defaults                      2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/ex-each                       2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/ex-group                      2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/layout-fact-rows              n/a        n/a        n/a        N/A
+addition:add_word_problems|single/layout-timed                  n/a        n/a        n/a        N/A
+addition:add_word_problems|single/layout-todays-number          2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+nline+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+nline+short        2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-cols2+short+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/more-nline+short+afterpage    2+1k .     2+1k .     2+1k .     OK
+addition:add_word_problems|single/pages-3                       6+3k .     6+3k .     6+3k .     OK
+addition:add_wp_change_unknown|mixed/defaults                   4+2k .     4+2k .     4+2k .     OK
+addition:add_wp_change_unknown|sections/defaults                4+2k .     4+2k .     4+2k .     OK
+addition:add_wp_change_unknown|sections/ex-each                 6+3k 2     6+3k .     8+4k .     PENDING(no-baseline)
+addition:add_wp_change_unknown|sections/ex-group                6+3k 2     6+3k .     8+4k .     PENDING(no-baseline)
+addition:add_wp_change_unknown|sections/pages-2                 12+6k 13   12+6k 17   12+6k 13   PENDING(no-baseline)
+addition:add_wp_change_unknown|single/defaults                  2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/ex-each                   2+1k 8     2+1k 7     2+1k 7     PENDING(no-baseline)
+addition:add_wp_change_unknown|single/ex-group                  2+1k 6     2+1k 7     2+1k .     PENDING(no-baseline)
+addition:add_wp_change_unknown|single/layout-fact-rows          n/a        n/a        n/a        N/A
+addition:add_wp_change_unknown|single/layout-timed              n/a        n/a        n/a        N/A
+addition:add_wp_change_unknown|single/layout-todays-number      2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/more-cols2+nline+short    2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+addition:add_wp_change_unknown|single/pages-3                   6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_word_problems_plain|mixed/defaults              4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems_plain|sections/defaults           4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems_plain|sections/ex-each            6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems_plain|sections/ex-group           6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems_plain|sections/pages-2            10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+subtraction:sub_word_problems_plain|single/defaults             2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/ex-each              2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/ex-group             2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/layout-fact-rows     n/a        n/a        n/a        N/A
+subtraction:sub_word_problems_plain|single/layout-timed         n/a        n/a        n/a        N/A
+subtraction:sub_word_problems_plain|single/layout-todays-number 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+nline+short2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems_plain|single/pages-3              6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_word_problems|mixed/defaults                    4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems|sections/defaults                 4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_word_problems|sections/ex-each                  4+2k 11    6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems|sections/ex-group                 6+3k .     6+3k 2     8+4k 2     PENDING(no-baseline)
+subtraction:sub_word_problems|sections/pages-2                  10+5k 7    10+5k 7    12+6k 9    PENDING(no-baseline)
+subtraction:sub_word_problems|single/defaults                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/ex-each                    2+1k 3     2+1k .     2+1k .     PENDING(no-baseline)
+subtraction:sub_word_problems|single/ex-group                   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/layout-fact-rows           n/a        n/a        n/a        N/A
+subtraction:sub_word_problems|single/layout-timed               n/a        n/a        n/a        N/A
+subtraction:sub_word_problems|single/layout-todays-number       2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+nline+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+nline+short     2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-cols2+short+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/more-nline+short+afterpage 2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_word_problems|single/pages-3                    6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_wp_change_unknown|mixed/defaults                4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_wp_change_unknown|sections/defaults             4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_wp_change_unknown|sections/ex-each              6+3k 2     4+2k 10    8+4k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|sections/ex-group             6+3k 2     6+3k .     8+4k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|sections/pages-2              12+6k 11   10+5k 13   12+6k 13   PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|single/defaults               2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_change_unknown|single/ex-each                2+1k 7     2+1k 7     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|single/ex-group               2+1k 6     2+1k 1     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|single/layout-fact-rows       n/a        n/a        n/a        N/A
+subtraction:sub_wp_change_unknown|single/layout-timed           n/a        n/a        n/a        N/A
+subtraction:sub_wp_change_unknown|single/layout-todays-number   2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_change_unknown|single/more-cols2+nline+afterpage2+1k .     2+1k 2     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|single/more-cols2+nline+short 2+1k .     2+1k 1     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_change_unknown|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_change_unknown|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_change_unknown|single/pages-3                6+3k .     6+3k .     6+3k .     OK
+subtraction:sub_wp_compare_smaller|mixed/defaults               4+2k .     4+2k .     4+2k .     OK
+subtraction:sub_wp_compare_smaller|sections/defaults            4+2k 2     4+2k 2     4+2k .     PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|sections/ex-each             4+2k 12    4+2k 12    6+3k 9     PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|sections/ex-group            6+3k 4     6+3k 4     6+3k 2     PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|sections/pages-2             12+6k 16   12+6k 13   12+6k 14   PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|single/defaults              2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/ex-each               2+1k 8     2+1k 7     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|single/ex-group              2+1k 8     2+1k 6     2+1k .     PENDING(no-baseline)
+subtraction:sub_wp_compare_smaller|single/layout-fact-rows      n/a        n/a        n/a        N/A
+subtraction:sub_wp_compare_smaller|single/layout-timed          n/a        n/a        n/a        N/A
+subtraction:sub_wp_compare_smaller|single/layout-todays-number  2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/more-cols2+nline+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/more-cols2+nline+short2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/more-cols2+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/more-nline+short+afterpage2+1k .     2+1k .     2+1k .     OK
+subtraction:sub_wp_compare_smaller|single/pages-3               6+3k .     6+3k 16    6+3k 2     PENDING(no-baseline)
+
+ws-coverage-matrix: OK 64 · CACHED 0 · RED 0 · PENDING 132 · N/A 42 · ERROR 0
+wrote design/audit/runs/lf-builds/stories/logs/pc3/coverage-matrix.json
+ws-coverage-matrix: OK (238 row(s), 112 run, 0 cached, 2098 s; 34 row(s) PENDING(no-baseline): printed, not judged)

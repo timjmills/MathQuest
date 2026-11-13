@@ -1,0 +1,242 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems_plain --card --card-opts
+
+mq-browser-run: slot 1 after 67s
+ws-cell-checks: 225 page(s) - subtraction:sub_word_problems_plain (card plan + option values)
+  ok   subtraction:sub_word_problems_plain independent S: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain more-practice S: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain more-practice M: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain more-practice L: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test S: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain lesson S: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain scripted-model S: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain scripted-model M: 3p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain scripted-model L: 3p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided S: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain opener S: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain opener M: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain opener L: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain error-analysis S: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain error-analysis M: 1p 1x? per 2
+  ok   subtraction:sub_word_problems_plain error-analysis L: 1p 1x? per 2
+  ok   subtraction:sub_word_problems_plain review S: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain pre-skill-check S: 1p 4x? per undefined
+  ok   subtraction:sub_word_problems_plain pre-skill-check M: 1p 4x? per undefined
+  ok   subtraction:sub_word_problems_plain pre-skill-check L: 1p 4x? per undefined
+  ok   subtraction:sub_word_problems_plain mixed-practice S: 1p 8x? per undefined
+  ok   subtraction:sub_word_problems_plain mixed-practice M: 1p 6x? per undefined
+  ok   subtraction:sub_word_problems_plain mixed-practice L: 1p 4x? per undefined
+  ok   subtraction:sub_word_problems_plain true-false S: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain true-false M: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain true-false L: 1p 2x? per 2
+  FAIL subtraction:sub_word_problems_plain reason-it S: 1p 1x? per 2 - OVERFLOW (4)
+  FAIL subtraction:sub_word_problems_plain reason-it M: 1p 1x? per 2 - OVERFLOW (4)
+  FAIL subtraction:sub_word_problems_plain reason-it L: 1p 1x? per 2 - OVERFLOW (4)
+  ok   subtraction:sub_word_problems_plain stretch S: 1p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain stretch M: 1p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain stretch L: 1p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain word-problems S: 1p 1x? per 3
+  ok   subtraction:sub_word_problems_plain word-problems M: 1p 1x? per 3
+  ok   subtraction:sub_word_problems_plain word-problems L: 1p 1x? per 3
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[0,1,2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[0,1,2]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[0,1,2]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[0,1,2]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[0,1,2]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[0,1,2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[0,1,2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[0]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[0]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[0]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[0]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[0]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[0]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[0]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[0]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[0]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[0]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[0]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[0]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[0]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[0]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[0]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[1]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[1]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[1]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[1]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[1]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[1]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[1]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[1]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[1]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[1]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[1]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[1]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[1]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[1]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[1]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[2]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[2]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[2]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[2]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[2]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[2]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[2]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[3,4,5]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[3,4,5]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[3,4,5]}: 5p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[3,4,5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[3,4,5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[3,4,5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[3,4,5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[3,4,5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[3,4,5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[3,4,5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[3,4,5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[3,4,5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[3,4,5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[3,4,5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[3,4,5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[3]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[3]}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[3]}: 5p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[3]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[3]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[3]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[3]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[3]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[3]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[3]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[3]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"forms":[3]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[3]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[3]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[3]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[4]}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[4]}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[4]}: 5p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[4]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[4]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[4]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[4]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[4]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[4]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[4]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[4]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test L {"forms":[4]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[4]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[4]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[4]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"forms":[5]}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"forms":[5]}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"forms":[5]}: 5p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"forms":[5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"forms":[5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent L {"forms":[5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"forms":[5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"forms":[5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"forms":[5]}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"forms":[5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"forms":[5]}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test L {"forms":[5]}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"forms":[5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"forms":[5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"forms":[5]}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"band":10}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"band":10}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"band":10}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"band":10}: 1p 1x? per 9
+  ok   subtraction:sub_word_problems_plain independent M {"band":10}: 1p 2x? per 8
+  ok   subtraction:sub_word_problems_plain independent L {"band":10}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain guided S {"band":10}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"band":10}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"band":10}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"band":10}: 1p 1x? per 8
+  ok   subtraction:sub_word_problems_plain test M {"band":10}: 1p 2x? per 8
+  ok   subtraction:sub_word_problems_plain test L {"band":10}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain review S {"band":10}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"band":10}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"band":10}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"band":20}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"band":20}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"band":20}: 3p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"band":20}: 1p 1x? per 9
+  ok   subtraction:sub_word_problems_plain independent M {"band":20}: 1p 2x? per 8
+  ok   subtraction:sub_word_problems_plain independent L {"band":20}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain guided S {"band":20}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"band":20}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"band":20}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"band":20}: 1p 1x? per 8
+  ok   subtraction:sub_word_problems_plain test M {"band":20}: 1p 2x? per 8
+  ok   subtraction:sub_word_problems_plain test L {"band":20}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain review S {"band":20}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"band":20}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"band":20}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"band":100}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"band":100}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"band":100}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"band":100}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain independent M {"band":100}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"band":100}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain guided S {"band":100}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"band":100}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"band":100}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"band":100}: 1p 2x? per 6
+  ok   subtraction:sub_word_problems_plain test M {"band":100}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"band":100}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain review S {"band":100}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"band":100}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"band":100}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson S {"wpBar":true}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson M {"wpBar":true}: 4p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain lesson L {"wpBar":true}: 6p 1x? per undefined
+  ok   subtraction:sub_word_problems_plain independent S {"wpBar":true}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent M {"wpBar":true}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain independent L {"wpBar":true}: 1p 2x? per 2
+  ok   subtraction:sub_word_problems_plain guided S {"wpBar":true}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided M {"wpBar":true}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain guided L {"wpBar":true}: 2p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain test S {"wpBar":true}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test M {"wpBar":true}: 1p 2x? per 4
+  ok   subtraction:sub_word_problems_plain test L {"wpBar":true}: 1p 2x? per 2
+  ok   subtraction:sub_word_problems_plain review S {"wpBar":true}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review M {"wpBar":true}: 1p 2x? per undefined
+  ok   subtraction:sub_word_problems_plain review L {"wpBar":true}: 1p 2x? per undefined
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it M: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it M: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it M: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it M: key page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it L: pupil page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it L: pupil page 1 cell 2: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it L: key page 1 cell 1: <div> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it L: key page 1 cell 2: <div> leaves the cell
+ws-cell-checks: FAIL - 12 finding(s) (OVERFLOW 12) on 225 page(s), 148s

@@ -1,0 +1,164 @@
+$ node tests/scripts/ws-sibling-compare.cjs --run design/audit/runs/lf-builds/stories/logs/pc3/coverage-matrix.json --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --run-siblings --json design/audit/runs/lf-builds/stories/logs/pc3/sibling-compare.json
+
+ws-sibling-compare: 7 lane skill(s) on this tree; 238 row(s), 0 RED, 34 PENDING(no-baseline), 0 ERROR; comparing every printed row with findings (RED, OK, PENDING(no-baseline)) with the paired siblings (all approved where the skill has no pair)
+  addition:add_word_problems: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  addition:add_word_problems_plain: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  subtraction:sub_word_problems: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  subtraction:sub_word_problems_plain: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  addition:add_wp_change_unknown: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  subtraction:sub_wp_change_unknown: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  subtraction:sub_wp_compare_smaller: template word-work, 2 track(s); siblings NONE (no approved sibling of this template and shape in tests/fixtures/precritic/siblings.json)
+  sibling counts from: pins (design/audit/matrix/baseline.json): 0 sibling row(s)
+NO-SIBLING addition:add_word_problems_plain|sections/ex-each M L-DENSITY GRID-EVEN: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING addition:add_word_problems_plain|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING addition:add_word_problems_plain|sections/ex-group M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_word_problems_plain|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY PG-23: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 L L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 L L-DENSITY PG-23: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems_plain|sections/pages-2 L L-DENSITY SPREAD: ours 1, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems_plain|single/ex-each M L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at M
+NO-SIBLING addition:add_word_problems|sections/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured sections/ex-each at S
+NO-SIBLING addition:add_word_problems|sections/ex-each M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING addition:add_word_problems|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING addition:add_word_problems|sections/ex-group M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING addition:add_word_problems|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING addition:add_word_problems|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_word_problems|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_word_problems|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_word_problems|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 M L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 M L-DENSITY SPREAD: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_wp_change_unknown|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at S
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each S L-DENSITY H13: ours 6, no approved sibling measured single/ex-each at S
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each M L-DENSITY H13: ours 6, no approved sibling measured single/ex-each at M
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each M L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-each at M
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each L L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at L
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each L L-DENSITY H13: ours 4, no approved sibling measured single/ex-each at L
+NO-SIBLING addition:add_wp_change_unknown|single/ex-each L L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-each at L
+NO-SIBLING addition:add_wp_change_unknown|single/ex-group S L-DENSITY H13: ours 6, no approved sibling measured single/ex-group at S
+NO-SIBLING addition:add_wp_change_unknown|single/ex-group M L-DENSITY H13: ours 6, no approved sibling measured single/ex-group at M
+NO-SIBLING addition:add_wp_change_unknown|single/ex-group M L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-group at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/ex-each M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING subtraction:sub_word_problems_plain|sections/ex-group M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 M L-DENSITY SPREAD: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems_plain|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems|sections/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured sections/ex-each at S
+NO-SIBLING subtraction:sub_word_problems|sections/ex-each S L-DENSITY SPREAD: ours 1, no approved sibling measured sections/ex-each at S
+NO-SIBLING subtraction:sub_word_problems|sections/ex-each M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at M
+NO-SIBLING subtraction:sub_word_problems|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING subtraction:sub_word_problems|sections/ex-group M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at M
+NO-SIBLING subtraction:sub_word_problems|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 S L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_word_problems|single/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_word_problems|single/ex-each S L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 S L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 M L-DENSITY SPREAD: ours 1, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_change_unknown|sections/pages-2 L L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each S L-DENSITY H13: ours 4, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each S L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each M L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each M L-DENSITY H13: ours 4, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-each M L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-group S L-DENSITY H13: ours 6, no approved sibling measured single/ex-group at S
+NO-SIBLING subtraction:sub_wp_change_unknown|single/ex-group M L-DENSITY PAGEFILL: ours 1, no approved sibling measured single/ex-group at M
+NO-SIBLING subtraction:sub_wp_change_unknown|single/more-cols2+nline+afterpage M L-DENSITY H13: ours 2, no approved sibling measured single/more-cols2+nline+afterpage at M
+NO-SIBLING subtraction:sub_wp_change_unknown|single/more-cols2+nline+short M L-DENSITY H13: ours 1, no approved sibling measured single/more-cols2+nline+short at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/ex-each L L-DENSITY PG-23: ours 2, no approved sibling measured sections/ex-each at L
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/ex-each L L-DENSITY SPREAD: ours 1, no approved sibling measured sections/ex-each at L
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 S L-DENSITY PAGEFILL: ours 2, no approved sibling measured sections/pages-2 at S
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 M L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 L L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 L L-DENSITY PAGEFILL: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_compare_smaller|sections/pages-2 L L-DENSITY PG-23: ours 3, no approved sibling measured sections/pages-2 at L
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-each S L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-each S L-DENSITY H13: ours 6, no approved sibling measured single/ex-each at S
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-each M L-DENSITY GRID-EVEN: ours 2, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-each M L-DENSITY H13: ours 4, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-each M L-DENSITY SPREAD: ours 1, no approved sibling measured single/ex-each at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-group S L-DENSITY H13: ours 8, no approved sibling measured single/ex-group at S
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/ex-group M L-DENSITY H13: ours 6, no approved sibling measured single/ex-group at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/pages-3 M L-DENSITY H13: ours 16, no approved sibling measured single/pages-3 at M
+NO-SIBLING subtraction:sub_wp_compare_smaller|single/pages-3 L L-DENSITY H13: ours 2, no approved sibling measured single/pages-3 at L
+partner    addition:add_word_problems_plain|sections/ex-each M L-DENSITY GRID-EVEN: 4 on the partner skill(s)' cells (addition:add_facts, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_word_problems_plain|sections/ex-each M L-WRAP WRAP-OP: 6 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    addition:add_word_problems|mixed/defaults S L-OVERLAP TEXT-FRAME: 2 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_word_problems|mixed/defaults M L-OVERLAP TEXT-FRAME: 2 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_word_problems|mixed/defaults L L-OVERLAP TEXT-FRAME: 2 on the partner skill(s)' cells (algebra:tape_diagram): reported, never blocks the lane (D1)
+partner    addition:add_word_problems|sections/ex-each S L-DENSITY GRID-EVEN: 4 on the partner skill(s)' cells (addition:add_facts, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_word_problems|sections/ex-each S L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    addition:add_wp_change_unknown|sections/ex-each S L-DENSITY H13: 2 on the partner skill(s)' cells (addition:add_word_problems): reported, never blocks the lane (D1)
+partner    addition:add_wp_change_unknown|sections/ex-group S L-DENSITY H13: 2 on the partner skill(s)' cells (addition:add_word_problems): reported, never blocks the lane (D1)
+partner    addition:add_wp_change_unknown|sections/pages-2 S L-DENSITY H13: 6 on the partner skill(s)' cells (addition:add_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_wp_change_unknown|sections/pages-2 M L-DENSITY H13: 10 on the partner skill(s)' cells (addition:add_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    addition:add_wp_change_unknown|sections/pages-2 L L-DENSITY H13: 4 on the partner skill(s)' cells (addition:add_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_word_problems|sections/ex-each S L-DENSITY GRID-EVEN: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_word_problems|sections/ex-each S L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/ex-each S L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/ex-each M L-DENSITY GRID-EVEN: 6 on the partner skill(s)' cells (subtraction:sub_word_problems, addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/ex-each M L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/ex-each M L-WRAP WRAP-OP: 2 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/ex-group S L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/pages-2 S L-DENSITY H13: 4 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/pages-2 M L-DENSITY H13: 6 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_change_unknown|sections/pages-2 L L-DENSITY H13: 4 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/defaults S L-DENSITY H13: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/defaults M L-DENSITY H13: 2 on the partner skill(s)' cells (area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each S L-DENSITY GRID-EVEN: 6 on the partner skill(s)' cells (subtraction:sub_word_problems, addition:add_facts, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each S L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each S L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each M L-DENSITY GRID-EVEN: 6 on the partner skill(s)' cells (subtraction:sub_word_problems, addition:add_facts, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each M L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each M L-WRAP WRAP-OP: 4 on the partner skill(s)' cells (addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each L L-DENSITY GRID-EVEN: 4 on the partner skill(s)' cells (subtraction:sub_word_problems, addition:add_facts): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-each L L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-group S L-DENSITY H13: 4 on the partner skill(s)' cells (subtraction:sub_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-group M L-DENSITY H13: 4 on the partner skill(s)' cells (subtraction:sub_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/ex-group L L-DENSITY H13: 2 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/pages-2 S L-DENSITY H13: 10 on the partner skill(s)' cells (subtraction:sub_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/pages-2 M L-DENSITY H13: 6 on the partner skill(s)' cells (subtraction:sub_word_problems, area_perimeter:perimeter_intro): reported, never blocks the lane (D1)
+partner    subtraction:sub_wp_compare_smaller|sections/pages-2 L L-DENSITY H13: 4 on the partner skill(s)' cells (subtraction:sub_word_problems): reported, never blocks the lane (D1)
+  no approved siblings for addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller: every red count of theirs is unproven
+ws-sibling-compare: FAIL - worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 113 unproven (no sibling), 0 ERROR (34 row(s) with findings compared (PENDING(no-baseline) 34); 0 count(s) at or below the siblings (engine red, non-blocking), 0 above, 113 with no sibling measured, 0 ERROR row(s), 38 partner-skill count(s) (non-blocking); 0.6 s (lane matrix 0 s, sibling matrix 0 s))

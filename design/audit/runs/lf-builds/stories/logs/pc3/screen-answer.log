@@ -1,0 +1,12 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-answer.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+mq-browser-run: slot 1 after 39s
+addition:add_word_problems         card ok | worksheet ok (3/3) | quiz ok (3/3)
+addition:add_word_problems_plain   card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_word_problems      card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_word_problems_plain card ok | worksheet ok (3/3) | quiz ok (3/3)
+addition:add_wp_change_unknown     card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_wp_change_unknown  card ok | worksheet ok (3/3) | quiz ok (3/3)
+subtraction:sub_wp_compare_smaller card ok | worksheet ok (3/3) | quiz ok (3/3)
+live green (card, quiz)            ok
+ws-screen-answer: OK
