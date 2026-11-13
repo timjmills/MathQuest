@@ -589,6 +589,15 @@
         "why": "the skill own items (wide steps, counting back)"
       },
       {
+        "key": "stretch",
+        "d": "hidden",
+        "skills": [
+          "multiplication:count_by_tables"
+        ],
+        "source": "owner 2026-11-13 via the lead (lf-ops-props r5: ws-empty-band EB-ROLE - the card offered it, the app refuses it)",
+        "why": "the app has no Stretch for this skill yet (owner, 2026-11-13)"
+      },
+      {
         "key": "lesson",
         "d": "offered",
         "source": "CLAUDE.md (any skill on any page type, every page with a key); lane decision 2026-11-07 (owner: no sign-off)",
