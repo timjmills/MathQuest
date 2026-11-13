@@ -1,0 +1,87 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+mq-browser-run: slot 1 after 19s
+addition:add_word_problems 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_wp_change_unknown 390x844 item 1: ok (focus ok, 4 answer box(es), paper 346 px)
+addition:add_wp_change_unknown 390x844 item 2: ok (focus ok, 4 answer box(es), paper 346 px)
+addition:add_wp_change_unknown 390x844 item 3: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_change_unknown 390x844 item 1: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_change_unknown 390x844 item 2: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_change_unknown 390x844 item 3: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_compare_smaller 390x844 item 1: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_compare_smaller 390x844 item 2: ok (focus ok, 4 answer box(es), paper 346 px)
+subtraction:sub_wp_compare_smaller 390x844 item 3: ok (focus ok, 4 answer box(es), paper 346 px)
+addition:add_word_problems 390x664 item 1: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems 390x664 item 2: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems 390x664 item 3: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x664 item 1: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x664 item 2: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_word_problems_plain 390x664 item 3: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x664 item 1: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x664 item 2: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems 390x664 item 3: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x664 item 1: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x664 item 2: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+subtraction:sub_word_problems_plain 390x664 item 3: FAIL (focus FAIL, 10 answer box(es), paper 338 px)
+    FOCUS focus is on input.mq-cellslot.mq-active-box (answer box 8 of 10 in entry order); the pupil writes first in input.mq-wwork
+addition:add_wp_change_unknown 390x664 item 1: ok (focus ok, 4 answer box(es), paper 338 px)
+addition:add_wp_change_unknown 390x664 item 2: ok (focus ok, 4 answer box(es), paper 338 px)
+addition:add_wp_change_unknown 390x664 item 3: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_change_unknown 390x664 item 1: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_change_unknown 390x664 item 2: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_change_unknown 390x664 item 3: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_compare_smaller 390x664 item 1: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_compare_smaller 390x664 item 2: ok (focus ok, 4 answer box(es), paper 338 px)
+subtraction:sub_wp_compare_smaller 390x664 item 3: ok (focus ok, 4 answer box(es), paper 338 px)
+A14 siblings clean: 4 approved skill(s) the probe must pass
+A14 sibling addition:add_10k_regroup 390x844 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 4 answer box(es), paper 346 px)
+A14 sibling addition:add_10k_regroup 390x844 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 4 answer box(es), paper 346 px)
+A14 sibling subtraction:sub_1m_regroup 390x844 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 6 answer box(es), paper 346 px)
+A14 sibling subtraction:sub_1m_regroup 390x844 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 6 answer box(es), paper 346 px)
+A14 sibling addition:add_100_regroup 390x844 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 2 answer box(es), paper 346 px)
+A14 sibling addition:add_100_regroup 390x844 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 2 answer box(es), paper 346 px)
+A14 sibling addition:add_10_no_regroup 390x844 item 1: ok (focus ok (column: ones first, the ones box by entry order), 1 answer box(es), paper 346 px)
+A14 sibling addition:add_10_no_regroup 390x844 item 2: ok (focus ok (column: ones first, the ones box by entry order), 1 answer box(es), paper 346 px)
+A14 sibling addition:add_10k_regroup 390x664 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 4 answer box(es), paper 338 px)
+A14 sibling addition:add_10k_regroup 390x664 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 4 answer box(es), paper 338 px)
+A14 sibling subtraction:sub_1m_regroup 390x664 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 6 answer box(es), paper 338 px)
+A14 sibling subtraction:sub_1m_regroup 390x664 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 6 answer box(es), paper 338 px)
+A14 sibling addition:add_100_regroup 390x664 item 1: ok (focus ok (column: ones first, the ones box by its place attribute), 2 answer box(es), paper 338 px)
+A14 sibling addition:add_100_regroup 390x664 item 2: ok (focus ok (column: ones first, the ones box by its place attribute), 2 answer box(es), paper 338 px)
+A14 sibling addition:add_10_no_regroup 390x664 item 1: ok (focus ok (column: ones first, the ones box by entry order), 1 answer box(es), paper 338 px)
+A14 sibling addition:add_10_no_regroup 390x664 item 2: ok (focus ok (column: ones first, the ones box by entry order), 1 answer box(es), paper 338 px)
+ws-phone-card: FAIL - 24 finding(s) (FOCUS 24) (7 skill(s) × 2 size(s) × 3 item(s): 42 of 42 renders measured; A14 siblings clean (4 approved skill(s) × 2 size(s) × 2 item(s)); 158.5 s)

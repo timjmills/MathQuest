@@ -35,3 +35,5 @@ ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktre
   PASS            ws-boot-smoke (35 s, waited 31 s for a slot)
   PASS            ws-coverage-matrix --skills (2098 s)
   FAIL            ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) (1 s)
+  FAIL            ws-phone-card (practice card at 390 px: clip, first-box focus) (178 s, waited 19 s for a slot)
+  PASS            ws-chromebook-fit --skills (289 s, waited 17 s for a slot)
