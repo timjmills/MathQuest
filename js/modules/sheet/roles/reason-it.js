@@ -71,7 +71,10 @@ export function prepare(it, info = {}) {
     // column; UNDER (A | B side by side at half the cell each, the response a full-width row under them) when it fits half the
     // cell; STACKED (A over B, the response beside, top start) only when it does not. The sentence story and the across
     // equation keep their stacked layout (passed pages).
-    const halfBeside = (LIVE_W_MM - 52 - 10) / 2;
+    // (a true INK width - footprint.inkWMm - is held to the panel's INNER width, less its 2 mm pads and rules: 61 mm compare ink
+    // crossed the box rules at S under the 62 mm outer width, lf-placevalue 2026-11-13; a footprint wMm already carries its own pads,
+    // so it keeps the outer width - sub_100k's 45 mm stack fits beside at M)
+    const halfBeside = (LIVE_W_MM - 52 - 10) / 2 - (Number(fp.inkWMm) ? 4.5 : 0);
     const halfCell = (LIVE_W_MM - 5) / 2 - 4;
     // (a sentence story is a story too: its number sentence fits half the cell, so it lays out like a column story - it stacked,
     // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)

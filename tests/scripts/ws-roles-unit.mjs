@@ -223,6 +223,15 @@ if (on('RI-LAYOUT')) {
     };
     const want = { 40: 'beside', 70: 'under', 85: 'under', 100: 'stacked-top' };
     for (const [w, k] of Object.entries(want)) { const got = lay(Number(w)); if (got !== k) findings.push(`RI-LAYOUT: work ${w} mm lays out ${got} (want ${k})`); }
+    // (a true ink width is held to the panel's INNER width: 61 mm of compare ink crossed the box rules beside, lf-placevalue)
+    const inkLay = (inkWMm) => {
+        const it = Object.assign(itemOf('one'), { template: 'pv', footprint: { wMm: 40, inkWMm, hMm: 30, maxCols: 1 } });
+        const p = RI.prepare(it, { seed: 1, index: 0 });
+        const h = p ? p.render(Object.assign({}, ctx, { state: 'blank' }), { cols: 1 }) : '';
+        return /grid-template-columns:1fr 1fr/.test(h) ? 'under' : 'beside';
+    };
+    if (inkLay(61.2) !== 'under') findings.push(`RI-LAYOUT: 61.2 mm of ink beside a 57.5 mm panel lays out ${inkLay(61.2)} (want under)`);
+    if (inkLay(50) !== 'beside') findings.push(`RI-LAYOUT: 50 mm of ink lays out ${inkLay(50)} (want beside)`);
 }
 if (on('LINE-TELL')) {
     // lf-roles r10 (a key's "hundreds" past a 2-digit line; then "no" on a short line beside "yes" on a long one): a word answer's
