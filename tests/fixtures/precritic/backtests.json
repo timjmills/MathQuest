@@ -5851,8 +5851,8 @@
    "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
   },
   "pass": {
-   "commit": "TBD-lf-ops-npr-digits",
-   "state": "lf-ops' fix (pass commit to come)"
+   "commit": "b6107d339",
+   "state": "lf-checks probe merge (branch claude/sweet-newton-c8wrv1-lf-checks-r2-digitpass): the worksheet per-cell digit floor 46a7c3c45 (lf-checks queue 11/18/21) + lf-ops-props 63b26321a (contains 85c694896: card / quiz count-row digits, the count-row grid-cell digit rule). npr passes card, worksheet and quiz at 1280 / 820 / 390"
   },
   "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
   "expect": {
@@ -6119,6 +6119,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "cell-read-ss-mult-facts-card",
+  "check": "ws-screen-slots CELL-READ: a host render that reads 0 [data-ws-cell] cells is the finding host:read, never a pass",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots CELL-READ (lf-checks queue 20, lead 2026-11-13; lf-ops divarray critic)",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "the mult_facts practice card (#questionPaper) carries no [data-ws-cell]: card:read"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "question-render.js: the card paper carries data-ws-cell=\"fact\""
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:mult_facts --hosts card",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ },
+ {
+  "id": "cell-read-sa-mult-facts-card",
+  "check": "ws-screen-answer CELL-READ: each host root must hold a [data-ws-cell] cell before the answer is entered",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer CELL-READ (lf-checks queue 20)",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "the mult_facts card has 0 [data-ws-cell] cells at #questionPaper"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "the card paper carries data-ws-cell"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:mult_facts --hosts card --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "cell-read-pc-mult-facts-card",
+  "check": "ws-phone-card CELL-READ: the card at 390 carries a [data-ws-cell] cell",
+  "kind": "commit-pair",
+  "rule": "ws-phone-card CELL-READ (lf-checks queue 20)",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "the mult_facts card at 390 has 0 [data-ws-cell] cells"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "the card paper carries data-ws-cell"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --skills multiplication:mult_facts --items 1 --sizes 390x844 --hosts card --only CELL-READ --no-siblings-check",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "touch-target-sub-wp-390",
+  "check": "ws-phone-card TOUCH-TARGET: every typed answer place on card, worksheet and quiz at 390 has a >= 48 x 48 px touch box (working boxes >= 44)",
+  "kind": "commit-pair",
+  "rule": "ws-phone-card TOUCH-TARGET (lf-checks queue 10; lf-builds word-stories critic F3, lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "sub_word_problems .mq-wwans answer inputs 40 x 44 px (card, quiz) and 44 x 44 (worksheet) at 390"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "screen-cell.css: the input is >= 48 x 48 as transparent padding around the drawn 44 px box"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_word_problems --items 1 --sizes 390x844 --only TOUCH-TARGET --no-siblings-check",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-digit-mult-facts-worksheet",
+  "check": "ws-screen-slots SCREEN-DIGIT on the online worksheet: grid cell digits >= 40 / 48 / 56 px at 390 / 820 / 1280 (a per-cell host floor)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots SCREEN-DIGIT (lf-checks queue 11 / 18 / 21)",
+  "browser": true,
+  "fail": {
+   "commit": "1fbdb8eca",
+   "state": "mult_facts worksheet fact cells at the 40 px touch floor (one --mq-digit per sheet): worksheet@1280 and @820 miss"
+  },
+  "pass": {
+   "commit": "46a7c3c45",
+   "state": "screen-cell.css: every #worksheetView grid cell takes the host floor 40 / 48 / 56 px"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:mult_facts --screen-digit --hosts worksheet",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ }
  ]
 }

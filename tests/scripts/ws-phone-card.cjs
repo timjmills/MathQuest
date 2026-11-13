@@ -22,6 +22,15 @@
 //             last answer box of its cell in DOM order. A wrong focus is named by its place (ones = place 0) by the
 //             same rule. An item with no typed answer (choices, a drawing) has no FOCUS check (listed as n/a).
 //   INVIEW    that focused input lies inside the viewport (both axes).
+//   CELL-READ the card's B&W cell (#questionPaper) carries [data-ws-cell], as the worksheet's and the quiz's cells do (lf-checks
+//             queue 20: the mult_facts card drew none, so every card-host check read nothing there and passed); 0 cells is a
+//             finding, never a pass.
+//   TOUCH-TARGET every visible typed answer place (input, textarea) has a touch box (its border box, padding included) of
+//             >= 48 x 48 px, an optional working box (carry, regroup, working row) >= 44 x 44 (lf-checks queue 10; word-stories
+//             critic F3: the card's column inputs were 40 x 44 px at 390). The drawn box may be smaller (transparent padding).
+//   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
+//   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
+//             once per skill and width as well, and judged on CELL-READ and TOUCH-TARGET (CLIP-X / FOCUS are the card's).
 // Every finding names the skill, size, item and the element. Page errors raised while a skill rendered are its own.
 //   A14       "siblings clean": after the lane's skills, the probe runs on the approved skills pinned in
 //             tests/fixtures/precritic/phone-card-siblings.json (--siblings-file; two legacy column twins, a kit stack
@@ -43,6 +52,9 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[
 const has = (k) => argv.includes('--' + k);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const say = (...a) => console.log(...a);
+let HOSTS = ['card', 'worksheet', 'quiz'];
+let ONLY = [];
+const keep = (m) => { if (ONLY.length && m && m.findings) m.findings = m.findings.filter((f) => ONLY.includes(f.rule)); return m; };
 const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 /* In the page: the checks. Pure DOM, so the self-test runs it on a fixture page too. */
@@ -171,12 +183,60 @@ function PROBE() {
         const fr = (act && graded.includes(act) ? act : want).getBoundingClientRect();
         if (fr.left < -TOL || fr.right > W + TOL || fr.top < -TOL || fr.bottom > H + TOL) findings.push({ rule: 'INVIEW', msg: `the first answer box is not in view (left ${Math.round(fr.left)}, right ${Math.round(fr.right)}, top ${Math.round(fr.top)}, bottom ${Math.round(fr.bottom)} in ${W} x ${H})` });
     }
+    // CELL-READ (lf-checks queue 20): the card's B&W cell carries [data-ws-cell] like the worksheet's and the quiz's, or every
+    // card-host check reads nothing there (the r1 mult_facts card)
+    const cellN = paper ? [paper, ...paper.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length : 0;
+    if (!cellN) findings.push({ rule: 'CELL-READ', msg: paper ? '0 [data-ws-cell] cells on the card (#questionPaper): the card-host checks read nothing (screen parity with the worksheet and quiz)' : 'no #questionPaper on the card (0 cells read)' });
+    // TOUCH-TARGET (lf-checks queue 10)
+    for (const t of TARGETS('#questionCard')) findings.push({ rule: 'TOUCH-TARGET', msg: t });
     return { focus, columnItem, onesHow, inputs: graded.length, findings: findings.map((f) => ({ rule: f.rule, msg: f.msg })), paperW: paper ? Math.round(paper.getBoundingClientRect().width) : 0 };
 }
 
+/* In the page: TOUCH-TARGET (lf-checks queue 10; lf-builds word-stories critic F3, lead 2026-11-13: the practice card's
+   inputs at 390 px were 40 x 44 px). Every visible typed answer place under `rootSel` (input, textarea, contenteditable;
+   the host's chrome bar, nav and choice buttons are not answer places) has a touch box - its border box, padding included -
+   of at least 48 x 48 px (SP-10: digit inputs >= 48 px); an optional working box (carry, regroup, a working row) at least
+   44 x 44 px (RUBRIC H6). The drawn box may be smaller: the target is transparent padding around it (the kit line-slot rule).
+   Returns one message per under-floor group (class + size), naming the count. Pure DOM: the self-test runs it on fixtures. */
+function TARGETS(rootSel) {
+    const roots = Array.from(document.querySelectorAll(rootSel));
+    const SKIP = new Set(['hidden', 'checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'file', 'color']);
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], .mq-sr, [aria-hidden="true"]'); };
+    const OPT = '.mq-carry, .column-carry-input, .mq-opswork, .mq-wwork, [data-mq-work], [data-ws-slot^="regroup"], .mq-regroup';
+    const groups = new Map();
+    for (const rt of roots) {
+        for (const el of rt.querySelectorAll('input, textarea, [contenteditable="true"]')) {
+            if (el.tagName === 'INPUT' && SKIP.has((el.type || '').toLowerCase())) continue;
+            if (!vis(el) || el.closest('.mq-qactions, .qt-nav, .mq-wsbar, .next-btn-container, .hint-popup')) continue;
+            const r = el.getBoundingClientRect();
+            const opt = el.matches(OPT) || /carry|regroup/i.test(String(el.className));
+            const floor = opt ? 44 : 48;
+            if (r.width >= floor - 0.5 && r.height >= floor - 0.5) continue;
+            const cls = typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).filter((c) => !/^mq-(active-box|live-|wd-)/.test(c)).slice(0, 2).join('.') : '';
+            const k = `${el.tagName.toLowerCase()}${cls} ${Math.round(r.width)} x ${Math.round(r.height)} px (${opt ? 'a working box: want >= 44 x 44, RUBRIC H6' : 'an answer place: want >= 48 x 48, SP-10'})`;
+            groups.set(k, (groups.get(k) || 0) + 1);
+        }
+    }
+    return [...groups.entries()].map(([k, n]) => `${n} x ${k}`);
+}
+
+/* In the page, on the worksheet / quiz host: CELL-READ and TOUCH-TARGET only (CLIP-X and FOCUS are the card's). */
+function HOST_PROBE(host) {
+    const sel = host === 'worksheet' ? '#worksheetView .problem-card.mq-wscard' : '#quizTakeView .mq-qtpaper';
+    const cards = Array.from(document.querySelectorAll(sel));
+    const vis = (el) => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+    const findings = [];
+    if (!cards.length) findings.push({ rule: 'CELL-READ', msg: `no ${sel} on the ${host} host (0 cells read)` });
+    const bare = cards.filter((c) => ![c, ...c.querySelectorAll('[data-ws-cell]')].some((e) => e.hasAttribute('data-ws-cell') && vis(e)));
+    if (bare.length) findings.push({ rule: 'CELL-READ', msg: `${bare.length} of ${cards.length} ${host} cell(s) carry no [data-ws-cell] (0 cells read there)` });
+    for (const t of TARGETS(sel)) findings.push({ rule: 'TOUCH-TARGET', msg: t });
+    return { cards: cards.length, findings };
+}
+
 const FIXTURE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px;overflow:hidden}
-.ws-stack{display:grid;grid-template-columns:repeat(4,${variant === 'clip' ? '120px' : '40px'})}</style>
-<div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div class="ws-stack">
+.ws-stack{display:grid;grid-template-columns:repeat(4,${variant === 'clip' ? '120px' : '48px'})}input.mq-digit{width:48px;height:48px;box-sizing:border-box}
+${variant === 'small' ? 'input.mq-digit{width:40px;height:44px}' : ''}${variant === 'padded' ? 'input.mq-digit{width:48px;height:48px;padding:4px;margin:-4px;background-clip:content-box;border:0;box-shadow:inset 0 0 0 1px #000}' : ''}</style>
+<div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"${variant === 'nocell' ? '' : ' data-ws-cell="stack"'}><div class="ws-stack">
 <span>4</span><span>3</span><span>6</span><span>7</span>
 <input class="mq-digit" data-ws-slot="ans-3"><input class="mq-digit" data-ws-slot="ans-2"><input class="mq-digit" data-ws-slot="ans-1"><input class="mq-digit" data-ws-slot="ans-0">
 </div></div><button id="qcCheckBtn">Check</button></div>
@@ -186,12 +246,12 @@ const FIXTURE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{m
 // pilot r1 D5: the r1 screen twin's boxes (input.mq-cellslot) carry no place, no data-col and no digit class; the
 // leftmost focused must FAIL, the rightmost pass ('bare-left' / 'bare-right').
 const BARE = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
-input{width:40px;height:40px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper"><div><span>4,367</span><span>- 2,244</span></div>
+input{width:48px;height:48px}</style><div id="questionCard"><div id="questionText">Subtract.</div><div id="questionPaper" data-ws-cell="legacy"><div><span>4,367</span><span>- 2,244</span></div>
 <div><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"><input class="mq-cellslot"></div></div><button id="qcCheckBtn">Check</button></div>
 <script>window.state = { currentQ: { printFormat: 'column-sub', cell: { template: 'stack' } } }; (() => { const b = document.querySelectorAll('input.mq-cellslot')[${variant === 'bare-right' ? 3 : 0}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
 const LEGACY = (variant) => `<!doctype html><meta charset="utf-8"><style>body{margin:0;font:16px sans-serif}#questionCard{width:370px;margin:0 10px}
-.column-answer-input{width:24px;height:24px}.mq-active-box{position:relative;top:-4px}</style>
-<div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper"><div class="column-problem"><div>4 3 6 7</div><div>+ 1 2 2 1</div>
+.column-answer-input{width:48px;height:48px}.mq-active-box{position:relative;top:-4px}</style>
+<div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper" data-ws-cell="legacy"><div class="column-problem"><div>4 3 6 7</div><div>+ 1 2 2 1</div>
 <div><input class="column-answer-input" data-col="q1-ans-0"><input class="column-answer-input" data-col="q1-ans-1"><input class="column-answer-input" data-col="q1-ans-2"><input class="column-answer-input" data-col="q1-ans-3"></div>
 </div></div><button id="qcCheckBtn">Check</button></div>
 <script>window.state = { currentQ: { printFormat: 'column-addition' } }; (() => { const b = document.querySelectorAll('input.column-answer-input')[${variant === 'lifted' ? 3 : 2}]; b.classList.add('mq-active-box'); b.focus(); })();</script>`;
@@ -204,20 +264,33 @@ async function selfTest() {
     try {
         const page = await browser.newPage();
         await page.setViewport({ width: 390, height: 844 });
-        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); return page.evaluate(PROBE); };
+        const run = async (v) => { await page.setContent(FIXTURE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
         const good = await run('good');
         if (good.findings.length || good.focus !== 'ok') fails.push(`good fixture: ${JSON.stringify(good)}`);
         const f = await run('focus');
         if (!f.findings.some((x) => x.rule === 'FOCUS')) fails.push('leftmost box focused: no FOCUS finding');
         const c = await run('clip');
         if (!c.findings.some((x) => x.rule === 'CLIP-X')) fails.push('stack wider than the card: no CLIP-X finding');
-        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); return page.evaluate(PROBE); };
+        // CELL-READ (lf-checks queue 20): the card's paper with no [data-ws-cell] is a finding
+        const nc = await run('nocell');
+        if (!nc.findings.some((x) => x.rule === 'CELL-READ')) fails.push(`card paper with no [data-ws-cell]: no CELL-READ finding (${JSON.stringify(nc.findings)})`);
+        // TOUCH-TARGET (lf-checks queue 10): 40 x 44 px answer boxes (word-stories F3) fail; a 40 px drawn box inside 48 px of
+        // transparent padding passes
+        const sm = await run('small');
+        const st = sm.findings.find((x) => x.rule === 'TOUCH-TARGET');
+        if (!st || !/4 x input\.mq-digit 40 x 44 px/.test(st.msg)) fails.push(`40 x 44 px answer boxes: a TOUCH-TARGET finding naming 4 x 40 x 44 (${JSON.stringify(sm.findings)})`);
+        const pd = await run('padded');
+        if (pd.findings.some((x) => x.rule === 'TOUCH-TARGET')) fails.push(`a drawn 40 px box in 48 px of transparent padding: no TOUCH-TARGET finding (${JSON.stringify(pd.findings)})`);
+        await page.setContent('<div id="h"><input class="mq-carry" style="width:44px;height:44px"><input class="mq-wwork" style="width:44px;height:44px"><input style="width:46px;height:48px"><textarea style="width:60px;height:30px"></textarea><div class="mq-wsbar"><input style="width:20px;height:20px"></div></div>');
+        const ht = await page.evaluate(TARGETS, '#h');
+        if (ht.length !== 2 || !ht.some((t) => /46 x 48/.test(t)) || !ht.some((t) => /textarea 60 x 30/.test(t))) fails.push(`working boxes at 44 pass, a 46 px answer box and a 30 px textarea fail, the chrome bar is skipped: ${JSON.stringify(ht)}`);
+        const runL = async (v) => { await page.setContent(LEGACY(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
         const lifted = await runL('lifted');
         if (lifted.focus !== 'ok' || lifted.findings.length) fails.push(`legacy ones box lifted 4 px by .mq-active-box and focused: must be ok (${JSON.stringify(lifted.findings)})`);
         const tens = await runL('lifted-tens');
         const tf = tens.findings.find((x) => x.rule === 'FOCUS');
         if (!tf || !/place 1,/.test(tf.msg) || !/place 0/.test(tf.msg)) fails.push(`legacy tens box focused: a FOCUS finding naming place 1 and the ones box (place 0) (${JSON.stringify(tens.findings)})`);
-        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); return page.evaluate(PROBE); };
+        const runB = async (v) => { await page.setContent(BARE(v)); await page.waitForFunction(() => document.readyState === 'complete'); await page.evaluate(() => document.querySelector('.mq-active-box').focus()); await page.evaluate(`window.TARGETS = ${TARGETS}`); return page.evaluate(PROBE); };
         const bl = await runB('bare-left');
         const bf = bl.findings.find((x) => x.rule === 'FOCUS');
         if (!bf || !/place 3,/.test(bf.msg)) fails.push(`r1 twin, leftmost box focused: a FOCUS finding at place 3 (${JSON.stringify(bl.findings)})`);
@@ -225,13 +298,13 @@ async function selfTest() {
         if (br.focus !== 'ok') fails.push(`r1 twin, ones box focused: must be ok (${JSON.stringify(br.findings)})`);
     } finally { await browser.close(); }
     for (const f of fails) say(`  self-test FAIL: ${f}`);
-    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 7 fixture pages)`);
+    say(fails.length ? `${TOOL}: FAIL - self-test (${fails.length})` : `${TOOL}: OK (self-test, 11 fixture pages)`);
     process.exit(fails.length ? 1 : 0);
 }
 
 async function main() {
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items']);
+    const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
     const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
@@ -243,6 +316,10 @@ async function main() {
     const sizes = String(arg('sizes', '390x844,390x664')).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
     if (sizes.some((s) => !s)) { say(`${TOOL}: --sizes takes WxH,...`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const ITEMS = Math.max(1, +arg('items', '3'));
+    // --only R1,R2 (a backtest row runs the rule it proves): findings of other rules are dropped
+    ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean);
+    HOSTS = String(arg('hosts', 'card,worksheet,quiz')).split(',').map((h) => h.trim()).filter(Boolean);
+    if (!HOSTS.includes('card') || HOSTS.some((h) => !['card', 'worksheet', 'quiz'].includes(h))) { say(`${TOOL}: --hosts takes card plus worksheet and / or quiz`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const SHOTS = arg('shots', null);
     // A14 "siblings clean" (critic r6 D2): the approved skills of the pinned list must pass, or the probe is wrong
     let sibs = [];
@@ -259,7 +336,9 @@ async function main() {
     const rows = [], sibRows = [];
     let mark = 0;
     const take = () => { const p = app.problems.slice(mark); mark = app.problems.length; return p; };
+    const hostRows = [];
     const measure = async (list, items, out, outFails, label) => {
+        const seenW = new Set();
         for (const size of sizes) {
             await page.setViewport({ width: size.w, height: size.h, deviceScaleFactor: 1 });
             for (const s of list) {
@@ -281,7 +360,8 @@ async function main() {
                         await sleep(900);
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await sleep(400);
-                        m = await page.evaluate(PROBE);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}`);
+                        m = keep(await page.evaluate(PROBE));
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
@@ -289,6 +369,41 @@ async function main() {
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
                     out.push({ skill: s, size: `${size.w}x${size.h}`, item: it + 1, focus: m.focus, ones: m.onesHow || null, inputs: m.inputs, findings: m.findings });
                     say(`${tag}: ${m.findings.length ? 'FAIL' : 'ok'} (focus ${m.focus}${m.columnItem ? ` (column: ones first, the ones box by ${m.onesHow || 'entry order'})` : ''}, ${m.inputs} answer box(es), paper ${m.paperW} px)${m.findings.length ? '\n' + m.findings.map((f) => `    ${f.rule} ${f.msg}`).join('\n') : ''}`);
+                }
+                // the online worksheet and the quiz at the same width (TOUCH-TARGET and CELL-READ; once per width)
+                if (seenW.has(`${s}@${size.w}`)) continue;
+                seenW.add(`${s}@${size.w}`);
+                for (const host of HOSTS.filter((h) => h !== 'card')) {
+                    const tag = `${label}${s} ${size.w}x${size.h} ${host}`;
+                    let m;
+                    try {
+                        await page.reload({ waitUntil: 'networkidle2' });
+                        await page.waitForFunction(() => typeof window.initWorksheet === 'function' && !!window.SKILLS, { timeout: 30000 });
+                        const ok = await page.evaluate((c, k, host, seed) => {
+                            try {
+                                if (window.__wsReseed) window.__wsReseed(seed);
+                                if (window.setUserRole) window.setUserRole('student', { persist: false });
+                                const st = window.state;
+                                if (host === 'worksheet') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3; window.initWorksheet(); return true; }
+                                const questions = [0, 1].map((i) => ({ id: i, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, window.generateQuestionFor({ category: c, skill: k, seed: seed + i, itemIndex: i }))) }));
+                                const test = { id: null, name: 'Phone', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }], settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
+                                window.handleQuizURL(window.compressTestForURL(test));
+                                const nm = document.getElementById('qtStudentName'); nm.value = 'A'; nm.dispatchEvent(new Event('input'));
+                                window.startQuizTest(); return true;
+                            } catch (e) { return String((e && e.message) || e).slice(0, 160); }
+                        }, c, k, host, hash(`${s}:phone:${host}`));
+                        if (ok !== true) throw new Error(`the ${host} host did not render (${ok})`);
+                        if (host === 'worksheet') await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !!g && g.dataset.mqLaidOut === '1'; }, { timeout: 15000 }).catch(() => {});
+                        try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
+                        await sleep(900);
+                        await page.evaluate(`window.TARGETS = ${TARGETS}`);
+                        m = keep(await page.evaluate(HOST_PROBE, host));
+                    } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
+                    for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
+                    for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
+                    hostRows.push({ skill: s, size: `${size.w}x${size.h}`, host, cards: m.cards, findings: m.findings });
+                    say(`${tag}: ${m.findings.length ? 'FAIL' : 'ok'} (${m.cards} cell(s))${m.findings.length ? '\n' + m.findings.map((f) => `    ${f.rule} ${f.msg}`).join('\n') : ''}`);
+                    await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                 }
             }
         }
@@ -306,13 +421,17 @@ async function main() {
         if (sibs.length) { say(`A14 siblings clean: ${sibs.length} approved skill(s) the probe must pass`); await measure(sibs, SIB_ITEMS, sibRows, sibFails, 'A14 sibling '); }
     } finally { await app.close(); }
     const secs = ((Date.now() - T0) / 1000).toFixed(1);
-    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills, sizes: sizes.map((z) => `${z.w}x${z.h}`), items: ITEMS, rows, fails, siblingsCheck: { skills: sibs, items: SIB_ITEMS, rows: sibRows, fails: sibFails }, seconds: +secs }, null, 1) + '\n');
+    if (has('json')) fs.writeFileSync(path.resolve(arg('json')), JSON.stringify({ tool: TOOL, root: ROOT, skills, sizes: sizes.map((z) => `${z.w}x${z.h}`), items: ITEMS, hosts: HOSTS, rows, hostRows, fails, siblingsCheck: { skills: sibs, items: SIB_ITEMS, rows: sibRows, fails: sibFails }, seconds: +secs }, null, 1) + '\n');
     const want = skills.length * sizes.length * ITEMS;
     if (rows.length < want && !fails.length) fails.push(`only ${rows.length} of ${want} renders measured`);
+    // the worksheet / quiz renders (once per skill and width): an unmeasured host is a failure, never a pass (lf-checks queue 20)
+    const laneHost = hostRows.filter((r) => skills.includes(r.skill));
+    const wantH = skills.length * new Set(sizes.map((z) => z.w)).size * (HOSTS.length - 1);
+    if (laneHost.length < wantH && !fails.length) fails.push(`only ${laneHost.length} of ${wantH} worksheet / quiz renders measured`);
     const byRule = {};
-    for (const r of rows) for (const f of r.findings) byRule[f.rule] = (byRule[f.rule] || 0) + 1;
+    for (const r of [...rows, ...laneHost]) for (const f of r.findings) byRule[f.rule] = (byRule[f.rule] || 0) + 1;
     const a14 = has('no-siblings-check') ? 'A14 siblings check skipped (--no-siblings-check)' : sibFails.length ? `A14 siblings NOT clean: ${sibFails.length} finding(s) on approved skill(s) ${[...new Set(sibFails.map((f) => f.split(' ')[2]))].join(', ')}` : `A14 siblings clean (${sibs.length} approved skill(s) × ${sizes.length} size(s) × ${SIB_ITEMS} item(s))`;
-    const tail = `${skills.length} skill(s) × ${sizes.length} size(s) × ${ITEMS} item(s): ${rows.length} of ${want} renders measured; ${a14}; ${secs} s`;
+    const tail = `${skills.length} skill(s) × ${sizes.length} size(s) × ${ITEMS} item(s): ${rows.length} of ${want} renders measured; ${HOSTS.length > 1 ? `${HOSTS.filter((h) => h !== 'card').join(' + ')} ${laneHost.length} of ${wantH} renders; ` : ''}${a14}; ${secs} s`;
     let line;
     if (sibFails.length) line = `${TOOL}: FAIL - the probe misjudges approved skills (A14 siblings not clean), so its verdict cannot be trusted: ${sibFails.slice(0, 3).join(' | ').slice(0, 400)}${fails.length ? `; the lane's own: ${fails.length} finding(s)` : ''} (${tail})`;
     else if (fails.length) line = `${TOOL}: FAIL - ${fails.length} finding(s) (${Object.entries(byRule).map(([k, v]) => `${k} ${v}`).join(', ') || 'render errors'}) (${tail})`;

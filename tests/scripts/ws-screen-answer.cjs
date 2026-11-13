@@ -16,6 +16,8 @@
 //   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
 //                         only the kit's answer slots (input.mq-slot)
 //   --focus-gap-self-test FOCUS-GAP on synthetic pages, no app (critic eb-r6 m2: a word 1 px under or over the ring is a finding)
+//   --cell-read-self-test CELL-READ on synthetic pages, no app (lf-checks queue 20): a host render whose cell carries no
+//                         [data-ws-cell] (or has no cell) is a finding, never a pass - every host, before the answer is entered
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
@@ -321,7 +323,24 @@ function FOCUS_GAP(e, rootSel, all) {
     return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" ${worst.where} it (need >= 4 px)` : '';
 }
 
+// CELL-READ (lf-checks queue 20; lf-ops divarray critic, lead 2026-11-13): the mult_facts practice card drew no [data-ws-cell],
+// so card-host checks read nothing there. In the page: the visible [data-ws-cell] cells at or under `sel` (null: no `sel`).
+function CELL_COUNT(sel) {
+    const root = document.querySelector(sel);
+    if (!root) return null;
+    const vis = (e) => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+    return [root, ...root.querySelectorAll('[data-ws-cell]')].filter((e) => e.hasAttribute('data-ws-cell') && vis(e)).length;
+}
+/** Why a host render reads nothing (0 cells), or '' when it holds a [data-ws-cell] cell. Pure. */
+function cellReadError(host, sel, n) {
+    if (n == null) return `CELL-READ: ${sel} is not on the ${host} host (0 cells read)`;
+    if (!(n > 0)) return `CELL-READ: 0 [data-ws-cell] cells at ${sel} on the ${host} host - its checks read nothing (screen parity: the worksheet and quiz cells carry it)`;
+    return '';
+}
+
 async function run(page, sel, which) {
+    const ce = cellReadError(which.host, sel, await page.evaluate(CELL_COUNT, sel));
+    if (ce) return { error: ce };
     const r = await page.evaluate(PLAN, sel, which);
     if (r.error) return r;
     for (const step of r.plan) {
@@ -433,7 +452,33 @@ async function liveGreen(page) {
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 // --stress N: one command that loads the CPU and repeats the whole run N times.
-if (has('focus-gap-self-test')) (async () => {
+if (has('cell-read-self-test')) (async () => {
+    // CELL-READ on synthetic pages (no app): a host whose cell carries no [data-ws-cell] (the r1 mult_facts card), a missing
+    // root and a hidden cell are findings; the attribute on the root, or on a cell inside it, reads.
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const b = await puppeteer.launch({ headless: 'new', executablePath: chromePath(), args: ['--no-sandbox'] });
+    const bad = [];
+    try {
+        const p = await b.newPage();
+        const cases = [
+            ['card paper with no [data-ws-cell] (mult_facts r1)', '<div id="questionPaper" class="mq-scell"><div id="visualAid">9 x 2 = <input></div></div>', '#questionPaper', true],
+            ['no root on the page', '<div id="other">7</div>', '#questionPaper', true],
+            ['a hidden cell only', '<div id="questionPaper"><div data-ws-cell="fact" style="display:none">9 x 2</div></div>', '#questionPaper', true],
+            ['the attribute on the root (the card after the fix)', '<div id="questionPaper" data-ws-cell="fact"><div>9 x 2 = <input></div></div>', '#questionPaper', false],
+            ['a cell inside the root (the quiz paper)', '<div class="mq-qtpaper"><div class="qt-cell" data-ws-cell="eq">24 / 12</div></div>', '.mq-qtpaper', false],
+        ];
+        for (const [name, html, sel, want] of cases) {
+            await p.setContent(`<!doctype html><body>${html}</body>`);
+            const msg = cellReadError('card', sel, await p.evaluate(CELL_COUNT, sel));
+            const ok = !!msg === want;
+            if (!ok) bad.push(`${name}: ${msg || 'read'} (want ${want ? 'a finding' : 'read'})`);
+            console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${msg || 'read'}`);
+        }
+    } finally { await b.close(); }
+    console.log(`ws-screen-answer CELL-READ self-test: ${bad.length ? 'FAIL' : 'OK'} (5 cases)`);
+    process.exit(bad.length ? 1 : 0);
+})();
+else if (has('focus-gap-self-test')) (async () => {
     // FOCUS-GAP on synthetic pages (no app): the critic eb-r6 probe set. A finding where a word touches the ring beside, under
     // (1 px, m2) or over it; none for a lone box, a word on another line, or words 6+ px clear above / beside / below.
     const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
