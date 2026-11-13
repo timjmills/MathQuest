@@ -3300,6 +3300,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "max-number-band-word-stories",
+   "check": "an unset 'no limit' band bounds the answer by the Max Number: Addition Word Problems at band null / Max Number 100 deals no sum past 100 (word-stories critic r1 F9, lf-builds 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-content-audit MAX-NUMBER BAND (owner ruling 2026-09-19: 'within N' bounds the answer; card 7a range line, 2.OA.A.1)",
+   "browser": true,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "join answers to 185 at band null (two addends each up to the Max Number)"
+   },
+   "pass": {
+    "commit": "365769361",
+    "state": "0 of 240 items past 100"
+   },
+   "command": "node tests/scripts/ws-content-audit.cjs --skill add_word_problems --category addition --no-mc",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
