@@ -704,8 +704,6 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
  * `heightMm`. A row of `noStretch` templates (lf-ops-props r4b, lead ruling 2026-11-12 (b)) grows to PT-GDP's
  * GDP_ROW_ROOM x its shortest problem at most, never below its tallest; the spare height stays under the grid.
  */
-/** Every item a `noStretch` template (arrays, arrays-turn, count-row: answered in place, lead ruling 2026-11-12 (b)). */
-const allNoStretch = (its) => its.length > 0 && its.every((it) => it && it.footprint && it.footprint.noStretch);
 
 export function capFillShape(items, cols, chunk, heightMm) {
     const tpl = String(chunk.rowsTpl || '');
@@ -1199,11 +1197,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // critic r8 D8-2 - fills its page by size: its rows keep their proportions, scaled to the grid)
             // (`capFillCont`, lesson 3a P1d - E12: every page of the sheet, the continuation page too, takes the first page's grid height)
             const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && (sec.capFillCont || (!pg.cont && part.chunk.gridMm && part.chunk.rowsTpl));
-            // (r4b: a lesson's `noCap` Practice page of noStretch templates takes rowShape too - each row to what IT holds, at
-            // most NO_STRETCH_ROOM x its shortest; one cell height for every row stood a 62 mm pair in a 99 mm row, 38 %)
             const shape0 = capFill ? capFillShape(its, L.cols, part.chunk, Math.max(Number(part.chunk.gridMm) || 0, L.gridH - 1))
                 : part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
-                : its.some((it) => it.anchor) || (noCapSec && !allNoStretch(its)) ? null : rowShape(its, L.cols, part.chunk.rows, pcH, L.fillRefH);
+                : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH, L.fillRefH);
             // a split part's uniform rows take what the part holds, never the section's tallest cell
             const shape = shape0 || (!fillByFlex && !noCapSec && pcH < L.cellH - 0.5 && !its.some((it) => it.anchor)
                 ? { heightMm: Math.round(part.chunk.rows * pcH * 100) / 100, rowsTpl: '' } : null);
