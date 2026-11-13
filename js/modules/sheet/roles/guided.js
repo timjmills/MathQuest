@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -1070,11 +1070,15 @@ export function plan(input = {}) {
         const tF = w.map((x, r) => (pi === 0 && (r === 0 || r === hintRow) ? x : Math.max(x, FACT_STRETCH * Math.max(1, mins[r] - CELL_PAD_MM))));
         const sumT = tF.reduce((x, y) => x + y, 0);
         const lam = sumT > sumW ? Math.max(0, Math.min(1, (room - sumW) / (sumT - sumW))) : 0;
-        let Hr = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
+        // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
+        // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
+        const tight = tightRows(host);
+        let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         // (`evenRows` on a template's footprint - its cell spreads its content over its own height, so the Model's trace and the
         // first try's hint line fit in a row as tall as the others: every row takes the same share, when that share holds the
         // tallest row's content. Opt-in, so no other template's page changes - lane lf-vocab r3, critic r2 #4: 405 / 340 px)
-        if (rows > 1 && host.length && host.every((it) => it.footprint && it.footprint.evenRows)) {
+        if (!tight && rows > 1 && host.length && host.every((it) => it.footprint && it.footprint.evenRows)) {
             // (the share is at least the tallest row's content when the page holds that many rows of it: lf-vocab r5, critic r3
             // #6 - at L the Model row's tab and the hint line made it taller than the average, so the rows stayed 99 / 78 mm)
             const even = Math.max(Hr.reduce((a, b) => a + b, 0) / rows, Math.max(...w));
