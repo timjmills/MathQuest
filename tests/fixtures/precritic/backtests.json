@@ -3999,6 +3999,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r10-nb8-wrong-focus-tick",
+   "check": "lf-vocab r10 item 6: critic r9 #1: a focused wrong Match 3 letter box keeps its red dashed edge and no next ring (worksheet); the quiz right box is green with the card's tick badge, wrong boxes their cross",
+   "kind": "commit-pair",
+   "rule": "ws-next-box NB8",
+   "browser": true,
+   "fail": {
+    "commit": "b502c983",
+    "state": "lf-vocab r10 before item 6"
+   },
+   "pass": {
+    "commit": "bae5c32e",
+    "state": "lf-vocab r10 item 6"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB8 ' && echo 'nb8: FAIL' || echo 'nb8: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
