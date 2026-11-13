@@ -53,5 +53,9 @@ const PV3C_IDS = [
     'placevalue:value',
     'placevalue:combine',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4])]);
+const OPS_DF = 'Lane lf-ops, division:div_facts: support-aid print pages narrow critics r5-r7 + r8 re-check PASS (Independent / Test / Review / More practice x touch, skip, array, think, boxsign, supports off, fade packet, S / M / L; design/audit/runs/lf-ops/critic-divfacts-r8.md, 2026-11-09); shared fact roles guided + scripted-model critics factroles r2 / r3 / r4 PASS (critic-factroles-r4.md, 2026-11-12); screen hosts card 1280 / 820 / 390, worksheet, quiz x every support critic divfacts-screen r2 PASS (critic-divfacts-screen-r2.md, 2026-11-12); every page type and host >= 8 (independent Opus medium critics)';
+const OPS_DF_IDS = [
+    'division:div_facts',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...OPS_DF_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...OPS_DF_IDS.map((id) => [id, OPS_DF])]);
