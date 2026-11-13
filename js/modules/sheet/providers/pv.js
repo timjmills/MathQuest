@@ -662,9 +662,10 @@ registerSkill('placevalue:number_word_names', {
 // lf-placevalue compare r2 (critic r1 F2): the steps name and MARK the deciding place. Step 1 counts the digits (the count in
 // words when both are alike, so the Guided page's fading cue - hintOf, the first step that names a number - is step 2, the
 // decision, never "Compare 924 and 998" again); a same-length item names the first different place and boxes its two digits
-// (mark `digits`), then says which digit is bigger and so which number (mark `win`), then writes the sign. An "=" item works
-// three steps and a different-length item three, so the Guided Model - the item with the most steps - is always an item the
-// first different digit decides (F4: the only Model was "691 = 691"). Marks: `count` (a grey dot under every digit), `digits`
+// (mark `digits`, the two digits and their sign), then writes the sign, the bigger number underlined (mark `win`). Three steps
+// for every item (SCC-P4), so the lesson anchor is three full-width panels (four left a 32 % band in each 2 x 2 panel:
+// print-lint H13-ABS). The "=" item is never a Model: it carries `noModel` (gen-pv), which the Guided, Opener and Scripted
+// Model pages read (F4: the only Model was "691 = 691"). Marks: `count` (a grey dot under every digit), `digits`
 // (the index, from the left, of the deciding digit - or `all`), `win` ('a' | 'b', the bigger number underlined), `answer`.
 const COUNT_WORD = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
 const PLACE_FROM_LEFT = (len, i) => PLACE_WORD[10 ** (len - 1 - i)] || '';
@@ -700,23 +701,21 @@ registerSkill('placevalue:compare', {
         if (p.a === undefined) return [];
         const d = compareDecision(p.a, p.b);
         const A = f(p.a), B = f(p.b);
-        const write = step(`Write ${A} ${q.ans} ${B}.`, [{ slot: 'answer', value: String(q.ans) }]);
         const count = { slot: 'count', value: `${d.la},${d.lb}` };
+        const answer = { slot: 'answer', value: String(q.ans) };
         if (d.kind === 'length') {
-            const big = d.la > d.lb ? A : B;
-            return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb} digit${d.lb === 1 ? '' : 's'}.`, [count]),
-                step(`More digits is bigger: ${big} is greater.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
-                write];
+            return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb}.`, [count]),
+                step(`More digits is bigger: ${d.la > d.lb ? A : B}.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
+                step(`Write ${A} ${q.ans} ${B}.`, [answer])];
         }
         if (d.kind === 'equal') {
             return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
                 step('Every digit is the same.', [{ slot: 'digits', value: 'all' }]),
-                write];
+                step(`Write ${A} = ${B}.`, [answer])];
         }
         return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
-            step(`The ${d.place} digits differ: ${d.da} and ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
-            step(`${d.da} is ${d.da > d.db ? 'greater' : 'less'} than ${d.db}, so ${A} is ${d.da > d.db ? 'greater' : 'less'}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }]),
-            write];
+            step(`The ${d.place} digits differ: ${d.da} ${d.da > d.db ? '>' : '<'} ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            step(`Write ${A} ${q.ans} ${B}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);

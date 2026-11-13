@@ -82,7 +82,7 @@ const LATE = {
                 const a = String(q.pv && q.pv.a), b = String(q.pv && q.pv.b);
                 if (a.length !== b.length) return /more digits|longer|digit count/i.test(chant);
                 if (a === b) return /\bsame\b|=|equal/i.test(chant) && /first different|left/i.test(chant);
-                return /first different|from the left|left to right/i.test(chant);
+                return /first different|from the left|look left|left to right/i.test(chant);
             },
         };
         let judged = 0;

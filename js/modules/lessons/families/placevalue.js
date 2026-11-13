@@ -219,13 +219,12 @@ export const ROUTINES = Object.freeze({
             { word: 'equal to', meaning: 'the same', picture: { kind: 'text', text: '5 = 5' } },
         ],
         // (one step a worked step - workedSteps of placevalue:compare on an item the first different digit decides: count the
-        // digits / the first different place, its two digits boxed / the bigger digit, the bigger number underlined / the sign.
+        // digits / the first different place, its two digits boxed / the sign, the bigger number underlined.
         // lf-placevalue compare r2, critic r1 F2: the r1 steps "Compare 419 and 470." and an unmarked "1 and 7" drew the same
         // picture twice; each state now draws its own mark - the template's stepState)
         steps: [
             { icon: 'count', text: 'Count the digits.' },
             { icon: 'look', text: 'Find the first different digit.' },
-            { icon: 'decide', text: 'The bigger digit wins.' },
             { icon: 'write', text: 'Write <, > or =.' },
         ],
         // (critic r1 F2: "More digits, bigger number." decided 8 of the lesson's 33 items - every other one has two numbers of one

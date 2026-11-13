@@ -64,7 +64,8 @@ const ordered = (items0, cols) => {
     // one whose worked steps are the MOST (a regroup, a ring, a skip-count adds its own step)
     // is the Model; then the shortest, as above.
     const nSteps = (it) => { try { return providerWorkedSteps(it, 6).length; } catch (e) { return 0; } };
-    const fwd = items0.map((it, i) => i).filter((i) => !(items0[i] && items0[i].q && items0[i].q.missing));
+    // (lf-placevalue compare r2, critic r1 F4: nor an item its generator marks `noModel` - the compare "=", which decides nothing)
+    const fwd = items0.map((it, i) => i).filter((i) => !(items0[i] && items0[i].q && (items0[i].q.missing || items0[i].q.noModel)));
     const most = fwd.length ? Math.max(...fwd.map((i) => nSteps(items0[i]))) : 0;
     const full = fwd.filter((i) => nSteps(items0[i]) === most);
     const first = full.length ? full[0] : items0.findIndex((it) => !(it && it.q && it.q.missing));

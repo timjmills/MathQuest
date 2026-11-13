@@ -712,7 +712,7 @@ function pvRender(p, ctx0) {
  * lf-placevalue compare r2 (pixel EB-BAND on the Guided rows; lead 2026-11-13: "the compare cell's measured height carries
  * 6-7 mm of pad around a one-line compare"): the CL-40 top spacer keeps a cell's first line clear of its number tab. On a
  * scaffolded page (Guided, Opener, Model: level 2-3) a compare line centred across a cell whose white each side is wider
- * than the tab (9 mm: a two-digit tab and its keep-out) cannot meet the tab, so the spacer is left off - on the page and the
+ * than the widest tab (22 mm: an "Example" tab and its keep-out; sibling-compare CL40-INK) cannot meet the tab, so the spacer is left off - on the page and the
  * measuring cell alike. The practice pages keep it (their rows are laid to the page fill, and the spacer is part of it).
  */
 function compareClearOfTab(p, ctx) {
@@ -725,7 +725,7 @@ function compareClearOfTab(p, ctx) {
     const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + ({ S: 8, M: 10, L: 12 }[size] || 10);
     const cell = 186 / cols - 1;
     const gap = size === 'L' && cols >= 3 ? 3 : cols <= 2 ? Math.max(4, Math.min(10, (0.46 * cell - bare) / 2)) : 4;
-    return (cell - bare - 2 * gap) / 2 >= 9;
+    return (cell - bare - 2 * gap) / 2 >= 22;
 }
 
 function pvRenderBody(p, ctx0) {
@@ -853,7 +853,7 @@ function pvRenderBody(p, ctx0) {
                         const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:1.2mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
                         const win = mk.win && mk.win.value === who;
                         return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
-                            + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.8mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
+                            + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.3mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;
                     };
                     return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;align-items:flex-end;">`
                         + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
@@ -1079,6 +1079,9 @@ register('pv', {
      * keeps the anchor's whole-cell fallback (anchors.js stepTemplateOf reads `hasStepState`).
      */
     hasStepState(p) { return !!p && p.kind === 'compare'; },
+    // Guided cell 1 of a lesson sheet is drawn at step 1 (P-LC-7; lesson-pages/we-do.js): the digit counts traced grey. Read
+    // only through stepTemplateOf, so only the compare item - the one kind with step states - takes it.
+    guidedStepOne: true,
     /** State k as a payload variant (`_marks`) and the answer's ink ('trace' | 'solid' | null): the Scripted Model draws it. */
     statePayload(p, steps, k) {
         const mk = {};
