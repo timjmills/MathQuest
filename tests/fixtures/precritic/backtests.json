@@ -3279,6 +3279,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "roles-keyjoin-frame",
+  "check": "a shared role writes ONE value a slot: a list answer one part a box, a sentence answer never on a write line (lf-roles; lf-algebra KEYJOIN 340 class)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit KEYJOIN-ROLE",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "24 findings: tf-ans / ri-ans hold the list and the sentence; EA splits the sentence into parts"
+  },
+  "pass": {
+   "commit": "aa200514",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-review-title",
+  "check": "a Review budgets its body under the title it prints, measured (growing_shape_patterns Review L body 1.3 mm over)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit REVIEW-TITLE",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "2 findings: topicOf drawing and count; titleLinesOf never asked"
+  },
+  "pass": {
+   "commit": "2a3ecb9c",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only REVIEW-TITLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-model-across",
+  "check": "a tall-state Scripted Model that needs 2 pages beside its text lays 2 + 2 on one page (fte Model M EB-BAND / EB-SIDE)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit MOD-ACROSS",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "1 finding: 2 pages"
+  },
+  "pass": {
+   "commit": "35c881b6",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-ACROSS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
