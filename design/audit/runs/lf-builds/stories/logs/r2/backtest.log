@@ -1,0 +1,76 @@
+ws-backtest row tf-eval-word-stories: PASS  fail state FAIL 4.1s, pass state OK 4.7s
+ws-backtest: max-number-band-word-stories (fail state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 24238 (up 353 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+    slot.2: pid 27904 (up 207 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-s4XYT6/jobs-3.json 
+    queue: pid 28971 (up 161 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 29934 (up 124 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-cell-checks
+    queue: pid 29936 (up 124 s) flock 10
+    queue: pid 31465 (up 70 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 31467 (up 70 s) flock 10
+    queue: pid 31913 (up 52 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill
+    queue: pid 31915 (up 52 s) flock 10
+    queue: pid 32157 (up 45 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-ink-size.cjs --skill composing:hundreds_chart_
+    queue: pid 32159 (up 45 s) flock 10
+    queue: pid 522 (up 13 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-s4XYT6/jobs-4.json 
+    queue: pid 524 (up 13 s) flock 10
+    queue: pid 921 (up 0 s) sleep 1
+ws-backtest: max-number-band-word-stories (pass state) has waited 120 s for a browser slot; holders:
+    queue: pid 2174 (up 157 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 2696 (up 136 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+    queue: pid 2698 (up 136 s) flock 10
+    slot.1: pid 31913 (up 258 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-empty-band.cjs --skill composing:hundreds_chart_fill
+    queue: pid 3382 (up 103 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 3384 (up 103 s) flock 10
+    queue: pid 4525 (up 24 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-cell-checks
+    queue: pid 4527 (up 24 s) flock 10
+    queue: pid 4949 (up 7 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --skills composing:hundre
+    queue: pid 4953 (up 7 s) flock 10
+    queue: pid 5212 (up 0 s) sleep 1
+    slot.2: pid 522 (up 218 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-matrix-s4XYT6/jobs-4.json 
+ws-backtest row max-number-band-word-stories: PASS  fail state FAIL 194.2s, pass state OK 170.6s
+ws-backtest row story-ladder-word-stories: PASS  fail state FAIL 1.0s, pass state OK 0.9s
+ws-backtest row vq-live-bands-word-stories: PASS  fail state FAIL 1.3s, pass state OK 1.4s
+ws-backtest: eb-guided-word-stories (fail state) has waited 120 s for a browser slot; holders:
+    queue: pid 10024 (up 0 s) sleep 1
+    slot.2: pid 2696 (up 354 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+    slot.1: pid 4525 (up 242 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-cell-checks
+    queue: pid 4949 (up 225 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --skills composing:hundre
+    queue: pid 5581 (up 202 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --size S --skills composi
+    queue: pid 5583 (up 202 s) flock 10
+    queue: pid 6219 (up 184 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GBidYb/jobs-0.jso
+    queue: pid 6220 (up 184 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GBidYb/jobs-1.jso
+    queue: pid 6222 (up 184 s) flock 10
+    queue: pid 6224 (up 184 s) flock 10
+    queue: pid 6625 (up 171 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 6627 (up 171 s) flock 10
+    queue: pid 7975 (up 123 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 7977 (up 123 s) flock 10
+ws-backtest: eb-guided-word-stories (pass state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 10050 (up 262 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+    slot.1: pid 11080 (up 235 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-cell-checks
+    queue: pid 11951 (up 196 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GBidYb/jobs-2.jso
+    queue: pid 12139 (up 193 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-GBidYb/jobs-3.jso
+    queue: pid 12141 (up 193 s) flock 10
+    queue: pid 12600 (up 178 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems,addition:add_word_problems_p
+    queue: pid 12602 (up 178 s) flock 10
+    queue: pid 13068 (up 152 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 13070 (up 152 s) flock 10
+    queue: pid 13313 (up 146 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-print-lint.cjs --source kit
+    queue: pid 13315 (up 146 s) flock 10
+    queue: pid 14103 (up 119 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S -
+    queue: pid 14105 (up 119 s) flock 10
+    queue: pid 14500 (up 106 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-grade-render.cjs --skills composing:hundreds_chart_fi
+    queue: pid 14502 (up 106 s) flock 10
+    queue: pid 16288 (up 1 s) sleep 1
+ws-backtest row eb-guided-word-stories: PASS  fail state FAIL 253.0s, pass state OK 262.4s
+ws-backtest: 5 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+tf-eval-word-stories        commit-pair  FAIL 4.1s           OK 4.7s             PASS
+max-number-band-word-storie commit-pair  FAIL 194.2s         OK 170.6s           PASS
+story-ladder-word-stories   commit-pair  FAIL 1.0s           OK 0.9s             PASS
+vq-live-bands-word-stories  commit-pair  FAIL 1.3s           OK 1.4s             PASS
+eb-guided-word-stories      commit-pair  FAIL 253.0s         OK 262.4s           PASS
+
+5 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 979.9 s
+ws-backtest: OK

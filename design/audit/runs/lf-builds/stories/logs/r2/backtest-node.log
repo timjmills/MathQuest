@@ -1,0 +1,9 @@
+ws-backtest: 3 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state      pass state      verdict
+tf-eval-word-stories        commit-pair  FAIL 6.1s       OK 5.7s         PASS
+story-ladder-word-stories   commit-pair  FAIL 1.3s       OK 1.3s         PASS
+vq-live-bands-word-stories  commit-pair  FAIL 1.5s       OK 1.6s         PASS
+
+3 PASS, 0 FAIL, 0 PENDING; 73.5 s
+ws-backtest: OK

@@ -1,0 +1,54 @@
+g3-oa8-two-step-wp: 28 pages -> tests/audit-runs/detailed/g3-oa8-two-step-wp
+   T1:teacher T2:teacher T2b:teacher T3:teacher T4:teacher T4-2:teacher T5:teacher P0:pupil P1:pupil P2:pupil P2b:pupil P3:pupil P3b:pupil P4-1:pupil P4-2:pupil P5:pupil P6:pupil P0-key:key P1-key:key P2-key:key P2b-key:key P3-key:key P3b-key:key P4-1-key:key P4-2-key:key P5-key:key P6-key:key T6:teacher
+   note: Exit slip: a group of items does not fit two across a 132.5 mm half; printed one across.
+   note: Tall problems: 2 rows per page. Very tall problems: fewer than 3 rows fit.
+E1    PASS 26 portrait + 2 landscape of 28; 28 pages in the DOM
+E1b   PASS P6: 132.5 / 132.5; P6-key: 132.5 / 132.5
+E2    PASS 700/28px true, 400/15px true; other faces 0
+E3    PASS paints #000000, #5b2a86, #949494, #c2410c, #ffffff; out of place 0
+E4    PASS pupil-page paints: #000000, #5b2a86, #949494, #ffffff
+E5    PASS 0 found
+E6    PASS smallest 12 pt (P0 "Name", P1 "Name")
+E7    PASS smallest 10 pt (T1 "#", T2 "#")
+E8    PASS the kit sets --ws-digit 28pt at size L on every pupil page (one size L pack); measured by ws-print-lint --source kit
+E9    PASS min 75 %; overflow none; under 50 %: none
+E9c   PASS T1 97, T2 93, T2b 91, T3 91, T4 98, T4-2 75, T5 92, T6 79; continued under 92 %: none
+E9b   PASS max 4 %; over 8 %: none
+E10   PASS 74 cells; min free 47 %; below 40 %: none
+E11   PASS worst 22 %; 52 top cells; failing: none
+E12   PASS all grids equal; Practice cells 4, spread 0.0 × 0.1 mm
+E13   PASS underscores 0
+E14   PASS 0 outside a cut line
+E15   PASS 20 instructions; failing: none; in the kit library but missing from V22 C.1: "Read the story. Write each step. Solve.", "Write how many of each place."
+E16c  PASS none
+E16   PASS 12 frames; blanks 0, 1
+E16b  PASS 12 rows; tallest 9 mm
+E17b  PASS P2: 0, P2b: 0, P2-key: 0, P2b-key: 0
+E17   PASS P0 20/20, P1 12/12, P2 0/0, P2b 0/0, P3 53/53, P3b 40/40, P4-1 49/49, P4-2 38/38, P5 15/15, P6 32/32
+E18   PASS © 28/28; tab 0/28
+E19   PASS I Can solve two-step stories
+E20   PASS none
+E21b  PASS T2 New rows 2 → Standard; T1 "Standard"
+E21   PASS 8 atoms: Fact, Category, Category, Conceptual, Category, Conceptual, Comparative, Category; ★ false
+E22   PASS T3: 1, T4: 2, T5: 1
+E23   PASS 4/4
+E24   PASS 29 places (29 numbers), usable pool 29 (pool 29 keys, 29 facts, recomputed from its list rule: matches; forbidden 0); repeats 0; chart examples or their turn-arounds returning 0; same-page turn-arounds 0; outside the pool / forbidden 0; items without a rep 0
+E24b  PASS 2 Practice pages: last rows all edge cases (8 edge numbers dealt); no twin answers on any page; near twins checked for one-number and + / − items (0 + / −: no first addend twice in a grid row, no number taken away twice, both numbers within 2); 6 × / ÷ items: 
+E31   PASS groups-then-change, share-then-change: modelled on P2, practised on P3–P6, assessed on P6
+E32   PASS 38 stories, every sentence on one line, at most 4 lines
+E33   PASS no Mixed page
+E34   PASS T2b /2, P6 2 items a half
+E35   PASS 5 questions, all printed or on the board; Practice 1 Steps band not printed
+E36   PASS no + exit items
+E37   PASS no tables
+E38   PASS none
+E40   PASS none
+E39   PASS 36 grids, none
+E30   PASS none declared: on no pupil page or key (20 pages)
+E29   PASS 13 quotes, all on their pages
+E41   PASS 0 statements, all true
+E28   PASS 4 Practice / Mixed pages; extra bands 0
+E27   PASS no counters
+E26   PASS P2 3 / 3 panels; P2b 3 / 3 panels
+E25   PASS 10 pupil pages, 10 keys
+ws-detailed-lesson: OK

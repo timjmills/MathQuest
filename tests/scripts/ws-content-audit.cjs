@@ -543,13 +543,14 @@ function sampleInPage({ categoryId, skillId, n, baseSeed, range, k2, pv, tm, opt
         return out;
     }
 
-    // MAX-NUMBER BAND (word-stories critic r1 F9, 2026-11-13): a skill whose `band` option offers "no limit" (null) and is
+    // MAX-NUMBER BAND (word-stories critic r1 F9, 2026-11-13): a skill whose `band` option offers "no limit (the Max Number)"
+    // (a null value whose label names the Max Number - "As dealt (to about 1,000)" is another promise) and is
     // dealt with it unset bounds its ANSWER by the Max Number - "No limit: the Max Number decides" (owner ruling 2026-09-19:
     // "within N" bounds the answer). The cap is read from the skill's own option schema, so it cannot rot.
     let maxNumCap = null;
     try {
         const bd = (typeof window.optionsFor === 'function' ? window.optionsFor(categoryId, skillId) || [] : []).find((d) => d && d.id === 'band');
-        if (bd && (bd.values || []).some((v) => v && v.v === null)) {
+        if (bd && (bd.values || []).some((v) => v && v.v === null && /max(imum)? number/i.test(String(v.l || '')))) {
             const cur = opts && Object.prototype.hasOwnProperty.call(opts, 'band') ? opts.band : bd.default;
             if (cur === null || cur === undefined) maxNumCap = Math.max(10, Number(range) || 100);
         }
