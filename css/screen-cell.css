@@ -752,6 +752,9 @@ html .mq-scell .mq-work-area .mq-work:focus { box-shadow: inset 0 0 0 3px #000 !
     font-size: var(--mq-text); line-height: 1.6; text-align: left; align-self: stretch; margin: 0 0 10px;
 }
 .mq-scell .mq-ibline .mq-cellbox { font-size: calc(var(--mq-digit) * 0.8); height: max(48px, 1.2em); }
+/* lf-placevalue live1: a number sentence (placevalue:expand) at the host's digit size, bold as on paper; an operator keeps its box */
+.mq-scell .mq-ibline.mq-ibnum { font-size: var(--mq-digit); font-weight: 700; line-height: 1.5; text-align: center; }
+.mq-scell .mq-ibline.mq-ibnum .mq-ibkeep { white-space: nowrap; }
 
 /* cloze twin: the equation, then the two lists in ink */
 .mq-scell .mq-cloze { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }

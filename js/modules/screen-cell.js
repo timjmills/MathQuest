@@ -2981,14 +2981,18 @@ export function cellSlot(w = 2, label = '', fixed = false) {
 }
 
 /** "This array shows ___ rows of ___." -> the sentence with one boxed slot per blank (SL-7). */
-export function inlineBlanksHTML(text, widths, fixed = false) {
+export function inlineBlanksHTML(text, widths, fixed = false, { numeric = false } = {}) {
     let i = 0;
-    const html = esc(plainText(text)).replace(/_{3,}/g, () => {
+    let html = esc(plainText(text)).replace(/_{3,}/g, () => {
         const w = widths && widths[i] ? Math.max(1, Math.min(4, widths[i] - 1)) : 3;
         i++;
         return cellSlot(w, '', fixed && !!(widths && widths[i - 1]));
     });
-    return i ? `<div class="mq-ibline">${html}</div>` : '';
+    // `numeric` (lf-placevalue live1, the lead via lf-hosts: placevalue:expand's "144 = [ ] + [ ] + [ ]" on the online worksheet
+    // was set at the sentence size, 18 px, under the 29 px digit floor): a number sentence is set at the host's digit size, bold
+    // as on paper, and each operator keeps its box on its line (ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP)
+    if (numeric) html = html.replace(/([+=\u2212\u00d7])\s*(<span class="mq-cellbox"[^>]*><\/span>)/g, '<span class="mq-ibkeep">$1 $2</span>');
+    return i ? `<div class="mq-ibline${numeric ? ' mq-ibnum' : ''}">${html}</div>` : '';
 }
 
 /**
@@ -3571,7 +3575,9 @@ export function screenTwin(q, { categoryId = '', typedOrder = false } = {}) {
     const t = q.answerType;
     if (t === 'inline-blanks' && /_{3,}/.test(String(q.text || ''))) {
         const widths = q.inlineBlanksData && q.inlineBlanksData.cellWidths;
-        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth)) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
+        // (a place-value expanded form - the paper's pv `expand` cell - is a number sentence: set at the digit size)
+        const numeric = !!(q.cell && q.cell.payload && q.cell.payload.kind === 'expand');
+        return { mode: 'slots', html: inlineBlanksHTML(q.text, widths, !!(q.inlineBlanksData && q.inlineBlanksData.fixedWidth), { numeric }) + (q.visual || ''), instr: q.screenInstr || printInstructionFor(q, categoryId) || 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
     }
     if (t === 'inline-cloze' && /_{3,}/.test(String(q.text || ''))) {
         return { mode: 'slots', html: clozeHTML(q), instr: 'Solve.', count: (String(q.text).match(/_{3,}/g) || []).length };
