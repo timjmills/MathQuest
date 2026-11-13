@@ -1134,6 +1134,12 @@ function framesLayout(p, ctx) {
     const pt = digitPt(ctx);
     const two = p.steps.length > 1;
     const lastI = p.steps.length - 1;
+    // (lf-roles r9 RI-DISTINCT, two-step round 3b: a worked-WRONG frames cell - Reason It's A or B, Error analysis, True or
+    // False? - draws the work it is shown, as the column layout does: shownSteps' signs and numbers, and the shown value in
+    // the answer box (n = on the letter equation); it drew the model's work in both panels and ignored the wrong value)
+    const sh = put ? shownSteps(p, ctx) : null;
+    const S = sh ? sh.steps : p.steps;
+    const shownAns = sh ? sh.ans : String(p.ans);
     const face = (w, heavy) => `display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:${tw(ctx, w)};height:${tw(ctx, bx)};border:${B(ctx, heavy ? 1.5 : 1)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, pt)};font-weight:700;line-height:1;color:${col};text-align:center;${KEY_FEATURES}`;
     // one number box; on screen an input as wide as its number (the answer: the host's own cell, `data-mq-cell`)
     const box = (id, v, digits, graded = false, heavy = false) => {
@@ -1151,10 +1157,11 @@ function framesLayout(p, ctx) {
     const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
     const row = (html) => `<div class="mq-wwframe" style="display:flex;align-items:center;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.2)};">${html}</div>`;
     let rows;
+    let nRow = '';
     const parts = {};
     if (p.letter) {
         // msLetter (3.OA.D.8): the whole story as ONE equation with a letter, then the letter's value
-        const [s1, s2] = p.steps;
+        const [s1, s2] = S;
         const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
         const brk = two && (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
         // (two-step card decision 7: the EQUATION is a graded answer of its own - both signs and the three numbers, one
@@ -1162,13 +1169,16 @@ function framesLayout(p, ctx) {
         const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length, false, true)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length, false, true)}`;
         const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length, false, true)}` : first;
         const eqGroup = twin ? `<span data-mq-part="equation" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
-        parts.eq = row(eqGroup); parts.n = row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+        nRow = `${sym('n')}${sym('=')}${box('answer', shownAns, Math.max(String(p.ans).length, shownAns.length), true, true)}`;
+        parts.eq = row(eqGroup); parts.n = row(nRow);
         rows = parts.eq + parts.n;
     } else {
-        rows = p.steps.map((st, i) => {
+        rows = S.map((st, i) => {
             const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
             const r = st.op === '/' ? st.q : st.ans;
-            const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
+            const t = p.steps[i] ? (p.steps[i].op === '/' ? p.steps[i].q : p.steps[i].ans) : r;
+            // (a box holds the number written in it - KEYFIT: a wrong 152 in a box sized for 99 ran past it)
+            const res = i === lastI ? box('answer', shownAns, Math.max(String(t).length, shownAns.length), true, true) : box(`fr${i}-r`, String(r), Math.max(String(t).length, String(r).length));
             return row(`${two ? cap(`Step ${i + 1}:`) : ''}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${sym('=')}${res}`);
         }).join('');
         parts.steps = rows;
@@ -1182,9 +1192,12 @@ function framesLayout(p, ctx) {
             : box('es-r', v, d, false, true).replace(' data-ws-graded="0"', ''));
         const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
             + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${esBox(String(c.est), String(c.est).length)}`);
+        // (the ring judges the SHOWN answer: within the rounding error - 5 for each number rounded to the nearest ten - is
+        // close; a worked-wrong answer far from the estimate rings No, the estimate check this skill teaches)
+        const close = Math.abs(Number(shownAns) - c.est) <= 5 * (two ? 3 : 2);
         const ring = (w) => (twin
             ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
-            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
+            : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === (close ? 'Yes' : 'No') ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
         parts.est = est; parts.ok = row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
         rows += parts.est + parts.ok;
     }
@@ -1197,16 +1210,19 @@ function framesLayout(p, ctx) {
     }
     // (the two-step bar model on the teaching cells and with wpBar, above the sentences; the middle question over Step 1)
     if (two && !p.letter) { const mq = midQuestion(p, ctx); if (mq) rows = mq + rows; }
+    // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
+    let unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
+    // (two-step round 3b: on paper the letter equation's unit word sits in the n = row - "n = [2] crayons" - not beside the
+    // whole work column, where it ran past a Reason It panel's edge by the equation row's width)
+    if (p.letter && !twin && unit && nRow) { rows = parts.eq + row(nRow + unit); unit = ''; }
     // (lf-hosts 2026-11-13, ws-phone-card CLIP-X: on screen the work column may shrink to the cell, so its rows wrap at 390 px
     // instead of running 18-34 px past the phone's edge; paper keeps its one-line rows)
     const work = `<div style="${twin ? 'flex:1 1 auto;min-width:0;' : 'flex:none;'}display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
     const tsBar = two ? twoStepBarFor(p, ctx) : '';
-    // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
-    const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
     // (the story starts level with the item tab, in a gutter beside it - the frames cell takes no tab spacer, CSS
     // .mq-wwframes in sheet-kit.css: lesson 7 r2, the exit slip half overflowed by 8 mm and content never shrinks)
     return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
-        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;flex-wrap:wrap;gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
 /**
