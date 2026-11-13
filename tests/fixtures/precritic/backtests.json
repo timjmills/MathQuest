@@ -3628,13 +3628,13 @@
   "browser": true,
   "fail": {
    "commit": "55e7d0f2f",
-   "state": "6 findings: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+   "state": "6 findings, over the pin of 4: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
   },
   "pass": {
-   "commit": "fcbf82424",
-   "state": "0 findings: the stacks in their own columns, 5 at S (37 mm cells)"
+   "commit": "4e2e4c988",
+   "state": "4 findings, within the pin (master's 4 x 46 mm cells, 30 %): the stacks in their own 4 columns"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --no-baseline --opts '{\"support\":[\"array\"]}'",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --opts '{\"support\":[\"array\"]}'",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

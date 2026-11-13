@@ -127,17 +127,7 @@ function geometry(pools, input) {
     const wrap = stripExtraMm(ctx, '', instructionText(instructionKeyOf(main, input.skills), main))
         + (earlier.length ? stripExtraMm(ctx, 'Mixed Review:', instructionText(instructionKeyOf(earlier, input.skills), earlier)) : 0);
     const M = sectionFit(main, ctx);
-    // lf-ops r-review (RUBRIC H13 across the cell): the earlier step's STATIC-width problems (stacks) - their widest one.
-    const eStatic = earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
-    const eWMax = eStatic ? Math.max(...earlier.map((it) => it.footprint.wMm)) : 0;
-    const eSide = (c) => (eStatic ? (1 - Math.min(1, eWMax / cellWidthMm(c, LIVE_W_MM, ctx.look).inner)) / 2 : 0);
-    let E = sectionFit(earlier, ctx);
-    // ... at S they take a 5th column when 4 leave a quarter of each cell empty on each side (as layout.js does for the
-    // Independent page, L1: two-digit stacks at S, 46 mm cells round 34 mm of ink, 30 % beside it)
-    if (eStatic && ctx.size === 'S' && E.cols === AUTO_COLS.S && eSide(E.cols) >= 0.125 && fitsAt(earlier, 5, ctx)) {
-        const h5 = hMinAt(earlier, 5, ctx);
-        if (Number.isFinite(h5) && h5 > 0) E = { cols: 5, h: h5 };
-    }
+    const E = sectionFit(earlier, ctx);
     const ceil = CEILING[ctx.size];
     // The earlier band may print fewer columns than it could, so a WHOLE row of it keeps the share
     // under 45% (a disks Review of three full-width charts takes a mixed row of 2, not 3).
@@ -164,6 +154,8 @@ function geometry(pools, input) {
     // when fewer would only widen the cell round the same ink - mult_facts array Review S took the mixed band from 4 to 3
     // columns to fit a second row under the 45 % share, and every "47 - 6" stack sat in a 61.5 mm cell with a 19.7 mm
     // empty band (32 %). A narrower column count stays open while the widest problem still fills 70 % of the cell.
+    const eStatic = earlier.length > 0 && earlier.every((it) => { const fp = it && it.footprint; return !!fp && !fp.measure && !fp.factLike && !it.scalesWithCols && Number.isFinite(fp.wMm); });
+    const eWMax = eStatic ? Math.max(...earlier.map((it) => it.footprint.wMm)) : 0;
     const widens = (c) => eStatic && c < E.cols && eWMax < 0.7 * cellWidthMm(c, LIVE_W_MM, ctx.look).inner;
     if (!split) for (let c = E.cols; c >= (oneColOk ? 1 : 2); c--) if (!widens(c)) eOpts.push({ c, h: c === E.cols ? E.h : hMinAt(earlier, c, ctx), hw: 0, nMax: Infinity, wMax: 0 });
     const availOf = (kindBands) => m.body - 2 - (bands + kindBands - 1) * m.strip - wrap;
