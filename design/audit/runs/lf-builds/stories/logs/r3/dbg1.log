@@ -1,0 +1,1 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_wp_compare_smaller,addition:add_wp_change_unknown --roles independent,guided,scripted-model,mixed-practice,error-analysis --size S,M,L --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg1  [f8afbb142]

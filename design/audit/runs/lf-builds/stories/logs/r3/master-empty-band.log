@@ -1,0 +1,64 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain --json /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/master/eb.json  [1db0e3309]
+note: addition:add_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 7 + hosts card, worksheet, quiz
+note: addition:add_word_problems card 390: no kit cell on the host (legacy screen item?)
+note: addition:add_word_problems card 820: no kit cell on the host (legacy screen item?)
+note: addition:add_word_problems card 1280: no kit cell on the host (legacy screen item?)
+note: addition:add_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 6 + hosts card, worksheet, quiz
+note: addition:add_word_problems_plain card 390: no kit cell on the host (legacy screen item?)
+note: addition:add_word_problems_plain card 820: no kit cell on the host (legacy screen item?)
+note: addition:add_word_problems_plain card 1280: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 10 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems card 390: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems card 820: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems card 1280: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems_plain card 390: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems_plain card 820: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_word_problems_plain card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  FAIL 157
+   addition:add_word_problems independent M p1 cell 1: empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]
+   addition:add_word_problems independent M p1 cell 3: empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]
+   addition:add_word_problems more-practice M p1 cell 1: empty band 34.6 mm under the ink of a 109.3 mm cell (31.7 %; limit 30 % = 32.8 mm) [word-work]
+   addition:add_word_problems more-practice M p1 cell 2: empty band 34.6 mm under the ink of a 109.3 mm cell (31.7 %; limit 30 % = 32.8 mm) [word-work]
+   addition:add_word_problems more-practice M p1 cell 4: empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]
+   addition:add_word_problems test M p1 cell 1: empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]
+   addition:add_word_problems test M p1 cell 3: empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]
+   addition:add_word_problems lesson L p2 cell 4: empty band 43.2 mm under the ink of a 123.9 mm cell (34.9 %; limit 30 % = 37.2 mm) [word-work]
+   addition:add_word_problems scripted-model S p1 cell 2: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model S p1 cell 4: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model S p1 cell 6: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model S p2 cell 2: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model S p2 cell 4: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model S p2 cell 6: empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []
+   addition:add_word_problems scripted-model M p1 cell 2: empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []
+   ... 142 more
+EB-SIDE  FAIL 33
+   addition:add_word_problems lesson S p2 cell 4: empty band 37.2 mm beside the ink of a 122.9 mm wide cell (32 %) [word-work]
+   addition:add_word_problems lesson M p2 cell 4: empty band 37.2 mm beside the ink of a 122.9 mm wide cell (32 %) [word-work]
+   addition:add_word_problems scripted-model S p1 cell 2: empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   addition:add_word_problems scripted-model S p1 cell 6: empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []
+   addition:add_word_problems scripted-model S p2 cell 4: empty band 51 mm beside the ink of a 92.3 mm wide cell (59 %) []
+   addition:add_word_problems scripted-model M p2 cell 2: empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []
+   addition:add_word_problems scripted-model M p3 cell 2: empty band 46.3 mm beside the ink of a 92.3 mm wide cell (54 %) []
+   addition:add_word_problems scripted-model L p2 cell 2: empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []
+   addition:add_word_problems scripted-model L p3 cell 2: empty band 41.6 mm beside the ink of a 92.3 mm wide cell (48 %) []
+   addition:add_word_problems_plain lesson S p2 cell 7: empty band 37.2 mm beside the ink of a 122.9 mm wide cell (32 %) [word-work]
+   addition:add_word_problems_plain lesson M p2 cell 7: empty band 37.2 mm beside the ink of a 122.9 mm wide cell (32 %) [word-work]
+   addition:add_word_problems_plain lesson L p2 cell 1: empty band 43.5 mm beside the ink of a 137.6 mm wide cell (33 %) [word-work]
+   addition:add_word_problems_plain scripted-model S p1 cell 2: empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   addition:add_word_problems_plain scripted-model S p1 cell 6: empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []
+   addition:add_word_problems_plain scripted-model S p2 cell 4: empty band 51 mm beside the ink of a 92.3 mm wide cell (59 %) []
+   ... 18 more
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(4 skill(s), 224 renders, 1099 cells, 531 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (190)
+exit 1
