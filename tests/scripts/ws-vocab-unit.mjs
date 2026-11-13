@@ -118,6 +118,14 @@ const deal = (skill, opts, n, seed) => {
     for (let i = 0; i < n; i++) out.push(app.gq.generateQuestionFor({ category: 'vocabulary', skill, opts, seed: seed + i, itemIndex: i, itemCount: n }));
     return out;
 };
+// (--only with r16's browser checks alone: straight to the browser, so a backtest row can judge an older tree whose node-phase
+// data the later checks no longer read - e.g. V18M on the tree before Match 3's evenRows)
+if (ONLY && process.argv.includes('--browser') && ONLY.every((k) => r16List().includes(k) && k !== 'V18')) {
+    await browserChecks();
+    for (const f of fails.slice(0, Number(process.env.VOCAB_SHOW) || 40)) console.log(`  - ${f}`);
+    console.log(`ws-vocab-unit: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
+    process.exit(fails.length ? 1 : 0);
+}
 const runs = [];
 for (const g of W.VOCAB_GRADES) runs.push({ opts: { vocabGrade: g } });
 W.VOCAB_SETS.forEach((_, i) => runs.push({ opts: { vocabSet: i } }));
