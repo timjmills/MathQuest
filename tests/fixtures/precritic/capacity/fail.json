@@ -1,0 +1,13 @@
+{
+ "note": "fixture: the pin says one more item than the page prints (a drop)",
+ "pages": {
+  "placevalue:unit_form reason-it S": {
+   "items": 5,
+   "pages": 1
+  },
+  "patterns:none x S": {
+   "items": 1,
+   "pages": 1
+  }
+ }
+}
