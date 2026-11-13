@@ -108,10 +108,14 @@ register('words', {
         // Model, the Scripted Model's last row and the opener's Model cells printed an EMPTY answer line)
         const key = ctx.state === 'answered' || ctx.state === 'traced' ? keyOf(p) : null;
         if (toWords(p)) {
-            const line = blank({ id: 'answer', kind: 'text', shape: 'line', widthMm: ctx.size === 'S' ? 70 : ctx.size === 'M' ? 85 : 100, graded: true }, ctx, key);
-            return `<div class="ws-words" data-ws-words="to_words" style="display:flex;flex-direction:column;align-items:center;gap:2mm;">`
+            // (critic live1 r2 N7: the L line is 100 mm, and the Opener's half-width Model cell is narrower - the line ran out of the
+            // cell into the Steps column. The line keeps its width where the cell has it and never leaves the cell; a name longer
+            // than the line wraps on it at its own size, never smaller)
+            const line = blank({ id: 'answer', kind: 'text', shape: 'line', widthMm: ctx.size === 'S' ? 70 : ctx.size === 'M' ? 85 : 100, graded: true }, ctx, key)
+                .replace('style="--w:', 'style="max-width:100%;box-sizing:border-box;min-height:var(--ws-hw);height:auto;overflow-wrap:break-word;--w:');
+            return `<div class="ws-words" data-ws-words="to_words" style="display:flex;flex-direction:column;align-items:center;gap:2mm;max-width:100%;">`
                 + `<span style="font-size:${pt(digitPt)};font-weight:700;line-height:1.1;">${esc(Number(p.n).toLocaleString('en-US'))}</span>`
-                + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;">${line}</span></div>`;
+                + `<span style="font-size:${pt(textPt + 4)};line-height:1.2;display:block;max-width:100%;text-align:center;">${line}</span></div>`;
         }
         if (p.slot === 'hto') {
             // (critic nwf r1 N2: a True or False? / Reason It / error-analysis cell draws the CLAIM in state `wrong`; the boxes read

@@ -1292,24 +1292,49 @@ const NUMBER_TO_WORDS = { iCan: 'I Can write a number in words', instructionKey:
 // its steps read the tens word, then the ones word)
 const WORDS_TO_NUMBER_2 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'Read the ones word.', 'Write the digits.'] });
 // (lf-roles critic r8b D4: "eleven" sat on a Guided page whose Steps read "the tens word, the ones word" - a teen, a tens word
-// alone ("forty") and a one-word name under ten are each their own kind of problem, with Steps that fit them. Their own Steps
-// also make them their own kind to the Guided page (guided.js kindOf), which keeps one kind: PT 2.3, GUIDED-ONE-KIND.)
-const WORDS_TO_NUMBER_TEEN = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Eleven to nineteen: 1 ten.', 'Find the ones in the word.', 'Write 1, then the ones.'] });
-const WORDS_TO_NUMBER_TENS = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'No ones word? Write 0 ones.', 'Write the digits.'] });
-const WORDS_TO_NUMBER_1 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the word.', 'Write its digit.'] });
-/** The kind of a words-to-numeral name: one word under ten, a teen, a tens word alone, two words (tens and ones), 100 and up. */
-export const wordsKind = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
-const WORDS_STRINGS = { 'one-word': WORDS_TO_NUMBER_1, teen: WORDS_TO_NUMBER_TEEN, decade: WORDS_TO_NUMBER_TENS, 'two-word': WORDS_TO_NUMBER_2 };
+// alone ("forty") and a one-word name are each their own kind of problem, with Steps that fit them. Their own Steps also make
+// them their own kind to every role that sets a Model / Steps over items (compose.js stepsKindOf): PT 2.3, GUIDED-ONE-KIND.)
+// (round-cap r3, critic live1 r2 N3 / N6: the teen Steps "Find the ones in the word." were dealt over ELEVEN and TWELVE, which
+// have no ones word - a pupil who follows the Steps cannot read them. 11 and 12 are their OWN kind, with Steps that name them:
+// they are learnt as whole words, and the "1 ten and the ones" Steps teach 13-19 truly only when the irregular two are not in
+// the set (CLAUDE.md "teen numbers shouldn't include 11/12"). Rewriting the teen Steps to fit 11-19 would make them say "learn
+// the word" for all seven, and drop the one regularity 13-19 have. 0 and one to ten are one kind: each is one word of its own -
+// "ten" is a single word to learn, not a tens word with 0 ones.)
+// Each kind also carries the lesson's `remember` (a one-line concept) and the answer-slot `lessonRule`: the lesson role prints them
+// in place of its routine's own where the routine asks (`ruleFromItems`), so a Rule / Remember line names only what the page
+// deals (critic live1 r2 N6: "Every box gets a digit." over words on a line, "the hundreds" over two-digit numbers).
+const WORDS_TO_NUMBER_TEEN = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Thirteen to nineteen: 1 ten.', 'Find the ones in the word.', 'Write 1, then the ones.'], remember: 'A teen word is 1 ten and some ones.' });
+const WORDS_TO_NUMBER_11_12 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Eleven and twelve: 1 ten.', 'Eleven: 1 one. Twelve: 2 ones.', 'Write 1, then the ones.'], remember: 'Eleven and twelve are special words: learn them.' });
+const WORDS_TO_NUMBER_TENS = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the tens word.', 'No ones word? Write 0 ones.', 'Write the digits.'], remember: 'A tens word alone has 0 ones.' });
+const WORDS_TO_NUMBER_1 = Object.assign({}, WORDS_TO_NUMBER, { steps: ['Read the word.', 'Write its number.'], remember: 'Zero to ten: each number has its own word.' });
+WORDS_TO_NUMBER_2.remember = 'Read the tens word, then the ones word.';
+WORDS_TO_NUMBER.remember = 'A number name says the hundreds, then the rest.';
+/** The kind of a number name: 0-10 one word each, 11 / 12, 13-19, a tens word alone, two words (tens and ones), 100 and up. */
+export const wordsKind = (n) => (n <= 10 ? 'one-word' : n <= 12 ? 'teen-irregular' : n < 20 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
+const WORDS_STRINGS = { 'one-word': WORDS_TO_NUMBER_1, 'teen-irregular': WORDS_TO_NUMBER_11_12, teen: WORDS_TO_NUMBER_TEEN, decade: WORDS_TO_NUMBER_TENS, 'two-word': WORDS_TO_NUMBER_2 };
 // numeral to words, one string set a kind (critic live1 N2: the hundreds Steps over two-digit numbers)
 const TO_WORDS_STRINGS = {
-    'one-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its word.'] }),
-    teen: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Eleven to nineteen: one word.', 'Write the teen word.'] }),
-    decade: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'No ones? Write the tens word alone.'] }),
-    'two-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'Say the ones word.', 'Write them with a dash.'] }),
+    'one-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its word.'], remember: 'Zero to ten: each number has its own word.' }),
+    'teen-irregular': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Eleven and twelve: say the word.', 'Write the word.'], remember: 'Eleven and twelve are special words: learn them.' }),
+    teen: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Thirteen to nineteen: one word.', 'Write the teen word.'], remember: 'Thirteen to nineteen end in teen.' }),
+    decade: Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'No ones? Write the tens word alone.'], remember: 'A tens number is one word.' }),
+    'two-word': Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the tens word.', 'Say the ones word.', 'Write them with a dash.'], remember: 'Write the tens word, a dash, then the ones word.' }),
 };
-// ("numbers to 20" numeral to words: every name from zero to twenty is ONE word, so one Steps set fits every item of the page -
-// its kinds need not be dealt apart; critic live1 N3 on the band-20 Opener)
-const TO_WORDS_UPTO20 = Object.assign({}, NUMBER_TO_WORDS, { steps: ['Say the number.', 'Write its name: one word up to twenty.'] });
+NUMBER_TO_WORDS.remember = 'Say the hundreds, then the rest.';
+// (critic live1 N3: "numbers to 20" numeral to words once printed ONE Steps set over every name 0-20; round-cap r3 deals those
+// names by kind too - the Model's worked steps ("16: 1 ten, 6 ones.") never fit a Guided 3 - so the band takes the kinds' Steps)
+const WORDS_RULED = new Map();   // (one def a kind and slot shape: stringsBy caches its strings by the def)
+/** The strings of one number-name item: its kind's Steps and Remember line, and the boxes' Rule where it has boxes. */
+function wordsStringsOf(q) {
+    const p = pvOf(q);
+    const n = Number(p.n);
+    const hto = !!(q && q.cell && q.cell.payload && q.cell.payload.slot === 'hto');
+    const base = p.way === 'to_words' ? (n < 100 ? TO_WORDS_STRINGS[wordsKind(n)] : NUMBER_TO_WORDS) : n < 100 ? WORDS_STRINGS[wordsKind(n)] : WORDS_TO_NUMBER;
+    if (!base) return null;
+    const boxed = hto && p.way !== 'to_words';
+    if (!WORDS_RULED.has(base)) WORDS_RULED.set(base, [Object.assign({}, base, { lessonRule: '' }), Object.assign({}, base, { lessonRule: 'Every box gets a digit.' })]);
+    return WORDS_RULED.get(base)[boxed ? 1 : 0];
+}
 const swapTeen = (n) => { const t = Math.floor(n / 10) % 10, o = n % 10; return t === 1 && o > 2 ? n - 10 - o + o * 10 : null; };
 
 /** Every named wrong answer of a words-to-numeral item (`fits`: in H T O boxes, the claim has the boxes' digit count). */
@@ -1341,7 +1366,7 @@ function wordsWrongs(q) {
 }
 
 registerSkill('composing:number_word_form', {
-    strings: stringsBy((q) => (pvOf(q).way === 'to_words' ? (q.cell && q.cell.payload && q.cell.payload.pool === 20 ? TO_WORDS_UPTO20 : Number(pvOf(q).n) < 100 ? TO_WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : NUMBER_TO_WORDS) : Number(pvOf(q).n) < 100 ? WORDS_STRINGS[wordsKind(Number(pvOf(q).n))] : null), WORDS_TO_NUMBER),
+    strings: stringsBy(wordsStringsOf, WORDS_TO_NUMBER),
     misconceptions: ['M-Z1', 'M-V9', 'M-L3'],
     workedSteps: (q) => {
         const p = pvOf(q);

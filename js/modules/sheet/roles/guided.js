@@ -35,7 +35,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, stepsHtml, assemble, poolItems, answerOf, stringsOf, labelStyleOf, opOf, operandsOf,
-    providerWorkedSteps, esc, stripExtraMm, factRows,
+    providerWorkedSteps, esc, stripExtraMm, factRows, stepsKindOf,
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
@@ -201,7 +201,9 @@ const kindOf = (it) => {
     // band that only fits the first (critic guided-r1, nl_sub).
     const q = (it && it.q) || {};
     const missing = q.missing === undefined || q.missing === null ? '' : JSON.stringify(q.missing);
-    return `${(it && it.template) || ''}:${p.kind || ''}:${missing}:${(own.length ? own : generalStepsOf(it)).join('|')}`;
+    // (the provider's Steps for this question are the shared kind rule, compose.js stepsKindOf - round-cap r3: the opener and
+    // the lesson's We Do take the same one)
+    return `${(it && it.template) || ''}:${p.kind || ''}:${missing}:${own.length ? stepsKindOf(it) : generalStepsOf(it).join('|')}`;
 };
 
 export function pageSet(items0, ctx, kind = null, input = null, fixedCols = 0, facts = factRows(input)) {

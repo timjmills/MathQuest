@@ -17,7 +17,7 @@
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, bestCols, planItem, gridPart,
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
-    poolItems, answerOf, labelStyleOf, stripExtraMm,
+    poolItems, answerOf, labelStyleOf, stripExtraMm, oneKindFirst, stepsKindOf,
 } from './compose.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
@@ -139,26 +139,13 @@ export function counts(pools, input) {
     // a count-row page asks for the most it could hold (2 Guided rows, 2 Independent rows); the plan places what fits
     // (critic r5 N13: and one spare row more, so a taller row can be left out without the page coming up short)
     if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 5 * g.gc };
-    return { main: needOf(g) };
+    // (round-cap r3, critic live1 r2 N3: a mixed-kind deal asks for two rows more, so the Model's kind fills its Guided rows
+    // from the deal - plan() takes them first and leaves the rest unplaced)
+    return { main: needOf(g) + (mixedKinds(probe) ? 2 * g.gc : 0) };
 }
 
-/**
- * PT 2.3 on the Opener (lf-placevalue critic live1 N3): the Model and its Guided band are one kind of problem - the items whose
- * Steps are the same. The pool is reordered, stably, so the kind it deals most comes first (ties: the kind dealt first): the
- * Model, the Steps band (read off the first item) and the Guided band take it, and the other kinds go to the Independent band.
- * A pool of one kind - every skill but a mixed-kind one such as number_word_form at "numbers to 20" - is returned as it was.
- */
-function oneKindFirst(pool) {
-    if (!Array.isArray(pool) || pool.length < 3) return pool;
-    const key = (it) => { try { return JSON.stringify((stringsOf(it) || {}).steps || null); } catch (e) { return ''; } };
-    const keys = pool.map(key);
-    if (new Set(keys).size < 2) return pool;
-    const n = new Map();
-    keys.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
-    let top = keys[0];
-    for (const [k, c] of n) if (c > n.get(top)) top = k;
-    return [...pool.filter((_, i) => keys[i] === top), ...pool.filter((_, i) => keys[i] !== top)];
-}
+/** A pool whose items are of more than one kind (compose.js stepsKindOf): number_word_form's names by kind, a mixed pool. */
+const mixedKinds = (pool) => Array.isArray(pool) && new Set(pool.map(stepsKindOf)).size > 1;
 
 export function plan(input = {}) {
     const fit = bestGeometry(oneKindFirst(poolItems(input, 'main')), input);
@@ -169,9 +156,19 @@ export function plan(input = {}) {
     // critic r4 N12: when the deal comes up short of the plan, the Independent rows are filled before the second Guided row
     // (PT-OPN-7 rows are scored; the second Guided row only fills a page that would otherwise end in a blank band)
     const rest = items.slice(nModel);
-    const guided1 = rest.slice(0, g.gc);
-    const indep = rest.slice(g.gc, g.gc + g.iRows * g.gc);
-    const guided = guided1.concat(g.gRows > 1 ? rest.slice(g.gc + indep.length, g.gc + indep.length + g.gc) : []);
+    let guided1 = rest.slice(0, g.gc);
+    let indep = rest.slice(g.gc, g.gc + g.iRows * g.gc);
+    let guided = guided1.concat(g.gRows > 1 ? rest.slice(g.gc + indep.length, g.gc + indep.length + g.gc) : []);
+    // PT 2.3 (round-cap r3, critic live1 r2 N3): the Guided band is the Model's kind - the items whose Steps are the Model's
+    // Steps (compose.js oneKindFirst, the shared rule); the other kinds go to the Independent band. A one-kind pool is as before.
+    if (mixedKinds(items)) {
+        const want = g.gc * g.gRows;
+        const all = oneKindFirst(rest, models[0]).slice(0, want);
+        const left = rest.filter((it) => !all.includes(it));
+        guided1 = all.slice(0, g.gc);
+        indep = left.slice(0, g.iRows * g.gc);
+        guided = guided1.concat(g.gRows > 1 ? all.slice(g.gc) : []);
+    }
     const lesson = Math.max(1, Number(input.lesson) || 1);
     const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);

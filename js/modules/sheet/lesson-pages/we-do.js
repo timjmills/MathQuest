@@ -6,7 +6,7 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc } from '../roles/compose.js';
+import { planItem, gridPart, instructionText, instructionKeyOf, answerOf, operandsOf, opOf, esc, oneKindFirst } from '../roles/compose.js';
 import { resolveCtx } from '../index.js';
 import { workedStepsOf, stepTemplateOf } from '../anchors.js';
 import { dotTile, countCueOf, countCueRow } from '../roles/guided.js';
@@ -84,6 +84,10 @@ export function pickWeDo(items, example, data, n, others = []) {
         for (const it of order) if (f(it) !== f(example) && !lead.some((x) => f(x) === f(it))) lead.push(it);
         order = [...lead, ...order.filter((it) => !lead.includes(it))];
     }
+    // PT 2.3 (round-cap r3, lf-placevalue critic live1 r2 N6): the Guided cells are the example's kind - the items whose Steps
+    // are the example's Steps (compose.js oneKindFirst, the rule the Opener and the Guided page share); every other kind comes
+    // after them, so it is dealt only when the pool has too few of the example's. A one-kind pool keeps its order.
+    order = oneKindFirst(order, example);
     // Lessons r1: a Guided set is varied - no two with the same answer, at most one "make 10"
     // (a fact whose answer is the band's top), and the big number on both sides where the pool
     // has it (the chart models both).
