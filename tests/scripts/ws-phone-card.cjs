@@ -28,6 +28,7 @@
 //   TOUCH-TARGET every visible typed answer place (input, textarea) has a touch box (its border box, padding included) of
 //             >= 48 x 48 px, an optional working box (carry, regroup, working row) >= 44 x 44 (lf-checks queue 10; word-stories
 //             critic F3: the card's column inputs were 40 x 44 px at 390). The drawn box may be smaller (transparent padding).
+//   --only RULE[,RULE] judge only these rules (a backtest row runs the rule it proves; e.g. --only TOUCH-TARGET)
 //   --hosts card,worksheet,quiz (default all three): the online worksheet (3 cards) and the quiz (2 questions) are rendered
 //             once per skill and width as well, and judged on CELL-READ and TOUCH-TARGET (CLIP-X / FOCUS are the card's).
 // Every finding names the skill, size, item and the element. Page errors raised while a skill rendered are its own.
@@ -52,6 +53,8 @@ const has = (k) => argv.includes('--' + k);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const say = (...a) => console.log(...a);
 let HOSTS = ['card', 'worksheet', 'quiz'];
+let ONLY = [];
+const keep = (m) => { if (ONLY.length && m && m.findings) m.findings = m.findings.filter((f) => ONLY.includes(f.rule)); return m; };
 const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
 /* In the page: the checks. Pure DOM, so the self-test runs it on a fixture page too. */
@@ -301,7 +304,7 @@ async function selfTest() {
 
 async function main() {
     if (has('self-test')) return selfTest();
-    const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts']);
+    const VALUE = new Set(['skills', 'sizes', 'items', 'shots', 'json', 'siblings-file', 'sibling-items', 'hosts', 'only']);
     const BOOL = new Set(['report-only', 'self-test', 'no-siblings-check']);
     for (let i = 0; i < argv.length; i++) {
         const m = /^--([a-z-]+)$/.exec(argv[i]);
@@ -313,6 +316,8 @@ async function main() {
     const sizes = String(arg('sizes', '390x844,390x664')).split(',').map((s) => { const m = /^(\d+)x(\d+)$/.exec(s.trim()); return m ? { w: +m[1], h: +m[2] } : null; });
     if (sizes.some((s) => !s)) { say(`${TOOL}: --sizes takes WxH,...`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const ITEMS = Math.max(1, +arg('items', '3'));
+    // --only R1,R2 (a backtest row runs the rule it proves): findings of other rules are dropped
+    ONLY = String(arg('only', '')).split(',').map((r) => r.trim()).filter(Boolean);
     HOSTS = String(arg('hosts', 'card,worksheet,quiz')).split(',').map((h) => h.trim()).filter(Boolean);
     if (!HOSTS.includes('card') || HOSTS.some((h) => !['card', 'worksheet', 'quiz'].includes(h))) { say(`${TOOL}: --hosts takes card plus worksheet and / or quiz`); say(`${TOOL}: FAIL - usage`); process.exit(2); }
     const SHOTS = arg('shots', null);
@@ -356,7 +361,7 @@ async function main() {
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await sleep(400);
                         await page.evaluate(`window.TARGETS = ${TARGETS}`);
-                        m = await page.evaluate(PROBE);
+                        m = keep(await page.evaluate(PROBE));
                         if (m.error) throw new Error(m.error);
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
@@ -392,7 +397,7 @@ async function main() {
                         try { await page.waitForFunction(() => document.fonts.status === 'loaded', { timeout: 8000 }); } catch (e) { /* measured anyway */ }
                         await sleep(900);
                         await page.evaluate(`window.TARGETS = ${TARGETS}`);
-                        m = await page.evaluate(HOST_PROBE, host);
+                        m = keep(await page.evaluate(HOST_PROBE, host));
                     } catch (e) { outFails.push(`${tag}: ERR ${e.message}`); say(`${tag}: ERR ${e.message}`); continue; }
                     for (const p of take()) m.findings.push({ rule: 'PAGE-ERROR', msg: `[${p.type}] ${String(p.text).split('\n')[0].slice(0, 160)}` });
                     for (const f of m.findings) outFails.push(`${tag}: ${f.rule} ${f.msg}`);
