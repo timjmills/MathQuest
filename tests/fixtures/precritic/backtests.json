@@ -3540,6 +3540,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "options-panel-hit",
+  "check": "critic-panel-r3 P1: every visible option control in the panel body takes a pointer at its centre (document.elementFromPoint is the control, inside it, or its own label), and the option-change pass clicks with page.mouse.click",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots [hit]",
+  "browser": true,
+  "fail": {
+   "commit": "fdfddfdd",
+   "state": "master: the \"?\" button's 44 px ::after hangs off the whole row (position: static !important); 6 of 6 controls on geo_translate and 15 of 15 on mult_chart_easy hit .sko-tip, and a mouse click on the first tick box / select opens the tip"
+  },
+  "pass": {
+   "commit": "6553e352",
+   "state": "the P1 hotfix: .tv-sko .sko-has-tip > .sko-tip { position: relative !important }"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --change --widths 1280 --skill coordinates:geo_translate,multiplication:mult_chart_easy --checks hit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
