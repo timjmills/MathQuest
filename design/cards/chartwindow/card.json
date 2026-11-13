@@ -194,6 +194,11 @@
       "date": "2026-11-13",
       "ruling": "Routed, not this card's: the Guided Model-row band (EB-BAND guided M/L, the shared Guided layout) and the review / pre-skill-check counters band (EB-SIDE 4, known master debt) go to lane lf-roles; sibling-compare stays SKIPPED (first family on the template: the critic grades the named pages).",
       "source": "lead ruling 2026-11-13 (chart_120 precritic-diff OPEN 2-4)"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "role:stretch is OUT OF SCOPE on the chartwindow card (hundreds_chart_fill and its preset chart_to_120), the same as count_by_tables: the window has no open problem of its own and the app composes no Stretch page for it; Reason It and True or False? are its thinking pages.",
+      "source": "lead ruling 2026-11-13 (via the coordinator; chart_120 precritic r8 EB-ROLE)"
     }
   ],
   "misconceptions": [
@@ -537,10 +542,9 @@
       },
       {
         "key": "role:stretch",
-        "d": "offered",
-        "proposed": true,
-        "source": "CLAUDE.md (any skill on any page type); RUBRIC scope",
-        "why": "any skill on any page type"
+        "d": "out of scope",
+        "source": "lead ruling 2026-11-13 (as count_by_tables)",
+        "why": "no open problem of its own: the app does not compose a Stretch page for the chart window (\"No Stretch for this skill yet\"); Reason It and True or False? are its thinking pages (lead ruling 2026-11-13, the same as count_by_tables; ws-empty-band EB-ROLE)"
       },
       {
         "key": "role:word-problems",
