@@ -2532,7 +2532,10 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 // template on paper and screen (no legacy visual: see below).
                 q.pv = { kind: 'words', n: num, words: wordForm, way: mode };
                 q.instructionKey = mode === 'to_words' ? 'number-words' : 'standard-form';
-                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}, wfBand === 20 ? { pool: 20 } : {}) };
+                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}, wfBand === 20 ? { pool: 20 } : {},
+                    // (critic nwf r2 N10: every name of a 1,000 page keeps the two-line box - 'one thousand' (12 letters) and the long
+                    // names alike - so a row's answer places line up whatever was dealt)
+                    wfBand === 1000 && mode !== 'to_words' ? { twoLine: true } : {}) };
 
                 // (critic nwf r1 N9, lead ruling: screen parity is a contract rule) No legacy q.visual: the place chart with its
                 // empty tens / ones boxes was a SECOND answer place beside the card's input, and a "Number Word Form" title inside

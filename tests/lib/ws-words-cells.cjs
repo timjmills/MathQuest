@@ -89,17 +89,22 @@ function wordsChecksInPage(opts) {
             if (!written) out.push({ rule: 'MODEL-ANSWER', msg: 'p' + (pi + 1) + ': ' + words.length + ' number-name cell(s), none with its answer written - the Model never shows its answer' });
         }
         // ROW-SLOT-Y: grid cells of one row (same top within 1 mm), their answer places' bottoms within 1 mm
-        if (/^(independent|more-practice|test|review|true-false|mixed-practice)$/.test(role)) {
+        // (critic nwf r2 N10 / N10b: lesson pages - the practice rows AND the Guided rows - are judged too)
+        if (/^(independent|more-practice|test|review|true-false|mixed-practice|lesson|guided|detailed-lesson)$/.test(role)) {
             var cells = Array.prototype.slice.call(pg.querySelectorAll('[data-ws-cell]')).filter(function (c) { return !c.parentElement.closest('[data-ws-cell]') && c.querySelector('[data-ws-words="to_number"]'); });
             var rows = [];
             cells.forEach(function (c) {
                 var t = c.getBoundingClientRect().top;
                 var row = rows.filter(function (r) { return Math.abs(r.top - t) < MM; })[0];
                 if (!row) { row = { top: t, ys: [] }; rows.push(row); }
+                if (c.querySelector('[data-ws-label="model"]')) row.model = true;
                 var s = slotsOf(c.querySelector('[data-ws-words="to_number"]'));
                 if (s.length) row.ys.push(Math.max.apply(null, s.map(function (x) { return x.getBoundingClientRect().bottom; })));
             });
             rows.forEach(function (r, ri) {
+                // (the Model's own row: the kit's Model tab, cell.js data-ws-label="model", sits inside the cell top - an engine
+                // layout every skill's Guided page shares, lead D3; recorded, not judged here)
+                if (r.model) return;
                 if (r.ys.length < 2) return;
                 var d = (Math.max.apply(null, r.ys) - Math.min.apply(null, r.ys)) / MM;
                 if (d > 1) out.push({ rule: 'ROW-SLOT-Y', msg: 'p' + (pi + 1) + ' row ' + (ri + 1) + ': answer places ' + d.toFixed(1) + ' mm apart up and down (limit 1 mm)' });

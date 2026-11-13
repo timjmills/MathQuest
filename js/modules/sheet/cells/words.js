@@ -82,7 +82,7 @@ function nameHtml(p, under) {
 // items and the space between them was dropped - "one hundredthirteen". The name is ONE inner span: one flex item, its spaces kept.)
 // (only the flex name box takes the inner span: a plain name is one inline run already, and an inner span there re-measured the
 // detailed lesson's practice cells narrower - three across, names wrapped, ws-detailed-lesson E9b)
-const nameSpan = (p, textPt, inner) => { const box = p.inPlace === false ? '' : nameBox(p, textPt); return `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${box}">${box ? `<span data-ws-name style="max-width:100%;">${inner}</span>` : inner}</span>`; };
+const nameSpan = (p, textPt, inner) => { const box = p.inPlace === false && !p.twoLine ? '' : nameBox(p, textPt); return `<span style="font-size:${pt(textPt + 2)};font-weight:700;line-height:1.2;text-align:center;max-width:100%;text-wrap:balance;${box}">${box ? `<span data-ws-name style="max-width:100%;">${inner}</span>` : inner}</span>`; };
 function htoCell(p, ctx, valueOf, inkOf, under) {
     const m = ctx.metrics || {};
     return `<div class="ws-words" data-ws-words="to_number" style="display:flex;flex-direction:column;align-items:center;gap:4mm;">`
@@ -95,7 +95,9 @@ function htoCell(p, ctx, valueOf, inkOf, under) {
 // (critic nwf r1 N4: "one hundred" is one line - only a name long enough to wrap takes the two-line box)
 // (lesson print-lint CL-4b: a one-line name at the FOOT of its two-line box started the cell 6-7 mm under the top pad; the name
 // sits at the top of the box - the box's fixed height still puts every answer place of the row at one y)
-const nameBox = (p, textPt) => (Number(p.n) > 100 && String(p.words || numberWords(p.n)).length >= 15 ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-start;justify-content:center;` : '');
+// (critic nwf r2 N10: the box is the PAGE's, not the name's: `twoLine` from the generator's band, so 'one thousand' gets it too;
+// a payload without it keeps the r1 rule)
+const nameBox = (p, textPt) => ((p.twoLine || (p.twoLine === undefined && Number(p.n) > 100 && String(p.words || numberWords(p.n)).length >= 15)) ? `min-height:${(2 * 1.2 * (textPt + 2) * 0.3528).toFixed(1)}mm;display:flex;align-items:flex-start;justify-content:center;` : '');
 const keyOf = (p) => String(p.ans !== undefined ? p.ans : (toWords(p) ? (p.words || numberWords(p.n)) : p.n));
 
 register('words', {
@@ -161,8 +163,12 @@ register('words', {
         // three across x 7 rows holds all 21 at about the item's own height)
         const capCols = p.pool === 20 && ctx && ctx.size === 'S' ? 3 : (({ S: 4, M: 3, L: 3 })[ctx && ctx.size] || 3);
         if (p.slot === 'hto' && !toWords(p)) return { wMm: Math.min(84, Math.max(62, words.length * (textPt + 2) * 0.52 * 0.3528 + 10)), hMm: null, measure: true, factLike: false, maxCols: p.inPlace === false ? 2 : Math.max(2, capCols), ...ip };
-        const wMm = toWords(p) ? 110 : Math.min(84, Math.max(60, words.length * (textPt + 2) * 0.52 * 0.3528 + 10));
-        return { wMm, hMm: null, measure: true, factLike: false, maxCols: toWords(p) ? 1 : p.inPlace === false ? 2 : capCols, ...ip };
+        // (critic nwf r2 N11: numeral to words stands two across where its write line fits a half-width cell - 70 mm at S in a 93 mm
+        // cell - one across left half the page empty; M and L lines (85 / 100 mm) keep the full width)
+        const lineMm = ({ S: 70, M: 85, L: 100 })[ctx && ctx.size] || 85;
+        const twWide = lineMm + 12 > 90;
+        const wMm = toWords(p) ? (twWide ? 110 : lineMm + 12) : Math.min(84, Math.max(60, words.length * (textPt + 2) * 0.52 * 0.3528 + 10));
+        return { wMm, hMm: null, measure: true, factLike: false, maxCols: toWords(p) ? (twWide ? 1 : 2) : p.inPlace === false ? 2 : capCols, ...ip };
     },
     inputs(p) {
         if (p && p.slot === 'hto' && !toWords(p)) return htoDigits(p).map((d, i) => ({ id: `pv-${i}`, kind: 'number', shape: 'box', graded: true, order: i, maxLength: 1, inputmode: 'numeric', scopes: ['full'] }));
