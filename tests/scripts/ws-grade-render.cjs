@@ -449,7 +449,9 @@ async function renderWorksheet(page, skill, file, width = 1280, height = 900, se
     await sleep(400);
     // the grid's scheduled layout passes (worksheet.js, up to 900 ms) end with data-mq-laid-out="1"
     await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
-    const el = await page.$('#worksheetView');
+    let el = await page.$('#worksheetView');
+    // a short landscape screen (1366 x 768, 1024 x 768) lays the view out with no box of its own: shoot the page
+    if (el && !(await el.boundingBox())) el = null;
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
     return { ...info, width, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':worksheet'), contentHash: hashOf(await page.evaluate(G.canonicalHostInPage, '#worksheetGrid'), file), measure: await measure(page, '#worksheetGrid') };
 }
@@ -484,7 +486,8 @@ async function renderQuiz(page, skill, file, width = 1280, height = 900, seedOve
     }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':quiz') });
     if (info.error) return { error: info.error };
     await sleep(400);
-    const el = await page.$('#quizTakeView');
+    let el = await page.$('#quizTakeView');
+    if (el && !(await el.boundingBox())) el = null;   // (as the worksheet: no box of its own at 768 px tall)
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
     const m = await measure(page, '#quizTakeView');
     const contentHash = hashOf(await page.evaluate(G.canonicalHostInPage, '#quizTakeView'), file);

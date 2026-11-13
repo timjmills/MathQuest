@@ -4437,7 +4437,7 @@
    "commit": "df31bcb3",
    "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4457,7 +4457,7 @@
    "commit": "df31bcb3",
    "state": "lf-vocab r7 render fixes, 2026-11-09"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4477,7 +4477,7 @@
    "commit": "5d8fe328",
    "state": "lf-vocab r8 step A: the O-1 switch"
   },
-  "command": "node tests/scripts/ws-next-box.cjs",
+  "command": "out=$(node tests/scripts/ws-next-box.cjs 2>&1); echo \"$out\" | grep -q '^ws-next-box: \\(OK\\|FAIL\\)' || { echo 'nb1-5: FAIL (no ws-next-box result)'; exit 0; }; echo \"$out\" | grep -qE ' - NB[1-5] ' && echo 'nb1-5: FAIL' || echo 'nb1-5: OK'",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -4497,7 +4497,7 @@
    "commit": "3127258f",
    "state": "lf-vocab r8 steps B + C"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27 --no-pupil-pin",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

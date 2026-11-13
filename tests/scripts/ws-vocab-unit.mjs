@@ -45,6 +45,9 @@
 //     key's highlight is GREY only; V25 (R-2) a wrong answer shows and speaks the RIGHT word's explanation once, with
 //     sound off shows it and does not speak, a right answer shows none
 //   --pin-pupil   (with --browser) write the pupil hashes of this tree to the fixture (run on 70cdbaf9 only)
+//   --no-pupil-pin (with --browser) skip ONLY the pupil-hash comparison (lf-tools r1 A4: the pin is read from today's
+//                 checkout, so on an old commit it misses on print pages later lanes changed; a backtest row that proves the
+//                 SCREEN half of V23 / V25 at 820 uses it). Every other V23 check (no highlight on the pupil page, grey key) runs.
 
 import { pathToFileURL } from 'url';
 import path from 'path';
@@ -929,6 +932,7 @@ async function r7Checks(page, fail, sheet) {
         if (bad.length) fail(`V23 ${skillId} key: ${bad.length} highlight mark(s) painted ${bad[0]} (want the single grey rgb(148, 148, 148))`);
     }
     if (process.argv.includes('--pin-pupil')) { fs.writeFileSync(PUPIL_PIN, JSON.stringify(hashes, null, 1) + '\n'); console.log(`ws-vocab-unit: pinned ${Object.keys(hashes).length} pupil hashes`); }
+    else if (process.argv.includes('--no-pupil-pin')) console.log('ws-vocab-unit: note: --no-pupil-pin: the pupil-hash pin is not compared');
     else {
         const pin = fs.existsSync(PUPIL_PIN) ? JSON.parse(fs.readFileSync(PUPIL_PIN, 'utf8')) : null;
         if (!pin) fail('V23: no pinned pupil hashes (tests/fixtures/precritic/vocab-pupil-hashes.json)');
