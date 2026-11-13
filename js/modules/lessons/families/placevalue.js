@@ -205,6 +205,34 @@ export const ROUTINES = Object.freeze({
         // (three across where the name and its boxes fit: two across left 31 % beside the boxes at S - ws-print-lint H13)
         practiceShapes: [[15, 3], [12, 3], [12, 2], [10, 2], [8, 2], [6, 2]],
     },
+    // lf-placevalue compare round (2026-11-13): compare two numbers with <, > and = (2.NBT.A.4); the card's PV-04 and M6.
+    'pv-compare': {
+        archetype: 'pv',
+        casesPending: 'New with lf-placevalue compare: its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'length', text: 'More digits is the bigger number.' },
+            { id: 'left', text: 'Same length: the first different digit from the left decides.' },
+        ],
+        vocab: [
+            { word: 'greater than', meaning: 'bigger', picture: { kind: 'text', text: '7 > 3' } },
+            { word: 'less than', meaning: 'smaller', picture: { kind: 'text', text: '3 < 7' } },
+            { word: 'equal to', meaning: 'the same', picture: { kind: 'text', text: '5 = 5' } },
+        ],
+        // (one step a worked step: Compare a and b / why / write the sign - workedSteps of placevalue:compare)
+        steps: [
+            { icon: 'look', text: 'Count the digits.' },
+            { icon: 'decide', text: 'Find the first different digit.' },
+            { icon: 'write', text: 'Write <, > or =.' },
+        ],
+        chant: 'More digits, bigger number.',
+        format: { kind: 'numbered steps with icons + a chant', why: 'The error is comparing the wrong digits (M6); the chant puts the digit count first.' },
+        example: { match: 'Compare' },
+        // (two blocks, the card's step 5 in order: same length, then different lengths. The rows are held to the ink
+        // (tightRows), so one 12-item grid left 42-54 % of the page white - ws-print-lint PAGEFILL; 20 in two blocks fill it,
+        // DN-1's ceiling at L)
+        practiceBlocks: [{ shape: [12, 3] }, { shape: [8, 2], opts: { lengths: 'mixed' } }],
+        practiceShapes: [[12, 3], [9, 3]],
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -288,6 +316,18 @@ export const LESSONS = Object.freeze({
         warmup: [
             { key: 'placevalue:identify', opts: { writeValue: false }, why: 'Unit form names each place.' },
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
+        ],
+        mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
+    // lf-placevalue compare round (2026-11-13, 2.NBT.A.4): compare two numbers; skill: id.
+    'skill:placevalue:compare': {
+        routine: 'pv-compare',
+        practice: { skill: 'placevalue:compare' },
+        defaultFor: true,
+        prereqsPending: 'New with lf-placevalue compare: its Warm-up until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'placevalue:identify', opts: { writeValue: false }, why: 'Comparing reads the digits place by place.' },
+            { key: 'placevalue:compare', opts: { band: 99 }, why: 'Two-digit numbers first: tens, then ones.' },
         ],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
     },
