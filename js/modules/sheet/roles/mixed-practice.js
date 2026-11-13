@@ -176,7 +176,13 @@ function packing(poolsIn, input) {
 
 /** The drop a library lesson's Mixed page gives a place-value cell under its tab at L (print-sheet.js LESSON_PM_CENTRE_CSS,
  *  TAB-CLEAR: margin-top tab - 0.5 mm), which the measuring cell does not carry (lf-engine PC r5). 0 elsewhere. */
-export const pvLiftOf = (its, input, ctx) => (input && input.lessonFit && ctx.size === 'L' && (its || []).some((it) => /^pv(-support)?$/.test(String((it && it.template) || '')) && !(it && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.tabFree)) ? ((ctx.s && ctx.s.tabMm) || 5) - 0.5 : 0);
+export const pvLiftOf = (its, input, ctx) => {
+    if (!(input && input.lessonFit && ctx.size === 'L')) return 0;
+    const pv = (its || []).filter((it) => /^pv(-support)?$/.test(String((it && it.template) || '')));
+    if (!pv.length) return 0;
+    // (a head-less Mixed partner's place item - `tabFree` - drops only pv.js TAB_FREE_MM, 2.5 mm)
+    return pv.some((it) => !(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.tabFree)) ? ((ctx.s && ctx.s.tabMm) || 5) - 0.5 : 2.5;
+};
 
 /* ============================================================ the MIXED arrangement (M1) */
 

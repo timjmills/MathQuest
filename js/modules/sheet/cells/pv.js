@@ -515,6 +515,9 @@ function slotFloor(p, grow) {
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
+/** (lf-engine PC r5) The drop under the number tab of a head-less "name the place" numeral on a lesson Mixed page (`tabFree`):
+ *  its digits clear the tab by TAB-CLEAR's 2 mm at 6 across, L, a two-digit tab too (0 left 1.2 mm, 1.5 left 1.7 mm). */
+export const TAB_FREE_MM = 2.5;
 function ringRow(ctx, items, correct, sizePt, tight = false, stack = false) {
     const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
     // (`tight`, lf-placevalue r1 F1: the words keep their size and their ring's room, with less air between the rows)
@@ -769,9 +772,9 @@ function pvRenderBody(p, ctx0) {
                     return `<div class="pv-cell"><div class="pv-side" style="display:flex;align-items:center;justify-content:center;column-gap:${tight ? 4 : 5}mm;">`
                         + `<div style="text-align:center;">${numeral({ underline: p.place, heads: nameHeads })}</div>${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight, true)}</div>${valueLine()}</div>`;
                 }
-                // (`tabFree`, lead ruling 2026-11-13 N9: a lesson Mixed partner's place item prints no heads, so nothing sits in the
-                // tab's corner - the page's TAB-CLEAR drop under the tab, print-sheet.js LESSON_PM_CENTRE_CSS, is not taken)
-                return `<div class="pv-cell"${p.tabFree ? ' style="margin-top:0"' : ''}>${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
+                // (`tabFree`, lead ruling 2026-11-13 N9: a lesson Mixed partner's place item prints no heads, so only the digits need
+                // to clear the tab - TAB_FREE_MM, not the page's whole tab drop for the heads, print-sheet.js LESSON_PM_CENTRE_CSS)
+                return `<div class="pv-cell"${p.tabFree ? ` style="margin-top:${TAB_FREE_MM}mm"` : ''}>${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
             case 'place-bank': {
                 const bank = `<div class="pv-bank" style="display:table;margin:0 auto ${tight ? 1 : 2}mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`
                     + `font-size:${pt(m.textPt + 1)};font-weight:700;">${(p.words || []).map(esc).join('&nbsp;&nbsp;&nbsp;')}</div>`;
