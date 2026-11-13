@@ -5032,7 +5032,7 @@ async function buildLesson(n, metaOf) {
         // F7 (lf-engine pc critic r3, live-fix 2026-11-13): a rounding Practice cell ("27 -> ___") is one short line in a
         // row the page's fill made tall - drawn at the top it left a 49 % band under it in all 15 cells (H13). The cells of
         // a rounding lesson's Practice sheet centre their line down the cell (additive: only these pages carry the rule).
-        if (first === 'lesson-practice' && rounding) return out.replace(/<main class="ws-body">/g, `<main class="ws-body">${ROUND_PRACTICE_CSS}`);
+        if (first === 'lesson-practice' && rounding && /pv-round1/.test(out)) return out.replace(/<main class="ws-body">/g, `<main class="ws-body">${ROUND_PRACTICE_CSS}`);
         // F5 (same round): a Mixed row of vertical facts shares the page's row height with a taller kind (the bond row
         // below), so its facts sat on a 55 % band; one-line facts and count rows centre down the cell instead (Mixed and
         // Practice sheets that draw one - PM-H13 found the same 30 % band on the add S Practice and the L count row).
