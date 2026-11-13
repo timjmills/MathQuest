@@ -9,6 +9,13 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-13 two-step round 2 (mq-opus-medium; lead rulings R1-R4). Each finding a check first (owner rule), backtested, on
+  precritic's path, a CHECKS_FROM_CRITICS row. R1: probe -> (c) cannot reach M 2 -> (a) M 1 ruled, the no-stretch routed to
+  lf-roles (check ws-two-step --print CAP-BAND). R2: band 100 dropped, B100 codes fold to no band (BAND-ALIAS). Card re-signed
+  791c84183 (decision 9 + band) and 9f963a32f (add-first routine line, found by the new F6 check). R3: HINT-ON-TEST,
+  STATE-PROGRESS, STEPS-FOLLOW-PRESET, VQ-TITLE X and Y built and backtested. R4: letter + wpBar L is the R1 role class
+  (CAP-BAND letter case, routed); the letter / estimate chart frames part built in twoStepPart (PART-FRAMES), its routing is
+  lf-engine's. See "Round 2 (lead rulings R1-R4)" and "Precritic two-step r11".
 - 2026-11-13 two-step build (mq-opus-medium: the first build of a new drawing; resumed after a container restart, WIP 937a8c36b
   reviewed and reworked). Card signed 0e119f312 (unchanged). Built, in order, each committed and pushed:
   (1) the two-step bar model, sheet/graphics/two-step-bar.js (Step 1 bar equal groups / part-whole, Step 2 bar carrying the Step 1
@@ -105,6 +112,7 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: two-step round 2 (R1 probe + CAP-BAND, R2 band alias, card re-sign x2, R3 four checks + backtests, R4 checks + frames part, gates, precritic r11), start 2026-11-13T14:10Z, end 2026-11-13T18:30Z, profile mq-opus-medium (rebuild after the precritic reds / lead rulings)
 Times: two-step build (bar model, within N, Visual default, decisions 6-10, lesson data, tags, ws-two-step + backtest, precritic of the 7), start 2026-11-13T11:15Z, end 2026-11-13T13:55Z, profile mq-opus-medium (first build of a new drawing)
 Times: two-step spec card (research, card.json, generate + coverage check), start 2026-11-13T09:30Z, end 2026-11-13T10:15Z, profile mq-opus-medium (first card on a new drawing part)
 Times: fix r10 (critic r2 G5 Fix-it letters, G6 card feature tiles, G8 growing two across at S; ws-patterns-cells + ws-precritic-clean + backtests; precritic r10 the two skills), start 2026-11-13T10:10Z, end 2026-11-13T13:20Z, profile mq-opus-medium (rebuild after a failed critic)
@@ -118,6 +126,70 @@ Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-m
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
+
+## Round 2 (lead rulings R1-R4, 2026-11-13, mq-opus-medium)
+
+**R1 capacity of multi_step_word (Visual) at M / L: (c) probed, cannot reach 2 at M -> (a).** Probe (scratch probe2/probe3, widest
+of 200 stories; rendered cell at M): the bar across 132.3 x 29.8 mm (L 159.3 x 34.7), stacked 62.5 x 61.6 mm (L 71.5 x 71.4); the
+two step columns 39.8 + 67.4 mm wide (+ 8 mm gap), 53.7 mm tall; the story 27.5 mm; the cell measures 125 mm at M (S 109, L 142).
+Side by side: across beside the columns needs ~247 mm, stacked beside ~181 mm of a 174 mm row, and the cell would be 27.5 + 61.6 +
+pads ~102 mm (over 93). So M holds 1 (card decision 9 re-signed: bar model S 2 / M 1 / L 1). The 41 % (M) / 32 % (L) band is the
+role stretching a one-row page: routed (Red, by owner). Check: ws-two-step --print CAP-BAND (CAP >= pin, BAND < 30 %), backtest
+two-step-visual-cap-band (FAIL 8438ca59d -> OK fixture tests/fixtures/precritic/two-step/visual-M-nostretch.pass.html).
+
+**R2 band 100 dropped.** band is a scalar (B<digits>, SCALAR_ONLY): no code index depends on it. Values 30 / 50; OPTION_FOLDS for
+multi_step_word(_plain) (presets fold through the host) rewrites band 100 to null. Round trip: M7~B100, M8~B100, ZA~B100 ... ZE~B100
+(generateSkillCode on 8438ca59d) decode on 910dd9f0b to their skill at no band and re-encode as M7 ... ZE. G2 lesson record
+(lessons/families/algebra.js) and links Y2.B4.S10 / Y3 (G2) at no band. ws-code-snapshot OK (736 codes, no MOVED / changed /
+DELETED). Check ws-two-step BAND-ALIAS, backtest two-step-band100-alias (FAIL 8438ca59d -> OK 910dd9f0b).
+
+**Card re-sign:** 791c84183 (decision 9 S 2 / M 1 / L 1 with the probe; band 100 dropped; LEAD_DECISIONS row), then 9f963a32f
+(the add-first routine 'Step 1: add or take away.', found by STEPS-FOLLOW-PRESET). Signature line `Signed: owner (delegated to
+lead), 2026-11-13`, --check-signed OK.
+
+**R3 the four critic r1 checks (each FAIL 47b1f2a86 -> OK 796952c03, OK at HEAD):**
+- F1 ws-patterns-cells HINT-ON-TEST (paper level 0, hint on: no hint part; quiz twin hint parts marked, quiz-mode.css hides) -
+  patterns-hint-on-test-f1 PASS.
+- F5 ws-patterns-cells STATE-PROGRESS (chart.js stateDrawing panels differ, "Write N" shows N) on function_table_easy -
+  patterns-state-progress-f5 PASS. number_patterns_rule / follow_given_rule PINNED (31 findings, lf-ops count-row has no stepState).
+  NOTED for the lead: notice / growing / pattern_features "check" steps that mark nothing draw the panel before (20 findings; critic
+  r2 graded those pages clean, so not failed).
+- F6 ws-node-lint STEPS-FOLLOW-PRESET (opt-in; lf-algebra on node-lint-s1 via opt-in-rules.json) - steps-follow-preset-f6 PASS. Over
+  all 126 presets it found two_step_add_then_mult / _add_then_div (ours: fixed 9f963a32f, row steps-follow-preset-two-step-addfirst
+  FAIL 95473c403 -> OK 9f963a32f), division:div_facts_long and graphs:pictograph_how_many_more (others, below).
+- F7 ws-visual-quality VQ-TITLE "X and Y" (topicOf gives both verbs one form; 729 skills OK at HEAD) - vq-title-and-f7 PASS.
+- Tool fix: ws-precritic-plan's opt-in leak probe used lf-ops' add_facts (opted in itself); now a skill no lane opted in.
+- ws-two-step --rules / ws-patterns-cells --rules: a row proves its own rules (three ws-two-step rows went red when later rules joined
+  the tool; fixed).
+
+**R4:** (a) letter + wpBar L: ~13 % of x / ÷-first bars need 177-187 mm across a 171 mm row and stack (132 vs 95 mm), so a page plans
+1 at L (card bar model L 1) and the one 95 mm story is stretched to 172-225 mm (41-45 % band) or, unstretched, leaves the 60 mm
+PAGEFILL strip: the R1 role class. Check ws-two-step --print CAP-BAND letter case (seeds 1 2 7 11 26), backtest
+two-step-letter-wpbar-L-band (FAIL 35f427f4c -> OK fixture letter-wpbar-L-nostretch.pass.html). (b) the frames part IS ours:
+twoStepPart now draws letter (equation / + the two steps / n) and estimate (steps / + estimate / Yes-No) panels, rows wrapping in a
+half panel (letter L widest 99 mm, the chart's zoom fits it; estimate 64 mm). Check PART-FRAMES, backtest two-step-part-frames (FAIL
+d88ab9aee -> OK b5d9a9cc7). The ROUTING (chart.js stateDrawing sends only msOf + 3 groups to story.js twoState; letter has 4 groups,
+estimate is + / − first) is lf-engine's: untouched.
+
+### Red, by owner (round 2)
+- **lf-roles** (R1, R4a - one role change): a practice page (independent / more-practice / test) holding ONE row whose items' card
+  capacity is ruled 1 (multi_step_word (Visual) M / L; two_step_letter_equation + wpBar L) must not stretch that row past its
+  content: cap the single-row stretch so the band under the work stays < 30 % (cell <= measured hMm / 0.7), top-aligned, and let
+  PAGEFILL / EB-PAGE accept the strip under a ruled one-row page. Proof: ws-two-step --print (CAP-BAND) goes green; re-point the
+  backtest rows two-step-visual-cap-band and two-step-letter-wpbar-L-band from their fixtures to that commit. Also (unchanged) the
+  two-step guided 1-per-page, opener and Reason It overflow.
+- **lf-engine**: route every two-step word-work item (steps.length 2, letter and estimate included, any group count) from
+  chart.js stateDrawing to story.js twoState -> twoStepPart (it now draws the letter / estimate frames); then STATE-PROGRESS can judge
+  the two-step charts. chart.js twoState untouched here.
+- **lf-ops**: count-row anchor-chart stepState (STATE-PROGRESS pinned on number_patterns_rule / follow_given_rule); F2;
+  division:div_facts_long STEPS-FOLLOW-PRESET (the page's Steps band prints div_facts' default steps).
+- **graphs owner**: graphs:pictograph_how_many_more STEPS-FOLLOW-PRESET (prints pictograph's default steps).
+- **lf-checks**: phone-card first-box focus, screen grading of the letter equation and estimate, screen-support-eq.
+- **lf-partopts**: F8 / G11.
+- **lead (ruling)**: the NOTED STATE-PROGRESS panels on notice / growing / pattern_features (a check step that writes nothing) - a
+  finding or by design?
+- **ours, open**: the x / ÷-first bars that stack (13 %) make item heights uneven on a wpBar page at every size; the add-first
+  presets deal a take-away first in ~55 % of items under the name "add then" (content-audit passes; a naming question for the lead).
 
 ## Fixes after critic r2 (fix r10, 2026-11-13, mq-opus-medium)
 A finding closes only by a line here (ws-precritic-clean reads `- <ID> fixed`).
@@ -1066,6 +1138,12 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 round 2 (lead rulings R1-R4), commits in order: a1c55d93b R1 check (CAP-BAND) | 910dd9f0b R2 fix (+ check BAND-ALIAS) |
+  791c84183 card re-sign | 95473c403 R3 checks | 9f963a32f add-first Steps fix + card re-sign | 35f427f4c R3 backtests |
+  d88ab9aee R4 checks | b5d9a9cc7 R4 frames part. Check for each fix: R1 / R4a CAP-BAND (fix routed), R2 BAND-ALIAS, F6 two-step
+  STEPS-FOLLOW-PRESET, R4b PART-FRAMES. Gates: boot-smoke, code-snapshot, standards, search-terms, content-audit algebra, presets-unit,
+  card-rulings x3, spec-card --check-signed x3, lesson-unit, two-step, patterns-cells, wrm-page-unit, lesson-seed --check OK;
+  ws-backtest on the 13 lane rows PASS (+ 2 browser rows PASS run alone); ws-precritic-plan: every lane row on path.
 - 2026-11-13 two-step build (mq-opus-medium; resumed after a container restart: WIP 937a8c36b reviewed - kept the WDS 18.1 row,
   the library entry, the generator guard loop and the wpBar default; reworked the bar drawing (the WIP printed the known numbers in
   the pupil's boxes, put '?' as box content not a zone-label, never fit 6 equal groups and stacked to 68 mm) and found its wpBar
