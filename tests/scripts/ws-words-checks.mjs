@@ -9,6 +9,8 @@
 //   is a NAMED error (not the registry's near-miss nudge) - a band with none prints a True or False? page that is all True and a Reason It page of one item.
 // WORDS-STEPS-TRUE (N3): every quoted phrase of a worked step ("...") is part of the item's own name - "thirty-five hundred" for
 //   35 was a false step on the model, the Guided hints and the lesson's Steps strip.
+// WORDS-STEPS-PLURAL (N12): no worked step counts one of a place in the plural ("3 tens, 1 ones"), with the answer line and with
+//   the H T O boxes (answerSlot hto).
 // Prints `ws-words-checks: OK` / `FAIL (n)`; exits 1 on FAIL.
 import { loadApp, fnv } from './ws-card-rulings.mjs';
 import { fileURLToPath } from 'url';
@@ -48,6 +50,26 @@ for (const band of [20, 100, 1000]) {
     }
     if (judged && withWrong < judged / 3) bad.push(`WORDS-WRONG-RATE band ${band}: ${withWrong} of ${judged} items have a wrong answer (want at least a third)`);
     console.log(`band ${band}: ${judged} items, ${withWrong} with a wrong answer`);
+}
+// WORDS-STEPS-PLURAL (critic nwf r2 / r3 N12): a worked step never counts ONE of a place in the plural ("3 tens, 1 ones") - every
+// band, the default answer line and the H T O boxes (answerSlot hto: the lesson's model, its Steps band and its key)
+for (const band of [20, 100, 1000]) for (const answerSlot of ['line', 'hto']) {
+    let plural = 0, seen = 0;
+    for (let i = 0; i < N && prov; i++) {
+        const un = quiet();
+        let q = null;
+        try { q = app.gq.generateQuestionFor({ category: 'composing', skill: 'number_word_form', opts: { wordform: ['to_number'], band, answerSlot }, seed: (fnv(KEY) + band + i) >>> 0, itemIndex: i, itemCount: N }); } catch (e) { q = null; } finally { un(); }
+        if (!q || !q.pv) continue;
+        let steps = []; try { steps = prov.workedSteps ? prov.workedSteps(q) : []; } catch (e) { steps = []; }
+        for (const st of steps || []) {
+            const text = String((st && (st.text || st.label || st.say)) || '');
+            seen++;
+            const m = /\b1 (ones|tens|hundreds|thousands)\b/.exec(text);
+            if (m && plural++ < 2) bad.push(`WORDS-STEPS-PLURAL band ${band} ${answerSlot} item ${i} (${q.pv.n}): "${text}" counts 1 of a place in the plural ("1 ${m[1]}")`);
+        }
+    }
+    if (plural > 2) bad.push(`WORDS-STEPS-PLURAL band ${band} ${answerSlot}: ${plural} plural steps in all`);
+    console.log(`band ${band} ${answerSlot}: ${seen} steps read, ${plural} with "1 ones / tens / hundreds"`);
 }
 for (const b of bad.slice(0, 12)) console.log(`  FAIL ${b}`);
 console.log(`ws-words-checks: ${bad.length ? `FAIL (${bad.length})` : 'OK'}`);
