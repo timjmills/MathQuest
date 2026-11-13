@@ -6279,6 +6279,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pl-row-mixed-props-m",
+   "check": "No row of items answered in place (footprint noStretch) mixes height classes so its short cell keeps a band over 20 % - the bridge deals the boundary item again from the page's majority class, same ladder step, same place (lead ruling (b') 2026-11-13; r4b: arrays_groups test M, mult_properties independent S / M kept one mixed boundary row)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint ROW-MIXED (opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "85c694896",
+    "state": "lf-ops-props r4b: groupByHeight leaves a boundary row mixed (3 short + 3 tall on a 2-column page)"
+   },
+   "pass": {
+    "commit": "e95fca804",
+    "state": "lf-ops-props r5 B2: evenMixedRows re-deals the boundary item"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice,test,mixed-practice,review --size M --rules ROW-MIXED --lints ROW-MIXED --skills multiplication:mult_properties,multiplication:arrays_groups",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
