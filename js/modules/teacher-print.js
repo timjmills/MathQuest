@@ -719,7 +719,7 @@ function partsHTML(s, i) {
         <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="-1" aria-label="Fewer: ${esc(name)}"${at <= 0 ? ' disabled' : ''}>${icon('minus', 16)}</button>
         <output class="tv-step-val" aria-live="polite">${n}</output>
         <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="1" aria-label="More: ${esc(name)}"${at >= vals.length - 1 ? ' disabled' : ''}>${icon('plus', 16)}</button>
-      </span><span class="tv-part-range">${esc(lim.fixed ? rangeText(p, lim) : rangeText(p, lim))}${pn ? ` · ${esc(pn)}` : ''}</span>${note}`;
+      </span><span class="tv-part-range">${esc(lim.fixed ? `${lim.dflt}, or 0 to leave it off` : rangeText(p, lim))}${pn ? ` · ${esc(pn)}` : ''}</span>${note}`;
             }
         }
         // (step B opens the Supports panel here; step A states the standard as plain text - F8)

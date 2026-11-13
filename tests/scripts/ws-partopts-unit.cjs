@@ -10,14 +10,20 @@
 //   {}); a section's partOpts survive a JSON save and load unchanged; a saved section's older `parts` list reads into partOpts;
 //   the parts list a partOpts asks for; offeredValues never leaves [min, max] and steps in whole rows on Practice.
 // PO-2 (browser): for every live lesson (lessons/prereqs.js LESSONS and the add sample) at M and L (S prints as M - print-sheet.js
-//   LESSON_SIZE_NOTE), the standard packet is built and its parts' limits read (res.lesson.partFit -> partLimits). Then each part
-//   at its min and its max (and the toggles: Remember off, We Do off) is built ALONE and judged:
-//     PO-2a  it builds, its key builds (the key renders from the same plan), the anchor chart keeps its planned size (sizing.ok)
-//     PO-2b  the count is honoured where the build reports it (Prerequisite questions, We Do cells, lesson rows, Practice a page)
-//     PO-2c  no overflow: every page's content inside its page, no cell past the page's foot (a split cell would cross it)
-//     PO-2d  ws-empty-band's rules (EB-BAND / EB-SIDE / EB-EDGE, the shared measureCells + judge) and EB-PAGE (a page before its
-//            sheet's last 30 % or more empty) find nothing the standard packet of the same lesson and size does not already
-//            have - a non-default count may not add an empty band.
+//   LESSON_SIZE_NOTE), Practice 2 pages, the standard packet is built and its parts' limits read (res.lesson.partFit -> partLimits).
+//   Then each part at its min and max, each part off, and parts changed TOGETHER (critic A r1 F12: every part at its min; the
+//   same with We Do off; Vocabulary 0 with We Do off; Remember off with no lesson rows) are built through the Print screen's
+//   own loop - a build returns its limits, the request is normalised to them (a value no longer offered snaps), built again -
+//   and the packet that would print is judged ON ITS OWN, never against the standard packet:
+//     PO-2a  it builds, its key builds, the anchor chart keeps its planned size (sizing.ok)
+//     PO-2b  every count asked is the count printed (Prerequisite questions, We Do cells, lesson rows, Practice / Mixed TOTALS)
+//     PO-2c  no overflow: every page's content inside its page, no cell past the page's foot
+//     PO-2d  EB-PAGE on EVERY page, each sheet's last page included: 30 % or more of the body empty under its last block fails;
+//            the last page of a sheet of 2+ pages fails under half used (H5). EB-BAND / EB-SIDE / EB-EDGE on every cell except
+//            a page identical to a standard page, or a cell of the same template, sheet and size the standard packet already
+//            draws with that finding (the standard's own defect, critic A r1 F11b - another lane's).
+//     PO-2e  coverage (critic A r1 F2): the lesson x size cases offering a real We Do range and a real Practice range (2+ values),
+//            against floors (--floor-wedo, --floor-practice; full runs only).
 //   Sampling is deterministic (seed 4242).
 // Prints `ws-partopts-unit: OK` / `FAIL (n)`; exits 1 on FAIL.
 'use strict';
