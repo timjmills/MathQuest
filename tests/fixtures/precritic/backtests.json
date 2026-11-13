@@ -5898,6 +5898,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "eb-fixture-interior-hole",
+  "check": "ws-empty-band EB-SIDE judges the widest run of columns with no ink from top to bottom BETWEEN two pieces of ink in a cell, side to side (critic eb-r7 m5, probe u3): a practice card with its content pinned left and a 95 mm input whose only dark edge is its right one leaves about 93 mm of paper between the written digit and that edge, and FAILS; the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (between) (critic eb-r7 m5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/interior-hole.fail.html",
+   "state": "seeded: OK at 96ba50e36 (only the outer side bands judged; proven 2026-11-13 with that tree's tool); FAIL EB-SIDE 93.4 mm (58.6 %) between the pieces of ink now"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the content centred in the card: no interior hole"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-item-key",
+  "check": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3, its key-leak probe made a gate): on a grid role the pupil page's data-eb-item sequence equals its key's, and no index appears twice on a pupil page; a key whose first two cells answer each other's item FAILS, the sheet as built (arrays_groups independent L) passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-key.fail.html",
+   "state": "seeded: the key's first two cells answer each other's item (pupil item 1, key item 2 at cell 1)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's own pupil page and key: the same item order"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMKEY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-item-parity",
+  "check": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3, its parity probe made a gate): on a grid role the pupil page and key with data-eb-item / data-eb-partial removed are byte-identical to the same sheet built with ebItem: false; a tagged page whose first cell also gained a style FAILS, the sheet as built passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-parity.fail.html",
+   "state": "seeded: the tagged pupil page's first cell also carries min-height:1mm (a tag that changes what is drawn)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's tagged and untagged sheets: identical once the tags are removed"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMPARITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
