@@ -45,6 +45,9 @@
 //     TAB-CLEAR  on every Practice / Mixed page and its key: the item-number tab clears the nearest content box of its cell
 //                by >= 2 mm (1 mm for an across fact: the kit's CL-40 contract) (finding 4: the "1" tab touched the "T" head of a rounding cell); ink, not boxes: a drawing by
 //                its shapes, text by its own run (a Range, not its element) from its glyphs' top (canvas text metrics)
+//     PG-TURN    (lead ruling, lf-engine PC r4: a same-page turnaround is worse than a cross-page repeat) no page of the packet
+//                prints one of its own sums / products turned round (1 + 3 and 3 + 1; a number bond "1 + 2 = ?" read as a sum):
+//                --seeds builds of the three samples, and the 4242 build at every size of every lesson (--all-lessons too)
 //     SHEET-2PG  a lesson sheet printed on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages ~38 % empty)
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
@@ -367,6 +370,22 @@ function pcMeasure() {
     });
 }
 
+/** PG-TURN (lead ruling, lf-engine PC r4 2026-11-13): no page prints one of its OWN sums or products turned round
+ *  ("1 + 3 = ?" and "3 + 1 = ?"; a number bond read as a sum, "1 + 2 = ?", is one too). LR-5's key (lesson-rules itemKey):
+ *  the same + / x numbers, a different text. `placed` [{part, page, t}]; returns [{part, msg}]. Pure. */
+function pageTurns(placed) {
+    const out = []; const by = new Map();
+    for (const x of placed || []) {
+        const m = /^(\d+)\s*([+×x*])\s*(\d+)\s*=\s*\?$/.exec(x.t); if (!m) continue;
+        const k = `${x.page}|${m[2] === '+' ? '+' : '×'}${[Number(m[1]), Number(m[3])].sort((a, b) => a - b).join(',')}`;
+        const was = by.get(k);
+        if (was && was.t !== x.t) out.push({ part: x.part, msg: `"${x.t}" turns round "${was.t}" on the same page (${was.part === x.part ? x.part : `${was.part} / ${x.part}`})` });
+        else if (!was) by.set(k, x);
+    }
+    return out;
+}
+const ONLY_RULES0 = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
+
 async function checkMain() {
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -387,13 +406,15 @@ async function checkMain() {
                 const b = await page.evaluate(async ({ skill, seed, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size: 'L', paper: 'A4', seed, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
                     // (PC-LR5, critic r3 F4: the PLACED items of the sheet, Practice and Mixed - partPlans' grids, the chart's own
                     // examples left out - so a re-dealt sheet item printed again on Practice is seen)
-                    const placed = []; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
-                    for (const pp of r.partPlans || []) if (['teach', 'practice', 'mixed'].includes(pp.part)) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) (pg.sections || []).forEach((sc) => walk(sc, pp.part));
+                    const placed = []; let pgN = 0; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, page: pgN, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
+                    // (PG-TURN reads every part's pages, the check and the chart included; PC-LR5 the sheet, Practice and Mixed)
+                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pgN++; (pg.sections || []).forEach((sc) => walk(sc, pp.part)); }
                     return { placed, pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
                 if (b.error) { F('PC-BUILD', `${l.id} seed ${seed}`, b.error.slice(0, 160)); continue; }
                 // PC-LR5 (critic r3 F4; LR-5): no item of the lesson sheet printed again on Practice or Mixed
                 { const sheet = new Set((b.placed || []).filter((x) => x.part === 'teach' && /\d/.test(x.t)).map((x) => x.t));
-                    for (const x of b.placed || []) if (x.part !== 'teach' && sheet.has(x.t)) F('PC-LR5', `${l.id} seed ${seed} ${x.part}`, `"${x.t}" is on the lesson sheet and on ${x.part}`); }
+                    for (const x of b.placed || []) if (['practice', 'mixed'].includes(x.part) && sheet.has(x.t)) F('PC-LR5', `${l.id} seed ${seed} ${x.part}`, `"${x.t}" is on the lesson sheet and on ${x.part}`); }
+                for (const m of pageTurns(b.placed)) F('PG-TURN', `${l.id} seed ${seed} ${m.part}`, m.msg);
                 if (!b.pre) { na++; break; }
                 for (const it of b.items) {
                     const k = Number(String(it.pool).replace(/\D/g, '')); const pre = b.pre[k]; if (!pre) continue; read++;
@@ -404,8 +425,12 @@ async function checkMain() {
             // layout: seed 4242 at every size
             for (const size of SIZES) {
                 const built = await page.evaluate(async ({ skill, size, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
+                    const placed = []; let pgN = 0; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, page: pgN, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
+                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pgN++; (pg.sections || []).forEach((sc) => walk(sc, pp.part)); }
+                    return { placed, pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
+                for (const m of pageTurns(built.placed)) F('PG-TURN', `${l.id} ${size} seed 4242 ${m.part}`, m.msg);
+                if (ONLY_RULES0.length && ONLY_RULES0.every((r) => r === 'PG-TURN')) continue;
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
@@ -495,7 +520,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => (x === 'PC-H13P' ? 'PM-H13' : x));
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PAGES', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PG-TURN', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PAGES', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [
