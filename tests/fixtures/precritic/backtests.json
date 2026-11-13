@@ -8703,6 +8703,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-r6-compare-cross",
+   "check": "A lesson Mixed page never prints one number by two skills, a place-value compare item's two numbers included",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PG-LR6 cross-skill read; r6 builder own proof read",
+   "browser": true,
+   "fail": {
+    "commit": "02a109264",
+    "state": "compare L / M Mixed: compare 715 / 702 beside the place partner 715"
+   },
+   "pass": {
+    "commit": "dbc1190c7",
+    "state": "near-twins pageNumsOf: a compare item's numbers join the page's printed set"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --all-lessons --only placevalue:compare --seeds 1 --sizes M,L --rules PG-LR6",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
