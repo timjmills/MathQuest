@@ -26,17 +26,17 @@ export const VOCAB_WORDS = Object.freeze({
     odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left', 'grow'] },
     product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation'] },
     factor: { meaning: 'a number you multiply', explain: 'Factor means a number you multiply, like the 4 and the 3.', notWith: ['equation'] },
-    row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern'] },
-    column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: ['multiple', 'pattern'] },
-    multiple: { meaning: 'a number you land on counting in steps', explain: 'Multiple means a number you land on when you count in threes.', notWith: ['pattern', 'sequence', 'count on'] },
+    row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive'] },
+    column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive'] },
+    multiple: { meaning: 'a number you land on counting in steps', explain: 'Multiple means a number you land on when you count in threes.', notWith: ['pattern', 'sequence', 'count on', 'rule', 'grow'] },
     input: { meaning: 'the number that goes in', explain: 'Input means the number that goes in, on the In side.', notWith: ['column'] },
     output: { meaning: 'the number that comes out', explain: 'Output means the number that comes out, on the Out side.', notWith: ['column'] },
-    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern'] },
+    rule: { meaning: 'what we do to every number', explain: 'Rule means what we do to every number, like add 3.', notWith: ['pattern', 'row', 'column', 'multiple'] },
     pattern: { meaning: 'numbers that change the same way', explain: 'Pattern means numbers that change the same way, plus 2 each time.', notWith: ['multiple', 'sequence', 'rule', 'repeat'] },
     array: { meaning: 'things in equal rows', explain: 'Array means things in equal rows, like 3 rows of 4 dots.', notWith: ['equal groups', 'distributive', 'commutative', 'even', 'row', 'column'] },
-    commutative: { meaning: 'turn it round, the answer stays the same', explain: 'Commutative means you can turn it round and the answer stays the same.', notWith: ['array'] },
+    commutative: { meaning: 'turn it round, the answer stays the same', explain: 'Commutative means you can turn it round and the answer stays the same.', notWith: ['array', 'row', 'column'] },
     identity: { meaning: 'times 1 keeps the number the same', explain: 'Identity means times 1 keeps the number the same, so 5 stays 5.', notWith: ['equal groups', 'odd'] },
-    distributive: { meaning: 'split it into two easier parts', explain: 'Distributive means you split it into two easier parts, then add them.', notWith: ['array'] },
+    distributive: { meaning: 'split it into two easier parts', explain: 'Distributive means you split it into two easier parts, then add them.', notWith: ['array', 'row', 'column'] },
     step: { meaning: 'one part of the work, in order', explain: 'Step means one part of the work: first Step 1, then Step 2.', notWith: ['column', 'row', 'total', 'left', 'grow'] },
     total: { meaning: 'all of them together', explain: 'Total means all of them together: 5 and 3 make the whole bar.', notWith: ['unknown'] },
     left: { meaning: 'what stays after some go', explain: 'Left means what stays after some go: four are left.', notWith: ['one less'] },
@@ -60,9 +60,9 @@ export const VOCAB_WORDS = Object.freeze({
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round and back to the start, like ones digits do.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
-    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd'] },
-    term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 7 in the box.', notWith: ['first term', 'sequence', 'multiple', 'pattern'] },
-    'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 3.', notWith: ['term', 'sequence', 'multiple', 'pattern'] },
+    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd', 'multiple'] },
+    term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 14 in the box.', notWith: ['first term', 'sequence', 'multiple', 'pattern'] },
+    'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 30.', notWith: ['term', 'sequence', 'multiple', 'pattern'] },
     'times as many': { meaning: 'the same amount, again and again', explain: 'Times as many means one bar is 3 times as long as the other.', notWith: ['compare'] },
     compare: { meaning: 'find which is more, and by how much', explain: 'Compare means find which bar is longer, and by how much.', notWith: ['times as many'] },
     equation: { meaning: 'two sides that are equal', explain: 'Equation means both sides are equal: 12 is the same as 3 times 4.', notWith: [] },
@@ -72,6 +72,72 @@ export const VOCAB_WORDS = Object.freeze({
     dividend: { meaning: 'the number you divide up', explain: 'Dividend means the number you divide up, like the 13.', notWith: [] },
     'round up': { meaning: 'use one more group for what is left', explain: 'Round up means use one more group for what is left over.', notWith: ['remainder', 'equal groups', 'quotient'] },
 });
+
+/**
+ * V-FEAT (lf-vocab r11): each word's DEFINING FEATURES - alternatives, each a set of picture features (graphics/vocab-pictures.js
+ * VOCAB_FEATURES) that together show the word. 'step:*' matches any step; '!f' means the picture must NOT draw f. A picture of
+ * word A whose features satisfy word B's definition reads as B: dealt with B it is a clash, unless A and B are notWith
+ * (ws-vocab-unit V-FEAT). A word with no picture of its own still has a definition: other pictures may read as it.
+ */
+export const VOCAB_DEFS = Object.freeze({
+    even: [['pairs-ringed', '!lone-mark']],
+    odd: [['pairs-ringed', 'lone-mark']],
+    product: [['boxed-answer', 'times-sign']],
+    factor: [['boxed-operand', 'times-sign']],
+    row: [['row-ringed'], ['array']],
+    column: [['column-ringed'], ['array']],
+    multiple: [['hops', 'number-line'], ['skip-count']],
+    input: [['arrow-into-box', 'numbers-at-ends'], ['in-ringed']],
+    output: [['arrow-out-of-box', 'numbers-at-ends'], ['out-ringed']],
+    // (a run reads as THE rule when its step is the rule picture's own +3, or when its step is written on it, +2 hops; a bare
+    // run with another step does not - critic r10 #1's redraw of term and first term)
+    rule: [['step:3'], ['plus-sign', 'rising-run'], ['arrow-into-box'], ['op-box']],
+    pattern: [['rising-run'], ['falling-run'], ['loop-numbers'], ['repeated-block']],
+    array: [['array']],
+    commutative: [['turn-arrow']],
+    identity: [['same-number-arc']],
+    distributive: [['split-line', 'array']],
+    step: [['step-labels']],
+    total: [['bar-whole', 'bar-parts']],
+    left: [['crossed-mark'], ['lone-mark']],
+    'equal groups': [['groups-of:*']],
+    unknown: [['question-mark']],
+    'count on': [['forward-hop', 'number-track', 'rising-run']],
+    'one more': [['ringed-new'], ['forward-hop']],
+    'one less': [['crossed-mark'], ['back-hop']],
+    before: [['back-hop']],
+    after: [['forward-hop']],
+    'hundred chart': [['table', 'step:10']],
+    hundred: [['base10-flat']],
+    ten: [['base10-rod']],
+    one: [['base10-unit']],
+    digit: [['digit-ringed'], ['last-digit-boxed']],
+    'expanded form': [['expanded-sum']],
+    'number name': [['number-words']],
+    'ones digit': [['last-digit-boxed']],
+    repeat: [['repeated-block']],
+    sequence: [['rising-run'], ['falling-run'], ['loop-numbers'], ['repeated-block']],
+    cycle: [['loop-shapes'], ['loop-numbers'], ['loop-arrows']],
+    grow: [['rising-run'], ['shapes-growing']],
+    term: [['boxed-in-run'], ['boxed-first-of-run']],
+    'first term': [['boxed-first-of-run']],
+    'times as many': [['times-bar']],
+    compare: [['bar-pair', 'double-arrow'], ['times-bar']],
+    equation: [['equals']],
+    remainder: [['groups-of:*', 'lone-mark']],
+    quotient: [['boxed-answer', 'divide-sign']],
+    divisor: [['boxed-divisor']],
+    dividend: [['boxed-dividend']],
+    'round up': [['grouped-boxes', 'lone-mark'], ['grouped-boxes']],
+});
+const featHas = (fs, t) => (t.endsWith(':*') ? fs.some((f) => f.startsWith(t.slice(0, -1))) : fs.includes(t));
+/** Do these picture features satisfy a word's definition (one alternative all met)? */
+export function featuresSatisfy(features, word) {
+    const fs = Array.isArray(features) ? features : [];
+    return (VOCAB_DEFS[word] || []).some((alt) => alt.every((t) => (t.startsWith('!') ? !featHas(fs, t.slice(1)) : featHas(fs, t))));
+}
+/** Every word a picture with these features reads as (its own word included). */
+export const vocabWordsReading = (features) => Object.keys(VOCAB_DEFS).filter((w) => featuresSatisfy(features, w));
 
 /**
  * THE SETS (append-only; position = option value). `lesson` the BUILD lesson's site id, `grade`
@@ -167,4 +233,4 @@ export function vocabHowSteps(template, word, wrong = []) {
         ? ['Read the three words in the box.', `Tap ${word}.`]
         : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
 }
-export default { VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
+export default { VOCAB_DEFS, featuresSatisfy, vocabWordsReading, VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };

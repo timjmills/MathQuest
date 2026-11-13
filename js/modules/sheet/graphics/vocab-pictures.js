@@ -22,6 +22,7 @@
 // Pure module (SCC-01): no window, no DOM, no state, no Math.random.
 
 import { L, esc, isTwin, GREY } from './units.js';
+import { vocabWordsReading as readingsOf } from '../lesson-pages/vocab-words.js';
 
 /** The canvas every picture is drawn on (units), and the approved widths (mm). */
 export const PIC_CANVAS = Object.freeze({ w: 60, h: 40 });
@@ -397,13 +398,16 @@ const PICS = {
     },
     term: {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
-        alt: 'three numbers in order, 4, 7, 10; the 7 in a heavy box',
-        draw: () => tx(9, 20, 0, '4,', { size: 9 }) + rect(19, 11, 15, 18, W.heavy) + tx(26.5, 20, 0, '7', { size: 9 }) + tx(37, 20, 0, ',', { size: 9 }) + tx(47, 20, 0, '10', { size: 9 }),
+        // (r11, critic r10 #1: 4, [7], 10 rose by the rule picture's +3, so it read as grow and as rule - now a FALLING run with
+        // another step; V-FEAT reads its features from the markup)
+        alt: 'three numbers in order, 18, 14, 10; the 14 in a heavy box',
+        draw: () => tx(9, 20, 0, '18,', { size: 9 }) + rect(19, 11, 15, 18, W.heavy) + tx(26.5, 20, 0, '14', { size: 9 }) + tx(37, 20, 0, ',', { size: 9 }) + tx(47, 20, 0, '10', { size: 9 }),
     },
     'first term': {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
-        alt: '3, 7, 11: the 3 at the start in a heavy box',
-        draw: () => rect(3, 11, 13, 18, W.heavy) + tx(9.5, 20, 0, '3', { size: 9 }) + tx(17, 20, 0, ', 7, 11…', { size: 9, anchor: 'start' }),
+        // (r11, critic r10 #1: [3], 7, 11 rose, so it read as grow - now a FALLING run: [30], 25, 20)
+        alt: '30, 25, 20: the 30 at the start in a heavy box',
+        draw: () => rect(3, 11, 15, 18, W.heavy) + tx(10.5, 20, 0, '30', { size: 9 }) + tx(19, 20, 0, ', 25, 20', { size: 9, anchor: 'start' }),
     },
     /* ---- Grade 4: multiplicative comparison (4.OA.A.1) */
     'times as many': {
@@ -459,6 +463,60 @@ const PICS = {
     },
 };
 
+/**
+ * V-FEAT (lf-vocab r11): the features each picture DECLARES it draws (VOCAB_FEATURES). ws-vocab-unit V-FEAT fails a picture
+ * whose markup shows a feature (vocabReadFeatures) it does not declare, and every co-dealt picture whose features satisfy
+ * another dealt word's definition (vocab-words.js VOCAB_DEFS) unless the two are notWith.
+ */
+const PIC_FEAT = Object.freeze({
+    even: ['dots', 'pairs-ringed', 'groups-of:2'],
+    odd: ['dots', 'lone-mark', 'pairs-ringed', 'groups-of:2'],
+    product: ['boxed-answer', 'boxed-number', 'equals', 'times-sign', 'number-sentence'],
+    factor: ['boxed-number', 'boxed-operand', 'equals', 'times-sign', 'number-sentence'],
+    row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
+    column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
+    multiple: ['dots', 'rising-run', 'skip-count', 'step:3', 'number-line', 'hops', 'forward-hop'],
+    input: ['table', 'column-ringed', 'in-ringed'],
+    output: ['table', 'column-ringed', 'out-ringed'],
+    rule: ['arrow-into-box', 'arrow-out-of-box', 'op-box', 'plus-sign'],
+    pattern: ['ellipsis', 'plus-sign', 'rising-run', 'skip-count', 'step:2', 'hops', 'forward-hop'],
+    array: ['dots', 'array'],
+    commutative: ['dots', 'equals', 'times-sign', 'array', 'turn-arrow', 'number-sentence'],
+    identity: ['equals', 'times-sign', 'same-number-arc', 'number-sentence'],
+    distributive: ['dots', 'plus-sign', 'times-sign', 'array', 'split-line'],
+    step: ['equals', 'minus-sign', 'plus-sign', 'step-labels', 'number-sentence'],
+    total: ['boxed-question', 'question-mark', 'bar-whole', 'bar-parts'],
+    left: ['crossed-mark', 'bracket'],
+    'equal groups': ['dots', 'groups-of:4'],
+    unknown: ['boxed-question', 'equals', 'plus-sign', 'question-mark', 'number-sentence'],
+    'count on': ['rising-run', 'step:1', 'number-track', 'forward-hop', 'hops'],
+    'one more': ['dots', 'lone-mark', 'ringed-new'],
+    'one less': ['crossed-mark', 'dots'],
+    before: ['boxed-first-of-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'back-hop'],
+    after: ['boxed-in-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'forward-hop'],
+    'hundred chart': ['table', 'rising-run', 'step:1', 'step:10'],
+    hundred: ['base10-flat'],
+    ten: ['base10-rod'],
+    one: ['base10-unit'],
+    digit: ['digit-ringed'],
+    'expanded form': ['plus-sign', 'expanded-sum'],
+    'number name': ['number-words'],
+    'ones digit': ['boxed-number', 'last-digit-boxed'],
+    repeat: ['repeated-block', 'bracket'],
+    sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
+    cycle: ['loop-arrows', 'loop-shapes'],
+    grow: ['shapes-growing'],
+    term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4'],
+    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count'],
+    'times as many': ['times-sign', 'times-bar', 'bar-pair', 'bracket'],
+    compare: ['bar-pair', 'double-arrow'],
+    equation: ['equals', 'times-sign', 'number-sentence'],
+    remainder: ['dots', 'lone-mark', 'groups-of:4'],
+    quotient: ['boxed-answer', 'boxed-number', 'divide-sign', 'equals', 'number-sentence'],
+    divisor: ['boxed-number', 'divide-sign', 'boxed-divisor'],
+    dividend: ['boxed-number', 'divide-sign', 'boxed-dividend'],
+    'round up': ['dots', 'grouped-boxes', 'groups-of:4'],
+});
 /**
  * V-FIT (r10, critic r9 #4 / #5, rule 5): what each picture TEACHES - the CCSS codes its drawing shows (`ccss`) and its operation
  * (`op`). A lesson set's core words (its first three, the vocabulary page's Match 3 cell) must have pictures that teach the
@@ -523,97 +581,134 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     'round up': ['remainder', 'equal groups', 'quotient'],
 });
 /*
- * V-AMBIG+ (critic r7 #6, lf-vocab r9): the words a picture's OWN marks show, DERIVED from its drawing, never written by hand:
- *   a number sentence with "="                                   -> equation
- *   three or more numbers one step apart, along a line or down    -> pattern, sequence, multiple
- *   a heavy outline round two or more numbers, taller than wide   -> column (wider than tall: row)
- *   a crossed mark (two strokes across each other), or a ring round one lone dot -> left
- *   three or more arrow heads round a centre (a loop of arrows)   -> pattern
- *   an arrow INTO a box and an arrow OUT of it, a number at both ends -> input, output (r10, critic r9 #2: 2 -> [+3] -> 5)
- *   a loop of three or more numbers (round a centre, not in table cells) -> sequence, pattern (r10, critic r9 #3: 2 4 8 6)
- * vocabPictureAlsoShows() is these plus the hand list (VOCAB_ALSO_SHOWS), which stays only as an extra.
+ * V-FEAT (lf-vocab r11, rule 5 root cause: the look-alike class failed r6, r7, r9 and r10, each time closed by one more
+ * derived rule). Every picture DECLARES the features it draws (`feat`, a closed vocabulary: VOCAB_FEATURES), and every word
+ * declares its defining features (vocab-words.js VOCAB_WORDS `def`: alternatives, each a set of features). A picture of A
+ * whose features satisfy B's definition, dealt with B, is a clash (ws-vocab-unit V-FEAT). The declarations are CHECKED
+ * against the drawing: vocabReadFeatures reads every feature the markup shows, and a picture that draws a feature it does
+ * not declare fails V-FEAT. Parameterised features: step:<d> (a run's step), groups-of:<n>.
  */
+export const VOCAB_FEATURES = Object.freeze([
+    // read from the markup (vocabReadFeatures)
+    'equals', 'times-sign', 'plus-sign', 'minus-sign', 'divide-sign', 'question-mark', 'ellipsis', 'dots',
+    'rising-run', 'falling-run', 'step:<d>', 'skip-count', 'boxed-number', 'boxed-question', 'op-box', 'boxed-answer',
+    'boxed-operand', 'boxed-divisor', 'boxed-dividend', 'boxed-first-of-run', 'boxed-in-run', 'row-ringed', 'column-ringed', 'in-ringed', 'out-ringed',
+    'crossed-mark', 'lone-mark', 'loop-arrows', 'loop-numbers', 'arrow-into-box', 'arrow-out-of-box', 'numbers-at-ends',
+    // declared only (not read from the markup)
+    'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
+    'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
+    'ringed-new', 'base10-unit', 'base10-rod', 'base10-flat', 'digit-ringed', 'last-digit-boxed', 'expanded-sum',
+    'number-words', 'repeated-block', 'loop-shapes', 'shapes-growing', 'times-bar', 'number-sentence', 'grouped-boxes',
+]);
 const num_ = (s) => Number(s);
-const isAP_ = (ns) => { for (let i = 0; i + 2 < ns.length; i++) { const d = ns[i + 1] - ns[i]; if (d !== 0 && ns[i + 2] - ns[i + 1] === d) return true; } return false; };
-function derivedFromBody(body) {
-    const words = new Set();
+/** Every feature a drawn picture body (svg markup, canvas units) shows, read from its marks. */
+export function vocabReadFeatures(body) {
+    body = String(body || '');
+    const f = new Set();
     const attrs = (s) => Object.fromEntries([...s.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
     const texts = [...body.matchAll(/<text([^>]*)>([^<]*)<\/text>/g)].map((m) => { const a = attrs(m[1]); return { x: num_(a.x), y: num_(a.y), t: m[2].replace(/&amp;/g, '&') }; });
-    // 1. "=" : a number sentence -> equation
-    if (texts.some((t) => t.t.includes('='))) words.add('equation');
-    // 2. a number run (3+ numbers, one step) along a line or down a column -> pattern, sequence, multiple
-    const runOf = (list) => list.flatMap((t) => (t.t.match(/\d+/g) || []).map(Number));
-    const byLine = new Map(), byCol = new Map();
-    for (const t of texts) {
-        const ky = Math.round(t.y / 2), kx = Math.round(t.x / 2);
-        if (!byLine.has(ky)) byLine.set(ky, []); byLine.get(ky).push(t);
-        if (!byCol.has(kx)) byCol.set(kx, []); byCol.get(kx).push(t);
-    }
-    const runs = [...[...byLine.values()].map((l) => l.sort((a, b) => a.x - b.x)), ...[...byCol.values()].map((l) => l.sort((a, b) => a.y - b.y))];
-    if (runs.some((l) => isAP_(runOf(l)))) ['pattern', 'sequence', 'multiple'].forEach((w) => words.add(w));
-    // 3. a column drawn round: a heavy outline taller than wide round two or more numbers -> column (wider: row)
-    const rects = [...body.matchAll(/<rect([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.x), y: num_(a.y), w: num_(a.width), h: num_(a.height), sw: num_(a['stroke-width']), rx: num_(a.rx || 0), fill: a.fill }));
-    const heavy = Math.max(0, ...rects.map((r) => r.sw || 0));
-    for (const r of rects) {
-        if (!(r.sw >= heavy) || r.fill !== 'none') continue;
-        const inside = texts.filter((t) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h);
-        if (inside.length < 2) continue;
-        if (r.h > 1.5 * r.w) words.add('column');
-        if (r.w > 1.5 * r.h) words.add('row');
-    }
-    // 4. a crossed or a lone mark -> left
-    const lines = [...body.matchAll(/<line([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x1: num_(a.x1), y1: num_(a.y1), x2: num_(a.x2), y2: num_(a.y2) }));
-    const crosses = (p, q) => { const d = (a, b, c) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); const A = { x: p.x1, y: p.y1 }, B = { x: p.x2, y: p.y2 }, C = { x: q.x1, y: q.y1 }, D = { x: q.x2, y: q.y2 }; return d(A, B, C) * d(A, B, D) < 0 && d(C, D, A) * d(C, D, B) < 0; };
-    const diag = lines.filter((l) => Math.abs(l.x2 - l.x1) > 0.5 && Math.abs(l.y2 - l.y1) > 0.5);
-    if (diag.some((p, i) => diag.slice(i + 1).some((q) => crosses(p, q)))) words.add('left');
+    const all = texts.map((t) => t.t).join(' ');
+    if (all.includes('=')) f.add('equals');
+    if (all.includes('×')) f.add('times-sign');
+    if (/\+/.test(all)) f.add('plus-sign');
+    if (/[−-]/.test(all.replace(/\b[a-z]+-[a-z]+\b/g, ''))) f.add('minus-sign');
+    if (all.includes('÷')) f.add('divide-sign');
+    if (all.includes('?')) f.add('question-mark');
+    if (all.includes('…')) f.add('ellipsis');
     const circles = [...body.matchAll(/<circle([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.cx), y: num_(a.cy), r: num_(a.r), fill: a.fill }));
     const dotsC = circles.filter((c) => c.fill !== 'none');
+    if (dotsC.length >= 2) f.add('dots');
+    const rects = [...body.matchAll(/<rect([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x: num_(a.x), y: num_(a.y), w: num_(a.width), h: num_(a.height), sw: num_(a['stroke-width']), fill: a.fill }));
+    const inR = (t, r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h;
+    // number runs: 3+ numbers one step apart, along a line or down a column (a line of text tokens, in reading order)
+    const toks = texts.flatMap((t) => (t.t.match(/\d+/g) || []).map((n, i, a) => ({ n: Number(n), x: t.x + (a.length > 1 ? i : 0) * 0.01, y: t.y, src: t })));
+    const group = (key) => { const m = new Map(); for (const k of toks) { const g = key(k); if (!m.has(g)) m.set(g, []); m.get(g).push(k); } return [...m.values()]; };
+    const lines = [...group((k) => Math.round(k.y / 2)).map((l) => l.sort((a, b) => a.x - b.x)), ...group((k) => Math.round(k.x / 2)).map((l) => l.sort((a, b) => a.y - b.y))];
+    const runs = [];
+    for (const l of lines) for (let i = 0; i + 2 < l.length; i++) {
+        const d = l[i + 1].n - l[i].n;
+        if (d === 0 || l[i + 2].n - l[i + 1].n !== d) continue;
+        let j = i + 2; while (j + 1 < l.length && l[j + 1].n - l[j].n === d) j++;
+        runs.push({ items: l.slice(i, j + 1), d });
+        f.add(d > 0 ? 'rising-run' : 'falling-run'); f.add(`step:${Math.abs(d)}`);
+        if (Math.abs(d) > 1 && (l[i].n === Math.abs(d) || l[i].n === 0 || l[i].n % Math.abs(d) === 0)) f.add('skip-count');
+        i = j - 1;
+    }
+    const heavy = rects.filter((r) => r.sw >= 2 && r.fill === 'none');
+    const eqX = texts.filter((t) => t.t.trim() === '=' || /\s=\s/.test(t.t)).map((t) => t);
+    for (const r of heavy) {
+        const inside = texts.filter((t) => inR(t, r));
+        if (inside.length >= 2) {
+            if (r.h > 1.5 * r.w) f.add('column-ringed');
+            if (r.w > 1.5 * r.h) f.add('row-ringed');
+            if (inside.some((t) => t.t === 'In')) f.add('in-ringed');
+            if (inside.some((t) => t.t === 'Out')) f.add('out-ringed');
+            continue;
+        }
+        if (inside.length !== 1) continue;
+        const t = inside[0].t.trim();
+        if (t === '?') f.add('boxed-question');
+        else if (/^[+−×÷]\d+$/.test(t)) f.add('op-box');
+        else if (/^\d+$/.test(t)) {
+            f.add('boxed-number');
+            const eq = eqX.find((e) => Math.abs(e.y - inside[0].y) < r.h / 2);
+            if (eq) f.add(inside[0].x > eq.x ? 'boxed-answer' : 'boxed-operand');
+            const dv = texts.find((e) => e.t.trim() === '÷' && Math.abs(e.y - inside[0].y) < r.h / 2);
+            if (dv && !(eq && inside[0].x > eq.x)) f.add(inside[0].x > dv.x ? 'boxed-divisor' : 'boxed-dividend');
+            for (const run of runs) {
+                const k = run.items.findIndex((it) => it.src === inside[0]);
+                if (k === 0) f.add('boxed-first-of-run'); else if (k > 0) f.add('boxed-in-run');
+            }
+        }
+    }
+    // a crossed mark (two strokes across each other); a ring round one lone dot
+    const lns = [...body.matchAll(/<line([^>]*)\/>/g)].map((m) => attrs(m[1])).map((a) => ({ x1: num_(a.x1), y1: num_(a.y1), x2: num_(a.x2), y2: num_(a.y2) }));
+    const crosses = (p, q) => { const d = (a, b, c) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x); const A = { x: p.x1, y: p.y1 }, B = { x: p.x2, y: p.y2 }, C = { x: q.x1, y: q.y1 }, D = { x: q.x2, y: q.y2 }; return d(A, B, C) * d(A, B, D) < 0 && d(C, D, A) * d(C, D, B) < 0; };
+    const diag = lns.filter((l) => Math.abs(l.x2 - l.x1) > 0.5 && Math.abs(l.y2 - l.y1) > 0.5);
+    if (diag.some((p, i) => diag.slice(i + 1).some((q) => crosses(p, q)))) f.add('crossed-mark');
     for (const ring of circles.filter((c) => c.fill === 'none')) {
         const inn = dotsC.filter((d) => Math.hypot(d.x - ring.x, d.y - ring.y) < ring.r);
-        if (inn.length === 1 && texts.every((t) => Math.hypot(t.x - ring.x, t.y - ring.y) >= ring.r)) words.add('left');
+        if (inn.length === 1 && texts.every((t) => Math.hypot(t.x - ring.x, t.y - ring.y) >= ring.r)) f.add('lone-mark');
     }
-    // 5. a loop of arrows (three or more arrow heads round a centre, not along one line) -> pattern
+    // a loop of arrows: three or more arrow heads round a centre, not along one line
     const heads = [...body.matchAll(/<path d="M([\d.-]+) ([\d.-]+) [Ll][^"]*Z" fill="#000"\/>/g)].map((m) => ({ x: num_(m[1]), y: num_(m[2]) }));
     if (heads.length >= 3) {
         const xs = heads.map((h) => h.x), ys = heads.map((h) => h.y);
         const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-        if (w > 4 && h > 4 && Math.min(w, h) / Math.max(w, h) > 0.5) words.add('pattern');
+        if (w > 4 && h > 4 && Math.min(w, h) / Math.max(w, h) > 0.5) f.add('loop-arrows');
     }
-    // 6. a function machine: a box with a line arriving at its left side and one leaving its right side (on the box's
-    // height), a number before the first and after the second -> input, output (r10, critic r9 #2)
+    // a machine: a line arriving at a box's left side / leaving its right side, on the box's height; numbers at both ends
     const numT = texts.filter((t) => /\d/.test(t.t));
     for (const r of rects) {
         if (r.fill !== 'none') continue;
         const onBox = (y) => y > r.y && y < r.y + r.h;
-        const ins = lines.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.max(l.x1, l.x2) <= r.x + 0.5 && Math.max(l.x1, l.x2) >= r.x - 5);
-        const outs = lines.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.min(l.x1, l.x2) >= r.x + r.w - 0.5 && Math.min(l.x1, l.x2) <= r.x + r.w + 5);
+        const ins = lns.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.max(l.x1, l.x2) <= r.x + 0.5 && Math.max(l.x1, l.x2) >= r.x - 5);
+        const outs = lns.filter((l) => Math.abs(l.y1 - l.y2) < 0.5 && onBox(l.y1) && Math.min(l.x1, l.x2) >= r.x + r.w - 0.5 && Math.min(l.x1, l.x2) <= r.x + r.w + 5);
+        if (ins.length) f.add('arrow-into-box');
+        if (outs.length) f.add('arrow-out-of-box');
         for (const a of ins) for (const b of outs) {
             const x0 = Math.min(a.x1, a.x2), x1 = Math.max(b.x1, b.x2);
-            if (numT.some((t) => t.x < x0 && Math.abs(t.y - a.y1) < r.h / 2) && numT.some((t) => t.x > x1 && Math.abs(t.y - b.y1) < r.h / 2)) { words.add('input'); words.add('output'); }
+            if (numT.some((t) => t.x < x0 && Math.abs(t.y - a.y1) < r.h / 2) && numT.some((t) => t.x > x1 && Math.abs(t.y - b.y1) < r.h / 2)) f.add('numbers-at-ends');
         }
     }
-    // 7. a loop of numbers: three or more numbers, outside any box, spread round a centre (each about as far from it, the
-    // spread as tall as it is wide) -> sequence, pattern (r10, critic r9 #3: the 2, 4, 8, 6 ring read as numbers in order)
-    const free = numT.filter((t) => !rects.some((r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h));
+    // a loop of numbers: three or more numbers outside any box, spread round a centre
+    const free = numT.filter((t) => !rects.some((r) => inR(t, r)));
     if (free.length >= 3) {
         const cx = free.reduce((a, t) => a + t.x, 0) / free.length, cy = free.reduce((a, t) => a + t.y, 0) / free.length;
         const ds = free.map((t) => Math.hypot(t.x - cx, t.y - cy)), md = ds.reduce((a, d) => a + d, 0) / ds.length;
         const xs = free.map((t) => t.x), ys = free.map((t) => t.y);
         const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-        if (md > 3 && ds.every((d) => Math.abs(d - md) < 0.3 * md) && Math.min(w, h) / Math.max(w, h) > 0.5) { words.add('sequence'); words.add('pattern'); }
+        if (md > 3 && ds.every((d) => Math.abs(d - md) < 0.3 * md) && Math.min(w, h) / Math.max(w, h) > 0.5) f.add('loop-numbers');
     }
-    return [...words];
+    return [...f].sort();
 }
-/** The V-AMBIG+ reading of any drawn picture body (svg markup, canvas units): the words its marks show. */
-export const vocabDerivedFromBody = (body) => derivedFromBody(String(body || ''));
-/** The words a library picture's drawing shows, other than its own word (derived; [] for no picture). */
-export function vocabPictureDerived(id) {
-    if (!Object.prototype.hasOwnProperty.call(PICS, String(id))) return [];
-    return derivedFromBody(bodyFor(String(id), '')).filter((w) => w !== String(id));
-}
-/** The other words a library picture could be read as: derived from its drawing, plus the hand list (null: no list). */
+/** The features a library picture's drawing shows, read from its markup ([] for no picture). */
+export const vocabPictureReadFeatures = (id) => (Object.prototype.hasOwnProperty.call(PICS, String(id)) ? vocabReadFeatures(bodyFor(String(id), '')) : []);
+/** The features a library picture DECLARES it draws (its `feat`; null when it declares none). */
+export const vocabPictureFeatures = (id) => (Object.prototype.hasOwnProperty.call(PIC_FEAT, String(id)) ? PIC_FEAT[id].slice() : null);
+/** The other words a library picture could be read as: the words its declared features satisfy, plus the hand list. */
 export const vocabPictureAlsoShows = (id) => (Object.prototype.hasOwnProperty.call(VOCAB_ALSO_SHOWS, id)
-    ? [...new Set([...vocabPictureDerived(id), ...VOCAB_ALSO_SHOWS[id]])] : null);
+    ? [...new Set([...readingsOf(vocabPictureFeatures(id) || vocabPictureReadFeatures(id)).filter((w) => w !== id), ...VOCAB_ALSO_SHOWS[id]])] : null);
 export const VOCAB_PICTURE_IDS = Object.freeze(Object.keys(PICS));
 /** Does the library have a picture of this word? */
 export const hasVocabPicture = (id) => Object.prototype.hasOwnProperty.call(PICS, String(id));
@@ -815,4 +910,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, vocabDerivedFromBody, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

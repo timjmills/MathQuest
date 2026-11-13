@@ -3794,11 +3794,12 @@
     "commit": "b52eb44c",
     "state": "lf-vocab r9 items 5 + 6"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\)\" picture reads as \"\\(pattern\\|multiple\\)\"\\|the \"array\" picture reads as \"\\(row\\|column\\)\"' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "note": "r11: V-AMBIG+ (the derived-rule list) was replaced by V-FEAT; the row judges the same r7 cases through V-FEAT"
   },
   {
    "id": "vocab-r9-v27-minors",
@@ -3840,86 +3841,86 @@
     "pass": "OK"
    }
   },
- {
-  "id": "model-interior-band-facts",
-  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
-  "kind": "commit-pair",
-  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
-  "browser": true,
-  "fail": {
-   "commit": "9f7983dd",
-   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+  {
+   "id": "model-interior-band-facts",
+   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+   "browser": true,
+   "fail": {
+    "commit": "9f7983dd",
+    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+   },
+   "pass": {
+    "commit": "04683166",
+    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "04683166",
-   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+  {
+   "id": "screen-support-eq-divfacts",
+   "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+   },
+   "pass": {
+    "commit": "d377e32b",
+    "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-support-eq-divfacts",
-  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+  {
+   "id": "screen-cue-size-divfacts",
+   "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+   },
+   "pass": {
+    "commit": "d377e32b",
+    "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+  {
+   "id": "screen-support-place-divfacts",
+   "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+   "browser": true,
+   "fail": {
+    "commit": "1428a84c",
+    "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+   },
+   "pass": {
+    "commit": "d377e32b",
+    "state": "0 findings: every ÷ card under once one wraps"
+   },
+   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-cue-size-divfacts",
-  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
-  },
-  "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
- {
-  "id": "screen-support-place-divfacts",
-  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
-  "kind": "commit-pair",
-  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
-  "browser": true,
-  "fail": {
-   "commit": "1428a84c",
-   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
-  },
-  "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: every ÷ card under once one wraps"
-  },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
-  }
- },
   {
    "id": "vocab-r10-rule-machine",
    "check": "lf-vocab r10 item 1: critic r9 #2: a picture with an arrow into and out of a box and a number at both ends (2 -> [+3] -> 5) derives input and output; rule may not share a bank with them",
@@ -3934,11 +3935,12 @@
     "commit": "0c3d4c59",
     "state": "rule drawn as the box and arrows only"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+ 2>&1 | grep -q '\"rule\": its drawing also shows \"\\(input\\|output\\)\"' && echo 'rule-machine: FAIL' || echo 'rule-machine: OK')",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"rule\" picture reads as \"\\(input\\|output\\)\"' && echo 'rule-machine: FAIL' || echo 'rule-machine: OK')",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
   },
   {
    "id": "vocab-r10-cycle-loop",
@@ -3954,11 +3956,12 @@
     "commit": "856aba09",
     "state": "cycle drawn as a loop of four shapes"
    },
-   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+ 2>&1 | grep -q '\"cycle\": its drawing also shows' && echo 'cycle-loop: FAIL' || echo 'cycle-loop: OK')",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"cycle\" picture reads as' && echo 'cycle-loop: FAIL' || echo 'cycle-loop: OK')",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
   },
   {
    "id": "vocab-r10-v-fit",
@@ -4040,24 +4043,81 @@
     "pass": "OK"
    }
   },
- {
-  "id": "runner-orphan-slot",
-  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
-  "kind": "fixture",
-  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
-  "fail": {
-   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
-   "state": "master 7e0c074b runner: the command inherits the slot fd"
+  {
+   "id": "runner-orphan-slot",
+   "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
+   "kind": "fixture",
+   "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
+    "state": "master 7e0c074b runner: the command inherits the slot fd"
+   },
+   "pass": {
+    "fixture": "tests/scripts/mq-browser-run.sh",
+    "state": "lf-engine-bt: \"$@\" {fd}>&-"
+   },
+   "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "pass": {
-   "fixture": "tests/scripts/mq-browser-run.sh",
-   "state": "lf-engine-bt: \"$@\" {fd}>&-"
+  {
+   "id": "vocab-r11-feat-r7-row-pattern",
+   "check": "V-FEAT: the r7 look-alikes (row / column read as pattern and multiple; array as row / column) are clashes: critic r7 #6",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+   "fail": {
+    "commit": "d17f8d6a",
+    "state": "lf-vocab r8 start: row, column, array dealt with pattern / multiple / row"
+   },
+   "pass": {
+    "commit": "TBD-r11-1",
+    "state": "V-FEAT, the r11 notWith and redraws"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\|array\\)\" picture reads as' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   },
-  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
-  "expect": {
-   "fail": "FAIL",
-   "pass": "OK"
+  {
+   "id": "vocab-r11-feat-r9-rule-cycle",
+   "check": "V-FEAT: the r9 cases, rule (2 -> [+3] -> 5) read as input / output and cycle (2, 4, 8, 6 ring) as sequence: critic r9 #2, #3",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+   "fail": {
+    "commit": "6ae462d1",
+    "state": "lf-vocab r9 head"
+   },
+   "pass": {
+    "commit": "TBD-r11-1",
+    "state": "V-FEAT"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(rule\\|cycle\\)\" picture reads as \"\\(input\\|output\\|sequence\\)\"' && echo 'r9-rule-cycle: FAIL' || echo 'r9-rule-cycle: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r11-feat-r10-term",
+   "check": "V-FEAT: the r10 cases, term / first term (4, [7], 10 / [3], 7, 11) read as grow and term as rule: critic r10 #1",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+   "fail": {
+    "commit": "03eddcc2",
+    "state": "lf-vocab r10 head"
+   },
+   "pass": {
+    "commit": "TBD-r11-1",
+    "state": "term 18, [14], 10 and first term [30], 25, 20"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(term\\|first term\\)\" picture reads as \"\\(grow\\|rule\\)\"' && echo 'r10-term: FAIL' || echo 'r10-term: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- }
-]
+ ]
 }

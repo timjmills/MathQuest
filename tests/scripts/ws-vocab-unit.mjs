@@ -18,9 +18,11 @@
 //     with its halo (.mq-vhalo) in the single grey on the key and hidden on the screen until answered; the pupil page has neither
 // V24 (owner R-2, r7) every word has an `explain`: "<Word> means ...", naming its own word, no word of its notWith list,
 //     at most 14 words
-// V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails;
-//     (r10) the rules are this checkout's, read over the checked tree's drawings: + a function machine with numbers at both
-//     ends derives input / output (critic r9 #2), + a loop of three or more numbers derives sequence / pattern (critic r9 #3)
+// V-FEAT (r11, rule 5 root cause; replaces r9-r10's derived-rule list V-AMBIG+) every picture DECLARES the features it draws
+//     (vocab-pictures.js PIC_FEAT) and fails when its markup shows one it does not declare (vocabReadFeatures); every word
+//     declares its defining features (vocab-words.js VOCAB_DEFS). A picture of A dealt with B (the same set or grade pool, one
+//     item) whose features satisfy B's definition FAILS unless A and B are notWith. An older tree (backtest rows) declares
+//     none: its pictures take today's declaration where the drawing is today's, else the features its markup shows.
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
 // V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
@@ -145,23 +147,49 @@ const ambig = [];
         const hand = (P.VOCAB_ALSO_SHOWS || {})[id] || [];
         for (const b of hand) if (b !== id && W.VOCAB_WORDS[b] && W.compatible([id, b])) fail(`V-AMBIG "${id}": its picture could also show "${b}", and the two may share a bank (make them notWith)`);
     }
-    // V-AMBIG+ (critic r7 #6, lf-vocab r9): the words DERIVED from what each picture draws (vocabPictureDerived: "=" ->
-    // equation; a number run -> pattern, sequence, multiple; a column drawn round -> column; a crossed or lone mark -> left;
-    // a loop of arrows -> pattern). Every same-grade pair that compatible() lets share a bank FAILS: add it to notWith, or
-    // redraw the picture.
-    // (r10: the derivation rules are THIS checkout's - vocabDerivedFromBody - read over the checked tree's drawings, so a
-    // backtest row judges an old drawing by today's rules: the 2 -> [+3] -> 5 machine derives input / output, critic r9 #2)
-    const HERE_P = await import(pathToFileURL(path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', 'js/modules/sheet/graphics/vocab-pictures.js')).href);
-    const derivedOf = (id) => [...new Set([...(typeof P.vocabPictureDerived === 'function' ? P.vocabPictureDerived(id) : []),
-        ...(typeof HERE_P.vocabDerivedFromBody === 'function' ? HERE_P.vocabDerivedFromBody(P.vocabPictureSVG({}, id, { wMm: 46 })) : [])])].filter((w) => w !== id);
-    if (typeof P.vocabPictureDerived !== 'function') fail('V-AMBIG+: the library derives no alsoShows from its drawings (vocabPictureDerived)');
-    else for (const g of W.VOCAB_GRADES) {
-        const ws = W.gradeWords(g);
-        for (const id of ws) {
-            if (!P.hasVocabPicture(id)) continue;
-            for (const b of derivedOf(id)) if (b !== id && ws.includes(b) && W.compatible([id, b])) fail(`V-AMBIG+ grade ${g} "${id}": its drawing also shows "${b}" (derived), and the two may share a bank (make them notWith or redraw)`);
+    // V-FEAT (r11, rule 5: the look-alike class failed r6, r7, r9 and r10, each time closed by one more derived rule). Today's
+    // definitions (this checkout's VOCAB_DEFS) judge the checked tree's pictures and deals, so a backtest row judges an old
+    // drawing by today's vocabulary of features.
+    const here = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+    const HERE_P = await import(pathToFileURL(path.join(here, 'js/modules/sheet/graphics/vocab-pictures.js')).href);
+    const HERE_W = await import(pathToFileURL(path.join(here, 'js/modules/sheet/lesson-pages/vocab-words.js')).href);
+    const svgOf = (M, id) => M.vocabPictureSVG({}, id, { wMm: 46 });
+    const featCache = new Map();
+    const featOf = (id) => {
+        if (featCache.has(id)) return featCache.get(id);
+        const read = HERE_P.vocabReadFeatures(svgOf(P, id));
+        const own = typeof P.vocabPictureFeatures === 'function' ? P.vocabPictureFeatures(id) : null;
+        let fs;
+        if (own) {
+            for (const x of read) if (!own.includes(x)) fail(`V-FEAT "${id}": its drawing shows "${x}", which its picture does not declare`);
+            for (const x of own) if (!HERE_P.VOCAB_FEATURES.includes(x) && !HERE_P.VOCAB_FEATURES.includes(x.replace(/:.*/, ':<n>')) && !HERE_P.VOCAB_FEATURES.includes(x.replace(/:.*/, ':<d>'))) fail(`V-FEAT "${id}": "${x}" is not a feature of the closed list`);
+            fs = own;
+        } else {
+            const same = HERE_P.hasVocabPicture(id) && svgOf(HERE_P, id) === svgOf(P, id);
+            fs = same ? HERE_P.vocabPictureFeatures(id) : read;
+        }
+        featCache.set(id, fs);
+        return fs;
+    };
+    if (typeof P.vocabPictureFeatures !== 'function' && !process.env.MQ_ROOT) fail('V-FEAT: the library declares no picture features (vocabPictureFeatures)');
+    for (const w of Object.keys(W.VOCAB_WORDS)) if (!HERE_W.VOCAB_DEFS[w]) fail(`V-FEAT "${w}": the word declares no defining features (VOCAB_DEFS)`);
+    // (a picture reads as its own word: a declaration that does not is a wrong declaration or a wrong definition)
+    if (typeof P.vocabPictureFeatures === 'function') for (const id of P.VOCAB_PICTURE_IDS) if (HERE_W.VOCAB_DEFS[id] && !HERE_W.featuresSatisfy(featOf(id), id)) fail(`V-FEAT "${id}": its features (${featOf(id).join(' ')}) do not satisfy its own word's definition`);
+    const picsOf = (s) => s.words;
+    const pools = W.VOCAB_SETS.map((s) => ({ name: `set "${s.title}"`, pics: picsOf(s), words: s.words }))
+        .concat(W.VOCAB_GRADES.map((g) => ({ name: `grade ${g}`, pics: W.gradeWords(g), words: W.gradeWords(g) })));
+    const seenClash = new Set();
+    for (const pl of pools) for (const a of pl.pics) {
+        if (!P.hasVocabPicture(a)) continue;
+        for (const b of pl.words) {
+            if (a === b || !W.compatible([a, b]) || !HERE_W.featuresSatisfy(featOf(a), b)) continue;
+            const k = `${pl.name}|${a}|${b}`;
+            if (seenClash.has(k)) continue;
+            seenClash.add(k);
+            fail(`V-FEAT ${pl.name}: the "${a}" picture reads as "${b}" (${featOf(a).join(' ')}), and the two may be dealt together (notWith, redraw or the hatch)`);
         }
     }
+    if (process.argv.includes('--feat-list')) for (const id of P.VOCAB_PICTURE_IDS) console.log(`  feat ${id}: ${featOf(id).join(' ')} -> ${HERE_W.vocabWordsReading(featOf(id)).join(', ')}`);
     // (a lesson set's Match 3 cells are clash-free trios - lesson-pages/vocab-pages.js trios() by compatible - so the pair rule
     // above covers them, as it covers every dealt Match 3 cell and 1 picture, 3 words bank)
     // the lesson bands (lesson Warm-up vocabulary, sheet/lesson-pages/vocab.js): every {word, picture} list of the lesson
