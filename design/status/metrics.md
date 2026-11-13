@@ -564,3 +564,4 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
 | r14 | Opus medium builder (V-NUM single, V-PLACE, V-TWIN runs, screen size fixes); narrow critic r14 PASS min 8. Narrow rounds after r5: r6-r14 = 9 (r6, r7, r9-r14), 1 pass |
 | 2026-11-13 | lf-placevalue | compare r1 | critic FAIL (6 holding) | builder ~$30 + critic ~$12 | 2 builder passes cleared machine reds but not teaching: chant / M6 / deal depth are not machine-checked yet |
+| 2026-11-13 | lf-placevalue | placevalue:compare | 4 critic rounds (r4 PASS) | session +$33 of the $170 allocation since the reset (earlier rounds before the reset) | the wrap class recurred because the fix was keyed to one string and the check to the default band: fix the class (one helper), check every option band |

@@ -1059,3 +1059,5 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Round | What was lost | Cause | Fix |
 |---|---|---|---|
 | r14 critic PASS min 8 | - | Medium rebuild closed the complete defect list from r13 in one round; master merge brought ws-screen-ink-size (2 real screen size defects fixed, 4 SIZE-REF coverage findings ruled known) | Keep the dealt-banks table; the 3 minors are follow-ups |
+
+- 2026-11-13 lf-placevalue compare: a defect fixed in ONE string recurs in its siblings (the wrap: the "differ" step joined, the "Write" step not), and a check built on the default option misses the wide bands. Rule: fix the class at one helper, and run every layout check on the widest offered option value.

@@ -70,6 +70,19 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-13 **placevalue:compare PASSED** (critic compare r4 PASS; r1 FAIL F1-F6, r2 FAIL N1-N3, r3 FAIL N9 only -> round cap 2
+  root cause: every relation a step writes is one no-break unit, WRAP-SIGN runs the wide bands). redesign-passed.js PVC. Rounds: 4 critic
+  (r4 narrow), 5 builder passes (r1, r2, r3, checks pass, r4) + 2 merges. Every finding is in CHECKS_FROM_CRITICS with a backtest row
+  (or a reasoned exemption); the lane's ledger rows sweep clean. Open minors: N10 (box grazes its digit 0.3 mm), N11 (lesson Guided pad
+  3.2 mm). Engine items with their owners: opener / scripted-model / review / mixed bands, PG-23 / DN-2 (lf-engine), error-analysis
+  PUPILTAG / Reason It panel (lf-roles), worksheet 29 px (hosts). PNGs design/status/lf-placevalue/compare-pass/.
+
+| Finding (compare) | Check | Backtest | On path | Would have saved |
+|---|---|---|---|---|
+| r1 F1 reason-it overflow at band 999,999 | ws-cell-checks thinking roles x every band (opt-in) | pv-compare-thinking-bands | precritic | 1 round |
+| r1 F2-F6 teaching / deal | ws-pv-compare-deal / -pages, ws-lesson-unit chant-fit | pv-compare-* (10 rows) | precritic | 1-2 rounds |
+| r2 N1-N4, N6-N8, F9 | TOF-SHARE, MARK-CLEAR, SIGN-PARITY, MODEL-M6, remember-fit, EQ-SHARE(-PAGE), WRAP-SIGN, SIDE-PAD, --quiz-builder | pv-compare-* (11 rows) | precritic | 1 round |
+| r3 N9 wrap (2nd round) | WRAP-SIGN on band 9999 / 999999 / close | pv-compare-wrap-sign-bands | precritic | 1 round (and the round-cap stop) |
 - 2026-11-13 **compare critic r1 FAIL** (`design/audit/runs/lf-placevalue/critic-compare1.md`, head 16748cd8). Holding: F1 reason-it at
   band=999999 overflows the A/B boxes at S and L (H2; ws-cell-checks --card-opts passed it: the thinking roles are not rendered under
   every band); F2 the chant / worked steps do not teach the deciding place (chant decides 8 of 33 items); F3 M6 never the shown error

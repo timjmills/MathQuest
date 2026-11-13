@@ -66,5 +66,9 @@ const OPS_DF = 'Lane lf-ops, division:div_facts: support-aid print pages narrow 
 const OPS_DF_IDS = [
     'division:div_facts',
 ];
-export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS]);
-export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW])]);
+const PVC = 'Lane lf-placevalue week 2, placevalue:compare: critic compare r1 FAIL, r2 FAIL, r3 FAIL (one 7: N9 wrap), round-cap root cause + r4 PASS (independent Opus medium critics; every page type at M / L - print S dropped, owner 2026-11-13 - every option value of the signed pv card, card 1280 / 820, worksheet, quiz via the quiz builder >= 8; changed passed pages B1-B3 re-graded PASS; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-compare1.md .. critic-compare4.md, 2026-11-13';
+const PVC_IDS = [
+    'placevalue:compare',
+];
+export const REDESIGN_PASSED = new Set([...IDS, ...LD_IDS, ...VQ_IDS, ...VQ5_IDS, ...PV_IDS, ...PV3C_IDS, ...PV4_IDS, ...VOC_IDS, ...OPS_DF_IDS, ...PVW_IDS, ...PVC_IDS]);
+export const REDESIGN_EVIDENCE = Object.fromEntries([...IDS.map((id) => [id, S3]), ...VQ_IDS.map((id) => [id, VQ]), ...VQ5_IDS.map((id) => [id, VQ5]), ...LD_IDS.map((id) => [id, LD]), ...PV_IDS.map((id) => [id, PV]), ...PV3C_IDS.map((id) => [id, PV3C]), ...PV4_IDS.map((id) => [id, PV4]), ...VOC_IDS.map((id) => [id, VOC]), ...OPS_DF_IDS.map((id) => [id, OPS_DF]), ...PVW_IDS.map((id) => [id, PVW]), ...PVC_IDS.map((id) => [id, PVC])]);
