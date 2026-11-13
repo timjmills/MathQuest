@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows, oneRowMm,
+    tightRows, capRowsToInk, isStoryWork,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -1194,16 +1194,17 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
                 }
             }
-            // ONE-ROW (layout.oneRowMm, lead ruling R1 / R4a): a lone page of ONE row is held where the band under its work stays
-            // under 30 %, top-aligned - never spread, gapped or flexed to the page; the strip under it is the ruled one-row page's.
-            let oneRow = 0;
-            if (lone && part.chunk.rows === 1 && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs)) {
-                const cap = oneRowMm(its, L.cols);
-                const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : part.chunk.rows * L.cellH;
-                if (cap > 0 && drawn > cap + 0.05) oneRow = cap;
+            // ONE-ROW (layout.capRowsToInk, lead ruling R1 / R4a): a lone page of ONE row - and every row of a lone page of column
+            // stories (two-step estimate L: two 83 mm stories spread to 114 mm rows, 31 %) - is held where the band under its work
+            // stays under 30 %, top-aligned - never spread or flexed to the page; the strip under it is the ruled page's.
+            let oneRow = null;
+            const rowsN = part.chunk.rows;
+            if (lone && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs) && (rowsN === 1 || (!gap.gap && its.every(isStoryWork)))) {
+                const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : rowsN * L.cellH;
+                oneRow = capRowsToInk(its, L.cols, rowsN, drawn, rowsN === 1 ? '' : spread ? spread.rowsTpl : shape ? shape.rowsTpl : '');
             }
             if (oneRow) sections.push({
-                kind: 'grid', cols: L.cols, rows: 1, labels: labelStyle, start, cls: 'fixed mq-spread mq-onerow', height: `${oneRow}mm`, rowsTpl: '',
+                kind: 'grid', cols: L.cols, rows: rowsN, labels: labelStyle, start, cls: `fixed mq-spread ${rowsN === 1 ? 'mq-onerow' : 'mq-inkrows'}`, height: `${oneRow.heightMm}mm`, rowsTpl: oneRow.rowsTpl,
                 rowGap: 0, availMm: avail, items: its.map((it) => planItem(it, level, L.cols)), _its: its,
             });
             else sections.push({

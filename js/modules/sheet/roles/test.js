@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, oneRowMm } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, capRowsToInk, isStoryWork } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 import { scorePoints } from '../paginate.js';
 
@@ -298,12 +298,13 @@ export function plan(input = {}) {
         const g = rowGapFor(rows, parseFloat(sections[1].height), L.gridH);
         if (g.gap) { sections[1].rowGap = g.gap; sections[1].height = `${g.heightMm}mm`; }
     }
-    // ONE-ROW (layout.oneRowMm, lead ruling R1 / R4a): a Test of ONE row is held where the band under its work stays under 30 %,
-    // top-aligned; the strip under it is the ruled one-row page's (multi_step_word (Visual) M: one story in a 184 mm cell, 32 %).
-    if (rows === 1) {
-        const cap = oneRowMm(items, L.cols);
+    // ONE-ROW (layout.capRowsToInk, lead ruling R1 / R4a): a Test of ONE row - or of column stories - is held where the band under
+    // its work stays under 30 %, top-aligned; the strip under it is the ruled page's (multi_step_word (Visual) M: one story in a
+    // 184 mm cell, 32 %; two_step_estimate_check L: two 83 mm stories in 114 mm rows, 31 %).
+    if (rows === 1 || (!sections[1].rowGap && items.every(isStoryWork))) {
         const drawn = sections[1].height ? parseFloat(sections[1].height) : L.gridH;
-        if (cap > 0 && drawn > cap + 0.05) Object.assign(sections[1], { height: `${cap}mm`, rowsTpl: '', rowGap: 0, cls: `${sections[1].cls === '' ? 'fixed' : sections[1].cls || 'fixed'} mq-onerow` });
+        const held = capRowsToInk(items, L.cols, rows, drawn, rows === 1 ? '' : sections[1].rowsTpl || '');
+        if (held) Object.assign(sections[1], { height: `${held.heightMm}mm`, rowsTpl: held.rowsTpl, rowGap: 0, cls: `${sections[1].cls || 'fixed'} ${rows === 1 ? 'mq-onerow' : 'mq-inkrows'}` });
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,

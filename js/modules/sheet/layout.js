@@ -1009,6 +1009,31 @@ export const oneRowMm = (items, cols) => {
  * over ONE_ROW_FILL - ws-empty-band reads the band from the ink to the cell's foot, so h / 0.72 still left 31-33 %. */
 export const oneRowCapOf = (h) => (h > 0 ? Math.max(h, (h - CELL_PAD_MM) / ONE_ROW_FILL) : h);
 
+/** A column story (word-work, not the sentence layout): its cell's spare height under the work is never the pupil's room. */
+export const isStoryWork = (it) => !!it && it.template === 'word-work' && ((((it.q || {}).cell || {}).payload || {}).layout !== 'sentence');
+/**
+ * ONE-ROW, per row (lf-roles r9): each row of a grid drawn `heightMm` tall (`rowsTpl` its fr shares, '' even) held to
+ * oneRowCapOf its tallest measured cell. {heightMm, rowsTpl} when a row was held, else null (a row with an unmeasured cell keeps
+ * its height).
+ */
+export function capRowsToInk(items, cols, rows, heightMm, rowsTpl = '') {
+    if (!(rows >= 1) || !(heightMm > 0)) return null;
+    const fr = rowsTpl ? String(rowsTpl).split(/\s+/).map((t) => parseFloat(t)) : Array(rows).fill(1);
+    if (fr.length !== rows || fr.some((f) => !(f > 0))) return null;
+    const tot = fr.reduce((a, b) => a + b, 0);
+    let held = false;
+    const H = fr.map((f, r) => {
+        const h = (heightMm * f) / tot;
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols));
+        if (!hs.length || hs.some((x) => !(x > 0))) return h;
+        const cap = oneRowCapOf(Math.max(...hs));
+        if (h > cap + 0.05) { held = true; return cap; }
+        return h;
+    });
+    if (!held) return null;
+    return { heightMm: Math.round(H.reduce((a, b) => a + b, 0) * 100) / 100, rowsTpl: rows > 1 ? H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') : '' };
+}
+
 /**
  * Rows of the same content stand at the same height (round 5 D-E: number_families_add S printed
  * rows of 200 / 282 px for the same families, because each row's stretch was capped by its own

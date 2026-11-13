@@ -464,6 +464,18 @@ if (on('ONE-ROW-CAP')) {
             } catch (e) { findings.push(`ONE-ROW-CAP ${role} ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
         }
     }
+    // every row of a page of column stories (two_step_estimate_check L: two 83 mm stories spread to 114 mm rows, 31 %)
+    checks++;
+    try {
+        const st = (i) => Object.assign(item(i, 83), { template: 'word-work', q: Object.assign(item(i, 83).q, { cell: { template: 'word-work', payload: { steps: [{}, {}] } } }) });
+        const pl = IND.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }], items: [st(1), st(2)], seed: 1, sections: [{ columns: 1 }] });
+        const g = gridOf(pl);
+        const fr = g && g.rowsTpl ? g.rowsTpl.split(/\s+/).map(parseFloat) : Array((g && g.rows) || 1).fill(1);
+        const tot = fr.reduce((a, b) => a + b, 0);
+        const H = g && g.height ? fr.map((f) => (parseFloat(g.height) * f) / tot) : fr.map(() => Infinity);
+        const lim = (84 - 7) / 0.72 + 0.5;
+        if (H.some((h) => h > lim)) findings.push(`ONE-ROW-CAP stories L: rows ${H.map((h) => h.toFixed(1)).join(' / ')} mm for 83 mm stories (cap ${lim.toFixed(1)}: a 30 % band under the work)`);
+    } catch (e) { findings.push(`ONE-ROW-CAP stories: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     // control: two 60 mm rows on an Independent page keep their own (multi-row) layout - never marked one-row
     checks++;
     try {
