@@ -4016,6 +4016,101 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "patterns-hint-on-test-f1",
+   "check": "ws-patterns-cells HINT-ON-TEST: notice_patterns / pattern_features (each patTask) / growing_shape_patterns items with the fading hint (patShow) ON, drawn at the Test's scaffold level 0, print no hint part; every quiz-twin hint part is marked data-ws-hint=fade and css/quiz-mode.css hides it in #quizTakeView",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells HINT-ON-TEST (lf-algebra critic r1 F1, PT-TST-2 / P-SC-5)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: the cells read only p.show - the Test printed even / odd under each factor, the track numbers, the times-table row and the growing counts; the quiz twin drew them unmarked"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: no hint at scaffold level 0; hint parts carry data-ws-hint=fade, hidden in the quiz"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --rules HINT-ON-TEST --skill patterns:notice_patterns,patterns:pattern_features,patterns:growing_shape_patterns",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "patterns-state-progress-f5",
+   "check": "ws-patterns-cells STATE-PROGRESS: the lesson anchor chart's panels (chart.js stateDrawing over the provider's worked steps and stateGroups) - adjacent panels draw different pictures, and a panel whose step says 'Write N' shows N",
+   "kind": "commit-pair",
+   "rule": "ws-patterns-cells STATE-PROGRESS (lf-algebra critic r1 F5; number_patterns_rule / follow_given_rule pinned to lf-ops' count-row stepState)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: function_table_easy chart panels 1-3 the same picture, 'Write 9' under an empty box"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: function-table stepState draws the marks of steps 1..k (the newest traced grey)"
+   },
+   "command": "node tests/scripts/ws-patterns-cells.mjs --root {root} --rules STATE-PROGRESS --skill algebra:function_table_easy",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "steps-follow-preset-f6",
+   "check": "ws-node-lint STEPS-FOLLOW-PRESET (opt-in): a preset's Guided / Model Steps band - guided.js stepsOf over the page's dealt items - prints no line of the host's default steps that none of the preset's items gives",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint STEPS-FOLLOW-PRESET (lf-algebra critic r1 F6, LESSONS_LEARNED L28)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: pattern_features items' steps differed (per-item stepsFor), so the band took the item-less strings and printed notice_patterns' parity steps"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: fixed task steps (the lesson's step names), the band takes the items' own"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill patterns:pattern_features --rules STEPS-FOLLOW-PRESET --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "steps-follow-preset-two-step-addfirst",
+   "check": "ws-node-lint STEPS-FOLLOW-PRESET on the two-step add-first presets (found by the F6 check over every preset)",
+   "kind": "commit-pair",
+   "rule": "ws-node-lint STEPS-FOLLOW-PRESET (L28 class, found by the check before any critic)",
+   "fail": {
+    "commit": "95473c403",
+    "state": "two_step_add_then_mult / _add_then_div: per-item addfirst stepsFor made the items differ, so the band printed multi_step_word_plain's + / - steps"
+   },
+   "pass": {
+    "commit": "9f963a32f",
+    "state": "one fixed add-first step list ('Step 1: add or take away.') fitting every item"
+   },
+   "command": "node tests/scripts/ws-node-lint.mjs --root {root} --skill algebra:two_step_add_then_mult,algebra:two_step_add_then_div --rules STEPS-FOLLOW-PRESET --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vq-title-and-f7",
+   "check": "ws-visual-quality VQ-TITLE 'X and Y': the role title compose.js topicOf makes from an 'I Can <verb> and <verb> ...' gives both verbs one form (never 'drawing and count')",
+   "kind": "commit-pair",
+   "rule": "ws-visual-quality VQ-TITLE X and Y (lf-algebra critic r1 F7, H17)",
+   "fail": {
+    "commit": "47b1f2a86",
+    "state": "critic r1: growing Test / Review title 'drawing and count the next term'"
+   },
+   "pass": {
+    "commit": "796952c03",
+    "state": "fix r8: growing I Can one verb ('find the next term'); lf-roles 2a3ecb9c3 also gerundises the second verb"
+   },
+   "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --skill patterns:growing_shape_patterns --rules VQ-TITLE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }

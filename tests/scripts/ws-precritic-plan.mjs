@@ -154,7 +154,10 @@ else {
             console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
             if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
         }
-        const other = [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
+        // (the other skill is one NO lane opted in - lf-algebra 2026-11-13: the first addition skill was lf-ops' add_facts, whose
+        // own opt-in put --rule-skills on its plan, so every lane read as leaking)
+        const anyLane = new Set(((optIn && optIn.lanes) || []).flatMap((l) => l.skills || []));
+        const other = [...live].find((k) => !anyLane.has(k) && k.startsWith('addition:'));
         if (other) {
             checked++;
             const q = plan([other], null);
