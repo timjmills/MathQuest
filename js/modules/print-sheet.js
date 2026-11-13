@@ -1030,7 +1030,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (hard && !refHardOk(skH, cand)) continue;
                 // (lf-ops-props D-MP-1 / D-MP-3: a pictured array and its turn too wide for two across a row is dealt again - the
                 // DEALT factor range is capped at the page's size, the drawing never shrinks; the last try keeps what it gets)
-                if (k < tries && !turnFitsTwo(cand, sk)) { if (!got) got = cand; continue; }
+                // (a detailed pack's sheet - `edgeLast` / `onlyKeys`: its places are solved for its edge case, the square that ends
+                // the page, E24b - keeps its own deal; the pack's rows are laid by its own shape)
+                if (k < tries && !sk.edgeLast && !Array.isArray(skH.onlyKeys) && !turnFitsTwo(cand, sk)) { if (!got) got = cand; continue; }
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's

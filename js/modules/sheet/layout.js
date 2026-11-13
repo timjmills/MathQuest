@@ -136,6 +136,8 @@ export const FILL_CAP = 1.8;
 export const CONTENT_FILL = 1.5;
 /** `noStretch` sections (div_facts' fade packet, owner 2026-11-08): a row takes its measured height and this much room. */
 export const NO_STRETCH_ROOM = 1.25;
+/** PT-GDP (design/PAGE_TYPES.md): a row is at most this multiple of its content where a page's shape is its count. */
+export const GDP_ROW_ROOM = 1.42;
 export const CELL_PAD_MM = 7;
 export const fillLimit = (h) => (h > 0 ? Math.min(FILL_CAP * h, CONTENT_FILL * Math.max(1, h - CELL_PAD_MM) + CELL_PAD_MM) : h);
 /** Page fill: the practice roles take more rows when less than this share of the grid is used. */
@@ -879,7 +881,9 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     // array and its turn, an array and its sentence, a count row: answered in place, no working room - keeps rows sized to
     // what they hold on every grid page, a lesson's `noCap` Practice page included; the spare height stays under the grid)
     const fpNoStretch = hMin > 0 && cls !== 'long' && cls !== 'word' && infos.length > 0 && infos.every((i) => i.fp && i.fp.noStretch);
-    const noStretch = section.noStretch || (fpNoStretch ? NO_STRETCH_ROOM : 0);
+    // (a page whose shape IS its count - `pageCap`, a detailed lesson's Practice sheet: the rows share the page, E9b - takes up
+    // to PT-GDP's 1.42 x what a row holds, never more)
+    const noStretch = section.noStretch || (fpNoStretch ? (Number(section.pageCap) > 0 ? GDP_ROW_ROOM : NO_STRETCH_ROOM) : 0);
     if (fpNoStretch && !capped) cellH = r3(Math.min(even, fillLimit(hMin)));
     if (capped && rows * cellH < 0.8 * G && !noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
     if ((capped || fpNoStretch) && noStretch) cellH = r3(Math.min(even, hMin * (typeof noStretch === 'number' ? noStretch : NO_STRETCH_ROOM)));
