@@ -244,6 +244,21 @@ if (on('LINE-TELL')) {
     const nd = CO.answerPlace('x', '29', null, ['141']).digits;
     if (nd !== 3) findings.push(`LINE-TELL: the answer 29 against a shown wrong 141 gets a ${nd}-digit line (want 3: the longer of the two)`);
 }
+if (on('EA-REDO-ALIGN')) {
+    // lf-algebra critic r2 G2: an Error Analysis REDO item (a count row written again under itself) starts its pupil work at the
+    // cell's left like the redraw zone under it - the widened work centred the train 60 px right of its copy
+    checks++;
+    const ctx = resolveCtx({ size: 'L' });
+    const it = Object.assign(itemOf('rule'), { template: 'count-row', footprint: { wMm: 90, hMm: 30, maxCols: 1 } });
+    const p = EA.prepare(it, { seed: 1, index: 0, wrong: true });
+    if (!p) findings.push('EA-REDO-ALIGN: the planted count-row item was not dealt');
+    else {
+        const h = p.render(Object.assign({}, ctx, { state: 'blank' }), { cols: 1, workW: 90 });
+        const m = /class="mq-judge-work" style="([^"]*)"/.exec(h);
+        if (!m) findings.push('EA-REDO-ALIGN: no pupil-work block rendered');
+        else if (/align-items:center/.test(m[1])) findings.push(`EA-REDO-ALIGN: a redo item's widened work is centred (${m[1].slice(0, 80)}) - its copy starts at the left`);
+    }
+}
 if (on('FIX-MINIMAL')) {
     // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
     // changes one part (a propagated wrong "12, 15, 19, 22" against "12, 15, 18, 21" made the pupil rewrite every later term)
