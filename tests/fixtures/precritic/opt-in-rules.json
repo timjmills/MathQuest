@@ -305,7 +305,7 @@
   },
   {
    "lane": "lf-ops-props",
-   "why": "r4 probe (design/status/lf-ops-props.md 'Round r4'): the bands on the array / count-row pages came from row STRETCH - practice.js spreadRows, the guided rows and the lesson Practice capFill ignored the footprint's `noStretch` (lead ruling 2026-11-12 (b)). ROW-STRETCH (ws-print-lint, opt-in) holds a row of noStretch templates to 1.25 x its tallest item (1.42 on a pageCap page) and its shortest item's band to 20 %, on every grid role at S / M / L and on the lane skills' lesson pages. The independent page is judged on the print-lint-kit rows (L / S / M); the other grid roles on print-lint-rowstretch-<size>.",
+   "why": "r4 probe (design/status/lf-ops-props.md 'Round r4'): the bands on the array / count-row pages came from row STRETCH - practice.js spreadRows, the guided rows and the lesson Practice capFill ignored the footprint's `noStretch` (lead ruling 2026-11-12 (b)). ROW-STRETCH (ws-print-lint, opt-in) holds a row of noStretch templates to 1.25 x its tallest item (1.42 on a pageCap page) and its shortest item's band to 20 %, on every grid role at S / M / L and on the lane skills' lesson pages. The independent page is judged on the print-lint-kit rows (L / S / M); the other grid roles on print-lint-rowstretch-<size>. Screen: ws-screen-slots --screen-digit (SCREEN-DIGIT + TRAIN-FIT, lead ruling (a) 2026-11-13: the count-row train at the digit floor, no sideways scroll, no ink past its cell).",
    "skills": [
     "multiplication:mult_properties",
     "multiplication:arrays_groups",
@@ -406,6 +406,11 @@
      "args": [
       "--rules",
       "ROW-STRETCH"
+     ]
+    },
+    "screen-slots": {
+     "args": [
+      "--screen-digit"
      ]
     }
    }

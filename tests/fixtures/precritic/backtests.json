@@ -3780,6 +3780,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ss-train-fit-cbt",
+   "check": "A count-row screen train draws its numerals at the SCREEN-DIGIT floor (40 / 48 / 56 px at 390 / 820 / 1280) with no sideways scroll or swipe and no ink past its cell, on card 390 / 820 / 1280, worksheet and quiz (lead ruling (a) 2026-11-13; lf-algebra critic r2 G1)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots TRAIN-FIT",
+   "browser": true,
+   "fail": {
+    "commit": "8d7343c0f",
+    "state": "lf-ops-props r4b: the count_by_tables arcs train still a swipe row of 26-29 px numerals"
+   },
+   "pass": {
+    "commit": "c2ab95cc4",
+    "state": "lf-ops-props r4b: the arcs train wraps at the digit floor, pair-form arrows, no swipe"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:count_by_tables --train-fit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
