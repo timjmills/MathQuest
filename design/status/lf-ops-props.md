@@ -149,3 +149,48 @@ lesson p2 numbers did not move (the guard `pool >= k x 3` most likely fails: the
 | EB-FOOT false positives (centred cells, height-sorted pages) | ws-empty-band EB-FOOT (fixed in the check) | - |
 | detailed lesson regressions from a deal change | ws-detailed-lesson --check E9b / E24b | - |
 | Speed: two attempts reached no code that sets the count | trace the call path (column probe, cellH) in node before editing; `ws-empty-band --dump <dir>` writes each render's HTML | - |
+
+## Precritic (2026-11-13, short builder, Opus medium) - on dd42b05c (master merged), card signed 9e2c301a, ws-empty-band = master's (6e6f2f4c)
+Card: d1584ed3 mult_properties `band=36` -> **hidden** ("not offered: failed the post-fix re-measure at S (EB-BAND 10, EB-SIDE 2 on a384a0b4)");
+skill-options drops 36 from the band values in the appended lf-ops-props block (normalizeOptions decodes an old 36 to 25); ws-card-rulings
+--check offered OK (N-D-band-3). Re-generated with --resign; the lead signed it at 9e2c301a.
+ws-empty-band: this branch's EB-FOOT change and `--dump` reverted to master's file (6e6f2f4c; lf-checks ported it with a guard, e5aa5ae1).
+Logs (outside the repo): /tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/props-precritic/
+(precritic `<skill>.log/.json`, `eb-master-<skill>.json`, `pl-roles-{S,M,L}.json` = print-lint kit guided / more-practice / test / independent).
+Browser gates ran one at a time (MQ_BROWSER_SLOTS=1).
+
+| Skill | Result | Red rows |
+|---|---|---|
+| mult_properties | FAIL (11 FAIL, 17 PASS) | empty-band, coverage-matrix (13 rows PENDING no-baseline; 0 run of this skill judged), print-lint kit S/M/L (L-TOPSTART), print-lint lesson S/L (L-TOPSTART; L CL40-INK 2), render-gate other roles (pre-skill-check L key overflow), cell-checks (OVERFLOW 69: forms 1 / mixed lesson, test S mixed, pre-skill-check L; SIZE-S 5), sibling-compare (no approved sibling), options-render (forms=1, task=1 @L L-TOPSTART) |
+| arrays_groups | FAIL (11 FAIL, 18 PASS) | empty-band, coverage-matrix (as above), print-lint kit S/M/L (L-TOPSTART), print-lint lesson S/L (L-TOPSTART; S PAGEFILL 1), render-gate (test M body overflows 2.6 mm, pupil + key), cell-checks (the same test M overflow), sibling-compare, options-render (forms=0 S/L, forms=1 L: L-TOPSTART) |
+| count_by_tables | FAIL (6 FAIL, 23 PASS) | empty-band (BAND 9, FOOT 4), print-lint lesson S/L (L-OVERFLOW TY-12 10, L-TOPSTART 2, PAGEFILL 1, PG-23 1), sibling-compare, phone-card (390 px: CLIP-X 86, FOCUS 4, INVIEW 4), node-lint S1 (LESSON-DATA: no lesson record for count_by_tables) |
+
+EB-FOOT, with / without the gate change (mult_properties, arrays_groups; all roles + variants):
+- with this branch's change (the precritic run of mult_properties, before the revert): mult_properties 21 (independent L forms 3 / 0+1+2+3 /
+  variants only); arrays_groups 0 (measured on a384a0b4 earlier; not re-run).
+- master's file: mult_properties 70, arrays_groups 58 - every independent / more-practice / test page at S / M / L of both skills,
+  plus mixed-practice M / L. Cause: master measures the centring offset of the centred arrays / arrays-turn cells as drawn height.
+- lf-checks' guarded tool (their tree, per the lead): arrays_groups 19, real (independent M p1 cell 1 68.2 mm drawn for 52.2 mm;
+  more-practice S rows 26-28 % over).
+
+### Clean pages for the narrow critic (default options; independent / more-practice / test / guided x S / M / L)
+**None of the 24 is clean.** Every one carries L-TOPSTART CL-4b (print-lint kit, pl-roles-*.json): the first row of an arrays /
+arrays-turn cell starts 3-18 mm below the top pad. Cause: this branch's additive sheet-kit.css rule that centres those cells
+(`justify-content: safe center`, lead ruling (b) / LESSONS_LEARNED P4-2) breaks owner ruling CL-4b ("top of the box is the default").
+The two rulings conflict; this needs a lead decision (drop the centring and re-measure EB-BAND, or a CL-4b exemption for
+in-cell-answered templates). Not changed here.
+Other red rows on those pages:
+- mult_properties: independent / more-practice / test S M L EB-FOOT (master's tool, centring offset); more-practice L CL40-INK 4
+  (an array dot at 6.8 x 5.3 mm inside the 7 x 7 mm label keep-out, p1-p2 cell 1 and 5). guided S/M/L: L-TOPSTART only.
+- arrays_groups: independent / more-practice / test S M L EB-FOOT (master's tool; lf-checks' guarded tool keeps independent M p1 and
+  more-practice S as real: next round); test M body overflow 2.6 mm (pupil + key). guided S/M/L: L-TOPSTART only.
+
+### Findings -> checks (this run)
+| Finding | Check that catches it | Note |
+|---|---|---|
+| centred arrays cells vs CL-4b | ws-print-lint L-TOPSTART (already on precritic's path) | the earlier rebuild ran no print-lint after fix (b); rule: run print-lint kit after any cell-alignment CSS |
+| EB-FOOT counts a centring offset | ws-empty-band EB-FOOT (lf-checks' guarded version, e5aa5ae1) | reaches master with lf-checks |
+| arrays_groups test M overflow 2.6 mm | ws-grade-render --gate, ws-cell-checks | - |
+| array dot in the label keep-out (mult_properties more-practice L) | ws-print-lint L-OVERLAP CL40-INK (--roles more-practice; not on precritic's --skill path) | add more-practice to precritic's print-lint roles |
+| count_by_tables has no lesson record | ws-node-lint LESSON-DATA | - |
+| count_by_tables phone 390 px clip / focus | ws-phone-card | - |
