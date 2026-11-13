@@ -510,6 +510,7 @@ function _tidySample(frame) {
     // under it puts the stage off the frame (lf-algebra F8/G11), so it never survives a tidy.
     frame.classList.remove('is-cropped');
     _sampleShowAll(stage);     // each tidy starts from the whole item, at the panel's own frame height (re-runs are idempotent)
+    _sampleSaidOnce(stage);    // a question line the drawn item already says is hidden (critic-panel-r2 F6)
     _sampleChoices(stage);     // answer choices: lettered, figures two to a row (critic-panel-r2 F2)
     frame.style.height = '';
     const fw = frame.clientWidth - SAMPLE_PAD;
@@ -555,8 +556,14 @@ function _tidySample(frame) {
         place(whole.w, whole.h, setInner(tall(whole.w, whole.h, need), cap2), need);
         return;
     }
+    const want = Math.max(...pages.map((p) => tall(p.w, p.h, p.need)));
+    let fh = setInner(want, cap2);
+    // The panel could not give the frame that height (a short window): the parts are packed again for the frame it has.
+    if (fh < Math.min(want, cap2) - 1) {
+        const again = _samplePages(stage, fw, fh);
+        if (again.length) { pages.splice(0, pages.length, ...again); fh = setInner(Math.max(...pages.map((p) => p.h * Math.min(_sampleZoom(p.need), fw / p.w, fh / p.h))), fh); }
+    }
     const at = Math.max(0, Math.min(pages.length - 1, Number(frame.dataset.skoPart) || 0));
-    const fh = setInner(Math.max(...pages.map((p) => tall(p.w, p.h, p.need))), cap2);
     _sampleShowPage(stage, pages, at);
     const now = _sampleSize(stage);
     place(now.w, now.h, fh, pages[at].need);
@@ -575,6 +582,20 @@ const SAMPLE_MAX_ZOOM = 2;
 function _sampleZoom(need) { return Math.min(SAMPLE_MAX_ZOOM, Math.max(1, need || 1)); }
 // The answer-choice blocks of an item (screen cell and printed item).
 const SAMPLE_CHOICES = '.tvp-options, .opt-list';
+
+/**
+ * Said once (critic-panel-r2 F6), as live play's mq-dup: when the item's drawing (a word problem's story, a widget that
+ * draws itself after the preview mounted) shows the whole question line, the line is hidden. Judged on what is drawn.
+ */
+function _sampleSaidOnce(stage) {
+    const line = stage.querySelector('.tvp-q');
+    const vis = stage.querySelector('.tvp-visual') || stage.querySelector('.tvp-printed');
+    if (!line || !vis || line.style.display === 'none') return;
+    const norm = (t) => ` ${String(t || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `;
+    const want = norm(line.textContent);
+    if (want.trim().length < 6 || !/[a-z]{3,}/.test(want)) return;
+    if (norm(vis.innerText).includes(want)) line.style.display = 'none';
+}
 
 /**
  * Answer choices are one unit of the item (critic-panel-r2 F2): each carries its letter (a figure-only choice gets A, B,
@@ -608,15 +629,26 @@ function _sampleChoices(stage) {
  * that held it are released, so the stage measures the real content and the parts can split it (critic-panel-r2 F1).
  */
 function _sampleUnclip(stage) {
-    for (const el of stage.querySelectorAll('*')) {
-        if (el.closest('svg') || !el.getClientRects().length) continue;
+    // innermost boxes first, and again until nothing changes: an opened box can make the box around it overflow
+    const all = [...stage.querySelectorAll('*')].reverse();
+    let any = false;
+    for (let pass = 0, changed = true; changed && pass < 4; pass++) {
+        changed = false;
+        for (const el of all) if (_sampleUnclipOne(stage, el)) { changed = true; any = true; }
+    }
+    return any;
+}
+function _sampleUnclipOne(stage, el) {
+    {
+        if (el.closest('svg') || !el.getClientRects().length) return false;
         const cs = getComputedStyle(el);
         const wide = cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1;
         const tall = cs.overflowY !== 'visible' && el.scrollHeight > el.clientHeight + 1;
-        if (!wide && !tall) continue;
-        el.style.overflow = 'visible';
+        if (!wide && !tall) return false;
+        el.style.setProperty('overflow', 'visible', 'important');   // (a print rule may hold it with !important)
         if (tall) { el.style.height = 'auto'; el.style.maxHeight = 'none'; }
         for (let a = el; a && a !== stage; a = a.parentElement) a.style.maxWidth = 'none';
+        return true;
     }
 }
 const _SKO_HIDE = 'skoHide';
@@ -625,8 +657,43 @@ const _SKO_HIDE = 'skoHide';
 function _sampleSize(stage) {
     stage.style.transform = 'translate(-50%, -50%)';
     stage.style.width = ''; stage.style.maxWidth = '';
-    if (stage.scrollWidth > stage.offsetWidth + 1) { stage.style.maxWidth = 'none'; stage.style.width = `${stage.scrollWidth}px`; }
+    stage.style.paddingLeft = ''; stage.style.paddingRight = ''; stage.style.paddingTop = ''; stage.style.paddingBottom = '';
+    _sampleFitStage(stage);
+    // (padding the stage out reflows the item: a box it makes overflow is opened, and the stage measured again)
+    if (_sampleUnclip(stage)) {
+        stage.style.width = ''; stage.style.maxWidth = '';
+        stage.style.paddingLeft = ''; stage.style.paddingRight = ''; stage.style.paddingTop = ''; stage.style.paddingBottom = '';
+        _sampleFitStage(stage);
+    }
     return { w: Math.max(stage.scrollWidth, stage.offsetWidth, 1), h: Math.max(stage.scrollHeight, stage.offsetHeight, 1) };
+}
+function _sampleFitStage(stage) {
+    if (stage.scrollWidth > stage.offsetWidth + 1) { stage.style.maxWidth = 'none'; stage.style.width = `${stage.scrollWidth}px`; }
+    // Content that overhangs the stage VISIBLY (a timeline row centred wider than its box spills past both sides; scroll
+    // sizes miss the left side) pads the stage out to it, so the frame fits what is drawn (critic-panel-r2 F1).
+    const o = _sampleOverhang(stage);
+    if (o) {
+        const cs = getComputedStyle(stage);
+        stage.style.maxWidth = 'none';
+        if (stage.style.width) stage.style.width = `${parseFloat(stage.style.width) + o.l + o.r}px`;
+        else if (o.l + o.r > 0) stage.style.width = `${stage.offsetWidth + o.l + o.r}px`;
+        stage.style.paddingLeft = `${parseFloat(cs.paddingLeft) + o.l}px`; stage.style.paddingRight = `${parseFloat(cs.paddingRight) + o.r}px`;
+        stage.style.paddingTop = `${parseFloat(cs.paddingTop) + o.t}px`; stage.style.paddingBottom = `${parseFloat(cs.paddingBottom) + o.b}px`;
+    }
+}
+/** How far the stage's drawn content reaches past its own box on each side (unscaled px), or null when it does not. */
+function _sampleOverhang(stage) {
+    const r = stage.getBoundingClientRect();
+    let l = 0, t = 0, rr = 0, b = 0;
+    for (const el of stage.querySelectorAll('*')) {
+        if (el.parentElement && el.parentElement.closest('svg')) continue;
+        const q = el.getBoundingClientRect();
+        if (!(q.width > 0 && q.height > 0)) continue;
+        l = Math.max(l, r.left - q.left); rr = Math.max(rr, q.right - r.right);
+        t = Math.max(t, r.top - q.top); b = Math.max(b, q.bottom - r.bottom);
+    }
+    const c = (v) => (v > 1 ? Math.ceil(v) : 0);
+    return c(l) || c(rr) || c(t) || c(b) ? { l: c(l), r: c(rr), t: c(t), b: c(b) } : null;
 }
 
 /** The scale at which everything visible in `root` is legible: 0.3 for strokes, 9 px for its smallest word or digit (HTML or SVG). */
@@ -672,6 +739,14 @@ function _sampleLeaves(el, fits, splits) {
     if (el.matches(SAMPLE_CHOICES)) return [el];
     if (fits(el)) return [el];
     if (el.tagName === 'TABLE' && !el.closest('svg')) {
+        // a one-row table that sets blocks side by side (a word list beside its definitions) gives its cells, left to right
+        const rows = [...el.rows].filter(_sampleDrawn);
+        const cells = rows.length === 1 ? [...rows[0].cells].filter(_sampleDrawn) : [];
+        if (cells.length >= 2) {
+            splits.push(el, rows[0]);
+            if (rows[0].parentElement !== el) splits.push(rows[0].parentElement);
+            return cells.flatMap((c) => _sampleLeaves(c, fits, splits));
+        }
         const tiles = _sampleTiles(el, fits);
         if (tiles) {
             splits.push(el);
@@ -754,9 +829,11 @@ function _sampleSliceRestore(stage) {
 function _sampleTiles(table, fits) {
     const rows = [...table.rows].filter(_sampleDrawn);
     const nCols = Math.max(0, ...rows.map((r) => r.cells.length));
-    if (rows.length < 2 || nCols < 2 || rows.some((r) => [...r.cells].some((c) => c.colSpan > 1))) return null;
+    if (rows.length < 2 || nCols < 2) return null;
     const dataRows = rows.length - 1, dataCols = nCols - 1;
-    let k = 0;
+    // (a table with a spanning cell keeps all its columns: it pages by rows only)
+    const spans = rows.some((r) => [...r.cells].some((c) => c.colSpan > 1));
+    let k = spans ? dataCols : 0;
     while (k < dataCols && fits(table, { table, r: [1, 1], c: [1, k + 1] })) k++;
     if (!k) return null;
     const cGroups = Math.ceil(dataCols / k), cSize = Math.ceil(dataCols / cGroups);

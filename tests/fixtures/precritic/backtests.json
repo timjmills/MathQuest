@@ -3463,7 +3463,7 @@
  },
  {
   "id": "options-panel-repeat",
-  "check": "critic-panel-r2 F6: the panel sample shows no sentence of 20 or more characters twice",
+  "check": "critic-panel-r2 F6: the panel sample shows no sentence (20+ characters) of its question line again outside it",
   "kind": "commit-pair",
   "rule": "ws-options-shots [repeat]",
   "browser": true,

@@ -263,11 +263,13 @@ function mountBuilt(frame, s, name, what = 'Sample question', opts = {}) {
         const line = cell.querySelector('.tvp-q');
         if (line) {
             screenTextLine(line);
-            const vis = cell.querySelector('.tvp-visual');
+            // (a legacy printed item says its own prompt inside `.tvp-printed`)
+            const vis = cell.querySelector('.tvp-visual') || cell.querySelector('.tvp-printed');
             // Said once, as live play does (question-render's mq-dup): a copy inside the visual is hidden, or, when the
             // visual says it as part of a larger block (a word problem's story, one sentence a line), the line is hidden
             // instead (critic-panel-r2 F6: the sample printed the story twice).
-            if (vis && !hideRepeatedPrompt(vis, line.textContent) && visualRepeatsText(vis, line.textContent)) line.style.display = 'none';
+            // (judged on what the visual SHOWS: a copy already marked screen-only counts as found but stays drawn)
+            if (vis) { hideRepeatedPrompt(vis, line.textContent); if (visualRepeatsText({ textContent: vis.innerText || '' }, line.textContent)) line.style.display = 'none'; }
         }
         monoCell(cell);
         // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then

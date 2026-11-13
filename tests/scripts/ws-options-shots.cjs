@@ -220,7 +220,7 @@ function measure(page) {
         const vis = [];
         const visText = [];
         let qShown = false;
-        if (stage) for (const a of atomsOf()) if (visible(a)) { vis.push(idOf(a.n)); if (a.n.nodeType === 3) { visText.push(a.t); if (a.el.closest(QLINE)) qShown = true; } }
+        if (stage) for (const a of atomsOf()) if (visible(a)) { vis.push(idOf(a.n)); if (a.n.nodeType === 3) { const inQ = !!a.el.closest(QLINE); visText.push([a.t, inQ]); if (inQ) qShown = true; } }
         // F1: a box inside the stage that clips its own content (overflow not visible and content wider or taller than it)
         const clips = [];
         if (stage) for (const el of stage.querySelectorAll('*')) {
@@ -239,10 +239,14 @@ function measure(page) {
             const label = [...c.querySelectorAll('*'), c].filter((e) => !e.closest('svg')).map((e) => [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('')).join('').trim();
             if (!label) unlabeled.push(i);
         });
-        // F6: a sentence of 20 or more characters shown twice
-        const sentences = new Map();
-        for (const t of visText) for (const snt of t.split(/(?<=[.?!])\s+/)) { const k = snt.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); if (k.length >= 20 && /[a-z]{3,}/.test(k)) sentences.set(k, (sentences.get(k) || 0) + 1); }
-        const repeats = [...sentences].filter(([, c]) => c > 1).map(([k]) => k.slice(0, 40));
+        // F6: the question line said again in the sample: its whole text (20+ characters) is contained in the visible text
+        // outside it. That is the sample's composition (live play hides such a line, question-render's mq-dup). A sentence
+        // the ITEM repeats (a question naming the sentence its visual shows, two glossary words with one definition) is the
+        // item's own content, left alone, and not counted.
+        const norm = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+        const qText = norm(visText.filter(([, inQ]) => inQ).map(([t]) => t).join(' '));
+        const oText = ` ${norm(visText.filter(([, inQ]) => !inQ).map(([t]) => t).join(' '))} `;
+        const repeats = qText.length >= 20 && /[a-z]{3,}/.test(qText) && oText.includes(` ${qText} `) ? [qText.slice(0, 40)] : [];
         // F4: the option body's own visible height (and whether it has more than that to show)
         const bodyEl = pop.querySelector('.tv-sko-body');
         // F5: a summary clamped to two lines has an expand control reachable by touch and keyboard
@@ -287,7 +291,7 @@ function judge(m, inkR) {
     if (!m.unavailable && m.clips && m.clips.length) fails.push(`[clip] a box inside the stage clips its content: ${m.clips.slice(0, 3).join('; ')}`);
     if (!m.unavailable && m.svgPx != null && m.svgPx < SVG_TEXT_MIN - 0.05) fails.push(`[svgtext] SVG text drawn at ${m.svgPx.toFixed(1)} px ("${m.svgText}"; needs >= ${SVG_TEXT_MIN} px)`);
     if (m.sum && m.sum.clamped && !m.sum.moreOK) fails.push('[summary] the option summary is clamped and its full text has no expand control (title attribute only: not reachable by touch or keyboard)');
-    if (!m.unavailable && m.repeats && m.repeats.length) fails.push(`[repeat] the sample shows a sentence twice: "${m.repeats[0]}"`);
+    if (!m.unavailable && m.repeats && m.repeats.length) fails.push(`[repeat] the sample says its question line twice: "${m.repeats[0]}"`);
     if (!m.unavailable && m.choices && m.choices.unlabeled.length) fails.push(`[choices] answer choice(s) ${m.choices.unlabeled.map((i) => String.fromCharCode(65 + i)).join(', ')} shown with no letter or label`);
     if (!m.unavailable && m.part && m.choices && m.choices.vis.length && m.choices.q) fails.push(`[choices] part ${m.part}: answer choices share a part with the question`);
     if (!m.unavailable && s && m.minPx != null && m.minPx < TEXT_MIN - 0.05) fails.push(`[text] text drawn at ${m.minPx.toFixed(1)} px ("${m.minText}"; needs >= ${TEXT_MIN} px; ${m.transform})`);
