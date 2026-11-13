@@ -5744,6 +5744,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-identify-heads-unaided",
+  "check": "placevalue:identify's place heads (labels H T O, or the chart's place names) are off on the unaided pages - Review, Test, the pre-skill check - and in the quiz (the online test), and kept on Practice / Mixed: the answer is the place name (lead ruling PEDAGOGY 4.1a, 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-identify-heads PV-HEADS-UNAIDED / PV-HEADS-TAUGHT / PV-HEADS-QUIZ",
+  "browser": true,
+  "fail": {
+   "commit": "1db0e330",
+   "state": "origin/master: every identify item on Review / Test / pre-skill check at S / M / L prints H T O (or the chart's names); the quiz builder deals fractions:identify for 'identify'"
+  },
+  "pass": {
+   "commit": "0d61403a",
+   "state": "provider roleOpts: support none on the unaided roles and the quiz; Practice / Mixed keep the heads"
+  },
+  "command": "node tests/scripts/ws-pv-identify-heads.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
