@@ -341,7 +341,7 @@ export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list' || pl
 export function answerPlace(id, correct, it = null, others = []) {
     // (a WORD answer - "hundreds", "tens" - takes the widest line, the same for every word so the line never tells which; it was 2
     // digits wide and the key's "hundreds" ran past it: lf-roles r10, identify Reason It key)
-    const width = (v) => (/[0-9]/.test(String(v)) || !/[a-z]{2}/i.test(String(v)) ? Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2)) : 6);
+    const width = (v) => (/[0-9]/.test(String(v)) || !/[a-z]/i.test(String(v)) ? Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2)) : 6);
     if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
     const parts = answerListOf(correct);
     // numbers joined by unit words ("2 hundreds 9 tens 7 ones"): a line a number, its word printed after it - one value a
