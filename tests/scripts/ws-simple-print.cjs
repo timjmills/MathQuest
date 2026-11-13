@@ -2044,8 +2044,9 @@ async function factsSweep(app, full) {
         }
         await page.evaluate(() => { document.body.classList.remove('teacher-mode'); document.body.classList.add('student-mode'); });
         // TOAST / BAR / FOCUS on the pupil home
-        for (const w of [1366, 820, 390]) {
-            await page.setViewport({ width: w, height: w === 1366 ? 768 : w === 820 ? 1180 : 844, deviceScaleFactor: 1 });
+        // the pupil home on the owner widths (critic lf-tools r2 D2, NP-PUPIL: this pupil step ran at 390 under the teacher allow)
+        for (const w of [1366, 820, 1024]) {
+            await page.setViewport({ width: w, height: w === 820 ? 1180 : 768, deviceScaleFactor: 1 });
             const t = await page.evaluate(async () => {
                 const W = window, out = [];
                 if (W.showView) W.showView('homeView');
