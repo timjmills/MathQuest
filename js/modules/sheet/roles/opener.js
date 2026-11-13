@@ -71,11 +71,11 @@ function geometry(items, input, cap = {}) {
     // column only, e.g. an expanded-form row - takes the whole width the same way; it was sized Infinity mm, the page then
     // dropped every Independent row and said the bands were over budget)
     const halfOk = !!first && Number.isFinite(modelHAt([first], 2, ctx));
-    const modelFull = !twoModels && !!first && steps.length > 0 && ((first.template === 'count-row' && !fitsAt([first], 2, ctx)) || !halfOk);
-    const mc = twoModels ? 4 : modelFull || (first && !halfOk) ? 1 : 2;
-    const modelH = modelHAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
-    const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
-    const modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
+    let modelFull = !twoModels && !!first && steps.length > 0 && ((first.template === 'count-row' && !fitsAt([first], 2, ctx)) || !halfOk);
+    let mc = twoModels ? 4 : modelFull || (first && !halfOk) ? 1 : 2;
+    let modelH = modelHAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
+    let stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
+    let modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
     // critic r5 N13: a count-row page sizes its practice rows from the practice items only - the Model row is drawn in the Model
     // cell, so a taller Model row never blocks a practice row (other skills keep the probe-wide sizing they always had)
@@ -87,6 +87,42 @@ function geometry(items, input, cap = {}) {
     // 12.6 mm at S / M / L), not the generic estimate (Hw + 4.5): with the taller practice rows its 2 mm decide whether a row fits
     const sayMm = first && first.template === 'count-row' ? m.writeMm + 2.6 : m.say;
     let used = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm + m.strip + gH;
+    // (lf-engine roles, lead ruling 2026-11-13: coordinate_q1 at L - the Model at its real measured height, the Say band and ONE
+    // Guided row are taller than the page, and the page ran 10 mm past its foot. Master squashed the Model instead - its Answer
+    // line printed over the "A: ( , )" line - which is not restored. Neither a half-width Model | Guided row fits (the cell does
+    // not lay out at half width), so the practice moves to a SECOND page: page 1 the Model (and Steps) and the Say band, page 2
+    // the Guided and Independent bands on the continuation page's own budget. Every cell keeps its full measured height and
+    // both pages close. ws-print-lint OPENER-OVERFLOW: no opener gains PG-12 / PG-21 / PG-13 against master.)
+    const onePage = used;
+    const budget2 = bandMetrics(ctx, layoutHeader(frame.contHeader || frame.header), { cont: true }).budget;
+    // Page 2 is taken only when it closes both pages: page 1 holds the Model (and What's New, Steps) and the Say band, page 2 one
+    // Guided row - an item taller than a page is not helped by a second page.
+    const head1 = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm;
+    const pagesFit = Number.isFinite(head1) && head1 <= m.budget && m.strip + gH <= budget2;
+    // A LEGACY cell (old print HTML, not migrated) prints taller than it measures. Where the Model lays out at half width
+    // (halfOk) the page is master's - never split (composite_shapes, percent_visual: a page 2 printed one more cell over its
+    // edge). Where it does not, the page splits only when both pages close (coordinate_q1); otherwise it keeps master's layout
+    // exactly - the Model at half width, sized from its content, one Guided row, no Independent row (measure_angles,
+    // fraction_of_set_hard: round 1's full-width Model and added rows printed cells over their edge). Kit cells measure true.
+    // (halfOk here is master's reading - the layout's own half-width minimum, hMinAt - not round 1's measured fallback: a legacy
+    // Model the fallback let into the half-width cell (solve_eq_addsub) is one master sized Infinity too)
+    const legacy = items.some((it) => !it.template || it.template === 'legacy');
+    const halfLayout = !!first && Number.isFinite(hMinAt([first], 2, ctx));
+    const split = used > m.budget && pagesFit && (!legacy || !halfLayout);
+    const parity = legacy && !halfLayout && !twoModels && !split;
+    if (parity) {
+        modelFull = false;
+        mc = 2;
+        modelH = hMinAt(items.slice(0, 1), 2, ctx);
+        stepsH = stepLines(steps, m.textPt, 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
+        modelBand = m.strip + Math.max(modelH, stepsH);
+        used = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm + m.strip + gH;
+    }
+    let budget = m.budget;
+    if (split) {
+        budget = budget2;
+        used = m.strip + gH;
+    }
     let iRows = 0;
     // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
@@ -96,7 +132,7 @@ function geometry(items, input, cap = {}) {
     const crow = !!first && first.template === 'count-row';
     const hand = crow && ctx.size === 'L' ? m.strip : crow ? stripExtraMm(ctx, 'Independent Practice:', instructionText(instructionKeyOf(practice, input.skills), practice)) : 0;
     const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
-    while (iRows < iMax && used + (iRows ? 0 : m.strip) + gH + hand <= m.budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
+    while (iRows < iMax && used + (iRows ? 0 : m.strip) + gH + hand <= budget) { used += (iRows ? 0 : m.strip) + gH; iRows++; }
     // the L label-wrap reserve is for the Independent band's label: with no Independent band drawn it is not held (critic r5 N13a)
     const held = iRows ? hand : 0;
     // critic r2 N4 (PT-OPN-6: one Guided column gives 2 rows): a one-column page - each Guided cell a full-width row - takes a
@@ -104,8 +140,8 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic B1: this was built for count rows only, so expand / unit_form / combine printed a "We do" of ONE
     // cell; any one-column practice now takes it, and when it does not fit the plan says so - ws-print-lint L-DENSITY OPN-6)
     let gRows = 1;
-    if (first && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
-    const spare = Math.max(0, m.budget - used - held);
+    if (first && gc === 1 && !legacy && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= budget) { gRows = 2; used += gH; }
+    const spare = Math.max(0, budget - used - held);
     const rowsThatGrow = gRows + iRows;
     const tight = tightRows(practice);
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first), tight ? tightCapMm(gH) : Infinity);
@@ -113,7 +149,7 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic N2: ONE Model only - two Model cells side by side keep the band's height, so the rule between
     // them runs down to the band's bottom rule; held short, it stopped 2.5 mm above it: ws-print-lint L-OVERLAP RULE)
     const modelTight = !twoModels && tightRows(items.slice(0, 1)) ? modelH + tightCapMm(modelH) : null;
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy };
 }
 
 /**
@@ -141,7 +177,14 @@ const countRowFirst = (items) => !!(items[0] && items[0].template === 'count-row
  */
 function bestGeometry(items, input) {
     const all = geometry(items, input);
-    if (!countRowFirst(items)) return { g: all, items };
+    if (!countRowFirst(items)) {
+        // (lf-engine roles: the deal is counted from the probe, whose tallest item can be taller than the items dealt - then the
+        // page fits more rows than it was dealt, and the Independent rows, fitted first, took the second Guided cell: a page 2 of
+        // ONE Guided cell. A deal short of the plan drops Independent rows first, so the Guided band keeps its two cells, PT-OPN-6.)
+        if (needOf(all) <= items.length) return { g: all, items };
+        const room = items.length - (all.twoModels ? 2 : 1) - all.gc * all.gRows;
+        return { g: geometry(items, input, { iMax: Math.max(0, Math.ceil(room / all.gc)), gMax: all.gRows }), items };
+    }
     const nModel = all.twoModels ? 2 : 1;
     const models = items.slice(0, nModel), practice = items.slice(nModel);
     const hOf = (it) => hMinAt([it], all.gc, all.ctx);
@@ -208,20 +251,23 @@ export function plan(input = {}) {
         });
     } else sections.push(modelBandPart);
     sections.push({ kind: 'say', frame: oralFrameOf(items[0] || {}), digits: 2 });
-    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
+    // (split: the practice bands open page 2)
+    const practiceSections = g.split ? [] : sections;
+    practiceSections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
         content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
     if (indep.length) {
-        sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
+        practiceSections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
             content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
     }
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     // (PT-OPN-6, ws-print-lint OPN-6: a Guided band of one cell says why - the row did not fit, or the skill dealt too few items)
-    if (guided.length < 2) notes.push(g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
-    return assemble(ROLE_ID, input, frame, [{ sections }], {
+    if (guided.length < 2) notes.push(g.legacy && g.gc === 1 ? 'The second Guided row did not fit: a legacy drawing takes one Guided row until it migrates.' : g.gc === 1 && g.gRows < 2 ? 'The second Guided row did not fit the page budget at this size.' : 'The second Guided row did not fit: the deal came up short.');
+    if (g.split) notes.push('The Model and one Guided row are taller than one page at this size: the practice is on page 2.');
+    return assemble(ROLE_ID, input, frame, g.split ? [{ sections }, { sections: practiceSections }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
-            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
+            fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, onePageMm: g.onePage, budgetMm: m.budget, modelMm: g.modelH, split: g.split, parity: g.parity, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }
 

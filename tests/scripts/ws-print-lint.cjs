@@ -2253,7 +2253,8 @@ function lintKitGeometry(dom, pdf, info, F) {
             // L-DENSITY OPN-6 (lf-engine-roles critic B1, PAGE_TYPES PT-OPN-6 "Guided holds 2 to 4 cells ... 1 column gives 2 rows"):
             // an Opener's Guided band holding fewer than 2 cells fails, unless the plan's notes say the second Guided row did not
             // fit the page budget (the role writes that note; a kit build hands its notes to the lint).
-            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && p.guidedCells < 2 && !(info.notes || []).some(t => /second Guided row did not fit/i.test(t)))
+            // (a page that holds no Guided band - page 1 of an Opener whose practice moved to page 2 - is not judged)
+            if (info.mode === 'kit' && !pt.key && p.role === 'opener' && (p.bands || []).some(b => /^Guided Practice\s*:/i.test(b)) && p.guidedCells < 2 && !(info.notes || []).some(t => /second Guided row did not fit/i.test(t)))
                 F('L-DENSITY', 'OPN-6', 'major', { page: p.idx }, `page ${p.idx}: the Opener's Guided band holds ${p.guidedCells} cell(s); Guided holds 2 to 4 cells (1 column gives 2 rows), or the plan notes that the second row did not fit (PT-OPN-6)`, 'one-cell Guided band');
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
