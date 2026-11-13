@@ -4176,6 +4176,64 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r12-vstd-product-multiple",
+   "check": "V-STD: a set's standards text (3.OA.C.7 / 4.OA.B.4) names product and multiple together, and the product picture reads as multiple: critic r11 #2",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-STD (lf-vocab r12 item 1)",
+   "fail": {
+    "commit": "8d955045",
+    "state": "lf-vocab r11 head"
+   },
+   "pass": {
+    "commit": "fe6dfdaa",
+    "state": "product / multiple notWith; sets 0 and 6 re-picked"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-STD 2>&1 | grep -q 'V-STD .*\"product\" and \"multiple\"\\|V-STD .*\"multiple\" and \"product\"' && echo 'vstd: FAIL' || echo 'vstd: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r12-feat-term-rule",
+   "check": "V-AMBIG: the term picture (18, [14], 10) could also show the rule 'take 4', and the two may share a bank: critic r11 #3",
+   "kind": "commit-pair",
+   "rule": "vocab-pictures.js VOCAB_ALSO_SHOWS term +rule; term / rule notWith",
+   "fail": {
+    "commit": "8d955045",
+    "state": "lf-vocab r11 head"
+   },
+   "pass": {
+    "commit": "b3d5d9f4",
+    "state": "term / rule notWith; set 7 re-picked"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG 2>&1 | grep -q 'V-AMBIG \"term\": its picture could also show \"rule\"' && echo 'termrule: FAIL' || echo 'termrule: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r12-nb9-every-card",
+   "check": "NB9: on the Match 3 worksheet, every card focused in turn, and the card: after Check no vocab slot holds the focus and no wrong slot shows a caret: critic r11 #4",
+   "kind": "commit-pair",
+   "browser": true,
+   "rule": "screen-cell.js blurVocabSlots + caret-color transparent; ws-next-box NB9",
+   "fail": {
+    "commit": "8d955045",
+    "state": "lf-vocab r11 head"
+   },
+   "pass": {
+    "commit": "20f00492",
+    "state": "Check blurs every vocab slot; wrong slots have no caret"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
