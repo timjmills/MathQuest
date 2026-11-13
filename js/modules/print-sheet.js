@@ -33,7 +33,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
-import { applySheetTags } from './sheet/index.js';
+import { applySheetTags, ebItemOf } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -50,6 +50,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
+import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP, practiceSplit } from './sheet/part-opts.js';
 import { lessonFor, optionLesson, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
@@ -390,6 +391,9 @@ function normaliseRequest(req = {}) {
         lessonSeeds: req.role === 'lesson' && req.lessonSeeds && typeof req.lessonSeeds === 'object'
             ? Object.fromEntries(lessonPartIds().filter((x) => req.lessonSeeds[x] !== undefined && req.lessonSeeds[x] !== null && req.lessonSeeds[x] !== '' && Number.isFinite(Number(req.lessonSeeds[x]))).map((x) => [x, Number(req.lessonSeeds[x]) >>> 0]))
             : null,
+        // lf-partopts (design/partopts/DESIGN.md): the teacher's per-part counts, only the values that differ from the
+        // standard packet (sheet/part-opts.js normalizePartOpts); null = the packet exactly as before.
+        partOpts: req.role === 'lesson' && req.partOpts && typeof req.partOpts === 'object' && !partOptsEmpty(req.partOpts) ? normalizePartOpts(req.partOpts, null) : null,
         perQuestion: Array.isArray(req.perQuestion) ? req.perQuestion.map(Number) : Number(req.perQuestion) >= 1 ? Math.floor(Number(req.perQuestion)) : undefined,
         // A Prerequisite Check's routes (pre-skill-check.js, plan §8b, lessons-phase0 D1): per question
         // {lesson, title, checks?} - its "If missed" teacher tag and the key's routing table. Absent otherwise.
@@ -2419,6 +2423,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         let contentBottom = r.top;
         let stampH = 0;
         let slackPx = Infinity;
+        let inkLo = Infinity, inkHi = -Infinity;   // (lf-partopts: the ink's width - its leftmost to rightmost leaf)
         const pics = [];
         const leaves = [];
         for (const el of cell.querySelectorAll('*')) {
@@ -2435,6 +2440,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
             if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
                 slackPx = Math.min(slackPx, er.left - r.left, r.right - er.right);
+                inkLo = Math.min(inkLo, er.left); inkHi = Math.max(inkHi, er.right);
             }
             if (er.right > r.right - padR + 1 || er.left < r.left + padL - 1) { fits = false; why(it, c, `x ${el.tagName}.${el.className} +${((er.right - (r.right - padR)) / PX_PER_MM).toFixed(1)}mm w${(er.width / PX_PER_MM).toFixed(1)} of ${((r.width - padL - padR) / PX_PER_MM).toFixed(1)}`); }
             // A clip under 1 mm is a stroke or a line box, not hidden content.
@@ -2481,7 +2487,26 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
             }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx };
+        // (lf-partopts A r3: the pupil cell's NEEDED height - its lowest ink from the cell's top plus its bottom padding and border,
+        // read by ws-empty-band measureCells' own ink rule (text runs, a drawing, a stroked box, an answer slot; labels aside).
+        // A cell drawn H tall leaves H - neededMm empty under its ink: the lesson's offer gate predicts EB-BAND with it.)
+        let neededPx = 0;
+        if (state === 'blank') {
+            const isSvg = (d) => d.namespaceURI === 'http://www.w3.org/2000/svg';
+            let inkB = -Infinity;
+            for (const d of cell.querySelectorAll('*')) {
+                if (d.closest('[data-ws-label], .ws-letter, .ws-tab')) continue;
+                const st = getComputedStyle(d);
+                if (st.display === 'none' || parseFloat(st.opacity || '1') <= 0.05) continue;
+                const ownText = [...d.childNodes].some((nd) => nd.nodeType === 3 && nd.textContent.trim());
+                if (ownText) { const rg = d.ownerDocument.createRange(); rg.selectNodeContents(d); for (const q of rg.getClientRects()) if (q.width && q.height) inkB = Math.max(inkB, q.bottom); continue; }
+                const stroked = (parseFloat(st.borderTopWidth) > 0 && st.borderTopStyle !== 'none') || (parseFloat(st.borderBottomWidth) > 0 && st.borderBottomStyle !== 'none') || (parseFloat(st.borderLeftWidth) > 0 && st.borderLeftStyle !== 'none');
+                const drawn = isSvg(d) ? d.tagName.toLowerCase() === 'svg' : /^(img|canvas|input)$/i.test(d.tagName);
+                if (drawn || stroked || d.hasAttribute('data-ws-slot')) { const q = d.getBoundingClientRect(); if (q.width && q.height) inkB = Math.max(inkB, q.bottom); }
+            }
+            if (inkB > -Infinity) { const cs0 = getComputedStyle(cell); neededPx = (inkB - r.top) + parseFloat(cs0.paddingBottom || 0) + parseFloat(cs0.borderBottomWidth || 0); }
+        }
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx: inkHi > inkLo ? inkHi - inkLo : 0, neededPx };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -2520,7 +2545,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
         best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
-            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM) });
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM), inkMm: Math.max(b0.inkMm || 0, (m.inkPx || 0) / PX_PER_MM), neededMm: Math.max(b0.neededMm || 0, (m.neededPx || 0) / PX_PER_MM) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -2547,6 +2572,11 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits && !divFactTooWide(it, size, inner) };
                 if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
+                // (lf-partopts: the widest the ink drew at this column width - the We Do and lesson rows read it before they
+                // offer fewer, wider cells: a cell much wider than its ink has an empty side, EB-SIDE)
+                if (b.inkMm > 0) it.measured[c].inkMm = Math.ceil(b.inkMm * 10) / 10;
+                // (lf-partopts A r3: the blank cell's needed height - its ink's bottom and bottom padding; the offer gate's EB-BAND)
+                if (b.neededMm > 0) it.measured[c].neededMm = Math.floor(b.neededMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
@@ -3267,12 +3297,12 @@ function tagItemIndex(plan, items) {
     const walk = (s) => {
         if (!s || typeof s !== 'object') return;
         // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        // (critic ebitem-r1 m2: one that matched only SOME of them also carries ebPartial "k/n": data-eb-partial, an EB-FOOT note)
         if (s.kind === 'grid') for (const pi of s.items || []) {
             if (!pi) continue;
-            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
-            if (many.length > 1) pi.ebItem = many;
-            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
-            else if (many.length) pi.ebItem = many[0];
+            const t = ebItemOf(pi, idx);
+            if (t.ebItem !== undefined) pi.ebItem = t.ebItem;
+            if (t.ebPartial) pi.ebPartial = t.ebPartial;
         }
         if (Array.isArray(s.contents)) s.contents.forEach(walk);
         if (s.content) walk(s.content);
@@ -3319,6 +3349,9 @@ function touchFitLine(line, html, size) {
 async function buildSheetDeal(req = {}) {
     setOnePagePaper(req.paper);      // before the request is read: it counts the one-page rows the paper holds
     const n = normaliseRequest(req);
+    // `ebItem: false` (ws-empty-band EB-ITEMPARITY, critic ebitem-r1 m3): the same sheet with no data-eb-item tags, to prove the
+    // tags change nothing else in the pupil page or its key
+    n.ebTag = req.ebItem !== false;
     if (!n.sections.length) throw new Error('buildSheet: no section has a skill');
     await fontsReady();
     await loadStandards();
@@ -4127,7 +4160,7 @@ async function buildSheetDeal(req = {}) {
         const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
         plan = t.plan; trimmed = t.trimmed;
     }
-    tagItemIndex(plan, hostItems);
+    if (n.ebTag !== false) tagItemIndex(plan, hostItems);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -4897,7 +4930,7 @@ async function buildRoleSheet(n, metaOf) {
     // (lf-ops-props r5, lead ruling (b'): a mixed-class noStretch row has its boundary item(s) dealt again - evenMixedRows)
     const evenRows = evenMixedRows(plan, items, (its) => { input.items = its; return mod.plan(input); }, n);
     plan = evenRows.plan;
-    tagItemIndex(plan, items);
+    if (n.ebTag !== false) tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
@@ -4992,6 +5025,28 @@ export function lessonPartSeed(seed, part, refresh = 0) {
 /** Support options the lesson packet turns off (practice-page working space; critic visual-quality r2 N1). */
 const LESSON_OFF_OPTS = ['familyChart'];
 
+/**
+ * lf-partopts (critic A r2 N3): the share of its page the LAST page of a built sheet uses, from its plan - the grids' own
+ * heights and a strip per band, against the fullest page (the sheet's pages share one frame). An estimate for the screen's
+ * pages note ("the last under half full"); ws-partopts-unit PO-CAP measures the printed page against it.
+ */
+function planLastFill(res) {
+    const plan = res && Array.isArray(res.partPlans) ? null : res && res.plan;
+    const pages = (plan && plan.pages) || [];
+    if (pages.length < 2) return 1;
+    const STRIP = 9.5;
+    const hOf = (sec) => {
+        if (!sec || typeof sec !== 'object') return 0;
+        const c = sec.content;
+        const g = c && (c.kind === 'grid' ? c : null);
+        const gh = g ? (parseFloat(g.height) || (Number(g.rows) || 1) * (Number(g.cellH) || 0)) : 0;
+        return sec.kind === 'band' ? STRIP + gh : 0;
+    };
+    const used = pages.map((pg) => (pg.sections || []).reduce((a, x) => a + hOf(x), 0));
+    const top = Math.max(...used);
+    return top > 0 ? +(used[used.length - 1] / top).toFixed(3) : 1;
+}
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     // The lesson record (plan phase 0.4): a detailed lesson's own `lessonData`; else the library lesson asked for by
@@ -5039,7 +5094,10 @@ async function buildLesson(n, metaOf) {
     // question per prerequisite, drawn by sheet/roles/pre-skill-check.js with each question's route - and its
     // lesson sheet drops the Warm-up (the check is the warm-up). Every other lesson keeps its Warm-up.
     // (the LR-17 switch: a record with `prereqsLive: false` keeps its Warm-up - library.js prereqCheckLive)
-    const prereqs = !n.lessonData && prereqCheckLive(data) ? data.prereqs : null;
+    const prereqsAll = !n.lessonData && prereqCheckLive(data) ? data.prereqs : null;
+    // (lf-partopts: `partOpts.prereq.n` - the first n questions; the routing table routes only the printed ones)
+    const po = n.partOpts || null;
+    const prereqs = prereqsAll && po && po.prereq && Number.isFinite(po.prereq.n) ? prereqsAll.slice(0, Math.max(1, Math.min(prereqsAll.length, po.prereq.n))) : prereqsAll;
     const warmSkills = prereqs ? [] : data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
     try { if (standardsMod) st = standardsMod.standardsFor(sk.categoryId, sk.skillId); } catch (e) { /* no tags */ }
@@ -5061,7 +5119,9 @@ async function buildLesson(n, metaOf) {
     const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
     const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
-
+    // (lf-partopts: the counts the lesson role reads - chart examples, vocabulary words, Remember, We Do cells, rows)
+    const partN = lessonPartN(po);
+    if (partN) lessonInput.partN = partN;
     // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
     // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
     // whole packet, so the parts before it are built too (they are what it avoids); a REFRESHED part (its seed not the
@@ -5204,7 +5264,39 @@ async function buildLesson(n, metaOf) {
             if (packNums) packNums.push(...planKeys(res));
         }
     }
+    // (lf-partopts: the Practice page's fit - the problems a page holds, its columns, and the fewest whole rows whose cells,
+    // grown to fill the page, stay under PRACTICE_GROW_CAP - read from the standard page; `partOpts.practice.n` then prints
+    // that many a page, in whole rows. Block and detailed-lesson pages keep their own shapes: no fit, the row is fixed.)
+    let practiceFit = null;
+    const pCap = po && po.practice && Number.isFinite(po.practice.n) ? po.practice.n : null;
+    const fitOfPractice = (r) => {
+        const pages = Math.max(1, Number(r.pageCount) || 1);
+        const per = Math.ceil((r.items || []).length / pages);
+        const f0 = r.fits && r.fits.sections && r.fits.sections[0];
+        const cols = Math.max(1, Math.min(per || 1, Number(r.fits && r.fits.cols) || 1));
+        const rows = Math.max(1, Math.ceil(per / cols));
+        const G = f0 && Number(f0.cellH) > 0 ? rows * Number(f0.cellH) : 0;
+        const minRows = f0 && Number(f0.hMin) > 0 && G ? Math.min(rows, Math.max(1, Math.ceil(G / (Number(f0.hMin) * PRACTICE_GROW_CAP)))) : rows;
+        return per > 0 ? { perPage: per, cols, rows, minRows } : null;
+    };
     const buildPractice = async (seed, sec) => {
+        const r0 = await buildPracticeOwn(seed, sec);
+        if (blocks) return r0;
+        practiceFit = fitOfPractice(r0);
+        const f = practiceFit;
+        if (f) f.pages = practicePages;
+        // (lf-partopts §8a: `partOpts.practice.n` is the TOTAL - P equal pages of k problems, k whole rows; the pages follow
+        // from it. A total that is not P x k of this page prints the standard pages.)
+        const sp = pCap !== null && f ? practiceSplit(pCap, f) : null;
+        if (!sp || (sp.per === f.perPage && sp.pages === practicePages)) return r0;
+        const withStrip = /data-mq-lesson-strip/.test(r0.pupilHtml);
+        const k = sp.per;
+        const capSec = facts ? (k >= f.perPage ? sec : Object.assign({}, sec, { pageCap: k, dense: { S: k, M: k, L: k } })) : Object.assign({}, sec, { pageCap: k });
+        const r = await buildSheetInner(practiceReq(sp.pages, withStrip, [k, f.cols], seed, capSec));
+        // (a total that would not print as asked prints the standard pages)
+        return r && r.pageCount === sp.pages && (r.items || []).length === pCap ? r : r0;
+    };
+    const buildPracticeOwn = async (seed, sec) => {
         let res = null;
         for (const shape of facts || blocks ? [null] : stackShapes) {
             const r = await buildSheetInner(practiceReq(practicePages, true, shape || undefined, seed, sec));
@@ -5242,6 +5334,17 @@ async function buildLesson(n, metaOf) {
         const preTexts = (((parts.find((p) => p.part === 'prereq') || {}).res || {}).items || []).map(refText).filter(Boolean);
         const res = await buildMixed(lessonPartSeed(n.seed, 'mixed'), undefined, preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts);
         parts.push({ part: 'mixed', role: 'mixed-practice', res });
+        // (lf-partopts §8a: `partOpts.mixed.n` is the total - a whole number of Mixed pages, each its own sheet that fills its page,
+        // each dealt avoiding the pages before it)
+        const mN = po && po.mixed && Number.isFinite(po.mixed.n) ? po.mixed.n : null;
+        const per = (res.items || []).length;
+        const mPages = mN && per ? Math.max(1, Math.min(2, Math.round(mN / per))) : 1;
+        const seen = (preTexts.length ? practiceTexts.concat(preTexts) : practiceTexts).concat((res.items || []).map(refText));
+        for (let k = 2; k <= mPages; k++) {
+            const rk = await buildMixed((lessonPartSeed(n.seed, 'mixed') + 7919 * (k - 1)) >>> 0, (r) => Object.assign({}, r, { avoidTexts: seen.concat(Array.isArray(r.avoidTexts) ? r.avoidTexts : []) }), seen);
+            parts.push({ part: 'mixed', role: 'mixed-practice', res: rk, sheet: k });
+            seen.push(...(rk.items || []).map(refText));
+        }
     }
     // A part the registry adds (lesson-pages/index.js registerLessonPart, role 'lesson'): drawn by the lesson role.
     const lessonRolePart = (x, seed, extra = {}) => buildRoleSheet(Object.assign({}, nz, {
@@ -5369,7 +5472,32 @@ async function buildLesson(n, metaOf) {
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,
-            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent } : null,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk, freeMm: teach.plan.meta.sheetFreeMm, rowMm: teach.plan.meta.indepRowMm, cellBands: teach.plan.meta.cellBands,
+                // (lf-partopts A r3, ws-partopts-unit EB-ROWFIT: the bridge's measured heights, at 1-4 across, of the problems the
+                // lesson rows draw - the level-1 twins of the lesson's main pool - not the planner's figures)
+                indepH: Object.fromEntries([1, 2, 3, 4].map((c) => [c, (teach.extras || []).filter((x) => x && x.lessonIndepOf && x.measured && x.measured[c] && x.measured[c].fits !== false).map((x) => x.measured[c].hMm)])) } : null,
+            // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
+            // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
+            partFit: (() => {
+                const cm = (chart.plan && chart.plan.meta && chart.plan.meta.partFit) || {};
+                const tm = (teach.plan && teach.plan.meta && teach.plan.meta.partFit) || {};
+                // (lf-partopts §8b-c: the lesson sheet's parts - the values each may take with the others as asked, probed by the
+                // role: a value whose sheet would not fill its page is not offered)
+                const of = (teach.plan && teach.plan.meta && teach.plan.meta.partOffer) || {};
+                const mixedRes = (allParts.find((p) => p.part === 'mixed') || {}).res;
+                return {
+                    prereq: prereqsAll ? { total: prereqsAll.length } : null,
+                    chart: cm.chart ? { designed: cm.chart, min: cm.chartMin || cm.chart } : null,
+                    vocab: of.vocab ? { words: of.vocab.dflt, values: of.vocab.values, canOff: of.vocab.canOff } : null,
+                    remember: { has: !!tm.remember, canOff: !!(of.remember && of.remember.canOff) },
+                    wedo: of.wedo ? { fit: of.wedo.dflt, values: of.wedo.values, canOff: of.wedo.canOff } : null,
+                    rows: of.rows ? Object.assign({ fit: of.rows.dflt, perRow: of.rows.perRow || 1, values: of.rows.values, canOff: of.rows.canOff }, of.rows.none ? { noRoom: of.rows.noRoom !== false } : {}) : null,
+                    practice: practiceFit,
+                    mixed: mixedRes ? Object.assign({ count: (mixedRes.items || []).length, pages: Number(mixedRes.pageCount) || 1 }, Number(mixedRes.pageCount) > 1 ? { lastFill: planLastFill(mixedRes) } : {}) : null,
+                    // (critic A r2 N3: the pages the lesson sheet prints on and its last page's used share - the screen's caption)
+                    sheet: teach.plan && teach.plan.meta && Array.isArray(teach.plan.meta.sheetFill) && teach.plan.meta.sheetFill.length ? { pages: teach.plan.meta.sheetFill.length, lastFill: teach.plan.meta.sheetFill[teach.plan.meta.sheetFill.length - 1] } : null,
+                };
+            })(),
             size,
         },
     };

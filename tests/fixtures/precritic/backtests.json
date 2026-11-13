@@ -6120,6 +6120,691 @@
     "pass": "OK"
    }
   },
+ {
+  "id": "sa-focus-gap-fixture-below",
+  "check": "ws-screen-answer FOCUS-GAP judges the text ABOVE and BELOW the focused box's ring, to the glyph ink (critic eb-r6 m2): the word \"tens\" with its ink 1 px under the ring FAILS; the same word 10 px clear passes",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (above / below, critic eb-r6 m2)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/focus-gap/below-1px.fail.html",
+   "state": "seeded: no finding with 8dc176e6's FOCUS_GAP (it judged only words on the ring's own line; proven 2026-11-13 by running that commit's function on this fixture); FAIL 1 px now"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/focus-gap/below-clear.pass.html",
+   "state": "the word's ink 10 px under the ring"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-wrap-line",
+  "check": "ws-screen-answer FOCUS-GAP reads a wrapped text node LINE BY LINE (critic eb-r7 m1): one text node under the ring, line 1 \"wer once\" (x-height only), line 2 \"Tall\"; line 1's ink 1 px under the ring FAILS, 5 px clear passes (the whole-node metrics put \"Tall\"'s ascenders on line 1 and read 0 px)",
+  "kind": "fixture",
+  "rule": "ws-screen-answer FOCUS-GAP (per line, critic eb-r7 m1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-1px.fail.html",
+   "state": "line 1's ink 1 px under the ring: a real touch, FAIL with either read"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/focus-gap/wrap-clear.pass.html",
+   "state": "line 1's ink 5 px clear: FAIL 0 px at 7bd6f3d31 (the whole-node read, the old way, so the row FAILED there); OK per line now"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --focus-gap-html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-interior-hole",
+  "check": "ws-empty-band EB-SIDE judges the widest run of columns with no ink from top to bottom BETWEEN two pieces of ink in a cell, side to side (critic eb-r7 m5, probe u3): a practice card with its content pinned left and a 95 mm input whose only dark edge is its right one leaves about 93 mm of paper between the written digit and that edge, and FAILS; the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (between) (critic eb-r7 m5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/interior-hole.fail.html",
+   "state": "seeded: OK at 96ba50e36 (only the outer side bands judged; proven 2026-11-13 with that tree's tool); FAIL EB-SIDE 93.4 mm (58.6 %) between the pieces of ink now"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the content centred in the card: no interior hole"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-item-key",
+  "check": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3, its key-leak probe made a gate): on a grid role the pupil page's data-eb-item sequence equals its key's, and no index appears twice on a pupil page; a key whose first two cells answer each other's item FAILS, the sheet as built (arrays_groups independent L) passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMKEY (critic ebitem-r1 m3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-key.fail.html",
+   "state": "seeded: the key's first two cells answer each other's item (pupil item 1, key item 2 at cell 1)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's own pupil page and key: the same item order"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMKEY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-item-parity",
+  "check": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3, its parity probe made a gate): on a grid role the pupil page and key with data-eb-item / data-eb-partial removed are byte-identical to the same sheet built with ebItem: false; a tagged page whose first cell also gained a style FAILS, the sheet as built passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-ITEMPARITY (critic ebitem-r1 m3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-parity.fail.html",
+   "state": "seeded: the tagged pupil page's first cell also carries min-height:1mm (a tag that changes what is drawn)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/item-eb.pass.html",
+   "state": "buildSheet's tagged and untagged sheets: identical once the tags are removed"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture} --only EB-ITEMPARITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "rr-clip-npr-model-l",
+  "check": "ws-grade-render --raster-fit (LP-RASTER on role pages, tests/lib/ws-role-raster.cjs): a role sheet printed to a real PDF and rasterised - RR-PAGES the PDF's pages = the plan's, RR-EDGE no ink within 5 mm of the paper's edge, RR-CLIP every text span's tall glyphs inked at top and foot. lf-algebra critic F3: the number_patterns_rule Scripted Model at L ran its Say band 6 mm past the panel frame and the frame cut the text in half - clean on screen and in emulated print, visible only in the PDF",
+  "kind": "commit-pair",
+  "rule": "ws-grade-render --raster-fit RR-CLIP (lf-checks queue 13; lf-algebra critic F3, via lf-roles)",
+  "browser": true,
+  "fail": {
+   "commit": "47b1f2a86",
+   "state": "lf-algebra r7: npr Scripted Model L on one page, the Say band ('Say: The rule is count on by 10...') clipped by the frame: RR-CLIP x2"
+  },
+  "pass": {
+   "commit": "7c1e3dbb4",
+   "state": "master (lf-roles' Scripted Model re-plan, 35c881b64 / 24cbb0678, merged): the same Model laid on 2 pages, every text span inked; lf-algebra made no fix of its own (F3 handed to lf-roles)"
+  },
+  "command": "node tests/scripts/ws-grade-render.cjs --skills patterns:number_patterns_rule --roles scripted-model --size L --no-screen --raster-fit --out tests/audit-runs/rr-clip-npr",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "conflict-markers-3c7b",
+  "check": "ws-conflict-markers: no tracked file holds a merge conflict marker line (a line starting with seven '<' or '>' and a space); on every ws-precritic run and in deploy session 1",
+  "kind": "commit-pair",
+  "rule": "ws-conflict-markers (lf-hosts critic r1 F2)",
+  "browser": false,
+  "fail": {
+   "commit": "3c7b548a",
+   "state": "lf-hosts merge of the lf-checks hand-off: <<<<<<< HEAD / >>>>>>> marker lines committed in design/lessons-first/CHECKS_FROM_CRITICS.md"
+  },
+  "pass": {
+   "commit": "28d13e788",
+   "state": "the g9 merge resolved the ledger: no marker line in any tracked file"
+  },
+  "command": "node tests/scripts/ws-conflict-markers.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-f1-sheet-foot",
+  "check": "A lower part count may not leave the lesson sheet's foot blank: EB-PAGE absolute on EVERY page, last pages included (critic A r1 F1: 23-77 % empty feet)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2d EB-PAGE (30 %; the last page of a 2+ page sheet, 50 %: H5)",
+  "browser": true,
+  "fail": {
+   "commit": "327356e6",
+   "state": "nearest_10 M: We Do off 39 %, everything at min 41 %, + We Do off 77 %, Vocabulary 0 + We Do off 62 % of the sheet body empty under its last block"
+  },
+  "pass": {
+   "commit": "7cab5fca",
+   "state": "the freed height becomes Independent rows and a value whose sheet does not fill is not offered: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M --no-walk --only PO-2d",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-f12-combined-state",
+  "check": "A packet with SEVERAL parts changed at once is judged on its own, never against the standard packet (critic A r1 F12: PO-2 varied one part at a time and judged relatively, so F1 passed)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2d on a settled combined state (--state)",
+  "browser": true,
+  "fail": {
+   "commit": "327356e6",
+   "state": "nearest_10 M, Vocabulary 0 with We Do off: 62 % of the lesson sheet body empty"
+  },
+  "pass": {
+   "commit": "7cab5fca",
+   "state": "the same state settles to a sheet that fills: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M --state '{\"vocab\":{\"n\":0},\"wedo\":{\"on\":false}}' --only PO-2d",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-f2-count-coverage",
+  "check": "The problem counts the owner asked for are really on offer: the share of lesson x size cases with a We Do and a Practice range of 2+ values, against their floors (critic A r1 F2)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2e (We Do floor 7/52 - a ratchet, lead 2026-11-13 - and Practice 90 %)",
+  "browser": true,
+  "fail": {
+   "commit": "327356e6",
+   "state": "We Do range 0/52, Practice range 8/52"
+  },
+  "pass": {
+   "commit": "7cab5fca",
+   "state": "We Do range 7/52 (the measured floor), Practice range 52/52"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --coverage-only --only PO-2e",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-wedo-floor-ratchet",
+  "check": "The PO-2e We Do floor is a RATCHET: a run asked for a floor under the measured 7/52 fails at once (lead ruling 2026-11-13). Both states are the same commit: what differs is the floor the run asks for, since the ratchet lives in the check, not in the app",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2e-RATCHET",
+  "browser": false,
+  "fail": {
+   "commit": "94420f66",
+   "args": "--floor-wedo 0.10",
+   "state": "a run that argues the floor down to 10 %"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "args": "",
+   "state": "the default floor (7/52) - and a raised one is accepted"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only PO-2e {args}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-f6-f7-fixed-counts",
+  "check": "A fixed count is written once as \"Fixed: n (why)\", and a part with no room is `none` - no tick, nothing stored (critic A r1 F6, F7)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 (rangeText, partLimits none)",
+  "browser": false,
+  "fail": {
+   "commit": "327356e6",
+   "state": "F6: the rows range reads \"0 · No row fits under the bands\"; F7: rows with no room are not `none`, so the tick stores a value"
+  },
+  "pass": {
+   "commit": "7cab5fca",
+   "state": "\"Fixed: n (...)\" once, rows none with canOff false"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only F6,F7",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-f3-f10-screen",
+  "check": "The Print screen's Lesson parts: settings cleared when the skill changes (F3), a stepper live at 0 (F4), no overlap and no sideways scroll at 390 (F5), a fixed count once (F6), no tick or New numbers on a no-room part (F7), no Supports pill (F8), the full-width table at 1280 under 700 px and no lone dash (F9), one New numbers for the lesson sheet (F10)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots (F3-F10)",
+  "browser": true,
+  "fail": {
+   "commit": "327356e6",
+   "state": "29 findings on Y1.B2.S9: no full-width card, 12 x a count written twice, 7 x a part's own New numbers, a Supports pill, the stepper dead at 0, the 390 overlap, settings kept across a skill swap"
+  },
+  "pass": {
+   "commit": "7cab5fca",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only F3,F4,F5,F6,F7,F8,F9,F10",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n1-rowfit",
+  "check": "Freed height goes back to Independent rows, and \"no room\" is only written where no row fits (critic A r2 N1: 26-27 % feet with rows \"Not on this lesson sheet\")",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit EB-ROWFIT + PO-NOROOM (part-opts.js rowFits / shortestRowMm on the rows' own problems)",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "nearest_10 L and add_wp_10 L with Vocabulary off: 62.6 / 63.6 mm of foot, one row with its head 32 / 56.7 mm, rows \"no room\" - 2 EB-ROWFIT + 2 PO-NOROOM"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "the rows are dealt into the freed height: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10,addition:add_wp_10 --sizes L --state '{\"vocab\":{\"on\":false}}' --only EB-ROWFIT,PO-NOROOM",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n2-remember-off",
+  "check": "Remember off removes the rule from the lesson sheet; it does not move it into the We Do Steps (critic A r2 N2)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-REM (the lesson's concept / chant text absent from the printed sheet)",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "nearest_10 L, Vocabulary off + Remember off: the sheet still prints \"5 or more, round up. 4 or less, round down.\""
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "no rule text anywhere on the sheet"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes L --state '{\"vocab\":{\"on\":false},\"remember\":{\"on\":false}}' --only PO-REM",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n3-n6-part-texts",
+  "check": "The Parts table tells the truth about the pages: the caption's page count is the built count, \"fills the page\" only when it does, every multi-page part says its pages, no \"<n> a page\" on a total, \"or 0 to leave it off\" wherever the stepper reaches 0 (critic A r2 N3, N6)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-CAP",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "nearest_10 L standard: caption \"one page\" over a 2-page sheet, rows \"fills the page\" with the last page 39 % empty, Mixed \"15 a page\", two steppers with no \"or 0\" - 5 findings"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "the caption and every row text are read from the build: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes L --no-jobs --walk-depth 0 --only PO-CAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n3-screen-caption",
+  "check": "On the screen, the lesson-sheet caption and each part's pages note match the live preview's own pages (critic A r2 N3)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots captionCheck (N3)",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "Y4.B1.S14 at L: the caption says one page, the preview holds 2 lesson-sheet pages; rows \"fills the page\" over the 2-page sheet"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "the caption reads \"two pages\": 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y4.B1.S14 --no-shots --only N3",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n4-one-pair-match",
+  "check": "Vocabulary never offers 1 word: one pair is no matching task (critic A r2 N4)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 N4 (offeredValues(vocab), probed and unprobed) + PO-VOC on every built state",
+  "browser": false,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "Vocabulary offers 1,2,3 (probed) and 0,1,2,3 (unprobed)"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "VOCAB_MIN 2: 1 is never offered"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only N4",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n5-lock-reason",
+  "check": "A locked tick gives its reason in visible text, not only in a hover title (critic A r2 N5)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots textLint (N5)",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "Y1.B2.S9: Vocabulary and We Do locked with no visible reason, at 1280 and at 390 (where there is no hover)"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "\"Needed to fill the sheet\" as visible text: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only N5",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n6-range-text",
+  "check": "One form of range text everywhere: no \"<n> a page\" on a total, \"or 0 to leave it off\" wherever the stepper reaches 0, no lone word wrapped onto its own line at 390 (critic A r2 N6)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 N6 + ws-partopts-shots textLint (N6)",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "Y1.B2.S9: Mixed \"12 to 24 problems, 12 a page\", Practice and Mixed steppers reach 0 with no \"or 0\", a lone word wrapped at 390 - 16 findings"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only N6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n6-range-text-unit",
+  "check": "The same one form in the engine's own text writer: the Mixed range never says \"<n> a page\" (critic A r2 N6)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 N6",
+  "browser": false,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "the Mixed range reads \"15 to 30 problems, 15 a page\""
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "partRowText writes the pages note separately"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only N6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-n7-step-walk",
+  "check": "The gate walks the states the screen can REACH, one offered step at a time with the settle loop, not only the combinations it can ask for in one jump (critic A r2 N7: N1 and N2 live in walked states only)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2w walk (breadth-first, de-duplicated by the settled partOpts) carrying EB-ROWFIT, PO-NOROOM and PO-REM",
+  "browser": true,
+  "fail": {
+   "commit": "d6f22be0",
+   "state": "the walk alone (--no-jobs) reaches 8 states and finds 3 EB-ROWFIT, 3 PO-NOROOM and 2 PO-REM on nearest_10 L"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "16 states walked, 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes L --no-jobs --walk-depth 2 --only EB-ROWFIT,PO-NOROOM,PO-REM",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r3-edge-margin",
+  "check": "An equation cell of a CHANGED lesson sheet keeps the 1.5 mm margin between its ink and the cell border (critic A r3 full walk: div_facts M We Do off printed 0.7 mm once the row margin was dropped)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-2d EB-EDGE on a settled state",
+  "browser": true,
+  "fail": {
+   "commit": "c69917b7",
+   "state": "div_facts M We Do off: 2 cells with ink 0.7 mm from the border"
+  },
+  "pass": {
+   "commit": "1dbe32f1",
+   "state": "equation facts keep EQ_EDGE_MM: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons division:div_facts --sizes M --state '{\"wedo\":{\"on\":false}}' --only PO-2d",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r1-lock-on-unprinted",
+  "check": "A part that does not print carries no lock reason: \"Needed to fill the sheet\" beside \"Not on this lesson sheet (no room)\" contradicts itself (critic A r3 R1, a regression of the N5 fix)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots textLint converse (R1)",
+  "browser": true,
+  "fail": {
+   "commit": "389a69c6",
+   "state": "Y1.B2.S9 at 1280 M, 1280 L and 390: rows read \"Needed to fill the sheet | Not on this lesson sheet (no room)\" - 3 findings"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "state": "`locked` excludes `none`: 0 findings"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only R1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r2-clamp-note",
+  "check": "A count clamped to the size's most (or fewest) says so; \"rounded so no page is under half full\" is kept for a count that lay BETWEEN two offered values (critic A r3 R2)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-unit PO-4 R2 (part-opts.js snapNote)",
+  "browser": false,
+  "fail": {
+   "commit": "389a69c6",
+   "state": "Mixed 42 -> 30 and 6 -> 15 both read \"Rounded to n so no page is under half full\" - 3 findings"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "state": "\"Now 30: the most size L holds\"; the rounding reason only between two offered values"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --unit --only R2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r2-clamp-note-screen",
+  "check": "The same note on the real screen, reached by clicks: Practice and Mixed stepped to their max at M, then Size L (critic A r3 R2)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots size-change walk (R2)",
+  "browser": true,
+  "fail": {
+   "commit": "389a69c6",
+   "state": "Y4.B1.S14 Mixed 42 -> 30 at L: \"Rounded to 30 so no page is under half full\" - a false reason, and it does not say 30 is the most at L"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "state": "\"Now 30: the most size L holds\""
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only R2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r4-no-sideways-scroll",
+  "check": "At 390 the WHOLE page does not scroll sideways, on the standard packet and after the largest packet (critic A r3 R4: the preview's page tabs widen with each page; the old check saw only `.tv-section`)",
+  "kind": "commit-pair",
+  "rule": "ws-partopts-shots documentElement.scrollWidth - innerWidth (R4)",
+  "browser": true,
+  "fail": {
+   "commit": "389a69c6",
+   "state": "Y1.B2.S9 at 390: the page is 10 px wider than the viewport"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "state": "#tvPageTabs wraps at <= 640 px: 0 px"
+  },
+  "command": "node tests/scripts/ws-partopts-shots.cjs --lessons Y1.B2.S9 --no-shots --only R4",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-r3-rowfit-plus-detects",
+  "check": "EB-ROWFIT+ DETECTS the critic's case - rows the teacher cannot add to while the printed foot holds one more row of their own cells (critic A r3 R3: fact_family_sort M, Vocabulary 2, Remember off, We Do 0, a 60.7 mm foot under a 59.5 mm row) - and stays REPORT-ONLY by default. The fix is the row packer's, routed to lf-engine (DESIGN §8d R3), so the two states are the same commit: with --gate-rowfit-plus the check gates and fails on the case; without it the run reports and passes",
+  "kind": "commit-pair",
+  "reportOnly": true,
+  "rule": "ws-partopts-unit EB-ROWFIT+ (report-only; --gate-rowfit-plus gates the changed sheets)",
+  "browser": true,
+  "fail": {
+   "commit": "94420f66",
+   "args": "--gate-rowfit-plus",
+   "state": "gating: the state is flagged (EB-ROWFIT+)"
+  },
+  "pass": {
+   "commit": "94420f66",
+   "args": "",
+   "state": "report-only (the default): the state is printed in the EB-ROWFIT+ line and the run passes"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --lessons addition:fact_family_sort --sizes M --state '{\"vocab\":{\"n\":2},\"remember\":{\"on\":false},\"wedo\":{\"on\":false}}' --only EB-ROWFIT+ {args}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-fill-bt-low",
+  "check": "SHEET_FILL_MIN may not drop: the plan reads up to 0.052 fuller than the print near the floor (identify M We Do off), so a floor of 0.75 lets a sheet planned at the floor print a 30 % foot (critic A r3, DESIGN §8d). The two states are the same tree with the threshold judged as moved - the backtest sheets are built as asked, not through the offer gate, so what they print does not depend on it",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit FILL-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.75.json",
+   "state": "SHEET_FILL_MIN 0.75 - under 0.70 + the measured gap"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 0.76"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-fill-bt-high",
+  "check": "SHEET_FILL_MIN may not rise either: 0.77 refuses add_wp_10_plain L (planned 0.762, prints 24 % empty - a good sheet) (DESIGN §8d)",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit FILL-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-fill-0.77.json",
+   "state": "SHEET_FILL_MIN 0.77 - over the lowest-planned good sheet"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 0.76"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-rowfit-bt-low",
+  "check": "ROWFIT_SLACK_MM may not drop: at 10 mm the gate offers placevalue:value M We Do 1, whose printed foot (35.0 mm) holds a whole row and its head (33.7 mm) at a plan gap of 11.4 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from expand L Remember off, which master moved to 15.9 mm)",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit ROWFIT-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-10.json",
+   "state": "ROWFIT_SLACK_MM 10 - under the must-refuse gap"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 12 mm"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-rowfit-bt-high",
+  "check": "ROWFIT_SLACK_MM may not rise either: at 14 mm the gate refuses placevalue:combine L rows 0, whose printed foot (28.5 mm) holds no row (29.4 mm needed) at a plan gap of 13.5 mm (DESIGN §8d; re-pinned on the deploy merge 2026-11-13 from value L rows 0, which master moved to 26.4 mm)",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit ROWFIT-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-rowfit-14.json",
+   "state": "ROWFIT_SLACK_MM 14 - over the must-keep gap"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 12 mm"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only ROWFIT-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-band-bt-low",
+  "check": "BAND_SLACK_MM may not drop: at 0 mm the offer gate lets div_facts M (Vocabulary + Remember off) through, whose We Do cells print a 31.4 % band while the plan reads 26.8 % (critic A r3, DESIGN §8d)",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit BAND-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-band-0.json",
+   "state": "BAND_SLACK_MM 0 - under the 0.8 mm the must-flag sheet needs"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 2 mm"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only BAND-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "partopts-band-bt-high",
+  "check": "BAND_SLACK_MM may not rise either: at 3 mm it flags div_facts M We Do 1, which prints a 27 % band (DESIGN §8d)",
+  "kind": "fixture",
+  "rule": "ws-partopts-unit BAND-BT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-band-3.json",
+   "state": "BAND_SLACK_MM 3 - over the 2.6 mm the must-keep sheet allows"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/partopts/bt-live.json",
+   "state": "the live 2 mm"
+  },
+  "command": "node tests/scripts/ws-partopts-unit.cjs --bt-only --only BAND-BT --bt-k-file {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
   {
    "id": "pl-cl40-arrays-turn-mp",
    "check": "An array dot never enters the cell label's 7 x 7 mm keep-out (CL-40; lf-ops-props precritic: mult_properties more-practice L, first dot 6.8 mm across, 4.8 mm down, cells 1 and 5)",

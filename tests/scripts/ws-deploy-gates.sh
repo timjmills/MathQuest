@@ -89,14 +89,14 @@
 #            The matrix's exit 2 within the budget (rows selected, none checkable) is NOTHING RUN.
 #            Flake re-run (N7): only the rows the first inline run found red (--rows), never the whole budget.
 #            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
-# Session 4  ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned --check
+# Session 4  ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check
 #            design/audit/baselines/lesson-baseline.json (lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c, which
 #            was a lane rule and is now a deploy gate): every page of every lesson master prints (the three samples, every
 #            key of lessons/prereqs.js LESSONS, every detailed lesson; L and S, seeds 4242 and 1) is byte-identical to the
 #            pin, and every lesson the tree prints is pinned (UNPINNED fails). ≈ 13 min on one browser slot: in its own
 #            session because sessions 1-3 each sit at 27-28 min of their 30-min budget (MQ_LESSON_BASELINE_SESSION moves it).
 #            RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the pin in the same deploy commit
-#            (ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --write <the pin>) and the
+#            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
 #            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
@@ -882,6 +882,7 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
   node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
@@ -921,9 +922,9 @@ build_list() {
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
   # session 4 (lead ruling 2026-11-13, process rule 0c as a deploy gate): every lesson page master prints vs the pin
   # (≈ 13 min, one slot). RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes $LESSON_BASE in the same
-  # deploy commit (ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --write $LESSON_BASE) and the
+  # deploy commit (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write $LESSON_BASE) and the
   # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
-  if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
+  if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
   else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
 }
 
