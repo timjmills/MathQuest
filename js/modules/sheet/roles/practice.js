@@ -724,6 +724,10 @@ export function capFillShape(items, cols, chunk, heightMm) {
     const H = evenRows(w, frS.map((f, r) => Math.max(w[r], Math.min(heightMm * f / sum, GDP_ROW_ROOM * mins[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total >= heightMm - 0.5) return plain;
+    // (a capFill page is meant to FILL - E9b: a detailed lesson's body is at most 8 % blank below its last band. Capping the
+    // rows to GDP_ROW_ROOM leaves the rest under the grid; take it only when the page still fills to 92 %, else the cap would
+    // trade a cell band for a page band. A page that cannot both fill and keep its rows under 1.42 x content needs a lead ruling.)
+    if (total < 0.92 * heightMm) return plain;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
 }
 
