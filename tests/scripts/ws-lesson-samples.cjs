@@ -29,6 +29,12 @@
 //                ws-print-lint L-OVERLAP SECTION reads it on the PDF (precritic lesson-samples-key-L / -S; critic r2 D1)
 //     PC-PAGES   (lf-engine PC, lead ruling A) the Prerequisite Check prints on ONE pupil page; --force-check renders a
 //                check whose LR-17 switch is still off (buildSheet prereqsForce)
+//     PC-H13P    (critic r3 F5 / F7) Practice and Mixed pages: no cell band >= 30 % (blocking; every page gated)
+//     PC-FRAME   (critic r3 F3) every page, pupil and key: the body's drawn ink ends inside the body (no band cut at the foot)
+//     PC-CLIP    also (critic r3 F2) on the check page and its key: each band's grid ink ends above its "If missed" tag and
+//                every tag is drawn inside its band
+//     PC-PV      (critic r3 F1) a routed check's place cells print no place heads, and with two ring words the word nearest
+//                the underlined digit is not the wrong one in every item
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
@@ -205,6 +211,58 @@ function stripMeasure() {
     });
 }
 
+/** In the page (lf-engine PC r3 fix, critic r3 F1-F3): per page, (a) FRAME: the lowest drawn ink inside the body vs the
+ *  body's bottom (F3: a band cut at the body foot); (b) INK: per routed band (.mq-lprecol) its grid's ink bottom vs its
+ *  teacher tag's top, and whether the tag's own text is drawn inside its band (F2: a 36.1 mm fact cell in a 35.9 mm row
+ *  hid the tag); (c) PV: per place cell, whether the numeral prints place heads (F1) and, with two ring words, which word
+ *  lies nearest the underlined digit and which word is ringed (the key). */
+function pcMeasure() {
+    const MM = 96 / 25.4;
+    const vis = (e) => { const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none') return null; const r = e.getBoundingClientRect(); return r.width && r.height ? r : null; };
+    const inkBottom = (root) => { let b = -Infinity; for (const d of root.querySelectorAll('*')) { if (d.children.length && !(d instanceof SVGSVGElement) && !(d.textContent || '').trim() && !(parseFloat(getComputedStyle(d).borderBottomWidth) > 0)) continue;
+        const r = vis(d); if (!r) continue; const leaf = !d.children.length || d instanceof SVGSVGElement; const bordered = parseFloat(getComputedStyle(d).borderBottomWidth) > 0 || parseFloat(getComputedStyle(d).borderTopWidth) > 0;
+        if (leaf || bordered) b = Math.max(b, r.bottom); } return b; };
+    return [...document.querySelectorAll('body > section.ws-page, body > .ws-page')].map((pg) => {
+        const body = pg.querySelector('.ws-body');
+        const out = { frame: null, ink: [], pv: [] };
+        if (body) { const br = body.getBoundingClientRect(); const ib = inkBottom(body);
+            // (and each band's own frame: a cell drawn past its grid / band bottom hides the band's bottom rule - sub L sheet
+            // Independent cells 69 mm in a 64.8 mm row, cut by the grid: the body's ink stayed inside the body)
+            let worst = { over: Math.round((ib - br.bottom) / MM * 10) / 10, what: 'body' };
+            for (const bd of body.querySelectorAll('.ws-band, .ws-grid')) { const r = vis(bd); if (!r) continue; let b = -Infinity; for (const c of bd.querySelectorAll('.ws-cell')) { const q = vis(c); if (q) b = Math.max(b, q.bottom); }
+                const o = Math.round((b - r.bottom) / MM * 10) / 10; if (o > worst.over) worst = { over: o, what: `${String(bd.className).split(' ')[0]} "${((bd.querySelector('.ws-strip') || {}).textContent || '').trim().slice(0, 30)}"` }; }
+            out.frame = worst; }
+        for (const col of pg.querySelectorAll('.mq-lprecol')) {
+            const grid = col.querySelector(':scope > .ws-grid'), tag = col.querySelector(':scope > .mq-lpretag');
+            if (!grid || !tag) continue;
+            const gb = Math.max(inkBottom(grid), grid.getBoundingClientRect().bottom);
+            const tr = tag.getBoundingClientRect();
+            // the tag's ink: its text's own box, inside every ancestor that clips (the band) and below the grid's ink
+            let shown = !!(tag.textContent || '').trim() && tr.height > 1;
+            for (let a = tag.parentElement; shown && a && a !== pg; a = a.parentElement) { const cs = getComputedStyle(a); if (cs.overflow === 'visible' && cs.overflowY === 'visible') continue; const q = a.getBoundingClientRect(); if (tr.bottom > q.bottom + 1) shown = false; }
+            out.ink.push({ text: (tag.textContent || '').trim().slice(0, 40), over: Math.round((gb - tr.top) / MM * 10) / 10, shown: shown && gb <= tr.top + 1 });
+        }
+        pg.querySelectorAll('.ws-cell').forEach((c, k) => {
+            const tracks = c.querySelector('.pv-tracks'); const ring = c.querySelector('.pv-ring-row');
+            if (!tracks) return;
+            const rows = tracks.querySelectorAll('tr').length;
+            const lab = c.querySelector('[data-ws-label], .ws-letter');
+            const rec = { cell: (lab && lab.textContent.trim()) || String(k + 1), heads: rows > 1 };
+            const ul = [...tracks.querySelectorAll('span')].find((s) => parseFloat(getComputedStyle(s).borderBottomWidth) > 0);
+            const ch = ring ? [...ring.querySelectorAll('.pv-choice')] : [];
+            if (ul && ch.length === 2) {
+                const ux = (ul.getBoundingClientRect().left + ul.getBoundingClientRect().right) / 2;
+                const d = ch.map((x) => { const r = x.getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - ux); });
+                rec.nearest = ch[d[0] <= d[1] ? 0 : 1].textContent.trim();
+                const ringed = ch.find((x) => { const cs = getComputedStyle(x); return parseFloat(cs.borderTopWidth) > 0 && !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.borderTopColor); });
+                rec.ringed = ringed ? ringed.textContent.trim() : null;
+            }
+            out.pv.push(rec);
+        });
+        return out;
+    });
+}
+
 async function checkMain() {
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -233,7 +291,7 @@ async function checkMain() {
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure) }; } finally { await sh.close(); } };
+                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), pc: await sh.evaluate(pcMeasure) }; } finally { await sh.close(); } };
                 const P = await read2(built.pupil), K = await read2(built.key);
                 // PC-PAGES (lf-engine PC 2026-11-12, lead ruling A): the Prerequisite Check is ONE pupil page (PAGE_TYPES 2.10)
                 for (const pt of built.parts) if (pt.part === 'prereq' && pt.pages !== 1) F('PC-PAGES', `${l.id} ${size}`, `the check runs to ${pt.pages} pupil pages`);
@@ -250,6 +308,20 @@ async function checkMain() {
                     for (const b of bandsOf(P.sc, n)) if (m.part === 'prereq' || /blank at the bottom/.test(b)) F('PC-H13', where('pupil', n), b.replace(/^page \d+:? ?/, ''));
                     if (m.part === 'prereq' && P.st[n] && P.st[n].maxGap > 15) F('PC-H13', where('pupil', n), `a gap of ${P.st[n].maxGap} mm between the check page's cells`);
                 });
+                // PC-H13P (critic r3 F5 / F7; speed-up 1: every page of the packet is gated): Practice and Mixed cell bands, blocking
+                pm.forEach((m, n) => { if (!['practice', 'mixed'].includes(m.part)) return; for (const b of bandsOf(P.sc, n)) if (!/blank at the bottom/.test(b)) F('PC-H13P', where('pupil', n) + ` (${m.part})`, b.replace(/^page \d+:? ?/, '')); });
+                // PC-FRAME (critic r3 F3): every page of the packet, pupil and key, ends inside its body (no band cut at the foot)
+                for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if (pg.frame && pg.frame.over > 0.3) F('PC-FRAME', where(k, n) + ` (${(mm[n] || {}).part || '?'})`, `${pg.frame.what === 'body' ? 'ink runs' : `a cell runs past its ${pg.frame.what} by`} ${pg.frame.over} mm${pg.frame.what === 'body' ? " past the body's bottom" : ''} (the band has no bottom rule inside the frame)`); });
+                // PC-CLIP on ink (critic r3 F2): on the check page and its key, each routed band's grid ink ends above its tag, and
+                // every "If missed" tag is drawn inside its band
+                for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if ((mm[n] || {}).part !== 'prereq') return;
+                    for (const t of pg.ink) if (!t.shown) F('PC-CLIP', where(k, n), `the tag "${t.text}" has no ink: the grid's ink ends ${t.over} mm below its top`); });
+                // PC-PV (critic r3 F1): on a routed check a place cell prints no place heads (they give the answer), and with two
+                // ring words the word nearest the underlined digit is not always the wrong one (words in place order)
+                { const kpn = km.findIndex((x) => x.part === 'prereq'); const ppn = pm.findIndex((x) => x.part === 'prereq');
+                    for (const [doc, n, k] of [[P, ppn, 'pupil'], [K, kpn, 'key']]) for (const c of ((doc.pc || [])[n] || {}).pv || []) if (c.heads) F('PC-PV', `${where(k, n)} check Q${c.cell}`, 'place heads over the numeral on a routed check (they name the answer)');
+                    const two = (((K.pc || [])[kpn] || {}).pv || []).filter((c) => c.nearest && c.ringed);
+                    if (two.length >= 2 && two.every((c) => c.nearest !== c.ringed)) F('PC-PV', where('key', kpn), `in all ${two.length} two-word place items the word nearest the underlined digit is the wrong one (${two.map((c) => `Q${c.cell} ${c.nearest}`).join(', ')})`); }
                 if (has('debug')) console.log(JSON.stringify({ lesson: l.id, size, pupil: P.st.map((x) => x.strips), key: K.st.map((x) => x.strips) }));
                 // strips covered; pupil vs key twin
                 pm.forEach((m, n) => { for (const s of (P.st[n] || {}).strips || []) { if (s.covered && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" covered by ${s.covered}`); if (s.clip && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" clipped by ${s.clip}`); } });
@@ -288,7 +360,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR6', 'PC-H13', 'PC-CLIP', 'PC-PAGES', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR6', 'PC-H13', 'PC-H13P', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PAGES', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}` : na === LESSONS.length && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); for (const x of fs2.slice(0, 8)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > 8) console.log(`   ... ${fs2.length - 8} more`); }
     if (na < LESSONS.length && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });

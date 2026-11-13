@@ -7,6 +7,7 @@
 //   node tests/scripts/ws-lesson-check.cjs --layout 3          # render + measure the first 3 seeds (default 3)
 //   node tests/scripts/ws-lesson-check.cjs --rule-off LR-5     # PROOF: that rule's engine side off
 //                                                              #   (the gate must then FAIL on it)
+//   node tests/scripts/ws-lesson-check.cjs --force-check       # the packets with their Prerequisite Check forced on
 //   node tests/scripts/ws-lesson-check.cjs --report-only       # print, never exit 1
 //
 // What it checks (rule numbers are LESSON_RULES.md's):
@@ -38,6 +39,10 @@ const ONLY = arg('only', '');
 const LAYOUT = Math.max(0, parseInt(arg('layout', '3'), 10));
 const RULE_OFF = (arg('rule-off', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const REPORT_ONLY = has('report-only');
+// --force-check (lf-engine PC r3 fix, critic r3 F4 / F9; additive): build every packet WITH its Prerequisite Check even
+// while the lesson's LR-17 switch is off (buildSheet's render-only `prereqsForce`), so LR-5 / LR-6 / LR-7 read the packet
+// the check re-deals (the sheet loses its Warm-up and re-deals).
+const FORCE = has('force-check');
 const SEED_LIST = Array.from({ length: SEEDS }, (_, i) => (i === 0 ? 4242 : 1000 + i * 37));
 
 // (`lesson`: the library id - the request carries it as `lessonId` once the engine reads one, B's
@@ -236,8 +241,9 @@ async function renderDoc(app, html) {
                 const layout = si < LAYOUT;
                 let r = null;
                 try {
-                    r = await app.page.evaluate(async ({ skill, lessonId, size, seed, layout, rulesOff, rules, packetSize, checkSrc }) => {
+                    r = await app.page.evaluate(async ({ force, skill, lessonId, size, seed, layout, rulesOff, rules, packetSize, checkSrc }) => {
                         const req = { role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed, key: layout, practicePages: 1, mixed: true, rulesOff };
+                        if (force) req.prereqsForce = true;
                         if (window.lessonById && window.lessonById(lessonId)) req.lessonId = lessonId;
                         const b = await window.buildSheet(req);
                         // eslint-disable-next-line no-eval
@@ -247,7 +253,7 @@ async function renderDoc(app, html) {
                             pupil: layout ? window.sheetDocument(b.pupilHtml, b.title, { paper: 'A4' }) : '',
                             key: layout ? window.sheetDocument(b.keyHtml, b.title, { paper: 'A4' }) : '',
                         };
-                    }, { skill: l.skill, lessonId: l.lesson, size, seed, layout, rulesOff: RULE_OFF, rules: l.rules, packetSize: PACKET_SIZE, checkSrc: PACKET_CHECK_SRC });
+                    }, { force: FORCE, skill: l.skill, lessonId: l.lesson, size, seed, layout, rulesOff: RULE_OFF, rules: l.rules, packetSize: PACKET_SIZE, checkSrc: PACKET_CHECK_SRC });
                 } catch (e) { fail(where, 'BUILD', String(e && e.message || e).slice(0, 200)); continue; }
                 builds++;
                 if (has('verbose')) console.log(`  built ${where}`);
