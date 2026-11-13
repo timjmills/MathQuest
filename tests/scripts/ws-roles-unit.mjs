@@ -51,7 +51,7 @@ const PLANT = {
     list: { ans: '12, 15, 18', wrong: '12, 15, 19' },
     one: { ans: '42', wrong: '48' },
     // control: a unit form is written on its line (placevalue:unit_form, a passed skill) - it starts with a digit
-    unit: { ans: '2 hundreds 3 tens 5 ones', wrong: '3 hundreds 2 tens 5 ones' },
+    unit: { ans: '2 hundreds 1 ten 1 one', wrong: '1 hundred 2 tens 1 one' },
 };
 for (const [id, p] of Object.entries(PLANT)) {
     try { registerSkill(`rolesunit:${id}`, { wrongAnswer: () => ({ value: p.wrong, misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run in one process */ }
@@ -93,11 +93,13 @@ if (on('KEYJOIN-ROLE')) {
             for (const s of slots) {
                 const t = s.text.replace(/&amp;/g, '&').trim();
                 if (JOIN.test(t)) findings.push(`${tag}: key slot "${s.id}" holds "${t.slice(0, 30)}" - several answers in ONE slot (H1, KEYJOIN)`);
-                else if (id !== 'unit' && PROSE.test(t) && !/^[✓]?$/.test(t)) findings.push(`${tag}: key slot "${s.id}" holds the sentence "${t.slice(0, 30)}" - a write line for a sentence (PAGE_TYPES 6.1 number blanks only)`);
+                else if (!(id === 'unit' && role === 'error-analysis') && PROSE.test(t) && !/^[✓]?$/.test(t)) findings.push(`${tag}: key slot "${s.id}" holds the sentence "${t.slice(0, 30)}" - a write line for a sentence (PAGE_TYPES 6.1 number blanks only)`);
             }
             if (id === 'one' && role !== 'error-analysis' && !slots.some((s) => s.text.trim() === '42')) findings.push(`${tag}: control - no slot holds the one-number answer 42 (the frame was lost)`);
             if (id === 'one' && role === 'error-analysis' && !slots.some((s) => s.text.trim() === '42')) findings.push(`${tag}: control - the fix slot does not hold 42`);
-            if (id === 'unit' && role !== 'error-analysis' && !slots.some((s) => s.text.trim() === PLANT.unit.ans)) findings.push(`${tag}: control - the unit form lost its one frame line`);
+            if (id === 'unit' && role !== 'error-analysis' && slots.filter((s) => /^[12]$/.test(s.text.trim())).length !== 3) findings.push(`${tag}: a unit form answer is not written a number a line (its words printed after each)`);
+            if (id === 'unit' && role !== 'error-analysis' && /\bten\b|\bone\b|\bhundred\b/.test(html.replace(/<[^>]+>/g, ' ').replace(/2 hundreds 1 ten 1 one|1 hundred 2 tens 1 one/g, ''))) findings.push(`${tag}: a frame word is singular - it gives the value away (FIX-WORDS)`);
+            if (id === 'unit' && role !== 'error-analysis' && slots.some((s) => /[A-Za-z]{3}/.test(s.text))) findings.push(`${tag}: a unit form's words written into a slot`);
             if (id === 'list' && role !== 'error-analysis' && slots.filter((s) => /^1[258]$/.test(s.text.trim())).length !== 3) findings.push(`${tag}: the list answer is not written one part a box`);
             if (id === 'proseopts' && role === 'error-analysis' && !/data-ws-slot="ea-pick-\d"/.test(html)) findings.push(`${tag}: a sentence answer with choices is not fixed by checking the right one`);
             if (id === 'prose' && role === 'true-false' && /class="mq-frame/.test(html)) findings.push(`${tag}: a sentence answer printed a frame row (PT-TOF-4)`);

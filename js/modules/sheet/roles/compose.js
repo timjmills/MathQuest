@@ -342,6 +342,19 @@ export function answerPlace(id, correct) {
     const width = (v) => Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2));
     if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
     const parts = answerListOf(correct);
+    // numbers joined by unit words ("2 hundreds 9 tens 7 ones"): a line a number, its word printed after it - one value a
+    // line (critic precritic r2: unit_form Reason It key wrote the whole unit form on one 2-digit line, off the cell)
+    const tok = String(correct).trim().split(/(\d[\d,.]*)/);
+    const nums = tok.filter((_, i) => i % 2 === 1);
+    const glue = tok.filter((_, i) => i % 2 === 0);
+    if (!parts && nums.length >= 2 && !glue[0].trim() && glue.slice(1).every((g) => /^\s*[A-Za-z]+(?:\s[A-Za-z]+)?\s*$/.test(g))) {
+        const slots = {};
+        nums.forEach((v, i) => { slots[`${id}-${i}`] = v; });
+        // the word printed after a line never tells its value: "1 ten" would give the 1 away (lf-placevalue G5, FIX-WORDS), so
+        // every unit word prints in its plural, the way the item prints its place names
+        const plural = (w) => w.split(' ').map((x, k, a) => (k === a.length - 1 && !/s$/i.test(x) ? `${x}s` : x)).join(' ');
+        return { kind: 'list', slots, parts: nums, digits: nums.map(width), words: glue.slice(1).map((g) => plural(g.trim())) };
+    }
     if (!parts) return { kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) };
     const slots = {};
     parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
@@ -354,7 +367,8 @@ export function answerPlaceHtml(place, id, ctx, key) {
     if (place.kind === 'one') return writeLine(id, ctx, key, place.digits);
     // a part and its comma never part; the list wraps under the frame's words in a narrow cell (.mq-framelist)
     const n = place.parts.length;
-    return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${i < n - 1 ? ',' : '.'}</span>`).join('');
+    const after = (i) => (place.words ? `<span style="margin-left:1mm">${esc(place.words[i])}${i < n - 1 ? '' : '.'}</span>` : (i < n - 1 ? ',' : '.'));
+    return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap${place.words ? ';margin-right:1.5mm' : ''}">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${after(i)}</span>`).join('');
 }
 
 /**
