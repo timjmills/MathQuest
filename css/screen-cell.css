@@ -1948,3 +1948,16 @@ html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisua
     margin-left: calc(max(0.2em, 9px) - var(--mq-tp)) !important;
     margin-right: calc(9px - var(--mq-tp)) !important;
 }
+
+/* FOCUS-GAP (lf-checks 2026-11-13, critic eb-r5 D2 extended by --focus-gap-all): a focused answer box's ring keeps >= 4 px
+   from the word beside it on every host. Additive.
+   (1) On the online worksheet the host rule `.online-edition .problem-card.mq-wscard .mq-scell input:focus` (offset 1 px)
+       outranked the in-box cell-slot rule (offset -4 px), so a boxed cell slot drew its ring 3 px OUTSIDE its box, onto the
+       next word (arrays_groups -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px). The cell slot keeps its
+       inset ring on every host.
+   (2) The inline-blanks box (input.ib-cell, its own border, 6 px side margin) drew its ring 4 px outside: 2 px from the
+       word. The box itself thickens in ink, as the stack digits and cell slots do. */
+html body .online-edition .problem-card.mq-wscard .mq-scell [data-mq-cell] > input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard .mq-scell .mq-multchart input.mq-cellslot:focus { outline-offset: -4px !important; }
+html body .online-edition .problem-card.mq-wscard .mq-scell input.ib-cell:focus,
+html body .mq-scell input.ib-cell:focus { outline-offset: -3px !important; }
