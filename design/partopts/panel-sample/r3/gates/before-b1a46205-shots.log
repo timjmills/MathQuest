@@ -1,0 +1,42 @@
+FAIL multiplication:mult_chart_easy @1280: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @1280 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+FAIL coordinates:geo_translate @1280: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @1280 part 2: [choices] answer choice(s) B, C shown with no letter or label
+FAIL coordinates:geo_translate @1280 part 3: [choices] answer choice(s) D shown with no letter or label
+FAIL coordinates:geo_translate @1280 (all parts): [choices] the 4 answer choices are spread over 3 parts (A | BC | D)
+FAIL algebra:multi_step_word @1280: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @1280 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/1407 px, part 2 of 3
+ok   algebra:multi_step_word @1280 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/1407 px, part 3 of 3
+ok   algebra:multi_step_word @1280 (all parts): 3 reading(s), choices -
+ok   fractions:fraction_of_set @1280: ink 1.99 % (own box 7.0 %), scale 1, text >= 16.0 px, frame 300 px, options 439/439 px, part 1 of 2
+FAIL fractions:fraction_of_set @1280 part 2: [svgtext] SVG text drawn at 8.6 px ("1"; needs >= 9 px)
+ok   fractions:fraction_of_set @1280 (all parts): 2 reading(s), choices -
+FAIL algebra_mixed:algebra_all @1280: [repeat] the sample says its question line twice: "tom had 62 shells tom gave away 13 then "
+ok   algebra_mixed:algebra_all @1280 part 2: ink 3.57 % (own box 6.7 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 453/2199 px, part 2 of 3
+ok   algebra_mixed:algebra_all @1280 part 3: ink 4.75 % (own box 8.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 453/2199 px, part 3 of 3
+ok   algebra_mixed:algebra_all @1280 (all parts): 3 reading(s), choices -
+FAIL measurement:elapsed_find_start @1280: [svgtext] SVG text drawn at 4.9 px ("2:00"; needs >= 9 px)
+ok   measurement:elapsed_find_start @1280 (all parts): 1 reading(s), choices -
+FAIL multiplication:mult_chart_easy @820: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @820 part 2: [clip] a box inside the stage clips its content: div 765>400 wide
+FAIL multiplication:mult_chart_easy @820 (all parts): [cover] 73 of 162 blocks of the item appear on no part (2 parts): "7", "8", "9", "10", "11", "12"
+FAIL coordinates:geo_translate @820: [svgtext] SVG text drawn at 5.8 px ("original"; needs >= 9 px); [choices] answer choice(s) A shown with no letter or label; [choices] part 1 of 3: answer choices share a part with the question
+FAIL coordinates:geo_translate @820 part 2: [choices] answer choice(s) B, C shown with no letter or label
+FAIL coordinates:geo_translate @820 part 3: [choices] answer choice(s) D shown with no letter or label
+FAIL coordinates:geo_translate @820 (all parts): [choices] the 4 answer choices are spread over 3 parts (A | BC | D)
+FAIL algebra:multi_step_word @820: [repeat] the sample says its question line twice: "lena had 87 cards lena got 12 more then "
+ok   algebra:multi_step_word @820 part 2: ink 4.34 % (own box 8.2 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/1407 px, part 2 of 3
+ok   algebra:multi_step_word @820 part 3: ink 4.21 % (own box 7.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/1407 px, part 3 of 3
+ok   algebra:multi_step_word @820 (all parts): 3 reading(s), choices -
+ok   fractions:fraction_of_set @820: ink 1.99 % (own box 7.0 %), scale 1, text >= 16.0 px, frame 300 px, options 439/439 px, part 1 of 2
+FAIL fractions:fraction_of_set @820 part 2: [svgtext] SVG text drawn at 8.6 px ("1"; needs >= 9 px)
+ok   fractions:fraction_of_set @820 (all parts): 2 reading(s), choices -
+FAIL algebra_mixed:algebra_all @820: [repeat] the sample says its question line twice: "tom had 62 shells tom gave away 13 then "
+ok   algebra_mixed:algebra_all @820 part 2: ink 3.57 % (own box 6.7 %), scale 0.8827, text >= 11.5 px, frame 300 px, options 633/2199 px, part 2 of 3
+ok   algebra_mixed:algebra_all @820 part 3: ink 4.75 % (own box 8.5 %), scale 0.7448, text >= 9.7 px, frame 300 px, options 633/2199 px, part 3 of 3
+ok   algebra_mixed:algebra_all @820 (all parts): 3 reading(s), choices -
+FAIL measurement:elapsed_find_start @820: [svgtext] SVG text drawn at 4.9 px ("2:00"; needs >= 9 px)
+ok   measurement:elapsed_find_start @820 (all parts): 1 reading(s), choices -
+  6 skills × 2 widths (1280, 820 px), 40 readings, 1 worker(s), 27 s
+ws-options-shots: FAIL (22)

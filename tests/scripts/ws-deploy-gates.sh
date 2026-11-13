@@ -672,9 +672,11 @@ self_test() {
   if grep -q 'UNTIMED ws-options-pin --gate' "$tmp/bu.log" && ! grep -q 'budget: FAIL' "$tmp/bu.log"; then echo "  ok   today's list: no session over 30 min; the gate with no measure is listed UNTIMED"; else echo "  FAIL today's list: $(grep -E '^budget: (FAIL|WARNING)' "$tmp/bu.log" | head -n 3)"; bad=1; fi
   cat "$bx/timings-2026-10-23.jsonl" "$bx/timings-pin-check.jsonl" > "$tmp/pin.jsonl"
   bcase "critic r4 D1: ws-options-pin --check added to session 1: FAIL" 1 "$tmp/pin.jsonl" 'FAIL - session 1 is predicted at [0-9]+\.[0-9] min, over the 30-min budget \(the longest: ws-options-pin --check 13440 s' BCASE_ADD=1
- # session 4 (lf-partopts 2026-11-13): ws-options-shots, the whole 725 x 2 sweep, on the timings of its own timed run
+ # sessions 4 and 5 (lf-partopts 2026-11-13): ws-options-shots, the whole 725 x 4-width sweep in 4 shards, on its timed run
   cat "$bx/timings-2026-10-23.jsonl" "$bx/timings-options-shots.jsonl" > "$tmp/os.jsonl"
-  bcase "ws-options-shots in session 4, 2 shards on the two slots: within 30 min" 4 "$tmp/os.jsonl" 'session 4: predicted [0-9]+\.[0-9] min .* budget 30 min: within'
+  # (critic-panel-r2 rebuild: 4 panel widths, 4 shards, 1-2 in session 4 and 3-4 in session 5, each pair on the two slots)
+  bcase "ws-options-shots shards 1-2 of 4 in session 4: within 30 min" 4 "$tmp/os.jsonl" 'session 4: predicted [0-9]+\.[0-9] min .* budget 30 min: within'
+  bcase "ws-options-shots shards 3-4 of 4 in session 5: within 30 min" 4 "$tmp/os.jsonl" 'session 5: predicted [0-9]+\.[0-9] min .* budget 30 min: within'
   bcase "ws-options-shots added to session 3 instead (MQ_OPTSHOTS_SESSION=3): FAIL" 1 "$tmp/os.jsonl" 'FAIL - session 3 is predicted at [0-9]+\.[0-9] min, over the 30-min budget' MQ_OPTSHOTS_SESSION=3
   bcase "a gate with no measure (no timings file at all) is UNTIMED, never a FAIL" 4 "$tmp/none.jsonl" 'WARNING - UNTIMED ws-content-audit'
   bcase "the matrix budget is modelled from MQ_MATRIX_BUDGET (900 documents x 5.26 slot-s): session 3 over 30 min" 1 "$bx/timings-2026-10-23.jsonl" 'FAIL - session 3 is predicted' MATRIX_BUDGET=900

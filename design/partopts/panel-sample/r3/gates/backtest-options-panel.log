@@ -1,0 +1,23 @@
+ws-backtest: 17 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state      pass state      verdict
+options-panel-sample        commit-pair  FAIL 9.5s       OK 9.5s         PASS
+options-panel-legibility    commit-pair  FAIL 9.6s       OK 11.3s        PASS
+options-panel-controls      commit-pair  FAIL 5.9s       OK 6.0s         PASS
+options-panel-resize        commit-pair  FAIL 11.5s      OK 13.3s        PASS
+options-panel-frame-scale   commit-pair  FAIL 6.1s       OK 6.7s         PASS
+options-panel-option-change commit-pair  FAIL 9.4s       OK 15.9s        PASS
+options-panel-clip          fixture      FAIL 4.6s       OK 4.5s         PASS
+options-panel-pageerror     fixture      FAIL 4.5s       OK 4.4s         PASS
+options-panel-inner-clip    commit-pair  FAIL 4.7s       OK 6.2s         PASS
+options-panel-cover         commit-pair  FAIL 10.8s      OK 6.3s         PASS
+options-panel-choices       commit-pair  FAIL 4.6s       OK 4.5s         PASS
+options-panel-svgtext       commit-pair  FAIL 6.5s       OK 6.5s         PASS
+options-panel-summary       commit-pair  FAIL 6.4s       OK 6.5s         PASS
+options-panel-repeat        commit-pair  FAIL 4.8s       OK 4.7s         PASS
+options-panel-inner-clip-fi fixture      FAIL 12.4s      OK 12.4s        PASS
+options-panel-parts-cap     fixture      FAIL 11.5s      OK 4.5s         PASS
+options-panel-part-ink      fixture      FAIL 4.4s       OK 4.6s         PASS
+
+17 PASS, 0 FAIL, 0 PENDING; 427.5 s
+ws-backtest: OK
