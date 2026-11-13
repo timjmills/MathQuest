@@ -6179,6 +6179,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "guided-stack-side",
+  "check": "the column-stack Guided pages of the 7 no-regroup subtraction skills pass ws-empty-band at S, M and L (lf-roles r8b via the lead: EB-SIDE 32.4 % at S / 31.7 % at M - a measured stack whose every offered grid left 30 % beside it now takes one column more; EB-BAND 34.8 % at L - stack cells centred; the Model spans the cells that complete the grid)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE / EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "ae8511168",
+   "state": "EB-SIDE 57 at S/M, EB-BAND 30 at L"
+  },
+  "pass": {
+   "commit": "85c322f50",
+   "state": "ws-empty-band OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d --roles guided --hosts none --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-stack-side-unit",
+  "check": "a planted narrow column stack's Guided grid leaves under 30 % beside it, keeps S 11 / M 9 / L 6, fills every row and centres its cells (lf-roles r8b)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-STACK-SIDE",
+  "browser": false,
+  "fail": {
+   "commit": "ae8511168",
+   "state": "S 4 columns 32.4 %, M 3 columns 31.7 %, cells not centred"
+  },
+  "pass": {
+   "commit": "85c322f50",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-STACK-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-row",
+  "check": "a Model with worked lines under it never leaves the try beside it in a row stretched past what it fills to 70 % (lf-builds chart_to_120 Guided M / L EB-BAND 42 % / 36 %, lead via lf-roles r8b (a); verified on a worktree of e1389d1f3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-MODEL-ROW",
+  "browser": false,
+  "fail": {
+   "commit": "85c322f50",
+   "state": "the Model's row 124.7 / 124.9 mm beside a 61 mm try"
+  },
+  "pass": {
+   "commit": "4845f6b25",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-ROW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-row-wp",
+  "check": "the word-problem Guided S pages' first try no longer sits in the Model's stretched row (EB-BAND 40-42 % on add_wp / sub_wp row 1; the GUIDED-MODEL-ROW rule, lf-roles r8b (a))",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "85c322f50",
+   "state": "EB-BAND 40.4 % on add_wp_10 guided S cell 2"
+  },
+  "pass": {
+   "commit": "4845f6b25",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_10,subtraction:sub_wp_10 --roles guided --sizes S --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
