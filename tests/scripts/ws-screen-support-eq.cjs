@@ -21,6 +21,8 @@
 //   SUPPORT-NOT-SLOT     (critic divarray r1 D1) a support draws no empty closed box the size/shape of the answer slot
 //                        (±40 %), and a frame drawn on only some cells of a band (the × zero frame, the lone framed support)
 //                        is a finding - on paper and on every screen host. ARRAY-CAPTION also fails "1 rows" for one row.
+//   ARRAY-GAP            (critic r5 R5-3, WDS RP-81) an array of more than 5 columns / rows draws the 1.5 mm subitising gap
+//                        after every 5th (the step after the 5th is >= 1 mm longer than the first) - paper S/M/L and screen.
 //   ARRAY-FRAME          (lead ruling 2026-11-13) on an array-support band EVERY fact draws its array or frame: a × fact
 //                        with a zero factor (4 × 0, 0 × n) the band's EMPTY frame, as 0 ÷ n does (no dots, never portrait;
 //                        r2 ruling: one frame per band, so it is the frame its neighbours draw) - never nothing.
@@ -127,6 +129,13 @@ function frameFinding(id, sup, item) {
     }
     return null;
 }
+/** ARRAY-GAP (critic r5 R5-3, WDS RP-81 / RP-21): an array of more than 5 columns or rows leaves the subitising gap (1.5 mm
+ *  drawn; at least 1 mm more than the dot pitch) after every 5th column and row. */
+function gapFinding(id, arr, item) {
+    if (!arr || !item) return null;
+    const bad = [['columns', arr.gapX], ['rows', arr.gapY]].filter(([, g]) => g !== null && g !== undefined && g < 1);
+    return bad.length ? `${id}: ${item.a} ${item.op} ${item.b} array has no 5-group gap between its ${bad.map(([n]) => n).join(' and ')} 5 and 6 (extra step ${bad.map(([, g]) => g.toFixed(2)).join(' / ')} mm, want >= 1)` : null;
+}
 /** PLACE: one place across a worksheet's cards. */
 function placeFinding(id, places) {
     const set = [...new Set(places.filter(Boolean))];
@@ -163,6 +172,8 @@ function selfTest() {
     eq('frame band square × 0 (r2: the 12 x 12 band frame)', frameFinding('array', { arr: { dots: 0, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), null);
     eq('frame portrait × 0', !!frameFinding('array', { arr: { dots: 0, wPx: 20, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
     eq('frame dots × 0', !!frameFinding('array', { arr: { dots: 3, wPx: 30, hPx: 30 } }, { a: 0, b: 3, op: '×' }), true);
+    eq('gap ok', gapFinding('array', { gapX: 1.5, gapY: null }, { a: 7, b: 12, op: '×' }), null);
+    eq('gap missing (R5-3)', !!gapFinding('array', { gapX: 0, gapY: 1.5 }, { a: 7, b: 12, op: '×' }), true);
     eq('caption 1 row ok (N1)', captionFinding('array', { label: '1 row of 7, for 7 × 1', rows: 1, cols: 7, dots: 7 }, { a: 7, b: 1, op: '×' }), null);
     eq('frame other support', frameFinding('touch', {}, { a: 4, b: 0, op: '×' }), null);
     eq('place one', placeFinding('touch', ['beside', 'beside', null]), null);
@@ -247,8 +258,11 @@ function readCellsInPage({ sel, cellSel }) {
                 const xs = new Set(cs.map((c) => Number(c.getAttribute('cx')).toFixed(1))), ys = new Set(cs.map((c) => Number(c.getAttribute('cy')).toFixed(1)));
                 // framed: the support draws a closed box (a <rect>) round / behind the dots (the ÷ section frame, the × zero frame)
                 const framed = !!asvg.querySelector('rect');
+                // ARRAY-GAP (critic r5 R5-3, WDS RP-81): the step after the 5th column / row against the first step, in the
+                // svg's own units (mm on paper, the same viewBox on screen); null when the axis has 5 or fewer
+                const extra5 = (set) => { const v = [...set].map(Number).sort((a, b) => a - b); return v.length > 5 ? (v[5] - v[4]) - (v[1] - v[0]) : null; };
                 arr = { label: asvg.getAttribute('aria-label'), wPx: br.width, hPx: br.height, dotPx: cs.length ? 2 * Number(cs[0].getAttribute('r')) * k : 0,
-                    dots: cs.length, rows: ys.size, cols: xs.size, framed };
+                    dots: cs.length, rows: ys.size, cols: xs.size, framed, gapX: extra5(xs), gapY: extra5(ys) };
             }
             sups[id] = { arr, sig, ratio: textPx && digitPx ? textPx / digitPx : 0, dotRatio: arr && arr.dotPx && digitPx ? arr.dotPx / digitPx : 0, place };
         }
@@ -265,7 +279,7 @@ function readCellsInPage({ sel, cellSel }) {
 
 (async () => {
     const { open } = require('../lib/ws-harness.cjs');
-    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT') || '').split(',').map((s) => s.trim().toUpperCase());
+    const ONLY = (arg('only', 'EQ,CUE,PLACE,ORIENT,DOTMIN,CAPTION,FRAME,NOTSLOT,GAP') || '').split(',').map((s) => s.trim().toUpperCase());
     const keys = (arg('skills', 'division:div_facts') || '').split(',').map((s) => s.trim()).filter(Boolean);
     const app = await open({ seed: 1 });
     const { page } = app;
@@ -305,7 +319,7 @@ function readCellsInPage({ sel, cellSel }) {
                 const paper = await paperAt('M');
                 // ARRAY-ORIENT on paper: the Independent page at S, M and L
                 // (r2: NOTSLOT judges these paper pages too - `--only NOTSLOT` skipped them, so its backtest read only the screen hosts)
-                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME') || ONLY.includes('NOTSLOT')) && sup === 'array') {
+                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME') || ONLY.includes('NOTSLOT') || ONLY.includes('GAP')) && sup === 'array') {
                     for (const size of ['S', 'M', 'L']) {
                         const pr = size === 'M' ? paper : await paperAt(size);
                         if (ONLY.includes('FRAME')) for (const c of (pr.cells || []).filter((x) => x.item)) {
@@ -317,6 +331,8 @@ function readCellsInPage({ sel, cellSel }) {
                             if (f) findings.push(`ARRAY-ORIENT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                             const g = ONLY.includes('CAPTION') ? captionFinding(sup, c.sups[sup].arr, c.item) : null;
                             if (g) findings.push(`ARRAY-CAPTION ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${g}`);
+                            const gp = ONLY.includes('GAP') ? gapFinding(sup, c.sups[sup].arr, c.item) : null;
+                            if (gp) findings.push(`ARRAY-GAP ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${gp}`);
                             if (ONLY.includes('NOTSLOT')) {
                                 const s = slotLikeFinding(sup, c.sups[sup].arr, c.slot);
                                 if (s) findings.push(`SUPPORT-NOT-SLOT ${key} paper ${size} ${c.item.a} ${c.item.op} ${c.item.b}: ${s}`);
@@ -421,6 +437,10 @@ function readCellsInPage({ sel, cellSel }) {
                             const f = captionFinding(sup, s.arr, c.item);
                             if (f) findings.push(`ARRAY-CAPTION ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
                         }
+                        if (ONLY.includes('GAP') && s && s.arr) {
+                            const f = gapFinding(sup, s.arr, c.item);
+                            if (f) findings.push(`ARRAY-GAP ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
+                        }
                         if (ONLY.includes('DOTMIN') && s && s.dotRatio) {
                             const f = dotFinding(sup, pDot, s.dotRatio);
                             if (f) findings.push(`ARRAY-DOT-MIN ${key} ${h.host} ${c.item.a} ${c.item.op} ${c.item.b}: ${f}`);
@@ -459,4 +479,4 @@ function readCellsInPage({ sel, cellSel }) {
     process.exit(findings.length ? 1 : 0);
 })();
 
-module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding };
+module.exports = { placeOf, sigKey, eqFinding, cueFinding, placeFinding, orientFinding, dotFinding, captionFinding, frameFinding, slotLikeFinding, bandFrameFinding, gapFinding };
