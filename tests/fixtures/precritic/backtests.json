@@ -4931,6 +4931,63 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r14-vnum-one",
+   "check": "V-NUM one mark: a single ringed or boxed number is a parity feature; ones digit 47[3] dealt with odd in set 8: critic r13 #1",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-NUM (lf-vocab r14)",
+   "fail": {
+    "commit": "905528f2",
+    "state": "lf-vocab r13 head"
+   },
+   "pass": {
+    "commit": "8506cbaa",
+    "state": "ones digit boxes 47[6]; even / product, odd / quotient, odd / dividend notWith"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"ones digit\".*one mark' && echo 'v-num-one: FAIL' || echo 'v-num-one: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r14-vplace",
+   "check": "V-PLACE: a ringed or boxed digit inside a number reads as one / ten / hundred; digit 4(7)2 dealt with ten in set 5: critic r13 #2",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-PLACE (lf-vocab r14)",
+   "fail": {
+    "commit": "905528f2",
+    "state": "lf-vocab r13 head"
+   },
+   "pass": {
+    "commit": "b57960c6",
+    "state": "digit notWith one, ten, hundred"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-PLACE 2>&1 | grep -q 'V-PLACE .*\"digit\"' && echo 'v-place: FAIL' || echo 'v-place: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r14-vtwin-run",
+   "check": "V-TWIN run: every run picture (grow's 1, 3, 5 squares read from its drawing) reads as rule; grow dealt with rule in sets 7 and 8: critic r13 #3",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-TWIN (lf-vocab r14)",
+   "fail": {
+    "commit": "905528f2",
+    "state": "lf-vocab r13 head"
+   },
+   "pass": {
+    "commit": "2e8a59a3",
+    "state": "grow / rule, sequence / rule notWith"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*\"grow\" draws a run' && echo 'v-twin-run: FAIL' || echo 'v-twin-run: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
