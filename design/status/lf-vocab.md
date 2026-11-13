@@ -585,3 +585,7 @@ SIZE-REF coverage findings, Known findings above). empty-band and next-box green
 first precritic on a browser-queue flake - "Cannot set properties of null" at host 10 - and is reliably green standalone, 19 hosts).
 Renders: scratchpad r15/sets (ws-vocab-set-renders --since a3eb9d25: the sets changed by item 1's redraws - set 6 sequence and the
 grade-4 pool); hundred chart key rendered separately (set 4 pick3 item 1).
+Final precritic --strict on 9e3f2cd9 (pin in place): vocab_grade_pictures 2 FAIL / 33 PASS, vocab_pick3_words 2 FAIL / 33 PASS;
+both FAIL only sibling-compare (structural) and ws-screen-ink-size (the 4 ruled SIZE-REF findings: distributive on Match 3;
+pick3 answer-choice ring / picture marks). empty-band and next-box PASS inside precritic. ws-backtest --row vones, vkey, vpage:
+3 PASS. Hundred chart key: r15/hundred-chart/hundred-chart-key-seed143869.png (middle row grey, inside its cells).
