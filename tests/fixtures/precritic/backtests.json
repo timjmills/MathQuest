@@ -4148,7 +4148,7 @@
     "state": "lf-vocab r10 head"
    },
    "pass": {
-    "commit": "TBD-r11-3",
+    "commit": "7c8fee58",
     "state": "cycle and unknown explains reworded; factor / divisor / dividend / first term point at boxed marks"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-REF 2>&1 | grep -q '\"cycle\": its explanation points at \"ones digits\"\\|\"unknown\".s explanation points at \"the one in the box\", and the \"factor\"' && echo 'vref: FAIL' || echo 'vref: OK')",
@@ -4168,7 +4168,7 @@
     "state": "lf-vocab r10 head"
    },
    "pass": {
-    "commit": "TBD-r11-3",
+    "commit": "7c8fee58",
     "state": "Check blurs the vocab slots"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
