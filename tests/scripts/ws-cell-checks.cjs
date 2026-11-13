@@ -40,7 +40,8 @@ const h13On = (j) => H13ABS && (has('h13-abs-all') || !!j.variant) && (!RULE_SKI
 // --words-rules (OPT-IN; critic lf-placevalue nwf r1 N2 / N4 / N5 / N7 / N8, lead ruling D1): the number-name cell's checks
 // (tests/lib/ws-words-cells.cjs: CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y), judged on --rule-skills
 const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', 'ROW-SLOT-Y'];
-if (has('words-rules')) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
+// (an explicit --rules list stays the list: a backtest row proves one rule alone)
+if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
 const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 const SIZES = list(arg('size', 'S,M,L'));
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));

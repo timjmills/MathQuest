@@ -3220,6 +3220,146 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-words-parity",
+   "check": "composing:number_word_form on the practice card / worksheet / quiz draws the kit words cell with its answer place inside it, and no empty legacy box beside it (critic nwf r1 N9, lead ruling: screen parity is a contract rule)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band --screen-parity EB-PARITY",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the legacy place chart: no [data-ws-cell=words] on the card, empty tens / ones boxes beside the input"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "the kit words cell on every host, the input in its line"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles independent --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-claim",
+   "check": "composing:number_word_form True or False? with answerSlot hto prints the claimed number in its boxes (critic nwf r1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules CLAIM-INK",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "every H T O box empty on the pupil page; the key marks False against nothing"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "the claim one digit a box"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles true-false --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules CLAIM-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-model",
+   "check": "composing:number_word_form Scripted Model / Guided / opener write the Model's answer (critic nwf r1 N5)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules MODEL-ANSWER",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the traced state drew an empty answer line on every Model"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "the answer traced in grey"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles scripted-model,guided,opener --rules MODEL-ANSWER",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-text",
+   "check": "composing:number_word_form: every word space of a printed name is visible (critic nwf r1 N7, 'one hundredthirteen' in the lesson's Guided model)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules WORDS-TEXT",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the two-line name box was a flex box: the space between the text run and the underlined span dropped"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "the name one inner span"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles lesson,guided --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-break",
+   "check": "composing:number_word_form: a name over two lines breaks after 'hundred' (critic nwf r1 N8)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules WORDS-BREAK",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "'seven / hundred eight', 'seven / hundred nine' at band 1000"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "'seven hundred' kept on one line"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles independent --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-rowy",
+   "check": "composing:number_word_form: the answer places of one grid row sit within 1 mm up and down (critic nwf r1 N4)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+   "browser": true,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "'one hundred' in a two-line box, its line 5 mm under its row (test S)"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "only a name long enough to wrap takes the two-line box"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles test,independent --size S,M,L --rules ROW-SLOT-Y",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-chant",
+   "check": "a routine's chant that names boxes holds for every item its lessons deal (critic nwf r1 N6: 'Three boxes, three digits.' over 2-digit items and 'one thousand')",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-unit chant-box",
+   "browser": false,
+   "fail": {
+    "commit": "2ccd5b21",
+    "state": "the default deal had no boxes; the practice deal gave 1000 four boxes"
+   },
+   "pass": {
+    "commit": "3d927dbf",
+    "state": "'Every box gets a digit.', the lesson deals its practice options"
+   },
+   "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-box",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
