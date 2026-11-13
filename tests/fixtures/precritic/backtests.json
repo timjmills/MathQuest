@@ -7135,6 +7135,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-page-fresh",
+   "check": "ws-two-step PAGE-FRESH: a printed run of the two-step skills (seed base + i, itemIndex i, pages of 20) repeats no Step 1 pair on a page, a first number at most twice, an answer at most 3 times",
+   "kind": "commit-pair",
+   "rule": "ws-two-step PAGE-FRESH (lf-algebra precritic two-step r11: ws-dealer-uniform PAGE on the x / ÷ / add-first presets, which dealer-uniform reads INCOMPLETE)",
+   "fail": {
+    "commit": "33810c189",
+    "state": "the msOps deals (x / ÷ first, add-first) drew each item alone: 45 ÷ 5 three times and 6 ÷ 2 twice on a page of 20"
+   },
+   "pass": {
+    "commit": "5921196d7",
+    "state": "freshDeal on both msOps deals: the Step 1 pair is the fresh signature, first number cap 2, answer cap 3"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules PAGE-FRESH --skill algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
