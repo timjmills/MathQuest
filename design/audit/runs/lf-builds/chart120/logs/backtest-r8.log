@@ -1,0 +1,34 @@
+ws-backtest row c120-wrong-fits: PASS  fail state FAIL 0.5s, pass state OK 0.4s
+ws-backtest row c120-tagink: PASS  fail state FAIL 92.1s, pass state OK 93.2s
+ws-backtest row c120-lesson-wide: PASS  fail state FAIL 64.8s, pass state OK 104.9s
+ws-backtest row eb-centred-band: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest: c120-title-band (fail state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 5263 (up 263 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-slot-clip.cjs --probe /tmp/
+    slot.2: pid 7971 (up 148 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+ws-backtest row c120-title-band: PASS  fail state FAIL 285.5s, pass state OK 26.9s
+ws-backtest: c120-ri-under (pass state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 16467 (up 147 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-grade-rende
+    slot.1: pid 5263 (up 622 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/tests/scripts/ws-slot-clip.cjs --probe /tmp/
+ws-backtest row c120-ri-under: PASS  fail state FAIL 25.4s, pass state OK 183.9s
+ws-backtest row c120-pupiltag: PASS  fail state FAIL 65.5s, pass state OK 64.2s
+ws-backtest row c120-role-hidden: PASS  fail state FAIL 22.5s, pass state OK 13.2s
+ws-backtest row c120-text-misc: PASS  fail state FAIL 32.2s, pass state OK 31.9s
+ws-backtest row c120-guided-echo: PASS  fail state FAIL 10.7s, pass state OK 17.2s
+ws-backtest row c120-score-slots: PASS  fail state FAIL 23.5s, pass state OK 27.1s
+ws-backtest: 11 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-wrong-fits             commit-pair  FAIL 0.5s           OK 0.4s             PASS
+c120-tagink                 commit-pair  FAIL 92.1s          OK 93.2s            PASS
+c120-lesson-wide            commit-pair  FAIL 64.8s          OK 104.9s           PASS
+eb-centred-band             fixture      FAIL 0.2s           OK 0.2s             PASS
+c120-title-band             commit-pair  FAIL 285.5s         OK 26.9s            PASS
+c120-ri-under               commit-pair  FAIL 25.4s          OK 183.9s           PASS
+c120-pupiltag               commit-pair  FAIL 65.5s          OK 64.2s            PASS
+c120-role-hidden            commit-pair  FAIL 22.5s          OK 13.2s            PASS
+c120-text-misc              commit-pair  FAIL 32.2s          OK 31.9s            PASS
+c120-guided-echo            commit-pair  FAIL 10.7s          OK 17.2s            PASS
+c120-score-slots            commit-pair  FAIL 23.5s          OK 27.1s            PASS
+
+11 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 1346.5 s
+ws-backtest: OK
