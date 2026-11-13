@@ -1,0 +1,6 @@
+{"ref":"coordinates:geo_translate","vp":"1280x1000","part":"1 of 3","frame":[396,298],"whole":[380,1085],"k":0.264,"textPx":4.2}
+{"ref":"algebra:multi_step_word","vp":"1280x1000","part":"1 of 3","frame":[396,298],"whole":[400,957],"k":0.299,"textPx":3.9}
+{"ref":"algebra_mixed:algebra_all","vp":"1280x1000","part":"1 of 3","frame":[396,298],"whole":[400,957],"k":0.299,"textPx":3.9}
+{"ref":"fractions:fraction_of_set","vp":"1280x1000","part":"1 of 2","frame":[396,298],"whole":[298,600],"k":0.477,"textPx":7.2}
+{"ref":"multiplication:mult_chart_easy","vp":"1280x1000","part":"1 of 2","frame":[396,298],"whole":[400,764],"k":0.374,"textPx":6.7}
+{"ref":"composing:base10_build_hundreds","vp":"1280x1000","part":"1 of 2","frame":[396,286],"whole":[497,298],"k":0.773,"textPx":10.3}
