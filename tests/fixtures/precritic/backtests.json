@@ -4111,6 +4111,27 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-letter-wpbar-L-band",
+   "check": "ws-two-step --print CAP-BAND on two_step_letter_equation with wpBar at L (five seeds): at least the card's bar-model L 1 a page, and the one story is not stretched past a 30 % band (the options-render 'letter + wpBar L PAGEFILL' strip)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step CAP-BAND letter case (lf-algebra R4; same role class as R1: a one-row practice page must not stretch)",
+   "browser": true,
+   "fail": {
+    "commit": "35f427f4c",
+    "state": "letter + wpBar L: ~13 % of x / ÷-first bars do not fit across 171 mm and stand one over the other (132 vs 95 mm), so the page plans 1 a page; the one 95 mm story is stretched to 172-225 mm (41-45 % band), or with no stretch leaves the 60 mm PAGEFILL strip"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/two-step/letter-wpbar-L-nostretch.pass.html",
+    "command": "node tests/scripts/ws-two-step.mjs --print --html {fixture} --size L --skill algebra:two_step_letter_equation",
+    "state": "A FIXTURE, because the fix is the R1 role change routed to lf-roles (a ruled one-row practice page does not stretch its row): the same seed-2 L page with its grid row at its content height. Replace with the lf-roles commit when it lands."
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --print --skill algebra:two_step_letter_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }

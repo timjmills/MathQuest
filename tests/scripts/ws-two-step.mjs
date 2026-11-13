@@ -16,10 +16,16 @@
 //   BAND-ALIAS (lead ruling R2 2026-11-13) band 100 is no longer offered on the seven skills (the G2 lesson takes "no band",
 //              which at Max Number 100 deals the same), and a share code written with band 100 before the change (pinned
 //              below, encoded on 8438ca59d) still decodes to its skill at "no band" (band null) - a round trip, never lost
+//   PART-FRAMES (lf-algebra R4) the lesson chart's two-step panel drawing (cells/word-work.js twoStepPart, panels 0-3) of a
+//              letter story draws ITS response - the equation (data-ws-slot="equation") on panels 1-3, n = the answer on
+//              panel 3 - and of an estimate story the estimate row ("Estimate:") on 2-3 and the Yes / No ring on 3; the
+//              four panels differ (the chart drew the whole cell four times). lf-engine routes those panels to it.
 //   CAP-BAND   (--print, browser; lead ruling R1 2026-11-13, card decision 9 re-signed) multi_step_word (Visual) - the bar
 //              ABOVE the column work - holds its ruled capacity on the practice pages (independent / more-practice / test):
 //              at least S 2 / M 1 / L 1 stories a page (CAP), and no cell keeps an empty band of 30 % or more of its height
 //              under its lowest ink (BAND, RUBRIC H13; a one-story page at M / L stretched its cell to the page: 41 % / 32 %).
+//              Also (lf-algebra R4) two_step_letter_equation with wpBar at L, five seeds: at least 1 a page (card: bar model L 1)
+//              and no 30 % band (the options-render "letter + wpBar L PAGEFILL": the one story stretched 1.8x to 172 mm).
 //              `--html F --size M` measures one saved pupil page instead (the backtest's PASS fixture).
 // Skills outside the card print OK (n/a).
 import { createRequire } from 'node:module';
@@ -137,6 +143,31 @@ for (const key of mine) {
     }
 }
 
+// PART-FRAMES: the chart panels of the letter / estimate stories draw their own response
+{
+    const ww = await import(pathToFileURL(join(ROOT, 'js', 'modules', 'sheet', 'cells', 'word-work.js')).href).catch(() => null);
+    const cases = [['two_step_letter_equation', 'letter'], ['two_step_estimate_check', 'check']].filter(([sk]) => mine.includes(`algebra:${sk}`));
+    for (const [sk, kind] of cases) {
+        if (!ww || typeof ww.twoStepPart !== 'function') { fail('PART-FRAMES', `${sk}: no twoStepPart in cells/word-work.js`); continue; }
+        let seen = 0;
+        for (let i = 0; i < 6; i++) {
+            const q = gen(sk, undefined, i);
+            const p = q && q.cell && q.cell.payload;
+            if (!p || (p.steps || []).length !== 2) continue;
+            seen++;
+            const ctx = kit.resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank', scaffoldLevel: 1 });
+            const parts = [0, 1, 2, 3].map((k) => { try { return ww.twoStepPart(p, k, ctx); } catch (e) { return `ERR ${e.message}`; } });
+            const need = kind === 'letter'
+                ? [[1, /data-ws-slot="equation"/, 'the equation'], [2, /data-ws-slot="equation"/, 'the equation'], [3, /data-ws-slot="equation"/, 'the equation'], [3, /data-ws-slot="answer"/, 'n = the answer']]
+                : [[2, /Estimate:/, 'the estimate row'], [3, /Estimate:/, 'the estimate row'], [3, /data-ws-slot="ok-yes"/, 'the Yes / No ring']];
+            for (const [k, re, what] of need) if (!re.test(parts[k])) fail('PART-FRAMES', `${sk} item ${i}: chart panel ${k} does not draw ${what}`);
+            for (let k = 0; k + 1 < parts.length; k++) if (parts[k] === parts[k + 1]) fail('PART-FRAMES', `${sk} item ${i}: chart panels ${k} and ${k + 1} draw the same`);
+            if (fails.length > 60) break;
+        }
+        if (!seen) fail('PART-FRAMES', `${sk}: no two-step item`);
+    }
+}
+
 // BAND-ALIAS: band 100 is not offered; the codes written with it before R2 decode to "no band"
 {
     const BAND100_CODES = { multi_step_word: 'M7~B100', multi_step_word_plain: 'M8~B100', two_step_mult_div_first: 'ZA~B100', two_step_add_then_mult: 'ZB~B100',
@@ -159,15 +190,15 @@ for (const key of mine) {
 
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
 async function printMode() {
-    if (!arg('--html', null) && !mine.includes('algebra:multi_step_word')) { console.log(`${TOOL}: OK (--print n/a: multi_step_word (Visual) not in scope)`); process.exit(0); }
+    if (!arg('--html', null) && !mine.includes('algebra:multi_step_word') && !mine.includes('algebra:two_step_letter_equation')) { console.log(`${TOOL}: OK (--print n/a: neither multi_step_word (Visual) nor two_step_letter_equation in scope)`); process.exit(0); }
     if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
     const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
     // card decision 9 (re-signed 2026-11-13, lead ruling R1 (a)): the bar above the column work, S 2 / M 1 / L 1
@@ -209,21 +240,29 @@ async function printMode() {
             r.forEach((c, i) => { if (c.band / c.h >= 0.3) bad('BAND', `${html} ${size} cell ${i + 1}: ${c.band.toFixed(1)} mm empty under the work in a ${c.h.toFixed(1)} mm cell (${Math.round(100 * c.band / c.h)} %, H13 >= 30 %)`); });
             if (!r.length) bad('BAND', `${html}: no kit cell`);
         } else {
-            for (const role of ROLES) for (const size of SIZES) {
+            // the cases: multi_step_word (Visual) on the three practice roles at S / M / L (R1), and - lf-algebra R4, precritic
+            // two-step options-render "letter + wpBar L PAGEFILL" - two_step_letter_equation with wpBar at L on the Independent
+            // page over five seeds (its bar stands one over the other on ~13 % of items, so a page holds 1 at L: the card's
+            // bar-model L 1; the one story must not be stretched to the page either)
+            const cases = [];
+            if (mine.includes('algebra:multi_step_word')) for (const role of ROLES) for (const size of SIZES) cases.push({ sk: 'multi_step_word', tag: 'multi_step_word (Visual)', opts: null, role, size, seed: 7, pin: PIN[size] });
+            if (mine.includes('algebra:two_step_letter_equation') && SIZES.includes('L')) for (const seed of [1, 2, 7, 11, 26]) cases.push({ sk: 'two_step_letter_equation', tag: `two_step_letter_equation wpBar (seed ${seed})`, opts: { wpBar: true }, role: 'independent', size: 'L', seed, pin: 1 });
+            for (const c of cases) {
+                const { role, size } = c;
                 const r = await app.page.evaluate(async (a, f) => {
-                    const s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: 'multi_step_word' }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: 7, form: 'A', key: true, anchors: 'off' });
+                    const s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk, ...(a.opts ? { opts: a.opts } : {}) }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: a.seed, form: 'A', key: true, anchors: 'off' });
                     await document.fonts.ready;
                     const m = s.plan && s.plan.meta;
                     return { items: m && Number.isFinite(Number(m.items)) ? Number(m.items) : (s.items || []).length, cells: (0, eval)(`(${f})`)(s.pupilHtml) };
-                }, { role, size }, measure.toString());
-                if (r.items < PIN[size]) bad('CAP', `multi_step_word (Visual) ${role} ${size}: ${r.items} stories a page, the card rules ${PIN[size]} (decision 9)`);
-                r.cells.forEach((c, i) => { if (c.band / c.h >= 0.3) bad('BAND', `multi_step_word (Visual) ${role} ${size} cell ${i + 1}: ${c.band.toFixed(1)} mm empty under the work in a ${c.h.toFixed(1)} mm cell (${Math.round(100 * c.band / c.h)} %, H13 >= 30 %)`); });
-                if (!r.cells.length) bad('BAND', `multi_step_word (Visual) ${role} ${size}: no kit cell on the page`);
+                }, c, measure.toString());
+                if (r.items < c.pin) bad('CAP', `${c.tag} ${role} ${size}: ${r.items} stories a page, the card rules ${c.pin} (decision 9)`);
+                r.cells.forEach((x, i) => { if (x.band / x.h >= 0.3) bad('BAND', `${c.tag} ${role} ${size} cell ${i + 1}: ${x.band.toFixed(1)} mm empty under the work in a ${x.h.toFixed(1)} mm cell (${Math.round(100 * x.band / x.h)} %, H13 >= 30 %)`); });
+                if (!r.cells.length) bad('BAND', `${c.tag} ${role} ${size}: no kit cell on the page`);
             }
         }
     } finally { await app.close(); }
     for (const r of ['CAP', 'BAND']) { const n = out.filter((x) => x.startsWith(r + ' ')).length; console.log(`CAP-BAND ${r.padEnd(5)} ${n ? `FAIL ${n}` : 'PASS'}`); }
     for (const f of out.slice(0, 30)) console.log(`  ${f}`);
-    console.log(out.length ? `${TOOL}: FAIL (--print: ${out.length} finding(s))` : `${TOOL}: OK (--print: CAP-BAND, multi_step_word (Visual) ${html ? 'fixture' : `${ROLES.length} roles x ${SIZES.join('/')}`})`);
+    console.log(out.length ? `${TOOL}: FAIL (--print: ${out.length} finding(s))` : `${TOOL}: OK (--print: CAP-BAND, ${html ? 'fixture' : 'multi_step_word (Visual) / two_step_letter_equation wpBar L'})`);
     process.exit(out.length ? 1 : 0);
 }
