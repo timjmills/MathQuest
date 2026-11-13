@@ -8,7 +8,7 @@ import { generatePvRounding, generatePvPlaceValue, generatePvEstimation, pvSpan,
 import { numeralTracksHTML, k2Twin } from './sheet/index.js';
 import { generateFunctionTable } from './gen-function-table.js';
 import { genNumberPatterns, genSkipCountGrid, genSkipCountLine } from './gen-mult-patterns.js';
-import { onNewPage } from './page-deal.js';
+import { onNewPage, freshDeal } from './page-deal.js';
 
 // ===========================================================================
 // THE ODD / EVEN SORT ON PAPER
@@ -5114,6 +5114,8 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     const est = add2 ? e1 + r10(c) : e1 - r10(c);
                     return e1 >= 0 && est >= 0;
                 };
+                // (dealt FRESH on the page - ws-dealer-uniform PAGE: no start number three times, no story twice on a page)
+                const msDraw = () => {
                 let msGuard = 0;
                 for (;;) {
                 msGuard++;
@@ -5178,6 +5180,10 @@ export function generateAlgebraQuestion(q, mappedSkill, helpers) {
                     if (ok || msGuard > 3000) break;
                 }
                 }
+                return [startVal, step1Val, step2Val, afterStep1, finalVal];
+                };
+                [startVal, step1Val, step2Val, afterStep1, finalVal] = freshDeal(`ms:${msMax}:${msCheckOn ? 1 : 0}`, msDraw,
+                    { sig: (v) => `${v[0]},${v[1]},${v[2]}`, tags: (v) => [String(v[0]), `${v[0]},${v[1]}`, String(v[4])], caps: [2, 1, 2] });
                 step1Text = { add_then_sub: `bought ${step1Val} more`, sub_then_add: `lost ${step1Val}`, add_then_add: `earned ${step1Val} more`, sub_then_sub: `used ${step1Val}` }[problemType];
                 step2Text = { add_then_sub: `gave ${step2Val} to a friend`, sub_then_add: `found ${step2Val} more`, add_then_add: `received ${step2Val} more`, sub_then_sub: `gave away ${step2Val}` }[problemType];
                 q.text = `${msName} had ${startVal} ${msItem}. She ${step1Text}, then ${step2Text}. How many ${msItem} does she have now?`;
