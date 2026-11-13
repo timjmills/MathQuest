@@ -329,6 +329,15 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - npr / count_by_tables count-row digits pass SCREEN-DIGIT on card and quiz from -props 85c694896. The arcs train passes their new TRAIN-FIT (ws-screen-slots --train-fit; row ss-train-fit-cbt) from 85c694896.
     - Row screen-digit-npr-worksheet still CANNOT be armed: the WORKSHEET host stays at about 29 px because worksheet.js:1052 sets one --mq-digit per sheet. That is OURS (item 11): a per-cell digit floor. mult_properties arrays-turn numerals are also 29 px. Arm the row with pass = the item-11 fix commit, once 85c694896 is merged in.
     - The CL40-INK more-practice row (pass c1c54b5c4) is already recorded (item 7).
+22. On merge with lf-placevalue w2 (claude/lf-placevalue-w2 fb05bcb1), carry into ws-empty-band:
+    - --grid-foot / --columns (item 12);
+    - EB-FOOT measures a CL-4d centred `ws-rowstretch` cell as pads + tab clearance + the line's box (lead ruling 11-13, CL-4d: a one-line cell its row stretches >= 30 % is centred; it raised 234 false findings before);
+    - an OPT_IN_FLAGS literal near the top. The builder's 5a8e27ec already names the opt-in flags in the first 80 lines; reconcile the two. Plus a GUARD: precritic should not rely on an 80-line source scan for flags (a self-test that every flag precritic passes is accepted).
+    Info: compare's pixel totals went 337 → 93 (lesson 17, opener 30, scripted-model 17, review 10, mixed 18, pre-skill-check EB-PAGE 1): lf-placevalue's.
+23. Host items from lf-algebra's two-step build (branch claude/sweet-newton-c8wrv1-lf-algebra @ 8438ca59d, lead 11-13); checks first, each with a backtest:
+    - (a) phone-card first-box focus FAILs on all 7 two-step skills (the _plain ones too);
+    - (b) GRADING PARITY: on screen the letter equation and the estimate are only "typed", not scored, while paper grades both. Add a check that every slot paper scores is scored on every screen host, then fix the hosts;
+    - (c) screen-support-eq: the log says OK but precritic's gate says FAIL. A parser / verdict mismatch: fix it, and add a self-test that the parsed verdict equals the tool's last line.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
@@ -441,3 +450,7 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   FAIL 47b1f2a86 (RR-CLIP x2) -> OK 7c1e3dbb4 (master; lf-roles' Model re-plan, 2 pages; lf-algebra had no fix of its own).
   False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.
 - no-dropped-row baseline FIXED (lf-checks 11-13): it compared with origin/master's tip, so a lane branch behind master read master's newer rows as dropped (13 false drops on -r2). Now the merge base of HEAD and origin/master; a deploy tree (master merged in) is unchanged.
+- The -r2 narrow critic was STOPPED by the weekly usage limit before its verdict; its partial report is committed as PARTIAL. Resume after 2026-11-19 22:00 UTC. All lf-checks work is paused until then.
+- CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
+  - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
+  - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.

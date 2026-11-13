@@ -225,15 +225,15 @@ const LESSON_FIT_BAND = 0.28;
 /**
  * How far a shelf may grow before one of its cells - content centred (print-sheet.js LESSON_PM_CENTRE_CSS), the tab drop `lift`
  * above it - leaves an empty band of LESSON_FIT_BAND: from each item's measured content height at the shelf's column count
- * (print-sheet.js measured[k].inkMm, the H13 reading's boxes). A cell of height H with content c leaves (H + lift - c) / 2 above;
+ * (print-sheet.js measured[k].inkHMm, the H13 reading's boxes). A cell of height H with content c leaves (H + lift - c) / 2 above;
  * growing by g adds g / 2 to it and g to the cell. null when an item was not measured so. Pure.
  */
 function measuredGrowth(sh) {
     const kk = Math.min(sh.k, 6);
     const its = (sh.items || []).filter((it) => !it.anchor);
-    if (!its.length || !its.every((it) => it.measured && it.measured[kk] && Number.isFinite(it.measured[kk].inkMm))) return null;
+    if (!its.length || !its.every((it) => it.measured && it.measured[kk] && Number.isFinite(it.measured[kk].inkHMm))) return null;
     const lift = sh.lift || 0;
-    const c = Math.min(...its.map((it) => it.measured[kk].inkMm));
+    const c = Math.min(...its.map((it) => it.measured[kk].inkHMm));
     return (LESSON_FIT_BAND * sh.h - (sh.h + lift - c) / 2) / (0.5 - LESSON_FIT_BAND);
 }
 /** lessonFit: the most a start shelf gives back so the one-shelf-a-skill start keeps to page 1 - the spare half of hMinAt's 1 mm
@@ -717,7 +717,7 @@ export function plan(input = {}) {
     // with bands under 30 % while H <= c / 0.42. A one-line fact shelf ("14 ÷ 7 = __") so stays at its own height; the
     // spare goes to the shelves that can take it (stacks, boxed equations, stories).
     // (a shelf's pv lift - pvLiftOf - is empty room above the content, not content: lf-engine PC r5)
-    // (r6, critic r5 R5: a shelf of one item a row grows by its items' MEASURED content - print-sheet.js measured[k].inkMm, as the
+    // (r6, critic r5 R5: a shelf of one item a row grows by its items' MEASURED content - print-sheet.js measured[k].inkHMm, as the
     // H13 reading takes it - so each centred band stays under LESSON_FIT_BAND: the 12 mm guess under-read a
     // one-line row's content and combine L printed five rows over a 20 % blank foot)
     const capOf = (sh) => {

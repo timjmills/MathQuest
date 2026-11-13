@@ -143,6 +143,27 @@ export const WEDO_W_MM = 62;       // the Steps zone beside the Guided cells: on
  * `env.weDo` is the set.
  */
 export function weDoBand(env) {
+    // (lf-partopts: with the teacher's count, the band is first planned uncapped on a copy of the bands - its count is the
+    // part's fit, env.weDoFit, the Parts table's max - then capped. Without one, exactly as before.)
+    if (weDoCap(env.input) === null) { weDoBandOwn(env); env.weDoFit = env.weDo.length; env.weDoMin = env._weDoMin; return env; }
+    const pn = Object.assign({}, env.input.lesson.partN);
+    delete pn.wedo;
+    const probe = Object.assign({}, env, {
+        input: Object.assign({}, env.input, { lesson: Object.assign({}, env.input.lesson, { partN: pn }) }),
+        groups: env.groups.map((g) => Object.assign({}, g, { sections: g.sections.map((x) => Object.assign({}, x)) })),
+    });
+    weDoBandOwn(probe);
+    env.weDoFit = probe.weDo.length;
+    env.weDoMin = probe._weDoMin;
+    // (§8c: the count asked is drawn - fewer, wider cells; roles/lesson.js sheetOffers offers only the counts whose cells keep
+    // their ink at half their width and whose sheet fills its page)
+    return weDoBandOwn(env);
+}
+
+/** The teacher's We Do count (lesson.partN.wedo), or null for the lesson's own. */
+const weDoCap = (input) => (input && input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.wedo) ? Math.max(0, input.lesson.partN.wedo) : null);
+
+function weDoBandOwn(env) {
     const { input, ctx, m, data, main, example, example2, example3, example4, exSteps, extrasList, stepsZone, groups } = env;
     const rest = main.filter((it) => it !== example && it !== example2 && it !== example3 && it !== example4);
     // (critic lessons-phase0 r1 D10 / D11: a lesson whose Prerequisite Check replaced its Warm-up - LR-17, `prereqs` - grows
@@ -178,8 +199,13 @@ export function weDoBand(env) {
     // div_facts long-division lesson - so a stack is at least two rows)
     // (`guidedStack` k on lesson data - the detailed lesson maker, lesson 2: k cells too wide to stand side by side stack beside the Steps)
     const forceStack = data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
-    const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
+    let stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
+    // (lf-partopts: `lesson.partN.wedo` - the teacher's cell count, 1 .. the fit; 0 = no We Do band. The fit is reported
+    // before the cap, env.weDoFit. Absent: as before.)
+    const wN = weDoCap(input);
+    if (wN === 0) { env.weDo = []; return env; }
+    if (wN !== null && wN < gk) { gk = wN; if (stackRows) stackRows = wN >= 2 ? wN : 0; }
     // (lf-engine PC r4, `indepRules.chartTexts` - the check on only: no chart example again in the Guided cells)
     const chartT = data && data.indepRules && Array.isArray(data.indepRules.chartTexts) ? data.indepRules.chartTexts : [];
     const weDoPool0 = main.filter((it) => it !== example2 && it !== example3 && it !== example4 && (it === example || !chartT.includes(String((it.q && it.q.text) || ''))));
@@ -193,6 +219,8 @@ export function weDoBand(env) {
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);
     const gH = stackRows ? Math.max(20, hAt(weDo, 2) + lineExtra(weDo)) * stackRows : Math.max(hAt(weDo, gcols) + lineExtra(weDo), 20) + (cue(weDo) ? 2 : 0);
     const weH = Math.max(gH, zH);
+    // (lf-partopts: how far the band stands over its cells' content - roles/lesson.js offers no changed sheet past WEDO_STRETCH_MAX)
+    if (wN !== null || (input.lesson && input.lesson.partN)) env.weDoStretch = gH > 0 ? +(weH / gH).toFixed(3) : 1;
     // Lessons r2 (H13): cells much shorter than the Steps list beside them (the add lesson: the
     // Steps panel 37-46 % empty at its foot), or a lesson whose Guided set names more cases than
     // fit beside the list (rounding: up, down, ends in 5), put the steps in a STRIP over the
@@ -221,6 +249,36 @@ export function weDoBand(env) {
         if (set.length && fitsWidth(set, tc)) top = { set, cols: tc, h: Math.max(20, hAt(set, tc) + lineExtra(set)) + (cue(set) ? 2 : 0) };
     }
     if (top) weDo = top.set;
+    // (lf-partopts: the fewest cells the band may print - k cells share the 124 mm left of the Steps, and a cell whose problem
+    // is drawn under half its width can leave a 30 % empty side (a 28 mm stack in a 61 mm cell, 30.0 %), EB-SIDE: ws-partopts-unit PO-2d)
+    if (wN === null) {
+        // (the ink's width: the measured one-third-page cell less its side slack, where measured; else the drawn width)
+        const inkOf = (it) => { const m3 = it.measured && it.measured[3]; return m3 && Number.isFinite(m3.slackMm) ? Math.min(drawnW(it), 186 / 3 - 2 * m3.slackMm) : drawnW(it); };
+        const inkW = Math.min(...weDo.map(inkOf));
+        env._weDoMin = weDo.length;
+        // (only one-line facts, whose drawn width the band knows exactly: a worked cell - a stack, a story - draws its ink
+        // off-centre in a wider cell, measured 30.0 % at M with two stacks; its count stays the fit until it declares its ink)
+        if (weDo.every((it) => it.template === 'fact')) for (let k = 2; k < weDo.length; k++) if (inkW >= 0.5 * (124 / k - 4)) { env._weDoMin = k; break; }
+    }
+    if (wN !== null && weDo.length > wN) {
+        // (a strip-over-the-cells set picked its own count: the teacher's count caps it, the rows / columns follow)
+        weDo = weDo.slice(0, wN);
+        // (§8c: across the page under the strip, fewer cells are drawn at their own wider column - a rounding cell's number
+        // line takes the width)
+        if (top) top = top.rows ? Object.assign({}, top, { set: weDo, rows: weDo.length }) : Object.assign({}, top, { set: weDo, cols: Math.max(1, Math.min(top.cols, weDo.length)), h: Math.max(20, hAt(weDo, Math.max(1, Math.min(top.cols, weDo.length))) + lineExtra(weDo)) + (cue(weDo) ? 2 : 0) });
+    }
+    // (lf-partopts §8c: fewer cells re-flow WIDER - k cells share the width left of the Steps, or the page's width under a strip.
+    // A count is offered only where every cell's ink - measured at the nearest narrower column width - fills at least half the
+    // cell (a centred problem then leaves under 25 % each side, EB-SIDE 30 %); roles/lesson.js sheetOffers reads it.)
+    if (wN !== null && weDo.length) {
+        const k = top ? (top.rows ? 1 : weDo.length) : stackRows ? 1 : weDo.length;
+        const W = (top ? 186 : 124) / k - 4;
+        // (a rounding cell draws the chart's number line under its problem, as long as its column leaves - weDoRender)
+        const pc = top ? top.cols : stackRows ? 2 : colsFor(weDo.length);
+        const lineW = (it) => (isRound(it) ? Math.max(28, Math.min(62, 186 / pc - 8)) : 0);
+        const inkAt = (it) => { const ms = it.measured || {}; const c = [1, 2, 3, 4].find((x) => ms[x] && ms[x].inkMm > 0 && 186 / x - 4 <= W + 0.5) || 4; return Math.max(lineW(it), ms[c] && ms[c].inkMm > 0 ? ms[c].inkMm + (cue([it]) ? 10 : 0) : 0); };
+        env.weDoSideOk = weDo.every((it) => inkAt(it) >= 0.5 * W);
+    }
     // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
     // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
     const weInPlace = weDo.length > 0 && weDo.every((it) => it && it.footprint && it.footprint.inPlace);
@@ -247,11 +305,20 @@ export function weDoBand(env) {
         const rem = groups.find((g) => g.sections[0] && g.sections[0].label === 'Remember:');
         if (rem && data && data.chant) Object.assign(rem.sections[0], { label: 'Rule:', instr: data.chant });
         // (`noStripChant` - the detailed lesson maker, lesson 7: two Guided cells fill the page; the chant is on the chart)
-        const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
+        // (critic A r2 N2: Remember off - lesson.partN.remember false - takes the rule off the sheet with it, here too)
+        const remOff = !!(input && input.lesson && input.lesson.partN && input.lesson.partN.remember === false);
+        const chantH = data && data.chant && !rem && !data.noStripChant && !remOff ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
-    } else if (weDo.length) groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+        // (lf-partopts A r3: the We Do cells, for the offer gate's EB-BAND prediction - roles/lesson.js cellBands)
+        // (a rounding cell draws the chart's number line under its problem - weDoRender - which its measured cell has not: no
+        // prediction for it; its width is judged by weDoSideOk)
+        env.weDoCells = { grid, items: weDo.filter((it) => !isRound(it)), cols: top.rows ? 1 : top.cols };
+    } else if (weDo.length) {
+        groups.push(band(m.strip + weH, weBand, { h: weH, grid: [weBand.parts[0].content], box: weBand.parts[1], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
+        env.weDoCells = { grid: weBand.parts[0].content, items: weDo.filter((it) => !isRound(it)), cols: gcols };
+    }
     env.weDo = weDo;
     return env;
 }
