@@ -5848,6 +5848,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-cl4d-guided",
+  "check": "CL-4d on the Guided role: a one-line compare cell its Guided row stretches by 30 % or more is centred (the r3 ws-rowstretch marks on Guided rows; lf-roles review of compare r3, item b3)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-TOPSTART CL-4d / opt-in TOPSTART-STRETCH (--roles guided)",
+  "browser": true,
+  "fail": {
+   "commit": "cd47e0a5",
+   "state": "compare Guided L: 8 one-line cells at the top of rows that stretch them 319 %, 38.3 mm (63 %) white under each (CL-4d on practice pages only)"
+  },
+  "pass": {
+   "commit": "f0d0ac7d",
+   "state": "Guided rows sized to pads + line and marked ws-rowstretch where they stretch: L-TOPSTART 0"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --size L --roles guided --skills placevalue:compare --lints L-TOPSTART --rules TOPSTART-STRETCH --rule-skills placevalue:compare",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
