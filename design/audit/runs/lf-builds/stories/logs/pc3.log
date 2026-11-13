@@ -38,3 +38,209 @@ ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktre
   FAIL            ws-phone-card (practice card at 390 px: clip, first-box focus) (178 s, waited 19 s for a slot)
   PASS            ws-chromebook-fit --skills (289 s, waited 17 s for a slot)
   FAIL            ws-options-verify --render (each offered appearance value at S / L vs the default page) (455 s, waited 75 s for a slot)
+  PASS            ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) (1644 s)
+
+### ws-precritic — --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+commit `72638e476a` + uncommitted changes (2 file(s)) (claude/sweet-newton-c8wrv1-lf-builds-stories) · started 2026-11-13T03:08:16Z · finished 2026-11-13T04:10:44Z · wall 3748 s · logs `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3`
+
+| Gate | Scope | Result | Findings vs baseline | Seconds |
+|---|---|---|---|---|
+| ws-node-lint | 7 skills | PASS | 0 found, 0 pinned, 0 new | 3 |
+| ws-providers-unit --skill | 7 skills | N/A | no provider test for addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller | 3 |
+| ws-content-audit --skill | 7 skills | PASS | 7 skill(s) audited | 11 |
+| ws-options-verify --skill | 7 skills | PASS (baseline) | 356 value(s) checked; 9 failing, 9 pinned, 0 new | 99 |
+| ws-presets-unit | 5 preset / host skill(s) | PASS | - | 93 (87 waiting) |
+| ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT) | 7 skills × card roles × S/M/L + hosts | FAIL | ws-empty-band: FAIL (266) | 701 (31 waiting) |
+| ws-lessonfit (WRM site lessons, every year) | site lessons Y1, Y4, Y6 | PASS | - | 25 |
+| ws-coverage-matrix --skills | 7 skills × kinds × S/M/L | PASS | 64 of 238 row(s) run × S/M/L: OK 64, RED 0, ERROR 0; PENDING 132, N/A 42 | 2098 |
+| ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) | 7 skills | PASS | 0 found (7 doc(s)) | 58 (31 waiting) |
+| ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) | 7 skills | PASS | 0 found (7 doc(s), unpinned) | 106 (77 waiting) |
+| ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) | 7 skills | PASS | 0 found (7 doc(s), unpinned) | 116 (88 waiting) |
+| ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 7 skills | FAIL | 2 found in 1 of 7 doc(s); 1 (document, lint, rule) count(s) above the pin; lesson page not pinned at L: addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, … 1 more (must be clean) | 91 (54 waiting) |
+| ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) | 7 skills | FAIL | 4 found in 1 of 7 doc(s); 1 (document, lint, rule) count(s) above the pin; lesson page not pinned at S: addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, … 1 more (must be clean) | 122 (83 waiting) |
+| ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px) | 7 skills × lesson, test, independent × S/M/L + screen hosts | FAIL | ws-grade-render: FAIL - 12 finding(s) (0 overflow, 12 small target) in 7 unit(s) | 445 (59 waiting) |
+| ws-print-lint --source kit --kind sections --pages 2 --size S --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) | addition:add_word_problems + addition:add_word_problems_plain + subtraction:sub_word_problems + subtraction:sub_word_problems_plain × sections × 2 pages × S | FAIL | 1 found in 1 of 1 doc(s) (no pinned baseline: an unpinned document must be clean) | 77 (66 waiting) |
+| ws-print-lint --source kit --kind sections --pages 2 --size L --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet) | addition:add_word_problems + addition:add_word_problems_plain + subtraction:sub_word_problems + subtraction:sub_word_problems_plain × sections × 2 pages × L | FAIL | 1 found in 1 of 1 doc(s) (no pinned baseline: an unpinned document must be clean) | 95 (83 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) | addition:add_word_problems × 12 roles × S/M/L | FAIL | ws-grade-render: FAIL - 16 finding(s) (16 overflow, 0 small target) in 1 unit(s) | 270 (65 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | addition:add_word_problems × 15 roles + 10 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 16 finding(s) (OVERFLOW 16) on 195 page(s), 119s | 201 (79 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) | addition:add_word_problems_plain × 12 roles × S/M/L | FAIL | ws-grade-render: FAIL - 12 finding(s) (12 overflow, 0 small target) in 1 unit(s) | 253 (47 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | addition:add_word_problems_plain × 15 roles + 9 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 54 finding(s) (OVERFLOW 54) on 180 page(s), 115s | 165 (47 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) | subtraction:sub_word_problems × 12 roles × S/M/L | FAIL | ws-grade-render: FAIL - 12 finding(s) (12 overflow, 0 small target) in 1 unit(s) | 255 (51 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | subtraction:sub_word_problems × 15 roles + 13 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 12 finding(s) (OVERFLOW 12) on 240 page(s), 144s | 228 (80 waiting) |
+| ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) | subtraction:sub_word_problems_plain × 12 roles × S/M/L | FAIL | ws-grade-render: FAIL - 12 finding(s) (12 overflow, 0 small target) in 1 unit(s) | 269 (60 waiting) |
+| ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) | subtraction:sub_word_problems_plain × 15 roles + 12 option values × S/M/L | FAIL | ws-cell-checks: FAIL - 12 finding(s) (OVERFLOW 12) on 225 page(s), 148s | 219 (67 waiting) |
+| ws-screen-slots --skills | 7 skills | PASS | 0 found, 0 pinned, 0 new (35 host renders, --baseline design/audit/baselines/screen-slots.json) | 72 (44 waiting) |
+| ws-screen-answer --skills | 7 skills | PASS | - | 102 (39 waiting) |
+| ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE) | 7 skills | FAIL | 6 of 7 skill(s) in scope absent from the output (checked nothing for them): addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown | 43 (40 waiting) |
+| ws-chromebook-fit --skills | 7 skills | PASS | - | 289 (17 waiting) |
+| ws-code-snapshot | all share codes | PASS | - | 1 |
+| ws-boot-smoke | app boot | PASS | - | 35 (31 waiting) |
+| ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings) | 7 skills: matrix rows with findings | FAIL | worse than siblings: 0 count(s) above the approved siblings in 0 row(s), 113 with no sibling measured, 0 ERROR row(s); 0 at or below (engine) in 34 printed row(s) with findings (PENDING(no-baseline) 34; siblings per skill: add_word_problems: 0, add_word_problems_plain: 0, sub_word_problems: 0, sub_word_problems_plain: 0, add_wp_change_unknown: 0, sub_wp_change_unknown: 0, sub_wp_compare_smaller: 0) | 1 |
+| ws-slot-clip (SLOT L-ANSAREA + CLIP L-OVERFLOW on every matrix row + test / more-practice / supports-on pages, box width, head overlap) | 7 skills × matrix rows × S/M/L + extras at S | PASS | 98 matrix row(s) × S/M/L + 14 extra document(s) (test, more-practice, supports on): 308 document(s), SLOT 0 / CLIP 0 finding(s), 22314 box segment(s) and 0 head(s) probed (SLOT-W N/A on 0, HEADS N/A on 308 document(s): no digit strip / no heads); every SLOT / CLIP count at or below the approved siblings | 1644 |
+| ws-phone-card (practice card at 390 px: clip, first-box focus) | 7 skills × 390x844, 390x664 | FAIL | ws-phone-card: FAIL - 24 finding(s) (FOCUS 24) (7 skill(s) × 2 size(s) × 3 item(s): 42 of 42 renders measured; A14 siblings clean (4 approved skill(s) × 2 size( | 178 (19 waiting) |
+| ws-card-rulings --check rulings (spec card numeric rulings, 300 items) | 7 skills | SKIPPED (no rulings) | no machine-readable rulings block (<!-- rulings {json} -->, tests/scripts/ws-card-rulings.mjs) in the spec card: not checked | 0 |
+| ws-card-rulings --check offered (panel offers nothing the card bans) | 7 skills | INCOMPLETE (partial rulings) | not checked (no rulings block entry): addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller; 0 ruling check(s), 8 not-offered check(s), 4 of 7 skill(s) checked, 3 NOT checked (3 without a rulings block); 0.2 s | 0 |
+| ws-dealer-uniform (120 seeded items: digits and values even, page caps, no pinned case position) | 7 skills | PASS (baseline) | -; 2 pinned finding(s) | 9 |
+| ws-visual-quality (VQ-REP relation drawn, VQ-ONEANSWER one answer place, VQ-LIVE no dead part, VQ-TITLE a sentence, VQ-NOLEGACY kit cell) | 7 skills | PASS (baseline) | 7 skill(s), 8 pinned finding(s), 4 stale pin(s), 1.6 s | 2 |
+| ws-node-lint --rules LESSON-DATA,OPTION-HELP,WRONG-FITS (lesson data, option help names only offered values, wrongAnswer fits its slot) | 7 skills | PASS (baseline) | 4 found, 4 pinned, 0 new | 1 |
+| ws-spec-card --check-signed --skill (card signed; every host, role and option value decided) | 7 skills | PASS | design/cards/word-stories/word-stories.md: Signed: owner, 2026-11-12; body as generated; coverage green against the current rule index; card.json generates the same signed content; every host, role an | 2 |
+| ws-options-verify --render (each offered appearance value at S / L vs the default page) | 7 skills × S/L | FAIL | 17 value page(s) worse than the default: add_word_problems response="which-numbers" @S, add_word_problems response="which-numbers" @L, sub_word_problems response="which-numbers" @S, sub_word_problems wpBar=true @S, sub_w | 455 (75 waiting) |
+
+Failing rows (first lines; the full output is in the log):
+- **ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/empty-band.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller`
+  - `EB-BAND  FAIL 204`
+  - `EB-SIDE  FAIL 38`
+  - `EB-EDGE  FAIL 24`
+  - `ws-empty-band: FAIL (266)`
+- **ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/print-lint-lesson-L.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --baseline design/audit/baselines/print-lint.json`
+  - `pin (STATUS note required): node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills <skills> --report-only --json <out>, then merge its documents into the pin`
+  - `- subtraction:sub_wp_compare_smaller#lesson L-WRAP WRAP-OP: 0 -> 2`
+- **ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/print-lint-lesson-S.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --baseline design/audit/baselines/print-lint.S.json`
+  - `pin (STATUS note required): node tests/scripts/ws-print-lint.cjs --source kit --size S --roles lesson --skills <skills> --report-only --json <out>, then merge its documents into the pin`
+  - `- subtraction:sub_word_problems_plain#lesson L-DENSITY H13: 0 -> 4`
+- **ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-390 / 820 targets >= 44 px)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/render-gate.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles lesson,test,independent --size S,M,L --gate --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate`
+  - `FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET addition:add_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET addition:add_word_problems_plain card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET subtraction:sub_word_problems card-390: <input class="mq-cellslot"> 40 x 44 px (under 44 px, H6)`
+  - `FAIL TARGET subtraction:sub_word_problems_plain card-390: <input class="mq-cellslot mq-active-box"> 40 x 44 px (under 44 px, H6)`
+- **ws-print-lint --source kit --kind sections --pages 2 --size S --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/print-lint-sections-S.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain`
+  - `sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain: 10+5 pages, 1 finding(s)`
+- **ws-print-lint --source kit --kind sections --pages 2 --size L --lints L-DENSITY (critic lf-ops r1 check 5: PAGEFILL / PG-23 on a two-skill sheet)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/print-lint-sections-L.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size L --lints L-DENSITY --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain`
+  - `sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain: 10+5 pages, 1 finding(s)`
+- **ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/render-gate-add_word_problems.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems --roles more-practice,scripted-model,guided,opener,error-analysis,review,pre-skill-check,mixed-practice,true-false,reason-it,stretch,word-problems --size S,M,L --gate --no-screen --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate-add_word_problems`
+  - `[1/1] addition:add_word_problems  more-practice-S 1p+1k 2x3  more-practice-M 1p+1k 2x2  more-practice-L 1p+1k 2x2  scripted-model-S 2p+2k 2x6  scripted-model-M 3p+3k 2x6  scripted-model-L 3p+3k 2x6  guided-S 1p+1k 2x2  g`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check-L pupil: page 1 cell 9: content overflows its cell`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check-L pupil: page 1 cell 9: <div class="ws-eq-hold"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check-L key: page 1 cell 9: content overflows its cell`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check-L key: page 1 cell 9: <div class="ws-eq-hold"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems reason-it-S pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems reason-it-S pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems reason-it-S key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems reason-it-S key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems reason-it-M pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+- **ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/cell-checks-add_word_problems.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills addition:add_word_problems --card --card-opts`
+  - `ok   addition:add_word_problems error-analysis S: 1p 1x? per 4`
+  - `ok   addition:add_word_problems error-analysis M: 1p 2x? per 4`
+  - `ok   addition:add_word_problems error-analysis L: 1p 1x? per 2`
+  - `FAIL addition:add_word_problems pre-skill-check L: 1p 4x? per undefined - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems reason-it S: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems reason-it M: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems reason-it L: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check L: pupil page 1 cell 9: content overflows its cell`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check L: pupil page 1 cell 9: <div> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems pre-skill-check L: key page 1 cell 9: content overflows its cell`
+- **ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/render-gate-add_word_problems_plain.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills addition:add_word_problems_plain --roles more-practice,scripted-model,guided,opener,error-analysis,review,pre-skill-check,mixed-practice,true-false,reason-it,stretch,word-problems --size S,M,L --gate --no-screen --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate-add_word_problems_plain`
+  - `[1/1] addition:add_word_problems_plain  more-practice-S 1p+1k 2x3  more-practice-M 1p+1k 2x2  more-practice-L 1p+1k 2x2  scripted-model-S 2p+2k 2x5  scripted-model-M 3p+3k 2x5  scripted-model-L 3p+3k 2x5  guided-S 1p+1k `
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-S pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-S pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-S key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-S key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-M pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-M pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-M key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-M key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it-L pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+- **ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/cell-checks-add_word_problems_plain.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills addition:add_word_problems_plain --card --card-opts`
+  - `ok   addition:add_word_problems_plain error-analysis S: 1p 2x? per 4`
+  - `ok   addition:add_word_problems_plain error-analysis M: 1p 1x? per 2`
+  - `ok   addition:add_word_problems_plain error-analysis L: 1p 1x? per 2`
+  - `FAIL addition:add_word_problems_plain reason-it S: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems_plain reason-it M: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems_plain reason-it L: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL addition:add_word_problems_plain lesson S {"forms":[0]}: 4p 1x? per undefined - OVERFLOW (14)`
+  - `FAIL addition:add_word_problems_plain lesson M {"forms":[0]}: 4p 1x? per undefined - OVERFLOW (14)`
+  - `FAIL addition:add_word_problems_plain lesson L {"forms":[0]}: 4p 1x? per undefined - OVERFLOW (14)`
+  - `FAIL OVERFLOW addition:add_word_problems_plain reason-it S: pupil page 1 cell 1: <div> leaves the cell`
+- **ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/render-gate-sub_word_problems.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_word_problems --roles more-practice,scripted-model,guided,opener,error-analysis,review,pre-skill-check,mixed-practice,true-false,reason-it,stretch,word-problems --size S,M,L --gate --no-screen --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate-sub_word_problems`
+  - `[1/1] subtraction:sub_word_problems  more-practice-S 1p+1k 2x3  more-practice-M 1p+1k 2x2  more-practice-L 1p+1k 2x2  scripted-model-S 2p+2k 2x6  scripted-model-M 3p+3k 2x6  scripted-model-L 3p+3k 2x6  guided-S 1p+1k 2x2`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-S pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-S pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-S key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-S key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-M pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-M pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-M key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-M key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it-L pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+- **ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/cell-checks-sub_word_problems.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems --card --card-opts`
+  - `ok   subtraction:sub_word_problems error-analysis S: 1p 2x? per 4`
+  - `ok   subtraction:sub_word_problems error-analysis M: 1p 1x? per 2`
+  - `ok   subtraction:sub_word_problems error-analysis L: 1p 1x? per 2`
+  - `FAIL subtraction:sub_word_problems reason-it S: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL subtraction:sub_word_problems reason-it M: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL subtraction:sub_word_problems reason-it L: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it S: pupil page 1 cell 1: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it S: pupil page 1 cell 2: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it S: key page 1 cell 1: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems reason-it S: key page 1 cell 2: <div> leaves the cell`
+- **ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/render-gate-sub_word_problems_plain.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_word_problems_plain --roles more-practice,scripted-model,guided,opener,error-analysis,review,pre-skill-check,mixed-practice,true-false,reason-it,stretch,word-problems --size S,M,L --gate --no-screen --out design/audit/runs/lf-builds/stories/logs/pc3/render-gate-sub_word_problems_plain`
+  - `[1/1] subtraction:sub_word_problems_plain  more-practice-S 1p+1k 2x3  more-practice-M 1p+1k 2x2  more-practice-L 1p+1k 2x2  scripted-model-S 2p+2k 2x6  scripted-model-M 3p+3k 2x6  scripted-model-L 3p+3k 2x6  guided-S 1p+`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-S pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-S pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-S key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-S key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-M pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-M pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-M key: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-M key: page 1 cell 2: <div class="mq-ww"> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it-L pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell`
+- **ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/cell-checks-sub_word_problems_plain.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems_plain --card --card-opts`
+  - `ok   subtraction:sub_word_problems_plain error-analysis S: 1p 2x? per 4`
+  - `ok   subtraction:sub_word_problems_plain error-analysis M: 1p 1x? per 2`
+  - `ok   subtraction:sub_word_problems_plain error-analysis L: 1p 1x? per 2`
+  - `FAIL subtraction:sub_word_problems_plain reason-it S: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL subtraction:sub_word_problems_plain reason-it M: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL subtraction:sub_word_problems_plain reason-it L: 1p 1x? per 2 - OVERFLOW (4)`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: pupil page 1 cell 1: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: pupil page 1 cell 2: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: key page 1 cell 1: <div> leaves the cell`
+  - `FAIL OVERFLOW subtraction:sub_word_problems_plain reason-it S: key page 1 cell 2: <div> leaves the cell`
+- **ws-screen-support-eq --skills (SCREEN-SUPPORT-EQ, SCREEN-CUE-SIZE, SCREEN-SUPPORT-PLACE)** (exit 0, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/screen-support-eq.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller`
+  - `subtraction:sub_word_problems_plain: no supports (nothing to compare)`
+  - `addition:add_wp_change_unknown: no supports (nothing to compare)`
+  - `subtraction:sub_wp_change_unknown: no supports (nothing to compare)`
+  - `subtraction:sub_wp_compare_smaller: no supports (nothing to compare)`
+  - `ws-screen-support-eq: addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, s`
+  - `ws-screen-support-eq: OK`
+- **ws-sibling-compare (rule 0b: every printed row with findings vs the paired approved siblings)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/sibling-compare.log`); rerun alone: `node tests/scripts/ws-sibling-compare.cjs --run design/audit/runs/lf-builds/stories/logs/pc3/coverage-matrix.json --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --run-siblings --json design/audit/runs/lf-builds/stories/logs/pc3/sibling-compare.json`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/ex-each M L-DENSITY GRID-EVEN: ours 2, no approved sibling measured sections/ex-each at M`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/ex-each L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-each at L`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/ex-group M L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at M`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/ex-group L L-DENSITY DN-2: ours 2, no approved sibling measured sections/ex-group at L`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 S L-DENSITY PG-23: ours 3, no approved sibling measured sections/pages-2 at S`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY DN-2: ours 4, no approved sibling measured sections/pages-2 at M`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY PAGEFILL: ours 1, no approved sibling measured sections/pages-2 at M`
+  - `NO-SIBLING addition:add_word_problems_plain|sections/pages-2 M L-DENSITY PG-23: ours 2, no approved sibling measured sections/pages-2 at M`
+- **ws-phone-card (practice card at 390 px: clip, first-box focus)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/phone-card.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller`
+  - `addition:add_word_problems 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `addition:add_word_problems 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `addition:add_word_problems 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `addition:add_word_problems_plain 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `addition:add_word_problems_plain 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `addition:add_word_problems_plain 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `subtraction:sub_word_problems 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `subtraction:sub_word_problems 390x844 item 2: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `subtraction:sub_word_problems 390x844 item 3: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+  - `subtraction:sub_word_problems_plain 390x844 item 1: FAIL (focus FAIL, 10 answer box(es), paper 346 px)`
+- **ws-options-verify --render (each offered appearance value at S / L vs the default page)** (exit 1, `/home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/options-render.log`); rerun alone: `tests/scripts/mq-browser-run.sh node tests/scripts/ws-options-verify.cjs --render --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller`
+  - `FAIL addition:add_word_problems S response="which-numbers": capacity: 4 items on its fullest page where the default page prints 6 (the value costs the page items without adding a drawing; RUBRIC H13)`
+  - `FAIL addition:add_word_problems L response="which-numbers": L-DENSITY PAGEFILL: 0 -> 1 (page 1: an empty strip 57 mm tall under the problems (24% of the problem area): fill the page with more problems or spread the rows `
+  - `FAIL subtraction:sub_word_problems S response="which-numbers": capacity: 4 items on its fullest page where the default page prints 6 (the value costs the page items without adding a drawing; RUBRIC H13)`
+  - `FAIL subtraction:sub_word_problems S wpBar=true: L-INK LS-4: 0 -> 2 (dashed border: a dashed line means "cut here" (data-ws-cut) or the missing-digit box (data-ws-shape="box-unknown"), nothing else (LS-2, LS-4)`
+  - `FAIL subtraction:sub_word_problems L response="which-numbers": L-DENSITY PAGEFILL: 0 -> 1 (page 1: an empty strip 57 mm tall under the problems (24% of the problem area): fill the page with more problems or spread the ro`
+  - `FAIL subtraction:sub_word_problems L wpBar=true: L-INK LS-4: 0 -> 2 (dashed border: a dashed line means "cut here" (data-ws-cut) or the missing-digit box (data-ws-shape="box-unknown"), nothing else (LS-2, LS-4)`
+  - `FAIL subtraction:sub_word_problems_plain S wpBar=true: L-INK LS-4: 0 -> 4 (dashed border: a dashed line means "cut here" (data-ws-cut) or the missing-digit box (data-ws-shape="box-unknown"), nothing else (LS-2, LS-4)`
+  - `FAIL subtraction:sub_word_problems_plain L wpBar=true: L-INK LS-4: 0 -> 2 (dashed border: a dashed line means "cut here" (data-ws-cut) or the missing-digit box (data-ws-shape="box-unknown"), nothing else (LS-2, LS-4)`
+  - `FAIL addition:add_wp_change_unknown S response="which-numbers": capacity: 4 items on its fullest page where the default page prints 9 (the value costs the page items without adding a drawing; RUBRIC H13)`
+  - `FAIL addition:add_wp_change_unknown L response="which-numbers": L-DENSITY PAGEFILL: 0 -> 1 (page 1: an empty strip 57 mm tall under the problems (24% of the problem area): fill the page with more problems or spread the r`
+
+ws-precritic: FAIL: 18 FAIL, 19 PASS (4 on the baseline), 1 N/A, 0 SKIPPED-NOT-BUILT, 2 SKIPPED / INCOMPLETE (no or partial rulings) of 40 (FAIL: empty-band, print-lint-lesson-L, print-lint-lesson-S, render-gate, print-lint-sections-S, print-lint-sections-L, render-gate-add_word_problems, cell-checks-add_word_problems, render-gate-add_word_problems_plain, cell-checks-add_word_problems_plain, render-gate-sub_word_problems, cell-checks-sub_word_problems, render-gate-sub_word_problems_plain, cell-checks-sub_word_problems_plain, screen-support-eq, sibling-compare, phone-card, options-render; N/A (ran, nothing to check): providers; SKIPPED / INCOMPLETE (no or partial rulings: not all checked, not passed): card-rulings, card-not-offered)
