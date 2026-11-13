@@ -5208,6 +5208,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r15-vpage",
+  "check": "V-PAGE: no two Match 3 cells of one printed page put the same pictures in the same A / B / C places (every set and grade pool, independent / more-practice / test / guided, S / M / L, seed 7 and the render seed): set 5 Match 3 page 1, critic r14 #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit --browser V-PAGE (lf-vocab r15)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r14 pass)"
+  },
+  "pass": {
+   "commit": "567bf064",
+   "state": "a repeated trio takes a picture order the 3 slots before it do not hold"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-PAGE 2>&1 | grep -q '  - V-PAGE ' && echo 'v-page: FAIL' || echo 'v-page: OK'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
