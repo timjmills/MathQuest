@@ -45,7 +45,7 @@ Critic rounds: 1, r1 FAIL (14 role findings, 8 caused by this lane; report scrat
 | 1 | aa200514 | true-false / reason-it frame: a list answer one line a part (wraps), no frame for a sentence answer; EA: a sentence answer's fix is the item again (redo), never parts or a line | ws-roles-unit KEYJOIN-ROLE (roles-keyjoin-frame: FAIL 24 -> OK); ws-cell-checks KEYJOIN skips open zones (+ self-test) | 0 changed |
 | 2 | 2a3ecb9c | review geometry budgets the printed "Review: <topic>" title, measured by the bridge (input.titleLinesOf); topicOf "draw and count" -> "drawing and counting" | ws-roles-unit REVIEW-TITLE (roles-review-title: FAIL 2 -> OK) | 0 changed |
 | 3 | a55f373c | adapters.js legacy Answer line > 12 characters keeps to its cell (278 mm joined list off the sheet on Pre-skill Checks) | ws-cell-checks OVERFLOW on lf-algebra (no master fixture: needs the algebra skills) | 0 changed |
-| 4 | 4e8eca14 | ws-empty-band EB-FOOT pairs each cell with its own grid's column measure (gridCols / measuredAll) | lf-algebra pf independent M 5 -> 2 | tool only |
+| 4 | 4e8eca14 (REVERTED: lf-checks ported it, fdf3af0f on their branch; measure with their tool until master has it) | ws-empty-band EB-FOOT pairs each cell with its own grid's column measure (gridCols / measuredAll) | lf-algebra pf independent M 5 -> 2 | tool only |
 | 5 | 35c881b6 | scripted-model: a tall state whose beside layout needs 2 pages lays 2 + 2 on one page (the facts "across" layout) | ws-roles-unit MOD-ACROSS (roles-model-across: FAIL -> OK) | 5 INTENDED: sub_50/100/1k/10k no_regroup + sub_2d_1d Model L, two half-empty pages -> one 2 + 2 page |
 
 ## Red left, by owner
