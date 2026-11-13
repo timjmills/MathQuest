@@ -38,7 +38,7 @@
 # ("acceptedNotYet"). Only NOT YET gates can be accepted; an unknown name is an error. SKIPPED is never acceptable.
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
-#            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
+#            ws-code-snapshot, ws-no-phone-width (no 390 px screen-gate default; owner 2026-11-13), ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
 #            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
@@ -92,9 +92,11 @@
 # Session 4  ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check
 #            design/audit/baselines/lesson-baseline.json (lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c, which
 #            was a lane rule and is now a deploy gate): every page of every lesson master prints (the three samples, every
-#            key of lessons/prereqs.js LESSONS, every detailed lesson; L and S, seeds 4242 and 1) is byte-identical to the
+#            key of lessons/prereqs.js LESSONS, every detailed lesson; L and M, seeds 4242 and 1) is byte-identical to the
 #            pin, and every lesson the tree prints is pinned (UNPINNED fails). ≈ 13 min on one browser slot: in its own
 #            session because sessions 1-3 each sit at 27-28 min of their 30-min budget (MQ_LESSON_BASELINE_SESSION moves it).
+#            (Owner 2026-11-13, size S dropped: the pin's S keys were renamed M - a lesson asked for at S always printed at
+#            M, and the M render hashes equal the S keys, checked on the samples 30/30 - so the pin stays whole.)
 #            RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the pin in the same deploy commit
 #            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
 #            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
@@ -836,6 +838,7 @@ first_of() { local f; for f in "$@"; do [ -f "tests/scripts/$f" ] && { echo "$f"
 build_list() {
   # session 1: browser gates first in rough longest-first order (the two browser workers take them in this order)
   browser_gate 1 ws-content-audit ws-content-audit.cjs
+  browser_gate 1 "ws-no-size-s --browser" ws-no-size-s.mjs --browser   # critic nos r1 F1: S seeded in every restore path reads M (saved set, &set= link, stores)
   if [ -f "$PRINT_BASE" ]; then browser_gate 1 "ws-print-lint --source kit --baseline" ws-print-lint.cjs --source kit --baseline "$PRINT_BASE"
   else add 1 fn "ws-print-lint --source kit (limit $PRINT_LINT_LIMIT)" "print_lint_limit"; fi
   browser_gate 1 ws-teacher-wrm ws-teacher-wrm.cjs
@@ -869,6 +872,7 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
   node_gate 1 ws-search-terms ws-search-terms.cjs
@@ -883,6 +887,7 @@ build_list() {
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
   node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
+  node_gate 1 ws-no-size-s ws-no-size-s.mjs --docs-advisory   # (+ live instruction docs, critic nos r1 F4) no size picker offers S, no gate default runs S; S decodes as M (owner 2026-11-13, plan item 9)
   node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no

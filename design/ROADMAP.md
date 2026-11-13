@@ -69,7 +69,7 @@ sufficient.
 |---|---|---|
 | P7.1 Ink | Sheets are always black / white / one grey: drop the Colour/Grey print option and the grayscale filter; accent fills become outline, grey `#949494` or hatch, never solid black > 7 mm; text inside a shape stays legible; remove the 60 / 50 px visual caps in favour of the standard's minimum sizes (§11.2) | L-INK green on every redone skill |
 | P7.2 Page engine | `sheet/layout.js` (`resolveSectionLayout`, DN-20) and pagination (PG-20..25: no split cell, short last page rebalanced, continuation header); page roles as `plan()` composers that return a `PagePlan`; the facsimile key from the same plan; header / strand tab / "I Can" title / teacher footer; no "Part NN" | every role renders; L-SPLIT, L-DENSITY, L-KEY green |
-| P7.3 Print dialog | Page type, size S/M/L, look Auto/I Can/Daily, paper, header fields, the "Fits:" line, a preview that is exactly what prints; the Print button prints (today its output sits under `.container { display:none }` in `@media print`) | a teacher can print every role from the dialog |
+| P7.3 Print dialog | Page type, size M/L (S dropped 2026-11-13), look Auto/I Can/Daily, paper, header fields, the "Fits:" line, a preview that is exactly what prints; the Print button prints (today its output sits under `.container { display:none }` in `@media print`) | a teacher can print every role from the dialog |
 | P7.4 Screen parity | The practice card, the online worksheet and the quiz draw the kit cell (Andika, black on white, chrome outside); the online worksheet generates through `generateQuestionFor` (seeded, options honoured); the serif fallback goes | SP-1/SP-2 on every host |
 | P7.5 Gates | `ws-print-lint` (automated L-INK, L-FONT, L-OVERFLOW, L-SPLIT, L-DENSITY, L-KEY, L-VERBS subset) as a ratchet; `ws-grade-render` + the independent critic (`design/audit/RUBRIC.md`); a per-wave owner contact sheet (one PDF page per skill) | gates run in one command |
 | P7.6 Housekeeping | CLAUDE.md corrected (kit, not per-skill print handlers; live code count); catalogue and coverage regenerated each wave; [`REDESIGN_GAP.md`](../REDESIGN_GAP.md) retired to a pointer (its colourful restyle contradicts screen parity) | docs agree with code |
@@ -112,7 +112,7 @@ run practice first). The pupil side is unchanged.
 5. Screen: the same cell on every host, one input per slot, entry order, feedback outside the ink.
 6. Twins merged by alias; share codes unchanged (`ws-code-snapshot`).
 7. The family's legacy print branches deleted.
-8. `ws-print-lint` green at S / M / L, both looks, every page type, print and key.
+8. `ws-print-lint` green at M / L, both looks, every page type, print and key.
 9. **Independent critic: every criterion >= 8 on every page type and every screen host.**
 10. Owner contact sheet approved; code review + live browser QA; catalogue regenerated.
 

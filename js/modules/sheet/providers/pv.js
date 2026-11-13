@@ -99,7 +99,18 @@ const PLACE_CIRCLE_3 = { ...PLACE_CIRCLE, steps: PLACE_STEPS_3.concat('Circle th
 
 // D5 (lead 2026-11-07): with writeValue on, the instruction names both tasks (the place and the value).
 const withValue = (set, q) => (pvOf(q).writeValue ? { ...set, instructionKey: `${set.instructionKey}-value`, steps: set.steps.concat('Write what the digit is worth.') } : set);
+// Lead ruling (PEDAGOGY 4.1a, lf-placevalue 2026-11-13): identify's answer IS the place name, so its place heads (the H T O
+// letters, or the chart's place names) give it away on the unaided roles - Review, Test (A / B) and the pre-skill check, on
+// paper and in the quiz (the online test). There the support follows the role: none. The lesson's own Practice and Mixed
+// pages (independent / mixed-practice) and every other role keep the support as taught. Check: ws-pv-identify-heads.
+export const IDENTIFY_UNAIDED_ROLES = Object.freeze(['review', 'test', 'test-b', 'pre-skill-check']);
+// (lead ruling 14:24, 2026-11-13: only the DEFAULT changes on those roles - a support the teacher CHOSE for the page is kept. The
+// option store keeps a skill's choices as the values that differ from its defaults (packOptions: a share code, a saved
+// section, a stored quiz), so a chosen support is one that is not the default 'labels': the chart. A set with no support, or
+// the default, takes none. ws-pv-identify-heads PV-HEADS-UNAIDED (the default) and PV-HEADS-CHOSEN (the chart kept))
+const IDENTIFY_DEFAULT_SUPPORT = 'labels';
 registerSkill('placevalue:identify', {
+    roleOpts: (role, o) => (IDENTIFY_UNAIDED_ROLES.includes(role) && (o.support === undefined || o.support === IDENTIFY_DEFAULT_SUPPORT) ? { ...o, support: 'none' } : o),
     strings: stringsBy((q) => withValue(pvOf(q).response === 'bank'
         ? (placeSteps(q) === PLACE_STEPS ? PLACE_BANK : PLACE_BANK_3)
         : (placeSteps(q) === PLACE_STEPS ? PLACE_CIRCLE : PLACE_CIRCLE_3), q), PLACE_CIRCLE_3,
@@ -659,11 +670,48 @@ registerSkill('placevalue:number_word_names', {
 
 /* =============================================================================== compare / order */
 
+// lf-placevalue compare r2 (critic r1 F2): the steps name and MARK the deciding place. Step 1 counts the digits (the count in
+// words when both are alike, so the Guided page's fading cue - hintOf, the first step that names a number - is step 2, the
+// decision, never "Compare 924 and 998" again); a same-length item names the first different place and boxes its two digits
+// (mark `digits`, the two digits and their sign), then writes the sign, the bigger number underlined (mark `win`). Three steps
+// for every item (SCC-P4), so the lesson anchor is three full-width panels (four left a 32 % band in each 2 x 2 panel:
+// print-lint H13-ABS). The "=" item is never a Model: it carries `noModel` (gen-pv), which the Guided, Opener and Scripted
+// Model pages read (F4: the only Model was "691 = 691"). Marks: `count` (a grey dot under every digit), `digits`
+// (the index, from the left, of the deciding digit - or `all`), `win` ('a' | 'b', the bigger number underlined), `answer`.
+const COUNT_WORD = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+const PLACE_FROM_LEFT = (len, i) => PLACE_WORD[10 ** (len - 1 - i)] || '';
+/** The compare item's decision: kind 'length' | 'place' | 'equal', the deciding index and digits. */
+export function compareDecision(a, b) {
+    const sa = String(Math.trunc(Math.abs(Number(a)))), sb = String(Math.trunc(Math.abs(Number(b))));
+    if (sa.length !== sb.length) return { kind: 'length', la: sa.length, lb: sb.length, sa, sb };
+    const i = [...sa].findIndex((d, k) => d !== sb[k]);
+    if (i < 0) return { kind: 'equal', la: sa.length, lb: sb.length, sa, sb };
+    return { kind: 'place', la: sa.length, lb: sb.length, sa, sb, i, da: Number(sa[i]), db: Number(sb[i]), place: PLACE_FROM_LEFT(sa.length, i) };
+}
+/**
+ * The M6 sign a pupil writes by comparing the last digits (M-C2) or, lengths differing, the digits from the left without
+ * counting them (M-C3): the first digit that differs decides - 89 > 312 (8 > 3), and 345 < 37 (4 < 7: compare r4, critic r2,
+ * the close trap's own first-digit form; the first digits alone, 3 and 3, named no error, so a lengths=mixed page could show
+ * the last-digit form only).
+ */
+export function compareM6(a, b) {
+    const sa = String(a), sb = String(b);
+    const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+    const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]);
+    return {
+        last: cmp(Number(sa.slice(-1)), Number(sb.slice(-1))),
+        first: sa.length !== sb.length ? (k < 0 ? '=' : cmp(Number(sa[k]), Number(sb[k]))) : null,
+    };
+}
+
 registerSkill('placevalue:compare', {
+    // (compare r4, critic r2 N1: an item M6 gets right - "=", a pair the ones place decides - names no error on purpose; a True
+    // or False? False slot skips it, as Error analysis does, instead of printing it True: 12-33 % false, PT-TOF-1 asks 40-60 %)
+    falseNeedsWrong: true,
     strings: strings({
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
-        steps: ['Count the digits: more digits is bigger.', 'Same length: compare from the left place.', 'The first different digit decides.'],
+        steps: ['Count the digits: more digits is bigger.', 'Same count: find the first different digit from the left.', 'The bigger digit is the bigger number.'],
         say: '__ is __ __.',
         sayValues: (q) => { const p = pvOf(q); return p.a !== undefined ? [p.a, q.ans === '>' ? 'greater than' : q.ans === '<' ? 'less than' : 'equal to', p.b] : null; },
     }),
@@ -671,31 +719,45 @@ registerSkill('placevalue:compare', {
     workedSteps: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return [];
-        const la = String(p.a).length, lb = String(p.b).length;
-        let why;
-        if (la !== lb) why = `${f(la > lb ? p.a : p.b)} has more digits.`;
-        else if (p.a === p.b) why = 'Every digit is the same.';
-        else {
-            const sa = String(p.a), sb = String(p.b);
-            const i = [...sa].findIndex((d, k) => d !== sb[k]);
-            why = `The first different digits are ${sa[i]} and ${sb[i]}.`;
+        const d = compareDecision(p.a, p.b);
+        const A = f(p.a), B = f(p.b);
+        // (critic compare r3 N9, the wrap class a second time: EVERY relation a step writes is one unbreakable unit - "Write
+        // 501,765 > / 179,619." broke at band 999,999; ws-pv-compare-pages WRAP-SIGN runs the wide bands too)
+        const rel = (x, s, y) => `${x}\u00a0${s}\u00a0${y}`;
+        const count = { slot: 'count', value: `${d.la},${d.lb}` };
+        const answer = { slot: 'answer', value: String(q.ans) };
+        if (d.kind === 'length') {
+            return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb}.`, [count]),
+                step(`More digits is bigger: ${d.la > d.lb ? A : B}.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
+                step(`Write ${rel(A, q.ans, B)}.`, [answer])];
         }
-        return [step(`Compare ${f(p.a)} and ${f(p.b)}.`), step(why), step(`${f(p.a)} ${q.ans} ${f(p.b)}.`, [{ slot: 'answer', value: String(q.ans) }])];
+        if (d.kind === 'equal') {
+            return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+                // (critic r2 N7: the step names the digits it judges, so the Guided cue - hintOf, the first step that names a number
+                // - is this step, the one that decides "=", never "Both have three digits.")
+                step(`Every digit is the same: ${A} and ${B}.`, [{ slot: 'digits', value: 'all' }]),
+                step(`Write ${rel(A, '=', B)}.`, [answer])];
+        }
+        return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
+            // (critic r2: "7 >" / "5." broke over two lines - the sign is held to its digits with no-break spaces; ws-pv-compare-pages WRAP-SIGN)
+            step(`The ${d.place} digits differ: ${d.da}\u00a0${d.da > d.db ? '>' : '<'}\u00a0${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            step(`Write ${rel(A, q.ans, B)}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
         if (p.a === undefined) return null;
-        const flip = q.ans === '>' ? '<' : q.ans === '<' ? '>' : '<';
-        const lastDigits = (String(p.a).slice(-1) > String(p.b).slice(-1)) ? '>' : (String(p.a).slice(-1) < String(p.b).slice(-1) ? '<' : '=');
-        const sa = String(p.a), sb = String(p.b);
-        const firstDigits = sa.length !== sb.length ? (sa[0] > sb[0] ? '>' : sa[0] < sb[0] ? '<' : null) : null;
-        // A named place error first (critic round 3: every shown mistake was the reversed sign);
-        // the reversed sign only when no place error gives a wrong sign.
-        const place = [
-            firstDigits ? { value: firstDigits, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
-            { value: lastDigits, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' },
+        const m6 = compareM6(p.a, p.b);
+        // (critic r1 F3: the thinking pages show the card's M6 - "89 > 312 because 8 > 3" - and nothing else. Different lengths:
+        // the first-digit form whenever it gives a wrong sign, else the last digits; same length: the last digits. An item M6
+        // gets RIGHT - "=", or a pair the last place decides (775 / 778) - has no named error and returns none, so a slot that
+        // must show an error skips it: Error analysis (PT-ERR-1) and a True or False? False slot (falseNeedsWrong above); on a
+        // True slot it prints true. The reversed sign (M-C1) the r1
+        // pages showed instead - 509 < 508, 418 < 418 - was not the card's error.)
+        const named = [
+            m6.first && m6.first !== '=' ? { value: m6.first, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,
+            m6.last !== '=' ? { value: m6.last, misconception: 'M-C2', explain: 'Compared the ones digits, not the biggest place.' } : null,
         ].filter((c) => c && c.value !== String(q.ans));
-        return choose(q, place.length ? place : [{ value: flip, misconception: 'M-C1', explain: 'Wrote the sign the wrong way round.' }]);
+        return named.length ? choose(q, named.slice(0, 1)) : null;
     },
 });
 
@@ -1279,15 +1341,15 @@ registerSkill('composing:number_word_form', {
             if (!h) return clampSteps([step(n >= 10 ? `"${p.words}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.` : `"${p.words}": ${o} one${o === 1 ? '' : 's'}.`, n >= 10 ? [{ slot: 'pv-0', value: String(t) }, { slot: 'pv-1', value: String(o) }] : [{ slot: 'pv-0', value: String(o) }])]);
             const rest = String(p.words).split(' hundred')[1] ? String(p.words).split(' hundred')[1].trim() : '';
             const two = !r ? 'No tens or ones words: write 0 tens, 0 ones.'
-                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} ones.`
-                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} ones.`;
+                : r < 10 ? `"${rest}": no tens word, so 0 tens, ${o} one${o === 1 ? '' : 's'}.`
+                    : `"${rest}": ${t} ten${t === 1 ? '' : 's'}, ${o} one${o === 1 ? '' : 's'}.`;
             return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the H box.`, [{ slot: 'pv-0', value: String(h) }]),
                 step(two, [{ slot: 'pv-1', value: String(t) }, { slot: 'pv-2', value: String(o) }])]);
         }
         // (critic nwf r1 N3: a name under 100 has no hundreds word - "thirty-five hundred: 0 in the hundreds" was false)
         if (!h) return clampSteps([step(`"${p.words}": ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'}, ${r % 10} one${r % 10 === 1 ? '' : 's'}.`),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
-        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} tens ${r % 10} ones.` : 'No tens or ones words: 0 tens 0 ones.'),
+        return clampSteps([step(`"${String(p.words).split(' hundred')[0]} hundred": ${h} in the hundreds.`), step(r ? `The rest is ${r}: ${Math.floor(r / 10)} ten${Math.floor(r / 10) === 1 ? '' : 's'} ${r % 10} one${r % 10 === 1 ? '' : 's'}.` : 'No tens or ones words: 0 tens 0 ones.'),
             step(`Write ${f(n)}.`, [{ slot: 'answer', value: String(n) }])]);
     },
     wrongAnswer: (q) => {
