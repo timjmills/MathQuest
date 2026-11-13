@@ -997,7 +997,33 @@ export function groupByHeight(items, cols) {
     // guided-r1, L10: a fine sort by height put a count page's answers in falling order,
     // 20, 16, 19, 18, 15 ... 3, 5, 2). A class spans a 1.35 x height ratio.
     const cls = (h) => Math.floor(Math.log(h / lo) / Math.log(1.35) + 1e-9);
-    return items.map((it, i) => ({ it, i, b: -cls(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.it);
+    const tallFirst = items.map((it, i) => ({ it, i, b: -cls(hs[i]) })).sort((a, b) => a.b - b.b || a.i - b.i).map((x) => x.i);
+    // (lf-ops-props r4b, lead ruling 2026-11-12 (a) on top of (b): a section of `noStretch` templates - answered in place,
+    // a row at most NO_STRETCH_ROOM x its shortest - takes the row order whose bands are lowest: the tallest-first classes
+    // above, the deal order, or height classes (a class spans NO_STRETCH_ROOM) SHORT to tall, i.e. easy to hard, each class
+    // in its dealt order. The deal decides which items appear; this decides only where. Nothing is dropped or re-dealt;
+    // a boundary row (an odd class count) stays mixed. An order is taken only when it is strictly better.)
+    if (items.every((it) => it && it.footprint && it.footprint.noStretch) && cols >= 2) {
+        const srt = hs.map((h, i) => [h, i]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+        const gc = []; let c = -1, base = 0;
+        for (const [h, i] of srt) { if (c < 0 || h > base * NO_STRETCH_ROOM) { c++; base = h; } gc[i] = c; }
+        const grouped = hs.map((_, i) => i).sort((a, b) => gc[a] - gc[b] || a - b);
+        const deal = hs.map((_, i) => i);
+        const score = (ord) => {
+            let n30 = 0, n20 = 0, worst = 0;
+            for (let r = 0; r < ord.length; r += cols) {
+                const row = ord.slice(r, r + cols).map((i) => hs[i]);
+                const H = Math.max(Math.max(...row), NO_STRETCH_ROOM * Math.min(...row));
+                for (const h of row) { const b = 1 - h / H; if (b >= 0.3) n30++; if (b > 0.2005) n20++; worst = Math.max(worst, b); }
+            }
+            return [n30, Math.round(worst * 1000), n20];
+        };
+        const less = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+        let best = tallFirst, bs = score(tallFirst);
+        for (const ord of [deal, grouped]) { const sc = score(ord); if (less(sc, bs) < 0) { best = ord; bs = sc; } }
+        return best.map((i) => items[i]);
+    }
+    return tallFirst.map((i) => items[i]);
 }
 
 /** A legacy cell's row height: its own measurement when it has one (never past cellH), else cellH. */

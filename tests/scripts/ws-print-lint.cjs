@@ -48,7 +48,7 @@
 //   --no-combined             legacy: skip the combined multi-section sheet (see below)
 //   --key-place end|after-page  kit: where the key prints (Wave 4.4; default end = today)
 //   --key-style copy|short    kit: the facsimile key (default) or the short answers-only key
-//   --lints L-INK,L-KEY       only report these lints (the others still run)
+//   --lints L-INK,L-KEY       only report these lints (the others still run); an entry may name a rule instead (ROW-STRETCH)
 //   --rules H13-ABS,GRID-EVEN-ALL   OPT-IN rules (lf-placevalue critic r1, lead ruling D1 2026-11-07; default OFF, so every
 //                             pinned baseline and deploy gate reads as before). See "OPT-IN RULES" below.
 //   --rule-skills cat:skill,...   judge the --rules only on documents of these skills (ws-precritic passes the lane's
@@ -149,6 +149,9 @@
 //              and fact pages - sub_50 / sub_2d_1d L 27 % raw, add_facts L 30 % - pass while the pv bands of 34-55 % fail).
 //              H13 / H13-ROW judge a top cell only against its row; this judges it absolutely. Sibling rule: H13-ANY (an
 //              empty band ANYWHERE in a cell, e.g. between a picture and its slots) lives in tests/scripts/ws-cell-checks.cjs (lf-ops).
+//   ROW-STRETCH (lf-ops-props r4, lead ruling 2026-11-12 (b)) a row of `noStretch` templates (arrays, arrays-turn,
+//              count-row: answered in place, top-started) is at most 1.25 x its tallest item's height (1.42 on a pageCap
+//              page, grid class mq-pagecap, PT-GDP), and its shortest item's band is at most 20 % of the row (H13).
 //   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
 //              section (consecutive .ws-grid siblings with no instruction, strip or other text between them, on one
 //              pupil page) has one width within 0.2 mm - a full-width cell included (GRID-EVEN exempts it): combine L
@@ -192,7 +195,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -534,6 +537,8 @@ const PACK_NOT_SHEETS = ['12-screen-and-dialog'];
 // =============================================================================================
 function wsLintPage(cfg) {
     const PX = 96 / 25.4;
+    // ROW-STRETCH: the templates whose footprint says `noStretch` (ops-counters.js arrays, arrays-turn.js, count-row.js)
+    const NO_STRETCH_T = ['arrays', 'arrays-turn', 'count-row'];
     const mm = px => Math.round((px / PX) * 10) / 10;
     const findings = [];
     const isLegacy = cfg.mode === 'legacy';
@@ -955,6 +960,7 @@ function wsLintPage(cfg) {
 
     /* ------------------------------------------------------------------ L-OVERFLOW */
     const TOL = 0.75; // px (0.2 mm), the same tolerance design/mockups/build.cjs uses
+    const stretchCells = [];   // ROW-STRETCH (opt-in): every kit cell of every page (judged after the H13 loop)
     for (const ri of rootInfo) {
         for (const c of ri.cells) {
             const cr = c.getBoundingClientRect();
@@ -1002,6 +1008,12 @@ function wsLintPage(cfg) {
                    a regroup stack, a division bracket) is centred down the cell within 2 mm. Cells whose
                    visual is the workspace (CL-4) and legacy pictures are not judged. */
                 const tmpl = c.getAttribute('data-ws-cell') || '';
+                // ROW-STRETCH (opt-in): every kit cell of a pupil page, its row (top + height) and the height it needs (the
+                // content's bottom less the cell's top, plus the bottom pad and border), judged per row after the loop
+                if (optOn('ROW-STRETCH') && c.hasAttribute('data-ws-cell')) {
+                    const bb = parseFloat(cs.paddingBottom) + (parseFloat(cs.borderBottomWidth) || 0);
+                    stretchCells.push({ c, ri, n: ri.cells.indexOf(c), top: cr.top, H, need: Math.min(H, box.b - cr.top + bb), ns: NO_STRETCH_T.includes(tmpl), pc: !!c.closest('.mq-pagecap') });
+                }
                 const wa = c.hasAttribute('data-ws-writeabove') || !!c.querySelector('[data-ws-writeabove], .ws-stack-legacy i[data-ws-seg]');
                 const workspace = ['clock', 'frac-model', 'nl-place', 'number-line', 'hop-line', 'chartwindow', 'mult-chart', 'tenframe'].includes(tmpl) || (c.hasAttribute('data-ws-legacy') && !!c.querySelector('svg'));
                 const judged = (cfg.mode === 'pack' ? !!tmpl : c.hasAttribute('data-ws-cell')) && !workspace && !c.closest('[data-ws-topstart="off"]');
@@ -1339,6 +1351,38 @@ function wsLintPage(cfg) {
                 if (!r.width) continue;
                 if (r.right > w + TOL || r.left < -TOL) { F('L-OVERFLOW', 'PG-13', 'major', d, `extends ${mm(Math.max(r.right - w, -r.left))} mm past the ${mm(w)} mm printable width (PG-1, PG-13)`, 'off the paper'); break; }
             }
+        }
+    }
+    /* ROW-STRETCH (OPT-IN, --rules ROW-STRETCH; lf-ops-props r4 probe, lead ruling 2026-11-12 (b)): a row of templates
+       answered in place - footprint `noStretch`: arrays, arrays-turn, count-row; top-started, no writing room under
+       them - is at most NO_STRETCH_ROOM (1.25) x the tallest content it holds, PT-GDP's GDP_ROW_ROOM (1.42) on a page
+       whose shape is its count (`pageCap`, grid class mq-pagecap); and its shortest cell's band (row less what that
+       cell needs) is at most 20 % of the row (RUBRIC H13's 20 % for a cell with no writing room; 1 mm of tolerance: the layout
+       sizes rows from the measured cell, which reads up to ~0.7 mm over the drawn ink). A row is the cells
+       of one pupil page with the same top and height (1 px); a row holding any other template is not judged. What a
+       cell needs is its own content or, when larger, its facsimile key cell's (the same plan: the k-th key page,
+       the same cell index), as the layout measures both states. */
+    if (stretchCells.length) {
+        const pupilRoots = rootInfo.filter(r => !r.key), keyRoots = rootInfo.filter(r => r.key);
+        const keyOf = (a) => {
+            const kr = keyRoots[pupilRoots.indexOf(a.ri)];
+            if (!kr || kr.cells.length !== a.ri.cells.length) return null;
+            return stretchCells.find(b => b.ri === kr && b.n === a.n) || null;
+        };
+        const pc = stretchCells.filter(a => !a.ri.key).map(a => { const k = keyOf(a); return Object.assign({}, a, { need: Math.max(a.need, k && Math.abs(k.H - a.H) <= PX ? k.need : 0) }); });
+        const seen = new Set();
+        for (const a of pc) {
+            if (seen.has(a)) continue;
+            const row = pc.filter(b => b.ri === a.ri && Math.abs(b.top - a.top) <= PX && Math.abs(b.H - a.H) <= PX);
+            row.forEach(b => seen.add(b));
+            if (!row.every(b => b.ns)) continue;
+            const tall = row.reduce((x, b) => (b.need > x.need ? b : x), row[0]);
+            const short = row.reduce((x, b) => (b.need < x.need ? b : x), row[0]);
+            const lim = row.some(b => b.pc) ? 1.42 : 1.25;
+            const k = a.H / Math.max(1, tall.need);
+            if (k > lim + 0.03) F('L-DENSITY', 'ROW-STRETCH', 'major', tall.c, `row ${mm(a.H)} mm is ${k.toFixed(2)} x the tallest item it holds (${mm(tall.need)} mm): a row of items answered in place (noStretch) is at most ${lim} x its content (lead ruling 2026-11-12 (b)${lim > 1.25 ? ', PT-GDP' : ''}; ROW-STRETCH)`, 'noStretch row stretched');
+            const band = (a.H - short.need) / a.H;
+            if (a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-STRETCH', 'major', short.c, `the shortest item of its row needs ${mm(short.need)} mm of a ${mm(a.H)} mm row: a ${Math.round(band * 100)} % band under it (limit 20 % for a cell answered in place, RUBRIC H13; ROW-STRETCH)`, 'noStretch row band over 20 %');
         }
     }
     for (const el of textEls) {
@@ -2799,7 +2843,7 @@ const sortFindings = fs2 => fs2.sort((a, b) => LINTS.indexOf(a.lint) - LINTS.ind
 
 function report(results, source) {
     const only = (arg('lints', '') || '').split(',').map(s => s.trim()).filter(Boolean);
-    const keep = f => !only.length || only.includes(f.lint);
+    const keep = f => !only.length || only.includes(f.lint) || only.includes(f.rule);
     const idW = Math.max(28, ...results.map(r => r.info.id.length)) + 2;
     const cols = LINTS.map(l => l.replace('L-', ''));
     console.log('\n' + 'document'.padEnd(idW) + 'pages '.padStart(8) + cols.map(c => c.padStart(Math.max(5, c.length + 1))).join('') + '  result');
@@ -3410,7 +3454,7 @@ if (require.main === module) (async () => {
             const id = arg('doc-id', path.basename(file).replace(/\.html$/, ''));
             const r = await lintDocument(page, { id, mode: 'kit' });
             const only = (arg('lints', '') || '').split(',').map(x => x.trim()).filter(Boolean);
-            const kept = r.findings.filter(f => !only.length || only.includes(f.lint));
+            const kept = r.findings.filter(f => !only.length || only.includes(f.lint) || only.includes(f.rule));
             groupFindings(kept).forEach(g => console.log(`  [${g.lint} ${g.rule} ${g.sev}] x${g.n || 1} ${g.msg}`));
             const rel = path.relative(process.cwd(), file);
             if (kept.length) { console.error(`${TOOL}: FAIL - ${kept.length} finding(s) in ${rel}${optRules().length ? ` (rules ${optRules().join(',')})` : ''}`); process.exitCode = 1; }

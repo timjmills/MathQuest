@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows,
+    tightRows, NO_STRETCH_ROOM, GDP_ROW_ROOM,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -676,20 +676,51 @@ export const SPREAD_CAP = 1.7;
  */
 export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
     if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.9 * availMm) return null;
-    const w = [], mins = [];
+    const w = [], mins = [], cap = [];
     for (let r = 0; r < rows; r++) {
-        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols)).filter((h) => h > 0);
+        const row = items.slice(r * cols, (r + 1) * cols);
+        const hs = row.map((it) => measuredH(it, cols)).filter((h) => h > 0);
         w.push(hs.length ? Math.max(...hs) : hMin || baseMm / rows);
         mins.push(hs.length ? Math.min(...hs) : w[r]);
+        // (lf-ops-props r4b, lead ruling 2026-11-12 (b): a row of templates answered in place - footprint `noStretch`:
+        // arrays, arrays-turn, count-row, top-started with no writing room - is held to NO_STRETCH_ROOM x its shortest
+        // problem, as layout.js rowShape holds it; the spread checked only the SECTION's noStretch, so a lone page's rows
+        // were stretched to 1.45 x their content, a foot band of a third of the cell. ws-print-lint ROW-STRETCH)
+        cap.push(row.length && row.every((it) => it && it.footprint && it.footprint.noStretch) ? NO_STRETCH_ROOM : SPREAD_CAP);
     }
     const S = w.reduce((a, b) => a + b, 0);
     if (!(S > 0)) return null;
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
     const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r]))));
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, cap[r] * mins[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
+    return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
+}
+
+/**
+ * A capFill grid (a lesson's Practice sheet, `pageCap`: its rows share the whole grid, E9b): the chunk's rows scaled to
+ * `heightMm`. A row of `noStretch` templates (lf-ops-props r4b, lead ruling 2026-11-12 (b)) grows to PT-GDP's
+ * GDP_ROW_ROOM x its shortest problem at most, never below its tallest; the spare height stays under the grid.
+ */
+export function capFillShape(items, cols, chunk, heightMm) {
+    const tpl = String(chunk.rowsTpl || '');
+    const rows = chunk.rows || Math.ceil(items.length / cols);
+    const plain = { heightMm, rowsTpl: tpl };
+    if (!items.length || !items.every((it) => it && it.footprint && it.footprint.noStretch)) return plain;
+    const w = [], mins = [];
+    for (let r = 0; r < rows; r++) {
+        const hs = items.slice(r * cols, (r + 1) * cols).map((it) => measuredH(it, cols));
+        if (!hs.length || hs.some((h) => !(h > 0))) return plain;
+        w.push(Math.max(...hs)); mins.push(Math.min(...hs));
+    }
+    const fr = tpl ? tpl.split(/\s+/).map((x) => parseFloat(x)) : w.map(() => 1);
+    const frS = fr.length === rows && fr.every((x) => x > 0) ? fr : w;
+    const sum = frS.reduce((a, b) => a + b, 0);
+    const H = evenRows(w, frS.map((f, r) => Math.max(w[r], Math.min(heightMm * f / sum, GDP_ROW_ROOM * mins[r]))));
+    const total = H.reduce((a, b) => a + b, 0);
+    if (total >= heightMm - 0.5) return plain;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
 }
 
@@ -1161,7 +1192,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // critic r8 D8-2 - fills its page by size: its rows keep their proportions, scaled to the grid)
             // (`capFillCont`, lesson 3a P1d - E12: every page of the sheet, the continuation page too, takes the first page's grid height)
             const capFill = noCapSec && Number(sec.pageCap) > 0 && lone && (sec.capFillCont || (!pg.cont && part.chunk.gridMm && part.chunk.rowsTpl));
-            const shape0 = capFill ? { heightMm: Math.max(Number(part.chunk.gridMm) || 0, L.gridH - 1), rowsTpl: part.chunk.rowsTpl || '' }
+            const shape0 = capFill ? capFillShape(its, L.cols, part.chunk, Math.max(Number(part.chunk.gridMm) || 0, L.gridH - 1))
                 : part.chunk.gridMm ? { heightMm: part.chunk.gridMm, rowsTpl: part.chunk.rowsTpl || '' }
                 : its.some((it) => it.anchor) || noCapSec ? null : rowShape(its, L.cols, part.chunk.rows, pcH, L.fillRefH);
             // a split part's uniform rows take what the part holds, never the section's tallest cell
@@ -1203,7 +1234,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 start,
                 // (mq-spread: the lane marks a practice grid whose rows share the page; CL-4b still starts each cell at its top,
                 // the lane's "centre every cell" CSS was not taken in the 2026-10-30 port)
-                cls: spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread',
+                // (mq-pagecap: a page whose shape is its count - PT-GDP's 1.42 x row room; ws-print-lint ROW-STRETCH reads it)
+                cls: (spread ? 'fixed mq-spread' : fillByFlex && !shape ? 'mq-spread' : 'fixed mq-spread') + (Number(sec.pageCap) > 0 ? ' mq-pagecap' : ''),
                 height: spread ? `${spread.heightMm}mm` : gap.gap ? `${gap.heightMm}mm` : shape ? `${shape.heightMm}mm` : fillByFlex ? '' : `${Math.round(part.chunk.rows * L.cellH * 1000) / 1000}mm`,
                 // SIDE BY SIDE in one column: each pair's twin row and problem row as tall as each
                 // needs (anchors.js sideFit), so a tall twin never runs out of its row.

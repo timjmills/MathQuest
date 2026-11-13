@@ -1060,7 +1060,9 @@ export function plan(input = {}) {
         // PT-GDP's 1.42 x content; the spare height stays under the grid. D-MP-1 / D-AG-1 / D-CB-4)
         const noSt = host.length > 0 && host.every((it) => it && it.footprint && it.footprint.noStretch);
         const Hr0 = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
-        const Hr = noSt ? Hr0.map((h, r) => Math.min(h, w[r] * NO_STRETCH_ROOM)) : Hr0;
+        // (r4b: held to NO_STRETCH_ROOM x the row's SHORTEST problem, as layout.js rowShape, never below its tallest: 1.25 x the
+        // tallest left a 2-row array 28 % empty beside a 3-row one, ws-print-lint ROW-STRETCH)
+        const Hr = noSt ? Hr0.map((h, r) => Math.max(w[r], Math.min(h, mins[r] * NO_STRETCH_ROOM))) : Hr0;
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

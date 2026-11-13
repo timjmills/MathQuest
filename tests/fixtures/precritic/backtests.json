@@ -3760,6 +3760,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pl-row-stretch-mp-s",
+   "check": "A row of items answered in place (footprint noStretch: arrays, arrays-turn, count-row) is at most 1.25 x its content (1.42 on a pageCap page) and its shortest item's band at most 20 % (lead ruling 2026-11-12 (b); lf-ops-props r4 probe: practice.js spreadRows stretched a lone page's rows to 1.28-1.45 x, ignoring the footprint's noStretch)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint --rules ROW-STRETCH (more-practice)",
+   "browser": true,
+   "fail": {
+    "commit": "8f0e93e2a",
+    "state": "lf-ops-props r3b tree: the practice SPREAD ignores the footprint's noStretch (mult_properties more-practice S, 6 cells over 20 %)"
+   },
+   "pass": {
+    "commit": "TBD-props-r4b",
+    "state": "lf-ops-props r4b: spreadRows, guided and the lesson capFill hold noStretch rows to ruling (b)"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice --size S --rules ROW-STRETCH --lints ROW-STRETCH --skills multiplication:mult_properties",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

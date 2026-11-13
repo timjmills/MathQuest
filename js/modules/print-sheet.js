@@ -3960,7 +3960,7 @@ async function buildSheetDeal(req = {}) {
         fits,
         items: hostItems.map((it) => ({
             skill: it.skill, section: it.section, letter: it.letter, template: it.template,
-            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
+            text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q), ...(it.footprint && it.footprint.noStretch ? { noStretch: true } : {}),
         })),
         gaps: out.gaps,
         numberLine,
@@ -6511,6 +6511,7 @@ async function buildSheetFill0(req = {}) {
             // A single-skill page never prints the same problem twice (round 4 D-B: add_sub_10s S
             // dealt 22 from a pool of 20 facts): the fill stops at the skill's distinct problems.
             const dup = (x) => { const m = new Set(); return (x.items || []).some((it) => { const k = it.sig || it.text; if (m.has(k)) return true; m.add(k); return false; }); };
+            const noStretchPage = (x) => (x.items || []).length > 0 && x.items.every((it) => it && it.noStretch);
             const tried = [r];
             for (let k = 0; k < 4 && best.items.length < 40 && best.items.length + 1 <= ceil() * wanted; k++) {
                 const more = await buildSheetOnce(Object.assign({}, req, { sections: [Object.assign({}, s, { count: best.items.length + 1 })] }));
@@ -6538,7 +6539,11 @@ async function buildSheetFill0(req = {}) {
                     let pick = pick0, pickFill = pick ? fillOf(pick) : 0;
                     // (a bare div_facts page never re-lays in fewer, wider columns: its narrow facts would leave a 30 % band
                     // beside them, ws-empty-band EB-SIDE - it keeps its columns and its unstretched rows)
-                    const cMin = divFactsPlainSection(s) ? c0 : 1;
+                    // (nor does a page of `noStretch` templates - arrays, arrays-turn, count-row, answered in place: lead ruling
+                    // 2026-11-12 (b) keeps its rows to what they hold and the spare height under the grid, so its fill is not
+                    // short; lf-ops-props r4b: arrays_groups independent L fell from 4 problems in 2 columns to 3 in 1, a 31 %
+                    // band beside each array)
+                    const cMin = divFactsPlainSection(s) || noStretchPage(best) ? c0 : 1;
                     for (let c = c0; c >= cMin; c--) {
                         for (let n = best.items.length + c; n >= Math.max(c, best.items.length - 2 * c); n--) {
                             if (n % c || n > ceil() * wanted) continue;
