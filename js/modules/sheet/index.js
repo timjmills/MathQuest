@@ -36,7 +36,7 @@ export {
 
 /* --------------------------------------------------------------------------- frame */
 export {
-    headerFields, strandTab, pageTitle, pageFooter, page, doc,
+    headerFields, strandTab, pageTitle, pageHeader, TITLE_POSITIONS, pageFooter, page, doc,
     instruction, BAND_LABELS, band, sayBand, steps, story, sideStrip, withStrip,
 } from './frame.js';
 

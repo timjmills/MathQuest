@@ -32,7 +32,7 @@
 // loads the deferred half on the first press). Styles: css/simple-print.css (.sp-*), self-contained tokens, so it
 // looks the same on the student page and the teacher site.
 
-import { buildSheet as buildSheetRaw, sheetDocument } from './print-sheet.js';
+import { buildSheet as buildSheetRaw, sheetDocument, fitTitle } from './print-sheet.js';
 import * as printSheetNS from './print-sheet.js';
 // every request this dialog sends, last few kept for the gate (ws-simple-print reads lastSimpleRequests)
 const REQS = [];
@@ -225,7 +225,7 @@ export function reachOf(s) {
 function baseReq(o) {
     return {
         size: o.size, look: 'auto', paper: o.paper || 'A4', seed: o.seed >>> 0,
-        header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}),
+        header: Object.assign({ name: true, date: true, score: false, title: o.title || true }, o.footer ? { footerLeft: o.footer } : {}, titleHeaderOf(o)),
         key: o.key ? { on: true, placement: 'end', style: 'copy' } : { on: false },
         ...(o.arrange === 'mixed' ? { mixLayout: MIX_LAYOUTS[o.mixLayout] ? o.mixLayout : 'rows' } : {}),
     };
@@ -1090,7 +1090,22 @@ function cleanPrint(p) {
     if (typeof p.key === 'boolean') o.key = p.key;
     if (p.arrange === 'mixed' || p.arrange === 'sections') o.arrange = p.arrange;
     if (MIX_LAYOUTS[p.mixLayout]) o.mixLayout = p.mixLayout;
+    // the page title (owner request 2026-11-13): appended to the code only when set, so every earlier code is unchanged
+    const pt = typeof p.pageTitle === 'string' ? p.pageTitle.replace(/\s+/g, ' ').trim().slice(0, PAGE_TITLE_MAX) : '';
+    if (pt) o.pageTitle = pt;
+    if (p.titlePos === 'above') o.titlePos = 'above';
     return o;
+}
+/** The page-title option of a print setup (a quick print's `print`, or the dialog's opts) as the buildSheet header fields:
+ *  `titleText` (the teacher's words; buildSheet fits them to two lines) and `titlePos` 'above'. {} at the defaults, so a
+ *  request without them is exactly the request before the option existed. */
+export const PAGE_TITLE_MAX = 160;
+export function titleHeaderOf(p) {
+    const out = {};
+    const pt = p && typeof p.pageTitle === 'string' ? p.pageTitle.replace(/\s+/g, ' ').trim() : '';
+    if (pt) out.titleText = pt.slice(0, PAGE_TITLE_MAX);
+    if (p && p.titlePos === 'above') out.titlePos = 'above';
+    return out;
 }
 function cleanSkills(list) {
     return (Array.isArray(list) ? list : []).filter((x) => x && typeof x.categoryId === 'string' && typeof x.skillId === 'string')
@@ -1142,11 +1157,12 @@ export function openQuickPrint(id, ctx = {}) {
     if (!rec) return;
     const pr = cleanPrint(rec.print);
     Object.assign(P, { how: pr.how, sets: pr.sets, size: pr.size, cols: pr.cols, colsMode: pr.colsMode, key: pr.key, arrange: pr.arrange, mixLayout: pr.mixLayout || 'rows' });
+    const title = { pageTitle: pr.pageTitle || '', titlePos: pr.titlePos === 'above' ? 'above' : 'below' };
     if (pr.how === 'pages') P.nPages = pr.n; else P.nProblems = pr.n;
     savePrefs();
     const keep = S && S.ctx ? S.ctx : {};
     openSimplePrint(rec.skills.map((x) => ({ categoryId: x.categoryId, skillId: x.skillId, opts: x.opts })), Object.assign({ from: 'quick' }, keep, ctx, { quick: rec.id }));
-    if (S) { rec.skills.forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; }); render(); schedule(0); }
+    if (S) { Object.assign(S, title); rec.skills.forEach((x, i) => { if (S.list[i]) S.list[i].amt = x.amt || ''; }); render(); schedule(0); }
 }
 const isTeacher = () => typeof document !== 'undefined' && document.body && document.body.classList.contains('teacher-mode');
 let qpMenu = null, qpRename = null;
@@ -1253,7 +1269,8 @@ const hasFacts = () => !!(S && S.list.some(isFactSkill));
 function opts() {
     // 7–10 across only with fast facts in the set (owner item 4): without them an asked 7+ is read as 6
     const cols = P.cols !== 'auto' && Number(P.cols) > CELL_MAX_COLS && !hasFacts() ? CELL_MAX_COLS : P.cols;
-    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout || 'rows', seed: S.seed, title: S.ctx.title || true, paper: 'A4' };
+    return { how: P.how, n: P.how === 'pages' ? P.nPages : P.nProblems, sets: P.sets, size: P.size, cols, colsMode: P.colsMode, key: P.key, arrange: P.arrange, mixLayout: P.mixLayout || 'rows', seed: S.seed, title: S.ctx.title || true, paper: 'A4',
+        ...(S.pageTitle && S.pageTitle.trim() ? { pageTitle: S.pageTitle.trim() } : {}), ...(S.titlePos === 'above' ? { titlePos: 'above' } : {}) };
 }
 
 function mount() {
@@ -1398,6 +1415,12 @@ function render() {
     if (many) h += `<div class="sp-row"><span class="sp-lbl">Arrange</span><div class="sp-seg" role="radiogroup" aria-label="Arrange">${[['sections', 'In sections'], ['mixed', 'Mixed up']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="arrange" data-v="${v}" aria-checked="${P.arrange === v}">${l}</button>`).join('')}</div></div>`;
     const mixIds = engineMixLayouts();
     if (many && P.arrange === 'mixed' && mixIds.length > 1) { const ml = mixIds.includes(P.mixLayout) ? P.mixLayout : mixIds[0]; h += `<div class="sp-row sp-mixl"><span class="sp-lbl">Layout</span><div class="sp-seg" role="radiogroup" aria-label="Mixed up layout">${Object.entries(MIX_LAYOUTS).filter(([v]) => mixIds.includes(v)).map(([v, [l]]) => `<button type="button" role="radio" class="sp-segb" data-sp="mixlayout" data-v="${v}" aria-checked="${ml === v}">${l}</button>`).join('')}</div><span class="sp-hint">${MIX_LAYOUTS[ml][1]}</span></div>`; }
+    // the page title (owner request 2026-11-13): the teacher's own words in place of the skill's title, above or below the
+    // Name / Date line; never smaller (a long title takes two lines; past two it is cut, and this says so)
+    const fitNow = S.pageTitle && S.pageTitle.trim() ? (() => { try { return fitTitle(S.pageTitle, P.size); } catch (e) { return null; } })() : null;
+    h += `<div class="sp-row sp-ptitle"><label class="sp-lbl" for="spPageTitle">Page title</label><input id="spPageTitle" class="sp-ptitle-in" type="text" maxlength="${PAGE_TITLE_MAX}" autocomplete="off" value="${esc(S.pageTitle || '')}" placeholder="The skill's own title" aria-describedby="spPageTitleCap"></div>`;
+    h += `<p class="sp-hint sp-ptitle-cap${fitNow && fitNow.truncated ? ' is-warn' : ''}" id="spPageTitleCap"${fitNow && fitNow.truncated ? ' data-sp-warn="title-cut"' : ''}>${fitNow && fitNow.truncated ? `Too long for two lines: the page prints “${esc(fitNow.text)}”. Shorten it to print all of it.` : fitNow && fitNow.lines > 1 ? 'This title takes two lines on the page.' : 'Prints on every page and key, at full size.'}</p>`;
+    h += `<div class="sp-row"><span class="sp-lbl">Title place</span><div class="sp-seg" role="radiogroup" aria-label="Title place">${[['below', 'Below name'], ['above', 'Above name']].map(([v, l]) => `<button type="button" role="radio" class="sp-segb" data-sp="titlepos" data-v="${v}" aria-checked="${(S.titlePos === 'above' ? 'above' : 'below') === v}">${l}</button>`).join('')}</div></div>`;
     h += `<button type="button" class="sp-link" data-sp="newnums">New numbers</button>`;
     if (typeof S.ctx.more === 'function') h += `<button type="button" class="sp-link" data-sp="full">All print options (page types, examples, key style, sets)…</button>`;
     h += `</div></details>`;
@@ -1554,6 +1577,7 @@ function onClick(e) {
     }
     if (quickAct(act, v, render)) return;
     if (act === 'newnums') { S.seed = 100000 + Math.floor(Math.random() * 900000); schedule(0); return; }
+    if (act === 'titlepos') { S.titlePos = v === 'above' ? 'above' : 'below'; render(); schedule(0); return; }
     if (act === 'full') { const more = S.ctx.more; closeSimplePrint(); more(); return; }
     if (act === 'larger') { openLarge(); return; }
     if (act === 'smaller') { closeLarge(); return; }
@@ -1572,6 +1596,7 @@ function onInput(e) {
         schedule(450);
         return;
     }
+    if (t.id === 'spPageTitle') { S.pageTitle = t.value; schedule(450); return; }
     if (t.id === 'spSets') {
         const x = Math.round(Number(t.value));
         if (!(x >= 1)) return;

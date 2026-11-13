@@ -38,7 +38,7 @@ const RECS = [
             const sp = await import('./js/modules/simple-print.js');
             const out = { fails: [] };
             const f = (s) => out.fails.push(s);
-            const titleOf = (p) => ({ text: (p && typeof p.title === 'string') ? p.title : '', pos: (p && p.titlePos === 'above') ? 'above' : 'below' });
+            const titleOf = (p) => ({ text: (p && typeof p.pageTitle === 'string') ? p.pageTitle : '', pos: (p && p.titlePos === 'above') ? 'above' : 'below' });
             if (write) { out.old = RECS.map((rec) => { const code = sp.encodeQuickPrint(rec); return { code, decoded: sp.decodeQuickPrint(code) }; }); return out; }
             // TITLE-CODE-OLD
             for (const o of old) {
@@ -51,7 +51,7 @@ const RECS = [
             // TITLE-CODE-RT
             const cases = [['My own title', 'above'], ['I Can add 10 to a number (a long one that wraps to two lines on the page, still fine)', 'below'], ['Fractions & “quotes” é', 'above']];
             for (const [text, pos] of cases) {
-                const rec = { name: 'T', skills: [{ categoryId: 'addition', skillId: 'add_facts' }], print: Object.assign({}, RECS[0].print, { title: text, titlePos: pos }) };
+                const rec = { name: 'T', skills: [{ categoryId: 'addition', skillId: 'add_facts' }], print: Object.assign({}, RECS[0].print, { pageTitle: text, titlePos: pos }) };
                 const code = sp.encodeQuickPrint(rec);
                 const d = sp.decodeQuickPrint(code);
                 const t = titleOf(d && d.print);

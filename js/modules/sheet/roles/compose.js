@@ -112,6 +112,9 @@ export function frameOf({ skills = [], input = {}, tabId, title, twoLine = false
         score: on('score') && score > 0 ? score : false,
         tab, title: titleText, titleNote: h.titleNote || '', titleLines,
     };
+    // the teacher's page-title option (lf-roles 2026-11-13): placement and "custom words", only when set (frame.js pageHeader)
+    if (titleText && h.titlePos === 'above') header.titlePos = 'above';
+    if (titleText && h.titleCustom) header.titleCustom = true;
     const contTab = tab ? (tab.length > 1 ? [tab.slice(0, -1).join(' · '), tab[tab.length - 1]] : tab.slice()) : false;
     const contHeader = { name: on('name'), date: false, score: false, title: '', tab: contTab };
     // Wave 5.2: the reference number line under the header of every page (the host reserved its

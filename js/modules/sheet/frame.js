@@ -39,8 +39,29 @@ export const strandTab = (lines) => '';
  * The "I Can" title (HD-10, HD-15): plain bold Andika, one line, no banner, no icon.
  * `note` is the optional trailing detail set at weight 400 on the same baseline.
  */
-export const pageTitle = (text, note = '') =>
-    (text ? `<div class="ws-title">${esc(text)}${note ? `<small>${esc(note)}</small>` : ''}</div>` : '');
+export const pageTitle = (text, note = '', { custom = false } = {}) =>
+    (text ? `<div class="ws-title"${custom ? ' data-ws-title="custom"' : ''}>${esc(text)}${note ? `<small>${esc(note)}</small>` : ''}</div>` : '');
+
+/** The two places the title may print (owner request 2026-11-13, PT-DLG-20): under the Name / Date / Score line (the
+ *  default, today's layout) or above it. */
+export const TITLE_POSITIONS = Object.freeze(['below', 'above']);
+
+/**
+ * THE HEADER BAND (lf-roles title hook, 2026-11-13): the Name / Date / Score row, the title and the 2.25 pt rule, as
+ * `page()` draws them. Exported so a page that is not a `page()` sheet (lf-engine: the anchor charts' Name / Date line)
+ * draws the SAME header with the same options.
+ *   h.title        the title text ('' = none); h.titleNote the weight-400 tail
+ *   h.titlePos     'below' (default, byte-identical to the header before the option) | 'above'
+ *   h.titleCustom  the teacher's own words (fitted to two lines by the host, print-sheet.js fitTitle): marked
+ *                  data-ws-title="custom", which wraps by the kit stylesheet and never shrinks
+ *   h.name / date / time / goal / score / tab   as headerFields(); tabMeta = the unprinted data-ws-tab attribute
+ */
+export function pageHeader(h = {}, { cls = '' } = {}) {
+    const fields = headerFields(h);
+    const title = pageTitle(h.title, h.titleNote, { custom: !!h.titleCustom });
+    const above = !!title && h.titlePos === 'above';
+    return `<header class="ws-head${above ? ' ws-head--title-above' : ''}${cls ? ` ${cls}` : ''}">${above ? title : ''}<div class="ws-rowA notab">${fields}</div>${above ? '' : title}<div class="ws-headrule"></div></header>`;
+}
 
 /**
  * The teacher footer (HD-30): the ONLY place grade and CCSS codes appear. Left skill ids,
@@ -68,7 +89,7 @@ export const copyrightLine = (year) => `© ${year || new Date().getFullYear()} $
  * @param {'ican'|'daily'} [o.look]
  * @param {'S'|'M'|'L'} [o.size]
  * @param {number} [o.tab]        the tab step 6 / 5 / 4 from CL-31 (tokens.factTab)
- * @param {Object} [o.header]     {name, date, time, goal, score, tab, title, titleNote}
+ * @param {Object} [o.header]     {name, date, time, goal, score, tab, title, titleNote, titlePos, titleCustom}
  * @param {Object} [o.footer]     {left, center, right}
  * @param {string} o.body
  * @param {string} [o.cls]
@@ -76,14 +97,12 @@ export const copyrightLine = (year) => `© ${year || new Date().getFullYear()} $
  */
 export function page({ look = DEFAULT_LOOK, size = DEFAULT_SIZE, tab = 6, header = {}, footer = {}, body, cls = '', note = '' }) {
     const h = { name: true, date: true, score: false, tab: false, title: '', ...header };
-    const fields = headerFields(h);
     // Owner ruling 2026-10-23: no strand-tab box on any page (the "I Can" title names the skill).
     // The tab lines survive only as unprinted metadata, data-ws-tab, for the lints that read the role.
     const tabMeta = Array.isArray(h.tab) && h.tab.length ? ` data-ws-tab="${esc(h.tab.join('|'))}"` : '';
-    const title = pageTitle(h.title, h.titleNote);
     return `${note ? `<div class="ws-note">${note}</div>` : ''}
 <section class="ws-page ws-${size} ws-${look} ws-tab${tab} ${cls}" data-ws-look="${look}" data-ws-size="${size}"${tabMeta}>
-  <header class="ws-head"><div class="ws-rowA notab">${fields}</div>${title}<div class="ws-headrule"></div></header>${h.refBand ? `
+  ${pageHeader(h)}${h.refBand ? `
   ${h.refBand}` : ''}
   <main class="ws-body">${body}</main>
   ${pageFooter(footer)}

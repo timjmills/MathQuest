@@ -2604,6 +2604,78 @@ function measureTitleLines(text, size) {
     return wMm <= LIVE_W_MM - 0.6 ? 1 : 2;
 }
 
+/**
+ * The teacher's own page title (owner request 2026-11-13, PT-DLG-20), fitted to the header band. The title keeps the size's
+ * title token (HD-14: it never shrinks); it wraps to at most TWO lines at the live width (the layout already takes the
+ * second line's 6 mm off the body, HEADER_PARTS_MM.titleWrap); past two lines it is cut at the last whole word that
+ * still fits with "…", and `truncated` tells the dialog to warn. Measured in Andika 700 with the kit's custom-title rule
+ * (css/sheet-kit.css [data-ws-title="custom"]: line-height 7 mm, overflow-wrap anywhere). The fit is taken at the size the
+ * page prints (at least M, the size a lesson packet prints when S is asked), so every page of the job prints the same words.
+ * @returns {{asked: string, text: string, lines: number, truncated: boolean, size: string}}
+ */
+export const TITLE_MAX_LINES = 2;
+export const TITLE_MAX_CHARS = 200;
+export function fitTitle(asked, size = 'L') {
+    // (a title over TITLE_MAX_CHARS is far past two lines at any size: it is measured from its first TITLE_MAX_CHARS)
+    const text0 = String(asked || '').replace(/\s+/g, ' ').trim().slice(0, TITLE_MAX_CHARS).trim();
+    const sz = size === 'S' ? 'M' : (SIZES[size] ? size : 'L');
+    const res = { asked: text0, text: text0, lines: text0 ? 1 : 0, truncated: false, size: sz };
+    if (!text0 || typeof globalThis.document === 'undefined' || !globalThis.document.body) return res;
+    const document = MDOC && MDOC.body ? MDOC : globalThis.document;
+    const s = SIZES[sz];
+    const box = document.createElement('div');
+    box.style.cssText = `position:absolute;left:-10000px;top:0;visibility:hidden;width:${LIVE_W_MM - 0.6}mm;white-space:normal;overflow-wrap:anywhere;text-align:center;line-height:7mm;font-family:'Andika',sans-serif;font-weight:700;font-size:${s.titlePt}pt;font-feature-settings:"cv04" 1;`;
+    document.body.appendChild(box);
+    const lineMm = 7;
+    const linesOf = (t) => { box.textContent = t; return Math.max(1, Math.round(box.getBoundingClientRect().height / PX_PER_MM / lineMm)); };
+    try {
+        res.lines = linesOf(text0);
+        if (res.lines <= TITLE_MAX_LINES) return res;
+        // the longest run of whole words that fits two lines with the ellipsis
+        const words = text0.split(' ');
+        let lo = 1, hi = words.length - 1, best = 0;
+        while (lo <= hi) {
+            const mid = (lo + hi) >> 1;
+            if (linesOf(`${words.slice(0, mid).join(' ').replace(/[\s,;:.\-–—]+$/, '')}…`) <= TITLE_MAX_LINES) { best = mid; lo = mid + 1; } else hi = mid - 1;
+        }
+        let cut = best ? `${words.slice(0, best).join(' ').replace(/[\s,;:.\-–—]+$/, '')}…` : '';
+        // one word longer than two lines on its own: cut inside it (overflow-wrap anywhere)
+        if (!cut) { let n = words[0].length; while (n > 1 && linesOf(`${words[0].slice(0, n)}…`) > TITLE_MAX_LINES) n--; cut = `${words[0].slice(0, n)}…`; }
+        res.text = cut;
+        res.lines = linesOf(cut);
+        res.truncated = true;
+        return res;
+    } finally { box.remove(); }
+}
+
+/**
+ * The page-title option on a request (`req.header.titleText`, `req.header.titlePos`) turned into the header every role
+ * already reads: `title` (the fitted words), `titleLines` (their measured lines, which the layout reserves), `titleCustom`
+ * and `titlePos`. A request with neither option (or with them at the defaults: no text, 'below') is returned UNCHANGED, so
+ * its pages are byte-identical to the pages before the option existed (ws-frame-title TITLE-IDENT).
+ */
+async function withTitleOption(req) {
+    const h = req && req.header;
+    if (!h || typeof h !== 'object' || (!('titleText' in h) && !('titlePos' in h))) return { req, fit: null };
+    const text = typeof h.titleText === 'string' ? h.titleText.replace(/\s+/g, ' ').trim() : '';
+    const pos = h.titlePos === 'above' ? 'above' : 'below';
+    const header = Object.assign({}, h);
+    delete header.titleText;
+    delete header.titlePos;
+    if (pos === 'above') header.titlePos = 'above';
+    let fit = null;
+    if (text && header.title !== false) {
+        await fontsReady();
+        // (a lesson packet prints its teaching sheet at L whatever size is asked: its title is fitted at L, so every page
+        // of the packet prints the same words)
+        fit = fitTitle(text, req.role === 'lesson' ? 'L' : String(req.size || 'L').toUpperCase());
+        header.title = fit.text;
+        header.titleLines = fit.lines;
+        header.titleCustom = true;
+    }
+    return { req: Object.assign({}, req, { header }), fit };
+}
+
 /* ==================================================================== the one entry point */
 
 async function fontsReady() {
@@ -3248,7 +3320,7 @@ async function buildSheetDeal(req = {}) {
     const titles = [...new Set(skills.map((s) => s.iCan))];
     const title = typeof n.header.title === 'string' && n.header.title.trim() ? n.header.title.trim()
         : titles.length === 1 ? titles[0] : 'Mixed practice';
-    const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : measureTitleLines(title, n.size) });
+    const header = Object.assign({}, n.header, { titleLines: n.header.title === false ? 0 : n.header.titleCustom && n.header.titleLines ? Number(n.header.titleLines) : measureTitleLines(title, n.size) });
     const layoutHeader = { tab: n.header.tab === false ? false : ['Level', 'Strand', 'Id'], title: n.header.title === false ? '' : title, titleLines: header.titleLines };
     const lctx = { paper, header: layoutHeader };
     // Wave 5.2: the number line at the top of the page. Its band is reserved NOW, from a seeded
@@ -4286,7 +4358,8 @@ async function buildRoleSheet(n, metaOf) {
         if (!seenSkill.has(k)) { seenSkill.add(k); allSkills.push(metaOf(sk)); }
     }
     const header = Object.assign({}, n.header);
-    delete header.titleLines;
+    // (a teacher's own title keeps the lines it was fitted to: frameOf reserves them - withTitleOption)
+    if (!header.titleCustom) delete header.titleLines;
     // Wave 5.2: the number line, reserved before any capacity is worked out (see buildSheet).
     // A test / check page carries no hint scaffold unless the teacher allows hints on tests
     // (PEDAGOGY P-SC-5: a teacher option, `req.testHints`); every other role carries it.
@@ -6233,7 +6306,17 @@ export function buildSheet(req = {}) {
         if (!ref) return Promise.reject(new Error(`buildSheet: no lesson "${req.lessonId}" in the library`));
         req = Object.assign({}, req, { lessonId: lessonById(req.lessonId).id, sections: [Object.assign({}, (req.sections || [])[0] || {}, { skills: [ref] })] });
     }
-    const run = buildQueue.then(() => keyedSheet(req, buildSheetCounted));
+    // the teacher's page title (lf-roles 2026-11-13): a request without the option goes through exactly as before
+    const h = req && req.header;
+    const titled = !!(h && typeof h === 'object' && ('titleText' in h || 'titlePos' in h));
+    const run = titled
+        ? buildQueue.then(async () => {
+            const t = await withTitleOption(req);
+            const res = await keyedSheet(t.req, buildSheetCounted);
+            if (res && typeof res === 'object' && t.fit) res.titleFit = t.fit;
+            return res;
+        })
+        : buildQueue.then(() => keyedSheet(req, buildSheetCounted));
     buildQueue = run.catch(() => {});
     return run;
 }

@@ -107,6 +107,8 @@ function initState() {
     const d = printDefaults();
     pr = {
         title: '',
+        // the page title's place (owner request 2026-11-13): 'below' the Name / Date / Score line (today's layout) or 'above'
+        titlePos: 'below',
         sections: [newSection(fromQueue())],
         size: d.size, look: 'auto', paper: d.paper, photocopySafe: d.photocopySafe,
         // S6: step-by-step anchor problems on Independent, More Practice and Mixed practice.
@@ -265,8 +267,9 @@ function shellHTML() {
   <section class="tv-card tv-print-what" aria-labelledby="tvWhatH">
     <h2 class="tv-h2" id="tvWhatH">What to print</h2>
     <div>
-      <label class="tv-label" for="tvSheetTitle">Sheet title</label>
-      <input id="tvSheetTitle" class="tv-input" type="text" placeholder="Taken from the skill when left empty" maxlength="90">
+      <label class="tv-label" for="tvSheetTitle">Page title</label>
+      <input id="tvSheetTitle" class="tv-input" type="text" placeholder="Taken from the skill when left empty" maxlength="160" aria-describedby="tvTitleCap">
+      <p class="tv-cap" id="tvTitleCap" style="margin-top:4px;">Prints at the top of every page and key, at full size. A long title takes two lines.</p>
     </div>
     <div id="tvSections" style="display:flex;flex-direction:column;gap:12px;"></div>
     <div class="tv-row">
@@ -377,6 +380,7 @@ function onClick(e) {
         case 'remove-section': pr.sections.splice(Number(d.sec), 1); if (!pr.sections.length) pr.sections.push(newSection()); renderWhat(); scheduleBuild(); break;
         case 'size': pr.size = d.v; renderSetup(); scheduleBuild(); break;
         case 'look': pr.look = d.v; renderSetup(); scheduleBuild(); break;
+        case 'title-pos': pr.titlePos = d.v === 'above' ? 'above' : 'below'; renderSetup(); scheduleBuild(); break;
         case 'paper': pr.paper = d.v; renderSetup(); scheduleBuild(); break;
         case 'anchors': if (b.getAttribute('aria-disabled') === 'true') break; pr.anchors = d.v; renderSetup(); scheduleBuild(); break;
         case 'header': pr.header[d.v] = !pr.header[d.v]; renderSetup(); scheduleBuild(); break;
@@ -970,6 +974,8 @@ function renderSetup() {
       <p class="tv-cap" id="tvSizeLesson" style="margin-top:6px;">A lesson prints at Medium: at Small its regroup boxes and step words are too small to write in. The other page types print at Small.</p>` : ''}</div>
     <div><span class="tv-label">Look</span>${seg('look', pr.look, [['auto', 'Auto'], ['ican', 'I Can'], ['daily', 'Daily']], 'Look')}
       <p class="tv-cap" style="margin-top:6px;">${pr.look === 'daily' ? 'Daily: a light header for everyday practice.' : 'I Can: the title states the goal. Auto uses each page type\'s own look (Daily on fact rows, fact probes and Mixed practice).'}</p></div>
+    <div><span class="tv-label">Title place</span>${seg('title-pos', pr.titlePos === 'above' ? 'above' : 'below', [['below', 'Below name'], ['above', 'Above name']], 'Title place')}
+      <p class="tv-cap" style="margin-top:6px;">${pr.titlePos === 'above' ? 'The title prints above the Name, Date and Score line.' : 'The title prints under the Name, Date and Score line.'}</p></div>
     <div class="tv-fields-2">
       <div><span class="tv-label">Paper</span>${seg('paper', pr.paper, [['A4', 'A4'], ['Letter', 'Letter']], 'Paper')}</div>
     </div>
@@ -1129,7 +1135,10 @@ function requestFor(s, i) {
         paper: pr.paper,
         photocopySafe: pr.photocopySafe,
         anchors: anchorsBlocked() ? 'off' : (pr.anchors || 'off'),
-        header: { name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? (pr.title.trim() || true) : false },
+        // (the teacher's own title words go as titleText: buildSheet fits them to two lines, never smaller - fitTitle; the
+        // fields are sent only when set, so a page with neither prints exactly as before)
+        header: Object.assign({ name: h.name, date: h.date, score: h.score, tab: h.tab ? undefined : false, title: h.title ? true : false },
+            h.title && pr.title.trim() ? { titleText: pr.title.trim() } : {}, h.title && pr.titlePos === 'above' ? { titlePos: 'above' } : {}),
         testHints: !!pr.testHints,
         key: { on: !!pr.key, placement: pr.keyPlace || 'end', style: pr.keyStyle || 'copy', newSheet: !!pr.keyNewSheet },
         seed: (pr.seed + i * 7919) >>> 0,
@@ -1187,6 +1196,19 @@ async function buildAll(req) {
     const seen = {};
     out.pages = out.pages.map((l) => { seen[l] = (seen[l] || 0) + 1; return seen[l] > 1 ? `${l} (${seen[l]})` : l; });
     return out;
+}
+
+/** The caption under the Page title box: what the custom title printed as (two lines, or cut with a warning). */
+const TITLE_CAP = 'Prints at the top of every page and key, at full size. A long title takes two lines.';
+function titleFitCaption(built) {
+    const cap = root && root.querySelector('#tvTitleCap');
+    if (!cap) return;
+    const fit = built && built.parts.map((p) => p.res && p.res.titleFit).find(Boolean);
+    cap.classList.toggle('tv-fits-warn', !!(fit && fit.truncated));
+    cap.dataset.tvWarn = fit && fit.truncated ? 'title-cut' : '';
+    cap.textContent = !fit ? TITLE_CAP
+        : fit.truncated ? `Too long for two lines: the page prints "${fit.text}". Shorten the title to print all of it.`
+        : fit.lines > 1 ? 'This title takes two lines on the page (the body is 6 mm shorter).' : TITLE_CAP;
 }
 
 function scheduleBuild(delay = 350) {
@@ -1263,6 +1285,7 @@ async function runBuild() {
         const sized = built.parts.some((p) => (p.res.notes || []).includes(LESSON_SIZE_NOTE)) ? [LESSON_SIZE_NOTE] : [];
         const warn = short.concat(sized);
         root.querySelector('#tvFits').innerHTML = `<span class="tv-fits-line">${plain.map(esc).join('<br>')}</span>${details.length ? `<details class="tv-fits-why"><summary>Why?</summary><ul>${details.map((t) => `<li>${esc(t)}</li>`).join('')}</ul></details>` : ''}${warn.length ? `<span class="tv-fits-warn" data-tv-warn="${sized.length ? 'lesson-size' : 'short'}">${icon('info', 16)}<span>${esc(warn.join(' '))}</span></span>` : ''}`;
+        titleFitCaption(built);
         renderTabs(); renderSetup(); showPreview();
     } catch (e) {
         if (token !== buildToken) return;

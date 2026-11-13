@@ -143,6 +143,11 @@
 :is(.ws-page, .ws-sheet) .ws-title { height: 8mm; margin-top: 1mm; display: flex; align-items: center; justify-content: center; font-size: var(--ws-title); font-weight: 700; white-space: nowrap; }
 :is(.ws-page, .ws-sheet) .ws-title small { font-size: inherit; font-weight: 400; margin-left: .4em; }
 :is(.ws-page, .ws-sheet) .ws-headrule { border-top: var(--ws-rule) solid var(--ws-ink); margin: 1.2mm 0 1mm; }
+/* The teacher's page-title option (lf-roles 2026-11-13, PT-DLG-20; additive). A custom title wraps to at most two lines at the
+   size's own title token (never smaller; the host fits it, print-sheet.js fitTitle); placed above, it sits first in the band and
+   the Name / Date / Score row follows it, so the band's height (and the body under it) is the same as below. */
+:is(.ws-page, .ws-sheet) .ws-title[data-ws-title="custom"] { white-space: normal; height: auto; min-height: 8mm; line-height: 7mm; text-align: center; overflow-wrap: anywhere; }
+:is(.ws-page, .ws-sheet) .ws-head--title-above > .ws-title { margin-top: 0; margin-bottom: 1mm; }
 
 /* ---------- body, instruction, footer ---------- */
 :is(.ws-page, .ws-sheet) .ws-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
