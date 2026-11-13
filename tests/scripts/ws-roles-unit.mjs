@@ -144,6 +144,17 @@ if (on('MOD-ACROSS')) {
 }
 
 const pageText = (pl) => JSON.stringify(pl);
+if (on('FIX-MINIMAL')) {
+    // lead ruling N9 (2026-11-13): an item carries exactly ONE error - a list's later parts follow the correct rule, so the fix
+    // changes one part (a propagated wrong "12, 15, 19, 22" against "12, 15, 18, 21" made the pupil rewrite every later term)
+    checks++;
+    try { registerSkill('rolesunit:prop', { wrongAnswer: () => ({ value: '12, 15, 19, 22', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const it = itemOf('one');
+    it.q = Object.assign({}, it.q, { skillId: 'prop', ans: '12, 15, 18, 21' });
+    const w = CO.wrongOf(it);
+    const diff = w ? String(w.value).split(/,\s*/).filter((v, i) => v !== ['12', '15', '18', '21'][i]).length : -1;
+    if (diff !== 1) findings.push(`FIX-MINIMAL: the shown wrong list "${w && w.value}" differs from the answer in ${diff} parts (want exactly 1)`);
+}
 if (on('KEY-TRUE-BLANK')) {
     // PT-TOF-2 (critic r1/r2 R5): a True statement's key leaves the frame empty; a False one fills it
     for (const [wrong, want] of [[false, ''], [true, '42']]) {
