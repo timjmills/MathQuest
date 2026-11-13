@@ -105,17 +105,27 @@ function geometry(items, input, cap = {}) {
         // title line, budgeted here)
         const m2 = bandMetrics(ctx, layoutHeader(spillHeader(frame, true)), { cont: true });
         const p1 = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm;
-        const lv1 = practice.every((it) => it.measured && it.measured[gc] && it.measured[gc].atLevel && Number(it.measured[gc].atLevel[1]) > 0)
-            ? Math.max(...practice.map((it) => Number(it.measured[gc].atLevel[1]))) + 1 : gH;
-        const iH = Math.min(gH, lv1);
+        // (SPILL-FILL, critic r9 D3: page 2 is fitted from the stories it DEALS, in order - the Guided row, then each Independent row
+        // at its level-1 height - never from the deal's tallest spare, which no row draws)
+        const lv1Of = (it) => { const mm = it && it.measured && it.measured[gc]; const a = mm && mm.atLevel && Number(mm.atLevel[1]); return a > 0 ? a + 1 : hMinAt([it], gc, ctx); };
+        const gRowItems = practice.slice(0, gc);
+        const gHd = gRowItems.length ? Math.min(gH, hMinAt(gRowItems, gc, ctx)) : gH;
         // (the drawn page 2 ran 2-6 mm past the strip estimate - its titled continuation header and the two band rules: measured on
         // the rendered spill pages, plain M 6.2 mm; the Independent row is placed only with that much in hand, never squeezed)
         const instr2 = instructionText(instructionKeyOf(practice, input.skills), practice);
         const hand2 = SPILL_HAND_MM + stripExtraMm(ctx, 'Guided Practice:', instr2) + stripExtraMm(ctx, 'Independent Practice:', instr2);
-        let used2 = m2.strip + gH + hand2;
-        let iRows = 0;
+        let used2 = m2.strip + gHd + hand2;
+        let iRows = 0, iH = 0;
         const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
-        while (iRows < iMax && used2 + (iRows ? 0 : m2.strip) + iH <= m2.budget) { used2 += (iRows ? 0 : m2.strip) + iH; iRows++; }
+        while (iRows < iMax) {
+            const row = practice.slice(gc + iRows * gc, gc + (iRows + 1) * gc);
+            if (row.length < gc) break;
+            const h = Math.min(gH, Math.max(...row.map(lv1Of)));
+            const need = (iRows ? 0 : m2.strip) + Math.max(h, iH) * (iRows + 1) - iH * iRows;
+            if (used2 + need > m2.budget) break;
+            used2 += need; iH = Math.max(h, iH); iRows++;
+        }
+        if (!iH) iH = gH;
         return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true, stepPairs,
             overBudget: p1 > m.budget || used2 > m2.budget, used: p1, used2 };
     }
@@ -223,7 +233,11 @@ export function plan(input = {}) {
     const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) };
     if (g.steps.length && g.modelFull) {
         sections.push(modelBandPart);
-        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${g.stepPairs ? stepsHtml(g.steps, { cls: 'mq-steps-rows' }) : stepsHtml(g.steps)}</div>` });
+        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: g.stepPairs
+            // (critic r9 D1: the two-column Steps under a full-width Model take their PRINTED height - the estimate (stepLines, 0.5 em a
+            // character) drew a 50 mm band round 27 mm of text at L; the page budget keeps the estimate, so the spare stays under Say)
+            ? `<div class="mq-stepszone">${stepsHtml(g.steps, { cls: 'mq-steps-rows' })}</div>`
+            : `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });
     } else if (g.steps.length) {
         sections.push({
             kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow',

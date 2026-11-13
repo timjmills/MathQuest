@@ -901,7 +901,9 @@ async function main() {
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate((scope) => [...document.querySelectorAll(scope)].map((pg) => {
                             // (ONE-ROW, lead ruling R1 / R4a: a page of one row held to its work - layout.oneRowMm, mq-onerow - keeps the ruled strip)
-                            if (pg.querySelector('.ws-grid.mq-onerow')) return 0;
+                            // (tightened after critic r9: only while the white under it is shorter than its one row - else another row fits)
+                            const og = pg.querySelector('.ws-grid.mq-onerow');
+                            if (og) { const b0 = (pg.querySelector('.ws-body') || pg).getBoundingClientRect(); const gr = og.getBoundingClientRect(); if (b0.bottom - gr.bottom < gr.height) return 0; }
                             const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
                             const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
                             const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;

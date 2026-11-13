@@ -545,6 +545,27 @@ if (on('OPENER-SPILL')) {
     }
 }
 
+if (on('OPENER-SPILL')) {
+    // critic r9 D1: a spilled Opener's two-column Steps take their PRINTED height (no estimated fixed height: 50 mm round 27 mm of
+    // text at L); D3 SPILL-FILL: page 2 is fitted from the stories it DEALS - short dealt stories (60 mm at level 1) beside tall
+    // spares (150 mm) still get their Independent row
+    try { registerSkill('rolesunit:spill', { strings: () => ({ steps: ['Read it. What happens first?', 'Step 1: circle the sign. Solve.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] }), wrongAnswer: () => ({ value: '48', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const sp = (i, h1) => { const it = twoStep(i, { half: true, h1 }); it.q = Object.assign({}, it.q, { skillId: 'spill' }); return it; };
+    const SKS = [{ categoryId: 'rolesunit', skillId: 'spill', iCan: 'I Can solve two-step stories', grade: 3 }];
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const items = [sp(0, 93), sp(1, 60), sp(2, 60), sp(3, 150), sp(4, 150), sp(5, 150)];
+            items.forEach((it, k) => { if (k >= 3) for (const c of [1, 2, 3, 4]) it.measured[c].hMm = 160; });
+            const pl = OPN.plan({ ctx: { size }, skills: SKS, items });
+            const html = JSON.stringify(pl.pages[0].sections || []);
+            if (/mq-stepszone\\" style=\\"height:/.test(html) && /mq-steps-rows/.test(html)) findings.push(`OPENER-SPILL ${size}: the two-column Steps band takes an estimated fixed height (D1: 50 mm round 27 mm of text at L)`);
+            const p2 = pl.pages[1] ? pl.pages[1].sections || [] : [];
+            if (pl.pages.length > 1 && !p2.some((x) => x.label === 'Independent Practice:')) findings.push(`OPENER-SPILL ${size}: SPILL-FILL - page 2 holds no Independent row though the dealt stories (60 mm at level 1) fit; it was sized by the 150 mm spares (D3)`);
+        } catch (e) { findings.push(`OPENER-SPILL ${size} (D1 / D3): ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
 if (on('RI-TWOSTEP')) {
     checks++;
     try {
