@@ -449,6 +449,9 @@ export function renderPages(plan, opts = {}) {
     const pages = plan.pages && plan.pages.length ? plan.pages : [{ sections: plan.sections || [] }];
     const n = pages.length;
     const key = state === 'answered';
+    // (a key page says so to its cells: a vocabulary picture draws its focal part in the grey on the key only - owner R-1,
+    // lf-vocab r7; a model drawn answered on a PUPIL page has no keyPage and is unchanged)
+    if (key) ctx.keyPage = true;
     const report = { gaps: [], label: 1, cellNo: 0, page: 1, index: 0, key };
 
     const out = pages.map((pg, i) => {

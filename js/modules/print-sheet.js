@@ -33,6 +33,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
+import { applySheetTags } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -2723,6 +2724,8 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
+    // (Q-A: an item that carries its own standards - a vocabulary page dealt from one lesson's word set - prints them)
+    applySheetTags(meta, q);
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
     if (sk.skillId === 'count_by_tables') {
@@ -3098,7 +3101,7 @@ function numberLineRequest(n) {
  * Each grid cell of a plan carries its item's index in the bridge's returned `items` (critic eb-r5 m1): `ebItem` on the plan
  * item, written by the kit's grid as data-eb-item on the cell. ws-empty-band EB-FOOT pairs each cell with ITS OWN item's
  * measured footprint by it (a page that reorders its items is never judged against another item's footprint). Matched by the
- * item's question object; a plan item with no match carries nothing.
+ * item's question object; a plan item with no match carries nothing. Nothing draws from it.
  */
 function tagItemIndex(plan, items) {
     const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
@@ -3493,6 +3496,26 @@ async function buildSheetDeal(req = {}) {
                     left -= give;
                 }
             }
+            // (`wholeRows` on a template's footprint, opt-in so no other template's page changes - lf-vocab r9, print-lint
+            // sections L-DENSITY DN-2 / LONE at S and L: a one-column member whose share held ONE row and a half took
+            // the page's whole share as one tall cell, so a two-skill sheet printed one Match 3 alone on page 1. Such a
+            // member takes one more whole row from the others' spare room, when they keep the rows they had.)
+            members.forEach((si, k) => {
+                const its = probesOf(si) || [];
+                if (!its.length || !its.every((it) => it && it.footprint && it.footprint.wholeRows)) return;
+                const row = layouts[si].hMin;
+                if (!(row > 0)) return;
+                const rowsNow = Math.max(1, Math.floor((h[k] - 1 - band(si)) / row + 1e-6));
+                const want = (rowsNow + 1) * row + 1 + band(si) - h[k];
+                if (want <= 0) return;
+                const rowsOf = (j) => { const r = layouts[members[j]].hMin; return r > 0 ? Math.max(1, Math.floor((h[j] - 1 - band(members[j])) / r + 1e-6)) : 1; };
+                const keep = (j) => rowsOf(j) * layouts[members[j]].hMin + 1 + band(members[j]);
+                const spare = members.reduce((a, _, j) => a + (j === k ? 0 : Math.max(0, h[j] - Math.max(need[j], keep(j)))), 0);
+                if (spare + 1e-6 < want) return;
+                let left = want;
+                members.forEach((_, j) => { if (j === k || left <= 0) return; const give = Math.min(left, Math.max(0, h[j] - Math.max(need[j], keep(j)))); h[j] -= give; left -= give; });
+                h[k] += want;
+            });
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);

@@ -120,6 +120,12 @@ function gapBad(role, cells, i, lim) {
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
 const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-PARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
+// --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
+// slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
+// critic's row-ink scan of the PNG sees it. A `legacy` cell (another skill's old print HTML) is printed as a note, not judged.
+// The default stays on (a print slot is its whole box, the writing room). Screen slots are unchanged (drawn edges + one digit).
+const SLOT_INK = (() => { const i = process.argv.indexOf('--slot-ink'); return i < 0 || process.argv[i + 1] !== 'off'; })();
+const LEGACY_NOTES = [];
 const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)', 'EB-SIDE (slot width)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
 // compose), which a saved --html page cannot express, and no commit has failed it (lf-checks 2026-11-13; EB-FOOT has eb-foot-div-facts)
@@ -419,7 +425,7 @@ async function measurePix(arg) {
             const q = rel(r, 0);
             const spans = [];
             let xs = [[q.l, q.r]];
-            if (!screen) spans.push([q.t, q.b]);
+            if (!screen) { if (arg.slotInk === false) continue; spans.push([q.t, q.b]); }
             else {
                 // an edge counts only when it is drawn DARKER than the 225 pixel ink threshold (critic eb-r5 D1: a 1 px #eee closed
                 // border, no pixel of which is ink, read as one 150 px block of ink and hid the band)
@@ -488,10 +494,10 @@ async function pixRead(pg, cells, screen) {
             const id = await h.evaluate((e) => e.getAttribute('data-eb-i'));
             try { shots[id] = 'data:image/png;base64,' + await h.screenshot({ encoding: 'base64' }); } catch (e) { /* not capturable: the DOM read stands */ }
         }
-        px = await pg.evaluate(measurePix, { shots });
+        px = await pg.evaluate(measurePix, { shots, slotInk: SLOT_INK });
     } else {
         const png = 'data:image/png;base64,' + await pg.screenshot({ fullPage: true, encoding: 'base64' });
-        px = await pg.evaluate(measurePix, { png });
+        px = await pg.evaluate(measurePix, { png, slotInk: SLOT_INK });
     }
     await pg.evaluate(() => { for (const e of document.querySelectorAll('[data-eb-i]')) e.removeAttribute('data-eb-i'); });
     return applyPix(cells, px);
@@ -586,6 +592,8 @@ function measureVocab(scope) {
 
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
+        // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)
+        if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(`${where} p${c.page} cell ${c.label || c.cell}: legacy cell not judged by --slot-ink off`); return; }
         // a cell with no ink at all (critic eb-r3 D2: it was dropped, so a blank cell beside a good one read OK)
         if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with no pixel darker than the ink threshold 225 of 255: blank, or only ink too faint to count, e.g. #eee) [${c.tmpl}]`); return; }
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
@@ -787,6 +795,7 @@ async function main() {
     }
     const rules = RULES;
     for (const n of notes) console.log(`note: ${n}`);
+    for (const n of LEGACY_NOTES) console.log(`note: ${n}`);
     for (const r of rules) { const f = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(8)} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 15)) console.log(`   ${x.where}: ${x.msg}`); if (f.length > 15) console.log(`   ... ${f.length - 15} more`); }
     console.log(`(${SKILLS.length} skill(s), ${renders} renders, ${cellsRead} cells, ${((Date.now() - T0) / 1000).toFixed(0)} s${pinned != null ? `; ${pinned} finding(s) within the pin ${path.relative(ROOT, BASE)}` : ''})`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes, renders, cells: cellsRead }, null, 1));

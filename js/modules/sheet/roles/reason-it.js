@@ -54,7 +54,8 @@ export function prepare(it, info = {}) {
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
     // box; the response column stays beside both.
-    const wide = sentence || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
+    // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A too - lf-vocab r5, ws-empty-band)
+    const wide = sentence || it.template === 'vocab-match3' || (it.template === 'equation' && Number((it.footprint || {}).wMm) > (LIVE_W_MM - 52 - 10) / 2);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
