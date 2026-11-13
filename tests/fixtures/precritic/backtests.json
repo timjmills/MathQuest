@@ -3431,9 +3431,8 @@
    "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
   },
   "pass": {
-   "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
-   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
-   "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+   "commit": "393db090",
+   "state": "0 findings: the div_facts array landscape (fc04ba58 / a7f44d18) and screen cues at one CSS mm per paper mm (393db090); lf-ops-divarray, the pin 99 -> 0"
   },
   "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
   "expect": {
