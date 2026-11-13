@@ -291,7 +291,50 @@ fixed almost every count (F2). Resolved:
   `fillOk`'s EB-ROWFIT clause only refuses sheets with **zero** rows (`independent === 0`); it does not notice a foot that holds
   one *more* row when some rows already print. The new check **EB-ROWFIT+** (`ws-partopts-unit` PO-2w, report-only) flags it:
   a planner-fixed rows count (`lim.fixed`, or the count at the stepper's max) whose printed foot still holds one more row of
-  the rows' own cells (no head: the band exists). It flags 2 states today (both this fact_family_sort case).
+  the rows' own cells (no head: the band exists).
+  - **How often it fires (critic A r4 F1: this paragraph used to give a hand count, two, and call R3 one case).** The full unit run
+    (`ws-partopts-unit`, every lesson x M / L, the walk at depth 3, 815 settled states) prints one line, grouped by lesson x
+    size case; the run records it in `tests/fixtures/partopts/eb-rowfit-plus.line` and fails PO-DOC when its line differs
+    from the record, and `ws-partopts-unit --doc-only` (precritic row `partopts-doc`) fails when this paragraph does not quote
+    the record or gives any other count. Today's line:
+    ```
+    EB-ROWFIT+ by case: 105 state(s), 94 on changed sheets;
+      addition:add_wp_10 L 5 (5 changed);
+      addition:add_wp_10_plain L 2 (2 changed);
+      addition:add_wp_10_plain M 3 (3 changed);
+      addition:add_wp_20 L 3 (3 changed);
+      addition:add_wp_20 M 4 (4 changed);
+      addition:add_wp_20_plain L 3 (3 changed);
+      addition:add_wp_20_plain M 4 (4 changed);
+      addition:fact_family_sort M 2 (2 changed);
+      division:div_facts L 4 (4 changed);
+      division:div_facts M 7 (2 changed);
+      number_sense:nearest_10 L 11 (5 changed);
+      number_sense:nearest_10 M 12 (12 changed);
+      placevalue:combine L 3 (3 changed);
+      placevalue:combine M 4 (4 changed);
+      placevalue:expand L 2 (2 changed);
+      placevalue:expand M 4 (4 changed);
+      placevalue:identify M 3 (3 changed);
+      placevalue:unit_form L 2 (2 changed);
+      placevalue:unit_form M 3 (3 changed);
+      placevalue:value L 1 (1 changed);
+      placevalue:value M 1 (1 changed);
+      subtraction:sub_wp_10 L 2 (2 changed);
+      subtraction:sub_wp_10 M 4 (4 changed);
+      subtraction:sub_wp_10_plain L 2 (2 changed);
+      subtraction:sub_wp_10_plain M 4 (4 changed);
+      subtraction:sub_wp_20 L 1 (1 changed);
+      subtraction:sub_wp_20 M 4 (4 changed);
+      subtraction:sub_wp_20_plain L 1 (1 changed);
+      subtraction:sub_wp_20_plain M 4 (4 changed)
+    ```
+    The 94 changed sheets come from 29 lesson x size cases: the word-problem lessons (`add_wp_10`, `add_wp_10_plain`,
+    `add_wp_20`, `add_wp_20_plain`, `sub_wp_10`, `sub_wp_10_plain`, `sub_wp_20`, `sub_wp_20_plain`; 46), the place-value
+    lessons (`combine`, `expand`, `identify`, `unit_form`, `value`; 23), `number_sense:nearest_10` (17), `division:div_facts`
+    (6) and `addition:fact_family_sort` (2, the critic's case). The other 11 are standard sheets (`nearest_10` L 6,
+    `div_facts` M 5), master states. PO-2d passes on every walked state, so every one of these feet is under the 30 %
+    EB-PAGE line.
   - **Kept report-only, not gated. Why.** The foot is 25 %, under the 30 % EB-PAGE line, so it is not a failure the gate
     forbids. Making it *gating* would require either (a) the planner to **add** the second row, or (b) the value **not to be
     offered**. (b) is wrong — a Fixed:1 is already the only value; there is nothing to withdraw. (a) means packing one more
@@ -301,7 +344,8 @@ fixed almost every count (F2). Resolved:
     (`planMain`) would have to budget with the print-matching height, i.e. add ~12 mm of slack to its row loop. That change
     touches the row-packing of **every** lesson sheet and risks the 1556-hash baseline and, if the slack is miscalibrated in
     the *fits* direction, a print **overflow** (a row the inflated plan accepts but print cannot hold). That is a lane-wide
-    engine change with a worse failure mode than a 25 % foot, out of proportion to a single sub-threshold case. It belongs with
+    engine change with a worse failure mode than these feet (all under the 30 % EB-PAGE line), and it is a row-packer change
+    for the 29 cases above, not a fix for one lesson. It belongs with
     the **lf-engine** row-packer work (the same place the identify M standard-sheet foot is routed), not bolted on here. The
     report-only check stands as the tripwire: when the row-packer is reworked, flip EB-ROWFIT+ to gating (`--gate-rowfit-plus`)
     and this case closes.

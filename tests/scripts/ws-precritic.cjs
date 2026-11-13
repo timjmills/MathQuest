@@ -745,7 +745,10 @@ function applyOptIn(rows, keys) {
  *   partopts-bt        the three tuned §8d thresholds, two-sided (FILL-BT, ROWFIT-BT, BAND-BT; ~25 s)
  *   partopts-coverage  PO-2e: the We Do / Practice ranges of every lesson x size against their floors (the We Do floor is
  *                      a ratchet at 7/52, lead 2026-11-13; ~60 s)
- *   partopts-shots     the Print screen's own checks (F3-F10, N3, N5, N6, R1, R2, R4, H6) at 1280 and 390, no packets
+ *   partopts-shots     the Print screen's own checks (F3-F10, N3, N5, N6, R1, R2, R4, H6; critic A r4: A4-F2 the size round
+ *                      trip keeps the teacher's count, A4-P6 every page tab in view) at 1280 and 390, no packets
+ *   partopts-doc       PO-DOC (critic A r4 F1): DESIGN §8d quotes the full run's recorded EB-ROWFIT+ line and no other count
+ *                      (no browser, < 1 s)
  * Every finding of critic rounds A r1-r3 is backtested on these commands (tests/fixtures/precritic/backtests.json,
  * rows partopts-*); design/lessons-first/CHECKS_FROM_CRITICS.md names each row's check, backtest id and precritic row.
  */
@@ -759,7 +762,7 @@ function addPartOpts(add, ctx) {
         ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
     add(gate('partopts-coverage', 'ws-partopts-unit --coverage-only (PO-2e: the We Do / Practice ranges vs their floors, the We Do floor a ratchet)', 'every library lesson × M / L', 'browser', 'ws-partopts-unit',
         ['--coverage-only'], { parse: PARSE.partOpts, needFlags: ['coverage-only'], expect: { must: ['PO-2e'] } }));
-    add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
+    add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, A4-F2 size round trip, A4-P6 every page tab, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
         ['--no-packets', '--no-shots'], { parse: PARSE.partOpts, needFlags: ['no-shots'] }));
     // (step B, the supports: the pure checks, the declarations + sampler + paper = screen on the regroup lesson, the panels)
     add(gate('partopts-supports-unit', 'ws-partopts-supports --unit (PO-SUP resolver and fade, PO-SUPN storage, PO-4S off codec, PO-SIZE per-size gate)', 'pure', 'node', 'ws-partopts-supports',
@@ -768,6 +771,8 @@ function addPartOpts(add, ctx) {
         ['--lessons', 'subtraction:sub_100_regroup', '--sizes', 'M,L'], { parse: PARSE.partOpts, needFlags: ['lessons'], expect: { must: ['PO-5', 'PO-3', 'PO-PS'] } }));
     add(gate('partopts-supports-ui', 'ws-partopts-supports --ui (the Supports chip and panel at 1280 and 390, the needs warning, the Quiz sheet hints off by default)', 'Print screen + Quiz sheet', 'browser', 'ws-partopts-supports',
         ['--ui'], { parse: PARSE.partOpts, needFlags: ['ui'], expect: { must: ['PO-UI'] } }));
+    add(gate('partopts-doc', 'ws-partopts-unit --doc-only (PO-DOC: DESIGN §8d quotes the recorded EB-ROWFIT+ line)', 'design/partopts/DESIGN.md §8d', 'node', 'ws-partopts-unit',
+        ['--doc-only'], { parse: PARSE.partOpts, needFlags: ['doc-only'], expect: { must: ['PO-DOC'] } }));
 }
 
 function buildPlan(ctx) {

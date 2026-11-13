@@ -1056,3 +1056,11 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-part.has-sup-panel { grid-template-areas: 'print name many sup ref' '. warn warn warn warn' '. panel panel panel panel'; }
     .tv-sup-groups { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 }
+
+/* Preview page tabs past 8 (lane lf-partopts, critic A r4 P6): every page and the Answer keys get a tab, so a long lesson
+   packet's strip wraps onto more rows at every width instead of cutting tabs off. Additive. */
+#tvPageTabs.tv-tabs-many { display: flex; flex-wrap: wrap; align-content: flex-start; }
+#tvPageTabs.tv-tabs-many > button { flex: 1 0 auto; min-width: 76px; }
+@media (max-width: 640px) {
+    #tvPageTabs.tv-tabs-many > button { min-width: 64px; }
+}

@@ -25,6 +25,11 @@
 //   and says it is the most (fewest) at the size; R4 at 390 the whole page (not only the section) does not scroll sideways,
 //   on the standard packet and after the largest packet
 //   and every Parts control is at least 44 px (H6).
+//   critic A r4: A4-F2 a size round trip keeps the teacher's count - fact_family_sort M, EVERY Practice count M offers, then
+//   Size L, then Size M: the count is the one asked, with no note (the screen re-snapped the clamped value: 45 -> L 30 -> M 27);
+//   and Y4.B1.S14's largest packet (Practice and Mixed at their max at M) -> L -> M gives both back. A4-P6 after the largest
+//   packet, at M and at L, at 1280 and 390: one tab per pupil page, + 1 for the Answer keys when keys are on, and every tab is
+//   in view and opens its page (the strip stopped at 8 tabs: page 9, page 10 and the keys could not be previewed).
 //
 // Every check's message ends with the finding it comes from - (F3) ... (F10), (N3), (N5), (N6), (R1), (R2), (R4), (H6); a
 // message with no tag is a setup failure (the screen could not be reached) and always counts.
@@ -49,7 +54,7 @@ const skillOf = (id) => (id.startsWith('skill:') ? { categoryId: id.split(':')[1
 const ONLY = arg('only') ? arg('only').split(',').map((s) => s.trim()).filter(Boolean) : null;
 /** True when the run judges any of these findings (no --only: every one). */
 const want = (...tags) => !ONLY || tags.some((t) => ONLY.includes(t));
-const tagOf = (msg) => { const m = [...String(msg).matchAll(/[(, ]([FNR]\d+|H6)\)/g)]; return m.length ? m[m.length - 1][1] : null; };
+const tagOf = (msg) => { const m = [...String(msg).matchAll(/[(, ]((?:A4-)?[FNRP]\d+|H6)\)/g)]; return m.length ? m[m.length - 1][1] : null; };
 const fails = [];
 const check = (ok, msg) => { if (ok) return; const t = tagOf(msg); if (!t || want(t)) fails.push(msg); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -117,6 +122,47 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (NO_SHOTS) return;
         const clip = await page.evaluate((sel) => { const e = document.querySelector(sel); if (!e) return null; e.scrollIntoView({ block: 'start' }); const r = e.getBoundingClientRect(); return { x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height }; }, sel);
         if (clip && clip.width > 0 && clip.height > 0) await page.screenshot({ path: path.join(OUT, file), clip, captureBeyondViewport: true });
+    };
+    // (critic A r4 P6) the preview's page tabs: one per pupil page (+ the Answer keys when keys are on), each in view, each opens
+    // its own page
+    const tabCheck = async (where) => {
+        const t = await page.evaluate(async () => {
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+            const fr = document.querySelector('#tvPreviewFrame');
+            const keyOn = (document.querySelector('[data-act="key"]') || { getAttribute: () => 'false' }).getAttribute('aria-checked') === 'true';
+            const tabs = () => [...document.querySelectorAll('#tvPageTabs > button')];
+            // (open the first pupil page, so the frame holds the pupil pages)
+            const first = tabs().find((b) => b.dataset.v === '0');
+            if (first) { first.click(); await sleep(900); }
+            let pupil = -1; try { pupil = fr.contentDocument.querySelectorAll('.ws-page').length; } catch (e) { /* */ }
+            const out = { keyOn, pupil, n: tabs().length, hasKey: tabs().some((b) => b.dataset.v === 'key'), bad: [] };
+            for (const [i, b0] of tabs().entries()) {
+                const b = tabs()[i];
+                if (!b) { out.bad.push(`tab ${i + 1} went away`); continue; }
+                b.scrollIntoView({ block: 'center' });
+                const r = b.getBoundingClientRect();
+                const label = b.textContent.trim();
+                if (!b.offsetParent || r.width < 1 || r.height < 1) { out.bad.push(`"${label}" is not shown`); continue; }
+                if (r.left < -0.5 || r.right > window.innerWidth + 0.5) out.bad.push(`"${label}" is outside the screen (${Math.round(r.left)}-${Math.round(r.right)} px)`);
+                const v = b.dataset.v;
+                b.click(); await sleep(700);
+                const now = tabs().find((x) => x.dataset.v === v);
+                if (!now || now.getAttribute('aria-checked') !== 'true') { out.bad.push(`"${label}" does not open its page`); continue; }
+                if (v !== 'key') { let shown = -1; try { shown = [...fr.contentDocument.querySelectorAll('.ws-page')].findIndex((p) => p.style.display !== 'none'); } catch (e) { /* */ } if (shown !== Number(v)) out.bad.push(`"${label}" shows page ${shown + 1}`); }
+                void b0;
+            }
+            if (first) { tabs().find((b) => b.dataset.v === '0').click(); await sleep(600); }
+            out.wide = document.documentElement.scrollWidth - window.innerWidth;
+            return out;
+        });
+        await shotEl('.tv-preview-card', `p6-tabs-${where.replace(/[^A-Za-z0-9]+/g, '_').slice(0, 40)}.png`);
+        const want = t.pupil + (t.keyOn ? 1 : 0);
+        console.log(`A4-P6 ${where}: ${t.n} tab(s) for ${t.pupil} pupil page(s)${t.keyOn ? ' + the Answer keys' : ''}; page ${t.wide} px wider than the screen`);
+        check(t.pupil > 0 && t.n === want, `${where}: ${t.n} page tab(s), the preview has ${t.pupil} pupil page(s)${t.keyOn ? ' and keys on' : ''} - ${want} tabs needed (A4-P6)`);
+        if (t.keyOn) check(t.hasKey, `${where}: keys are on, yet no Answer keys tab (A4-P6)`);
+        check(!t.bad.length, `${where}: ${t.bad.slice(0, 4).join('; ')} (A4-P6)`);
+        check(t.wide <= 0, `${where}: with every tab shown the page scrolls sideways by ${t.wide} px (A4-P6)`);
+        return t;
     };
     // (a DOM click: the Print screen re-renders its controls while a build lands, so a held handle can be detached)
     const click = async (sel) => { const ok = await page.evaluate((sel) => { const b = document.querySelector(sel); if (!b || b.disabled) return false; b.scrollIntoView({ block: 'center' }); b.click(); return true; }, sel); await sleep(150); return ok; };
@@ -249,7 +295,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         // whole page must not scroll sideways (R4); then Size L - a count over the new maximum is a clamp: its note may say
         // "under half full" only when the asked count lay BETWEEN two offered values (it is then a rounding), never at the end
         // of the range (R2: "Rounded to 30 so no page is under half full" for Mixed 42 > 30, the most at L)
-        if (want('R2', 'R4')) {
+        if (want('R2', 'R4', 'A4-P6', 'A4-F2')) {
             const id = 'Y4.B1.S14';
             await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
             await page.evaluate(({ id }) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith([{ role: 'lesson', lessonId: id }]); }, { id });
@@ -267,8 +313,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const maxWide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
             console.log(`R4 ${id} M Practice ${asked.practice} Mixed ${asked.mixed}: the page is ${maxWide} px wider than 390`);
             check(maxWide <= 0, `${id} 390 (Practice ${asked.practice}, Mixed ${asked.mixed}): the page scrolls sideways by ${maxWide} px (R4)`);
+            if (want('A4-P6')) await tabCheck(`${id} M 390 (Practice ${asked.practice}, Mixed ${asked.mixed})`);
             await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
             await sleep(600);
+            if (want('A4-P6')) await tabCheck(`${id} M 1280 (Practice ${asked.practice}, Mixed ${asked.mixed})`);
             await click('[data-act="size"][data-v="L"]');
             await idle();
             const rows = await rowsOf();
@@ -284,6 +332,59 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 }
             }
             await textLint(rows, `${id} 1280 L after Practice / Mixed at their max at M`, false);
+            if (want('A4-P6')) {
+                await tabCheck(`${id} L 1280 (from Practice ${asked.practice}, Mixed ${asked.mixed} at M)`);
+                await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+                await sleep(900);
+                await tabCheck(`${id} L 390 (from Practice ${asked.practice}, Mixed ${asked.mixed} at M)`);
+                await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+                await sleep(600);
+            }
+            // (critic A r4 F2) back to M: both counts are the ones asked, with no note
+            if (want('A4-F2')) {
+                await click('[data-act="size"][data-v="M"]');
+                await idle();
+                const back = await rowsOf();
+                for (const p of ['practice', 'mixed']) {
+                    const r = back.find((x) => x.part === p);
+                    console.log(`A4-F2 ${id} ${p} ${asked[p]} at M -> L -> M ${r.val}: "${r.note}"`);
+                    check(Number(r.val) === asked[p], `${id} ${p} ${asked[p]} at M -> L -> M gives ${r.val}${r.note ? ` ("${r.note}")` : ''}: the count asked is lost (A4-F2)`);
+                    check(!r.note, `${id} ${p} back at ${r.val}, yet a note "${r.note}" (A4-F2)`);
+                }
+            }
+        }
+
+        // (critic A r4 F2) fact_family_sort M: EVERY Practice count M offers survives M -> L -> M (the critic's 45 -> 30 -> 27)
+        if (want('A4-F2')) {
+            const id = 'skill:addition:fact_family_sort';
+            await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+            await page.evaluate(({ sk }) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith([sk]); }, { sk: skillOf(id) });
+            await sleep(500);
+            await click('[data-act="types"][data-sec="0"]'); await sleep(300);
+            check(await click('[data-act="role"][data-sec="0"][data-v="lesson"]'), `${id}: could not choose the Lesson page type`);
+            await click('[data-act="size"][data-v="M"]');
+            await idle();
+            const P = '#tvPartsWide .tv-part[data-part-row="practice"]';
+            const val = async () => Number(((await rowsOf()).find((r) => r.part === 'practice') || {}).val);
+            // (down to the first count M offers above 0, then up through every count)
+            for (let k = 0; k < 40; k++) { const v = await val(); if (!await click(`${P} [data-dir="-1"]`)) break; await idle(); if ((await val()) === 0) { await click(`${P} [data-dir="1"]`); await idle(); break; } if ((await val()) === v) break; }
+            const seen = [];
+            for (let k = 0; k < 40; k++) {
+                const v = await val();
+                if (seen.includes(v)) break;
+                seen.push(v);
+                await click('[data-act="size"][data-v="L"]'); await idle();
+                const atL = await val();
+                await click('[data-act="size"][data-v="M"]'); await idle();
+                const r = (await rowsOf()).find((x) => x.part === 'practice');
+                check(Number(r.val) === v, `${id} Practice ${v} at M -> L ${atL} -> M ${r.val}${r.note ? ` ("${r.note}")` : ''}: the count asked is lost (A4-F2)`);
+                check(!r.note, `${id} Practice ${v} at M -> L -> M: back at ${r.val}, yet a note "${r.note}" (A4-F2)`);
+                if (Number(r.val) !== v) break;
+                if (!await click(`${P} [data-dir="1"]`)) break;
+                await idle();
+            }
+            console.log(`A4-F2 ${id} M Practice round trips: ${seen.join(', ')}`);
+            check(seen.length >= 3, `${id}: only ${seen.length} Practice count(s) walked (A4-F2)`);
         }
 
         // packets at min and max, M and L - the values the screen offers (ws-partopts-unit's own loop: a value no longer

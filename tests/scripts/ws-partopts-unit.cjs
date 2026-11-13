@@ -53,6 +53,10 @@
 //                      with every check of the walk (PO-2b-d, EB-ROWFIT, EB-ROWFIT+, PO-NOROOM, PO-REM, PO-CAP, PO-VOC)
 //   --coverage-only    PO-2e alone: the standard packet of every lesson x size, the floors (about 2 min, no page measured)
 //   --gate-rowfit-plus EB-ROWFIT+ (critic A r3 R3) gates the changed sheets; without it the check is REPORT-ONLY
+//   --doc-only         PO-DOC alone (critic A r4 F1, no browser, < 1 s): DESIGN §8d (MQ_ROOT's) quotes the recorded EB-ROWFIT+
+//                      line (tests/fixtures/partopts/eb-rowfit-plus.line) verbatim and gives no other EB-ROWFIT+ state count
+//   --write-rowfit-plus on a FULL run (the default scope), rewrite that record from the run's own line; without it a full run
+//                      FAILS PO-DOC when its line differs from the record (the count moved: re-record, re-quote in §8d)
 //   MQ_ROOT=<tree>     build, serve and judge another checkout (ws-backtest commit-pair rows): its part-opts.js and its app.
 //                      This script and its judges (ws-empty-band, the row / band predicates part-opts.js shares with the
 //                      offer gate - filled from this tree when the older engine has none) are always today's.
@@ -96,6 +100,45 @@ if (askedFloorW !== null && !(askedFloorW >= WEDO_FLOOR - 1e-9)) {
 }
 const STATE = arg('state') ? JSON.parse(arg('state')) : arg('state-file') ? JSON.parse(require('fs').readFileSync(path.resolve(arg('state-file')), 'utf8')) : null;
 
+// (critic A r4 F1) The EB-ROWFIT+ summary line, its record and the doc check. The record is the line a FULL run printed
+// (tests/fixtures/partopts/eb-rowfit-plus.line, today's tree: the check's truth); DESIGN §8d (MQ_ROOT's: the doc under test)
+// must quote it verbatim, and every EB-ROWFIT+ state count §8d gives must be the line's total or changed count.
+const ROWFIT_REC = path.join(HERE, 'tests', 'fixtures', 'partopts', 'eb-rowfit-plus.line');
+const readRec = () => { try { return require('fs').readFileSync(ROWFIT_REC, 'utf8').trim(); } catch (e) { return ''; } };
+/** `EB-ROWFIT+ by case: T state(s), C on changed sheets; <lesson> <size> n (c changed); ...` - sorted, so two runs agree. */
+function rowfitLine(total, changedN, cases) {
+    const list = [...cases.entries()].sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).map(([k, c]) => `${k} ${c.n} (${c.changed} changed)`);
+    return `EB-ROWFIT+ by case: ${total} state(s), ${changedN} on changed sheets; ${list.length ? list.join('; ') : 'none'}`;
+}
+/** The default scope: every lesson x M / L, every job, the walk at depth 3 - the only run whose line is the record's. */
+const FULL_SCOPE = !process.env.MQ_ROOT && !['walk-lessons', 'lessons', 'only', 'state', 'state-file', 'sizes', 'parts', 'full', 'walk-depth', 'bt-k-file'].some((k) => argv.includes('--' + k))
+    && !['unit', 'no-jobs', 'no-walk', 'bt-only', 'coverage-only', 'combos-only', 'doc-only'].some(has);
+/** PO-DOC (A4-F1): DESIGN §8d quotes the recorded line and no other EB-ROWFIT+ count. */
+function docCheck() {
+    const rec = readRec();
+    let doc = '';
+    try { doc = require('fs').readFileSync(path.join(ROOT, 'design', 'partopts', 'DESIGN.md'), 'utf8'); } catch (e) { errors.push(`PO-DOC: no design/partopts/DESIGN.md in ${ROOT}`); return; }
+    if (!rec) { errors.push(`PO-DOC: no record ${path.relative(HERE, ROWFIT_REC)} (a full run with --write-rowfit-plus writes it)`); return; }
+    // (§8d: the bullet "(d) The offer gate ..." of §8 through its "### 8d ..." follow-ups, up to the next other heading)
+    let a = doc.indexOf('\n- **(d) ');
+    if (a < 0) a = doc.indexOf('\n### 8d');
+    const z = a < 0 ? -1 : doc.slice(a + 1).search(/\n##+ (?!8d)/);
+    const sec = a < 0 ? '' : z < 0 ? doc.slice(a) : doc.slice(a, a + 1 + z);
+    if (!sec) { F('PO-DOC', 'DESIGN.md has no §8d (A4-F1)'); return; }
+    const m = /^EB-ROWFIT\+ by case: (\d+) state\(s\), (\d+) on changed sheets/.exec(rec);
+    const ok = new Set(m ? [m[1], m[2]] : []);
+    const flat = sec.replace(/\s+/g, ' ');
+    if (!flat.includes(rec)) F('PO-DOC', `DESIGN §8d does not quote the gate's EB-ROWFIT+ line "${rec.slice(0, 90)}..." (A4-F1)`);
+    // (every EB-ROWFIT+ count in §8d - "flags 2 states", "105 state(s)" - is the gate's total or changed count)
+    const paras = sec.split(/\n(?=\s*(?:- |\n))/).filter((x) => /EB-ROWFIT\+/.test(x));
+    for (const p of paras) for (const x of p.replace(/\s+/g, ' ').matchAll(/\b(\d+) states?\b|\b(\d+) state\(s\)/g)) {
+        const n = x[1] || x[2];
+        if (!ok.has(n)) F('PO-DOC', `DESIGN §8d says "${x[0]}" of EB-ROWFIT+; the gate's line counts ${m ? `${m[1]} state(s), ${m[2]} on changed sheets` : '(unreadable)'} (A4-F1)`);
+    }
+    if (/single sub-threshold case/.test(flat)) F('PO-DOC', 'DESIGN §8d calls EB-ROWFIT+ "a single sub-threshold case" (A4-F1)');
+    console.log(`PO-DOC ${fails.some((x) => x.startsWith('PO-DOC ')) ? 'FAIL' : 'PASS'}: DESIGN §8d against the recorded EB-ROWFIT+ line (${m ? `${m[1]} state(s), ${m[2]} changed` : '?'})`);
+    for (const x of fails.filter((f) => f.startsWith('PO-DOC '))) console.log(`   ${x}`);
+}
 /** The engine's part-opts.js (MQ_ROOT's), with the judge predicates it shares with the offer gate filled from today's
  *  copy when an older engine has none (rowFits, shortestRowMm, bandFails are the checks' own measure, not the code under test). */
 async function engineOpts() {
@@ -172,6 +215,36 @@ async function unit() {
             if (want && !want.test(t)) F('PO-4', `${p} ${asked} -> ${got}: note "${t}" does not say ${want} (R2)`);
         }
     });
+    // (critic A r4 F2) a size round trip keeps the teacher's count: every count M offers, set at M, re-limited to L and back to
+    // M through resnapPartOpts (the Print screen's re-limit, teacher-print.js), is that count again, with no note at M; a part
+    // that is off stays off. (Before the fix the screen re-snapped the CLAMPED count: Practice 45 -> L 30 -> M 27.)
+    blk('A4-F2', () => {
+        const fitM = { practice: { perPage: 24, cols: 3, rows: 8, minRows: 4, pages: 1 }, mixed: { count: 21 }, wedo: { fit: 4, values: [2, 3, 4], canOff: true } };
+        const fitL = { practice: { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 1 }, mixed: { count: 15 }, wedo: { fit: 2, values: [2], canOff: true } };
+        const limM = po.allPartLimits(fitM), limL = po.allPartLimits(fitL);
+        const countOf = (o, p, lim) => (o[p] && Number.isFinite(o[p].n) ? o[p].n : lim.dflt);
+        // (an engine before the fix has no resnapPartOpts: its Print screen re-limited the CURRENT counts -
+        //  normalizePartOpts(s.partOpts, limits), teacher-print.js runBuild - so that is what is judged there)
+        const resnap = po.resnapPartOpts || ((cur, ask, lim) => {
+            const out = po.normalizePartOpts(cur, lim); const notes = {};
+            for (const [p, v] of Object.entries(cur || {})) { if (!Number.isFinite(v.n)) continue; const got = countOf(out, p, lim[p]); if (got !== v.n) notes[p] = { asked: v.n, got }; }
+            return { partOpts: out, notes };
+        });
+        let n = 0;
+        for (const p of ['practice', 'mixed', 'wedo']) for (const v of po.offeredValues(limM[p])) {
+            const ask = { [p]: v };
+            const atM = po.normalizePartOpts({ [p]: { n: v } }, limM);
+            const atL = resnap(atM, ask, limL);
+            const back = resnap(atL.partOpts, ask, limM);
+            n++;
+            if (countOf(back.partOpts, p, limM[p]) !== v) F('PO-4', `${p} ${v} at M -> L ${countOf(atL.partOpts, p, limL[p])} -> M ${countOf(back.partOpts, p, limM[p])}: the size round trip lost the count asked (A4-F2)`);
+            if (back.notes[p]) F('PO-4', `${p} ${v} at M -> L -> M: back at its asked count, yet a note ${JSON.stringify(back.notes[p])} (A4-F2)`);
+            if (countOf(atL.partOpts, p, limL[p]) !== v && !atL.notes[p]) F('PO-4', `${p} ${v} at M -> L ${countOf(atL.partOpts, p, limL[p])}: snapped with no note (A4-F2)`);
+        }
+        const off = resnap({ wedo: { on: false } }, { wedo: 3 }, limL);
+        if (!(off.partOpts.wedo && off.partOpts.wedo.on === false)) F('PO-4', `We Do off with an asked 3: re-limited to ${JSON.stringify(off.partOpts)} - an off part must stay off (A4-F2)`);
+        console.log(`PO-4 A4-F2: ${n} counts through M -> L -> M`);
+    });
     // the save / load round trip: a section's partOpts as JSON, read back, normalised again
     blk('PO-4 save/load', () => {
     const lims = po.allPartLimits({ prereq: { total: 4 }, chart: { designed: 2, min: 1 }, vocab: { words: 3, values: [1, 2, 3], canOff: true }, remember: { has: true, canOff: true }, wedo: { fit: 3, values: [1, 2, 3], canOff: true }, rows: { fit: 2, perRow: 3, values: [1, 2], canOff: true }, practice: { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 1 }, mixed: { count: 10 } });
@@ -224,6 +297,8 @@ async function browser() {
     const cover = { cases: 0, wedo: 0, practice: 0, list: [] };
     const walk = { cases: 0, states: 0 };
     const rowfitPlus = [];   // (EB-ROWFIT+, report-only - critic A r3 R3)
+    const rowfitCases = new Map();   // (critic A r4 F1: the EB-ROWFIT+ states grouped by lesson x size case)
+    let curCase = '';
     // (the lessons critic A r2 graded: always walked)
     const MUST_WALK = ['number_sense:nearest_10', 'addition:add_wp_10', 'subtraction:sub_10k_no_regroup', 'addition:add_facts'];
     try {
@@ -426,6 +501,9 @@ async function browser() {
             if (rl && !rl.none && rowsPrinted >= 1 && lastSheet && rowH[perRow] && (rl.fixed || countOf(cur, 'rows', rl) >= rl.max) && po.rowFits(lastSheet.emptyMm, rowH[perRow], 0)) {
                 const msg = `${where} p${lastSheet.i + 1}: ${rowsPrinted} lesson row(s), "${rl.fixed ? 'Fixed' : 'at the most offered'}", yet ${lastSheet.emptyMm} mm of the foot is empty - one more row is ${rowH[perRow]} mm${changed(lastSheet) ? '' : ' (the standard sheet)'}`;
                 rowfitPlus.push(msg);
+                const c = rowfitCases.get(curCase) || { n: 0, changed: 0 };
+                c.n++; if (changed(lastSheet)) c.changed++;
+                rowfitCases.set(curCase, c);
                 if (has('gate-rowfit-plus') && changed(lastSheet)) F('EB-ROWFIT+', msg);
             }
             // (c) the rows' text is true, the standard packet included (the screen's text is no print: not in the print baseline):
@@ -469,6 +547,7 @@ async function browser() {
 
         for (const [li, l] of lessons.entries()) for (const size of sizes) {
             const where0 = `${l.id} ${size}`;
+            curCase = where0;
             const b0 = await build(l.skill, size, undefined); builds++;
             if (b0.error) { Fbuild(`${where0} standard packet`, b0.error); continue; }
             const lims = po.allPartLimits(b0.fit);
@@ -649,6 +728,17 @@ async function browser() {
     const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d', 'EB-ROWFIT', 'EB-ROWFIT+', 'PO-NOROOM', 'PO-REM', 'PO-CAP', 'PO-VOC'];
     console.log(`EB-ROWFIT+ (report-only${has('gate-rowfit-plus') ? ', gating changed sheets' : ''}): ${rowfitPlus.length} state(s) with a row-sized foot under rows the teacher cannot add to (${rowfitPlus.filter((x) => !/the standard sheet\)$/.test(x)).length} on changed sheets)`);
     for (const x of rowfitPlus.slice(0, 12)) console.log(`  ${x}`);
+    // (critic A r4 F1) ONE stable line: the EB-ROWFIT+ states grouped by lesson x size case (sorted), so a document quotes the
+    // gate's own count, never a hand count. A full run (the default scope) holds it to the recorded line (PO-DOC).
+    const line = rowfitLine(rowfitPlus.length, rowfitPlus.filter((x) => !/the standard sheet\)$/.test(x)).length, rowfitCases);
+    console.log(line);
+    if (FULL_SCOPE) {
+        if (has('write-rowfit-plus')) { require('fs').writeFileSync(ROWFIT_REC, line + '\n'); console.log(`(wrote ${path.relative(HERE, ROWFIT_REC)})`); }
+        else {
+            const rec = readRec();
+            if (rec !== line) F('PO-DOC', `the full run's EB-ROWFIT+ line differs from ${path.relative(HERE, ROWFIT_REC)} (${rec ? `recorded: "${rec.slice(0, 120)}..."` : 'no record'}) - rerun with --write-rowfit-plus and quote the new line in DESIGN §8d (A4-F1)`);
+        }
+    }
     console.log(`PO-2w walk: ${walk.states} settled states beyond the standard packet in ${walk.cases} lesson x size cases (depth ${arg('walk-depth', 3)})`);
     for (const id of ids) { const f = fails.filter((x) => x.startsWith(id + ' ')); console.log(`${id} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, Number(arg('show', 25)))) console.log(`   ${x}`); }
     // F2 (critic A r1): how many lesson x size cases offer a real We Do range and a real Practice range (2 values or more)
@@ -663,8 +753,11 @@ async function browser() {
 }
 
 (async () => {
-    await unit();
-    if (!has('unit')) await browser();
+    if (has('doc-only')) docCheck();
+    else {
+        await unit();
+        if (!has('unit')) await browser();
+    }
     if (ONLY) console.log(`(--only ${ONLY.join(',')}: other findings not counted)`);
     if (errors.length) {
         for (const x of errors.slice(0, 12)) console.log(`  ERROR ${x}`);

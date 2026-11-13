@@ -346,6 +346,34 @@ export function normalizePartOpts(partOpts, limits = {}) {
     return out;
 }
 
+/**
+ * Critic A r4 F2: re-limit a section's part counts from what the teacher ASKED, not from the last snapped value. `asked` is
+ * {part: n} - the count each stepper was last set to by the teacher; a part that is off keeps its off. So a size round trip
+ * (Practice 45 at M, then L: 30, the most L holds; then M) gives back 45, where re-snapping the clamped 30 gave 27. Returns
+ * {partOpts, notes}: notes[part] = {asked, got} for every part whose count differs from its asked count (the caller words
+ * it with snapNote), and a part back at its asked count has no note.
+ */
+export function resnapPartOpts(partOpts, asked, limits) {
+    const src = JSON.parse(JSON.stringify(partOpts && typeof partOpts === 'object' ? partOpts : {}));
+    const ask = asked && typeof asked === 'object' ? asked : {};
+    for (const [p, n] of Object.entries(ask)) {
+        if (!PART_OPT_IDS.includes(p) || !Number.isFinite(Number(n)) || Number(n) <= 0) continue;
+        if (src[p] && src[p].on === false) continue;
+        src[p] = Object.assign({}, src[p], { n: int(n) });
+        delete src[p].on;
+    }
+    const out = normalizePartOpts(src, limits);
+    const notes = {};
+    for (const [p, v] of Object.entries(src)) {
+        if (!Number.isFinite(v.n)) continue;
+        const lim = limits ? limits[p] : null;
+        const now = out[p];
+        const got = now && Number.isFinite(now.n) ? now.n : lim ? lim.dflt : v.n;
+        if (got !== v.n) notes[p] = { asked: v.n, got };
+    }
+    return { partOpts: out, notes };
+}
+
 /** True when the partOpts ask for the standard packet (nothing stored). */
 export const partOptsEmpty = (po) => !po || !Object.keys(normalizePartOpts(po, null)).length;
 

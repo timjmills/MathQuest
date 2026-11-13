@@ -22,7 +22,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack, lessonPartSeed } from './print-sheet.js';
-import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, snapNote, totalPages, PART_LEVEL, resolveSupports, supportsChip, supDeltaFromTicks, gateBySize } from './sheet/part-opts.js';
+import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, resnapPartOpts, sheetCaption, snapNote, totalPages, PART_LEVEL, resolveSupports, supportsChip, supDeltaFromTicks, gateBySize } from './sheet/part-opts.js';
 import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -361,7 +361,7 @@ function onClick(e) {
             renderParts(d.sec, b); scheduleBuild(); break;
         }
         case 'sup-cover': { const s = sec(d.sec); const r = supResolved(s, d.part); setPartSup(s, d.part, r.ticks, d.v === 'whole' ? null : d.v); renderParts(d.sec, b); scheduleBuild(); break; }
-        case 'parts-reset': { const s = sec(d.sec); const std = s.partStd || { pages: 1, mixed: false }; s.partOpts = {}; s.partRefresh = {}; s.pages = std.pages; s.mixed = std.mixed; delete s.parts; delete s.partNote; renderParts(d.sec, null); root.querySelector(`[data-act="part-on"][data-sec="${d.sec}"]`)?.focus(); scheduleBuild(); break; }
+        case 'parts-reset': { const s = sec(d.sec); const std = s.partStd || { pages: 1, mixed: false }; s.partOpts = {}; s.partRefresh = {}; s.pages = std.pages; s.mixed = std.mixed; delete s.parts; delete s.partNote; delete s.partAsk; renderParts(d.sec, null); root.querySelector(`[data-act="part-on"][data-sec="${d.sec}"]`)?.focus(); scheduleBuild(); break; }
         case 'remove-skill': sec(d.sec).skills.splice(Number(d.idx), 1); renderWhat(); scheduleBuild(); break;
         case 'skill-options': openOptions(Number(d.sec), Number(d.idx), b); break;
         case 'pick': { const s = sec(d.sec); s.picking = !s.picking; s.menu = ''; renderWhat(); if (s.picking) root.querySelector(`[data-pick="${d.sec}"]`)?.focus(); break; }
@@ -605,6 +605,7 @@ function partToggle(s, p, on) {
     if (want === now) return;
     if (p === 'practice') { if (!want) { s.pagesWas = s.pages; s.pages = 0; } else s.pages = Number(s.pagesWas) > 0 ? s.pagesWas : ((s.partStd && s.partStd.pages) || 1); return; }
     if (p === 'mixed') { s.mixed = want; return; }
+    if (s.partAsk) delete s.partAsk[p];   // (critic A r4 F2: the tick drops the count, and with it the count asked)
     const po = sectionPartOpts(s);
     const o = Object.assign({}, po[p]);
     if (!want) o.on = false;
@@ -627,6 +628,8 @@ function partStep(s, p, dir) {
     po[p] = Object.assign({}, po[p], { n: next });
     delete po[p].on;
     setPartOpts(s, po);
+    // (critic A r4 F2: the count the teacher asked for - every re-limit re-snaps from it, never from a clamped count)
+    s.partAsk = Object.assign({}, s.partAsk, { [p]: next });
 }
 
 /** The registry part a row's New numbers refreshes (the lesson sheet's bands are one sheet). */
@@ -655,7 +658,7 @@ function partsKeyCheck(s) {
         const std = s.partStd;
         if (std) { s.pages = std.pages; s.mixed = std.mixed; }
         s.partOpts = {}; s.partRefresh = {};
-        delete s.partStd; delete s.partFit; delete s.partLast; delete s.partNote; delete s.parts; delete s.partSup; delete s.supOpen;
+        delete s.partStd; delete s.partFit; delete s.partLast; delete s.partNote; delete s.parts; delete s.partSup; delete s.supOpen; delete s.partAsk;
     }
     s.partKey = key;
 }
@@ -1305,18 +1308,19 @@ async function runBuild() {
             s.partLast = Object.assign({}, s.partLast);
             for (const x of ['practice', 'mixed']) if (fit[x]) s.partLast[x] = fit[x];
             if (s.partOpts) {
-                // (a count the new limits no longer offer snaps to the nearest that is, and says so under its stepper - §8a)
-                const before = s.partOpts;
-                s.partOpts = normalizePartOpts(s.partOpts, sectionLimits(s));
-                for (const [x, v] of Object.entries(before)) {
-                    const now = s.partOpts[x];
-                    if (!Number.isFinite(v.n) || (now && now.n === v.n)) continue;
-                    const lim = sectionLimits(s)[x];
-                    const got = now && Number.isFinite(now.n) ? now.n : lim ? lim.dflt : v.n;
-                    if (got === v.n) continue;
+                // (a count the new limits no longer offer snaps to the nearest that is, and says so under its stepper - §8a).
+                // Critic A r4 F2: it snaps from the count the teacher ASKED (s.partAsk), so Practice 45 at M -> L (30) -> M is 45
+                // again, not a re-snap of the clamped 30; a count back at its asked value loses its note.
+                const lims = sectionLimits(s);
+                const r = resnapPartOpts(s.partOpts, s.partAsk, lims);
+                s.partOpts = r.partOpts;
+                const note = Object.assign({}, s.partNote);
+                for (const x of Object.keys(s.partAsk || {})) if (!r.notes[x]) delete note[x];
+                for (const [x, v] of Object.entries(r.notes)) {
                     // (critic A r3 R2: a clamp to the new max / min says so - "so no page is under half full" only for a true rounding)
-                    s.partNote = Object.assign({}, s.partNote, { [x]: snapNote(x, v.n, got, lim, pr.size === 'S' ? 'M' : pr.size) });   // (a lesson asked for at S prints at M)
+                    note[x] = snapNote(x, v.asked, v.got, lims[x], pr.size === 'S' ? 'M' : pr.size);   // (a lesson asked for at S prints at M)
                 }
+                s.partNote = note;
             }
             const box = root.querySelector(`#tvParts${si}`);
             const focus = box && box.contains(document.activeElement) ? document.activeElement : null;
@@ -1414,7 +1418,10 @@ function renderTabs() {
     const tabs = last.pages.map((l, i) => [String(i), l]);
     if (pr.key && last.keyHtml) tabs.push(['key', 'Answer keys']);
     const cur = String(pr.view);
-    box.innerHTML = tabs.slice(0, 8).map(([v, l]) => `<button type="button" role="radio" data-act="view" data-v="${v}" aria-checked="${cur === v}">${esc(l)}</button>`).join('');
+    // (critic A r4 P6: every page and the Answer keys get a tab - the strip used to stop at 8, so page 9, page 10 and the
+    // keys of a long lesson packet could not be previewed. Past 8 tabs the strip wraps onto more rows at every width.)
+    box.classList.toggle('tv-tabs-many', tabs.length > 8);
+    box.innerHTML = tabs.map(([v, l]) => `<button type="button" role="radio" data-act="view" data-v="${v}" aria-checked="${cur === v}">${esc(l)}</button>`).join('');
 }
 
 function pageDims() {

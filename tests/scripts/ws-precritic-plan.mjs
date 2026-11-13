@@ -61,7 +61,7 @@ export function readLessonCommand(cmd) {
  *  --teacher; a row's scope flag, --bt-only / --coverage-only / --lessons, must be on a planned line of that tool too, so a
  *  row cannot be proved by a differently scoped run of the same tool.) */
 export const LANE_TOOLS = {
-    'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
+    'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--doc-only', '--lessons'] },
     'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
     'ws-partopts-supports': { scope: ['--role', 'lesson'], flags: ['--unit', '--ui', '--lessons'] },
 };
@@ -111,6 +111,8 @@ function selfTest() {
     eq('lane bt row', readLaneCommand('/tmp/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--bt-only' });
     eq('lane lessons row', readLaneCommand('MQ_ROOT={root} node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M --only PO-2d'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--lessons' });
     eq('lane shots row', readLaneCommand('node tests/scripts/ws-partopts-shots.cjs --no-shots --only R1'), { tool: 'ws-partopts-shots', scope: ['--role', 'lesson'], flag: null });
+    eq('lane doc row', readLaneCommand('MQ_ROOT={root} node tests/scripts/ws-partopts-unit.cjs --doc-only --only PO-DOC'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--doc-only' });
+    eq('lane doc not planned by a bt line', planHasLane('  [browser] bt — node tests/scripts/ws-partopts-unit.cjs --bt-only', { tool: 'ws-partopts-unit', flag: '--doc-only' }).length, 0);
     eq('not a lane row', readLaneCommand('node tests/scripts/ws-node-lint.mjs --skill addition:add'), null);
     const lanePlan = '  [browser] parts — tests/scripts/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M,L --walk-depth 1\n  [browser] bt — node tests/scripts/ws-partopts-unit.cjs --bt-only\n  [browser] shots — node tests/scripts/ws-partopts-shots.cjs --no-packets --no-shots';
     eq('lane bt planned', planHasLane(lanePlan, { tool: 'ws-partopts-unit', flag: '--bt-only' }).length, 1);
