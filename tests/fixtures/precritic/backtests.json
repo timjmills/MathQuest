@@ -5172,6 +5172,226 @@
   }
  },
  {
+  "id": "ri-overflow-stack",
+  "check": "Reason It A / B work never leaves its cell: work wider than half the room stands A over B (lead ruling 2026-11-13; word-stories critic r1 F2, compare F1)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "b25479c5",
+   "state": "34 OVERFLOW on sub/add_word_problems + sub_1m_no_regroup RI S/M/L"
+  },
+  "pass": {
+   "commit": "244a84b6",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_word_problems,subtraction:sub_1m_no_regroup --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-tight-rows",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "EB-BAND 2 on expand / unit_form / combine guided"
+  },
+  "pass": {
+   "commit": "8307219c",
+   "state": "EB-BAND PASS"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-one-answer",
+  "check": "a Reason It item asks for the answer once: circle A or B, 'The answer is __.' (lead ruling F8, PT-RSN-4)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-ONEANSWER",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'__ is correct.' + ri-who on every item"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-ONEANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-layout",
+  "check": "Reason It work within half the cell keeps A and B side by side over a full-width response row; only wider work stacks, from the top (critic r6c D1 / D3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "85 mm work stacked (one item a page)"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell",
+  "check": "a word answer's line is one width whatever the word (no tell; holds 'hundreds')",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'no' 2 digits, 'yes' 6"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "key-fit",
+  "check": "a key's written answer stays inside its slot (identify's 'hundreds' on a 2-digit line)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks KEYFIT",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "KEYFIT on identify RI S/M/L, TF"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:identify --roles reason-it,true-false --size S,M,L --rules KEYFIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lone-page",
+  "check": "a role page never holds ONE item where its ceiling is 2+ (H5; critic r6c / r6d D1: a Grade 2 story one a sheet)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks LONE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "df83248e",
+   "state": "sub_word_problems RI L 1 item"
+  },
+  "pass": {
+   "commit": "faeb7759",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_wp_10 --roles reason-it --size L --rules LONE-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell-number",
+  "check": "a number answer line holds the longer of the right and the wrong answer (critic r6d E1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "df83248e",
+   "state": "29 against 141: a 2-digit line"
+  },
+  "pass": {
+   "commit": "c42f7504",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-countrow-overflow",
+  "check": "a Reason It count-row train never leaves its A / B panel (lf-algebra critic r2 G4 area; npr overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "c5235768",
+   "state": "npr RI OVERFLOW 18"
+  },
+  "pass": {
+   "commit": "7b33c7e3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-stack-band",
+  "check": "a stacked Reason It pair leaves no 30 % band under its work: the A / B tag stands in a gutter at S / M (critic r6f F1, H13)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "39213c4b",
+   "state": "npr RI S: 33 % under each cell"
+  },
+  "pass": {
+   "commit": "87b0c18c",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-ink-inner",
+  "check": "Reason It holds a true ink width (inkWMm) to the panel's inner width: 61 mm of compare ink goes under, not beside (lf-placevalue 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "d8baca1e",
+   "state": "61.2 mm ink laid out beside a 57.5 mm panel"
+  },
+  "pass": {
+   "commit": "8d757936",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
   "id": "eb-fixture-band",
   "check": "ws-empty-band EB-BAND: an empty band of >= 30 % of the cell under the ink fails, a cell sized to its item passes (the shared check of LESSONS_LEARNED L25; the real-head rows are in backtests-empty-band.json, pending each lane's fix)",
   "kind": "fixture",
