@@ -78,7 +78,9 @@ export function sources(skills, { earlier }) {
     // quadrants (a first skill checks itself once) rather than repeating one skill four times.
     return list.slice(0, 4).map((sk, i) => ({ id: `q${i}`, skills: [sk] }));
 }
-export const measureCols = () => [1, 2, 4];
+/** (critic r3 F2: a routed check lies a question 3 across - its rows were sized from the 4-column measure, and the sub S
+ *  "15 - 6" fact cells drew 38-40 mm in a 37.6 mm row, hiding their tag; a routed check measures 3 columns too) */
+export const measureCols = (ctx) => (ctx && ctx.routed ? [1, 2, 3, 4] : [1, 2, 4]);
 /**
  * A lesson's ROUTED check draws every item at level 0 (PAGE_TYPES 2.10, LR-17a (3); lead r2 PC-SCAFFOLD): a column
  * subtraction dealt with its place heads and a box per answer digit (sub_100_no_regroup's kit stack) prints plain - no
@@ -86,10 +88,19 @@ export const measureCols = () => [1, 2, 4];
  * untouched (`routed` only on a lesson's Prerequisite Check).
  */
 export function prepare(it, { routed = false } = {}) {
-    const pl = routed && it && it.template === 'stack' && it.q && it.q.cell && it.q.cell.payload;
-    if (pl) { pl.heads = false; pl.answer = 'open'; }
+    const pl = routed && it && it.q && it.q.cell && it.q.cell.payload;
+    if (pl && it.template === 'stack') { pl.heads = false; pl.answer = 'open'; }
+    // (critic r3 F1: a "name the place" cell prints no place heads on the check - the letter over the underlined digit IS the
+    // answer - and its words lie in the number's own place order, T before O, as one row under the number: dealt "ones tens",
+    // the word under the underlined digit was always the wrong one)
+    if (pl && it.template === 'pv' && /^place/.test(String(pl.kind || ''))) {
+        pl.heads = false;
+        if (Array.isArray(pl.words)) pl.words = pl.words.slice().sort((a, b) => PLACE_RANK.indexOf(a) - PLACE_RANK.indexOf(b));
+    }
     return it;
 }
+/** The place words, biggest place first (the order the digits print). */
+const PLACE_RANK = ['millions', 'hundred thousands', 'ten thousands', 'thousands', 'hundreds', 'tens', 'ones'];
 /** A check draws its items at level 0 (PAGE_TYPES 2.10: no supports), so it measures them at level 0 too (critic r1 D8). */
 export const MEASURE_LEVEL = () => 0;
 // The detailed lesson's check grows its rows to fill the body (critic r3 R7: no bordered empty strip

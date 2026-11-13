@@ -4198,7 +4198,7 @@ async function buildRoleSheet(n, metaOf) {
     // (critic r7 R7-1: a div_facts Test lays out on its Independent page's grid - 5 columns of drawn arrays at S - so it says
     // when the sheet is div_facts with a support; test.js measures the 5th column then)
     const divSupported = supported && n.sections.some((sec) => (sec.skills || []).some((sk) => sk && sk.categoryId === 'division' && sk.skillId === 'div_facts'));
-    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported }, divSupported ? { divSupported } : {})) : [1, 2]) || [1, 2];
+    const colsList = (typeof mod.measureCols === 'function' ? mod.measureCols(Object.assign({}, ctx, { supported }, divSupported ? { divSupported } : {}, n.routes && n.routes.length ? { routed: true } : {})) : [1, 2]) || [1, 2];
     const needsShow = SHOWS_WORK.has(n.role);
     const strictShow = n.role === 'error-analysis';
     const input = {
@@ -4867,6 +4867,10 @@ async function buildLesson(n, metaOf) {
     // (R5: the chart's own keys, the last thing a spent pool deals again - generateRun)
     const chartKeys = packNums ? [...planKeys(chart), ...chartQs.map(factKeyOf)].filter((k) => k !== null) : null;
     if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true, chartKeys }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
+    // (lf-engine PC r3 F4, LR-5: with the Prerequisite Check on, the sheet has no Warm-up and re-deals its Guided and
+    // Independent cells, so Practice and Mixed could deal one of them again - sub L / S printed "50 - 36" on both. Its fact keys
+    // go into the practice ref's hard avoid set; a lesson without the check deals exactly as before.)
+    if (prereqs && !packNums) { const sheetKeys = planKeys(teach); if (sheetKeys.length) practiceSk = Object.assign({}, practiceSk, { hardAvoid: [...(Array.isArray(practiceSk.hardAvoid) ? practiceSk.hardAvoid : []), ...sheetKeys] }); }
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.

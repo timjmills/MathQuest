@@ -64,7 +64,11 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
     const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)));
     const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
-    const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
+    // (lf-engine PC r3 F3, LR-17b `indepFrame`: an Independent column subtraction draws the T O heads, the exchange row and
+    // the answer boxes its Guided cells draw, so its row is at least a Guided cell's measured height - the pool's own level
+    // measure left the sub L row at 64.8 mm for a 68.7 mm cell, which printed past its band's bottom rule. Check-on only.)
+    const frameH = phase0On(data, 'indepFrame') ? hAt(weDo.filter((it) => it && it.template === 'stack'), ic) : 0;
+    const hI = Math.max(hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic), frameH && indepPool.some((it) => it.template === 'stack') ? frameH : 0);
     let indep = [];
     if (Number.isFinite(hI) && hI > 0) {
         // The band's strip is as tall as its label and instruction wrap (critic R2 R-1: a two-line

@@ -231,6 +231,12 @@ function pcMeasure() {
             let worst = { over: Math.round((ib - br.bottom) / MM * 10) / 10, what: 'body' };
             for (const bd of body.querySelectorAll('.ws-band, .ws-grid')) { const r = vis(bd); if (!r) continue; let b = -Infinity; for (const c of bd.querySelectorAll('.ws-cell')) { const q = vis(c); if (q) b = Math.max(b, q.bottom); }
                 const o = Math.round((b - r.bottom) / MM * 10) / 10; if (o > worst.over) worst = { over: o, what: `${String(bd.className).split(' ')[0]} "${((bd.querySelector('.ws-strip') || {}).textContent || '').trim().slice(0, 30)}"` }; }
+            // (the PDF lays a fixed grid's row out at its cells' natural height - the screen squeezes them: sub L sheet Independent
+            // cells drew 68.8 mm in the PDF in a 64.8 mm row, past the band's bottom rule. A row's natural height: the grid freed
+            // of its fixed height, read, and restored.)
+            for (const g of body.querySelectorAll('.ws-grid')) { const h0 = g.style.height; if (!h0) continue; const r0 = g.getBoundingClientRect(); const rows = Math.max(1, getComputedStyle(g).gridTemplateRows.split(' ').length);
+                const rowH = r0.height / rows; g.style.height = 'auto'; let nat = 0; for (const c of g.children) nat = Math.max(nat, c.getBoundingClientRect().height); g.style.height = h0;
+                const o = Math.round((nat - rowH) / MM * 10) / 10; if (o > Math.max(0.5, worst.over)) worst = { over: o, what: `row of the band "${((g.closest('.ws-band') || g).querySelector('.ws-strip') || { textContent: '' }).textContent.trim().slice(0, 30)}" (its cells need ${(nat / MM).toFixed(1)} mm in ${(rowH / MM).toFixed(1)} mm) - a cell runs past it` }; }
             out.frame = worst; }
         for (const col of pg.querySelectorAll('.mq-lprecol')) {
             const grid = col.querySelector(':scope > .ws-grid'), tag = col.querySelector(':scope > .mq-lpretag');
