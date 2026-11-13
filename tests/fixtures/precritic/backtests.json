@@ -5468,6 +5468,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "c120-title-band",
+  "check": "a band-120 chart names 'a chart to 120' on every role, not 'a hundreds chart' (L6 / L28; print-sheet reads the band for the I Can)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks TITLE (the lesson title follows the option)",
+  "browser": true,
+  "fail": {
+   "commit": "e7d3e8d8c",
+   "state": "lesson {band:120} key printed 'on a hundreds chart' and the key 101 left its square (KEYFIT)"
+  },
+  "pass": {
+   "commit": "72396d8a7",
+   "state": "'a chart to 120'; the window states its width so it never squeezes"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fill --card --card-opts --variant band=120 --opt-roles lesson --size L --rules KEYFIT --show 20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "c120-ri-under",
+  "check": "Reason It holds more than one chart-window item a page: a window past 100 states its true width (inkWMm) and takes the A|B-under layout, not the stacked one-a-page form (H5)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks LONE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "e7d3e8d8c",
+   "state": "reason-it L one item a page where the role holds 2 (LONE-PAGE)"
+  },
+  "pass": {
+   "commit": "72396d8a7",
+   "state": "chartwindow footprint inkWMm -> reason-it UNDER layout, 2 a page"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size L --rules LONE-PAGE --show 20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "c120-pupiltag",
+  "check": "the 'Sam wrote:' label sits 2 mm over a chart-window error-analysis item, not 6.5 mm (PT-ERR-4): the window drops its own letter keep-out inside the work block",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks PUPILTAG",
+  "browser": true,
+  "fail": {
+   "commit": "e7d3e8d8c",
+   "state": "error-analysis M label 6.5 mm from its work (PUPILTAG 8)"
+  },
+  "pass": {
+   "commit": "72396d8a7",
+   "state": "css/sheet-kit.css .mq-judge-work .k2-chart margin-top 0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:chart_to_120 --card --card-opts --size M --rules PUPILTAG --show 20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
