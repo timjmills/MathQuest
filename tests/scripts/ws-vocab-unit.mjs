@@ -31,7 +31,8 @@
 // V7-ALL (r13) every bank dealtBanks lists is judged (V-FEAT reading + today's notWith); V-NUM ringed/boxed numbers all
 //     even / all odd read as even / odd (r14: one ringed or boxed number too); V-TWIN pictures of one feature class share their
 //     notWith lists (r14: and every run picture, grow's squares included, is notWith rule); V-PLACE (r14) a ringed or boxed
-//     digit inside a number reads as one / ten / hundred
+//     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
+//     reads as cycle
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
@@ -278,6 +279,13 @@ const ambig = [];
         for (const [f, b] of [['place:ones', 'one'], ['place:tens', 'ten'], ['place:hundreds', 'hundred']]) {
             if (a !== b && read.includes(f) && pl.words.includes(b) && W.compatible([a, b])) fail(`V-PLACE ${pl.name}: the "${a}" picture marks a digit in the ${f.slice(6)} place, and it may be dealt with "${b}"`);
         }
+    }
+    // V-ONES (r15, critic r14 #1: sequence 5, 10, 15 read as cycle in set 6 - its ones digits go 5, 0, 5): a run whose visible
+    // ones digits repeat, or whose step divides 10 (2, 5, 10), shows a ones-digit cycle (ones-cycle, read from the drawing by
+    // today's reader), which reads as cycle; such a picture may not be dealt with cycle (any pool, any bank) unless notWith
+    for (const pl of pools) for (const a of pl.pics) {
+        if (a === 'cycle' || !P.hasVocabPicture(a) || !pl.words.includes('cycle') || !W.compatible([a, 'cycle'])) continue;
+        if (HERE_P.vocabReadFeatures(svgOf(P, a)).includes('ones-cycle')) fail(`V-ONES ${pl.name}: the "${a}" picture draws a run whose ones digits cycle, and it may be dealt with "cycle"`);
     }
     // V-TWIN (r13, critic r12 #3: first term missed the term / rule pin): two pictures of one pool with the same feature
     // class (their features less the box position and skip-count, every step:n as step) are notWith the same other words.

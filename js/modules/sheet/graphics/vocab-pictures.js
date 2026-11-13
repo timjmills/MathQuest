@@ -362,8 +362,10 @@ const PICS = {
     sequence: {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         focal: 'all',
-        alt: '5, 10, 15 and so on, numbers in order with commas',
-        draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
+        // (r15, critic r14 #1: 5, 10, 15 showed the ones digits 5, 0, 5 - a ones-digit cycle, so it read as cycle in the units-digit
+        // cycle lesson; 4, 7, 10 steps by 3, and its ones digits 4, 7, 0 never come back - V-ONES)
+        alt: '4, 7, 10 and so on, numbers in order with commas',
+        draw: () => tx(30, 20, 0, '4, 7, 10…', { size: 9 }),
     },
     cycle: {
         ccss: ['4.OA.C.5'], op: 'pattern',
@@ -410,8 +412,10 @@ const PICS = {
     'first term': {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         // (r11, critic r10 #1: [3], 7, 11 rose, so it read as grow - now a FALLING run: [30], 25, 20)
-        alt: '30, 25, 20: the 30 at the start in a heavy box',
-        draw: () => rect(3, 11, 15, 18, W.heavy) + tx(10.5, 20, 0, '30', { size: 9 }) + tx(19, 20, 0, ', 25, 20', { size: 9, anchor: 'start' }),
+        // (r15 V-ONES, critic r14 #1's class: 30, 25, 20 showed the ones digits 0, 5, 0, so it read as cycle in the grade 4 pool;
+        // [30], 26, 22 steps by 4, as its twin term does, and its ones digits 0, 6, 2 never come back)
+        alt: '30, 26, 22: the 30 at the start in a heavy box',
+        draw: () => rect(3, 11, 15, 18, W.heavy) + tx(10.5, 20, 0, '30', { size: 9 }) + tx(19, 20, 0, ', 26, 22', { size: 9, anchor: 'start' }),
     },
     /* ---- Grade 4: multiplicative comparison (4.OA.A.1) */
     'times as many': {
@@ -477,13 +481,13 @@ const PIC_FEAT = Object.freeze({
     odd: ['dots', 'lone-mark', 'pairs-ringed', 'groups-of:2'],
     product: ['boxed-answer', 'boxed-number', 'equals', 'times-sign', 'number-sentence', 'marked-even'],
     factor: ['boxed-number', 'boxed-operand', 'equals', 'times-sign', 'number-sentence'],
-    row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
-    column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
+    row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4', 'ones-cycle'],
+    column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4', 'ones-cycle'],
     multiple: ['dots', 'rising-run', 'skip-count', 'step:3', 'number-line', 'hops', 'forward-hop'],
     input: ['table', 'column-ringed', 'in-ringed'],
     output: ['table', 'column-ringed', 'out-ringed'],
     rule: ['arrow-into-box', 'arrow-out-of-box', 'op-box', 'plus-sign'],
-    pattern: ['ellipsis', 'plus-sign', 'rising-run', 'skip-count', 'step:2', 'hops', 'forward-hop'],
+    pattern: ['ellipsis', 'plus-sign', 'rising-run', 'skip-count', 'step:2', 'hops', 'forward-hop', 'ones-cycle'],
     array: ['dots', 'array'],
     commutative: ['dots', 'equals', 'times-sign', 'array', 'turn-arrow', 'number-sentence'],
     identity: ['equals', 'times-sign', 'same-number-arc', 'number-sentence'],
@@ -498,7 +502,7 @@ const PIC_FEAT = Object.freeze({
     'one less': ['crossed-mark', 'dots'],
     before: ['boxed-first-of-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'back-hop', 'marked-even'],
     after: ['boxed-in-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'forward-hop', 'marked-even'],
-    'hundred chart': ['table', 'rising-run', 'step:1', 'step:10'],
+    'hundred chart': ['table', 'rising-run', 'step:1', 'step:10', 'ones-cycle'],
     hundred: ['base10-flat'],
     ten: ['base10-rod'],
     one: ['base10-unit'],
@@ -507,11 +511,11 @@ const PIC_FEAT = Object.freeze({
     'number name': ['number-words'],
     'ones digit': ['boxed-number', 'last-digit-boxed', 'marked-even', 'place:ones'],
     repeat: ['repeated-block', 'bracket'],
-    sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
+    sequence: ['ellipsis', 'rising-run', 'step:3'],
     cycle: ['loop-arrows', 'loop-shapes'],
     grow: ['shapes-growing', 'rising-run', 'step:2'],
     term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
-    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count', 'marked-even'],
+    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
     'times as many': ['times-sign', 'times-bar', 'bar-pair', 'bracket'],
     compare: ['bar-pair', 'double-arrow'],
     equation: ['equals', 'times-sign', 'number-sentence'],
@@ -574,7 +578,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     cycle: ['repeat', 'circle'],
     grow: ['pattern', 'sequence', 'step'],
     term: ['first term', 'sequence', 'number', 'rule'],  // (r12, critic r11 #3: 18, [14], 10 reads as the rule "take 4")
-    'first term': ['term', 'sequence', 'rule'],  // (r13 V-TWIN, critic r12 #3: the twin of term - [30], 25, 20 reads as "take 5")
+    'first term': ['term', 'sequence', 'rule'],  // (r13 V-TWIN, critic r12 #3: the twin of term - [30], 26, 22 reads as "take 4")
     'times as many': ['compare', 'bar', 'equal parts'],
     compare: ['times as many', 'difference'],
     equation: ['number sentence', 'multiply', 'equal'],
@@ -602,6 +606,8 @@ export const VOCAB_FEATURES = Object.freeze([
     'all-even', 'all-odd', 'marked-even', 'marked-odd',
     // (r14 V-PLACE: the place of a ringed or boxed digit inside a number)
     'place:ones', 'place:tens', 'place:hundreds',
+    // (r15 V-ONES: a run whose ones digits repeat, or whose step divides 10 - 5, 10, 15 - reads as a ones-digit cycle)
+    'ones-cycle',
     // declared only (not read from the markup)
     'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
     'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
@@ -639,6 +645,11 @@ export function vocabReadFeatures(body) {
         let j = i + 2; while (j + 1 < l.length && l[j + 1].n - l[j].n === d) j++;
         runs.push({ items: l.slice(i, j + 1), d });
         f.add(d > 0 ? 'rising-run' : 'falling-run'); f.add(`step:${Math.abs(d)}`);
+        // V-ONES (r15, critic r14 #1: 5, 10, 15 read as cycle in the units-digit-cycle lesson - its ones digits go 5, 0, 5): a run
+        // whose visible ones digits repeat, or whose step (2, 5 or 10) divides 10, shows a ones-digit cycle. (Step 1 does not:
+        // ten numbers pass before a ones digit comes back, so a drawn run of 1s is a count, never a cycle.)
+        const ones = l.slice(i, j + 1).map((it) => Math.abs(it.n) % 10);
+        if ((Math.abs(d) > 1 && 10 % Math.abs(d) === 0) || new Set(ones).size < ones.length) f.add('ones-cycle');
         if (Math.abs(d) > 1 && (l[i].n === Math.abs(d) || l[i].n === 0 || l[i].n % Math.abs(d) === 0)) f.add('skip-count');
         i = j - 1;
     }
