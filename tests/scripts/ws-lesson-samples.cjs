@@ -26,6 +26,8 @@
 //     PC-CLIP    every band heading at the same place on a pupil page and its key twin (+/- 1 mm), and no heading
 //                clipped by an overflow-hiding ancestor. D10 itself (a fill painted over a heading) is NOT seen by the DOM:
 //                ws-print-lint L-OVERLAP SECTION reads it on the PDF (precritic lesson-samples-key-L / -S; critic r2 D1)
+//     PM-H13     (lf-engine-pc r3 F5, F7; live-fix 2026-11-13) every Practice and Mixed page: no cell band >= 30 % (blocking)
+//     LIVE-PART  (r3 F6, H15) every carry / regroup box a key page draws is filled by >= 1 stack of its section
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
@@ -100,6 +102,24 @@ if grey != '-':
     d[int(grey)].get_pixmap(dpi=dpi, colorspace=pymupdf.csGRAY).save(outdir + '/chart-grey.png')
 print(json.dumps(pages))
 `;
+
+/** LIVE-PART (F6): per key page, the carry / regroup boxes (a stack's `.rg[data-ws-seg]`, counted from the ones) that NO
+ *  stack of their section (`.ws-grid`) fills - a dead part (H15). One message per (section, box place). */
+function carryMeasure() {
+    return [...document.querySelectorAll('.ws-page')].map((pg) => {
+        const dead = [];
+        pg.querySelectorAll('.ws-grid').forEach((grid, gi) => {
+            const drawn = new Map();
+            grid.querySelectorAll('.ws-stack').forEach((st) => {
+                const rg = [...st.querySelectorAll(':scope > .rg')];
+                rg.forEach((r, i) => { if (!r.hasAttribute('data-ws-seg')) return; const place = rg.length - 1 - i; const filled = /\S/.test(r.textContent || '');
+                    drawn.set(place, (drawn.get(place) || false) || filled); });
+            });
+            for (const [place, filled] of drawn) if (!filled) dead.push(`section ${gi + 1}: the carry box over place ${place} (${['ones', 'tens', 'hundreds', 'thousands'][place] || place}) is drawn on every stack and filled on none`);
+        });
+        return dead;
+    });
+}
 
 function sheetCheck(page) {
     return page.evaluate(() => {
@@ -226,7 +246,7 @@ async function checkMain() {
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure) }; } finally { await sh.close(); } };
+                    return { lp: await sh.evaluate(LP.lpMeasure, { layout: true }), sc: await sheetCheck(sh), st: await sh.evaluate(stripMeasure), rg: await sh.evaluate(carryMeasure) }; } finally { await sh.close(); } };
                 const P = await read2(built.pupil), K = await read2(built.key);
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
@@ -241,6 +261,11 @@ async function checkMain() {
                     for (const b of bandsOf(P.sc, n)) if (m.part === 'prereq' || /blank at the bottom/.test(b)) F('PC-H13', where('pupil', n), b.replace(/^page \d+:? ?/, ''));
                     if (m.part === 'prereq' && P.st[n] && P.st[n].maxGap > 15) F('PC-H13', where('pupil', n), `a gap of ${P.st[n].maxGap} mm between the check page's cells`);
                 });
+                // PM-H13 (live-fix 2026-11-13, critic lf-engine-pc r3 F5 / F7: "critic-ready" = EVERY page of the packet gated): the
+                // Practice and Mixed pages have no cell band >= 30 % either (blocking; their blank foot stays print-lint's)
+                pm.forEach((m, n) => { if (!['practice', 'mixed'].includes(m.part)) return; for (const b of bandsOf(P.sc, n)) if (!/blank at the bottom/.test(b)) F('PM-H13', where('pupil', n), `${m.part}: ${b.replace(/^page \d+:? ?/, '')}`); });
+                // LIVE-PART (F6, H15): every carry / regroup box a key page draws is filled on that key by >= 1 stack of its section
+                km.forEach((m, n) => { for (const d of (K.rg[n] || [])) F('LIVE-PART', where('key', n), `${m.part}: ${d}`); });
                 if (has('debug')) console.log(JSON.stringify({ lesson: l.id, size, pupil: P.st.map((x) => x.strips), key: K.st.map((x) => x.strips) }));
                 // strips covered; pupil vs key twin
                 pm.forEach((m, n) => { for (const s of (P.st[n] || {}).strips || []) { if (s.covered && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" covered by ${s.covered}`); if (s.clip && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" clipped by ${s.clip}`); } });
@@ -273,7 +298,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-H13', 'PC-CLIP', 'PM-H13', 'LIVE-PART', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     for (const r of rules) { const fs2 = findings.filter((x) => x.rule === r); console.log(`${r.padEnd(12)} ${fs2.length ? `FAIL ${fs2.length}` : na === LESSONS.length && /RANGE|NAME|SLOTS|SCAFFOLD/.test(r) ? 'N/A (no Prerequisite Check in this tree)' : 'PASS'}`); for (const x of fs2.slice(0, 8)) console.log(`   ${x.where}: ${x.msg}`); if (fs2.length > 8) console.log(`   ... ${fs2.length - 8} more`); }
     if (na < LESSONS.length && !read) findings.push({ rule: 'PC-BUILD', where: 'all', msg: 'a Prerequisite Check exists but 0 prerequisite items were read (part / pool names changed?)' });
