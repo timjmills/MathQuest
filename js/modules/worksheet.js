@@ -1055,9 +1055,13 @@ function _wsEvenRows(cards) {
             return bottom - top + sideY(v);
         });
         const tgt = Math.max(Math.min(...hs), ...need);
+        // (c3, lead ruling 2026-11-13): the bordered box is stretched to the row only up to the RUBRIC H13 limit - its content
+        // to its bottom fills at least 78 % of it (its padding counts as white: under the 30 % band limit with room); the card keeps the row height and the rest stays white
+        // outside the box, as for a touch-numeral card above. CL-4b centring still applies inside the capped box.
         vs.forEach((v, i) => {
-            if (hs[i] > tgt + 0.5) v.style.maxHeight = `${tgt}px`;
-            else if (hs[i] < tgt - 0.5) v.style.minHeight = `${tgt}px`;
+            const h = Math.min(tgt, Math.max(need[i], (need[i] - sideY(v)) / 0.78));   // hs[i] is already the stretched row height; the box's own bottom padding is white too, so the content (to its bottom) fills >= 78 % of the box
+            if (hs[i] > h + 0.5) v.style.maxHeight = `${h}px`;
+            else if (hs[i] < h - 0.5) v.style.minHeight = `${h}px`;
         });
         // CL-4b as amended (owner, 2026-11-12): a fitted cell starts at the top unless its row stretches it by 30 % or more of
         // its own height; then it is centred (css/screen-cell.css reads data-mq-stretched)
