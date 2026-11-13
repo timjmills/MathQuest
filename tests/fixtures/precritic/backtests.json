@@ -6259,6 +6259,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ss-array-orient-ag",
+   "check": "An arrays_groups array of 2 or more rows is drawn LANDSCAPE - the smaller factor its rows - on the card at 390 / 820 / 1280, the online worksheet, the quiz and the paper Independent page at S / M / L (owner 2026-11-13 'arrays landscape so they can be bigger'; lead ruling for arrays_groups: master 203a4052's worksheet drew 4 rows of 3, 5 rows of 4). An item that asks a reading (payload.reading) and the arrays-turn pair are exempt.",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots ARRAY-ORIENT (--array-orient)",
+   "browser": true,
+   "fail": {
+    "commit": "203a4052",
+    "state": "live master: arrays_groups deals rows and columns independently - portrait arrays on every host"
+   },
+   "pass": {
+    "commit": "149d7cb4a",
+    "state": "lf-ops-props r5 B1: the smaller factor sets the rows"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:arrays_groups --array-orient",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

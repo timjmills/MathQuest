@@ -61,6 +61,8 @@
 // text run of digits in the cell (tabs, labels, the instruction and screen-only chrome excluded) - must be at least
 // 56 / 48 / 40 px at those widths, in Andika at weight >= 700. A miss is the finding "host:digit" (the baseline's
 // kind), e.g. "card@1280:digit". --rule-skills a:b,c:d judges it only on those skills (ws-precritic passes the lane's).
+// ARRAY-ORIENT (with --array-orient, or --screen-digit; lf-ops-props r5, owner 2026-11-13): every dot array of 2+ rows a kit cell draws
+//   is landscape on card 390/820/1280, worksheet, quiz and the paper Independent page S/M/L (tests/lib/ws-array-orient.cjs).
 // TRAIN-FIT (with --screen-digit, or --train-fit alone; lf-ops-props r4b, lead ruling (a) 2026-11-13): on the same renders, a
 // count-row train (.k2-countrow) draws its numerals at >= the SCREEN-DIGIT floor and nothing in it scrolls sideways or runs past
 // its cell's edge. A miss is "host@width:train".

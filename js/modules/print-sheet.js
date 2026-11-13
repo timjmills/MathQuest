@@ -40,7 +40,7 @@ import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practic
 import { normKeyOptions, shortKeyRows, renderShortKey, tagKeyAnswers, answerText } from './sheet/roles/key-short.js';
 import { composePractice, renderPlan, SHEET_ENGINE_CSS, skillWords, splitCellH, splitPairH, fineSplit, GRID_BORDERS_MM } from './sheet/roles/practice.js';
 import { onePageRows, setOnePagePaper, ONE_PAGE_ITEMS } from './count-rows.js';
-import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight } from './sheet/layout.js';
+import { resolveSectionLayout, resolveBandedLayout, cellWidthMm, LIVE_W_MM, bodyHeightMm, instructionMm, autoFitsAt, itemInfo, itemCap, DENSE_MAX_COLS_AT, DENSE_MAX_COLS, groupByHeight, packByHeight, measuredH, NO_STRETCH_ROOM } from './sheet/layout.js';
 import { paginate } from './sheet/paginate.js';
 import { ROLE_MODULES, ROLE_ALIASES } from './sheet/roles/index.js';
 import { tagLine as lessonTagLine, CASE_TESTS as LESSON_CASE_TESTS } from './sheet/roles/lesson.js';
@@ -3123,6 +3123,125 @@ function numberLineRequest(n) {
  * measured footprint by it (a page that reorders its items is never judged against another item's footprint). Matched by the
  * item's question object; a plan item with no match carries nothing. Nothing draws from it.
  */
+/* ============================================ mixed-class boundary re-deal (lf-ops-props r5, lead ruling (b') 2026-11-13) */
+/**
+ * Lead ruling (b'): a row of `noStretch` cells (arrays, arrays-turn, count-row - answered in place, top-started, a row at most
+ * NO_STRETCH_ROOM x its shortest) that MIXES height classes - its tallest cell over NO_STRETCH_ROOM x its shortest, so the short
+ * cell keeps a band over 20 % whatever the row does - has its BOUNDARY item(s) dealt again: each is swapped, in its own place,
+ * for an item of the page's MAJORITY height class (the NO_STRETCH_ROOM height window holding most of that grid's cells) from
+ * the SAME ladder step (`ladderStep`: its template, kind, task and drawing). Nothing is dropped, the count and the ladder order
+ * are kept; a pass whose swaps would change the page count is undone and its rows are reported (`stuck`), never forced.
+ * No allowance: a row the swaps cannot even out stays reported. Every other page deals exactly as before.
+ */
+export const ladderStep = (q) => {
+    const c = q && q.cell;
+    const p = (c && c.payload) || {};
+    return [c && c.template, p.kind || '', p.type || '', p.ask ? 'ask' : '', p.draw || '', q && q.skillId].join('|');
+};
+/** Every grid of a plan with its page number (1-based): [{page, grid}]. */
+function planGrids(plan) {
+    const out = [];
+    let page = 0;
+    const walk = (s) => {
+        if (!s || typeof s !== 'object') return;
+        if (s.kind === 'grid') out.push({ page, grid: s });
+        if (Array.isArray(s.contents)) s.contents.forEach(walk);
+        if (s.content) walk(s.content);
+        if (Array.isArray(s.parts)) s.parts.forEach(walk);
+    };
+    for (const sh of (plan && plan.sheets && plan.sheets.length ? plan.sheets : [plan || {}])) {
+        for (const pg of (sh.pages && sh.pages.length ? sh.pages : [{ sections: sh.sections || [] }])) { page++; (pg.sections || []).forEach(walk); }
+    }
+    return { grids: out, pages: page };
+}
+/** The NO_STRETCH_ROOM window [lo, hi] (mm) holding the most of `hs`; a tie takes the shorter window (it never adds a page). */
+function majorityWindow(hs) {
+    let best = null;
+    for (const b of [...new Set(hs)].sort((x, y) => x - y)) {
+        const n = hs.filter((h) => h >= b - 0.05 && h <= b * NO_STRETCH_ROOM + 0.05).length;
+        if (!best || n > best.n) best = { n, lo: b, hi: b * NO_STRETCH_ROOM };
+    }
+    return best;
+}
+/** The mixed noStretch rows of a plan: [{page, cols, row: [item index], hs, win, boundary: [item index]}]. */
+export function mixedNoStretchRows(plan, items) {
+    const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
+    const { grids } = planGrids(plan);
+    const out = [];
+    for (const { page, grid } of grids) {
+        const cols = Math.floor(Number(grid.cols) || 1);
+        const list = grid.items || [];
+        if (cols < 2 || list.length < 2) continue;
+        const ix = list.map((pi) => (pi && idx.has(pi.q) ? idx.get(pi.q) : -1));
+        if (ix.some((i) => i < 0) || !ix.every((i) => items[i].footprint && items[i].footprint.noStretch)) continue;
+        const hs = ix.map((i) => measuredH(items[i], cols));
+        if (hs.some((h) => !(h > 0))) continue;
+        const win = majorityWindow(hs);
+        for (let r = 0; r < ix.length; r += cols) {
+            const row = ix.slice(r, r + cols), rh = hs.slice(r, r + cols);
+            if (row.length < 2 || !(Math.max(...rh) > NO_STRETCH_ROOM * Math.min(...rh) + 0.05)) continue;
+            const inWin = (h, w) => h >= w.lo - 0.05 && h <= w.hi + 0.05;
+            const w = rh.some((h) => inWin(h, win)) ? win : majorityWindow(rh);
+            out.push({ page, cols, row, hs: rh, win: w, boundary: row.filter((_, k) => !inWin(rh[k], w)) });
+        }
+    }
+    return out;
+}
+/**
+ * Swap the boundary items of every mixed noStretch row (see above) and plan again; at most three passes. `replan(items)` plans
+ * the same input with the new items; `n` the normalised request (seed, size, look). Returns {plan, swaps, stuck}.
+ */
+function evenMixedRows(plan, items, replan, n) {
+    const swaps = [], stuck = [];
+    const REDEAL_TRIES = 80;
+    for (let pass = 0; pass < 3; pass++) {
+        const rows = mixedNoStretchRows(plan, items);
+        if (!rows.length) break;
+        const before = planGrids(plan).pages;
+        const seen = new Set(items.map((it) => it && it.q && signature(it.q)));
+        const undo = [];
+        let salt = 0;
+        for (const r of rows) {
+            for (const i of r.boundary) {
+                const it = items[i];
+                const sk = it && it.skillRef;
+                salt++;
+                if (!sk || it.twin || it.wrong || it.legacy) { stuck.push({ page: r.page, item: i + 1, why: 'not re-dealable (twin, wrong answer or legacy cell)' }); continue; }
+                const step = ladderStep(it.q);
+                const colsList = Object.keys(it.measured || {}).map(Number).filter(Number.isFinite);
+                let nu = null;
+                for (let k = 0; k < REDEAL_TRIES && !nu; k++) {
+                    const seed = ((Number(n.seed) >>> 0) + 7349 * (i + 1) + 104723 * (pass + 1) + 15485863 * k + 31 * salt) >>> 0;
+                    let q = null;
+                    try { q = generateQuestionFor(Object.assign({ category: sk.categoryId, skill: sk.skillId, opts: sk.opts, seed, itemIndex: 9000 + 13 * i + k }, sk.range ? { range: sk.range } : {})); } catch (e) { q = null; }
+                    if (!q || ladderStep(q) !== step || seen.has(signature(q)) || !turnFitsTwo(q, sk)) continue;
+                    let cand;
+                    try { cand = hostItem({ q, skill: sk }, it.section, n.size, { mix: null }); } catch (e) { continue; }
+                    settlePrompts([cand], it.instructionKey);
+                    for (const key of Object.keys(it)) if (!(key in cand) && key !== 'measured' && key !== 'measureWhy') cand[key] = it[key];
+                    measureItems([cand], { size: n.size, look: n.look, colsList: colsList.length ? colsList : [r.cols] });
+                    const h = measuredH(cand, r.cols);
+                    if (h >= r.win.lo - 0.05 && h <= r.win.hi + 0.05) nu = cand;
+                }
+                if (!nu) { stuck.push({ page: r.page, item: i + 1, why: `no item of the ${Math.round(r.win.lo)}-${Math.round(r.win.hi)} mm class from ladder step ${step} in ${REDEAL_TRIES} deals` }); continue; }
+                undo.push([i, it]);
+                seen.add(signature(nu.q));
+                items[i] = nu;
+                swaps.push({ page: r.page, item: i + 1, from: Math.round(measuredH(it, r.cols) * 10) / 10, to: Math.round(measuredH(nu, r.cols) * 10) / 10, step });
+            }
+        }
+        if (!undo.length) break;
+        const next = replan(items);
+        if (planGrids(next).pages !== before) {
+            for (const [i, it] of undo) items[i] = it;
+            for (const [i] of undo) { const s = swaps.findIndex((x) => x.item === i + 1); if (s >= 0) swaps.splice(s, 1); stuck.push({ page: rows.find((r) => r.row.includes(i)).page, item: i + 1, why: `the swap changes the page count (${before} -> ${planGrids(next).pages})` }); }
+            break;
+        }
+        plan = next;
+    }
+    return { plan, swaps, stuck };
+}
+
 function tagItemIndex(plan, items) {
     const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
     const walk = (s) => {
@@ -3972,7 +4091,11 @@ async function buildSheetDeal(req = {}) {
     // (round 9) one letter dealt by the Independent page's rules (`_mpLetter`) is composed as that page is: the deal
     // already holds distinct problems in whole rows, and buildSheet checks the printed page; the role's
     // own re-fit is for letters dealt from the first letter's sample (several skills, worked examples)
-    let plan = mpLetter ? composePractice('more-practice', input) : n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input);
+    const planOf = () => (mpLetter ? composePractice('more-practice', input) : n.role === 'more-practice' ? morePracticePlan(input) : independentPlan(input));
+    let plan = planOf();
+    // (lf-ops-props r5, lead ruling (b'): a mixed-class noStretch row has its boundary item(s) dealt again - evenMixedRows)
+    const evenRows = evenMixedRows(plan, hostItems, (items) => { input.items = items; return planOf(); }, n);
+    plan = evenRows.plan;
     // Wave 5.2 (critic nl-r4 D1): the number line never adds a page. A page-driven Independent
     // sheet ("a page", no count) whose band pushes a part overleaf (a split section's full-width
     // group under its grid) gives up its last problems, one at a time, until it is the pages it
@@ -4021,6 +4144,7 @@ async function buildSheetDeal(req = {}) {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
         pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
+        mixedRows: evenRows.swaps.length || evenRows.stuck.length ? { swaps: evenRows.swaps, stuck: evenRows.stuck } : undefined,
         pageCount,
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits,
@@ -4736,7 +4860,10 @@ async function buildRoleSheet(n, metaOf) {
         for (const list of bySec.values()) markSectionWriteAbove(list);
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
-    const plan = mod.plan(input);
+    let plan = mod.plan(input);
+    // (lf-ops-props r5, lead ruling (b'): a mixed-class noStretch row has its boundary item(s) dealt again - evenMixedRows)
+    const evenRows = evenMixedRows(plan, items, (its) => { input.items = its; return mod.plan(input); }, n);
+    plan = evenRows.plan;
     tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
@@ -4758,6 +4885,7 @@ async function buildRoleSheet(n, metaOf) {
         pupilHtml: out.pupilHtml,
         keyHtml: n.key ? out.keyHtml : '',
         pupilPages: out.pupilPages, keyPages: n.key ? out.keyPages : [],
+        mixedRows: evenRows.swaps.length || evenRows.stuck.length ? { swaps: evenRows.swaps, stuck: evenRows.stuck } : undefined,
         pageCount: out.pupilPages.length,
         keyPageCount: n.key ? out.keyPages.length : 0,
         numberLine,

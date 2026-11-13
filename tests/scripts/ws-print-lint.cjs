@@ -152,6 +152,8 @@
 //   ROW-STRETCH (lf-ops-props r4, lead ruling 2026-11-12 (b)) a row of `noStretch` templates (arrays, arrays-turn,
 //              count-row: answered in place, top-started) is at most 1.25 x its tallest item's height (1.42 on a pageCap
 //              page, grid class mq-pagecap, PT-GDP), and its shortest item's band is at most 20 % of the row (H13).
+//   ROW-MIXED  (lf-ops-props r5, lead ruling (b')) a row of `noStretch` templates whose tallest item needs more than 1.25 x
+//              its shortest (mixed height classes) leaves no short-cell band over 20 % (the bridge re-deals the boundary item).
 //   GRID-EVEN-ALL (critic lf-placevalue r1 F9, lf-ops r1) one cell geometry per SECTION: every cell of the grids of one
 //              section (consecutive .ws-grid siblings with no instruction, strip or other text between them, on one
 //              pupil page) has one width within 0.2 mm - a full-width cell included (GRID-EVEN exempts it): combine L
@@ -196,7 +198,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -1011,7 +1013,7 @@ function wsLintPage(cfg) {
                 const tmpl = c.getAttribute('data-ws-cell') || '';
                 // ROW-STRETCH (opt-in): every kit cell of a pupil page, its row (top + height) and the height it needs (the
                 // content's bottom less the cell's top, plus the bottom pad and border), judged per row after the loop
-                if (optOn('ROW-STRETCH') && c.hasAttribute('data-ws-cell')) {
+                if ((optOn('ROW-STRETCH') || optOn('ROW-MIXED')) && c.hasAttribute('data-ws-cell')) {
                     const bb = parseFloat(cs.paddingBottom) + (parseFloat(cs.borderBottomWidth) || 0);
                     stretchCells.push({ c, ri, n: ri.cells.indexOf(c), top: cr.top, H, need: Math.min(H, box.b - cr.top + bb), ns: NO_STRETCH_T.includes(tmpl), pc: !!c.closest('.mq-pagecap') });
                 }
@@ -1381,6 +1383,12 @@ function wsLintPage(cfg) {
             const short = row.reduce((x, b) => (b.need < x.need ? b : x), row[0]);
             const lim = row.some(b => b.pc) ? 1.42 : 1.25;
             const k = a.H / Math.max(1, tall.need);
+            // ROW-MIXED (lf-ops-props r5, lead ruling (b')): the row MIXES height classes - its tallest item needs more than
+            // NO_STRETCH_ROOM x its shortest (1 mm tolerance), so no row height can keep the short cell's band at 20 % - and
+            // the short cell's band is over 20 %. The fix is the bridge's boundary re-deal (print-sheet.js evenMixedRows).
+            const mixBand = (a.H - short.need) / a.H;
+            if (optOn('ROW-MIXED') && tall.need > 1.25 * short.need + PX && a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-MIXED', 'major', short.c, `a row of items answered in place mixes height classes: ${mm(short.need)} mm beside ${mm(tall.need)} mm (${(tall.need / short.need).toFixed(2)} x, over 1.25 x), a ${Math.round(mixBand * 100)} % band under the short one (limit 20 %; lead ruling (b'): its boundary item is dealt again from the page's majority class; ROW-MIXED)`, 'noStretch row mixes height classes');
+            if (!optOn('ROW-STRETCH')) continue;
             if (k > lim + 0.03) F('L-DENSITY', 'ROW-STRETCH', 'major', tall.c, `row ${mm(a.H)} mm is ${k.toFixed(2)} x the tallest item it holds (${mm(tall.need)} mm): a row of items answered in place (noStretch) is at most ${lim} x its content (lead ruling 2026-11-12 (b)${lim > 1.25 ? ', PT-GDP' : ''}; ROW-STRETCH)`, 'noStretch row stretched');
             const band = (a.H - short.need) / a.H;
             if (a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-STRETCH', 'major', short.c, `the shortest item of its row needs ${mm(short.need)} mm of a ${mm(a.H)} mm row: a ${Math.round(band * 100)} % band under it (limit 20 % for a cell answered in place, RUBRIC H13; ROW-STRETCH)`, 'noStretch row band over 20 %');
