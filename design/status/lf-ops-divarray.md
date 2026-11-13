@@ -319,3 +319,13 @@ Report design/audit/runs/lf-ops/critic-divarray-r2.md. r1 D1-D4 gone; div_facts 
 | D8 (major) mult / add worksheet digits 40 px vs 56 / 48 (brief) - LEAD_DECISIONS says 29 px floor: ruling needed | ws-screen-slots --digit-widths |
 | D9 (major) mult touch worksheet shrinks 2-digit facts (29 px, no dots) | SCREEN-DIGIT per card within a sheet |
 | minor: SCC-T10 mult Guided answer zone moves 26.7 -> 31.2 mm | existing SCC-T10 on guided |
+
+## PARKED: mult_facts arrays (lead ruling 2026-11-13, after critic r2 FAIL at the round cap)
+div_facts + add_facts ship on claude/sweet-newton-c8wrv1-lf-ops-divship with mult_facts hash-equal to master. mult_facts arrays (one frame per band, x 0 empty band frame, Test = Independent) stay on this branch, parked.
+Root causes (for the rebuild):
+- D1 / D2 / D4 / D5 are a DESIGN question, not a bug: the band frame (up to 12 x 12 dots) was designed for the Independent / Test grid only. The Scripted model's state slot (~12.7 mm), the Fact probe's dense 20-fact page and the Opener's mixed band have no room declared for it, so the kit squeezed it (D1), spilled the probe (D2), starved the Opener's independent band (D4) and cost Mixed practice two items at M (D5). Needs a design pass: what each of Scripted model, Fact probe, Opener and Mixed practice draws for an array (frame, one small array, or no picture), decided on the facts card BEFORE any rebuild.
+- D3 is a CONTENT bug: sheet/providers/multiplication.js writes "a groups of b" for every hint / Steps line whatever the drawing. Ruling C turns arrays (smaller factor = rows), so the words must come from the drawing ("9 rows of 10, for 10 x 9"). The check belongs on hint text for EVERY skill that turns an array (lead), not only mult.
+- D9: the mult touch worksheet sizes each card's digit separately; 2-digit facts drop to 29 px with no touch dots. Not caused by this lane's change per the critic (unverified on master) - logged for the rebuild.
+- D8 is not a finding: worksheet floor 29 px (LEAD_DECISIONS 2026-11-13).
+Checks: one ledger row each (CHECKS_FROM_CRITICS 2026-11-13 lf-ops-divarray r2 D1-D5, D9), all to be built and backtested (fail a4d6d970e) before the rebuild starts.
+Queue: QUEUE.md rows Y4.B4.* keep multiplication:mult_facts at its passed 8/10 (master's mult_facts is unchanged); the array support for mult is parked until the design pass.
