@@ -1056,8 +1056,9 @@ export function plan(input = {}) {
         const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols)) : host.slice(r * cols, (r + 1) * cols));
         // (lf-placevalue compare r3, step 4: a one-line cell that names its ink height - footprint `inkHMm`, the compare line - is
         // measured under a number tab (CL-40's clearance over its line), and a Guided cell carries none (CL-14): its row needs the
-        // pads and the line, never the 3-4 mm of tab clearance the measurement holds)
-        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, 6 + ink + 1) : h; });
+        // pads and the line, never the 3-4 mm of tab clearance the measurement holds; the pads are layout.js CELL_PAD_MM - the cell's
+        // 3 mm + 3 mm padding plus the 1 mm a measurement adds - so a size or look whose pads change moves them in one place)
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; const ink = Number((it.footprint || {}).inkHMm); const h = mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; return ink > 0 && tightRows([it]) ? Math.min(h, ink + CELL_PAD_MM) : h; });
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels) : -1;
         // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
         // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
