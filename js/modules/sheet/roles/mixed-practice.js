@@ -60,16 +60,40 @@ const divisorsDesc = (n) => Array.from({ length: n }, (_, i) => n - i).filter((d
  */
 const stripMmOf = (input) => (input.stepStrip && Number(input.stepStripMm) > 0 ? Number(input.stepStripMm) : 0);
 
-/** Shelves: for each pool {id, k, h}, then how many shelves each gets. */
+/**
+ * Shelves on the page's lattice (lf-engine roles, lead 2026-11-13, ws-capacity-pin SIZE-ORDER: a smaller size never holds
+ * fewer problems a page than a larger one). The Daily lattice is 8 / 6 / 4 at S / M / L, and a shelf takes the widest divisor
+ * of it up to 6 that its cells fit - so at S a fact shelf took 4 across (8's divisor) where M took 6, and S printed 20 facts to
+ * M's 30. The page now also tries the lattice of each larger size AT THIS SIZE (this size's cells, this size's heights: nothing
+ * is drawn below this size's metrics) and keeps the one that prints the most problems on no more pages (its own on a tie).
+ * Every shelf of a page still shares one lattice. A lattice the caller fixed (`latticeN`), and a lesson's Mixed page (its
+ * step strip, fill and lead rules are sized on the size's own lattice), keep it.
+ */
 function packing(poolsIn, input) {
+    const ctx = ctxOf(input, DEFAULT_LOOK);
+    const fixed = [4, 6, 8, 10].includes(Number(input.latticeN));
+    const lesson = !!(input.stepStrip || input.fill || input.lessonFit || input.leadHalf || input.leadDrop || input.growLast);
+    let best = packingAt(poolsIn, input, fixed ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size]);
+    if (fixed || lesson) return best;
+    const totalOf = (p) => p.ids.reduce((a, id) => a + p.shelf[id].n * p.shelf[id].per, 0);
+    for (let sz = SIZE_UP[ctx.size]; sz; sz = SIZE_UP[sz]) {
+        const N = AUTO_N[ctx.look][sz];
+        if (N === best.N) continue;
+        const p = packingAt(poolsIn, input, N);
+        if (p.pages <= best.pages && totalOf(p) > totalOf(best)) best = p;
+    }
+    return best;
+}
+
+/** Shelves: for each pool {id, k, h}, then how many shelves each gets, on lattice N. */
+function packingAt(poolsIn, input, N) {
     const ctx = ctxOf(input, DEFAULT_LOOK);
     const frame = frameOf({ skills: input.skills || [], input, tabId: 'Mixed 1', title: 'Mixed practice', twoLine: true, score: 1 });
     const m0 = bandMetrics(ctx, layoutHeader(frame.header));
     const m = Object.assign({}, m0, { budget: m0.budget - stripMmOf(input) });
     const mCont = bandMetrics(ctx, layoutHeader(frame.header), { cont: true });
     // A lesson packet's Mixed page keeps the L lattice (6) at M: a 3-across shelf of stacks, never
-    // 2 half-empty cells (lessons r1, H13 width).
-    const N = [4, 6, 8, 10].includes(Number(input.latticeN)) ? Number(input.latticeN) : AUTO_N[ctx.look][ctx.size];
+    // 2 half-empty cells (lessons r1, H13 width). (N is the caller's: packing() chooses it.)
     const ids = Object.keys(poolsIn).filter((id) => (poolsIn[id] || []).length);
     const shelf = {};
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
@@ -184,6 +208,8 @@ const LESSON_FIT_PAD_MM = 12;
 /** lessonFit: every shelf may still grow this much - the room an across fact's CL-40 tab inset needs to open fully in a
  *  row sized to its content (div_facts S Mixed: "70 ÷ 10 =" 0.6 mm under the tab with the inset shrunk to fit). */
 const LESSON_FIT_MIN_MM = 1.2;
+/** A height compare's floating-point allowance (mm): far under any drawn difference. */
+const EPS_MM = 1e-6;
 /** Instructions a computation cell's own sign already says: such a cell needs no cue on "Solve.". */
 const SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
 
@@ -671,9 +697,12 @@ export function plan(input = {}) {
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
         const budget = pages.length > 1 ? p.mCont.budget : m.budget;   // the page `cur` is on
         let bandH = m.strip + sh.h + grow + (sh.anchor ? sh.bandMm : 0);
-        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget;
+        // (lf-engine roles, SIZE-ORDER: the grow shares sum to the spare exactly, so the last shelf of a full page landed a
+        // floating-point hair over the budget and spilled alone onto page 2 - placevalue value / combine S printed 8 shelves
+        // + 1. A shelf the packing placed is compared within EPS_MM of the budget.)
+        let joins = !firstOfSkill && !!cur && cur.sections.some((x) => x.kind === 'band') && cur.used + bandH - m.strip <= budget + EPS_MM;
         if (joins) bandH -= m.strip;
-        if (!cur || cur.used + bandH > budget) {
+        if (!cur || cur.used + bandH > budget + EPS_MM) {
             cur = { sections: pages.length === 0 && input.stepStrip ? [{ kind: 'html', html: input.stepStrip }] : [], used: 0 };
             pages.push(cur);
             joins = false;
