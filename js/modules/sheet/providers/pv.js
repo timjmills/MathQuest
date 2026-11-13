@@ -683,17 +683,26 @@ export function compareDecision(a, b) {
     if (i < 0) return { kind: 'equal', la: sa.length, lb: sb.length, sa, sb };
     return { kind: 'place', la: sa.length, lb: sb.length, sa, sb, i, da: Number(sa[i]), db: Number(sb[i]), place: PLACE_FROM_LEFT(sa.length, i) };
 }
-/** The M6 sign a pupil writes by comparing the last digits (M-C2) or, lengths differing, the first digits (M-C3). */
+/**
+ * The M6 sign a pupil writes by comparing the last digits (M-C2) or, lengths differing, the digits from the left without
+ * counting them (M-C3): the first digit that differs decides - 89 > 312 (8 > 3), and 345 < 37 (4 < 7: compare r4, critic r2,
+ * the close trap's own first-digit form; the first digits alone, 3 and 3, named no error, so a lengths=mixed page could show
+ * the last-digit form only).
+ */
 export function compareM6(a, b) {
     const sa = String(a), sb = String(b);
     const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
+    const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]);
     return {
         last: cmp(Number(sa.slice(-1)), Number(sb.slice(-1))),
-        first: sa.length !== sb.length ? cmp(Number(sa[0]), Number(sb[0])) : null,
+        first: sa.length !== sb.length ? (k < 0 ? '=' : cmp(Number(sa[k]), Number(sb[k]))) : null,
     };
 }
 
 registerSkill('placevalue:compare', {
+    // (compare r4, critic r2 N1: an item M6 gets right - "=", a pair the ones place decides - names no error on purpose; a True
+    // or False? False slot skips it, as Error analysis does, instead of printing it True: 12-33 % false, PT-TOF-1 asks 40-60 %)
+    falseNeedsWrong: true,
     strings: strings({
         iCan: 'I Can compare numbers with <, > and =',
         instructionKey: 'compare',
@@ -716,11 +725,14 @@ registerSkill('placevalue:compare', {
         }
         if (d.kind === 'equal') {
             return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
-                step('Every digit is the same.', [{ slot: 'digits', value: 'all' }]),
+                // (critic r2 N7: the step names the digits it judges, so the Guided cue - hintOf, the first step that names a number
+                // - is this step, the one that decides "=", never "Both have three digits.")
+                step(`Every digit is the same: ${A} and ${B}.`, [{ slot: 'digits', value: 'all' }]),
                 step(`Write ${A} = ${B}.`, [answer])];
         }
         return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
-            step(`The ${d.place} digits differ: ${d.da} ${d.da > d.db ? '>' : '<'} ${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
+            // (critic r2: "7 >" / "5." broke over two lines - the sign is held to its digits with no-break spaces; ws-pv-compare-pages WRAP-SIGN)
+            step(`The ${d.place} digits differ: ${d.da}\u00a0${d.da > d.db ? '>' : '<'}\u00a0${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
             step(`Write ${A} ${q.ans} ${B}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
     },
     wrongAnswer: (q) => {
@@ -729,8 +741,9 @@ registerSkill('placevalue:compare', {
         const m6 = compareM6(p.a, p.b);
         // (critic r1 F3: the thinking pages show the card's M6 - "89 > 312 because 8 > 3" - and nothing else. Different lengths:
         // the first-digit form whenever it gives a wrong sign, else the last digits; same length: the last digits. An item M6
-        // gets RIGHT - "=", or a pair the last place decides (775 / 778) - has no named error and returns none, so the role
-        // skips it: it is never dealt to a True or False?, Reason It or Error analysis page. The reversed sign (M-C1) the r1
+        // gets RIGHT - "=", or a pair the last place decides (775 / 778) - has no named error and returns none, so a slot that
+        // must show an error skips it: Error analysis (PT-ERR-1) and a True or False? False slot (falseNeedsWrong above); on a
+        // True slot it prints true. The reversed sign (M-C1) the r1
         // pages showed instead - 509 < 508, 418 < 418 - was not the card's error.)
         const named = [
             m6.first && m6.first !== '=' ? { value: m6.first, misconception: 'M-C3', explain: 'Compared the first digits, not how many digits.' } : null,

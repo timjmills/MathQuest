@@ -29,7 +29,11 @@ import { EXAMPLE_KEYS, sigOf, digitsOfOps, stateGroups, namedSteps, stepMarker, 
 export function pickExample(items, data) {
     const re = data && data.example && data.example.match ? new RegExp(data.example.match, 'i') : null;
     const want = data && Array.isArray(data.steps) ? data.steps.length : 0;
-    const all = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);
+    const all0 = items.map((it, i) => ({ it, i, steps: workedStepsOf(it) })).filter((x) => x.steps.length >= 2);
+    // (an item its generator marks `noModel` is never the worked example while another can be - the compare "=" and a pair
+    // the ones place decides, which the M6 error also gets right: lf-placevalue compare r4, critic r2 N4; as the Guided,
+    // Opener and Scripted Model pages read it)
+    const all = all0.some((x) => !(x.it.q && x.it.q.noModel)) ? all0.filter((x) => !(x.it.q && x.it.q.noModel)) : all0;
     const tiers = [
         all.filter((x) => (!re || re.test(x.steps.map((s) => s.text).join(' '))) && (!want || x.steps.length === want)),
         all.filter((x) => !re || re.test(x.steps.map((s) => s.text).join(' '))),

@@ -978,13 +978,15 @@ function planSign(P, i) {
     }
     return P.signs[i];
 }
-/** True when M6 (the last digits compared; lengths differing, also the first digits) gives a WRONG sign for a / b. */
+/** True when M6 (the last digits compared; lengths differing, also the digits from the left uncounted - the provider's
+ *  compareM6) gives a WRONG sign for a / b. */
 function m6Wrong(a, b) {
     const sa = String(a), sb = String(b);
     const cmp = (x, y) => (x > y ? '>' : x < y ? '<' : '=');
     const right = cmp(a, b);
     const last = cmp(Number(sa.slice(-1)), Number(sb.slice(-1)));
-    const first = sa.length !== sb.length ? cmp(Number(sa[0]), Number(sb[0])) : '=';
+    const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]);
+    const first = sa.length !== sb.length && k >= 0 ? cmp(Number(sa[k]), Number(sb[k])) : '=';
     return (last !== '=' && last !== right) || (first !== '=' && first !== right);
 }
 

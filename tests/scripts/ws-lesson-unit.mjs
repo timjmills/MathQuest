@@ -93,7 +93,10 @@ const LATE = {
             judged++;
             const [category, skill] = String(l.practice.skill).split(':');
             const blocks = Array.isArray(r.practiceBlocks) && r.practiceBlocks.length ? r.practiceBlocks : [{ shape: [12, 1] }];
-            let dec = 0, all = 0;
+            // (compare r4, critic r2 N6: the Remember line - the routine's first concept, lesson-pages/vocab.js - is judged as the chant is:
+            // "More digits is the bigger number." decided none of the same-length items on its page)
+            const remember = r.concepts && r.concepts[0] ? String(r.concepts[0].text || '') : '';
+            let dec = 0, all = 0, decR = 0;
             blocks.forEach((bk, bi) => {
                 const w = Number((bk.shape || [])[0]) || 1;
                 const opts = Object.assign({}, l.practice.opts || {}, bk.opts || {});
@@ -103,9 +106,11 @@ const LATE = {
                     try { q = app.gq.generateQuestionFor({ category, skill, opts, seed: 9001 + bi * 100 + i, itemIndex: i, itemCount: 60 }); } catch (e) { q = null; } finally { Object.assign(console, sv); }
                     if (!q || !q.pv) continue;
                     all += w; if (judge(String(r.chant), q)) dec += w;
+                    if (remember && judge(remember, q)) decR += w;
                 }
             });
             ok(all > 0 && dec >= all / 2, `chant-fit: lesson ${id} chant "${r.chant}" decides ${all ? Math.round((100 * dec) / all) : 0} % of the items its practice deals (want at least half)`);
+            if (remember) ok(all > 0 && decR >= all / 2, `chant-fit: lesson ${id} Remember line "${remember}" decides ${all ? Math.round((100 * decR) / all) : 0} % of the items its practice deals (want at least half)`);
         }
         ok(judged > 0, 'chant-fit: no lesson with a known decision rule was judged (CHANT_DECIDES)');
     },

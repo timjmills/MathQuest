@@ -808,6 +808,15 @@ function pvRenderBody(p, ctx0) {
                 // until the line spans 46 % of its cell: the problem spread over its row, never enlarged)
                 const cols = Number(ctx.columns) || 0;
                 let gapMm = ctx.size === 'L' && cols >= 3 ? 3 : 4;
+                // (compare r4, critic r2 F9: three across at L the 6-digit line stood 4.5-4.8 mm from the cell rules - the gaps
+                // give way, down to 1.6 mm, until the line keeps 5.2 mm a side inside its 61.5 mm cell; the digits and the circle
+                // keep their size. ws-pv-compare-pages SIDE-PAD)
+                if (ctx.mode !== 'screen' && ctx.size === 'L' && cols >= 3) {
+                    const em = m.digitPt * 25.4 / 72;
+                    const txt = fmt(p.a) + fmt(p.b);
+                    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + 12;
+                    gapMm = Math.max(1.6, Math.min(gapMm, Math.floor(((186 / cols - 0.6 - 2 * 5.2) - bare) / 2 * 10) / 10));
+                }
                 if (ctx.mode !== 'screen' && cols > 0 && cols <= 2) {
                     const em = m.digitPt * 25.4 / 72;
                     const txt = fmt(p.a) + fmt(p.b);
@@ -822,16 +831,28 @@ function pvRenderBody(p, ctx0) {
                     const mk = p._marks;
                     const col = (ink) => (ink === 'trace' ? '#949494' : '#000');
                     const sd = (n) => String(Math.trunc(Math.abs(Number(n))));
+                    // (compare r4, critic r2 N2: the box round the deciding digit was that digit's own advance wide, so its rules ran
+                    // through the ink of the digits beside it - "4[1]7". The digit the item is decided at - and every digit of an "="
+                    // stands in 1.6 mm of room each side in EVERY state, boxed or not (the problem stands still from state to state):
+                    // the box's 0.5 mm offset and 1.5 pt rule end 0.5 mm short of its neighbours. An "=" item's "every digit" box is
+                    // one box round the whole number. The digit count over each number stands 2 mm above it (1.2 mm put the box's top
+                    // rule on the descender of "digits"). ws-pv-compare-pages MARK-CLEAR)
+                    const sA = sd(p.a), sB = sd(p.b);
+                    const decAt = sA.length !== sB.length || sA === sB ? -1 : [...sA].findIndex((d, k) => d !== sB[k]);
+                    const boxCss = (ink) => `display:inline-block;line-height:1;outline:1.5pt solid ${ink};outline-offset:0.5mm;border-radius:0.8mm;`;
                     const side = (n, who) => {
                         let di = 0;
-                        const body = [...fmt(n)].map((ch) => {
+                        const all = !!mk.digits && mk.digits.value === 'all';
+                        const body0 = [...fmt(n)].map((ch) => {
                             if (!/\d/.test(ch)) return esc(ch);
                             const i = di++;
-                            const on = mk.digits && (mk.digits.value === 'all' || Number(mk.digits.value) === i);
-                            return on ? `<span data-pv-mark="digit" style="display:inline-block;line-height:1;outline:1.5pt solid ${col(mk.digits.ink)};outline-offset:0.5mm;border-radius:0.8mm;">${ch}</span>` : ch;
+                            const on = !all && !!mk.digits && Number(mk.digits.value) === i;
+                            if (!on && decAt !== i) return ch;
+                            return `<span${on ? ' data-pv-mark="digit"' : ''} style="${boxCss(on ? col(mk.digits.ink) : 'transparent')}margin:0 1.6mm;">${ch}</span>`;
                         }).join('');
+                        const body = all ? `<span data-pv-mark="digit" style="${boxCss(col(mk.digits.ink))}">${body0}</span>` : body0;
                         const len = sd(n).length;
-                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:1.2mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
+                        const cnt = `<span data-pv-mark="count" style="display:block;font-weight:400;font-size:${pt(m.textPt)};line-height:1.2;margin-bottom:2mm;color:${mk.count ? col(mk.count.ink) : 'transparent'};">${len} digit${len === 1 ? '' : 's'}</span>`;
                         const win = mk.win && mk.win.value === who;
                         return `<span style="display:inline-flex;flex-direction:column;align-items:center;">${cnt}`
                             + `<span${win ? ' data-pv-mark="win"' : ''} style="line-height:1.1;padding:0 0.5mm 0.3mm;border-bottom:2pt solid ${win ? col(mk.win.ink) : 'transparent'};">${body}</span></span>`;

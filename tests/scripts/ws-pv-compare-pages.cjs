@@ -18,8 +18,23 @@
 // MODEL-RESERVE      (lf-roles review of compare r3, b2) the Guided page's Model row - the Model beside the hinted tries - reserves
 //                    max(the Model tab's clearance, the hint line), never their sum: its fullest cell leaves at most 3 mm white
 //                    under its ink. 023cafca: the row 41 / 54 / 61 mm at S / M / L, 21-25 mm white under the hint line.
+// TOF-SHARE (r2 N1)  True or False? at S / M / L on every offered option value (band 99 .. 999,999, closeness close / far,
+//                    lengths mixed, the default): 40-60 % of the statements on each page are false (PT-TOF-1). r2: 12-33 %.
+// MARK-CLEAR (r2 N2) the Scripted Model's states, the lesson anchor and the Guided page at S / M / L: every mark - the box round
+//                    the deciding digits (its outline), the bigger number's underline - keeps 0.5 mm from every character it
+//                    does not mark (the character's box from Range.getClientRects). r2: the box ran through "4" and "7" of 417.
+// MODEL-M6 (r2 N4)   the worked example - Guided Model, Scripted Model, Opener Model, lesson anchor - on the default, band
+//                    999,999 and lengths=mixed: an item M6 (the last digits; lengths differing, the first) gets WRONG.
+//                    r2: band 999,999's Guided Model 992,323 > 992,321, decided at the ones place.
+// EQ-SHARE-PAGE (r2 N7) independent, more-practice, test, guided, opener, lesson at S / M / L: each page holds at most
+//                    ceil(n / 6) "=" of its n compare problems; a Test's item 1 and a Guided page's first two are never "=".
+// WRAP-SIGN (r2)     scripted-model, guided and lesson at S / M / L: no line of text ends in a sign (< > = and the operators)
+//                    with the rest of its expression on the next line (ws-geom-probe WRAP-OP with wrapOps; r2: "7 >" / "5.").
+// SIDE-PAD (r1 F9)   independent at L (3 across) on the default and band 9,999 / 999,999: every digit of every problem stands
+//                    at least 5 mm inside its cell's rules. r2: 4.5-4.8 mm.
 // Prints `ws-pv-compare-pages: OK` / `FAIL (n)` last; exits 1 on FAIL.
 const H = require('../lib/ws-harness.cjs');
+const { GEOM_PROBE } = require('../lib/ws-geom-probe.cjs');
 
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -51,7 +66,9 @@ const truth = (a, b) => (a > b ? '>' : a < b ? '<' : '=');
 const m6Of = (a, b, sign) => {
     const sa = String(a), sb = String(b);
     const last = truth(Number(sa.slice(-1)), Number(sb.slice(-1)));
-    const first = sa.length !== sb.length ? truth(Number(sa[0]), Number(sb[0])) : null;
+    // (M-C3: lengths differing, the digits read from the left without counting them - the first that differs decides: 89 > 312, 345 < 37)
+    const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]);
+    const first = sa.length !== sb.length && k >= 0 ? truth(Number(sa[k]), Number(sb[k])) : null;
     return first && sign === first ? 'M-C3' : sign === last ? 'M-C2' : null;
 };
 
@@ -147,6 +164,132 @@ const m6Of = (a, b, sign) => {
             if (r.minWhite > 3) bad.push(`MODEL-RESERVE guided ${size} seed ${seed}: the Model row (${r.h.toFixed(1)} mm, ${r.cells} cells) leaves ${r.minWhite.toFixed(1)} mm white under its fullest cell's ink (over 3 mm: the row reserves the tab clearance AND the hint line, or is stretched past its content)`);
         }
         console.log('  MODEL-RESERVE: guided Model row at ' + SIZES.join('/'));
+    }
+    const m6Wrong = (a, b) => { const t = truth(a, b), sa = String(a), sb = String(b); const last = truth(Number(sa.slice(-1)), Number(sb.slice(-1))); const k = [...sa.slice(0, Math.min(sa.length, sb.length))].findIndex((d, i) => d !== sb[i]); const first = sa.length !== sb.length && k >= 0 ? truth(Number(sa[k]), Number(sb[k])) : '='; return (last !== '=' && last !== t) || (first !== '=' && first !== t); };
+    if (on('TOF-SHARE')) {
+        const OPTS = [['default', null], ['band 99', { band: 99 }], ['band 9999', { band: 9999 }], ['band 99999', { band: 99999 }], ['band 999999', { band: 999999 }],
+            ['close', { closeness: 'close' }], ['far', { closeness: 'far' }], ['mixed', { lengths: 'mixed' }]];
+        for (const size of SIZES) for (const [tag, opts] of OPTS) for (const seed of seedsFor('true-false').slice(0, 2)) {
+            const cs = (await build('true-false', size, seed, opts)).filter((c) => c.sign && Number.isFinite(c.a) && Number.isFinite(c.b));
+            if (!cs.length) { bad.push(`TOF-SHARE ${size} ${tag} seed ${seed}: no statement read`); continue; }
+            const f = cs.filter((c) => c.sign !== truth(c.a, c.b)).length / cs.length;
+            if (f < 0.4 || f > 0.6) bad.push(`TOF-SHARE true-false ${size} ${tag} seed ${seed}: ${Math.round(f * 100)} % of ${cs.length} statements are false (PT-TOF-1: 40-60 %)`);
+        }
+        console.log('  TOF-SHARE: true-false at ' + SIZES.join('/') + ' x 8 option values');
+    }
+    if (on('MARK-CLEAR')) {
+        for (const role of ['scripted-model', 'lesson', 'guided']) for (const size of SIZES) for (const [tag, opts] of [['default', null], ['band 999999', { band: 999999 }]]) {
+            const seed = seedsFor(role)[0];
+            await build(role, size, seed, opts);
+            const r = await sheet.evaluate(() => {
+                const MM = 96 / 25.4;
+                const out = { marks: 0, hits: [] };
+                const range = document.createRange();
+                for (const pc of document.querySelectorAll('.pv-compare')) {
+                    const marks = [...pc.querySelectorAll('[data-pv-mark="digit"], [data-pv-mark="win"]')];
+                    if (!marks.length) continue;
+                    const glyphs = [];
+                    const tw = document.createTreeWalker(pc, NodeFilter.SHOW_TEXT);
+                    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+                        if (getComputedStyle(n.parentElement).color === 'rgba(0, 0, 0, 0)' || n.parentElement.closest('[data-ws-slot]')) continue;
+                        for (let i = 0; i < n.nodeValue.length; i++) {
+                            if (/\s/.test(n.nodeValue[i])) continue;
+                            range.setStart(n, i); range.setEnd(n, i + 1);
+                            const rr = range.getClientRects()[0];
+                            if (rr && rr.width) glyphs.push({ ch: n.nodeValue[i], node: n, r: rr });
+                        }
+                    }
+                    for (const m of marks) {
+                        out.marks++;
+                        const cs = getComputedStyle(m);
+                        const b = m.getBoundingClientRect();
+                        let box;
+                        if (m.dataset.pvMark === 'digit') {
+                            const e = parseFloat(cs.outlineOffset) + parseFloat(cs.outlineWidth);
+                            box = { l: b.left - e, r: b.right + e, t: b.top - e, b: b.bottom + e, what: 'box' };
+                        } else {
+                            const w = parseFloat(cs.borderBottomWidth);
+                            box = { l: b.left, r: b.right, t: b.bottom - w, b: b.bottom, what: 'underline' };
+                        }
+                        const pad = 0.5 * MM;
+                        for (const g of glyphs) {
+                            if (m.contains(g.node)) continue;
+                            const gr = g.r;
+                            if (gr.right > box.l - pad && gr.left < box.r + pad && gr.bottom > box.t - pad && gr.top < box.b + pad) {
+                                const dx = Math.max(box.l - gr.right, gr.left - box.r, 0), dy = Math.max(box.t - gr.bottom, gr.top - box.b, 0);
+                                out.hits.push(`${box.what} round "${m.textContent.trim()}" ${(Math.max(dx, dy) / MM).toFixed(2)} mm from "${g.ch}" (${pc.textContent.replace(/\s+/g, ' ').trim().slice(0, 40)})`);
+                            }
+                        }
+                    }
+                }
+                return out;
+            });
+            // (the Guided page draws its tries at step 1 - the digit counts - and may draw no box or underline: judged where drawn)
+            if (!r.marks && role !== 'guided') bad.push(`MARK-CLEAR ${role} ${size} ${tag}: no mark drawn`);
+            for (const h of r.hits.slice(0, 3)) bad.push(`MARK-CLEAR ${role} ${size} ${tag}: the ${h} (want 0.5 mm clear of every character it does not mark)`);
+        }
+        console.log('  MARK-CLEAR: scripted-model, lesson, guided at ' + SIZES.join('/'));
+    }
+    if (on('MODEL-M6')) {
+        for (const role of ['guided', 'scripted-model', 'opener', 'lesson']) for (const size of SIZES) for (const [tag, opts] of [['default', null], ['band 999999', { band: 999999 }], ['mixed', { lengths: 'mixed' }]]) for (const seed of seedsFor(role).slice(0, 2)) {
+            const cs = await build(role, size, seed, opts);
+            const models = role === 'scripted-model' || role === 'lesson' ? cs.slice(0, 1) : cs.filter((c) => c.traced).slice(0, 1);
+            if (!models.length) { bad.push(`MODEL-M6 ${role} ${size} ${tag} seed ${seed}: no worked example found`); continue; }
+            const mo = models[0];
+            if (!m6Wrong(mo.a, mo.b)) bad.push(`MODEL-M6 ${role} ${size} ${tag} seed ${seed}: the worked example ${mo.a} / ${mo.b} is one M6 gets right (the last digits - or the first, lengths differing - give the right sign)`);
+        }
+        console.log('  MODEL-M6: guided, scripted-model, opener, lesson');
+    }
+    if (on('EQ-SHARE-PAGE')) {
+        for (const role of ['independent', 'more-practice', 'test', 'guided', 'opener', 'lesson']) for (const size of SIZES) for (const seed of seedsFor(role)) {
+            await build(role, size, seed, null);
+            const pages = await sheet.evaluate(() => [...document.querySelectorAll('.ws-page')].map((pg) => [...pg.querySelectorAll('.pv-compare')].map((el) => {
+                const t = (el.textContent || '').replace(/\d+ digits?/g, ' ');
+                const nums = (t.match(/\d[\d,]*/g) || []).map((x) => Number(x.replace(/,/g, '')));
+                return nums.length >= 2 ? nums[0] === nums[nums.length - 1] : null;
+            }).filter((x) => x !== null)));
+            pages.forEach((eqs, pi) => {
+                const n = eqs.length, k = eqs.filter(Boolean).length;
+                if (k > Math.ceil(n / 6)) bad.push(`EQ-SHARE-PAGE ${role} ${size} seed ${seed} p${pi + 1}: ${k} "=" in ${n} problems (at most ${Math.ceil(n / 6)})`);
+                if (pi === 0 && role === 'test' && eqs[0]) bad.push(`EQ-SHARE-PAGE test ${size} seed ${seed}: item 1 is "="`);
+                if (pi === 0 && role === 'guided' && eqs.slice(0, 2).some(Boolean)) bad.push(`EQ-SHARE-PAGE guided ${size} seed ${seed}: the Model or the first try is "="`);
+            });
+        }
+        console.log('  EQ-SHARE-PAGE: six roles at ' + SIZES.join('/'));
+    }
+    if (on('WRAP-SIGN')) {
+        for (const role of ['scripted-model', 'guided', 'lesson']) for (const size of SIZES) for (const seed of seedsFor(role)) {
+            await build(role, size, seed, null);
+            const g = await sheet.evaluate(GEOM_PROBE, { wrapOps: '−+×÷=<>' });
+            for (const w of g.wraps.slice(0, 2)) bad.push(`WRAP-SIGN ${role} ${size} seed ${seed} p${w.page}: a line ends in "${w.op}": "${w.before}" / "${w.after}..." (join the sign to its numbers with no-break spaces)`);
+        }
+        console.log('  WRAP-SIGN: scripted-model, guided, lesson at ' + SIZES.join('/'));
+    }
+    if (on('SIDE-PAD')) {
+        for (const [tag, opts] of [['default', null], ['band 9999', { band: 9999 }], ['band 999999', { band: 999999 }]]) for (const seed of seedsFor('independent').slice(0, 2)) {
+            await build('independent', 'L', seed, opts);
+            const r = await sheet.evaluate(() => {
+                const MM = 96 / 25.4;
+                const range = document.createRange();
+                let min = Infinity, at = '';
+                for (const pc of document.querySelectorAll('.ws-page .pv-compare')) {
+                    const cell = pc.closest('.ws-cell, [data-ws-cell]');
+                    if (!cell) continue;
+                    const cr = cell.getBoundingClientRect();
+                    const tw = document.createTreeWalker(pc, NodeFilter.SHOW_TEXT);
+                    for (let n = tw.nextNode(); n; n = tw.nextNode()) for (let i = 0; i < n.nodeValue.length; i++) {
+                        if (!/\d/.test(n.nodeValue[i])) continue;
+                        range.setStart(n, i); range.setEnd(n, i + 1);
+                        const g = range.getBoundingClientRect();
+                        const d = Math.min(g.left - cr.left, cr.right - g.right) / MM;
+                        if (d < min) { min = d; at = pc.textContent.replace(/\s+/g, ' ').trim(); }
+                    }
+                }
+                return { min, at };
+            });
+            if (r.min < 5) bad.push(`SIDE-PAD independent L ${tag} seed ${seed}: a digit of "${r.at}" stands ${r.min.toFixed(2)} mm inside its cell's rule (want 5 mm)`);
+            console.log(`  SIDE-PAD independent L ${tag} seed ${seed}: nearest digit ${r.min.toFixed(2)} mm from a cell rule`);
+        }
     }
     await app.close();
     for (const b of bad.slice(0, 30)) console.log(`  FAIL ${b}`);

@@ -211,7 +211,10 @@ export const ROUTINES = Object.freeze({
     'pv-compare': {
         archetype: 'pv',
         casesPending: 'New with lf-placevalue compare: its cases are declared when the lesson is carded (lessons-first).',
+        // (compare r4, critic r2 N6: the Remember line prints the FIRST concept, and "More digits is the bigger number." decided
+        // none of the same-length items its page deals; the whole rule first - ws-lesson-unit chant-fit judges the Remember line too)
         concepts: [
+            { id: 'rule', text: 'More digits wins. Same count: the first different digit decides.' },
             { id: 'length', text: 'More digits is the bigger number.' },
             { id: 'left', text: 'Same length: the first different digit from the left decides.' },
         ],

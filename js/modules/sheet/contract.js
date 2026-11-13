@@ -51,6 +51,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // ruling, PEDAGOGY 4.1a, lf-placevalue 2026-11-13: identify's place heads give the answer - the place name - so the
     // unaided roles Review / Test / pre-skill check, on paper and in the quiz, drop them). Absent: the opts as chosen.
     'roleOpts',
+    // `falseNeedsWrong: true`: an item with no `wrongAnswer` is SKIPPED in a True or False? False slot (as Error analysis
+    // skips it, PT-ERR-1) instead of being printed True there - for a skill whose items name no error on purpose (lf-placevalue
+    // compare r4, critic r2 N1: compare's "=" and the pairs M6 gets right left the page 12-33 % false). Absent: as before.
+    'falseNeedsWrong',
 ]);
 
 /* ================================================== the controlled instruction library */
