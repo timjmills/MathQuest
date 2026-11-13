@@ -363,6 +363,7 @@ function hideOff(html, ctx) {
     if (!ctx || !ctx.offReserve || !Array.isArray(ctx.off) || typeof html !== 'string') return html;
     let h = html;
     if (ctx.off.includes('heads')) h = h.replace(/<span class="head">([^<]*)<\/span>/g, '<span class="head" style="visibility:hidden" aria-hidden="true">$1</span>');
+    if (ctx.off.includes('heads')) h = h.replace(/<span class="headcap"><\/span>/g, '<span class="headcap" style="visibility:hidden" aria-hidden="true"></span>');
     if (ctx.off.includes('regroup')) {
         h = h.replace(/<span class="rg([^"]*)" data-ws-seg="([^"]*)">/g, '<span class="rg$1" data-ws-seg-off="$2" style="visibility:hidden" aria-hidden="true">');
         h = h.replace(/<svg class="ws-strike/g, '<svg style="visibility:hidden" class="ws-strike');

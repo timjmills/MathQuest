@@ -60,10 +60,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const chip = document.querySelector('.tvs-sup-row .tv-part-chip'); if (chip) chip.click();
             await new Promise((r) => setTimeout(r, 300));
             const h = document.querySelector('.tv-sup-panel [data-sup-kind="hint"]'); if (h) h.click();
+            await new Promise((r) => setTimeout(r, 1200));
+            window.__supShot = { ticked: [...document.querySelectorAll('.tv-sup-panel [data-sup-kind="hint"]')].map((b) => b.getAttribute('aria-checked')), line: !!document.querySelector('.tv-sup-quizline') };
             await new Promise((r) => setTimeout(r, 500));
             const row = document.querySelector('.tvs-sup-rows'); if (row) row.scrollIntoView({ block: 'center' });
         });
         await sleep(400);
+        console.log('quiz panel', JSON.stringify(await page.evaluate(() => window.__supShot)));
         await shotEl('.tvs-sup-rows', 'quiz-1280.png');
         await page.evaluate(() => { try { window.tvCloseSheet(); } catch (e) { /* */ } });
 
@@ -78,7 +81,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 const off = {}, on = {};
                 for (const [p, list] of Object.entries(sup)) {
                     const roleOff = list.filter((x) => x.from === 'role').map((x) => x.id);
-                    const bands = Object.fromEntries(list.filter((x) => x.kind === 'band').map((x) => [x.id, false]));
+                    const bands = Object.fromEntries(list.filter((x) => x.kind === 'band' && !x.locked).map((x) => [x.id, false]));
                     if (roleOff.length || Object.keys(bands).length) off[p] = Object.assign(roleOff.length ? { opts: { off: roleOff } } : {}, Object.keys(bands).length ? { bands } : {});
                     const hint = list.find((x) => x.from && typeof x.from === 'object');
                     if (hint) on[p] = { opts: { support: [hint.from.value] } };
