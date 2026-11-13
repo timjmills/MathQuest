@@ -3262,6 +3262,25 @@
   }
  },
  {
+  "id": "runner-orphan-slot",
+  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
+  "kind": "fixture",
+  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
+   "state": "master 7e0c074b runner: the command inherits the slot fd"
+  },
+  "pass": {
+   "fixture": "tests/scripts/mq-browser-run.sh",
+   "state": "lf-engine-bt: \"$@\" {fd}>&-"
+  },
+  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
   "id": "screen-ink-size-ink",
   "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
   "kind": "fixture",
