@@ -1647,6 +1647,13 @@ function _wsRenderCard(grid, q, i) {
             const sc = card.querySelector('.ws-card-visual.mq-scell');   // R3-3: THIS card's own cell
             if (sc) sc.setAttribute('data-mq-touch-floor', '1');
         }
+        // (lf-ops divarray r2, lead 2026-11-13 via lf-checks' tablet sweep: div_facts' worksheet numeral takes the HOST digit floor
+        // for its width - 56 px at 1200 px and wider, 48 px from 600 px - as the card and quiz do, not the 40 px touch floor;
+        // css/screen-cell.css [data-mq-host-floor]. lf-checks' general per-cell floor, when it lands, covers the same cells.)
+        if (state.category === 'division' && state.skill === 'div_facts') {
+            const sc = card.querySelector('.ws-card-visual.mq-scell');
+            if (sc) sc.setAttribute('data-mq-host-floor', '1');
+        }
     } catch (e) { /* optional */ }
     if (cellEl) {
         if (!kind) _wsTidyLegacyCell(cellEl);

@@ -143,7 +143,11 @@ function selectSkills(all, { only = [], categories = [], sample = null, from = 0
 // ---- SCREEN-DIGIT (opt-in): the targets and the in-page measure
 const SCREEN_DIGIT = has('screen-digit');
 const RULE_SKILLS = (arg('rule-skills', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
-const DIGIT_VIEWPORTS = [{ w: 1280, h: 900, px: 56 }, { w: 820, h: 1180, px: 48 }, { w: 390, h: 844, px: 40 }];
+const DIGIT_VIEWPORTS_ALL = [{ w: 1366, h: 768, px: 56 }, { w: 1280, h: 900, px: 56 }, { w: 1024, h: 768, px: 48 }, { w: 820, h: 1180, px: 48 }, { w: 390, h: 844, px: 40 }];
+// --digit-widths 1366,1280,1024,820 (lf-checks tablet-width sweep, lead 2026-11-13): judge SCREEN-DIGIT at these widths; the
+// default stays 1280 / 820 / 390, so pinned runs keep their keys
+const DIGIT_WIDTHS = (arg('digit-widths', '') || '').split(',').map(Number).filter(Boolean);
+const DIGIT_VIEWPORTS = DIGIT_WIDTHS.length ? DIGIT_VIEWPORTS_ALL.filter((v) => DIGIT_WIDTHS.includes(v.w)) : DIGIT_VIEWPORTS_ALL.filter((v) => [1280, 820, 390].includes(v.w));
 /** The verdict on one measured numeral {px, weight, family} at a viewport width: null when it passes, else why. */
 // Lead ruling T2 (2026-11-07): the size floor holds for every skill; weight >= 700 only where the paper prints the numeral
 // bold - the place-value numerals (`bold`, true for placevalue:*). add_facts and other non-bold skills are exempt.
