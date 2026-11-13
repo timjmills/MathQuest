@@ -13,6 +13,10 @@ Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
   Critic r2 not run: about $9 left, and it would fail again on rows owned elsewhere (F2 count-row train -> lf-ops; F3 / F4 /
   PT-MOD-1 marksFor / F5 npr-fgr chart -> lf-roles; F8 options panel; EB-FOOT pairing -> lf-checks; rule-check stepsBy -> lf-engine).
   Resume: merge those fixes, precritic --strict, then critic r2 on all six.
+- 2026-11-13 05:36Z lf-ops (via lead): count-row Reason It train fix 77187c6e8 on claude/sweet-newton-c8wrv1-lf-ops-props (wraps at
+  real panel width, panels clear label keep-out, number-pattern slots from the band's widest number) replaces our interim revert
+  2cfeb1d7: drop 2cfeb1d7 when -props lands on master, or cherry-pick 77187c6e8 on resume. F2 screen part (wrap, caption overprint,
+  digit px) still open at lf-ops.
 - 2026-11-13 fix r8 (after critic r1, all six FAIL): ours fixed - F1 hints off on Test / quiz, F5 function-table chart states,
   F6 / F6b steps follow the preset and the lesson, F7 growing title, pattern_features q.options, notice "40", screen grey,
   growing screen dots. Handed: F2 / slot width -> lf-ops; F3, F4, PT-MOD-1 (marksFor), F5 npr / fgr chart -> lf-roles; F8 ->
