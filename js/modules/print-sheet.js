@@ -4871,7 +4871,10 @@ async function buildLesson(n, metaOf) {
     // Independent cells, so Practice and Mixed could deal one of them again - sub L / S printed "50 - 36" on both. Its fact keys
     // go into the hard avoid set of the practice ref and of the Mixed partners; a lesson without the check deals exactly as before.)
     const sheetHard = prereqs && !packNums ? planKeys(teach) : [];
-    const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...sheetHard] }) : r);
+    // (and the sheet's item texts, soft: a Mixed number bond "2 + 2 = ?" has no fact key - add seed 1222)
+    const sheetTexts = [];
+    if (sheetHard.length) for (const pl of teach.keyPlans || [teach.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) sheetTexts.push(refText(it.q)); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); }
+    const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...sheetHard], avoidTexts: [...(Array.isArray(r.avoidTexts) ? r.avoidTexts : []), ...sheetTexts.filter(Boolean)] }) : r);
     practiceSk = withSheetHard(practiceSk);
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
