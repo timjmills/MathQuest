@@ -25,3 +25,5 @@ ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktre
   FAIL            ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) (201 s, waited 79 s for a slot)
   FAIL            ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) (165 s, waited 47 s for a slot)
   FAIL            ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) (253 s, waited 47 s for a slot)
+  FAIL            ws-grade-render --gate on every other role the signed card offers (word-stories §7a; critic lf-ops r1 check 2) (255 s, waited 51 s for a slot)
+  FAIL            ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9) (228 s, waited 80 s for a slot)
