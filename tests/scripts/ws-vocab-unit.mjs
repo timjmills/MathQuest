@@ -34,7 +34,8 @@
 //     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
 //     reads as cycle
 // --browser V-PAGE (r15) no two Match 3 cells of one printed page put the same pictures in the same places
-// --browser r16 (critic r5 nits): V-NAMES no Error analysis page repeats a pupil name while one is unused
+// --browser r16 (critic r5 nits): V-NAMES no Error analysis page repeats a pupil name while one is unused; V-LETTER the Match 3
+//     letter at one anchor (top-left of its picture) in every slot of a row, print and card; V-BOX390 card-390 boxes in one column
 // V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
 //     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
@@ -971,7 +972,14 @@ async function pageRepeatChecks(page, fail) {
 // ---- lf-vocab r16: the critic r5 nits as checks (design/lanes/lf-vocab/r16-builder-brief.md) --------------------------------
 // V-NAMES   (nit 5) no Error analysis page repeats a pupil name while an unused one remains ("Mia wrote" twice on Match 3 EA S
 //           items 3-4, "Sam wrote" twice on Pick 3 EA M items 1 and 4)
-function r16List() { return ['V-NAMES']; }   // (a function: browserChecks runs before this line, top-level await)
+// V-LETTER  (nit 3) a Match 3 picture letter sits at one anchor, the top-left of its picture, on every picture of a row, whatever
+//           the picture's height: in one line of pictures the letters' tops are within 0.5 mm, and the letter's offset from its
+//           picture's top-left (letter top - picture top, picture left - letter right) is the same within 0.5 mm. Every print
+//           role that deals Match 3 (S / M / L) and the practice card at 1280, 820 and 390 px (A sat at mid-height beside a
+//           short picture while B and C sat at the top: Match 3 S independent item 3; card-1280 A at the baseline)
+// V-BOX390  (nit 4) on the practice card at 390 px the three Match 3 letter boxes stand in one column: their left x within 4 px
+//           (they followed the centred words, x 230 / 260 / 225 px); worksheet-1280 already holds this (V19)
+function r16List() { return ['V-NAMES', 'V-LETTER', 'V-BOX390']; }   // (a function: browserChecks runs before this line, top-level await)
 function R16_FNV(x) { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 // the seeds a page is judged at: 7, V23's 143869 and ws-grade-render's seed for the role (the critic's page)
 function r16Seeds(skillId, role) { return [...new Set([7, 143869, R16_FNV(`vocabulary__${skillId}:${role}`) % 1000000])]; }
@@ -1000,6 +1008,68 @@ async function r16Checks(page, fail, sheet, build) {
             });
         }
         if (!pages) fail('V-NAMES: no Error analysis page shows a pupil name');
+    }
+    // (in the page) every Match 3 cell's letter anchors: [{lines: [[{lt, st, gap}]]}] in CSS px, the slots grouped into lines by
+    // vertical overlap (a wrapped card puts one picture a line)
+    const LETTERS = () => [...document.querySelectorAll('.mq-vm')].filter((c) => !c.closest('.mq-wspaper')).map((c) => {
+        const slots = [...c.querySelectorAll('.mq-vm-pic')].map((pc) => {
+            const r = pc.getBoundingClientRect(), l = pc.querySelector('.mq-vm-let'), sv = pc.querySelector('svg.mq-vpic');
+            if (!l || !sv) return null;
+            const lr = l.getBoundingClientRect(), sr = sv.getBoundingClientRect();
+            return { top: r.top, bottom: r.bottom, lt: lr.top, st: lr.top - sr.top, gap: sr.left - lr.right, let: l.textContent.trim() };
+        }).filter(Boolean);
+        const lines = [];
+        for (const sl of slots) {
+            const ln = lines.find((g) => g.some((o) => sl.top < o.bottom - 1 && o.top < sl.bottom - 1));
+            if (ln) ln.push(sl); else lines.push([sl]);
+        }
+        return { lines };
+    });
+    const judgeLetters = (tag, cells, tolPx) => {
+        let n = 0;
+        cells.forEach((c, ci) => c.lines.forEach((ln) => {
+            n++;
+            for (const [k, what] of [['lt', 'the letters\' tops'], ['st', 'letter top - picture top'], ['gap', 'picture left - letter right']]) {
+                const v = ln.map((x) => x[k]);
+                if (Math.max(...v) - Math.min(...v) > tolPx) fail(`V-LETTER ${tag} cell ${ci + 1}: ${what} differ across ${ln.map((x) => x.let).join(' / ')} (${v.map((x) => x.toFixed(1)).join(' / ')} px, want within ${tolPx.toFixed(1)})`);
+            }
+        }));
+        return n;
+    };
+    const card = async (skillId, width, k) => {
+        await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
+        await page.evaluate((a) => {
+            const st = window.state; st.quizMode = false; st.mapMode = false; st.category = 'vocabulary'; st.skill = a.k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+            window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
+        }, { k: skillId });
+        await new Promise((r) => setTimeout(r, 250));
+    };
+    if (want('V-LETTER')) {
+        let lines = 0;
+        const MM = 96 / 25.4;
+        for (const role of ['independent', 'more-practice', 'test', 'guided', 'error-analysis', 'review']) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds('vocab_grade_pictures', role)) {
+            const b = await build('vocab_grade_pictures', role, size, null, seed);
+            const tag = `print ${role} ${size} seed ${seed}`;
+            if (b.error) { fail(`V-LETTER ${tag}: not composed (${b.error})`); continue; }
+            lines += judgeLetters(tag, await sheet(b.html, LETTERS), 0.5 * MM);
+        }
+        for (const width of [1280, 820, 390]) for (let k = 0; k < 6; k++) {
+            await card('vocab_grade_pictures', width, k);
+            lines += judgeLetters(`card-${width} question ${k + 1}`, await page.evaluate(LETTERS), 2);
+        }
+        if (!lines) fail('V-LETTER: no Match 3 picture row measured');
+    }
+    if (want('V-BOX390')) {
+        let cells = 0;
+        for (let k = 0; k < 8; k++) {
+            await card('vocab_grade_pictures', 390, k);
+            const xs = await page.evaluate(() => [...document.querySelectorAll('#questionCard .mq-vm')].map((c) => [...c.querySelectorAll('.mq-vm-box')].map((b) => Math.round(b.getBoundingClientRect().left))));
+            for (const x of xs) {
+                cells++;
+                if (x.length && Math.max(...x) - Math.min(...x) > 4) fail(`V-BOX390 card-390 question ${k + 1}: the letter boxes stand at x ${x.join(' / ')} px (want one column, within 4 px)`);
+            }
+        }
+        if (!cells) fail('V-BOX390: no Match 3 cell on the card at 390 px');
     }
 }
 async function r7Checks(page, fail, sheet) {

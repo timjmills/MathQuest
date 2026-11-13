@@ -116,7 +116,10 @@ register(MATCH3_TEMPLATE, {
             + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${L(ctx, 2)} ${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
             // (a practice cell's free height goes above AND below the pictures - the row centred in the room over the words, which
             // stay at one y - so a row of flat pictures leaves no single blank band: ws-empty-band --slot-ink off, lf-vocab r6)
-            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:auto 0;' : ''}">${pics}</div>`
+            // (lf-vocab r16, critic r5 nit 3: the pictures hang from one top line, so every letter sits at the same anchor - the
+            // top-left of its picture - whatever the picture's height; bottom-aligned, a short picture's letter sat at mid-height
+            // beside the others; ws-vocab-unit V-LETTER)
+            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-start;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:auto 0;' : ''}">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },
     answerKey(p) {
