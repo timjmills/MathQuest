@@ -3745,6 +3745,163 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "partopts-b-resolver",
+   "check": "Step B supports model: the standard resolves to the PAGE_TYPES fade (nothing off), a delta turns exactly its ids off, a needed support off warns and still prints, every structure off says so, quiz hints are off by default, the panel writes back only what differs; part deltas survive a save / load",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-SUP + PO-SUPN (pure)",
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "step A only: part-opts.js has no resolveSupports / normalizeSupDelta - no supports model, a part delta is dropped"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "the resolver, chip words, write-back and storage as DESIGN §2"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --unit --only PO-SUP,PO-SUPN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-off-codec",
+   "check": "The universal hidden option `off` exists on every skill, is never a control, defaults to empty (a default skill encodes byte-identically) and round-trips through the share-code codec on an appended key",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-4S (pure)",
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "no `off` option on subtraction:sub_100_regroup"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "off: hidden set, key 5X, tokens R / H / F, 3 round trips"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --unit --only PO-4S",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-size-gate",
+   "check": "The per-size offer gate (lead): mult_properties band 36 is offered at S only - offeredOptionsFor at M / L leaves it out, a choice of it at M goes back to the default with its reason, S keeps it",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-SIZE (pure)",
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "no gate: band 36 offered at M and L ([25,36,81])"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "M / L offer [25,81]; S and no size [25,36,81]; gateBySize at M -> 25 + note"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --unit --only PO-SIZE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-declared-drawn",
+   "check": "Every support a part declares is drawn: flipping it changes that part's pupil pages (and, for structure and bands, its key) and no other sheet (PO-5); a paper's declared ticks change the paper",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-5",
+   "browser": true,
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "the build declares no supports (no res.lesson.partSup, no paperSupportDecl)"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "sub_100_regroup M: chart.say, sheet.regroup, sheet.heads, wedo.firststep, practice.regroup, practice.steps, mixed.regroup each change their part only"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --lessons subtraction:sub_100_regroup --sizes M --only PO-5",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-wedo-band-geometry",
+   "check": "A structure turned off on the lesson sheet may not leave its We Do cells with a 30 % empty band (the We Do band is as tall as its Steps): the lesson sheet keeps the standard geometry (offReserve)",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-3 EB-BAND on a settled state (--state)",
+   "browser": true,
+   "fail": {
+    "commit": "4c0ecd2eb",
+    "state": "sub_100_regroup L, regroup boxes and place-value letters off: lesson-sheet cell 6, 23.9 mm band under the ink of a 67.6 mm cell (35.4 %)"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "the marks are laid out and hidden: the cells keep the standard geometry, 0 findings"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --lessons subtraction:sub_100_regroup --sizes L --only PO-3 --state '{\"chart\":{\"bands\":{\"say\":false}},\"sheet\":{\"opts\":{\"off\":[\"regroup\",\"heads\"]}},\"practice\":{\"opts\":{\"off\":[\"regroup\"]}}}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-steps-strip-kept",
+   "check": "Turning the Practice Steps strip off may not grow the page's cells to a 30 % band: where its height would push the cells past the strip-off cap the strip is kept (listed, tick disabled, with the reason) and a stored delta is dropped as the screen settles",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-3 EB-BAND on a settled state (--state)",
+   "browser": true,
+   "fail": {
+    "commit": "f4643069e",
+    "state": "add_facts M, Steps strip off: every Practice cell 57.3 mm with a 17.2 mm band (30.0 %)"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "the strip is kept at add_facts M (BAND_KEPT_TEXT); the state settles to the standard page, 0 findings"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --lessons addition:add_facts --sizes M --only PO-3 --state '{\"practice\":{\"bands\":{\"steps\":false}}}'",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-paper-screen",
+   "check": "Paper = screen: a skill whose regroup boxes are off has none on paper and none on the practice card, online worksheet or quiz (kindHTML with the skill's own `off`); the four screen hosts pass it",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-PS",
+   "browser": true,
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "no screenOffFor: the screen draws 8 regroup inputs where the paper (once built) draws none; the hosts pass no `off`"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "default: boxes on both; off: 0 on paper, 0 on screen"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --lessons none --only PO-PS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "partopts-b-panel",
+   "check": "The Supports panel: every part with declared supports has a closed chip reading Standard, the panel lists only declared ids grouped Structure / Hints / On the page, a needed support off shows its warning and \"Custom: 1 off\" and Print stays live, the rebuilt sheet has no such mark, 390 px has no sideways scroll and 44 px controls; the Quiz sheet's hints are unticked by default and say so when ticked",
+   "kind": "commit-pair",
+   "rule": "ws-partopts-supports PO-UI",
+   "browser": true,
+   "fail": {
+    "commit": "a84d083e7",
+    "state": "step A: plain \"Supports: Standard\" text, no chip, no panel, no Quiz sheet supports"
+   },
+   "pass": {
+    "commit": "e2fb4b813",
+    "state": "chips, panel, warning, rebuild and Quiz sheet as DESIGN §1"
+   },
+   "command": "node tests/scripts/ws-partopts-supports.cjs --ui --only PO-UI",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

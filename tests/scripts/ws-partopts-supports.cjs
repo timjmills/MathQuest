@@ -296,13 +296,16 @@ async function browser() {
                     // the screen can reach, PO-2w's settle)
                     let r = await build(skill, size, po); builds++;
                     for (let k = 0; k < 3 && !r.error; k++) {
-                        const nx = await page.evaluate(async ({ po, fit }) => { const m = await import('./js/modules/sheet/part-opts.js'); return m.normalizePartOpts(po, m.allPartLimits(fit)); }, { po, fit: r.fit });
+                        // (and, as the screen does, a band its build KEEPS at this size - `locked` - loses its delta)
+                        const nx = await page.evaluate(async ({ po, fit, sup }) => { const m = await import("./js/modules/sheet/part-opts.js"); const q = JSON.parse(JSON.stringify(po)); for (const [x, list] of Object.entries(sup || {})) for (const e of list || []) if (e.locked && q[x] && q[x].bands && q[x].bands[e.id] === false) delete q[x].bands[e.id]; return m.normalizePartOpts(q, m.allPartLimits(fit)); }, { po, fit: r.fit, sup: r.partSup });
                         if (J(nx) === J(m0(po))) break;
                         po = nx; r = await build(skill, size, po); builds++;
                     }
                     if (r.error) { F('PO-3', `${tag}: does not build: ${r.error}`); continue; }
                     // asked = printed
-                    for (const x of asked) {
+                    // (asked = printed, for what the settled state still asks)
+                    const has = (x) => { const d = po[x.part] || {}; return x.kind === "band" ? !!(d.bands && d.bands[x.id] === false) : x.from === "role" ? ((d.opts && d.opts.off) || []).includes(x.id) : true; };
+                    for (const x of asked.filter(has)) {
                         const sh = SHEET_OF[x.part];
                         const mk = MARKS[x.id];
                         if (mk && !(x.from && typeof x.from === 'object')) {
