@@ -6,7 +6,7 @@ Owner of files: js/modules/sheet/roles/{true-false,reason-it,error-analysis,revi
 State: fix (critic r1 FAIL; r2 fixes in, critic r2 waits on lead rulings)
 Updated: 2026-11-13
 Builder profile: lane session (no sub-agent builder)
-Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
+Critic rounds: 3, r3 FAIL (passed skills set a PASS, 0 worse; changes FAIL D1-D4 -> fixed 000f6eb5); 2 earlier: r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
 
 ## Now
 - 5 fixes pushed, each with its check first (FAIL on master eef75f5, OK on the fix); 780 passed-skill pages (26 skills x 10 roles x
@@ -16,6 +16,17 @@ Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.
 - Proofs: ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --check vs master eef75f5: 1556/1556 identical;
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
+
+## Round 5 (2026-11-13, +$40)
+- N3 (435052b9): Error Analysis item + judgement centred in a stretched cell; "<Name> wrote:" rides on its work. EB-BAND 16 -> 0 on
+  the passed skills' EA; PUPILTAG extended (label <= 8 mm over its work: fires 28x on the unanchored state).
+- Critic r3 (mq-opus-medium, 182 pages vs BEFORE): passed skills (set a) PASS, every role page 8/8/8/8 and BETTER than BEFORE except
+  two pre-existing groups (unit_form TF S, N2; subtraction Model L, skill S1 lf-ops). changes FAIL: D1 rule span out of the Reason It
+  cell, D2 items fell on npr / fgr / fte, D3 2-part answer unlabelled, D4 bare "Review" at every size; D5 RI list wrapped a blank a
+  line; D6 label 1 mm over H T O (nit); D7 TF boxes beside the statement tick column (pf L).
+- Fixed in 000f6eb5: D1, D2 (Reason It: S/M/L counts back to BEFORE), D3, D4, D5 - Reason It list answers print no frame (the named
+  panel holds it, H16) - NEEDS LEAD RATIFICATION (PT-TOF-4 extended to Reason It lists).
+- Open: npr True or False? M 4 -> 3 (6-part frame wraps); D6, D7; R4, R13, R15, N2, N4, N9; mult_facts Review supports side band.
 
 ## Round 4 (2026-11-13, lead +$40): fixes, checks first
 | Finding | Fix (commit) | Check |
@@ -101,6 +112,8 @@ Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.
   the answer; on Reason It "__ is correct" names it); a list answer writes one line a part. Suggested: accept.
 
 ## Times
+Times: r5 (N3, critic r3, D1-D5), start 2026-11-13T08:15Z, end 2026-11-13T09:40Z, profile lane session
+Times: critic r3, start 2026-11-13T09:05Z, end 2026-11-13T09:13Z, profile mq-opus-medium
 Times: r4 (N10, N1, R2, R5, N5, R10, R11), start 2026-11-13T06:45Z, end 2026-11-13T08:10Z, profile lane session
 Times: r3 (ws-capacity-pin, unit-form RI row, PT-MOD-5, critic r2, master comparison), start 2026-11-13T05:25Z, end 2026-11-13T06:40Z, profile lane session
 Times: critic r2, start 2026-11-13T06:05Z, end 2026-11-13T06:13Z, profile mq-opus-medium
