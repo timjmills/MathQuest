@@ -546,3 +546,5 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | lf-engine PC r3 rebuild (2026-11-13) | builder, one session (budget ~$15) | merge live-pm2; F13 + add S foot; triage forced 354 vs unforced 428; live baseline 1,556 identical (write on 1b2d38f05 ~11 m, check ~12 m); ws-lesson-samples --check --force-check 8 seeds OK |
 
 | lf-engine PC r4 (2026-11-13) | builder, one session (~$25, ~0.9 % of the weekly limit) | lead ruling: dry-pool fallback order, PG-TURN + PG-LR67 (2 backtests PASS); ws-lesson-check forced 354 -> 118 (unforced 428, unchanged); live baseline 1,556 identical (written on be9528776) |
+
+| lf-engine PC r5 (2026-11-13) | fresh builder (§1.7 loop stop), one session (~$45, ~1.6 % of the weekly limit) | checks first: PC-RANGE floors, PC-PV both ways, PC-PVHEADS, CHART-H13, PG-LR6, PC-GAPS, PC-INSTR, PC-NAME both parts, --verify-grey, PC-FRAME on every lesson (13 backtest rows); one near-twin module; live: 176 of 1,556 hashes (Mixed pv partner heads, sub chart); deal64 + 8-seed forced gates OK |
