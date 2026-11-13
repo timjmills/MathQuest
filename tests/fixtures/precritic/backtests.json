@@ -5232,6 +5232,7 @@
   "id": "vocab-r16-vnames",
   "check": "V-NAMES: no Error analysis page repeats a pupil name while an unused one remains (both skills, S / M / L, default and grade 2 / 4 pools, seed 7, 143869 and the render seed): Match 3 EA S \"Mia wrote\" twice, Pick 3 EA M \"Sam wrote\" twice, critic r5 nit 5",
   "kind": "commit-pair",
+  "browser": true,
   "rule": "ws-vocab-unit --browser V-NAMES (lf-vocab r16)",
   "fail": {
    "commit": "a3eb9d25",
@@ -5251,6 +5252,7 @@
   "id": "vocab-r16-vletter",
   "check": "V-LETTER: a Match 3 picture letter sits at one anchor, the top-left of its picture, in every slot of a line of pictures (tops, letter-to-picture offset and gap within 0.5 mm): every print role that deals Match 3 at S / M / L and seeds 7, 143869 and the render seed, and the practice card at 1280 / 820 / 390 px; Match 3 S independent item 3 and card-1280, critic r5 nit 3",
   "kind": "commit-pair",
+  "browser": true,
   "rule": "ws-vocab-unit --browser V-LETTER (lf-vocab r16)",
   "fail": {
    "commit": "a3eb9d25",
@@ -5270,6 +5272,7 @@
   "id": "vocab-r16-vbox390",
   "check": "V-BOX390: on the practice card at 390 px the three Match 3 letter boxes stand in one column (left x within 4 px, 8 questions): critic r5 nit 4, x 230 / 260 / 225 px",
   "kind": "commit-pair",
+  "browser": true,
   "rule": "ws-vocab-unit --browser V-BOX390 (lf-vocab r16)",
   "fail": {
    "commit": "a3eb9d25",
@@ -5280,6 +5283,66 @@
    "state": "up to 600 px: one word a row, right-aligned in a centred column"
   },
   "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-BOX390 2>&1 | grep -q \"  - V-BOX390 \" && echo \"v-box390: FAIL\" || echo \"v-box390: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r16-vcaption",
+  "check": "V-CAPTION: the captions of one Match 3 picture row print at one size (each picture largest text, in pt as printed, within 1 pt): every print role that deals Match 3 at S / M / L, default and grade 2 / 4 pools, seeds 7, 143869 and the render seed; \"2 x 3 = 3 x 2\" 13 pt beside \"5 x 1 = 5\" 20 pt, critic r5 nit 6",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-vocab-unit --browser V-CAPTION (lf-vocab r16)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r5 pass): 397 rows with captions 1-9 pt apart"
+  },
+  "pass": {
+   "commit": "9878b2a6",
+   "state": "one caption size per row (vocabPictureTextPt), slots as wide as their pictures"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-CAPTION 2>&1 | grep -q \"  - V-CAPTION \" && echo \"v-caption: FAIL\" || echo \"v-caption: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r16-vgline",
+  "check": "V-GLINE: on a 1 picture, 3 words Guided page the write lines of one row stand at one y (bottom within 0.5 mm), the Model and the hinted try included (S / M / L, seeds 7, 143869, 43858, grade pools 1-4): row 1 hint line 560 px vs the Model 605 px at L, critic r5 nit 2",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-vocab-unit --browser V-GLINE (lf-vocab r16)",
+  "fail": {
+   "commit": "a3eb9d25",
+   "state": "vocabulary deployed (critic r5 pass): the hint hangs under the cell, lines follow the content"
+  },
+  "pass": {
+   "commit": "36f9dbfa",
+   "state": "guided.js hintInside; pick3 anchors its line to the cell bottom on a Guided page"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V-GLINE 2>&1 | grep -q \"  - V-GLINE \" && echo \"v-gline: FAIL\" || echo \"v-gline: OK\"",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r16-v18m",
+  "check": "V18M: the Match 3 Guided rows are equal within 1 mm at S / M / L on the rendered row boxes (seeds 7, 143869, 43858, grade pools 1-4); V18 already held it on the deploy (evenRows since 002e071f) - this row proves the measure catches unequal Match 3 rows: critic r5 nit 1",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-vocab-unit --browser V18M (lf-vocab r16; V18 extended to Match 3)",
+  "fail": {
+   "commit": "6e140668",
+   "state": "before Match 3 evenRows: rows 78.6 / 70.9 / 70.7 mm (33 pages)"
+  },
+  "pass": {
+   "commit": "002e071f",
+   "state": "Match 3 Guided rows one share each (evenRows)"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --browser --only V18M 2>&1 | grep -q \"  - V18M \" && echo \"v18m: FAIL\" || echo \"v18m: OK\"",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
