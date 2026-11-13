@@ -840,3 +840,36 @@
   section sub: Lesson · 4 practice pages + mixed
   preview pages: lesson-chart,lesson-sheet,lesson-practice,lesson-practice,lesson-practice,lesson-practice,lesson-mixed,lesson-mixed
   page tabs (8): Page 1 | Page 2 | Page 3 | Page 4 | Page 5 | Page 6 | Page 7 | Page 8
+
+=== r3-ffs-M (skill:addition:fact_family_sort) size M width 1280
+  START 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page"
+    vocab=3 [true] okx "Vocabulary 3 2 to 3 words, or 0 to leave it off"
+    remember= [true]  "Remember"
+    wedo=2 [true] okx "We Do 2 2 problems, or 0 to leave it off Supports: Standard"
+    rows= [none]  "Lesson practice rows Not on this lesson sheet (no room)"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard"
+    mixed= [false]  "Mixed Supports: Standard"
+  step vocab -1 -> true | vocab=2 [true] okok "Vocabulary 2 2 to 3 words, or 0 to leave it off"
+  tick remember -> true | remember= [false]  "Remember"
+  step wedo -1 -> true | wedo=0 [false] xok "We Do 0 2 problems, or 0 to leave it off Supports: Standard"
+  END 
+    chart= [true]  "Anchor chart Fixed: 1 (the chart's design) Supports: Standard"
+    GROUP= [none]  "Lesson sheetVocabulary, Remember, We Do and practice rows: one page"
+    vocab=2 [true] okok "Vocabulary 2 2 to 3 words, or 0 to leave it off"
+    remember= [false]  "Remember"
+    wedo=0 [false] xok "We Do 0 2 problems, or 0 to leave it off Supports: Standard"
+    rows= [LOCK +lockText]  "Lesson practice rowsNeeded to fill the sheet Fixed: 1 (fewer would leave the lesson sheet short) Supports: Standard"
+    practice=9 [true] okok "Practice 9 9 to 45 problems, in rows of 3, or 0 to leave it off · 1 page of 9 Supports: Standard"
+    mixed= [false]  "Mixed Supports: Standard"
+  section sub: Lesson · 1 practice page
+  preview pages: lesson-chart,lesson-sheet,lesson-practice
+  page tabs (4): Page 1 | Page 2 | Page 3 | Answer keys
+  page 1 lesson-chart cells 3 empty 0% (0 mm) strips[Say:]
+  page 2 lesson-sheet cells 7 empty 25% (60.7 mm) strips[Vocabulary:|Warm-up:|Independent Practice:]
+  page 3 lesson-practice cells 9 empty 6% (14.3 mm) strips[]
+  page 4 lesson-chart KEY cells 3 empty 0% (0 mm) strips[Say:]
+  page 5 lesson-sheet KEY cells 7 empty 25% (60.7 mm) strips[Vocabulary:|Warm-up:|Independent Practice:]
+  page 6 lesson-practice KEY cells 9 empty 6% (14.3 mm) strips[]
+  cell findings: 0

@@ -97,6 +97,8 @@ const SEED = `(() => { let a = 1; Math.random = function () { a |= 0; a = a + 0x
             if (st[0] === 'step') ok = await click(`${scope}[data-act="part-step"][data-part="${st[1]}"][data-dir="${st[2]}"]`);
             else if (st[0] === 'tick') ok = await click(`${scope}[data-act="part-on"][data-part="${st[1]}"]`);
             else if (st[0] === 'new') ok = await click(`${scope}[data-act="part-new"][data-part="${st[1]}"]`);
+            else if (st[0] === 'click') ok = await click(st[1]);   // master (no Parts table): a plain control
+            else if (st[0] === 'select') { await page.locator(st[1]).first().selectOption(String(st[2])); ok = true; }
             else if (st[0] === 'size') ok = await click(`[data-act="size"][data-v="${st[1]}"]`);
             else if (st[0] === 'max' || st[0] === 'min') {   // press + (or -) until it is disabled, settling after each click
                 let k = 0; const dir = st[0] === 'max' ? 1 : -1;
