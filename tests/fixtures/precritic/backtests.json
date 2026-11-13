@@ -7563,6 +7563,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "options-panel-scroll-cue",
+   "check": "critic-panel-r4 N1-cue: a panel sample frame that scrolls by more than 8 px shows a visible cue beside it (tablet and ChromeOS scrollbars are overlays that show nothing until touched), and no cue shows under a frame that does not scroll",
+   "kind": "commit-pair",
+   "rule": "ws-options-shots [scroll-cue]",
+   "browser": true,
+   "fail": {
+    "commit": "30a4674f",
+    "state": "round-4 tree: histogram_read and hotspot_quads drawn whole at 9 px scroll 122 / 213 px at 1024 and 820 with nothing on screen to say so; the hidden part is the last bar and 1-2 of the shapes the question asks about"
+   },
+   "pass": {
+    "commit": "05c287e1",
+    "state": "a line under the frame names the way to scroll (\"Scroll sideways to see the whole drawing\"), and the scrollbar is drawn always"
+   },
+   "command": "node tests/scripts/ws-options-shots.cjs --skip-no-panel --workers 1 --no-spot --widths 1024,820 --skill data_analysis:histogram_read,shapes_classify:hotspot_quads --checks scroll-cue",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
