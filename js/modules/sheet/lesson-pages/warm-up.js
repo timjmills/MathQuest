@@ -9,6 +9,7 @@
 
 import { ctxOf, planItem, gridPart, instructionKeyOf, instructionPart, poolItems } from '../roles/compose.js';
 import { reflowsAt, CL8_MM, warmPools, band, hAt, hOf } from './common.js';
+import { nearSplit } from '../near-twins.js';
 
 /** The library key every Warm-up item names itself (q.instructionKey), or '' when any item names none or they differ. */
 function warmItemKey(items) {
@@ -141,7 +142,11 @@ export function warmTracks(halves, wPools, shape, rowsOf) {
 export function warmUpBand(env) {
     const { input, m, labels, groups } = env;
     const wIds = warmPools(input);
-    const wPools = Object.fromEntries(wIds.map((id) => [id, poolItems(input, id)]));
+    // (r6, critic r5 R2: the near-twin rules on every library lesson's sheet, check on or off - `nearRules` / `indepRules` on the
+    // lesson data: a skill's one-number near twin goes after its clean items - round seed 1037 printed identify 61 / 63 here)
+    const ld0 = input && input.lesson && input.lesson.data;
+    const near = !!(ld0 && (ld0.nearRules || ld0.indepRules));
+    const wPools = Object.fromEntries(wIds.map((id) => [id, near ? (({ clean, later }) => clean.concat(later))(nearSplit(poolItems(input, id))) : poolItems(input, id)]));
     const shape = warmShape(wPools, input);
     const halves = wIds.filter((id) => wPools[id].length && shape[id]);
     let letter = 1;

@@ -57,6 +57,9 @@ export { nearSplit };
 
 export function indepRuled(pool, weDo, data) {
     const rules = data && data.indepRules;
+    // (r6, critic r5 R2: a library lesson with the check off - `nearRules` - keeps the one-number near-twin split with its Guided
+    // cells: round L printed 96 / 95 / 99 on one sheet page, the answer 100 three times)
+    if (!rules && data && data.nearRules) { const nl = nearSplit(pool, weDo || []); return nl.clean.concat(nl.later); }
     if (!rules) return pool;
     const caps = rules.caps || {};
     const plainOf = (it) => { const q = (it && it.q) || {}; return { text: String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ops: operandsOf(q) }; };

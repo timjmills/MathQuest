@@ -390,6 +390,14 @@ const PARSE = {
         if (m[m.length - 1][1] === 'OK') return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
         return { result: 'FAIL', findings: m[m.length - 1][0], detail: out.split('\n').filter((l) => /^FAIL /.test(l)).slice(0, 12), explainsExit: true };
     },
+    // (r6) ws-lesson-baseline --pages-only prints `ws-lesson-baseline --pages-only: OK|FAIL (n grew)`; the PARTPAGES lines are the findings
+    lessonBaselinePages(g, out, code) {
+        const m = [...out.matchAll(/^ws-lesson-baseline --pages-only: (OK|FAIL)\b.*$/gm)];
+        if (!m.length) return unparsed('no "ws-lesson-baseline --pages-only: OK|FAIL" line', out);
+        if (m[m.length - 1][1] === 'OK') return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
+        const rows = out.split('\n').filter((l) => /PARTPAGES/.test(l)).map((l) => l.trim());
+        return { result: 'FAIL', findings: rows.length ? listShort(rows, 3) : m[m.length - 1][0], detail: rows.slice(0, 12), explainsExit: true };
+    },
     lessonSamples(g, out, code) {
         const m = [...out.matchAll(/^ws-lesson-samples --check: (OK|FAIL)\b.*$/gm)];
         if (!m.length) return unparsed('no "ws-lesson-samples --check: OK|FAIL" line', out);
@@ -1110,10 +1118,14 @@ function buildPlan(ctx) {
             add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, PG-TURN, PG-LR67, PG-LR6, H13, CLIP, FRAME, PV, PVHEADS, CHART-H13, GAPS, INSTR, PAGES; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // (lf-engine PC critic r4, speed-up 1 / 5: the DEALING rules on 64 seeds - a deal count change re-runs the range gate on
             // the refs' floors; PG-LR6 one-number near twins on every lesson page - and the committed packet's chart-grey.png, N8)
-            add(gate('lesson-samples-deal64', 'ws-lesson-samples --check --seeds 64 (dealing: PC-RANGE on the route refs\' declared floors, PC-NAME both parts, PG-LR6 one-number near twins on every lesson page, PG-LR67, PG-TURN, PC-LR5)', 'add_facts, sub_100_regroup, nearest_10 × 64 seeds (L) + the 4242 check at L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check', '--seeds', '64', '--rules', 'PC-RANGE,PC-NAME,PG-LR6,PG-LR67,PG-TURN,PC-LR5'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-deal64', 'ws-lesson-samples --check --seeds 64 (dealing: PC-RANGE on the route refs\' declared floors, PC-NAME both parts, PG-LR6 one-number near twins on every lesson page, PG-LR67, PG-TURN, PC-LR5)', 'add_facts, sub_100_regroup, nearest_10 × 64 seeds (L) + the 4242 check at L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check', '--seeds', '64', '--rules', 'PC-RANGE,PC-NAME,PG-LR6,PG-LR67,PG-TURN,PC-LR5,PC-PV'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             add(gate('lesson-samples-grey', 'ws-lesson-samples --verify-grey (every committed packet\'s chart-grey.png is its chart page)', 'design/lesson-samples add / sub / round, L and S', 'browser', 'ws-lesson-samples', ['--verify-grey'], { parse: PARSE.lessonGrey, needFlags: ['verify-grey'] }));
             // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
-            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used; PG-TURN: no page turns round one of its own sums; PC-FRAME: no cell cut at its band, r5)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG,PG-TURN,PC-FRAME'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used; PG-TURN: no page turns round one of its own sums; PC-FRAME: no cell cut at its band, r5)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG,PG-TURN,PC-FRAME,PG-LR6,PG-LR67,PC-PV,PC-PVHEADS,PC-INSTR,PM-FOOT'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
+            // (r6, critic lf-engine-pc r5 R1 / R2: the dealing rules on LIVE pages too - check off, 64 seeds; R4: no part prints more pages
+            // than the pinned lesson baseline - sub_2d_1d L Mixed went 1 -> 2 inside "176 hashes changed")
+            add(gate('lesson-samples-deal64-live', 'ws-lesson-samples --check --seeds 64, check OFF (dealing on the live packets: PG-LR6, PG-LR67, PC-PV place pattern; live PG-TURN / PC-LR5 reds at seeds past 4242 are master\'s, not on this row)', 'add_facts, sub_100_regroup, nearest_10 × 64 seeds (L) + the 4242 build at L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '64', '--rules', 'PG-LR6,PG-LR67,PC-PV'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-baseline-pages', 'ws-lesson-baseline --pages-only (PARTPAGES: no lesson part prints more pages than design/audit/baselines/lesson-baseline.json pins)', 'every lesson of the pin, L and S, seed 4242', 'browser', 'ws-lesson-baseline', ['--all-lessons', '--sizes', 'L,S', '--seeds', '4242', '--pages-only', '--check', 'design/audit/baselines/lesson-baseline.json'], { parse: PARSE.lessonBaselinePages, needFlags: ['pages-only'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
@@ -1507,6 +1519,13 @@ async function main() {
     table.push('');
     table.push('| Gate | Scope | Result | Findings vs baseline | Seconds |');
     table.push('|---|---|---|---|---|');
+    // (r6, critic lf-engine-pc r5 P1: "clean before critic" is the branch MERGED with the current main - a branch 450 commits behind
+    // origin/master reached the critic, its before / after mixing master's changes into the diff. The local origin/master ref;
+    // fetch first. A tree with no origin/master ref skips the row.)
+    if (git(['rev-parse', '-q', '--verify', 'origin/master'])) {
+        let behind = ''; try { execFileSync('git', ['merge-base', '--is-ancestor', 'origin/master', 'HEAD'], { cwd: ROOT, stdio: 'ignore' }); } catch (e) { behind = git(['rev-list', '--count', 'HEAD..origin/master']) || '?'; }
+        rows.push({ id: 'merged-main', name: 'merged with origin/master', scope: 'branch', synthetic: behind ? { result: 'FAIL', findings: `${behind} commit(s) of origin/master not merged: git fetch; git merge origin/master; re-run`, detail: [] } : { result: 'PASS', findings: 'origin/master is an ancestor of HEAD' } });
+    }
     const outRows = [];
     for (const g of rows) {
         const r = results.get(g.id);

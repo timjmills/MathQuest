@@ -392,6 +392,31 @@ const LATE = {
         ok(typeof R.routedInstr === 'function', 'r3 F14: routedInstr exists');
         ok(/\.replace\(\/\\bnumbers\\b\/g, 'number'\)/.test(readSrc('js/modules/sheet/roles/pre-skill-check.js')), 'r3 F14: one blank an item - "number", not "numbers"');
     },
+    async 'pc-r6-place-pattern'() {
+        // (r6, critic lf-engine-pc r5 R1: the place-answer pattern rule - one reading for the dealer and the gate)
+        const NT = await tryImp('js/modules/sheet/near-twins.js');
+        const R = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        if (!NT || !R) { ok(false, 'r6: near-twins / pre-skill-check import'); return; }
+        const T = 'tens', O = 'ones', H = 'hundreds';
+        ok(NT.placeRunBad([T, O, T, O, T, O]).length === 1, 'r6 R1: T O T O T O strictly alternates');
+        ok(NT.placeRunBad([O, O, O]).length === 1, 'r6 R1: three of one place');
+        ok(NT.placeRunBad([H, T, O, H, T, O]).length === 1, 'r6 R1: H T O H T O cycles');
+        eq(NT.placeRunBad([T, O, O, T]), [], 'r6 R1: T O O T reads well');
+        eq(NT.placeRunBad([T, O]), [], 'r6 R1: two items are never a pattern');
+        const pvi = (a) => ({ template: 'pv', q: { ans: a, cell: { payload: { kind: 'place' } } } });
+        const alt = [T, O, T, O, T, O].map(pvi);
+        const orders = new Set();
+        for (let sd = 1; sd <= 12; sd++) { const o = NT.placeOrder(alt, sd).map((x) => x.q.ans); ok(!NT.placeRunBad(o).length, `r6 R1: placeOrder seed ${sd} leaves no pattern (${o.join(' ')})`); orders.add(o.join()); }
+        ok(orders.size >= 3, `r6 R1: placeOrder varies by seed (${orders.size} orders of 12 seeds)`);
+        const good = [T, O, O, T, T, O].map(pvi);
+        ok(NT.placeOrder(good, 7) === good, 'r6 R1: a band with no pattern is returned as it is (the page prints as before)');
+        const pick = NT.placePick([O, O, O, O, T, O].map(pvi), 4, 3).map((x) => x.q.ans);
+        ok(pick.includes(T) && !NT.placeRunBad(pick).length, `r6 R1: all one place takes another from the pool (${pick.join(' ')})`);
+        const mixSeeds = new Set();
+        for (let sd = 0; sd < 4; sd++) { const o = R.mixOrder(alt, sd).map((x) => x.q.ans); mixSeeds.add(o.slice(0, 4).join());
+            for (let k = 2; k <= o.length; k++) { const p = o.slice(0, k); ok(new Set(p).size > 1 && (k < 3 || !p.every((a, i) => !i || a !== p[i - 1])), `r6: mixOrder seed ${sd} prefix ${k} mixed, not alternating`); } }
+        eq(mixSeeds.size, 4, 'r6 (critic r5): the check order varies by seed - not T O O T on every check');
+    },
     async 'r4-r5-dealer'() {
         const ps = readSrc('js/modules/print-sheet.js');
         ok(/async function buildDetailedLesson\(req = \{\}\) \{\n    const late = new Set\(\);/.test(ps) && /late\.add\(e\.dlLate\)/.test(ps), 'R4: buildDetailedLesson rebuilds with the failing late item reserved');

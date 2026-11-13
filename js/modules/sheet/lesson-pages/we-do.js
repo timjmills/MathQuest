@@ -186,7 +186,8 @@ export function weDoBand(env) {
     // (... and a one-number item that is a near twin of an earlier one - its digits turned round, or within 2: round L 47 / 74,
     // 88 / 89 - goes last, as PC-LR6 reads twins on the check; practice.js nearSplit)
     // (pickWeDo reorders by case, so the twins are left out while 6 clean items remain)
-    const weDoPool = data && data.indepRules ? (() => { const o = nearSplit(weDoPool0, [], example); return o.clean.length >= 6 ? o.clean : o.clean.concat(o.later); })() : weDoPool0;
+    // (r6, critic r5 R2: and on every library lesson, check off too - `nearRules`)
+    const weDoPool = data && (data.indepRules || data.nearRules) ? (() => { const o = nearSplit(weDoPool0, [], example); return o.clean.length >= 6 ? o.clean : o.clean.concat(o.later); })() : weDoPool0;
     const exOthers = [example2, example3, example4].filter(Boolean);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);

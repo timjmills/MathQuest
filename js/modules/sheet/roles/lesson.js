@@ -113,7 +113,8 @@ export function counts(pools, input) {
     // 74 / 47, 43 / 34, 88 / 89 from a pool with no other. Check-on only (`indepRules`); every other sheet deals as before.)
     // (one-number items only - rounding, place value: a + / − fact pool - add 1-3 within 10, 21 facts - dealt twice as deep only
     // repeats and turns its own facts round, PG-TURN)
-    if (input && input.lesson && input.lesson.data && input.lesson.data.indepRules && mainPool.length && mainPool.every((it) => oneNumOf(it) !== null)) out.main = Math.max(out.main, 2 * PROBE);
+    // (r6, critic r5 R2: and with the check off - `nearRules`, every library lesson: live round L printed 43 / 34 on its sheet)
+    if (input && input.lesson && input.lesson.data && (input.lesson.data.indepRules || input.lesson.data.nearRules) && mainPool.length && mainPool.every((it) => oneNumOf(it) !== null)) out.main = Math.max(out.main, 2 * PROBE);
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
     // (split rows per kind may fall back to the shared row in `plan`: deal enough for either)
     if (Object.values(shape).some((s) => s.split)) for (const [id, s] of Object.entries(warmShape(pools, Object.assign({}, input, { _warmShared: true })))) out[id] = Math.max(out[id] || 0, s.k * (s.rows || 1));

@@ -85,7 +85,8 @@ const poolItems = (input, id) => {
     // never all one and never strictly alternate, and a "10 more, 10 less" question's first two items are one of each)
     // (lf-engine PC r5: a twin is taken only to keep a TWO-CHOICE / two-way question at its floor of 2 - ruling A; any other
     // question prints its one clean item: the sub check printed 13 - 7 beside 16 - 9 at 2 seeds of 64)
-    const mixed = mixOrder(first);
+    // (r6, critic r5: the order's pattern varies by seed - every check had answered T O O T)
+    const mixed = mixOrder(first, deriveSeed(input.seed === undefined ? 0 : input.seed, ROLE_ID, 'mix', id));
     const need = kept.some(twoChoice) || twoWay(kept) ? ROUTE_ITEMS : 1;
     return mixed.length >= need ? mixed : mixed.concat(later.slice(0, need - mixed.length));
 };
@@ -100,17 +101,20 @@ export function mixKeyOf(it) {
 }
 /**
  * A question's items in a MIXED order (critic r4 N2: the place items alternated tens / ones as dealt, or were all one): the
- * first two kinds in the pattern A B B A A B B A ..., so every prefix of 2 or more items holds both kinds and no prefix of 3
+ * first two kinds in the pattern A B B A A B B A ... (or A B B B ..., the kinds either way round, by seed), so every prefix of 2 or more items holds both kinds and no prefix of 3
  * or more strictly alternates; a kind that runs out leaves the rest to the other, in order. Items with no kind, or a question
  * of one kind, keep their order. Pure.
  */
-export function mixOrder(its) {
+export function mixOrder(its, seed = 0) {
     const ks = (its || []).map(mixKeyOf);
     if (!ks.length || ks.some((k) => k === null)) return its || [];
     const kinds = [...new Set(ks)];
     if (kinds.length < 2) return its;
+    // (r6, critic r5: by seed, which kind leads - bit 0 - and the fourth place - bit 1: A B B A or A B B B. Both keep every prefix of
+    // 2 or more two-kinded and no prefix of 3 or more strictly alternating; seed 0 is the order r5 printed)
+    if ((seed >>> 0) & 1) kinds.reverse();
     const q = kinds.map((k) => its.filter((_, i) => ks[i] === k));
-    const pat = [0, 1, 1, 0];
+    const pat = (seed >>> 0) & 2 ? [0, 1, 1, 1] : [0, 1, 1, 0];
     const out = [];
     for (let i = 0; out.length < its.length && i < 4 * its.length; i++) { const g = q[pat[i % 4]]; if (g.length) out.push(g.shift()); }
     for (const g of q) out.push(...g);

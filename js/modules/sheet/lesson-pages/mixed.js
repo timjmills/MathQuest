@@ -15,6 +15,9 @@
  *          packNums?: string[]|null, mixedLattice?: number, mixedLeadDrop?: boolean, seed: number,
  *          stripHtml?: string, stripH?: number, mixedStrip?: boolean, packTab?: string[], lessonFit?: boolean}} o
  */
+/** The skills a Mixed request deals more than once (the lead's own skill as a partner): their keys. Pure. */
+const twinSkillsOf = (lead, partners) => (partners || []).filter((w) => w && lead && w.categoryId === lead.categoryId && w.skillId === lead.skillId).map((w) => `${w.categoryId}:${w.skillId}`);
+
 export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts, packNums = null, mixedLattice, mixedLeadDrop, seed, stripHtml, stripH, mixedStrip, packTab, lessonFit = false }) {
     const withSkills = partners;
     const practiceSk = lead;
@@ -32,6 +35,9 @@ export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts,
         // (`lessonFit`, a library lesson - live-pm r2: no 30 % band from the fill, no lone shelf on a continuation page;
         // absent on a detailed lesson's Mixed page, byte-identical)
         ...(lessonFit ? { lessonFit: true } : {}),
+        // (r6, critic r5 R3: a partner that is the lesson's own skill - identify's Mixed - is dealt twice; its band reads its own items'
+        // instruction, roles/mixed-practice.js bandKey. Absent on every other lesson.)
+        ...(twinSkillsOf(practiceSk, withSkills).length ? { twinSkills: twinSkillsOf(practiceSk, withSkills) } : {}),
         // (`mixedStrip: false`, the detailed lesson maker - critic D18: one routine's Steps do not head a mixed page)
         stepStrip: stripHtml && mixedStrip !== false ? { html: stripHtml, hMm: stripH } : undefined,
         ...(Array.isArray(packTab) ? { header: Object.assign({}, common.header, { tab: [...packTab, 'Mixed 1'] }) } : {}),

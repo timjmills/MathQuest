@@ -371,6 +371,7 @@ function normaliseRequest(req = {}) {
         leadHalf: !!req.leadHalf,
         // (live-pm r2: a library lesson's Mixed page - band-safe fill, no lone continuation shelf; mixed-practice.js)
         ...(req.lessonFit === true ? { lessonFit: true } : {}),
+        ...(Array.isArray(req.twinSkills) && req.twinSkills.length ? { twinSkills: req.twinSkills.map(String) } : {}),
         // (the detailed lesson maker, lesson 2 r4: `leadHalf` may drop a partner's only shelf or narrow it)
         leadDrop: !!req.leadDrop,
         // The detailed lesson maker: no Steps strip on the lesson's Mixed page (critic D18).
@@ -1808,7 +1809,8 @@ const LESSON_PM_CENTRE_CSS = `<style data-mq-lpmcentre>${LESSON_PM_SEL}:not(.bla
     // place-value cells ("T|O 78 -> __" runs the cell's width; the T O heads of an identify cell sit in the tab's corner) start
     // under the tab - at M / S they clear it sideways, and a 22 mm row has no room to drop them. Practice rows are tall:
     // their centred content clears the tab already.)
-    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
+    // (r6, critic r5 R5: not in a grid of one item a row - mq-lpm1, mixed-practice.js LPM_ONE - whose centred item clears the tab sideways)
+    + `.ws-page.ws-L[data-ws-sheet="lesson-mixed"] .ws-grid:not(.mq-lpm1)>.ws-cell:has(>.ws-tab)>.pv-cell{margin-top:calc(var(--ws-tab, 5mm) - 0.5mm)}</style>`;
 const ROUND_PRACTICE_CSS = '<style data-mq-lpracround>.ws-page[data-ws-sheet="lesson-practice"] .ws-grid>.ws-cell:has(>.pv-round1){justify-content:center !important}</style>';
 
 /**
@@ -2498,6 +2500,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         let contentBottom = r.top;
         let stampH = 0;
         let slackPx = Infinity;
+        let inkT = Infinity, inkB = -Infinity;
         const pics = [];
         const leaves = [];
         for (const el of cell.querySelectorAll('*')) {
@@ -2510,6 +2513,12 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
             }
             if (el.closest('.ws-legacy-answer')) continue;
             contentBottom = Math.max(contentBottom, er.bottom);
+            // (r6, critic lf-engine-pc r5 R5: the content's own box as the H13 reading takes it - leaves, slots, bordered boxes; the
+            // number tab left out - so a role can grow a cell only as far as its centred content keeps each empty band under 30 %)
+            if (!el.closest('.ws-letter, [data-ws-label]') && !(el.parentElement && el.parentElement.closest('svg'))
+                && (!el.children.length || el.tagName === 'svg' || el.hasAttribute('data-ws-slot') || parseFloat(ecs.borderTopWidth) > 0 || parseFloat(ecs.borderBottomWidth) > 0)) {
+                inkT = Math.min(inkT, er.top); inkB = Math.max(inkB, er.bottom);
+            }
             // CL-8: how near the drawing comes to the cell's side borders (its leaves,
             // the label aside) - a role choosing columns keeps 3 mm (critic R4 R-4)
             if ((!el.children.length || el.tagName === 'svg') && !el.closest('.ws-letter') && !(el.parentElement && el.parentElement.closest('svg'))) {
@@ -2560,7 +2569,9 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 if (!it.scalesWithCols && pics.some((w, k) => b[k] && w < b[k] * tol - 0.5)) { fits = false; why(it, c, 'shrunk picture'); }
             }
         }
-        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx };
+        // (the content's height, top of its first box to the foot of its last)
+        const inkPx = inkB > inkT ? inkB - inkT : null;
+        return { fits, hPx, rH: r.height, padL, padR, ctx, slackPx, inkPx };
     };
     /** Fold one cell's reading into the item's figures (and measure its judge modes, which re-lay the root). */
     const fold = (it, c, inner, m) => {
@@ -2599,7 +2610,9 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
         const modes = Object.assign({}, b0.modes || {});
         for (const mode of Object.keys(vary)) modes[mode] = vary[mode] === null || modes[mode] === null ? null : Math.max(modes[mode] || 0, vary[mode]);
         best.set(it, { hMm: Math.max(b0.hMm, m.hPx / PX_PER_MM), fits: b0.fits && m.fits, modes, inkW,
-            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM) });
+            slackMm: Math.min(b0.slackMm === undefined ? Infinity : b0.slackMm, m.slackPx / PX_PER_MM),
+            // (the smallest content over the states measured: the widest band a centred cell can show)
+            inkMm: m.inkPx === null || m.inkPx === undefined ? b0.inkMm : Math.min(b0.inkMm === undefined ? Infinity : b0.inkMm, m.inkPx / PX_PER_MM) });
     };
     try {
         cols.forEach((c, ci) => {
@@ -2626,6 +2639,7 @@ function measureFresh(items, { size, look, cols, bodies, ctxOf, serial = false }
                 it.measured = it.measured || {};
                 it.measured[c] = { hMm: Math.ceil(b.hMm * 10) / 10, fits: b.fits && !divFactTooWide(it, size, inner) };
                 if (Number.isFinite(b.slackMm)) it.measured[c].slackMm = Math.floor(b.slackMm * 10) / 10;
+                if (Number.isFinite(b.inkMm)) it.measured[c].inkMm = Math.floor(b.inkMm * 10) / 10;
                 if (b.modes && Object.keys(b.modes).length) {
                     it.measured[c].modes = {};
                     for (const [mode, h] of Object.entries(b.modes)) it.measured[c].modes[mode] = h === null ? null : Math.ceil(h * 10) / 10;
@@ -4391,6 +4405,7 @@ async function buildRoleSheet(n, metaOf) {
         leadHalf: !!n.leadHalf,
         leadDrop: !!n.leadDrop || undefined,
         lessonFit: n.lessonFit === true || undefined,
+        twinSkills: n.twinSkills || undefined,
         // The detailed lesson's Prerequisite Check: items per question (absent otherwise).
         perQuestion: n.perQuestion || undefined,
         // (a Prerequisite Check's routes: absent on every other sheet)
@@ -4998,7 +5013,9 @@ async function buildLesson(n, metaOf) {
     // lessonRules - sheet/lesson-pages/practice.js indepRuled; a lesson without the check deals as before)
     const indepCaps = prereqs && libId ? ((lessonRules(libId) || {}).caps || {}) : null;
     const indepRules = indepCaps ? { caps: indepCaps, chartTexts: [] } : null;
-    const lessonInput = { data: indepRules ? Object.assign({}, data, { indepRules }) : data, warmSkills, tagLine, number: lessonNo };
+    // (r6, critic r5 R2: a library lesson with the check off keeps the one-number near-twin rules on its sheet too - `nearRules`;
+    // the check's LR-7 caps and chart rules stay with `indepRules`. A detailed lesson (n.lessonData) as before.)
+    const lessonInput = { data: indepRules ? Object.assign({}, data, { indepRules }) : (libId && data && !n.lessonData ? Object.assign({}, data, { nearRules: true }) : data), warmSkills, tagLine, number: lessonNo };
 
     // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
     // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
@@ -5091,9 +5108,11 @@ async function buildLesson(n, metaOf) {
     if (sheetHard.length) for (const pl of teach.keyPlans || [teach.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) sheetTexts.push(refText(it.q)); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); }
     const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { reuseAvoid: [...(Array.isArray(r.reuseAvoid) ? r.reuseAvoid : []), ...sheetHard], lastAvoid: [...(Array.isArray(r.lastAvoid) ? r.lastAvoid : []), ...chartAvoid], avoidTexts: [...(Array.isArray(r.avoidTexts) ? r.avoidTexts : []), ...sheetTexts.filter(Boolean)] }, checkHard.length ? { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...checkHard] } : {}) : r);
     practiceSk = withSheetHard(practiceSk);
-    // (lf-engine PC r4: with the check on, the Practice and Mixed lesson items keep LR-6 / LR-7 on their page - near twins, an
-    // answer twice and the library's page caps, sub L printed three answers under 10; a lesson without the check: as before)
-    if (sheetHard.length) practiceSk = Object.assign({}, practiceSk, { pageRules: { caps: indepCaps || {} } });
+    // (lf-engine PC r4: the Practice and Mixed lesson items keep LR-6 / LR-7 on their page - near twins, an answer twice and the
+    // library's page caps, sub L printed three answers under 10. r6, critic r5 R2: on EVERY library lesson, check on or off - live
+    // nearest_10 Mixed printed 34 / 35 / 39 and 40 three times, sub_2d_1d L "- 2" four times. The detailed lessons (packNums) keep
+    // their own LR-6 refs: unchanged.)
+    if (!packNums) practiceSk = Object.assign({}, practiceSk, { pageRules: { caps: indepCaps || ((libId && (lessonRules(libId) || {}).caps) || {}) } });
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
@@ -5199,7 +5218,9 @@ async function buildLesson(n, metaOf) {
         // (critic r4 N4 / PG-LR6 at 64 seeds: with the check on, the partners keep the one-number near-twin rules on the page too -
         // the Place Value partner printed 78 / 87 and 63 64 65; `pageRules` with no caps; a lesson without the check: as before)
         const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(withSheetHard).map(avoid)
-            .map((w) => (w ? Object.assign({}, w, { noPlaceHeads: true }, sheetHard.length && !w.pageRules ? { pageRules: { caps: {} } } : {}) : w));
+            // (r6, critic r5 R2: the partners' near-twin rules on every library lesson, check on or off; R3, lead ruling: a partner that
+            // IS the lesson's own skill keeps its heads - identify's steps say "Read the letter above it")
+            .map((w) => (w ? Object.assign({}, w, `${w.categoryId}:${w.skillId}` === `${sk.categoryId}:${sk.skillId}` ? {} : { noPlaceHeads: true }, !packNums && !w.pageRules ? { pageRules: { caps: {} } } : {}) : w));
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,

@@ -36,6 +36,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY, deriveSeed,
 } from './compose.js';
+import { placePick } from '../near-twins.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
@@ -83,7 +84,7 @@ function packing(poolsIn, input) {
         // (lf-engine PC r5: a library lesson's Mixed page at L drops every place-value cell under its number tab - print-sheet.js
         // LESSON_PM_CENTRE_CSS, margin-top tab - 0.5 mm, TAB-CLEAR - which the measuring cell does not carry: the shelf takes it,
         // or a third rounding shelf drew 29.5 mm of cell in a 25.1 mm row - PC-FRAME, round L with the check on)
-        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0) + pvLiftOf(its, input, ctx);
+        const h = Math.max(hMinAt(its, Math.min(k, 6), ctx), pairK ? hMinAt(twins, k, ctx) : 0) + pvLiftOf(its, input, ctx, k);
         // The skill's anchor band (SECTIONS, or SIDE when no pair fits): measured by the host.
         const band = a && (A.mode === 'sections' || !pairK) && (a.band || []).length ? Math.max(0, ...a.band.map((x) => anchorHeightMm(x, 1))) : 0;
         shelf[id] = { k, h: Number.isFinite(h) ? h : 60, n: 0, pairs: !!pairK, band, per: pairK ? k / 2 : k };
@@ -117,6 +118,13 @@ function packing(poolsIn, input) {
     // `lessonFit` (a library lesson's Mixed page, live-pm r2 finding 3): when the one-shelf-per-skill start already runs
     // past page 1, the extra shelves fill the pages it takes (as with anchor bands) - a continuation page is never one
     // lone shelf on a 72 % blank page.
+    // (r6, critic r5 R4: a start that overflows page 1 by no more than hMinAt's spare safety - its +1 mm a shelf, of which a row's
+    // rules take about 0.5 mm - fits page 1: each start shelf gives back an equal share, at most LESSON_FIT_TRIM_MM. sub_2d_1d L ran
+    // 212.5 mm of start in 212.3 mm once its place shelf took the 2.5 mm tab drop, and printed TWO Mixed pages, 25 % / 15 % blank.)
+    if (input.lessonFit && !A && !twinShelves(ids, shelf)) {
+        const over = used - m.budget;
+        if (over > 0 && over <= LESSON_FIT_TRIM_MM * ids.length) { const t = over / ids.length + 0.01; for (const id of ids) shelf[id].h -= t; used -= t * ids.length; }
+    }
     const multi = !!A || (!!input.lessonFit && pagesOf() > 1);
     const basePages = multi ? pagesOf() : 1;
     for (let guard = 0; guard < 40; guard++) {
@@ -176,21 +184,60 @@ function packing(poolsIn, input) {
 
 /** The drop a library lesson's Mixed page gives a place-value cell under its tab at L (print-sheet.js LESSON_PM_CENTRE_CSS,
  *  TAB-CLEAR: margin-top tab - 0.5 mm), which the measuring cell does not carry (lf-engine PC r5). 0 elsewhere. */
-export const pvLiftOf = (its, input, ctx) => {
+export const pvLiftOf = (its, input, ctx, k = 0) => {
     if (!(input && input.lessonFit && ctx.size === 'L')) return 0;
+    // (r6, critic r5 R5: a shelf of ONE item a row - combine's "100 + 70 + 4 = __" - is centred across the whole width and clears
+    // the tab sideways; the drop only sank it, 17 mm above and 6 mm below, and stopped the shelf growing: no lift, and its grid is
+    // marked mq-lpm1 so the page's drop rule (print-sheet.js LESSON_PM_CENTRE_CSS) leaves it out)
+    if (k === 1) return 0;
     const pv = (its || []).filter((it) => /^pv(-support)?$/.test(String((it && it.template) || '')));
     if (!pv.length) return 0;
     // (a head-less Mixed partner's place item - `tabFree` - drops only pv.js TAB_FREE_MM, 2.5 mm)
     return pv.some((it) => !(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.tabFree)) ? ((ctx.s && ctx.s.tabMm) || 5) - 0.5 : 2.5;
 };
 
+/** A band's instruction key. The page's skills are its skill METADATA, one per id (print-sheet.js metaOf), so when a lesson deals
+ *  one skill twice - the identify lesson's Mixed has identify as lead AND as a partner with writeValue off - the lookup finds the
+ *  lead's key for both, and the partner's band printed "Circle the place. Write the value of the underlined digit." over cells with
+ *  no value slot (r6, critic r5 R3). A skill the request deals twice (`input.twinSkills`, lesson-pages/mixed.js) has its band read
+ *  its items' own key when they all carry one; every other band as before. */
+function bandKey(pupil, skill, skills, twins) {
+    const key = instructionKeyOf(pupil, skills);
+    if (!(twins || []).includes(`${skill.categoryId}:${skill.skillId}`)) return key;
+    const own = [...new Set(pupil.map((it) => it.q && it.q.instructionKey).filter(Boolean))];
+    return own.length === 1 && pupil.every((it) => it.q && it.q.instructionKey) ? own[0] : key;
+}
+
 /* ============================================================ the MIXED arrangement (M1) */
 
+/** The class of a lesson Mixed grid of one item a row (r6): no tab drop (pvLiftOf). */
+export const LPM_ONE = 'mq-lpm1';
 /** A shelf's shorter cell keeps at least this share of the tallest's height (H13: < 30 % empty). */
 export const MIX_H_RATIO = 0.75;
 /** lessonFit: a shelf's height less its content (cell padding 2 x 3 mm, the tab clearance, the grid's 1 mm), taken large
  *  so the content is under-estimated and a grown shelf never passes a 30 % band (live-pm r2: div_facts L eq 11.4 mm in 22). */
 const LESSON_FIT_PAD_MM = 12;
+/** lessonFit: the largest empty band (top or bottom) a grown one-item shelf may leave in a cell - under H13's 30 %, with room. */
+const LESSON_FIT_BAND = 0.28;
+/**
+ * How far a shelf may grow before one of its cells - content centred (print-sheet.js LESSON_PM_CENTRE_CSS), the tab drop `lift`
+ * above it - leaves an empty band of LESSON_FIT_BAND: from each item's measured content height at the shelf's column count
+ * (print-sheet.js measured[k].inkMm, the H13 reading's boxes). A cell of height H with content c leaves (H + lift - c) / 2 above;
+ * growing by g adds g / 2 to it and g to the cell. null when an item was not measured so. Pure.
+ */
+function measuredGrowth(sh) {
+    const kk = Math.min(sh.k, 6);
+    const its = (sh.items || []).filter((it) => !it.anchor);
+    if (!its.length || !its.every((it) => it.measured && it.measured[kk] && Number.isFinite(it.measured[kk].inkMm))) return null;
+    const lift = sh.lift || 0;
+    const c = Math.min(...its.map((it) => it.measured[kk].inkMm));
+    return (LESSON_FIT_BAND * sh.h - (sh.h + lift - c) / 2) / (0.5 - LESSON_FIT_BAND);
+}
+/** lessonFit: the most a start shelf gives back so the one-shelf-a-skill start keeps to page 1 - the spare half of hMinAt's 1 mm
+ *  safety (compose.js: a row's 1.5 pt frame and 0.75 pt rules take about 0.5 mm of it). r6, critic r5 R4. */
+const LESSON_FIT_TRIM_MM = 0.5;
+/** A shelf of [twin | problem] pairs (SIDE anchors) keeps its height whole. */
+const twinShelves = (ids, shelf) => ids.some((id) => shelf[id].pairs);
 /** lessonFit: every shelf may still grow this much - the room an across fact's CL-40 tab inset needs to open fully in a
  *  row sized to its content (div_facts S Mixed: "70 ÷ 10 =" 0.6 mm under the tab with the inset shrunk to fit). */
 const LESSON_FIT_MIN_MM = 1.2;
@@ -631,7 +678,10 @@ export function plan(input = {}) {
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
     for (const id of p.ids) {
         const sh = p.shelf[id];
-        const its = pools[id].slice(0, sh.n * sh.per);
+        // (r6, critic r5 R1 - PEDAGOGY 4.1a: a lesson's Mixed page is where the support has faded, so a band's "name the place"
+        // items never read all one place or strictly alternate - T O T O T O: placePick takes another place from the pool, then a
+        // seeded order; a band with no pattern prints as before)
+        const its = input.lessonFit ? placePick(pools[id], sh.n * sh.per, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, sh.n * sh.per);
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
@@ -639,9 +689,9 @@ export function plan(input = {}) {
             const anchor = s === 0 && sh.band && A ? ((A.byPool[id] || {}).band || [])[0] : null;
             // H13 (owner 2026-09-25): a shelf is as tall as the tallest item IT holds, not the
             // tallest its skill could deal - a 3 x 5 chart window's row was sized for a bigger one.
-            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) + pvLiftOf(chunk, input, ctx) : sh.h;
+            const own = chunk.length ? hMinAt(chunk.filter((it) => !it.anchor), Math.min(sh.k, 6), ctx) + pvLiftOf(chunk, input, ctx, sh.k) : sh.h;
             const h = Number.isFinite(own) && own > 0 ? Math.min(sh.h, own) : sh.h;
-            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, lift: pvLiftOf(chunk, input, ctx) });
+            if (chunk.length) shelves.push({ id, items: chunk, k: sh.k, h, anchor, bandMm: sh.band, lift: pvLiftOf(chunk, input, ctx, sh.k) });
         }
     }
     const n = shelves.reduce((a, s) => a + s.items.filter((it) => !it.anchor).length, 0);
@@ -664,7 +714,15 @@ export function plan(input = {}) {
     // with bands under 30 % while H <= c / 0.42. A one-line fact shelf ("14 ÷ 7 = __") so stays at its own height; the
     // spare goes to the shelves that can take it (stacks, boxed equations, stories).
     // (a shelf's pv lift - pvLiftOf - is empty room above the content, not content: lf-engine PC r5)
-    const capOf = (sh) => (input.lessonFit ? Math.max(LESSON_FIT_MIN_MM, Math.min(sh.h * 0.35, (sh.h - LESSON_FIT_PAD_MM - (sh.lift || 0)) / 0.42 - sh.h)) : sh.h * 0.35);
+    // (r6, critic r5 R5: a shelf of one item a row grows by its items' MEASURED content - print-sheet.js measured[k].inkMm, as the
+    // H13 reading takes it - so each centred band stays under LESSON_FIT_BAND: the 12 mm guess under-read a
+    // one-line row's content and combine L printed five rows over a 20 % blank foot)
+    const capOf = (sh) => {
+        if (!input.lessonFit) return sh.h * 0.35;
+        const g = sh.k === 1 ? measuredGrowth(sh) : null;
+        if (g !== null) return Math.max(0, Math.min(sh.h * 0.35, g));
+        return Math.max(LESSON_FIT_MIN_MM, Math.min(sh.h * 0.35, (sh.h - LESSON_FIT_PAD_MM - (sh.lift || 0)) / 0.42 - sh.h));
+    };
     const fillShares = (() => {
         if (!(input.growLast || (input.lessonFit && input.fill)) || !shelves.length) return null;
         const g = shelves.map(() => 0);
@@ -677,7 +735,6 @@ export function plan(input = {}) {
         }
         return g;
     })();
-    if (globalThis.__MQ_DBG) console.log('MQDBG', JSON.stringify({ budget: m.budget, cont: p.mCont.budget, strip: m.strip, used, spare, pages: p.pages, shelves: shelves.map((s) => ({ id: s.id, h: +s.h.toFixed(1), lift: s.lift, n: s.items.length })), packH: Object.fromEntries(p.ids.map((id) => [id, { h: +p.shelf[id].h.toFixed(1), n: p.shelf[id].n }])), packUsed: p.used, fill: fillShares }));
     for (const [i, sh] of shelves.entries()) {
         const grow = fillShares ? fillShares[i] : growOf(sh);
         const firstOfSkill = i === 0 || shelves[i - 1].id !== sh.id;
@@ -700,7 +757,7 @@ export function plan(input = {}) {
         // `sectionLabel` on the skill ref (the detailed lesson maker, critic D17): the band's own name.
         const title = (first && first.q && first.q.sectionLabel) || STRAND_BY_CATEGORY[skill.categoryId] || skillWords(skill).strand || 'Practice';
         const pupil = sh.items.filter((it) => !it.anchor);
-        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start });
+        const grid = gridPart(sh.items.map((it) => (it.anchor ? anchorPlanItem(it, Math.min(sh.k, 6)) : planItem(it, { cols: Math.min(sh.k, 6) }))), { cols: sh.k, rows: 1, cellH: sh.h + grow, labels, start, ...(input.lessonFit && sh.k === 1 ? { cls: LPM_ONE } : {}) });
         if (joins) {
             // A further shelf of the same skill on the same page: its grid under the last one.
             const prev = cur.sections[cur.sections.length - 1];
@@ -712,7 +769,7 @@ export function plan(input = {}) {
         }
         // PG-22: a skill continued on a new page repeats its title and instruction.
         const band = {
-            kind: 'band', label: title, instr: instructionText(instructionKeyOf(pupil, input.skills), pupil),
+            kind: 'band', label: title, instr: instructionText(bandKey(pupil, skill, input.skills, input.twinSkills), pupil),
         };
         // SECTIONS: the skill's worked example sits in its band, above its problems.
         if (sh.anchor) band.contents = [gridPart([anchorPlanItem(sh.anchor, 1)], { cols: 1, rows: 1, cellH: sh.bandMm, labels: 'none', start, cls: 'mq-anchorgrid' }), grid];

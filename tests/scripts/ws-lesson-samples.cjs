@@ -69,6 +69,20 @@
 //                gap (above / below the ink) is not >= 25 % of the cell AND > 2 x the smaller
 //     PC-INSTR   (r3 F14) on the check page: an instruction that says "numbers" / "boxes" over one blank an item fails, and an
 //                instruction never ends on a one-word line (a widow)
+//   (lf-engine PC critic r5, 2026-11-13 - r6, every finding its check first; the dealing reads are ONE in-page pass, collectReads:)
+//     PC-PV      also, on EVERY lesson page (sheet, Practice, Mixed; check on AND off, every lesson): a band's "name the place" answers
+//                are never 3+ of one place, never strictly alternating (T O T O T O, R1), never cycling H T O H T O (near-twins.js
+//                placeRunBad - the dealer's own reading)
+//     PG-LR6     now with the check OFF too, every lesson (--seeds builds before the no-check break, the 4242 build at every size of
+//                every lesson; R2: live nearest_10 Mixed 34 / 35 / 39, 40 three times); the check's near-twin read is the module's
+//                nearKeys (the gate's copy nearKeyPair is gone)
+//     PG-LR67    Practice and Mixed with the check off too; the spot / --all-lessons lessons from the 4242 build (R2: sub_2d_1d L
+//                Mixed "- 2" four times)
+//     PC-PVHEADS live: on Mixed, a place item of the lesson's OWN skill keeps the heads its Practice prints (its steps read them,
+//                lead ruling); any other skill's prints none (R3). Each cell's skill from the plan, aligned by printed order
+//     PC-INSTR   also on every page: a band saying "Write the value" has a value slot in every cell (R3)
+//     PM-FOOT    a library lesson's Mixed page leaves <= 15 % of its body blank at the foot (R4, R5)
+//   (ws-lesson-baseline --check PARTPAGES: no lesson part prints more pages than the pin, R4)
 //   node tests/scripts/ws-lesson-samples.cjs --verify-grey   # (N8) every committed packet's chart-grey.png is its CHART page
 //                in grey (design/lesson-samples/<packet>/ and S/; the chart page found from the lesson's parts, check forced on)
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
@@ -200,10 +214,10 @@ if grey != '-':
 print(json.dumps(pages))
 `;
 
+/** (PC-LR6 near twins on drawn check cells, critic r3 F13, are read with sheet/near-twins.js nearKeys - r6, critic r5: the gate's
+ *  own copy, nearKeyPair, is gone: one definition) */
 /** LIVE-PART (F6): per key page, the carry / regroup boxes (a stack's `.rg[data-ws-seg]`, counted from the ones) that NO
  *  stack of their section (`.ws-grid`) fills - a dead part (H15). One message per (section, box place). */
-/** (PC-LR6 near twins on drawn check cells, critic r3 F13, read with sheet/near-twins.js nearKeys - r6, critic r5: the gate's own
- *  copy, nearKeyPair, is gone: one definition) */
 function carryMeasure() {
     return [...document.querySelectorAll('.ws-page')].map((pg) => {
         const dead = [];
@@ -394,10 +408,10 @@ function pcMeasure() {
         for (const bd of pg.querySelectorAll('.ws-band')) { const sp = bd.querySelector(':scope > .ws-strip > span'); if (!sp || !sp.textContent.trim()) continue;
             const words = []; const walker = document.createTreeWalker(sp, NodeFilter.SHOW_TEXT); let tn; while ((tn = walker.nextNode())) { const re = /\S+/g; let mm; while ((mm = re.exec(tn.textContent))) { const rg = document.createRange(); rg.setStart(tn, mm.index); rg.setEnd(tn, mm.index + mm[0].length); const rr = rg.getBoundingClientRect(); words.push({ w: mm[0], top: Math.round(rr.top) }); } }
             const tops = [...new Set(words.map((x) => x.top))]; const last = words.filter((x) => x.top === tops[tops.length - 1]);
-            const cells = [...bd.querySelectorAll('.ws-cell')].filter((x) => !x.parentElement.closest('.ws-cell'));
+            const cells = [...bd.querySelectorAll('.ws-cell')].filter((x) => !x.parentElement.closest('.ws-cell') && !x.classList.contains('blankrun'));
             const slots = cells.map((x) => [...x.querySelectorAll('[data-ws-slot]')].filter((e) => !/^(ring|check)$/.test(e.getAttribute('data-ws-shape') || '') && !/^c\d|choice|match/.test(e.getAttribute('data-ws-slot') || '')).length);
             // (r6, critic r5 R3: PC-INSTR value slot - each cell's "Value ____" slots)
-            const values = cells.filter((x) => !x.classList.contains('blankrun')).map((x) => x.querySelectorAll('[data-ws-slot="value"]').length);
+            const values = cells.map((x) => x.querySelectorAll('[data-ws-slot="value"]').length);
             out.instr.push({ text: sp.textContent.trim(), lines: tops.length, widow: tops.length > 1 && last.length === 1 ? last[0].w : null, slots, values }); }
         if (body) { const br = body.getBoundingClientRect(); const ib = inkBottom(body);
             // (and each band's own frame: a cell drawn past its grid / band bottom hides the band's bottom rule - sub L sheet
@@ -642,8 +656,9 @@ async function checkMain() {
                         for (const c of named) { const ownCell = m.part === 'mixed' && rows && rows[c.top] && rows[c.top].skill === built.own;
                             if (ownCell && pracHeads && !c.heads) F('PC-PVHEADS', where('pupil', n), `mixed cell ${c.cell}: the lesson's own place item lost the heads its Practice prints (its steps read them)`);
                             if (!ownCell && c.heads) F('PC-PVHEADS', where('pupil', n), `${m.part === 'prereq' ? 'check' : m.part} cell ${c.cell}: place heads over a "name the place" numeral`); } }); }
-                // PC-INSTR value slot (r6, critic r5 R3): on every page, a band that says "Write the value" has a value slot in every cell
-                pm.forEach((m, n) => { for (const x of ((P.pc || [])[n] || {}).instr || []) if (/\bWrite the value\b/i.test(x.text) && (x.values || []).some((v) => !v)) F('PC-INSTR', where('pupil', n), `${m.part}: "${x.text}" over ${(x.values || []).filter((v) => !v).length} of ${(x.values || []).length} cells with no value slot`); });
+                // PC-INSTR value slot (r6, critic r5 R3): on every page, a band that says "Write the value" has a slot to write it in every cell
+                // (a value line, or the cell's own answer slot - `value` answers in it; identify's ring-only cells have none)
+                pm.forEach((m, n) => { for (const x of ((P.pc || [])[n] || {}).instr || []) { const none = (x.slots || []).filter((v, i) => !v && !((x.values || [])[i])).length; if (/\bWrite the value\b/i.test(x.text) && none) F('PC-INSTR', where('pupil', n), `${m.part}: "${x.text}" over ${none} of ${(x.slots || []).length} cells with no slot to write a value in`); } });
                 // PM-FOOT (r6, critic r5 R4 / R5): a library lesson's Mixed page leaves at most 15 % of its body blank at the foot (every
                 // page of the part; the detailed lessons' Mixed has its own fill, growLast)
                 pm.forEach((m, n) => { if (m.part !== 'mixed') return; const st = (P.sc.stats || [])[n]; if (st && st.blank > 15) F('PM-FOOT', where('pupil', n), `mixed page ${m.i + 1}: ${st.blank} % of the body blank at the foot (at most 15 %)`); });
@@ -723,6 +738,13 @@ async function checkMain() {
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [
         { rule: 'SHEET-2PG', lesson: 'round', size: 'L', note: 'Y4.B1.S14 L lesson sheet re-flow (live-pm2 item 6) reverted after critic FAIL; item 6 redone separately - design/status/lf-engine.md' },
+        // (r6 PM-FOOT, new: the reds master already prints, one lesson each - never a rule-wide waiver)
+        { rule: 'PM-FOOT', lesson: 'placevalue:combine', size: 'L', note: 'r6 R5, for a lead ruling: 5 one-line rows (12.1: at most 5 rows at L), 8 mm of ink each - rows are 33-35 % banded at their natural 22 mm, so growth breaks H13; the foot closes only with a 6th row (master 29 %, r5 20 % with lopsided rows)' },
+        { rule: 'PM-FOOT', lesson: 'placevalue:expand', size: 'L', note: 'r6: as combine - its one-line rows cannot grow under H13 (master 20 %)' },
+        { rule: 'PM-FOOT', lesson: 'addition:add_wp_10', size: 'L', note: 'master live state (16 %), not changed by r6' },
+        { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'L', note: 'master live state: a 3-page Mixed (17 / 24 / 72 %) - vocab lane' },
+        { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_grade_pictures', size: 'S', note: 'master live state (19 %) - vocab lane' },
+        { rule: 'PM-FOOT', lesson: 'vocabulary:vocab_pick3_words', size: 'L', note: 'master live state (27 %) - vocab lane' },
     ];
     const known = findings.filter((x) => KNOWN.some((k) => k.rule === x.rule && x.where.startsWith(`${k.lesson} ${k.size} `)));
     { const keep = findings.filter((x) => !known.includes(x)); findings.length = 0; findings.push(...keep); }
