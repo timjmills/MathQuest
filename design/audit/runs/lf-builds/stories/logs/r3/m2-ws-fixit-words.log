@@ -1,0 +1,1 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-fixit-words.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain  [76bc11c61]

@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows, IN_PLACE_FILL,
+    tightRows, inPlaceCapMm,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -688,7 +688,7 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
     // (an IN-PLACE row - the sentence story, answered in its boxes - stops at its shortest item x IN_PLACE_FILL, as the layout's
     // cell and layout.js rowShape do: spread to SPREAD_CAP, a compare story page at M kept a 30 % band in every cell, word-stories r3)
     const ip = items.length > 0 && items.every((it) => !!it && !!((it.fp || it.footprint || {}).inPlace));
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r], ip ? mins[r] * IN_PLACE_FILL : Infinity))));
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r], ip ? inPlaceCapMm(mins[r]) : Infinity))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };

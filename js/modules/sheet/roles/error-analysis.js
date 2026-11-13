@@ -715,7 +715,11 @@ export function prepare(it, info = {}) {
             const place = ownLine
                 ? blank({ id: 'ea-ans', kind: 'number', shape: 'line', widthMm: fixWidth(c.size), graded: false }, c, slotOnly(key, 'ea-ans'))
                 : box('ea-ans', fixWidth(c.size));
-            fix = `<span class="mq-ansslot mq-fixslot${ownLine ? ' mq-fixtext' : ''}">${place}<small>correct answer</small></span>`;
+            // (a sentence story's fix box carries its label word, as the frame the pupil wrote in does - "[ ] coins", never a caption
+            // in other words: ws-fixit-words FIX-WORDS, word-stories r3)
+            const wwPl = it.template === 'word-work' ? (((it.q || {}).cell || {}).payload || {}) : {};
+            const fixCap = wwPl.layout === 'sentence' && wwPl.unit ? String(wwPl.unit) : 'correct answer';
+            fix = `<span class="mq-ansslot mq-fixslot${ownLine ? ' mq-fixtext' : ''}">${place}<small>${esc(fixCap)}</small></span>`;
             // a fraction is written stacked over its bar, never with a slash (TY-7)
             fix = fix.replace(/>(\d+)\s*\/\s*(\d+)</, '><span class="mq-frac"><span>$1</span><span>$2</span></span><');
         } else if (kind === 'text') {

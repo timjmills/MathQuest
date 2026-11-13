@@ -1,0 +1,58 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size L --lints L-DENSITY --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller; tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size M --lints L-DENSITY --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller; for z in L M; do tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size $z --skills addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller; done; tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_wp_compare_smaller --roles lesson --size M,L --opts '{"forms":[3,4,5]}'; tests/scripts/mq-browser-run.sh node tests/scripts/ws-fixit-words.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --sizes M,L  [a5d9d4f0e]
+ws-print-lint: source kit, 7 skill(s), kind sections
+  sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller: 16+8 pages, 4 finding(s)
+
+document                                                                                                                                                                                                                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller     16+8k    .     .    .    .        .     .       4    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                                                                                                                                                                                                                                   .     .    .    .        .     .       4    .     .       .     .    .      .       .        .       .    .
+
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller (7 skills as sections)
+  [L-DENSITY PAGEFILL major] x3 (p1,6,7) page 1: an empty strip 125 mm tall under the problems (53% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+  [L-DENSITY PG-23 major] (p8) last page 8: its problems fill 27% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)
+
+ws-print-lint: FAIL - 1 document(s), source kit; 4 finding(s) in 1 document(s)
+ws-print-lint: source kit, 7 skill(s), kind sections
+  sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller: 16+8 pages, 8 finding(s)
+
+document                                                                                                                                                                                                                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller     16+8k    .     .    .    .        .     .       8    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                                                                                                                                                                                                                                   .     .    .    .        .     .       8    .     .       .     .    .      .       .        .       .    .
+
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain+addition:add_wp_change_unknown+subtraction:sub_wp_change_unknown+subtraction:sub_wp_compare_smaller (7 skills as sections)
+  [L-DENSITY H13 major] x4 (p8,16 cells 1,2,1,2) one empty band 11.2 mm tall in a 30.7 mm cell (36%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "27 Lena has 12 books. Yuki h..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "28 Yuki has 16 stickers. Aya..."
+  [L-DENSITY PAGEFILL major] x3 (p1,6,7) page 1: an empty strip 125 mm tall under the problems (53% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+  [L-DENSITY PG-23 major] (p8) last page 8: its problems fill 24% of the page body, under a third: the rows were not rebalanced across the sheet's pages (PG-23)
+
+ws-print-lint: FAIL - 1 document(s), source kit; 8 finding(s) in 1 document(s)
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-cell-checks: 2 page(s) - subtraction:sub_wp_compare_smaller
+  ok   subtraction:sub_wp_compare_smaller lesson M {"forms":[3,4,5]}: 3p 1x? per undefined
+  ok   subtraction:sub_wp_compare_smaller lesson L {"forms":[3,4,5]}: 3p 1x? per undefined
+ws-cell-checks: OK (2 page(s), no finding; 6s)
+(7 skill(s), 2 size(s), 24 cell(s) judged)
+ws-fixit-words: OK
+exit 0

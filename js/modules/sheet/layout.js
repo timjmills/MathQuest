@@ -148,6 +148,14 @@ export const PAGE_FILL = 0.85;
  */
 export const IN_PLACE_FILL = 1.12;
 /**
+ * The tallest row an IN-PLACE item of measured height `h` (mm, the row's shortest) may be stretched to when a page shares its
+ * spare height among its rows (the practice spread, a row shape): until the empty band under its ink - the row less the item's
+ * ink, its bottom pad (about 3.5 mm) left in - would reach 26 % of the row, under RUBRIC H13's 30 % with a margin; never less
+ * than IN_PLACE_FILL x h. Held at 1.12 x, a sections sheet's preset rows left half a page empty (word-stories r3, PAGEFILL); stretched
+ * to SPREAD_CAP they kept a 30-50 % band (H13).
+ */
+export const inPlaceCapMm = (h) => Math.max(h * IN_PLACE_FILL, (h - 3.5) / 0.74);
+/**
  * lf-placevalue pv debt (ws-empty-band on the pixels): every item of a section declares `tightRows` in its footprint (an in-place
  * cell whose ink is its measured height less the pads, one or two short lines). Its rows are then never stretched past
  * IN_PLACE_FILL x their measured height on ANY role - the practice spread, a Test's fill floor and fill limit, a Review's page
@@ -792,7 +800,8 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             // H13 30 % in every 3-line row at M - counts its rows from the items' OWN heights, tallest first, as rows
             // of nearly one height do below: sizing every row for its one tallest item left each shorter row's cell a
             // third empty. Rows past the sample count as the tallest the skill can print.)
-            if (!section.freeRows && room <= 1) rr = Math.max(rr, Math.min(inPlaceRows(infos, pc, c, G - SAFETY_H_MM), Math.floor(dCeil / c)));
+            // (only where the rows are then shaped one by one: a lesson practice grid - `noCap`, every row the same - keeps its count)
+            if (!section.freeRows && !section.noCap && room <= 1) rr = Math.max(rr, Math.min(inPlaceRows(infos, pc, c, G - SAFETY_H_MM), Math.floor(dCeil / c)));
             if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             // (an in-place cell at the same count prefers MORE rows: one row of half-page cells is mostly empty paper)
             const tie = rr * c === best.perPage && best.cols !== c && ((sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols)) || (c0 < cols && rr > (best.rows || 0)));
@@ -1064,7 +1073,7 @@ export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     // (an IN-PLACE row stretches no further than its SHORTEST item x IN_PLACE_FILL - a 3-line story beside a 4-line one
     // keeps no working space under it: word-stories precritic r3, H13 33 % at L)
     const ip = inPlaceItems(items);
-    const cap = (r) => (ip ? mins[r] * IN_PLACE_FILL : Infinity);
+    const cap = (r) => (ip ? inPlaceCapMm(mins[r]) : Infinity);
     let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]), cap(r))));
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content

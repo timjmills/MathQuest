@@ -1,0 +1,48 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --json /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/branch-eb2.json  [a5d9d4f0e]
+note: slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)
+note: addition:add_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 10 + hosts card, worksheet, quiz
+note: addition:add_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+note: subtraction:sub_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: addition:add_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_compare_smaller: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+EB-BAND  FAIL 44
+   addition:add_word_problems independent M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems independent M p1 cell 2: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems independent M p1 cell 4: empty band 40.4 mm under the ink of a 117.8 mm cell (34.3 %; limit 30 % = 35.3 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 2: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems test M p1 cell 4: empty band 40.4 mm under the ink of a 117.8 mm cell (34.3 %; limit 30 % = 35.3 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems lesson L p2 cell 2: empty band 7.9 mm under the ink of a 26 mm cell (30.4 %; limit 30 % = 7.8 mm; the 2.0 mm top pad excluded) [fact]
+   addition:add_word_problems lesson L p2 cell 3: empty band 8.0 mm under the ink of a 26 mm cell (30.7 %; limit 30 % = 7.8 mm; the 2.0 mm top pad excluded) [fact]
+   addition:add_word_problems lesson L p2 cell 4: empty band 45.9 mm under the ink of a 123.9 mm cell (37.1 %; limit 30 % = 37.2 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems L p1 cell 1: empty band 24.6 mm under the ink of a 76.1 mm cell (32.3 %; limit 30 % = 22.8 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems word-problems L p1 cell 2: empty band 24.6 mm under the ink of a 76.1 mm cell (32.2 %; limit 30 % = 22.8 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems_plain independent M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems_plain independent M p1 cell 2: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems_plain independent M p1 cell 4: empty band 40.4 mm under the ink of a 117.8 mm cell (34.3 %; limit 30 % = 35.3 mm; the 3.0 mm top pad excluded) [word-work]
+   addition:add_word_problems_plain test M p1 cell 1: empty band 33.8 mm under the ink of a 105.6 mm cell (32.0 %; limit 30 % = 31.7 mm; the 3.0 mm top pad excluded) [word-work]
+   ... 29 more
+EB-SIDE  FAIL 4
+   addition:add_wp_change_unknown pre-skill-check S p1 cell 5: 28.5 mm empty beside the ink of a 92.3 mm wide cell interior (30.8 %; limit 30 %) [family-check]
+   addition:add_wp_change_unknown pre-skill-check S p1 cell 6: 28.5 mm empty beside the ink of a 92.3 mm wide cell interior (30.8 %; limit 30 %) [family-check]
+   addition:add_wp_change_unknown pre-skill-check M p1 cell 5: 28.0 mm empty beside the ink of a 92.3 mm wide cell interior (30.3 %; limit 30 %) [family-check]
+   addition:add_wp_change_unknown pre-skill-check M p1 cell 6: 28.0 mm empty beside the ink of a 92.3 mm wide cell interior (30.3 %; limit 30 %) [family-check]
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-ROLE  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+EB-PARITY PASS
+EB-ITEMKEY PASS
+EB-ITEMPARITY PASS
+(7 skill(s), 602 renders, 2456 cells, 1118 s; 80 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (48)
+exit 1
