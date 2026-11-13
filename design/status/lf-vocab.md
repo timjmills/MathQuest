@@ -483,3 +483,9 @@ green, so they cannot be split without a red commit.
 | 4 V-TWIN: one feature class, one notWith list; first term notWith rule | V-TWIN | vocab-r13-vtwin | y |
 | 5 sets re-picked in place: 0 product -> factor; 7 term -> repeat (core {grow, first term, repeat}); 8 first term -> odd | V6, V7, V7-ALL | as above | y |
 Hatch drops: none.
+Commits 86c844fd (items 1-5), 098cf83c (backtest rows; repeat meaning "the part comes back" so the Guided M hint fits one line -
+cell-checks OVERFLOW on pick3 guided M set 7). EB-FOOT: sets 0 and 6 have one bank a picture, so a pick3 repeat deals it in
+another order (dupKey carries the bank order). V23: all 60 pupil hashes re-pinned (row and In/Out redrawn, set 0 word swap,
+pick3 banks now vetted trios). Gates: vocab-unit OK (+browser OK), next-box OK, empty-band OK both skills (+self-test OK),
+boot-smoke OK, 4 backtest rows PASS, precritic --strict: sibling-compare FAIL only (known). Renders: scratchpad r13/sets (9 of 11
+sets; sets 4 and 5 unchanged by the tool's diff, their banks listed in manifest.json).
