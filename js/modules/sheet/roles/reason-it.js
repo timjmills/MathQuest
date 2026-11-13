@@ -27,7 +27,7 @@ const ROWS = { S: 4, M: 3, L: 2 };
 export const sources = (skills) => [{ id: 'main', skills }];
 export const measureCols = () => [1];
 
-const TRUE_W = new Set(['equation', 'stack', 'word-work']);
+const TRUE_W = new Set(['equation', 'stack', 'word-work', 'count-row']);
 
 export function prepare(it, info = {}) {
     const correct = answerOf(it);
@@ -83,7 +83,7 @@ export function prepare(it, info = {}) {
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
     const abStyle = under ? 'margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm'
-        : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm`
+        : wide ? `${legacy ? 'margin-top:auto;margin-bottom:auto' : 'margin-top:0;margin-bottom:auto'};grid-template-columns:1fr ${!legacy && place.kind !== 'one' ? 'auto' : 'minmax(52mm,auto)'};row-gap:3mm`
             : 'margin-top:auto;margin-bottom:auto';
     const respStyle = under ? 'grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm'
         : wide ? 'grid-column:2;grid-row:1 / 3;justify-content:flex-start' : 'justify-content:flex-start';
