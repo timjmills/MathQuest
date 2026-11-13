@@ -23,6 +23,9 @@
 //               union of its painted shapes, never its svg box: D1) < 60 % of the free width AND its ink height > ink width.
 //               The free width is the cell's content-box width less every block beside the drawing that HOLDS INK, at each
 //               level from the drawing up to the cell (D4: an empty spacer is not beside it).
+// Only INK marks are sizes: a white or unfilled shape with no dark stroke (the touch numeral's halo and keyline) is not a mark,
+// and a ring (no fill, a dark stroke) is its own mark beside the solid dots (lf-ops 2026-11-13). A touch numeral's kind is
+// its digit ("digit 7"), so its dots are compared with the same digit on paper.
 // Drawings under 4 mm across both ways are not judged (a tick, a ring). A numeral drawing (an svg with data-digit: the touch
 // dots laid on a digit) is judged by SIZE-INK only: its shape is the digit's, so SIZE-WIDTH does not apply. A mark group needs
 // >= 3 like marks at >= 3 distinct places (a picture's detail drawn three times on one spot is not a set of marks).
@@ -217,7 +220,7 @@ function selfTest() {
     // D8: every name is a noun of NOUNS (and a picture of PICTURES) for every label the passed skills draw today, and for junk
     const labels = ['ws-td-svg', 'and', 'rows of', 'count by', 'count by to', 'array', 'array, 3 rows of 4', 'ten frame:', 'dot tile of',
         'k2-svg (fish)', 'k2-svg (balls)', 'counting dots in fives', 'base-10 rods', 'cubes', 'tiles', 'bar model', 'dots for', 'x y z', ''];
-    const marks = ['circle', 'ellipse', 'rect', 'path', 'polygon', 'use', 'div.ws-counter', 'span', 'i.b10-rod', 'rect.cube'];
+    const marks = ['circle', 'circle.ring', 'ellipse', 'rect', 'path', 'polygon', 'use', 'div.ws-counter', 'span', 'i.b10-rod', 'rect.cube'];
     let named = 0; const offList = [];
     for (const label of labels) for (const mark of marks) for (const glyph of [false, true]) {
         const d = { label, cls: '', glyph, groups: [{ mark }] };
@@ -261,7 +264,9 @@ function readDrawingsInPage({ scope, cellSel }) {
         const noun = ctx ? (ctx.getAttribute('aria-label') || '').toLowerCase().replace(/\d+/g, ' ').split(/[^a-z]+/).filter((w) => w && !/^(and|plus|minus|times|divided|by|equals|is|of|the|a|answer)$/.test(w)).join(' ') : '';
         return noun ? `${cls} (${noun})` : cls;
     };
-    const markKey = (m) => `${m.tagName.toLowerCase()}${(m.getAttribute('class') || '').split(/\s+/).filter(Boolean).slice(0, 1).map((c) => '.' + c).join('')}`;
+    // an SVG shape drawn as a ring (no fill, a dark stroke) is its own mark kind beside the solid dots
+    const ringOf = (m) => { if (!(m instanceof SVGElement)) return false; const cs = getComputedStyle(m); return clear(cs.fill) && !clear(cs.stroke) && parseFloat(cs.strokeWidth) > 0; };
+    const markKey = (m) => `${m.tagName.toLowerCase()}${(m.getAttribute('class') || '').split(/\s+/).filter(Boolean).slice(0, 1).map((c) => '.' + c).join('')}${ringOf(m) ? '.ring' : ''}`;
     // groups of >= 3 like marks (same key, size within 20 % of the key's median); the frame (one big rect) never qualifies
     const groupsOf = (marks) => {
         const by = {};
@@ -325,8 +330,10 @@ function readDrawingsInPage({ scope, cellSel }) {
         // SVG drawings: the outermost svg (a nested svg is part of its parent's picture)
         for (const svg of rt.querySelectorAll('svg')) {
             if (svg.parentElement && svg.parentElement.closest('svg') || !visible(svg)) continue;
-            const g = groupsOf([...svg.querySelectorAll('circle, ellipse, rect, use, path, polygon')]);
-            if (g.length) drawings.push({ el: svg, kind: kindOf(svg), groups: g, glyph: svg.hasAttribute('data-digit'), ink: union([...svg.querySelectorAll('circle, ellipse, rect, path, polygon, polyline, line, use, text, image')].filter(painted)) });
+            // only INK marks: a white (or unfilled) shape with no dark stroke - the touch numeral's halo / keyline - is not a
+            // mark (lf-ops 2026-11-13: pooling the halos read the touch dots at 1.64 mm when the ink dots are larger than paper)
+            const g = groupsOf([...svg.querySelectorAll('circle, ellipse, rect, use, path, polygon')].filter((m) => m.tagName.toLowerCase() === 'use' || painted(m)));
+            if (g.length) drawings.push({ el: svg, kind: svg.hasAttribute('data-digit') ? `digit ${svg.getAttribute('data-digit')}` : kindOf(svg), groups: g, glyph: svg.hasAttribute('data-digit'), ink: union([...svg.querySelectorAll('circle, ellipse, rect, path, polygon, polyline, line, use, text, image')].filter(painted)) });
         }
         // HTML marks: leaf elements with no text, a fill or a border, grouped under their parent by class
         const parents = new Map();
