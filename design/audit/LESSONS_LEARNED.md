@@ -565,7 +565,7 @@ the dealing rules on 64 seeds (precritic lesson-samples-deal64), not 8.
 | N1 "20 - 11" under "1-digit from a teen" (ref minTop 11, maxTop 18, maxBottom 9): the relaxed last try kept no floor | PC-RANGE reads the route ref's declared floors (64 seeds + the 4242 check at L / S) | lesson-check-range-floors (6a9c268ce FAIL -> 302af774a OK) | lesson-samples-deal64, lesson-samples-check | 1 |
 | N2 the word nearest the underlined digit was always the key; round alternated T O T O | PC-PV both ways, per question | lesson-check-pv-bothways (-> 302af774a) | lesson-samples-check | 1 |
 | N3 sub chart panels 33 % bands | CHART-H13 (blocking) | lesson-chart-h13 (-> f18533dd7) | lesson-samples-check | 1 |
-| N4 / N5 one-number near twins on Practice, Mixed and the sheet (11 / 12, 97 / 98, four in the 60s, 74 / 47) | PG-LR6 (every lesson page, sheet/near-twins.js) | lesson-pg-lr6 (-> 302af774a) | lesson-samples-deal64 | 1 (class survived 2 rounds) |
+| N4 / N5 one-number near twins on Practice, Mixed and the sheet (11 / 12, 97 / 98, four in the 60s, 74 / 47) | PG-LR6 (every lesson page, sheet/near-twins.js) | lesson-pg-lr6 (6a9c268ce FAIL -> 5be6526e4 OK) | lesson-samples-deal64 | 1 (class survived 2 rounds) |
 | N6 grown Vocabulary band 29 % under the words, 7 % over | PC-GAPS (lopsided gaps in band-wide cells) | lesson-check-gaps (-> 9775cf9eb) | lesson-samples-check | 1 |
 | N7 "10 more, 10 less" printed one "10 more" item | PC-NAME both parts | lesson-check-name-parts (-> 302af774a) | lesson-samples-check | 1 |
 | N8 chart-grey.png was the check page | --verify-grey on the committed packet | lesson-packet-grey (-> the r5 packet commit) | lesson-samples-grey | 0.5 |
