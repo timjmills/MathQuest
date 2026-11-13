@@ -1,5 +1,5 @@
 {
- "note": "Pinned ws-options-verify failures per skill (IMPROVEMENT_PLAN §1.4 S1: red gates compare with a pinned baseline). Each entry is option=<JSON value> (as ws-options-verify prints it) or static:<message>. ws-precritic fails on any failing pair not listed here, and on any failure of a skill not listed. Remove a pair when its defect is fixed; never add one to make a new failure pass without a STATUS note.",
+ "note": "Pinned ws-options-verify failures per skill (IMPROVEMENT_PLAN §1.4 S1: red gates compare with a pinned baseline). Each entry is option=<JSON value> (as ws-options-verify prints it) or static:<message>. ws-precritic fails on any failing pair not listed here, and on any failure of a skill not listed. Remove a pair when its defect is fixed; never add one to make a new failure pass without a STATUS note. | 2026-11-13 (lf-builds word-stories fix r2, design/audit/runs/lf-builds/stories/precritic-diff.md): the four story hosts pin static band (the signed card's 'unset = the Max Number' default, null, is not one of the offered values 10 / 20 / 100; adding a null value needs an owner re-sign of the word-stories card) and the three presets add_wp_change_unknown / sub_wp_change_unknown / sub_wp_compare_smaller pin pictures=false, the defect their hosts already pin (the word-work cell draws no picture row on these stories, master too).",
  "how": "node tests/scripts/ws-options-pin.cjs --write (every live skill: ws-options-verify --skill <batch ids> --deadline 600000 --json per batch of 25, two batches at a time through /tmp/mq-browser-run.sh; a verifier timeout is re-run on its own); --write --skills cat:skill,... re-pins a subset; --check compares a fresh run with this pin. The skills that need more than ws-options-verify's 60 s default deadline time out under a plain run: pass --deadline 600000.",
  "pinned": "2026-10-23",
  "scope": [
@@ -866,9 +866,12 @@
   "addition:add_sub_100s": [],
   "addition:add": [],
   "addition:add_word_problems": [
-   "pictures=false"
+   "pictures=false",
+   "static:band: default null is not one of its values"
   ],
-  "addition:add_word_problems_plain": [],
+  "addition:add_word_problems_plain": [
+   "static:band: default null is not one of its values"
+  ],
   "addition:add_sub_fact_family": [],
   "addition:number_families_add": [
    "skipAfter=2",
@@ -936,9 +939,12 @@
   "subtraction:sub_facts": [],
   "subtraction:subtract": [],
   "subtraction:sub_word_problems": [
-   "pictures=false"
+   "pictures=false",
+   "static:band: default null is not one of its values"
   ],
-  "subtraction:sub_word_problems_plain": [],
+  "subtraction:sub_word_problems_plain": [
+   "static:band: default null is not one of its values"
+  ],
   "subtraction:missing_add_sub": [],
   "subtraction:sub_5_pictures": [],
   "subtraction:unknown_start_wp": [],
@@ -1883,6 +1889,15 @@
   "vocabulary:vocab_grade_6_geometry": [],
   "vocabulary:vocab_grade_6_data": [],
   "vocabulary:vocab_grade_6_algebra": [],
-  "vocabulary:vocab_grade_6_measurement": []
+  "vocabulary:vocab_grade_6_measurement": [],
+  "addition:add_wp_change_unknown": [
+   "pictures=false"
+  ],
+  "subtraction:sub_wp_change_unknown": [
+   "pictures=false"
+  ],
+  "subtraction:sub_wp_compare_smaller": [
+   "pictures=false"
+  ]
  }
 }
