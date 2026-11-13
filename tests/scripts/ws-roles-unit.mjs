@@ -23,7 +23,17 @@
 //
 //   KEY-TRUE-BLANK a True statement's key leaves the frame empty (PT-TOF-2; critic r1/r2 R5).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK]
+//   GUIDED-MODEL-SPAN a Guided page of narrow column stacks at S (4 columns, the ceiling 10 tries) whose plain grid the
+//                 ceiling trims to Model + 7 (S 8 < M 9, ws-capacity-pin SIZE-ORDER; subtraction sub_50 / sub_100 no regroup,
+//                 sub_2d_1d) lays the worked Model over TWO cells of row 1, its working written beside it, so Model + 10
+//                 tries fill 3 whole rows (lead ruling (e), 2026-11-13). Control: at M (3 columns, 9 cells fill the grid)
+//                 the Model keeps one cell.
+//   GUIDED-STACK-SIDE a narrow column stack's Guided grid leaves under 30 % beside the stack (EB-SIDE), keeps S 11 / M 9 / L 6,
+//                 fills every row (the Model spanning the cells that complete it) and centres each cell in its row (EB-BAND; r8b).
+//   GUIDED-MODEL-ROW a Model whose worked lines run under it never makes the try beside it sit in a row it fills under 70 %
+//                 (lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %; r8b (a)).
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -40,6 +50,7 @@ const CO = await mod('roles/compose.js');
 const SM = await mod('roles/scripted-model.js');
 const PSC = await mod('roles/pre-skill-check.js');
 const TS = await mod('roles/test.js');
+const GD = await mod('roles/guided.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -312,6 +323,103 @@ if (on('REVIEW-MIXED')) {
         const plS = RV.plan({ ctx: { size: 'S' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t2, z) => ((z || 'S') === 'L' && t2.length > 50 ? 2 : 1) });
         if (/next term of a growing/.test(pageText(plS))) findings.push('REVIEW-MIXED: S printed the long topic title that L cannot hold (one title at every size, PT-FRM-6)');
     } catch (e) { findings.push(`REVIEW-MIXED: ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+}
+
+if (on('GUIDED-MODEL-SPAN')) {
+    // lead ruling (e) 2026-11-13 (ws-capacity-pin SIZE-ORDER on Guided: three subtraction stack pages printed S 8 < M 9): a planted
+    // column stack (24 mm wide, 38 mm tall: 3 columns leave 31 % beside it, 4 columns hold it) with worked steps of its own
+    try {
+        registerSkill('rolesunit:gspan', {
+            workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }],
+            wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }),
+        });
+    } catch (e) { /* re-run */ }
+    const stackItem = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gspan', ans: '25', text: `48 − 23 = ?`, answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 24) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { wMm: 24, hMm: h, maxCols: 4 }, fclass: 'standard' };
+    };
+    for (const [size, want, span] of [['S', 11, true], ['M', 9, false]]) {
+        checks++;
+        try {
+            const input = { ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gspan', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => stackItem(i, size)) };
+            const pl = GD.plan(input);
+            const n = pl && pl.meta && pl.meta.items;
+            const html = (pl.pages || []).map((pg) => (pg.sections || []).map((s) => (s.content && s.content.items ? s.content.items.map((c) => `<i style="${c.style || ''}">${c.render ? c.render(Object.assign({}, resolveCtx({ size }), { state: 'blank' })) : ''}</i>`).join('') : '')).join('')).join('');
+            const hasSpan = /grid-column:\s*span 2/.test(html);
+            if (n !== want) findings.push(`GUIDED-MODEL-SPAN ${size}: the page holds ${n} cells (want ${want}: ${span ? 'the Model over two cells + 10 tries, 3 whole rows' : 'Model + 8, 3 whole rows'})`);
+            if (hasSpan !== span) findings.push(`GUIDED-MODEL-SPAN ${size}: the Model ${hasSpan ? 'spans' : 'does not span'} two cells (want ${span ? 'two' : 'one'})`);
+            if (span && hasSpan && !/Ones: 8 − 3 = 5\./.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the two-cell Model has no working beside it (an empty band either side of the stack, EB-SIDE)`);
+            if (span && /Write 5/.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the working beside the Model repeats "Write 5." (the traced digit says it)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-SPAN ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-STACK-SIDE')) {
+    // lf-roles r8b (coordinator via the lead: the stack Guided pages of the 7 subtraction skills failed EB-SIDE at S 32.4 % / M 31.7 %
+    // and EB-BAND at L 34.8 %): a planted 16 mm column stack (S/M/L heights of sub_50) is laid in a column count whose side band is
+    // under 30 % of the cell (the measured slack beside it), keeps its capacity (S 11, M 9, L >= 6), every row full, and its cells
+    // centred in their rows
+    try { registerSkill('rolesunit:gside', { workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }], wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const W = { S: 16.2, M: 22.5, L: 28.4 };
+    const item = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gside', ans: '25', text: '48 − 23 = ?', answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 0.5 - W[size]) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 6 }, fclass: 'standard' };
+    };
+    for (const [size, want] of [['S', 11], ['M', 9], ['L', 6]]) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gside', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => item(i, size)) });
+            const f = pl.meta.fits[0];
+            const side = (186 / f.cols - 0.5 - W[size]) / 2 / (186 / f.cols - 0.5);
+            const parts = (pl.pages || []).flatMap((pg) => (pg.sections || []).map((s) => s.content).filter((c) => c && c.items));
+            const cells = parts.flatMap((c) => c.items);
+            const span = cells.reduce((a, c) => { const m = /grid-column:\s*span\s+(\d+)/.exec(c.style || ''); return a + (m ? Number(m[1]) - 1 : 0); }, 0);
+            if (side >= 0.30) findings.push(`GUIDED-STACK-SIDE ${size}: ${f.cols} columns leave ${(side * 100).toFixed(1)} % beside the stack (EB-SIDE, want < 30 %)`);
+            if (pl.meta.items < want) findings.push(`GUIDED-STACK-SIDE ${size}: ${pl.meta.items} cells (want at least ${want}: capacity and SIZE-ORDER kept)`);
+            if ((cells.length + span) % f.cols !== 0) findings.push(`GUIDED-STACK-SIDE ${size}: ${cells.length} cells + ${span} spanned in ${f.cols} columns leave a part row`);
+            if (cells.some((c) => !/justify-content:center/.test(c.style || ''))) findings.push(`GUIDED-STACK-SIDE ${size}: a stack cell is not centred in its row (EB-BAND under a stretched row)`);
+        } catch (e) { findings.push(`GUIDED-STACK-SIDE ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('GUIDED-MODEL-ROW')) {
+    // lf-roles r8b (a), via the lead: lf-builds chart_to_120 Guided M / L - the Model (a chart window, its one worked line wrapped
+    // UNDER it: no full-row Model, which would push the third try off the page) shared row 1 with a 60 mm try, and the row stretch
+    // made that row 115 mm: a 42 % / 36 % band beside the try (EB-BAND). The Model's row is held to what the tries beside it fill
+    // (at least 70 %), never under the Model's own height. Planted: 60 mm items, one 88-character worked line.
+    const line = 'Count on from 47 along the row: 48, 49, 50, then down the column.';
+    try { registerSkill('rolesunit:grow', { workedSteps: () => [{ text: line }], wrongAnswer: () => ({ value: '58', misconception: 'planted', basis: 'rule' }) }); } catch (e) { /* re-run */ }
+    const item = (i) => {
+        const q = { categoryId: 'rolesunit', skillId: 'grow', ans: '57', text: 'Fill in the chart.', answerType: 'number', seed: i };
+        const render = (c, o = {}) => `<div class="ws-cell-work">chart ${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '57'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4].map((c) => [c, { hMm: 60, fits: c <= 2, slackMm: 6 }]));
+        return { q, key: { value: '57', display: '57', slots: {} }, render, template: 'planted', pool: 'main', measured, footprint: { measure: true, wMm: null, maxCols: 2 }, fclass: 'standard' };
+    };
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'grow', iCan: 'I Can count on a chart', grade: 1 }], items: Array.from({ length: 12 }, (_, i) => item(i)) });
+            const part = (pl.pages[0].sections || []).map((s) => s.content).find((c) => c && c.items);
+            const cols = part.cols;
+            const own = part.spanFirst || new RegExp(`grid-column:\\s*(1 / -1|span ${cols})`).test(part.items[0].style || '');
+            const fr = part.rowsTpl ? part.rowsTpl.split(/\s+/).map((t) => parseFloat(t)) : Array(part.rows).fill(1);
+            const gridH = parseFloat(part.height);
+            const row0 = (gridH * fr[0]) / fr.reduce((a, b) => a + b, 0);
+            // (the try beside the Model needs tryRowMm - 61 mm and its hint - and the Model modelRowMm; the row may be as tall as the
+            // Model needs, never stretched so the try fills under 70 % of it; a tree without these fields reads 61 mm and no Model need)
+            const f0 = pl.meta.fits[0];
+            const tryMm = Number(f0.tryRowMm) || 61;
+            const need = Math.max(Number(f0.modelRowMm) || 0, tryMm / 0.7);
+            if (cols > 1 && !own && part.items.length > 1 && tryMm < 0.7 * row0 && row0 > need + 0.5) findings.push(`GUIDED-MODEL-ROW ${size}: a ${tryMm} mm try shares the Model's ${row0.toFixed(1)} mm row, stretched past ${need.toFixed(1)} mm (${((1 - tryMm / row0) * 100).toFixed(0)} % of it empty beside the try: EB-BAND)`);
+            if (pl.meta.items < 4) findings.push(`GUIDED-MODEL-ROW ${size}: ${pl.meta.items} cells (want the Model and 3 tries at least)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-ROW ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);
