@@ -29,6 +29,8 @@
 //                A state of a commit-pair row may instead name a `fixture` (and its own `command`, default the row's):
 //                it runs on the current tree with {fixture} filled, for a real fail commit whose fix has not landed
 //                (the row's state text says why; ws-screen-ink-size D6).
+// A row's `timeoutS` (seconds, both states together) replaces --timeout / --browser-timeout for that row (a whole-library
+// proof such as lesson-baseline-deploy-gate, ≈ 2 x 13 min).
 // A row with pending: true has no command yet; it is reported PENDING (never OK) and makes the run FAIL.
 // A state's result is the check's own last "name: OK" / "name: FAIL" line (else its exit code); a row PASSes when
 // its fail state gives the expected FAIL and its pass state the expected OK.
@@ -249,7 +251,7 @@ try {
         if (r.pending || !r.command) { results.push({ r, fail: 'PENDING', pass: 'PENDING', verdict: 'PENDING' }); say(`ws-backtest row ${r.id}: PENDING${r.reason ? ` (${r.reason})` : ''}`); continue; }
         let fail, pass;
         const rowT0 = Date.now();
-        const budget = () => Math.max(1000, (r.browser ? BROWSER_TIMEOUT : ROW_TIMEOUT) - (Date.now() - rowT0));
+        const budget = () => Math.max(1000, (Number(r.timeoutS) > 0 ? Number(r.timeoutS) * 1000 : r.browser ? BROWSER_TIMEOUT : ROW_TIMEOUT) - (Date.now() - rowT0));   // (a row's own `timeoutS` wins: a whole-library proof)
         const timedOut = { result: 'TIMEOUT', ms: 0, line: 'not run: the row timed out on its fail state', tail: [] };
         if (r.kind === 'fixture') {
             const file = (s) => (isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture));

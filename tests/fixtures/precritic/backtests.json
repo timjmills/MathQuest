@@ -3042,6 +3042,27 @@
    }
   },
   {
+   "id": "lesson-baseline-deploy-gate",
+   "check": "The deploy gate (ws-deploy-gates.sh session 4, lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c) catches a lesson page that changes silently: ws-lesson-baseline --all-lessons --unpinned --check against the PINNED whole-library baseline design/audit/baselines/lesson-baseline.json (every page of every lesson master prints) FAILS on a tree whose live lesson pages differ from the pin and PASSES on master, from which the pin was written",
+   "kind": "commit-pair",
+   "rule": "LESSONS_LEARNED process rule 0c as a deploy gate; ws-deploy-gates.sh session 4",
+   "browser": true,
+   "timeoutS": 2400,
+   "fail": {
+    "commit": "3bf3ef5c",
+    "state": "the landing drift before the opt-in (vocab zoom / rounding rows changed live lesson pages): many of the pin's hashes differ"
+   },
+   "pass": {
+    "commit": "3690ccb3f",
+    "state": "master, where the pin was written with --write: every hash identical, every lesson the tree prints is pinned"
+   },
+   "command": "node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned --check design/audit/baselines/lesson-baseline.json",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
    "id": "eb-fact-roles",
    "check": "add_facts, sub_facts, mult_facts, div_facts_long and div_facts on the guided and scripted-model pages at S, M and L: no cell has an empty band of 30 % or more under or beside its ink (facts-roles task: fact cells sized for a taller worked item, guided bands 31-41 %, scripted-model side bands 35-72 %)",
    "kind": "commit-pair",
@@ -5859,6 +5880,246 @@
    "pass": "OK"
   }
  },
+  {
+   "id": "ea-redo-align",
+   "check": "an Error Analysis redo item's widened work starts at the cell's left like the redraw zone under it (lf-algebra critic r2 G2)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit EA-REDO-ALIGN",
+   "browser": false,
+   "fail": {
+    "commit": "244849a9",
+    "state": "align-items:center on a redo work"
+   },
+   "pass": {
+    "commit": "f4fd737d",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only EA-REDO-ALIGN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "psc-2pg-balance",
+   "check": "a Pre-skill Check that runs to 2 pages splits 2 + 2, never one item a page, every prerequisite kept, the FULL header on every page (lead ruling R13)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit PSC-2PG-BALANCE",
+   "browser": false,
+   "fail": {
+    "commit": "3a9476fa",
+    "state": "3 + 1 split, short header on page 2"
+   },
+   "pass": {
+    "commit": "b7110b89",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only PSC-2PG-BALANCE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupiltag-ink",
+   "check": "the '<Name> wrote:' label's foot sits 2-4 mm over the work's first INK (lead ruling PUPILTAG, critic r4 n1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "25d7bf2f8",
+    "state": "PUPILTAG 28 on add_facts EA"
+   },
+   "pass": {
+    "commit": "b0efa7ee8",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_facts --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-rowx",
+   "check": "one Correct / Fix it place a column on an Error Analysis page (critic R15)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX",
+   "browser": true,
+   "fail": {
+    "commit": "b0efa7ee8",
+    "state": "EA-ROWX 8 on div_facts_long"
+   },
+   "pass": {
+    "commit": "2d958ba1d",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills division:div_facts_long --roles error-analysis --size S,M,L --rules EA-ROWX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-pad",
+   "check": "an Error Analysis cell keeps its 3 mm padding when its work is widened (critic r5 D1)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-PAD",
+   "browser": true,
+   "fail": {
+    "commit": "947db3a87",
+    "state": "EA-PAD 12 on div_facts_long S"
+   },
+   "pass": {
+    "commit": "ba2367a79",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills division:div_facts_long --roles error-analysis --size S --rules EA-PAD",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pupiltag-table",
+   "check": "the '<Name> wrote:' label over a function table / count row stays 2-4 mm over its ink (lead order 5: 5.5 mm / 1.8 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks PUPILTAG",
+   "browser": true,
+   "fail": {
+    "commit": "3b324bcc",
+    "state": "fte L 5.5 mm, npr M 1.8 mm"
+   },
+   "pass": {
+    "commit": "88032a8a",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:function_table_easy,patterns:number_patterns_rule --roles error-analysis --size S,M,L --rules PUPILTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "test-level",
+   "check": "the Test role measures its items at level 0, where it lays them out (lf-algebra r8)",
+   "kind": "commit-pair",
+   "rule": "ws-roles-unit TEST-LEVEL",
+   "browser": false,
+   "fail": {
+    "commit": "24cbb0678",
+    "state": "measured at level 1"
+   },
+   "pass": {
+    "commit": "947db3a87",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-roles-unit.mjs --only TEST-LEVEL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "key-fit-letters",
+   "check": "a letter answer ('C, A, B') takes the word line - the key fits (KEYFIT on the passed vocab_grade_pictures)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks KEYFIT",
+   "browser": true,
+   "fail": {
+    "commit": "1f762c471",
+    "state": "KEYFIT 4"
+   },
+   "pass": {
+    "commit": "e86ed3517",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills vocabulary:vocab_grade_pictures --roles reason-it --size M --rules KEYFIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ri-distinct",
+   "check": "Reason It's A and B panels show different work (word-stories critic r1 F2)",
+   "kind": "fixture",
+   "rule": "ws-cell-checks RI-DISTINCT",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/ri-distinct.fail.html",
+    "state": "A and B the same work"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/ri-distinct.pass.html",
+    "state": "A and B differ"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --fixture {fixture} --fixture-role reason-it --rules RI-DISTINCT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "abtag",
+   "check": "a Reason It A / B tag stands 2 mm clear of the work (critic r6g)",
+   "kind": "fixture",
+   "rule": "ws-cell-checks ABTAG",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/abtag.fail.html",
+    "state": "the tag on the first term box"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/abtag.pass.html",
+    "state": "12 mm clear"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --fixture {fixture} --fixture-role reason-it --rules ABTAG",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "overflow-not-pinnable",
+   "check": "an overflow named in a gate's pinned output turns the row FAIL - it is never pinnable (lead 2026-11-13, word-stories F2 / compare F1)",
+   "kind": "fixture",
+   "rule": "ws-precritic overflowOf",
+   "browser": false,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/overflow-pinned.fail.txt",
+    "state": "pinned 'mq-ww leaves the cell'"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/overflow-pinned.pass.txt",
+    "state": "pinned card targets only"
+   },
+   "command": "node tests/scripts/ws-precritic.cjs --overflow-fixture {fixture}",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ea-rowx-redo",
+   "check": "an Error Analysis redo item's Correct / Fix it stands at one x a column whatever its train's length (npr S 69.5 vs 131.5 mm)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX",
+   "browser": true,
+   "fail": {
+    "commit": "c1f2879c2",
+    "state": "EA-ROWX 2 on npr EA S"
+   },
+   "pass": {
+    "commit": "cec8a53ce",
+    "state": "0"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles error-analysis --size S --rules EA-ROWX",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
  {
   "id": "sa-focus-gap-fixture-below",
   "check": "ws-screen-answer FOCUS-GAP judges the text ABOVE and BELOW the focused box's ring, to the glyph ink (critic eb-r6 m2): the word \"tens\" with its ink 1 px under the ring FAILS; the same word 10 px clear passes",
@@ -5979,5 +6240,5 @@
    "pass": "OK"
   }
  }
-]
+ ]
 }
