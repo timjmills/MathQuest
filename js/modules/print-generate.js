@@ -12665,8 +12665,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
         // Extract the two addends from the text (e.g., "Use Make a Ten: 8 + 6 = ?")
         const addMatch = plainText.match(/(\d+)\s*\+\s*(\d+)/);
+        // (P-29 / RM-P-01, lf-checks 2026-11-12: the "Which shows the Make a Ten way to add 6 + 5?" item is a CHOICE item -
+        // its text also holds "a + b", so it printed the written Step 1-3 scaffold while the screen offered four buttons;
+        // a multiple-choice make-a-ten prints its choices)
+        const isChoice = problem.answerType === 'multiple-choice' && problem.options && problem.options.length;
 
-        if (addMatch) {
+        if (addMatch && !isChoice) {
             const a = parseInt(addMatch[1]);
             const b = parseInt(addMatch[2]);
             const complement = 10 - a;
@@ -12722,8 +12726,12 @@ function formatProblemForPrintRouted(problem, index, columns = 2, sizeCategory =
         const plainText = (problem.text || '').replace(/<[^>]*>/g, '');
         // Detect if it's "doubles + 1" or "doubles - 1" (near doubles)
         const addMatch = plainText.match(/(\d+)\s*\+\s*(\d+)/);
+        // (P-29 / RM-P-01, lf-checks 2026-11-12: the "Which shows the Make a Ten way to add 6 + 5?" item is a CHOICE item -
+        // its text also holds "a + b", so it printed the written Step 1-3 scaffold while the screen offered four buttons;
+        // a multiple-choice make-a-ten prints its choices)
+        const isChoice = problem.answerType === 'multiple-choice' && problem.options && problem.options.length;
 
-        if (addMatch) {
+        if (addMatch && !isChoice) {
             const a = parseInt(addMatch[1]);
             const b = parseInt(addMatch[2]);
             const isExactDouble = (a === b);

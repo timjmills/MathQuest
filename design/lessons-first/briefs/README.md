@@ -47,6 +47,13 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
     critic verdicts, cost in $ and %, what remains, owner questions with suggested answers; then report to the lead.
 13. Commit messages end with the attribution lines the session's system reminder gives; no model names in the message body.
 
+## Critic briefs (every critic brief carries this line)
+
+> **Legibility is scored.** Anything you notice that is small, hard to read, cramped, faint or thin (dots, digits, labels,
+> strokes, a tall narrow drawing in a wide cell) is a numbered defect with its criterion and hard cap, never an "unscored note".
+> A page or host carrying one does not pass. (Owner, 2026-11-13; LESSONS_LEARNED process rule 10; RUBRIC "How a page counts as
+> graded".)
+
 ## Briefs in wave 1
 
 | Brief | Lane id (status file) | Where |

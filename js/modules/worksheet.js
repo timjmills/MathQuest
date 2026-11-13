@@ -1065,7 +1065,7 @@ function _wsEvenRows(cards) {
     // The bordered cells fill their card (flex), so a card that also carries a touch-numeral count line
     // (SF-34) has a shorter box than its neighbour: every box of the row takes the row's shortest box,
     // or the tallest content when that needs more, and the card keeps the rest as white under the box.
-    cells.forEach(([, v]) => { v.style.minHeight = ''; v.style.maxHeight = ''; });
+    cells.forEach(([, v]) => { v.style.minHeight = ''; v.style.maxHeight = ''; v.removeAttribute('data-mq-stretched'); });
     const rows = new Map();
     for (const [c, v] of cells) {
         if (c.classList.contains('mq-span-row')) continue;
@@ -1083,9 +1083,19 @@ function _wsEvenRows(cards) {
             return bottom - top + sideY(v);
         });
         const tgt = Math.max(Math.min(...hs), ...need);
+        // (c3, lead ruling 2026-11-13): the bordered box is stretched to the row only up to the RUBRIC H13 limit - its content
+        // to its bottom fills at least 78 % of it (its padding counts as white: under the 30 % band limit with room); the card keeps the row height and the rest stays white
+        // outside the box, as for a touch-numeral card above. CL-4b centring still applies inside the capped box (kept by lead ruling 2026-11-13; with the cap it rarely fires).
         vs.forEach((v, i) => {
-            if (hs[i] > tgt + 0.5) v.style.maxHeight = `${tgt}px`;
-            else if (hs[i] < tgt - 0.5) v.style.minHeight = `${tgt}px`;
+            const h = Math.min(tgt, Math.max(need[i], (need[i] - sideY(v)) / 0.78));   // hs[i] is already the stretched row height; the box's own bottom padding is white too, so the content (to its bottom) fills >= 78 % of the box
+            if (hs[i] > h + 0.5) v.style.maxHeight = `${h}px`;
+            else if (hs[i] < h - 0.5) v.style.minHeight = `${h}px`;
+        });
+        // CL-4b as amended (owner, 2026-11-12): a fitted cell starts at the top unless its row stretches it by 30 % or more of
+        // its own height; then it is centred (css/screen-cell.css reads data-mq-stretched)
+        vs.forEach((v, i) => {
+            const h = v.getBoundingClientRect().height;
+            if (h > 0 && h - need[i] >= 0.30 * h) v.setAttribute('data-mq-stretched', '1');
         });
     }
 }

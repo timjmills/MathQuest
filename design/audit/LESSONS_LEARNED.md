@@ -148,6 +148,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    built from the de-duplicated skill queue, so a skill used twice with different options lost its second use and its
    options. Root fix: the link encodes its own items (each (skill, options) use). The gate compares use by use.
    *Check:* `ws-precritic --role lesson` now runs ws-teacher-wrm; backtest row `detailed-link-every-use`.
+10. **A legibility, size or readability note is a SCORED defect, never an unscored note (owner, 2026-11-13).** The div_facts
+   screen r2 critic listed "array dots are small on screen" as an unscored note and still passed the skill. The owner then saw
+   tall, narrow strips of tiny dots. A critic who notes that anything is small, hard to read, cramped, faint or thin files it as
+   a numbered defect against C3 (or the criterion it touches), with its hard cap. A page with one is not passed. Every critic
+   brief says so (`design/lessons-first/briefs/README.md` "Critic briefs"). *Check:* ws-screen-ink-size SCREEN-INK-SIZE (every
+   screen host and every skill in redesign-passed.js: a drawn element at least its print size in CSS mm; a drawing uses at least
+   60 % of the cell's free width before it grows taller). Backtest rows fail on master 73e96fc1 (div_facts array).
 
 ### Teacher-site preview screens (pdf-preview lane, 2026-10-31)
 - **A hidden element is not an open dialog.** A guard that tests `getElementById(overlay)` breaks the moment the overlay
