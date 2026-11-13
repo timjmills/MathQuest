@@ -110,7 +110,10 @@ export const factFillOfColumn = (cols, liveWMm = 186) => factWidthMm(cols) / (li
  */
 /** WDS RP-81: the subitising gap after every 5th row and column of an array over 5 (mm). */
 const ARRAY_GAP_MM = 1.5;
-export function factCue(p, { px = 0 } = {}) {
+// `digitMm` (screen only, with `px`): the paper digit the cue is drawn beside (mm), so a screen host draws the cue at
+// paper's ratio to ITS digit, calc(var(--mq-digit) * w / digitMm), never under the plain `px` size (lf-ops div_facts
+// screen critic r1 D3: the skip strip's numbers were 0.19-0.27 x the fact digit on screen, 0.37 on paper).
+export function factCue(p, { px = 0, digitMm = 0 } = {}) {
     const kind = p && p.cue;
     if (!kind) return '';
     const a = Number(p.a), b = Number(p.b);
@@ -123,7 +126,7 @@ export function factCue(p, { px = 0 } = {}) {
     // (critic r5 R5-5: the think box (div_facts only) never scales to its pane - content never shrinks to fit - so a page
     // draws every box at its one measured width; the other cues keep their max-width)
     const wrap = (w, h, body, label) => `<svg class="ws-factcue-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(w)} ${f2(h)}" ${size(w, h)} `
-        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;${kind === 'think' ? '' : 'max-width:100%;'}overflow:visible;${px ? `width:${Math.round(w * px)}px;height:auto;` : ''}">${body}</svg>`;
+        + `role="img" aria-label="${label}" style="display:block;margin:0 auto;${kind === 'think' ? '' : 'max-width:100%;'}overflow:visible;${px ? `width:${px && digitMm > 0 ? `max(${Math.round(w * px)}px, calc(var(--mq-digit, 40px) * ${(w / digitMm).toFixed(3)}))` : `${Math.round(w * px)}px`};height:auto;` : ''}">${body}</svg>`;
     const dot = (x, y, r, open) => `<circle cx="${f2(x)}" cy="${f2(y)}" r="${f2(r)}" ${open ? `fill="none" stroke="${INK}" stroke-width="0.35"` : `fill="${INK}"`}/>`;
     const cross = (x, y, r) => `<path d="M${f2(x - r)} ${f2(y - r)}L${f2(x + r)} ${f2(y + r)}M${f2(x + r)} ${f2(y - r)}L${f2(x - r)} ${f2(y + r)}" stroke="${INK}" stroke-width="0.5"/>`;
     // `ref`: a number of an evenly printed reference scale (the number line's 0, 5, 10 ...), never

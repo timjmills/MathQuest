@@ -302,7 +302,7 @@ function pieceOf(id, p, template, ctx) {
         }
         // (facts card F3: a ÷ skip strip runs to the section's top multiple, the tally length - 10 or 12 - never the quotient)
         const cp = { a: pp.a, b: pp.b, op: pp.op, cue: id, ...(id === 'skip' && pp.op === '/' ? { n: Number(p.supports && p.supports.tally) || 12 } : {}) };
-        const cue = factCueOf(cp, twin);
+        const cue = factCueOf(cp, twin, twin && pp.op === '/' && (id === 'skip' || id === 'think') ? SCREEN_CUE_DIGIT_MM : 0);
         if (!cue) return null;
         const m = MM_RE.exec(factCueOf(cp, false)) || [];
         const foot = { wMm: Number(m[1]) || 40, hMm: Number(m[2]) || 12, placements: ['beside', 'under'] };
@@ -315,7 +315,10 @@ function pieceOf(id, p, template, ctx) {
 // (installCueDrawer) rather than imported (no import cycle).
 let factCueOf = () => '';
 const twin0 = (ctx) => !!ctx && ctx.mode === 'screen';
-export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin) => fn(p, twin ? { px: 3.4 } : {}); }
+export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf = (p, twin, digitMm = 0) => fn(p, twin ? { px: 3.4, digitMm } : {}); }
+// A ÷ fact's skip strip and think box on screen follow the cell's digit at paper's ratio (lf-ops div_facts screen critic
+// r1 D3): paper draws them beside a 24 pt (8.47 mm) fact digit.
+const SCREEN_CUE_DIGIT_MM = 24 * 25.4 / 72;
 
 /**
  * Wrap a problem's HTML with the supports its payload carries. `problemWMm` / `problemHMm` are

@@ -12,15 +12,14 @@
     "state": "lf-vocab critic r3 FAIL head; ws-empty-band FAIL 4 (guided S Model 35.0 %, cell 2 32.4 %; guided L Model 33.5 %), 2026-11-08"
    },
    "pass": {
-    "commit": "TBD",
-    "state": "lf-vocab's fix: set the commit, drop \"pending\", append the row to backtests.json"
+    "commit": "6cec18b7",
+    "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   },
-   "pending": true
+   }
   },
   {
    "id": "eb-pv-value-band9999-L",

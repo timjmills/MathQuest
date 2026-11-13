@@ -13,6 +13,10 @@
 //        passed through) and prints `ws-screen-answer --stress: K/N passes`; exit 1 unless K = N.
 //        Run it as: /tmp/mq-browser-run.sh --exclusive node tests/scripts/ws-screen-answer.cjs --stress 10
 //   --wait-timeout <ms>   the worksheet settle waits (default 30000; lower only to test the messages)
+//   --focus-gap-all       FOCUS-GAP (critic eb-r5 D2: a focused box's ring >= 4 px from the nearest word) on every box, not
+//                         only the kit's answer slots (input.mq-slot)
+//   --focus-gap-html <f>  FOCUS-GAP on a saved page (backtest fixtures: tests/fixtures/precritic/focus-gap/), no app
+//   --focus-gap-self-test FOCUS-GAP on synthetic pages, no app (critic eb-r6 m2: a word 1 px under or over the ring is a finding)
 //
 // Prints one line per skill and host, then `ws-screen-answer: OK` or `FAIL` (exit 1).
 const { open } = require('../lib/ws-harness.cjs');
@@ -277,6 +281,60 @@ function PLAN(rootSel, which) {
     return { error: `no answer control (${q.answerType})` };
 }
 
+// FOCUS-GAP (critic eb-r5 D2, legibility): in the page, on the FOCUSED answer box: the outer edge of its focus ring (its
+// outline: the border box grown by outline-offset + outline-width) must keep >= 4 px from every text box of the cell beside it
+// on its line (a text line box that overlaps the ring vertically by >= 30 % of its height), AND from every text box above or below
+// it that overlaps the ring horizontally, measured to the glyph ink OF THAT LINE (critic eb-r6 m2: "tens" 1 px under the ring passed; eb-r7 m1: a wrapped text node is read line by line). 0f1a0bda's kit LINE slot pulled the
+// next word under the ring (0 px to "tens" on unit_form). Returns a message, or '' when the ring is clear or no ring is drawn.
+function FOCUS_GAP(e, rootSel, all) {
+    if (document.activeElement !== e || (!all && !e.matches('input.mq-slot'))) return '';
+    const cs = getComputedStyle(e);
+    const w = parseFloat(cs.outlineWidth) || 0;
+    if (!w || /^(none|hidden)$/.test(cs.outlineStyle)) return '';
+    const o = (parseFloat(cs.outlineOffset) || 0) + w, b = e.getBoundingClientRect();
+    const R = { l: b.left - o, r: b.right + o, t: b.top - o, b: b.bottom + o };
+    const root = e.closest(rootSel) || document.querySelector(rootSel) || e.parentElement;
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const cv = document.createElement('canvas').getContext('2d');
+    // a text's ink rows inside its text box: {top, bottom} from the box's top, by canvas metrics in its own font ('' -> null)
+    const ink = (txt, pcs) => { if (!txt) return null; cv.font = `${pcs.fontStyle} ${pcs.fontWeight} ${pcs.fontSize} ${pcs.fontFamily}`; const m = cv.measureText(txt); if (!(m.fontBoundingBoxAscent > 0)) return null; return { top: m.fontBoundingBoxAscent - m.actualBoundingBoxAscent, bottom: m.fontBoundingBoxAscent + m.actualBoundingBoxDescent }; };
+    // the characters of text node n that sit on line rect t (a Range per character; its centre inside t), trimmed
+    const lineText = (n, t) => {
+        const tx = n.textContent, r1 = document.createRange(); let s = '';
+        for (let i = 0; i < tx.length; i++) {
+            r1.setStart(n, i); r1.setEnd(n, i + 1); const q = r1.getBoundingClientRect();
+            if (!q.height) continue;
+            const cy = (q.top + q.bottom) / 2;
+            if (cy >= t.top && cy <= t.bottom && q.left >= t.left - 1 && q.right <= t.right + 1) s += tx[i];
+        }
+        return s.trim() || tx.trim();
+    };
+    let worst = null;
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+        if (!n.textContent.trim() || !n.parentElement) continue;
+        const pcs = getComputedStyle(n.parentElement);
+        if (pcs.visibility === 'hidden' || parseFloat(pcs.opacity || '1') <= 0.05 || n.parentElement.closest('[aria-hidden="true"], .sr-only')) continue;
+        const rg = document.createRange(); rg.selectNodeContents(n);
+        for (const t of rg.getClientRects()) {
+            if (!t.width || !t.height) continue;
+            let gap, where;
+            if (Math.min(t.bottom, R.b) - Math.max(t.top, R.t) >= 0.3 * t.height) { gap = Math.max(t.left - R.r, R.l - t.right); where = 'beside'; }
+            else if (Math.min(t.right, R.r) - Math.max(t.left, R.l) > 0) {
+                // above / below: to the GLYPH INK, not the text box (its content area carries the font's internal leading, about
+                // 0.2 em over a digit: a column sum's answer row read "1 px" from the digits over it with 5 px of paper between)
+                // ... and to THIS line's ink (critic eb-r7 m1): a text node that wraps has one rect per line, and the whole node's
+                // metrics put line 2's ascenders ("Tall") on line 1 ("wer once", x-height only, 5 px clear read 0 px)
+                const fm = ink(lineText(n, t), pcs);
+                const it = fm ? t.top + fm.top : t.top, ib = fm ? t.top + fm.bottom : t.bottom;
+                gap = Math.max(it - R.b, R.t - ib); where = (it + ib) / 2 >= (R.t + R.b) / 2 ? 'below' : 'above';
+            }
+            else continue;
+            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, where, word: (where === 'beside' ? n.textContent.trim() : lineText(n, t)).slice(0, 12) };
+        }
+    }
+    return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" ${worst.where} it (need >= 4 px)` : '';
+}
+
 async function run(page, sel, which) {
     const r = await page.evaluate(PLAN, sel, which);
     if (r.error) return r;
@@ -308,6 +366,11 @@ async function run(page, sel, which) {
         // instead, as a pupil's tap would, rather than abort the whole run.
         try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
         await el.evaluate(e => { e.value = ''; });
+        // FOCUS-GAP (critic eb-r5 D2): the focused box's ring keeps >= 4 px from the nearest word
+        // (default: the kit's answer slots, input.mq-slot; --focus-gap-all judges every box: 11-13 it finds arrays_groups
+        // -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px, routed to their lanes)
+        const fg = await el.evaluate(FOCUS_GAP, sel, process.argv.includes('--focus-gap-all'));
+        if (fg) (r.focusGap = r.focusGap || []).push(fg);
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));
     }
@@ -383,8 +446,91 @@ async function liveGreen(page) {
 
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
+// --focus-gap-html <file>: FOCUS-GAP on a saved page, no app (the backtest fixtures, tests/fixtures/precritic/focus-gap/): every
+// visible text input is focused in turn and judged as --focus-gap-all judges it (the ring against the words of `.c`, else the
+// page body). Prints each finding and `ws-screen-answer: OK` / `FAIL`.
+if (arg('focus-gap-html', null)) (async () => {
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const file = require('path').resolve(process.cwd(), arg('focus-gap-html'));
+    const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    const found = []; let n = 0;
+    try {
+        const p = await b.newPage();
+        await p.setViewport({ width: 800, height: 600, deviceScaleFactor: 1 });
+        await p.setContent(require('fs').readFileSync(file, 'utf8'), { waitUntil: 'load' });
+        const root = await p.evaluate(() => (document.querySelector('.c') ? '.c' : 'body'));
+        const ins = await p.$$('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])');
+        for (const h of ins) {
+            if (!(await h.evaluate((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }))) continue;
+            n++; await h.focus();
+            const msg = await h.evaluate(FOCUS_GAP, root, true);
+            if (msg) found.push(msg);
+        }
+    } finally { await b.close(); }
+    for (const m of found) console.log(`${require('path').basename(file)}: ${m}`);
+    console.log(`(${n} box(es) focused)`);
+    console.log(`ws-screen-answer: ${found.length || !n ? `FAIL (${found.length || 'no box'})` : 'OK'}`);
+    process.exit(found.length || !n ? 1 : 0);
+})();
 // --stress N: one command that loads the CPU and repeats the whole run N times.
-if (has('stress')) {
+else if (has('focus-gap-self-test')) (async () => {
+    // FOCUS-GAP on synthetic pages (no app): the critic eb-r6 probe set. A finding where a word touches the ring beside, under
+    // (1 px, m2) or over it; none for a lone box, a word on another line, or words 6+ px clear above / beside / below.
+    const puppeteer = require('puppeteer'); const { chromePath } = require('../lib/ws-harness.cjs');
+    const css = 'input.mq-slot{width:60px;height:40px;border:2px solid #000;font:24px sans-serif;margin:0}input.mq-slot:focus{outline:3px solid #1a73e8;outline-offset:2px}';
+    const W = 'font:24px sans-serif';
+    const cases = [
+        ['lone box', '<input class="mq-slot">', false],
+        ['word above, 10 px clear', `<div style="${W};margin-bottom:15px">Write the number</div><input class="mq-slot" style="display:block">`, false],
+        // "tens" with its INK 1 px under the ring (the text box starts above the ring's bottom edge; the glyphs 1 px below it)
+        ['word ink 1 px below the ring', `<input class="mq-slot" style="display:block"><div class="w" style="${W};margin-top:__BELOW1__px">tens</div>`, true],
+        ['word ink 1 px above the ring', `<div class="w" style="${W};margin-bottom:__ABOVE1__px">tens</div><input class="mq-slot" style="display:block">`, true],
+        ['word below, 10 px clear', `<input class="mq-slot" style="display:block"><div style="${W};margin-top:15px">tens</div>`, false],
+        ['word below, off to the side', `<input class="mq-slot" style="display:block"><div style="${W};margin:0 0 0 100px">tens</div>`, false],
+        ['word 20 px beside', `<span style="${W}">5 <input class="mq-slot" style="margin:0 20px"> tens</span>`, false],
+        ['word flush beside', `<span style="${W}">5<input class="mq-slot">tens</span>`, true],
+        // the critic's r6 "another line" probe: the wrapped next line's "tens" has its ink 1-2 px inside the ring (a screenshot
+        // shows the ring on its ascenders), so under m2 it is a finding; the same words with line-height 2.2 clear the ring
+        ['wrapped next line under the ring', `<div style="${W};width:120px">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, true],
+        // critic eb-r7 m1: ONE text node on two lines under the ring, line 1 x-height only ("wer once"), line 2 "Tall": judged per
+        // line, line 1's ink 5 px clear is no finding (the whole node's metrics read 0 px), and 1 px is one
+        ['x-height line 5 px under the ring, ascenders on line 2', `<input class="mq-slot" style="display:block"><div style="${W};white-space:pre-line;margin-top:__WRAP5__px">wer once\nTall</div>`, false],
+        ['x-height line 1 px under the ring, ascenders on line 2', `<input class="mq-slot" style="display:block"><div style="${W};white-space:pre-line;margin-top:__WRAP1__px">wer once\nTall</div>`, true],
+        ['wrapped lines, clear of the ring', `<div style="${W};width:120px;line-height:2.2">ones and <input class="mq-slot" style="margin:0 10px"> tens and some more words here</div>`, false],
+    ];
+    const b = await puppeteer.launch({ headless: true, executablePath: chromePath(), args: ['--no-sandbox', '--font-render-hinting=none'] });
+    const bad = [];
+    try {
+        const p = await b.newPage();
+        // the margins that put the word's INK 1 px from the ring (ring = border box + 2 px offset + 3 px outline = 5 px)
+        await p.setContent(`<canvas></canvas>`);
+        const fm = await p.evaluate((W) => { const g = document.querySelector('canvas').getContext('2d'); g.font = '24px sans-serif'; const m = g.measureText('tens'); const d = document.createElement('div'); d.style.cssText = W; d.textContent = 'tens'; document.body.appendChild(d); const r = document.createRange(); r.selectNodeContents(d.firstChild); const t = r.getClientRects()[0], box = d.getBoundingClientRect(); return { lead: t.top - box.top, top: m.fontBoundingBoxAscent - m.actualBoundingBoxAscent, bottom: m.fontBoundingBoxAscent + m.actualBoundingBoxDescent, h: box.height }; }, W);
+        const BELOW1 = Math.round(5 + 1 - fm.lead - fm.top), ABOVE1 = Math.round(5 + 1 - (fm.h - fm.lead - fm.bottom));
+        const xt = await p.evaluate(() => { const g = document.querySelector('canvas').getContext('2d'); g.font = '24px sans-serif'; const m = g.measureText('wer once'); return m.fontBoundingBoxAscent - m.actualBoundingBoxAscent; });
+        const WRAP5 = Math.round(5 + 5 - fm.lead - xt), WRAP1 = Math.round(5 + 1 - fm.lead - xt);
+        for (const [name, html0, want] of cases) {
+            const html = html0.replace("__BELOW1__", BELOW1).replace("__ABOVE1__", ABOVE1).replace("__WRAP5__", WRAP5).replace("__WRAP1__", WRAP1);
+            await p.setContent(`<style>${css}</style><div class="c" style="padding:40px">${html}</div>`);
+            await p.focus('input.mq-slot');
+            const msg = await (await p.$('input.mq-slot')).evaluate(FOCUS_GAP, '.c', false);
+            if (!!msg !== want) bad.push(`${name}: ${msg || 'no finding'} (want ${want ? 'a finding' : 'none'})`);
+        }
+        // the ink read is checked against the PIXELS, so the canvas metrics are not taken on trust: the first and last ink rows
+        // of the text, black on white, within 1.5 px of what ink() predicts, in two fonts and two sizes (digits and a word)
+        for (const [txt, font] of [['40', '28px Andika, sans-serif'], ['tens', '24px sans-serif'], ['300', '40px serif']]) {
+            await p.setContent(`<div style="padding:20px;background:#fff"><span id="t" style="font:${font};color:#000">${txt}</span></div>`);
+            const pr = await p.evaluate(() => { const n = document.getElementById('t').firstChild, cs = getComputedStyle(n.parentElement); const cv = document.createElement('canvas').getContext('2d'); cv.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; const m = cv.measureText(n.textContent); const r = document.createRange(); r.selectNodeContents(n); const t = r.getClientRects()[0]; return { x: t.left, y: t.top, w: t.width, h: t.height, top: t.top + m.fontBoundingBoxAscent - m.actualBoundingBoxAscent, bottom: t.top + m.fontBoundingBoxAscent + m.actualBoundingBoxDescent }; });
+            const png = await p.screenshot({ clip: { x: Math.floor(pr.x), y: Math.floor(pr.y) - 4, width: Math.ceil(pr.w) + 1, height: Math.ceil(pr.h) + 8 }, encoding: 'base64' });
+            const rowsInk = await p.evaluate(async (src) => { const im = new Image(); im.src = 'data:image/png;base64,' + src; await im.decode(); const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g = c.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, im.width, im.height).data; const rows = []; for (let y = 0; y < im.height; y++) { let any = false; for (let x = 0; x < im.width && !any; x++) { const k = (y * im.width + x) * 4; if ((d[k] + d[k + 1] + d[k + 2]) / 3 < 160) any = true; } if (any) rows.push(y); } return rows.length ? [rows[0], rows[rows.length - 1] + 1] : null; }, png);
+            const oy = Math.floor(pr.y) - 4;
+            if (!rowsInk || Math.abs(rowsInk[0] + oy - pr.top) > 1.5 || Math.abs(rowsInk[1] + oy - pr.bottom) > 1.5) bad.push(`ink calibration "${txt}" ${font}: pixels ${rowsInk ? rowsInk.map((v) => v + oy).join('-') : 'none'}, predicted ${pr.top.toFixed(1)}-${pr.bottom.toFixed(1)}`);
+        }
+    } finally { await b.close(); }
+    for (const x of bad) console.log(`self-test FAIL: FOCUS-GAP ${x}`);
+    console.log(`ws-screen-answer FOCUS-GAP self-test: ${bad.length ? 'FAIL' : 'OK'} (${cases.length} cases + 3 ink calibrations)`);
+    process.exit(bad.length ? 1 : 0);
+})();
+else if (has('stress')) {
     const { spawn, spawnSync } = require('child_process');
     const os = require('os');
     const n = Math.max(1, parseInt(arg('stress', '10'), 10) || 10);
@@ -429,6 +575,7 @@ else (async () => {
             await sleep(500);
             const before = await page.evaluate(() => window.state.score || 0);
             const r = await run(page, '#questionPaper', { host: 'card' });
+            if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} card: ${m}`));
             await page.evaluate(() => { window.__saDone = true; });
             if (r.error) { line.push(`card ERR ${r.error}`); fails.push(`${s} card: ${r.error}`); }
             else {
@@ -480,6 +627,7 @@ else (async () => {
             let err = '';
             for (let i = 0; i < n; i++) {
                 const r = await run(page, `#ws_card_${i} .ws-cell`, { host: 'worksheet', i });
+                if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} worksheet item ${i + 1}: ${m}`));
                 if (r.error) { err = `item ${i + 1}: ${r.error}`; break; }
                 await sleep(80);
             }
@@ -519,6 +667,7 @@ else (async () => {
             let err = '';
             for (let i = 0; i < 3; i++) {
                 const r = await run(page, '#quizTakeView .qt-cell', { host: 'quiz' });
+                if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} quiz Q${i + 1}: ${m}`));
                 if (r.error) { err = `Q${i + 1}: ${r.error}`; break; }
                 await page.keyboard.press('Tab');
                 await sleep(250);

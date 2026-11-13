@@ -1,0 +1,1 @@
+{"note":"ws-precritic-plan --rows-before fixture (lf-checks 2026-11-13): a baseline holding a row id this tree does not have - a dropped row, must FAIL","rows":[{"id":"eb-fixture-band"},{"id":"a-row-a-deploy-dropped"}]}

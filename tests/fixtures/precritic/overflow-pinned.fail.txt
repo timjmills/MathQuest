@@ -1,0 +1,2 @@
+ws-grade-render --gate (reason-it): PASS (baseline)
+meta.json: mq-ww leaves the cell x2 (pinned on master)

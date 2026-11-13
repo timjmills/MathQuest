@@ -1,0 +1,6 @@
+<!-- ws-empty-band --html fixture (lf-checks 2026-11-12, critic eb-r3 D1): a 60 mm fact cell with padding-bottom 25 mm and line-height 2.
+The glyphs end well above the padding, so the visible band under them is over 40 mm (over 65 %). The DOM measure reads from the padding box to the
+line box: 17.1 mm (28.5 %), a PASS. This fixture must FAIL (EB-BAND) once the band is read from the border box or the pixels. -->
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0"><section class="ws-page" style="width:210mm;padding:10mm;display:grid;grid-template-columns:60mm;gap:4mm"><div data-ws-cell="fact" style="box-sizing:border-box;width:60mm;height:60mm;border:0.75pt solid #000;padding:2mm 2mm 25mm;position:relative;font:28pt Andika,sans-serif">
+<span data-ws-label="tab" style="position:absolute;left:0;top:0;font-size:9pt">1</span>
+<div style="text-align:center;line-height:2">7 + 5 = 12</div></div></section></body></html>

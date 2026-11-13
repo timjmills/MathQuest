@@ -28,7 +28,7 @@ export function readDecisions(md) {
     for (const line of sec.split('\n')) {
         const g = /^\*\*(Option values|Page roles|Screen hosts)/.exec(line);
         if (g) { group = g[1] === 'Option values' ? 'options' : g[1] === 'Page roles' ? 'roles' : 'hosts'; continue; }
-        const m = /^- `([^`]+)` — \*\*(offered|hidden|out of scope)\*\*(?: on ((?:`[^`]+`(?:, )?)+))?/.exec(line);
+        const m = /^- `([^`]+)` — \*\*(offered|hidden|out of scope)\*\*(?: \([^)]*\))?(?: on ((?:`[^`]+`(?:, )?)+))?/.exec(line);
         if (!m || !group) continue;
         const on = m[3] ? [...m[3].matchAll(/`([^`]+)`/g)].map((x) => x[1]) : null;
         // (some cards write their role and host keys `role:independent`, `host:quiz`)
@@ -66,7 +66,12 @@ export async function cardPlanFor(root, skillKey) {
     for (const l of lines.filter((x) => x.group === 'roles' && applies(x, id))) {
         if (l.decision === 'offered' && !roles.includes(l.key)) roles.push(l.key);
     }
-    const hidden = lines.filter((x) => x.group === 'roles' && x.decision === 'hidden' && applies(x, id)).map((x) => x.key);
+    // lf-checks critic eb-r2 D8: "out of scope" removes a role as "hidden" does; a line with an "on" list naming this skill
+    // wins over a general one (a role offered on this skill stays, though a general line rules it out of scope elsewhere)
+    const named = (x) => x.on && x.on.includes(id);
+    const offeredHere = new Set(lines.filter((x) => x.group === 'roles' && x.decision === 'offered' && named(x)).map((x) => x.key));
+    const hidden = [...new Set(lines.filter((x) => x.group === 'roles' && (x.decision === 'hidden' || x.decision === 'out of scope')
+        && (named(x) || (!x.on && !offeredHere.has(x.key)))).map((x) => x.key))];
     const SO = await import(pathToFileURL(join(root, 'js', 'modules', 'skill-options.js')).href);
     let defs = [];
     try { defs = SO.offeredOptionsFor(cat, id) || []; } catch (e) { defs = []; }
@@ -109,8 +114,14 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (a.includes('--self-test')) {
         const md = '### 7a. x\n\n**Option values (offeredOptionsFor)**\n\n- `forms=0 | 1` — **offered** on `a_b` — x\n- `nlOn=true | false` — **out of scope** — y\n\n**Page roles (buildSheet)**\n\n- `independent` — **offered** — p\n- `word-problems` — **hidden** on `a_b` — q\n\n## 8. Gates\n';
         const d = readDecisions(md);
-        const ok = d.length === 4 && d[0].on[0] === 'a_b' && d[2].key === 'independent' && d[3].decision === 'hidden';
-        console.log(`ws-card-plan --self-test: ${ok ? 'OK' : 'FAIL'} (${d.length} lines)`);
+        const ok1 = d.length === 4 && d[0].on[0] === 'a_b' && d[2].key === 'independent' && d[3].decision === 'hidden';
+        // D8 (lf-checks critic eb-r2): a "(PROPOSED)" tag before the "on" list keeps the list; "out of scope" is read
+        const md2 = '### 7a. x\n\n**Page roles (buildSheet)**\n\n- `word-problems` — **offered** (PROPOSED) on `add_wp_10`, `add_wp_20` — p\n- `word-problems` — **out of scope** on `fact_family_sort` — q\n\n## 8. Gates\n';
+        const d2 = readDecisions(md2);
+        const ok2 = d2.length === 2 && Array.isArray(d2[0].on) && d2[0].on.join(',') === 'add_wp_10,add_wp_20'
+            && d2[1].decision === 'out of scope' && d2[1].on[0] === 'fact_family_sort';
+        const ok = ok1 && ok2;
+        console.log(`ws-card-plan --self-test: ${ok ? 'OK' : 'FAIL'} (${d.length} + ${d2.length} lines; tagged on-list ${ok2 ? 'kept' : 'DROPPED'})`);
         process.exit(ok ? 0 : 1);
     }
     const out = [];

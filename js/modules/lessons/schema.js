@@ -48,6 +48,8 @@
 //     practice: {skill: 'category:skill', opts?}       THE skill that practises it, with the option
 //                                                      values the lesson deals (LINK-1)
 //     defaultFor?: true                                the lesson a skill-keyed request prints
+//     dealPracticeOpts?: true                          a skill-keyed request (no options) deals `practice.opts`
+//                                                      (print-sheet buildLesson; critic nwf r1 N6)
 //     warmup:   [{key, opts?, why, ...floors}]         the Warm-up's prerequisite skills (the engine's
 //                                                      `skills`; a lesson with `prereqs` replaces its
 //                                                      Warm-up with the Prerequisite Check, LR-17)

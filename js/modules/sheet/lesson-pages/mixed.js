@@ -13,9 +13,9 @@
  *
  * @param {{common: object, lookAsked?: string, lead: object, partners: object[], practiceTexts: string[],
  *          packNums?: string[]|null, mixedLattice?: number, mixedLeadDrop?: boolean, seed: number,
- *          stripHtml?: string, stripH?: number, mixedStrip?: boolean, packTab?: string[]}} o
+ *          stripHtml?: string, stripH?: number, mixedStrip?: boolean, packTab?: string[], lessonFit?: boolean}} o
  */
-export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts, packNums = null, mixedLattice, mixedLeadDrop, seed, stripHtml, stripH, mixedStrip, packTab }) {
+export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts, packNums = null, mixedLattice, mixedLeadDrop, seed, stripHtml, stripH, mixedStrip, packTab, lessonFit = false }) {
     const withSkills = partners;
     const practiceSk = lead;
     return Object.assign({}, common, {
@@ -29,6 +29,9 @@ export function mixedRequest({ common, lookAsked, lead, partners, practiceTexts,
         // half the placed items (`leadHalf`, enforced after packing).
         sections: [{ skills: [Object.assign({}, practiceSk, { weight: Math.max(1, withSkills.length) + 0.5, avoidTexts: practiceTexts }, packNums ? { avoidKeys: packNums.slice(), edgeLast: undefined } : {}), ...withSkills] }], latticeN: mixedLattice || 6, leadHalf: true, leadDrop: !!(packNums && mixedLeadDrop), growLast: !!packNums,
         seed,
+        // (`lessonFit`, a library lesson - live-pm r2: no 30 % band from the fill, no lone shelf on a continuation page;
+        // absent on a detailed lesson's Mixed page, byte-identical)
+        ...(lessonFit ? { lessonFit: true } : {}),
         // (`mixedStrip: false`, the detailed lesson maker - critic D18: one routine's Steps do not head a mixed page)
         stepStrip: stripHtml && mixedStrip !== false ? { html: stripHtml, hMm: stripH } : undefined,
         ...(Array.isArray(packTab) ? { header: Object.assign({}, common.header, { tab: [...packTab, 'Mixed 1'] }) } : {}),

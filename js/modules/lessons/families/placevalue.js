@@ -61,9 +61,11 @@ export const ROUTINES = Object.freeze({
             { id: 'right-to-left', text: 'The ones place is on the right.' },
         ],
         vocab: [
-            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 0, ones: 4, compact: true } },
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'vocab', id: 'digit' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
+            // (lf-vocab r8, owner O-2: 472 with one digit ringed / an H T O chart with one heading shaded / a ten beside its ones drawn
+            // round: four cubes alone read as four empty boxes, a 'place'; ws-vocab-unit V-AMBIG)
+            { word: 'ones', meaning: 'the right-hand place', picture: { kind: 'blocks', tens: 1, ones: 4, ring: true } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
@@ -91,8 +93,8 @@ export const ROUTINES = Object.freeze({
         ],
         vocab: [
             { word: 'value', meaning: 'how much it is worth', picture: { kind: 'text', text: '6 → 600' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
-            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'text', text: '4 7 2' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
+            { word: 'digit', meaning: 'one of 0 to 9', picture: { kind: 'vocab', id: 'digit' } },
         ],
         steps: [
             { icon: 'look', text: 'Find the underlined digit.' },
@@ -117,7 +119,7 @@ export const ROUTINES = Object.freeze({
         vocab: [
             { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
             { word: 'value', meaning: 'what a digit is worth', picture: { kind: 'text', text: '7 → 70' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
         ],
         steps: [
             { icon: 'look', text: 'Hundreds digit: its value.' },
@@ -140,7 +142,7 @@ export const ROUTINES = Object.freeze({
         vocab: [
             { word: 'standard form', meaning: 'the number in digits', picture: { kind: 'text', text: '472' } },
             { word: 'expanded form', meaning: 'the parts added', picture: { kind: 'text', text: '400 + 70 + 2' } },
-            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'heads', heads: 'H T O' } },
+            { word: 'place', meaning: 'hundreds, tens, ones', picture: { kind: 'placechart', heads: 'H T O', shade: 1 } },
         ],
         steps: [
             { icon: 'write', text: 'Hundreds: write the digit.' },
@@ -177,6 +179,33 @@ export const ROUTINES = Object.freeze({
         example: { match: 'hundreds' },
         chartWide: true,
         practiceShapes: [[12, 2], [10, 2], [12, 1], [10, 1], [8, 1], [6, 1]],
+    },
+    // lf-placevalue w2 (2026-11-12): number names to the numeral (2.NBT.A.3), the H T O boxes keep a missing tens word's 0.
+    'pv-number-words': {
+        archetype: 'pv',
+        casesPending: 'New with lf-placevalue w2; its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'parts', text: 'A number name says the hundreds, then the rest.' },
+            { id: 'zero', text: 'No tens word? Write 0 tens.' },
+        ],
+        vocab: [
+            { word: 'number name', meaning: 'a number in words', picture: { kind: 'text', text: 'forty-one' } },
+            { word: 'numeral', meaning: 'a number in digits', picture: { kind: 'glyph', text: '41' } },
+            { word: 'place', meaning: 'hundreds, tens or ones', picture: { kind: 'heads', heads: 'H T O' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the hundreds word.' },
+            { icon: 'write', text: 'Write the hundreds digit.' },
+            { icon: 'decide', text: 'Read the rest. Tens and ones.' },
+            { icon: 'check', text: 'Read the number back.' },
+        ],
+        // (critic nwf r1 N6: "Three boxes, three digits." was printed over 2-digit items with no boxes and over "one thousand" in
+        // four boxes; the chant names no count - every item the lesson deals is boxed, one digit a box, the empty place a 0)
+        chant: 'Every box gets a digit.',
+        format: { kind: 'numbered steps with icons + a chant', why: 'The one step pupils skip is the empty place; the chant cues its 0.' },
+        example: { match: 'hundred' },
+        // (three across where the name and its boxes fit: two across left 31 % beside the boxes at S - ws-print-lint H13)
+        practiceShapes: [[15, 3], [12, 3], [12, 2], [10, 2], [8, 2], [6, 2]],
     },
 });
 
@@ -263,6 +292,20 @@ export const LESSONS = Object.freeze({
             { key: 'placevalue:unit_form', opts: { band: 99 }, why: 'Tens and ones first.' },
         ],
         mixWith: [{ key: 'placevalue:identify' }, { key: 'placevalue:more_less_10' }],
+    },
+    // lf-placevalue w2 (2026-11-12, 2.NBT.A.3 / 1.NBT.B.2): number names to numerals; skill: id.
+    'skill:composing:number_word_form': {
+        routine: 'pv-number-words',
+        practice: { skill: 'composing:number_word_form', opts: { wordform: ['to_number'], band: 1000, zeroPlace: 'some', answerSlot: 'hto' } },
+        // (critic nwf r1 N6: the lesson asked for by the skill alone deals these practice options - print-sheet buildLesson)
+        dealPracticeOpts: true,
+        defaultFor: true,
+        prereqsPending: 'New with lf-placevalue w2: its Warm-up until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'composing:number_word_form', opts: { wordform: ['to_number'], band: 100 }, why: 'Names to 100 first: forty-one is 41.' },
+            { key: 'placevalue:unit_form', opts: { band: 999 }, why: 'A 3-digit number is hundreds, tens and ones.' },
+        ],
+        mixWith: [{ key: 'placevalue:unit_form' }, { key: 'placevalue:expand' }],
     },
 });
 

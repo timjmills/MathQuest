@@ -1,0 +1,13 @@
+{
+ "note": "fixture: the pin as master prints it",
+ "pages": {
+  "placevalue:unit_form reason-it S": {
+   "items": 4,
+   "pages": 1
+  },
+  "patterns:none x S": {
+   "items": 1,
+   "pages": 1
+  }
+ }
+}

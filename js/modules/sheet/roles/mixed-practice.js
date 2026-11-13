@@ -111,14 +111,18 @@ function packing(poolsIn, input) {
         }
         return pages;
     };
-    const basePages = A ? pagesOf() : 1;
+    // `lessonFit` (a library lesson's Mixed page, live-pm r2 finding 3): when the one-shelf-per-skill start already runs
+    // past page 1, the extra shelves fill the pages it takes (as with anchor bands) - a continuation page is never one
+    // lone shelf on a 72 % blank page.
+    const multi = !!A || (!!input.lessonFit && pagesOf() > 1);
+    const basePages = multi ? pagesOf() : 1;
     for (let guard = 0; guard < 40; guard++) {
         if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves * basePages) break;
         const tw = ids.reduce((a, id) => a + (weights[id] || 1), 0);
         const gaps = ids.map((id) => ({ id, gap: (weights[id] || 1) / tw - (shelf[id].n * shelf[id].per) / Math.max(1, total()) }))
             .sort((a, b) => b.gap - a.gap);
         const fits = (id) => {
-            if (!A) return used + bandH(id, false) <= m.budget;
+            if (!multi) return used + bandH(id, false) <= m.budget;
             shelf[id].n++;
             const ok = pagesOf() <= basePages;
             shelf[id].n--;
@@ -136,9 +140,11 @@ function packing(poolsIn, input) {
         const lead = ids[0];
         const cnt = (id) => shelf[id].n * shelf[id].per;
         const rest = () => ids.slice(1).reduce((a, id) => a + cnt(id), 0);
+        // (lessonFit over several pages: a lead shelf fits when the pages stay the pages the start took)
+        const leadFits = () => { if (!multi) return used + bandH(lead, false) <= m.budget; shelf[lead].n++; const ok = pagesOf() <= basePages; shelf[lead].n--; return ok; };
         for (let g = 0; g < 24 && cnt(lead) < rest(); g++) {
             const shelves = ids.reduce((a, id) => a + shelf[id].n, 0);
-            if (shelves < maxShelves * basePages && used + bandH(lead, false) <= m.budget) { shelf[lead].n++; used += bandH(lead, false); continue; }
+            if (shelves < maxShelves * basePages && leadFits()) { shelf[lead].n++; used += bandH(lead, false); continue; }
             const drop = ids.slice(1).filter((id) => shelf[id].n > 1).sort((a, b) => cnt(b) - cnt(a))[0];
             if (drop) { shelf[drop].n--; used -= bandH(drop, false); continue; }
             // `leadDrop` (the detailed lesson maker, lesson 2 r4 - critic r2 D3: 2 stories of 14 items):
@@ -169,6 +175,12 @@ function packing(poolsIn, input) {
 
 /** A shelf's shorter cell keeps at least this share of the tallest's height (H13: < 30 % empty). */
 export const MIX_H_RATIO = 0.75;
+/** lessonFit: a shelf's height less its content (cell padding 2 x 3 mm, the tab clearance, the grid's 1 mm), taken large
+ *  so the content is under-estimated and a grown shelf never passes a 30 % band (live-pm r2: div_facts L eq 11.4 mm in 22). */
+const LESSON_FIT_PAD_MM = 12;
+/** lessonFit: every shelf may still grow this much - the room an across fact's CL-40 tab inset needs to open fully in a
+ *  row sized to its content (div_facts S Mixed: "70 ÷ 10 =" 0.6 mm under the tab with the inset shrunk to fit). */
+const LESSON_FIT_MIN_MM = 1.2;
 /** Instructions a computation cell's own sign already says: such a cell needs no cue on "Solve.". */
 const SIGN_KEYS = new Set(['add', 'subtract', 'multiply', 'divide', 'mixed-sign', 'mixed-ops', 'default-solve', 'default-write']);
 
@@ -633,14 +645,20 @@ export function plan(input = {}) {
     // `growLast` (the detailed lesson maker): the spare is water-filled - a shelf that reaches its
     // 35 % cap passes the rest to the others - so no bordered empty strip is left under the
     // last row (critic r3 nit, P4m-1). Absent on every other Mixed page (equal shares, as before).
+    // `lessonFit` (a library lesson's Mixed page, live-pm r2 findings 1 / 5): the spare is water-filled too, and a shelf
+    // grows only as far as its centred content keeps each band under 30 % (H13): content is taken as the shelf's height
+    // less LESSON_FIT_PAD_MM (padding, tab clearance - an under-estimate), and a centred cell of height H holds content c
+    // with bands under 30 % while H <= c / 0.42. A one-line fact shelf ("14 ÷ 7 = __") so stays at its own height; the
+    // spare goes to the shelves that can take it (stacks, boxed equations, stories).
+    const capOf = (sh) => (input.lessonFit ? Math.max(LESSON_FIT_MIN_MM, Math.min(sh.h * 0.35, (sh.h - LESSON_FIT_PAD_MM) / 0.42 - sh.h)) : sh.h * 0.35);
     const fillShares = (() => {
-        if (!input.growLast || !shelves.length) return null;
+        if (!(input.growLast || (input.lessonFit && input.fill)) || !shelves.length) return null;
         const g = shelves.map(() => 0);
-        let left = spare, open = shelves.map((_, i) => i);
+        let left = spare, open = shelves.map((_, i) => i).filter((i) => capOf(shelves[i]) > 0.05);
         for (let it = 0; it < 8 && left > 0.05 && open.length; it++) {
             const each = left / open.length;
             const next = [];
-            for (const i of open) { const room = shelves[i].h * 0.35 - g[i]; const add = Math.min(room, each); g[i] += add; left -= add; if (room - add > 0.05) next.push(i); }
+            for (const i of open) { const room = capOf(shelves[i]) - g[i]; const add = Math.min(room, each); g[i] += add; left -= add; if (room - add > 0.05) next.push(i); }
             open = next;
         }
         return g;

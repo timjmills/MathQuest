@@ -70677,6 +70677,256 @@
      "pin": "owner 2026-10-31: shared-role defects -> page-types lane (Lane D restart r2 closing; R1-9 Reason It A / B box ink in the keep-out)"
     }
    ]
+  },
+  {
+   "id": "vocabulary:vocab_grade_pictures#lesson",
+   "pages": 12,
+   "keyPages": 6,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 6,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 9,
+    "L-KEY": 0,
+    "L-VERBS": 1,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "page 2 holds 0 item(s) while page 4 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "page 3 holds 0 item(s) while page 4 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "page 8 holds 0 item(s) while page 10 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 9,
+     "msg": "page 9 holds 0 item(s) while page 10 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 3,
+     "msg": "one empty band 29.7 mm wide in a 91.8 mm cell (32%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 3,
+     "msg": "one empty band 29.7 mm wide in a 91.8 mm cell (32%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 9,
+     "msg": "one empty band 29.7 mm wide in a 91.8 mm cell (32%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "H13",
+     "sev": "major",
+     "page": 9,
+     "msg": "one empty band 29.7 mm wide in a 91.8 mm cell (32%): the content is pinned to one side (RUBRIC H13)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "LONE",
+     "sev": "major",
+     "page": 2,
+     "msg": "page 2 holds one cell alone (sheet pages 1 + 3 + 4): another page of the sheet holds 4: rebalance so no page holds one alone (H5, PG-23; L-LONE)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-10",
+     "sev": "minor",
+     "page": 2,
+     "msg": "no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)"
+    }
+   ]
+  },
+  {
+   "id": "vocabulary:vocab_pick3_words#lesson",
+   "pages": 10,
+   "keyPages": 5,
+   "error": null,
+   "counts": {
+    "L-INK": 0,
+    "L-EMOJI": 0,
+    "L-FONT": 6,
+    "L-SIZE": 0,
+    "L-OVERFLOW": 0,
+    "L-SPLIT": 0,
+    "L-DENSITY": 5,
+    "L-KEY": 0,
+    "L-VERBS": 1,
+    "L-ANSAREA": 0,
+    "L-INPUT": 0,
+    "L-CCSS": 0,
+    "L-ANCHOR": 0,
+    "L-SUPPORT": 0,
+    "L-TOPSTART": 0,
+    "L-OVERLAP": 0,
+    "L-WRAP": 0
+   },
+   "findings": [
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-FONT",
+     "rule": "TY-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "font-weight 900: Andika has only 400 and 700 (TY-2)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 2,
+     "msg": "page 2 holds 0 item(s) while page 4 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 3,
+     "msg": "page 3 holds 0 item(s) while page 4 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 7,
+     "msg": "page 7 holds 0 item(s) while page 9 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "DN-2",
+     "sev": "major",
+     "page": 8,
+     "msg": "page 8 holds 0 item(s) while page 9 of the same sheet follows and its fullest page holds 2: a page is never less than half used (PG-20, PG-23)"
+    },
+    {
+     "lint": "L-DENSITY",
+     "rule": "LONE",
+     "sev": "major",
+     "page": 2,
+     "msg": "page 2 holds one cell alone (sheet pages 1 + 2 + 4): another page of the sheet holds 4: rebalance so no page holds one alone (H5, PG-23; L-LONE)"
+    },
+    {
+     "lint": "L-VERBS",
+     "rule": "BD-10",
+     "sev": "minor",
+     "page": 2,
+     "msg": "no instruction line above the cells: the task sentence is not a section instruction (BD-10: one instruction per section, never inside a cell)"
+    }
+   ]
   }
  ],
  "runs": [

@@ -2473,6 +2473,7 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                                   'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen',
                                   'seventeen', 'eighteen', 'nineteen'];
                     const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+                    if (n === 0) return 'zero';
                     if (n < 20) return ones[n];
                     if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : '');
                     if (n < 1000) return ones[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + numberToWordForm(n % 100) : '');
@@ -2481,12 +2482,14 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 };
 
                 // `band` (0 = the Max Number setting, the old behaviour) and `zeroPlace` bound the
-                // number itself: band 1000 deals 101-1,000, band 100 deals 21-100, band 20 deals 11-20.
+                // number itself: band 1000 deals 101-1,000, band 100 deals 21-100, band 20 deals 0-20.
+                // (critic nwf r1 band 20: 11-20 is only ten names, so a page dealt ten problems and stretched five rows over
+                // 45-51 % of each cell under its line; "numbers to 20" is the 21 names 0-20 (K.CC.3), three across x 7 at S)
                 const wfO = state.skillOptions || {};
                 const wfBand = [20, 100, 1000].includes(Number(wfO.band)) ? Number(wfO.band) : 0;
                 let num;
                 if (wfBand) {
-                    const lo = wfBand === 1000 ? 101 : wfBand === 100 ? 21 : 11;
+                    const lo = wfBand === 1000 ? 101 : wfBand === 100 ? 21 : 0;
                     const k = Number.isFinite(state.itemIndex) ? state.itemIndex : 0;
                     const wantZero = wfBand >= 100 && (wfO.zeroPlace === 'always' || (wfO.zeroPlace === 'some' && k % 3 === 2));
                     num = rng(lo, wfBand);
@@ -2526,53 +2529,17 @@ export function generatePlaceValueQuestion(q, mappedSkill, helpers) {
                 }
                 q.skillLabel = 'Word Form';
                 // The kit cell (detailed lesson 1, 2026-10-16): the same item drawn by the `words`
-                // template on paper and screen; the legacy visual below stays for the old print path.
+                // template on paper and screen (no legacy visual: see below).
                 q.pv = { kind: 'words', n: num, words: wordForm, way: mode };
                 q.instructionKey = mode === 'to_words' ? 'number-words' : 'standard-form';
-                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}) };
+                q.cell = { template: 'words', payload: Object.assign({ n: num, words: wordForm, way: mode, ans: mode === 'to_words' ? wordForm : String(num) }, mode !== 'to_words' && wfO.answerSlot === 'hto' && num <= 1000 ? { slot: 'hto' } : {}, wfBand === 20 ? { pool: 20 } : {},
+                    // (critic nwf r2 N10: every name of a 1,000 page keeps the two-line box - 'one thousand' (12 letters) and the long
+                    // names alike - so a row's answer places line up whatever was dealt)
+                    wfBand === 1000 && mode !== 'to_words' ? { twoLine: true } : {}) };
 
-                // Place value chart visual
-                const digits = num.toString().split('');
-                const placeLabels = ['thousands', 'hundreds', 'tens', 'ones'];
-                const placeColors = ['var(--accent-purple)', 'var(--accent-orange)', 'var(--accent-cyan)', 'var(--accent-green)'];
-                const startIdx = 4 - digits.length;
-
-                // The chart is filled only when the NUMERAL is the thing given. Asking "Write the
-                // numeral: thirty-seven" beside a chart reading Tens 3 Ones 7 prints the answer
-                // in the cell; with the direction now dealt, every cell on the page would have
-                // done it. So that way round gets an EMPTY digit grid instead — the structural
-                // scaffold the pupil writes into, one box per place, which is what the grid is
-                // for. The number of boxes tells the pupil how many digits to write, exactly as
-                // a column-addition grid does.
-                const chartCols = digits.map((d, i) => {
-                    const pIdx = startIdx + i;
-                    const filled = mode === "to_words";
-                    const box = filled
-                        ? `<div style="width:40px;height:40px;border-radius:8px;background:${placeColors[pIdx]};display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:1.2rem;">${d}</div>`
-                        : `<div style="width:40px;height:40px;border-radius:8px;background:var(--bg-card-light);border:2px solid ${placeColors[pIdx]};"></div>`;
-                    return `<div style="text-align:center;padding:6px 10px;">
-                        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:6px;text-transform:capitalize;">${placeLabels[pIdx]}</div>
-                        ${box}
-                    </div>`;
-                }).join('');
-
-                // The given number is NOT repeated inside the cell. q.text already carries it
-                // ("Write the numeral: seventy-three"), and the visual restated it one line
-                // below, so every printed cell on the page said the same words twice
-                // (CLAUDE.md print checklist 5 / BD-10). visualContainsText does not catch it
-                // because the visual wraps the word in quotes, so the duplicate is removed at
-                // source. What is left is the digit grid, which is the structural scaffold:
-                // empty when the pupil writes the numeral, filled when the numeral is given and
-                // the pupil writes the words.
-                q.visual = `<div style="text-align:center;">
-                    <div style="font-weight:700;margin-bottom:10px;color:var(--accent-purple);font-size:1.1rem;">Number Word Form</div>
-                    <div style="display:inline-flex;gap:4px;padding:10px 16px;background:var(--bg-card);border-radius:12px;border:2px solid var(--accent-cyan);">
-                        ${chartCols}
-                    </div>
-                </div>`;
-                // The caption under the chart ("Write this as a numeral") restated the
-                // instruction inside the cell, which BD-10 forbids and the printed cell showed
-                // twice over. q.text above the cell is the instruction.
+                // (critic nwf r1 N9, lead ruling: screen parity is a contract rule) No legacy q.visual: the place chart with its
+                // empty tens / ones boxes was a SECOND answer place beside the card's input, and a "Number Word Form" title inside
+                // the cell. Every host draws the kit `words` cell instead (screen-cell.js wordsTwin), the same drawing as print.
                 return;
             } else if (placeSkill === "compare") {
                 // Level 2: Compare Numbers (>, <, =)

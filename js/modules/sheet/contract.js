@@ -43,6 +43,10 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // `wrongAnswers(q) -> WrongAnswer[]`: EVERY misconception's wrong answer for one item (the detailed
     // lesson's Check Question options, 2026-10-16); `wrongAnswer` stays the one a page shows.
     'wrongAnswers',
+    // `preSkills(skillRef) -> [{categoryId, skillId, opts}]`: the skills a Pre-skill check tests before this one, nearest
+    // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
+    // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
+    'preSkills',
 ]);
 
 /* ================================================== the controlled instruction library */
@@ -112,6 +116,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     graph: 'Use the graph. Answer the questions.',
     table: 'Use the rule. Fill in the table.',
     match: 'Draw a line to match.',
+    // the vocabulary redesign (lane lf-vocab, 2026-11-07): Match 3 pictures, 1 picture 3 words
+    'vocab-letter': 'Write the letter of its picture next to each word.',
+    'vocab-word': 'Look at the picture. Write its word on the line.',
     story: 'Read the story. Fill in the diagram. Solve.',
     'story-v2': 'Solve. Write the number and the label.',
     'story-k': 'Show the story with lines. Write the equation.',
@@ -124,6 +131,8 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'check-fix-mixed': 'Is it right? Check one box. Fix it: write or check.',
     'check-by': 'Multiply to check. Check one box: Correct or Fix it.',
     'true-false': 'Check one box: True or False. Finish the sentence.',
+    // (PT-TOF-4: a page whose statements all have sentence answers prints no frame, so nothing to finish; lf-roles critic r1 R1)
+    'true-false-judge': 'Check one box: True or False.',
     spot: 'Find the mistake. Circle it. Write the correct answer.',
     'odd-one': 'Circle the one that does not belong. Finish the sentence.',
     asn: 'Check one box: Always, Sometimes or Never. Write an example.',
@@ -323,6 +332,7 @@ const SCREEN_VERB_MAP = Object.freeze([
     ['Draw hops of the number you divide by', 'Tap the line to hop by the number you divide by'],
     ['Draw the hops on the line', 'Tap the line to make the hops'],
     ['Shade every multiple of', 'Tap every multiple of'],
+    ['Write its word on the line', 'Tap its word'],
     ['Draw a line to match', 'Tap the two that match'],
     ['Mark the number on the line', 'Tap the number on the line'],
     ['Mark each number on the line', 'Tap each number, then its tick on the line'],

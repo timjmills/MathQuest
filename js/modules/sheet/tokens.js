@@ -348,7 +348,7 @@ export function resolveCtx(ctx = {}) {
         metrics: ctx.metrics || metricsFor(size, look, ctx),
     };
     // Optional extensions are copied through untouched so a template may read them.
-    for (const k of ['wrong', 'step', 'compact', 'template', 'feedback', 'static', 'idPrefix', 'options']) {
+    for (const k of ['wrong', 'step', 'compact', 'template', 'feedback', 'static', 'idPrefix', 'options', 'keyPage']) {
         if (ctx[k] !== undefined) out[k] = ctx[k];
     }
     return out;

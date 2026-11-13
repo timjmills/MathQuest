@@ -17,7 +17,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, bestCols, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, topicOf, labelStyleOf, fitsAt, stripExtraMm, splitByWidth,
 } from './compose.js';
-import { FILL_CAP, rowShape, groupByHeight, fillLimit } from '../layout.js';
+import { FILL_CAP, rowShape, groupByHeight, fillLimit, tightRows } from '../layout.js';
 import { itemInstructionKey, neutralForKinds, itemKindSig, GRID_BORDERS_MM } from './practice.js';
 
 /** A row grows at most CONTENT_FILL x its content plus its pads (layout.fillLimit, one rule). */
@@ -116,11 +116,39 @@ function allocate(main, cols, mRows, skills) {
     return out.sort((a, b) => a.at - b.at).map((g) => Object.assign(g.items, { kindKey: g.k || neutralForKinds('default-write', g.items) }));
 }
 
+/**
+ * The Review's title: "Review: <topic>" when it fits one line (measured by the bridge, input.titleLinesOf), else the fixed
+ * "Review" (as the Pre-skill Check falls back to its fixed title) - a two-line title took the room of the Mixed Review band
+ * (lf-roles critic r1 R9: growing_shape_patterns Review L lost its Mixed Review). A teacher's own title is kept.
+ */
+function reviewTitle(input, topic) {
+    const h0 = input.header || {};
+    if (h0.title === false) return '';
+    if (typeof h0.title === 'string' && h0.title.trim()) return h0.title.trim();
+    // decided at L, the widest title, so every size prints the SAME title (critic r2 N5, PT-FRM-6); a topic too long for one line
+    // is shortened at a phrase break ("of", "in", "with", "to", "from", "for") until it fits, never dropped (critic r3 D4)
+    const fits = (t) => typeof input.titleLinesOf !== 'function' || input.titleLinesOf(t, 'L') <= 1;
+    let tp = topic;
+    while (!fits(`Review: ${tp}`)) {
+        const m = /^(.*\S)\s+(?:of|in|with|to|from|for|on|by)\s+.*$/.exec(tp);
+        if (!m || m[1] === tp) break;
+        tp = m[1];
+    }
+    return fits(`Review: ${tp}`) ? `Review: ${tp}` : 'Review';
+}
+
 function geometry(pools, input) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
     const earlier = pools.earlier || [];
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Review 1', title: 'Review', score: 1 });
+    // the header the page prints: "Review: <topic>" of the skill under review, so a title that wraps to two lines takes
+    // its line off the body here too (lf-roles: growing_shape_patterns L ran 1.3 mm over the body under a 2-line title)
+    const skills0 = (input.skills || []).slice(0, 1);
+    const topic = topicOf((skills0[0] || {}).iCan || '');
+    const title = reviewTitle(input, topic);
+    // the bridge measures it (input.titleLinesOf); a host with no measure keeps the old one-line budget
+    const titleLines = !title ? 0 : typeof input.titleLinesOf === 'function' ? input.titleLinesOf(title) : 1;
+    const frame = frameOf({ skills: skills0.length ? skills0 : input.skills || [], input: Object.assign({}, input, { header: Object.assign({}, input.header || {}, { titleLines }) }), tabId: 'Review 1', title, score: 1 });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const bands = earlier.length ? 2 : 1;
     // A wrapped instruction takes its extra line off the page too.
@@ -256,7 +284,7 @@ export function plan(input = {}) {
     }
     const n = useM.length + useE.length + useEW.length;
     const n0 = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: `Review: ${topic}`, score: n });
+    const frame = frameOf({ skills: mainSkills.length ? mainSkills : input.skills || [], input, tabId: `Review ${n0}`, title: reviewTitle(input, topic), score: n });
     const rowsOf = groups.map((gr) => Math.ceil(gr.length / g.cols));
     const rowsM = rowsOf.reduce((a, b) => a + b, 0);
     const rowsE = Math.ceil(useE.length / eCols);
@@ -294,10 +322,14 @@ export function plan(input = {}) {
     // height (pads and tab keep-out included), never by the page's share - 26-33 mm rows held a 20 mm fact (35-40 %).
     // div_facts only: the passed fact Reviews keep their rows.
     const factBand = (gr) => gr.length > 0 && gr.every((it) => !!it && (it.skillRef ? it.skillRef.skillId === 'div_facts' : /div_facts(?!_)/.test(String(it.skill || ''))));
-    const cellsM = hsM.map((hs, gi) => (factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
+    // (lf-placevalue pv debt: a band of `tightRows` in-place cells - layout.tightRows - keeps its rows' own height, never the
+    // page's share: combine's two-line frames in 32-41 mm rows were 37-40 % empty under the answer line, read on the pixels, and
+    // a one-line expand row at IN_PLACE_FILL still 32 % - its measured height already holds the pads; the rest stays under the grid)
+    const tight = (gr, hs, c) => (tightRows(gr) && hs.length ? Math.min(c, sum(hs) / hs.length) : c);
+    const cellsM = hsM.map((hs, gi) => tight(groups[gi], hs, factBand(groups[gi]) && hs.length ? Math.min(cellOf(hs, hM), FACT_ROOM * (sum(hs) / hs.length)) : cellOf(hs, hM)));
     const cellM = cellsM[0] || hM;
-    const cellE = cellOf(hsE, hE);
-    const cellEW = cellOf(hsEW, g.ehw || hE);
+    const cellE = tight(useE, hsE, cellOf(hsE, hE));
+    const cellEW = tight(useEW, hsEW, cellOf(hsEW, g.ehw || hE));
     const labels = labelStyleOf(ctx.look, input.labels);
     const shaped = (part, items, cols, rows, cellH) => {
         // Each row as tall as what IT holds (layout.rowShape).

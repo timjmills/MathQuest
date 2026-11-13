@@ -476,6 +476,15 @@ export function speakHint() {
     _safeSpeak(utterance);
 }
 
+// Read a wrong-answer explanation aloud once (owner R-2, lane lf-vocab r7: "The answer is <word>! <Word> means ...").
+// Gated by the sound toggle (state.ttsEnabled): with sound off nothing is spoken. Goes through window.speak, the same
+// path the vocabulary speak buttons use. Returns true when it spoke.
+export function speakExplanation(text) {
+    if (!state.ttsEnabled || !text || typeof window === 'undefined' || typeof window.speak !== 'function') return false;
+    window.speak(String(text));
+    return true;
+}
+
 // Speak an answer option on hover
 export function speakAnswerOption(option) {
     if (!state.ttsEnabled || !("speechSynthesis" in window)) return;

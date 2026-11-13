@@ -1,10 +1,10 @@
 <!-- spec-card
-{"card":"pv","kind":"family","template":"pv","families":["placevalue"],"match":{"templates":["pv","pv-support","pv-times"]},"config":"design/cards/pv/card.json","indexSha":"ddfb5451b2da0853015491edbe288999e6ca7461","bodySha":"6222e25efecb7abd","format":2,"configSha":"4f7d1be50f9a"}
-{"cited":"AX-4 BD-7 BD-14 CL-5 DN-1 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 INK-5 L1 L3 L5 L6 L10 L11 OC4 OC8 OC14 OC15 PT-GDP-1 PT-MOD-1 PT-REV-1 PT-REV-3 PT-RSN-1 RP-10 RP-11 RP-30 RP-31 RP-40 RP-60 SC-5 SL-1 SL-11 SP-4 SP-11a TY-7","rules":"PV-06 873a10 07 76250d 09 5a34d6 14 6f6816 15 1c7999 RP-40 a30801 VA-30 5b42ae 31 2f0077 P-SC-7 65e105 P-LG-10 198e3b SF-42 0765d4 H13 36f579 L1 799b66 2 fecb99 3 901e56 6 6e19d8 10 d2ca35 CL-5 75480a DN-1 138103 1a 4fcc05 H1 ac8ff7 2 967612 4 464c24 5 66ed70 6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 11 bef034 INK-5 631a6d L5 4d48a8 OC4 00a5e1 14 18b2a5 PT-GDP-1 a0e2cc PT-REV-3 d5e0d9 SP-11a 9ce3fb AK-1 a0cc12 AX-4 2eb6c1 CL-40 2a6dbb DN-10 93c9b7 INK-1 0e2b59 LS-3 62bf3d P-7 aa3040 26 adce50 RD-07 e3e747 RL-13 b37a55 RM-27 55a15a RP-1 d529bd 32 097209 41 8ce5b8 SCC-01 8aa70b TY-11 78dd96 25 b0a223 VQ-8 6d0278","entries":"R%3AR-COMBINE-999 d97edd R%3AR-VALUE-999 cfa832 R%3AR-VALUE-N 88f27c R%3AR-IDENTIFY-N 0defa3 R%3AR-EXPAND-N e5da6a R%3AR-UNIT-N c3e080 R%3AR-PV10-BAND 33c12d R%3AR-TEN-N 976ddb R%3AR-TENTH-N f40712 R%3AR-TENSTORY-N 513568 D%3Aband%3D99 972948 D%3Aband%3D999 972948 D%3Aband%3D9999 972948 D%3Aband%3D99999 972948 D%3Aband%3D999999 972948 D%3AzeroPlace%3Dnone 972948 D%3AzeroPlace%3Dsome 972948 D%3AzeroPlace%3Dalways 972948 D%3Aorder%3Dlargest 972948 D%3Aorder%3Dscrambled 972948 D%3Acalculator%3Dtrue 972948 D%3Acalculator%3Dfalse 972948 D%3AskipAfter%3D* 972948 D%3Aframe%3Dboxes 972948 D%3Aframe%3Dline 972948 D%3Aform%3Dsum%40placevalue%3Aexpand 972948 D%3Aform%3Dnotation%40placevalue%3Aexpand 972948 D%3Aplaces%3D1 972948 D%3Aplaces%3D10 972948 D%3Aplaces%3D100 972948 D%3Aplaces%3D1000 972948 D%3Aplaces%3D10000 972948 D%3Aplaces%3D100000 972948 D%3Asupport%3Dchart 972948 D%3Asupport%3Dlabels 972948 D%3Asupport%3Dnone 972948 D%3Aresponse%3Dcircle 972948 D%3Aresponse%3Dbank 972948 D%3ArepeatDigit%3Dtrue 972948 D%3ArepeatDigit%3Dfalse 972948 D%3Aform%3Dvalue%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dunit%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dnotation%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dtimes%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3AzeroDigit%3Dtrue 972948 D%3AzeroDigit%3Dfalse 972948 D%3AtenDir%3Dtimes 972948 D%3AtenDir%3Dtenth 972948 D%3AtenDir%3Dboth 972948 D%3AtenValues%3Dtrue 972948 D%3AtenValues%3Dfalse 972948 D%3AtenPlain%3Dtrue 972948 D%3AtenPlain%3Dfalse 972948 D%3AtenWrite%3Dboth 972948 D%3AtenWrite%3Dtop 972948 D%3AtenTask%3Dcompare 972948 D%3AtenTask%3Dstory 972948 D%3AtenChoice%3Dtwo 972948 D%3AtenChoice%3Dfour 972948 D%3Aop%3Dx 972948 D%3Aop%3D%2F 972948 D%3Aop%3Dboth 972948 D%3Apower%3D10 972948 D%3Apower%3D100 972948 D%3Apower%3D1000 972948 D%3Aband%3D1000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D10000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D100000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D1000000%40placevalue%3Aplace_value_10x 972948 D%3Adecimals%3Dtrue 972948 D%3Adecimals%3Dfalse 972948 D%3Asupport%3Dshift%40placevalue%3Aplace_value_10x 972948 D%3Asupport%3Dnone%40placevalue%3Aplace_value_10x 972948 D%3Arename%3Dstandard 972948 D%3Arename%3Dmore 972948 D%3AwriteValue%3Dtrue%40placevalue%3Aidentify bcefeb D%3AwriteValue%3Dfalse%40placevalue%3Aidentify bcefeb D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 04b8b3 D%3Arole%3Alesson 972948 D%3Arole%3Afact-probe 04b8b3 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-bigboard 11baa8 D%3Ahost%3Amode-dark 11baa8"}
+{"card":"pv","kind":"family","template":"pv","families":["placevalue"],"match":{"templates":["pv","pv-support","pv-times"]},"config":"design/cards/pv/card.json","indexSha":"dcf21cd9b6ae2bb3ac5bdf1aa12e0fbfb8af3792","bodySha":"1c22d751c8e647f5","format":2,"configSha":"63b7ac6907d7"}
+{"cited":"AX-4 BD-7 BD-14 CL-5 DN-1 DN-1a H1 H2 H3 H4 H5 H6 H7 H8 H9 H10 H11 H12 H13 INK-5 L1 L3 L5 L6 L10 L11 OC4 OC8 OC14 OC15 PT-GDP-1 PT-MOD-1 PT-REV-1 PT-REV-3 PT-RSN-1 RP-10 RP-11 RP-30 RP-31 RP-40 RP-60 SC-5 SL-1 SL-11 SP-4 SP-11a TY-7 WRM-rule-17","rules":"PV-06 873a10 07 76250d 09 5a34d6 14 6f6816 15 1c7999 RP-40 a30801 VA-30 5b42ae 31 2f0077 P-SC-7 65e105 P-LG-10 198e3b SF-42 0765d4 H13 36f579 L1 799b66 2 fecb99 3 901e56 6 6e19d8 10 d2ca35 BD-14 c8d982 7 81d3da CL-5 75480a DN-1 138103 1a 4fcc05 H1 ac8ff7 10 fbd802 11 bef034 12 2de4f7 2 967612 3 fdfc5c 4 464c24 5 66ed70 6 0722fd 7 3d3d38 8 44c23b 9 fd82d1 INK-5 631a6d L11 9ebe19 5 4d48a8 OC14 18b2a5 15 0d5392 4 00a5e1 8 089b5e PT-GDP-1 a0e2cc PT-MOD-1 45072b PT-REV-1 441cc5 3 d5e0d9 PT-RSN-1 a94b1e RP-10 67d199 11 0e9c64 30 d1ff22 31 9101f1 60 89c323 SC-5 648376 SL-1 e3b064 11 183e7a SP-11a 9ce3fb 4 51a802 TY-7 e3e1e1 AK-1 a0cc12 AX-4 2eb6c1 CL-40 2a6dbb DN-10 93c9b7 INK-1 0e2b59 LS-3 62bf3d P-7 aa3040 26 adce50 RD-07 e3e747 RL-13 b37a55 RM-27 55a15a RP-1 d529bd 32 097209 41 8ce5b8 SCC-01 8aa70b TY-11 78dd96 25 b0a223 VQ-8 6d0278","entries":"R%3AR-COMBINE-999 d97edd R%3AR-VALUE-999 cfa832 R%3AR-VALUE-N 88f27c R%3AR-IDENTIFY-N 0defa3 R%3AR-EXPAND-N e5da6a R%3AR-UNIT-N c3e080 R%3AR-PV10-BAND 33c12d R%3AR-TEN-N 976ddb R%3AR-TENTH-N f40712 R%3AR-TENSTORY-N 513568 D%3Aband%3D99 972948 D%3Aband%3D999 972948 D%3Aband%3D9999 972948 D%3Aband%3D99999 972948 D%3Aband%3D999999 972948 D%3AzeroPlace%3Dnone 972948 D%3AzeroPlace%3Dsome 972948 D%3AzeroPlace%3Dalways 972948 D%3Aorder%3Dlargest 972948 D%3Aorder%3Dscrambled 972948 D%3Acalculator%3Dtrue 972948 D%3Acalculator%3Dfalse 972948 D%3AskipAfter%3D* 972948 D%3Aframe%3Dboxes 972948 D%3Aframe%3Dline 972948 D%3Aform%3Dsum%40placevalue%3Aexpand 972948 D%3Aform%3Dnotation%40placevalue%3Aexpand 972948 D%3Aplaces%3D1 972948 D%3Aplaces%3D10 972948 D%3Aplaces%3D100 972948 D%3Aplaces%3D1000 972948 D%3Aplaces%3D10000 972948 D%3Aplaces%3D100000 972948 D%3Asupport%3Dchart 972948 D%3Asupport%3Dlabels 972948 D%3Asupport%3Dnone 972948 D%3Aresponse%3Dcircle 972948 D%3Aresponse%3Dbank 972948 D%3ArepeatDigit%3Dtrue 972948 D%3ArepeatDigit%3Dfalse 972948 D%3Aform%3Dvalue%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dunit%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dnotation%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3Aform%3Dtimes%40placevalue%3Aone_tenth_value%2Cplacevalue%3Aten_times_story%2Cplacevalue%3Aten_times_value%2Cplacevalue%3Avalue 972948 D%3AzeroDigit%3Dtrue 972948 D%3AzeroDigit%3Dfalse 972948 D%3AtenDir%3Dtimes 972948 D%3AtenDir%3Dtenth 972948 D%3AtenDir%3Dboth 972948 D%3AtenValues%3Dtrue 972948 D%3AtenValues%3Dfalse 972948 D%3AtenPlain%3Dtrue 972948 D%3AtenPlain%3Dfalse 972948 D%3AtenWrite%3Dboth 972948 D%3AtenWrite%3Dtop 972948 D%3AtenTask%3Dcompare 972948 D%3AtenTask%3Dstory 972948 D%3AtenChoice%3Dtwo 972948 D%3AtenChoice%3Dfour 972948 D%3Aop%3Dx 972948 D%3Aop%3D%2F 972948 D%3Aop%3Dboth 972948 D%3Apower%3D10 972948 D%3Apower%3D100 972948 D%3Apower%3D1000 972948 D%3Aband%3D1000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D10000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D100000%40placevalue%3Aplace_value_10x 972948 D%3Aband%3D1000000%40placevalue%3Aplace_value_10x 972948 D%3Adecimals%3Dtrue 972948 D%3Adecimals%3Dfalse 972948 D%3Asupport%3Dshift%40placevalue%3Aplace_value_10x 972948 D%3Asupport%3Dnone%40placevalue%3Aplace_value_10x 972948 D%3Arename%3Dstandard 972948 D%3Arename%3Dmore 972948 D%3AwriteValue%3Dtrue%40placevalue%3Aidentify bcefeb D%3AwriteValue%3Dfalse%40placevalue%3Aidentify bcefeb D%3Acloseness%3Dfar%40placevalue%3Acompare 972948 D%3Acloseness%3Dclose%40placevalue%3Acompare 972948 D%3Acloseness%3Dsome%40placevalue%3Acompare 972948 D%3Alengths%3Dequal%40placevalue%3Acompare 972948 D%3Alengths%3Dmixed%40placevalue%3Acompare 972948 D%3Astep%3D1%40placevalue%3Amore_less_10 972948 D%3Astep%3D10%40placevalue%3Amore_less_10 972948 D%3Astep%3D0%40placevalue%3Amore_less_10 972948 D%3Astep%3D10%40placevalue%3Amore_less_100 972948 D%3Astep%3D100%40placevalue%3Amore_less_100 972948 D%3Astep%3D1000%40placevalue%3Amore_less_100 972948 D%3Astep%3D0%40placevalue%3Amore_less_100 972948 D%3Adir%3Dmore%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 972948 D%3Adir%3Dless%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 972948 D%3Adir%3Dboth%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 972948 D%3Aband%3D20%40placevalue%3Amore_less_10 972948 D%3Aband%3D50%40placevalue%3Amore_less_10 972948 D%3Aband%3D100%40placevalue%3Amore_less_10 972948 D%3Aband%3D120%40placevalue%3Amore_less_10 972948 D%3Asupport%3Dstrip%40placevalue%3Amore_less_10 972948 D%3Asupport%3Dchart%40placevalue%3Amore_less_10 972948 D%3Asupport%3Dline%40placevalue%3Amore_less_10 972948 D%3Asupport%3Dnone%40placevalue%3Amore_less_10 972948 D%3Asupport%3Dstrip%40placevalue%3Amore_less_100 972948 D%3Asupport%3Dline%40placevalue%3Amore_less_100 972948 D%3Asupport%3Dnone%40placevalue%3Amore_less_100 972948 D%3Aunknown%3Danswer%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 972948 D%3Aunknown%3Dstart%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 972948 D%3AnlOn%3Dtrue%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlOn%3Dfalse%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlFrom%3D*%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlTo%3D*%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D2%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D5%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D10%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D20%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D25%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D50%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D100%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1000%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3Dauto%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F2%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F3%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F4%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F5%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F6%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F8%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F10%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D1%2F12%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D0.1%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlStep%3D0.01%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3Dauto%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3Dall%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3D2%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3D5%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3D10%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3Dends%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlLabels%3Dnone%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3Dauto%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3D0%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3D2%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3D4%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3D5%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlMinor%3D10%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlHops%3Dtrue%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3AnlHops%3Dfalse%40placevalue%3Amore_less_10%2Cplacevalue%3Amore_less_100 d55128 D%3Awordform%3Dto_number%40composing%3Anumber_word_form 972948 D%3Awordform%3Dto_words%40composing%3Anumber_word_form 972948 D%3Aband%3D0%40composing%3Anumber_word_form 972948 D%3Aband%3D20%40composing%3Anumber_word_form 972948 D%3Aband%3D100%40composing%3Anumber_word_form 972948 D%3Aband%3D1000%40composing%3Anumber_word_form 972948 D%3AzeroPlace%3Dnone%40composing%3Anumber_word_form 972948 D%3AzeroPlace%3Dsome%40composing%3Anumber_word_form 972948 D%3AzeroPlace%3Dalways%40composing%3Anumber_word_form 972948 D%3AanswerSlot%3Dline%40composing%3Anumber_word_form 972948 D%3AanswerSlot%3Dhto%40composing%3Anumber_word_form 972948 D%3Arole%3Aindependent 972948 D%3Arole%3Amore-practice 972948 D%3Arole%3Aopener 972948 D%3Arole%3Ascripted-model 972948 D%3Arole%3Aguided 972948 D%3Arole%3Aerror-analysis 972948 D%3Arole%3Areview 972948 D%3Arole%3Atest 972948 D%3Arole%3Apre-skill-check 972948 D%3Arole%3Amixed-practice 972948 D%3Arole%3Atrue-false 972948 D%3Arole%3Areason-it 972948 D%3Arole%3Astretch 04b8b3 D%3Arole%3Alesson 972948 D%3Arole%3Afact-probe 04b8b3 D%3Arole%3Aword-problems 11baa8 D%3Arole%3Afact-rows 11baa8 D%3Ahost%3Apractice-card 972948 D%3Ahost%3Aonline-worksheet 972948 D%3Ahost%3Aquiz 972948 D%3Ahost%3Aboss 11baa8 D%3Ahost%3Arace 11baa8 D%3Ahost%3Amap 11baa8 D%3Ahost%3Amode-bigboard 11baa8 D%3Ahost%3Amode-dark 11baa8"}
 -->
 <!-- rulings
 {"v": 1, "card": "pv",
-"skills": ["placevalue:combine","placevalue:expand","placevalue:identify","placevalue:one_tenth_value","placevalue:place_value_10x","placevalue:ten_times_story","placevalue:ten_times_value","placevalue:unit_form","placevalue:value"],
+"skills": ["composing:number_word_form","placevalue:combine","placevalue:compare","placevalue:expand","placevalue:identify","placevalue:more_less_10","placevalue:more_less_100","placevalue:one_tenth_value","placevalue:place_value_10x","placevalue:ten_times_story","placevalue:ten_times_value","placevalue:unit_form","placevalue:value"],
 "rulings": [
  {"id":"R-COMBINE-999","source":"§7a band=999 (default)","skills":["placevalue:combine"],"assert":"range","of":"ans","min":101,"max":999},
  {"id":"R-VALUE-999","source":"§7a band=999 (default), zeroDigit=false","skills":["placevalue:value"],"read":"value","assert":"range","of":"ans","min":1,"max":900},
@@ -18,6 +18,13 @@
  {"id":"R-TENSTORY-N","source":"§7a ten-times presets: band=9999","skills":["placevalue:ten_times_story"],"read":"value","assert":"range","of":"n","min":1,"max":9999}
 ],
 "notOffered": [
+ {"id":"N-D-nlOn-1","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlOn","skills":["placevalue:more_less_10","placevalue:more_less_100"]},
+ {"id":"N-D-nlFrom-2","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlFrom","skills":["placevalue:more_less_10","placevalue:more_less_100"]},
+ {"id":"N-D-nlTo-3","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlTo","skills":["placevalue:more_less_10","placevalue:more_less_100"]},
+ {"id":"N-D-nlStep-4","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlStep","skills":["placevalue:more_less_10","placevalue:more_less_100"],"values":["1","2","5","10","20","25","50","100","1000","auto","1/2","1/3","1/4","1/5","1/6","1/8","1/10","1/12","0.1","0.01"]},
+ {"id":"N-D-nlLabels-5","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlLabels","skills":["placevalue:more_less_10","placevalue:more_less_100"],"values":["auto","all","2","5","10","ends","none"]},
+ {"id":"N-D-nlMinor-6","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlMinor","skills":["placevalue:more_less_10","placevalue:more_less_100"],"values":["auto","0","2","4","5","10"]},
+ {"id":"N-D-nlHops-7","source":"§7a (decision, PROPOSED: lf-placevalue 2026-11-12 (proposed))","option":"nlHops","skills":["placevalue:more_less_10","placevalue:more_less_100"]}
 ],
 "todo": [
  {"id":"T-5.1","source":"§5.1","text":"placevalue:identify: pupils also WRITE the value of the underlined digit on a line at t..."},
@@ -37,17 +44,18 @@ One numeral per boxed cell at digit size, the asked digit underlined (never high
 
 ## 1. What it teaches
 
-Reading and writing whole numbers in standard, expanded and unit form; naming the place and the value of a digit; and, from Grade 4, that a digit is worth ten times as much one place to the left and one tenth as much one place to the right. Grades 2-5 (CCSS 2.NBT.A.1, 2.NBT.A.3, 4.NBT.A.1, 4.NBT.A.2, 5.NBT.A.1; WRM Y3.B1, Y5.B1-B2, Y6.B2).
+Reading and writing whole numbers in standard, expanded and unit form; naming the place and the value of a digit; and, from Grade 4, that a digit is worth ten times as much one place to the left and one tenth as much one place to the right. Grades 2-5 (CCSS 2.NBT.A.1, 2.NBT.A.3, 4.NBT.A.1, 4.NBT.A.2, 5.NBT.A.1; WRM Y3.B1, Y5.B1-B2, Y6.B2); comparing two numbers with <, > and = (1.NBT.B.3, 2.NBT.A.4) and finding 1, 10 or 100 more or less (1.NBT.C.5, 2.NBT.B.8).
 
-**Skills on this family** (9; listed in card.json + 9 listed):
+**Skills on this family** (13; listed in card.json + 13 listed):
 
-- **placevalue** (9): `combine`, `expand`, `identify`, `one_tenth_value`, `place_value_10x`, `ten_times_story`, `ten_times_value`, `unit_form`, `value`
+- **composing** (1): `number_word_form`
+- **placevalue** (12): `combine`, `compare`, `expand`, `identify`, `more_less_10`, `more_less_100`, `one_tenth_value`, `place_value_10x`, `ten_times_story`, `ten_times_value`, `unit_form`, `value`
 
-**CCSS** (SKILL_STANDARDS of those skills): 2.NBT.A.1, 2.NBT.A.3, 4.NBT.A.1, 4.NBT.A.2, 5.NBT.A.1, 5.NBT.A.2
+**CCSS** (SKILL_STANDARDS of those skills): 1.NBT.B.3, 1.NBT.C.5, 2.NBT.A.1, 2.NBT.A.3, 2.NBT.A.4, 2.NBT.B.8, 4.NBT.A.1, 4.NBT.A.2, 5.NBT.A.1, 5.NBT.A.2, K.CC.C.7
 
-**Essential Elements:** M.EE.2.NBT.1, M.EE.2.NBT.3, M.EE.4.NBT.2, M.EE.5.NBT.1, M.EE.5.NBT.2
+**Essential Elements:** M.EE.1.NBT.3, M.EE.1.OA.5, M.EE.2.NBT.1, M.EE.2.NBT.3, M.EE.2.NBT.4, M.EE.4.NBT.2, M.EE.5.NBT.1, M.EE.5.NBT.2, M.EE.5.NBT.3
 
-**WRM small steps** (SKILL_WRM): Y1.B6 S5; Y1.B12 S3 (part); Y2.B1 S4 (part), S5 (part), S8 (part); Y3.B1 S1 (part), S2 (part), S6 (part), S8 (part); Y4.B1 S1 (part), S2 (part), S6 (part); Y4.B5 S3 (part), S4 (part), S5 (part), S6 (part); Y4.B8 S5 (part), S6 (part), S10 (part); Y5.B1 S2 (part), S6, S6 (part), S8, S8 (part); Y5.B3 S8 (part), S9 (part); Y5.B12 S10 (part), S11 (part); Y6.B1 S4; Y6.B8 S5 (part), S6 (part)
+**WRM small steps** (SKILL_WRM): R.B11.S2 (part); Y1.B1 S5 (part), S7 (part), S9 (part), S13 (part); Y1.B4 S7 (part), S11 (part); Y1.B6 S5, S8 (part); Y1.B12 S3 (part), S5 (part), S6 (part), S7 (part); Y2.B1 S4 (part), S5 (part), S6 (part), S8 (part), S13 (part); Y2.B2 S13 (part); Y3.B1 S1 (part), S2 (part), S6 (part), S8 (part), S9 (part), S12 (part); Y3.B2 S3 (part); Y4.B1 S1 (part), S2 (part), S6 (part), S8 (part), S11 (part); Y4.B5 S3 (part), S4 (part), S5 (part), S6 (part); Y4.B8 S5 (part), S6 (part), S10 (part); Y5.B1 S2 (part), S6, S6 (part), S7 (part), S8, S8 (part), S10 (part), S11 (part); Y5.B3 S8 (part), S9 (part); Y5.B12 S10 (part), S11 (part); Y6.B1 S4, S6 (part); Y6.B8 S5 (part), S6 (part)
 
 ## 2. Problem types and progression
 
@@ -59,6 +67,9 @@ Reading and writing whole numbers in standard, expanded and unit form; naming th
 - PV-06 expanded / standard form: write the expanded form with one blank per place, zero place kept (expand); combine the parts into a numeral (combine)
 - PV-07 unit form and renaming: '__ hundreds __ tens __ ones'; '34 tens = __' (unit_form)
 - PV-14 / PV-15 x10 / ÷10: the same digit one place apart, '700 is 10 times 70', 'one tenth of 700 is __' (place_value_10x and the ten-times presets)
+- PV-04 compare two numbers: write <, > or = in the circle between them; the first place that differs decides, a longer number is bigger (compare)
+- PV-05 1 / 10 / 100 more or less: write the number that is 1, 10 or 100 more or less, or the start it came from (more_less_10, more_less_100)
+- PV-03 number names: write the numeral for a number name ('three hundred five' -> 305), or the name for a numeral; the place boxes H T O keep a missing tens word's 0 (composing:number_word_form)
 
 **Progression** (one new thing per step, P-1)
 
@@ -66,6 +77,9 @@ Reading and writing whole numbers in standard, expanded and unit form; naming th
 2. a zero place dealt on purpose (405, 350): the zero is written, never dropped
 3. 4-digit and larger with the comma; the letters fade, the digit boxes stay
 4. ten times: the same digit one place left; then one tenth one place right; then 'how many times as many' (700 ÷ 70 = 10)
+5. compare: far apart, same length; then close (same first digit); then different lengths; '=' dealt one item in six
+6. 1 / 10 / 100 more or less: the answer missing, with a hundreds-chart strip or a number line; then no support; then the start missing; crossing a 9 or a 0 last
+7. number names: to 20, then to 100, then to 1,000; words to numeral first (lower writing load), numeral to words after; a missing tens / ones word (305, 340) dealt on purpose; H T O boxes before the bare line
 
 **Build-list entries on this template** (standards, ladder and full spec of each in `design/BUILD_LIST.md`)
 
@@ -104,7 +118,7 @@ Template `pv` — `js/modules/sheet/cells/pv.js`; also `pv-support` (`js/modules
 
 ## 4. Rules that apply
 
-From the rule-id index (`design/cards/rule-index.json`, sha `ddfb5451b2da`). An id written `ID@SRC` is defined in more than one standard.
+From the rule-id index (`design/cards/rule-index.json`, sha `dcf21cd9b6ae`). An id written `ID@SRC` is defined in more than one standard.
 
 ### 4a. Core rules — apply every one (6 rules; ✱ = quoted in full, the rest cut at a sentence)
 
@@ -117,41 +131,51 @@ From the rule-id index (`design/cards/rule-index.json`, sha `ddfb5451b2da`). An 
 - **PV-15** (PROB) Shift digits on a chart (x / ÷ 10, 100, 1,000) — 5 — RL-06 chart with shift arrows + one sentence frame — cells 2x2 — digit-grid, frame — `place_value_10x`
 - **RP-40** (WDS) Heavy 1.5 pt outline, 0.75 pt interior, 2-9 columns. Heads row in words when columns are 14 mm or wider, otherwise letters (VA-30). The thousands comma is pre-printed on the column boundary. A decimal chart prints the point on its boundary at working digit size.
 
-### 4b. Also applies — ids only (48 rules)
+### 4b. Also applies — ids only (69 rules)
 
 Each id's full text is in `design/cards/rule-index.json` (look it up by id) and in the standard it names; open it when the rule is in play. Grouped by the heading that defines them:
 
+- WDS · 1.1 Scope — `SC-5`
+- WDS · 3.1 Family — `TY-7`
 - WDS · 3.2 Size table — `TY-11`
 - WDS · 3.3 em and track tables — `TY-25`
 - WDS · 4.1 Ink — `INK-1` `INK-5`
 - WDS · 5. Line-style and corner semantics — `LS-3`
+- WDS · 6.1 Blank width function — `SL-1` `SL-11`
 - WDS · 7.1 Cell construction — `CL-5`
 - WDS · 7.4 Keep-out and label options — `CL-40`
+- WDS · 9.1 Bands — `BD-7`
+- WDS · 9.2 Instruction line — `BD-14`
 - WDS · 10.4 Place-value heads — `VA-30` `VA-31`
 - WDS · 11.1 Rules for every drawing — `RP-1`
-- WDS · 11.5 Base-10 blocks — `RP-32`
+- WDS · 11.3 Ten frame — `RP-10` `RP-11`
+- WDS · 11.5 Base-10 blocks — `RP-30` `RP-31` `RP-32`
 - WDS · 11.6 Place-value chart — `RP-41`
+- WDS · 11.8 Number bond and part-whole — `RP-60`
 - WDS · 12.1 Ceilings by page role — `DN-1` `DN-1a`
 - WDS · 12.2 The column x size rule — `DN-10`
 - WDS · 13.4 Think box and other helper … — `SF-42`
 - WDS · 14. Answer key = facsimile — `AK-1`
+- WDS · 15.1 What must match — `SP-4`
 - WDS · 15.2 What may differ — `SP-11a`
 - WDS · 16. Accessibility — `AX-4`
 - WDS · 18. Visual quality bar — `VQ-8`
-- PED · 4.2 The fixed fade order for hints — `H1@PED` `H2@PED` `H4@PED` `H5@PED`
+- PED · 4.2 The fixed fade order for hints — `H1@PED` `H2@PED` `H3@PED` `H4@PED` `H5@PED`
 - PED · 4.3 Scaffold levels 3 to 0 — `P-SC-7`
 - PED · 10.3 Vocabulary — `P-LG-10`
 - PED · Application, review, assessment — `P-26`
 - PED · Sequencing — `P-7`
+- PAGE · 2.2 Scripted Model page — `PT-MOD-1`
 - PAGE · 2.3 Guided page — `PT-GDP-1`
-- PAGE · 2.8 Review — `PT-REV-3`
+- PAGE · 2.8 Review — `PT-REV-1` `PT-REV-3`
+- PAGE · 6.2 Reason It — `PT-RSN-1`
 - SCC · 0.4 Module map and layers — `SCC-01`
 - PROB · 1.3 Rounding and estimation — `RD-07`
 - PROB · 2.2 Mode table — `RM-27`
 - PROB · 3.2 Library entries — `RL-13`
-- RUBRIC · 4. Hard caps — `H1@RUBRIC` `H2@RUBRIC` `H4@RUBRIC` `H5@RUBRIC` `H6` `H7` `H8` `H9` `H11` `H13`
-- ORUBRIC · 3. Hard caps — `OC4` `OC14`
-- LL · The recurring failure classes — `L1` `L2` `L3` `L5` `L6` `L10`
+- RUBRIC · 4. Hard caps — `H1@RUBRIC` `H2@RUBRIC` `H3@RUBRIC` `H4@RUBRIC` `H5@RUBRIC` `H6` `H7` `H8` `H9` `H10` `H11` `H12` `H13`
+- ORUBRIC · 3. Hard caps — `OC4` `OC8` `OC14` `OC15`
+- LL · The recurring failure classes — `L1` `L2` `L3` `L5` `L6` `L10` `L11`
 
 ## 5. Owner rulings
 
@@ -168,6 +192,11 @@ For answer keys, `wrongAnswer`, error analysis, True or False? and Reason It (P-
 - **M3** combines parts by writing the digits side by side — e.g. 300 + 5 = 3005
 - **M4** counts places from the left — e.g. the 4 in 4,215 is in the ones place
 - **M5** ten times moves the digit the wrong way — e.g. 10 times 70 is 7
+- **M6** compares the last digits, or the first digits of numbers of different lengths — e.g. 89 > 312 because 8 > 3
+- **M7** reads the sign backwards (the open side faces the smaller number) — e.g. 45 < 38
+- **M8** changes the wrong place for 10 or 100 more / less — e.g. 10 more than 347 is 348
+- **M9** does not regroup across a 9 or a 0 — e.g. 10 more than 396 is 3,106; 10 less than 305 is 395 done as 3,05
+- **M10** writes the number as it sounds, one chunk per word — e.g. three hundred five -> 3005 or 35
 - From the build list (entries hosted on placevalue): misses a zero; groups digits wrongly; the sign points to the bigger number; compares ones before tens; adds zeros to decimals (3.4 × 10 = 3.40); shifts the wrong way; only standard partitions; partitions into digits (45 = 4 + 5); 10³ = 30; moves the point the wrong way when dividing; changes the wrong digit; forgets the carry into millions; IIII for 4; XL = 60; CM = 1,100; MD = 500; the value is the digit; answers "one more place" instead of ×10
 
 ## 7. Options and presets
@@ -208,6 +237,26 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 - `support=shift | none` — **offered** (PROPOSED) on `place_value_10x` — place_value_10x: the shift chart (hint, fades) (skill-options.js)
 - `rename=standard | more` — **offered** (PROPOSED) — unit_form: standard unit form, then more than 9 of one place (34 tens) (skill-options.js)
 - `writeValue=true | false` — **offered** on `identify` — identify: also write the value of the underlined digit on a line under the ring row (default on) (owner ruling 2026-10-10 (card §5.1); built after critic r1 F4)
+- `closeness=far | close | some` — **offered** (PROPOSED) on `compare` — compare: far apart, then close (same first digit), both by default (skill-options.js)
+- `lengths=equal | mixed` — **offered** (PROPOSED) on `compare` — compare: same digit count, then different counts (more digits is bigger) (skill-options.js)
+- `step=1 | 10 | 0` — **offered** (PROPOSED) on `more_less_10` — more_less_10: 1, 10, or both (0) (skill-options.js)
+- `step=10 | 100 | 1000 | 0` — **offered** (PROPOSED) on `more_less_100` — more_less_100: 10, 100, 1,000 (4.NBT, to 10,000), or both 10 and 100 (0) (skill-options.js)
+- `dir=more | less | both` — **offered** (PROPOSED) on `more_less_10`, `more_less_100` — more / less: one direction, then both alternating (skill-options.js)
+- `band=20 | 50 | 100 | 120` — **offered** (PROPOSED) on `more_less_10` — more_less_10: numbers to 20, 50, 100, 120 (skill-options.js)
+- `support=strip | chart | line | none` — **offered** (PROPOSED) on `more_less_10` — more_less_10: hundreds-chart strip, chart rows, number line, then none (the fade) (skill-options.js)
+- `support=strip | line | none` — **offered** (PROPOSED) on `more_less_100` — more_less_100: hundreds-chart strip, number line, then none (the fade) (skill-options.js)
+- `unknown=answer | start` — **offered** (PROPOSED) on `more_less_10`, `more_less_100` — more / less: the answer missing, then the start (the inverse) (skill-options.js)
+- `nlOn=true | false` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — the page number line duplicates the skill's own support (support=line draws the jumps in the cell); one number line, never two (lf-placevalue 2026-11-12 (proposed))
+- `nlFrom=*` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `nlTo=*` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `nlStep=1 | 2 | 5 | 10 | 20 | 25 | 50 | 100 | 1000 | auto | 1/2 | 1/3 | 1/4 | 1/5 | 1/6 | 1/8 | 1/10 | 1/12 | 0.1 | 0.01` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `nlLabels=auto | all | 2 | 5 | 10 | ends | none` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `nlMinor=auto | 0 | 2 | 4 | 5 | 10` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `nlHops=true | false` — **hidden** (PROPOSED) on `more_less_10`, `more_less_100` — a sub-control of the page number line (nlOn) (lf-placevalue 2026-11-12 (proposed))
+- `wordform=to_number | to_words` — **offered** (PROPOSED) on `number_word_form` — words to numeral (default, lower writing load), then numeral to words (spelling too); both alternate (skill-options.js)
+- `band=0 | 20 | 100 | 1000` — **offered** (PROPOSED) on `number_word_form` — numbers to 20, 100, 1,000 (0 = the Max Number setting, saved codes) (skill-options.js)
+- `zeroPlace=none | some | always` — **offered** (PROPOSED) on `number_word_form` — a missing tens / ones word (305, 340), dealt on purpose (skill-options.js)
+- `answerSlot=line | hto` — **offered** (PROPOSED) on `number_word_form` — the numeral on a line, or in H T O boxes (one digit a box: the 0 is not dropped) (skill-options.js)
 
 **Page roles (buildSheet)**
 
@@ -244,7 +293,7 @@ What the critic grades and the panel may show. Each live line in §7b needs one 
 
 Each runs as `node tests/scripts/<script> …`.
 
-- `ws-precritic.cjs --skill placevalue:identify,placevalue:value,placevalue:expand,placevalue:combine,placevalue:unit_form,placevalue:place_value_10x --strict`
+- `ws-precritic.cjs --skill placevalue:identify,placevalue:value,placevalue:expand,placevalue:combine,placevalue:unit_form,placevalue:place_value_10x,placevalue:compare,placevalue:more_less_10,placevalue:more_less_100 --strict`
 - `ws-spec-card.mjs --check-signed design/cards/pv/pv.md` — build-start gate
 - `ws-content-audit.cjs --category placevalue`
 - `ws-visual-quality.mjs --skill <each>`
@@ -255,28 +304,41 @@ Each runs as `node tests/scripts/<script> …`.
 2. **identify writeValue (owner 2026-10-10): is the write-the-value line still wanted on identify, given value is its own skill?** Recommended: Yes, default on, as ruled; it is the bridge from place to value.
 3. **Does this card also cover the decimals place value builds (thousandths_pv, pv10_exponents), or do they get a decimals card?** Recommended: This card covers them: the same pv cell with a decimal point track; a decimals card only for x / ÷ of decimals by decimals (5.NBT.B.7).
 
-Signed: owner, 2026-11-08
+Signed: owner, 2026-11-12
 
 <!-- informational: not signed. Not hashed, not compared, never read by any check. -->
 ## 7b. What the repo offers today (informational, not signed)
 
 Listed from the repo at generation. The decisions are signed in §7a; `--check-signed` re-derives this listing from the repo and FAILS on any line without a decision (`[UNDECIDED]`). Not part of the signed card.
 
-**Option values (offeredOptionsFor)** (65 lines; 0 undecided)
+**Option values (offeredOptionsFor)** (130 lines; 0 undecided)
 
-- `band=99` Numbers to [difficulty] (combine, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
-- `band=999` Numbers to [difficulty], default on combine, expand, identify, unit_form, value (combine, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
-- `band=9999` Numbers to [difficulty], default on one_tenth_value, ten_times_story, ten_times_value (combine, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
-- `band=99999` Numbers to [difficulty] (combine, expand, identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
-- `band=999999` Numbers to [difficulty] (combine, expand, identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
-- `zeroPlace=none` A zero place (305, 340) [difficulty] (combine, expand) [offered, PROPOSED]
-- `zeroPlace=some` A zero place (305, 340) [difficulty], default (combine, expand) [offered, PROPOSED]
-- `zeroPlace=always` A zero place (305, 340) [difficulty] (combine, expand) [offered, PROPOSED]
+- `wordform=to_number` Which way round [difficulty], default (number_word_form) [offered, PROPOSED]
+- `wordform=to_words` Which way round [difficulty] (number_word_form) [offered, PROPOSED]
+- `band=0` Numbers to [difficulty], default (number_word_form) [offered, PROPOSED]
+- `band=20` Numbers to [difficulty] (number_word_form, more_less_10) [offered, PROPOSED]
+- `band=100` Numbers to [difficulty], default on more_less_10 (number_word_form, more_less_10) [offered, PROPOSED]
+- `band=1000` Numbers to [difficulty] (number_word_form, place_value_10x) [offered, PROPOSED]
+- `zeroPlace=none` A zero place (305, 340) [difficulty], default on number_word_form (number_word_form, combine, expand) [offered, PROPOSED]
+- `zeroPlace=some` A zero place (305, 340) [difficulty], default on combine, expand (number_word_form, combine, expand) [offered, PROPOSED]
+- `zeroPlace=always` A zero place (305, 340) [difficulty] (number_word_form, combine, expand) [offered, PROPOSED]
+- `answerSlot=line` Write the number [support], default (number_word_form) [offered, PROPOSED]
+- `answerSlot=hto` Write the number [support] (number_word_form) [offered, PROPOSED]
+- `calculator=true` Calculator [play] (all 13) [offered, PROPOSED]
+- `calculator=false` Calculator [play], default (all 13) [offered, PROPOSED]
+- `skipAfter=*` Skip appears after [play] (all 13) [offered, PROPOSED]
+- `band=99` Numbers to [difficulty] (combine, compare, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
+- `band=999` Numbers to [difficulty], default on combine, compare, expand, identify, unit_form, value (combine, compare, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
+- `band=9999` Numbers to [difficulty], default on one_tenth_value, ten_times_story, ten_times_value (combine, compare, expand, identify, one_tenth_value, ten_times_story, ten_times_value, unit_form, value) [offered, PROPOSED]
+- `band=99999` Numbers to [difficulty] (combine, compare, expand, identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
+- `band=999999` Numbers to [difficulty] (combine, compare, expand, identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
 - `order=largest` Order of the parts [difficulty], default (combine) [offered, PROPOSED]
 - `order=scrambled` Order of the parts [difficulty] (combine) [offered, PROPOSED]
-- `calculator=true` Calculator [play] (all 9) [offered, PROPOSED]
-- `calculator=false` Calculator [play], default (all 9) [offered, PROPOSED]
-- `skipAfter=*` Skip appears after [play] (all 9) [offered, PROPOSED]
+- `closeness=far` How close the numbers are [difficulty] (compare) [offered, PROPOSED]
+- `closeness=close` How close the numbers are [difficulty] (compare) [offered, PROPOSED]
+- `closeness=some` How close the numbers are [difficulty], default (compare) [offered, PROPOSED]
+- `lengths=equal` Digit counts [difficulty], default (compare) [offered, PROPOSED]
+- `lengths=mixed` Digit counts [difficulty] (compare) [offered, PROPOSED]
 - `frame=boxes` Answer frame [support], default (expand) [offered, PROPOSED]
 - `frame=line` Answer frame [support] (expand) [offered, PROPOSED]
 - `form=sum` How the parts are written [layout], default (expand) [offered, PROPOSED]
@@ -287,15 +349,68 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `places=1000` Which place is asked [difficulty], default (identify) [offered, PROPOSED]
 - `places=10000` Which place is asked [difficulty], default (identify) [offered, PROPOSED]
 - `places=100000` Which place is asked [difficulty], default (identify) [offered, PROPOSED]
-- `support=chart` Place-value support [support] (identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
+- `support=chart` Place-value support [support] (identify, more_less_10, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
 - `support=labels` Place-value support [support], default (identify, one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
-- `support=none` Place-value support [support] (identify, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, value) [offered, PROPOSED]
+- `support=none` Place-value support [support], default on more_less_10, more_less_100 (identify, more_less_10, more_less_100, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, value) [offered, PROPOSED]
 - `response=circle` How the pupil answers [layout], default (identify) [offered, PROPOSED]
 - `response=bank` How the pupil answers [layout] (identify) [offered, PROPOSED]
 - `repeatDigit=true` A repeated digit (747: which 7?) [difficulty] (identify) [offered, PROPOSED]
 - `repeatDigit=false` A repeated digit (747: which 7?) [difficulty], default (identify) [offered, PROPOSED]
 - `writeValue=true` Also write the value of the underlined digit [layout], default (identify) [offered]
 - `writeValue=false` Also write the value of the underlined digit [layout] (identify) [offered]
+- `step=1` How much more or less [difficulty] (more_less_10) [offered, PROPOSED]
+- `step=10` How much more or less [difficulty] (more_less_10, more_less_100) [offered, PROPOSED]
+- `step=0` How much more or less [difficulty], default (more_less_10, more_less_100) [offered, PROPOSED]
+- `dir=more` More or less [difficulty] (more_less_10, more_less_100) [offered, PROPOSED]
+- `dir=less` More or less [difficulty] (more_less_10, more_less_100) [offered, PROPOSED]
+- `dir=both` More or less [difficulty], default (more_less_10, more_less_100) [offered, PROPOSED]
+- `band=50` Numbers to [difficulty] (more_less_10) [offered, PROPOSED]
+- `band=120` Numbers to [difficulty] (more_less_10) [offered, PROPOSED]
+- `support=strip` Support [support] (more_less_10, more_less_100) [offered, PROPOSED]
+- `support=line` Support [support] (more_less_10, more_less_100) [offered, PROPOSED]
+- `unknown=answer` What is missing [difficulty], default (more_less_10, more_less_100) [offered, PROPOSED]
+- `unknown=start` What is missing [difficulty] (more_less_10, more_less_100) [offered, PROPOSED]
+- `nlOn=true` Show the number line [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlOn=false` Show the number line [nline], default (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlFrom=*` Starts at [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlTo=*` Ends at [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=2` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=5` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=10` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=20` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=25` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=50` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=100` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1000` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=auto` Step between ticks [nline], default (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/2` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/3` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/4` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/5` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/6` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/8` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/10` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=1/12` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=0.1` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlStep=0.01` Step between ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=auto` Numbers under the ticks [nline], default (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=all` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=2` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=5` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=10` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=ends` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlLabels=none` Numbers under the ticks [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=auto` Small ticks between [nline], default (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=0` Small ticks between [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=2` Small ticks between [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=4` Small ticks between [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=5` Small ticks between [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlMinor=10` Small ticks between [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlHops=true` Hop arrows over each step [nline] (more_less_10, more_less_100) [hidden, PROPOSED]
+- `nlHops=false` Hop arrows over each step [nline], default (more_less_10, more_less_100) [hidden, PROPOSED]
+- `step=100` How much more or less [difficulty] (more_less_100) [offered, PROPOSED]
+- `step=1000` How much more or less [difficulty] (more_less_100) [offered, PROPOSED]
 - `form=value` How the value is written [layout], default on value (one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
 - `form=unit` How the value is written [layout] (one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
 - `form=times` How the value is written [layout], default on one_tenth_value, ten_times_story, ten_times_value (one_tenth_value, ten_times_story, ten_times_value, value) [offered, PROPOSED]
@@ -320,7 +435,6 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `power=10` By [difficulty], default (place_value_10x) [offered, PROPOSED]
 - `power=100` By [difficulty], default (place_value_10x) [offered, PROPOSED]
 - `power=1000` By [difficulty], default (place_value_10x) [offered, PROPOSED]
-- `band=1000` Numbers to [difficulty] (place_value_10x) [offered, PROPOSED]
 - `band=10000` Numbers to [difficulty] (place_value_10x) [offered, PROPOSED]
 - `band=100000` Numbers to [difficulty], default (place_value_10x) [offered, PROPOSED]
 - `band=1000000` Numbers to [difficulty] (place_value_10x) [offered, PROPOSED]
@@ -332,44 +446,51 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 
 **Page roles (buildSheet)** (17 lines; 0 undecided)
 
-- `role:independent` — the skill's own items (all 9) [offered, PROPOSED]
-- `role:more-practice` — the skill's own items (all 9) [offered, PROPOSED]
-- `role:opener` (also lesson-opener) — the skill's own items (all 9) [offered, PROPOSED]
-- `role:scripted-model` (also model) — provider workedSteps: real 9/9 (all 9) [offered, PROPOSED]
-- `role:guided` — provider workedSteps: real 9/9 (all 9) [offered, PROPOSED]
-- `role:error-analysis` (also check-it) — provider wrongAnswer: real 9/9; provider misconceptions: real 9/9 (all 9) [offered, PROPOSED]
-- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 9) [offered, PROPOSED]
-- `role:test` (also test-a, test-b) — the skill's own items (all 9) [offered, PROPOSED]
-- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 9) [offered, PROPOSED]
-- `role:word-problems` — provider stories: real 0/9 (default on combine, expand, identify, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 9) [out of scope, PROPOSED]
-- `role:fact-rows` — provider stories: real 0/9 (default on combine, expand, identify, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 9) [out of scope, PROPOSED]
-- `role:fact-probe` — the skill's own items (all 9) [out of scope]
-- `role:mixed-practice` (also mixed) — provider stories: real 0/9 (default on combine, expand, identify, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 9) [offered, PROPOSED]
-- `role:true-false` — provider wrongAnswer: real 9/9 (all 9) [offered, PROPOSED]
-- `role:reason-it` (also reason) — provider workedSteps: real 9/9; provider wrongAnswer: real 9/9 (all 9) [offered, PROPOSED]
-- `role:stretch` — the skill's own items (all 9) [out of scope]
-- `role:lesson` — lesson data: prereqs.js 5/9 (FALLBACK, warm-up from the earlier skills in data.js order, on one_tenth_value, place_value_10x, ten_times_story, ten_times_value); provider stories: real 0/9 (default on combine, expand, identify, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 9) [offered, PROPOSED]
+- `role:independent` — the skill's own items (all 13) [offered, PROPOSED]
+- `role:more-practice` — the skill's own items (all 13) [offered, PROPOSED]
+- `role:opener` (also lesson-opener) — the skill's own items (all 13) [offered, PROPOSED]
+- `role:scripted-model` (also model) — provider workedSteps: real 13/13 (all 13) [offered, PROPOSED]
+- `role:guided` — provider workedSteps: real 13/13 (all 13) [offered, PROPOSED]
+- `role:error-analysis` (also check-it) — provider wrongAnswer: real 13/13; provider misconceptions: real 13/13 (all 13) [offered, PROPOSED]
+- `role:review` — earlier skills: data.js order (print-sheet.js earlierSkills) (all 13) [offered, PROPOSED]
+- `role:test` (also test-a, test-b) — the skill's own items (all 13) [offered, PROPOSED]
+- `role:pre-skill-check` (also pre-skill) — earlier skills: data.js order (print-sheet.js earlierSkills) (all 13) [offered, PROPOSED]
+- `role:word-problems` — provider stories: real 0/13 (default on number_word_form, combine, compare, expand, identify, more_less_10, more_less_100, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 13) [out of scope, PROPOSED]
+- `role:fact-rows` — provider stories: real 0/13 (default on number_word_form, combine, compare, expand, identify, more_less_10, more_less_100, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 13) [out of scope, PROPOSED]
+- `role:fact-probe` — the skill's own items (all 13) [out of scope]
+- `role:mixed-practice` (also mixed) — provider stories: real 0/13 (default on number_word_form, combine, compare, expand, identify, more_less_10, more_less_100, one_tenth_value, place_value_10x, ten_times_story, ten_times_value, unit_form, value) (all 13) [offered, PROPOSED]
+- `role:true-false` — provider wrongAnswer: real 13/13 (all 13) [offered, PROPOSED]
+- `role:reason-it` (also reason) — provider workedSteps: real 13/13; provider wrongAnswer: real 13/13 (all 13) [offered, PROPOSED]
+- `role:stretch` — the skill's own items (all 13) [out of scope]
+- `role:lesson` — lesson data: prereqs.js 5/13 (FALLBACK, warm-up from the earlier skills in data.js order, on number_word_form, compare, more_less_10, more_less_100, one_tenth_value, place_value_10x, ten_times_story, ten_times_value) (all 13) [offered, PROPOSED]
 
 **Screen hosts** (8 lines; 0 undecided)
 
-- `host:boss` — driven by ws-chromebook-fit (all 9) [out of scope, PROPOSED]
-- `host:map` — driven by ws-screen-slots (all 9) [out of scope, PROPOSED]
-- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 9) [out of scope, PROPOSED]
-- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 9) [out of scope, PROPOSED]
-- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 9) [offered, PROPOSED]
-- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 9) [offered, PROPOSED]
-- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 9) [offered, PROPOSED]
-- `host:race` — driven by ws-chromebook-fit (all 9) [out of scope, PROPOSED]
+- `host:boss` — driven by ws-chromebook-fit (all 13) [out of scope, PROPOSED]
+- `host:map` — driven by ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:mode-bigboard` — driven by ws-chromebook-fit, ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:mode-dark` — driven by ws-chromebook-fit, ws-screen-slots (all 13) [out of scope, PROPOSED]
+- `host:online-worksheet` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered, PROPOSED]
+- `host:practice-card` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered, PROPOSED]
+- `host:quiz` — driven by ws-chromebook-fit, ws-envelope, ws-screen-answer, ws-screen-slots, ws-support-ladder (all 13) [offered, PROPOSED]
+- `host:race` — driven by ws-chromebook-fit (all 13) [out of scope, PROPOSED]
 
 **Options declared today** (`js/modules/skill-options.js`; id, label, values, skills that declare it):
 
-- `band` Numbers to: 99 / 999 / 9999 / 99999 / 999999 (6)
+- `band` Numbers to: 0 / 20 / 100 / 1000 (9)
+- `support` Support: strip / chart / line / none (3)
+- `zeroPlace` A zero place (305, 340): none / some / always (3)
+- `dir` More or less: more / less / both (2)
+- `step` How much more or less: 1 / 10 / 0 (2)
 - `support` Place-value support: chart / labels / none (2)
-- `zeroPlace` A zero place (305, 340): none / some / always (2)
+- `unknown` What is missing: answer / start (2)
+- `answerSlot` Write the number: line / hto (1)
+- `closeness` How close the numbers are: far / close / some (1)
 - `decimals` Decimals (grade 5): free (1)
 - `form` How the parts are written: sum / notation (1)
 - `form` How the value is written: value / unit / notation / times (1)
 - `frame` Answer frame: boxes / line (1)
+- `lengths` Digit counts: equal / mixed (1)
 - `op` Multiply or divide: x / / / both (1)
 - `order` Order of the parts: largest / scrambled (1)
 - `places` Which place is asked: 1 / 10 / 100 / 1000 / 10000 / 100000 (1)
@@ -377,15 +498,15 @@ Listed from the repo at generation. The decisions are signed in §7a; `--check-s
 - `rename` More than 9 of one place: standard / more (1)
 - `repeatDigit` A repeated digit (747: which 7?): free (1)
 - `response` How the pupil answers: circle / bank (1)
-- `support` Support: shift / none (1)
 - `tenChoice` Ten times: words to choose from: two / four (1)
 - `tenDir` Ten times: which way: times / tenth / both (1)
 - `tenPlain` Ten times: the digit and zeros only (700 and 70): free (1)
 - `tenTask` Ten times: the task: compare / story (1)
 - `tenValues` Ten times: write both values first: free (1)
 - `tenWrite` Ten times: values written: both / top (1)
+- `wordform` Which way round: to_number / to_words (1)
 - `writeValue` Also write the value of the underlined digit: free (1)
 - `zeroDigit` Ask the value of a 0: free (1)
 
-**Preset skills on these hosts** (`js/modules/skill-presets.js`): `placevalue:digit_value_notation` → `placevalue:value` {"form":"notation"}; `placevalue:digit_value_unit_form` → `placevalue:value` {"form":"unit"}; `placevalue:expanded_notation` → `placevalue:expand` {"form":"notation"}; `placevalue:one_tenth_value` → `placevalue:value` {"form":"times","band":9999,"tenDir":"tenth"}; `placevalue:ten_times_story` → `placevalue:value` {"form":"times","band":9999,"tenTask":"story"}; `placevalue:ten_times_value` → `placevalue:value` {"form":"times","band":9999}
+**Preset skills on these hosts** (`js/modules/skill-presets.js`): `composing:write_numbers_in_words` → `composing:number_word_form` {"wordform":["to_words"]}; `placevalue:digit_value_notation` → `placevalue:value` {"form":"notation"}; `placevalue:digit_value_unit_form` → `placevalue:value` {"form":"unit"}; `placevalue:expanded_notation` → `placevalue:expand` {"form":"notation"}; `placevalue:one_tenth_value` → `placevalue:value` {"form":"times","band":9999,"tenDir":"tenth"}; `placevalue:ten_times_story` → `placevalue:value` {"form":"times","band":9999,"tenTask":"story"}; `placevalue:ten_times_value` → `placevalue:value` {"form":"times","band":9999}
 <!-- /informational -->

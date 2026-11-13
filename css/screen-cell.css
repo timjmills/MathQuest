@@ -1861,6 +1861,9 @@ html.dark body .online-edition .problem-card.mq-wscard.mq-active-problem .mq-wsb
 /* CL-4b (owner ruling 2026-10-23), additive: the online worksheet's fitted cell starts at the top of
    the box; a write-above cell (regroup stack, division bracket) stays centred. */
 .online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell:not(:has([data-ws-writeabove])) { justify-content: flex-start; }
+/* CL-4b as amended (owner, 2026-11-12), additive: a fitted cell that its row stretches by 30 % or more of its own height
+   (worksheet.js _wsEvenRows sets data-mq-stretched) is centred, so the stretch never leaves a >= 30 % band under the ink. */
+.online-edition .problems-grid.mq-wsgrid.mq-wsfit > .problem-card.mq-wscard > .mq-wspaper > .ws-cell.mq-scell[data-mq-stretched]:not(:has([data-ws-writeabove])) { justify-content: center; }
 
 /* Critic s3-stack r1 S1: a 6-digit stack (7 tracks, its comma track) is 348 px of 48 px tracks and ran
    past a 346 px card at 390. On a phone the tracks of a 7+-track stack are 46 px (the boxes keep
@@ -1897,3 +1900,206 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 /* the library's sentence frame: the sign is written IN A CIRCLE on screen as on paper (the slot
    rule above squares every input's corners) */
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
+
+/* lf-checks eb-r4 D1 (lead ruling 2026-11-13, (b)): a kit LINE slot taken by the host's input. Its DRAWN box is the digit
+   height (1.15em) and the underline under it; the 48 px touch target stays, as transparent padding around the drawn box,
+   pulled out of the layout by an equal negative margin, so no blank box shows above the digits. The underline is a
+   background strip on the drawn box's foot; every fill (white, the yellow next-box glow, the green / red checks) is clipped
+   to the drawn box, and every ring is an outline set back by the padding onto it. ADDITIVE: the 1128 rule stays. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    --mq-tp: calc((max(48px, 1.15em) - 1.15em) / 2);
+    box-sizing: border-box !important; height: max(48px, 1.15em) !important;
+    padding: var(--mq-tp) calc(0.15em + var(--mq-tp)) !important;
+    margin: calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0px - var(--mq-tp)) calc(0.2em - var(--mq-tp)) !important;
+    width: calc(var(--mq-n, 3) * 0.62em + 0.9em + 2 * var(--mq-tp)) !important;
+    min-width: calc(max(64px, 2.4em) + 2 * var(--mq-tp)) !important; max-width: none !important;
+    border-width: 0 !important;
+    background-image: linear-gradient(#000, #000) !important; background-size: 100% 2px !important;
+    background-position: 0 100% !important; background-repeat: no-repeat !important;
+    background-origin: content-box !important; background-clip: content-box !important;
+    box-shadow: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):is(:focus, .mq-active-box) {
+    box-shadow: none !important; outline: 3px solid #f2c200 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .online-edition .problem-card.mq-wscard .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle):focus {
+    outline: 3px solid #5E3FCC !important; outline-offset: calc(2px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-correct {
+    box-shadow: none !important; outline: 3px solid var(--mq-box-ok) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: linear-gradient(var(--mq-box-ok), var(--mq-box-ok)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot.mq-live-wrong {
+    box-shadow: none !important; outline: 3px dashed var(--mq-box-bad) !important; outline-offset: calc(0px - var(--mq-tp) - 3px) !important;
+    background-image: none !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-correct, .flash-correct, [style*="var(--correct)"], [style*="var(--accent-green)"]) {
+    box-shadow: none !important; outline: 2px solid #2E7D5B !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-wrong, .flash-wrong, [style*="var(--incorrect)"], [style*="var(--accent-red)"]) {
+    box-shadow: none !important; outline: 2px solid #B73838 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
+}
+
+/* lf-checks critic eb-r5 D2 (legibility): the kit LINE slot's focus ring (3 px, at up to 2 px offset beyond the drawn box)
+   must keep >= 4 px from the word beside it. The negative side margins above pulled the next word ("tens") under the ring
+   (0 px). Each side margin now leaves ring + offset + 4 px (9 px) beyond the drawn box. ADDITIVE: the rule above stays;
+   ws-screen-answer FOCUS-GAP is the check. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    margin-left: calc(max(0.2em, 9px) - var(--mq-tp)) !important;
+    margin-right: calc(9px - var(--mq-tp)) !important;
+}
+
+/* FOCUS-GAP (lf-checks 2026-11-13, critic eb-r5 D2 extended by --focus-gap-all): a focused answer box's ring keeps >= 4 px
+   from the word beside it on every host. Additive.
+   (1) On the online worksheet the host rule `.online-edition .problem-card.mq-wscard .mq-scell input:focus` (offset 1 px)
+       outranked the in-box cell-slot rule (offset -4 px), so a boxed cell slot drew its ring 3 px OUTSIDE its box, onto the
+       next word (arrays_groups -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px). The cell slot keeps its
+       inset ring on every host.
+   (2) The inline-blanks box (input.ib-cell, its own border, 6 px side margin) drew its ring 4 px outside: 2 px from the
+       word. The box itself thickens in ink, as the stack digits and cell slots do. */
+html body .online-edition .problem-card.mq-wscard .mq-scell [data-mq-cell] > input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard .mq-scell .mq-multchart input.mq-cellslot:focus { outline-offset: -4px !important; }
+html body .online-edition .problem-card.mq-wscard .mq-scell input.ib-cell:focus,
+html body .mq-scell input.ib-cell:focus { outline-offset: -3px !important; }
+
+/* Vocabulary feedback (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). Additive, scoped to the vocabulary
+   cells. Before the answer nothing changes: the picture's halo (vocab-pictures.js) is drawn hidden. Once a host judges
+   the answer, screen-cell.js markVocabFeedback adds .mq-vfb: the focal part's thick halo shows, the right word glows
+   yellow, and a wrong answer's explanation sits under the cell. */
+.mq-vfb svg.mq-vpic .mq-vhalo { visibility: visible; color: #ffd400 !important; }
+.mq-vfb svg.mq-vpic .mq-vhalo * { stroke-width: 10px; }
+.mq-vfb .mq-vglow { background: #fff27a !important; border-radius: 8px; box-shadow: 0 0 0 4px #fff27a, 0 0 14px 6px rgba(255, 212, 0, 0.75); }
+.mq-vfb button.mq-vglow { background: #fff27a !important; border-color: #000 !important; }
+.mq-vexplain { margin: 12px 0 0; padding: 10px 14px; border: 2px solid #000; border-left: 10px solid #ffd400; border-radius: 10px;
+    background: #fff; color: #000; font-family: 'Andika', 'Open Sans', sans-serif; font-size: 20px; line-height: 1.35; text-align: left; }
+.mq-vexplain p { margin: 0; }
+.mq-vexplain p + p { margin-top: 6px; }
+
+/* ---- O-1 (owner, 2026-11-10; lane lf-vocab r8): the NEXT answer box is a thick BLUE outline that pulses gently, on a
+   white fill, on the practice card, the online worksheet and the quiz (every skill). Yellow now means only "right"
+   (R-1, the vocabulary feedback). ONE SWITCH: the --mq-next-* properties below. ADDITIVE: the 2026-10-02 / 2026-10-04
+   rules above stay; these later rules of equal or higher specificity repaint them through the switch.
+   GOING BACK TO YELLOW IS ONE LINE, in index.html:   <html lang="en" class="mq-next-yellow">
+   (the html.mq-next-yellow block restores the 2026-10-04 colours: ring #f2c200, fill #fff3a0 -> #ffe14d, card #fffbe0).
+   A wrong box keeps its red (R4-3, restated after); prefers-reduced-motion keeps a static outline. Screen only. */
+:root {
+    --mq-next-color: #1565d8;                    /* the ring */
+    --mq-next-glow: rgba(21, 101, 216, 0.30);    /* the pulsing inner ring */
+    --mq-next-w: 4px;                            /* the ring's width */
+    --mq-next-fill-a: #fff; --mq-next-fill-b: #fff;   /* the box's fill (white: the pulse is the ring only) */
+    --mq-next-card: #f3f7fe;                     /* the current worksheet problem's card */
+}
+html.mq-next-yellow {
+    --mq-next-color: #f2c200; --mq-next-glow: rgba(242, 194, 0, 0.45); --mq-next-w: 3px;
+    --mq-next-fill-a: #fff3a0; --mq-next-fill-b: #ffe14d; --mq-next-card: #fffbe0;
+}
+@keyframes mq-next-switch-pulse {
+    0%, 100% { --mq-next-ring: 4px; --mq-next-fill: var(--mq-next-fill-a); }
+    50%      { --mq-next-ring: 10px; --mq-next-fill: var(--mq-next-fill-b); }
+}
+@keyframes mq-next-switch-card {
+    0%, 100% { box-shadow: 0 0 0 3px var(--mq-next-color); }
+    50%      { box-shadow: 0 0 0 3px var(--mq-next-color), 0 0 0 8px var(--mq-next-glow); }
+}
+html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+html body .mq-active-box,
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus),
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: inset 0 0 0 var(--mq-next-w) var(--mq-next-color), inset 0 0 0 var(--mq-next-ring) var(--mq-next-glow) !important;
+    animation: mq-next-switch-pulse 1.4s ease-in-out infinite !important;
+}
+html body .online-edition .problem-card.mq-wscard.mq-active-problem input:focus,
+html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within {
+    background-color: var(--mq-next-fill) !important;
+}
+html body .online-edition .problem-card.mq-wscard.mq-active-problem {
+    background-color: var(--mq-next-card);
+    box-shadow: 0 0 0 3px var(--mq-next-color);
+    animation: mq-next-switch-card 1.6s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #gameView #questionCard #questionPaper input.mq-slot:focus,
+    html body #gameView #questionCard #questionPaper input.mq-cellslot:focus,
+    html body #gameView #questionCard #questionPaper [data-mq-cell]:focus-within,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-slot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem input.mq-cellslot:focus,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem [data-mq-cell]:focus-within,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-slot:focus,
+    html body .qt-question-card .ws-cell.mq-scell input.mq-cellslot:focus,
+    html body .qt-question-card .ws-cell.mq-scell [data-mq-cell]:focus-within,
+    html body .mq-active-box,
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell:focus),
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box,
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem {
+        animation: none !important; --mq-next-ring: var(--mq-next-w); --mq-next-fill: var(--mq-next-fill-a);
+    }
+}
+/* R4-3 restated after the switch: a box judged wrong or missing keeps its red, with no ring and no pulse */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-active-box.mq-active-box.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit),
+html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box:is(.mq-live-wrong, .mq-wd-empty, .mq-wrong-digit)) {
+    animation: none !important;
+    box-shadow: none !important;
+    background-color: var(--mq-box-bad-bg, #FDE7E4) !important;
+    border-color: var(--mq-box-bad, #B3261E) !important;
+}
+@media print {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView) .mq-active-box.mq-active-box.mq-active-box,
+    html body .mq-scell .mq-cellbox:has(> input.ib-cell.mq-active-box),
+    html body .online-edition .problem-card.mq-wscard.mq-active-problem { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
+}
+
+/* lf-vocab r8 (critic r6 #1-#5), additive. Match 3 wrong: only the pictures of the wrongly matched words glow (.mq-vpic-on),
+   each letter beside its glow lit; a pick3 wrong word's line carries the slot's wrong outline; the vocabulary "Here is how"
+   sits inside the explanation, and the support ladder's own worked box and "Not yet" line hide while it shows. */
+.mq-vfb.mq-vfb-some svg.mq-vpic .mq-vhalo { visibility: hidden; }
+.mq-vfb.mq-vfb-some .mq-vm-pic.mq-vpic-on svg.mq-vpic .mq-vhalo { visibility: visible; }
+.mq-vfb .mq-vm-let.mq-vglow-let { background: #fff27a !important; border-radius: 50%; padding: 0.12em 0.3em;
+    box-shadow: 0 0 0 4px #fff27a, 0 0 12px 5px rgba(255, 212, 0, 0.75); }
+.mq-vfb .mq-vp-line.box-wrong { border-bottom-color: #B73838 !important; box-shadow: 0 0 0 2px #B73838 !important; border-radius: 2px; }
+.mq-vexplained .mq-ladder-worked, .mq-vexplained .mq-ladder-msg, .mq-vexplained .mq-ladder-extra { display: none !important; }
+.mq-vexplain .mq-vhow { margin-top: 8px; padding-top: 6px; border-top: 1px solid #949494; }
+.mq-vexplain .mq-vhow-title { font-weight: 700; }
+.mq-vexplain .mq-vhow ol { margin: 2px 0 0 24px; padding: 0; }
+
+/* lf-vocab r9 (lead default for critic r7 note 2, owner may overrule): 1 picture, 3 words takes its answer on the LINE (the
+   tapped word lands there), so the line is its next answer box: before an answer it carries the O-1 next outline through the
+   same switch (--mq-next-*); the word pills stay plain. After a tap (a pill pressed) or once judged (.mq-vfb) it has none -
+   a wrong word's line keeps its red outline. Screen hosts only; additive. ws-next-box NB7. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView .problem-card.mq-active-problem, #quizTakeView .qt-question-card) .mq-vp:not(.mq-vfb):not(:has(button[data-mq-choice][aria-pressed="true"])) .mq-vp-line {
+    background-color: var(--mq-next-fill) !important;
+    box-shadow: inset 0 0 0 var(--mq-next-w) var(--mq-next-color), inset 0 0 0 var(--mq-next-ring) var(--mq-next-glow) !important;
+    border-radius: 2px;
+    animation: mq-next-switch-pulse 1.4s ease-in-out infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body :is(#gameView #questionCard #questionPaper, #worksheetView .problem-card.mq-active-problem, #quizTakeView .qt-question-card) .mq-vp:not(.mq-vfb):not(:has(button[data-mq-choice][aria-pressed="true"])) .mq-vp-line {
+        animation: none !important; --mq-next-ring: var(--mq-next-w); --mq-next-fill: var(--mq-next-fill-a);
+    }
+}
+@media print {
+    html body .mq-vp .mq-vp-line { animation: none !important; box-shadow: none !important; background-color: transparent !important; }
+}
+
+/* lf-vocab r10 (critic r9 #1): a picture-vocabulary letter box judged wrong keeps its red dashed edge when it is focused - the
+   host's black / purple focus outline never covers it - and its box carries no next ring or pulse (the box's :focus-within).
+   Screen hosts only; additive. ws-next-box NB8. */
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-vm .mq-vm-box > input.mq-live-wrong.mq-live-wrong:is(:focus, :focus-visible) {
+    outline: 3px dashed var(--mq-box-bad) !important; outline-offset: -3px !important; box-shadow: none !important;
+}
+html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-vm .mq-vm-box.mq-vm-box:has(> input.mq-live-wrong) {
+    box-shadow: none !important; animation: none !important;
+}
+/* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
+html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong, html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus,
+html body input.mq-vp-line.mq-live-wrong.mq-live-wrong.mq-live-wrong.mq-live-wrong:focus { caret-color: transparent !important; }

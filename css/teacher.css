@@ -1038,3 +1038,10 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 /* (N1) a label a drawing sets past its own edge ("minutes" left of a double number line) is drawn whole in the sample, never
    clipped to "inutes"; the stage pads out to it (skill-options-ui _sampleOverhang). */
 .tv-sko-frame .tvp-stage svg { overflow: visible; }
+/* Preview page tabs at phone width (lane lf-partopts, critic A r3 R4): more pages made the one-row segmented strip wider
+   than the screen, so the whole Print page scrolled sideways (10 px on master, 31 px with a 42-problem Mixed). The tabs
+   wrap inside their own box instead; additive, phone only. */
+@media (max-width: 640px) {
+    #tvPageTabs { display: flex; flex-wrap: wrap; align-content: flex-start; }
+    #tvPageTabs > button { flex: 1 1 auto; min-width: 0; }
+}

@@ -1,0 +1,9 @@
+{
+  "about": "ws-backtest --self-test only: a row whose check sleeps (must report TIMEOUT under --timeout 2, its tree killed) and one that finishes at once (must PASS).",
+  "rows": [
+    {"id": "sleeper", "kind": "fixture", "check": "a check that hangs", "fail": {"fixture": "tests/fixtures/precritic/backtest-selftest.json"}, "pass": {"fixture": "tests/fixtures/precritic/backtest-selftest.json"},
+     "command": "echo selftest tail line 1; echo selftest tail line 2; echo selftest tail line 3; bash -c 'exec -a ws-backtest-selftest-sleeper sleep 60' & sleep 60; echo sleeper: OK"},
+    {"id": "instant", "kind": "fixture", "check": "a check that answers at once", "fail": {"fixture": "FAIL"}, "pass": {"fixture": "OK"},
+     "command": "echo \"instant: $(basename {fixture})\""}
+  ]
+}

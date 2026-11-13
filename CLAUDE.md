@@ -552,6 +552,22 @@ Extensive SVG generation functions across 5 modules:
 
 Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC). Working figure: **1 % ≈ $28 of session `cost_usd`**, so 80 % ≈ $2,240 a week. Before starting lanes, sum `cost_usd` of the sessions since the reset and check the remaining budget; stop new work at 80 %. Benchmarks and the week's running total: `design/IMPROVEMENT_PLAN.md` "Usage budget". **Every spend figure told to the owner is also given as a % of the weekly limit** (owner, 2026-10-30; $28 ≈ 1 %).
 
+## Fastest-implementation plan (owner, 2026-11-13) — `design/plans/FASTEST_PLAN_2026-11-13.md`
+
+1. **Build by school unit.** Work follows `design/lessons-first/QUEUE.md` rounds (round 1 = GK-Y1.B1, G1-Y2.B1, G2-Y3.B1,
+   G3-Y4.B4, G4-Y5.B3, G5-Y6.B1). No lane starts a skill outside the current round; a unit ships when all its skills pass.
+2. **Copy-light review.** The first skill on a template gets the full critic. Every later skill on an already-passed template
+   gets the machine gates plus a NARROW critic on its own content (answers, ladder, words, options) on a sample of pages.
+3. **Batch critics:** 3–6 same-template skills per critic run.
+4. **Round cap 2:** the same defect class failing two rounds → stop, root-cause, machine check, then one more round.
+5. **Deploy train** twice a day (11:00 and 19:00 UTC): the lead merges every passed lane in one gate run.
+6. **Six lanes**, cut by template family within the round.
+7. **Screens: print, computer / Chromebook (1280–1366 px) and tablet (820–1024 px). No phone width (390 px)**: gates,
+   critic briefs and RUBRIC hosts drop 390; answer boxes keep 48 px touch targets for tablets.
+8. **Long (atomised) lessons stay paused**; shared-tool work only when a skill in the current round is blocked on it.
+
+9. **Two print sizes: M and L (owner, 2026-11-13). Size S is dropped**: no new S work, gates / critic briefs / pins drop S;
+   an S setting or share code falls back to M (codes must still decode); skills already passed stay passed.
 ## Agents — model and effort (owner rule, 2026-10-02, latest revision)
 
 - **Builders and fixers** run on **Opus 5.5 at LOW effort** (profile `mq-opus-low`, `model: "opus"`).
@@ -561,7 +577,10 @@ Use at most **80 % of the weekly usage limit** (window resets Thursday 22:00 UTC
 - **Critics / auditors / reviewers** run on **Opus 5.5 at MEDIUM effort** (profile `mq-opus-medium`, `model: "opus"`).
 - Explorers and small one-off checks: Opus low.
 
-Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling; never higher). If the same
+- **Lesson design runs at HIGH (owner, 2026-11-13):** the builders and fixers of the lesson design work (lf-engine lesson pages and
+  checks, lf-partopts lesson part settings) use `mq-opus-high`. Their critics stay at medium; every other lane stays at medium.
+
+Otherwise escalate a builder only when a problem persists: Opus low → Opus medium (the ceiling for every lane except lesson design, which runs at high; never higher without the owner). If the same
 defect survives two rounds at medium, stop the loop: find the root cause, make it a machine check, and re-brief a fresh builder (§1.7).
 
 How to call them:

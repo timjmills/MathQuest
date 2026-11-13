@@ -186,6 +186,17 @@ const SCREENS = ['home', 'sets', 'print', 'run', 'quizzes', 'settings', 'progres
     if (pop.jargon) fail('the popover still uses developer wording');
     if (pop.purple) fail('the popover still uses the purple accent');
   }
+  // SAMPLE-VISIBLE (teacher-preview F8, lf-roles 2026-11-13): after both fit passes (~0.9 s, ~0.95 s) the sample's stage still
+  // sits inside its frame - a second transform once re-centred a cropped stage off the frame and the sample went blank
+  await sleep(1300);
+  const vis = await page.evaluate(() => {
+    const f = document.querySelector('#skillOptionsPopover .tv-sko-frame'), st = f && f.querySelector('.tvp-stage');
+    if (!f || !st) return null;
+    const a = f.getBoundingClientRect(), b = st.getBoundingClientRect();
+    const ix = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)), iy = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+    return { share: b.width * b.height > 0 ? (ix * iy) / Math.min(b.width * b.height, a.width * a.height) : 0 };
+  });
+  if (vis && vis.share < 0.5) fail(`the options popover's sample is out of its frame after the fit passes (${Math.round(vis.share * 100)} % inside; teacher-preview F8)`);
   // A change re-draws the sample with the new choice.
   const after = await page.evaluate(async () => {
     const el = document.getElementById('skillOptionsPopover');

@@ -1,0 +1,8 @@
+<!doctype html>
+<!-- ws-fonts backtest fixture (fonts-late): Andika is declared, but no text uses it until 1 s after load and the probe
+     serves its woff2 files 2.5 s late, so a one-shot document.fonts.check after networkidle0 + fonts.ready reads false. -->
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="/css/fonts/andika.css">
+<style>body{font-family:sans-serif} .a{font-family:"Andika"} .b{font-family:"Andika";font-weight:700}</style></head>
+<body><p>Waiting for the sheet.</p><div id="late"></div>
+<script>setTimeout(function(){document.getElementById('late').innerHTML='<p class="a">3 + 4 = 7</p><p class="b">Add</p>';},1000);</script>
+</body></html>

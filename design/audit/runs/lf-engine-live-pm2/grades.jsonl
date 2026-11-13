@@ -1,0 +1,14 @@
+{"page":"div_facts p3 Practice","size":"S","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"answer line moved to cell foot ('under' look, matches L Practice); one problem per cell reads; key facsimile"}
+{"page":"div_facts p4 Mixed","size":"S","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"eq cells 19-22 centred; div rows inline compact; ~10% page foot"}
+{"page":"div_facts p3 Practice","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"equal"}
+{"page":"div_facts p4 Mixed","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"eq cells 13-14 centred; Mixed div cells take the under look at L but inline at S (minor cross-size inconsistency)"}
+{"page":"sub_wp_10 p4 Mixed","size":"S","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"story cells centred; equation frames of cells 1/2 offset ~3 mm (4-line vs 3-line story), was ~6 mm"}
+{"page":"add_wp_20 p4 Mixed","size":"S","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better"}
+{"page":"add_wp_20 p4 Mixed","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"equal"}
+{"page":"fact_family_sort p4 Mixed","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better"}
+{"page":"fact_family_sort p5 Mixed cont.","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"was 72% blank, now ~13% foot"}
+{"page":"sub_100_regroup p4 Mixed KEY","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"equal"}
+{"page":"nearest_10 p5 Mixed","size":"L","c1":8,"c2":8,"c3":8,"c4":8,"min":8,"vs_before":"better","note":"T heads clear the tab; rounding row fills the cell width"}
+{"page":"nearest_10 lesson sheet p2","size":"L","c1":8,"c2":8,"c3":6,"c4":7,"min":6,"vs_before":"equal","note":"unchanged: page ends at 62% height, ~35% blank foot"}
+{"page":"nearest_10 lesson sheet p3","size":"L","c1":8,"c2":8,"c3":5,"c4":6,"min":5,"vs_before":"worse","note":"new row 10-12: number tab covers the T heading entirely; rows 4-9 tab touches T; ~27% blank foot while rows are squeezed"}
+{"page":"add_wp_10 p? Mixed","size":"L","c1":null,"c2":null,"c3":null,"c4":null,"min":null,"vs_before":"ungraded","note":"no PNG committed; not rendered (budget)"}

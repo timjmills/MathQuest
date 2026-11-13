@@ -10,6 +10,7 @@
 //                                                                        # checks-field (D12), parts-plugin (D18),
 //                                                                        # chart-sizing (lesson 7 D1)
 //   MQ_ROOT=<checkout> node tests/scripts/ws-lesson-unit.mjs --only ... # run them on another tree (ws-backtest commit-pair)
+//   node tests/scripts/ws-lesson-unit.mjs --only chant-box               # a chant naming boxes holds for every dealt item (nwf r1 N6)
 // The engine checks also run in the full gate.
 import fs from 'fs';
 import path from 'path';
@@ -34,6 +35,39 @@ const PRE = await imp('js/modules/lessons/prereqs.js');
 const BL = await imp('js/modules/build-list.js');
 const DET = await imp('js/modules/lessons/detailed/index.js');
 const LATE = {
+    // (lf-placevalue critic nwf r1 N6: "Three boxes, three digits." was printed over 2-digit items with no boxes, and over "one
+    // thousand" in four. A routine's chant that names boxes must hold for every item its lessons deal: a chant naming a count
+    // ("Three boxes") - every item has that many boxes; any chant about boxes - every item has boxes. Judged on the deal a
+    // skill-keyed lesson prints: the practice options when the lesson sets `dealPracticeOpts`, else the skill's defaults too.
+    // Items: generateQuestionFor, seeded, 60 a deal; boxes: the kit cell rendered blank, its data-ws-shape="box" slots.)
+    async 'chant-box'() {
+        const { loadApp } = await import(pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), 'ws-card-rulings.mjs')).href);
+        const app = await loadApp(ROOT);
+        const KIT = await imp('js/modules/sheet/index.js');
+        const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
+        for (const [id, l] of Object.entries(LIB.LESSONS)) {
+            const r = LIB.ROUTINES[l.routine];
+            const chant = String((r && r.chant) || '');
+            if (!/\bbox(es)?\b/i.test(chant) || !l.practice) continue;
+            const m = chant.match(/\b(one|two|three|four|five|six)\s+box(es)?\b/i);
+            const want = m ? NUM[m[1].toLowerCase()] : null;
+            const [category, skill] = String(l.practice.skill).split(':');
+            const deals = [l.practice.opts || null].concat(l.dealPracticeOpts || !l.practice.opts ? [] : [null]);
+            for (const opts of deals) {
+                const bad = [];
+                for (let i = 0; i < 60; i++) {
+                    const sv = {}; for (const k of ['log', 'warn', 'info', 'debug']) { sv[k] = console[k]; console[k] = () => {}; }
+                    let q = null;
+                    try { q = app.gq.generateQuestionFor(Object.assign({ category, skill, seed: 7001 + i, itemIndex: i, itemCount: 60 }, opts ? { opts } : {})); } catch (e) { q = null; } finally { Object.assign(console, sv); }
+                    if (!q || !q.cell) { bad.push(`item ${i}: no kit cell`); continue; }
+                    let html = ''; try { html = KIT.renderCell(q, KIT.resolveCtx({ mode: 'print', size: 'M', look: 'ican', state: 'blank' })); } catch (e) { html = ''; }
+                    const boxes = (html.match(/data-ws-shape="box"/g) || []).length;
+                    if (want !== null ? boxes !== want : boxes === 0) bad.push(`item ${i} (${q.ans}): ${boxes} box(es)`);
+                }
+                ok(!bad.length, `chant-box: lesson ${id} chant "${chant}" ${want !== null ? `names ${want} boxes` : 'names boxes'}, but the ${opts ? 'practice-option' : 'default'} deal has ${bad.slice(0, 3).join('; ')}${bad.length > 3 ? ` (+${bad.length - 3})` : ''}`);
+            }
+        }
+    },
     // (P1d r3, lesson 3a critic: {p4.last} counted a Practice k a PAGE - "Practice 3" for Practice 1's second page. A
     // practiceSheets sheet over two pages is ONE unit whose last row is on its last page; a plan without `sheet`, one a page)
     async 'practice-units'() {

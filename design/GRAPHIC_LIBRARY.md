@@ -54,3 +54,55 @@ for each relation:
 | one-step + / − story within 20 | `sentenceFrame` (+ `answerArea`, the plural unit printed), `partWholeBar` on the teaching pages and as the practice pages' bar option |
 | a scored number with a unit | `answerArea` |
 | compare, equal groups, place value, fractions, measure, time | the re-exported drawings above; comparison bar and groups bar are still to be added |
+
+## Vocabulary pictures (lane lf-vocab, 2026-11-07; design/cards/vocabulary/vocabulary.md)
+
+One shared set (owner 2026-10-25): the same drawing of a word serves the lesson's vocabulary page (lesson part
+`vocab-page`) and the vocabulary practice (`vocab-match3`, `vocab-pick3`). `js/modules/sheet/graphics/vocab-pictures.js`:
+`vocabPictureSVG(ctx, word, {wMm})`, `vocabPictureAlt(word)`, `hasVocabPicture(word)`, `VOCAB_PICTURE_IDS`. Each picture is
+drawn once on a 60 x 40 canvas and scaled to the width the cell gives it; strokes are non-scaling (named mark 1.5 pt, parts
+1 pt, fine 0.75 pt); black on white, no grey; text >= 5.8 canvas units; a picture never prints its own word. Words whose
+pictures could be read as each other are never offered together (`notWith`, `sheet/lesson-pages/vocab-words.js`).
+
+Sizes in use: 38 / 40 / 40 mm (Match 3 at S / M / L); 80 / 40 / 34 mm (1 picture, 3 words, grades K-1 / 2-3 / 4-5; x 0.88 at
+S, x 0.94 at M). Library range 34-82 mm. Critic evidence: pending (lf-vocab critic r1).
+
+| id (word) | What it shows (the heavy mark is the word's part) | Lesson sets |
+|---|---|---|
+| `even` | six dots in three ringed pairs | G3 table patterns |
+| `odd` | three ringed pairs and one dot alone, heavy ring | G3 table patterns |
+| `product` | 4 × 3 = 12, the 12 boxed | G3 (4 sets), G4 units digit, times as many |
+| `factor` | 4 × 3 = 12, the 4 and 3 boxed | G3 input-output, properties; G4 times as many |
+| `row` / `column` | a times table, one row / one column outlined | G3 table patterns |
+| `multiple` | number line 0-12, hops of 3 landing on 3, 6, 9, 12 | G3 table patterns; G4 units digit |
+| `input` / `output` | In / Out table, the In / Out column outlined | G3 input-output |
+| `rule` | 2 → [+ 3] → 5, the rule boxed | G3 input-output; G4 shape patterns, follow a rule |
+| `pattern` | 2, 4, 6, 8 … with +2 hops | G3 input-output; G4 shape patterns |
+| `array` | three rows of four dots | G3 properties |
+| `commutative` | 2 × 3 array turned to 3 × 2, "2 × 3 = 3 × 2" | G3 properties |
+| `identity` | five rings of one dot, "5 × 1 = 5" | G3 properties |
+| `distributive` | 3 × 7 dots split 5 + 2 by a heavy line, "3 × 5 + 3 × 2" | G3 properties |
+| `step` | box ① → box ② with work lines | G3 two-step problems |
+| `total` | bar 5 + 3 under a whole bar marked ? | G3 two-step problems |
+| `left` | seven circles, three crossed out | G3 two-step problems |
+| `equal groups` | three rings of four dots | G3 two-step problems |
+| `unknown` | 8 + [?] = 13 | G3 two-step problems; G4 times as many |
+| `count on` | track 112-115 with forward hops | G1 count to 120 |
+| `one more` / `one less` | 4 dots → 5 dots (new one ringed) / six dots, one crossed out | G1 count to 120 |
+| `before` / `after` | track 104 105 106, hop back to 104 / on to 106 (boxed) | G1 count to 120 |
+| `hundred chart` | 101-104 over 111-114 | G1 count to 120 |
+| `hundred` / `ten` / `one` | a 10 × 10 flat / a rod of ten / one unit square | G2 read and write to 1,000 |
+| `digit` | one large 7 | G2 read and write to 1,000 |
+| `expanded form` / `number name` | 300 + 40 + 7 / "three hundred forty-seven" | G2 read and write to 1,000 |
+| `ones digit` | 473, the 3 boxed | G4 units digit, follow a rule |
+| `repeat` | 2 4 8 6 2 4 8 6, each four bracketed | G4 units digit, follow a rule |
+| `sequence` | 5, 10, 15, 20, … | G4 units digit, shape patterns, follow a rule |
+| `cycle` | 2 → 4 → 8 → 6 round a ring of arrows | G4 units digit |
+| `grow` | figures of 1, 3, 5 squares | G4 shape patterns |
+| `term` / `first term` | 4, [7], 10 / [3], 7, 11, 15 | G4 shape patterns, follow a rule |
+| `times as many` | a one-part bar and a three-part bar, ×3 | G4 times as many |
+| `compare` | a long bar over a short bar, the difference arrowed | G4 times as many |
+| `equation` | 12 = 3 × 4 | G4 times as many, remainder |
+| `remainder` | three rings of four and one dot in a heavy ring | G4 remainder |
+| `quotient` / `divisor` / `dividend` | 13 ÷ 4 = [3] R 1 / 13 ÷ [4] / [13] ÷ 4 | G4 remainder |
+| `round up` | three full boxes of four and a fourth box with one | G4 remainder |

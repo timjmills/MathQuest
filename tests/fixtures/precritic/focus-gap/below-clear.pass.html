@@ -1,0 +1,7 @@
+<!-- ws-screen-answer --focus-gap-html fixture (lf-checks 2026-11-13). The pass side of below-1px.fail.html: the same word with its ink 10 px under the ring. Must pass. The script sets the word's top margin so its GLYPH INK starts 10 px under the focus ring (ring = border box + 2 px offset + 3 px outline), whatever the font metrics. -->
+<!doctype html><html><head><meta charset="utf-8"><style>input.mq-slot{width:60px;height:40px;border:2px solid #000;font:24px sans-serif;margin:0;display:block}input.mq-slot:focus{outline:3px solid #1a73e8;outline-offset:2px}</style></head>
+<body style="margin:0;background:#fff"><div class="c" style="padding:40px"><input class="mq-slot"><div id="w" style="font:24px sans-serif;white-space:pre-line">tens</div></div>
+<script>(function () { var w = document.getElementById('w'), g = document.createElement('canvas').getContext('2d'); g.font = '24px sans-serif';
+var first = w.textContent.split('\n')[0], m = g.measureText(first), r = document.createRange(); r.selectNodeContents(w.firstChild);
+var lead = r.getClientRects()[0].top - w.getBoundingClientRect().top, top = m.fontBoundingBoxAscent - m.actualBoundingBoxAscent;
+w.style.marginTop = Math.round(5 + 10 - lead - top) + 'px'; })();</script></body></html>

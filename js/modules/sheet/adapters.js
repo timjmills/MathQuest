@@ -179,7 +179,11 @@ function stamp(key, ctx) {
     const wrongValue = ctx.state === 'wrong' && ctx.wrong && ctx.wrong.value !== undefined ? String(ctx.wrong.value) : '';
     if (ctx.state !== 'wrong' && shown === '') return '';
     const digits = Math.max(4, shown.length, wrongValue.length);
-    const slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, key);
+    let slot = blank({ id: 'answer', kind: 'text', shape: 'line', digits, graded: true, order: 0, scopes: ['full', 'answer-only'] }, ctx, key);
+    // a joined answer ("77, 68, 59, 50") sized the line past the cell and off the sheet (278 mm on a Pre-skill Check, lf-roles):
+    // a line for more than 12 characters (a joined list, a sentence) keeps to its cell - it wraps under "Answer:"; every
+    // shorter line prints exactly as before
+    if (digits > 12) slot = slot.replace('style="--w:', 'style="max-width:100%;--w:');
     return `<div class="ws-legacy-answer" data-ws-stamp="1"><span class="ws-zone">Answer:</span> ${slot}</div>`;
 }
 
