@@ -29,6 +29,7 @@ import './figures.js';
 // wave 1 lane D r4: titles of skills without a family provider (strings.iCan only).
 import './titles.js';
 import './patterns.js';
+import './vocabulary.js';
 
 export { storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor } from './stories.js';
 export { columnAdd, lineSteps } from './addition.js';

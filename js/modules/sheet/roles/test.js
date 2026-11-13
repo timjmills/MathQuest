@@ -19,6 +19,7 @@ import {
 } from './compose.js';
 import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
+import { scorePoints } from '../paginate.js';
 
 export const ROLE_ID = 'test';
 const CEILING = { S: 20, M: 16, L: 12 };
@@ -245,7 +246,7 @@ function planSplit(input, sp, items) {
     const hsW = wideHs.map(grow);
     const sum = (a) => Math.round(a.reduce((x, y) => x + y, 0) * 100) / 100;
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
-    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: all.length });
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(all) });
     const labels = labelStyleOf(ctx.look, input.labels);
     const gN = gridPart(nar.map((it) => planItem(it, { cols: sp.cols, level: 0 })), { cols: sp.cols, rows: rowsN, labels, start: 1 });
     gN.rowsTpl = hsN.map((x) => `${x}fr`).join(' ');
@@ -258,7 +259,7 @@ function planSplit(input, sp, items) {
     const fits = Object.assign({}, sp.Ln, { cols: sp.cols, rows: rowsN + wid.length, perPage: all.length, count: all.length, split: true, line });
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
-        meta: { items: all.length, scoreOutOf: all.length, form, fits: [fits], notes: [`${nar.length} problems in ${sp.cols} columns, ${wid.length} full width.`] },
+        meta: { items: all.length, scoreOutOf: scorePoints(all), form, fits: [fits], notes: [`${nar.length} problems in ${sp.cols} columns, ${wid.length} full width.`] },
     });
 }
 
@@ -275,7 +276,7 @@ export function plan(input = {}) {
     // RUBRIC H13: problems of one height together, so each row is sized for what it holds.
     items = groupByHeight(items, L.cols);
     const topic = topicOf(((input.skills || [])[0] || {}).iCan || '');
-    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: items.length });
+    const frame = frameOf({ skills: input.skills || [], input: Object.assign({}, input, { form }), tabId: `Test ${form}`, title: `Test ${form}: ${topic}`, score: scorePoints(items) });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     const instr = instructionPart(instructionKeyOf(items, input.skills), items);
     const sections = [
@@ -299,8 +300,12 @@ export function plan(input = {}) {
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
-        meta: { items: items.length, scoreOutOf: items.length, form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
+        meta: { items: items.length, scoreOutOf: scorePoints(items), form, fits: [Object.assign({}, L, { line: fitsLine(L) })], notes: L.note ? [L.note] : [] },
     });
 }
+
+// A Test plans every item at level 0 (PT-TST-2: no hints; planItem level 0), so the bridge measures it there too - measured at
+// level 1, a hint scaffold the page never draws sized its rows (lf-algebra r8 via the lead). A function: a bare 0 reads as unset.
+export const MEASURE_LEVEL = () => 0;
 
 export default { ROLE_ID, sources, measureCols, counts, plan };

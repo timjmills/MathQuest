@@ -298,7 +298,7 @@ function machine(p, g, d, wMm, merged = null) {
 /** A writing box for slot `s` (screen twin: an input; sign / rule slots say what they take). */
 function slotBox(g, s, d, vals, ink, extra = {}) {
     const shape = s.kind === 'sign' ? 'circle' : s.kind === 'rule' ? 'line' : 'box';
-    const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink, mark: 'cell', shape, ...extra };
+    const o = { wMm: d.boxW, hMm: d.boxH, value: vals[s.id] || '', ink: typeof ink === 'function' ? ink(s.id) : ink, mark: 'cell', shape, ...extra };
     if (s.kind === 'sign') { o.wMm = extra.hMm || d.signW; o.hMm = extra.hMm || d.signW; o.extra = 'border-radius:50%;'; }
     let html = box(g, s.id, o);
     if (s.kind === 'rule') {
@@ -628,6 +628,8 @@ register('function-table', {
             vals = {};
             for (const [id, v] of Object.entries(partial)) if (id in key && v !== undefined && v !== null) vals[id] = String(v);
             ink = ink || 'trace';
+            // (master, lf-roles critic r5b D2: earlier steps' marks black, only this step's - p.traceNew - grey: PT-MOD-1, P-LC-9)
+            if (!ctx.ftOnly && Array.isArray(p.traceNew)) { const newIds = new Set(p.traceNew.map(String)); ink = (id) => (newIds.has(String(id)) ? 'trace' : 'solid'); }
         }
         const wMm = tableWidth(p, d);
         const fx = fixOf(p, ctx, vals, key);

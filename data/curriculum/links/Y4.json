@@ -12289,6 +12289,20 @@
       "places": 1
      },
      "why": "a rule continued along a sequence (count on by the same number each time)"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 1
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 1
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Domain-test build lesson (site: \"New CCSS BUILD lesson so the domain test only asks what has been taught\"), W05-W07, 3.OA.D.9. function_table_easy {ftTask: rule} shows an In / Out table with every row filled and the pupil writes the rule: the + and − rules with numbers to 100 (+ 23, − 10), the × and ÷ rules (× 2 to × 5, ÷ 2 to ÷ 5) with every number to 20, so every row is a table fact (× 4: 2 → 8; ÷ 4: 12 → 3); at band 100 the × and ÷ rows leave the tables (× 6: 15 → 90; ÷ 3: 87 → 29, a division taught in W06), so the two kinds of rule are two links. The two-step rules (× then +) are left out at W05. Explaining a pattern with the properties of operations (the other half of 3.OA.D.9) is the same week's \"Patterns on the multiplication table\" lesson (partial, patterns_notice)."
@@ -12378,6 +12392,20 @@
     {
      "key": "multiplication:mult_chart_easy",
      "why": "filling the missing products of the chart: the table the patterns are found in"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 0
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 0
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson, W05-W06, 3.OA.C.7 and 3.OA.D.9, block Y4.B4. Y4.B4.S6 \"The 3, 6 and 9 times-tables\" (W02) uses the lesson's own mult_chart key, so it is not listed as a pre (one key, one role). mult_chart finds a pattern but never explains it, which is the core of 3.OA.D.9 (\"observe that 4 times a number is always even, and explain why\").",
@@ -12452,6 +12480,20 @@
       "band": 25
      },
      "why": "a dot array read as rows times columns, one array at a time (products to 25): the array the lesson then turns"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 2
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 2
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Domain-test build lesson, W05-W06, 3.OA.B.5. mult_properties {forms: 0, 1, 2} deals the three properties the title names: forms 0 an array and its turn, two facts with one product (3 × 4 = 4 × 3, commutative); forms 1 breaking a fact apart by its rows (5 × 9 = 1 × 9 + 4 × 9, distributive); forms 2 times 1 (1 × 11 = 11, identity). Forms 3 (times 0) is left out: the title does not name it. The associative property of 3.OA.B.5 is not in the title; Y4.B4.S13 \"Multiply three numbers\" (W04, a gap, mult_three) is the step that teaches it."
@@ -12548,6 +12590,20 @@
     {
      "key": "algebra:tape_diagram",
      "why": "a bar model of a one-step story: one of the two bars of a two-step story"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 3
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 3
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson, W06-W07, 3.OA.D.8, block Y4.B4. Lesson 7 (2026-10-30): the five presets deal every clause of 3.OA.D.8.",

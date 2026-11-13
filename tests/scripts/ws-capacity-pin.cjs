@@ -23,7 +23,11 @@ const ALLOW = new Set(list(arg('allow', '')));
 (async () => {
     if (!has('write') && !has('check')) { console.log('usage: --write | --check [--pin f] [--skills ..] [--roles ..]'); console.log('ws-capacity-pin: FAIL (usage)'); process.exit(2); }
     const passed = [...new Set((fs.readFileSync(path.join(H.ROOT, 'js/modules/redesign-passed.js'), 'utf8').match(/'[a-z_]+:[a-z_0-9]+'/g) || []).map((x) => x.slice(1, -1)))];
-    const skills = list(arg('skills', '')).length ? list(arg('skills', '')) : passed;
+    // RULED capacities (lead rulings): a page whose items are taller than the page allows is pinned by design with its reason; the
+    // critic treats it as by design. Measured when the skill is in this tree (lf-algebra's skills join on their merge).
+    const ruled = has('check') && fs.existsSync(PIN) ? (JSON.parse(fs.readFileSync(PIN, 'utf8')).ruled || {}) : {};
+    const ruledSkills = [...new Set(Object.keys(ruled).map((k) => k.split(' ')[0]))];
+    const skills = [...new Set([...(list(arg('skills', '')).length ? list(arg('skills', '')) : passed), ...(list(arg('skills', '')).length ? [] : ruledSkills)])];
     const app = await H.open({});
     const now = await app.page.evaluate(async ({ skills, ROLES, SIZES }) => {
         const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -51,11 +55,20 @@ const ALLOW = new Set(list(arg('allow', '')));
     let seen = 0;
     for (const [k, v] of Object.entries(now)) {
         const b = pin[k];
-        if (!b || b.na || v.na) continue;
+        if (!b || b.na || v.na || ruled[k]) continue;
         seen++;
         if (v.items < b.items) (ALLOW.has(k) ? allowed : drops).push(`${k}: ${b.items} -> ${v.items} items (${b.pages} -> ${v.pages} page(s))`);
         else if (v.items > b.items) rises.push(`${k}: ${b.items} -> ${v.items}`);
     }
+    // a ruled page must print at least its ruled count; a page not in this tree is noted, never failed
+    const ruledNotes = [];
+    for (const [k, r] of Object.entries(ruled)) {
+        const v = now[k];
+        if (!v || v.na) { ruledNotes.push(`${k}: not in this tree (ruled ${r.items}: ${r.reason})`); continue; }
+        if (v.items < r.items) drops.push(`${k}: ${v.items} items, under its RULED ${r.items} (${r.reason})`);
+        else ruledNotes.push(`${k}: ${v.items} items (ruled ${r.items}, by design: ${r.reason})`);
+    }
+    for (const n of ruledNotes) console.log(`  ruled ${n}`);
     // SIZE-ORDER (critic r2 N2, "Size S ignored" L1): a smaller size never prints FEWER items than a larger one (S >= M >= L)
     const order = [];
     const groups = {};

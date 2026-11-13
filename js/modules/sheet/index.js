@@ -31,7 +31,7 @@ export {
 export {
     esc, label, defaultLabelStyle, tabStepFor, tabSideMm,
     cell, cutLine, blank, line, box, circle, check, unknownBox,
-    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE,
+    renderCellBox, gradeSlots, markWriteAbove, WRITE_ABOVE, ebItemOf,
 } from './cell.js';
 
 /* --------------------------------------------------------------------------- frame */
@@ -194,6 +194,9 @@ import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 export { RCDWS_ROWS, RCDWS_CSS } from './cells/rcdws.js';
 // composing:number_word_form's kit cell (a number and its name).
 export { numberWords } from './cells/words.js';
+// The vocabulary redesign (lane lf-vocab, 2026-11-07): Match 3 pictures and 1 picture 3 words.
+export { MATCH3_TEMPLATE, match3Letters } from './cells/vocab-match3.js';
+export { PICK3_TEMPLATE, PICK3_PER_PAGE, gradeClass as vocabGradeClass } from './cells/vocab-pick3.js';
 export * as teacherParts from './teacher-parts.js';
 export { TEACHER_CSS } from './teacher-parts.js';
 export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
@@ -201,7 +204,7 @@ export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
-    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words'];
+    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words', 'vocab-match3', 'vocab-pick3'];
 
 export { wordWorkWrongs } from './providers/word-work.js';
 /* ------------------------------------------------- skill providers (register on load) */
@@ -211,3 +214,13 @@ export {
     REGRADED_SKILLS, storiesFor, STORY_NOUNS, STORY_NAMES, STORY_TEMPLATES, nounFor,
     columnAdd, lineSteps, longDivision,
 } from './providers/index.js';
+
+/* ------------------------------------------- part options (lane lf-partopts, design/partopts/DESIGN.md) */
+export {
+    PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount,
+    rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN,
+    PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages,
+} from './part-opts.js';
+
+/* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
+export { applySheetTags, shortCcss } from './sheet-tags.js';

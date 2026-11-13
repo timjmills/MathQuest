@@ -838,6 +838,8 @@ export const SKILL_STANDARDS = {
     'patterns:growing_shape_patterns': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Growing Shape Patterns: Draw and Count the Next Term
     'patterns:pattern_features': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Features of a Number Pattern: Odd, Even and Ones Digits
     'patterns:follow_given_rule': { ccss: ['4.OA.C.5'], ee: ['M.EE.4.OA.5'] }, // Follow a Given Rule: Extend a Number Pattern
+    'vocabulary:vocab_grade_pictures': { ccss: ['3.OA.D.9', '3.OA.B.5', '3.OA.D.8'], ee: ['M.EE.3.OA.8'], note: 'the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)' }, // Vocabulary: Match 3 Pictures (Lesson Words)
+    'vocabulary:vocab_pick3_words': { ccss: ['3.OA.D.9', '3.OA.B.5', '3.OA.D.8'], ee: ['M.EE.3.OA.8'], note: 'the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)' }, // Vocabulary: 1 Picture, 3 Words
 };
 
 /* ================================================================= lookup */

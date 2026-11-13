@@ -376,6 +376,8 @@ export const FROZEN_SKILL_CODES = {
     "patterns:growing_shape_patterns": "ZX",
     "patterns:pattern_features": "ZY",
     "patterns:follow_given_rule": "ZZ",
+    "vocabulary:vocab_grade_pictures": "VS",
+    "vocabulary:vocab_pick3_words": "VZ",
 };
 
 // Per-category positional order (index = the number used by settings codes, MX- codes and

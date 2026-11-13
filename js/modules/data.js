@@ -318,6 +318,8 @@ export const SKILL_GRADES = {
     'growing_shape_patterns': 4,
     'pattern_features': 4,
     'follow_given_rule': 4,
+    'vocab_grade_pictures': 'M',
+    'vocab_pick3_words': 'M',
 };
 
 // Look up grade for a skill, resolving category collisions
@@ -1491,6 +1493,8 @@ export const SKILLS = {
         { v: "vocab_grade_6_data",        l: "Math Vocabulary – Grade 6: Data (Match)" },
         { v: "vocab_grade_6_algebra",     l: "Math Vocabulary – Grade 6: Algebra (Match)" },
         { v: "vocab_grade_6_measurement", l: "Math Vocabulary – Grade 6: Measurement (Match)" },
+        { v: "vocab_grade_pictures", l: "Vocabulary: Match 3 Pictures (Lesson Words)" },
+        { v: "vocab_pick3_words", l: "Vocabulary: 1 Picture, 3 Words", presetOf: "vocab_grade_pictures" },
     ],
 };
 
@@ -2022,6 +2026,7 @@ export const SKILL_TIME_CATEGORY = {
     vocab_grade_6_operations: "extended", vocab_grade_6_fractions: "extended",
     vocab_grade_6_geometry: "extended", vocab_grade_6_data: "extended",
     vocab_grade_6_algebra: "extended", vocab_grade_6_measurement: "extended",
+    vocab_grade_pictures: "standard",
     // Everything else defaults to "extended" (50s threshold)
 };
 
@@ -2358,6 +2363,7 @@ export const SKILL_PRINT_SIZE = {
     vocab_grade_6_algebra: "wide", vocab_grade_6_measurement: "wide",
     notice_patterns: "medium",
     growing_shape_patterns: "wide",
+    vocab_grade_pictures: "wide",
 };
 
 // PRESET skills (skill-presets.js, SKILLS entries carrying `presetOf`) inherit their host's print

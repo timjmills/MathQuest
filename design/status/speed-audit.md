@@ -823,6 +823,19 @@ that are not blocking on the lesson path. Lane paused by the owner after r1; fix
 | critic r3 PASS (lane part) | footer ids fixed; per-type summary added after | FOOTER gate (backtest FAIL on the r2 head) | 9 owner additions arrived DURING r3: queuing them (process rule 0) kept the round valid; resuming the same critic for r2/r3 cost 144k → 162k → 192k tokens (its context grows): a fresh narrow critic with a short brief is cheaper after r2 |
 | simple-print-2 critic r1 FAIL (C2 6, C3 7) | Aim = Exactly; Tables-to band shown as Highest number; × 6–8 column cycle; footer label; "Facts" for column work; key PNG captured the app | EXACT (differs), WITHIN 12-admitted, FACTPATTERN (backtest: old gen FAILs whole columns at M), FOOTER options, SUMMARY Facts naming, evidence asserts Answer Key | the builder's own render pass looked at page 1 only: read every PNG incl. the key, and run each mode pair through a "plans differ" check before the critic |
 
+
+### Lane lf-vocab (2026-11-07)
+
+| Round | Result | (1) Automatic checks the findings point to | (2) Speed-ups |
+|---|---|---|---|
+| precritic r1 (build 1) | 7 FAIL: letter boxes kept digits on screen, the skills' own lesson packet overflowed (full-width cell in half-width chart panels), grade-4 cells 6 a page, LESSON-DATA | ws-vocab-unit V1-V7 (new; backtest row vocab-sets-split), data-mq-kind word slots (ws-screen-answer caught) | render the skill's own lesson role and every option value (ws-options-verify --render) on the first local render; decide role:lesson on the card before building lesson data |
+| precritic r2 | 3 FAIL, then 1 (sibling-compare: no approved sibling for a new family) | min-height cells give H13 bands in rebalanced rows: a cell fills its row (height:100%); DN-10 counts a browser-shrunk drawing as not fitting: size the drawing to the room it has | measure every grade band x size x paper in one loop before precritic (16 renders, 3 min) |
+| critic r1 FAIL (min 1; 4 without EA) | pick3 declined error analysis (choice slot); Match 3 EA drew the key as the wrong work; bank words not delimited; answer place moves; screen picture text 6-9 px; look-alike pairs; 4 pictures at 6 | V-EA (every role the card offers renders, shown work differs from the key on a Fix item); V-BANK (no bank line holds two words without a divider); L-SLOTPOS (slot position and width equal across a section); a screen picture floor (picture text >= 14 px); V-CLASH (pictures sharing a mark are notWith) | render pictures at the smallest real host widths; run precritic against the card's offered roles; one seed across grade and lesson renders so rounds diff |
+| r3 rebuild (fresh builder, rule 5) | 5 survivors each got a check that FAILed on r2 code and passes (V8-V11, + V12 / V13); precritic r5 3 FAIL: 2 from master's fact-rows.js opEm TDZ (facts lane), 1 sibling-compare (first family); my critic render found Match 3 guided at S overflowing - not on precritic's path | render-gate on every offered role (see LESSONS_LEARNED lf-vocab last row) | **The next lesson's vocabulary page must check first:** (1) ws-vocab-unit (V1-V13) on its word set; (2) ws-grade-render --gate --roles independent,more-practice,test,guided,error-analysis at S, M and L for both picture skills with that set's vocabSet; (3) the lesson part vocab-page rendered at the lesson's grade, its footer naming the set's grade |
+| r4 small round + critic r3 FAIL (min 6) | Guided overflow fixed with a static hMm, which turned it into H13 emptiness at S/L. Also: error-analysis 2 a page with 35-40 % bands; worksheet-1280 tile layout (3rd round); guided Score not per word; grow/sequence (a deliberate notWith omission); grade 4 lines short; base-ten scales; ambiguous hint; pilot frame on the other sets' lesson renders. Precritic was green apart from sibling-compare and one card-ruled S-not-more pin. | An H13 row-ink empty-band scan per cell on every offered role and host; drawn height vs footprint hMm (±10 %); V11 on every role; a look-alike list that FAILs on removal; line length vs the widest bank word; hint uniqueness; base-ten unit equality; guided row equality at S/M/L; worksheet tile structure equal | **Check first next time:** (1) the empty-band scan and the drawn-vs-footprint check on guided, error-analysis and worksheet-1280 BEFORE spending a critic; (2) a fix for overflow is checked for emptiness in the same run; (3) render each lesson set in its own lesson. Rule 5: worksheet tile layout and guided row equality survived 3 rounds, so stop and hand over the root cause |
+| r5 fresh builder + critic r4 FAIL (min 6) | All 10 r3 defects were checked first. 8 of 10 are fixed (r3 #3 partly, #6 persists). ws-empty-band and precritic --strict were green (only sibling-compare), yet the critic found an H13 hit of 30.1 % on pick3 error analysis at S and pick3 guided rows unequal at L (4th round), plus 3 new findings (EA S height, a number-name/hundred look-alike, the left picture) | ws-empty-band and V18 must measure what the critic measures (the same ink set, rendered row boxes at every size); S <= 0.9 x L height; a bank word never in the picture's text; picture referent marks | **Check first:** (1) align ws-empty-band's ink set with the critic's scan, and backtest it on 31bee0fb pick3 EA S; (2) V18 on rendered rows at S/M/L; (3) OQ-1 (base-ten unit size) answered BEFORE the rebuild. Rule 5: pick3 guided row equality survived 4 rounds, so stop |
+| r6 fresh builder + critic r5 PASS (min 8) | Every critic r4 finding got a check first (it FAILed on 90e2eee4). ws-empty-band was aligned to the critic's scan (--slot-ink off) and V18 to the rendered rows. The critic then found only 8 nits | row-spread 10 % on every guided template; VQ-7 answer-place height; letter anchor; 390 box alignment; distinct names; caption size; provider-comment lint | **Check first, for the next lesson's vocabulary page:** ws-vocab-unit (V1-V21) and --browser on its set; ws-empty-band with and without --slot-ink off on every offered role and host; render each set inside its own lesson. Speed-up: a check passes only once it measures what the critic measures, so backtest each new check on the last critic-failed render |
+| r7 owner R-1 / R-2 + narrow critic FAIL (min 7, near-miss) | Built with 4 checks (V22-V25) and 4 backtests, gates green; the critic failed Match 3 C2: the wrong line names the word, not the letter the pupil writes. 6 minor findings | V25+ (letter in the Match 3 line, glow count); V26 ladder vs explanation; V27 equal blocks; V22+ no halo on glyphs; V24+ word list | **Check first:** the feedback names the pupil's own response kind (a letter on Match 3, a word on pick3); render answered states full-page on every host, the quiz included |
 ### lf-placevalue critic r1 (2026-11-07): FAIL on all five pv skills (lesson #1)
 **Automatic checks** (critic findings a machine could have measured; owner of each below):
 - F1 H13 absolute band: print-lint H13 compares a cell with its row only; proposed H13-ABS (band under the lowest ink ≥ 30 % of the cell, less Hw) — backtest value independent L 34 %. Owner: checks lane (shared print-lint).
@@ -957,6 +970,38 @@ and the backtest row `lesson-baseline-phase0-optin`, so it is copied, never rety
 ws-backtest removes each checkout as soon as its state has run (c3245504). **Rule:** a full backtest needs ~3 min a commit-pair row:
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
+### lf-checks · ws-empty-band critic r1 (2026-11-08, FAIL 5 / 6 / 7 / 7)
+
+Full report: design/status/lf-checks/critic-eb-r1.md. Backtests held (all four critic-failed heads FAIL); the defects were coverage and pin.
+
+**Automatic checks:** a host that reads 0 cells is an EB-READ FAILURE, not a note (the practice card was silently unmeasured: its cell is `.mq-scell`); a synthetic `--html` fixture per band position (under / above / between) in the backtest table; an offered-but-not-composed role FAILs (EB-ROLE); the pin is generated from `redesign-passed.js` (every passed skill), not a hand list; a tool header's numeric claim ("separates the classes") is backed by a recorded measurement or removed.
+
+**Speed-ups:** freeze the branch while a critic runs (two commits landed mid-round; the critic graded a `git archive`); pin runs (~2.5 min a skill) go to the background the moment the rule is fixed; one shared measure (`measureCells`) for print and host keeps a fix in one place.
+
+### lf-checks · ws-empty-band critic r2 (2026-11-08, FAIL 6 / 4 / 7 / 6; loop stopped by rule 7)
+
+Full report: design/status/lf-checks/critic-eb-r2.md. r1 D2-D6 confirmed fixed; the four failing-head backtests FAIL (4, 112, 12, 16).
+New: D7 the r1 fix's colour test read rgb(0, 0, 0) as transparent (black SVG invisible: false "above the ink" bands, an inflated
+pin - add_wp_10 238 pinned vs 40 true); D8 ws-card-plan (lf-ops) drops an "on" list after "(PROPOSED)" and ignores "out of scope"
+(false EB-ROLE on fact_family_sort word-problems); D9 = r1 D1 left half-open (a host that does not render was a note).
+
+**Automatic checks:** a colour-classifier fixture with black SVG fill and stroke (built: eb-fixture-svg-black, FAILs the r1
+code's pass state); host coverage: every host renders and reads a cell or EB-READ (built); a ws-card-plan self-test with
+"(PROPOSED) on" and "out of scope" lines (lf-ops' file - sent to lf-ops); before a re-pin, sampled crops and a refusal when a
+count is over 3x the last raw count (proposed).
+
+**Speed-ups:** reuse tests/lib/ws-ink.cjs (pixels) instead of a DOM colour classifier; dump every cell's bands in --json, not
+only findings; a no-browser --self-test; the branch freeze worked (no re-run).
+
+**Stop (rule 7):** host coverage (r1 D1 -> r2 D9) survived two rounds. Root cause: the host loop treated "nothing to measure" as
+a note in two places; the machine check is the EB-READ rule now applied to both (a host that does not render, a host with no
+cell). Fixed after r2 with D7 and re-pinned; NOT re-graded.
+
+### Lane lf-vocab rounds 9-10 (2026-11-12 to 13)
+| Round | What was lost | Cause | Fix before the next lane |
+|---|---|---|---|
+| r9 critic FAIL min 7 | 1 round | Word swaps were checked for look-alikes but not for lesson fit; the critic's band render was blank because the lead render step used the wrong lesson file | V-FIT / V-FIT6; ws-lesson-render with title and body checks |
+| r10 critic FAIL min 7 | 1 round | The look-alike class was closed rule by rule after each critic (r6, r7, r9, r10); the swap in "grow" was not run against every picture of its set in the same change | Rule 5 stop: replace the derived rules with a feature model (V-FEAT) and a referent lint (V-REF); render every changed set on both skills automatically |
 
 ### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
 **Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
@@ -976,6 +1021,9 @@ ws-words-checks style provider checks for compare / more_less BEFORE the first c
 | Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
 | 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
 | ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+| r11 critic FAIL min 7 | 1 round | V-FEAT word definitions were written from the pictures, not from each set's standard text (4.OA.B.4 names product/multiple); NB9 probed card 1 only | V-STD (standard-text pairs); NB9 on every card and host |
+| r12 critic FAIL min 7 | 1 round | pick3 banks are drawn from the whole set, so new pairs appear each deal; hand links fixed one picture of a twin pair; the numbers a picture rings were not features | Enumerate the dealable pairs (or deal pick3 only from vetted trios); V-NUM; V-TWIN |
+| r13 critic FAIL min 7 | 1 round | V-NUM had an untested boundary (1 marked number); place and tower-step features were not modelled | V-NUM single mark; V-PLACE; V-TWIN over all run pictures; the enumerated banks make the next review complete |
 
 ### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
 
@@ -1006,3 +1054,24 @@ open, 43 claims) and PASSES on the r10 status.
 **Speed-ups next time:** run `ws-print-lint --roles reason-it,error-analysis,true-false,test --skills <family>` once (about a minute)
 before writing any clean list; when a critic proposes a check, building it is part of the fix round's done (F8 / G11);
 `ws-patterns-cells` (node, 1 s) now holds the cell-vs-page contracts G5 / G6 / G8 (LABEL-REF, TILE-CARD, ROW2-S).
+### lf-engine live-pm2 (2026-11-13): critic lf-engine-live-pm findings 1-5 + lead items 6-7, all LIVE on master
+
+Rule (from this round): **a page rule is gated on every cell kind and every lesson, not on the cell kinds the last fix
+touched.** PM-H13 measured every cell but only on the three samples, so the equation, missing-factor and word-problem
+cells of the critic's spot lessons were never read; the rounding fix reached Practice and not Mixed. ws-lesson-samples
+--check now carries the four spot lessons, and precritic runs PM-CONT / SHEET-2PG over every library lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| 1 div_facts Mixed equation / missing-factor cells top-anchored: 53 % (L), 54 % and 40 % (S) bands | ws-lesson-samples PM-H13 on the spot lessons (every cell kind) | lesson-pm-h13-spot (9135190b FAIL 6 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 2 sub_wp_10 / add_wp_20 S Mixed word problem 37 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 3 fact_family_sort L Mixed: one 6-cell row alone on a continuation page 72 % blank | ws-lesson-samples PM-CONT (new: no Practice / Mixed continuation page >= 50 % blank) | lesson-pm-cont (9135190b FAIL → 709605bb OK) | precritic lesson-samples-check + lesson-samples-all | 1 round |
+| 4 nearest_10 L Mixed rounding cells not centred, item number on the "T" head | PM-H13 + ws-lesson-samples TAB-CLEAR (new: tab >= 2 mm from ink; 1 mm for an across fact, CL-40) | lesson-tab-clear (9135190b FAIL 2 → 709605bb OK) | precritic lesson-samples-check | 1 round |
+| 5 div_facts S Practice fact over its line 47 % band | PM-H13 (as 1) | lesson-pm-h13-spot | precritic lesson-samples-check | 1 round |
+| 6 (lead) Y4.B1.S14 L lesson sheet on 2 pages, each ~38 % empty | ws-lesson-samples SHEET-2PG (new: a 2+ page lesson sheet has a page >= 70 % used) | lesson-sheet-2pg (9135190b FAIL → 709605bb OK) | precritic lesson-samples-all (every lesson) | 1 round |
+| 7 (lead) add_wp_10 L Mixed ends on a page ~72 % empty | PM-CONT over every lesson (--all-lessons) | lesson-pm-cont | precritic lesson-samples-all | 1 round |
+
+### Lane lf-vocab r14 (2026-11-13)
+| Round | What was lost | Cause | Fix |
+|---|---|---|---|
+| r14 critic PASS min 8 | - | Medium rebuild closed the complete defect list from r13 in one round; master merge brought ws-screen-ink-size (2 real screen size defects fixed, 4 SIZE-REF coverage findings ruled known) | Keep the dealt-banks table; the 3 minors are follow-ups |

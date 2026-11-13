@@ -9103,6 +9103,20 @@
     {
      "key": "patterns:follow_given_rule",
      "why": "generate the pattern from its given rule first (4.OA.C.5)"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 7
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 7
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Domain-test build lesson (W09, OA unit; intervention track W09, standard W10)."
@@ -9192,6 +9206,20 @@
     {
      "key": "patterns:follow_given_rule",
      "why": "generate the pattern from its given rule first (4.OA.C.5)"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 6
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 6
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson in Y5.B3 (Multiplication and division A), W09."
@@ -9295,6 +9323,20 @@
       "band": 1000
      },
      "why": "find the rule yourself and fill the gaps: the inverse task"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 8
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 8
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson in Y5.B3, W09. With rule:false the rule is printed above the row (\"Rule: count on by 5\") and the pupil continues it, which is the lesson."
@@ -9351,6 +9393,20 @@
      "key": "number_ops_mixed:word_problems_mixed",
      "maxNumber": 100,
      "why": "times-as-many stories among other multiplication and division stories (Y5.B5.S11)"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 9
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 9
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Awsaj supplement lesson in Y5.B3, W10 (power standard 4.OA.A.1).",
@@ -9499,6 +9555,20 @@
     {
      "key": "division:remainder_too_big",
      "why": "checking that a remainder is smaller than the divisor before interpreting it"
+    },
+    {
+     "key": "vocabulary:vocab_grade_pictures",
+     "opts": {
+      "vocabSet": 10
+     },
+     "why": "the lesson's six words: match each to its picture (the same pictures as the lesson's vocabulary page)"
+    },
+    {
+     "key": "vocabulary:vocab_pick3_words",
+     "opts": {
+      "vocabSet": 10
+     },
+     "why": "the lesson's six words: name each picture from a bank of three"
     }
    ],
    "note": "Domain-test build lesson (W11, OA unit). 5.NBT.B.6 on the site is the Grade 5 extension. div_word_problems / div_word_problems_plain with forms value 2 (\"A remainder to interpret\") are not listed: on the print path that value does not filter, and 12 of 12 generated items are sharing stories with no remainder (a generator defect, Y5-report.md).",

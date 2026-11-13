@@ -1923,7 +1923,7 @@
    "pages": 1
   },
   "placevalue:expand true-false S": {
-   "items": 4,
+   "items": 5,
    "pages": 1
   },
   "placevalue:expand true-false M": {
@@ -2115,7 +2115,7 @@
    "pages": 1
   },
   "placevalue:unit_form true-false S": {
-   "items": 4,
+   "items": 5,
    "pages": 1
   },
   "placevalue:unit_form true-false M": {
@@ -2208,6 +2208,102 @@
   },
   "placevalue:unit_form more-practice L": {
    "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form true-false S": {
+   "items": 8,
+   "pages": 1
+  },
+  "composing:number_word_form true-false M": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form true-false L": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it S": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it M": {
+   "items": 3,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it L": {
+   "items": 2,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis S": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis M": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis L": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form pre-skill-check S": {
+   "items": 10,
+   "pages": 2
+  },
+  "composing:number_word_form pre-skill-check M": {
+   "items": 6,
+   "pages": 2
+  },
+  "composing:number_word_form pre-skill-check L": {
+   "items": 6,
+   "pages": 2
+  },
+  "composing:number_word_form review S": {
+   "items": 16,
+   "pages": 1
+  },
+  "composing:number_word_form review M": {
+   "items": 12,
+   "pages": 1
+  },
+  "composing:number_word_form review L": {
+   "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form test S": {
+   "items": 20,
+   "pages": 1
+  },
+  "composing:number_word_form test M": {
+   "items": 15,
+   "pages": 1
+  },
+  "composing:number_word_form test L": {
+   "items": 12,
+   "pages": 1
+  },
+  "composing:number_word_form independent S": {
+   "items": 28,
+   "pages": 1
+  },
+  "composing:number_word_form independent M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form independent L": {
+   "items": 15,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice S": {
+   "items": 28,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice L": {
+   "items": 15,
    "pages": 1
   },
   "placevalue:value true-false S": {
@@ -2379,7 +2475,7 @@
    "pages": 1
   },
   "placevalue:combine independent S": {
-   "items": 28,
+   "items": 27,
    "pages": 1
   },
   "placevalue:combine independent M": {
@@ -2391,7 +2487,7 @@
    "pages": 1
   },
   "placevalue:combine more-practice S": {
-   "items": 28,
+   "items": 27,
    "pages": 1
   },
   "placevalue:combine more-practice M": {
@@ -2497,6 +2593,28 @@
   "division:div_facts more-practice L": {
    "items": 18,
    "pages": 1
+  }
+ },
+ "ruled": {
+  "subtraction:sub_1m_no_regroup reason-it M": {
+   "items": 2,
+   "reason": "7-digit column work is about 59 mm wide: A and B stand side by side over a full-width response row, never shrunk; the pinned 3 overflowed the cell (lead ruling 2026-11-13, critic r6c D3)"
+  },
+  "algebra:function_table_easy true-false L": {
+   "items": 2,
+   "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"
+  },
+  "patterns:growing_shape_patterns review S": {
+   "items": 7,
+   "reason": "items taller than the page allows: Term 1-4 drawings (lead ruling 2026-11-13, critic r2/r3 N4: PT-REV-1's 8 cannot fit)"
+  },
+  "patterns:growing_shape_patterns review M": {
+   "items": 5,
+   "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
+  },
+  "patterns:growing_shape_patterns review L": {
+   "items": 5,
+   "reason": "items taller than the page allows (lead ruling 2026-11-13, N4)"
   }
  }
 }

@@ -212,6 +212,9 @@ S, M and L on every page. A grade given at one size only is not a grade of the p
 Every critic brief names the sizes.
 
 The bar does not change: 8 or more on all four criteria, on every page and every screen host. One 7 is a fail.
+**No unscored legibility notes (owner, 2026-11-13).** A critic's note that anything on the page or screen is small, hard to
+read, cramped, faint or thin is a SCORED defect, filed and capped like any other. It is never an "unscored note", and a page
+carrying one does not pass (LESSONS_LEARNED process rule 10; the div_facts screen array case).
 What changes is how a page reaches that bar (`design/IMPROVEMENT_PLAN.md` §1.3, §1.6.3, §1.6.4). A page counts as
 graded in one of two ways:
 

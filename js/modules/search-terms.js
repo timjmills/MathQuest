@@ -349,6 +349,8 @@ export const CONCEPT_RULES = [
     [/^patterns:follow_given_rule$/, ['patterns']],
     // two-step card 2026-11-13 (§7): 'two-step' / 'multi-step' find the host, its twin and the five presets
     [/^algebra:(multi_step_word(_plain)?|two_step_\w+)$/, ['two_step', 'word_problems']],
+    [/^vocabulary:vocab_grade_pictures$/, ['vocabulary']],
+    [/^vocabulary:vocab_pick3_words$/, ['vocabulary']],
 ];
 
 /* ================================================================= hand-written terms */
@@ -658,6 +660,8 @@ export const SKILL_TERMS = {
     'patterns:growing_shape_patterns': ['growing pattern', 'growing patterns', 'growing shape pattern', 'shape pattern that grows', 'next term', 'draw the next term', 'term 4', 'term 10', 'dot pattern', 'square pattern', 'visual pattern', 'pattern rule add 2'],
     'patterns:pattern_features': ['pattern features', 'features of a pattern', 'emergent features', 'units digit cycle', 'ones digit repeats', 'odd even alternate', 'alternates odd and even', 'what else does the pattern show', 'start at 5 add 5'],
     'patterns:follow_given_rule': ['follow a given rule', 'follow the rule', 'extend a number pattern', 'use the rule', 'given rule pattern', 'continue the pattern from the rule', 'start at 3 add 4', 'rule add each time', 'generate a number pattern', 'next numbers in the pattern'],
+    'vocabulary:vocab_grade_pictures': ['vocabulary pictures', 'match 3 pictures', 'match the word to the picture', 'write the letter of the picture', 'picture word match', 'lesson vocabulary', 'picture vocabulary', 'match words and pictures'],
+    'vocabulary:vocab_pick3_words': ['one picture three words', '1 picture 3 words', 'word bank picture', 'copy the word for the picture', 'name the picture vocabulary', 'which word is the picture'],
 };
 
 /* ================================================================= misspellings */

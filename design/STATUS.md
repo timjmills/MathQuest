@@ -753,3 +753,61 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - 2026-11-13 OWNER RULE (direct): effort levels — the orchestrator (lead session) may run at medium or high; every lane, builder and critic runs at medium; any escalation above medium is asked of the owner first. Owner also: "keep going" (rounds resume despite the account's weekly-limit warning).
 - 2026-11-13 OWNER RULE (direct): "no budget limits right now" — the weekly 80 % stop and per-round caps are suspended until the owner says otherwise; lanes keep caps only as planning estimates.
 - 2026-11-13 LIVE: shared page roles (lf-roles critics r1–r4; r3 + r4 PASS on every passed skill, 0 pages worse): True or False? keys leave the frame empty on True (PT-TOF-2) and print no frame for sentence answers (PT-TOF-4, extended to Reason It lists); Reason It frames under the A/B ring, block centred; Reason It wrong panel shows the wrong answer's own sign (SIGNMATCH; was "6 + 2 = 4" on the 8 word-problem skills); Error Analysis centred, "<Name> wrote:" label anchored over the work (PT-ERR-4, PUPILTAG); unit_form frames; the 5 subtraction Model L pages as one 2 + 2 page (PT-MOD-5); unit_form / expand True or False? S hold 5. New checks: ws-roles-unit (72), ws-capacity-pin (624 pages, no drops, SIZE-ORDER), PUPILTAG, SIGNMATCH, KEYJOIN-ROLE. Lessons 1556/1556 unchanged. Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot, redesign-passed (27), simple-print, screen-answer, backtest + cell-checks self-tests, stamp, detailed-lesson ×7 (only lesson 2 E9/E35).
+- 2026-11-13 LIVE: lesson Practice / Mixed fixes, round 2 (lf-engine -live-pm2 de8eec183; re-critic PASS on items 1–5, item 7 critic PASS 9/8/8/8): equation / missing-factor cells centred, word-problem S bands, fact_family_sort L continuation page 72 → 13 % blank, nearest_10 L Mixed tab clears the heads, div_facts S Practice, add_wp_10 L Mixed last page 72 → 8.6 % blank. Item 6 (Y4.B1.S14 L lesson sheet) reverted — got worse; redone in the next live round with TAB-CLEAR + SHEET-2PG. New checks PM-CONT, SHEET-2PG (known for one lesson), TAB-CLEAR. Lesson sheets / charts / checks unchanged. Gates as the previous deploy; detailed-lesson ×7 only lesson 2 E9/E35.
+
+## 2026-11-13 — Deploy shared page roles deploy-3 (lf-roles r9, critic r5b/r5c PASS)
+- Scripted Model: earlier steps black, only the newest step grey (MOD-MARKS-INK); Error Analysis label offsets on tables / count rows (PUPILTAG, EA-PAD, EA-ROWX); Pre-skill Check at L splits 2+2 with full headers (PSC-2PG-BALANCE, lead ruling R13); FIX-MINIMAL.
+- Gates on the deploy tree: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (732), redesign-passed (27), simple-print (OK on re-run; first run a one-off FAIL), screen-answer, backtest self-test, roles-unit (75), capacity-pin (648, 0 rises), detailed-lesson g3-oa9 OK.
+- Passed skills: every role byte-identical except 36 two-page Pre-skill Check pages (R13). Lessons 1560/1596 identical; the 36 differ by attribute only (g3-oa9), pixel-identical.
+
+## 2026-11-13 — Deploy EB-FOOT item pairing (lf-checks ebitem, narrow critic PASS 9/9/8/9)
+- The kit writes data-eb-item on every grid cell (pupil page and key); master's ws-empty-band pairs each cell with its own item(s) by it; fallbacks print a note. No pixel/layout change (critic: 32 sheets + keys byte-identical with the attribute removed). arrays_groups EB-FOOT 35 → 0 (reordered pages read correctly). Unblocks lf-ops -props critic.
+- Gates: boot-smoke, code-snapshot (732), redesign-passed (27), backtest self-test, empty-band self-test (15 EB-FOOT cases), simple-print.
+
+## 2026-11-13 — Deploy vocabulary (lf-vocab, narrow critic r14 PASS, min 8; both skills redesign-passed)
+- grade_pictures + pick3_words: r5 print, R-1 (highlight after answering, screen only), R-2 (spoken explanation on a wrong answer), O-1 blue next-answer box, O-2/O-3 unambiguous pictures that never fit a distractor, rounds r9–r14 (V-NUM, V-PLACE, V-TWIN, screen picture at print size). Known: 4 SIZE-REF gate-gap findings per lead ruling (same-word proof in the packet; gate fix with lf-checks).
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, backtest self-test, capacity-pin (648), roles-unit (75), vocab-unit, empty-band self-test. Merged with master 70fa12c2 (EB-FOOT pairing; comment conflict resolved, backtests unioned 261 rows).
+
+## 2026-11-13 — Owner rule: lesson design at high effort
+- Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
+
+## 2026-11-13 — Deploy shared page roles deploy-4: Reason It (lf-roles, critics r6e + r6g PASS, 0 counted defects)
+- Reason It: work wider than half the room stands A over B (never shrunk); work that fits half a cell keeps A | B with the response as a full-width row under them; a column word story prints once over A and B; "__ is correct." dropped (PT-RSN-4: "Circle A or B. The answer is __."); one answer line length for every word answer (LINE-TELL); KEYFIT (a letter answer takes the word line); Guided tightRows; LONE-PAGE. Checks: RI-LAYOUT, RI-ONEANSWER, RI-DISTINCT, LINE-TELL, KEYFIT, ABTAG, LONE-PAGE, ri-overflow-stack / ri-countrow-overflow / ri-stack-band backtests; overflow non-pinnable in precritic.
+- Passed skills: all 81 RI pages change (F8), TF identify + fact_family_sort (word lines), 9 guided pages; capacity 0 drops, 17 rises, 1 ruled pin (sub_1m RI M = 2). Vocab Guided 6/6 identical. Lessons identical.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit (78), backtest self-test, capacity-pin, empty-band self-test.
+
+## 2026-11-13 — Owner rule: everything becomes an automatic check
+- Owner: "make sure you are saving everything to automatic checks as well". Sent to all 9 lanes: every critic / owner / lead-ruling finding ships with a failing-then-passing check, a proven backtest row, a place on precritic's path and a CHECKS_FROM_CRITICS row; each lane lists today's gaps in its next report and closes them before its next critic. lf-checks builds a ledger sweep so the rule enforces itself.
+- 2026-11-13 ~12:25 owner on the 7-day usage warning: "we will go back to the limits later but for now just let things be" - no slow-down; lanes continue as they are.
+
+## 2026-11-13 — Deploy lf-checks: pixel empty-band tool (critic r7 PASS 9/8/8/8) + findings→checks ledger sweep
+- ws-empty-band reads the PIXELS (border box; a screen slot counts as its drawn edges + one digit; a faint edge is not ink), EB-FOOT paired by data-eb-item on every indexed cell, --slot-ink off ported; app: CL-4b row cap (worksheet.js), kit slot-input drawn at digit height (48 px target outside the box), central FOCUS-GAP ring fix (additive CSS); precritic defaults (SCREEN-DIGIT on every skill, --page-fill, cell-checks, capacity per role); font-load helper in 5 gates.
+- Owner rule "everything to automatic checks": ws-precritic-plan --checks-from-critics (ledger rows need a backtest id on precritic's path; blocking on a lane's own rows now, warning globally until 2026-11-14 13:00 UTC) and the NO-DROPPED-ROW guard (always blocking). Today: 44 pass / 16 exempt / 16 open (warning), routed by lane.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit, backtest self-test, capacity-pin, empty-band self-test, precritic-plan + self-test (46), no row dropped.
+
+## 2026-11-13 — Deploy shared page roles deploy-5 (lf-roles, critic r7a PASS, 0 counted defects)
+- npr Error Analysis S: the Correct / Fix it column keeps its own width (was flex-grow, judgement at 69.5 vs 131.5 mm); EA redo work left-aligned like its copy (G2, EA-REDO-ALIGN); owner rule batch: 11 backtest rows, ws-cell-checks --fixture, ws-precritic --overflow-fixture, per-role precritic plans (duplicate per-role gate removed so --model-states stays); teacher-preview F8 ledger row closed against options-panel-sample. r17 (widened capacity pin) NOT included - ships with the Guided S round.
+- Gates: boot-smoke, roles-unit (80), precritic-plan (156 on path; no row dropped), capacity-pin, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, empty-band self-test. 0 passed EA pages change.
+
+## 2026-11-13 ~16:45 UTC — Weekly usage limit reached (resets 2026-11-19 22:00 UTC)
+- Lane builders hit HTTP 429 (weekly limit). Owner had lifted the budget limits ("let things be"); the CLAUDE.md 80 % rule was suspended by owner and the account reached 100 %.
+- Nothing lost; every lane pushed its work with resume points in design/status/<lane>.md. Do NOT deploy: lf-engine -pc (79ea333b8, WIP), -roles (a8ec3f2ac, pre re-critic), -g7; lf-partopts -deploy (2d008dfb3, gates not re-run; §8d 12 mm margin reason needs a re-read after the ROWFIT-BT re-pin).
+- Live today: vocabulary (both skills redesign-passed), Reason It deploy-4, roles deploy-3/-5, pixel empty-band + ledger sweep + no-dropped-row guard (+ merge-base hotfix), EB-FOOT item pairing, lesson-baseline deploy gate.
+- On reset: each lane resumes its builders where they stopped (no fresh starts); first deploy in line is lf-partopts step A.
+
+## 2026-11-13 ~17:00 UTC — Owner: usage back at 0 %; cap 70 % for now
+- All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.
+
+## 2026-11-13 — Deploy lf-checks -r2 (narrow critic PASS 9/8/8/8)
+- Checker minors (FOCUS-GAP per line, EB-SIDE between, slot-ink / EB-FOOT notes, EB-ITEMKEY / EB-ITEMPARITY), LP-RASTER on role pages (ws-grade-render --raster-fit), no-dropped-row merge-base fix. Checks only; 50/50 builds byte-identical.
+- Gates: boot-smoke, precritic-plan (+ self-test, none dropped), backtest / empty-band self-tests, code-snapshot, redesign-passed, screen-answer, simple-print.
+## 2026-11-13 ~18:00 UTC — Owner approves the fastest-implementation plan (all eight changes)
+- design/plans/FASTEST_PLAN_2026-11-13.md; summary in CLAUDE.md "Fastest-implementation plan". Unit order (round 1 first), copy-light review, batch critics, round cap 2, deploy train 11:00 / 19:00 UTC, six lanes, no phone width (390) — print + computer/Chromebook + tablet only, long lessons paused.
+
+## 2026-11-13 — Deploy conflict-marker gate (lf-hosts tool via lf-checks)
+- tests/scripts/ws-conflict-markers.mjs fails on merge markers in tracked files; runs on every precritic and deploy session 1 (row conflict-markers-3c7b). Closes the lead's own ledger row (markers committed to STATUS earlier today).
+
+## 2026-11-13 — Deploy lesson part settings, step A (lf-partopts, critic r4 PASS: 8+ everywhere)
+- Per-part settings for lessons, practice and quiz: how many problems per part and which supports, with the screen only offering settings the page checks pass. Default identity: all 1,732 default lesson pages byte-identical to master.
+- Gates: boot-smoke, code-snapshot, redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, capacity-pin, roles-unit, precritic-plan (none dropped), conflict-markers.
+- 2026-11-13 ~18:45 UTC owner: drop print size S; keep M and L (plan item 9 in CLAUDE.md). S settings / codes fall back to M.
