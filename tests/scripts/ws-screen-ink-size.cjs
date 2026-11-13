@@ -68,7 +68,53 @@ const WIDTH_MIN = 0.60;    // SIZE-WIDTH: drawing width >= 60 % of the free widt
 const MIN_DRAW_MM = 4;     // drawings smaller than this both ways are not judged
 const PIN_SLACK = 1;       // a worst % may move by 1 point (rounding) before it counts as worse
 
+// TEXT-SIZE (lf-checks queue 16 / 17, 2026-11-13): the digit floors are ws-screen-slots' SCREEN-DIGIT targets, read from its
+// source so the two never drift (40 / 48 / 56 px at 390 / 820 / 1280); the label floor is RUBRIC H2 / TY-11's 8 pt.
+const DIGIT_FLOORS = (() => {
+    try {
+        const m = /const DIGIT_VIEWPORTS = (\[[^\n]*\]);/.exec(fs.readFileSync(path.join(__dirname, 'ws-screen-slots.cjs'), 'utf8'));
+        const vs = Function(`return ${m[1]}`)();
+        return Object.fromEntries(vs.map((v) => [v.w, v.px]));
+    } catch (e) { return { 390: 40, 820: 48, 1280: 56 }; }
+})();
+const COUNT_ROW_PHONE_PX = 29;          // TY-10b (owner exception): count rows on a phone (<= 480 px) draw ~29 px digits
+const LABEL_FLOOR_PX = 8 * 96 / 72;     // RUBRIC H2 / TY-11: nothing a pupil reads under 8 pt
+const TEXT_TOL = 0.05;                  // a label >= 95 % of its print size
+const WORK_DIGIT_SHARE = 0.85;          // a print run at >= 85 % of the working digit size is a working digit
+
 /* ------------------------------------------------------------------ pure judging */
+
+/** TEXT-SIZE: the digit floor (px) of a host width; a count row on a phone takes TY-10b's 29 px. */
+function digitFloorPx(width, { countRow = false } = {}) {
+    if (countRow && width <= 480) return COUNT_ROW_PHONE_PX;
+    const ws = Object.keys(DIGIT_FLOORS).map(Number).sort((a, b) => a - b);
+    const w = ws.filter((x) => x <= width).pop() || ws[0];
+    return DIGIT_FLOORS[w];
+}
+/** TEXT-SIZE: a screen text run's role and floor (px) from its print counterpart (px; NaN when paper has no such run).
+ *  A run paper prints at working-digit size is a DIGIT (the host's digit floor); anything else is a LABEL, held to its print
+ *  size (5 % tolerance) and never under 8 pt. */
+function textFloor({ numeric, printPx, workPx, width, countRow = false, inSvg = false }) {
+    // (a numeral drawn INSIDE a picture - a hundred chart's square, an axis label - is the picture's label (RP-6), held to its print size)
+    // (a count row's numbers ARE its working digits, TY-10a / TY-10b, whatever size paper fitted them at)
+    if (numeric && !inSvg && (countRow || printPx >= WORK_DIGIT_SHARE * workPx)) return { role: 'digit text', floor: digitFloorPx(width, { countRow }) };
+    const p = Number.isFinite(printPx) && printPx > 0 ? (1 - TEXT_TOL) * printPx : 0;
+    return { role: 'label text', floor: +Math.max(LABEL_FLOOR_PX, p).toFixed(2) };
+}
+/** TEXT-SIZE: the finding text for a run of `px` against `floor`; null when it holds. */
+function textFinding(role, text, px, floor, printPx) {
+    if (!(px > 0) || !(floor > 0) || px >= floor - 0.05) return null;
+    const pr = Number.isFinite(printPx) && printPx > 0 ? `, print ${(printPx * 72 / 96).toFixed(1)} pt` : ', no print run';
+    return `${role} "${String(text).slice(0, 24)}" is ${px.toFixed(1)} px (${(px * 72 / 96).toFixed(1)} pt${pr}); needs >= ${floor.toFixed(1)} px`;
+}
+/** TEXT-SIZE pin bucket: the floor that held the run. */
+function textBucket(role, floor) {
+    if (role === 'digit text') return `digit floor ${Math.round(floor)} px`;
+    const pt = floor * 72 / 96;
+    return pt <= 8.05 ? 'label 8 pt floor' : pt < 11 ? 'label print under 11 pt' : pt < 15 ? 'label print 11-15 pt' : 'label print 15 pt+';
+}
+/** Queue 15: a TERM drawing of a growing pattern (one term of a sequence) is judged by its unit size, never its width. */
+const isTermDrawing = ({ label = '', cls = '', term = false }) => !!term || /^term\b/i.test(String(label).trim()) || /(^|\s)(mq-gp-|gp-)?term(\s|$)/i.test(cls);
 
 function median(xs) {
     const a = xs.filter((x) => Number.isFinite(x)).sort((p, q) => p - q);
@@ -92,7 +138,7 @@ function widthFinding(name, w, h, freeW, min = WIDTH_MIN) {
 
 // D8: every mark is named by a noun of this list, every picture by a name of PICTURES; nothing else reaches a message.
 const NOUNS = ['dot', 'touch dot', 'ring', 'touch ring', 'counter', 'frame cell', 'tile', 'cube', 'base-10 rod', 'bar', 'square', 'box', 'picture mark', 'block'];
-const PICTURES = ['array', 'ten frame', 'dot tile', 'digit', 'skip-count strip', 'base-10 blocks', 'five-dot groups', 'number track', 'picture'];
+const PICTURES = ['array', 'ten frame', 'dot tile', 'digit', 'skip-count strip', 'base-10 blocks', 'five-dot groups', 'number track', 'pattern term', 'picture'];
 /** The noun of a mark from its drawing's label / class and its own tag / class (D8). */
 function nounOf({ label = '', cls = '', glyph = false, mark = '' }) {
     const [tag, ...mc] = String(mark).split('.');
@@ -117,6 +163,7 @@ function nounOf({ label = '', cls = '', glyph = false, mark = '' }) {
 function pictureOf({ label = '', cls = '', glyph = false }) {
     const t = `${label} ${cls}`.toLowerCase();
     if (glyph || /\bws-td\b|ws-td-/.test(t)) return 'digit';
+    if (/^\s*term\b/.test(t)) return 'pattern term';
     if (/array|rows? of/.test(t)) return 'array';
     if (/ten frame|frame/.test(t)) return 'ten frame';
     if (/dot tile/.test(t)) return 'dot tile';
@@ -140,8 +187,11 @@ const markName = (d, g, support = '') => {
 /** A drawing's name for SIZE-WIDTH: its picture, else "<noun> picture". */
 const drawingName = (d, support = '') => pictureOf(d) || supportPicture(support) || `${nounOf({ label: d.label, cls: d.cls, glyph: d.glyph, mark: (d.groups[0] || {}).mark })} picture`;
 
-/** The print reference of screen drawing sd's group g among the print drawings (D2, D3); null when none. */
-function matchRef(sd, g, prints) {
+/** The print reference of screen drawing sd's group g among the print drawings (D2, D3); null when none. `dealt` holds the
+ *  print cells of the very items a host dealt (queue 14: the worksheet deals its own items, so a vocabulary word the
+ *  Independent page never deals read as SIZE-REF): after the page's same item, a screen item is matched with its own dealt
+ *  print cell, before any geometric fallback on the page. */
+function matchRef(sd, g, prints, dealt = []) {
     // a ring is its own mark: it is paired only with a print ring, and a dot only with a print dot (critic sis-r2 D1)
     const ringy = (m) => /\.ring$/.test(m);
     const all = prints.flatMap((p) => p.groups.map((pg) => ({ p, g: pg }))).filter((c) => ringy(c.g.mark) === ringy(g.mark));
@@ -150,6 +200,12 @@ function matchRef(sd, g, prints) {
         const same = all.filter((c) => c.p.sig === sd.sig);
         for (const f of [(c) => c.p.kind === sd.kind && c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark, (c) => c.g.n === g.n]) {
             const r = same.filter(f); if (r.length) return pick(r, 'same item');
+        }
+    }
+    if (sd.dealt) {
+        const own = dealt.filter((p) => p.dealt === sd.dealt).flatMap((p) => p.groups.map((pg) => ({ p, g: pg }))).filter((c) => ringy(c.g.mark) === ringy(g.mark));
+        for (const f of [(c) => c.p.kind === sd.kind && c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark]) {
+            const r = own.filter(f); if (r.length) return pick(r, 'same item, dealt cell');
         }
     }
     let r = all.filter((c) => c.p.kind === sd.kind && c.g.mark === g.mark && c.g.n === g.n);
@@ -313,6 +369,37 @@ function selfTest() {
     const pinFile = path.join(ROOT_DIR, 'design/audit/baselines/screen-ink-size.json');
     eq('sweep report matches the pin', fs.existsSync(sweepFile) && fs.existsSync(pinFile) ? sweepPinDrift(fs.readFileSync(sweepFile, 'utf8'), JSON.parse(fs.readFileSync(pinFile, 'utf8'))) : ['sweep or pin missing'], []);
     eq('sweep drift caught', sweepPinDrift('**38 keys, 99 findings**', { totals: { keys: 1, findings: 2 }, keys: { 'a|SIZE-INK|dot|b': { n: 2, worst: 90 } } }).length > 0, true);
+    // queue 14: a word the Independent page never deals is matched with the print cell of the item the host DEALT
+    const vocabPage = [{ sig: '', kind: 'picture', groups: [{ mark: 'circle', n: 12, sizeMm: 2.7 }] }];
+    const dealtCells = [{ sig: '', dealt: 'w1', kind: 'picture', groups: [{ mark: 'path', n: 3, sizeMm: 5 }] }, { sig: '', dealt: 'w2', kind: 'picture', groups: [{ mark: 'path', n: 3, sizeMm: 9 }] }];
+    eq('dealt: no page counterpart, no dealt cell -> SIZE-REF', matchRef({ sig: '', kind: 'picture' }, { mark: 'path', n: 3 }, vocabPage), null);
+    eq('dealt: its own dealt cell', matchRef({ sig: '', dealt: 'w1', kind: 'picture' }, { mark: 'path', n: 3 }, vocabPage, dealtCells), { printMm: 5, how: 'same item, dealt cell' });
+    eq('dealt: never another item\'s dealt cell', matchRef({ sig: '', dealt: 'w3', kind: 'picture' }, { mark: 'path', n: 3 }, vocabPage, dealtCells), null);
+    eq('dealt: the page same item still wins', matchRef({ sig: '6,2', dealt: 'w1', kind: 'array' }, { mark: 'circle', n: 6 }, prints, dealtCells), { printMm: 4, how: 'same item' });
+    // queue 15: a pattern term is judged by its unit, never its width
+    eq('term: by label', isTermDrawing({ label: 'Term 1: 3 dots' }), true);
+    eq('term: by flag', isTermDrawing({ label: '', term: true }), true);
+    eq('term: an array is not a term', isTermDrawing({ label: 'array, 3 rows of 4', cls: 'ws-factcue-svg' }), false);
+    eq('term: "determine" is not a term', isTermDrawing({ label: 'determine the rule', cls: 'determine' }), false);
+    eq('term: picture name', markName({ label: 'Term 2: 5 dots', cls: '' }, { mark: 'circle.ring' }), 'ring (pattern term)');
+    // queue 16 / 17: TEXT-SIZE floors
+    eq('digit floors from ws-screen-slots', [390, 820, 1280].map((w) => digitFloorPx(w)), [40, 48, 56]);
+    eq('count row on a phone: TY-10b 29 px', digitFloorPx(390, { countRow: true }), 29);
+    eq('count row at 820: the card floor', digitFloorPx(820, { countRow: true }), 48);
+    const work = 22 * 96 / 72;
+    eq('a working digit (print 22 pt) -> digit floor', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280 }), { role: 'digit text', floor: 56 });
+    eq('a numeral inside a picture -> label', textFloor({ numeric: true, printPx: work, workPx: work, width: 1280, inSvg: true }).role, 'label text');
+    eq('a small numeral (print 10 pt) -> label at print size', textFloor({ numeric: true, printPx: 10 * 96 / 72, workPx: work, width: 390 }), { role: 'label text', floor: 12.67 });
+    eq('a label with no print run -> 8 pt floor', textFloor({ numeric: false, printPx: NaN, workPx: work, width: 390 }), { role: 'label text', floor: 10.67 });
+    // G9 (lf-algebra critic r2): "Term 1" at 8.3 pt on the quiz, 11 pt on paper -> FAIL; at 11 pt -> holds
+    const g9 = textFloor({ numeric: false, printPx: 11 * 96 / 72, workPx: work, width: 1280 });
+    eq('G9 quiz label 8.3 pt fails', !!textFinding(g9.role, 'Term 1', 11.0, g9.floor, 11 * 96 / 72), true);
+    eq('G9 label at print size holds', textFinding(g9.role, 'Term 1', 14.7, g9.floor, 11 * 96 / 72), null);
+    // G1 (lf-algebra critic r2 via lf-ops): count-row digits 20 px on the 390 card fail TY-10b's 29 px
+    const g1 = textFloor({ numeric: true, printPx: work, workPx: work, width: 390, countRow: true });
+    eq('G1 count-row 20 px at 390 fails', !!textFinding(g1.role, '12', 20, g1.floor, work), true);
+    eq('G1 count-row 29 px at 390 holds', textFinding(g1.role, '12', 29, g1.floor, work), null);
+    eq('text buckets', [textBucket('digit text', 40), textBucket('label text', 10.67), textBucket('label text', 13.9), textBucket('label text', 15), textBucket('label text', 22)], ['digit floor 40 px', 'label 8 pt floor', 'label print under 11 pt', 'label print 11-15 pt', 'label print 15 pt+']);
     for (const b of bad) console.log('  ' + b);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
     console.log(`${NAME}: ${bad.length ? 'FAIL' : 'OK'}`);
@@ -324,7 +411,7 @@ if (require.main === module && has('self-test')) selfTest();
 
 // Run in the page: every drawing (svg with repeated marks, or the parent of repeated HTML marks) under `scope`, with its
 // cell, its mark groups (mark, count, median smaller side in mm), its INK extent, its free width and its item's signature.
-function readDrawingsInPage({ scope, cellSel }) {
+function readDrawingsInPage({ scope, cellSel, withText = false }) {
     const MM = 96 / 25.4;
     const roots = [...document.querySelectorAll(scope)];
     if (!roots.length) return { error: `no ${scope}` };
@@ -345,7 +432,7 @@ function readDrawingsInPage({ scope, cellSel }) {
     const ringOf = (m) => { if (!(m instanceof SVGElement)) return false; const cs = getComputedStyle(m); return clear(cs.fill) && !clear(cs.stroke) && parseFloat(cs.strokeWidth) > 0; };
     const markKey = (m) => `${m.tagName.toLowerCase()}${(m.getAttribute('class') || '').split(/\s+/).filter(Boolean).slice(0, 1).map((c) => '.' + c).join('')}${ringOf(m) ? '.ring' : ''}`;
     // groups of >= 3 like marks (same key, size within 20 % of the key's median); the frame (one big rect) never qualifies
-    const groupsOf = (marks) => {
+    const groupsOf = (marks, minN = 3) => {
         const by = {};
         for (const m of marks) {
             if (!visible(m)) continue;
@@ -359,7 +446,7 @@ function readDrawingsInPage({ scope, cellSel }) {
             const xs = by[k]; const m0 = med(xs.map((x) => x.s));
             const like = xs.filter((x) => Math.abs(x.s - m0) <= 0.2 * m0 && Math.abs(Math.max(x.w, x.h) - med(xs.map((y) => Math.max(y.w, y.h)))) <= 0.2 * Math.max(x.w, x.h));
             // >= 3 marks at >= 3 DISTINCT places (a picture's detail stacked on one spot - three eyes drawn at one point - is not a set of marks)
-            if (like.length >= 3 && new Set(like.map((x) => x.at)).size >= 3) out.push({ mark: k, n: like.length, sizeMm: +(med(like.map((x) => x.s)) / MM).toFixed(3) });
+            if (like.length >= minN && new Set(like.map((x) => x.at)).size >= minN) out.push({ mark: k, n: like.length, sizeMm: +(med(like.map((x) => x.s)) / MM).toFixed(3) });
         }
         return out;
     };
@@ -409,8 +496,10 @@ function readDrawingsInPage({ scope, cellSel }) {
             if (svg.parentElement && svg.parentElement.closest('svg') || !visible(svg)) continue;
             // only INK marks: a white (or unfilled) shape with no dark stroke - the touch numeral's halo / keyline - is not a
             // mark (lf-ops 2026-11-13: pooling the halos read the touch dots at 1.64 mm when the ink dots are larger than paper)
-            const g = groupsOf([...svg.querySelectorAll('circle, ellipse, rect, use, path, polygon')].filter((m) => m.tagName.toLowerCase() === 'use' || painted(m)));
-            if (g.length) drawings.push({ el: svg, kind: svg.hasAttribute('data-digit') ? `digit ${svg.getAttribute('data-digit')}` : kindOf(svg), groups: g, glyph: svg.hasAttribute('data-digit'), ink: union([...svg.querySelectorAll('circle, ellipse, rect, path, polygon, polyline, line, use, text, image')].filter(painted)) });
+            // queue 15: a pattern TERM (one term of a growing sequence) is sized by its unit, even with one or two marks
+            const term = /^\s*term\b/i.test(svg.getAttribute('aria-label') || '') || !!svg.closest('[data-ws-term], .mq-gp-term');
+            const g = groupsOf([...svg.querySelectorAll('circle, ellipse, rect, use, path, polygon')].filter((m) => m.tagName.toLowerCase() === 'use' || painted(m)), term ? 1 : 3);
+            if (g.length) drawings.push({ el: svg, term, kind: svg.hasAttribute('data-digit') ? `digit ${svg.getAttribute('data-digit')}` : kindOf(svg), groups: g, glyph: svg.hasAttribute('data-digit'), ink: union([...svg.querySelectorAll('circle, ellipse, rect, path, polygon, polyline, line, use, text, image')].filter(painted)) });
         }
         // HTML marks: leaf elements with no text, a fill or a border, grouped under their parent by class
         const parents = new Map();
@@ -458,28 +547,87 @@ function readDrawingsInPage({ scope, cellSel }) {
         const item = lab ? lab.getAttribute('aria-label') : '';
         out.push({ kind: d.kind, label: (d.el.getAttribute('aria-label') || '').slice(0, 80), cls: String(d.el.getAttribute('class') || ''), groups: d.groups,
             wMm: +(r.width / MM).toFixed(1), hMm: +(r.height / MM).toFixed(1), cellMm, freeMm, sig: sigOf(d.el, cell), item: (item || '').slice(0, 40),
-            hasCell: !!cell, glyph: !!d.glyph, screenOnly: !!d.el.closest('[data-mq-screen-only]') });
+            hasCell: !!cell, glyph: !!d.glyph, term: !!d.term, dealt: (d.el.closest('[data-mq-dealt]') || { getAttribute: () => '' }).getAttribute('data-mq-dealt') || '', screenOnly: !!d.el.closest('[data-mq-screen-only]') });
     }
-    return { drawings: out };
+    if (!withText) return { drawings: out };
+    // TEXT-SIZE (queue 16 / 17): every text run and answer slot in a cell, at its RENDERED size (font-size x the scale of
+    // every transform above it: an SVG's CTM, a CSS scale on a host), with its cell's item signature
+    const scaleOf = (el) => {
+        if (el instanceof SVGElement && el.getScreenCTM) { const m = el.getScreenCTM(); return m ? Math.sqrt(Math.abs(m.a * m.d - m.b * m.c)) : 1; }
+        const r = el.getBoundingClientRect(); const big = el.offsetWidth >= el.offsetHeight;
+        const k = big ? (el.offsetWidth > 0 ? r.width / el.offsetWidth : 1) : (el.offsetHeight > 0 ? r.height / el.offsetHeight : 1);
+        return Math.abs(k - 1) < 0.06 ? 1 : k;
+    };
+    const EXCL = '.ws-tab, [data-ws-label], .ws-letter, .mq-instr, .mq-tn-count, [data-mq-screen-only], button, script, style, title, desc, .pv-tracks tr:first-child';
+    const texts = []; const seen = new Set();
+    const allCells = [...document.querySelectorAll(cellSel)];
+    for (const rt of roots) {
+        const w = document.createTreeWalker(rt, NodeFilter.SHOW_TEXT);
+        for (let n = w.nextNode(); n; n = w.nextNode()) {
+            const t = n.nodeValue.replace(/\s+/g, ' ').trim(); const el = n.parentElement;
+            if (!t || !/[A-Za-z0-9]/.test(t) || !el || seen.has(el)) continue;
+            const cell = el.closest(cellSel); if (!cell || el.closest(EXCL)) continue;
+            const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+            if (!el.getClientRects().length || r.width <= 2 || r.height <= 2 || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) continue;
+            seen.add(el);
+            const own = [...el.childNodes].filter((c) => c.nodeType === 3).map((c) => c.nodeValue).join(' ').replace(/\s+/g, ' ').trim();
+            texts.push({ text: own.slice(0, 40), px: +(parseFloat(cs.fontSize) * scaleOf(el)).toFixed(2), numeric: /\d/.test(own) && !/[A-Za-z]/.test(own), inSvg: !!el.closest('svg'),
+                countRow: !!el.closest('[data-ws-cell="count-row"], .k2-countrow') && !el.closest('.k2-timeslbl, .k2-steptab, .k2-rule, .k2-rulebox, .k2-swipe-cues'), sig: sigOf(el, cell), cellKey: allCells.indexOf(cell),
+                item: ((cell.querySelector('[aria-label]:not(svg)') || { getAttribute: () => '' }).getAttribute('aria-label') || '').slice(0, 40) });
+        }
+    }
+    return { drawings: out, texts };
 }
 
 /* ------------------------------------------------------------------ judging a host's drawings */
 
-function judgeHost({ where, detail, drawings, prints, F, notes, support = '' }) {
+function judgeHost({ where, detail, drawings, prints, dealt = [], F, notes, support = '' }) {
     for (const d of drawings) {
         const at = `${detail || ''}${d.item ? ` [${d.item}]` : d.sig ? ` [${d.sig}]` : ''}`;
         for (const g of d.groups) {
             const name = markName(d, g, support);
             if (d.screenOnly) { notes.add(`${where}: ${name} is marked screen-only (not compared)`); continue; }
-            const m = matchRef(d, g, prints);
+            const m = matchRef(d, g, prints, dealt);
             if (!m) { F({ rule: 'SIZE-REF', where, at, name, bucket: '-', pct: 0, msg: `${name}: ${g.n} marks of ${g.sizeMm.toFixed(2)} mm have no print counterpart (no same item, no print drawing of the same marks and count)` }); continue; }
             const f = inkFinding(name, g.sizeMm, m.printMm);
             if (f) F({ rule: 'SIZE-INK', where, at, name, bucket: inkBucket(m.printMm), pct: Math.round(g.sizeMm / m.printMm * 100), msg: `${f} [print: ${m.how}]` });
         }
-        if (d.hasCell && !d.glyph) {
+        // queue 15: a pattern term is as wide as its maths (a one-dot column is taller than wide): its unit size is judged above
+        if (d.hasCell && !d.glyph && !isTermDrawing(d)) {
             const name = drawingName(d, support);
             const f = widthFinding(name, d.wMm, d.hMm, d.freeMm);
             if (f) F({ rule: 'SIZE-WIDTH', where, at, name, bucket: widthBucket(d.wMm, d.hMm), pct: Math.round(d.wMm / d.freeMm * 100), msg: `${f} (cell content ${d.cellMm} mm)` });
+        }
+    }
+}
+
+const WORK_DIGIT_PT = { S: 16, M: 22, L: 28 };   // WORKSHEET_DESIGN_STANDARD type table: working digits
+
+/** TEXT-SIZE (queue 16 / 17): every label and non-slot text run of a screen cell against its floor (textFloor). One finding per
+ *  cell and role (its worst run). The cell's largest numeral is ws-screen-slots SCREEN-DIGIT's and is not judged twice. */
+function judgeText({ where, detail, texts, printTexts, F, width, size = 'M' }) {
+    const workPx = WORK_DIGIT_PT[size] * 96 / 72;
+    const bySig = new Map(); const byText = new Map();
+    for (const t of printTexts || []) {
+        const k1 = `${t.sig}|${t.text}`; (bySig.get(k1) || bySig.set(k1, []).get(k1)).push(t.px);
+        (byText.get(t.text) || byText.set(t.text, []).get(t.text)).push(t.px);
+    }
+    const cells = new Map();
+    for (const t of texts || []) (cells.get(t.cellKey) || cells.set(t.cellKey, []).get(t.cellKey)).push(t);
+    for (const runs of cells.values()) {
+        const nums = runs.filter((t) => t.numeric);
+        const top = nums.length ? nums.reduce((a, b) => (b.px > a.px ? b : a)) : null;
+        const worst = {};
+        for (const t of runs) {
+            if (t === top) continue;
+            const printPx = median(bySig.get(`${t.sig}|${t.text}`) || byText.get(t.text) || []);
+            const { role, floor } = textFloor({ numeric: t.numeric, printPx, workPx, width, countRow: t.countRow, inSvg: t.inSvg });
+            const msg = textFinding(role, t.text, t.px, floor, printPx);
+            if (msg && (!worst[role] || t.px / floor < worst[role].pct / 100)) worst[role] = { msg, floor, pct: Math.round(t.px / floor * 100), t };
+        }
+        for (const role of Object.keys(worst)) {
+            const w = worst[role];
+            F({ rule: 'TEXT-SIZE', where, at: `${detail || ''}${w.t.item ? ` [${w.t.item}]` : w.t.sig ? ` [${w.t.sig}]` : ''}`, name: role, bucket: textBucket(role, w.floor), pct: w.pct, msg: w.msg });
         }
     }
 }
@@ -549,13 +697,19 @@ async function main() {
             // a fixture: paper cells under [data-mq-print], screen cells under [data-mq-screen], in one document
             await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
             await page.setContent(fs.readFileSync(path.resolve(process.cwd(), HTML), 'utf8'), { waitUntil: 'load' });
-            const pr = await page.evaluate(readDrawingsInPage, { scope: '[data-mq-print]', cellSel: '[data-ws-cell]' });
-            const sc = await page.evaluate(readDrawingsInPage, { scope: '[data-mq-screen]', cellSel: '[data-ws-cell], .mq-scell' });
-            if (pr.error || sc.error) throw new Error(pr.error || sc.error);
+            // (queue 14: [data-mq-print-dealt] holds the print cells of the items the screen dealt, each [data-mq-dealt="id"]
+            // as on the screen cell; queue 16 / 17: --width W judges TEXT-SIZE at that host width)
+            const FW = parseInt(arg('width', '1280'), 10);
+            const pr = await page.evaluate(readDrawingsInPage, { scope: '[data-mq-print]', cellSel: '[data-ws-cell]', withText: true });
+            const hasDealt = await page.evaluate(() => !!document.querySelector('[data-mq-print-dealt]'));
+            const dl = hasDealt ? await page.evaluate(readDrawingsInPage, { scope: '[data-mq-print-dealt]', cellSel: '[data-ws-cell]' }) : { drawings: [] };
+            const sc = await page.evaluate(readDrawingsInPage, { scope: '[data-mq-screen]', cellSel: '[data-ws-cell], .mq-scell', withText: true });
+            if (pr.error || sc.error || dl.error) throw new Error(pr.error || sc.error || dl.error);
             renders += 2;
-            if (!sc.drawings.length) F({ rule: 'SIZE-READ', where: path.basename(HTML), at: '', name: '-', bucket: '-', pct: 0, msg: 'no screen drawing read' });
+            if (!sc.drawings.length && !sc.texts.length) F({ rule: 'SIZE-READ', where: path.basename(HTML), at: '', name: '-', bucket: '-', pct: 0, msg: 'no screen drawing or text read' });
             visited.add(path.basename(HTML));
-            judgeHost({ where: path.basename(HTML), detail: '', drawings: sc.drawings, prints: pr.drawings, F, notes });
+            judgeHost({ where: path.basename(HTML), detail: '', drawings: sc.drawings, prints: pr.drawings, dealt: dl.drawings, F, notes });
+            judgeText({ where: path.basename(HTML), detail: '', texts: sc.texts, printTexts: pr.texts, F, width: FW, size: SIZE });
         }
         for (const key of SKILLS) {
             const [cat, skill] = key.split(':');
@@ -582,16 +736,16 @@ async function main() {
                 }, { cat, skill, opts: v.opts, SIZE, SEED });
                 if (doc.error) { notes.add(`${tag}: paper not composed (${doc.error})`); continue; }
                 const sh = await app.browser.newPage();
-                let prints = [];
+                let prints = []; let printTexts = [];
                 try {
                     await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
                     await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(doc.html, { waitUntil: 'networkidle0', timeout: 60000 });
                     await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
-                    const pr = await sh.evaluate(readDrawingsInPage, { scope: 'body', cellSel: '[data-ws-cell]' });
+                    const pr = await sh.evaluate(readDrawingsInPage, { scope: 'body', cellSel: '[data-ws-cell]', withText: true });
                     renders++;
-                    prints = pr.drawings || [];
+                    prints = pr.drawings || []; printTexts = pr.texts || [];
                 } finally { await sh.close(); }
                 // ---- screen hosts: the card deals print items 0-2, the quiz items 0-1 (the same seed and itemIndex)
                 for (const host of HOSTS) for (const w of (hostWidths[host] || []).filter((x) => !WIDTHS || WIDTHS.includes(x))) {
@@ -605,7 +759,10 @@ async function main() {
                                 if (opts) window.setSetOptions(c, k, opts, { silent: true });
                                 const item = (sd, ix) => window.generateQuestionFor(Object.assign({ category: c, skill: k, seed: sd, itemIndex: ix }, opts ? { opts } : {}));
                                 if (host === 'card') { st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false; window.showView('gameView'); st.currentQ = item(s + i, i); window.renderQuestion(); return '#questionCard'; }
-                                if (host === 'worksheet') { if (window.__wsReseed) window.__wsReseed(4242 + s); st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 4; window.initWorksheet(); return '#worksheetView .mq-wspaper'; }
+                                if (host === 'worksheet') { if (window.__wsReseed) window.__wsReseed(4242 + s); st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 4; window.initWorksheet();
+                                    // queue 14: the worksheet deals its own items; each card names its item for the dealt print cells
+                                    window.__sisDealt = (st.worksheetQs || []).map((q, ix) => { const el = document.getElementById(`ws_card_${ix}`); if (el) el.setAttribute('data-mq-dealt', `w${ix}`); return { id: `w${ix}`, q }; });
+                                    return '#worksheetView .mq-wspaper'; }
                                 if (host === 'quiz') {
                                     const questions = [0, 1].map((ix) => { const q = item(s + ix, ix); return { id: ix, skillId: k, points: 1, questionData: window.quizQuestionData(Object.assign({ categoryId: c }, q)) }; });
                                     const test = { id: null, name: 'Ink', sections: [{ id: 0, label: 'A', layout: { columns: 2, spacing: 'normal' }, instructions: '', questions }], settings: { timeLimit: null, randomOrder: false, showFeedback: 'end', allowRetry: false, passingScore: 70, sectionMode: 'sequential', shuffleWithinSections: false, printVersions: 1 } };
@@ -619,13 +776,44 @@ async function main() {
                         if (!scope || /^ERR/.test(scope)) { notes.add(`${tag} ${host} ${w}: not rendered (${scope})`); continue; }
                         await new Promise((r) => setTimeout(r, 450));
                         if (host === 'worksheet') await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
-                        const sc = await page.evaluate(readDrawingsInPage, { scope, cellSel: '[data-ws-cell], .mq-scell, .problem-card' });
+                        const sc = await page.evaluate(readDrawingsInPage, { scope, cellSel: '[data-ws-cell], .mq-scell, .problem-card', withText: true });
                         renders++;
+                        // queue 14: the print cells of the very items the worksheet dealt (the SAME word / item), drawn by the kit
+                        let dealt = [];
+                        if (host === 'worksheet' && !sc.error && sc.drawings.length) {
+                            const dd = await page.evaluate(async ({ SIZE }) => {
+                                try {
+                                    // the app's own instance of the kit (its stamped URL), so its providers and templates are the ones registered
+                                    const url = (performance.getEntriesByType('resource').map((e) => e.name).find((n) => /\/js\/modules\/sheet\/index\.js/.test(n))) || new URL('js/modules/sheet/index.js', location.href).href;
+                                    const K = await import(url);
+                                    const parts = [];
+                                    for (const { id, q } of window.__sisDealt || []) {
+                                        try { const h = K.renderCell(q, K.resolveCtx({ mode: 'print', size: SIZE, look: 'ican', state: 'blank' })); if (h) parts.push(`<div data-mq-dealt="${id}" style="width:186mm;margin:0 0 6mm 0;">${h}</div>`); } catch (e) { /* a cell the kit cannot draw alone: page reference only */ }
+                                    }
+                                    return parts.length ? { html: window.sheetDocument(`<div data-mq-print-dealt>${parts.join('')}</div>`, 'x', { paper: 'A4' }), n: parts.length } : { n: 0 };
+                                } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
+                            }, { SIZE });
+                            if (dd.error) notes.add(`${tag} worksheet: dealt print cells not drawn (${dd.error})`);
+                            else if (dd.html) {
+                                const sh2 = await app.browser.newPage();
+                                try {
+                                    await sh2.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 });
+                                    await sh2.goto(page.url(), { waitUntil: 'domcontentloaded' });
+                                    await sh2.setContent(dd.html, { waitUntil: 'networkidle0', timeout: 60000 });
+                                    await sh2.emulateMediaType('print');
+                                    const r2 = await sh2.evaluate(readDrawingsInPage, { scope: 'body', cellSel: '[data-ws-cell]' });
+                                    renders++;
+                                    dealt = (r2.drawings || []).filter((d) => d.dealt);
+                                } finally { await sh2.close(); }
+                            }
+                        }
                         await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                         if (sc.error) { notes.add(`${tag} ${host} ${w}: ${sc.error}`); continue; }
                         visited.add(`${tag} ${host} ${w}px`);
+                        if (has('dump-text')) for (const t of sc.texts) console.log(`text ${host} ${w} cell ${t.cellKey}: "${t.text}" ${t.px} px${t.numeric ? ' numeric' : ''}${t.inSvg ? ' svg' : ''}${t.countRow ? ' count-row' : ''} sig ${t.sig}`);
+                        judgeText({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', texts: sc.texts, printTexts, F, width: w, size: SIZE });
                         if (!sc.drawings.length) continue;
-                        judgeHost({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', drawings: sc.drawings, prints, F, notes, support: v.support || '' });
+                        judgeHost({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', drawings: sc.drawings, prints, dealt, F, notes, support: v.support || '' });
                     }
                 }
                 const ref = {};
@@ -674,4 +862,4 @@ async function main() {
 
 if (require.main === module && !has('self-test')) main().catch((e) => { console.error(e); console.log(`${NAME}: FAIL`); process.exit(1); });
 
-module.exports = { median, inkFinding, widthFinding, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, findingLines, pinScope, sweepPinDrift, supportPicture, inkBucket, widthBucket, NOUNS, PICTURES };
+module.exports = { median, inkFinding, widthFinding, textFloor, textFinding, textBucket, digitFloorPx, isTermDrawing, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, findingLines, pinScope, sweepPinDrift, supportPicture, inkBucket, widthBucket, NOUNS, PICTURES };
