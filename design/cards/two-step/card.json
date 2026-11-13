@@ -446,7 +446,7 @@
     ],
     "d": "offered",
     "source": "skill-options.js _o2RangeBand; §9.2",
-    "why": "caps every computed number, the Step 1 result and the answer (Q2); 100 appended at build and dropped (lead ruling R2 2026-11-13: equal to no band at Max Number 100; B100 codes alias to no band); 50 is NOT offered on two_step_add_then_div and two_step_letter_equation (lead ruling B (a) 2026-11-13: there it changed ~6 % of items, 37 / 600 and 38 / 600, so it printed the default page under another name; skill-options.js PRESET_HIDE_VALUES, an old code with band 50 reads the default; check ws-two-step BAND-BITES)",
+    "why": "caps every computed number, the Step 1 result and the answer (Q2); 100 appended at build and dropped (lead ruling R2 2026-11-13: equal to no band at Max Number 100; B100 codes alias to no band); 50 is NOT offered on two_step_add_then_div and two_step_letter_equation (lead ruling B (a) 2026-11-13: there it changed ~6 % of items, 37 / 600 and 38 / 600, so it printed the default page under another name) nor on two_step_mult_div_first and two_step_add_then_mult (lead ruling 2026-11-13, round 3b step 0: 5.7 % / 9.3 % of items, under the 10 % bar; skill-options.js PRESET_HIDE_VALUES, an old code with band 50 reads the default; check ws-two-step BAND-BITES)",
     "proposed": true
    },
    {
