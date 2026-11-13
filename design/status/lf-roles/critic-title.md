@@ -104,3 +104,80 @@ off; Letter paper; Title off but with text; key after each page; and a 2-page sh
 - Dialogs: `dialog-teacher-{1280,1024}-{default,long-above,two,esc,spaces}.png`,
   `dialog-simple-{1280,1024}-{default,long-above,two,more-options}.png`, `dialog-simple-1280-warn.png` and
   `dialog-simple-1280-from-link.png` (re-opened from the link in a fresh browser).
+
+---
+
+## Re-critic r2 (branch at `52ec869a7`), 2026-11-13
+
+### Verdict: PASS. Every criterion is 8 or more, on every page and both dialogs.
+
+| Criterion | Pages (pupil + key) | Teacher print dialog | Simple print dialog |
+|---|---|---|---|
+| C1 Ease of use | 9 | 9 | 9 (was 7) |
+| C2 Educational value | 9 | 9 | 9 |
+| C3 Spacing and layout | 8 | 8 | 8 |
+| C4 Standard fidelity | 9 | 9 | 9 |
+
+New PNGs are in `design/status/lf-roles/title/critic-r2/`. I changed no code.
+
+### 1. Dialogs, typed with real keystrokes, at 1280 and 1024
+
+I drove the dialogs with puppeteer `keyboard.type` and `press`, never by setting `.value`.
+
+- **T1, fixed.** In the simple print I typed the 2-line title, put the cursor at position 5 (Home, then → five times), and
+  typed X. I waited 3.5 s, which is past the debounce and the rebuild, then typed Y, waited 3.5 s again, and typed Z. The box
+  read `I CanXYZ subtract …` with the cursor at 8 and the focus still in the box. A Shift+→ selection over 8 characters,
+  deleted, then a 3.5 s wait, then typing "We ", replaced the selection in place. The teacher print box does not redraw, and
+  the same mid-word test there gives `I CanXY …`. Both widths match. The builder's `ws-frame-title-ui` is OK (UI-CARET,
+  UI-TITLE-OFF, UI-WIDTH).
+- **T4, fixed.** I clicked Header › Title off. The Page title box and both Title place buttons become disabled. The caption
+  reads "Title is off (Header: Title), so the pages print no title. Tick Title to use these." The preview prints no title.
+  When I ticked Title back on, the typed text, "Above name" and the cut warning all came back.
+  *Nit:* while Title is off, the caption under Title place still says "The title prints above the Name, Date and Score line"
+  (`dialog-teacher-1024-title-off.png`). This does not affect the score.
+- **T5, fixed.** The simple print box is 460 px wide at both widths, and the label "Page title" stays on one line (21 px tall).
+  There is no horizontal scroll.
+- **T10, fixed.** In both dialogs a 2-line title now says "…the page is 6 mm shorter and may hold one row of problems fewer."
+- **T7, addressed.** The teacher print caption now says the title replaces the page type's own title (Test A, Review …).
+- **Unchanged and still right:**
+  - Both dialogs default to "Below name" with an empty box.
+  - The cut warning quotes the exact words printed at the chosen size: L in the teacher print, M in the simple print.
+  - The preview matches the warning.
+  - No console errors.
+
+### 2. Pages: "above" moved and nothing else did
+
+- **Pin.** `ws-frame-title --hashes-against …/master-hashes.json`: OK, 690 builds, **196 of 196** identical. `--only api`
+  (TITLE-API, T8): OK.
+- **My spot-hashes.** These are against `a6883082c`, the master base of this branch and the commit the pin was made on. The
+  set is 6 passed skills × 9 roles × M/L, seed 777, Score on. All **108 of 108** pupil + key hashes are identical.
+  (origin/master has since moved to `b9414a659`; the branch has not merged it, so I compared against its own base.)
+- **Re-render of my r1 matrix.** I rebuilt 162 builds: 9 roles × M/L × 9 variants. Against r1, the only change is the
+  "above" variants (including the whitespace-only title set to above). Their header is 22.99 mm instead of 22.98 mm, a
+  sub-pixel rounding. The body top, the body height, the page count, the title text, the line count and the header order are
+  unchanged on every page and every key, with no overflow. Default, below, 2-line-below and long-below pages are identical
+  in every measurement.
+- **T2, fixed.** The ink gap from the "above" title to the Name row is now **3.4 mm at L and 4.1 mm at M**; it was 6.5 and
+  7.2. The Name row still sits 1.2 mm above the rule. The title now reads as the head of the form line, with the free space
+  above it (`zoom-heads-default-above-twoabove.png`). A 2-line title above the Name row has 3.3 mm (L) or 5.3 mm (M) to the
+  Name row.
+- **CSS.** Against origin/master the CSS is still purely additive. r2 edits only rules that this lane added.
+- **Other gates.** `ws-boot-smoke` OK. `ws-title-code` OK. The syntax check is OK on the 4 changed modules.
+- **T6.** I read the builder's reasoning: L-VERBS reads only `.ws-instrline`, and VQ-TITLE reads the provider's iCan string.
+  It holds; I did not re-run the lint.
+- **T8.** `HEADER_DEFAULTS` is shared, and TITLE-API asserts that `pageHeader(h)` equals the header that `page()` draws.
+
+### 3. T3: acceptable as listed
+
+The clearance between the 2-line title's descenders and the rule is 0.68 mm at L and 0.85 mm at M. The default one-line page
+has 1.02–1.2 mm. Nothing touches, the two lines are fully legible, and the gap is only about 0.3 mm narrower than on pages
+the owner has already passed. It occurs only when a teacher chooses a 2-line title of their own. Either fix the builder names
+is worse: a taller band would cost a row of problems on every 2-line page, and a tighter line pitch would squeeze the
+0.5 mm gap between the two lines. **I accept it as listed, for the owner to see.** It does not lower C3 below 8.
+
+### Checks this round confirmed
+
+- UI-CARET is a real-keystroke probe. It fails on `aaafcfb67` and passes now; backtest `title-ui-caret`.
+- UI-TITLE-OFF and UI-WIDTH are on precritic `--teacher`.
+- A further check is worth adding to T4's probe: when a control is disabled, the caption under it must not describe what it
+  will do. That would catch the nit above.
