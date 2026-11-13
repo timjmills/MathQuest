@@ -154,7 +154,10 @@ else {
             console.log(`  ${line ? 'OK  ' : 'FAIL'} opt-in ${lane.lane} ${id.padEnd(18)} ${want.join(' ')}`);
             if (!line) fails.push(`opt-in ${lane.lane} ${id}: ws-precritic --skill ${ks.join(',')} --dry-run plans no gate with ${want.join(' ')} --rule-skills`);
         }
-        const other = [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
+        // (lf-ops-props r5: the probe skill is in NO opted-in lane - add_facts is lf-ops's, so its own --rule-skills read as a
+        // leak of every other lane's rules)
+        const anyLane = new Set(((optIn && optIn.lanes) || []).flatMap((l) => l.skills || []));
+        const other = [...live].find((k) => !anyLane.has(k) && k.startsWith('addition:')) || [...live].find((k) => !(lane.skills || []).includes(k) && k.startsWith('addition:'));
         if (other) {
             checked++;
             const q = plan([other], null);
