@@ -421,6 +421,44 @@ ink is judged at 30 % as before. Check: ws-empty-band EB-BAND (`modBandOk`), wit
 never appears, over 35 %, Guided, the last state, ink only in the next example: FAIL). Narrow on purpose: not a licence for
 white on any other role.
 
+## lf-placevalue week 2 (2026-11-12): number_word_form critic nwf r1 FAIL - findings -> checks
+| Finding (critic nwf r1) | Fixed this round | Check | Backtest | On path | Saved |
+|---|---|---|---|---|---|
+| N1 2-digit names had no named wrong answer (TF all True, Reason It 1 item) | yes: providers/pv.js wrongAnswer M-V9 401 / M-L3 swap / M-Z1 for 2-digit | ws-words-checks WORDS-WRONG-RATE (DRAFT: getProvider reads every candidate as a nudge on both commits) | pending | not wired (draft) | 1 round once wired |
+| N2 TF claim never prints with answerSlot hto | no | PROPOSED ws-cell-checks CLAIM-INK | none | - | - |
+| N3 "thirty-five hundred: 0 in the hundreds" steps under 100 | yes: workedSteps 2-digit branch | ws-words-checks WORDS-STEPS-TRUE (DRAFT, same reason) | pending | not wired | 1 round once wired |
+| N4 "one hundred" in a 2-digit row 5 mm lower | yes: two-line box only for names >= 15 chars over 100 | PROPOSED ws-cell-checks ROW-SLOT-Y | none | - | - |
+| N5 model never shows its answer (scripted-model / guided / opener) | no | PROPOSED ws-empty-band --model-states MODEL-ANSWER | none | - | - |
+| N6 chant "Three boxes" over 2-digit items; lesson role ignores practice opts | no | PROPOSED lesson-unit chant-box assertion | none | - | - |
+| N7 "one hundredthirteen" in the guided model | no (source not found this round) | PROPOSED ws-cell-checks WORDS-TEXT | none | - | - |
+| N8 "seven / hundred eight" breaks | yes: "n hundred" kept together (no-break space) | PROPOSED ws-cell-checks WORDS-BREAK | none | - | - |
+| N9 card host draws legacy q.visual (two answer places) | no: lead ruling needed (D3 names worksheet / quiz, not card) | PROPOSED ws-empty-band SCREEN-PARITY | none | - | - |
+| band=20 S 45 %, to_words capacity | no | ws-empty-band EB-BAND / options-render (exist) | none | precritic | - |
+- Lesson: a provider check through getProvider() reads the REGISTRY's wrapped answer (a near-miss nudge when the provider has no
+  named error), so it cannot see the provider's own gap; backtest a new check on the failed commit BEFORE writing the table row.
+- Lesson: a skill moved onto a new card brings its family's past critic findings into the card's scope (21 rule ids here): add them
+  in the same change, or the re-sign stalls.
+
+## lf-placevalue number_word_form r2-r3 (2026-11-13): findings -> checks
+| Finding | Check (new / extended) | Backtest row (FAIL old -> PASS fix) | Path | Saved |
+|---|---|---|---|---|
+| N1 2-digit names: no named wrong answer | ws-words-checks WORDS-WRONG-RATE (new; reads the real provider) | pv-words-provider (2ccd5b21 -> 1e3b128e) | precritic opt-in | 1 round |
+| N3 false hundreds steps under 100 | ws-words-checks WORDS-STEPS-TRUE (new) | pv-words-provider | precritic opt-in | 1 round |
+| N2 TF claim not printed with H T O | ws-cell-checks --words-rules CLAIM-INK (new) | pv-words-claim | precritic opt-in | 1 round |
+| N4 / N10 / N10b row answer places out of line | ws-cell-checks --words-rules ROW-SLOT-Y (new; lesson + guided rows; band 1,000 + zeroPlace always row) | pv-words-rowy, pv-words-rowy-1000 (706d940a -> 5a4ca828) | precritic opt-in (2 rows) | 2 rounds (N4 class came back as N10) |
+| N5 model never shows its answer | ws-cell-checks --words-rules MODEL-ANSWER (new) | pv-words-model | precritic opt-in | 1 round |
+| N6 chant vs slots; lesson ignored its practice opts | ws-lesson-unit chant-box (new, always on) | pv-words-chant | ws-lesson-unit (gate) | 1 round |
+| N7 dropped space at the highlight split | ws-cell-checks --words-rules WORDS-TEXT (new) | pv-words-text | precritic opt-in | 1 round |
+| N8 "seven / hundred eight" breaks | ws-cell-checks --words-rules WORDS-BREAK (new) | pv-words-break | precritic opt-in | 1 round |
+| N9 card drew the legacy visual (2 answer places) | ws-empty-band --screen-parity EB-PARITY (new, lead ruling) | pv-words-parity | precritic opt-in | 1 round |
+| N11 numeral-to-words one across at S | ws-empty-band EB-SIDE on the to_words option (exists; backtest added) | pv-words-towords-side (706d940a -> 5a4ca828) | precritic options variants | 1 round |
+| band 20 S stretched rows | ws-empty-band EB-BAND (exists) | (builder r2 row) | precritic | 1 round |
+| N12 "1 ones" step plural (minor, open) | PROPOSED: step-string lint \b1 (ones|tens|hundreds)\b | none | - | - |
+| guided Model tab row 2.5-3.2 mm (guided.js, D3) | ROW-SLOT-Y records, does not judge the Model row | none | - | 0 - engine |
+| card EB-SIDE 36-42 % (host width, D3) | ws-empty-band EB-SIDE (exists) | none | - | 0 - hosts |
+- Lesson: a row-alignment fix keyed to ONE item's length (>= 15 letters) misses the item of the same row it does not cover ('one
+  thousand', 12): key it to what the PAGE deals (the band) so every cell of the row gets the same box.
+- Lesson: getProvider takes (category, skill); one string silently reads the defaults - a provider check must assert real members.
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
 | Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
