@@ -209,6 +209,11 @@
       "date": "2026-11-13",
       "ruling": "div_facts' array support is LANDSCAPE: the divisor is the number of ROWS, laid across the cell (28 ÷ 4 is 4 rows of 7), so the array can be bigger. The dots are as large as the cell width allows and NEVER smaller than the print dot (screen dot to digit >= paper's); the 5-group gaps stay (WDS RP-81 / RP-21); 0 ÷ n draws the empty frame as a short landscape frame. Screen hosts (practice card 1280 / 820 / 390, online worksheet, quiz) and the print support-aid pages alike (paper = screen); the print pages still fit (ws-empty-band, EB-*, Test count = Independent capacity). Owner, from a screenshot of the div_facts online worksheet: \"it would be better to have the arrays landscape so they can be bigger\".",
       "source": "owner, 2026-11-13, direct"
+    },
+    {
+      "date": "2026-11-13",
+      "ruling": "The landscape-array ruling (§5.9) covers arrays in general, so it applies to mult_facts' array support too: the FIRST factor is the number of ROWS, the second factor's dots across each (3 x 7 is 3 rows of 7); the dots as large as the cell width allows and never smaller than the print dot; the 5-group gaps (WDS RP-81 / RP-21). Every screen picture mark of the fact supports (add_facts touch / tile / frame, mult_facts touch / skip / array, div_facts array) is at least 95 % of its print size (SIZE-INK).",
+      "source": "owner ruling 2026-11-13 (arrays in general), applied to mult_facts by the lead, 2026-11-13"
     }
   ],
   "misconceptions": [
