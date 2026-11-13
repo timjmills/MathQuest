@@ -84,13 +84,13 @@ These rules come from `design/IMPROVEMENT_PLAN.md` (§1.3 – §1.7, §4.3). The
    roles / templates / hosts the lane did not touch.
 0c. **Every engine change is proved against master before hand-over (lead, lf-engine landing, 2026-11-09).** A change to the
    lesson engine (sheet/roles/lesson.js, sheet/lesson-pages/*, print-sheet.js buildLesson, lessons/library.js or the lesson
-   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --check
+   records) runs `node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --check
    <master baseline>` (written with `--write` on a master worktree) before the lane hands over; every differing hash is either
    the change's intended page on a lesson the change was made for (opt-in on that lesson's data, LR-17b) or a defect.
    Backtest row `lesson-baseline-phase0-optin` (FAIL 3bf3ef5c / PASS the LR-17b fix).
    *Why:* the lf-engine landing found 80 hashes of live packets changed by two critic fixes made for the sample lessons.
    **Now a DEPLOY GATE (lead ruling 2026-11-13):** the lane rule alone let a change through when a lane skipped it (2 days
-   unseen), so `ws-deploy-gates.sh` session 4 runs `ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson
+   unseen), so `ws-deploy-gates.sh` session 4 runs `ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson
    --unpinned --check design/audit/baselines/lesson-baseline.json` on every deploy (≈ 13 min, one slot; its own session
    because sessions 1-3 sit at 27-28 of their 30 min). A lesson page that differs from the pin, or a lesson the tree prints
    that the pin lacks (UNPINNED), fails the deploy. **Re-pin protocol:** a deploy whose lesson pages change ON PURPOSE
