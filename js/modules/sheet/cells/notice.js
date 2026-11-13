@@ -62,7 +62,15 @@ export function noticeStatements(terms) {
 
 const LABELS2 = (p, d) => (Array.isArray(p.labels) && p.labels.length === 2 ? p.labels.map(String) : d);
 const correctOf = (p) => Math.max(0, Number(p.correct) || 0);
-const showOn = (p) => p && p.show !== false;
+/**
+ * The fading hint (`patShow`) shows only where the page gives hints: never at scaffold level 0 - the Test (
+ * roles/test.js plans level 0) - whatever the option says (critic r1 F1: "even / odd" under each factor printed on the Test
+ * decided the item). The quiz hides the parts marked data-ws-hint (css/quiz-mode.css), the twin being dealt once for every
+ * host. Checked by ws-cell-checks HINT-ON-TEST (proposed, lf-checks) and the lane probe in design/status/lf-algebra.md.
+ */
+const showOn = (p, ctx) => !!p && p.show !== false && !(ctx && ctx.scaffoldLevel === 0);
+/** The mark every fading-hint part carries: the quiz hides it; the screen ink pass keeps its grey (mq-keep-color). */
+const HINT_ATTR = ' data-ws-hint="fade"';
 
 /** Which printed word a state rings: the key's, Error analysis's wrong one, or none (family-check's rule). */
 function ringedIndex(labels, p, ctx) {
@@ -98,10 +106,10 @@ function wordChoice(ctx, labels, p) {
 }
 
 /** A number tile of a track or a row: given (0.75 pt) or a working box (empty, never graded). */
-function tile(ctx, { value = '', wMm, hMm, pt, work = false, expect = '', id = '', ink = null }) {
+function tile(ctx, { value = '', wMm, hMm, pt, work = false, expect = '', id = '', ink = null, hint = false }) {
     const base = `box-sizing:border-box;flex:none;width:${L(ctx, wMm)};height:${L(ctx, hMm)};display:inline-flex;align-items:center;justify-content:center;`
         + `font-size:${P(ctx, pt)};font-weight:700;line-height:1;background:#fff;border-radius:${L(ctx, 1)};${KEY_FEATURES}`;
-    if (!work) return `<span class="mq-nt-tile" style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">${esc(value)}</span>`;
+    if (!work) return `<span class="mq-nt-tile"${hint ? HINT_ATTR : ''} style="${base}border:${B(ctx, 0.75)} solid ${INK};color:${INK};">${esc(value)}</span>`;
     if (isTwin(ctx)) {
         return `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(expect)}" data-ws-graded="0" inputmode="numeric" maxlength="3" autocomplete="off" spellcheck="false" aria-label="number ${esc(id)}" `
             + `style="${base}width:max(44px, ${L(ctx, wMm)});height:max(44px, ${L(ctx, hMm)});border:${B(ctx, 0.75)} solid ${INK};color:${INK};text-align:center;padding:0;margin:0;font-family:'Andika','Open Sans',sans-serif;">`;
@@ -114,8 +122,8 @@ function tile(ctx, { value = '', wMm, hMm, pt, work = false, expect = '', id = '
 function parityCell(p, ctx) {
     const labels = LABELS2(p, ['Even', 'Odd']);
     const dp = digitPt(ctx);
-    const hint = (n) => (showOn(p)
-        ? `<span class="mq-nt-hint" style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};font-weight:400;color:${GREY};line-height:1.1;">${n % 2 === 0 ? 'even' : 'odd'}</span>`
+    const hint = (n) => (showOn(p, ctx)
+        ? `<span class="mq-nt-hint mq-keep-color"${HINT_ATTR} style="display:block;margin-top:${L(ctx, 1)};font-size:${P(ctx, textPt(ctx))};font-weight:400;color:${GREY};line-height:1.1;">${n % 2 === 0 ? 'even' : 'odd'}</span>`
         : '');
     const num = (n) => `<span style="display:inline-flex;flex-direction:column;align-items:center;min-width:${L(ctx, 10)};">`
         + `<span style="font-size:${P(ctx, dp)};font-weight:700;line-height:1;${KEY_FEATURES}">${esc(n)}</span>${hint(n)}</span>`;
@@ -147,7 +155,7 @@ function trackTiles(p, ctx) {
     const pt = Math.min(digitPt(ctx) * 0.7, 18);
     const filled = !!ctx.state && ctx.state !== 'blank' && ctx.state !== 'wrong';
     return terms.map((v, i) => {
-        if (i === 0 || showOn(p)) return tile(ctx, { value: v, wMm: w, hMm: h, pt });
+        if (i === 0 || showOn(p, ctx)) return tile(ctx, { value: v, wMm: w, hMm: h, pt, hint: i > 0 });
         return tile(ctx, { value: filled ? v : '', wMm: w, hMm: h, pt, work: true, expect: String(v), id: `w${i}`, ink: filled ? inkOf(ctx) : null });
     });
 }
@@ -203,13 +211,13 @@ function trueFalseCell(p, ctx) {
     const st = `<div class="mq-nt-statement" style="border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1.5)};padding:${L(ctx, 2)} ${L(ctx, 3)};`
         + `font-size:${P(ctx, textPt(ctx) + 2)};font-weight:400;line-height:1.3;text-align:left;">${esc(p.statement)}</div>`;
     let row = '';
-    if (showOn(p)) {
+    if (showOn(p, ctx)) {
         const prods = p.products || [];
         const digits = Math.max(1, ...prods.map((v) => String(v).length));
         const sz = sizeOf(ctx);
         const w = (sz === 'S' ? 5.2 : sz === 'M' ? 6.2 : 7.2) + digits * (sz === 'S' ? 1.3 : 1.6);
         const pt = sz === 'S' ? 10 : sz === 'M' ? 12 : 14;
-        row = `<div class="mq-nt-row" role="img" aria-label="${esc(`the ${p.table} times-table: ${prods.join(', ')}`)}" style="display:flex;justify-content:center;flex-wrap:wrap;gap:${L(ctx, 1)};">`
+        row = `<div class="mq-nt-row"${HINT_ATTR} role="img" aria-label="${esc(`the ${p.table} times-table: ${prods.join(', ')}`)}" style="display:flex;justify-content:center;flex-wrap:wrap;gap:${L(ctx, 1)};">`
             + prods.map((v) => tile(ctx, { value: v, wMm: w, hMm: w * 0.8, pt })).join('') + '</div>';
     }
     return root(ctx, 'mq-nt mq-nt--tf', `${st}${row}${wordChoice(ctx, labels, p)}`,

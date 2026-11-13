@@ -35,7 +35,8 @@ const NOTICE_BY_TASK = {
     parity: {
         iCan: 'I Can tell if a product is even or odd',
         instructionKey: 'product-even-odd',
-        steps: ['Look at each number in the fact: is it even or odd?', 'One even number makes the product even.', 'Both numbers odd: the product is odd.'],
+        // (r8, critic r1 F6b: the steps are the lesson's four step names, lessons/families/algebra.js 'notice-parity')
+        steps: ['Check the first.', 'Check the second.', 'An even one? Even.', 'Circle the word.'],
         say: 'The product is __ because __.',
         sayValues: (q) => {
             const p = noticeOf(q);
@@ -57,7 +58,8 @@ const NOTICE_BY_TASK = {
     feature: {
         iCan: 'I Can find what a number pattern shows',
         instructionKey: 'pattern-true-one',
-        steps: ['Read the rule. Read or write the numbers.', 'Test each sentence on every number, not only the first.', 'Check the one sentence that is true.'],
+        // (r8: the lesson's step names, 'pattern-features')
+        steps: ['Read the rule. Write the numbers.', 'Test a sentence.', 'Test the next one.', 'Check the true one.'],
         say: 'I notice that __.',
         sayValues: (q) => { const p = noticeOf(q); return p && p.task === 'feature' ? [lowerFirst((p.choices || [])[p.correct])] : null; },
         stepsFor: (q) => {
@@ -88,6 +90,11 @@ const NOTICE_BY_TASK = {
         vocabulary: ['times-table', 'product', 'true', 'false'],
     },
 };
+// (r8, critic r1 F6: a page's Steps band takes the item's steps only when every item's are the same; a per-item
+// `stepsFor` sent the guided page to the provider's item-less strings, which have no options and fell to PARITY on the
+// pattern_features preset. The steps are the task's fixed list (the same on every item of a page); the numbers stay in
+// the worked steps and the Say band. ws-node-lint STEPS-FOLLOW-PRESET (proposed) and the lane probe check it.)
+for (const d of Object.values(NOTICE_BY_TASK)) delete d.stepsFor;
 const nbSteps = (f) => (typeof f === 'function' ? (q) => { const r = f(q); return Array.isArray(r) ? r.map(nb) : r; } : undefined);
 const NOTICE_STRINGS = Object.fromEntries(Object.entries(NOTICE_BY_TASK).map(([k, d]) => [k, strings({ ...d, stepsFor: nbSteps(d.stepsFor) })]));
 
@@ -137,7 +144,8 @@ function noticeSteps(q) {
         } else {
             out.push(step('Odd × odd leaves one over: odd.'));
         }
-        out.push(step(`${p.product} is ${even ? 'even' : 'odd'}. Circle ${even ? 'Even' : 'Odd'}.`, ans));
+        // (r8, card ruling P2: the product is never printed - the lesson is to know it from the factors)
+        out.push(step(`So the product is ${even ? 'even' : 'odd'}. Circle ${even ? 'Even' : 'Odd'}.`, ans));
         return clampSteps(out);
     }
     if (p.task === 'feature') {
@@ -194,8 +202,10 @@ function noticeWrong(q) {
 /* ================================================================== growing_shape_patterns */
 
 const GROW_BY_TASK = {
-    next: { iCan: 'I Can draw and count the next term of a growing pattern', instructionKey: 'grow-next',
-        steps: ['Count each term.', 'Find how many more each term has.', 'Draw Term 4 with that many more. Write how many.'] },
+    // (r8, critic r1 F7: one verb, so a role title reads "Review: finding the next term ...", never "drawing and count";
+    // the steps are the lesson's four step names, 'growing-shape-patterns', F6b)
+    next: { iCan: 'I Can find the next term of a growing pattern', instructionKey: 'grow-next',
+        steps: ['Count.', 'Find the more.', 'Draw Term 4.', 'Write it.'] },
     rule: { iCan: 'I Can find the rule of a growing pattern', instructionKey: 'grow-rule',
         steps: ['Count each term.', 'Find how many more each term has: that is the rule.', 'Draw Term 4. Write how many and the rule.'] },
     far: { iCan: 'I Can find a later term of a growing pattern', instructionKey: 'grow-far',
@@ -207,15 +217,7 @@ const growSayValues = (q) => {
     if (!p) return null;
     return p.ask === 'far' ? [p.step, 10, p.count10] : [p.step, 4, p.counts[3]];
 };
-const growStepsFor = (q) => {
-    const p = growOf(q);
-    if (!p) return null;
-    const [a, b, c, d] = p.counts;
-    const out = [`Terms 1, 2, 3 have ${a}, ${b}, ${c} ${p.unit}.`, `Each term has ${p.step} more: the rule is + ${p.step}.`];
-    out.push(p.ask === 'far' ? `Count on by ${p.step} to Term 10: ${p.count10}.` : `Term 4 has ${c} + ${p.step} = ${d}.`);
-    return out;
-};
-const GROW_STRINGS = Object.fromEntries(Object.entries(GROW_BY_TASK).map(([k, d]) => [k, strings({ ...d, say: GROW_SAY, sayValues: growSayValues, stepsFor: nbSteps(growStepsFor), vocabulary: ['term', 'pattern', 'rule'] })]));
+const GROW_STRINGS = Object.fromEntries(Object.entries(GROW_BY_TASK).map(([k, d]) => [k, strings({ ...d, say: GROW_SAY, sayValues: growSayValues, vocabulary: ['term', 'pattern', 'rule'] })]));
 function growStrings(ref = {}) {
     const p = growOf(ref && ref.q);
     const t = p && GROW_STRINGS[p.ask] ? p.ask : (ref && ref.opts && GROW_STRINGS[ref.opts.patTask] ? ref.opts.patTask : 'next');

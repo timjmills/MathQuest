@@ -411,6 +411,13 @@ function ftStepState(p, steps, k, ctx) {
         // (the Check row from the state whose step works the Check - rule-check's "Check: 8 − 1 = 7" panel - else the last)
         const chkAt = (Array.isArray(steps) ? steps : []).findIndex((s) => ((s && s.marks) || []).some((m) => m && m.slot === 'chk'));
         const withCheck = last || whole || (chkAt >= 0 && chkAt < n - 1 && k >= chkAt);
+        // (r8, critic r1 F5: "Write 1" sat over an empty Out box - each state before the last shows what steps 1..k
+        // wrote, traced grey, so the four panels progress; ws-detailed-lesson STATE-PROGRESS, proposed)
+        if (!last && !whole) {
+            const acc = {};
+            (Array.isArray(steps) ? steps : []).slice(0, k + 1).forEach((s) => ((s && s.marks) || []).forEach((m) => { if (m && m.slot !== undefined) acc[m.slot] = m.value; }));
+            if (Object.keys(acc).length) c.ftOnly = acc;
+        }
         return this.render(chartState(p, c, last || whole, withCheck), Object.assign(c, { ftChart: true }));
     }
     const G = { '+': '+', '-': '−', x: '×', '/': '÷' };
@@ -606,13 +613,22 @@ register('function-table', {
         const slots = ftSlots(p);
         const slotsById = Object.fromEntries(slots.map((s) => [s.id, s]));
         const key = keyMap(p);
-        const ink = inkOf(ctx);
-        const vals = slotValues(ctx, key, (w) => {
+        let ink = inkOf(ctx);
+        let vals = slotValues(ctx, key, (w) => {
             const l = splitParts(w);
             const o = {};
             slots.forEach((s, n) => { if (l[n] !== undefined) o[s.id] = l[n]; });
             return o;
         });
+        // A PARTIAL state (r8, critic r1 F5 and the lead's Model item): only the slots the steps so far have written, traced grey - the
+        // anchor chart's states (ftStepState: ctx.ftOnly) and a Model state that passes the marks of steps 1..k as
+        // `payload.traceSlots` (count-row's convention, roles/scripted-model.js marksFor).
+        const partial = ctx.ftOnly || (ctx.state === 'blank' && p.traceSlots && typeof p.traceSlots === 'object' ? p.traceSlots : null);
+        if (partial) {
+            vals = {};
+            for (const [id, v] of Object.entries(partial)) if (id in key && v !== undefined && v !== null) vals[id] = String(v);
+            ink = ink || 'trace';
+        }
         const wMm = tableWidth(p, d);
         const fx = fixOf(p, ctx, vals, key);
         let inner = '';

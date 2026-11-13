@@ -125,6 +125,8 @@ function noticeFeature(q, o) {
     };
     q.text = 'Read the pattern. Which sentence is true?';
     q.ans = picked.target.text;
+    // (r8, lead: the three sentences ARE the choices - hosts and checks that read q.options see them, in printed order)
+    q.options = payload.choices.slice();
     q.acceptedAnswers = [picked.target.text.toLowerCase()];
     q.printAnswer = picked.target.text;
     q.printText = 'Read the pattern. Check the sentence that is true.';

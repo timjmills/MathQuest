@@ -217,16 +217,18 @@ registerSkill('patterns:number_patterns_rule', {
         return {
             iCan: shown ? 'I Can use the rule of a number pattern' : 'I Can find the rule of a number pattern',
             instructionKey: shown ? 'pattern-rule' : 'pattern-find-rule',   // R3: the default (no item) is find the rule
+            // (lf-algebra r8, critic r1 F6b: the lesson's four step names - lessons/families/algebra.js
+            // 'follow-given-rule' and 'number-patterns-find-rule' - so the Guided band and the anchor chart say the same)
             steps: shown ? [
                 'Read the rule.',
-                'Start at the last number shown.',
-                'Use the rule to get the next number.',
-                'Write each missing number.',
+                'Do it to the number.',
+                'Write the next one.',
+                'Every gap, same rule.',
             ] : [
-                'Look at two numbers side by side.',
-                'Find the rule: more, less, double, half or times 10?',
-                'Check the rule on the next pair.',
-                'Write the rule. Use it to write each missing number.',
+                'Look at the jumps.',
+                'Name the rule.',
+                'Use the rule at the gap.',
+                'Every gap. Check each jump.',
             ],
             say: 'The rule is __. The next number is __.',
             sayValues: (item) => {

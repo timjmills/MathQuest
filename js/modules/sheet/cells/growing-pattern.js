@@ -82,6 +82,12 @@ export function growthCells(fam, e, t) {
 
 const unitOf = (ctx) => (isTwin(ctx) ? 3.0 : UNIT[sizeOf(ctx)] || UNIT.L);
 const boxMm = (ctx) => (GRID + 2 * PAD) * unitOf(ctx);
+/**
+ * A term box's CSS side. On screen (the twin) it never goes under TWIN_BOX_PX (critic r1 F9: the worksheet's zoomed-down
+ * twin drew ~6 px dots, too small to count): 100 px is a 12.8 px unit, a 10 px dot (from ~6), three terms across a 390 px phone card.
+ */
+const TWIN_BOX_PX = 100;
+const boxCss = (ctx) => (isTwin(ctx) ? `max(${TWIN_BOX_PX}px, ${L(ctx, boxMm(ctx))})` : L(ctx, boxMm(ctx)));
 
 /** One term drawn as an SVG in units (viewBox), black outline only. */
 function termSVG(ctx, cells, shape, { ink = INK, label = '' } = {}) {
@@ -111,14 +117,14 @@ function tapGrid(ctx, shape) {
 }
 
 /** A number box: given (thin), working (thin, never graded) or the graded answer (heavy, via the library's answerArea). */
-function countBox(ctx, { value = '', kind = 'given', id = '', expect = '', ink = null, unit = '' }) {
+function countBox(ctx, { value = '', kind = 'given', id = '', expect = '', ink = null, unit = '', hint = false }) {
     if (kind === 'answer') return answerArea(ctx, { id, shown: value, expect, digits: 2, ink, unit });
     const sz = sizeOf(ctx);
     const w = isTwin(ctx) ? 12 : sz === 'S' ? 10 : sz === 'M' ? 11.5 : 12.5;
     const h = isTwin(ctx) ? 12 : sz === 'S' ? 9 : sz === 'M' ? 9.5 : 9.5;
     const pt = Math.min(digitPt(ctx) * 0.75, 20);
     const base = `box-sizing:border-box;flex:none;display:inline-flex;align-items:center;justify-content:center;border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, pt)};font-weight:700;line-height:1;${KEY_FEATURES}`;
-    if (kind === 'given') return `<span class="mq-gp-count" style="${base}width:${L(ctx, w)};height:${L(ctx, h)};color:${INK};">${esc(value)}</span>`;
+    if (kind === 'given') return `<span class="mq-gp-count"${hint ? ' data-ws-hint="fade"' : ''} style="${base}width:${L(ctx, w)};height:${L(ctx, h)};color:${INK};">${esc(value)}</span>`;
     if (isTwin(ctx)) {
         return `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(expect)}" data-ws-graded="0" inputmode="numeric" maxlength="2" autocomplete="off" spellcheck="false" aria-label="${esc(id)}" `
             + `style="${base}width:max(44px, ${L(ctx, w)});height:max(44px, ${L(ctx, h)});color:${INK};text-align:center;padding:0;margin:0;font-family:'Andika','Open Sans',sans-serif;">`;
@@ -141,6 +147,10 @@ register(GROW_TEMPLATE, {
         const box = boxMm(ctx);
         const tp = textPt(ctx);
         // (the anchor chart's step states, stepState below: Term 4 drawn on its own step before its count is written)
+        // The fading hint (`patShow`: Terms 1-3's counts printed) never shows at scaffold level 0 - the Test (the test role;
+        // critic r1 F1: the counts were printed on the Test) - whatever the option says; the quiz hides the given counts
+        // (data-ws-hint, css/quiz-mode.css).
+        const show = p.show !== false && ctx.scaffoldLevel !== 0;
         const drawInk = ctx.gpDraw || (keyed ? (state === 'traced' ? 'trace' : 'solid') : null);
         const term = (t) => {
             const head = `<div class="mq-gp-label" style="font-size:${P(ctx, Math.max(10, tp - 2))};font-weight:700;line-height:1.1;margin-bottom:${L(ctx, 0.3)};">Term ${t}</div>`;
@@ -151,11 +161,11 @@ register(GROW_TEMPLATE, {
             else pic = '';
             const frame = twin && t === 4
                 ? tapGrid(ctx, shape)
-                : `<div class="mq-gp-box"${t === 4 ? ' data-ws-slot="draw" data-ws-shape="draw" data-ws-graded="0"' : ''}${t === 4 && drawInk ? ` data-ws-ink="${drawInk}"` : ''} style="box-sizing:border-box;width:${L(ctx, box)};height:${L(ctx, box)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;">${pic}</div>`;
+                : `<div class="mq-gp-box"${t === 4 ? ' data-ws-slot="draw" data-ws-shape="draw" data-ws-graded="0"' : ''}${t === 4 && drawInk ? ` data-ws-ink="${drawInk}"` : ''} style="box-sizing:border-box;width:${boxCss(ctx)};height:${boxCss(ctx)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;">${pic}</div>`;
             // the count under the box
             let cnt;
             if (t < 4) {
-                if (p.show !== false) cnt = countBox(ctx, { value: counts[t - 1], kind: 'given' });
+                if (show) cnt = countBox(ctx, { value: counts[t - 1], kind: 'given', hint: true });
                 else cnt = countBox(ctx, { value: keyed ? counts[t - 1] : wrongSlot(`n${t}`), kind: 'work', id: `n${t}`, expect: String(counts[t - 1]), ink: keyed ? ink : null });
             } else if (ask === 'far') {
                 cnt = countBox(ctx, { value: keyed ? counts[3] : wrongSlot('n4'), kind: 'work', id: 'n4', expect: String(counts[3]), ink: keyed ? ink : null });

@@ -40,7 +40,8 @@ const BY_TASK = {
     outputs: {
         iCan: 'I Can use a rule to complete an In and Out table',
         instructionKey: 'table',
-        steps: ['Read the rule.', 'Do the rule to each In number.', 'Write each Out number.'],
+        // (r8, F6b: the lesson's step names, 'function-table-use-rule')
+        steps: ['Read the rule.', 'Do it to the In.', 'Write the Out.', 'Same rule again.'],
     },
     rule: {
         iCan: 'I Can find the rule of an In and Out table',
