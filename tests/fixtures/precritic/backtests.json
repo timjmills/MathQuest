@@ -3212,8 +3212,8 @@
    "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
   },
   "pass": {
-   "commit": "d377e32b",
-   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+   "commit": "fc04ba58",
+   "state": "0 findings: frame-array 43.0x14.4 (landscape, the divisor's rows) on every host, 'no dots' frame on 0 ÷ n (re-pointed from d377e32b: since the owner's landscape ruling of 2026-11-13 EQ wants the divisor's rows)"
   },
   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
   "expect": {
@@ -3256,6 +3256,46 @@
    "state": "0 findings: every ÷ card under once one wraps"
   },
   "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-orient-divfacts",
+  "check": "div_facts' framed ÷ array with 2 or more rows is drawn landscape (width >= height) on every screen host and on the Independent page at S / M / L, the empty 0 ÷ n frame too (facts card §5.9, owner 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-ORIENT (facts card 5.9, RP-81)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "FAIL: the frame is the quotient's rows of the divisor's dots, 41 x 122 px on screen (12.0 x 35.8 mm on paper)"
+  },
+  "pass": {
+   "commit": "fc04ba58",
+   "state": "0 findings: frame 43.0 x 14.4 mm at M, the divisor's rows"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only ORIENT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-dot-min-divfacts",
+  "check": "div_facts' screen array dot stands to the fact digit at >= paper's ratio - never smaller than the print dot (facts card §5.9, owner 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-DOT-MIN (facts card 5.9, RUBRIC C1)",
+  "browser": true,
+  "fail": {
+   "commit": "88753326",
+   "state": "FAIL: screen dot 0.167 x the fact digit, paper 0.252"
+  },
+  "pass": {
+   "commit": "fc04ba58",
+   "state": "0 findings: the screen dot 1.5 x paper's ratio, capped by the cell"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only DOTMIN",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
