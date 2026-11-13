@@ -329,6 +329,11 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - npr / count_by_tables count-row digits pass SCREEN-DIGIT on card and quiz from -props 85c694896. The arcs train passes their new TRAIN-FIT (ws-screen-slots --train-fit; row ss-train-fit-cbt) from 85c694896.
     - Row screen-digit-npr-worksheet still CANNOT be armed: the WORKSHEET host stays at about 29 px because worksheet.js:1052 sets one --mq-digit per sheet. That is OURS (item 11): a per-cell digit floor. mult_properties arrays-turn numerals are also 29 px. Arm the row with pass = the item-11 fix commit, once 85c694896 is merged in.
     - The CL40-INK more-practice row (pass c1c54b5c4) is already recorded (item 7).
+22. On merge with lf-placevalue w2 (claude/lf-placevalue-w2 fb05bcb1), carry into ws-empty-band:
+    - --grid-foot / --columns (item 12);
+    - EB-FOOT measures a CL-4d centred `ws-rowstretch` cell as pads + tab clearance + the line's box (lead ruling 11-13, CL-4d: a one-line cell its row stretches >= 30 % is centred; it raised 234 false findings before);
+    - an OPT_IN_FLAGS literal near the top. The builder's 5a8e27ec already names the opt-in flags in the first 80 lines; reconcile the two. Plus a GUARD: precritic should not rely on an 80-line source scan for flags (a self-test that every flag precritic passes is accepted).
+    Info: compare's pixel totals went 337 → 93 (lesson 17, opener 30, scripted-model 17, review 10, mixed 18, pre-skill-check EB-PAGE 1): lf-placevalue's.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
