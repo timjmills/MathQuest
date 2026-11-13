@@ -168,6 +168,31 @@ function cellChecksInPage(opts) {
                     }
                 });
             }
+            // ---- RI-DISTINCT (word-stories critic r1 F2, lead 2026-11-13): Reason It's A and B panels show DIFFERENT work - the
+            // same drawing in both (the template ignored the shown answer) asks the pupil to pick between two identical solutions
+            if (role === 'reason-it') {
+                var boxes = c.querySelectorAll('.mq-abbox');
+                if (boxes.length === 2) {
+                    var sig = function (b) { var k = b.cloneNode(true); [].forEach.call(k.querySelectorAll('.mq-abtag'), function (t) { t.remove(); }); return k.innerHTML.replace(/\s+/g, ' ').trim(); };
+                    if (sig(boxes[0]) === sig(boxes[1])) out.findings.push({ rule: 'RI-DISTINCT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': panels A and B show the same work (PT-RSN-4: two different worked solutions)' });
+                }
+            }
+            // ---- ABTAG (critic r6g): a Reason It panel's A / B tag stands clear of the work's ink - 2 mm at least where they share rows
+            if (role === 'reason-it') {
+                c.querySelectorAll('.mq-abbox').forEach(function (bx) {
+                    var tg = bx.querySelector('.mq-abtag'); if (!tg) return;
+                    var tr = tg.getBoundingClientRect(), hit = '';
+                    [].forEach.call(bx.querySelectorAll('*'), function (e) {
+                        if (hit || e === tg || tg.contains(e) || !shownEl(e)) return;
+                        var cs = getComputedStyle(e), own = [].some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
+                        var ink = own || (cs.borderTopStyle !== 'none' && parseFloat(cs.borderTopWidth) > 0) || /svg/i.test(e.tagName);
+                        if (!ink) return;
+                        var r = e.getBoundingClientRect(); if (!r.width || !r.height) return;
+                        if (r.top < tr.bottom - 0.5 && r.bottom > tr.top + 0.5 && r.left < tr.right + 2 * PX && r.right > tr.left) hit = (e.textContent || e.tagName).trim().slice(0, 12);
+                    });
+                    if (hit) out.findings.push({ rule: 'ABTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the A / B tag touches the work ("' + hit + '" within 2 mm)' });
+                });
+            }
             // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
             // so the single grey never reads as "trace me"
             if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {
@@ -204,6 +229,17 @@ function cellChecksInPage(opts) {
                 // 2-4 mm (lead) with 0.5 mm for the cap-height estimate of the ink edge
                 var gap = top - tagFoot;
                 if (gap > 4.5 * PX || gap < 1.8 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over its ink, 2-4 mm +/- 0.5; critic r3 D6 / r4 n1)' });
+            }
+            // ---- KEYFIT (lf-roles r10): a key's written answer stays inside its slot - "hundreds" on a 2-digit line ran past it
+            if (isKey) {
+                c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
+                    if (s.querySelector('[data-ws-slot]') || s.getAttribute('data-ws-shape') === 'open' || !shownEl(s)) return;
+                    var sr = s.getBoundingClientRect();
+                    if (!sr.width) return;
+                    var tr = rectsOfText(s, '.mq-slottag');
+                    var wide = tr.some(function (r) { return r.left < sr.left - 1.5 || r.right > sr.right + 1.5; });
+                    if (wide) out.findings.push({ rule: 'KEYFIT', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + (s.textContent || '').trim().slice(0, 20) + '" past its slot (an answer never leaves its line or box)' });
+                });
             }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {

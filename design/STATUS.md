@@ -767,3 +767,15 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-13 — Deploy vocabulary (lf-vocab, narrow critic r14 PASS, min 8; both skills redesign-passed)
 - grade_pictures + pick3_words: r5 print, R-1 (highlight after answering, screen only), R-2 (spoken explanation on a wrong answer), O-1 blue next-answer box, O-2/O-3 unambiguous pictures that never fit a distractor, rounds r9–r14 (V-NUM, V-PLACE, V-TWIN, screen picture at print size). Known: 4 SIZE-REF gate-gap findings per lead ruling (same-word proof in the packet; gate fix with lf-checks).
 - Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, backtest self-test, capacity-pin (648), roles-unit (75), vocab-unit, empty-band self-test. Merged with master 70fa12c2 (EB-FOOT pairing; comment conflict resolved, backtests unioned 261 rows).
+
+## 2026-11-13 — Owner rule: lesson design at high effort
+- Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
+
+## 2026-11-13 — Deploy shared page roles deploy-4: Reason It (lf-roles, critics r6e + r6g PASS, 0 counted defects)
+- Reason It: work wider than half the room stands A over B (never shrunk); work that fits half a cell keeps A | B with the response as a full-width row under them; a column word story prints once over A and B; "__ is correct." dropped (PT-RSN-4: "Circle A or B. The answer is __."); one answer line length for every word answer (LINE-TELL); KEYFIT (a letter answer takes the word line); Guided tightRows; LONE-PAGE. Checks: RI-LAYOUT, RI-ONEANSWER, RI-DISTINCT, LINE-TELL, KEYFIT, ABTAG, LONE-PAGE, ri-overflow-stack / ri-countrow-overflow / ri-stack-band backtests; overflow non-pinnable in precritic.
+- Passed skills: all 81 RI pages change (F8), TF identify + fact_family_sort (word lines), 9 guided pages; capacity 0 drops, 17 rises, 1 ruled pin (sub_1m RI M = 2). Vocab Guided 6/6 identical. Lessons identical.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit (78), backtest self-test, capacity-pin, empty-band self-test.
+
+## 2026-11-13 — Owner rule: everything becomes an automatic check
+- Owner: "make sure you are saving everything to automatic checks as well". Sent to all 9 lanes: every critic / owner / lead-ruling finding ships with a failing-then-passing check, a proven backtest row, a place on precritic's path and a CHECKS_FROM_CRITICS row; each lane lists today's gaps in its next report and closes them before its next critic. lf-checks builds a ledger sweep so the rule enforces itself.
+- 2026-11-13 ~12:25 owner on the 7-day usage warning: "we will go back to the limits later but for now just let things be" - no slow-down; lanes continue as they are.
