@@ -356,5 +356,5 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - review S p1 cells 13, 14, 15, 16 (items 25-28): drawn 14.6 mm, footprint 12.5 mm (+17 %);
     - review M p1 cells 7, 8, 9, 10 (items 19-22): drawn 18.2 mm, footprint 15 mm (+21 %);
     - review L p1 cells 7, 8, 9, 10 (items 19-22): drawn 19.7 mm, footprint 16 mm (+23 %).
-    - In every case the cells are the 4 cells of the Mixed Review band.
+    - S cells 13-16 are the page's last four cells (the Mixed Review band comes last). The M and L bands are not yet confirmed: lf-ops should check them.
   - Re-pin (facts-lane debt, lead ruling): only `addition:add_facts review S|EB-FOOT`, `review M|EB-FOOT` and `review L|EB-FOOT`, at 4 each. The facts pin is then OK. Its "tighten the pin" notes were there before this change and are left alone.
