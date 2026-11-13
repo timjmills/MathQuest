@@ -1004,6 +1004,10 @@ function buildPlan(ctx) {
             const more = pl.roles.filter((r) => !BASE_ROLES.includes(r));
             if (more.length) add(gate(`render-gate-${sid}`, `ws-grade-render --gate on every other role the signed card offers (${pl.cards.map((c) => path.basename(c, '.md')).join(', ')} §7a; critic lf-ops r1 check 2)`, `${k} × ${more.length} roles × S/M/L`, 'browser', 'ws-grade-render',
                 ['--skills', k, '--roles', more.join(','), '--size', 'S,M,L', '--gate', '--no-screen', '--out', path.join(ctx.logs, `render-gate-${sid}`)], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
+            // (critic divarray r2 D6: the Scripted Model with a support DRAWN - div_facts' landscape array on the 10s band, tables 2-5 -
+            // ran its trace jots onto the cell rule at L; the card-role gate above renders the default, support-free page only)
+            if (k === 'division:div_facts') add(gate('render-gate-div_facts-sm-array', 'ws-grade-render --gate on the Scripted Model with the array support (10s band, tables 2-5) at M, L (critic divarray r2 D6: overflow)', `${k} × scripted-model × array × M/L`, 'browser', 'ws-grade-render',
+                ['--skills', k, '--roles', 'scripted-model', '--size', 'M,L', '--supports', 'array', '--opts', JSON.stringify({ band: 100, constant: [2, 3, 4, 5] }), '--gate', '--no-screen', '--out', path.join(ctx.logs, 'render-gate-div_facts-sm-array')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: 1 }));
             add(gate(`cell-checks-${sid}`, 'ws-cell-checks --card --card-opts (every card role x S/M/L and every offered option value: overflow, tag over answer, one answer a key slot, Size S; critic lf-ops r1 checks 2, 4, 8, 9)', `${k} × ${pl.roles.length} roles + ${pl.variants.length} option values × S/M/L`, 'browser', 'ws-cell-checks',
                 ['--skills', k, '--card', '--card-opts'], { needFlags: ['card-opts'], expect: { mention: [k] }, missingMsg: 'ws-cell-checks is not in this tree' }));
         }
