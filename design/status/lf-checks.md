@@ -213,3 +213,8 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     not pinned, and routed to lf-ops.
   - The "opt-in leak" probe was wrong: it picked add_facts, which is lf-ops' own opt-in skill. It now picks a skill in no lane's
     opt-in, and a leak is a --rule-skills line naming the lane's skills.
+- 2026-11-13 CL-4b stretch fix (fixer, Opus medium): 451207ab's centring worked; the band was INSIDE the content. A kit twin's line
+  slot becomes a 48 px host input (touch box, underline only, flex-end beside 33 px digits) and adoptVisualBlank drops the paper
+  slot's data-ws-slot, so the pixel read saw ~28 px of "empty" input above the digits (p2/p3 82 px cells, p5 centred too).
+  worksheet.js now keeps data-ws-slot="answer" on the input that took the slot. unit_form worksheet: OK; unit_form + div_facts
+  card/worksheet/quiz vs head: 0 new, 3 gone. div_facts worksheet keeps 30 pre-existing [eq] bands (33.7 % above), not touched.
