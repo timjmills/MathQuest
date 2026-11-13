@@ -41,7 +41,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 const ONLY = arg('only', '') ? list(arg('only')) : null;
 const on = (id) => !ONLY || ONLY.includes(id);
-const SIZES = list(arg('sizes', 'S,M,L'));
+const SIZES = list(arg('sizes', 'M,L'));   // (owner, 2026-11-13: print size S is dropped)
 const NSEED = Number(arg('seeds', 3));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const seedsFor = (role) => Array.from({ length: NSEED }, (_, k) => (hash(`placevalue__compare:${role}`) + k * 7919) % 1000000);
@@ -266,12 +266,14 @@ const m6Of = (a, b, sign) => {
         console.log('  EQ-SHARE-PAGE: six roles at ' + SIZES.join('/'));
     }
     if (on('WRAP-SIGN')) {
+        // (critic compare r3 N9: the default band never wraps - the wide bands and close pairs are where it broke)
+        for (const [tag, opts] of [['default', null], ['band 9999', { band: 9999 }], ['band 999999', { band: 999999 }], ['close 999999', { band: 999999, closeness: 'close' }]])
         for (const role of ['scripted-model', 'guided', 'lesson']) for (const size of SIZES) for (const seed of seedsFor(role)) {
-            await build(role, size, seed, null);
+            await build(role, size, seed, opts);
             const g = await sheet.evaluate(GEOM_PROBE, { wrapOps: '−+×÷=<>' });
-            for (const w of g.wraps.slice(0, 2)) bad.push(`WRAP-SIGN ${role} ${size} seed ${seed} p${w.page}: a line ends in "${w.op}": "${w.before}" / "${w.after}..." (join the sign to its numbers with no-break spaces)`);
+            for (const w of g.wraps.slice(0, 2)) bad.push(`WRAP-SIGN ${tag} ${role} ${size} seed ${seed} p${w.page}: a line ends in "${w.op}": "${w.before}" / "${w.after}..." (join the sign to its numbers with no-break spaces)`);
         }
-        console.log('  WRAP-SIGN: scripted-model, guided, lesson at ' + SIZES.join('/'));
+        console.log('  WRAP-SIGN: scripted-model, guided, lesson at ' + SIZES.join('/') + ' x default / band 9999 / band 999999 / close');
     }
     if (on('SIDE-PAD')) {
         for (const [tag, opts] of [['default', null], ['band 9999', { band: 9999 }], ['band 999999', { band: 999999 }]]) for (const seed of seedsFor('independent').slice(0, 2)) {

@@ -721,24 +721,27 @@ registerSkill('placevalue:compare', {
         if (p.a === undefined) return [];
         const d = compareDecision(p.a, p.b);
         const A = f(p.a), B = f(p.b);
+        // (critic compare r3 N9, the wrap class a second time: EVERY relation a step writes is one unbreakable unit - "Write
+        // 501,765 > / 179,619." broke at band 999,999; ws-pv-compare-pages WRAP-SIGN runs the wide bands too)
+        const rel = (x, s, y) => `${x}\u00a0${s}\u00a0${y}`;
         const count = { slot: 'count', value: `${d.la},${d.lb}` };
         const answer = { slot: 'answer', value: String(q.ans) };
         if (d.kind === 'length') {
             return [step(`${A} has ${COUNT_WORD[d.la] || d.la} digits. ${B} has ${COUNT_WORD[d.lb] || d.lb}.`, [count]),
                 step(`More digits is bigger: ${d.la > d.lb ? A : B}.`, [{ slot: 'win', value: d.la > d.lb ? 'a' : 'b' }]),
-                step(`Write ${A} ${q.ans} ${B}.`, [answer])];
+                step(`Write ${rel(A, q.ans, B)}.`, [answer])];
         }
         if (d.kind === 'equal') {
             return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
                 // (critic r2 N7: the step names the digits it judges, so the Guided cue - hintOf, the first step that names a number
                 // - is this step, the one that decides "=", never "Both have three digits.")
                 step(`Every digit is the same: ${A} and ${B}.`, [{ slot: 'digits', value: 'all' }]),
-                step(`Write ${A} = ${B}.`, [answer])];
+                step(`Write ${rel(A, '=', B)}.`, [answer])];
         }
         return [step(`Both have ${COUNT_WORD[d.la] || d.la} digits.`, [count]),
             // (critic r2: "7 >" / "5." broke over two lines - the sign is held to its digits with no-break spaces; ws-pv-compare-pages WRAP-SIGN)
             step(`The ${d.place} digits differ: ${d.da}\u00a0${d.da > d.db ? '>' : '<'}\u00a0${d.db}.`, [{ slot: 'digits', value: String(d.i) }]),
-            step(`Write ${A} ${q.ans} ${B}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
+            step(`Write ${rel(A, q.ans, B)}.`, [{ slot: 'win', value: d.da > d.db ? 'a' : 'b' }, answer])];
     },
     wrongAnswer: (q) => {
         const p = pvOf(q);
