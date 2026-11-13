@@ -3971,7 +3971,7 @@
     "commit": "814109016",
     "state": "two-step build: every computed number within the cap, answer guards, the two-step bar model drawn with the carried Step 1 answer, Visual draws it by default, middle question on teaching cells only"
    },
-   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 60 --rules WITHIN-N,ANS-STORY,BAR-DRAWN,VISUAL,HINT-L0 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4011,7 +4011,7 @@
     "commit": "910dd9f0b",
     "state": "band 30 / 50 offered; OPTION_FOLDS rewrites band 100 to null, so every B100 code decodes to no band and re-encodes without a payload"
    },
-   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --rules BAND-ALIAS --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4146,7 +4146,7 @@
     "commit": "b5d9a9cc7",
     "state": "letter: equation / + the two steps / n; estimate: the steps / + the estimate / the question ringed (frames rows, the newest grey)"
    },
-   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --rules PART-FRAMES --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

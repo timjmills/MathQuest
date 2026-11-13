@@ -1,7 +1,7 @@
 // ws-two-step — node checks of the two-step story family against its signed card (design/cards/two-step/two-step.md;
 // lane lf-algebra, two-step build 2026-11-13; owner rule: each finding is a check before its fix lands). No browser.
 //
-//   node tests/scripts/ws-two-step.mjs [--skill cat:a,...] [--root DIR] [--n 120]
+//   node tests/scripts/ws-two-step.mjs [--skill cat:a,...] [--root DIR] [--n 120] [--rules WITHIN-N,...]
 //
 //   WITHIN-N   (card decision 2) every computed number - the Step 1 result AND the answer - is at most the band
 //              (30 / 50 / 100) or, with no band, the Max Number 100; sampled with generateQuestionFor, every band
@@ -188,6 +188,9 @@ for (const key of mine) {
     }
 }
 
+// --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
+const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
+if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
 for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
