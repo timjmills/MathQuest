@@ -515,13 +515,14 @@ function slotFloor(p, grow) {
 }
 
 /** Words or numbers printed for the pupil to ring; the key rings the right ones. */
-function ringRow(ctx, items, correct, sizePt, tight = false) {
+function ringRow(ctx, items, correct, sizePt, tight = false, stack = false) {
     const on = ctx.state === 'wrong' ? new Set([shownVal(ctx, 'answer', '')]) : answered(ctx) ? new Set((correct || []).map(String)) : new Set();
     // (`tight`, lf-placevalue r1 F1: the words keep their size and their ring's room, with less air between the rows)
-    const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:inline-block;`
-        + `padding:0.8mm ${tight ? 1.8 : 2.2}mm;margin:${tight ? '0.5mm 1mm' : '1mm 2mm'};${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
+    // (`stack`, lf-engine PC critic r4 N2: the words one under the other, beside the number - see 'place' below)
+    const cells = items.map(w => `<span class="pv-choice" data-ws-slot="choice" data-ws-shape="ring" style="display:${stack ? 'block' : 'inline-block'};`
+        + `padding:0.8mm ${tight ? 1.8 : 2.2}mm;margin:${stack ? '0.4mm 0' : tight ? '0.5mm 1mm' : '1mm 2mm'};${on.has(String(w)) ? `${ringLine(ctx)}border-radius:999px;` : 'border:1.5pt solid transparent;'}">${esc(w)}</span>`).join('');
     return `<div class="pv-ring-row" style="font-size:${pt(sizePt || ctx.metrics.digitPt * 0.75)};font-weight:700;text-align:center;`
-        + `line-height:${tight ? 1.35 : 1.6};">${cells}</div>`;
+        + `line-height:${tight ? 1.35 : 1.6};${stack ? 'display:flex;flex-direction:column;align-items:center;' : ''}">${cells}</div>`;
 }
 
 /** Check-box choices ("Round up / Round down", "Correct / Fix it"): the key ticks the right one. */
@@ -760,6 +761,14 @@ function pvRenderBody(p, ctx0) {
         };
         switch (p.kind) {
             case 'place':
+                // (`bankSide`, lf-engine PC critic r4 N2 - a lesson's routed Prerequisite Check: the word bank a row under the
+                // number put "tens" under the tens digit and "ones" under the ones digit, so the word nearest the underlined digit
+                // WAS the answer. The bank is a fixed column - the words one under the other in place order - to the right of the
+                // whole number: no word lies nearer one digit than the other. Absent on every other page: as before.)
+                if (p.bankSide && !p.hideNumeral) {
+                    return `<div class="pv-cell"><div class="pv-side" style="display:flex;align-items:center;justify-content:center;column-gap:${tight ? 4 : 5}mm;">`
+                        + `<div style="text-align:center;">${numeral({ underline: p.place, heads: nameHeads })}</div>${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight, true)}</div>${valueLine()}</div>`;
+                }
                 return `<div class="pv-cell">${top ?? center(numeral({ underline: p.place, heads: nameHeads }))}${ringRow(ctx, p.words || [], [kv], ctx.metrics.textPt + 2, tight)}${valueLine()}</div>`;
             case 'place-bank': {
                 const bank = `<div class="pv-bank" style="display:table;margin:0 auto ${tight ? 1 : 2}mm;border:1.5pt solid #000;border-radius:3mm;padding:1mm 3mm;`

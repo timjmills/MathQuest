@@ -25,6 +25,7 @@
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
+import { oneNumOf as ntOneNumOf, oneAnsOf as ntOneAnsOf, oneNumFits as ntOneNumFits } from './sheet/near-twins.js';
 import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits, nearTwins as lrNearTwins, casesOf as lrCasesOf, opOfItem as lrOpOf } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
@@ -532,17 +533,25 @@ function refOperands(q) {
  *   maxSmall       at most this many items with a one-place second operand
  *   avoidTexts     never an item another page of the packet printed
  */
-/** What a pool that ran dry still never gives up (lf-engine PC r4, lead ruling): the ref's declared range (its operand floors)
- *  and the page's own items - no item again, none turned round. */
-function refCoreOk(sk, cand, key, seen) {
-    if (Array.isArray(sk.reuseAvoid) && sumIdOf(cand) && seen.has(`sum:${sumIdOf(cand)}`)) return false;
+/** THE ref's declared range - its operand floors (minOperand, minTop, maxTop, maxBottom, zeroOnes, minN) - in ONE function
+ *  (lf-engine PC critic r4: refCoreOk and refAccepts each held a copy). Pure. */
+export function refFloorsOk(sk, cand) {
     const ops = refOperands(cand);
     if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
     if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
     if (sk.maxTop !== undefined && !(ops[0] <= Number(sk.maxTop))) return false;
     if (sk.maxBottom !== undefined && !(ops[1] <= Number(sk.maxBottom))) return false;
     if (sk.zeroOnes && !(ops[0] % 10 === 0)) return false;
+    // `minN`: a rounding item's number at least this (the 90s -> 100 example).
     if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
+    return true;
+}
+/** What a pool that ran dry still never gives up (lf-engine PC r4, lead ruling): the ref's declared range (its operand floors)
+ *  and the page's own items - no item again, none turned round. */
+function refCoreOk(sk, cand, key, seen) {
+    if (Array.isArray(sk.reuseAvoid) && sumIdOf(cand) && seen.has(`sum:${sumIdOf(cand)}`)) return false;
+    const ops = refOperands(cand);
+    if (!refFloorsOk(sk, cand)) return false;
     if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
     return !seen.has(signature(cand));
 }
@@ -552,12 +561,16 @@ function refCoreOk(sk, cand, key, seen) {
 const lrPlain = (q) => ({ text: String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ops: refOperands(q) });
 function pageRulesOk(sk, cand, key, kept) {
     const x = lrPlain(cand);
+    // (lf-engine PC critic r4 N4: one-number items - rounding, place value - keep the shared near-twin rules on Practice and Mixed
+    // too: no pair within 2 or turned round, at most 2 in one ten, one answer at most twice; sheet/near-twins.js)
+    if (!ntOneNumFits(ntOneNumOf(cand), ntOneAnsOf(cand), kept.get(`one:${key}`) || [], { twinsOnly: !!sk.pageRules.oneLoose })) return false;
     for (const [c, max] of Object.entries(sk.pageRules.caps || {})) if (lrCasesOf(x).includes(c) && (kept.get(`cap:${key}:${c}`) || 0) >= Number(max)) return false;
     if (lrOpOf(x) === '-' && x.ops.length >= 2) for (const o of kept.get(`subs:${key}`) || []) if (lrNearTwins(x.ops, o) || x.ops[0] - x.ops[1] === o[0] - o[1]) return false;
     return true;
 }
 function pageRulesRecord(sk, q, key, kept) {
     const x = lrPlain(q);
+    if (ntOneNumOf(q) !== null) kept.set(`one:${key}`, [...(kept.get(`one:${key}`) || []), { n: ntOneNumOf(q), ans: ntOneAnsOf(q) }]);
     for (const c of Object.keys(sk.pageRules.caps || {})) if (lrCasesOf(x).includes(c)) kept.set(`cap:${key}:${c}`, (kept.get(`cap:${key}:${c}`) || 0) + 1);
     if (lrOpOf(x) === '-' && x.ops.length >= 2) kept.set(`subs:${key}`, [...(kept.get(`subs:${key}`) || []), x.ops]);
 }
@@ -566,13 +579,7 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
     if (sk.pageRules && !pageRulesOk(sk, cand, key, kept)) return false;
     if (Array.isArray(sk.reuseAvoid) && sumIdOf(cand) && seen.has(`sum:${sumIdOf(cand)}`)) return false;
     const ops = refOperands(cand);
-    if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
-    if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
-    if (sk.maxTop !== undefined && !(ops[0] <= Number(sk.maxTop))) return false;
-    if (sk.maxBottom !== undefined && !(ops[1] <= Number(sk.maxBottom))) return false;
-    if (sk.zeroOnes && !(ops[0] % 10 === 0)) return false;
-    // `minN`: a rounding item's number at least this (the 90s -> 100 example).
-    if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
+    if (!refFloorsOk(sk, cand)) return false;
     if (sk.distinctFirst && seen.has(`first:${key}:${ops[0]}`)) return false;
     if (sk.distinctAnswer && seen.has(`ans:${key}:${refAnswer(cand)}`)) return false;
     // (`avoidKeys` refs - the detailed lesson maker: no two answers alike on the page across its skills, LR-6)
@@ -1013,7 +1020,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
     // no third story that is not a near twin though 44 sets of four exist. So a run whose + / − item had to drop an
     // LR-6 rule is dealt again under the next seed, up to 12 times, keeping the deal whose first such item comes
     // latest. Attempt 0 is the run's own seed: a run with nothing dropped deals exactly as before.)
-    const lr6Run = slots.some((sk) => sk.lr6 && sk.avoidKeys);
+    // (lf-engine PC r5: a `pageRules` run - a lesson ref with its Prerequisite Check on - is dealt again the same way when an item
+    // had to give a page rule up: round Practice cornered itself at seed 2628, four answers of 70 from the loose tier)
+    const lr6Run = slots.some((sk) => (sk.lr6 && sk.avoidKeys) || sk.pageRules);
     const seen0 = lr6Run ? new Set(seen) : null, kept0 = lr6Run ? new Map(kept) : null;
     let best = null;
     for (let att = 0; att < (lr6Run ? 12 : 1); att++) {
@@ -1061,7 +1070,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
         // (`hs`: the ref whose hard bounds a pass holds - a tier of the PC r4 avoid lists given up; `soft` 'core': the soft
         // floors dropped but refCoreOk held)
-        const pass = (rotate, relaxLast, soft, words = true, hs = skH) => {
+        const pass = (rotate, relaxLast, soft, words = true, hs = skH, sr = null) => {
             let got = null;
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
@@ -1082,9 +1091,15 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (!cand) continue;
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
-                const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
+                // (`sr`: the ref a pass judges by in place of `sk` - a looser pageRules tier, lf-engine PC r5)
+                const sk0 = sr || sk;
+                const skR = edgeAt >= 0 ? Object.assign({}, sk0, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk0;
                 const strict = soft === true && !(relaxLast && k === tries);
                 if (hard && !refHardOk(hs, cand)) continue;
+                // (`floorsHard`, lf-engine PC critic r4 N1: a routed Prerequisite Check's ref keeps its DECLARED floors on every try,
+                // the relaxed last one included - "20 - 11" under "1-digit from a teen" routed a miss to the wrong lesson; the
+                // question prints fewer items rather than one out of range. Absent on every other ref: unchanged.)
+                if (sk.floorsHard && !refFloorsOk(sk, cand)) continue;
                 if (soft === 'core' && !refCoreOk(skR, cand, key, seen)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
@@ -1120,7 +1135,10 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // outside the range, never a same-page turnaround (refCoreOk))
         const tiered = Array.isArray(sk.reuseAvoid) || Array.isArray(sk.lastAvoid);
         const tier = (n) => Object.assign({}, skH, n === 1 ? { reuseExact: true } : { reuseAvoid: undefined }, n > 2 ? { lastAvoid: undefined } : {});
-        q = hard && tiered ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, true, true, tier(1)) || pass(true, false, true, true, tier(2)) || pass(true, false, true, true, tier(3)) || pass(true, false, 'core', true, tier(3)))
+        // (lf-engine PC r5: before the last 'core' tier drops the page rules whole, a `pageRules` ref gives up only the one-number
+        // ten and answer caps - its near twins still held: round Practice dealt 68 / 67 at seed 2628 from the core tier)
+        const loose = sk.pageRules ? Object.assign({}, sk, { pageRules: Object.assign({}, sk.pageRules, { oneLoose: true }) }) : null;
+        q = hard && tiered ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, true, true, tier(1)) || pass(true, false, true, true, tier(2)) || pass(true, false, true, true, tier(3)) || (loose ? pass(true, false, true, true, tier(3), loose) : null) || pass(true, false, 'core', true, tier(3)))
             : hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
@@ -1144,6 +1162,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         seen.add(signature(q));
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
+        else if (lr6Run && sk.pageRules && !pageRulesOk(sk, q, key, kept)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);
         kept.set(key, itemIndex + 1);
         placed[j] = { q, skill: sk };
@@ -4948,7 +4967,8 @@ async function buildLesson(n, metaOf) {
         // when the page would not hold it; `checks` is what the question asks, the routing table's words - critic r1 D12)
         seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: prereqs.map((p) => Number(p.items) || 2), checkFor: meta,
         // (critic r2 N4: the check holds LR-6 on its page - no answer twice, no near twins, no subtrahend or first addend twice)
-        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({ lr6: true, distinctAnswer: true }, p.ref))) }],
+        // (critic r4 N1: the route ref's declared floors are HARD - `floorsHard`, on every try)
+        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({ lr6: true, distinctAnswer: true, floorsHard: true }, p.ref))) }],
         routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
         // (critic r2 N7: the check's title always carries a topic - the lesson's short `checkTopic` when the long one wraps)
         checkTopic: data && data.checkTopic ? String(data.checkTopic) : undefined,
@@ -5109,7 +5129,10 @@ async function buildLesson(n, metaOf) {
     // skill its own section, the page filled in one frame per section.
     const buildMixed = (seed, avoid = (r) => r, avoidTexts = practiceTexts) => {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
-        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(withSheetHard).map(avoid);
+        // (critic r4 N4 / PG-LR6 at 64 seeds: with the check on, the partners keep the one-number near-twin rules on the page too -
+        // the Place Value partner printed 78 / 87 and 63 64 65; `pageRules` with no caps; a lesson without the check: as before)
+        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(withSheetHard).map(avoid)
+            .map((w) => (w && sheetHard.length && !w.pageRules ? Object.assign({}, w, { pageRules: { caps: {} } }) : w));
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,

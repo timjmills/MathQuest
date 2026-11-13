@@ -29,6 +29,7 @@
 // Pure module (SCC-01).
 
 import { LESSON_ROUTE_CSS } from '../lesson-css.js';
+import { nearNumbers, nearKeys, nearSubs } from '../near-twins.js';
 import { estimateTitleLines } from './practice.js';
 import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
@@ -72,31 +73,54 @@ const poolItems = (input, id) => {
     // "+a,b" / "×a,b" keys - goes last too: add L seed 1629 printed the bond "2 + 6 = ?" under the chart's "6 + 2 = ?")
     const avoidSums = Array.isArray(input.avoidSums) ? input.avoidSums : [];
     const sumOf = (it) => { const m = /^(\d+)\s*([+×x*])\s*(\d+)\s*=\s*\?$/.exec(String(((it && it.q) || {}).text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()); return m ? `${m[2] === '+' ? '+' : '×'}${[Number(m[1]), Number(m[3])].sort((a, b) => a - b).join(',')}` : null; };
-    for (const it of kept) { const k = itemNumberKey(it); if ((avoidSums.length && avoidSums.includes(sumOf(it))) || (k && (earlier.some((t) => nearKeys(t, k)) || took.some((t) => nearKeys(t, k, true))))) later.push(it); else { first.push(it); if (k) took.push(k); } }
+    // (lf-engine PC r5, a pupil's read of the sub check: "11 - 3" beside "11 - 5" - two take-aways a pupil does the same way, LR-6
+    // nearSubs - go last too, within the question)
+    const subOf = (it) => { const m = /^(\d+)\s*[−-]\s*(\d+)/.exec(String(((it && it.q) || {}).text || '').replace(/<[^>]+>/g, ' ').trim()); return m ? [Number(m[1]), Number(m[2])] : null; };
+    const tookSubs = [];
+    for (const it of kept) { const k = itemNumberKey(it); const o = subOf(it); if ((avoidSums.length && avoidSums.includes(sumOf(it))) || (k && (earlier.some((t) => nearKeys(t, k)) || took.some((t) => nearKeys(t, k, true)))) || (o && tookSubs.some((t) => nearSubs(t, o)))) later.push(it); else { first.push(it); if (k) took.push(k); if (o) tookSubs.push(o); } }
     // (a near twin is printed only to keep a question at ROUTE_ITEMS: the pool can hold no more clean items - sub S dealt
     // 77, 27, 71, 72 for one question - and a third twin is never laid to fill a row)
-    return first.length >= ROUTE_ITEMS ? first : first.concat(later.slice(0, ROUTE_ITEMS - first.length));
+    // (critic r4 N2 / N7: the clean items in a MIXED order - see mixOrder - so whatever count the page keeps, its answers are
+    // never all one and never strictly alternate, and a "10 more, 10 less" question's first two items are one of each)
+    // (lf-engine PC r5: a twin is taken only to keep a TWO-CHOICE / two-way question at its floor of 2 - ruling A; any other
+    // question prints its one clean item: the sub check printed 13 - 7 beside 16 - 9 at 2 seeds of 64)
+    const mixed = mixOrder(first);
+    const need = kept.some(twoChoice) || twoWay(kept) ? ROUTE_ITEMS : 1;
+    return mixed.length >= need ? mixed : mixed.concat(later.slice(0, need - mixed.length));
 };
-/** Two numbers a pupil would do the same way (LR-6 near twins, critic r3 F13): both 10 or more and the same digits
- *  reordered (27 / 72) or within 2 - anywhere on the check page; and, inside ONE question (`sameQ`), the same digit count
- *  with only ONE place different and a shared digit that is not 0 (77 / 27, 77 / 71, 75 / 45; not 30 / 90). */
-export function nearNumbers(x, y, sameQ = false) {
-    if (!(x >= 10 && y >= 10) || x === y) return false;
-    if (Math.abs(x - y) <= 2) return true;
-    const a = String(x), b = String(y);
-    if (a.length !== b.length) return false;
-    if (a.split('').sort().join('') === b.split('').sort().join('')) return true;
-    if (!sameQ) return false;
-    let d = 0, z = true; for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; else if (a[i] !== '0') z = false; }
-    return d === 1 && !z;
+/** The answer KIND of a check item whose question deals two kinds (critic r4 N2 / N7): a "name the place" item's place word,
+ *  a "10 more / 10 less" item's direction; else null. */
+export function mixKeyOf(it) {
+    const q = (it && it.q) || {};
+    const pl = (q.cell && q.cell.payload) || {};
+    if (it && it.template === 'pv' && /^place/.test(String(pl.kind || '')) && typeof q.ans === 'string') return q.ans;
+    const m = /\b\d+\s+(more|less)\b/i.exec(String(q.text || '').replace(/<[^>]+>/g, ' '));
+    return m ? m[1].toLowerCase() : null;
 }
-export function nearKeys(k1, k2, sameQ = false) {
-    const A = String(k1).split(',').filter(Boolean).map(Number), B = String(k2).split(',').filter(Boolean).map(Number);
-    if (!A.length || A.length !== B.length) return false;
-    const a = A.slice(), b = B.slice();
-    for (let i = a.length - 1; i >= 0; i--) { const j = b.indexOf(a[i]); if (j >= 0) { b.splice(j, 1); a.splice(i, 1); } }
-    return a.length === 1 && b.length === 1 && nearNumbers(a[0], b[0], sameQ);
+/**
+ * A question's items in a MIXED order (critic r4 N2: the place items alternated tens / ones as dealt, or were all one): the
+ * first two kinds in the pattern A B B A A B B A ..., so every prefix of 2 or more items holds both kinds and no prefix of 3
+ * or more strictly alternates; a kind that runs out leaves the rest to the other, in order. Items with no kind, or a question
+ * of one kind, keep their order. Pure.
+ */
+export function mixOrder(its) {
+    const ks = (its || []).map(mixKeyOf);
+    if (!ks.length || ks.some((k) => k === null)) return its || [];
+    const kinds = [...new Set(ks)];
+    if (kinds.length < 2) return its;
+    const q = kinds.map((k) => its.filter((_, i) => ks[i] === k));
+    const pat = [0, 1, 1, 0];
+    const out = [];
+    for (let i = 0; out.length < its.length && i < 4 * its.length; i++) { const g = q[pat[i % 4]]; if (g.length) out.push(g.shift()); }
+    for (const g of q) out.push(...g);
+    return out;
 }
+/** A question that deals two kinds (a place word each, more and less) is a TWO-WAY question: it keeps ROUTE_ITEMS so both
+ *  print (critic r4 N7, ruling A: "10 more or 10 less" printed one "10 more" item). */
+export const twoWay = (its) => new Set((its || []).map(mixKeyOf).filter((k) => k !== null)).size >= 2;
+/** (lf-engine PC critic r4: the near-twin rules live in ONE module, sheet/near-twins.js - the check, the sheet, Practice, Mixed
+ *  and the gate read the same thresholds; re-exported here for the callers that imported them from this role) */
+export { nearNumbers, nearKeys };
 const PER_QUAD = 4;
 
 export function sources(skills, { earlier }) {
@@ -128,8 +152,23 @@ export function prepare(it, { routed = false } = {}) {
     if (pl && it.template === 'pv' && /^place/.test(String(pl.kind || ''))) {
         pl.heads = false;
         if (Array.isArray(pl.words)) pl.words = pl.words.slice().sort((a, b) => PLACE_RANK.indexOf(a) - PLACE_RANK.indexOf(b));
+        // (critic r4 N2: a row of words under the number lined "tens" up under the tens digit - the nearest word was the key.
+        // The bank is a fixed column to the right of the whole number: pv.js `bankSide`)
+        if (pl.kind === 'place') pl.bankSide = true;
     }
     return it;
+}
+/** One answer an item: not a list ("70 and 80", "30, 50, 70"). */
+const oneAnswer = (it) => { const a = it && it.q ? it.q.ans : undefined; if (Array.isArray(a)) return a.length <= 1; if (a && typeof a === 'object') return Object.keys(a).length <= 1; return !/,|\band\b/.test(String(a === undefined || a === null ? '' : a)); };
+/**
+ * A routed question's instruction (r3 F14, critic r4): its plural follows the blanks - "Write the missing number." over one
+ * blank an item ("numbers" / "boxes" when every item has one answer) - and the boxes a drawing already shows are not named
+ * ("Skip count along the line. Write the missing numbers in the boxes." left "boxes." alone on a second line at L). Pure.
+ */
+export function routedInstr(its, input) {
+    let t = String(instructionText(instructionKeyOf(its, input && input.skills), its) || '');
+    if ((its || []).length && its.every(oneAnswer)) t = t.replace(/\bnumbers\b/g, 'number').replace(/\bboxes\b/g, 'box');
+    return t.replace(/ in the (?:boxes|box)\./g, '.');
 }
 /** The place words, biggest place first (the order the digits print). */
 const PLACE_RANK = ['millions', 'hundred thousands', 'ten thousands', 'thousands', 'hundreds', 'tens', 'ones'];
@@ -212,7 +251,7 @@ export function twoChoice(it) {
     return /\b(circle|check one box)\b/i.test(String(q.printText || q.text || '')) && /\b(ones|tens|yes|no|same)\b/i.test(String(q.printText || q.text || '') + ' ' + String(q.ans));
 }
 /** A question's item floor (ruling A): ROUTE_ITEMS for a two-choice question, else 1 - never more than its pool holds. */
-export const itemFloor = (its) => Math.max(1, Math.min((its || []).some(twoChoice) ? ROUTE_ITEMS : 1, (its || []).length || 1));
+export const itemFloor = (its) => Math.max(1, Math.min((its || []).some(twoChoice) || twoWay(its) ? ROUTE_ITEMS : 1, (its || []).length || 1));
 /** When a question counts as missed (LR-17a (2), P-25; critic r2 N3): printed under the routing table. */
 export const ROUTE_MISSED_RULE = 'A question is missed when any one of its items is wrong (its score is under full marks).';
 
@@ -402,7 +441,7 @@ function planCheck(input, cut) {
     const answerOf = (it) => { const a = it && it.q ? it.q.ans : ''; return Array.isArray(a) ? a.join(', ') : a && typeof a === 'object' ? Object.values(a).join(', ') : String(a === undefined || a === null ? '' : a); };
     const band = (its, cols, rows, cellH, pageCols, tagLines = 1, natW = 0) => {
         const qi = qIndex[bandNo++];
-        const instr = instructionText(instructionKeyOf(its, input.skills), its);
+        const instr = routed ? routedInstr(its, input) : instructionText(instructionKeyOf(its, input.skills), its);
         // (the detailed lesson's check centres each item in its grown cell, H13; a lesson's routed check keeps CL-4b's top
         // start - its rows grow only to the H13 cap, ROUTE_GROW)
         // (lf-engine PC 2026-11-12: the routed check centres its items too - a lone item, or the shorter question of a pair,
@@ -540,7 +579,7 @@ function planCheck(input, cut) {
  */
 export function routedLayout(quads, qIndex, input, ctx, m) {
     const em = ((ctx.s && ctx.s.textPt) || 14) * PT_MM;
-    const instrOf = (q) => String(instructionText(instructionKeyOf(q, input.skills), q) || '');
+    const instrOf = (q) => routedInstr(q, input);
     const extraLines = (q, w) => Math.max(0, Math.ceil((instrOf(q).length * INSTR_CHAR_EM * em) / Math.max(30, w - 10)) - 1);
     const colsOf = (q) => [4, 3, 2, 1].filter((c) => c <= q.length).find((c) => roomyAt(q, c, ctx)) || 1;
     const units = [];
@@ -629,4 +668,4 @@ export function routedLayout(quads, qIndex, input, ctx, m) {
     return { units, used, foot: +(Math.max(0, m.budget - used) / m.budget).toFixed(3), fits: used <= m.budget + 0.5 };
 }
 
-export default { ROLE_ID, nearNumbers, nearKeys, sources, measureCols, prepare, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };
+export default { ROLE_ID, nearNumbers, nearKeys, mixOrder, mixKeyOf, twoWay, sources, measureCols, prepare, counts, plan, routeText, routeTagHtml, routingTableHtml, routePlan, routedLayout, ROUTE_TAG_MM, PREREQ_CHECK_TITLE };

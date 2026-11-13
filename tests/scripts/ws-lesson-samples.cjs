@@ -531,6 +531,8 @@ async function checkMain() {
                 for (const m of b.lr67 || []) F('PG-LR67', `${l.id} seed ${seed} ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
                 if (!b.pre) { na++; break; }
                 // PG-LR6 (critic r4 N4 / N5): one threshold set, the engine's own module (sheet/near-twins.js)
+                { const byQ = new Map(); for (const it of b.printed || []) { const o = /^(\d+)\s*[−-]\s*(\d+)/.exec(it.text || ''); if (!o) continue; if (!byQ.has(it.pool)) byQ.set(it.pool, []); byQ.get(it.pool).push([Number(o[1]), Number(o[2])]); }
+                    for (const [q, os] of byQ) for (let x = 0; x < os.length; x++) for (let y = x + 1; y < os.length; y++) if (NT.nearSubs(os[x], os[y])) F('PG-LR6', `${l.id} seed ${seed} check ${q}`, `take-away near twins ${os[x].join(' - ')} / ${os[y].join(' - ')}`); }
                 for (const [k, its] of b.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} seed ${seed} ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
                 for (const it of b.items) {
                     const k = Number(String(it.pool).replace(/\D/g, '')); const pre = b.pre[k]; if (!pre) continue; read++;
@@ -643,6 +645,10 @@ async function checkMain() {
                         // same digits reordered, one place different, or within 2; both 10 or more. Independent of the dealer's copy.)
                         for (const [k2, q2] of seenK) if (nearKeyPair(k2, k, qOf[i] !== undefined && qOf[i] === qOf[q2.i])) { F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `near twin of Q${q2.n} (${k2} / ${k})`); break; }
                         seenK.set(k, { n: c.letter || i + 1, i }); } }); }
+                // (lf-engine PC r5, PC-LR6: two take-aways of one question a pupil does the same way - LR-6, sheet/near-twins.js
+                // nearSubs: the sub check printed 11 - 3 beside 11 - 5)
+                { const byQ = new Map(); for (const it of built.preItems || []) { const o = /^(\d+)\s*[−-]\s*(\d+)/.exec(it.text || ''); if (!o) continue; if (!byQ.has(it.pool)) byQ.set(it.pool, []); byQ.get(it.pool).push([Number(o[1]), Number(o[2])]); }
+                    for (const [q, os] of byQ) for (let a = 0; a < os.length; a++) for (let b = a + 1; b < os.length; b++) if (NT.nearSubs(os[a], os[b])) F('PC-LR6', `${l.id} ${size} check ${q}`, `take-away near twins ${os[a].join(' - ')} / ${os[b].join(' - ')}`); }
                 if (has('debug')) console.log(JSON.stringify(pp.cells.map((c) => [c.letter, c.text])));
                 pp.cells.forEach((c, i) => {
                     const kc = kp.cells[i]; const q = `${l.id} ${size} check Q${c.letter || i + 1}`;

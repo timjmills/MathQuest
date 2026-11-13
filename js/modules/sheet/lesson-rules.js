@@ -10,6 +10,8 @@
 
 /* ================================================================================ items */
 
+import { nearSubs } from './near-twins.js';
+
 const plain = (t) => String(t || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
 /**
@@ -38,12 +40,9 @@ export function opOfItem(it) {
     return '';
 }
 
-/** Two subtractions a pupil would do the same way (51 - 44 and 53 - 45; 27 - 19 and 77 - 19): LR-6. */
-export function nearTwins(x, y) {
-    const [a1, b1] = x, [a2, b2] = y;
-    if (b1 === b2) return true;                                       // the same number taken away
-    return Math.abs(a1 - a2) <= 3 && Math.abs(b1 - b2) <= 3;          // both numbers within 3
-}
+/** Two subtractions a pupil would do the same way (51 - 44 and 53 - 45; 27 - 19 and 77 - 19): LR-6 - the same number taken
+ *  away, or both numbers within 3. (lf-engine PC critic r4: the rule lives in sheet/near-twins.js, the one near-twin module.) */
+export function nearTwins(x, y) { return nearSubs(x, y); }
 
 /* ================================================================================ cases */
 

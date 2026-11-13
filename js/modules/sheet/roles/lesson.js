@@ -60,6 +60,7 @@ import { winShare } from '../lesson-arch/grid.js';
 import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker, phase0On } from '../lesson-pages/common.js';
 import { pickExample, pickSecond, otherExamples, chartLayout, stateItems, finalItems, secondItems, sameFactForms, chartPage } from '../lesson-pages/chart.js';
 import { vocabItem, vocabOrder } from '../lesson-pages/vocab.js';
+import { oneNumOf } from '../near-twins.js';
 import { warmShape } from '../lesson-pages/warm-up.js';
 import { pickWeDo, stepsItem } from '../lesson-pages/we-do.js';
 import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.js';
@@ -107,6 +108,12 @@ export function counts(pools, input) {
     const mainPool = pools.main || [];
     const divFacts = mainPool.length > 0 && mainPool.every((it) => it.q && it.q.divForm);
     const out = { main: divFacts ? PROBE + 12 : PROBE };
+    // (lf-engine PC critic r4 N5: with the Prerequisite Check on, the sheet's Guided and Independent cells keep the near-twin
+    // rules together - sheet/near-twins.js - so the pool is twice as deep before indepRuled has to take a twin: round S printed
+    // 74 / 47, 43 / 34, 88 / 89 from a pool with no other. Check-on only (`indepRules`); every other sheet deals as before.)
+    // (one-number items only - rounding, place value: a + / − fact pool - add 1-3 within 10, 21 facts - dealt twice as deep only
+    // repeats and turns its own facts round, PG-TURN)
+    if (input && input.lesson && input.lesson.data && input.lesson.data.indepRules && mainPool.length && mainPool.every((it) => oneNumOf(it) !== null)) out.main = Math.max(out.main, 2 * PROBE);
     for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
     // (split rows per kind may fall back to the shared row in `plan`: deal enough for either)
     if (Object.values(shape).some((s) => s.split)) for (const [id, s] of Object.entries(warmShape(pools, Object.assign({}, input, { _warmShared: true })))) out[id] = Math.max(out[id] || 0, s.k * (s.rows || 1));
@@ -291,7 +298,9 @@ function planOnce(input = {}) {
                 const add = Math.min(left, g.h * g.capIfEmpty);
                 if (add <= 0) continue;
                 left -= add;
-                for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
+                // (critic r4 N6: the grown Vocabulary match spends the height in its line-drawing gap - `mq-lvgrow`, lesson-css.js -
+                // not as a 30 % band under its words)
+                for (const part of g.grid) { part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`; part.cls = `${part.cls || ''} mq-lvgrow`.trim(); }
             }
         }
     }

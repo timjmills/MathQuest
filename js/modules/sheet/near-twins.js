@@ -68,9 +68,11 @@ const tenOf = (v) => Math.floor(v / 10);
  * May a one-number item (n, answer `ans`) join a page that holds `taken` [{n, ans}]? Never a near twin of one of them, never
  * a third in one ten, never a third use of one answer. An item with no number (null n) always may.
  */
-export function oneNumFits(n, ans, taken) {
+export function oneNumFits(n, ans, taken, { twinsOnly = false } = {}) {
     if (n === null || n === undefined) return true;
     for (const t of taken) if (t && t.n !== null && nearNumbers(t.n, n)) return false;
+    // (`twinsOnly`: a dealer's last tier before its floors go - the pairs still held, the ten and answer caps given up)
+    if (twinsOnly) return true;
     if (taken.filter((t) => t && t.n !== null && tenOf(t.n) === tenOf(n)).length >= NEAR.perTen) return false;
     if (ans !== null && ans !== undefined && taken.filter((t) => t && t.ans === ans).length >= NEAR.perAnswer) return false;
     return true;

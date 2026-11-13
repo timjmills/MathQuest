@@ -8,6 +8,7 @@
 
 import { bestCols, planItem, gridPart, instructionKeyOf, instructionText, answerOf, opOf, operandsOf, stripExtraMm, esc } from '../roles/compose.js';
 import { nearTwins, casesOf, opOfItem } from '../lesson-rules.js';
+import { nearSplit } from '../near-twins.js';
 import { resolveCtx } from '../index.js';
 import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
@@ -50,17 +51,9 @@ export function stripItem(data, steps) {
  * order, for a page that needs more. Absent: the
  * pool as it was. Pure.
  */
-/** A one-number item's number (payload n, 10 or more), else null. */
-const oneNumOf = (it) => { const v = Number(((it && it.q && it.q.cell && it.q.cell.payload) || {}).n); return Number.isFinite(v) && v >= 10 ? v : null; };
-const nearNum = (x, y) => x !== y && (Math.abs(x - y) <= 2 || String(x).split('').sort().join('') === String(y).split('').sort().join(''));
-/** `pool` split: {clean, later} - every one-number item that is a near twin of one taken before it (or of `taken`) goes to
- *  `later`, in order; `keep` never moves (lf-engine PC r4, the re-dealt sheet with the check on). Pure. */
-export function nearSplit(pool, taken = [], keep = null) {
-    const ns = taken.map(oneNumOf).filter((v) => v !== null);
-    const clean = [], later = [];
-    for (const it of pool) { const v = oneNumOf(it); if (v !== null && it !== keep && ns.some((u) => nearNum(u, v))) later.push(it); else { clean.push(it); if (v !== null) ns.push(v); } }
-    return { clean, later };
-}
+/** (lf-engine PC critic r4: `nearSplit` - one-number near twins, at most 2 a ten, one answer at most twice - is the shared
+ *  module's, sheet/near-twins.js: one threshold set on every lesson page. Re-exported for we-do.js.) */
+export { nearSplit };
 
 export function indepRuled(pool, weDo, data) {
     const rules = data && data.indepRules;

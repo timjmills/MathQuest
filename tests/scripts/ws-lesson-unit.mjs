@@ -282,11 +282,81 @@ const LATE = {
         eq(R.itemFloor([mk({ template: 'bond', q: { text: '2 + ? = 10' } }), mk({ template: 'bond' })]), 1, 'A: a written-answer question may print 1 item');
         eq(R.itemFloor([mk({ template: 'compare' })]), 1, 'A: never more than the pool holds');
         ok(/extra: input\.perQuestion && !routed \? '' : scoreTag\(its\.length\)/.test(src), 'N3: a routed band carries its __/n score');
-        ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
+        ok(/Object\.assign\(\{ lr6: true, distinctAnswer: true(, floorsHard: true)? \}, p\.ref\)/.test(readSrc('js/modules/print-sheet.js')), 'N4: the lesson check refs hold LR-6');
         ok(!/10 \* em - 24\)/.test(src) && /ROUTE_TABLE_FIXED_MM/.test(src), 'D16: routePlan names its fixed margins');
     },
     // R4 / R5 (lf-engine P1b): a detailed pack builds at every seed (a late item that finds its case spent is reserved and the
     // pack rebuilt); a spent pool never deals a chart example, its turn, or an item already on the page, while another is left.
+    // lf-engine PC critic r4 (2026-11-13, IMPROVEMENT_PLAN §1.7 root causes): ONE near-twin module; route-ref floors hard on every
+    // try (the relaxed last try included); a check question's answers mixed; "10 more, 10 less" keeps 2; the instruction plural.
+    async 'pc-r4-near-twins'() {
+        const NT = await tryImp('js/modules/sheet/near-twins.js');
+        if (!NT) { ok(false, 'r4: sheet/near-twins.js import'); return; }
+        eq([NT.NEAR.within, NT.NEAR.perTen, NT.NEAR.perAnswer, NT.NEAR.subWithin], [2, 2, 2, 3], 'r4: one documented threshold set');
+        ok(NT.nearNumbers(47, 49) && NT.nearNumbers(27, 72) && !NT.nearNumbers(47, 50) && !NT.nearNumbers(5, 7), 'r4: within 2, turned round; never under 10');
+        ok(NT.nearNumbers(77, 71, true) && !NT.nearNumbers(77, 71) && !NT.nearNumbers(30, 90, true), 'r4: one place different only inside a question, a shared 0 is no twin');
+        ok(NT.nearSubs([51, 44], [53, 45]) && NT.nearSubs([27, 19], [77, 19]) && !NT.nearSubs([11, 2], [11, 8]), 'r4: take-away twins (LR-6) as lesson-rules read them');
+        const pg = (ns) => NT.pageOneNumViolations(ns.map((n) => ({ n, ans: Math.round(n / 10) * 10 })));
+        ok(pg([11, 12]).length === 1 && pg([97, 98]).length === 1, 'r4 N4: 11 / 12 and 97 / 98 on one page fail');
+        ok(pg([61, 64, 67]).some((m) => /3 items in the 60s/.test(m)), 'r4 N4: three in one ten fail');
+        ok(pg([36, 41, 44]).some((m) => /answer 40 3 times/.test(m)), 'r4 N4: one answer three times fails');
+        eq(pg([12, 25, 38, 41, 57, 63, 76, 84, 99]), [], 'r4: a varied page passes');
+        const mk = (n) => ({ q: { cell: { payload: { n } }, ans: String(Math.round(n / 10) * 10) } });
+        const sp = NT.nearSplit([mk(74), mk(47), mk(43), mk(34), mk(88), mk(89), mk(52)], [mk(77)]);
+        eq(sp.clean.map((x) => x.q.cell.payload.n), [74, 43, 88, 52], 'r4 N5: nearSplit (Guided 77 taken) puts 47 (74 turned round), 34, 89 later');
+        const LRm = await tryImp('js/modules/sheet/lesson-rules.js');
+        ok(LRm && LRm.nearTwins([51, 44], [53, 45]) === NT.nearSubs([51, 44], [53, 45]), 'r4: lesson-rules nearTwins is the module rule');
+        const PR = await tryImp('js/modules/sheet/lesson-pages/practice.js');
+        ok(PR && PR.nearSplit === NT.nearSplit, 'r4: practice.js nearSplit is the module (one definition)');
+        const R = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        ok(R && R.nearNumbers === NT.nearNumbers && R.nearKeys === NT.nearKeys, 'r4: pre-skill-check re-exports the module rules');
+        const ps = readSrc('js/modules/print-sheet.js');
+        ok(/ntOneNumFits\(ntOneNumOf\(cand\)/.test(ps) && /pageRulesRecord[\s\S]{0,200}ntOneNumOf\(q\)/.test(ps), 'r4 N4: pageRules (Practice / Mixed, check on) hold the one-number rules');
+        ok(!/const nearNum = /.test(readSrc('js/modules/sheet/lesson-pages/practice.js')) && !/export function nearNumbers/.test(readSrc('js/modules/sheet/roles/pre-skill-check.js')), 'r4: no local near-twin copy left');
+    },
+    async 'pc-r4-floors'() {
+        const ps = readSrc('js/modules/print-sheet.js');
+        const fo = ps.match(/function refOperands\(q\) \{[\s\S]*?\n\}\n/), ff = ps.match(/export function refFloorsOk\(sk, cand\) \{[\s\S]*?\n\}\n/);
+        ok(!!fo && !!ff, 'r4 N1: print-sheet.js has ONE floor function refFloorsOk');
+        if (fo && ff) {
+            const f = new Function(`${fo[0]}${ff[0].replace('export ', '')}; return refFloorsOk;`)();
+            const ref = { minTop: 11, maxTop: 18, maxBottom: 9 };
+            const c = (a, b) => ({ cell: { payload: { operands: [a, b] } } });
+            ok(!f(ref, c(20, 11)) && f(ref, c(15, 6)) && !f(ref, c(10, 3)), 'r4 N1: "20 - 11" breaks minTop 11 / maxTop 18 / maxBottom 9, "15 - 6" keeps them');
+        }
+        ok(/function refCoreOk[\s\S]{0,300}refFloorsOk\(sk, cand\)/.test(ps) && /function refAccepts[\s\S]{0,400}refFloorsOk\(sk, cand\)/.test(ps), 'r4: refCoreOk and refAccepts read the one floor function');
+        // the LAST relaxed try: `strict` is false at k === tries on a relaxLast pass, and the floorsHard line must come before any use of
+        // `strict`, unconditional on k
+        const pass = ps.match(/const pass = \(rotate, relaxLast, soft[\s\S]*?return got;\n        \};/);
+        ok(!!pass && /if \(sk\.floorsHard && !refFloorsOk\(sk, cand\)\) continue;/.test(pass[0]) && pass[0].indexOf('sk.floorsHard') < pass[0].indexOf('if (strict &&'), 'r4 N1: floorsHard holds on every try of a pass, the relaxed last try included');
+        if (pass) {
+            // simulate the relaxed last try of a pass(false, true, true) on a ref with floorsHard: the only candidate is out of range
+            const tries = 3; let got = null; const sk = { floorsHard: true, minTop: 11, maxTop: 18, maxBottom: 9 };
+            const f = fo && ff ? new Function(`${fo[0]}${ff[0].replace('export ', '')}; return refFloorsOk;`)() : () => true;
+            for (let k = 0; k <= tries; k++) { const cand = { cell: { payload: { operands: [20, 11] } } }; const strict = !(true && k === tries); if (sk.floorsHard && !f(sk, cand)) continue; if (strict) continue; got = cand; }
+            eq(got, null, 'r4 N1: the relaxed last try takes no out-of-range item (the question prints fewer)');
+        }
+        ok(/lr6: true, distinctAnswer: true, floorsHard: true \}, p\.ref/.test(ps), 'r4 N1: the routed check refs carry floorsHard');
+    },
+    async 'pc-r4-mix'() {
+        const R = await tryImp('js/modules/sheet/roles/pre-skill-check.js');
+        if (!R) { ok(false, 'r4: pre-skill-check import'); return; }
+        const pvi = (a) => ({ template: 'pv', q: { ans: a, cell: { payload: { kind: 'place' } } } });
+        const ord = R.mixOrder(['tens', 'ones', 'tens', 'ones', 'tens', 'ones'].map(pvi)).map((x) => x.q.ans);
+        eq(ord.slice(0, 4), ['tens', 'ones', 'ones', 'tens'], 'r4 N2: dealt alternating, laid T O O T');
+        for (let k = 2; k <= ord.length; k++) { const p = ord.slice(0, k); ok(new Set(p).size > 1 && (k < 3 || !p.every((a, i) => !i || a !== p[i - 1])), `r4 N2: a prefix of ${k} is mixed and not strictly alternating`); }
+        eq(R.mixOrder(['tens', 'tens', 'tens'].map(pvi)).map((x) => x.q.ans), ['tens', 'tens', 'tens'], 'r4 N2: one kind keeps its order');
+        const ml = (t) => ({ template: 'pv', q: { text: t, cell: { payload: { kind: 'moreless' } } } });
+        eq(R.mixOrder([ml('What is 10 more than 30?'), ml('What is 10 more than 52?'), ml('What is 10 less than 59?')]).slice(0, 2).map((x) => R.mixKeyOf(x)), ['more', 'less'], 'r4 N7: the first two are one more, one less');
+        eq(R.itemFloor([ml('What is 10 more than 30?'), ml('What is 10 less than 59?')]), 2, 'r4 N7 (ruling A): a "10 more, 10 less" question keeps 2');
+        const pl = { q: { cell: { payload: { kind: 'place', words: ['ones', 'tens'] } } }, template: 'pv' };
+        R.prepare(pl, { routed: true });
+        ok(pl.q.cell.payload.bankSide === true && pl.q.cell.payload.heads === false && pl.q.cell.payload.words.join() === 'tens,ones', 'r4 N2: a routed place item - no heads, its bank a column to the right (bankSide), T before O');
+        const pvSrc = readSrc('js/modules/sheet/cells/pv.js');
+        ok(/if \(p\.bankSide && !p\.hideNumeral\)/.test(pvSrc), 'r4 N2: pv.js draws the side bank');
+        ok(typeof R.routedInstr === 'function', 'r3 F14: routedInstr exists');
+        ok(/\.replace\(\/\\bnumbers\\b\/g, 'number'\)/.test(readSrc('js/modules/sheet/roles/pre-skill-check.js')), 'r3 F14: one blank an item - "number", not "numbers"');
+    },
     async 'r4-r5-dealer'() {
         const ps = readSrc('js/modules/print-sheet.js');
         ok(/async function buildDetailedLesson\(req = \{\}\) \{\n    const late = new Set\(\);/.test(ps) && /late\.add\(e\.dlLate\)/.test(ps), 'R4: buildDetailedLesson rebuilds with the failing late item reserved');
