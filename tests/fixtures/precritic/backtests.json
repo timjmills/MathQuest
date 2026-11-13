@@ -8590,6 +8590,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-div-bar-guided-L",
+   "check": "ws-cell-checks OVERFLOW: the two_step_add_then_div Guided L page holds every cell inside its body (the 6-group ÷ bar no longer stacks the bars into a 188 mm cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks OVERFLOW (lf-roles r9: guided L p2, a stacked ÷ bar story 188 mm in a 184 mm continuation body - lf-algebra's template)",
+   "browser": true,
+   "fail": {
+    "commit": "3a1b05c58",
+    "state": "the ÷ groups bar (6 x (box + ? room) = 114 mm) did not fit beside Step 1, the bars stacked, the cell drew 188 mm"
+   },
+   "pass": {
+    "commit": "c3aef9acc",
+    "state": "the groups row grows by the ? height (box under the ?), the bars stand across, the cell fits"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_add_then_div --roles guided --size L --rules OVERFLOW --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-frames-eb-side",
+   "check": "ws-empty-band EB-SIDE: a full-width two-step FRAMES cell (letter equation, estimate check) keeps under 30 % of its width empty beside its ink at M / L",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE (lf-roles r9 EB-SIDE 120, re-measured round 3b: the 120 are the frames cells, 33-42 %, not the columns)",
+   "browser": true,
+   "fail": {
+    "commit": "c3aef9acc",
+    "state": "the frames sentences (95-130 mm) at the left of a 185 mm cell: 60-78 mm empty on the right"
+   },
+   "pass": {
+    "commit": "126eab3e4",
+    "state": "the sentences centred under the story on a one-column cell not worked wrong"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill algebra:two_step_letter_equation,algebra:two_step_estimate_check --sizes M,L --roles independent,test --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "two-step-letter-ea-rowx",
+   "check": "ws-cell-checks EA-ROWX: the letter equation's Error analysis judgement starts at one x a page (the unit word stays beside the work in a full-width cell)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks EA-ROWX (regression found in round 3b: b1da0079e put the letter unit in the n = row in every cell)",
+   "browser": true,
+   "fail": {
+    "commit": "b1da0079e",
+    "state": "the judgement starts 125-134 mm (M) / 131-141 mm (L) into the cells"
+   },
+   "pass": {
+    "commit": "126eab3e4",
+    "state": "the unit word in the n = row only in a narrow cell (a Reason It panel)"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_letter_equation --roles error-analysis --size M,L --rules EA-ROWX --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
