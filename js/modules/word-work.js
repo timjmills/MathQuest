@@ -144,7 +144,6 @@ export function applyWordWork(q) {
         payload.signSet = ['+', '-'];
         const said = ` ${payload.lines.join(' ').toLowerCase().replace(/[^a-z ]+/g, ' ')} `;
         if (Array.isArray(payload.bank)) payload.bank = payload.bank.filter((w) => said.includes(` ${String(w).toLowerCase()} `));
-        payload.bankBeside = true;
     }
     // `wpFrames` (detailed lesson 7): one number sentence a step (the kit cell's `layout: 'frames'`)
     if (opt('wpFrames') && !payload.bar) payload.layout = 'frames';

@@ -1049,9 +1049,6 @@ function unitBlock(ctx, p, unitShown, top = false) {
             + '</div>'
         : '';
     if (isTwin(ctx)) return `<div class="mq-wwanswer" style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:${L(ctx, 2)};">${line}${bank}</div>`;
-    // (`bankBeside`, the + / − story hosts: their bank holds the story's own noun only, so it stands BESIDE the label line on
-    // one row - stacked over the line, the narrow 2-track work left a 31-39 % band beside the ink of a 2-column cell)
-    if (p.bankBeside && bank) return `<div class="mq-wwanswer" style="display:flex;flex-direction:row;align-items:flex-end;gap:${L(ctx, 2)};">${line}${bank}</div>`;
     return `<div class="mq-wwanswer" style="display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 1.2)};">${top ? line + bank : bank + line}</div>`;
 }
 
