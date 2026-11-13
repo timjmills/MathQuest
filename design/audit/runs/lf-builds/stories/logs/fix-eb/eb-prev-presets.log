@@ -1,0 +1,68 @@
+note: addition:add_wp_change_unknown: card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: addition:add_wp_change_unknown card 390: no kit cell on the host (legacy screen item?)
+note: addition:add_wp_change_unknown card 820: no kit cell on the host (legacy screen item?)
+note: addition:add_wp_change_unknown card 1280: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_change_unknown: card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_change_unknown card 390: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_change_unknown card 820: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_change_unknown card 1280: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_compare_smaller: card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_compare_smaller card 390: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_compare_smaller card 820: no kit cell on the host (legacy screen item?)
+note: subtraction:sub_wp_compare_smaller card 1280: no kit cell on the host (legacy screen item?)
+EB-BAND  FAIL 83
+   addition:add_wp_change_unknown scripted-model S p1 cell 2: empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []
+   addition:add_wp_change_unknown scripted-model S p1 cell 4: empty band 37 mm under the ink of a 55.6 mm cell (66.5 %; limit 30 % = 16.7 mm) []
+   addition:add_wp_change_unknown scripted-model S p2 cell 2: empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []
+   addition:add_wp_change_unknown scripted-model S p2 cell 4: empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []
+   addition:add_wp_change_unknown scripted-model M p1 cell 2: empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []
+   addition:add_wp_change_unknown scripted-model M p1 cell 4: empty band 39.4 mm under the ink of a 60 mm cell (65.7 %; limit 30 % = 18.0 mm) []
+   addition:add_wp_change_unknown scripted-model M p2 cell 2: empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []
+   addition:add_wp_change_unknown scripted-model M p2 cell 4: empty band 39.4 mm under the ink of a 60 mm cell (65.7 %; limit 30 % = 18.0 mm) []
+   addition:add_wp_change_unknown scripted-model L p1 cell 2: empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []
+   addition:add_wp_change_unknown scripted-model L p1 cell 4: empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []
+   addition:add_wp_change_unknown scripted-model L p2 cell 2: empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []
+   addition:add_wp_change_unknown scripted-model L p2 cell 4: empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []
+   addition:add_wp_change_unknown guided S p1 cell 2: empty band 37.6 mm under the ink of a 118.2 mm cell (31.8 %; limit 30 % = 35.5 mm) [word-work]
+   addition:add_wp_change_unknown guided L p1 cell 2: empty band 78.1 mm under the ink of a 176.8 mm cell (44.2 %; limit 30 % = 53.0 mm) [word-work]
+   addition:add_wp_change_unknown reason-it L p1 cell 1: empty band 71.2 mm under the ink of a 185.1 mm cell (38.5 %; limit 30 % = 55.5 mm) [word-work]
+   ... 68 more
+EB-SIDE  FAIL 10
+   addition:add_wp_change_unknown lesson S p2 cell 5: empty band 43.3 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]
+   addition:add_wp_change_unknown lesson M p2 cell 5: empty band 43.3 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]
+   addition:add_wp_change_unknown scripted-model S p1 cell 2: empty band 26.6 mm beside the ink of a 92.3 mm wide cell (31 %) []
+   addition:add_wp_change_unknown scripted-model S p2 cell 2: empty band 28.2 mm beside the ink of a 92.3 mm wide cell (33 %) []
+   subtraction:sub_wp_change_unknown scripted-model S p1 cell 2: empty band 31.1 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   subtraction:sub_wp_change_unknown scripted-model S p2 cell 2: empty band 32.7 mm beside the ink of a 92.3 mm wide cell (38 %) []
+   subtraction:sub_wp_compare_smaller lesson S p2 cell 5: empty band 39.5 mm beside the ink of a 122.9 mm wide cell (34 %) [word-work]
+   subtraction:sub_wp_compare_smaller lesson M p2 cell 5: empty band 39.5 mm beside the ink of a 122.9 mm wide cell (34 %) [word-work]
+   subtraction:sub_wp_compare_smaller scripted-model S p1 cell 2: empty band 31.1 mm beside the ink of a 92.3 mm wide cell (36 %) []
+   subtraction:sub_wp_compare_smaller scripted-model S p2 cell 2: empty band 32.7 mm beside the ink of a 92.3 mm wide cell (38 %) []
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  FAIL 40
+   addition:add_wp_change_unknown mixed-practice M p1 cell 1: drawn 51.7 mm, footprint hMm 111.6 mm at 6 columns (-54 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 2: drawn 51.7 mm, footprint hMm 95.1 mm at 6 columns (-46 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 3: drawn 51.7 mm, footprint hMm 95.1 mm at 6 columns (-46 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 4: drawn 51.7 mm, footprint hMm 106.1 mm at 6 columns (-51 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 5: drawn 51.7 mm, footprint hMm 95.1 mm at 6 columns (-46 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 6: drawn 51.7 mm, footprint hMm 95.1 mm at 6 columns (-46 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 7: drawn 51.7 mm, footprint hMm 95.1 mm at 6 columns (-46 %)
+   addition:add_wp_change_unknown mixed-practice M p1 cell 8: drawn 51.7 mm, footprint hMm 106.1 mm at 6 columns (-51 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 1: drawn 64.2 mm, footprint hMm 94.6 mm at 4 columns (-32 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 2: drawn 57.9 mm, footprint hMm 88.2 mm at 4 columns (-34 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 3: drawn 57.9 mm, footprint hMm 88.2 mm at 4 columns (-34 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 4: drawn 57.9 mm, footprint hMm 88.2 mm at 4 columns (-34 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 5: drawn 57.9 mm, footprint hMm 88.2 mm at 4 columns (-34 %)
+   addition:add_wp_change_unknown mixed-practice L p1 cell 6: drawn 57.9 mm, footprint hMm 88.2 mm at 4 columns (-34 %)
+   subtraction:sub_wp_change_unknown mixed-practice M p1 cell 1: drawn 51.7 mm, footprint hMm 100.6 mm at 6 columns (-49 %)
+   ... 25 more
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(3 skill(s), 168 renders, 953 cells, 323 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: FAIL (133)

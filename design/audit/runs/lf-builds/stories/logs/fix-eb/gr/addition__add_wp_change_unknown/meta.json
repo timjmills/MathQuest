@@ -1,0 +1,4357 @@
+{
+  "skill": "addition:add_wp_change_unknown",
+  "category": "addition",
+  "skillId": "add_wp_change_unknown",
+  "label": "Addition Word Problems: How Many Were Added?",
+  "grade": "1",
+  "dir": "addition__add_wp_change_unknown",
+  "roles": {
+    "lesson-S": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 3,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 1 page. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 3,
+      "keyPageCount": 3,
+      "seed": 625246,
+      "title": "I Can find how many were added",
+      "notes": [
+        "A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.",
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 4 books. Lena got some more. Now Lena has 7 books. How many books did L",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 4 stickers. Yuki got some more. Now Yuki has 17 stickers. How many stic",
+          "ans": "13",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 2 pencils. Aya got some more. Now Aya has 6 pencils. How many pencils di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 6 apples. Ravi got some more. Now Ravi has 8 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 10 cookies. Zara got some more. Now Zara has 15 cookies. How many cooki",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 10 buttons. Tom got some more. Now Tom has 17 buttons. How many buttons ",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 13 crayons. Sam got some more. Now Sam has 16 crayons. How many crayons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 6 stamps. Leo got some more. Now Leo has 10 stamps. How many stamps did ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-S-p1.png",
+          "words": 170,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p2.png",
+          "words": 140,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p3.png",
+          "words": 244,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-S-key-p1.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p2.png",
+          "words": 152,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p3.png",
+          "words": 279,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 200
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c5e511228b8d3850",
+          "f09f96951fac25d8",
+          "062c831833c4d342"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x8 mm ×1",
+                "14x13 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 24.2,
+              "wPct": 28.7,
+              "cell": 4
+            },
+            "footPct": 1.2
+          },
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                14.3,
+                13
+              ],
+              "sizes": [
+                "14x13 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 9.8,
+              "wPct": 4.3,
+              "cell": 8
+            },
+            "footPct": 0.2
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 243
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c999d6c8a5e238af",
+          "d4c02de2f10f60c8",
+          "d16323cfe45a4fce"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x8 mm ×1",
+                "14x13 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 21.8,
+              "wPct": 28.7,
+              "cell": 1
+            },
+            "footPct": 1.2
+          },
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                14.3,
+                13
+              ],
+              "sizes": [
+                "14x13 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 9.8,
+              "wPct": 4.3,
+              "cell": 8
+            },
+            "footPct": 0.2
+          }
+        ]
+      }
+    },
+    "lesson-M": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 3,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 1 page. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 3,
+      "keyPageCount": 3,
+      "seed": 625246,
+      "title": "I Can find how many were added",
+      "notes": [
+        "Dense: 2 x 4, cells sized to the problems."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 92.4,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 49.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 81.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.9,
+              "fits": false,
+              "slackMm": -12.4
+            },
+            "4": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -27.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 4 books. Lena got some more. Now Lena has 7 books. How many books did L",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 4 stickers. Yuki got some more. Now Yuki has 17 stickers. How many stic",
+          "ans": "13",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 2 pencils. Aya got some more. Now Aya has 6 pencils. How many pencils di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 6 apples. Ravi got some more. Now Ravi has 8 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 10 cookies. Zara got some more. Now Zara has 15 cookies. How many cooki",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 10 buttons. Tom got some more. Now Tom has 17 buttons. How many buttons ",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 13 crayons. Sam got some more. Now Sam has 16 crayons. How many crayons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 6 stamps. Leo got some more. Now Leo has 10 stamps. How many stamps did ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 28,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 51.1,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "M",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-M-p1.png",
+          "words": 170,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-p2.png",
+          "words": 140,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-p3.png",
+          "words": 244,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-M-key-p1.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-key-p2.png",
+          "words": 152,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-key-p3.png",
+          "words": 279,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 200
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c5e511228b8d3850",
+          "f09f96951fac25d8",
+          "062c831833c4d342"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x8 mm ×1",
+                "14x13 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 24.2,
+              "wPct": 28.7,
+              "cell": 4
+            },
+            "footPct": 1.2
+          },
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                14.3,
+                13
+              ],
+              "sizes": [
+                "14x13 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 9.8,
+              "wPct": 4.3,
+              "cell": 8
+            },
+            "footPct": 0.2
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          8
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 243
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c999d6c8a5e238af",
+          "d4c02de2f10f60c8",
+          "d16323cfe45a4fce"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                8.4
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x8 mm ×1",
+                "14x13 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 21.8,
+              "wPct": 28.7,
+              "cell": 1
+            },
+            "footPct": 1.2
+          },
+          {
+            "cells": 8,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                14.3,
+                13
+              ],
+              "sizes": [
+                "14x13 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 9.8,
+              "wPct": 4.3,
+              "cell": 8
+            },
+            "footPct": 0.2
+          }
+        ]
+      }
+    },
+    "lesson-L": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 3,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 1 page. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 3,
+      "keyPageCount": 3,
+      "seed": 625246,
+      "title": "I Can find how many were added",
+      "notes": [],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 10 buttons. Leo got some more. Now Leo has 13 buttons. How many buttons ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 crayons. Mia got some more. Now Mia has 11 crayons. How many crayons d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had 7 dollars. Ana got some more. Now Ana has 9 dollars. How many dollars di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor had 3 beads. Noor got some more. Now Noor has 8 beads. How many beads did N",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had 7 shells. Omar got some more. Now Omar has 15 shells. How many shells d",
+          "ans": "8",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had 4 cards. Kofi got some more. Now Kofi has 16 cards. How many cards did ",
+          "ans": "12",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben had 2 dollars. Ben got some more. Now Ben has 5 dollars. How many dollars di",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 8 books. Lena got some more. Now Lena has 11 books. How many books did ",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 7 stickers. Yuki got some more. Now Yuki has 16 stickers. How many stic",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 8 pencils. Aya got some more. Now Aya has 17 pencils. How many pencils d",
+          "ans": "9",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 3 apples. Ravi got some more. Now Ravi has 5 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 9 cookies. Zara got some more. Now Zara has 15 cookies. How many cookie",
+          "ans": "6",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 127.9,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 7 buttons. Tom got some more. Now Tom has 12 buttons. How many buttons d",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam had 5 dollars. Sam got some more. Now Sam has 9 dollars. How many dollars di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 108.9,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had 13 stamps. Leo got some more. Now Leo has 17 stamps. How many stamps did",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia had 2 beads. Mia got some more. Now Mia has 6 beads. How many beads did Mia ",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 54.4,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 89.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 102.5,
+              "fits": false,
+              "slackMm": -24.8
+            },
+            "4": {
+              "hMm": 121.6,
+              "fits": false,
+              "slackMm": -40.2
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "16 − 9 = ?",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 4 = ?",
+          "ans": "15",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "19 − 9 = ?",
+          "ans": "10",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena had 4 books. Lena got some more. Now Lena has 7 books. How many books did L",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 37.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki had 4 stickers. Yuki got some more. Now Yuki has 17 stickers. How many stic",
+          "ans": "13",
+          "measured": {
+            "1": {
+              "hMm": 44.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya had 2 pencils. Aya got some more. Now Aya has 6 pencils. How many pencils di",
+          "ans": "4",
+          "measured": {
+            "1": {
+              "hMm": 37.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had 6 apples. Ravi got some more. Now Ravi has 8 apples. How many apples di",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 37.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara had 10 cookies. Zara got some more. Now Zara has 15 cookies. How many cooki",
+          "ans": "5",
+          "measured": {
+            "1": {
+              "hMm": 44.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had 10 buttons. Tom got some more. Now Tom has 17 buttons. How many buttons ",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 44.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 56.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-L-p1.png",
+          "words": 170,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p2.png",
+          "words": 140,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p3.png",
+          "words": 200,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-L-key-p1.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p2.png",
+          "words": 152,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p3.png",
+          "words": 225,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 186
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c5e511228b8d3850",
+          "fee02f61621a6060",
+          "04f1f351ae53c26c"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                10.5
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x11 mm ×1",
+                "17x15 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 12.4,
+              "wPct": 28.7,
+              "cell": 2
+            },
+            "footPct": 1.3
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 15,
+              "median": 15,
+              "min": 11
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                17,
+                15
+              ],
+              "sizes": [
+                "17x15 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 14.7,
+              "wPct": 4.3,
+              "cell": 6
+            },
+            "footPct": 9
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 3,
+        "cells": [
+          4,
+          5,
+          6
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 221
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "c999d6c8a5e238af",
+          "938a1f04c2846e58",
+          "f0f337eb304e96a6"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 15.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 10.8
+          },
+          {
+            "cells": 5,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                14.2,
+                10.5
+              ],
+              "sizes": [
+                "14x11 mm ×3",
+                "179x11 mm ×1",
+                "17x15 mm ×1"
+              ]
+            },
+            "band": {
+              "hPct": 9.2,
+              "wPct": 28.7,
+              "cell": 1
+            },
+            "footPct": 1.3
+          },
+          {
+            "cells": 6,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 6,
+              "minMm": [
+                17,
+                15
+              ],
+              "sizes": [
+                "17x15 mm ×6"
+              ]
+            },
+            "band": {
+              "hPct": 14.7,
+              "wPct": 4.3,
+              "cell": 6
+            },
+            "footPct": 9
+          }
+        ]
+      }
+    }
+  },
+  "consoleErrors": []
+}

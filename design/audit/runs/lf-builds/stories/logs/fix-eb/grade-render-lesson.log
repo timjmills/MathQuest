@@ -1,0 +1,10 @@
+ws-grade-render: 7 skills -> design/audit/runs/lf-builds/stories/logs/fix-eb/gr
+  [1/7] addition:add_word_problems  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  22s
+  [2/7] addition:add_word_problems_plain  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  39s
+  [3/7] addition:add_wp_change_unknown  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  56s
+  [4/7] subtraction:sub_word_problems  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  73s
+  [5/7] subtraction:sub_word_problems_plain  lesson-S 4p+4k 1x1  lesson-M 4p+4k 1x1  lesson-L 4p+4k 1x1  91s
+  [6/7] subtraction:sub_wp_change_unknown  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  107s
+  [7/7] subtraction:sub_wp_compare_smaller  lesson-S 3p+3k 1x1  lesson-M 3p+3k 1x1  lesson-L 3p+3k 1x1  123s
+ws-grade-render: done, 7 units, 150 pages, 123s
+ws-grade-render: OK (7 unit(s): no overflow on any role page, no phone / tablet card target under 44 px)

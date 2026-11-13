@@ -1,0 +1,42 @@
+  detailed/g3-oa8-two-step-wp/1/html: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p06: CHANGED
+  detailed/g3-oa8-two-step-wp/1/p09: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/html: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/p06: CHANGED
+  detailed/g3-oa8-two-step-wp/4242/p09: CHANGED
+  [add] 40/40 identical
+  [addition:add_facts] 40/40 identical
+  [addition:add_wp_10] 44/44 identical
+  [addition:add_wp_10_plain] 40/40 identical
+  [addition:add_wp_20] 40/40 identical
+  [addition:add_wp_20_plain] 40/40 identical
+  [addition:fact_family_sort] 44/44 identical
+  [g1-oa1-bar-model-wp-20] 52/52 identical
+  [g2-nbt3-read-write-1000] 74/74 identical
+  [g3-oa5-mult-properties] 60/60 identical
+  [g3-oa8-two-step-wp] 64/70 identical
+  [g3-oa9-input-output-rule] 56/56 identical
+  [g3-oa9-mult-table-patterns] 52/52 identical
+  [g4-nbt1-ten-times-value] 56/56 identical
+  [division:div_facts] 40/40 identical
+  [number_sense:nearest_10] 44/44 identical
+  [placevalue:combine] 40/40 identical
+  [placevalue:expand] 40/40 identical
+  [placevalue:identify] 40/40 identical
+  [placevalue:unit_form] 40/40 identical
+  [placevalue:value] 40/40 identical
+  [round] 44/44 identical
+  [sub] 40/40 identical
+  [subtraction:sub_100_no_regroup] 40/40 identical
+  [subtraction:sub_100_regroup] 40/40 identical
+  [subtraction:sub_100k_no_regroup] 40/40 identical
+  [subtraction:sub_10k_no_regroup] 40/40 identical
+  [subtraction:sub_1k_no_regroup] 40/40 identical
+  [subtraction:sub_1m_no_regroup] 40/40 identical
+  [subtraction:sub_2d_1d] 40/40 identical
+  [subtraction:sub_50_no_regroup] 40/40 identical
+  [subtraction:sub_wp_10] 40/40 identical
+  [subtraction:sub_wp_10_plain] 40/40 identical
+  [subtraction:sub_wp_20] 40/40 identical
+  [subtraction:sub_wp_20_plain] 40/40 identical
+ws-lesson-baseline: FAIL (6 of 1556 differ)

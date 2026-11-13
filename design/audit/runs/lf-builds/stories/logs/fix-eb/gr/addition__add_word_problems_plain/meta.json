@@ -1,0 +1,4476 @@
+{
+  "skill": "addition:add_word_problems_plain",
+  "category": "addition",
+  "skillId": "add_word_problems_plain",
+  "label": "Addition Word Problems (No Pictures)",
+  "grade": "2",
+  "dir": "addition__add_word_problems_plain",
+  "roles": {
+    "lesson-S": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 4,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 2 pages. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page. No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 4,
+      "keyPageCount": 4,
+      "seed": 652243,
+      "title": "I Can solve addition stories",
+      "notes": [
+        "A lesson prints at Medium or Large: Small is printed at Medium, because its regroup boxes, place-value letters and step words are too small to write in at Small.",
+        "No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 64 dollars for books and games. 2 dollars are for books. How many dolla",
+          "ans": "62",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stamps. Tom got 7 more stamps. Now Tom has 73 stamps. How many stam",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 16 beads. Sam gets 30 more beads. How many beads does Sam have now?",
+          "ans": "46",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some shells. Leo got 7 more shells. Now Leo has 35 shells. How many shel",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 82 cards. Mia gets 50 more cards. How many cards does Mia have now?",
+          "ans": "132",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 22 dollars for books and games. 2 dollars are for books. How many dollar",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "S",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-S-p1.png",
+          "words": 118,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p2.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p3.png",
+          "words": 153,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-p4.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-S-key-p1.png",
+          "words": 120,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p2.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p3.png",
+          "words": 189,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-S-key-p4.png",
+          "words": 105,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 199
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5c69d017bfb779c5",
+          "a04c479798f90f68",
+          "77d1649cdb413915",
+          "c209e2b3e7b4b71c"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 33.1,
+              "wPct": 21.3,
+              "cell": 1
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 37.5,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 36.5,
+              "wPct": 3.2,
+              "cell": 1
+            },
+            "footPct": 51.4
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 270
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "e085e56c0537e508",
+          "fb22ba3e3ba1492a",
+          "609d999d7b25caae",
+          "9e7c3fb9cd6207db"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 33.1,
+              "wPct": 21.3,
+              "cell": 1
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 37.5,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 36.5,
+              "wPct": 3.2,
+              "cell": 1
+            },
+            "footPct": 51.4
+          }
+        ]
+      }
+    },
+    "lesson-M": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 4,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 2 pages. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page. No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 4,
+      "keyPageCount": 4,
+      "seed": 652243,
+      "title": "I Can solve addition stories",
+      "notes": [
+        "No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 56.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 82.1,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 76.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 64 dollars for books and games. 2 dollars are for books. How many dolla",
+          "ans": "62",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stamps. Tom got 7 more stamps. Now Tom has 73 stamps. How many stam",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 85.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 16 beads. Sam gets 30 more beads. How many beads does Sam have now?",
+          "ans": "46",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some shells. Leo got 7 more shells. Now Leo has 35 shells. How many shel",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 48.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 82 cards. Mia gets 50 more cards. How many cards does Mia have now?",
+          "ans": "132",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 74.8,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 22 dollars for books and games. 2 dollars are for books. How many dollar",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 48.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 80.3,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "M",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-M-p1.png",
+          "words": 118,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-p2.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-p3.png",
+          "words": 153,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-p4.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-M-key-p1.png",
+          "words": 120,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-key-p2.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-key-p3.png",
+          "words": 189,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-M-key-p4.png",
+          "words": 105,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 199
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5c69d017bfb779c5",
+          "a04c479798f90f68",
+          "77d1649cdb413915",
+          "c209e2b3e7b4b71c"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 33.1,
+              "wPct": 21.3,
+              "cell": 1
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 37.5,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 13,
+              "median": 13,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 36.5,
+              "wPct": 3.2,
+              "cell": 1
+            },
+            "footPct": 51.4
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 270
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "e085e56c0537e508",
+          "fb22ba3e3ba1492a",
+          "609d999d7b25caae",
+          "9e7c3fb9cd6207db"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 33.1,
+              "wPct": 21.3,
+              "cell": 1
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 37.5,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 22,
+              "median": 22,
+              "min": 10
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                10,
+                10
+              ],
+              "sizes": [
+                "10x10 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 36.5,
+              "wPct": 3.2,
+              "cell": 1
+            },
+            "footPct": 51.4
+          }
+        ]
+      }
+    },
+    "lesson-L": {
+      "fits": {
+        "cols": 1,
+        "rows": 1,
+        "pages": 4,
+        "note": "Anchor chart: 1 page · Lesson: 1 page · Practice: 2 pages. Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page. No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "sections": [
+          {
+            "cols": 1,
+            "rows": 1,
+            "line": "Fits: an anchor chart of 4 steps, 3 warm-up, 1 guided and 0 independent on 1 page."
+          }
+        ]
+      },
+      "pageCount": 4,
+      "keyPageCount": 4,
+      "seed": 652243,
+      "title": "I Can solve addition stories",
+      "notes": [
+        "No lesson data for this skill yet: the warm-up uses the skills listed before it, with no vocabulary.",
+        "Tall problems: 2 rows per page."
+      ],
+      "gaps": [],
+      "anchors": {
+        "mode": "off",
+        "examples": [],
+        "notes": []
+      },
+      "items": [
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 5 books. Sam gets 11 more books. How many books does Sam have now?",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 52 stickers. Mia has 72 stickers. How many stickers do they have in all?",
+          "ans": "124",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 75 pencils. 32 of them are red. The rest are blue. How many pencils are ",
+          "ans": "43",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana had some apples. Ana got 2 more apples. Now Ana has 67 apples. How many appl",
+          "ans": "65",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Noor has 31 cookies. 15 of them are red. The rest are blue. How many cookies are",
+          "ans": "16",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Omar had some buttons. Omar got 29 more buttons. Now Omar has 30 buttons. How ma",
+          "ans": "1",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Kofi had some crayons. Kofi got 42 more crayons. Now Kofi has 44 crayons. How ma",
+          "ans": "2",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ben has 33 stamps. Lena has 38 stamps. How many stamps do they have in all?",
+          "ans": "71",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Lena has 9 beads. 6 of them are red. The rest are blue. How many beads are blue?",
+          "ans": "3",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Yuki has 81 shells. 46 of them are red. The rest are blue. How many shells are b",
+          "ans": "35",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Aya has 53 cards. Aya gets 67 more cards. How many cards does Aya have now?",
+          "ans": "120",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ravi had some marbles. Ravi got 31 more marbles. Now Ravi has 38 marbles. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 61 dollars. Zara gets 77 more dollars. How many dollars does Zara have ",
+          "ans": "138",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stickers. Tom got 90 more stickers. Now Tom has 97 stickers. How ma",
+          "ans": "7",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 41 pencils. 9 of them are red. The rest are blue. How many pencils are b",
+          "ans": "32",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some apples. Leo got 16 more apples. Now Leo has 64 apples. How many app",
+          "ans": "48",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 93,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo has 15 dollars for books and games. 4 dollars are for books. How many dollar",
+          "ans": "11",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "3": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -29.3
+            },
+            "4": {
+              "hMm": 86.6,
+              "fits": false,
+              "slackMm": -37
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "13 + 5 = ?",
+          "ans": "18",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "fact",
+          "fclass": "standard",
+          "text": "9 + 10 = ?",
+          "ans": "19",
+          "measured": {
+            "1": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 79.4
+            },
+            "2": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 33.1
+            },
+            "3": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 17.6
+            },
+            "4": {
+              "hMm": 42.1,
+              "fits": true,
+              "slackMm": 9.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Zara has 64 dollars for books and games. 2 dollars are for books. How many dolla",
+          "ans": "62",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Tom had some stamps. Tom got 7 more stamps. Now Tom has 73 stamps. How many stam",
+          "ans": "66",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Sam has 16 beads. Sam gets 30 more beads. How many beads does Sam have now?",
+          "ans": "46",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Leo had some shells. Leo got 7 more shells. Now Leo has 35 shells. How many shel",
+          "ans": "28",
+          "measured": {
+            "1": {
+              "hMm": 63.1,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 97.5,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Mia has 82 cards. Mia gets 50 more cards. How many cards does Mia have now?",
+          "ans": "132",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        },
+        {
+          "template": "word-work",
+          "fclass": "standard",
+          "text": "Ana has 22 dollars for books and games. 2 dollars are for books. How many dollar",
+          "ans": "20",
+          "measured": {
+            "1": {
+              "hMm": 54.7,
+              "fits": true,
+              "slackMm": 2.9
+            },
+            "2": {
+              "hMm": 91.2,
+              "fits": true,
+              "slackMm": 2.9
+            }
+          }
+        }
+      ],
+      "role": "lesson",
+      "size": "L",
+      "opts": null,
+      "pages": [
+        {
+          "file": "lesson-L-p1.png",
+          "words": 118,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p2.png",
+          "words": 150,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p3.png",
+          "words": 153,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-p4.png",
+          "words": 85,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "keyPages": [
+        {
+          "file": "lesson-L-key-p1.png",
+          "words": 120,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p2.png",
+          "words": 172,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p3.png",
+          "words": 189,
+          "w_mm": 209.9,
+          "h_mm": 297
+        },
+        {
+          "file": "lesson-L-key-p4.png",
+          "words": 105,
+          "w_mm": 209.9,
+          "h_mm": 297
+        }
+      ],
+      "check": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 199
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "5c69d017bfb779c5",
+          "08714acaf2beb391",
+          "7c902b7a2f70528e",
+          "bf0961df6aec6192"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 15,
+              "min": 11
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                11.5,
+                11.4
+              ],
+              "sizes": [
+                "12x12 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 21.8,
+              "wPct": 21.3,
+              "cell": 2
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 15,
+              "median": 15,
+              "min": 11
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                11.5,
+                11.5
+              ],
+              "sizes": [
+                "12x12 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 22.9,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 15,
+              "median": 15,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                11.5,
+                11.5
+              ],
+              "sizes": [
+                "12x12 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 21.6,
+              "wPct": 3.2,
+              "cell": 2
+            },
+            "footPct": 51.2
+          }
+        ]
+      },
+      "keyCheck": {
+        "pages": 4,
+        "cells": [
+          4,
+          4,
+          4,
+          2
+        ],
+        "problems": [],
+        "fonts": {
+          "Andika": 270
+        },
+        "fontsReady": true,
+        "andika": true,
+        "pageHashes": [
+          "e085e56c0537e508",
+          "1304a5e77c7ded3f",
+          "d7474483aac2e73d",
+          "13144151920fc03e"
+        ],
+        "measured": [
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 18,
+              "min": 15
+            },
+            "slots": {
+              "n": 0,
+              "minMm": null,
+              "sizes": []
+            },
+            "band": {
+              "hPct": 11.8,
+              "wPct": 4.3,
+              "cell": 3
+            },
+            "footPct": 31.6
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 7,
+              "minMm": [
+                11.5,
+                11.4
+              ],
+              "sizes": [
+                "12x12 mm ×5",
+                "14x11 mm ×2"
+              ]
+            },
+            "band": {
+              "hPct": 20.7,
+              "wPct": 21.3,
+              "cell": 4
+            },
+            "footPct": 0.9
+          },
+          {
+            "cells": 4,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 8,
+              "minMm": [
+                11.5,
+                11.5
+              ],
+              "sizes": [
+                "12x12 mm ×8"
+              ]
+            },
+            "band": {
+              "hPct": 22.9,
+              "wPct": 3.2,
+              "cell": 3
+            },
+            "footPct": 0.2
+          },
+          {
+            "cells": 2,
+            "digitPt": {
+              "max": 28,
+              "median": 28,
+              "min": 11
+            },
+            "slots": {
+              "n": 5,
+              "minMm": [
+                11.5,
+                11.5
+              ],
+              "sizes": [
+                "12x12 mm ×5"
+              ]
+            },
+            "band": {
+              "hPct": 21.6,
+              "wPct": 3.2,
+              "cell": 2
+            },
+            "footPct": 51.2
+          }
+        ]
+      }
+    }
+  },
+  "consoleErrors": []
+}
