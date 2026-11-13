@@ -31,10 +31,7 @@ async function openRaster({ fontPx = 100 } = {}) {
  .h{display:flex;align-items:center;justify-content:center;height:1.15em;line-height:1;position:relative}
  .bm{display:inline-block;width:0;height:0}
 </style></head><body><div id="stage" style="position:absolute;left:40px;top:40px"></div></body></html>`, { waitUntil: 'load' });
-  await page.evaluate(async () => {
-    await Promise.all([document.fonts.load('400 40px Andika'), document.fonts.load('700 40px Andika')]);
-    await document.fonts.ready;
-  });
+  await require('./ws-fonts.cjs').awaitFonts(page, { faces: ['400 40px Andika', '700 40px Andika'] });   // bounded retry
   const ok = await page.evaluate(() => document.fonts.check('400 28px Andika') && document.fonts.check('700 28px Andika'));
   if (!ok) throw new Error('Andika webfont did not load');
   const close = async () => { await browser.close(); await new Promise((r) => server.close(r)); };
