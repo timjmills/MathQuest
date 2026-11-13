@@ -28,7 +28,14 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   edge as ink. ws-cell-checks PUPILTAG + OVERFLOW: 0 on function_table_easy / number_patterns_rule / function_table EA S/M/L.
 - Proofs: passed skills 810/810 role pages (27 skills x 10 roles x S/M/L, pupil + key) identical vs 3b324bcc; lesson baseline
   --all-lessons vs master 8a7c5d43: see below.
-- Next: critic r5c on the fte Model + the changed EA pages; deploy-3; R13 ruling asked.
+- R13 (lead ruling (a)): a Pre-skill Check that runs to 2 pages splits as evenly as its bands allow (2 + 2), never a page of
+  one item, every prerequisite kept, the FULL header on every page; check ws-roles-unit PSC-2PG-BALANCE (b7110b89). 36 of 81
+  passed PSC pages change - all 2-page checks; one-page checks byte-identical.
+- Critic r5c (design/status/lf-roles/r5c/critic-r5c.md): PASS, 0 counted defects; every changed set 8+ and better than before.
+  Nits N1 (fte step 5 text says "every row" while one mark is new), N2 (npr Model steps 1-2 add no mark; pre-existing).
+- Lesson baseline --all-lessons vs master 8a7c5d43: 1560/1596 identical; the 36 are g3-oa9-input-output-rule (the function
+  table's vertical-align attribute) and its 23 pages are pixel-identical.
+- Next: deploy-3; then Reason It F2 / compare band 999999 (A over B), overflow not pinnable, F7; F8 needs a PT-RSN-4 ruling.
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
