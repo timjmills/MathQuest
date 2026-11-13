@@ -1,0 +1,86 @@
+{
+  "$schema": "../manifest.schema.json",
+  "version": 1,
+  "lane": "lf-vocab",
+  "mergeOrder": 70,
+  "description": "Lessons-first wave 1, vocabulary lane: the picture vocabulary host (Match 3 pictures, 1 picture 3 words) and its two task presets, on the lesson word sets of the CCSS BUILD lessons (design/cards/vocabulary/vocabulary.md).",
+  "skills": [
+    {
+      "key": "vocabulary:vocab_grade_pictures",
+      "entry": {
+        "v": "vocab_grade_pictures",
+        "l": "Vocabulary: Match 3 Pictures (Lesson Words)"
+      },
+      "code": "VS",
+      "grade": "M",
+      "timeCategory": "standard",
+      "printSize": "wide",
+      "standards": {
+        "ccss": [
+          "3.OA.D.9",
+          "3.OA.B.5",
+          "3.OA.D.8"
+        ],
+        "ee": [
+          "M.EE.3.OA.8"
+        ],
+        "note": "the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)"
+      },
+      "terms": [
+        "vocabulary pictures",
+        "match 3 pictures",
+        "match the word to the picture",
+        "write the letter of the picture",
+        "picture word match",
+        "lesson vocabulary",
+        "picture vocabulary",
+        "match words and pictures"
+      ],
+      "concepts": [
+        "vocabulary"
+      ]
+    },
+    {
+      "key": "vocabulary:vocab_pick3_words",
+      "entry": {
+        "v": "vocab_pick3_words",
+        "l": "Vocabulary: 1 Picture, 3 Words",
+        "presetOf": "vocab_grade_pictures"
+      },
+      "code": "VZ",
+      "grade": "M",
+      "preset": {
+        "skill": "vocab_grade_pictures",
+        "opts": {
+          "vocabTask": "pick3"
+        }
+      },
+      "standards": {
+        "ccss": [
+          "3.OA.D.9",
+          "3.OA.B.5",
+          "3.OA.D.8"
+        ],
+        "ee": [
+          "M.EE.3.OA.8"
+        ],
+        "note": "the default word pool: the grade 3 BUILD lessons of round 1 (the pilot unit G3-Y4.B4); vocabGrade / vocabSet move the words to grades 1, 2 and 4 (1.NBT.A.1, 2.NBT.A.3, 4.OA.A.1, 4.OA.A.3, 4.OA.C.5)"
+      },
+      "terms": [
+        "one picture three words",
+        "1 picture 3 words",
+        "word bank picture",
+        "copy the word for the picture",
+        "name the picture vocabulary",
+        "which word is the picture"
+      ],
+      "concepts": [
+        "vocabulary"
+      ]
+    }
+  ],
+  "providers": [
+    "./vocabulary.js"
+  ],
+  "lessons": []
+}

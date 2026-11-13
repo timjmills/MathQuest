@@ -759,3 +759,14 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Scripted Model: earlier steps black, only the newest step grey (MOD-MARKS-INK); Error Analysis label offsets on tables / count rows (PUPILTAG, EA-PAD, EA-ROWX); Pre-skill Check at L splits 2+2 with full headers (PSC-2PG-BALANCE, lead ruling R13); FIX-MINIMAL.
 - Gates on the deploy tree: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (732), redesign-passed (27), simple-print (OK on re-run; first run a one-off FAIL), screen-answer, backtest self-test, roles-unit (75), capacity-pin (648, 0 rises), detailed-lesson g3-oa9 OK.
 - Passed skills: every role byte-identical except 36 two-page Pre-skill Check pages (R13). Lessons 1560/1596 identical; the 36 differ by attribute only (g3-oa9), pixel-identical.
+
+## 2026-11-13 — Deploy EB-FOOT item pairing (lf-checks ebitem, narrow critic PASS 9/9/8/9)
+- The kit writes data-eb-item on every grid cell (pupil page and key); master's ws-empty-band pairs each cell with its own item(s) by it; fallbacks print a note. No pixel/layout change (critic: 32 sheets + keys byte-identical with the attribute removed). arrays_groups EB-FOOT 35 → 0 (reordered pages read correctly). Unblocks lf-ops -props critic.
+- Gates: boot-smoke, code-snapshot (732), redesign-passed (27), backtest self-test, empty-band self-test (15 EB-FOOT cases), simple-print.
+
+## 2026-11-13 — Deploy vocabulary (lf-vocab, narrow critic r14 PASS, min 8; both skills redesign-passed)
+- grade_pictures + pick3_words: r5 print, R-1 (highlight after answering, screen only), R-2 (spoken explanation on a wrong answer), O-1 blue next-answer box, O-2/O-3 unambiguous pictures that never fit a distractor, rounds r9–r14 (V-NUM, V-PLACE, V-TWIN, screen picture at print size). Known: 4 SIZE-REF gate-gap findings per lead ruling (same-word proof in the packet; gate fix with lf-checks).
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, backtest self-test, capacity-pin (648), roles-unit (75), vocab-unit, empty-band self-test. Merged with master 70fa12c2 (EB-FOOT pairing; comment conflict resolved, backtests unioned 261 rows).
+
+## 2026-11-13 — Owner rule: lesson design at high effort
+- Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
