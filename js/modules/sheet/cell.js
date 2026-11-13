@@ -100,7 +100,27 @@ export function cell(inner, opts = {}) {
     // the items a cell holds ("3,4,5": EB-FOOT judges every cell against the items it holds)
     const ebList = (Array.isArray(opts.ebItem) ? opts.ebItem : [opts.ebItem]).filter((x) => Number.isInteger(x) && x >= 0);
     if (ebList.length) extra += ` data-eb-item="${ebList.join(',')}"`;
+    // a cell holding several questions of which only some matched a bridge item (critic ebitem-r1 m2): "k/n", so EB-FOOT notes
+    // it as partly indexed instead of judging it against the matched items alone. Nothing draws from it.
+    if (ebList.length && /^\d+\/\d+$/.test(String(opts.ebPartial || ''))) extra += ` data-eb-partial="${opts.ebPartial}"`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
+}
+
+/**
+ * The bridge's item index for one grid plan item (critic eb-r5 m1, ebitem-r1 m2). Pure. `idx`: Map question -> index in the
+ * bridge's returned items. A plan item holding several questions (`qs`) carries the list of the matched indexes; when only SOME
+ * of them matched, `ebPartial` = "matched/held" too (EB-FOOT notes such a cell, never judges it against part of its items).
+ * Returns { ebItem, ebPartial } (either may be undefined).
+ */
+export function ebItemOf(pi, idx) {
+    if (!pi || !idx) return {};
+    const qs = Array.isArray(pi.qs) ? pi.qs : null;
+    const many = qs ? qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
+    const partial = qs && many.length && many.length < qs.length ? `${many.length}/${qs.length}` : undefined;
+    if (many.length > 1) return { ebItem: many, ebPartial: partial };
+    if (pi.q && idx.has(pi.q) && !partial) return { ebItem: idx.get(pi.q) };
+    if (many.length) return { ebItem: partial ? many : many[0], ebPartial: partial };
+    return {};
 }
 
 /** LS-3: a dashed line across the page means CUT, and only that. Tagged for the lint (LS-4). */
