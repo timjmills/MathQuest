@@ -61,13 +61,22 @@ export function prepare(it, info = {}) {
     const panelW = (LIVE_W_MM - 6 - 52 - 10) / 2 - 4, halfW = (LIVE_W_MM - 6 - 5) / 2 - 4;
     const over = !sentence && Number.isFinite(fw) && fw > panelW;
     const legacyWide = sentence || (it.template === 'equation' && over);
-    const pair = !legacyWide && over && fw <= halfW;
-    const full = !legacyWide && over && fw > halfW;
+    // (lf-ops-props r3b, replaces lf-algebra's interim revert 2cfeb1d7: a count row wider than half the cell no longer takes
+    // `full` - A over B, one item a page - it WRAPS to its own panel: A and B side by side, each told its live width
+    // (`cellLiveMm`, read by count-row's narrowLive, the same key the lesson chart panel and the we-do Steps use). The wrap is
+    // keyed on the panel's real width, never on ctx.columns, so a full-width panel keeps its line.)
+    const crWrap = !legacyWide && over && it.template === 'count-row' && pl.look === 'train' && fw > halfW;   // (a train wraps; an arcs row shrinks its boxes in a narrow width, TY-21 - it keeps `full`)
+    const pair = !legacyWide && over && (fw <= halfW || crWrap);
+    const full = !legacyWide && over && fw > halfW && !crWrap;
+    const liveC = crWrap ? { cellLiveMm: halfW - 8 } : null;
     const wide = legacyWide;
     const at = (col, row) => (full ? ` style="grid-column:1;grid-row:${row}"` : pair ? ` style="grid-column:${col};grid-row:1"` : wide ? ` style="grid-column:${col};grid-row:${row}"` : '');
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : full ? 1 : pair || wide ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
+    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }, liveC || {}), Object.assign({}, o, { cols: sentence ? 2 : full ? 1 : pair || wide ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
     const respStyle = ' style="grid-column:1 / -1;grid-row:' + (full ? 3 : 2) + ';display:flex;flex-wrap:wrap;align-items:center;column-gap:8mm;row-gap:2mm"';
-    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${full ? ' style="grid-template-columns:1fr;row-gap:3mm"' : pair ? ' style="grid-template-columns:1fr 1fr;row-gap:3mm"' : wide ? ' style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm"' : ''}>`
+    // (lf-ops-props r3b, CL-40: the A panel's top-left corner printed at 3 mm across, 5 mm down - in the label's 7 x 7 mm
+    // keep-out - at L; the panels start below it (--ws-koin, the kit's keep-out edge; 0 on screen))
+    const ko = sentence ? '' : 'margin-top:max(0mm, var(--ws-koin, 0mm));';
+    const render = (c, o = {}) => story(c) + `<div class="mq-ab"${full ? ` style="grid-template-columns:1fr;row-gap:3mm;${ko}"` : pair ? ` style="grid-template-columns:1fr 1fr;row-gap:3mm;${ko}"` : wide ? ` style="grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm;${ko}"` : ko ? ` style="${ko}"` : ''}>`
         + `<div class="mq-abbox"${full ? at(1, 1) : pair ? at(1) : at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
         + `<div class="mq-abbox"${full ? at(1, 2) : pair ? at(2) : at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
         + `<div class="mq-abresp"${full || pair ? respStyle : at(2, '1 / 3')}>`

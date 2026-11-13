@@ -110,7 +110,8 @@ const insetOf = (ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? INSET_MM : 0);
 const lineGapOf = (ctx, g) => (ctx && ctx.tightRows && !isTwin(ctx) && g && g.rows >= 3 ? (g.lines ? 1.5 : 2) : 2.5);   // a Lines row has no box tops
 const tabLineH = (g, ctx) => (ctx && ctx.tightRows && !isTwin(ctx) ? Math.min(g.h, tabPt(g) * PT_MM * 0.72 + 4.5) : g.h);
 const fmt = (v) => (Number.isFinite(Number(v)) && String(v).trim() !== '' ? Number(v).toLocaleString('en-US') : String(v));
-const maxDigits = (p) => Math.max(1, ...(p.values || []).map((v) => fmt(v).length));
+// (`bandDigits`, lf-ops-props r3b: a row sized from the widest number of its band, so a page keeps one slot width)
+const maxDigits = (p) => Math.max(1, Number(p.bandDigits) || 0, ...(p.values || []).map((v) => fmt(v).length));
 const lvlOf = (ctx) => (ctx && Number.isFinite(ctx.scaffoldLevel) ? ctx.scaffoldLevel : 1);
 /** The step tab this render draws: a hint tab (`tabHint`) is dropped at level 0. */
 const tabOf = (p, ctx) => (p.tabHint && lvlOf(ctx) < 1 ? '' : (p.tab || ''));
