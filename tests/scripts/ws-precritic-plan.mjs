@@ -56,6 +56,28 @@ export function readLessonCommand(cmd) {
     const mode = /--sweep(?:-packets)?\b/.test(tail) ? 'sweep' : /--(lp|packet|raster)\b/.test(tail) ? 'lp' : /--repeats\b/.test(tail) ? 'repeats' : 'check';
     return { tool: 'ws-detailed-lesson', lesson, mode };
 }
+/** Lane tools whose backtests name no skill and no detailed lesson: the precritic scope each one is wired to.
+ *  (lane lf-partopts, 2026-11-13: the lesson parts are on the --role lesson path - which --lesson and --unit bring - and on
+ *  --teacher; a row's scope flag, --bt-only / --coverage-only / --lessons, must be on a planned line of that tool too, so a
+ *  row cannot be proved by a differently scoped run of the same tool.) */
+export const LANE_TOOLS = {
+    'ws-partopts-unit': { scope: ['--role', 'lesson'], flags: ['--bt-only', '--coverage-only', '--lessons'] },
+    'ws-partopts-shots': { scope: ['--role', 'lesson'], flags: [] },
+};
+/** {tool, scope, flag} of a backtest command on a lane tool, or null. Pure. */
+export function readLaneCommand(cmd) {
+    const c = String(cmd);
+    const tool = Object.keys(LANE_TOOLS).find((t) => new RegExp(`tests/scripts/${t}\\.(?:c?js|mjs)`).test(c));
+    if (!tool) return null;
+    const tail = c.slice(c.lastIndexOf(`${tool}.`));
+    const spec = LANE_TOOLS[tool];
+    return { tool, scope: spec.scope, flag: spec.flags.find((f) => new RegExp(`${f}\\b`).test(tail)) || null };
+}
+/** The plan lines that run a lane tool (with the row's scope flag, when it has one). Pure. */
+export function planHasLane(planText, { tool, flag }) {
+    return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`)).filter((l) => !flag || new RegExp(`${flag}\\b`).test(l));
+}
+
 /** The plan lines that run ws-detailed-lesson on `lesson` in `mode`. Pure. */
 export function planHasLesson(planText, { lesson, mode }) {
     return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
@@ -84,6 +106,15 @@ function selfTest() {
     eq('lesson lp planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'lp' }).length, 1);
     eq('lesson sweep not planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'sweep' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
+    // lane rows (lf-partopts): no skill, no detailed lesson - the tool and its scope flag
+    eq('lane bt row', readLaneCommand('/tmp/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--bt-only' });
+    eq('lane lessons row', readLaneCommand('MQ_ROOT={root} node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M --only PO-2d'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--lessons' });
+    eq('lane shots row', readLaneCommand('node tests/scripts/ws-partopts-shots.cjs --no-shots --only R1'), { tool: 'ws-partopts-shots', scope: ['--role', 'lesson'], flag: null });
+    eq('not a lane row', readLaneCommand('node tests/scripts/ws-node-lint.mjs --skill addition:add'), null);
+    const lanePlan = '  [browser] parts — tests/scripts/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --lessons number_sense:nearest_10 --sizes M,L --walk-depth 1\n  [browser] bt — node tests/scripts/ws-partopts-unit.cjs --bt-only\n  [browser] shots — node tests/scripts/ws-partopts-shots.cjs --no-packets --no-shots';
+    eq('lane bt planned', planHasLane(lanePlan, { tool: 'ws-partopts-unit', flag: '--bt-only' }).length, 1);
+    eq('lane coverage not planned', planHasLane(lanePlan, { tool: 'ws-partopts-unit', flag: '--coverage-only' }).length, 0);
+    eq('lane shots planned', planHasLane(lanePlan, { tool: 'ws-partopts-shots', flag: null }).length, 1);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
 }
@@ -106,7 +137,27 @@ else {
     };
     const fails = []; const na = []; let checked = 0;
     const lplans = new Map();
+    const scopePlans = new Map();
+    const scopePlan = (argv) => {
+        const key = argv.join(' ');
+        if (!scopePlans.has(key)) {
+            const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), ...argv, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 });
+            scopePlans.set(key, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` });
+        }
+        return scopePlans.get(key);
+    };
     for (const row of table.rows || []) {
+        const lane = readLaneCommand(row.command || '');
+        if (lane) {
+            const p = scopePlan(lane.scope);
+            checked++;
+            const via = `ws-precritic ${lane.scope.join(' ')}`;
+            if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
+            const hit = planHasLane(p.text, lane);
+            console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${lane.tool}${lane.flag ? ` ${lane.flag}` : ''} (via ${via})`);
+            if (!hit.length) fails.push(`${row.id}: ${via} plans no ${lane.tool}${lane.flag ? ` ${lane.flag}` : ''} gate (the check is backtested but not on the lane's path)`);
+            continue;
+        }
         const lc = readLessonCommand(row.command || '');
         if (lc) {
             if (!lplans.has(lc.lesson)) { const r = spawnSync(process.execPath, [join(ROOT, 'tests/scripts/ws-precritic.cjs'), '--lesson', lc.lesson, '--dry-run'], { cwd: ROOT, encoding: 'utf8', maxBuffer: 32 << 20 }); lplans.set(lc.lesson, { ok: r.status === 0, text: `${r.stdout || ''}${r.stderr || ''}` }); }

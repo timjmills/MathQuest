@@ -82,12 +82,19 @@
 //             (LP-FAMILY-REPEAT, LP-TEXT, LP-GIVEAWAY, LP-MODELLED, LP-NUMBERS, LP-FALLBACK, LP-PREREQ, LP-MEASURE, LP-RASTER),
 //             ws-detailed-lesson --sweep (LP-SWEEP: seeds 1-25), plus the --role lesson gates (which bring ws-teacher-wrm
 //             and ws-lesson-link-uses). Repeatable / comma list.
+//             and the lesson PARTS (lane lf-partopts, 2026-11-13; the per-part "how many" lives on the lesson page and the
+//             teacher Print screen, so these four rows are on the --role lesson path and on --teacher, scoped to stay fast):
+//             ws-partopts-unit --lessons <the 5 lessons the critics graded> --sizes M,L --walk-depth 1 (PO-2a-e, EB-ROWFIT,
+//               EB-ROWFIT+ (report-only), PO-NOROOM, PO-REM, PO-CAP, PO-VOC on the PO-2w step walk; the full sweep is ~65 min),
+//             ws-partopts-unit --bt-only (FILL-BT, ROWFIT-BT, BAND-BT: the three tuned §8d thresholds, two-sided),
+//             ws-partopts-unit --coverage-only (PO-2e: the We Do / Practice ranges, the We Do floor a ratchet at 7/52), and
+//             ws-partopts-shots --no-packets --no-shots (the Print screen: F3-F10, N3, N5, N6, R1, R2, R4, 44 px targets)
 //   --unit <unit-id>  every lesson of design/lessons-first/queue.json's unit whose long lesson is built (its `long`
 //             field names the detailed lesson id); a lesson with no long lesson yet is named in an N/A row (its short lesson's
 //             checks, ws-lesson-check --unit, join when lf-engine merges phase 0).
 //   --teacher         ws-teacher-shell, -library, -preview, -quiz, -wrm (--grade / --lesson passed on), ws-teacher-flows,
 //             ws-teacher-tokens (SKIPPED-NOT-BUILT until they land), ws-pdf-preview (print preview parity + timing),
-//             ws-plain-words --check
+//             ws-plain-words --check, and the four lesson-parts rows above (ws-partopts-unit x 3, ws-partopts-shots)
 //
 // BASELINES (pinned; changed only with a STATUS note)
 //   design/audit/baselines/print-lint.json    ws-print-lint --json of `--source kit` (independent, size L) per skill:
@@ -643,6 +650,24 @@ const PARSE = {
         if (want && +m[1] < want) return { result: 'FAIL', findings: `rendered ${m[1]} of ${want} unit(s)`, detail: tailLines(out), explainsExit: false };
         return { result: 'PASS', findings: `rendered ${m[1]} unit(s), ${m[2]} page(s) for the critic (print-lint judges them)`, detail: [], explainsExit: false };
     },
+    /** ws-partopts-unit / ws-partopts-shots (lane lf-partopts): `name: OK | FAIL (n) | ERROR (...)`. ERROR means a check could
+     *  not run (a crash, a build that errored in a narrow run), so the row is FAIL "could not run", never PASS; the per-check
+     *  `ID FAIL n` lines and their indented details are the findings, and `expect.must` names the check lines the scope's run
+     *  has to print (a run that printed none of them judged nothing). */
+    partOpts(g, out, code) {
+        const err = [...out.matchAll(new RegExp(`^${reEsc(g.script)}: ERROR\\b.*$`, 'gm'))].pop();
+        if (err) return { result: 'FAIL', findings: `could not run: ${err[0].replace(`${g.script}: `, '').slice(0, 150)}`, detail: out.split('\n').filter((l) => /^ {2}ERROR /.test(l)).slice(0, 8).map((l) => l.trim()), explainsExit: true };
+        const v = lastVerdict(out, g.script);
+        if (!v) return unparsed(`no "${g.script}: OK|FAIL|ERROR" line`, out);
+        const must = (g.expect && g.expect.must) || [];
+        const missing = must.filter((k) => !new RegExp(`^${reEsc(k)}\\b`, 'm').test(out));
+        if (v[1] !== 'OK') {
+            const rows = out.split('\n').filter((l) => /^[A-Z][\w+-]*(-BT)? FAIL\b/.test(l) || /^ {3}\S/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
+            return { result: 'FAIL', findings: listShort(rows.map((r) => r.slice(0, 150)), 3) || v[0].slice(0, 160), detail: rows.slice(0, 12), explainsExit: true };
+        }
+        if (missing.length) return { result: 'FAIL', findings: `the run printed no ${listShort(missing)} line (it judged nothing for ${missing.length === 1 ? 'that check' : 'those checks'})`, detail: tailLines(out), explainsExit: false };
+        return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
+    },
     /** ws-card-rulings: NO-RULINGS (exit 4) is SKIPPED, never PASS. */
     cardRulings(g, out, code) {
         // Lead ruling R2 (lf-placevalue, 2026-11-07): the --check offered row of a card that HAS a rulings block but no
@@ -711,6 +736,31 @@ function applyOptIn(rows, keys) {
             r.name = `${r.name} + opt-in ${lane.lane}: ${[...(g.addRules || []), ...(g.args || []).filter((a) => /^--/.test(a) || /[A-Z]/.test(a))].join(' ')}`;
         }
     }
+}
+
+/* ---------------------------------------------------------- lane lf-partopts: the lesson's per-part "how many" (2026-11-13)
+ * The parts live on the lesson page and on the teacher Print screen, so the lane's two gates are on the --role lesson path
+ * (which --lesson and --unit bring) and on the --teacher path, scoped to stay fast:
+ *   partopts-unit      the five lessons the critics graded x M / L, the walk one step deep (the full sweep is ~65 min)
+ *   partopts-bt        the three tuned §8d thresholds, two-sided (FILL-BT, ROWFIT-BT, BAND-BT; ~25 s)
+ *   partopts-coverage  PO-2e: the We Do / Practice ranges of every lesson x size against their floors (the We Do floor is
+ *                      a ratchet at 7/52, lead 2026-11-13; ~60 s)
+ *   partopts-shots     the Print screen's own checks (F3-F10, N3, N5, N6, R1, R2, R4, H6) at 1280 and 390, no packets
+ * Every finding of critic rounds A r1-r3 is backtested on these commands (tests/fixtures/precritic/backtests.json,
+ * rows partopts-*); design/lessons-first/CHECKS_FROM_CRITICS.md names each row's check, backtest id and precritic row.
+ */
+const PARTOPTS_LESSONS = 'number_sense:nearest_10,addition:add_wp_10,placevalue:identify,division:div_facts,addition:fact_family_sort';
+function addPartOpts(add, ctx) {
+    const sub = '5 graded lessons × M / L';
+    add(gate('partopts-unit', 'ws-partopts-unit (lesson parts: PO-2a-e, EB-ROWFIT, PO-NOROOM, PO-REM, PO-CAP, PO-VOC + the PO-2w step walk)', sub, 'browser', 'ws-partopts-unit',
+        ['--lessons', PARTOPTS_LESSONS, '--sizes', 'M,L', '--walk-depth', '1'],
+        { parse: PARSE.partOpts, needFlags: ['lessons', 'walk-depth'], expect: { must: ['PO-2d', 'PO-CAP', 'PO-2w walk'] } }));
+    add(gate('partopts-bt', 'ws-partopts-unit --bt-only (the §8d thresholds two-sided: FILL-BT, ROWFIT-BT, BAND-BT)', 'fixed sheets either side of each threshold', 'browser', 'ws-partopts-unit',
+        ['--bt-only'], { parse: PARSE.partOpts, needFlags: ['bt-only'], expect: { must: ['FILL-BT', 'ROWFIT-BT', 'BAND-BT'] } }));
+    add(gate('partopts-coverage', 'ws-partopts-unit --coverage-only (PO-2e: the We Do / Practice ranges vs their floors, the We Do floor a ratchet)', 'every library lesson × M / L', 'browser', 'ws-partopts-unit',
+        ['--coverage-only'], { parse: PARSE.partOpts, needFlags: ['coverage-only'], expect: { must: ['PO-2e'] } }));
+    add(gate('partopts-shots', 'ws-partopts-shots (the Print screen: F3-F10, N3 captions, N5 / R1 lock text, N6 range text, R2 clamp note, R4 no sideways scroll, 44 px)', 'Print screen at 1280 and 390', 'browser', 'ws-partopts-shots',
+        ['--no-packets', '--no-shots'], { parse: PARSE.partOpts, needFlags: ['no-shots'] }));
 }
 
 function buildPlan(ctx) {
@@ -991,6 +1041,7 @@ function buildPlan(ctx) {
             for (const sz of ['L', 'S']) add(gate(`lesson-samples-key-${sz}`, `ws-print-lint --roles lesson --lints L-KEY,L-OVERLAP --size ${sz} (the three lesson samples, no baseline: AK-4 and SECTION blocking)`, `3 sample lessons at ${sz}`, 'browser', 'ws-print-lint', ['--source', 'kit', '--roles', 'lesson', '--size', sz, '--lints', 'L-KEY,L-OVERLAP', '--skills', SAMPLES], { parse: PARSE.printLint, expect: { ids: SAMPLES.split(',').map((k) => `${k}#lesson`) } }));
         }
         if (ctx.role === 'lesson' && !ctx.teacher) add(gate('lesson-link-uses', 'ws-lesson-link-uses (a pupil plays every use of a detailed lesson link, each with its own options)', 'every detailed lesson that uses a skill twice', 'browser', 'ws-lesson-link-uses', []));
+        if (ctx.role === 'lesson') addPartOpts(add, ctx);
     }
     // the lesson scope: per detailed lesson, the E-checks + repeats, the LP checks on the rendered pack, the 25-seed sweep
     for (const u of ctx.unitInfo || []) {
@@ -1014,6 +1065,7 @@ function buildPlan(ctx) {
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
+        addPartOpts(add, ctx);
     }
     return rows;
 }
