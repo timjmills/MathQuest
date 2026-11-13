@@ -114,7 +114,10 @@ function packing(poolsIn, input) {
     // `lessonFit` (a library lesson's Mixed page, live-pm r2 finding 3): when the one-shelf-per-skill start already runs
     // past page 1, the extra shelves fill the pages it takes (as with anchor bands) - a continuation page is never one
     // lone shelf on a 72 % blank page.
-    const multi = !!A || (!!input.lessonFit && pagesOf() > 1);
+    // (lf-engine roles, lf-placevalue compare r2 finding 2 - PG-23 on every Mixed practice page: compare + add_facts +
+    // tape_diagram + perimeter at L printed 10 problems and then a page 2 of ONE shelf of 2 under a third of a full page; the
+    // rule is the page's, not the lesson's, so every Mixed page whose start spills fills the pages it takes the same way)
+    const multi = !!A || pagesOf() > 1;
     const basePages = multi ? pagesOf() : 1;
     for (let guard = 0; guard < 40; guard++) {
         if (ids.reduce((a, id) => a + shelf[id].n, 0) >= maxShelves * basePages) break;
