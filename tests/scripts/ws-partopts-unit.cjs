@@ -404,6 +404,7 @@ async function browser() {
         const WORD_N = { one: 1, two: 2, three: 3, four: 4, five: 5 };
         const pagesSaid = (t) => { const a = /\bone page\b/.exec(t); if (a) return 1; const b = /\b(\d+|two|three|four|five) pages\b/.exec(t); return b ? (WORD_N[b[1]] || Number(b[1])) : null; };
         // every new check of critic A r2 on one settled state (the standard packet included: the screen's texts are this lane's)
+        let textNoteOnce = 0;
         const judgeWalk = (where, b, cur, m, std, rowH) => {
             const lims = po.allPartLimits(b.fit);
             const sheetPgs = m.pages.map((x, i) => Object.assign({ i }, x)).filter((x) => x.sheet === 'lesson-sheet');
@@ -437,8 +438,15 @@ async function browser() {
             // (f) N4: no one-pair match
             if (lims.vocab && po.offeredValues(lims.vocab).includes(1)) F('PO-VOC', `${where}: Vocabulary offers 1 word - a one-pair "Draw a line to match"`);
             if (cur.vocab && cur.vocab.n === 1) F('PO-VOC', `${where}: Vocabulary prints 1 pair`);
-            // (e) the screen's texts tell the truth about pages
-            const tx = textsOf(b.fit, lims, cur);
+            // (e) the screen's texts tell the truth about pages. (An engine older than the text writers - totalPages,
+            // partRowText, sheetCaption - cannot answer this one: on a narrow run that does not ask for PO-CAP it is a
+            // note, and when PO-CAP IS asked it is an ERROR, never a silent pass.)
+            let tx;
+            try { tx = textsOf(b.fit, lims, cur); } catch (e) {
+                const msg = `${where}: the part texts cannot be read on this engine - ${String((e && e.message) || e).split('\n')[0].slice(0, 120)}`;
+                if (counts('PO-CAP', msg)) errors.push(`PO-CAP ${msg}`); else if (!textNoteOnce++) console.log(`  (not judged: PO-CAP ${msg})`);
+                return;
+            }
             const said = pagesSaid(tx.cap);
             if (said !== sheetPgs.length) F('PO-CAP', `${where}: the lesson sheet caption "${tx.cap}" - the sheet prints on ${sheetPgs.length} page${sheetPgs.length === 1 ? '' : 's'}`);
             if (sheetPgs.length > 1 && lastSheet.empty >= 50 && !/under half/.test(tx.cap)) F('PO-CAP', `${where}: the lesson sheet's last page is ${lastSheet.empty} % empty, the caption does not say so ("${tx.cap}")`);
