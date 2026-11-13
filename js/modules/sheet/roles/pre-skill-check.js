@@ -153,8 +153,17 @@ export const measureCols = (ctx) => (ctx && ctx.routed ? [1, 2, 3, 4] : [1, 2, 4
  * untouched (`routed` only on a lesson's Prerequisite Check).
  */
 export function prepare(it, { routed = false } = {}) {
-    const pl = routed && it && it.q && it.q.cell && it.q.cell.payload;
+    let pl = routed && it && it.q && it.q.cell && it.q.cell.payload;
     if (pl && it.template === 'stack') { pl.heads = false; pl.answer = 'open'; }
+    // (r6, after the w2 merge: identify's support is none on the pre-skill-check role - lead ruling, providers/pv.js
+    // IDENTIFY_UNAIDED_ROLES - so its place item comes as a pv-support cell, a plain numeral over its words, and the rules below
+    // (no heads, place order, the side bank) passed it by: the check lost its side bank and read T O T. A routed check draws it as
+    // the plain place cell it is - no heads, its numeral its own - so they apply. The support stays none.)
+    if (pl && it.template === 'pv-support' && pl.picture === 'plain' && pl.base && /^place/.test(String(pl.base.kind || ''))) {
+        const base = Object.assign({}, pl.base, { n: pl.n, place: pl.place, heads: false });
+        delete base.hideNumeral;
+        it.q.cell.template = 'pv'; it.q.cell.payload = base; it.template = 'pv'; pl = base;
+    }
     // (critic r3 F1: a "name the place" cell prints no place heads on the check - the letter over the underlined digit IS the
     // answer - and its words lie in the number's own place order, T before O, as one row under the number: dealt "ones tens",
     // the word under the underlined digit was always the wrong one)
