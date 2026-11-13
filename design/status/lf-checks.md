@@ -306,6 +306,8 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
    - option-panel screenshots as a gate.
    Coordinate the kit- and role-level items with lf-roles.
 4. V-AMBIG into precritic once lf-vocab merges.
+5. The font-load race (lf-engine, 11-13): ws-detailed-lesson E2 ("Andika 700/400 not loaded") flakes under load, because document.fonts.check runs before the web font arrives (g2-nbt3, g3-oa8, g4-nbt1). Fix: await document.fonts.load for both faces with a bounded retry; a font that never loads is an ERROR, not a page FAIL. Apply to every browser gate that checks fonts.
+6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
     threshold; fixture row.
