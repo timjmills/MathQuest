@@ -8081,6 +8081,126 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-words-hint-any-digit",
+   "check": "number_word_form Guided: no hint names ANY digit of the answer outside a ruled gap, on every band and answer slot (lf-placevalue critic live1 N1, the class; PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK (any digit)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 1000 M / L: '\"two hundred\": 2 in the hundreds.' under 262, '\"nine hundred\": 9 in the hundreds.' under 986"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "every count of a words-to-numeral hint a gap: '\"two hundred\": ___ in the hundreds.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-LEAK --roles guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-hint-garble",
+   "check": "number_word_form Guided: every hint reads as English - no template filled with 'no' ('the no is'), no doubled word, no hole (critic live1 N2)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-GARBLE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words M / L: '26: the no is in the hundreds place.'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words first step from the digits: '26: 2 tens, 6 ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-HINT-GARBLE --roles guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-to-words-steps",
+   "check": "number_word_form numeral-to-words Guided: the Steps fit every item's kind and name no place no item has (critic live1 N2: 'Say the hundreds: three hundred.' over 53, 26, 99)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND (to_words, places)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "to_words default / band 20 / band 1000 M / L: the hundreds Steps with a literal 'three hundred' over two-digit numbers"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "to_words Steps a kind (one word, teen, tens word alone, two words, hundreds; one word up to twenty at band 20)"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --roles guided",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-opener-one-kind",
+   "check": "number_word_form Opener: the Model and its Guided band are one kind its Steps cover (critic live1 N3: 'twenty' beside a teen Model and the teen Steps at band 20)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND --roles opener",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "band 20 M: Model 'five' with Guided 'fifteen', 'seventeen', 'ten'; to_words band 20 '15' beside '20'"
+   },
+   "pass": {
+    "commit": "feadad0b",
+    "state": "opener.js oneKindFirst: the kind the pool deals most leads the Model and Guided band"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --seeds 1 --skills composing:number_word_form --only GUIDED-ONE-KIND --roles opener",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-one-line",
+   "check": "placevalue:expand online worksheet at 820 px and wider: the sentence on one line, every answer box at least 100 x 76 px - the size before the twin (critic live1 N4, a ratchet)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-ONE-LINE / WS-SLOT-SIZE",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "3 columns at 1280: '+ [ ]' on a second line in every card, boxes 62 x 46"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "nowrap line, 2 columns at 1280 / 1 at 820, boxes 103 x 76"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-touch-target",
+   "check": "placevalue:expand and placevalue:unit_form answer boxes >= 48 px on the worksheet and the builder-made quiz at 820 / 1024 (critic live1 N5, H6; lf-tools r1 A1 - one shared fix)",
+   "kind": "commit-pair",
+   "rule": "ws-grade-render --gate TOUCH-TARGET (--quiz-builder)",
+   "browser": true,
+   "fail": {
+    "commit": "7bf2bc3f",
+    "state": "expand quiz-820 / -1024 and worksheet 46 px inputs; unit_form worksheet-820 / -1024 46 px (30 findings)"
+   },
+   "pass": {
+    "commit": "a7764393",
+    "state": "a boxed slot's box >= 50 px, its input 48 px: 0 findings"
+   },
+   "command": "node tests/scripts/ws-grade-render.cjs --skills placevalue:expand,placevalue:unit_form --roles independent --size M --gate --quiz-builder --out /tmp/mq-bt-touch",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
