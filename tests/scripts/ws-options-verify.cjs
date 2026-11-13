@@ -236,6 +236,9 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
             return [[], [`"Up to ${v}" but the answer reaches ${maxA} and the numbers ${maxT}`]];
         },
         band(v, items) {
+            // (null - "No limit (the Max Number)", word-stories card Q2: no number to hold here; ws-content-audit's MAX-NUMBER
+            // BAND holds the answer to the Max Number. Read as 0 it failed every item: "Numbers to null but a number reaches 97")
+            if (v === null || v === undefined) return [[], []];
             const all = items.flatMap(pageNums);
             if (!all.length) return [[], []];
             const mx = Math.max(...all);
@@ -745,7 +748,14 @@ async function verifyInPage({ categoryId, skillId, label, n, baseSeed, bigRange,
         } else if (!ownSetting && (!items.length || diff === false)) {
             const bigItems = gen(opts, bigRange);
             const bigDiff = bigItems.length ? differs(bigItems, baseAt(bigRange)) : false;
-            if (bigItems.length && bigDiff) {
+            // (a `band` whose default is null - "No limit: the Max Number decides" - deals the SAME page as the default when
+            // the value IS the Max Number: that is the definition, not a dead value; it is checked at a raised Max Number,
+            // where it bounds the page. word-stories fix r2: F9 made "no limit" at Max Number 100 bound the answer by 100.)
+            const sameAsMax = def.id === 'band' && def.default === null && value === APP_RANGE;
+            if (bigItems.length && bigDiff && sameAsMax) {
+                r.notes = (r.notes || []).concat([`band ${value} is the Max Number ${APP_RANGE}: the default page by definition; checked at Max Number ${bigRange}`]);
+                range = bigRange; items = bigItems; base = baseAt(bigRange); diff = true;
+            } else if (bigItems.length && bigDiff) {
                 r.gated = true;
                 fail('gen', items.length ? `does nothing at Max Number ${APP_RANGE}; only works once Max Number is raised (gated)` : `refused at Max Number ${APP_RANGE} (no items); works at ${bigRange} (gated)`);
                 range = bigRange; items = bigItems; base = baseAt(bigRange); diff = true;
