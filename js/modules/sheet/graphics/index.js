@@ -16,7 +16,7 @@ export { factTriangle, factTriangleSize, TRIANGLE_SIDE } from './fact-triangle.j
 export { answerArea, boxW, BOX_H } from './answer-area.js';
 export { sentenceFrame, sentenceFrameWidthMm, CIRCLE_D } from './sentence-frame.js';
 export { partWholeBar, BAR_SEG_H } from './part-whole-bar.js';
-export { twoStepBar, twoStepBars, TS_BAR_H } from './two-step-bar.js';
+export { twoStepBar, twoStepBars, twoStepBarSize, TS_BAR_H } from './two-step-bar.js';
 export { familyChart, familyChartSize, familyFacts } from './family-chart.js';
 export { INK, GREY, PAPER, stroke, NUM_FEATURES } from './units.js';
 

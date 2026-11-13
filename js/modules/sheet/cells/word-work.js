@@ -440,26 +440,27 @@ export function tellTwoStep(s1, s2, k = 0) {
             const L = s1.op === '+'
                 ? [`Each ${C.one} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} does ${n1} have?`]
                 : [`Each ${C.one} had ${countOf(s1.a, T)}.`, `${n1} took ${num(s1.b)} out of each ${C.one}.`, `${n1} has ${countOf(n, C)}.`, `How many ${T.many} are in the ${C.many} now?`];
-            return { lines: L, unit: T, ans: s2.ans };
+            // `mid`: the hidden middle question (P-WP-11 v1; two-step card decision 6), printed under Step 1 on Model / Guided
+            return { lines: L, unit: T, ans: s2.ans, mid: s1.op === '+' ? `How many ${T.many} are in each ${C.one}?` : `How many ${T.many} are in each ${C.one} now?` };
         }
         const L = s1.op === '+'
             ? [`${n1} has ${num(s1.a)} red ${s1.a === 1 ? T.one : T.many} and ${num(s1.b)} blue ${s1.b === 1 ? T.one : T.many}.`, `${n1} shares them equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`]
             : [`${n1} has ${countOf(s1.a, T)}.`, `${n1} keeps ${num(s1.b)}.`, `${n1} shares the rest equally among ${num(n)} friends.`, `How many ${T.many} does each friend get?`];
-        return { lines: L, unit: T, ans: s2.ans };
+        return { lines: L, unit: T, ans: s2.ans, mid: s1.op === '+' ? `How many ${T.many} does ${n1} have?` : `How many ${T.many} are left to share?` };
     }
     if (s1.op === '*' || s1.op === '/') {
         const c = s2.bottom;
         if (s1.op === '*') {
             const C = pickAt(WW_CONTAINERS, k * 5 + 1);
             const ch = s2.op === '+' ? `${n1} gets ${num(c)} more ${c === 1 ? T.one : T.many}.` : `${n1} gives away ${countOf(c, T)}.`;
-            return { lines: [`${n1} has ${countOf(s1.a, C)}.`, `Each ${C.one} has ${countOf(s1.b, T)}.`, ch, `How many ${T.many} does ${n1} have ${s2.op === '+' ? 'now' : 'left'}?`], unit: T, ans: s2.ans };
+            return { lines: [`${n1} has ${countOf(s1.a, C)}.`, `Each ${C.one} has ${countOf(s1.b, T)}.`, ch, `How many ${T.many} does ${n1} have ${s2.op === '+' ? 'now' : 'left'}?`], unit: T, ans: s2.ans, mid: `How many ${T.many} are in the ${C.many}?` };
         }
         const ch = s2.op === '+' ? `Each friend gets ${num(c)} more.` : `Each friend gives away ${num(c)}.`;
-        return { lines: [`${n1} has ${countOf(s1.a, T)}.`, `${n1} shares them equally among ${num(s1.b)} friends.`, ch, `How many ${T.many} does each friend have now?`], unit: T, ans: s2.ans };
+        return { lines: [`${n1} has ${countOf(s1.a, T)}.`, `${n1} shares them equally among ${num(s1.b)} friends.`, ch, `How many ${T.many} does each friend have now?`], unit: T, ans: s2.ans, mid: `How many ${T.many} does each friend get?` };
     }
     const c1 = s1.op === '+' ? `${n1} got ${num(s1.bottom)} more.` : `${n1} gave away ${num(s1.bottom)}.`;
     const c2 = s2.op === '+' ? `Then ${n1} found ${num(s2.bottom)} more.` : `Then ${n1} lost ${num(s2.bottom)}.`;
-    return { lines: [`${n1} had ${countOf(s1.top, T)}.`, c1, c2, `How many ${T.many} does ${n1} have now?`], unit: T, ans: s2.ans };
+    return { lines: [`${n1} had ${countOf(s1.top, T)}.`, c1, c2, `How many ${T.many} does ${n1} have now?`], unit: T, ans: s2.ans, mid: `How many ${T.many} did ${n1} have then?` };
 }
 
 /* ---------------------------------------------------------------------- the payload */
@@ -486,6 +487,7 @@ export function wordWorkPayload(q, o = {}) {
     const seed = steps.reduce((s, st) => s + st.a * 7 + st.b * 13, ans);
     // The story is RETOLD in the controlled grammar (the K picture story keeps its own words).
     const schema = steps.length > 1 ? 'two-step' : schemaOf(q.text, last, ans);
+    let mid = '';
     if (o.retell !== false) {
         const k = Number.isFinite(o.seed) ? o.seed : seed;
         const tm = /(\d[\d,]*)\s+times as many\b/i.exec(plain(q.text));
@@ -497,6 +499,7 @@ export function wordWorkPayload(q, o = {}) {
             const others = [];
             for (const x of [...WW_CONTAINERS.map((c) => c.many), ...WW_THINGS.map((c) => c.many)]) if (lines.join(' ').includes(` ${x}`) && (!u || x !== u.many)) others.push(x);
             unit = u ? { word: ans === 1 ? u.one : u.many, many: u.many, one: u.one, others } : { word: '', many: '', others };
+            if (steps.length > 1 && told.mid) mid = told.mid;
         }
     }
     // The answer is written ONCE (round-4 critic, H8): in the bottom row of the columns (or the
@@ -514,6 +517,7 @@ export function wordWorkPayload(q, o = {}) {
         hl: !!o.hl, kb: !!o.kb, bar: !!o.bar && steps.length === 1, bar2: !!o.bar && steps.length === 2, barKind,
         ...(steps.length === 2 && steps[0].op === '/' && steps[0].top <= 100 && steps[0].bottom <= 10 && !steps[0].r ? { factDiv: true } : {}),
         pic: o.pic || null,
+        ...(mid ? { mid } : {}),
     };
 }
 
@@ -815,7 +819,7 @@ function blockWidthMm(ctx, st, p = {}) {
 }
 
 /** One step's work block: its sign row over its columns. */
-function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false) {
+function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', noSigns = false, sub = '') {
     const isAnswer = !!unitBlock || (p.inRow && idx === (p.steps || []).length - 1);
     const grid = st.op === '/' ? divisionWork(ctx, st, show, idx, p, isAnswer) : columnWork(ctx, st, show, idx, p, isAnswer);
     // The unit line stands beside the answer row (the bottom row; the quotient row of ÷), its
@@ -827,7 +831,7 @@ function stepBlock(ctx, st, show, pick, idx, caption, p = {}, unitBlock = '', no
             : `<div style="display:flex;gap:${L(ctx, 3)};align-items:${st.op === '/' ? 'flex-start' : 'flex-end'};">${grid}${unitBlock}</div>`)
         : grid;
     const cap = caption ? `<div style="font-size:${P(ctx, zonePt(ctx))};font-weight:700;line-height:1.3;">${esc(caption)}</div>` : '';
-    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
+    return `<div class="mq-wwstep" style="display:flex;flex-direction:column;align-items:${isTwin(ctx) ? 'center' : 'flex-start'};gap:${L(ctx, 1)};">${cap}${sub}${noSigns ? '' : signRow(ctx, st.op, pick, idx, idx === 0 && !!p.traceOp0 && !filled(ctx))}`
         + `<div style="max-width:100%;overflow-x:auto;">${work}</div></div>`;
 }
 
@@ -1144,13 +1148,16 @@ function framesLayout(p, ctx) {
             : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
         rows += est + row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
     }
+    // (the two-step bar model on the teaching cells and with wpBar, above the sentences; the middle question over Step 1)
+    if (two && !p.letter) { const mq = midQuestion(p, ctx); if (mq) rows = mq + rows; }
     const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
+    const tsBar = two ? twoStepBarFor(p, ctx) : '';
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
     const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
     // (the story starts level with the item tab, in a gutter beside it - the frames cell takes no tab spacer, CSS
     // .mq-wwframes in sheet-kit.css: lesson 7 r2, the exit slip half overflowed by 8 mm and content never shrinks)
     return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
-        + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
 /**
@@ -1242,6 +1249,35 @@ function chooseLayout(p, ctx) {
         + `<div data-ws-slot="answer" data-ws-shape="check"${ink} style="display:grid;grid-template-columns:repeat(2, max-content);column-gap:${L(ctx, 14)};margin-top:${L(ctx, 2)};">${rows}</div></div>`;
 }
 
+/**
+ * The two-step bar model (two-step card 2026-11-13, decision 4 / 5; WDS 18.1; graphics/two-step-bar.js) of a two-step
+ * story: DRAWN on the teaching cells (scaffold level >= 2 - the Model, a Guided try, the lesson's chart and model) and,
+ * on every other page and the screen, with the `wpBar` option (`p.bar2`; default on for multi_step_word). Never on a
+ * worked-wrong cell (Error analysis, True or False?, Reason It): the bar would write the right answer beside the wrong
+ * work. '' when the story is not two steps.
+ */
+function twoStepBarFor(p, ctx) {
+    if (!p || !Array.isArray(p.steps) || p.steps.length !== 2 || ctx.state === 'wrong') return '';
+    const teach = !isTwin(ctx) && Number(ctx.scaffoldLevel) >= 2;
+    if (!p.bar2 && !teach) return '';
+    const put = filled(ctx) && !isTwin(ctx);
+    // (the room the cell gives it: a two-step cell is full width - its inner width less the story's left inset)
+    const maxW = 186 / Math.max(1, Number(ctx.columns || 1)) - 17;
+    return twoStepBar(ctx, { steps: p.steps, show: put, ink: put ? inkOf(ctx) : null, maxW });
+}
+
+/**
+ * The hidden middle question (P-WP-11 v1, two-step card decision 6): "How many stickers are in the bags?" under Step 1,
+ * on the teaching cells only (scaffold level >= 2: Model and Guided) - a hint that fades: never at level 0 or 1 (a test,
+ * a practice page) and never on the screen; marked `data-ws-hint="fade"` so a host that hides hints drops it.
+ */
+function midQuestion(p, ctx, wMm = 50, k = 0) {
+    if (!p || !p.mid || isTwin(ctx) || !(Number(ctx.scaffoldLevel) >= 2)) return '';
+    // (Step 2's line is the story's own question, so both step columns carry a question line and stand level, P-WP-11)
+    const t = k === 0 ? p.mid : String(p.lines[p.lines.length - 1] || '');
+    return `<div class="mq-wwmid" data-ws-hint="fade" style="max-width:${L(ctx, Math.max(56, wMm))};font-size:${P(ctx, zonePt(ctx))};font-weight:400;line-height:1.25;">${esc(t)}</div>`;
+}
+
 /** The cell body (everything but a pool caption). */
 function renderWork(p, ctx) {
     if (!p || !Array.isArray(p.steps) || !p.steps.length) return '';
@@ -1283,7 +1319,10 @@ function renderWork(p, ctx) {
     // ONE place the sign is answered, so no + − × ÷ row to circle as well (H8).
     const noSigns = p.signs === false || p.signRow === false;
     const unitHere = inRow ? unitBlock(ctx, p, put ? p.unit : '', p.steps[lastI].op === '/') : '';
-    const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns)).join('');
+    // The hidden middle question (P-WP-11 v1, two-step card decision 6) under the Step 1 caption: a HINT, printed on the
+    // teaching cells only (scaffold level >= 2: Model, Guided) - never on practice, a test (level 0) or the screen.
+    const midQ = (i) => (two ? midQuestion(p, ctx, blockWidthMm(ctx, p.steps[i], p), i) : '');
+    const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns, midQ(i))).join('');
     const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
     // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
     // (or a two-step story) makes the cell a full-width one (see fullW below).
@@ -1294,8 +1333,7 @@ function renderWork(p, ctx) {
     // The two-step bar model (two-step card 2026-11-13, WDS 18.1): drawn above the two step columns on
     // the teaching cells (scaffold level >= 2: model, guided, the lesson chart) and on a practice page
     // with the `wpBar` option (`p.bar2`). Schematic (graphics/two-step-bar.js), one `?` per bar.
-    const teach2 = !twin && Number(ctx.scaffoldLevel) >= 2;
-    const ts2 = two && (p.bar2 || teach2) ? twoStepBar(ctx, { steps: p.steps, show: put, ink: inkOf(ctx) }) : '';
+    const ts2 = two ? twoStepBarFor(p, ctx) : '';
     const head = `<div style="display:flex;gap:${L(ctx, 4)};align-items:flex-start;${narrow ? 'flex-direction:column;align-items:stretch;' : ''}">${storyHTML(ctx, p, narrow)}${p.kb ? keywordBank(ctx) : ''}</div>`
         + pictureRow(ctx, p.pic) + (p.bar ? barModel(ctx, p) : '') + ts2;
     // A FULL-WIDTH cell whose work is narrow reads left to right: the story with its sign row

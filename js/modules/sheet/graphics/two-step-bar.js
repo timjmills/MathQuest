@@ -1,111 +1,165 @@
 // js/modules/sheet/graphics/two-step-bar.js
-// Library entry `twoStepBar` (design/GRAPHIC_LIBRARY.md; two-step card 2026-11-13): the SCHEMATIC
-// two-step bar model, WDS 18.1 / RP-70 / RP-72. A Step 1 bar (equal groups when the first step is
-// × / ÷, part-whole when it is + / −) sits over a Step 2 bar; the Step 1 answer box is joined to
-// the Step 2 carried box by a 0.75 pt arrow labelled "Step 1 answer". Each bar carries exactly one
-// `?` writing place - its step's unknown.
+// Library entry `twoStepBar` (design/GRAPHIC_LIBRARY.md; two-step card 2026-11-13, decision 4): the
+// SCHEMATIC two-step bar model, WDS 18.1 / RP-70 / RP-71 / RP-72. A Step 1 bar (equal groups when the
+// first step is × / ÷, part-whole when it is + / −) sits over a Step 2 bar whose whole or first part is
+// the Step 1 answer; a 0.75 pt arrow labelled "Step 1 answer" runs from Step 1 to the cell that carries
+// it. The bars stand side by side (the arrow between) when they fit the cell's room, else one over the
+// other (the arrow down); the screen twin always stacks. Each bar has exactly ONE unknown (card §3, LS-3 / RP-70): a solid cell with the zone-label
+// `?` in its top-left corner, never dashed.
 //
-// Schematic and fixed (RP-72: a bar length must never draw which number is bigger): equal groups
-// are `n` equal segments (at most 6 drawn), a part-whole bar is split 60 / 40, nothing is dashed.
-// Bars 10 / 12 / 14 mm tall (S / M / L), 1.5 pt outline; writing boxes slot-size, 0.75 pt. The
-// boxes are WORKING (`data-ws-graded="0"`): the pupil's scratch, the key writes them all when
-// `show`. Screen twin: the boxes are typed inputs (scratch, mq-wwork) carrying their value.
+// Schematic and fixed (RP-72: a bar length never draws which number is bigger): equal groups are `n`
+// equal segments (at most 6 drawn), a part-whole bar is split 60 / 40 (first part 60), whatever the
+// numbers. Bars 10 / 12 / 14 mm tall (S / M / L, card decision 9), 1.5 pt outline (RP-70); one writing
+// box a cell, 0.75 pt (VQ-6, lighter than the answer place), digits at the working size (ctx.metrics).
+// Equal groups carry ONE box, in the first segment (the size of every group). The boxes are WORKING
+// (`data-ws-graded="0"`): blank on the pupil page (RP-71: the pupil fills the numbers), every number
+// written on the key and on a worked cell. Screen twin: the boxes are typed inputs (mq-wwork, scratch,
+// `data-mq-expect` for the live mark); the drawing scrolls inside the cell when a phone is narrower.
+//
+// Content never shrinks to fit: the bar grows to hold its boxes (a segment is the box + the `?` room).
 //
 // Pure module (SCC-01).
 
-import { INK, GREY, L, P, B, isTwin, sizeOf, digitPt, esc, blankWidth, NUM_FEATURES } from './units.js';
+import { INK, GREY, L, P, B, isTwin, sizeOf, digitPt, zonePt, esc, blankWidth, NUM_FEATURES } from './units.js';
 
 export const TS_BAR_H = Object.freeze({ S: 10, M: 12, L: 14 });
+/** The writing box height inside a bar (as the part-whole bar's). */
+const BOX_H = Object.freeze({ S: 8, M: 9, L: 10 });
+/** The room the zone-label `?` takes at the left of a cell (mm). */
+const Q_ROOM = 4.5;
+/** The caption column ("Step 1" / "Step 2") at the bars' left (mm). */
+const CAP_W = Object.freeze({ S: 13, M: 15, L: 17 });
+/** The arrow block between two bars standing side by side: "Step 1 / answer" over a → (mm). */
+const ARROW_W = Object.freeze({ S: 13, M: 15, L: 17 });
 
 const fmt = (n) => Number(n).toLocaleString('en-US');
 
 /**
  * The two bars of a two-step story, as the descriptors the drawing uses. Each bar is
- * {whole: {v, unknown, carry}, parts: [{v, unknown, carry, count}]} where `count` draws a run of
- * equal segments (equal groups) and a plain part is one box. Exactly one box per bar has
- * `unknown: true`; the Step 1 answer box has `carry: true` on both bars (the arrow joins them).
+ * {kind: 'groups'|'whole', whole: cell, parts: [cell], n} where a cell is {v, unknown, carry}; a groups
+ * bar draws `n` equal segments and ONE box (its parts[0]) in the first. Exactly one cell a bar is
+ * `unknown`; the Step 1 answer is `carry` on bar 1 (where it is found) and on bar 2 (where it is used).
+ * Null when `steps` is not two steps whose second uses the first's answer as its first number.
  */
 export function twoStepBars(steps) {
     if (!Array.isArray(steps) || steps.length !== 2) return null;
     const [s1, s2] = steps;
+    const r1 = s1.op === '/' ? s1.q : s1.ans;
+    if (s1.op === '/' && s1.r) return null;
+    // the Step 2 bar carries the Step 1 answer as its first number (the generator writes it so; checked here)
+    const c2 = s2.op === '*' ? (s2.a === r1 ? s2.a : s2.b === r1 ? s2.b : null) : (s2.top === r1 ? s2.top : null);
+    if (c2 === null || (s2.op === '/' && s2.r)) return null;
     const cap = (n) => Math.max(2, Math.min(6, Number(n) || 2));
-    let bar1, bar2;
-    // Step 1 bar: the unknown is the Step 1 answer (the carry).
-    if (s1.op === '*') {
-        // a1 groups of b1 each; the whole (= Step 1 answer) is unknown, each segment labelled b1
-        bar1 = { whole: { v: s1.ans, unknown: true, carry: true }, parts: [{ v: s1.b, count: cap(s1.a) }] };
-    } else if (s1.op === '/') {
-        // s1.top shared among s1.bottom; the whole is known, one share (= Step 1 answer) is unknown
-        bar1 = { whole: { v: s1.top }, parts: [{ v: s1.ans, count: cap(s1.bottom), unknown: true, carry: true }] };
-    } else if (s1.op === '+') {
-        // part-whole: the whole (= Step 1 answer) is unknown, two known parts
-        bar1 = { whole: { v: s1.ans, unknown: true, carry: true }, parts: [{ v: s1.top }, { v: s1.bottom }] };
-    } else { // '-'
-        // part-whole: the whole is known, one known part and the unknown (= Step 1 answer)
-        bar1 = { whole: { v: s1.top }, parts: [{ v: s1.bottom }, { v: s1.ans, unknown: true, carry: true }] };
-    }
-    // Step 2 bar: it carries the Step 1 answer; the unknown is the final answer.
-    const carry = s1.ans;
+    let bar1;
+    if (s1.op === '*') bar1 = { kind: 'groups', n: cap(s1.a), whole: { v: s1.ans, unknown: true, carry: true }, parts: [{ v: s1.b }] };
+    else if (s1.op === '/') bar1 = { kind: 'groups', n: cap(s1.bottom), whole: { v: s1.top }, parts: [{ v: s1.q, unknown: true, carry: true }] };
+    else if (s1.op === '+') bar1 = { kind: 'whole', whole: { v: s1.ans, unknown: true, carry: true }, parts: [{ v: s1.top }, { v: s1.bottom }] };
+    else bar1 = { kind: 'whole', whole: { v: s1.top }, parts: [{ v: s1.bottom }, { v: s1.ans, unknown: true, carry: true }] };
+    let bar2;
     if (s2.op === '*') {
-        bar2 = { whole: { v: s2.ans, unknown: true }, parts: [{ v: carry, count: cap(s2.b), carry: true }] };
-    } else if (s2.op === '/') {
-        bar2 = { whole: { v: s2.top, carry: true }, parts: [{ v: s2.ans, count: cap(s2.bottom), unknown: true }] };
-    } else if (s2.op === '+') {
-        bar2 = { whole: { v: s2.ans, unknown: true }, parts: [{ v: carry, carry: true }, { v: s2.bottom }] };
-    } else { // '-'
-        bar2 = { whole: { v: s2.top, carry: true }, parts: [{ v: s2.bottom }, { v: s2.ans, unknown: true }] };
-    }
+        const n = s2.a === r1 ? s2.b : s2.a;
+        bar2 = { kind: 'groups', n: cap(n), whole: { v: s2.ans, unknown: true }, parts: [{ v: r1, carry: true }] };
+    } else if (s2.op === '/') bar2 = { kind: 'groups', n: cap(s2.bottom), whole: { v: s2.top, carry: true }, parts: [{ v: s2.q, unknown: true }] };
+    else if (s2.op === '+') bar2 = { kind: 'whole', whole: { v: s2.ans, unknown: true }, parts: [{ v: r1, carry: true }, { v: s2.bottom }] };
+    else bar2 = { kind: 'whole', whole: { v: s2.top, carry: true }, parts: [{ v: s2.bottom }, { v: s2.ans, unknown: true }] };
     return [bar1, bar2];
+}
+
+/** Every value a bar box can hold (the widest sets the box width, so the boxes of a drawing are one width). */
+const valuesOf = (bars) => bars.flatMap((b) => [b.whole.v, ...(b.kind === 'groups' ? [] : b.parts.map((c) => c.v))]);
+/** The digits of a value. */
+const nd = (v) => String(Math.abs(Number(v) || 0)).length;
+
+/**
+ * The drawing's geometry (mm), exported for the cell. Every box but an equal group's is one width (the widest number
+ * of the drawing, never the answer's own length - L3); an equal group's box is as wide as the group's number (2-10).
+ * `maxW` (the room the cell gives it): the two bars stand SIDE BY SIDE, the arrow between them, when they fit it
+ * (half the height - the page keeps its stories, card decision 9); else one over the other, the arrow down.
+ */
+export function twoStepBarSize(ctx, steps, maxW = 0) {
+    const bars = twoStepBars(steps);
+    if (!bars) return null;
+    const size = sizeOf(ctx);
+    const lw = Math.max(14, blankWidth(Math.max(2, ...valuesOf(bars).map(nd)), size));
+    const gw = (b) => Math.max(14, blankWidth(Math.max(1, nd(b.parts[0].v)), size));
+    // a cell: its box, the `?` room when it is the unknown, and air
+    const need = (b) => (b.kind === 'groups'
+        ? b.n * (gw(b) + 2 + (b.parts[0].unknown ? Q_ROOM : 0))
+        : (lw + 2 + Q_ROOM) / 0.4);
+    const Ws = bars.map((b) => Math.max(b.kind === 'groups' ? 48 : 56, need(b)));
+    const segH = TS_BAR_H[size] || 14;
+    const capW = CAP_W[size] || 17;
+    const arrowW = ARROW_W[size] || 16;
+    const twin = isTwin(ctx);
+    const wide = Ws[0] + arrowW + Ws[1] + 3;
+    const across = !twin && Number(maxW) > 0 && wide <= Number(maxW);
+    const capH = zonePt(ctx) * 0.3528 * 1.3;
+    const hMm = across ? capH + 2 * segH + 1.2 : 4 * segH + 2 * 1.2 + 8;
+    return { bars, lw, gw, Ws, segH, capW, arrowW, across, wMm: across ? wide : capW + 2 + Math.max(...Ws), hMm };
 }
 
 /**
  * @param {Object} ctx
- * @param {Object} o {steps (the word-work payload's two steps), show (write the numbers), ink}
+ * @param {Object} o {steps (the word-work payload's two steps), show (write every number), ink, maxW (mm the cell gives)}
  */
 export function twoStepBar(ctx, o = {}) {
-    const bars = twoStepBars(o.steps);
-    if (!bars) return '';
+    const g = twoStepBarSize(ctx, o.steps, o.maxW);
+    if (!g) return '';
     const { show = false, ink = null } = o;
+    const { bars, lw, gw, Ws, segH, capW, arrowW, across } = g;
     const size = sizeOf(ctx);
     const twin = isTwin(ctx);
-    const segH = TS_BAR_H[size] || 14;
-    const hw = { S: 8, M: 9, L: 10 }[size] || 10;
-    const lw = Math.max(14, blankWidth(2, size));
-    const W = Math.max(42, twin ? 56 : 68);
-    // a writing box: `?` when the step's unknown (filled with its value on the key), else the number
-    const box = (cell) => {
-        const q = cell.unknown && !show;
-        const v = q ? '?' : fmt(cell.v);
-        const col = ink === 'trace' ? GREY : INK;
-        if (twin) {
-            return `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(cell.v))}" data-ws-graded="0" inputmode="numeric" maxlength="8" autocomplete="off" aria-label="bar number" style="box-sizing:border-box;width:max(40px, ${L(ctx, lw)});height:max(40px, ${L(ctx, hw)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, digitPt(ctx))};font-weight:700;text-align:center;padding:0;margin:0;">`;
-        }
-        return `<span data-ws-graded="0" data-ws-slot="bar" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, lw)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${col};${NUM_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show || !q ? esc(v) : '?'}</span>`;
+    const hw = BOX_H[size] || 10;
+    const col = ink === 'trace' ? GREY : INK;
+    const zp = zonePt(ctx);
+    // a writing box (0.75 pt, working): blank for the pupil, its number on the key / a worked cell
+    const box = (cell, id, w) => (twin
+        ? `<input type="text" class="mq-wwork" data-mq-kind="number" data-mq-expect="${esc(String(cell.v))}" data-ws-graded="0" inputmode="numeric" maxlength="4" autocomplete="off" spellcheck="false" aria-label="${cell.unknown ? 'bar number to find' : 'bar number'}" style="box-sizing:border-box;width:max(44px, ${L(ctx, w)});height:max(44px, ${L(ctx, hw)});border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font-family:'Andika','Open Sans',sans-serif;font-size:${P(ctx, digitPt(ctx))};font-weight:700;text-align:center;padding:0;margin:0;">`
+        : `<span data-ws-graded="0" data-ws-slot="${esc(id)}" data-ws-shape="box" style="display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:${L(ctx, w)};height:${L(ctx, hw)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;font-size:${P(ctx, digitPt(ctx))};font-weight:700;line-height:1;padding:0 ${L(ctx, 1)};color:${col};${NUM_FEATURES}"${show && ink ? ` data-ws-ink="${ink}"` : ''}>${show ? esc(fmt(cell.v)) : ''}</span>`);
+    // the zone-label `?` in the unknown cell's top-left corner (RP-70 / LS-3)
+    const qMark = `<span aria-hidden="true" data-ws-zone="unknown" style="position:absolute;left:${L(ctx, 0.8)};top:${L(ctx, 0.3)};font-size:${P(ctx, zp)};font-weight:700;line-height:1;color:${INK};">?</span>`;
+    const segHcss = twin ? `max(50px, ${L(ctx, segH)})` : L(ctx, segH);
+    // one outlined cell (1.5 pt, RP-70) w mm wide, holding its box (none: an equal group's other segments)
+    const seg = (w, cell, id, first, bw) => `<span${cell && cell.unknown ? ' data-ws-unknown="1"' : ''} style="position:relative;flex:none;display:flex;align-items:center;justify-content:${cell && cell.unknown ? 'flex-end' : 'center'};box-sizing:border-box;width:${twin ? `max(${cell ? 56 : 14}px, ${L(ctx, w)})` : L(ctx, w)};height:${segHcss};border:${B(ctx, 1.5)} solid ${INK};${first ? '' : 'border-left:none;'}background:#fff;padding:0 ${L(ctx, 0.8)};">${cell && cell.unknown ? qMark : ''}${cell ? box(cell, id, bw) : ''}</span>`;
+    const capt = (k) => `<span class="mq-ts2bar-cap" style="flex:none;${across ? '' : `width:${L(ctx, capW)};padding-top:${L(ctx, 1)};`}font-size:${P(ctx, zp)};font-weight:700;line-height:1.3;">Step ${k}</span>`;
+    const drawBar = (bar, k) => {
+        const W = across ? Ws[k - 1] : Math.max(...Ws);
+        const id = (x) => `ts${k}-${x}`;
+        const whole = `<div style="display:flex;">${seg(W, bar.whole, id('w'), true, lw)}</div>`;
+        const parts = bar.kind === 'groups'
+            ? Array.from({ length: bar.n }, (_, i) => seg(W / bar.n, i === 0 ? bar.parts[0] : null, id('p0'), i === 0, gw(bar))).join('')
+            : seg(0.6 * W, bar.parts[0], id('p0'), true, lw) + seg(0.4 * W, bar.parts[1], id('p1'), false, lw);
+        const body = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.2)};">${whole}<div style="display:flex;">${parts}</div></div>`;
+        return across
+            ? `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 0.4)};">${capt(k)}${body}</div>`
+            : `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="display:flex;gap:${L(ctx, 2)};align-items:flex-start;">${capt(k)}${body}</div>`;
     };
-    // one outlined segment (1.5 pt) holding its writing box
-    const seg = (w, cell, left) => `<span style="display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:${L(ctx, w)};height:${twin ? `max(48px, ${L(ctx, segH)})` : L(ctx, segH)};border:${B(ctx, 1.5)} solid ${INK};${left ? '' : 'border-left:none;'}background:#fff;">${box(cell)}</span>`;
-    // a bar: the whole row over the parts row; equal groups draw `count` equal segments (cap 6)
-    const drawBar = (bar) => {
-        const whole = `<div style="display:flex;">${seg(W, bar.whole, true)}</div>`;
-        const groups = bar.parts.find((p) => p.count);
-        let parts;
-        if (groups) {
-            const n = groups.count;
-            const w = W / n;
-            parts = Array.from({ length: n }, (_, i) => seg(w, i === 0 ? groups : { v: groups.v }, true)).join('');
-        } else {
-            const [pa, pb] = bar.parts;
-            // never proportional: 60 / 40, the unknown part no longer than the other (RP-72)
-            const wa = pa.unknown ? 0.4 * W : (pb && pb.unknown ? 0.6 * W : 0.5 * W);
-            parts = pb ? seg(wa, pa, true) + seg(W - wa, pb, false) : seg(W, pa, true);
-        }
-        return `<div class="mq-ts2bar-row" style="display:flex;flex-direction:column;gap:${L(ctx, 1.2)};">${whole}<div style="display:flex;">${parts}</div></div>`;
-    };
-    // the arrow between the bars, labelled "Step 1 answer" (0.75 pt down-arrow)
-    const arrow = `<div class="mq-ts2bar-arrow" aria-hidden="true" style="display:flex;align-items:center;gap:${L(ctx, 1.5)};padding:${L(ctx, 0.5)} 0;">`
-        + `<svg width="${twin ? '14' : L(ctx, 4)}" height="${twin ? '18' : L(ctx, 6)}" viewBox="0 0 4 6" style="flex:none;">`
-        + `<path d="M2 0.4 L2 4.4 M0.8 3.4 L2 4.8 L3.2 3.4" fill="none" stroke="${INK}" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-        + `<span style="font-size:${P(ctx, digitPt(ctx) * 0.6)};font-weight:700;color:${INK};line-height:1;">Step 1 answer</span></div>`;
-    return `<div class="mq-ts2bar" aria-label="two-step bar model" style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 1)};margin-top:${L(ctx, 1.5)};">`
-        + `${drawBar(bars[0])}${arrow}${drawBar(bars[1])}</div>`;
+    const lab = (t) => `<span style="font-size:${P(ctx, zp)};font-weight:700;color:${INK};line-height:1.1;white-space:nowrap;">${t}</span>`;
+    const b2 = bars[1];
+    let arrow;
+    if (across) {
+        // → into the Step 2 cell that carries the answer: the whole row, or the parts row (its first part)
+        const svg = `<svg aria-hidden="true" width="${L(ctx, arrowW - 2)}" height="${L(ctx, 3)}" viewBox="0 0 ${arrowW - 2} 3" style="flex:none;overflow:visible;">`
+            + `<path d="M0.3 1.5 L${(arrowW - 2.4).toFixed(2)} 1.5 M${(arrowW - 3.6).toFixed(2)} 0.3 L${(arrowW - 2.3).toFixed(2)} 1.5 L${(arrowW - 3.6).toFixed(2)} 2.7" fill="none" stroke="${INK}" stroke-width="0.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const blk = `<div style="height:${L(ctx, segH)};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${L(ctx, 0.3)};">${lab('Step 1')}${lab('answer')}${svg}</div>`;
+        const row = b2.whole.carry ? 0 : 1;
+        arrow = `<div class="mq-ts2bar-arrow" style="flex:none;width:${L(ctx, arrowW)};display:flex;flex-direction:column;gap:${L(ctx, 1.2)};padding-top:${L(ctx, zp * 0.3528 * 1.3 + 0.4)};">`
+            + (row === 0 ? blk + `<div style="height:${L(ctx, segH)};"></div>` : `<div style="height:${L(ctx, segH)};"></div>` + blk) + '</div>';
+        return `<div class="mq-ts2bar-wrap" style="margin-top:${L(ctx, 1.5)};"><div class="mq-ts2bar" role="group" aria-label="two-step bar model" data-ts-across="1" style="display:inline-flex;align-items:flex-start;gap:${L(ctx, 1.5)};">`
+            + `${drawBar(bars[0], 1)}${arrow}${drawBar(bars[1], 2)}</div></div>`;
+    }
+    // ↓ from Step 1 to the Step 2 cell that carries its answer, standing over that cell
+    const W = Math.max(...Ws);
+    const carryX = b2.whole.carry ? W / 2 : (b2.kind === 'groups' ? W / b2.n / 2 : 0.3 * W);
+    const ah = 5;
+    arrow = `<div class="mq-ts2bar-arrow" style="display:flex;align-items:center;gap:${L(ctx, 1.5)};padding-left:${L(ctx, capW + 2 + carryX - 2)};height:${L(ctx, ah + 1)};">`
+        + `<svg aria-hidden="true" width="${L(ctx, 4)}" height="${L(ctx, ah)}" viewBox="0 0 4 ${ah}" style="flex:none;overflow:visible;">`
+        + `<path d="M2 0.3 L2 ${ah - 0.4} M0.7 ${ah - 1.6} L2 ${ah - 0.3} L3.3 ${ah - 1.6}" fill="none" stroke="${INK}" stroke-width="0.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+        + `${lab('Step 1 answer')}</div>`;
+    const inner = `<div class="mq-ts2bar" role="group" aria-label="two-step bar model" style="flex:none;display:inline-flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 0.6)};">`
+        + `${drawBar(bars[0], 1)}${arrow}${drawBar(bars[1], 2)}</div>`;
+    // (a phone card narrower than the bars scrolls the drawing inside the cell, as the number line does; never shrinks it)
+    return twin
+        ? `<div class="mq-ts2bar-wrap" style="max-width:100%;overflow-x:auto;margin-top:${L(ctx, 1.5)};text-align:left;">${inner}</div>`
+        : `<div class="mq-ts2bar-wrap" style="margin-top:${L(ctx, 1.5)};">${inner}</div>`;
 }
