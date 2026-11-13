@@ -1086,6 +1086,24 @@ export function twoStepPart(p, k, ctx) {
     const [s1, s2] = p.steps;
     const wrap = (html) => `<div class="mq-ww mq-wwpart" data-ww-ops="${s1.op} ${s2.op}" data-read style="box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${L(ctx, 2.5)};">${html}</div>`;
     if (k <= 0) return wrap(`<div style="white-space:nowrap;">${storyHTML(none, p)}</div>`);
+    // The letter (msLetter) and estimate (msCheck) stories draw THEIR response, the frames rows (lf-algebra R4; the lesson
+    // chart's panels drew the whole cell, the same picture four times, 146 mm in a 92 mm panel): the newest rows grey,
+    // the earlier ones black. Letter: 1 the equation, 2 the two steps worked under it, 3 n = the answer. Estimate: 1 the
+    // two steps solved, 2 the rounded estimate under them, 3 the estimate and "Is my answer close?" ringed. (lf-engine routes
+    // the panels here; the chart's zoom fits a panel wider than its half - the letter equation is one answer, never wrapped.)
+    if (p.letter || p.check) {
+        const fp = (rowsK, c) => framesLayout(Object.assign({}, p, { layout: 'frames', partRows: rowsK }), c);
+        const stepsOnly = (c) => framesLayout(Object.assign({}, p, { layout: 'frames', letter: false, check: null, partRows: ['steps'] }), c);
+        if (p.letter) {
+            if (k === 1) return wrap(fp(['eq'], grey));
+            if (k === 2) return wrap(fp(['eq'], solid) + stepsOnly(grey));
+            return wrap(fp(['eq'], solid) + fp(['n'], grey));
+        }
+        if (k === 1) return wrap(stepsOnly(grey));
+        if (k === 2) return wrap(stepsOnly(solid) + fp(['est'], grey));
+        // (panel 3 keeps the estimate and asks the question: the solved steps stay on panel 2, so the panel fits the chart)
+        return wrap(fp(['est'], solid) + fp(['ok'], grey));
+    }
     if (k === 1) return wrap(stepBlock(grey, s1, s1, s1.op, 0, 'Step 1', p));
     return wrap(stepBlock(grey, s2, s2, s2.op, 1, 'Step 2', p, unitBlock(grey, p, p.unit, s2.op === '/')));
 }
@@ -1122,6 +1140,7 @@ function framesLayout(p, ctx) {
     const cap = (t) => `<span style="font-size:${P(ctx, textPt(ctx))};font-weight:700;min-width:${L(ctx, 17)};">${t}</span>`;
     const row = (html) => `<div class="mq-wwframe" style="display:flex;align-items:center;${twin ? "flex-wrap:wrap;" : ""}gap:${L(ctx, 2.2)};">${html}</div>`;
     let rows;
+    const parts = {};
     if (p.letter) {
         // msLetter (3.OA.D.8): the whole story as ONE equation with a letter, then the letter's value
         const [s1, s2] = p.steps;
@@ -1132,7 +1151,8 @@ function framesLayout(p, ctx) {
         const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length, false, true)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length, false, true)}`;
         const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length, false, true)}` : first;
         const eqGroup = twin ? `${eqn}${sym('=')}${sym('n')}` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
-        rows = row(eqGroup) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+        parts.eq = row(eqGroup); parts.n = row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+        rows = parts.eq + parts.n;
     } else {
         rows = p.steps.map((st, i) => {
             const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
@@ -1140,6 +1160,7 @@ function framesLayout(p, ctx) {
             const res = i === lastI ? box('answer', String(p.ans), String(r).length, true, true) : box(`fr${i}-r`, String(r), String(r).length);
             return row(`${two ? cap(`Step ${i + 1}:`) : ''}${box(`fr${i}-a`, String(x), String(x).length)}${sign(`op${i}`, st.op)}${box(`fr${i}-b`, String(y), String(y).length)}${sym('=')}${res}`);
         }).join('');
+        parts.steps = rows;
     }
     // msCheck (3.OA.D.8): each story number rounded to the nearest ten, the estimate, and the pupil's own answer judged
     if (p.check) {
@@ -1153,7 +1174,15 @@ function framesLayout(p, ctx) {
         const ring = (w) => (twin
             ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
             : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
-        rows += est + row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
+        parts.est = est; parts.ok = row(`${cap('Is my answer close to the estimate?')}${ring('Yes')}${ring('No')}`);
+        rows += parts.est + parts.ok;
+    }
+    // (`partRows`, two-step lesson chart panels - twoStepPart below: only the named rows, no story, no bar, no tab gutter)
+    if (Array.isArray(p.partRows)) {
+        // (a row wraps inside a half-width chart panel - the estimate row of three numbers and the Yes / No question are
+        // wider than its 92 mm at L; content never shrinks, it wraps)
+        return `<div class="mq-wwpartrows" style="display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${p.partRows.map((k) => parts[k] || '').join('')}</div>`
+            .replace(/class="mq-wwframe" style="display:flex;(?!flex-wrap)/g, `class="mq-wwframe" style="display:flex;flex-wrap:wrap;row-gap:${L(ctx, 1.5)};`);
     }
     // (the two-step bar model on the teaching cells and with wpBar, above the sentences; the middle question over Step 1)
     if (two && !p.letter) { const mq = midQuestion(p, ctx); if (mq) rows = mq + rows; }
