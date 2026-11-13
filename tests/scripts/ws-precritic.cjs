@@ -339,11 +339,18 @@ function judge(g, run, p) {
 const PARSE = {
     // ws-detailed-lesson prints `ws-detailed-lesson: OK|FAIL` (--check), `ws-detailed-lesson --repeats|--lp|--sweep: OK|FAIL (n)`;
     // the last such line is the verdict, and the FAIL rows (E.. / LP-.. / seed ..) are the findings
+    // (lf-engine PC critic r4 N8) ws-lesson-samples --verify-grey prints `ws-lesson-samples --verify-grey: OK|FAIL`
+    lessonGrey(g, out, code) {
+        const m = [...out.matchAll(/^ws-lesson-samples --verify-grey: (OK|FAIL)\b.*$/gm)];
+        if (!m.length) return unparsed('no "ws-lesson-samples --verify-grey: OK|FAIL" line', out);
+        if (m[m.length - 1][1] === 'OK') return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
+        return { result: 'FAIL', findings: m[m.length - 1][0], detail: out.split('\n').filter((l) => /^FAIL /.test(l)).slice(0, 12), explainsExit: true };
+    },
     lessonSamples(g, out, code) {
         const m = [...out.matchAll(/^ws-lesson-samples --check: (OK|FAIL)\b.*$/gm)];
         if (!m.length) return unparsed('no "ws-lesson-samples --check: OK|FAIL" line', out);
         if (m[m.length - 1][1] === 'OK') return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
-        const rows = out.split('\n').filter((l) => /^PC-\w+\s+FAIL/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
+        const rows = out.split('\n').filter((l) => /^(PC|PG|PM|CHART|LIVE|TAB|SHEET)-[\w-]+\s+FAIL/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
         return { result: 'FAIL', findings: rows.join(', ') || m[m.length - 1][0], detail: out.split('\n').filter((l) => /^ {3}\S/.test(l)).slice(0, 12).map((l) => l.trim()), explainsExit: true };
     },
     detailedLesson(g, out, code) {
@@ -986,7 +993,11 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, PG-TURN, PG-LR67, H13, CLIP, FRAME, PV, PAGES; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples, check forced on: PC-RANGE, NAME, SLOTS, SCAFFOLD, LR5, LR6, PG-TURN, PG-LR67, PG-LR6, H13, CLIP, FRAME, PV, PVHEADS, CHART-H13, GAPS, INSTR, PAGES; PM-H13, LIVE-PART, PM-CONT, TAB-CLEAR, SHEET-2PG on every Practice / Mixed page, also on the spot lessons div_facts, sub_wp_10, fact_family_sort, add_wp_20)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S + 4 spot lessons', 'browser', 'ws-lesson-samples', ['--check', '--force-check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            // (lf-engine PC critic r4, speed-up 1 / 5: the DEALING rules on 64 seeds - a deal count change re-runs the range gate on
+            // the refs' floors; PG-LR6 one-number near twins on every lesson page - and the committed packet's chart-grey.png, N8)
+            add(gate('lesson-samples-deal64', 'ws-lesson-samples --check --seeds 64 (dealing: PC-RANGE on the route refs\' declared floors, PC-NAME both parts, PG-LR6 one-number near twins on every lesson page, PG-LR67, PG-TURN, PC-LR5)', 'add_facts, sub_100_regroup, nearest_10 × 64 seeds (L) + the 4242 check at L / S', 'browser', 'ws-lesson-samples', ['--check', '--force-check', '--seeds', '64', '--rules', 'PC-RANGE,PC-NAME,PG-LR6,PG-LR67,PG-TURN,PC-LR5'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-grey', 'ws-lesson-samples --verify-grey (every committed packet\'s chart-grey.png is its chart page)', 'design/lesson-samples add / sub / round, L and S', 'browser', 'ws-lesson-samples', ['--verify-grey'], { parse: PARSE.lessonGrey, needFlags: ['verify-grey'] }));
             // (live-pm r2, lead items 6 / 7: the page-use rules over every lesson ws-lesson-baseline --all-lessons proves)
             add(gate('lesson-samples-all', 'ws-lesson-samples --check --all-lessons (PM-CONT: no Practice / Mixed continuation page >= 50 % blank; SHEET-2PG: a 2-page lesson sheet has a page >= 70 % used; PG-TURN: no page turns round one of its own sums)', 'every lessons/prereqs.js lesson × L / S', 'browser', 'ws-lesson-samples', ['--check', '--seeds', '1', '--all-lessons', '--rules', 'PM-CONT,SHEET-2PG,PG-TURN'], { parse: PARSE.lessonSamples, needFlags: ['check', 'all-lessons'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)

@@ -52,6 +52,25 @@
 //                sheet (and, check on, of Practice and Mixed) the lesson skill's items keep LR-6 (no near twins of a − item, no
 //                answer twice) and the library's LR-7 page caps (lessonRules: sub at most 1 onePlace, 2 underTen a page)
 //     SHEET-2PG  a lesson sheet printed on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages ~38 % empty)
+//   (lf-engine PC critic r4, 2026-11-13 - every finding its check first, IMPROVEMENT_PLAN §1.7:)
+//     PC-RANGE   also reads each route ref's DECLARED floors (minOperand / minTop / maxTop / maxBottom / zeroOnes; lessons/library.js
+//                lessonData(..).prereqs[k].ref), --seeds builds AND the 4242 build at every size (N1: "20 - 11" under a ref of
+//                minTop 11, maxTop 18, maxBottom 9)
+//     PC-NAME    also: a route step whose title names two ("10 more, 10 less") prints an item of EACH (N7, ruling A)
+//     PC-PV      both ways, per question (N2): the bank word nearest the underlined digit is neither always the key nor always
+//                wrong; the underlined places (the answers) are not constant and, 3 or more, not strictly alternating
+//     PC-PVHEADS (lead ruling 2026-11-13, N9) a "name the place" item (pv ring / bank of place words) on a Check or Mixed page
+//                prints no place heads over its numeral (the letter over the underlined digit IS the answer; Practice keeps them)
+//     CHART-H13  (N3) every anchor-chart cell: no empty band >= 30 % (blocking)
+//     PG-LR6     (N4, N5) --seeds builds: on EVERY lesson page (check, sheet Guided + Independent together, Practice, Mixed), one
+//                skill's one-number items keep sheet/near-twins.js NEAR: no pair within 2 or turned round, at most 2 in one ten,
+//                one answer at most twice (the gate reads the engine's own module: one threshold set)
+//     PC-GAPS    (N6) a band-wide cell (no number tab, >= 80 % of the body wide) on the check page or the sheet: its larger empty
+//                gap (above / below the ink) is not >= 25 % of the cell AND > 2 x the smaller
+//     PC-INSTR   (r3 F14) on the check page: an instruction that says "numbers" / "boxes" over one blank an item fails, and an
+//                instruction never ends on a one-word line (a widow)
+//   node tests/scripts/ws-lesson-samples.cjs --verify-grey   # (N8) every committed packet's chart-grey.png is its CHART page
+//                in grey (design/lesson-samples/<packet>/ and S/; the chart page found from the lesson's parts, check forced on)
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
@@ -68,7 +87,7 @@ const ONLY = arg('only', '');
 const OUT = path.resolve(ROOT, arg('out', 'tests/audit-runs/lessons'));
 const DPI = parseInt(arg('dpi', '110'), 10);
 const PRACTICE = parseInt(arg('pages', '1'), 10);
-const CHECK = has('check');
+const CHECK = has('check') && !has('verify-grey');
 // --force-check (lane lf-engine, 2026-11-12; additive): build every packet WITH its Prerequisite Check even while the
 // lesson's LR-17 switch is off (`prereqsLive: false`): buildSheet's render-only `prereqsForce`. --seed n: the render seed.
 const FORCE = has('force-check');
@@ -106,6 +125,44 @@ function nameCheck(item, pre) {
         const named = WORDS.filter((w) => new RegExp(`\\b${w}\\b`).test(ch));
         if (named.length && !named.some((w) => new RegExp(`\\b${w}\\b`).test(said))) out.push(`checks "${pre.checks}" names ${named.join(' / ')}; the item ("${item.text}") uses none of them`);
     }
+    return out;
+}
+/** PC-RANGE on a route ref's DECLARED floors (critic r4 N1): [problem] or []. `ref` lessonData(..).prereqs[k].ref. Pure. */
+function floorCheck(item, ref) {
+    if (!ref) return [];
+    const m = /^\s*(\d[\d,]*)\s*([+−\-×x*÷/])\s*(\d[\d,]*)/.exec(String(item.text || ''));
+    if (!m) return [];
+    const ops = [Number(m[1].replace(/,/g, '')), Number(m[3].replace(/,/g, ''))];
+    const out = [];
+    const say = (k, v) => out.push(`"${item.text}" breaks the ref's ${k} ${v} (route ${ref.categoryId}:${ref.skillId})`);
+    if (ref.minOperand !== undefined && ops.some((v) => v < Number(ref.minOperand))) say('minOperand', ref.minOperand);
+    if (ref.minTop !== undefined && !(ops[0] >= Number(ref.minTop))) say('minTop', ref.minTop);
+    if (ref.maxTop !== undefined && !(ops[0] <= Number(ref.maxTop))) say('maxTop', ref.maxTop);
+    if (ref.maxBottom !== undefined && !(ops[1] <= Number(ref.maxBottom))) say('maxBottom', ref.maxBottom);
+    if (ref.zeroOnes && ops[0] % 10 !== 0) say('zeroOnes', true);
+    return out;
+}
+/** PC-NAME two-part (critic r4 N7, ruling A): a question whose route step title names two ("10 more, 10 less") prints an
+ *  item of each. `items` the question's printed items. [problem] or []. Pure. */
+function namePartsCheck(items, pre) {
+    const st = STEPS.get(pre.lesson) || { title: pre.title || '' };
+    const want = [...String(st.title).matchAll(/\b(\d+) (more|less)\b/gi)].map((m) => `${m[1]} ${m[2].toLowerCase()}`);
+    if (want.length < 2 || !items.length) return [];
+    const said = items.map((it) => `${it.text} ${it.ans}`.toLowerCase());
+    const miss = want.filter((w) => !said.some((t) => t.includes(w)));
+    return miss.length ? [`"${st.title}" names ${want.join(' and ')}; the question prints ${items.length} item(s), none "${miss.join('" / "')}"`] : [];
+}
+/** PC-PV both ways per question (critic r4 N2): the records of one question's two-word place cells [{nearest, ringed}]. Pure. */
+function pvQuestionCheck(recs) {
+    const out = [];
+    const keyed = recs.filter((c) => c.ringed);
+    if (keyed.length < 2) return out;
+    const near = keyed.filter((c) => c.nearest);
+    if (near.length >= 2 && near.every((c) => c.nearest === c.ringed)) out.push(`the word nearest the underlined digit is the key in all ${near.length} items (the bank names the answer)`);
+    if (near.length >= 2 && near.every((c) => c.nearest !== c.ringed)) out.push(`the word nearest the underlined digit is wrong in all ${near.length} items`);
+    const ans = keyed.map((c) => c.ringed);
+    if (new Set(ans).size === 1) out.push(`every underlined place is "${ans[0]}" (${ans.length} items)`);
+    else if (ans.length >= 3 && ans.every((a, i) => i === 0 || a !== ans[i - 1])) out.push(`the underlined places strictly alternate (${ans.join(' ')})`);
     return out;
 }
 
@@ -328,7 +385,23 @@ function pcMeasure() {
         if (leaf || bordered) b = Math.max(b, r.bottom); } return b; };
     return [...document.querySelectorAll('body > section.ws-page, body > .ws-page')].map((pg) => {
         const body = pg.querySelector('.ws-body');
-        const out = { frame: null, ink: [], pv: [] };
+        const out = { frame: null, ink: [], pv: [], gaps: [], instr: [] };
+        // (critic r4 N6, PC-GAPS) a band-wide cell - no number tab, >= 80 % of the body wide: its empty gap above the ink and below
+        const bodyW = body ? body.getBoundingClientRect().width : 0;
+        if (body) for (const c of body.querySelectorAll('.ws-cell')) { if (c.parentElement.closest('.ws-cell') || c.querySelector(':scope > [data-ws-label], :scope > .ws-letter')) continue;
+            const cr = vis(c); if (!cr || cr.width < 0.8 * bodyW || cr.height < 40) continue;
+            let t = Infinity, b = -Infinity; for (const d of c.querySelectorAll('*')) { const r = vis(d); if (!r) continue; const leaf = !d.children.length || d instanceof SVGSVGElement || d.hasAttribute('data-ws-slot'); const st = getComputedStyle(d);
+                const bordered = parseFloat(st.borderTopWidth) > 0 || parseFloat(st.borderBottomWidth) > 0; if (!leaf && !bordered) continue; if (d.closest('svg') && !(d instanceof SVGSVGElement)) continue; t = Math.min(t, r.top); b = Math.max(b, r.bottom); }
+            if (!Number.isFinite(t)) continue;
+            const above = Math.max(0, t - cr.top), below = Math.max(0, cr.bottom - b);
+            out.gaps.push({ cls: String(c.className).split(' ').filter((x) => /^mq-/.test(x)).join(' ') || 'ws-cell', h: Math.round(cr.height / MM * 10) / 10, above: Math.round(above / cr.height * 1000) / 10, below: Math.round(below / cr.height * 1000) / 10 }); }
+        // (r3 F14, PC-INSTR) each band's instruction: its text, its lines (a one-word last line is a widow) and its cells' writing slots
+        for (const bd of pg.querySelectorAll('.ws-band')) { const sp = bd.querySelector(':scope > .ws-strip > span'); if (!sp || !sp.textContent.trim()) continue;
+            const words = []; const walker = document.createTreeWalker(sp, NodeFilter.SHOW_TEXT); let tn; while ((tn = walker.nextNode())) { const re = /\S+/g; let mm; while ((mm = re.exec(tn.textContent))) { const rg = document.createRange(); rg.setStart(tn, mm.index); rg.setEnd(tn, mm.index + mm[0].length); const rr = rg.getBoundingClientRect(); words.push({ w: mm[0], top: Math.round(rr.top) }); } }
+            const tops = [...new Set(words.map((x) => x.top))]; const last = words.filter((x) => x.top === tops[tops.length - 1]);
+            const cells = [...bd.querySelectorAll('.ws-cell')].filter((x) => !x.parentElement.closest('.ws-cell'));
+            const slots = cells.map((x) => [...x.querySelectorAll('[data-ws-slot]')].filter((e) => !/^(ring|check)$/.test(e.getAttribute('data-ws-shape') || '') && !/^c\d|choice|match/.test(e.getAttribute('data-ws-slot') || '')).length);
+            out.instr.push({ text: sp.textContent.trim(), lines: tops.length, widow: tops.length > 1 && last.length === 1 ? last[0].w : null, slots }); }
         if (body) { const br = body.getBoundingClientRect(); const ib = inkBottom(body);
             // (and each band's own frame: a cell drawn past its grid / band bottom hides the band's bottom rule - sub L sheet
             // Independent cells 69 mm in a 64.8 mm row, cut by the grid: the body's ink stayed inside the body)
@@ -357,13 +430,19 @@ function pcMeasure() {
             if (!tracks) return;
             const rows = tracks.querySelectorAll('tr').length;
             const lab = c.querySelector('[data-ws-label], .ws-letter');
-            const rec = { cell: (lab && lab.textContent.trim()) || String(k + 1), heads: rows > 1 };
+            // (lead ruling 2026-11-13, PC-PVHEADS: a "name the place" cell - its choices or its bank are place words)
+            const PLACES = /^(ones|tens|hundreds|thousands|ten thousands|hundred thousands|millions)$/i;
+            const bank = c.querySelector('.pv-bank');
+            const named = (ring && [...ring.querySelectorAll('.pv-choice')].some((x) => PLACES.test(x.textContent.trim()))) || (bank && /\b(ones|tens|hundreds)\b/i.test(bank.textContent));
+            const rec = { cell: (lab && lab.textContent.trim()) || String(k + 1), heads: rows > 1, named: !!named };
             const ul = [...tracks.querySelectorAll('span')].find((s) => parseFloat(getComputedStyle(s).borderBottomWidth) > 0);
             const ch = ring ? [...ring.querySelectorAll('.pv-choice')] : [];
             if (ul && ch.length === 2) {
-                const ux = (ul.getBoundingClientRect().left + ul.getBoundingClientRect().right) / 2;
-                const d = ch.map((x) => { const r = x.getBoundingClientRect(); return Math.abs((r.left + r.right) / 2 - ux); });
-                rec.nearest = ch[d[0] <= d[1] ? 0 : 1].textContent.trim();
+                // (critic r4 N2: nearest by the centres' distance - across AND down; a word no nearer than the other by 1 mm is
+                // no cue: `nearest` null)
+                const u = ul.getBoundingClientRect(); const ux = (u.left + u.right) / 2, uy = (u.top + u.bottom) / 2;
+                const d = ch.map((x) => { const r = x.getBoundingClientRect(); return Math.hypot((r.left + r.right) / 2 - ux, (r.top + r.bottom) / 2 - uy); });
+                rec.nearest = Math.abs(d[0] - d[1]) < MM ? null : ch[d[0] < d[1] ? 0 : 1].textContent.trim();
                 const ringed = ch.find((x) => { const cs = getComputedStyle(x); return parseFloat(cs.borderTopWidth) > 0 && !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.borderTopColor); });
                 rec.ringed = ringed ? ringed.textContent.trim() : null;
             }
@@ -389,7 +468,13 @@ function pageTurns(placed) {
 }
 const ONLY_RULES0 = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 
+// (critic r4: the near-twin rules are the engine's own module - one threshold set - read from THIS tree, so a backtest on an older
+// commit judges it by today's rules)
+let NT = null;
+// the rules read from the --seeds builds alone: a run asking only for these skips the layout reads (backtest rows)
+const CONTENT_RULES = ['PC-RANGE', 'PC-NAME', 'PC-LR5', 'PG-TURN', 'PG-LR67', 'PG-LR6'];
 async function checkMain() {
+    NT = await import(require('url').pathToFileURL(path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'near-twins.js')).href);
     const app = await open({ seed: 1 });
     const { page } = app;
     const findings = []; let na = 0; let read = 0;
@@ -425,7 +510,19 @@ async function checkMain() {
                         const ans = subs.map((x) => x.ops[0] - x.ops[1]); if (new Set(ans).size < ans.length) lr67.push({ part: k, msg: 'LR-6 two answers alike' });
                         for (const [c, max] of Object.entries(caps)) { const n = its.filter((x) => LR.casesOf(x).includes(c)).length; if (n > max) lr67.push({ part: k, msg: `LR-7 ${n} ${c} items (at most ${max} a page)` }); }
                     }
-                    return { placed, lr67, pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
+                    // (critic r4 N4 / N5, PG-LR6: every lesson page's one-number items, per page and skill - chart examples left out)
+                    const one = new Map(); let pg3 = 0;
+                    const walk3 = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; if (!it || it.model || !pl || !(Number(pl.n) >= 10)) return; const k = `${part}#${pg3}|${it.skill || ''}`; if (!one.has(k)) one.set(k, []);
+                        const a = typeof it.q.ans === 'object' || it.q.ans === null || it.q.ans === undefined ? '' : String(it.q.ans).replace(/,/g, '').trim(); one.get(k).push({ n: Number(pl.n), ans: /^\d+$/.test(a) ? Number(a) : null, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); });
+                        if (node.content) walk3(node.content, part); (node.contents || []).forEach((c) => walk3(c, part)); (node.parts || []).forEach((c) => walk3(c, part)); };
+                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pg3++; if (['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) (pg.sections || []).forEach((sc) => walk3(sc, pp.part)); }
+                    // (critic r4 N1: the route refs' declared floors, as the library records them)
+                    const ld = lid && LIB.lessonData ? LIB.lessonData(lid) : null; const floors = ((ld && ld.prereqs) || []).map((p) => p.ref || null);
+                    // (critic r4 N7: the check's PRINTED items, by question - r.items holds every item dealt, a routed check deals 8 a question)
+                    const printed = []; const walkP = (node) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) printed.push({ pool: it.pool, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.q.ans === 'object' ? JSON.stringify(it.q.ans) : String(it.q.ans) }); }); if (node.content) walkP(node.content); (node.contents || []).forEach(walkP); (node.parts || []).forEach(walkP); };
+                    for (const pp of r.partPlans || []) if (pp.part === 'prereq') for (const pl of (pp.plans || []).slice(0, 1)) for (const pg of (pl && pl.pages) || []) (pg.sections || []).forEach(walkP);
+                    { const qs = ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs); let at = 0; qs.forEach((len, q) => { for (let j = 0; j < len && at < printed.length; j++) printed[at++].pool = `q${q}`; }); }
+                    return { placed, lr67, oneNum: [...one.entries()], floors, printed, pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
                 if (b.error) { F('PC-BUILD', `${l.id} seed ${seed}`, b.error.slice(0, 160)); continue; }
                 // PC-LR5 (critic r3 F4; LR-5): no item of the lesson sheet printed again on Practice or Mixed
                 { const sheet = new Set((b.placed || []).filter((x) => x.part === 'teach' && /\d/.test(x.t)).map((x) => x.t));
@@ -433,21 +530,35 @@ async function checkMain() {
                 for (const m of pageTurns(b.placed)) F('PG-TURN', `${l.id} seed ${seed} ${m.part}`, m.msg);
                 for (const m of b.lr67 || []) F('PG-LR67', `${l.id} seed ${seed} ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
                 if (!b.pre) { na++; break; }
+                // PG-LR6 (critic r4 N4 / N5): one threshold set, the engine's own module (sheet/near-twins.js)
+                for (const [k, its] of b.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} seed ${seed} ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
                 for (const it of b.items) {
                     const k = Number(String(it.pool).replace(/\D/g, '')); const pre = b.pre[k]; if (!pre) continue; read++;
                     for (const m of rangeCheck(it, pre)) F('PC-RANGE', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m);
+                    for (const m of floorCheck(it, (b.floors || [])[k])) F('PC-RANGE', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m);
                     for (const m of nameCheck(it, pre)) F('PC-NAME', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m);
                 }
+                b.pre.forEach((pre, k) => { for (const m of namePartsCheck((b.printed && b.printed.length ? b.printed : b.items).filter((it) => Number(String(it.pool).replace(/\D/g, '')) === k), pre)) F('PC-NAME', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m); });
             }
             // layout: seed 4242 at every size
-            for (const size of SIZES) {
+            for (const size of (ONLY_RULES0.length && ONLY_RULES0.every((r) => CONTENT_RULES.includes(r) && r !== 'PC-RANGE' && r !== 'PC-NAME') ? [] : SIZES)) {
                 const built = await page.evaluate(async ({ skill, size, FORCE }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
                     const placed = []; let pgN = 0; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, page: pgN, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
                     for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pgN++; (pg.sections || []).forEach((sc) => walk(sc, pp.part)); }
-                    return { placed, pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
+                    // (critic r4 N1 / N7: the check's printed items and the route refs' floors at THIS size too - sub S printed "20 - 11")
+                    const LIB = await import('./js/modules/lessons/library.js'); const lid = (LIB.defaultLessonForSkill(skill.categoryId, skill.skillId) || {}).id;
+                    const ld = lid && LIB.lessonData ? LIB.lessonData(lid) : null; const floors = ((ld && ld.prereqs) || []).map((p) => p.ref || null);
+                    const preItems = []; const walkP = (node) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) preItems.push({ pool: it.pool, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.q.ans === 'object' ? JSON.stringify(it.q.ans) : String(it.q.ans) }); }); if (node.content) walkP(node.content); (node.contents || []).forEach(walkP); (node.parts || []).forEach(walkP); };
+                    for (const pp of r.partPlans || []) if (pp.part === 'prereq') for (const pl of (pp.plans || []).slice(0, 1)) for (const pg of (pl && pl.pages) || []) (pg.sections || []).forEach(walkP);
+                    { const qs = ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs); let at = 0; qs.forEach((len, q) => { for (let j = 0; j < len && at < preItems.length; j++) preItems[at++].pool = `q${q}`; }); }
+                    return { placed, floors, preItems, prePre: (r.lesson && r.lesson.prereqCheck) || null, pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 for (const m of pageTurns(built.placed)) F('PG-TURN', `${l.id} ${size} seed 4242 ${m.part}`, m.msg);
-                if (ONLY_RULES0.length && ONLY_RULES0.every((r) => r === 'PG-TURN')) continue;
+                // PC-RANGE / PC-NAME at this size (critic r4 N1, N7: the S check dealt "20 - 11", the L check one "10 more" item)
+                if (built.prePre) { for (const it of built.preItems || []) { const k = Number(String(it.pool).replace(/\D/g, '')); const pre = built.prePre[k]; if (!pre) continue;
+                    for (const m of floorCheck(it, (built.floors || [])[k])) F('PC-RANGE', `${l.id} ${size} seed 4242 Q${k + 1} (${pre.lesson})`, m); }
+                    built.prePre.forEach((pre, k) => { for (const m of namePartsCheck((built.preItems || []).filter((it) => Number(String(it.pool).replace(/\D/g, '')) === k), pre)) F('PC-NAME', `${l.id} ${size} seed 4242 Q${k + 1} (${pre.lesson})`, m); }); }
+                if (ONLY_RULES0.length && ONLY_RULES0.every((r) => CONTENT_RULES.includes(r))) continue;
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
                     await sh.emulateMediaType('print');
@@ -482,7 +593,20 @@ async function checkMain() {
                 // SHEET-2PG (lead, live-pm r2 item 6): a lesson sheet of two or more pages has at least one page >= 70 % used
                 { const tp = pm.map((m, n) => ({ m, n })).filter((x) => x.m.part === 'teach'); const st = tp.map((x) => (P.sc.stats || [])[x.n]).filter(Boolean);
                     if (tp.length > 1 && st.length === tp.length && st.every((x) => x.blank > 30)) F('SHEET-2PG', where('pupil', tp[0].n), `the lesson sheet prints on ${tp.length} pages, each under 70 % used (blank at the foot ${st.map((x) => `${x.blank} %`).join(', ')})`); }
+                // PC-PVHEADS (lead ruling 2026-11-13, N9): no "name the place" item on a Check or Mixed page prints place heads (the letter
+                // over the underlined digit is the answer); Practice keeps them (the support)
+                pm.forEach((m, n) => { if (!['prereq', 'mixed'].includes(m.part)) return; for (const c of ((P.pc || [])[n] || {}).pv || []) if (c.named && c.heads) F('PC-PVHEADS', where('pupil', n), `${m.part === 'prereq' ? 'check' : m.part} cell ${c.cell}: place heads over a "name the place" numeral`); });
                 if (l.spot) continue;
+                // CHART-H13 (critic r4 N3): every anchor-chart cell keeps its empty band under 30 % (blocking)
+                pm.forEach((m, n) => { if (m.part !== 'chart') return; for (const b of bandsOf(P.sc, n)) if (!/blank at the bottom/.test(b)) F('CHART-H13', where('pupil', n), b.replace(/^page \d+:? ?/, '')); });
+                // PC-GAPS (critic r4 N6): a band-wide cell on the check page or the sheet keeps no lopsided gap (the larger >= 25 % of
+                // the cell and > 2 x the smaller: the grown Vocabulary band left 29.7 % under its words and 28 px over them)
+                pm.forEach((m, n) => { if (!['prereq', 'teach'].includes(m.part)) return; for (const g of ((P.pc || [])[n] || {}).gaps || []) { const hi = Math.max(g.above, g.below), lo = Math.min(g.above, g.below);
+                    if (hi >= 25 && hi > 2 * lo) F('PC-GAPS', where('pupil', n), `${m.part === 'teach' ? 'sheet' : 'check'} ${g.cls} (${g.h} mm): ${g.above} % empty above the ink, ${g.below} % below`); } });
+                // PC-INSTR (r3 F14): on the check page an instruction's plural matches its blanks, and it never ends on a one-word line
+                pm.forEach((m, n) => { if (m.part !== 'prereq') return; for (const x of ((P.pc || [])[n] || {}).instr || []) {
+                    if (/\b(numbers|boxes)\b/.test(x.text) && x.slots.length && x.slots.every((v) => v === 1)) F('PC-INSTR', where('pupil', n), `"${x.text}" over one blank an item`);
+                    if (x.widow) F('PC-INSTR', where('pupil', n), `"${x.text}" ends on a one-word line ("${x.widow}")`); } });
                 // PC-FRAME (critic r3 F3): every page of the packet, pupil and key, ends inside its body (no band cut at the foot)
                 for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if (pg.frame && pg.frame.over > 0.3) F('PC-FRAME', where(k, n) + ` (${(mm[n] || {}).part || '?'})`, `${pg.frame.what === 'body' ? 'ink runs' : `a cell runs past its ${pg.frame.what} by`} ${pg.frame.over} mm${pg.frame.what === 'body' ? " past the body's bottom" : ''} (the band has no bottom rule inside the frame)`); });
                 // PC-CLIP on ink (critic r3 F2): on the check page and its key, each routed band's grid ink ends above its tag, and
@@ -493,8 +617,10 @@ async function checkMain() {
                 // ring words the word nearest the underlined digit is not always the wrong one (words in place order)
                 { const kpn = km.findIndex((x) => x.part === 'prereq'); const ppn = pm.findIndex((x) => x.part === 'prereq');
                     for (const [doc, n, k] of [[P, ppn, 'pupil'], [K, kpn, 'key']]) for (const c of ((doc.pc || [])[n] || {}).pv || []) if (c.heads) F('PC-PV', `${where(k, n)} check Q${c.cell}`, 'place heads over the numeral on a routed check (they name the answer)');
-                    const two = (((K.pc || [])[kpn] || {}).pv || []).filter((c) => c.nearest && c.ringed);
-                    if (two.length >= 2 && two.every((c) => c.nearest !== c.ringed)) F('PC-PV', where('key', kpn), `in all ${two.length} two-word place items the word nearest the underlined digit is the wrong one (${two.map((c) => `Q${c.cell} ${c.nearest}`).join(', ')})`); }
+                    // (critic r4 N2: both ways, per question - the cells grouped by the question their number falls in)
+                    const qOf2 = []; (built.qs || []).forEach((len, q) => { for (let j = 0; j < len; j++) qOf2.push(q); });
+                    const byQ = new Map(); for (const c of (((K.pc || [])[kpn] || {}).pv || []).filter((x) => x.ringed !== undefined)) { const q = qOf2[Number(c.cell) - 1]; if (!byQ.has(q)) byQ.set(q, []); byQ.get(q).push(c); }
+                    for (const [q, recs] of byQ) for (const msg of pvQuestionCheck(recs)) F('PC-PV', `${where('key', kpn)} check Q${recs.map((c) => c.cell).join('-')}${q === undefined ? '' : ` (question ${q + 1})`}`, msg); }
                 if (has('debug')) console.log(JSON.stringify({ lesson: l.id, size, pupil: P.st.map((x) => x.strips), key: K.st.map((x) => x.strips) }));
                 // strips covered; pupil vs key twin
                 pm.forEach((m, n) => { for (const s of (P.st[n] || {}).strips || []) { if (s.covered && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" covered by ${s.covered}`); if (s.clip && s.text) F('PC-CLIP', where('pupil', n), `heading "${s.text}" clipped by ${s.clip}`); } });
@@ -537,7 +663,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => (x === 'PC-H13P' ? 'PM-H13' : x));
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PG-TURN', 'PG-LR67', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PAGES', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PG-TURN', 'PG-LR67', 'PG-LR6', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PVHEADS', 'CHART-H13', 'PC-GAPS', 'PC-INSTR', 'PC-PAGES', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [
@@ -553,7 +679,47 @@ async function checkMain() {
     process.exit(findings.length ? 1 : 0);
 }
 
-if (CHECK) checkMain().catch((e) => { console.error(e); console.log('ws-lesson-samples --check: FAIL'); process.exit(1); });
+/** (critic r4 N8) --verify-grey: which pupil page of a committed packet chart-grey.png shows - argmin of the grey difference. */
+const GREY_PY = `
+import sys, json, pymupdf
+grey, pages = sys.argv[1], sys.argv[2:]
+g = pymupdf.Pixmap(grey)
+if g.n != 1: g = pymupdf.Pixmap(pymupdf.csGRAY, g)
+gs = g.samples
+out = []
+for p in pages:
+    x = pymupdf.Pixmap(p)
+    if x.alpha: x = pymupdf.Pixmap(x, 0)
+    x = pymupdf.Pixmap(pymupdf.csGRAY, x) if x.n != 1 else x
+    xs = x.samples
+    if x.width != g.width or x.height != g.height: out.append(255.0); continue
+    step = 7
+    d = sum(abs(gs[i] - xs[i]) for i in range(0, len(gs), step)) / (len(gs) / step)
+    out.append(round(d, 2))
+print(json.dumps(out))
+`;
+async function verifyGrey() {
+    const app = await open({ seed: 1 }); const { page } = app; const bad = []; let n = 0;
+    try {
+        for (const l of LESSONS.filter((x) => !x.spot)) for (const [size, sub] of [['L', ''], ['S', 'S']]) {
+            const dir = path.join(ROOT, 'design', 'lesson-samples', l.dir, sub);
+            if (!fs.existsSync(path.join(dir, 'chart-grey.png'))) continue;
+            const parts = await page.evaluate(async ({ skill, size }) => { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: true }); return (r.lesson && r.lesson.parts) || []; }, { skill: l.skill, size });
+            let at = 0, chartAt = -1; for (const p of parts) { if (p.part === 'chart' && chartAt < 0) chartAt = at; at += p.pages || 0; }
+            const pngs = fs.readdirSync(dir).filter((f) => /^pupil-p\d+\.png$/.test(f)).sort((a, b) => Number(a.match(/\d+/)[0]) - Number(b.match(/\d+/)[0]));
+            const d = JSON.parse(execFileSync('python3', ['-c', GREY_PY, path.join(dir, 'chart-grey.png'), ...pngs.map((f) => path.join(dir, f))], { encoding: 'utf8' }).trim().split('\n').pop());
+            const best = d.indexOf(Math.min(...d)); n++;
+            const ok = best === chartAt && d[best] < 10;
+            console.log(`${ok ? 'OK  ' : 'FAIL'} ${l.dir}/${sub || '.'}: chart-grey.png is pupil-p${best + 1} (diff ${d[best]}); the chart is pupil-p${chartAt + 1} (diffs ${d.join(', ')})`);
+            if (!ok) bad.push(`${l.dir}/${sub}`);
+        }
+    } finally { await app.close(); }
+    console.log(`ws-lesson-samples --verify-grey: ${bad.length || !n ? `FAIL (${bad.length || 'no packet read'})` : 'OK'}`);
+    process.exit(bad.length || !n ? 1 : 0);
+}
+
+if (has('verify-grey')) verifyGrey().catch((e) => { console.error(e); console.log('ws-lesson-samples --verify-grey: FAIL'); process.exit(1); });
+else if (CHECK) checkMain().catch((e) => { console.error(e); console.log('ws-lesson-samples --check: FAIL'); process.exit(1); });
 else (async () => {
     fs.mkdirSync(OUT, { recursive: true });
     const app = await open({ seed: 1, lock: 'ws-lesson-samples' });
@@ -581,7 +747,9 @@ else (async () => {
             const pdfK = path.join(dir, 'key.pdf');
             const checkP = await printDoc(page, built.pupil, pdfP);
             const checkK = await printDoc(page, built.key, pdfK);
-            const pages = JSON.parse(execFileSync('python3', ['-c', RASTER_PY, pdfP, dir, String(DPI), 'pupil', '0'], { encoding: 'utf8' }).trim().split('\n').pop());
+            // (critic r4 N8: chart-grey.png is the CHART page - with the check on it is not page 1)
+            let chartAt = 0; { let at = 0, c = -1; for (const p of (built.lesson && built.lesson.parts) || []) { if (p.part === 'chart' && c < 0) c = at; at += p.pages || 0; } chartAt = Math.max(0, c); }
+            const pages = JSON.parse(execFileSync('python3', ['-c', RASTER_PY, pdfP, dir, String(DPI), 'pupil', String(chartAt)], { encoding: 'utf8' }).trim().split('\n').pop());
             const keyPages = JSON.parse(execFileSync('python3', ['-c', RASTER_PY, pdfK, dir, String(DPI), 'key', '-'], { encoding: 'utf8' }).trim().split('\n').pop());
             fs.unlinkSync(pdfP); fs.unlinkSync(pdfK);
             const { pupil, key, ...rest } = built;
