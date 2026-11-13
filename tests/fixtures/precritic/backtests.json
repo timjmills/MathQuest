@@ -6977,6 +6977,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-compare-wrap-sign-bands",
+   "check": "no compare step line ends in a relation sign at the wide bands / close pairs (critic compare r3 N9: 'Write 501,765 >' / '179,619.' on the lesson model at band 999,999 - the wrap class a second time, round cap 2 root cause)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-compare-pages WRAP-SIGN (bands)",
+   "browser": true,
+   "fail": {
+    "commit": "94846b4e",
+    "state": "lesson / scripted-model at band 999,999 and close pairs: 'Write A >' / 'B.'"
+   },
+   "pass": {
+    "commit": "7fdfd0f4",
+    "state": "every relation joined by no-break spaces (rel())"
+   },
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN --seeds 2 --skills placevalue:compare",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
- ]
+]
 }
