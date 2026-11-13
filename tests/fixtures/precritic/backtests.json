@@ -6239,6 +6239,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "conflict-markers-3c7b",
+  "check": "ws-conflict-markers: no tracked file holds a merge conflict marker line (a line starting with seven '<' or '>' and a space); on every ws-precritic run and in deploy session 1",
+  "kind": "commit-pair",
+  "rule": "ws-conflict-markers (lf-hosts critic r1 F2)",
+  "browser": false,
+  "fail": {
+   "commit": "3c7b548a",
+   "state": "lf-hosts merge of the lf-checks hand-off: <<<<<<< HEAD / >>>>>>> marker lines committed in design/lessons-first/CHECKS_FROM_CRITICS.md"
+  },
+  "pass": {
+   "commit": "28d13e788",
+   "state": "the g9 merge resolved the ledger: no marker line in any tracked file"
+  },
+  "command": "node tests/scripts/ws-conflict-markers.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
