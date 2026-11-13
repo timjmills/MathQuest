@@ -5457,15 +5457,13 @@
   "kind": "commit-pair",
   "rule": "ws-cell-checks OVERFLOW (--opt-roles, opt-in lf-placevalue cell-checks-compare)",
   "browser": true,
-  "pending": true,
-  "pendingReason": "lead ruling 2026-11-13: lf-roles owns the Reason It A / B geometry and will stack A over B when the problem is wider than half the box (it reads the compare footprint's inkWMm). The fail state runs today: reason-it L at band 9,999 / 99,999 / 999,999 OVERFLOW on 16748cd8. Set pass.commit when the lf-roles stack lands.",
   "fail": {
    "commit": "16748cd8",
    "state": "reason-it L band 9,999+: the numerals leave the A / B boxes and the cell (OVERFLOW 4 a page)"
   },
   "pass": {
-   "commit": null,
-   "state": "lf-roles stack not built (roles/reason-it.js)"
+   "commit": "d9a565fd",
+   "state": "lf-roles Reason It A-over-B (master e4d12d6a, inkWMm against the panel inner width) merged: reason-it S / M / L band 999,999 no OVERFLOW"
   },
   "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:compare --card --card-opts --opt-roles reason-it --rules OVERFLOW --size S,L",
   "expect": {
