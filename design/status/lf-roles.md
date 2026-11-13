@@ -17,6 +17,20 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
 
+## Round 7 (2026-11-13, +$40; owner: keep going)
+- R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.
+- N9 FIX-MINIMAL (25d7bf2f): compose.wrongOf keeps a list's FIRST error only (later parts follow the correct rule); 0 passed pages
+  change; ws-roles-unit FIX-MINIMAL; backtest roles-fix-minimal.
+- PUPILTAG on ink (b0efa7ee): 2-4 mm +/- 0.5 from the label's foot to the work's first ink; the work's first element loses its top
+  margin and the label box sits 0.5 mm (S 1 mm) over it. 132 findings on deploy-2 -> 0 on 14 passed skills.
+- R15 EA-ROWX (2d958ba1): one work width a page where planned widths differ; judgement x per column within 4 mm. FAIL 8 before ->
+  0 on every passed skill. Word forms (number_word_form) still drift ~3.5 mm (text width on equal footprints) - under the 4 mm bar.
+- CORRECTION to 2d958ba1's message: ws-capacity-pin is NOT 0 drops - placevalue:combine Independent / More Practice S 28 -> 27.
+  The same drop is on master fb6528a9 (another lane's change since the pin on 5947159d; roles this lane does not touch) - routed
+  to the lead: a regression the check caught, or an intended change to re-pin.
+- Open: PUPILTAG still fires on function_table_easy EA M/L and number_patterns_rule EA (count-row / table first ink, lf-algebra
+  cells); R13 Pre-skill Check; lf-algebra r8 role items (F3/F4, marksFor function-table, F5 traceSlots, level 1 vs 0, F8).
+
 ## Deploy (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy): 8823e9a9 (critic r3) + SIGNMATCH d54d2850 + D6/N2/D7 5a46c6ee (critic r4 PASS)
 
 ## Round 6 (2026-11-13, +$35) - after the deploy branch (PR #42, claude/sweet-newton-c8wrv1-lf-roles-deploy @ 8823e9a9)
