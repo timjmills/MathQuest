@@ -18,7 +18,7 @@
 
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
-    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern,
+    labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, blank, writeLine, slotKey, rng, deriveSeed, wrongPattern, answerPlace, answerPlaceHtml, answerFrameCls,
 } from './compose.js';
 
 export const ROLE_ID = 'reason-it';
@@ -35,8 +35,9 @@ export function prepare(it, info = {}) {
     // (`wrongFlags`, handed in as `info.wrong`), so there is no A / B tell to learn.
     const aRight = info.wrong !== undefined ? !!info.wrong : rng(deriveSeed(info.seed === undefined ? 0 : info.seed, ROLE_ID, info.index || 0))() < 0.5;
     const right = aRight ? 'A' : 'B';
-    const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
-    const key = slotKey({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right, 'ri-ans': correct }, `${right}: ${correct}`);
+    // the answer frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one a part of a list, none for a sentence answer
+    const place = answerPlace('ri-ans', correct);
+    const key = slotKey(Object.assign({ 'ri-a': aRight ? 'A' : '', 'ri-b': aRight ? '' : 'B', 'ri-who': right }, place.slots), `${right}: ${correct}`);
     // (a sentence-layout story - word-work `layout: 'sentence'` - is a story over a number sentence 60+ mm wide: in a
     // third of the row its frame ran over the A panel's border; critic visual-quality r2 N4. It takes the wide form
     // below, B under A, drawn as a half-page column so its unit word still sits beside the box; the story once on top)
@@ -57,7 +58,7 @@ export function prepare(it, info = {}) {
         + `<div class="mq-abresp"${at(2, '1 / 3')}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
-        + `<div class="mq-frame">The answer is ${writeLine('ri-ans', c, key, digits)}.</div>`
+        + (place.kind === 'none' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
         + `</div></div>`;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,

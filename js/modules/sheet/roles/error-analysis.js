@@ -36,7 +36,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf,
+    checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
 import { coinSVG } from '../cells/tmkit.js';
@@ -447,7 +447,10 @@ export function prepare(it, info = {}) {
     if (info.wrong && !wrong) return null;
     const isWrong = !!(wrong && info.wrong);
     const q = it.q || {};
-    let P = LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
+    // a SENTENCE answer (a pattern's feature) is never split into parts nor written on a line: the fix is the item
+    // again, clean, where the pupil marks the right sentence (ws-roles-unit KEYJOIN-ROLE, PAGE_TYPES 6.1)
+    const prose = isProseAnswer(correct0);
+    let P = prose || LINED.has(it.template) || DRAWN.has(it.template) ? null : answerParts(it, correct0);
     const correct = correct0;
     // A place-value line slot writes the number the way the key does ("80,000", never "80000"
     // beside a wrong "80,000" - critic round 4); a digit grid keeps its bare digits.
@@ -544,6 +547,7 @@ export function prepare(it, info = {}) {
     else if (redraw) kind = 'redo';
     else if (LINED.has(it.template)) kind = 'line';
     else if (choice) kind = 'choice';
+    else if (prose) kind = 'redo';
     else if (P && P.parts.length > 1 && digitSplit) kind = 'value';
     else if (P && P.parts.length > 1) {
         labels = isList(glue) || !glue ? partLabels(it, P.parts, null) : null;

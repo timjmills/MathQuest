@@ -159,6 +159,8 @@ function cellChecksInPage(opts) {
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
                     if (s.querySelector('[data-ws-slot]')) return;
+                    // an OPEN slot is a zone (a judgement row, an Error Analysis redraw of the item), not one answer (lf-roles)
+                    if (s.getAttribute('data-ws-shape') === 'open') return;
                     var txt = rectsOfText(s, '.mq-slottag').length ? (s.textContent || '') : '';
                     if (/\d\s*,\s+\d/.test(txt)) out.findings.push({ rule: 'KEYJOIN', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + txt.trim().slice(0, 24) + '" into ONE answer slot (H1: one answer a slot, critic lf-ops r1 check 8)' });
                 });

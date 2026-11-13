@@ -307,6 +307,55 @@ export function answerOf(it) {
 }
 
 /**
+ * A SENTENCE answer ("The ones digits go 0, 2, 4, 6, 8.", "Every number is even."): three or more words. A role never
+ * writes one into a write line (PAGE_TYPES 6.1 "number blanks only"; ws-roles-unit KEYJOIN-ROLE, lf-roles 2026-11-13).
+ * It starts with a word: "8 R 5", "1 h 15 min", "2 hundreds 3 tens 5 ones" (a unit form, written on its line) or "Even"
+ * are not sentences.
+ */
+export const isProseAnswer = (v) => {
+    const s = String(v === undefined || v === null ? '' : v).trim();
+    return /^[A-Za-z]{2,}\b/.test(s) && (s.match(/[A-Za-z]{2,}/g) || []).length >= 3;
+};
+
+/**
+ * The parts of a several-value answer ("12, 15, 18" -> ['12', '15', '18']: a number pattern's terms, a function table's
+ * outputs), or null for one value or a sentence. A role writes them one part a box, never joined in one slot (RUBRIC H1,
+ * ws-cell-checks KEYJOIN / ws-roles-unit KEYJOIN-ROLE).
+ */
+export function answerListOf(v) {
+    const s = String(v === undefined || v === null ? '' : v).trim();
+    if (!/,\s/.test(s) || isProseAnswer(s)) return null;
+    const parts = s.split(/,\s+/).map((x) => x.trim());
+    return parts.length >= 2 && parts.every((x) => x && /\d/.test(x)) ? parts : null;
+}
+
+/**
+ * A role's answer frame place ("The answer is ____."): `kind` 'one' (one write line), 'list' (one line a part, joined by
+ * commas) or 'none' for a sentence (the frame row is left out; the judgement is the answer). `slots` are its key entries.
+ */
+// (inline, not in the engine stylesheet: the stylesheet travels on every page, and a page with no list stays byte-identical)
+export const answerFrameCls = (place, maxMm = 0) => (place.kind === 'list'
+    ? `mq-frame mq-framelist" style="flex-wrap:wrap;row-gap:3mm;white-space:normal${maxMm ? `;max-width:${maxMm}mm` : ''}` : 'mq-frame');
+export function answerPlace(id, correct) {
+    const width = (v) => Math.max(2, Math.min(6, String(v).replace(/[^0-9]/g, '').length || 2));
+    if (isProseAnswer(correct)) return { kind: 'none', slots: {}, parts: null };
+    const parts = answerListOf(correct);
+    if (!parts) return { kind: 'one', slots: { [id]: correct }, parts: null, digits: width(correct) };
+    const slots = {};
+    parts.forEach((v, i) => { slots[`${id}-${i}`] = v; });
+    return { kind: 'list', slots, parts, digits: parts.map(width) };
+}
+
+/** The write line(s) of an `answerPlace` ('' for 'none'); a list carries its own closing full stop. */
+export function answerPlaceHtml(place, id, ctx, key) {
+    if (place.kind === 'none') return '';
+    if (place.kind === 'one') return writeLine(id, ctx, key, place.digits);
+    // a part and its comma never part; the list wraps under the frame's words in a narrow cell (.mq-framelist)
+    const n = place.parts.length;
+    return place.parts.map((_, i) => `<span class="mq-framepart" style="display:inline-flex;align-items:flex-end;gap:0.5mm;white-space:nowrap">${writeLine(`${id}-${i}`, ctx, key, place.digits[i])}${i < n - 1 ? ',' : '.'}</span>`).join('');
+}
+
+/**
  * The misconception-based wrong answer of a question, through its provider (SCC 3.8):
  * `{value, display, misconception, slot, slots, explain}`. The value keeps the answer's shape
  * (a number, "8 R 5", ["14", "3"] -> "14, 3", "20, 20, 15, 5"); null when there is none or it

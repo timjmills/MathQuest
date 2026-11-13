@@ -16,7 +16,7 @@
 import {
     ctxOf, frameOf, layoutHeader, planItem, gridPart, instructionPart, assemble, poolItems,
     labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, answerOf, wrongOf, wrongPattern,
-    checkLine, writeLine, slotKey, judgeGroup,
+    checkLine, writeLine, slotKey, judgeGroup, answerPlace, answerPlaceHtml, answerFrameCls,
     esc, operandsOf, opOf, opGlyphOf,
 } from './compose.js';
 
@@ -32,8 +32,10 @@ export function prepare(it, info = {}) {
     const wrong = wrongOf(it);
     const isFalse = !!(wrong && info.wrong);
     const shown = isFalse ? wrong.value : correct;
-    const digits = Math.max(2, Math.min(6, correct.replace(/[^0-9]/g, '').length || 2));
-    const key = slotKey({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '', 'tf-ans': correct }, correct);
+    // the frame's place (ws-roles-unit KEYJOIN-ROLE): one line, one line a part of a list ("12, 15, 18"), or no frame row
+    // for a sentence answer (PAGE_TYPES 6.1 number blanks only); a one-value answer prints exactly as before
+    const place = answerPlace('tf-ans', correct);
+    const key = slotKey(Object.assign({ 'tf-true': isFalse ? '' : '✓', 'tf-false': isFalse ? '✓' : '' }, place.slots), correct);
     // the short key's line (critic r1, B2): the judgement, then the answer the frame asks for
     key.short = `${isFalse ? 'False' : 'True'}; ${correct}`;
     // 09-A mock-up: the frame restates the problem ("6 x 7 = ____."), so the pupil writes the
@@ -46,7 +48,7 @@ export function prepare(it, info = {}) {
         return `<div class="mq-judge mq-tf">`
             + `<div class="mq-judge-work">${work}</div>`
             + judgeGroup('tf-judge', `${checkLine('tf-true', 'True', c, key, { graded: false })}${checkLine('tf-false', 'False', c, key, { graded: false })}`)
-            + `<div class="mq-frame">${esc(stem)}${writeLine('tf-ans', c, key, digits)}.</div>`
+            + (place.kind === 'none' ? '' : `<div class="${answerFrameCls(place)}">${esc(stem)}${answerPlaceHtml(place, 'tf-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
             + `</div>`;
     };
     return Object.assign({}, it, {
