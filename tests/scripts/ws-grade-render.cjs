@@ -25,6 +25,15 @@
 //                the page: check.problems) or a card-390 / card-820 touch target is under 44 x 44 px (RUBRIC H6); last line
 //                `ws-grade-render: OK|FAIL`. ws-precritic --skill runs it on the lane skills' lesson, test and independent
 //                pages at S, M and L (visual-quality critic r1: F3 and F4 were measured here and failed nothing)
+// --raster-fit  LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3, a Scripted Model whose Say band ran
+//                6 mm past its frame and showed ONLY in the printed PDF): every role sheet and key printed to a real PDF is
+//                rasterised and read by tests/lib/ws-role-raster.cjs - RR-PAGES (PDF pages = the plan's pageCount /
+//                keyPageCount), RR-EDGE (no ink within 5 mm of the paper's edge), RR-CLIP (every text span's tall glyphs
+//                inked at their tops and feet: clipped or covered text). Last line `ws-grade-render: OK|FAIL`; with
+//                --gate its findings join the gate's. ws-precritic runs it on scripted-model and guided at S / M / L
+//                (--skill: the lane skills; --role R: role R on its sample). --keep-pdf keeps the role PDFs.
+//                --raster-pdf <pdf> [--expect-pages N] reads one PDF (no browser); --raster-self-test checks the reader
+//                on PDFs it draws itself (no browser, ~1 s).
 // --roles r1,r2  renders each page role through the sheet engine (js/modules/print-sheet.js
 //                `buildSheet` -> `sheetDocument`), prints the pupil sheet and its key as two A4
 //                PDFs and rasterises them to <role>-p1.png ... and <role>-key-p1.png ..., recording
@@ -112,11 +121,27 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const { ROOT, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
 const G = require('../lib/ws-golden.cjs');
+const FONTS = require('../lib/ws-fonts.cjs');
 // MQ_GOLDEN_DUMP=1 writes each hashed canonical DOM beside its PNG (<file>.canon.html), to see why a hash moved
 const hashOf = (html, file) => { if (process.env.MQ_GOLDEN_DUMP && file) fs.writeFileSync(file.replace(/\.png$/, '') + '.canon.html', html); return G.contentHash(html); };
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = k => process.argv.includes('--' + k);
+const RR = require('../lib/ws-role-raster.cjs');
+const RASTER_FIT = has('raster-fit');
+if (has('raster-self-test')) {
+    const r = RR.selfTest();
+    for (const b of r.bad) console.log('  FAIL ' + b);
+    console.log(r.pass ? `ws-grade-render --raster-self-test: OK (${r.cases} cases)` : `ws-grade-render --raster-self-test: FAIL (${r.bad.length} of ${r.cases})`);
+    process.exit(r.pass ? 0 : 1);
+}
+if (arg('raster-pdf', null)) {
+    const exp = arg('expect-pages', null);
+    const r = RR.roleRaster(path.resolve(process.cwd(), arg('raster-pdf')), { expectPages: exp === null ? null : Number(exp) });
+    for (const f of r.findings) console.log(`  FAIL ${f.rule} ${f.msg}`);
+    console.log(r.pass ? `ws-grade-render: OK (${r.pages} page(s), ${r.spans} text spans read, ${r.engine})` : `ws-grade-render: FAIL - ${r.findings.length} raster finding(s)`);
+    process.exit(r.pass ? 0 : 1);
+}
 
 // ---- S4 modes (see the header)
 const TEMPLATE = arg('template', null);
@@ -414,6 +439,7 @@ async function renderPrinted(page, skill, dir) {
         await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });   // same origin, so relative assets resolve
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        await FONTS.awaitFonts(sheet);   // the PNGs the critic grades are drawn in Andika, not a fallback mid-load
         await sleep(250);
         const pdf = path.join(dir, 'print.pdf');
         await sheet.pdf({ path: pdf, format: 'A4', printBackground: false, preferCSSPageSize: true });
@@ -483,8 +509,10 @@ async function printDoc(page, html, pdfPath) {
         await sheet.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 });
         await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
         await sheet.evaluate(() => document.fonts && document.fonts.ready);
+        const fontWait = await FONTS.awaitFonts(sheet, { faces: ['700 28px Andika', '400 28px Andika'] });   // before check.andika (font-load race)
         await sleep(200);
         const check = await sheetCheck(sheet);
+        if (FONTS.isEnvError(fontWait)) check.fontsEnvError = FONTS.describe(fontWait);   // the font never arrived: environment, not the page
         // S4: the content hash of each printed page (canonical DOM, not pixels) and its measured numbers
         check.pageHashes = (await sheet.evaluate(G.canonicalPagesInPage, '.ws-page')).map((h, i) => hashOf(h, pdfPath.replace(/\.pdf$/, `-p${i + 1}.png`)));
         check.measured = await sheet.evaluate(G.measurePagesInPage);
@@ -528,9 +556,11 @@ async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts =
     const checkK = await printDoc(page, built.key, pdfK);
     const pages = rasterisePrefix(pdfP, dir, prefix);
     const keyPages = rasterisePrefix(pdfK, dir, `${prefix}-key`);
-    fs.unlinkSync(pdfP); fs.unlinkSync(pdfK);
+    // --raster-fit: what only the printed PDF shows (RR-PAGES / RR-EDGE / RR-CLIP; tests/lib/ws-role-raster.cjs)
+    const raster = RASTER_FIT ? [RR.roleRaster(pdfP, { expectPages: built.pageCount, label: `${prefix} pupil` }), RR.roleRaster(pdfK, { expectPages: built.keyPageCount, label: `${prefix} key` })] : null;
+    if (!has('keep-pdf')) { fs.unlinkSync(pdfP); fs.unlinkSync(pdfK); }
     const { pupil, key, ...rest } = built;
-    return { ...rest, role, size, opts: supOpts[0] || null, pages, keyPages, check: checkP, keyCheck: checkK };
+    return { ...rest, role, size, opts: supOpts[0] || null, pages, keyPages, check: checkP, keyCheck: checkK, ...(raster ? { raster } : {}) };
 }
 
 // ---------------------------------------------------------------- S4: --template, the envelope sample
@@ -1087,6 +1117,23 @@ td{padding:3px 0;word-break:break-word}`;
     }
     console.log(`ws-grade-render: done, ${manifest.length} units, ${records.length} pages, ${((Date.now() - t0) / 1000).toFixed(0)}s`);
     for (const e of errs.slice(0, 12)) console.log('  ERROR ' + e);
+    // --raster-fit findings (RR-*), per role sheet
+    const rasterBad = [];
+    let rasterRead = 0;
+    if (RASTER_FIT) for (const m of manifest) for (const [, v] of Object.entries(m.roles || {})) {
+        if (!v || !v.raster) continue;
+        rasterRead++;
+        for (const r of v.raster) for (const f of r.findings) rasterBad.push(`${f.rule} ${m.skill} ${f.msg}`);
+    }
+    if (RASTER_FIT && !GATE) {
+        for (const b of rasterBad.slice(0, 30)) console.log('  FAIL ' + b);
+        if (errs.length) console.log(`ws-grade-render: FAIL - ${errs.length} render error(s)`);
+        else if (!rasterRead) console.log('ws-grade-render: FAIL - --raster-fit read no role sheet (nothing judged)');
+        else if (rasterBad.length) console.log(`ws-grade-render: FAIL - ${rasterBad.length} raster finding(s) on ${rasterRead} role sheet(s) (RR-PAGES / RR-EDGE / RR-CLIP)`);
+        else console.log(`ws-grade-render: OK (${rasterRead} role sheet(s) printed to PDF and rasterised: pages as planned, no ink at the edge, no clipped text)`);
+        if ((errs.length || rasterBad.length || !rasterRead) && !REPORT_ONLY) process.exit(1);
+        return;
+    }
     if (GATE) {
         // --gate (visual-quality critic r1, root cause of F3 / F4): what this renderer MEASURES but nothing failed on -
         // a cell, the body or the page overflowing on any rendered role page or its key (`check.problems`: content in
@@ -1103,10 +1150,11 @@ td{padding:3px 0;word-break:break-word}`;
                 for (const t of (v.measure.smallTargets || [])) bad.push(`TARGET ${m.skill} ${k}: <${t.tag} class="${t.cls}"> ${t.w} x ${t.h} px (under 44 px, H6)`);
             }
         }
+        bad.push(...rasterBad);
         const units0 = manifest.length;
         for (const b of bad.slice(0, 30)) console.log('  FAIL ' + b);
         if (errs.length) console.log(`ws-grade-render: FAIL - ${errs.length} render error(s)`);
-        else if (bad.length) console.log(`ws-grade-render: FAIL - ${bad.length} finding(s) (${bad.filter((b) => /^OVERFLOW/.test(b)).length} overflow, ${bad.filter((b) => /^TARGET/.test(b)).length} small target) in ${units0} unit(s)`);
+        else if (bad.length) console.log(`ws-grade-render: FAIL - ${bad.length} finding(s) (${bad.filter((b) => /^OVERFLOW/.test(b)).length} overflow, ${bad.filter((b) => /^TARGET/.test(b)).length} small target${RASTER_FIT ? `, ${rasterBad.length} raster` : ''}) in ${units0} unit(s)`);
         else console.log(`ws-grade-render: OK (${units0} unit(s): no overflow on any role page, no phone / tablet card target under 44 px)`);
         if ((errs.length || bad.length) && !REPORT_ONLY) process.exit(1);
         return;

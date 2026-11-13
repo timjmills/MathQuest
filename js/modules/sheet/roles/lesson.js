@@ -64,6 +64,7 @@ import { warmShape } from '../lesson-pages/warm-up.js';
 import { pickWeDo, stepsItem } from '../lesson-pages/we-do.js';
 import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.js';
 import { sheetBands, lessonPart } from '../lesson-pages/index.js';
+import { VOCAB_MIN, ROWFIT_SLACK_MM, BAND_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
 
 // (The role's earlier exports, now homed in the builders.)
 export { reflowsAt, winShare, CASE_TESTS, pickExample, pickSecond, otherExamples, pickWeDo, stateGroups, hopsSvg, roundLineSvg, roundLineMm, roundLinePad };
@@ -154,9 +155,15 @@ export function extras(input = {}) {
     // has been modelled.
     const mixFinals = ex && !ex2 && ex.q && ex.q.divMix ? sameFactForms(ex) : [];
     out.push(...finalItems(mixFinals.length ? mixFinals : [{ it: ex2, label: lab('second') }, { it: ex3, label: lab('third') }, { it: ex4, label: lab('fourth') }]));
-    const v = vocabItem(data && data.vocab, input.seed);
+    // (lf-partopts: `lesson.partN.vocab` - the teacher's word count, 0 = no Vocabulary band; absent: the lesson's own)
+    const vN = lesson.partN && Number.isFinite(lesson.partN.vocab) ? lesson.partN.vocab : null;
+    // (at 0 the full match is still measured, flagged off: the Parts table probes the words back - roles/lesson.js sheetOffers)
+    const v = vocabItem(data && data.vocab && vN !== null && vN > 0 ? data.vocab.slice(0, vN) : data && data.vocab, input.seed);
+    if (v && vN === 0) v.lessonVocabOff = true;
     if (v) out.push(v);
-    if (steps.length) { out.push(stepsItem(data, steps)); out.push(stripItem(data, steps)); }
+    // (critic A r2 N2: Remember off takes the rule with it - the chant under the Steps list is the same rule; lesson.partN)
+    const remOff = !!(lesson.partN && lesson.partN.remember === false);
+    if (steps.length) { out.push(stepsItem(remOff && data ? Object.assign({}, data, { chant: '' }) : data, steps)); out.push(stripItem(data, steps)); }
     // The Independent rows are drawn at level 1, but the pool was measured at the Guided cells'
     // level 3 (heads, grey boxes): a level-1 twin of each item is measured for the rows' height.
     for (const it of main) if (it !== ex) out.push(Object.assign({}, it, { measured: null, measureLevel: 1, lessonIndepOf: it, pool: 'extra' }));
@@ -172,14 +179,139 @@ export function plan(input = {}) {
     if (own && typeof own.plan === 'function') return partPlan(own, input);
     // Warm-up rows per item kind (critic SU-C r2 N2): when split rows would push the sheet onto
     // another page, the shared row is kept (the page count never grows for the split).
+    // (lf-partopts §8: the values each lesson-sheet part may take on THIS sheet - probed first, the plan drawn last, so a
+    // probe leaves nothing behind on the items the plan draws)
+    const part = (input.lesson && input.lesson.part) || 'all';
+    const offer = !input._probe && part !== 'chart' ? sheetOffers(input) : null;
+    const p = planMain(input);
+    if (offer && p.meta) p.meta.partOffer = offer;
+    return p;
+}
+
+function planMain(input) {
     const p1 = planOnce(input);
     if (!p1._warmSplit || input._warmShared) return p1;
     const p0 = planOnce(Object.assign({}, input, { _warmShared: true }));
     return (p1.pages || []).length > (p0.pages || []).length ? p0 : p1;
 }
 
+/* ============================================================ lf-partopts: what each sheet part may offer */
+
+/** The lesson-sheet parts the teacher may change (design/partopts/DESIGN.md §3, §8b). */
+const SHEET_PARTS = ['vocab', 'remember', 'wedo', 'rows'];
+/** True when the teacher changed a part of the lesson SHEET (the chart, Practice and Mixed are other pages). */
+export const sheetChanged = (partN) => !!partN && SHEET_PARTS.some((k) => partN[k] !== undefined);
+/** The fewest share of a sheet page its blocks must use (EB-PAGE: 30 % empty fails; the last of 2+ pages: H5, half used). */
+// (the planner's used share reads 2-6 % fuller than the printed page measures - the body under the frame prints taller than the
+// plan's budget - so a floor of 0.72 printed a 30 % foot, EB-PAGE; 0.76 keeps the printed foot under 30 %: design/partopts/DESIGN.md
+// §8d has the measured gap, and ws-partopts-unit FILL-BT pins it)
+export const SHEET_FILL_MIN = 0.76;
+/** The row test's plan-to-print margin (EB-ROWFIT): part-opts.js ROWFIT_SLACK_MM (DESIGN §8d; ws-partopts-unit ROWFIT-BT pins it). */
+export { ROWFIT_SLACK_MM };
+export const SHEET_LAST_FILL_MIN = 0.55;
+/** The most a changed sheet's We Do band may stand over its cells' content height (EB-BAND, div_facts at M and L). */
+export const WEDO_STRETCH_MAX = 1.3;
+/** A planned cell's EB-BAND key: the template, the columns it was measured at, its height to the mm (the unit gate's excuse key). */
+const bandKey = (c) => `${c.tmpl}|${c.cols}|${Math.round(c.hMm)}`;
+/** The cells of a plan that would fail EB-BAND (part-opts.js bandFails on the bridge's measured neededMm). */
+const bandBad = (pl) => ((pl && pl.meta && pl.meta.cellBands) || []).filter((c) => c.fails);
+const fillOk = (pl, stdBad) => {
+    // (a We Do band stretched far past its cells' content - by the Steps beside it - leaves a 30 % band in its cells, H13)
+    if (pl && pl.meta && pl.meta.weDoStretch > WEDO_STRETCH_MAX) return false;
+    // (A r3, EB-BAND: no planned cell whose empty band under its ink would reach 30 % - a cell the STANDARD sheet already draws
+    // the same (template, columns, height) with that band is the standard's own, as the unit gate excuses it)
+    if (bandBad(pl).some((c) => !(stdBad && stdBad.has(bandKey(c))))) return false;
+    // (critic A r2 N1, EB-ROWFIT: a sheet with no lesson rows whose foot still holds one row and its band head is not offered -
+    // the freed height goes to rows, or the value is not on the stepper; part-opts.js rowFits, the unit gate's own predicate)
+    const mt = (pl && pl.meta) || {};
+    if (!(mt.independent > 0) && rowFits(mt.sheetFreeMm, mt.indepRowMm, ROWFIT_SLACK_MM)) return false;
+    const f = (pl && pl.meta && pl.meta.sheetFill) || [];
+    return f.length > 0 && f.every((v, i) => v >= (f.length > 1 && i === f.length - 1 ? SHEET_LAST_FILL_MIN : SHEET_FILL_MIN));
+};
+
+/**
+ * For the teacher's counts as they stand (`lesson.partN`), the values each sheet part may take with the others held: a value
+ * is offered only where the sheet it plans fills its page (every page at least SHEET_FILL_MIN used, a last page of two or
+ * more at least SHEET_LAST_FILL_MIN - no near-empty foot, no stub page), prints the count asked, and - for fewer, wider
+ * We Do or lesson-row cells - keeps each cell's ink at least half its width (EB-SIDE). The part's own auto value (what it
+ * prints when the teacher leaves it) is always offered. Returns {vocab, remember, wedo, rows} - each {dflt, values, canOff}.
+ */
+function sheetOffers(input) {
+    const lesson = input.lesson || {};
+    const base = Object.assign({}, lesson.partN || {});
+    const run = (pn) => {
+        const keep = Object.fromEntries(Object.entries(pn).filter(([, v]) => v !== undefined));
+        return planMain(Object.assign({}, input, { _probe: true, lesson: Object.assign({}, lesson, { partN: Object.keys(keep).length ? keep : undefined }) }));
+    };
+    const without = (p) => { const o = Object.assign({}, base); delete o[p]; return o; };
+    // (A r3: the standard sheet's own EB-BAND cells - excused, as the unit gate excuses them)
+    const stdBad = new Set(bandBad(run({})).map(bandKey));
+    const ok = (pl) => fillOk(pl, stdBad);
+    const out = {};
+    const data = lesson.data || null;
+    // Vocabulary: 0 (the band off) .. the lesson's words
+    const W = data && Array.isArray(data.vocab) ? Math.min(3, data.vocab.length) : 0;
+    if (W > 0) {
+        const vals = [];
+        // (critic A r2 N4: a match of one pair is no task - 1 word is never offered where the lesson has more)
+        const lo = W >= VOCAB_MIN ? VOCAB_MIN : 1;
+        for (let v = 0; v < W; v++) { if (v > 0 && v < lo) continue; const pl = run(Object.assign(without('vocab'), { vocab: v })); if (ok(pl)) vals.push(v); }
+        vals.push(W);
+        out.vocab = { dflt: W, values: vals.filter((v) => v >= lo), canOff: vals.includes(0) };
+    }
+    // Remember: on / off
+    if (data && data.concepts && data.concepts[0]) {
+        const pl = run(Object.assign(without('remember'), { remember: false }));
+        out.remember = { dflt: 1, values: [1], canOff: ok(pl) };
+    }
+    // We Do: 0 (the band off), 1 .. the cells that fit
+    const a = run(without('wedo'));
+    const K = (a.meta && a.meta.guided) || 0;
+    if (K > 0) {
+        const vals = [];
+        for (let k = 0; k < K; k++) {
+            const pl = run(Object.assign(without('wedo'), { wedo: k }));
+            if (ok(pl) && pl.meta.guided === k && (k === 0 || pl.meta.weDoSideOk !== false)) vals.push(k);
+        }
+        vals.push(K);
+        out.wedo = { dflt: K, values: vals.filter((v) => v > 0), canOff: vals.includes(0) };
+    }
+    // Lesson practice rows: 0 (none) .. the rows that fit
+    const r = run(without('rows'));
+    const per = (r.meta && r.meta.partFit && r.meta.partFit.perRow) || 1;
+    const R = Math.round(((r.meta && r.meta.independent) || 0) / per);
+    if (R > 0) {
+        const vals = [];
+        for (let k = 0; k < R; k++) { const pl = run(Object.assign(without('rows'), { rows: k })); if (ok(pl) && Math.round((pl.meta.independent || 0) / per) === k) vals.push(k); }
+        vals.push(R);
+        out.rows = { dflt: R, values: vals.filter((v) => v > 0), canOff: vals.includes(0), perRow: per };
+    } else out.rows = { dflt: 0, values: [], canOff: true, perRow: per, none: true, noRoom: !((r.meta && r.meta.partFit && r.meta.partFit.rows) > 0) && !(r.meta && rowFits(r.meta.sheetFreeMm, r.meta.indepRowMm, ROWFIT_SLACK_MM)) };
+    return out;
+}
+
+/** The planned cells of grids {grid, items, cols}: each cell's height (the grid's, as grown) and the empty band under its ink. */
+function cellBandsOf(list) {
+    const out = [];
+    for (const bc of list) {
+        if (!bc || !bc.grid) continue;
+        const H = parseFloat(bc.grid.height) / (bc.grid.rows || 1);
+        if (!(H > 0)) continue;
+        for (const it of bc.items || []) {
+            const mm = it && it.measured && it.measured[bc.cols];
+            if (!mm || !(mm.neededMm > 0)) continue;
+            const below = H - mm.neededMm;
+            // (the printed band reads up to ~1 mm wider than planned near the line: BAND_SLACK_MM, DESIGN §8d)
+            out.push({ tmpl: it.template || '', cols: bc.cols, hMm: +H.toFixed(1), belowMm: +below.toFixed(1), fails: bandFails(below + BAND_SLACK_MM, H) });
+        }
+    }
+    return out;
+}
+
 /** The parts this role plans itself ('all' draws the chart and the sheet, as before). */
 const OWN_PARTS = new Set(['all', 'chart', 'sheet']);
+/** How far a band may grow (a share of its height) on a sheet whose parts the teacher changed (lf-partopts §8b): not at all -
+ * the cells' own measured room is their room; the page fills with whole rows or the value is not offered. */
+export const SHEET_GROW_CAP = 0.1;
 
 /** A registered lesson part's plan: its pages in the lesson's frame (title, tab = the part's name, tags). */
 function partPlan(def, input) {
@@ -211,7 +343,9 @@ function planOnce(input = {}) {
     const part = lesson.part || 'all';
     const { ex2: example2, ex3: example3, ex4: example4 } = otherExamples(input, example, data);
     const finals = extrasList.filter((x) => x.lessonFinal !== undefined);
-    const vocab = extrasList.find((x) => x.lessonVocab);
+    // (lf-partopts: Vocabulary 0 - the match is measured but not drawn; a count under the measured one draws on its height)
+    const vN0 = lesson.partN && Number.isFinite(lesson.partN.vocab) ? lesson.partN.vocab : null;
+    const vocab = vN0 === 0 ? null : extrasList.find((x) => x.lessonVocab);
     const stepsZone = extrasList.find((x) => x.lessonSteps);
     const labels = labelStyleOf(ctx.look, input.labels);
     const tabId = `Lesson ${lesson.number || 1}`;
@@ -285,13 +419,18 @@ function planOnce(input = {}) {
         let left = spare;
         let carry = 0;   // (what a band's `maxAdd` refused, passed to the bands after it)
         for (const [gi, g] of grows.entries()) {
-            const cap0 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            const cap00 = wide && g.capIfEmpty !== undefined ? g.capIfEmpty : (g.cap !== undefined ? g.cap : 0.35);
+            // (lf-partopts §8b: with the teacher's counts the height a band gave up goes first to more Independent rows
+            // (practice.js), not to taller bands (SHEET_GROW_CAP 0: a band grown a tenth passed a 30 % empty band in div_facts' cells, H13);
+            // a value whose sheet still cannot fill its page is not offered, sheetOffers. Absent: as before.)
+            const cap0 = sheetChanged(lesson.partN) ? Math.min(cap00, SHEET_GROW_CAP) : cap00;
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
             const share = data && data.growAll ? left / (grows.length - gi) : spare / grows.length + carry;
             const add0 = Math.min(share, g.h * cap);
             const add = g.maxAdd !== undefined ? Math.min(add0, g.maxAdd) : add0;
             carry = data && data.growAll ? 0 : add0 - add;
             left -= add;
+            pg.grown = (pg.grown || 0) + add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
             if (g.box) g.box.html = g.box.html.replace(/height:[\d.]+mm/, `height:${(g.h + add).toFixed(2)}mm`);
         }
@@ -303,8 +442,20 @@ function planOnce(input = {}) {
     let zoom = 0;
     let secondShown = 0;
     let chartSizing = null;
+    let chartDesigned = 0, chartMin = 0;
     if (states.length && part !== 'sheet') {
-        const chart = chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, second, extrasList.find((x) => x.lessonTail), finals, extrasList.find((x) => x.lessonTailPanel));
+        const chartOf = (sec, fin) => chartPage(input, ctx, data, example, states.filter((s) => s.lessonState !== undefined), draws, sec, extrasList.find((x) => x.lessonTail), fin, extrasList.find((x) => x.lessonTailPanel));
+        // (lf-partopts: `lesson.partN.chart` - n worked examples, 1 .. the chart's own design; the design is the chart laid
+        // out uncapped, so the Parts table's range never moves with the teacher's choice)
+        const cN = lesson.partN && Number.isFinite(lesson.partN.chart) ? Math.max(1, lesson.partN.chart) : null;
+        let chart = chartOf(second, finals);
+        chartDesigned = 1 + (chart.second || 0);
+        // (a count is offered only where the chart laid out with that many examples keeps its planned size - sizing.ok: the
+        // fewer examples of a grid chart can leave its panels taller than the page holds, lesson 7 D1)
+        const capped = (k) => chartOf(k >= 2 && chart.mode === 'row' ? second : [], k >= 2 ? finals.slice(0, k - 1) : []);
+        chartMin = chartDesigned;
+        for (let k = 1; k < chartDesigned; k++) { const c = capped(k); if (c.sizing && c.sizing.ok && 1 + (c.second || 0) === k) { chartMin = k; break; } }
+        if (cN !== null && cN < chartDesigned) { const c = capped(Math.max(cN, chartMin)); if (c.sizing && c.sizing.ok) chart = c; }
         zoom = chart.zoom;
         secondShown = chart.second;
         chartSizing = chart.sizing;
@@ -322,6 +473,15 @@ function planOnce(input = {}) {
             example2: secondShown && example2 ? String((example2.q && example2.q.text) || '') : '', part, chartSizing,
             example2Found: example2 ? String((example2.q && example2.q.text) || '') : '',
             example3: example3 ? String((example3.q && example3.q.text) || '') : '', example4: example4 ? String((example4.q && example4.q.text) || '') : '', bandSizes,
+            // (lf-partopts: each part's own fit before the teacher's counts - print-sheet.js reports it as res.lesson.partFit)
+            // (lf-partopts: each sheet page's used share after the bands grew - sheetOffers reads it; We Do's ink check)
+            sheetFill: part === 'chart' ? [] : pages.map((pg) => +((pg.used + (pg.grown || 0)) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoStretch: env.weDoStretch,
+            // (critic A r2 N1: the last sheet page's free height and the height one Independent row with its head takes)
+            sheetFreeMm: part === 'chart' || !pages.length ? null : +Math.max(0, pages[pages.length - 1].budget - pages[pages.length - 1].used - (pages[pages.length - 1].grown || 0)).toFixed(1),
+            indepRowMm: pages.length ? pages[pages.length - 1].indepRowMm || null : null,
+            // (A r3: every We Do and lesson-row cell as planned - its height and the empty band its measured ink leaves, EB-BAND)
+            cellBands: part === 'chart' ? [] : cellBandsOf([env.weDoCells, ...pages.flatMap((pg) => pg.bandCells || [])]),
+            partFit: { chart: chartDesigned, chartMin, wedo: env.weDoFit !== undefined ? env.weDoFit : weDo.length, wedoMin: env.weDoMin, rows: cur.indepFit ? cur.indepFit.rows : 0, perRow: cur.indepFit ? cur.indepFit.ic : 0, remember: lesson.partN && lesson.partN.remember === false ? !!(data && data.concepts && data.concepts[0]) : groups.some((g) => g.sections[0] && (g.sections[0].label === 'Remember:' || g.sections[0].label === 'Rule:')) },
             // the chart's items themselves (the detailed lesson maker reads its scripts' numbers from them)
             exampleQs: [example, example2, example3, example4].filter(Boolean).map((x) => x.q),
             fits: [{ cols: 1, rows: out.length, line: `Fits: an anchor chart of ${states.length} steps, ${warmCount} warm-up, ${weDo.length} guided and ${indep.length} independent on ${out.length} page${out.length > 1 ? 's' : ''}.` }],

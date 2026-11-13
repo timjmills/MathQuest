@@ -89,6 +89,21 @@ function selfTest() {
 }
 
 (async () => {
+    // --fixture f.html [--fixture-role r] [--fixture-key] [--rules R,..]: the checks on ONE saved page (ws-backtest fixture rows - a
+    // finding with no failing commit, e.g. RI-DISTINCT / ABTAG); `ws-cell-checks: OK` / `FAIL - n finding(s)`
+    if (arg('fixture', null)) {
+        const app = await H.open({});
+        const sheet = await app.browser.newPage();
+        await sheet.setViewport({ width: 900, height: 1200 });
+        const html = fs.readFileSync(path.resolve(arg('fixture')), 'utf8');
+        await sheet.setContent(html, { waitUntil: 'load' });
+        const r = await sheet.evaluate(cellChecksInPage, { role: arg('fixture-role', ''), key: has('fixture-key'), h13abs: false });
+        const got = [...(r.problems.length ? r.problems.map((m) => ({ rule: 'OVERFLOW', msg: m })) : []), ...r.findings].filter((f) => RULES.includes(f.rule));
+        for (const f of got) console.log(`  FAIL ${f.rule} ${f.msg}`);
+        console.log(got.length ? `ws-cell-checks: FAIL - ${got.length} finding(s) on the fixture` : 'ws-cell-checks: OK (fixture, no finding)');
+        await app.close();
+        process.exit(got.length ? 1 : 0);
+    }
     if (has('self-test')) {
         const app = await H.open({});
         const sheet = await app.browser.newPage();

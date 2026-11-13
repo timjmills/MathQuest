@@ -12,7 +12,9 @@
 #   bash tests/scripts/ws-deploy-gates.sh --session 2       # ws-screen-slots + ws-chromebook-fit, sharded over the two
 #                                                           # browser slots, + viewport, S9 and the board / dark sweeps
 #   bash tests/scripts/ws-deploy-gates.sh --session 3       # coverage matrix (budgeted), digests hook, owner go
-#   bash tests/scripts/ws-deploy-gates.sh --all             # sessions 1, 2, 3 in sequence
+#   bash tests/scripts/ws-deploy-gates.sh --session 4       # ws-lesson-baseline --all-lessons --check (every lesson page
+#                                                           # vs the pin; ≈ 13 min on one slot)
+#   bash tests/scripts/ws-deploy-gates.sh --all             # sessions 1, 2, 3, 4 in sequence
 #   bash tests/scripts/ws-deploy-gates.sh --session 3 --accept-notyet digests
 #                                                           # the lead accepts a named NOT YET gate (logged)
 #   bash tests/scripts/ws-deploy-gates.sh --deploy-check [--lanes-dir design/lanes] [--status-dir design/status]
@@ -38,7 +40,8 @@
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
 #            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
-#            --self-test, ws-text-vs-gen (claims vs the generator), ws-backtest --kind fixture (the S2 checks still
+#            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
+#            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
 #            catch their fixtures), ws-lessonfit (every year's WRM site-lesson gate) and ws-options-pin --gate design/audit/matrix (critic r4 D1: READ-ONLY, node only,
 #            no browser slot, seconds: it folds the nightly's options-pin-*.json by `finished`, newest result per skill;
 #            FAIL on a NEW failing pair of a live skill that no later check fixed, WARNING while fewer than 28 slices
@@ -86,6 +89,16 @@
 #            The matrix's exit 2 within the budget (rows selected, none checkable) is NOTHING RUN.
 #            Flake re-run (N7): only the rows the first inline run found red (--rows), never the whole budget.
 #            Then the digests hook (M4 record/replay) prints NOT YET, and the owner-go check.
+# Session 4  ws-lesson-baseline --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check
+#            design/audit/baselines/lesson-baseline.json (lead ruling 2026-11-13; LESSONS_LEARNED process rule 0c, which
+#            was a lane rule and is now a deploy gate): every page of every lesson master prints (the three samples, every
+#            key of lessons/prereqs.js LESSONS, every detailed lesson; L and S, seeds 4242 and 1) is byte-identical to the
+#            pin, and every lesson the tree prints is pinned (UNPINNED fails). ≈ 13 min on one browser slot: in its own
+#            session because sessions 1-3 each sit at 27-28 min of their 30-min budget (MQ_LESSON_BASELINE_SESSION moves it).
+#            RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the pin in the same deploy commit
+#            (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write <the pin>) and the
+#            commit message names the changed lessons / pages; the gate fails until then (no lesson page changes unseen).
+#            No pin in the tree: the gate is SKIPPED (INCOMPLETE). Backtest row lesson-baseline-deploy-gate.
 # Prerequisites, checked before any session runs: PyMuPDF (python3 -c "import fitz"; fix: pip install pymupdf),
 # puppeteer, flock. A missing one fails at once with its fix.
 #
@@ -114,6 +127,7 @@ SLOTS_BASE=design/audit/baselines/screen-slots.json
 PRINT_BASE=design/audit/baselines/print-lint.json
 SAMPLE=tests/fixtures/precritic/sweep-sample.json
 VIEWPORT_BASE=design/audit/baselines/viewport-check.json
+LESSON_BASE=design/audit/baselines/lesson-baseline.json
 SLOTS_SHARDS=${MQ_SLOTS_SHARDS:-4}
 FIT_SHARDS=${MQ_FIT_SHARDS:-2}
 MATRIX_SHARDS=${MQ_MATRIX_SHARDS:-2}
@@ -123,7 +137,7 @@ PRINT_LINT_LIMIT=${MQ_PRINT_LINT_LIMIT:-461/33}
 COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
 [ -n "$(git status --porcelain 2>/dev/null | grep -v '^??' | head -n 1)" ] && COMMIT="$COMMIT+dirty"
 
-usage() { sed -n '2,37p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,39p' "$0" | sed 's/^# \{0,1\}//'; }
 MATRIX_DIR=${MQ_MATRIX_DIR:-design/audit/matrix}
 MATRIX_BUDGET=${MQ_MATRIX_BUDGET:-500}
 ACCEPT_NOTYET=()
@@ -643,6 +657,17 @@ self_test() {
      && ! printf '%s\n' "${G_CMD[@]}" | grep -q 'ws-options-pin.cjs --check'; then echo "  ok   session 1 lists the read-only options gate (nfn, --gate) and never ws-options-pin --check"
   else echo "  FAIL session 1's options gate is not the read-only --gate"; bad=1; fi
   G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
+  # the lesson-baseline deploy gate (lead ruling 2026-11-13, process rule 0c): session 4, a browser gate when the pin is
+  # in the tree, carrying --all-lessons --unpinned --check $LESSON_BASE; SKIPPED when the pin is not there
+  build_list
+  if for i in "${!G_NAME[@]}"; do [ "${G_SES[$i]}" = 4 ] && [[ "${G_NAME[$i]}" == "ws-lesson-baseline --all-lessons --check" ]] && [ "${G_KIND[$i]}" = browser ] && [[ "${G_CMD[$i]}" == *"--all-lessons"* && "${G_CMD[$i]}" == *"--unpinned"* && "${G_CMD[$i]}" == *"--check $LESSON_BASE" ]] && echo yes; done | grep -q yes; then echo "  ok   session 4 lists the lesson-baseline gate (browser, --all-lessons --unpinned --check $LESSON_BASE)"
+  else echo "  FAIL session 4's lesson-baseline gate is missing or wrong: $(for i in "${!G_NAME[@]}"; do [ "${G_SES[$i]}" = 4 ] && echo "${G_KIND[$i]} ${G_CMD[$i]}"; done)"; bad=1; fi
+  G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
+  # with no pin in the tree, the gate is SKIPPED (INCOMPLETE), never silently absent (subshell: the override cannot leak)
+  if ( LESSON_BASE=$tmp/no-such-pin.json; G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=(); build_list
+       for i in "${!G_NAME[@]}"; do [ "${G_SES[$i]}" = 4 ] && [[ "${G_NAME[$i]}" == "ws-lesson-baseline --all-lessons --check" ]] && [ "${G_KIND[$i]}" = skip ] && echo yes; done | grep -q yes ); then echo "  ok   no pin in the tree: the lesson-baseline gate is SKIPPED (INCOMPLETE), not absent"
+  else echo "  FAIL no-pin lesson-baseline gate not SKIPPED"; bad=1; fi
+  G_SES=(); G_KIND=(); G_NAME=(); G_CMD=(); G_KEY=()
   # A8: the deploy-list time budget, on the timings of the 2026-10-23 timed runs (tests/fixtures/precritic/deploy/budget)
   echo "-- A8: the deploy-list time budget (timings of the 2026-10-23 timed runs, 30-min budget)"
   local bx=$fx/budget
@@ -857,6 +882,8 @@ build_list() {
   node_gate 1 "ws-envelope --self-test" "$(first_of ws-envelope.mjs ws-envelope.cjs)" --self-test
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
+  node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
+  node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no
   # browser slot, seconds); it never runs the pin itself (the whole pin is ≈ 1 h 52 min on the two slots). On a node
@@ -893,6 +920,12 @@ build_list() {
   exclusive_gate "${MQ_PERF_SESSION:-3}" "ws-chromebook-perf --only load,play" ws-chromebook-perf.cjs --only load,play
   add 3 notyet "digests hook (M4 record/replay)" "the tip's digests (§1.6.2, ≈ 8 min) need M4 record/replay, which is not built; before M4 the lead accepts this one item by name: --accept-notyet digests" digests
   add 3 fn "owner go (lane manifests)" "deploy_check design/lanes design/status"
+  # session 4 (lead ruling 2026-11-13, process rule 0c as a deploy gate): every lesson page master prints vs the pin
+  # (≈ 13 min, one slot). RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes $LESSON_BASE in the same
+  # deploy commit (ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --write $LESSON_BASE) and the
+  # commit message names the changed lessons / pages; until then this gate FAILS - no lesson page changes unseen.
+  if [ -f "$LESSON_BASE" ]; then browser_gate "${MQ_LESSON_BASELINE_SESSION:-4}" "ws-lesson-baseline --all-lessons --check" ws-lesson-baseline.cjs --all-lessons --sizes M,L --seeds 4242,1 --per-lesson --unpinned --check "$LESSON_BASE"
+  else add "${MQ_LESSON_BASELINE_SESSION:-4}" skip "ws-lesson-baseline --all-lessons --check" "$LESSON_BASE (the pin is not in the tree)"; fi
 }
 
 # --accept-notyet: every name must be the key of a NOT YET gate on the list
@@ -1073,7 +1106,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --session) SESSIONS+=("$2"); shift ;;
     --accept-notyet) IFS=', ' read -r -a _acc <<< "$2"; ACCEPT_NOTYET+=("${_acc[@]}"); shift ;;
-    --all) SESSIONS=(1 2 3) ;;
+    --all) SESSIONS=(1 2 3 4) ;;
     --list) MODE=list ;;
     --budget) MODE=budget ;;
     --timings) TIMINGS_READ=$2; shift ;;
