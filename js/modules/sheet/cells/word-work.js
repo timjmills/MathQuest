@@ -1213,16 +1213,22 @@ function framesLayout(p, ctx) {
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
     let unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
     // (two-step round 3b: on paper the letter equation's unit word sits in the n = row - "n = [2] crayons" - not beside the
-    // whole work column, where it ran past a Reason It panel's edge by the equation row's width)
-    if (p.letter && !twin && unit && nRow) { rows = parts.eq + row(nRow + unit); unit = ''; }
+    // whole work column, where it ran past a Reason It panel's edge by the equation row's width; a narrow cell only - a full-width
+    // cell keeps the word beside the work, so an Error analysis judgement stands at one x a page, EA-ROWX)
+    if (p.letter && !twin && unit && nRow && Number(ctx.columns || 1) > 1) { rows = parts.eq + row(nRow + unit); unit = ''; }
     // (lf-hosts 2026-11-13, ws-phone-card CLIP-X: on screen the work column may shrink to the cell, so its rows wrap at 390 px
     // instead of running 18-34 px past the phone's edge; paper keeps its one-line rows)
     const work = `<div style="${twin ? 'flex:1 1 auto;min-width:0;' : 'flex:none;'}display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
     const tsBar = two ? twoStepBarFor(p, ctx) : '';
+    // (two-step round 3b, ws-empty-band EB-SIDE 33-42 % on the letter / estimate cells: the sentences, 95-130 mm, stood at the left
+    // of a 185 mm full-width cell. Centred under the story as the two step columns are (344435351), the space splits into two
+    // margins under the H13 30 %; the rows keep their left edge inside the block, so Step 1 still reads above Step 2. Only a
+    // one-column cell that is not worked wrong: an Error analysis judgement stands at one x a page (EA-ROWX), a Reason It panel
+    // (columns 3) is as narrow as its work.)
     // (the story starts level with the item tab, in a gutter beside it - the frames cell takes no tab spacer, CSS
     // .mq-wwframes in sheet-kit.css: lesson 7 r2, the exit slip half overflowed by 8 mm and content never shrinks)
     return `<div class="mq-ww mq-wwframes" data-ww-ops="${p.steps.map((x) => x.op).join(' ')}" data-read style="width:100%;box-sizing:border-box;color:${INK};font-family:'Andika','Open Sans',sans-serif;padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">${storyHTML(ctx, p, true)}`
-        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;flex-wrap:wrap;gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
+        + tsBar + `<div style="margin-top:${L(ctx, 2)};display:flex;align-items:flex-end;flex-wrap:wrap;${two && !twin && Number(ctx.columns || 1) === 1 && ctx.state !== 'wrong' ? 'justify-content:safe center;' : ''}gap:${L(ctx, 2.5)};">${work}${unit}</div></div>`;
 }
 
 /**
