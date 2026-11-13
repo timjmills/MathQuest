@@ -8606,6 +8606,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "copy-light-pipe-verdict",
+  "check": "lf-ops 2026-11-13 (count_by_tables, branch lf-ops-props 594642d49): precritic marked the copy-light row 'unparsed output': ws-copy-light ended with process.exit() while its stdout pipe (precritic's reader) still held queued output, so the log ended on a 'why not' line with no verdict. 30 skills through a slow pipe reproduce it",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light ends with process.exitCode (its verdict line always reaches a pipe)",
+  "browser": false,
+  "fail": {
+   "commit": "7a5bc902c",
+   "state": "the piped output stops mid 'why not' list: no 'ws-copy-light: OK|FAIL' line"
+  },
+  "pass": {
+   "commit": "82b8fbf44",
+   "state": "the verdict line is the last line"
+  },
+  "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_1k_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_100k_no_regroup,subtraction:sub_1m_no_regroup,subtraction:sub_2d_1d,addition:fact_family_sort,addition:add_wp_20_plain,addition:add_wp_10,subtraction:sub_wp_20,addition:add_wp_10_plain,addition:add_wp_20,subtraction:sub_wp_10,subtraction:sub_wp_10_plain,subtraction:sub_wp_20_plain,vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words,placevalue:expand,placevalue:identify,placevalue:unit_form,composing:number_word_form,placevalue:value,placevalue:combine,division:div_facts,placevalue:compare 2>/dev/null | (sleep 3; cat) | tail -1 | grep -q '^ws-copy-light: \\(OK\\|FAIL\\)' && echo 'pipe-verdict: OK' || echo 'pipe-verdict: FAIL (no verdict line through a pipe)'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

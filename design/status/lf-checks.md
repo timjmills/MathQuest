@@ -718,3 +718,9 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
 - copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
   multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
+- copy-light "unparsed" (lf-ops log, 594642d49): reproduced. ws-copy-light ended with process.exit(), which drops stdout
+  still queued for a pipe; precritic's reader got no verdict line. Fix: process.exitCode, plus the drawings / reasons lists
+  capped at 12. Row `copy-light-pipe-verdict` (30 skills through a slow pipe). The count-row key granularity lf-ops noted
+  (~290 skeletons from 384 items: values and blanks in the key) is the parked "too fine" item under COPYLIGHT-ADVISORY.
+- Other tools that end with process.exit() after a large output are at the same risk: parked (a lint: a ws-* tool's final
+  exit uses exitCode when its output can exceed the 64 KB pipe buffer).
