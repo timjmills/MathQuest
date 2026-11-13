@@ -4270,13 +4270,13 @@
    "browser": true,
    "fail": {
     "commit": "e3aa95d32",
-    "state": "EB-SUPBAND fires 12 on mult_facts array Test S/M/L (Test S cell 4 ~38%); div_facts array PASSes (the frame fills). master also fails (pre-existing unframed x array)"
+    "state": "EB-SUPBAND fires 114 across the default roles on mult_facts {support:array} (e.g. Test S cell 4 ~38%); div_facts array PASSes (the frame fills). master also fails (pre-existing unframed x array, 2 at S)"
    },
    "pass": {
     "commit": "TBD-divarray-r2",
     "state": "0 findings: the x array gets a band frame (or the rows size to the items)"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles test --sizes S,M,L --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
