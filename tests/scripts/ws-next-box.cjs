@@ -233,7 +233,8 @@ const YELLOW = 'rgb(242, 194, 0)';
                 }
             }
             // NB9 (lf-vocab r12, critic r11 #4: the caret moved to card 3): on the Match 3 worksheet, for EVERY card, focus its
-            // slot and Check: the active element is no vocab slot after Check, and every wrong slot's caret is transparent; the
+            // slot and Check: the active element is no vocab slot after Check, and every wrong slot's caret is transparent even when
+            // the pupil taps it again (focused: screen-cell.css shows a focused red digit box's caret); the
             // same on the practice card
             {
                 await page.reload({ waitUntil: 'networkidle2' });
@@ -254,7 +255,7 @@ const YELLOW = 'rgb(242, 194, 0)';
                         return new Promise((res) => setTimeout(() => {
                             const ae = document.activeElement;
                             const wrong = [...document.querySelectorAll('#worksheetView .mq-vm-box input.mq-live-wrong')];
-                            res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => getComputedStyle(w).caretColor).filter((c) => !/transparent|rgba\(0, 0, 0, 0\)/.test(c)) });
+                            res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => { w.focus(); const c = getComputedStyle(w).caretColor; w.blur(); return c; }).filter((c) => !/transparent|rgba\(0, 0, 0, 0\)/.test(c)) });
                         }, 400));
                     }, k);
                     judged++;
@@ -278,7 +279,7 @@ const YELLOW = 'rgb(242, 194, 0)';
                     return new Promise((res) => setTimeout(() => {
                         const ae = document.activeElement;
                         const wrong = [...document.querySelectorAll('#questionCard .mq-vm-box input.mq-live-wrong')];
-                        res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => getComputedStyle(w).caretColor).filter((x) => !/transparent|rgba\(0, 0, 0, 0\)/.test(x)) });
+                        res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => { w.focus(); const x = getComputedStyle(w).caretColor; w.blur(); return x; }).filter((x) => !/transparent|rgba\(0, 0, 0, 0\)/.test(x)) });
                     }, 400));
                 });
                 judged++;
