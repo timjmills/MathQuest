@@ -72,6 +72,7 @@ async function browser() {
     const app = await open({ seed: 1 });
     const T0 = Date.now();
     let builds = 0;
+    const cover = { cases: 0, wedo: 0, practice: 0, list: [] };
     try {
         const { page, browser } = app;
         let lessons = await page.evaluate(async () => Object.keys((await import('./js/modules/lessons/prereqs.js')).LESSONS));
@@ -80,23 +81,25 @@ async function browser() {
         if (arg('lessons')) lessons = lessons.filter((l) => arg('lessons').split(',').some((x) => l.id.startsWith(x)));
         const sizes = arg('sizes', 'M,L').split(',');
         const onlyParts = arg('parts') ? arg('parts').split(',') : null;
+        const onlyCombos = has('combos-only');
         const full = Number(arg('full', 0)) || 0;
         const po = await import(pathToFileURL(path.join(ROOT, 'js/modules/sheet/part-opts.js')).href);
+        const PAGES = 2;   // (Practice prints 2 pages, so a total count re-paginates and its last page is judged too)
 
-        const build = (skill, size, partOpts) => page.evaluate(async ({ skill, size, partOpts }) => {
+        const build = (skill, size, partOpts) => page.evaluate(async ({ skill, size, partOpts, PAGES }) => {
             try {
-                const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, partOpts });
+                const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: PAGES, mixed: true, partOpts });
                 const prac = (r.items || []).filter((it) => it.part === 'practice');
-                const pracPart = (r.lesson.parts || []).find((p) => p.part === 'practice');
+                const mixed = (r.items || []).filter((it) => it.part === 'mixed');
                 return {
                     pupil: r.pupilHtml, doc: window.sheetDocument(r.pupilHtml, 'x', { paper: 'A4' }), keyLen: (r.keyHtml || '').length, keyPages: r.keyPageCount, pages: r.pageCount,
                     fit: r.lesson.partFit, sizingOk: !r.chartSizing || r.chartSizing.ok !== false,
-                    got: { prereq: r.lesson.prereqCheck ? r.lesson.prereqCheck.length : null, wedo: r.lesson.teach && r.lesson.teach.guided, rowsItems: r.lesson.teach && r.lesson.teach.independent, practice: pracPart && pracPart.pages ? Math.ceil(prac.length / pracPart.pages) : null },
+                    got: { prereq: r.lesson.prereqCheck ? r.lesson.prereqCheck.length : null, wedo: r.lesson.teach && r.lesson.teach.guided, rowsItems: r.lesson.teach && r.lesson.teach.independent, practice: prac.length || null, mixed: mixed.length || null },
                 };
             } catch (e) { return { error: String((e && e.stack) || e).split('\n').slice(0, 2).join(' ') }; }
-        }, { skill, size, partOpts });
+        }, { skill, size, partOpts, PAGES });
 
-        // render a pupil document; read its cells (ws-empty-band), its overflow and its page fill per sheet
+        // render a pupil document; read its cells (ws-empty-band), its overflow, its page fill and each page's own markup hash
         const measure = async (doc) => {
             const sh = await browser.newPage();
             try {
@@ -112,29 +115,71 @@ async function browser() {
                     const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
                     const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;
                     const cellsOut = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => c.getBoundingClientRect().bottom > pr.bottom + 1).length;
-                    return { sheet: pg.getAttribute('data-ws-sheet') || '', over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, br.bottom - last) / br.height * 100) };
+                    let h = 0; const s = pg.outerHTML; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+                    return { sheet: pg.getAttribute('data-ws-sheet') || '', over: pg.scrollHeight > pg.clientHeight + 2 || cellsOut > 0, empty: Math.round(Math.max(0, br.bottom - last) / br.height * 100), h };
                 }));
-                return { cells, pages };
+                // (each cell's own markup and size: a cell drawn exactly as in the standard packet carries the standard's findings)
+                const sigs = await sh.evaluate(() => [...document.querySelectorAll('body > section.ws-page, body > .ws-page')].map((rt) => {
+                    const visible = (e) => { const cs = getComputedStyle(e); return cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity || '1') > 0.05; };
+                    return [...rt.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]') && visible(c)).map((c) => {
+                        const r = c.getBoundingClientRect(); let h = 0; const s = c.innerHTML; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+                        return `${h}|${Math.round(r.width)}|${Math.round(r.height)}`;
+                    });
+                }));
+                return { cells, pages, sigs };
             } finally { await sh.close(); }
         };
-        const findingsOf = (m, where) => {
+        // F12 (critic A r1): EVERY page judged on its own, the last page of each sheet included - never against the standard
+        // packet. EB-PAGE: a page 30 % or more empty under its last block fails; the last page of a sheet of 2 or more pages
+        // fails under half used (H5). EB-BAND / EB-SIDE / EB-EDGE: absolute, on every cell not drawn exactly (same markup, same size) as a
+        // cell of the standard packet (an unchanged cell is the standard packet's, graded by its own lane - critic A r1 F11b).
+        const findingsOf = (m, where, std) => {
             const out = [];
-            const sheetOf = (pi) => (m.pages[pi - 1] || {}).sheet || '';
-            judge(m.cells, where, (rule, w, msg) => { if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule)) out.push({ key: `${rule}|${sheetOf(Number((/ p(\d+) /.exec(w) || [])[1]))}`, msg: `${w}: ${msg}` }); }, 'lesson');
-            m.pages.forEach((p, i) => { const nx = m.pages[i + 1]; if (nx && nx.sheet === p.sheet && p.empty >= 30) out.push({ key: `EB-PAGE|${p.sheet}`, msg: `${where} p${i + 1} (${p.sheet}): ${p.empty} % of the page body empty under its last block` }); });
+            const changed = (pi) => !std || !std.pages.has((m.pages[pi - 1] || {}).h);
+            // (EB-SIDE / EB-EDGE read the width: the same markup at the same width is the standard's cell; EB-BAND reads the height too)
+            const cellNew = (pi, ci, rule) => { const sg = ((m.sigs[pi - 1] || [])[ci - 1]) || '-'; return changed(pi) && !(std && std.cells.has(rule === 'EB-BAND' ? sg : sg.replace(/\|\d+$/, ''))); };
+            judge(m.cells.map((c) => Object.assign({}, c, { label: `${c.label || ''}#${c.cell}` })), where, (rule, w, msg) => {
+                const pi = Number((/ p(\d+) /.exec(w + ' ') || [])[1]);
+                const ci = Number((/#(\d+)/.exec(w) || [])[1]);
+                if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule) && cellNew(pi, ci, rule)) out.push(`${rule} ${w}: ${msg}`);
+            }, 'lesson');
+            m.pages.forEach((p, i) => {
+                const nx = m.pages[i + 1], pv = m.pages[i - 1];
+                const lastOfMany = (!nx || nx.sheet !== p.sheet) && pv && pv.sheet === p.sheet;
+                const lim = lastOfMany ? 50 : 30;
+                if (p.empty >= lim && changed(i + 1)) out.push(`EB-PAGE ${where} p${i + 1} (${p.sheet || 'sheet'}): ${p.empty} % of the page body empty under its last block (limit ${lim} %${lastOfMany ? ', the last page of its sheet: H5 half used' : ''})`);
+            });
             return out;
         };
-        const count = (list) => list.reduce((a, x) => { a[x.key] = (a[x.key] || 0) + 1; return a; }, {});
+        // The Print screen's loop (teacher-print.js runBuild): a build returns its parts' limits, the section's partOpts are
+        // normalised to them (a value no longer offered snaps to one that is) and the packet is built again.
+        const settle = async (skill, size, want) => {
+            let cur = po.normalizePartOpts(want, null), b = null;
+            for (let k = 0; k < 4; k++) {
+                b = await build(skill, size, Object.keys(cur).length ? cur : undefined); builds++;
+                if (b.error) return { b, cur };
+                const next = po.normalizePartOpts(cur, po.allPartLimits(b.fit));
+                if (JSON.stringify(next) === JSON.stringify(cur)) break;
+                cur = next;
+            }
+            return { b, cur };
+        };
 
         for (const [li, l] of lessons.entries()) for (const size of sizes) {
             const where0 = `${l.id} ${size}`;
             const b0 = await build(l.skill, size, undefined); builds++;
             if (b0.error) { F('PO-2a', `${where0} standard packet: ${b0.error}`); continue; }
             const m0 = await measure(b0.doc);
-            const base = count(findingsOf(m0, where0));
+            const std = { pages: new Set(m0.pages.map((p) => p.h)), cells: new Set(m0.sigs.flat().flatMap((x) => [x, x.replace(/\|\d+$/, '')])) };
             const lims = po.allPartLimits(b0.fit);
+            // (F2 coverage: a real range - two values or more - on We Do and on Practice)
+            cover.cases++;
+            const nv = (p) => (lims[p] ? po.offeredValues(lims[p]).length : 0);
+            if (nv('wedo') >= 2) cover.wedo++;
+            if (nv('practice') >= 2) cover.practice++;
+            cover.list.push(`${where0}: wedo ${lims.wedo ? po.offeredValues(lims.wedo).join('/') : '-'} · practice ${lims.practice ? po.offeredValues(lims.practice).join('/') : '-'}`);
             const jobs = [];
-            for (const [p, lim] of Object.entries(lims)) {
+            if (!onlyCombos) for (const [p, lim] of Object.entries(lims)) {
                 if (onlyParts && !onlyParts.includes(p)) continue;
                 if (lim.toggle) { jobs.push({ p, partOpts: { [p]: { on: false } }, tag: `${p} off` }); continue; }
                 if (p === 'wedo') jobs.push({ p, partOpts: { wedo: { on: false } }, tag: 'wedo off' });
@@ -142,30 +187,44 @@ async function browser() {
                 const vals = li < full ? po.offeredValues(lim) : [lim.min, lim.max];
                 for (const v of [...new Set(vals)]) if (v !== lim.dflt) jobs.push({ p, v, partOpts: { [p]: { n: v } }, tag: `${p} ${v}` });
             }
+            // (F12: parts changed TOGETHER - every part at its min; the same with We Do off; Vocabulary 0 with We Do off;
+            // Remember off with no lesson rows)
+            const allMin = {};
+            for (const [p, lim] of Object.entries(lims)) if (lim.toggle) allMin[p] = { on: false }; else if (!lim.fixed) allMin[p] = { n: lim.min };
+            jobs.push({ partOpts: allMin, tag: 'everything at min' });
+            jobs.push({ partOpts: Object.assign({}, allMin, { wedo: { on: false } }), tag: 'everything at min, We Do off' });
+            if (lims.vocab && lims.wedo) jobs.push({ partOpts: { vocab: { n: 0 }, wedo: { on: false } }, tag: 'Vocabulary 0, We Do off' });
+            if (lims.remember && lims.rows) jobs.push({ partOpts: { remember: { on: false }, rows: { n: 0 } }, tag: 'Remember off, rows 0' });
             for (const j of jobs) {
-                const where = `${where0} ${j.tag}`;
-                const b = await build(l.skill, size, j.partOpts); builds++;
+                const { b, cur } = await settle(l.skill, size, j.partOpts);
+                const where = `${where0} ${j.tag}${JSON.stringify(cur) !== JSON.stringify(po.normalizePartOpts(j.partOpts, null)) ? ` (offered: ${JSON.stringify(cur)})` : ''}`;
                 if (b.error) { F('PO-2a', `${where}: ${b.error}`); continue; }
                 if (!b.keyLen || !(b.keyPages > 0)) F('PO-2a', `${where}: no answer key`);
                 if (!b.sizingOk) F('PO-2a', `${where}: the anchor chart lost its planned size (sizing.ok false)`);
-                if (b.pupil === b0.pupil) F('PO-2b', `${where}: the page is the standard page (the count was not applied)`);
-                const lim = lims[j.p];
-                if (j.v !== undefined) {
-                    const want = j.v;
-                    const got = j.p === 'prereq' ? b.got.prereq : j.p === 'wedo' ? b.got.wedo : j.p === 'rows' ? (b.got.rowsItems / (lim.perRow || 1)) : j.p === 'practice' ? b.got.practice : undefined;
-                    if (got !== undefined && got !== null && got !== want) F('PO-2b', `${where}: printed ${got}, asked ${want}`);
+                if (!Object.keys(cur).length) continue;   // (snapped back to the standard packet: nothing new to judge)
+                const lim2 = po.allPartLimits(b.fit);
+                for (const [p, v] of Object.entries(cur)) {
+                    if (!Number.isFinite(v.n)) continue;
+                    const lim = lim2[p] || {};
+                    const got = p === 'prereq' ? b.got.prereq : p === 'wedo' ? b.got.wedo : p === 'rows' ? (b.got.rowsItems / (lim.perRow || 1)) : p === 'practice' ? b.got.practice : p === 'mixed' ? b.got.mixed : undefined;
+                    if (got !== undefined && got !== null && got !== v.n) F('PO-2b', `${where}: ${p} printed ${got}, asked ${v.n}`);
                 }
                 const m = await measure(b.doc);
                 if (m.pages.some((x) => x.over)) F('PO-2c', `${where}: content past its page (overflow or a split cell) on p${m.pages.findIndex((x) => x.over) + 1}`);
-                const now = findingsOf(m, where);
-                const c = count(now);
-                for (const [k, v] of Object.entries(c)) if (v > (base[k] || 0)) F('PO-2d', `${where}: ${k} ${v} finding(s), the standard packet ${base[k] || 0} - ${now.filter((x) => x.key === k).map((x) => x.msg).slice(0, 2).join(' | ')}`);
+                for (const x of findingsOf(m, where, std)) F('PO-2d', x);
             }
             if (has('verbose')) console.log(`  [${((Date.now() - T0) / 1000).toFixed(0)} s] ${where0}: ${jobs.length} variants`);
         }
     } finally { await app.close(); }
     const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d'];
-    for (const id of ids) { const f = fails.filter((x) => x.startsWith(id + ' ')); console.log(`${id} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, 20)) console.log(`   ${x}`); }
+    for (const id of ids) { const f = fails.filter((x) => x.startsWith(id + ' ')); console.log(`${id} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, Number(arg('show', 25)))) console.log(`   ${x}`); }
+    // F2 (critic A r1): how many lesson x size cases offer a real We Do range and a real Practice range (2 values or more)
+    const floorW = Number(arg('floor-wedo', 0.4)), floorP = Number(arg('floor-practice', 0.9));
+    const cw = cover.cases ? cover.wedo / cover.cases : 1, cp = cover.cases ? cover.practice / cover.cases : 1;
+    if (has('verbose')) for (const x of cover.list) console.log(`   ${x}`);
+    const covOk = !cover.cases || arg('lessons') || (cw >= floorW && cp >= floorP);
+    console.log(`PO-2e ${covOk ? 'PASS' : 'FAIL'} coverage: We Do range ${cover.wedo}/${cover.cases}, Practice range ${cover.practice}/${cover.cases} (floors ${Math.round(floorW * 100)} % / ${Math.round(floorP * 100)} %)`);
+    if (!covOk) fails.push('PO-2e coverage under its floor');
     console.log(`(${builds} builds, ${((Date.now() - T0) / 1000).toFixed(0)} s)`);
 }
 
