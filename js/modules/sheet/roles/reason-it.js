@@ -80,10 +80,9 @@ export function prepare(it, info = {}) {
     // and add_wp_10's picture story printed one a page at every size: ws-cell-checks LONE-PAGE)
     const story1 = sentence || column;
     // (a Match 3 vocabulary cell is a full-width row of three pictures: B under A, centred, as before - lf-vocab r5, ws-empty-band)
-    // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - ran over both panels side by side: it
-    // takes the stacked B-under-A form, as before this merge; its footprint wMm carries the 2-column slack, not its ink)
-    const chartPast100 = it.template === 'chartwindow' && Array.isArray(pl.rows) && pl.rows.some((r) => Number(r) >= 10);
-    const legacy = it.template === 'vocab-match3' || chartPast100 || (it.template === 'equation' && workW > halfBeside);
+    // (a chart window past 100 - chart_120's band 120, three-digit squares, 85 mm at L - states its true width as footprint
+    // inkWMm, so it takes the UNDER layout: A | B at half the cell each, the response under them; stacked it held one a page)
+    const legacy = it.template === 'vocab-match3' || (it.template === 'equation' && workW > halfBeside);
     const under = !legacy && (story1 ? true : workW > halfBeside && workW <= halfCell);
     const wide = legacy || (!under && workW > halfBeside);
     const at = (col, row) => (wide ? ` style="grid-column:${col};grid-row:${row}"` : '');

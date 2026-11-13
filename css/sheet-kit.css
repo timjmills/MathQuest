@@ -626,3 +626,6 @@
    tag, not behind it. Here, not in the role's inline CSS, so no other page's HTML changes. Additive. */
 :is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] { padding-top: calc(var(--ws-zone) + 1.8mm); }
 :is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] > .mq-slottag { top: 0; left: .6mm; }
+/* chart_120 fix (ws-cell-checks PUPILTAG, PT-ERR-4): inside an Error-analysis work block the chart window drops its own 4.5 mm
+   item-letter keep-out (the "<Name> wrote:" label already stands over it), so the label sits 2 mm over the chart, not 6.5. Additive. */
+:is(.ws-page, .ws-sheet) .mq-judge-work > .k2-chartwindow > .k2-chart, :is(.ws-page, .ws-sheet) .mq-judge-work .k2-chartwindow > .k2-chart { margin-top: 0 !important; }

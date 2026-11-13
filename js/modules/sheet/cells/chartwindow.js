@@ -119,7 +119,9 @@ register('chartwindow', {
             // two rows, four- and five-digit cells) states its width, so a narrow cell overflows (and
             // the page measures it into fewer columns) instead of the table squeezing its boxes below
             // the size a pupil writes in. The 3 x 5 keeps its markup (old pages are unchanged).
-            const wide = !((p.rows || []).length === 3 && (p.cols || []).length === 5 && c.w === (CELL[sizeOf(ctx)] || CELL.L).w);
+            // (a window of three-digit numbers - the chart to 120 - states its width too: squeezed beside a lesson's Steps its
+            // 101 102 103 ran together and the key's 101 left its square; lf-builds chart_120 fix, ws-cell-checks KEYFIT)
+            const wide = !((p.rows || []).length === 3 && (p.cols || []).length === 5 && c.w === (CELL[sizeOf(ctx)] || CELL.L).w && topOf(p) <= 100);
             const width = ten ? `width:min(100%,${L(ctx, part.length * c.w)});` : wide ? `width:${L(ctx, part.length * c.w)};` : '';
             // a ten-column twin names its widest number's digits: a phone sizes its squares from it (css/screen-cell.css)
             const tenCls = ten ? ' k2-chart-ten' : '';
@@ -141,9 +143,11 @@ register('chartwindow', {
         // The window's width at L: a 1-100 window (85 mm) shares a row; a row of ten or a window
         // of four- and five-digit numbers takes the whole row (the host's measurement decides at S).
         if (p && isWhole(p)) return { wMm: 10 * WHOLE.w + 4, hMm: null, measure: true, factLike: false, maxCols: 1 };
+        // (`inkWMm`: a window past 100 never squeezes - its true width, so a host laying cells beside other work knows it)
         const w = (p && p.cols ? p.cols.length : 5) * cellW(p || {}, 'L', 28 * 0.8);
         // `hardCap`: the chart's tracks have a 12 mm floor its measurement cannot see (the table
         // squeezes rather than overflowing), so its 2 columns hold at every size (critic guided-r1).
+        if (w <= 90 && topOf(p || {}) > 100) return { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true };
         return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true }
             : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1 };
     },

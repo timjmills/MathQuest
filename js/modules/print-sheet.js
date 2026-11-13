@@ -2736,6 +2736,8 @@ function skillMeta(sk, q) {
             titleOpts = { opts: no };
         } catch (e) { titleOpts = {}; }
     }
+    // chart_120 (card chartwindow §3, L28): the chart's I Can follows its band (band 120: "a chart to 120"), read from the options
+    if (sk.skillId === 'hundreds_chart_fill' && sk.opts && Number(sk.opts.band) === 120) titleOpts = { opts: { band: 120 } };
     const words = skillWords(Object.assign({ answerType: q && q.answerType, printFormat: q && q.printFormat }, meta, titleOpts, { skillId: nameId }));
     meta.iCan = sk.iCan || optionTitle(sk, words.iCan) || words.iCan;
     meta.instructionKey = q ? instructionKeyFor(q, words) : words.instructionKey;
