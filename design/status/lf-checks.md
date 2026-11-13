@@ -313,6 +313,7 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
    - (a) EB-FOOT pairs cells with items[i] by POSITION, not with their own item. This blocks arming eb-foot-gridcols-patterns, and it is the same fix as r5 m1: data-eb-item written by the kit.
    - (b) the precritic screen-support-eq gate misses 5 of 6 skills in its output: check its output or the mention matcher.
    - (c) adopt their HINT-ON-TEST check into precritic; backtest FAIL 47b1f2a86 / PASS 796952c03.
+10. The practice-card inputs at 390 are 40x44 px on master (lf-builds word-stories critic F3, lead 11-13). Each needs a >= 48 px touch target, kept as transparent padding outside the drawn box (as the slot fix did). Add a check across every host at 390.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
