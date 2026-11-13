@@ -1510,7 +1510,7 @@ function supportPlanFor(sk, q, template, size, mix = null) {
     }
     // ÷: the tally row is the same length for every item of the section: 12 on a 12s set.
     if (op === '/') extra.tally = Number(o.band) >= 144 ? 12 : 10;
-    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(o) / extra.tally), rows: extra.tally };
+    if (divArr && !arrayOff && worst.includes('array')) extra.arrayFrame = { cols: extra.tally, rows: Math.max(1, divFactsMaxDividend(o) / extra.tally) };   // (facts card §5.9: landscape, the divisor's rows)
     return {
         chosen, worst, need, forceL, extra,
         cover: o.cover || 'whole', mix: o.mix || 'section',

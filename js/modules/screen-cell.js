@@ -500,7 +500,7 @@ export function screenSupportsFor(q, k, { index = 0, total = 1, categoryId = '',
     if (opKey(k.op) === '/') out.tally = Number(o.band) >= 144 ? 12 : 10;
     if (arrayFrame) {
         out.tally = Number(no.band) >= 144 ? 12 : 10;
-        out.arrayFrame = { cols: Math.max(1, divFactsMaxDividend(no) / out.tally), rows: out.tally };
+        out.arrayFrame = { cols: out.tally, rows: Math.max(1, divFactsMaxDividend(no) / out.tally) };   // (facts card §5.9: landscape)
     }
     if (opKey(k.op) === '*' && Array.isArray(o.constant)) {
         const cs = o.constant;

@@ -283,12 +283,18 @@ function pieceOf(id, p, template, ctx) {
         // S4 array pane draws the dividend's counters loose, to be ringed (answer-free, §S4.2).
         const panes = pp.op === '-' ? CUE_PANE[id] || [] : pp.op === '/' && id === 'array' ? ['array'] : [];
         // (facts card F2: a ÷ fact whose section offers the array - every dividend 50 or less, print-sheet.js - draws the
-        // TRUE array, the quotient's rows of the divisor's dots, in the section's one frame `supports.arrayFrame`)
+        // TRUE array, landscape since the owner's 2026-11-13 ruling - the divisor's rows of the quotient's dots - in the
+        // section's one frame `supports.arrayFrame`)
         const af = pp.op === '/' && id === 'array' && p.supports && p.supports.arrayFrame;
         if (af) {
-            // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M)
-            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: ctx && ctx.size === 'S' ? Object.assign({}, af, { pitch: 2.25 }) : af };
-            const html = factCueOf(cp, twin);
+            // (critic r5 R5-4: at S the dots take a 2.25 mm pitch, so the S page holds a 4th row of arrays - S denser than M;
+            // facts card §5.9, landscape: at M and L the dots grow into the cell's width - ARRAY_PITCH_MM; a screen host
+            // draws paper M's frame, scaled to its digit)
+            const pitch = ARRAY_PITCH_MM[twin ? 'M' : (ctx && ctx.size) || 'M'] || ARRAY_PITCH_MM.M;
+            const cp = { a: pp.a, b: pp.b, op: '/', cue: 'array', frame: Object.assign({}, af, { pitch }) };
+            // (facts card §5.9, owner 2026-11-13: on screen the landscape array follows the cell's digit, its dots
+            // SCREEN_ARRAY_SCALE x paper's dot-to-digit ratio - bigger, never smaller than the print dot - capped by the cell)
+            const html = factCueOf(cp, twin, twin ? SCREEN_CUE_DIGIT_MM / SCREEN_ARRAY_SCALE : 0);
             const m = MM_RE.exec(factCueOf(cp, false)) || [];
             return html ? { html: `<div class="ws-factcue">${html}</div>`, foot: { wMm: Number(m[1]) || 16, hMm: Number(m[2]) || 38, placements: ['beside', 'under'] }, place: null } : null;
         }
@@ -319,6 +325,14 @@ export function installCueDrawer(fn) { if (typeof fn === 'function') factCueOf =
 // A ÷ fact's skip strip and think box on screen follow the cell's digit at paper's ratio (lf-ops div_facts screen critic
 // r1 D3): paper draws them beside a 24 pt (8.47 mm) fact digit.
 const SCREEN_CUE_DIGIT_MM = 24 * 25.4 / 72;
+// The ÷ landscape array on screen (facts card §5.9): its dots this many times paper's ratio to the fact digit.
+const SCREEN_ARRAY_SCALE = 1.5;
+// The ÷ landscape array's dot pitch on paper by size (mm; facts card §5.9: "as large as the cell width allows", and never
+// under the old 2.6 mm print dot): its frame is 12 columns wide at most (the 12s band) - 35.8 / 43.0 / 57.4 mm at S / M / L.
+const ARRAY_PITCH_MM = Object.freeze({ S: 2.6, M: 3.2, L: 4.4 });
+// ... and the columns that give that frame its width (a 3-column cell holds ~49 mm inside its pads, a 2-column L cell ~79 mm):
+// the frame is never shrunk to fit the cell (max-width), it is given the cell it needs.
+const ARRAY_MAX_COLS = Object.freeze({ S: 3, M: 3, L: 2 });
 
 /**
  * Wrap a problem's HTML with the supports its payload carries. `problemWMm` / `problemHMm` are
@@ -479,7 +493,9 @@ export function supportFootprint(fp, p, template, ctx = {}) {
     // measured height already holds its supports and pads, so its rows keep the Test's 1.05 room over it (test.js), not the
     // practice 1.2 - touch S / M prints 3 x 5 = 15, as the Test of the same support does.
     const room = pp && pp.op === '/' ? { denseRoom: 1.05 } : {};
-    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4) }, room);
+    // (facts card §5.9: the landscape ÷ array takes the columns its frame needs at this size, ARRAY_MAX_COLS)
+    const arrCap = pp && pp.op === '/' && s && s.on.includes('array') && s.arrayFrame ? ARRAY_MAX_COLS[ctx.size] || ARRAY_MAX_COLS.L : 10;
+    return Object.assign({}, out, { wMm: Math.ceil(w), hMm: out.hMm, measure: true, factLike: false, maxCols: Math.min(out.maxCols || 10, cap, 4, arrCap), ...(arrCap < 10 ? { hardCap: true } : {}) }, room);
 }
 
 // Every template's render and footprint go through the registry, which draws the supports round
