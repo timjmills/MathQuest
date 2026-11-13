@@ -55,3 +55,4 @@ since the merge base against the lane's extracted copies before rendering anythi
 | 2026-11-13 | lf-partopts | A r2 N5: lock reason only in a hover title | ws-partopts-shots: a disabled tick has visible reason text (new) | FAIL 7 on d6f22be → PASS | ws-partopts-shots | — |
 | 2026-11-13 | lf-partopts | A r2 N6: mixed range forms, "15 a page", lone "6" at 390 | PO-4 N6 + PO-CAP + ws-partopts-shots range form / lone-word lint (new) | FAIL 18 shots on d6f22be → PASS | both | — |
 | 2026-11-13 | lf-partopts | A r2 N7: PO-2 built combinations in one jump; the screen reaches more states step by step | ws-partopts-unit PO-2w step walk, BFS depth 3 with the settle loop (new) | 191 states on d6f22be found N1/N2 → PASS | ws-partopts-unit | 2 rounds |
+| 2026-11-13 | lf-partopts | A r3 full walk: div_facts M We Do off EB-EDGE 0.7 mm once the 1.5 mm row margin was dropped | existing PO-2d EB-EDGE on PO-2w states | FAIL 26 on c69917b → PASS (EQ_EDGE_MM) | ws-partopts-unit | — |

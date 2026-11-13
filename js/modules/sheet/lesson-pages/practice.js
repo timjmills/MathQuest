@@ -39,6 +39,8 @@ export function stripItem(data, steps) {
  * the standard sheet's own rows (nearest_10 at L, 3.3 mm, the same cells the standard sheet draws) off a sheet whose foot then
  * stood 62 mm empty; the cells' own CL-8 (icKeep) is the rule, and ws-partopts-unit PO-2d judges EB-EDGE on every page. */
 export const INK_EDGE_MM = 0;
+/** ... except a written equation fact (div_facts M: its measured slack read 1.5 mm wider than it drew, EB-EDGE 0.7 mm). */
+export const EQ_EDGE_MM = 1.5;
 
 /**
  * The lesson sheet's Independent Practice rows (roles/lesson.js planOnce, after the bands are packed):
@@ -77,7 +79,7 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (and 1.5 mm more than CL-8 from its sides: a fact the We Do band used to hold came 0.7 mm from its border, EB-EDGE)
         // (critic A r2 N1: one column across is the standard sheet's own full-width cell - its slack is the design's, as icKeep
         // keeps it; the extra 1.5 mm stays for narrower columns only where the slack is near CL-8)
-        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && (c === 1 || !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + INK_EDGE_MM))); });
+        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && (c === 1 || !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + (it.template === 'equation' ? EQ_EDGE_MM : INK_EDGE_MM)))); });
         if (!inkOk(ic)) inkShort = true;
     }
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
@@ -127,7 +129,10 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         cur.indepFit = { rows: rows >= 1 && hRows(rows) <= room ? rows : 0, ic };
         // (critic A r2 N1, EB-ROWFIT: the height ONE row and its band head take - roles/lesson.js offers no sheet whose foot holds
         // one and prints none, and says "no room" only where one does not fit)
-        cur.indepRowMm = +(hRows(1) + m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + safety).toFixed(1);
+        // (the SHORTEST row the pool could make - its ic shortest problems - as ws-partopts-unit EB-ROWFIT measures it)
+        const hsAll = indepPool.map((it) => hAt([twins.get(it) || it], ic)).filter((h) => Number.isFinite(h) && h > 0).sort((a, b) => a - b);
+        const hRowMin = hsAll.length >= ic ? Math.min(hRows(1), hsAll[ic - 1]) : hRows(1);
+        cur.indepRowMm = +(hRowMin + m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + safety).toFixed(1);
         const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
         if (rN === 0 || inkShort) return indep;
         if (rN !== null && rN < rows) rows = rN;

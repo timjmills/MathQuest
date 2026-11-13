@@ -261,7 +261,7 @@ function sheetOffers(input) {
         for (let k = 0; k < R; k++) { const pl = run(Object.assign(without('rows'), { rows: k })); if (fillOk(pl) && Math.round((pl.meta.independent || 0) / per) === k) vals.push(k); }
         vals.push(R);
         out.rows = { dflt: R, values: vals.filter((v) => v > 0), canOff: vals.includes(0), perRow: per };
-    } else out.rows = { dflt: 0, values: [], canOff: true, perRow: per, none: true, noRoom: !((r.meta && r.meta.partFit && r.meta.partFit.rows) > 0) };
+    } else out.rows = { dflt: 0, values: [], canOff: true, perRow: per, none: true, noRoom: !((r.meta && r.meta.partFit && r.meta.partFit.rows) > 0) && !(r.meta && r.meta.indepRowMm > 0 && r.meta.sheetFreeMm + ROWFIT_SLACK_MM >= r.meta.indepRowMm) };
     return out;
 }
 
