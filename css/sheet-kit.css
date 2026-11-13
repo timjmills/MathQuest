@@ -615,3 +615,7 @@
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun) {
     padding-left: var(--fp, 3mm) !important; padding-top: calc(var(--ws-tab, 6mm) + 1.3mm) !important; --ws-koin: 0mm; --mq-fx: 0mm !important; }
 .ws-page .ws-grid > .ws-cell.ws-cell:has(> .ws-tab, > .ws-letter):has([data-ws-undertab]):not(.blankrun)::before { display: none !important; }
+/* chart_120 fix (ws-cell-checks TAGINK, Error analysis L): a lettered chart square keeps its written number under its A / B
+   tag, not behind it. Here, not in the role's inline CSS, so no other page's HTML changes. Additive. */
+:is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] { padding-top: calc(var(--ws-zone) + 1.8mm); }
+:is(.ws-page, .ws-sheet) .k2-chartwindow [data-ws-tagged] > .mq-slottag { top: 0; left: .6mm; }
