@@ -311,6 +311,10 @@ function measure(page) {
             const bR = bodyEl.getBoundingClientRect();
             for (const e of bodyEl.querySelectorAll('input, select, button:not(.sko-tip), textarea')) {
                 if (!e.getClientRects().length || !seen(e) || e.disabled) continue;
+                // (a control inside a closed <details> is not drawn: Chrome still gives it a box on the summary)
+                const dt = e.closest('details');
+                if (dt && !dt.open && !e.closest('summary')) continue;
+                if (e.checkVisibility && !e.checkVisibility({ contentVisibilityAuto: true })) continue;
                 let t = e;
                 const r0 = e.getBoundingClientRect();
                 // (a visually hidden tick box is pointed at through its label)
