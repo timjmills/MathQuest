@@ -4222,6 +4222,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ri-ink-inner",
+  "check": "Reason It holds a true ink width (inkWMm) to the panel's inner width: 61 mm of compare ink goes under, not beside (lf-placevalue 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "d8baca1e",
+   "state": "61.2 mm ink laid out beside a 57.5 mm panel"
+  },
+  "pass": {
+   "commit": "8d757936",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
