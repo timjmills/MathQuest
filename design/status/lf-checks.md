@@ -450,3 +450,4 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   FAIL 47b1f2a86 (RR-CLIP x2) -> OK 7c1e3dbb4 (master; lf-roles' Model re-plan, 2 pages; lf-algebra had no fix of its own).
   False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.
 - no-dropped-row baseline FIXED (lf-checks 11-13): it compared with origin/master's tip, so a lane branch behind master read master's newer rows as dropped (13 false drops on -r2). Now the merge base of HEAD and origin/master; a deploy tree (master merged in) is unchanged.
+- The -r2 narrow critic was STOPPED by the weekly usage limit before its verdict; its partial report is committed as PARTIAL. Resume after 2026-11-19 22:00 UTC. All lf-checks work is paused until then.
