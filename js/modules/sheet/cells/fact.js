@@ -223,6 +223,15 @@ export function factCue(p, { px = 0, digitMm = 0 } = {}) {
             if (some) for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) body += dot(pad + x * pitch + pitch / 2 + (fc > 5 ? gap(x) : 0), pad + y * pitch + pitch / 2 + (fr > 5 ? gap(y) : 0), r, false);
             return wrap(w, h, body, some ? `array, ${rows} rows of ${cols}` : 'no dots');
         }
+        // A × fact with a zero factor (4 × 0, 0 × n) draws the empty landscape frame as 0 ÷ n does (lead ruling 2026-11-13):
+        // one row tall, as wide as the larger factor's dots (a five-group at least) - no dots, the support still in its place.
+        if (!div && (a === 0 || b === 0)) {
+            const n = Math.max(5, a, b), pitch = Math.min(3, 36 / n), pad = 0.8;
+            const gap = (k) => Math.floor(k / 5) * ARRAY_GAP_MM;
+            const w = n * pitch + (n > 5 ? gap(n - 1) : 0) + 2 * pad, h = pitch + 2 * pad;
+            const body = `<rect x="0.2" y="0.2" width="${f2(w - 0.4)}" height="${f2(h - 0.4)}" rx="1.2" fill="none" stroke="${INK}" stroke-width="0.3"/>`;
+            return wrap(w, h, body, `0 rows of ${Math.max(a, b)}, for ${a} × ${b}`);
+        }
         if (!cols || !rows) return '';
         const pitch = Math.min(3, 36 / Math.max(cols, rows)), r = pitch * 0.32;
         // WDS RP-81: the 1.5 mm subitising gap after every 5th row and column of an array over 5
