@@ -96,6 +96,8 @@ export function cell(inner, opts = {}) {
     let extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
     // CL-4b: after the style too, for the same reason
     if (opts.writeAbove || String(inner).includes(WRITE_ABOVE)) extra += ` ${WRITE_ABOVE}`;
+    // the bridge's item index (critic eb-r5 m1, ws-empty-band EB-FOOT pairing): after the style too; an integer only
+    if (Number.isInteger(opts.ebItem) && opts.ebItem >= 0) extra += ` data-eb-item="${opts.ebItem}"`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 

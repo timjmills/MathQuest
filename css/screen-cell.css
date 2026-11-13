@@ -1939,3 +1939,12 @@ html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisua
 html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle).mq-slot:is(.box-wrong, .flash-wrong, [style*="var(--incorrect)"], [style*="var(--accent-red)"]) {
     box-shadow: none !important; outline: 2px solid #B73838 !important; outline-offset: calc(0px - var(--mq-tp)) !important;
 }
+
+/* lf-checks critic eb-r5 D2 (legibility): the kit LINE slot's focus ring (3 px, at up to 2 px offset beyond the drawn box)
+   must keep >= 4 px from the word beside it. The negative side margins above pulled the next word ("tens") under the ring
+   (0 px). Each side margin now leaves ring + offset + 4 px (9 px) beyond the drawn box. ADDITIVE: the rule above stays;
+   ws-screen-answer FOCUS-GAP is the check. */
+html body .mq-scell.mq-scell.mq-scell .mq-kittwin input.mq-slot.mq-slot--invisual:not(.mq-slot--box):not(.mq-slot--circle) {
+    margin-left: calc(max(0.2em, 9px) - var(--mq-tp)) !important;
+    margin-right: calc(9px - var(--mq-tp)) !important;
+}

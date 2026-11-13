@@ -132,6 +132,26 @@ function uncovered(rows) {
 // lays it (a lone last-row cell of a 2-column grid is still at 2; a full-width problem in its own 1-column grid at 1); with no
 // grid read, the cells across its row (lf-placevalue 2026-11-08: mixed-practice's fits[0].cols is not the cells across)
 function footCols(c, cells) { return c.gridCols || cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length; }
+// EB-FOOT pairing, pure (critic eb-r5 m1): each cell against the footprint of ITS OWN item.
+//  - 'index': every cell carries the bridge's item index the kit wrote (data-eb-item -> c.item): cell -> m[c.item];
+//  - 'position' (fallback, no index): only where cells and measured items are one to one, by dealt order, or BY HEIGHT
+//    (lf-ops-props, guarded) when every page's rows are sorted tallest first and that pairing fits every cell;
+//  - '' : not paired. Returns { mode, byH, out: [{c, fp, k}] } - out holds the cells off their footprint by more than FOOT.
+function footFindings(cells, m, cols, sections, FOOT = 0.10) {   // FOOT: the EB-FOOT limit (the const below)
+    const out = [];
+    const fpOf = (mi, k) => (mi ? (mi[k] != null ? mi[k] : mi[cols]) : null);
+    const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
+    if (cells.length && cells.every((c) => Number.isInteger(c.item) && c.item >= 0 && c.item < m.length)) {
+        for (const c of cells) { const k = footCols(c, cells); const fp = fpOf(m[c.item], k); if (off(c, fp)) out.push({ c, fp, k }); }
+        return { mode: 'index', byH: false, out };
+    }
+    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) return { mode: '', byH: false, out };
+    const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
+    const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpOf(m[y], cols) || 0) - (fpOf(m[x], cols) || 0));
+    const byH = sortedPages && cells.some((c, i) => off(c, fpOf(m[i], footCols(c, cells)))) && !cs2.some((c, q) => off(c, fpOf(m[ord[q]], footCols(c, cells))));
+    if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k }); });
+    return { mode: 'position', byH, out };
+}
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
         const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
@@ -153,6 +173,17 @@ if (argv.includes('--self-test')) {
         const fbad = fc.filter(([, got, want]) => got !== want);
         for (const [n, got, want] of fbad) console.log(`self-test FAIL: EB-FOOT columns ${n}: ${got}, want ${want}`);
         if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT columns)`); process.exit(1); }
+    }
+    {   // EB-FOOT pairs by the kit's item index (critic eb-r5 m1): two equal-height cells whose items the page swapped, each
+        // drawn at the OTHER item's footprint, are 2 findings by index; the old by-height fallback hides both (no index)
+        const mk = (item, needed, cell) => ({ page: 1, cell, topPx: 10, hMm: 45, neededMm: needed, gridCols: 2, item });
+        const m = [{ 2: 20 }, { 2: 40 }];
+        const swapped = [mk(0, 40, 1), mk(1, 20, 2)], noIdx = swapped.map((c) => Object.assign({}, c, { item: -1 })), right = [mk(1, 40, 1), mk(0, 20, 2)];
+        const pc = [['index: swapped footprints', footFindings(swapped, m, 2, 1).out.length, 2], ['index: own footprints', footFindings(right, m, 2, 1).out.length, 0],
+            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: fallback', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).mode, 'position']];
+        const pbad = pc.filter(([, got, want]) => got !== want);
+        for (const [n, got, want] of pbad) console.log(`self-test FAIL: EB-FOOT pairing ${n}: ${got}, want ${want}`);
+        if (pbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT pairing)`); process.exit(1); }
     }
     {   // EB-GAP: 30.5 % never inked (FAIL, the div_facts r3 state) / 27 % (OK) / reserved and inked later (OK) / not the Model (OK)
         const g = (step, gapAtMm, gapMm, iv) => ({ step, gapAtMm, gapMm, hMm: 81.2, iv });
@@ -284,7 +315,9 @@ function measureCells(scope) {
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
                 neededMm: +(((box.b - cr.top - ((() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })())) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
-                screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1),
+                screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN),
+                // the bridge's item index the kit wrote on the cell (critic eb-r5 m1): EB-FOOT pairs by it; -1 when absent
+                item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item')) : -1, inkMm: +((box.b - cr.top) / MM).toFixed(1),
                 // the column count of the grid that LAYS this cell (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13): a lone cell
                 // on a 2-column grid's last row is still laid at 2 columns; a full-width problem in its own 1-column grid at 1
                 gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; return t && t !== 'none' ? t.trim().split(/\s+/).length : 0; })() });
@@ -342,7 +375,10 @@ async function measurePix(arg) {
             const spans = [];
             if (!screen) spans.push([q.t, q.b]);
             else {
-                const ew = (k) => (parseFloat(cs2[`border${k}Width`]) > 0 && !/^(none|hidden)$/.test(cs2[`border${k}Style`]) && paints(cs2[`border${k}Color`]) ? parseFloat(cs2[`border${k}Width`]) : 0);
+                // an edge counts only when it is drawn DARKER than the 225 pixel ink threshold (critic eb-r5 D1: a 1 px #eee closed
+                // border, no pixel of which is ink, read as one 150 px block of ink and hid the band)
+                const dark = (v) => { if (!paints(v)) return false; const m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?/.exec(v); if (!m) return true; const a = m[4] == null ? 1 : (/%$/.test(m[4]) ? parseFloat(m[4]) / 100 : parseFloat(m[4])); return a * 255 >= 32 && (255 - a * (255 - (+m[1] + +m[2] + +m[3]) / 3)) < 225; };
+                const ew = (k) => (parseFloat(cs2[`border${k}Width`]) > 0 && !/^(none|hidden)$/.test(cs2[`border${k}Style`]) && dark(cs2[`border${k}Color`]) ? parseFloat(cs2[`border${k}Width`]) : 0);
                 const bt = ew('Top'), bb2 = ew('Bottom');
                 if (bt && bb2) spans.push([q.t, q.b]);
                 else {
@@ -602,22 +638,10 @@ async function main() {
                     }
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
-                    if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
-                        // each cell against the measure at ITS row's count across (lf-placevalue 2026-11-08: mixed-practice's
-                        // fits[0].cols is the lattice size N, not the cells across; the role sizes a row from measured[k])
-                        const across = (c) => footCols(c, cells);
-                        const fpAt = (i, k) => (m[i][k] != null ? m[i][k] : m[i][b.cols]);
-                        const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
-                        // pair BY HEIGHT (lf-ops-props 2026-11-13, accepted by lf-checks with a guard): only when the page really sorts its
-                        // rows tallest first (layout groupByHeight: every page's drawn heights non-increasing), and only when that pairing
-                        // fits every cell; otherwise dealt order, as before. A real foot band still fails (row eb-foot-div-facts).
-                        const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
-                        const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpAt(y, b.cols) || 0) - (fpAt(x, b.cols) || 0));
-                        const byH = sortedPages && cells.some((c, i) => off(c, fpAt(i, across(c)))) && !cs2.some((c, q) => off(c, fpAt(ord[q], across(c))));
-                        if (byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page sorts its rows tallest first)`);
-                        if (!byH) cells.forEach((c, i) => { const k = across(c); const fp = fpAt(i, k); if (fp == null) return;
-                            if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${k} across (${Math.round((c.neededMm - fp) / fp * 100)} %; limit ${FOOT * 100} %)`); });
-                    } else if (j.role === 'independent' && !j.opts) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
+                    if (GRID_ROLES.has(j.role)) { const fr = footFindings(cells, m, b.cols, b.sections, FOOT);
+                        if (fr.byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page sorts its rows tallest first)`);
+                        for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} across${x.c.item >= 0 && fr.mode === 'index' ? `, item ${x.c.item + 1}` : ''} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %; limit ${FOOT * 100} %)`); }
+                    if (j.role === 'independent' && !j.opts && !footFindings(cells, m, b.cols, b.sections).mode) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
                 } finally { await sh.close(); }
             }
             // screen hosts

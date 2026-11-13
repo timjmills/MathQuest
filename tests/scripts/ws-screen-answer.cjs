@@ -277,6 +277,35 @@ function PLAN(rootSel, which) {
     return { error: `no answer control (${q.answerType})` };
 }
 
+// FOCUS-GAP (critic eb-r5 D2, legibility): in the page, on the FOCUSED answer box: the outer edge of its focus ring (its
+// outline: the border box grown by outline-offset + outline-width) must keep >= 4 px from every text box of the cell beside it
+// on its line (a text line box that overlaps the ring vertically by >= 30 % of its height). 0f1a0bda's kit LINE slot pulled the
+// next word under the ring (0 px to "tens" on unit_form). Returns a message, or '' when the ring is clear or no ring is drawn.
+function FOCUS_GAP(e, rootSel) {
+    if (document.activeElement !== e) return '';
+    const cs = getComputedStyle(e);
+    const w = parseFloat(cs.outlineWidth) || 0;
+    if (!w || /^(none|hidden)$/.test(cs.outlineStyle)) return '';
+    const o = (parseFloat(cs.outlineOffset) || 0) + w, b = e.getBoundingClientRect();
+    const R = { l: b.left - o, r: b.right + o, t: b.top - o, b: b.bottom + o };
+    const root = e.closest(rootSel) || document.querySelector(rootSel) || e.parentElement;
+    const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let worst = null;
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+        if (!n.textContent.trim() || !n.parentElement) continue;
+        const pcs = getComputedStyle(n.parentElement);
+        if (pcs.visibility === 'hidden' || parseFloat(pcs.opacity || '1') <= 0.05 || n.parentElement.closest('[aria-hidden="true"], .sr-only')) continue;
+        const rg = document.createRange(); rg.selectNodeContents(n);
+        for (const t of rg.getClientRects()) {
+            if (!t.width || !t.height) continue;
+            if (Math.min(t.bottom, R.b) - Math.max(t.top, R.t) < 0.3 * t.height) continue;
+            const gap = Math.max(t.left - R.r, R.l - t.right);
+            if (gap < 4 && (!worst || gap < worst.gap)) worst = { gap, word: n.textContent.trim().slice(0, 12) };
+        }
+    }
+    return worst ? `FOCUS-GAP: the focus ring of ${e.className.split(/\s+/).filter(Boolean).slice(0, 3).map(c => '.' + c).join('') || e.tagName.toLowerCase()} is ${Math.round(worst.gap * 10) / 10} px from "${worst.word}" (need >= 4 px)` : '';
+}
+
 async function run(page, sel, which) {
     const r = await page.evaluate(PLAN, sel, which);
     if (r.error) return r;
@@ -308,6 +337,9 @@ async function run(page, sel, which) {
         // instead, as a pupil's tap would, rather than abort the whole run.
         try { await el.click({ clickCount: 3 }); } catch (e) { await el.evaluate(x => x.focus()); }
         await el.evaluate(e => { e.value = ''; });
+        // FOCUS-GAP (critic eb-r5 D2): the focused box's ring keeps >= 4 px from the nearest word
+        const fg = await el.evaluate(FOCUS_GAP, sel);
+        if (fg) (r.focusGap = r.focusGap || []).push(fg);
         await page.keyboard.type(step.value, { delay: 10 });
         await el.evaluate(e => e.dispatchEvent(new Event('change', { bubbles: true })));
     }
@@ -429,6 +461,7 @@ else (async () => {
             await sleep(500);
             const before = await page.evaluate(() => window.state.score || 0);
             const r = await run(page, '#questionPaper', { host: 'card' });
+            if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} card: ${m}`));
             await page.evaluate(() => { window.__saDone = true; });
             if (r.error) { line.push(`card ERR ${r.error}`); fails.push(`${s} card: ${r.error}`); }
             else {
@@ -480,6 +513,7 @@ else (async () => {
             let err = '';
             for (let i = 0; i < n; i++) {
                 const r = await run(page, `#ws_card_${i} .ws-cell`, { host: 'worksheet', i });
+                if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} worksheet item ${i + 1}: ${m}`));
                 if (r.error) { err = `item ${i + 1}: ${r.error}`; break; }
                 await sleep(80);
             }
@@ -519,6 +553,7 @@ else (async () => {
             let err = '';
             for (let i = 0; i < 3; i++) {
                 const r = await run(page, '#quizTakeView .qt-cell', { host: 'quiz' });
+                if (r.focusGap) fails.push(...r.focusGap.map(m => `${s} quiz Q${i + 1}: ${m}`));
                 if (r.error) { err = `Q${i + 1}: ${r.error}`; break; }
                 await page.keyboard.press('Tab');
                 await sleep(250);
