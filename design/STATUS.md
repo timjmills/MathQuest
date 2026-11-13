@@ -797,3 +797,6 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-13 ~17:00 UTC — Owner: usage back at 0 %; cap 70 % for now
 - All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.
+
+## 2026-11-13 ~18:00 UTC — Owner approves the fastest-implementation plan (all eight changes)
+- design/plans/FASTEST_PLAN_2026-11-13.md; summary in CLAUDE.md "Fastest-implementation plan". Unit order (round 1 first), copy-light review, batch critics, round cap 2, deploy train 11:00 / 19:00 UTC, six lanes, no phone width (390) — print + computer/Chromebook + tablet only, long lessons paused.
