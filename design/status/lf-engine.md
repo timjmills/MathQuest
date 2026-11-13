@@ -9,6 +9,7 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+- G7 PAUSED (FOCUS rule) at -g7 f5d61e7f9 (WIP, ungated); proof branch -g7-proof 5d022c783 (backtest PASS state only, never merge). Checks built: LS-WARM, LS-FILL, PM-CONT --practice-pages; rows lesson-g7-growing, lesson-div-chart-fill, lesson-mult-facts-sheet-fill, lesson-ffs-mixed-pp2. M2 (fact_family_sort L Mixed) is ALREADY fixed on master (de8eec183): lf-partopts branched from d34311d - they must merge master. Resume at the builder's "Remains" item 1 (all-lessons L/M/S re-run with the 27 % Warm-up margin). Route: vocab_grade_pictures L Mixed continuation 72 % (pre-existing, full-page mult-grid shelf) -> mixed engine / lf-vocab.
 - QUEUED low priority after G7 (lead 16:58, lf-partopts sweep): placevalue:identify L lesson sheet (We Do off, rows 0) foot would hold another row at a 12.4 mm gap (> partopts' 12 mm margin) - fill the row or confirm the foot is under H13 / PAGEFILL. Same class as ROWFIT (queued for the live round): fold together.
 - BUDGET (lead 16:58, owner cap 70 % ≈ $1,960 this week): lf-engine allocation $280 above the session cost_usd baseline $777.61 → stop starting agents at $1,057.61. Checkpoint 16:58 UTC: $784.45 (+$6.84). Report spend each report; high effort on lesson design only.
 - 2026-11-13 ~16:00 UTC STOPPED: weekly usage limit hit (resets 2026-11-19 22:00 UTC). All work pushed. Resume points:
