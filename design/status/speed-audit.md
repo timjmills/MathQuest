@@ -1033,3 +1033,32 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Round | What was lost | Cause | Fix |
 |---|---|---|---|
 | r14 critic PASS min 8 | - | Medium rebuild closed the complete defect list from r13 in one round; master merge brought ws-screen-ink-size (2 real screen size defects fixed, 4 SIZE-REF coverage findings ruled known) | Keep the dealt-banks table; the 3 minors are follow-ups |
+
+### lf-engine G7 / DIV / M1 (2026-11-13): page-used + Warm-up band checks were LIVE on master, on parts no `--skill` gate rendered
+
+The lf-algebra growing lesson (G7, critic r2), the div_facts anchor chart (lf-partopts critic r3 P4) and the
+multiplication:mult_facts default lesson sheet (lf-partopts critic r4 M1) all failed on the SAME class a critic was the
+first to measure: a lesson page left a third or half of itself blank, or a Warm-up row grown past its content, on a PART
+no machine check rendered on a `--skill` path. precritic r9's lesson print-lint PASSED the Warm-up (CL-4b reads the band
+under a top cell as writing room) and never ran a page-use floor over the anchor chart or a single-page sheet.
+
+Causes and fixes (each a check with a backtest, then the root fix):
+- the lesson print-lint had no page-use floor and no absolute-band rule for a UNIFORM Warm-up row -> **LS-WARM** (a row
+  where every cell is >= 30 % empty; H13-ROW handles a short cell beside a tall neighbour) and **LS-FILL** (anchor chart
+  >= 60 %, single-page sheet / Practice / Mixed >= 70 %), on `ws-precritic --skill` (lesson-pages-own) and `--role lesson`
+  (lesson-samples-all, L/M/S), with `--layout-seeds` for the seed a critic graded.
+- the Warm-up grew uniform cells to their footprint (pad + answer room), not their ink -> print-sheet measures `inkMm`;
+  warm-up.js caps the grow by ink.
+- a 2 x 2 chart of a one-line drawing stopped half way down -> chartPage lays it as full-width rows (drawing 1.6 x,
+  content-sized, never stretched: PT-ANC-1).
+- a default fact lesson sheet's Independent band capped at 6 -> a kit fact cell is one-number (gated to no-library
+  lessons, so carded lessons byte-identical).
+- a wide-cell Practice dealt whatever a page holds -> buildPractice trims a spill to the engine's own perPage.
+
+M2 (fact_family_sort L Mixed 72 % empty) is ROUTED: it reproduces only under lf-partopts' partOpts (not on master) and is
+the shared mixed-engine's last-page rebalance, byte-identical on d34311d. The part-option sweep needs partOpts merged first.
+
+#### Per-round findings (checks that would have caught each)
+- LS-WARM: a lesson sheet's Warm-up uniform row every cell >= 30 % empty | ws-lesson-samples LS-WARM | backtest lesson-g7-growing | on precritic lesson-pages-own + lesson-samples-all | 1 round/family
+- LS-FILL chart: a 2 x 2 anchor chart < 60 % used | ws-lesson-samples LS-FILL | lesson-div-chart-fill | same | 1 round
+- LS-FILL sheet: a single-page lesson sheet < 70 % used | ws-lesson-samples LS-FILL | lesson-mult-facts-sheet-fill | same | 1 round
