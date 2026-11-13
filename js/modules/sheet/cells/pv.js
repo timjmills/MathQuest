@@ -831,9 +831,6 @@ function pvRenderBody(p, ctx0) {
                     return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;align-items:flex-end;">`
                         + `${side(p.a, 'a')}<span style="padding-bottom:1.4mm;">${slot}</span>${side(p.b, 'b')}</div></div>`;
                 }
-                // (lf-placevalue compare r2, pixel ws-empty-band EB-BAND 40 % at S: the one line sat at the top of a row the
-                // practice spread grows - its white all under it. css/sheet-kit.css centres a compare cell's content in its row,
-                // the white split above and below, as the Reason It panels are)
                 return `<div class="pv-cell" style="text-align:center;"><div class="ws-eq pv-compare" style="font-weight:700;display:inline-flex;gap:${gapMm}mm;">`
                     + `<span>${esc(fmt(p.a))}</span>${slot}<span>${esc(fmt(p.b))}</span></div></div>`;
             }
