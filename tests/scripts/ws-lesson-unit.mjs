@@ -301,6 +301,7 @@ const LATE = {
         ok(pg([61, 64, 67]).some((m) => /3 items in the 60s/.test(m)), 'r4 N4: three in one ten fail');
         ok(pg([36, 41, 44]).some((m) => /answer 40 3 times/.test(m)), 'r4 N4: one answer three times fails');
         eq(pg([12, 25, 38, 41, 57, 63, 76, 84, 99]), [], 'r4: a varied page passes');
+        ok(pg([85, 31, 85]).some((m) => /85 2 times/.test(m)) && !NT.oneNumFits(85, null, [{ n: 85, ans: null }]), 'r5: one number twice on a page fails (round S Mixed "8 5" twice)');
         const mk = (n) => ({ q: { cell: { payload: { n } }, ans: String(Math.round(n / 10) * 10) } });
         const sp = NT.nearSplit([mk(74), mk(47), mk(43), mk(34), mk(88), mk(89), mk(52)], [mk(77)]);
         eq(sp.clean.map((x) => x.q.cell.payload.n), [74, 43, 88, 52], 'r4 N5: nearSplit (Guided 77 taken) puts 47 (74 turned round), 34, 89 later');

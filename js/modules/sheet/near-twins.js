@@ -13,6 +13,7 @@
  *   - they are within `within` of each other (47 / 49),
  *   - they are the same digits turned round (27 / 72),
  *   - inside ONE question of the check (`sameQ`), one place differs and they share a digit that is not 0 (77 / 71; not 30 / 90).
+ * One page never prints one skill's number twice (oneNumFits, pageOneNumViolations).
  * A page also holds at most `perTen` one-number items in one ten (61, 64, 67 is three) and uses one numeric answer at most
  * `perAnswer` times (three items rounding to 60). Two take-aways (a − b) are near twins when they take the same number away or
  * both numbers are within `subWithin` (51 − 44 / 53 − 45) - LR-6 as lesson-rules.js always read it.
@@ -70,7 +71,8 @@ const tenOf = (v) => Math.floor(v / 10);
  */
 export function oneNumFits(n, ans, taken, { twinsOnly = false } = {}) {
     if (n === null || n === undefined) return true;
-    for (const t of taken) if (t && t.n !== null && nearNumbers(t.n, n)) return false;
+    // (the same number twice is no new item either - round S Mixed printed "8 5" twice, r5 own read)
+    for (const t of taken) if (t && t.n !== null && (t.n === n || nearNumbers(t.n, n))) return false;
     // (`twinsOnly`: a dealer's last tier before its floors go - the pairs still held, the ten and answer caps given up)
     if (twinsOnly) return true;
     if (taken.filter((t) => t && t.n !== null && tenOf(t.n) === tenOf(n)).length >= NEAR.perTen) return false;
@@ -87,6 +89,9 @@ export function pageOneNumViolations(items) {
     for (let i = 0; i < its.length; i++) for (let j = i + 1; j < its.length; j++) {
         if (nearNumbers(its[i].n, its[j].n)) out.push(`${its[i].n} and ${its[j].n} are near twins (within ${NEAR.within} or the digits turned round)`);
     }
+    const seenN = new Map();
+    for (const x of its) seenN.set(Number(x.n), (seenN.get(Number(x.n)) || 0) + 1);
+    for (const [v, c] of seenN) if (c > 1) out.push(`${v} ${c} times on one page`);
     const tens = new Map();
     for (const x of its) tens.set(tenOf(x.n), [...(tens.get(tenOf(x.n)) || []), x.n]);
     for (const [t, v] of tens) if (v.length > NEAR.perTen) out.push(`${v.length} items in the ${t * 10}s (${v.join(', ')}; at most ${NEAR.perTen} a page)`);
