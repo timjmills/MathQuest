@@ -3982,6 +3982,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "eb-foot-div-facts",
+  "check": "ws-empty-band EB-FOOT: div_facts Independent at S / M / L draws each cell within 10 % of the footprint the bridge measured for it (lf-checks L25: the supports-off rows were stretched past the measured height). Its fail commit predates data-eb-item, so the row also exercises the position-pairing fallback (its NOTE); the pass commit pairs by index",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "commit": "537c2275",
+   "state": "EB-FOOT 156 on independent (rows stretched past the facts' measured footprint)"
+  },
+  "pass": {
+   "commit": "48e24daa6",
+   "state": "rows of 1.1 x the measured height (noStretch, de8e7531) on every offered role, each cell judged by its own data-eb-item: EB-FOOT within the pin (the 10 mixed-practice L findings are pinned facts debt)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --hosts none --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-reorder-arrays-groups",
+  "check": "ws-empty-band EB-FOOT pairs each cell with ITS OWN item by the kit's data-eb-item (critic eb-r5 m1): arrays_groups lays its items tallest first, so dealt-order pairing judged each cell against another item's footprint",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (index pairing, critic eb-r5 m1)",
+  "browser": true,
+  "fail": {
+   "commit": "4474a995",
+   "state": "no data-eb-item: position pairing, EB-FOOT 35 false findings on independent / more-practice / test / review (drawn heights are other items' footprints)"
+  },
+  "pass": {
+   "commit": "48e24daa6",
+   "state": "the kit writes data-eb-item: every cell judged against its own item, EB-FOOT 0, no fallback note"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:arrays_groups --hosts none --no-baseline --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
