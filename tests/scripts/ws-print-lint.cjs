@@ -1556,6 +1556,8 @@ function wsLintPage(cfg) {
                 const bandLabel = band ? ((band.querySelector('.ws-strip > b') || {}).textContent || '').trim() : '';
                 const model = !!c.querySelector('[data-ws-label="model"]') || /^(traced|answered)$/.test(c.getAttribute('data-ws-state') || '') && !ri.key;
                 return {
+                    // (the skill a multi-skill sheet's cell was attributed to, attributeCells: DN-2 / PG-23 read a Sections sheet by sub-section)
+                    skill: c.getAttribute('data-ws-skill') || '',
                     tag: c.id, rect: mmRect(c.getBoundingClientRect(), pr), slots: slots.length,
                     answered: slots.filter(slotAnswered).length, weightOk: slots.every(slotWeightOk),
                     shapes: [...new Set(slots.map(s => s.getAttribute('data-ws-shape')))],
@@ -1684,6 +1686,7 @@ function wsLintPage(cfg) {
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
                 footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
+                skills: [...new Set(items.map(c => c.skill).filter(Boolean))], attributed: items.every(c => !!c.skill),
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
                 doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
@@ -2197,11 +2200,23 @@ function lintKitGeometry(dom, pdf, info, F) {
             // (a faded packet's stages carry different supports, so their cells are not one size: a page's count is compared
             // with the pages of its own stage only - div_facts critic r6 R6-4, the bare last stage fills its page)
             const fadeKey = arg('fade', null) === 'packet' ? (q) => q.supKey : () => '';
-            const dnGroup = (dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages).filter(q => fadeKey(q) === fadeKey(p));
+            // (lf-engine roles, lf-placevalue compare r2 finding 3: a SECTIONS sheet - several skills, each its own sub-section on
+            // a practice role - prints sub-sections of different cell heights: 10 compare lines + facts on page 1, 4 tape diagrams
+            // filling page 2 (98 % of the body), 2 perimeter shapes + their example on page 3 (86 %). Their item counts are not one
+            // section's rows, so a page is compared only with the pages that hold one of ITS skills (PG-23: "the last page of a
+            // row-based section ... rebalanced across the section's pages"). Every cell must be attributed to a skill, or the
+            // whole sheet is compared as before; a Mixed practice page is one section (its shelves are its rows) and is not split.)
+            const subSec = info.mode === 'kit' && /^(independent|more-practice)$/.test(p.role) && p.items > 0
+                && pt.pages.every(q => !q.items || q.attributed) && new Set(pt.pages.flatMap(q => q.skills || [])).size > 1;
+            const secOf = (list) => (subSec ? list.filter(q => q.items && q.skills.some(k => p.skills.includes(k))) : list);
+            const dnGroup = secOf((dnL ? pt.pages.filter(q => dnLetter(q) === dnL) : pt.pages).filter(q => fadeKey(q) === fadeKey(p)));
             const dnMax = Math.max(...dnGroup.map(q => q.items));
             const dnLast = dnGroup[dnGroup.length - 1] === p;
-            if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
-            if (comparable && last && pt.pages.length > 1 && max > 0 && p.items > 0 && p.items < max / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${max}): rows are rebalanced across the sheet's pages (PG-23)`, 'short last page');
+            if (comparable && !dnLast && dnMax > 0 && p.items < dnMax / 2) F('L-DENSITY', 'DN-2', 'major', { page: p.idx }, `page ${p.idx} holds ${p.items} item(s) while page ${dnGroup[dnGroup.length - 1].idx} of the same ${dnL ? `letter ${dnL} sheet` : subSec ? 'sub-section' : 'sheet'} follows and its fullest page holds ${dnMax}: a page is never less than half used (PG-20, PG-23)`, 'half-empty page');
+            const secPages = secOf(pt.pages);
+            const secMax = subSec ? Math.max(...secPages.map(q => q.items)) : max;
+            const secLast = subSec ? secPages[secPages.length - 1] === p : last;
+            if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
             // print screen's default; --count N fixes it and turns this off), a practice page whose
             // problems end more than 20% of the body above the footer wastes the page. The last page
@@ -2907,6 +2922,30 @@ const SELF_TESTS = [
         p1.after(p2);
         p1.querySelector('.ws-foot b').textContent = '1/2'; p2.querySelector('.ws-foot b').textContent = '2/2';
         [...p1.querySelectorAll('[data-ws-cell]')].slice(2).forEach(c => c.remove());
+    } },
+    // DN-2 / PG-23 on a SECTIONS sheet (lf-engine roles, lf-placevalue compare r2 finding 3): each skill its own sub-section,
+    // page 1 six short problems of a:x, pages 2 and 3 two taller problems each of b:y and c:z - every page one sub-section, none
+    // short against ITS OWN pages; the whole-sheet count read them as half-empty (FAIL on 8df014ab7's lint)
+    { name: 'sections sheet: sub-sections of different heights (no DN-2 / PG-23)', mode: 'kit', expect: [], absent: ['L-DENSITY', 'DN-2'], absentMsg: [['L-DENSITY', 'PG-23'], /holds \d+ item/], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true), p3 = p1.cloneNode(true);
+        p1.after(p2); p2.after(p3);
+        [p1, p2, p3].forEach((p, i) => { p.setAttribute('data-ws-role', 'independent'); p.querySelector('.ws-foot b').textContent = `${i + 1}/3`; });
+        const top = (p) => [...p.querySelectorAll('[data-ws-cell]')].filter(c => !c.parentElement.closest('[data-ws-cell]'));
+        top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
+        top(p2).slice(2).forEach(c => c.remove()); top(p2).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
+        top(p3).slice(2).forEach(c => c.remove()); top(p3).forEach(c => c.setAttribute('data-ws-skill', 'c:z'));
+    } },
+    // ... and the control: a sub-section whose OWN last page holds one problem of six still fails PG-23
+    { name: 'sections sheet: a sub-section\'s short last page (PG-23)', mode: 'kit', expect: ['L-DENSITY', 'PG-23'], fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true), p3 = p1.cloneNode(true);
+        p1.after(p2); p2.after(p3);
+        [p1, p2, p3].forEach((p, i) => { p.setAttribute('data-ws-role', 'independent'); p.querySelector('.ws-foot b').textContent = `${i + 1}/3`; });
+        const top = (p) => [...p.querySelectorAll('[data-ws-cell]')].filter(c => !c.parentElement.closest('[data-ws-cell]'));
+        top(p1).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
+        top(p2).slice(1).forEach(c => c.remove()); top(p2).forEach(c => c.setAttribute('data-ws-skill', 'a:x'));
+        top(p3).forEach(c => c.setAttribute('data-ws-skill', 'b:y'));
     } },
     // L-LONE (H5; skip-count critic r4 D12): the second page of a two-page sheet holds one cell alone
     { name: 'lone cell on the last page (L-LONE)', expect: ['L-DENSITY', 'LONE'], fn: () => {
