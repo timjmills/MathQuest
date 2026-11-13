@@ -1067,7 +1067,9 @@ export function plan(input = {}) {
             })
             // A fact page (factRows): the tries beside the Model start where the Model's fact starts, under the tab's keep-out,
             // so the facts of the Model's row line up and each try's hint ends near the Model's (H13 under the try).
-            : facts && stage === 'partial' && !fit.span && i < cols
+            // (and a `guidedTight` number name - lf-roles critic r8b n6: the row-1 names sat a tab's keep-out above the Model's, and
+            // the hinted tries kept that height as a 28-30 % band under their hint)
+            : (facts || guidedTight([it])) && stage === 'partial' && !fit.span && i < cols
                 ? Object.assign({}, it, { cellStyle: [it.cellStyle || '', 'padding-top:calc(var(--ws-tab,6mm) + 1.5mm)'].filter(Boolean).join(';') })
                 : it;
         return planItem(cell, { cols, level, render: fadeRender(it, stage, ans, { hint: !!fit.hint, lines: !fit.noLines }), model: stage === 'model', nolabel: stage === 'model' });
