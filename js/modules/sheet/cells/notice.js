@@ -98,7 +98,10 @@ function wordChoice(ctx, labels, p) {
         const ring = i === on
             ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -2.2)};top:${L(ctx, -1.6)};right:${L(ctx, -2.2)};bottom:${L(ctx, -1.6)};color:${ink === 'trace' ? GREY : INK};border:${B(ctx, 1.5)} solid currentColor;border-radius:50%;"></span>`
             : '';
-        return `<span class="mq-nt-word" style="position:relative;display:inline-flex;align-items:center;justify-content:center;padding:${L(ctx, 1)} ${L(ctx, 2.5)};font-size:${P(ctx, pt)};font-weight:700;line-height:1.1;color:${INK};">${esc(w)}${ring}</span>`;
+        // (the ring stands 2.2 mm out of the word's box at each side: a RINGED word keeps that room beside it, so at the cell's edge
+        // the ring never reaches the border - ws-empty-band EB-EDGE, notice guided M Model 0.8 mm, precritic r9. Only the ringed
+        // word: a margin on every word changed the pupil rows - ws-options-verify --render patShow=false @S H13 0 -> 20)
+        return `<span class="mq-nt-word" style="position:relative;display:inline-flex;align-items:center;justify-content:center;${ring ? `margin:0 ${L(ctx, 2.2)};` : ''}padding:${L(ctx, 1)} ${L(ctx, 2.5)};font-size:${P(ctx, pt)};font-weight:700;line-height:1.1;color:${INK};">${esc(w)}${ring}</span>`;
     }).join('');
     return twin
         ? `<div class="mq-nt-choice" role="group" aria-label="answer choices" style="display:flex;justify-content:center;gap:${L(ctx, 10)};">${words}</div>`
