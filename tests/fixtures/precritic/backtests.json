@@ -4142,6 +4142,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "roles-mixed-size-order",
+   "check": "Mixed practice at S holds no fewer problems a page than at M, M than L (lead 2026-11-13, lf-roles' widened ws-capacity-pin SIZE-ORDER per page): the S lattice took 4-across fact shelves where M took 6, and a float-exact grow spilled a full page's last shelf to page 2",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin SIZE-ORDER",
+   "browser": true,
+   "fail": {
+    "commit": "8df014ab7",
+    "state": "master: add/sub/mult_facts S 20 < M 30; sub_100k S 10 < M 12; fact_family_sort S 8 < M 9; placevalue value / combine S 36 over 2 pages < M 21 a page (growing_shape_patterns S 18 over 2 < M 14 where it is passed)"
+   },
+   "pass": {
+    "commit": "01cfd07e3",
+    "state": "OK: 0 drops, S 30 / 15 / 12 / 36 on one page"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,subtraction:sub_100k_no_regroup,addition:fact_family_sort,placevalue:value,placevalue:combine --roles mixed-practice",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -974,6 +974,9 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
+        // (lf-engine roles, lead 2026-11-13: SIZE-ORDER / CAPACITY-NO-DROP on the ROLE a lane touches - Mixed practice at S held
+        // fewer problems a page than at M; the lane skills on that role at S, M and L against the capacity pin)
+        if (ctx.role !== 'lesson' && ctx.skills.length) add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role} (SIZE-ORDER: S holds no fewer items a page than M, M than L)`, `${ctx.skills.length} lane skill(s) × ${ctx.role} × S/M/L`, 'browser', 'ws-capacity-pin', ['--check', '--skills', ctx.skills.map((s) => s.key).join(','), '--roles', ctx.role], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
         // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
         const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];
