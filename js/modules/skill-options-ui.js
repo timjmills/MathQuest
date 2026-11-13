@@ -506,14 +506,30 @@ function _tidySample(frame) {
     }
     const stage = frame.querySelector(':scope > .tvp-stage');
     if (!stage) return;
+    // The centred scale below is the panel's fit: a thumbnail crop (teacher-preview fit's `is-cropped`, origin top-left)
+    // under it puts the stage off the frame (lf-algebra F8/G11), so it never survives a tidy.
+    frame.classList.remove('is-cropped');
+    frame.style.height = '';   // each tidy starts from the panel's own frame height (re-runs are idempotent)
     stage.style.transform = 'translate(-50%, -50%)';
     const w = Math.max(stage.scrollWidth, stage.offsetWidth, 1);
     const h = Math.max(stage.scrollHeight, stage.offsetHeight, 1);
-    const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
+    const fw = frame.clientWidth - 12;
+    let fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
+    // A tall sample (a growing pattern's four terms over a grid) fitted whole into the 140 px frame is drawn under
+    // 0.3 and reads as specks: the frame grows (never shrinks) until the drawing reaches 0.3, up to 28 % of the
+    // window and 260 px, so the whole problem stays in view at a legible size (lf-algebra F8/G11).
+    if (fh / h < SAMPLE_MIN_LEGIBLE && fw / w >= SAMPLE_MIN_LEGIBLE) {
+        const vh = (typeof window !== 'undefined' && window.innerHeight) || 800;
+        const cap = Math.max(fh + 12, Math.min(260, Math.round(vh * 0.28)));
+        const want = Math.min(cap, Math.ceil(h * SAMPLE_MIN_LEGIBLE) + 12);
+        if (want > fh + 12) { frame.style.height = `${want}px`; fh = frame.clientHeight - 12; }
+    }
     const k = Math.min(1, fw / w, fh / h);
     stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
 }
+// (teacher-preview's MIN_LEGIBLE: below it a sample's strokes are hairlines)
+const SAMPLE_MIN_LEGIBLE = 0.3;
 
 /** Apply one control change to a full option object. Shared by every host and the print dialog. */
 export function applyOptionEdit(next, defs, action, optId, raw) {

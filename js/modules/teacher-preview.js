@@ -204,8 +204,11 @@ function fit(frame) {
     const fw = frame.clientWidth - 12, fh = frame.clientHeight - 12;
     if (fw <= 0 || fh <= 0) return;
     const s = Math.min(1, fw / w, fh / h);
-    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop
-    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop')) {
+    // the hover / pinned preview shows the whole problem (owner 2026-10-30): only small inline thumbnails crop.
+    // The option panel's sample (.tv-sko-sample) is not one: skill-options-ui _tidySample centres and scales it
+    // (translate(-50%,-50%) scale(k)), and a top-left crop under that transform put the stage off the frame
+    // (lf-algebra F8/G11: a blank sample for growing_shape_patterns and pattern_features).
+    if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop, .tv-sko-sample')) {
         frame.classList.add('is-cropped');
         stage.style.transform = `scale(${CROP_SCALE})`;
         return;
