@@ -429,7 +429,17 @@ async function changeFirstOption(page) {
         c.dispatchEvent(new Event('change', { bubbles: true }));
         return 'ok';
     }, at);
-    return res === 'ok' || res === 'gone' ? at.kind : res === 'same' ? '' : res;
+    if (!/^\[hit\]/.test(res)) return res === 'ok' || res === 'gone' ? at.kind : res === 'same' ? '' : res;
+    // (the pointer did not reach it: [hit] is reported, and the option is changed through the DOM all the same, so every
+    // other family is still judged after a change - the round-1 / round-2 backtest states carry the P1 hit area too)
+    await page.evaluate(() => {
+        const c = document.querySelector('#skillOptionsPopover .tv-sko-body select, #skillOptionsPopover .tv-sko-body input[type="checkbox"]');
+        if (!c) return;
+        if (c.tagName === 'SELECT') { c.selectedIndex = (c.selectedIndex + 1) % c.options.length; c.dispatchEvent(new Event('change', { bubbles: true })); } else c.click();
+        // (the tip the stray click opened is closed again, as a teacher would)
+        for (const t of document.querySelectorAll('#skillOptionsPopover .sko-tip[aria-expanded="true"]')) t.click();
+    });
+    return { hit: res, kind: at.kind };
 }
 
 // One check: open the panel at `vp`, read it after both tidies; then optionally resize it while open (`resizeTo`), or
@@ -521,9 +531,9 @@ async function checkSkill(app, ref, vp, mode = {}) {
         const rz = await read(`${vp.w}x${vp.h}>${mode.resizeTo}`);
         if (rz && !rz.part) walkPush(`${vp.w}x${vp.h}>${mode.resizeTo}`, [rz]);
     }
-    const changed = mode.change ? await changeFirstOption(page) : '';
-    if (/^\[hit\]/.test(changed)) out.push({ ref, width: `${vp.label} option change`, fails: CHECKS.has('hit') ? [changed] : [], note: changed });
-    else if (changed) {
+    let changed = mode.change ? await changeFirstOption(page) : '';
+    if (changed && typeof changed === 'object') { out.push({ ref, width: `${vp.label} option change`, fails: CHECKS.has('hit') ? [changed.hit] : [], note: changed.hit }); changed = changed.kind; }
+    if (changed) {
         await sleep(50);
         await read(`${vp.label} changed +50ms`);
         await sleep(1450);
