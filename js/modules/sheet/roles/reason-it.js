@@ -96,9 +96,15 @@ export function prepare(it, info = {}) {
         + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
         + `</div>`;
     const head = (c) => (topResp ? `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6mm;margin-bottom:3mm"><div style="flex:1 1 auto;min-width:0">${story(c).replace('margin-bottom:3mm;', '')}</div>${resp(c)}</div>` : story(c));
+    // (STACKED, new layout only: the A / B tag stands in a left gutter beside the work, not in a 10 mm band over it - npr's two
+    // stacked trains held 2 a page at S with a 33 % band under them; critic r6f F1)
+    // (at S and M only: it buys a third item there; L's ceiling is 2 rows, so the saved height only grew the band under the work
+    // to 32 % - ws-empty-band EB-BAND)
+    const stackTagOf = (c) => (wide && !legacy && c && c.size !== 'L' ? ';padding:2.5mm 2mm 2.5mm 11mm;align-items:flex-start' : '');
+    const boxAt = (c, col, row) => (stackTagOf(c) ? ` style="grid-column:${col};grid-row:${row}${stackTagOf(c)}"` : at(col, row));
     const render = (c, o = {}) => head(c) + `<div class="mq-ab" style="${abStyle}">`
-        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
-        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
+        + `<div class="mq-abbox"${boxAt(c, 1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
+        + `<div class="mq-abbox"${boxAt(c, 1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
         // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
         // the ring in a mostly empty column); inline, so only Reason It pages change
         + (topResp ? '' : resp(c))
