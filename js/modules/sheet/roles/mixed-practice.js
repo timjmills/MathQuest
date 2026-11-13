@@ -688,7 +688,9 @@ export function plan(input = {}) {
         // items never read all one place or strictly alternate - T O T O T O: placePick takes another place from the pool, then a
         // seeded order; a band with no pattern prints as before)
         // (r6, critic r5 "78 twice": and no band repeats a number an earlier band printed - pageUnique swaps in a pool spare)
-        const its = input.lessonFit ? placePick(pageUnique(pools[id].slice(0, sh.n * sh.per), pools[id], sh.n * sh.per, printedNums), pools[id], sh.n * sh.per, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, sh.n * sh.per);
+        const take = sh.n * sh.per;
+        const uniq = input.lessonFit ? pageUnique(pools[id].slice(0, take), pools[id], take, printedNums) : null;
+        const its = uniq ? placePick(uniq.concat(pools[id].filter((it) => !uniq.includes(it))), take, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, take);
         for (const it of its) { const v = oneNumOf(it); if (v !== null) printedNums.add(v); }
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
