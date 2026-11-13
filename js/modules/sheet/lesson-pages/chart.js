@@ -116,6 +116,15 @@ export function stateDrawing(it, steps, groups, k, c) {
         if (it.q.cell.template === 'fact') html = factMarks(html, it, steps, groups, k, !!c.hops);
         return unslot(html);
     }
+    // A count row (F5, lf-algebra r8 via the lead): state k draws the marks of steps 1..k in trace (`traceSlots`, as the Scripted
+    // Model's states do, PT-MOD-1; a provider's mark `blankN` is the row's slot `bN`), never a blank row then the answer.
+    if (it.q && it.q.cell && it.q.cell.template === 'count-row' && merged.some((g) => (g.marks || []).length)) {
+        const acc = {};
+        merged.slice(0, k + 1).forEach((g) => (g.marks || []).forEach((m) => { if (m && m.slot !== undefined) acc[String(m.slot).replace(/^blank(\d+)$/, 'b$1')] = String(m.value); }));
+        let html = '';
+        try { html = it.render(ctx, { cols: 2, payload: Object.assign({}, it.q.cell.payload || {}, { traceSlots: acc }) }); } catch (e) { html = ''; }
+        return unslot(html);
+    }
     // A template with no step states: the problem blank, then answered in grey on the last state.
     const ans = answerOf(it);
     const last = k === groups.length - 1;
