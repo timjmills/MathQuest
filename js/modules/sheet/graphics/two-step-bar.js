@@ -89,17 +89,29 @@ export function twoStepBarSize(ctx, steps, maxW = 0) {
     const need = (b) => (b.kind === 'groups'
         ? b.n * (gw(b) + AIR + (b.parts[0].unknown ? Q_ROOM : 0))
         : Math.max((lw + AIR + Q_ROOM) * 1.05, (lw + AIR + (b.parts[0].unknown ? Q_ROOM : 0)) / 0.6, (lw + AIR + (b.parts[1].unknown ? Q_ROOM : 0)) / 0.4));
-    const Ws = bars.map((b) => Math.max(48, need(b)));
+    let Ws = bars.map((b) => Math.max(48, need(b)));
     const segH = TS_BAR_H[size] || 14;
     const capW = CAP_W[size] || 17;
     const arrowW = ARROW_W[size] || 16;
     const twin = isTwin(ctx);
-    const wide = Ws[0] + arrowW + Ws[1] + 3;
+    let wide = Ws[0] + arrowW + Ws[1] + 3;
     // (side by side when the room given holds them; else the Step 2 bar wraps under - the drawing is one flex row)
-    const across = Number(maxW) > 0 ? wide <= Number(maxW) : !twin;
+    let across = Number(maxW) > 0 ? wide <= Number(maxW) : !twin;
+    // (two-step round 3b, lf-roles r9 OVERFLOW: a ÷ bar of 6 equal groups whose group size is the unknown is 6 x (box + `?` room)
+    // = 114 mm at L, so the bars stacked and the Guided cell grew to 188 mm in a 184 mm page body. When the bars would stand side
+    // by side without the `?` room, that groups row grows by the `?` height instead - the `?` stays in the top-left corner, the
+    // box sits under it at the right - and the bars stand across. No box, digit or line is smaller: only the row is taller.)
+    const qH = zonePt(ctx) * 0.3528 + 0.8;
+    let qTall = [false, false];
+    if (!across && !twin && Number(maxW) > 0) {
+        const tallable = bars.map((b) => b.kind === 'groups' && !!b.parts[0].unknown);
+        const Ws2 = bars.map((b, i) => (tallable[i] ? Math.max(48, b.n * (gw(b) + AIR + 1.6)) : Ws[i]));
+        const wide2 = Ws2[0] + arrowW + Ws2[1] + 3;
+        if (tallable.some(Boolean) && wide2 <= Number(maxW)) { Ws = Ws2; wide = wide2; across = true; qTall = tallable; }
+    }
     const capH = zonePt(ctx) * 0.3528 * 1.3;
-    const hMm = across ? capH + 2 * segH + 1.2 : 2 * (capH + 2 * segH + 1.2) + 2;
-    return { bars, lw, gw, Ws, segH, capW, arrowW, across, wMm: across ? wide : arrowW + 1.5 + Math.max(...Ws), hMm };
+    const hMm = across ? capH + 2 * segH + 1.2 + (qTall.some(Boolean) ? qH : 0) : 2 * (capH + 2 * segH + 1.2) + 2;
+    return { bars, lw, gw, Ws, segH, capW, arrowW, across, qTall, qH, wMm: across ? wide : arrowW + 1.5 + Math.max(...Ws), hMm };
 }
 
 /**
@@ -110,7 +122,7 @@ export function twoStepBar(ctx, o = {}) {
     const g = twoStepBarSize(ctx, o.steps, o.maxW);
     if (!g) return '';
     const { show = false, ink = null } = o;
-    const { bars, lw, gw, Ws, segH, arrowW } = g;
+    const { bars, lw, gw, Ws, segH, arrowW, qTall, qH } = g;
     const size = sizeOf(ctx);
     const twin = isTwin(ctx);
     const hw = BOX_H[size] || 10;
@@ -124,14 +136,15 @@ export function twoStepBar(ctx, o = {}) {
     const qMark = `<span aria-hidden="true" data-ws-zone="unknown" style="position:absolute;left:${L(ctx, 0.8)};top:${L(ctx, 0.3)};font-size:${P(ctx, zp)};font-weight:700;line-height:1;color:${INK};">?</span>`;
     const segHcss = twin ? `max(50px, ${L(ctx, segH)})` : L(ctx, segH);
     // one outlined cell (1.5 pt, RP-70) w mm wide, holding its box (none: an equal group's other segments)
-    const seg = (w, cell, id, first, bw) => `<span${cell && cell.unknown ? ' data-ws-unknown="1"' : ''} style="position:relative;flex:none;display:flex;align-items:center;justify-content:${cell && cell.unknown ? 'flex-end' : 'center'};box-sizing:border-box;width:${twin ? `max(${cell ? 56 : 14}px, ${L(ctx, w)})` : L(ctx, w)};height:${segHcss};border:${B(ctx, 1.5)} solid ${INK};${first ? '' : 'border-left:none;'}background:#fff;padding:0 ${L(ctx, 0.8)};">${cell && cell.unknown ? qMark : ''}${cell ? box(cell, id, bw) : ''}</span>`;
+    // (`tall`: a groups row grown by the `?` height - the box at the bottom right, under the `?`; see twoStepBarSize)
+    const seg = (w, cell, id, first, bw, tall = false) => `<span${cell && cell.unknown ? ' data-ws-unknown="1"' : ''}${tall ? ' data-ts-qtall="1"' : ''} style="position:relative;flex:none;display:flex;align-items:${tall ? 'flex-end' : 'center'};justify-content:${cell && cell.unknown ? 'flex-end' : 'center'};box-sizing:border-box;width:${twin ? `max(${cell ? 56 : 14}px, ${L(ctx, w)})` : L(ctx, w)};height:${tall ? L(ctx, segH + qH) : segHcss};border:${B(ctx, 1.5)} solid ${INK};${first ? '' : 'border-left:none;'}background:#fff;padding:0 ${L(ctx, 0.8)};${tall ? `padding-bottom:${L(ctx, Math.max(0.8, (segH - hw) / 2))};` : ''}">${cell && cell.unknown ? qMark : ''}${cell ? box(cell, id, bw) : ''}</span>`;
     const capt = (k) => `<span class="mq-ts2bar-cap" style="flex:none;font-size:${P(ctx, zp)};font-weight:700;line-height:1.3;">Step ${k}</span>`;
     const drawBar = (bar, k) => {
         const W = Ws[k - 1];
         const id = (x) => `ts${k}-${x}`;
         const whole = `<div style="display:flex;">${seg(W, bar.whole, id('w'), true, lw)}</div>`;
         const parts = bar.kind === 'groups'
-            ? Array.from({ length: bar.n }, (_, i) => seg(W / bar.n, i === 0 ? bar.parts[0] : null, id('p0'), i === 0, gw(bar))).join('')
+            ? Array.from({ length: bar.n }, (_, i) => seg(W / bar.n, i === 0 ? bar.parts[0] : null, id('p0'), i === 0, gw(bar), !!(qTall && qTall[k - 1]))).join('')
             : seg(0.6 * W, bar.parts[0], id('p0'), true, lw) + seg(0.4 * W, bar.parts[1], id('p1'), false, lw);
         const body = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.2)};">${whole}<div style="display:flex;">${parts}</div></div>`;
         return `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 0.4)};">${capt(k)}${body}</div>`;
