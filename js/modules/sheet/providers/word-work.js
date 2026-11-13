@@ -14,9 +14,10 @@
 //
 // Pure module (SCC-01).
 
-import { registerSkill } from '../contract.js';
+import { registerSkill, INSTRUCTION_LIBRARY } from '../contract.js';
 import { fmt, strings, step, clampSteps, chooseWrong } from './util.js';
 import { cueRanges, wordWorkPayload } from '../cells/word-work.js';
+import { presetOf } from '../../skill-presets.js';   // pure table (no window / state / DOM), SCC-01 safe
 
 const GLYPH = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 const VERB = { '+': 'Add', '-': 'Subtract', '*': 'Multiply', '/': 'Divide' };
@@ -48,6 +49,8 @@ function workLine(st) {
 export function wordWorkSteps(q) {
     const p = payloadOf(q);
     if (!p) return [];
+    // (the letter and the estimate presets answer differently: their own four moves, whatever the first step - two-step card §3)
+    if (p.steps.length === 2 && (p.letter || p.check)) return twoStepSteps(p);
     // A two-step story whose first step is × or ÷ (msOps, detailed lesson g3-oa8-two-step-wp): four moves, each one
     // a chart panel - read, Step 1, Step 2 (with the Step 1 answer), the answer and its unit. No key words.
     if (p.steps.length === 2 && (p.steps[0].op === '*' || p.steps[0].op === '/')) {
@@ -60,6 +63,9 @@ export function wordWorkSteps(q) {
             step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`),
         ];
     }
+    // Every other two-step story (two-step card §3: the routines of BUILD #17 and the lesson-7 follow-ons): four moves,
+    // one a chart panel and one a scripted-model frame - the count of the lesson routine's steps (lessons/families/algebra.js).
+    if (p.steps.length === 2) return twoStepSteps(p);
     // the sentence form (stories within 20): PART-WHOLE, never key words (PEDAGOGY P-21, P-WP-10; critic r1 F6) - read,
     // find the parts and the whole on the bar (the structure decision: "I know both parts. I add." / "I know the whole
     // and one part. I subtract."), write the number sentence, solve. Four steps: each is one panel of the lesson's chart
@@ -90,6 +96,46 @@ export function wordWorkSteps(q) {
     });
     out.push(step(`Write the answer: ${fmt(p.ans)}${p.unit ? ` ${p.unit}` : ''}.`, [{ slot: 'answer', value: String(p.ans) }]));
     return clampSteps(out);
+}
+
+const r10 = (n) => Math.round(n / 10) * 10;
+/** The x / ÷ step written in the story's order (groups x each; total ÷ friends). */
+const stepText = (st) => (st.op === '*' ? `${fmt(st.a)} × ${fmt(st.b)} = ${fmt(st.ans)}` : st.op === '/' ? `${fmt(st.top)} ÷ ${fmt(st.bottom)} = ${fmt(st.q)}` : `${fmt(st.top)} ${GLYPH[st.op]} ${fmt(st.bottom)} = ${fmt(st.ans)}`);
+
+/**
+ * The four moves of a two-step story whose first step is + or − (the G2 routine, BUILD #17, and the add-first presets),
+ * written as one equation with n (msLetter), or checked by an estimate (msCheck). Each step names only this item's numbers.
+ */
+function twoStepSteps(p) {
+    const [s1, s2] = p.steps;
+    const unit = p.unit ? ` ${Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit}` : '';
+    if (p.letter) {
+        const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
+        const brk = (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
+        const eq = `${brk ? '(' : ''}${fmt(x(s1))} ${GLYPH[s1.op]} ${fmt(y(s1))}${brk ? ')' : ''} ${GLYPH[s2.op]} ${fmt(s2.bottom)} = n`;
+        return [
+            step('Read the story two times.'),
+            step(`My equation is ${eq}.`, [{ slot: 'op0', value: GLYPH[s1.op] }, { slot: 'op1', value: GLYPH[s2.op] }]),
+            step(`Work it out: ${stepText(s1)}, then ${stepText(s2)}.`),
+            step(`n = ${fmt(p.ans)}.`, [{ slot: 'answer', value: String(p.ans) }]),
+        ];
+    }
+    if (p.check) {
+        const c = p.check;
+        return [
+            step(`Solve: ${stepText(s1)}. ${stepText(s2)}.`, [{ slot: 'answer', value: String(p.ans) }]),
+            step(`Round each number: ${fmt(s1.top)} is about ${fmt(c.a)}, ${fmt(s1.bottom)} is about ${fmt(c.b)}, ${fmt(s2.bottom)} is about ${fmt(c.c)}.`),
+            step(`Estimate: ${fmt(c.a)} ${GLYPH[s1.op]} ${fmt(c.b)} ${GLYPH[s2.op]} ${fmt(c.c)} = ${fmt(c.est)}.`, [{ slot: 'es-r', value: String(c.est) }]),
+            step(`${fmt(p.ans)} is close to ${fmt(c.est)}. Yes.`),
+        ];
+    }
+    const add = s1.op === '+' || s1.op === '-';
+    return [
+        step('Read the story two times.', [{ slot: 'ms-read', value: '1' }]),
+        step(`Step 1: ${add ? `circle ${GLYPH[s1.op]}. ` : ''}${stepText(s1)}.`, [{ slot: 'op0', value: GLYPH[s1.op] }]),
+        step(`Step 2: use ${fmt(s1.op === '/' ? s1.q : s1.ans)}. ${stepText(s2)}.`, [{ slot: 'op1', value: GLYPH[s2.op] }]),
+        step(`Write the answer: ${fmt(p.ans)}${unit}.`, [{ slot: 'answer', value: String(p.ans) }]),
+    ];
 }
 
 /** Error analysis / True or False?: the same story worked with the wrong sign. */
@@ -135,6 +181,22 @@ export function wordWorkWrongs(q) {
         return out.filter((w) => Number.isFinite(w.value) && w.value >= 0 && !seen.has(w.value) && (seen.add(w.value), true))
             .concat([{ value: s2.ans, display: fmt(s2.ans), correct: true }]);
     }
+    // Every other two-step story (+ / − first; two-step card §6): M-TS1 stopped after Step 1, M-TS3 Step 2 with a story
+    // number, M-TS2 / M-TS6 one operation for all the story numbers (every number added).
+    if (p && p.steps.length === 2) {
+        const [s1, s2] = p.steps;
+        const r1 = s1.op === '/' ? s1.q : s1.ans;
+        const calc = (x, op, y) => (op === '+' ? x + y : op === '-' ? Math.abs(x - y) : op === '*' ? x * y : (y && x % y === 0 ? x / y : NaN));
+        const n2 = s2.op === '*' ? (s2.a === r1 ? s2.b : s2.a) : s2.bottom;
+        const out = [
+            { value: r1, display: fmt(r1), misconception: 'ms-stop-step1', explain: 'Stopped after Step 1.' },
+            { value: calc(s1.op === '-' ? s1.top : s1.bottom, s2.op, n2), misconception: 'ms-story-number', explain: 'Did Step 2 with a story number, not the Step 1 answer.' },
+            { value: s1.top + s1.bottom + n2, misconception: 'ms-one-op', explain: 'Added every number in the story.' },
+        ].map((w) => Object.assign(w, { display: fmt(w.value) }));
+        const seen = new Set([s2.op === '/' ? s2.q : s2.ans]);
+        return out.filter((w) => Number.isInteger(w.value) && w.value >= 0 && !seen.has(w.value) && (seen.add(w.value), true))
+            .concat([{ value: p.ans, display: fmt(p.ans), correct: true }]);
+    }
     if (!p || p.steps.length !== 1) return [];
     const st = p.steps[0];
     if (st.op !== '+') { const w = wordWorkWrong(q); return w ? [w] : []; }
@@ -177,6 +239,78 @@ export function wordWorkProvider(iCan, extra = {}, { sentence = false } = {}) {
     }, extra);
 }
 
+/**
+ * The two-step stories' provider (two-step card 2026-11-13: algebra:multi_step_word(_plain) and the five two_step_*
+ * presets, which answer through their host). Its strings FOLLOW THE ITEM, or with no item the page's options (ref.opts,
+ * else the preset's values - L28): the instruction ('story-letter', 'story-estimate', 'story-steps', 'story-work'), the
+ * lesson routine of card §3 as the steps (four, as many as workedSteps), the title and the Say frame of each kind.
+ */
+const TS_KIND = {
+    letter: { iCan: 'I Can write a two-step story as one equation', key: 'story-letter',
+        steps: ['Read it. What do I find first?', 'Write one equation.', 'Work it out.', 'n is the answer.'],
+        say: 'My equation is __. n is __.',
+        sayValues: (q) => { const p = payloadOf(q); if (!p || p.steps.length !== 2) return null; const w = twoStepSteps(p)[1]; const m = /My equation is (.+)\.$/.exec(w.text); return m ? [m[1], fmt(p.ans)] : null; } },
+    check: { iCan: 'I Can check a two-step answer with an estimate', key: 'story-estimate',
+        steps: ['Solve the two steps.', 'Round each number to the nearest ten.', 'Estimate.', 'Is my answer close?'],
+        say: 'About __. My answer __ is close.',
+        sayValues: (q) => { const p = payloadOf(q); return p && p.check ? [fmt(p.check.est), fmt(p.ans)] : null; } },
+    muldiv: { iCan: 'I Can solve two-step stories', key: 'story-work',
+        steps: ['Read it. What do I find first?', 'Step 1: groups or share. × or ÷.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] },
+    addfirst: { iCan: 'I Can solve two-step stories', key: 'story-work',
+        steps: ['Read it. What do I find first?', 'Step 1: put them together.', 'Step 2: share or make groups.', 'Write the answer and the unit.'],
+        // (the item's own moves, L6: a take-away first step is not "put them together"; Step 2 shares OR makes groups)
+        stepsFor: (q) => { const p = payloadOf(q); if (!p || p.steps.length !== 2) return null; const [s1, s2] = p.steps;
+            return ['Read it. What do I find first?', s1.op === '+' ? 'Step 1: put them together.' : 'Step 1: take some away.', s2.op === '/' ? 'Step 2: share them.' : 'Step 2: make groups.', 'Write the answer and the unit.']; } },
+    addsub: { iCan: 'I Can solve two-step stories', key: 'story-work',
+        steps: ['Read it. What happens first?', 'Step 1: circle the sign. Solve.', 'Step 2: use my Step 1 answer.', 'Write the answer and the unit.'] },
+};
+/** The kind of a two-step page: from the item's payload, else the page's options, else the preset's values. */
+function twoStepKind(ref = {}) {
+    const p = ref.q ? payloadOf(ref.q) : null;
+    if (p && Array.isArray(p.steps) && p.steps.length === 2) {
+        if (p.letter) return 'letter';
+        if (p.check) return 'check';
+        const [s1, s2] = p.steps;
+        if (s1.op === '*' || s1.op === '/') return 'muldiv';
+        return s2.op === '*' || s2.op === '/' ? 'addfirst' : 'addsub';
+    }
+    let o = ref.opts && typeof ref.opts === 'object' ? ref.opts : null;
+    if (!o) { const pre = presetOf(ref.categoryId || 'algebra', ref.skillId || ''); o = pre ? pre.opts : {}; }
+    if (o.msLetter === true) return 'letter';
+    if (o.msCheck === true) return 'check';
+    if (['mult', 'div', 'multdiv'].includes(o.msOps)) return 'muldiv';
+    if (['addmult', 'adddiv'].includes(o.msOps)) return 'addfirst';
+    return 'addsub';
+}
+export function twoStepProvider() {
+    const fns = {};
+    for (const [k, d] of Object.entries(TS_KIND)) {
+        fns[k] = strings({
+            iCan: d.iCan, instructionKey: d.key, steps: d.steps,
+            say: d.say || 'The answer is __ __.',
+            ...(d.stepsFor ? { stepsFor: d.stepsFor } : {}),
+            sayValues: d.sayValues || ((q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), Number(p.ans) === 1 && p.unitOne ? p.unitOne : p.unit] : null; }),
+        });
+    }
+    const pick = (ref) => {
+        const kind = twoStepKind(ref || {});
+        const out = fns[kind](ref);
+        // (the compact form: one number sentence a step - its own instruction, as the item's printText says)
+        const p = ref && ref.q ? payloadOf(ref.q) : null;
+        const frames = p ? p.layout === 'frames' && !p.letter && !p.check : !!(ref && ref.opts && ref.opts.wpFrames);
+        if (frames && (kind === 'addsub' || kind === 'muldiv' || kind === 'addfirst')) { out.instructionKey = 'story-steps'; out.instruction = INSTRUCTION_LIBRARY['story-steps']; }
+        return out;
+    };
+    pick.def = fns.addsub.def;
+    return wordWorkProvider('I Can solve two-step stories', {
+        strings: pick,
+        // card §6: the two-step errors (M-TS1 / M-TS3 / M-TS2 / M-TS6) and the wrong operation for a step (M-TS4)
+        misconceptions: ['ms-stop-step1', 'ms-story-number', 'ms-one-op', 'wrong-operation'],
+        // a two-step story is a full-width cell (the two step columns side by side), measured on the page
+        footprint: { kind: 'word-work', factLike: false, maxCols: 1, wMm: 186, measure: true },
+    });
+}
+
 const OWN = {
     'addition:add_word_problems': 'I Can solve addition stories',
     'subtraction:sub_word_problems': 'I Can solve subtraction stories',
@@ -211,6 +345,7 @@ for (const [key, iCan] of Object.entries(OWN)) {
                 sayValues: (q) => { const p = payloadOf(q); return p && p.unit ? [fmt(p.ans), p.unit] : null; },
             }),
         })
+        : /multi_step_word/.test(key) ? twoStepProvider()
         : wordWorkProvider(iCan);
     registerSkill(key, def);
     if (!/remainder_/.test(key)) registerSkill(`${key}_plain`, def);

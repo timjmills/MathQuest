@@ -13,6 +13,8 @@
 
 const NOT_CARDED = 'lf-algebra lesson (2026-11-07), moved from prereqs.js; its cases are declared when the lesson passes its critic (lessons-first).';
 const NO_CHECK = 'lf-algebra lesson moved from prereqs.js with its Warm-up until its Prerequisite Check is written (LR-17).';
+const TWO_STEP_CASES = 'lf-algebra two-step build (2026-11-13, card decision 11): its cases are declared when the lesson passes its critic (lessons-first).';
+const TWO_STEP_CHECK = 'lf-algebra two-step build (2026-11-13): the Warm-up deals the one-step facts each step is, until its Prerequisite Check is written (LR-17).';
 
 export const ROUTINES = Object.freeze({
     // ------------------------------------------------ Function tables: use a rule (3.OA.D.9, 4.OA.C.5)
@@ -213,6 +215,142 @@ export const ROUTINES = Object.freeze({
         // printed - pickExample's first tier is then its no-pattern tier - until the lesson is carded)
         example: { match: '[\\s\\S]' },
     },
+
+    // ------------------------------------------------ Two-step stories (two-step card 2026-11-13, decision 11; card §3)
+    // Seven skills on the word-work drawing: multi_step_word(_plain) (BUILD #17, G2: + / − then + / −) and the five
+    // presets of detailed lesson 7 (BUILD #7, 3.OA.D.8). Each routine's four steps are the four worked steps of
+    // sheet/providers/word-work.js (twoStepSteps / the x / ÷-first moves), one a chart panel. The two-step bar model is
+    // drawn on the teaching cells (scaffold level >= 2), so the chart and the model show the structure.
+    'two-step-addsub': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'two-steps', text: 'A two-step story has two changes. Do them in order.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer, not a story number.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'Step 1', meaning: 'what happens first', picture: { kind: 'text', text: '27 + 31 = 58' } },
+            { word: 'Step 2', meaning: 'what happens next, from the Step 1 answer', picture: { kind: 'text', text: '58 + 19 = 77' } },
+            { word: 'two-step', meaning: 'a story with two changes', picture: { kind: 'text', text: '+ then −' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What happens first?' },
+            { icon: 'decide', text: 'Step 1: circle the sign. Solve.' },
+            { icon: 'start', text: 'Step 2: use my Step 1 answer.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First this. Then that.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error pupils make is to stop after Step 1 or to start Step 2 from a story number; a four-word chant said at step 3 keeps the order.',
+        },
+        example: { match: 'Step 2: use' },
+    },
+    'two-step-muldiv-first': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'groups-first', text: 'Equal groups or a fair share come first: × or ÷.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'equal groups', meaning: 'groups with the same number', picture: { kind: 'text', text: '4 bags of 6' } },
+            { word: 'share', meaning: 'split into equal groups', picture: { kind: 'text', text: '28 ÷ 4 = 7' } },
+            { word: 'Step 1 answer', meaning: 'the number Step 2 uses', picture: { kind: 'text', text: '24 − 5' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            { icon: 'decide', text: 'Step 1: groups or share. × or ÷.' },
+            { icon: 'start', text: 'Step 2: use my Step 1 answer.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First the groups. Then the change.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7: the two chunks (× first, ÷ first) say "First the groups / First the share. Then the change."; the chant orders the two steps.',
+        },
+        example: { match: 'Step 1: \\d+ [×÷]' },
+    },
+    'two-step-add-first': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'brackets', text: 'Put them together first, then share or make groups.' },
+            { id: 'use-step-1', text: 'Step 2 starts from the Step 1 answer.' },
+            { id: 'unit', text: 'The answer is a number of things: say the unit.' },
+        ],
+        vocab: [
+            { word: 'in each', meaning: 'how many one group has', picture: { kind: 'text', text: '6 + 3 in each bag' } },
+            { word: 'the rest', meaning: 'what is left to share', picture: { kind: 'text', text: '17 − 5 = 12' } },
+            { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(6 + 3) × 2' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            { icon: 'decide', text: 'Step 1: put them together.' },
+            { icon: 'start', text: 'Step 2: share or make groups.' },
+            { icon: 'write', text: 'Write the answer and the unit.' },
+        ],
+        chant: 'First this. Then that.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'The error is doing the × or ÷ first (brackets left out, M-TS5); the chant keeps the story order.',
+        },
+        example: { match: 'Step 2: use' },
+    },
+    'two-step-letter': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'one-equation', text: 'One equation can show both steps.' },
+            { id: 'letter', text: 'A letter, n, stands for the number we find.' },
+            { id: 'order', text: 'Brackets show the step to do first.' },
+        ],
+        vocab: [
+            { word: 'equation', meaning: 'two sides that are equal', picture: { kind: 'text', text: '5 × 9 + 13 = n' } },
+            { word: 'n', meaning: 'the unknown number', picture: { kind: 'text', text: 'n = 58' } },
+            { word: 'brackets', meaning: 'do this part first', picture: { kind: 'text', text: '(6 + 3) × 2' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read it. What do I find first?' },
+            { icon: 'write', text: 'Write one equation.' },
+            { icon: 'start', text: 'Work it out.' },
+            { icon: 'check', text: 'n is the answer.' },
+        ],
+        chant: 'Write one equation. n is the answer.',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7 follow-on (card §3): the equation and the letter are the new thing; the chant names both.',
+        },
+        example: { match: 'My equation is' },
+    },
+    'two-step-estimate': {
+        archetype: 'story',
+        casesPending: TWO_STEP_CASES,
+        concepts: [
+            { id: 'round', text: 'Round each story number to the nearest ten.' },
+            { id: 'estimate', text: 'Work the rounded numbers: that is the estimate.' },
+            { id: 'close', text: 'A right answer is close to the estimate.' },
+        ],
+        vocab: [
+            { word: 'round', meaning: 'to the nearest ten', picture: { kind: 'text', text: '37 → 40' } },
+            { word: 'estimate', meaning: 'a number close to the answer', picture: { kind: 'text', text: '40 − 30 + 40 = 50' } },
+            { word: 'close', meaning: 'not far from', picture: { kind: 'text', text: '47 is close to 50' } },
+        ],
+        steps: [
+            { icon: 'start', text: 'Solve the two steps.' },
+            { icon: 'look', text: 'Round each number to the nearest ten.' },
+            { icon: 'write', text: 'Estimate.' },
+            { icon: 'check', text: 'Is my answer close?' },
+        ],
+        chant: 'Round. Estimate. Is my answer close?',
+        format: {
+            kind: 'numbered steps with icons + a chant',
+            why: 'Detailed lesson 7 follow-on (card §3): the three words are the three new moves; the chant is the check the pupil says.',
+        },
+        example: { match: 'Estimate:' },
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -289,6 +427,85 @@ export const LESSONS = Object.freeze({
             { key: 'subtraction:subtract', opts: { band: 20, notation: ['stacked'] }, why: 'Each step of a take-away rule is a subtraction fact.' },
         ],
         mixWith: [{ key: 'patterns:skip_count_line' }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
+    // ---- two-step stories (two-step card 2026-11-13, decision 11): the G2 lesson (BUILD #17) on the host and its twin,
+    // band 100 (decision 2: appended, the G2 lesson's band); lesson 7's x / ÷ first and its four follow-ons on the presets
+    'skill:algebra:multi_step_word': {
+        routine: 'two-step-addsub',
+        practice: { skill: 'algebra:multi_step_word', opts: { band: 100 } },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_100_mixed', why: 'Each + step is a 2-digit addition.' },
+            { key: 'subtraction:sub_100_mixed', why: 'Each − step is a 2-digit subtraction.' },
+        ],
+        mixWith: [{ key: 'addition:add_wp_100' }, { key: 'subtraction:sub_wp_100' }],
+    },
+    'skill:algebra:multi_step_word_plain': {
+        routine: 'two-step-addsub',
+        practice: { skill: 'algebra:multi_step_word_plain', opts: { band: 100 } },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_100_mixed', why: 'Each + step is a 2-digit addition.' },
+            { key: 'subtraction:sub_100_mixed', why: 'Each − step is a 2-digit subtraction.' },
+        ],
+        mixWith: [{ key: 'addition:add_wp_100' }, { key: 'subtraction:sub_wp_100' }],
+    },
+    'skill:algebra:two_step_mult_div_first': {
+        routine: 'two-step-muldiv-first',
+        practice: { skill: 'algebra:two_step_mult_div_first' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'multiplication:mult_facts', why: 'Step 1 of an equal-groups story is a times-table fact.' },
+            { key: 'division:div_facts', why: 'Step 1 of a sharing story is a division fact.' },
+        ],
+        mixWith: [{ key: 'multiplication:mult_word_problems' }, { key: 'division:div_word_problems' }],
+    },
+    'skill:algebra:two_step_add_then_mult': {
+        routine: 'two-step-add-first',
+        practice: { skill: 'algebra:two_step_add_then_mult' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Step 1 puts two numbers together.' },
+            { key: 'multiplication:mult_facts', why: 'Step 2 makes equal groups: a times-table fact.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'multiplication:mult_word_problems' }],
+    },
+    'skill:algebra:two_step_add_then_div': {
+        routine: 'two-step-add-first',
+        practice: { skill: 'algebra:two_step_add_then_div' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'addition:add_facts', opts: { band: 20, notation: ['stacked'] }, why: 'Step 1 puts two numbers together or takes some away.' },
+            { key: 'division:div_facts', why: 'Step 2 shares equally: a division fact.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'division:div_word_problems' }],
+    },
+    'skill:algebra:two_step_letter_equation': {
+        routine: 'two-step-letter',
+        practice: { skill: 'algebra:two_step_letter_equation' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'multiplication:mult_facts', why: 'Step 1 of the equation is a times-table fact.' },
+            { key: 'algebra:solve_unknown', why: 'A letter or a box stands for the number we find.' },
+        ],
+        mixWith: [{ key: 'algebra:two_step_mult_div_first' }, { key: 'algebra:two_step_add_then_mult' }],
+    },
+    'skill:algebra:two_step_estimate_check': {
+        routine: 'two-step-estimate',
+        practice: { skill: 'algebra:two_step_estimate_check' },
+        defaultFor: true,
+        prereqsPending: TWO_STEP_CHECK,
+        warmup: [
+            { key: 'number_sense:nearest_10', why: 'Each story number is rounded to the nearest ten.' },
+            { key: 'addition:add_100_mixed', why: 'The two steps are 2-digit additions and subtractions.' },
+        ],
+        mixWith: [{ key: 'algebra:multi_step_word_plain' }, { key: 'number_sense:nearest_10' }],
     },
 });
 

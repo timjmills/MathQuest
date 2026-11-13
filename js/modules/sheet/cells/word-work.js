@@ -1127,9 +1127,12 @@ function framesLayout(p, ctx) {
         const [s1, s2] = p.steps;
         const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
         const brk = two && (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
-        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length)}`;
-        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length)}` : first;
-        rows = row(`${eqn}${sym('=')}${sym('n')}`) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
+        // (two-step card decision 7: the EQUATION is a graded answer of its own - both signs and the three numbers, one
+        // answer place, `data-ws-slot="equation"` - and n the second; its boxes are drawn heavy, as an answer place is)
+        const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length, false, true)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length, false, true)}`;
+        const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length, false, true)}` : first;
+        const eqGroup = twin ? `${eqn}${sym('=')}${sym('n')}` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
+        rows = row(eqGroup) + row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
     } else {
         rows = p.steps.map((st, i) => {
             const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
@@ -1141,8 +1144,12 @@ function framesLayout(p, ctx) {
     // msCheck (3.OA.D.8): each story number rounded to the nearest ten, the estimate, and the pupil's own answer judged
     if (p.check) {
         const c = p.check;
+        // (two-step card decision 8: the estimate is the second graded answer on paper - a heavy box, graded; on the screen
+        // it is a typed box marked as it is filled, the host scoring the answer)
+        const esBox = (v, d) => (twin ? box('es-r', v, d, false, true)
+            : box('es-r', v, d, false, true).replace(' data-ws-graded="0"', ''));
         const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
-            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${box('es-r', String(c.est), String(c.est).length)}`);
+            + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${esBox(String(c.est), String(c.est).length)}`);
         const ring = (w) => (twin
             ? `<button type="button" class="mq-wwword" data-mq-word="${w}" style="min-height:44px;min-width:44px;padding:0 ${L(ctx, 1.5)};border:${B(ctx, 0.75)} solid ${INK};border-radius:${L(ctx, 1)};background:#fff;color:${INK};font:inherit;cursor:pointer;">${w}</button>`
             : `<span data-ws-slot="ok-${w.toLowerCase()}" data-ws-shape="choice" data-ws-graded="0" style="position:relative;display:inline-flex;padding:0 ${L(ctx, 2)};font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;">${w}${put && w === 'Yes' ? `<span data-ws-ink="${ink}" style="position:absolute;left:${L(ctx, -0.5)};top:${L(ctx, -1)};right:${L(ctx, -0.5)};bottom:${L(ctx, -1)};border:${B(ctx, 1.5)} solid ${col};border-radius:50%;"></span>` : ''}</span>`);
@@ -1262,7 +1269,7 @@ function twoStepBarFor(p, ctx) {
     if (!p.bar2 && !teach) return '';
     const put = filled(ctx) && !isTwin(ctx);
     // (the room the cell gives it: a two-step cell is full width - its inner width less the story's left inset)
-    const maxW = 186 / Math.max(1, Number(ctx.columns || 1)) - 17;
+    const maxW = 186 / Math.max(1, Number(ctx.columns || 1)) - 15;
     return twoStepBar(ctx, { steps: p.steps, show: put, ink: put ? inkOf(ctx) : null, maxW });
 }
 
@@ -1402,9 +1409,17 @@ register(WW_TEMPLATE, {
                 slots[`fr${i}-b`] = { value: String(st.op === '*' ? st.b : st.bottom), graded: false };
                 if (i !== lastI && !p.letter) slots[`fr${i}-r`] = { value: String(st.op === '/' ? st.q : st.ans), graded: false };
             });
+            if (p.letter && p.steps.length === 2) {
+                // the equation: ONE graded answer (decision 7), its parts written in its boxes and circles
+                const [s1, s2] = p.steps;
+                const brk = (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
+                const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
+                const eq = `${brk ? '(' : ''}${x(s1)} ${GLYPH[s1.op]} ${y(s1)}${brk ? ')' : ''} ${GLYPH[s2.op]} ${s2.bottom} = n`;
+                slots.equation = { value: eq, graded: true, accept: [eq.replace(/\s+/g, '')] };
+            }
             if (p.check) {
                 const c = p.check;
-                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: false }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
+                Object.assign(slots, { 'es-a': { value: String(c.a), graded: false }, 'es-b': { value: String(c.b), graded: false }, 'es-r': { value: String(c.est), graded: true }, 'es-op0': { value: GLYPH[p.steps[0].op], graded: false } });
                 if (p.steps.length > 1) Object.assign(slots, { 'es-c': { value: String(c.c), graded: false }, 'es-op1': { value: GLYPH[p.steps[1].op], graded: false } });
             }
         }

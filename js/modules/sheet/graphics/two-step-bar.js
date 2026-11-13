@@ -26,11 +26,11 @@ export const TS_BAR_H = Object.freeze({ S: 10, M: 12, L: 14 });
 /** The writing box height inside a bar (as the part-whole bar's). */
 const BOX_H = Object.freeze({ S: 8, M: 9, L: 10 });
 /** The room the zone-label `?` takes at the left of a cell (mm). */
-const Q_ROOM = 4.5;
+const Q_ROOM = 3.5;
 /** The caption column ("Step 1" / "Step 2") at the bars' left (mm). */
 const CAP_W = Object.freeze({ S: 13, M: 15, L: 17 });
 /** The arrow block between two bars standing side by side: "Step 1 / answer" over a → (mm). */
-const ARROW_W = Object.freeze({ S: 13, M: 15, L: 17 });
+const ARROW_W = Object.freeze({ S: 12, M: 13, L: 15 });
 
 const fmt = (n) => Number(n).toLocaleString('en-US');
 
@@ -83,10 +83,12 @@ export function twoStepBarSize(ctx, steps, maxW = 0) {
     const lw = Math.max(14, blankWidth(Math.max(2, ...valuesOf(bars).map(nd)), size));
     const gw = (b) => Math.max(14, blankWidth(Math.max(1, nd(b.parts[0].v)), size));
     // a cell: its box, the `?` room when it is the unknown, and air
+    // (a part-whole bar: each part holds its box - and the `?` room when it is the unknown - at 60 / 40 of the bar)
+    const AIR = 1.5;
     const need = (b) => (b.kind === 'groups'
-        ? b.n * (gw(b) + 2 + (b.parts[0].unknown ? Q_ROOM : 0))
-        : (lw + 2 + Q_ROOM) / 0.4);
-    const Ws = bars.map((b) => Math.max(b.kind === 'groups' ? 48 : 56, need(b)));
+        ? b.n * (gw(b) + AIR + (b.parts[0].unknown ? Q_ROOM : 0))
+        : Math.max((lw + AIR + Q_ROOM) * 1.05, (lw + AIR + (b.parts[0].unknown ? Q_ROOM : 0)) / 0.6, (lw + AIR + (b.parts[1].unknown ? Q_ROOM : 0)) / 0.4));
+    const Ws = bars.map((b) => Math.max(48, need(b)));
     const segH = TS_BAR_H[size] || 14;
     const capW = CAP_W[size] || 17;
     const arrowW = ARROW_W[size] || 16;

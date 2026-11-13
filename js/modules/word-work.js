@@ -212,15 +212,16 @@ export function applyWordWork(q) {
         q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit, sentence: true };
         return q;
     }
-    if (payload.letter) { q.printText = 'Read the story. Write the equation. Find n.'; }
-    else if (payload.check) { q.printText = 'Solve. Estimate. Circle Yes or No.'; }
+    // (the two-step card's strings, decision 10: contract.js 'story-letter' / 'story-estimate')
+    if (payload.letter) { q.printText = 'Write one equation with n. Then find n.'; }
+    else if (payload.check) { q.printText = 'Solve. Then estimate. Is your answer close?'; }
     else if (payload.layout === 'frames') { q.printText = 'Read the story. Write each step. Solve.'; }
     // the same instruction in screen verbs (PEDAGOGY 10.2): the hosts print it over the cell
     q.screenInstr = payload.signs === false ? 'Type the numbers in the boxes. Divide. Answer the question.'
         : ring ? 'Type the sign in the circle. Type the numbers. Solve.'
         : 'Tap the sign. Type the numbers in the boxes. Solve.';
-    if (payload.letter) q.screenInstr = 'Read the story. Type the equation. Find n.';
-    else if (payload.check) q.screenInstr = 'Solve. Estimate. Tap Yes or No.';
+    if (payload.letter) q.screenInstr = 'Type one equation with n. Then find n.';
+    else if (payload.check) q.screenInstr = 'Solve. Then estimate. Is your answer close?';
     else if (payload.layout === 'frames') q.screenInstr = 'Read the story. Type each step. Solve.';
     // what the work expects, for a host that marks each box as it is filled
     q.wordWork = { ops: payload.steps.map((s) => s.op), unit: payload.unit };

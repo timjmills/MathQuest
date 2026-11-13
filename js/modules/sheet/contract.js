@@ -169,7 +169,9 @@ export const INSTRUCTION_LIBRARY = Object.freeze({
     'story-work-div': 'Write the numbers in the boxes. Divide. Answer the question.',
     // detailed lesson 7 (2026-10-17): the word-work cell's compact frames form (one number sentence a step)
     'story-steps': 'Read the story. Write each step. Solve.',
-    'story-letter': 'Read the story. Write the equation. Find n.',
+    // two-step card 2026-11-13 decision 10: the letter preset (3.OA.D.8 'an equation with a letter') and the estimate preset
+    'story-letter': 'Write one equation with n. Then find n.',
+    'story-estimate': 'Solve. Then estimate. Is your answer close?',
     'story-check': 'Solve. Estimate. Circle Yes or No.',
     // visual-quality lane (2026-10-31): the word-work cell's sentence form for stories within 20
     // (story, `[ ] ◯ [ ] = [ ] unit`), and the family-check cell (fact_family_sort)
