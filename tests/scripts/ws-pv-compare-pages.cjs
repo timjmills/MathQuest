@@ -243,11 +243,14 @@ const m6Of = (a, b, sign) => {
     if (on('EQ-SHARE-PAGE')) {
         for (const role of ['independent', 'more-practice', 'test', 'guided', 'opener', 'lesson']) for (const size of SIZES) for (const seed of seedsFor(role)) {
             await build(role, size, seed, null);
+            // (the two numbers are the problem's first and last child, as readCompares reads them: "724724" is one text run)
             const pages = await sheet.evaluate(() => [...document.querySelectorAll('.ws-page')].map((pg) => [...pg.querySelectorAll('.pv-compare')].map((el) => {
-                const t = (el.textContent || '').replace(/\d+ digits?/g, ' ');
-                const nums = (t.match(/\d[\d,]*/g) || []).map((x) => Number(x.replace(/,/g, '')));
-                return nums.length >= 2 ? nums[0] === nums[nums.length - 1] : null;
+                const kids = [...el.children];
+                const numOf = (k) => ((k && k.textContent) || '').replace(/\d+ digits?/g, ' ').replace(/[\s,]+/g, '');
+                const a = numOf(kids[0]), b = numOf(kids[kids.length - 1]);
+                return kids.length >= 2 && /^\d+$/.test(a) && /^\d+$/.test(b) ? a === b : null;
             }).filter((x) => x !== null)));
+            if (!pages.some((p) => p.length)) bad.push(`EQ-SHARE-PAGE ${role} ${size} seed ${seed}: no compare problem read`);
             pages.forEach((eqs, pi) => {
                 const n = eqs.length, k = eqs.filter(Boolean).length;
                 if (k > Math.ceil(n / 6)) bad.push(`EQ-SHARE-PAGE ${role} ${size} seed ${seed} p${pi + 1}: ${k} "=" in ${n} problems (at most ${Math.ceil(n / 6)})`);

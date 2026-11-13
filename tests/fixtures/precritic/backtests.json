@@ -5759,7 +5759,7 @@
    "commit": "0d61403a",
    "state": "provider roleOpts: support none on the unaided roles and the quiz; Practice / Mixed keep the heads"
   },
-  "command": "node tests/scripts/ws-pv-identify-heads.cjs",
+  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5868,6 +5868,226 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-tof-share",
+  "check": "a compare True or False? page is 40-60 % false at S / M / L on every offered option value (critic compare r2 N1, PT-TOF-1)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages TOF-SHARE",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "12-33 % false: a False slot whose item names no error (\"=\", a pair the ones place decides) printed True"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "provider falseNeedsWrong: the False slot skips such an item; every page half false"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only TOF-SHARE --seeds 2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-mark-clear",
+  "check": "the compare marks (deciding-digit box, bigger-number underline) keep 0.5 mm from every character they do not mark: Scripted Model, lesson anchor, Guided at S / M / L (critic compare r2 N2)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages MARK-CLEAR",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "the box is the digit's own advance wide: its rules cross the digits beside it (4[1]7, [7]33) and its top meets the digit count's descender"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "1.6 mm room each side of the deciding digit in every state, one box round an '=' number, the count 2 mm above"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MARK-CLEAR --seeds 1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-model-m6",
+  "check": "a compare worked example (Guided, Scripted Model, Opener Model, lesson anchor) is an item M6 gets wrong, on the default, band 999,999 and lengths=mixed (critic compare r2 N4)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages MODEL-M6",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "band 999,999: Guided Model 992,323 > 992,321 and lesson anchor 448,825 / 355,672 - decided where the last digits agree"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "noModel on every item M6 gets right; the lesson anchor (pickExample) honours it"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-M6 --seeds 2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-eq-share-page",
+  "check": "on a printed compare page at most ceil(n/6) of its n problems are '=', never a Test's item 1 nor a Guided page's Model or first try (critic compare r2 N7)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages EQ-SHARE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "Test item 1 '724 = 724', Guided first try '620 = 620', two '=' side by side across a block of six"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "the page plan: first '=' at item 3-7, then every 6th or 7th"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-SHARE-PAGE --seeds 2",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-wrap-sign",
+  "check": "no compare worked step breaks after its sign ('7 >' / '5.'): Scripted Model, Guided, lesson at S / M / L (critic compare r2; ws-geom-probe WRAP-OP with wrapOps < >)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages WRAP-SIGN",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "scripted-model L / guided M: 'The hundreds digits differ: 7 >' / '5.'"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "the sign joined to its digits with no-break spaces"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-side-pad",
+  "check": "three across at L every compare digit stands at least 5 mm inside its cell's rules (critic compare r1 F9 / r2)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages SIDE-PAD",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "independent L default: 4.80 mm"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "the gaps give way to 1.6 mm: 5.19 mm"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only SIDE-PAD",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-sign-parity",
+  "check": "the compare sign is never the item's parity: on every offered option value the share of '>' at even and at odd places is 0.25-0.75 and no page holds 4 strictly alternating signs (critic compare r2 N3)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal SIGN-PARITY",
+  "browser": false,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "lengths=mixed: > < > < down every page (the longer number first, swapped on the odd items)"
+  },
+  "pass": {
+   "commit": "54ec52ae",
+   "state": "the page plan's seeded sign, no 4-long alternation or run"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only SIGN-PARITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-eq-share",
+  "check": "the compare deal: no '=' at item 1 or 2, any n items hold at most ceil(n/6) '=', and an '=' item's Guided cue is step 2 (critic compare r2 N7)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal EQ-SHARE",
+  "browser": false,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "'=' at items 1 and 2, '=' pairs 1-2 items apart across a block's edge; the '=' cue 'Both have three digits.'"
+  },
+  "pass": {
+   "commit": "cb2c9741",
+   "state": "the page plan; step 2 'Every digit is the same: 724 and 724.'"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-SHARE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-remember-fit",
+  "check": "a lesson's Remember line (the routine's first concept) decides at least half the items its practice deals, as its chant does (critic compare r2 N6)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-unit remember-fit",
+  "browser": false,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "'More digits is the bigger number.' decides 40 % (the mixed block only)"
+  },
+  "pass": {
+   "commit": "10d3ce7c",
+   "state": "'More digits wins. Same count: the first different digit decides.'"
+  },
+  "command": "node tests/scripts/ws-lesson-unit.mjs --only remember-fit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-identify-heads-chosen",
+  "check": "identify's Review / Test keep a support the teacher CHOSE (the chart): only the default drops to none (lead ruling 14:24, 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-identify-heads PV-HEADS-CHOSEN",
+  "browser": true,
+  "fail": {
+   "commit": "0d61403a",
+   "state": "roleOpts set support none on review / test whatever the teacher chose: the chart was dropped"
+  },
+  "pass": {
+   "commit": "cb2c9741",
+   "state": "roleOpts replaces only the default (support absent or 'labels')"
+  },
+  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-CHOSEN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-grade-render-quiz",
+  "check": "the critic's quiz render deals through the quiz builder (ws-grade-render --quiz-builder): identify's quiz view has no place heads (critic compare r2 N8)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-identify-heads PV-HEADS-GRADE-QUIZ",
+  "browser": true,
+  "fail": {
+   "commit": "ae799fbf",
+   "state": "ws-grade-render deals the quiz with generateQuestionFor (no roleOpts) and has no --quiz-builder: no builder quiz view to judge"
+  },
+  "pass": {
+   "commit": "cb2c9741",
+   "state": "--quiz-builder: openQuizBuilder + addMultipleQuestions, quiz-1280.html written, 0 headed items"
+  },
+  "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-GRADE-QUIZ --grade-render {root}/tests/scripts/ws-grade-render.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
-]
+ ]
 }

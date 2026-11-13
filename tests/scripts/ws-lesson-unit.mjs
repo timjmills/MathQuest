@@ -12,6 +12,7 @@
 //   MQ_ROOT=<checkout> node tests/scripts/ws-lesson-unit.mjs --only ... # run them on another tree (ws-backtest commit-pair)
 //   node tests/scripts/ws-lesson-unit.mjs --only chant-box               # a chant naming boxes holds for every dealt item (nwf r1 N6)
 //   node tests/scripts/ws-lesson-unit.mjs --only chant-fit               # a chant decides at least half its lesson's items (compare r1 F2)
+//   node tests/scripts/ws-lesson-unit.mjs --only remember-fit            # ... and its Remember line (the first concept) does too (compare r2 N6)
 // The engine checks also run in the full gate.
 import fs from 'fs';
 import path from 'path';
@@ -74,46 +75,10 @@ const LATE = {
     // lesson's practice deals, judged where the skill's decision rules are known (CHANT_DECIDES: which rule a chant names, and
     // which items that rule decides). The deal: each practiceBlocks block (its opts over the practice opts), weighted by its
     // count, else the practice deal; generateQuestionFor, seeded, 60 an option set.)
-    async 'chant-fit'() {
-        const { loadApp } = await import(pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), 'ws-card-rulings.mjs')).href);
-        const app = await loadApp(ROOT);
-        const CHANT_DECIDES = {
-            'placevalue:compare': (chant, q) => {
-                const a = String(q.pv && q.pv.a), b = String(q.pv && q.pv.b);
-                if (a.length !== b.length) return /more digits|longer|digit count/i.test(chant);
-                if (a === b) return /\bsame\b|=|equal/i.test(chant) && /first different|left/i.test(chant);
-                return /first different|from the left|look left|left to right/i.test(chant);
-            },
-        };
-        let judged = 0;
-        for (const [id, l] of Object.entries(LIB.LESSONS)) {
-            const r = LIB.ROUTINES[l.routine];
-            const judge = l.practice && CHANT_DECIDES[l.practice.skill];
-            if (!judge || !r || !String(r.chant || '').trim()) continue;
-            judged++;
-            const [category, skill] = String(l.practice.skill).split(':');
-            const blocks = Array.isArray(r.practiceBlocks) && r.practiceBlocks.length ? r.practiceBlocks : [{ shape: [12, 1] }];
-            // (compare r4, critic r2 N6: the Remember line - the routine's first concept, lesson-pages/vocab.js - is judged as the chant is:
-            // "More digits is the bigger number." decided none of the same-length items on its page)
-            const remember = r.concepts && r.concepts[0] ? String(r.concepts[0].text || '') : '';
-            let dec = 0, all = 0, decR = 0;
-            blocks.forEach((bk, bi) => {
-                const w = Number((bk.shape || [])[0]) || 1;
-                const opts = Object.assign({}, l.practice.opts || {}, bk.opts || {});
-                for (let i = 0; i < 60; i++) {
-                    const sv = {}; for (const k of ['log', 'warn', 'info', 'debug']) { sv[k] = console[k]; console[k] = () => {}; }
-                    let q = null;
-                    try { q = app.gq.generateQuestionFor({ category, skill, opts, seed: 9001 + bi * 100 + i, itemIndex: i, itemCount: 60 }); } catch (e) { q = null; } finally { Object.assign(console, sv); }
-                    if (!q || !q.pv) continue;
-                    all += w; if (judge(String(r.chant), q)) dec += w;
-                    if (remember && judge(remember, q)) decR += w;
-                }
-            });
-            ok(all > 0 && dec >= all / 2, `chant-fit: lesson ${id} chant "${r.chant}" decides ${all ? Math.round((100 * dec) / all) : 0} % of the items its practice deals (want at least half)`);
-            if (remember) ok(all > 0 && decR >= all / 2, `chant-fit: lesson ${id} Remember line "${remember}" decides ${all ? Math.round((100 * decR) / all) : 0} % of the items its practice deals (want at least half)`);
-        }
-        ok(judged > 0, 'chant-fit: no lesson with a known decision rule was judged (CHANT_DECIDES)');
-    },
+    async 'chant-fit'() { return chantFit(false); },
+    // (compare r4, critic r2 N6: the Remember line - the routine's first concept, lesson-pages/vocab.js - judged as the chant is:
+    // "More digits is the bigger number." decided none of the same-length items on its page)
+    async 'remember-fit'() { return chantFit(true); },
     // (P1d r3, lesson 3a critic: {p4.last} counted a Practice k a PAGE - "Practice 3" for Practice 1's second page. A
     // practiceSheets sheet over two pages is ONE unit whose last row is on its last page; a plan without `sheet`, one a page)
     async 'practice-units'() {
@@ -655,3 +620,43 @@ for (const [g, fn] of Object.entries(Object.assign({}, ENGINE, LATE))) if (!ONLY
 for (const f of fails) console.log(`  FAIL ${f}`);
 console.log(fails.length ? `ws-lesson-unit: FAIL (${fails.length} of ${pass + fails.length})` : `ws-lesson-unit: OK (${pass} checks)`);
 process.exit(fails.length ? 1 : 0);
+
+/** chant-fit / remember-fit: the chant (or the Remember line) decides at least half its lesson's practice deal. */
+async function chantFit(rememberLine) {
+        const { loadApp } = await import(pathToFileURL(path.join(path.dirname(fileURLToPath(import.meta.url)), 'ws-card-rulings.mjs')).href);
+        const app = await loadApp(ROOT);
+        const CHANT_DECIDES = {
+            'placevalue:compare': (chant, q) => {
+                const a = String(q.pv && q.pv.a), b = String(q.pv && q.pv.b);
+                if (a.length !== b.length) return /more digits|longer|digit count/i.test(chant);
+                if (a === b) return /\bsame\b|=|equal/i.test(chant) && /first different|left/i.test(chant);
+                return /first different|from the left|look left|left to right/i.test(chant);
+            },
+        };
+        let judged = 0;
+        for (const [id, l] of Object.entries(LIB.LESSONS)) {
+            const r = LIB.ROUTINES[l.routine];
+            const judge = l.practice && CHANT_DECIDES[l.practice.skill];
+            if (!judge || !r || !String(r.chant || '').trim()) continue;
+            judged++;
+            const [category, skill] = String(l.practice.skill).split(':');
+            const blocks = Array.isArray(r.practiceBlocks) && r.practiceBlocks.length ? r.practiceBlocks : [{ shape: [12, 1] }];
+            const remember = rememberLine && r.concepts && r.concepts[0] ? String(r.concepts[0].text || '') : '';
+            let dec = 0, all = 0, decR = 0;
+            blocks.forEach((bk, bi) => {
+                const w = Number((bk.shape || [])[0]) || 1;
+                const opts = Object.assign({}, l.practice.opts || {}, bk.opts || {});
+                for (let i = 0; i < 60; i++) {
+                    const sv = {}; for (const k of ['log', 'warn', 'info', 'debug']) { sv[k] = console[k]; console[k] = () => {}; }
+                    let q = null;
+                    try { q = app.gq.generateQuestionFor({ category, skill, opts, seed: 9001 + bi * 100 + i, itemIndex: i, itemCount: 60 }); } catch (e) { q = null; } finally { Object.assign(console, sv); }
+                    if (!q || !q.pv) continue;
+                    all += w; if (judge(String(r.chant), q)) dec += w;
+                    if (remember && judge(remember, q)) decR += w;
+                }
+            });
+            if (!rememberLine) ok(all > 0 && dec >= all / 2, `chant-fit: lesson ${id} chant "${r.chant}" decides ${all ? Math.round((100 * dec) / all) : 0} % of the items its practice deals (want at least half)`);
+            if (remember) ok(all > 0 && decR >= all / 2, `remember-fit: lesson ${id} Remember line "${remember}" decides ${all ? Math.round((100 * decR) / all) : 0} % of the items its practice deals (want at least half)`);
+        }
+        ok(judged > 0, 'chant-fit: no lesson with a known decision rule was judged (CHANT_DECIDES)');
+    }
