@@ -542,16 +542,23 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const ceil = ceilFor(ctx, items);
     const facts = factRows(input);
     const nM = mixModels(items);
+    const tight = !facts && tightRows(items);
     while (pages.length < MAX_PAGES && total < ceil && (pages.length === 0 || !minMet(items, total))) {
         const isFirst = pages.length === 0;
         const avail = isFirst ? first.avail : availC;
         const maxR = Math.max(1, Math.ceil((ceil - total) / cols));
         // Each row is as tall as what IT holds (H13), so the rows that fit are counted by the sum
         // of their own heights, page 1's first row taller by the model's trace.
+        // (GUIDED-TIGHT-REFILL, lf-roles critic r8b D1: a `tightRows` page draws its plain try rows - not the Model's row, not the
+        // hinted row - without the measure's label keep-out (koMm, plan); the fit counts them at that drawn height, so the rows the
+        // page has room for are dealt, up to the ceiling)
+        const hintRowFit = isFirst && first.hint ? partialRowOf(cols, first.span, nM, first.span2) : -1;
+        const koFit = tight ? koMm(ctx.size) : 0;
         const rowsH = (k) => {
             let idx = total, sum = 0;
             for (let rr = 0; rr < k; rr++) {
                 const n = isFirst && rr === 0 ? cols - lead : cols;
+                if (koFit && !(isFirst && (rr === 0 || rr === hintRowFit))) sum -= koFit;
                 sum += hOf(idx, n) + (isFirst && nM > 1
                     ? mixRowAdd(rr, cols, nM, mixPartialEnd(nM, cols, ceil), extra, first.hint) - (rr === 0 ? extra : 0)
                     : (isFirst && rr === partialRowOf(cols, first.span, nM, isFirst ? first.span2 : 0) ? (facts && rr === 0 ? Math.max(0, first.hint - extra) : first.hint) : 0));
