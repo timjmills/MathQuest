@@ -116,33 +116,40 @@ function axis(x1, x2, y, ticks) {
 const PICS = {
     /* ---- Grade 3: multiplication table patterns (3.OA.D.9, 3.OA.C.7) */
     even: {
+        ccss: ['2.OA.C.3', '3.OA.D.9', '4.OA.C.5'], op: 'parity',
         focal: 'all',
         alt: 'six dots in three pairs, none left over',
         draw: () => [0, 1, 2].map((i) => { const x = 14 + i * 16; return oval(x - 4.5, 8, 9, 24, W.part) + dot(x, 14) + dot(x, 26); }).join(''),
     },
     odd: {
+        ccss: ['2.OA.C.3', '3.OA.D.9', '4.OA.C.5'], op: 'parity',
         alt: 'seven dots: three pairs and one dot on its own',
         draw: () => [0, 1, 2].map((i) => { const x = 9 + i * 13; return oval(x - 4.5, 8, 9, 24, W.part) + dot(x, 14) + dot(x, 26); }).join('') + dot(50, 20, 1.9) + ring(50, 20, 4.2, W.heavy),
     },
     product: {
+        ccss: ['3.OA.A.1', '3.OA.B.5', '3.OA.C.7', '3.OA.D.9', '4.OA.A.1', '4.OA.A.2'], op: 'multiply',
         alt: 'four times three equals twelve, the twelve in a box',
         draw: () => tx(8, 20, 0, '4', { size: 8 }) + tx(16, 20, 0, '×', { size: 8 }) + tx(24, 20, 0, '3', { size: 8 }) + tx(32, 20, 0, '=', { size: 8 })
             + rect(37.5, 12, 15, 16, W.heavy) + tx(45, 20, 0, '12', { size: 8 }),
     },
     factor: {
+        ccss: ['3.OA.A.1', '3.OA.A.4', '3.OA.B.5', '3.OA.C.7', '4.OA.A.1', '4.OA.A.2', '4.OA.B.4'], op: 'multiply',
         alt: 'four times three equals twelve, the four and the three in boxes',
         draw: () => rect(3, 12, 11, 16, W.heavy) + tx(8.5, 20, 0, '4', { size: 8 }) + tx(18.5, 20, 0, '×', { size: 8 })
             + rect(23, 12, 11, 16, W.heavy) + tx(28.5, 20, 0, '3', { size: 8 }) + tx(38, 20, 0, '=', { size: 8 }) + tx(48, 20, 0, '12', { size: 8 }),
     },
     row: {
+        ccss: ['3.OA.C.7', '3.OA.D.9'], op: 'table',
         alt: 'a times table, one line across it drawn round',
         draw: () => table([[1, 2, 3, 4], [2, 4, 6, 8], [3, 6, 9, 12]], { x0: 6, y0: 3.5, cw: 12, ch: 11, size: 8, outline: { row: 1 } }),
     },
     column: {
+        ccss: ['3.OA.C.7', '3.OA.D.9'], op: 'table',
         alt: 'a times table, one line down it drawn round',
         draw: () => table([[1, 2, 3, 4], [2, 4, 6, 8], [3, 6, 9, 12]], { x0: 6, y0: 3.5, cw: 12, ch: 11, size: 8, outline: { col: 2 } }),
     },
     multiple: {
+        ccss: ['3.OA.C.7', '3.OA.D.9', '4.OA.B.4', '4.OA.C.5'], op: 'multiply',
         alt: 'a number line from 0 to 12, hops of three landing on 3, 6, 9 and 12',
         draw: () => {
             const X = (v) => 5 + v * 4.2;
@@ -154,14 +161,17 @@ const PICS = {
     },
     /* ---- Grade 3: input-output tables (3.OA.D.9) */
     input: {
+        ccss: ['3.OA.D.9', '5.OA.B.3'], op: 'io-table',
         alt: 'an In and Out table, the In side drawn round',
         draw: () => table([['In', 'Out'], [2, 5], [4, 7]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 0 } }),
     },
     output: {
+        ccss: ['3.OA.D.9', '5.OA.B.3'], op: 'io-table',
         alt: 'an In and Out table, the Out side drawn round',
         draw: () => table([['In', 'Out'], [2, 5], [4, 7]], { x0: 12, y0: 3.5, cw: 18, ch: 11, size: 8.5, head: true, outline: { col: 1 } }),
     },
     rule: {
+        ccss: ['3.OA.D.9', '4.OA.C.5', '5.OA.B.3'], op: 'rule',
         // (r10, critic r9 #2: the 2 -> [+3] -> 5 machine's ends ARE an input and an output; the picture now shows only what is
         // done - an arrow in, the "+3" box, an arrow out, no number at either end; V-AMBIG+ derives input / output from ends)
         alt: 'an arrow going into a box that says add three, and an arrow coming out of it; the box drawn heavy',
@@ -169,6 +179,7 @@ const PICS = {
             + arrow(43, 20, 57, 20),
     },
     pattern: {
+        ccss: ['3.OA.D.9', '4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         alt: 'two, four, six, eight, each one two more, with a hop of plus two between',
         draw: () => {
             let b = '';
@@ -179,16 +190,19 @@ const PICS = {
     },
     /* ---- Grade 3: properties of multiplication (3.OA.B.5) */
     array: {
+        ccss: ['2.OA.C.4', '3.OA.A.1', '3.OA.A.3', '3.OA.B.5'], op: 'multiply',
         focal: 'all',
         alt: 'three rows of four dots in a rectangle',
         draw: () => dots(3, 4, 17.5, 9, 8.3, 2),
     },
     commutative: {
+        ccss: ['3.OA.B.5'], op: 'property',
         alt: 'two rows of three dots turned to make three rows of two dots; two times three, three times two',
         draw: () => dots(2, 3, 7, 7, 6, 2) + F(arrow(24, 11, 33, 11)) + dots(3, 2, 39, 4, 6, 2)
             + tx(30, 33, 0, '2 × 3 = 3 × 2', { size: 8 }),
     },
     identity: {
+        ccss: ['3.OA.B.5'], op: 'property',
         // (r3: no ringed dot - odd, one more and remainder used it too, critic r2; a number that comes out the same)
         alt: 'five times one equals five, a heavy arrow from the first five over to the last five',
         draw: () => tx(8, 28, 0, '5', { size: 10 }) + tx(18, 28, 0, '×', { size: 10 }) + tx(28, 28, 0, '1', { size: 10 }) + tx(38, 28, 0, '=', { size: 10 })
@@ -197,6 +211,7 @@ const PICS = {
             + `<path d="M8 21 Q29 3 49 20" fill="none" stroke="#000" stroke-width="${W.heavy}" ${NS}/><path d="M50 21.5 l-3.3 -0.3 l1.8 -2.6 Z" fill="#000"/>`,
     },
     distributive: {
+        ccss: ['3.OA.B.5'], op: 'property',
         alt: 'three rows of seven dots split by a line into three by five and three by two',
         // (a dot's width of clear paper each side of the split line, so the two arrays read as two - critic r3)
         draw: () => dots(3, 5, 5, 5, 6, 1.9) + ln(34.7, 1.5, 34.7, 21.5, W.heavy) + dots(3, 2, 40.4, 5, 6, 1.9)
@@ -204,6 +219,7 @@ const PICS = {
     },
     /* ---- Grade 3: two-step word problems (3.OA.D.8) */
     step: {
+        ccss: ['3.OA.D.8', '4.OA.A.3'], op: 'two-step',
         // (owner O-3, lf-vocab r8: the 1-2-3 staircase read as 'column' - now a short worked problem in two labelled steps; the
         // Step labels, each underlined heavy, are the focal part)
         alt: 'a sum worked in two parts, in order: the first line labelled 1, five plus three is eight, the second labelled 2, eight take away two is six',
@@ -211,11 +227,13 @@ const PICS = {
             + F(tx(1, 29, 0, 'Step 2', { size: 7.8, anchor: 'start' }) + ln(1, 35, 23.5, 35, W.heavy)) + tx(59, 29, 0, '8 − 2 = 6', { size: 7.8, weight: 400, anchor: 'end' }),
     },
     total: {
+        ccss: ['1.OA.A.1', '2.OA.A.1', '3.OA.D.8'], op: 'add',
         alt: 'a bar of 5 and 3 with a longer bar over both marked with a question mark',
         draw: () => rect(6, 5, 48, 12, W.heavy) + tx(30, 11, 0, '?', { size: 9 })
             + rect(6, 21, 30, 12, W.part) + tx(21, 27, 0, '5', { size: 9 }) + rect(36, 21, 18, 12, W.part) + tx(45, 27, 0, '3', { size: 9 }),
     },
     left: {
+        ccss: ['1.OA.A.1', '2.OA.A.1', '3.OA.D.8'], op: 'subtract',
         // (r3: circles of 7 units, about 5 mm at 40 mm - critic r2: about 3 mm)
         // (r6, critic r4 #5: the word names what STAYS, so the heavy mark is the bracket under the four circles left, in the
         // "repeat" bracket's style; the two that go are crossed out at the part weight - V21 referent)
@@ -231,38 +249,46 @@ const PICS = {
         },
     },
     'equal groups': {
+        ccss: ['2.OA.C.4', '3.OA.A.1', '3.OA.A.2', '3.OA.A.3'], op: 'multiply',
         focal: 'all',
         alt: 'three circles, each with four dots',
         draw: () => [0, 1, 2].map((i) => { const x = 11 + i * 19; return ring(x, 20, 8.5, W.part) + dots(2, 2, x - 3, 17, 6, 1.9); }).join(''),
     },
     unknown: {
+        ccss: ['1.OA.D.8', '3.OA.A.4', '3.OA.D.8', '4.OA.A.3'], op: 'unknown',
         alt: 'eight plus a box with a question mark equals thirteen',
         draw: () => tx(6, 20, 0, '8', { size: 9 }) + tx(14.5, 20, 0, '+', { size: 9 }) + rect(20, 12, 13, 16, W.heavy) + tx(26.5, 20, 0, '?', { size: 9 })
             + tx(39, 20, 0, '=', { size: 9 }) + tx(50, 20, 0, '13', { size: 9 }),
     },
     /* ---- Grade 1: count on to 120 (1.NBT.A.1) */
     'count on': {
+        ccss: ['K.CC.A.2', '1.NBT.A.1', '1.OA.C.5'], op: 'count',
         // (r3: three cells, digits 8 units - grade 1 strips printed at 11 pt, critic r1 #17 / r2 #10)
         alt: 'a number track 113, 114, 115 with hops going forward',
         draw: () => track([113, 114, 115], { x0: 4, y: 16, cw: 17, ch: 13, size: 8.5 }) + F(hop(12.5, 29.5, 14, 4) + hop(29.5, 46.5, 14, 4)),
     },
     'one more': {
+        ccss: ['K.CC.A.2', '1.NBT.A.1'], op: 'count',
         alt: 'four dots, an arrow, then five dots with the new dot in a ring',
         draw: () => dots(1, 4, 5, 20, 5.2, 1.7) + arrow(23.5, 20, 31.5, 20) + dots(1, 5, 35.5, 20, 5.2, 1.7) + ring(35.5 + 4 * 5.2, 20, 3.4, W.heavy),
     },
     'one less': {
+        ccss: ['K.CC.A.2', '1.NBT.A.1'], op: 'count',
         alt: 'six dots, one of them crossed out',
         draw: () => { let b = ''; for (let i = 0; i < 6; i++) { b += dot(8 + i * 8.8, 20, 2); } return b + cross(8 + 5 * 8.8, 20, 3.4); },
     },
     before: {
+        ccss: ['K.CC.A.2', '1.NBT.A.1'], op: 'count',
         alt: 'a number track 104, 105, 106: an arrow from 105 back to 104, the 104 in a heavy box',
         draw: () => track([104, 105, 106], { x0: 4, y: 16, cw: 17, ch: 13, mark: 0, size: 8.5 }) + hopBack(29.5, 12.5, 14, 4.5),
     },
     after: {
+        ccss: ['K.CC.A.2', '1.NBT.A.1'], op: 'count',
         alt: 'a number track 104, 105, 106: an arrow from 105 on to 106, the 106 in a heavy box',
         draw: () => track([104, 105, 106], { x0: 4, y: 16, cw: 17, ch: 13, mark: 2, size: 8.5 }) + hop(29.5, 46.5, 14, 4.5),
     },
     'hundred chart': {
+        ccss: ['1.NBT.A.1', '1.NBT.C.5', '2.NBT.A.2'], op: 'count',
         focal: 'all',
         // (three rows, so it reads as a chart of rows of ten, not a two-row table - critic r1; three columns, digits 8.5 units - r3)
         alt: 'three rows of a number chart: 94 to 96, 104 to 106, 114 to 116, each number ten more than the one above',
@@ -273,21 +299,25 @@ const PICS = {
     // the "one" is one unit, the ten 10 units long, the hundred 10 x 10, so a pupil never sees a "one" bigger than a unit of
     // the ten - critic r3 #8 / VQ-1; ws-vocab-unit V16)
     hundred: {
+        ccss: ['1.NBT.B.2', '2.NBT.A.1', '2.NBT.A.3'], op: 'place',
         focal: 'all',
         alt: 'a flat square of ten by ten small squares',
         draw: () => { const u = BASE10_U, x = 5, y = 0; let b = rect(x, y, u * 10, u * 10, W.part); for (let j = 1; j < 10; j++) b += ln(x, y + u * j, x + u * 10, y + u * j, W.fine) + ln(x + u * j, y, x + u * j, y + u * 10, W.fine); return b; },
     },
     ten: {
+        ccss: ['1.NBT.B.2', '2.NBT.A.1', '2.NBT.A.3'], op: 'place',
         focal: 'all',
         alt: 'a rod of 10 small squares in a line',
         draw: () => { const u = BASE10_U, x = 5, y = 17.5; let b = rect(x, y, u * 10, u, W.part); for (let j = 1; j < 10; j++) b += ln(x + u * j, y, x + u * j, y + u, W.fine); return b; },
     },
     one: {
+        ccss: ['1.NBT.B.2', '2.NBT.A.1', '2.NBT.A.3'], op: 'place',
         focal: 'all',
         alt: 'a single small square',
         draw: () => rect(27.5, 17.5, BASE10_U, BASE10_U, W.part),
     },
     digit: {
+        ccss: ['1.NBT.A.1', '1.NBT.B.2', '2.NBT.A.1', '2.NBT.A.3', '4.NBT.A.2'], op: 'place',
         // (owner O-2, lf-vocab r8: one large 7 alone did not say "a digit is one figure OF a number" - 472 with ONE digit (the
         // 7, not the ones digit: 'ones digit' is its own word) in a heavy ring, an arrow pointing at it; ring and arrow are focal)
         alt: 'the number 472 with the middle seven in a heavy ring and an arrow pointing at it',
@@ -295,11 +325,13 @@ const PICS = {
             + F(ring(30, 25, 9, W.heavy) + arrow(30, 1.5, 30, 14.5, W.heavy)),
     },
     'expanded form': {
+        ccss: ['2.NBT.A.3', '4.NBT.A.2'], op: 'place',
         focal: 'all',
         alt: '300 plus 40 plus 7',
         draw: () => tx(30, 20, 0, '300 + 40 + 7', { size: 7.6 }),
     },
     'number name': {
+        ccss: ['2.NBT.A.3', '4.NBT.A.2'], op: 'place',
         focal: 'all',
         // (r3: bold, as large as the expanded form's digits - critic r2: the lightest, smallest text on any page)
         alt: 'three hundred forty-seven written in words',
@@ -307,10 +339,12 @@ const PICS = {
     },
     /* ---- Grade 4: number and shape patterns (4.OA.C.5) */
     'ones digit': {
+        ccss: ['1.NBT.B.2', '2.NBT.A.1', '4.OA.C.5'], op: 'place',
         alt: 'the number 473 with the 3 in a heavy box',
         draw: () => tx(16, 20, 0, '4', { size: 13 }) + tx(26, 20, 0, '7', { size: 13 }) + rect(31, 9, 13, 22, W.heavy) + tx(37.5, 20, 0, '3', { size: 13 }),
     },
     repeat: {
+        ccss: ['4.OA.C.5'], op: 'pattern',
         alt: '2, 4, 8 then 2, 4, 8 again, each set of three bracketed underneath',
         referent: [[1.5, 27.5], [30.3, 56.3]],
         draw: () => {
@@ -321,11 +355,13 @@ const PICS = {
         },
     },
     sequence: {
+        ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         focal: 'all',
         alt: '5, 10, 15 and so on, numbers in order with commas',
         draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
     },
     cycle: {
+        ccss: ['4.OA.C.5'], op: 'pattern',
         // (r10, critic r9 #3: the 2, 4, 8, 6 ring also read as a sequence - now a loop of four SHAPES, no run of numbers; the
         // ones-digit link stays in the explanation; V-AMBIG+ derives sequence / pattern from a loop of numbers)
         alt: 'a circle, a square, a triangle and a diamond in a ring of arrows going round and back to the start',
@@ -349,6 +385,7 @@ const PICS = {
         },
     },
     grow: {
+        ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         focal: 'all',
         alt: 'three shapes made of squares: one square, then three, then five, each one bigger',
         draw: () => {
@@ -359,49 +396,59 @@ const PICS = {
         },
     },
     term: {
+        ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         alt: 'three numbers in order, 4, 7, 10; the 7 in a heavy box',
         draw: () => tx(9, 20, 0, '4,', { size: 9 }) + rect(19, 11, 15, 18, W.heavy) + tx(26.5, 20, 0, '7', { size: 9 }) + tx(37, 20, 0, ',', { size: 9 }) + tx(47, 20, 0, '10', { size: 9 }),
     },
     'first term': {
+        ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         alt: '3, 7, 11: the 3 at the start in a heavy box',
         draw: () => rect(3, 11, 13, 18, W.heavy) + tx(9.5, 20, 0, '3', { size: 9 }) + tx(17, 20, 0, ', 7, 11…', { size: 9, anchor: 'start' }),
     },
     /* ---- Grade 4: multiplicative comparison (4.OA.A.1) */
     'times as many': {
+        ccss: ['4.OA.A.1', '4.OA.A.2'], op: 'compare-times',
         alt: 'a short bar of one part and a bar three times as long, of three equal parts',
         draw: () => rect(6, 7, 14, 10, W.part) + [0, 1, 2].map((i) => rect(6 + i * 14, 23, 14, 10, W.part)).join('')
             + `<path d="M6 36 V37.5 H48 V36" fill="none" stroke="#000" stroke-width="${W.heavy}" ${NS}/>` + tx(54.5, 28, 0, '×3', { size: 8.5 }),
     },
     compare: {
+        ccss: ['1.OA.A.1', '2.OA.A.1', '4.OA.A.2'], op: 'compare',
         alt: 'a long bar over a short bar, a double arrow from the end of the short bar to the end of the long one',
         draw: () => rect(6, 6, 44, 10, W.part) + rect(6, 22, 26, 10, W.part) + ln(50, 16, 50, 34, W.fine)
             + `<path d="M34.6 27 H47.4" stroke="#000" stroke-width="${W.heavy}" ${NS}/><path d="M50 27 l-2.8 -1.7 v3.4 Z M32 27 l2.8 -1.7 v3.4 Z" fill="#000"/>`,
     },
     equation: {
+        ccss: ['1.OA.D.7', '3.OA.A.4', '4.OA.A.1', '4.OA.A.2', '4.OA.A.3'], op: 'equation',
         focal: 'all',
         alt: 'twelve equals three times four',
         draw: () => tx(30, 20, 0, '12 = 3 × 4', { size: 8.5 }),
     },
     /* ---- Grade 4: division and the remainder (4.OA.A.3) */
     remainder: {
+        ccss: ['4.OA.A.3', '4.NBT.B.6'], op: 'divide',
         alt: 'thirteen dots: three rings of four and one dot left over, in a heavy ring',
         draw: () => [0, 1, 2].map((i) => { const x = 9 + i * 16; return ring(x, 20, 7, W.part) + dots(2, 2, x - 2.7, 17.3, 5.4, 2.1); }).join('') + dot(54, 20, 2.1) + ring(54, 20, 4, W.heavy),
     },
     quotient: {
+        ccss: ['3.OA.A.2', '4.OA.A.3', '4.NBT.B.6', '5.NBT.B.6'], op: 'divide',
         // (no "R 1": with it, the picture also showed the remainder - critic r1 D12)
         alt: 'twelve divided by four equals three, the three in a heavy box',
         draw: () => tx(10, 20, 0, '12', { size: 8 }) + tx(20, 20, 0, '÷', { size: 8 }) + tx(28, 20, 0, '4', { size: 8 }) + tx(36, 20, 0, '=', { size: 8 })
             + rect(41.5, 12, 13, 16, W.heavy) + tx(48, 20, 0, '3', { size: 8 }),
     },
     divisor: {
+        ccss: ['3.OA.A.2', '4.OA.A.3', '4.NBT.B.6', '5.NBT.B.6'], op: 'divide',
         alt: 'thirteen divided by four, the four in a heavy box',
         draw: () => tx(16, 20, 0, '13', { size: 8 }) + tx(27, 20, 0, '÷', { size: 8 }) + rect(33, 12, 12, 16, W.heavy) + tx(39, 20, 0, '4', { size: 8 }),
     },
     dividend: {
+        ccss: ['3.OA.A.2', '4.OA.A.3', '4.NBT.B.6', '5.NBT.B.6'], op: 'divide',
         alt: 'thirteen divided by four, the thirteen in a heavy box',
         draw: () => rect(7, 12, 18, 16, W.heavy) + tx(16, 20, 0, '13', { size: 8 }) + tx(31, 20, 0, '÷', { size: 8 }) + tx(41, 20, 0, '4', { size: 8 }),
     },
     'round up': {
+        ccss: ['4.OA.A.3'], op: 'divide',
         // (r3: no brace and no "4" - with them the picture also read as the quotient, critic r2; the extra car is the idea)
         alt: 'four boxes: three full with four dots each, the last, drawn heavy, with the one dot left over',
         draw: () => {
@@ -412,6 +459,13 @@ const PICS = {
     },
 };
 
+/**
+ * V-FIT (r10, critic r9 #4 / #5, rule 5): what each picture TEACHES - the CCSS codes its drawing shows (`ccss`) and its operation
+ * (`op`). A lesson set's core words (its first three, the vocabulary page's Match 3 cell) must have pictures that teach the
+ * set's standard: a code in common, or an operation the standard names (vocab-words.js VOCAB_STANDARD_OPS). The 5 + 3 bar
+ * of "total" is additive part-whole and fails a 4.OA.A.1 core trio (ws-vocab-unit V-FIT).
+ */
+export const vocabPictureTeaches = (id) => (hasVocabPicture(id) ? { ccss: (PICS[id].ccss || []).slice(), op: PICS[id].op || '' } : null);
 /** The ids (words) the library draws. */
 /**
  * V-AMBIG (owner O-2 / O-3, lf-vocab r8): the OTHER words each picture could be read as - what a pupil could defend for it,
@@ -761,4 +815,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, vocabDerivedFromBody, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, vocabPictureDerived, vocabDerivedFromBody, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

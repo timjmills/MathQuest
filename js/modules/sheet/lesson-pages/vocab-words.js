@@ -118,6 +118,22 @@ export const VOCAB_SETS = Object.freeze([
         words: ['remainder', 'quotient', 'divisor', 'dividend', 'round up', 'equation'] },
 ]);
 
+/**
+ * V-FIT (r10): the operations each set standard teaches. A core word's picture fits its set when it shares a CCSS code with the
+ * set or its `op` (graphics/vocab-pictures.js vocabPictureTeaches) is one of these for a set code (ws-vocab-unit V-FIT).
+ */
+export const VOCAB_STANDARD_OPS = Object.freeze({
+    '1.NBT.A.1': ['count'],
+    '2.NBT.A.3': ['place'],
+    '3.OA.B.5': ['property', 'multiply'],
+    '3.OA.C.7': ['multiply', 'table'],
+    '3.OA.D.8': ['add', 'subtract', 'multiply', 'divide', 'two-step', 'unknown'],
+    '3.OA.D.9': ['pattern', 'table', 'parity', 'rule', 'io-table', 'multiply'],
+    '4.OA.A.1': ['multiply', 'compare-times'],
+    '4.OA.A.3': ['divide', 'two-step', 'unknown'],
+    '4.OA.C.5': ['pattern', 'rule'],
+    '5.NBT.B.6': ['divide'],
+});
 /** The set of a BUILD lesson (by site id), or null. */
 export const vocabSetFor = (lessonId) => VOCAB_SETS.find((s) => s.lesson === String(lessonId)) || null;
 /** The set at an option value (index), or null. */
@@ -151,4 +167,4 @@ export function vocabHowSteps(template, word, wrong = []) {
         ? ['Read the three words in the box.', `Tap ${word}.`]
         : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
 }
-export default { vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
+export default { VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };

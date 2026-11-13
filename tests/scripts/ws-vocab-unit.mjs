@@ -21,6 +21,8 @@
 // V-AMBIG+ (r9) every same-grade pair a picture's DERIVED alsoShows (vocabPictureDerived) names and compatible() allows fails;
 //     (r10) the rules are this checkout's, read over the checked tree's drawings: + a function machine with numbers at both
 //     ends derives input / output (critic r9 #2), + a loop of three or more numbers derives sequence / pattern (critic r9 #3)
+// V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
+//     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
 // V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
 //     a single-answer page still needs the Model + 3 tries (guided.js minMet)
 // V27 (r9) key dot underlays never overlap; the pick3 "Here is how" uses the screen verb; no broken comparison in an explain
@@ -193,6 +195,41 @@ const ambig = [];
         }
     }
     if (process.argv.includes('--ambig-list')) for (const x of ambig) console.log(`  ambig: ${x}`);
+}
+// V-FIT (r10, critic r9 #4 / #5, rule 5): every CORE word (the first three) of every lesson set has a picture that teaches the
+// set's standard - its declared `ccss` shares a code with the set, or its `op` is an operation the set's standard names
+// (VOCAB_STANDARD_OPS). The tags are the checked tree's when it has them, else this checkout's (a backtest row judges an old
+// set by today's tags: 6ae462d1's times-as-many core held "total", whose 5 + 3 bar is additive part-whole, in a 4.OA.A.1 set).
+const FIT6_PINNED = [
+    // (r10: the non-core misfits standing when V-FIT6 was written - each awaits a lead decision; remove a line when it is fixed)
+    'G4|-|findemergentfeaturesegunitsdigitcycle product',
+    'G4|-|extendgrowingshapepatterns equation',
+    'G4|-|multiplicativecomparisontimesasmany compare',
+    'G4|-|multiplicativecomparisontimesasmany unknown',
+];
+{
+    const here = (p) => import(pathToFileURL(path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..', p)).href);
+    const teaches = typeof P.vocabPictureTeaches === 'function' ? P.vocabPictureTeaches : (await here('js/modules/sheet/graphics/vocab-pictures.js')).vocabPictureTeaches;
+    const OPS = W.VOCAB_STANDARD_OPS || W0.VOCAB_STANDARD_OPS || (await here('js/modules/sheet/lesson-pages/vocab-words.js')).VOCAB_STANDARD_OPS;
+    for (const s of W.VOCAB_SETS) {
+        const ops = new Set((s.ccss || []).flatMap((c) => OPS[c] || []));
+        for (const w of s.words.slice(0, 3)) {
+            const t = teaches(w);
+            if (!t || (!t.ccss.length && !t.op)) { fail(`V-FIT ${s.title}: core word "${w}" has a picture with no ccss / op tag`); continue; }
+            if (!t.ccss.some((c) => (s.ccss || []).includes(c)) && !ops.has(t.op)) fail(`V-FIT ${s.title} (${(s.ccss || []).join(', ')}): core word "${w}"'s picture teaches ${t.ccss.join(', ')} / ${t.op}, not the set's standard`);
+        }
+        // V-FIT6: the other three words too. A misfit already pinned (FIT6_PINNED: awaiting a lead decision, design/status/lf-vocab.md)
+        // is reported, never added to: a swapped word that does not teach the set's standard FAILS (r9 put "output" in follow a
+        // rule and "total" in growing patterns - critic r9 #5). The pin only shrinks.
+        for (const w of s.words.slice(3)) {
+            const t = teaches(w);
+            if (!t) continue;
+            if (t.ccss.some((c) => (s.ccss || []).includes(c)) || ops.has(t.op)) continue;
+            const k = `${s.lesson} ${w}`;
+            if (FIT6_PINNED.includes(k)) { if (process.argv.includes('--fit-report')) console.log(`  V-FIT6 pinned: ${s.title} "${w}" (${t.ccss.join(', ')} / ${t.op})`); continue; }
+            fail(`V-FIT6 ${s.title} (${(s.ccss || []).join(', ')}): word "${w}"'s picture teaches ${t.ccss.join(', ')} / ${t.op}, not the set's standard`);
+        }
+    }
 }
 // ---- round 3 (rule 5): the checks of the five defects that survived critic rounds 1 and 2 ----------------------------
 const K = await imp('js/modules/sheet/index.js');
