@@ -285,3 +285,22 @@ Tool changes this round, each one reason:
 Speed notes: (1) a check's backtest must be re-run after every tool edit on the lane, not only after the code fix - the NOTSLOT and
 CAPTION rows had silently drifted. (2) `git pull --rebase` on a branch holding a merge commit replays master's commits and swaps the
 working tree under running browser gates: fetch, and merge only when the remote branch is ahead.
+
+### r2, later steps (2026-11-13 evening)
+
+- Merged origin/master twice more (203a4052e, 850b686b5). ws-empty-band is master's pixel rewrite now; EB-SUPBAND was re-applied
+  on it (d1812d16a). backtests.json and CHECKS_FROM_CRITICS are master's text plus this lane's rows (minimal diff).
+- ws-print-lint DN-1: a mult_facts Test may hold its Independent count (25 / 20 / 12 at S / M / L with touch or none), as the
+  div_facts Test does since 2026-11-08 (112f9109d). Before it, the Test = Independent ruling read as a DN-1 "over ceiling".
+- Screen support labels (lf-checks TEXT-SIZE, routed by the lead): checked first with lf-checks' tool (b7d4f7eb5, a scratch copy
+  outside the repo), then built into the repo as ws-screen-support-eq SUPPORT-LABEL (a support's text on screen >= 8 pt and >= 95 %
+  of the same text on paper; the reader now reads + and − facts for this rule). On origin/master 850b686b5 it fails add / sub
+  number-line labels (7.6 pt), mult skip-strip terms (8.2 pt vs 8.9) and the div sign box on the 390 card (89 %). This branch had
+  already fixed the first two (r1's SIZE-INK: support cues at one CSS mm per paper mm); the sign box is fixed in b92e5ab29 (on
+  screen the 'before' pane never shrinks and wraps above the problem when the row is too narrow; paper unchanged). Backtest
+  `support-label-facts` (850b686b5 -> b92e5ab29) PASS; ledger row added.
+- Hash check: the label fix is screen-only (the twin branch of attachPane); every r2 print change is mult_facts-only (array frame,
+  Test grid, Review supported × facts), so add / sub / div print pages are unchanged (108-document check above).
+- Not this lane's, seen while extending the reader to + / − (rules kept to × / ÷ so nothing new gates): add / sub number-line
+  cue text is 0.20-0.24 x the screen fact digit vs 0.30 on paper (SCREEN-CUE-SIZE), and the sub_facts tile worksheet places one
+  card's tile beside, the rest under (SCREEN-SUPPORT-PLACE). Routed to the lead.
