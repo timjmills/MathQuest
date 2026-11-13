@@ -1446,7 +1446,7 @@ const WW_DEF = {
                 const brk = (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
                 const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
                 const eq = `${brk ? '(' : ''}${x(s1)} ${GLYPH[s1.op]} ${y(s1)}${brk ? ')' : ''} ${GLYPH[s2.op]} ${s2.bottom} = n`;
-                // (lf-hosts 2026-11-13, PT-G-15 / PAGE_TYPES word problems "commutative equations are accepted": the Step 1
+                // (lf-hosts 2026-11-13, PROBLEM_TYPES "any equivalent answer is accepted" / PAGE_TYPES word problems "commutative equations are accepted": the Step 1
                 // numbers turned around when Step 1 adds or multiplies - 9 × 5 + 13 = n for 5 × 9 + 13 = n - is the same
                 // equation; the boxes fix every other place. Paper and screen read this one list.)
                 const turn = (s1.op === '+' || s1.op === '*') && String(x(s1)) !== String(y(s1))
