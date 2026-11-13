@@ -1019,3 +1019,14 @@ that FAILs on master and PASSes on the fix, so the next skill-lane's precritic c
 | Opener empty band on tightRows rows + one-column Model | ws-empty-band EB-BAND (every role) | roles-opener-tightrows-band | ws-precritic --skill | ~1 round per pv/in-place skill on the opener |
 | Mixed practice spilled start leaves a lone short page | ws-print-lint PG-23 | roles-mixed-spill-pg23 | precritic → coverage-matrix mixed | ~1 round per multi-skill Mixed page |
 | Sections sheet of mixed cell heights flagged DN-2/PG-23 wrongly | ws-print-lint DN-2/PG-23 by sub-section | roles-sections-subsection-density | precritic → coverage-matrix sections | ~1 false critic finding per Sections sheet |
+
+### lf-engine roles critic r1 (2026-11-13): B1 blocking rebuild, each finding a check before its fix
+
+Critic FAILed r0 (min 5 on B1: the tightRows cap of finding 1 correctly moved the white to the page foot but exposed a
+master defect in opener.js — a one-column Guided band printed ONE cell, not PT-OPN-6's two rows). Process: the blocking
+finding was a page rule with no machine check; the fix was a one-line generalisation (`first && first.template === 'count-row' && gc === 1`
+→ `first && gc === 1`). The three findings each became a check (OPN-6, L-OVERLAP RULE, DN-2 sub-section fill) with a
+backtest FAIL-on-2d7a7f158 / PASS-on-fix, all on ws-precritic's `--role opener` / `--skill` path, so the next opener lane
+catches a one-cell Guided band before a critic round. Lost time: none beyond the one critic round; the rebuild reused the
+r0 browser harness (lesson baseline, sweep, use.cjs). Rule added: a page-role capacity rule (PT-OPN-6, PT-ENG-3) is gated
+by a print-lint rule on the role, not only by the empty-band renderer, so a band that is short rather than stretched is caught.

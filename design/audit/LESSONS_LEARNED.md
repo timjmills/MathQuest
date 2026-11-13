@@ -514,3 +514,18 @@ Proof the passed skills are not harmed: a render-hash sweep of every `redesign-p
 changed exactly the opener pages of the three pv skills (items rose 2 → 4) and the Mixed pages whose start spilled (items
 rose, pages never dropped); 0 independent-sections pages changed (finding 3 is a check-only change); lesson pages
 byte-identical (ws-lesson-baseline --all-lessons, 1596 hashes). Before/after PNGs: `design/audit/runs/lf-engine-roles/proof/`.
+
+## lf-engine roles critic r1 (2026-11-13): B1 blocking + N2 nit + GUARD, each a check before its fix
+
+Critic FAILed the r0 change (min 5 on B1). The three findings, each turned into a machine check that FAILS on the bad
+commit `2d7a7f158` and PASSES on the fix:
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| B1 (blocking) The Opener's Guided band held ONE cell on a one-column page (expand / unit_form / combine): PT-OPN-6 wants 2-4 (1 col -> 2 rows). The second Guided row was taken for count rows only, so finding 1's tightRows cap pushed unit_form S under 50 % (47 %) with a half-blank foot | ws-print-lint L-DENSITY OPN-6: a kit Opener whose Guided band holds < 2 cells fails (major) unless the plan's notes say the second row did not fit the budget. Fix: the Opener takes the 2nd Guided row on ANY `gc === 1` page that fits (Independent rows fitted first) | roles-opener-guided-two-rows (2d7a7f158 FAIL → 03c5e762f OK) | ws-precritic --role opener | 1 critic round |
+| N2 (nit) A two-Model Opener band held its Model grid to its own ink (modelTight), so the vertical rule between the two Model cells stopped 2.4 mm above the band's bottom rule | ws-print-lint L-OVERLAP RULE: inside a kit band, a grid of 2+ columns that ends the band carries its column rules to the band's bottom rule (within 0.5 mm). Fix: modelTight only when nModel === 1 | roles-opener-model-rule (2d7a7f158 FAIL → 407969639 OK) | ws-precritic --role opener | 1 nit |
+| GUARD (critic ruling on finding 3's loosening) With a fixed --count, a mid-sheet sub-section page under half used passed (PAGEFILL / ORPHAN / SPREAD are Auto-only) | ws-print-lint DN-2 measures sub-section page FILL, not item count, when subSec: a non-last page whose problems fill < 50 % of the body fails at any count | roles-sections-midsheet-fill (fixture: the real sheet's mid page cut to one row; pre-guard PASS → guard FAIL) | ws-precritic --skill | closes the residual gap |
+
+Page use after B1: expand S 56 %, M 68 %, L 89 %; unit_form S 53 %, M 64 %, L 85 %; combine S 57 %, M 71 %, L 85 % — all
+one-column pv openers now Guided 2 + Independent 2 (master dropped every Independent row on expand/combine L and sized the
+Model Infinity mm). Lesson pages byte-identical (ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson).

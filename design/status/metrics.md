@@ -552,3 +552,14 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 Proof passed skills unharmed: render-hash sweep master vs branch — opener 9 pv pages changed (items 2→4), mixed 242 pages
 (items rose, pages never dropped), 0 independent-sections changed (finding 3 is check-only); ws-lesson-baseline
 --all-lessons 1596 hashes identical. Before/after PNGs: design/audit/runs/lf-engine-roles/proof/.
+
+### lf-engine roles critic r1 (2026-11-13): B1 + N2 + GUARD, each a check FAIL-on-2d7a7f158 / PASS-on-fix
+
+| Finding | Check | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| B1 Opener one-column Guided band held 1 cell (PT-OPN-6 wants 2) | ws-print-lint L-DENSITY OPN-6 | roles-opener-guided-two-rows | precritic --role opener | 1 critic round |
+| N2 two-Model band's column rule stopped 2.4 mm short | ws-print-lint L-OVERLAP RULE | roles-opener-model-rule | precritic --role opener | 1 nit |
+| GUARD mid-sheet sub-section page under half used passed at a fixed --count | ws-print-lint DN-2 sub-section fill | roles-sections-midsheet-fill | precritic --skill | closes the gap |
+
+Page use after B1 (opener, % of body): expand S 56 / M 68 / L 89; unit_form S 53 / M 64 / L 85; combine S 57 / M 71 / L 85.
+Master dropped every Independent row on expand/combine/unit_form L (Model sized Infinity mm). Lesson pages byte-identical.

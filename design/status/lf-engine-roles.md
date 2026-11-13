@@ -6,15 +6,18 @@ Owner of files: sheet/roles/{opener,mixed-practice}.js, sheet/grid.js, sheet/rol
 State: building
 Updated: 2026-11-13
 Builder profile: mq-opus-medium
-Critic rounds: 0 (engine round; findings from lf-placevalue compare r2)
+Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
 
 ## Now
-- Three findings fixed, each a check that FAILS on master 8df014ab7 and PASSES on its fix (backtest rows added):
-  1 Opener EB-BAND (tightRows rows + one-column Model held to ink); 2 Mixed PG-23 (spilled start fills its pages);
-  3 Sections DN-2/PG-23 compare each page with its own sub-section.
-- Proof the passed skills are unharmed: render-hash sweep (opener 9 pv pages changed, items rose; mixed 242 pages,
-  items rose, pages never dropped; 0 independent-sections changed; lessons byte-identical). Before/after PNGs in
-  design/audit/runs/lf-engine-roles/proof/. Pushed; ready for an independent critic.
+- Critic r1 FAIL (min 5, B1). Rebuilt:
+  B1 the Opener takes a second Guided row on ANY one-column page that fits (was count rows only); PT-OPN-6. Check
+  ws-print-lint L-DENSITY OPN-6 (Guided band < 2 cells fails unless the plan notes the second row did not fit).
+  unit_form S 46->53 %, expand S 49->56 % used, all one-column pv openers Guided 2.
+  N2 modelTight only when nModel===1, so a two-Model band's column rule reaches the band bottom; check L-OVERLAP RULE.
+  GUARD on finding 3: on a sections sheet DN-2 measures page FILL, so a mid-sheet page under half used fails at any
+  --count (self-tests CC1/CC2). N3 proof README re-done (sweep re-run base vs head, every changed page listed, opener
+  PNGs re-rendered). N4 (tape_diagram) not this lane - routed by the lead.
+- Findings 1-3 (r0) and B1/N2/GUARD each a check FAIL-on-bad / PASS-on-fix; backtests all PASS.
 
 ## Owner go
 
