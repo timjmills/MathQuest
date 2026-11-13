@@ -1,1 +1,6 @@
 $ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_wp_compare_smaller,addition:add_wp_change_unknown --roles independent,guided,scripted-model,mixed-practice,error-analysis --size S,M,L --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg1  [f8afbb142]
+ws-grade-render: 2 skills -> ../dbg1
+  [1/2] addition:add_wp_change_unknown  independent-S 1p+1k 1x9  independent-M 1p+1k 1x8  independent-L 1p+1k 2x3  guided-S 1p+1k 2x2  guided-M 2p+2k 2x2  guided-L 2p+2k 2x1  scripted-model-S 2p+2k 2x4  scripted-model-M 2p+2k 2x4  scripted-model-L 2p+2k 2x4  mixed-practice-S 1p+1k 8x4  mixed-practice-M 1p+1k 6x4  mixed-practice-L 1p+1k 4x3  error-analysis-S 1p+1k 2x3  error-analysis-M 1p+1k 1x4  error-analysis-L 1p+1k 2x2  91s
+  [2/2] subtraction:sub_wp_compare_smaller  independent-S 1p+1k 1x11  independent-M 1p+1k 1x8  independent-L 1p+1k 2x3  guided-S 1p+1k 2x2  guided-M 2p+2k 2x2  guided-L 2p+2k 2x1  scripted-model-S 2p+2k 2x4  scripted-model-M 2p+2k 2x4  scripted-model-L 2p+2k 2x4  mixed-practice-S 1p+1k 8x5  mixed-practice-M 1p+1k 6x4  mixed-practice-L 1p+1k 4x3  error-analysis-S 1p+1k 2x3  error-analysis-M 1p+1k 1x4  error-analysis-L 1p+1k 2x2  179s
+ws-grade-render: done, 2 units, 80 pages, 179s
+exit 0

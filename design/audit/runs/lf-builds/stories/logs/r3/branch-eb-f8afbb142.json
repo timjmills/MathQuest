@@ -1,0 +1,1170 @@
+{
+ "skills": [
+  "addition:add_word_problems",
+  "addition:add_word_problems_plain",
+  "subtraction:sub_word_problems",
+  "subtraction:sub_word_problems_plain",
+  "addition:add_wp_change_unknown",
+  "subtraction:sub_wp_change_unknown",
+  "subtraction:sub_wp_compare_smaller"
+ ],
+ "findings": [
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems independent M p1 cell 4",
+   "msg": "empty band 37.5 mm under the ink of a 117.8 mm cell (31.8 %; limit 30 % = 35.3 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems more-practice M p1 cell 4",
+   "msg": "empty band 34.8 mm under the ink of a 109.6 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems test M p1 cell 4",
+   "msg": "empty band 37.5 mm under the ink of a 117.8 mm cell (31.8 %; limit 30 % = 35.3 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems lesson L p2 cell 4",
+   "msg": "empty band 43.2 mm under the ink of a 123.9 mm cell (34.9 %; limit 30 % = 37.2 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p1 cell 2",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model S p1 cell 2",
+   "msg": "empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p1 cell 4",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p1 cell 6",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model S p1 cell 6",
+   "msg": "empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p2 cell 2",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p2 cell 4",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model S p2 cell 4",
+   "msg": "empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model S p2 cell 6",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model S p2 cell 6",
+   "msg": "empty band 26 mm beside the ink of a 92.3 mm wide cell (30 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p1 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p1 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p2 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model M p2 cell 2",
+   "msg": "empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p2 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p3 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model M p3 cell 2",
+   "msg": "empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model M p3 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p1 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p1 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p2 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model L p2 cell 2",
+   "msg": "empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p2 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p3 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems scripted-model L p3 cell 2",
+   "msg": "empty band 44.7 mm beside the ink of a 92.3 mm wide cell (52 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems scripted-model L p3 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems S p1 cell 1",
+   "msg": "empty band 34.7 mm under the ink of a 76.5 mm cell (45.4 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems S p1 cell 2",
+   "msg": "empty band 34.8 mm under the ink of a 76.5 mm cell (45.5 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems S p1 cell 3",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems M p1 cell 1",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems M p1 cell 2",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems word-problems M p1 cell 3",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain independent M p1 cell 4",
+   "msg": "empty band 37.5 mm under the ink of a 117.8 mm cell (31.8 %; limit 30 % = 35.3 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain more-practice M p1 cell 4",
+   "msg": "empty band 34.8 mm under the ink of a 109.6 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain test M p1 cell 4",
+   "msg": "empty band 37.5 mm under the ink of a 117.8 mm cell (31.8 %; limit 30 % = 35.3 mm) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain lesson S p2 cell 1",
+   "msg": "empty band 48.4 mm beside the ink of a 137.6 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain lesson M p2 cell 1",
+   "msg": "empty band 48.4 mm beside the ink of a 137.6 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p1 cell 2",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model S p1 cell 2",
+   "msg": "empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p1 cell 4",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p1 cell 6",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model S p1 cell 6",
+   "msg": "empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p2 cell 2",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p2 cell 4",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model S p2 cell 4",
+   "msg": "empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model S p2 cell 6",
+   "msg": "empty band 51.5 mm under the ink of a 65.4 mm cell (78.7 %; limit 30 % = 19.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model S p2 cell 6",
+   "msg": "empty band 26 mm beside the ink of a 92.3 mm wide cell (30 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p1 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p1 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p2 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model M p2 cell 2",
+   "msg": "empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p2 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p3 cell 2",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model M p3 cell 2",
+   "msg": "empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model M p3 cell 4",
+   "msg": "empty band 60.8 mm under the ink of a 75.4 mm cell (80.6 %; limit 30 % = 22.6 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p1 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p1 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p2 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model L p2 cell 2",
+   "msg": "empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p2 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p3 cell 2",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_word_problems_plain scripted-model L p3 cell 2",
+   "msg": "empty band 44.7 mm beside the ink of a 92.3 mm wide cell (52 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain scripted-model L p3 cell 4",
+   "msg": "empty band 76.1 mm under the ink of a 91.8 mm cell (82.9 %; limit 30 % = 27.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain review M p1 cell 4",
+   "msg": "empty band 37 mm under the ink of a 117.3 mm cell (31.5 %; limit 30 % = 35.2 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems S p1 cell 1",
+   "msg": "empty band 34.7 mm under the ink of a 76.5 mm cell (45.4 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems S p1 cell 2",
+   "msg": "empty band 34.8 mm under the ink of a 76.5 mm cell (45.5 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems S p1 cell 3",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems M p1 cell 1",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems M p1 cell 2",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_word_problems_plain word-problems M p1 cell 3",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems independent M p1 cell 3",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems more-practice M p1 cell 4",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems test M p1 cell 3",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model S p1 cell 2",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model S p1 cell 2",
+   "msg": "empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model S p1 cell 4",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model S p1 cell 4",
+   "msg": "empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model S p1 cell 6",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model S p2 cell 2",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model S p2 cell 2",
+   "msg": "empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model S p2 cell 4",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model S p2 cell 4",
+   "msg": "empty band 27.3 mm beside the ink of a 92.3 mm wide cell (32 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model M p1 cell 2",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model M p1 cell 4",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model M p1 cell 4",
+   "msg": "empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model M p2 cell 2",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model M p2 cell 4",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model M p2 cell 4",
+   "msg": "empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model M p3 cell 2",
+   "msg": "empty band 66.2 mm under the ink of a 80.8 mm cell (81.9 %; limit 30 % = 24.2 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model L p1 cell 2",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model L p1 cell 4",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model L p1 cell 4",
+   "msg": "empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model L p2 cell 2",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model L p2 cell 4",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems scripted-model L p2 cell 4",
+   "msg": "empty band 44.7 mm beside the ink of a 92.3 mm wide cell (52 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems scripted-model L p3 cell 2",
+   "msg": "empty band 82.3 mm under the ink of a 98 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems S p1 cell 1",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems S p1 cell 2",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems S p1 cell 3",
+   "msg": "empty band 34.7 mm under the ink of a 76.5 mm cell (45.4 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems M p1 cell 1",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems M p1 cell 2",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems word-problems M p1 cell 3",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain independent M p1 cell 3",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain more-practice M p1 cell 4",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain test M p1 cell 3",
+   "msg": "empty band 34.8 mm under the ink of a 109.5 mm cell (31.8 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p1 cell 2",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p1 cell 2",
+   "msg": "empty band 30.9 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p1 cell 4",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p1 cell 4",
+   "msg": "empty band 52.5 mm beside the ink of a 92.3 mm wide cell (61 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p1 cell 6",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p2 cell 2",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p2 cell 2",
+   "msg": "empty band 53.3 mm beside the ink of a 92.3 mm wide cell (62 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p2 cell 4",
+   "msg": "empty band 56.2 mm under the ink of a 70.1 mm cell (80.2 %; limit 30 % = 21.0 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model S p2 cell 4",
+   "msg": "empty band 27.3 mm beside the ink of a 92.3 mm wide cell (32 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p1 cell 2",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p1 cell 4",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p1 cell 4",
+   "msg": "empty band 48.1 mm beside the ink of a 92.3 mm wide cell (56 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p2 cell 2",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p2 cell 4",
+   "msg": "empty band 66.3 mm under the ink of a 80.9 mm cell (82.0 %; limit 30 % = 24.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p2 cell 4",
+   "msg": "empty band 49 mm beside the ink of a 92.3 mm wide cell (57 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model M p3 cell 2",
+   "msg": "empty band 66.2 mm under the ink of a 80.8 mm cell (81.9 %; limit 30 % = 24.2 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p1 cell 2",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p1 cell 4",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p1 cell 4",
+   "msg": "empty band 43.7 mm beside the ink of a 92.3 mm wide cell (51 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p2 cell 2",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p2 cell 4",
+   "msg": "empty band 82.4 mm under the ink of a 98.1 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p2 cell 4",
+   "msg": "empty band 44.7 mm beside the ink of a 92.3 mm wide cell (52 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain scripted-model L p3 cell 2",
+   "msg": "empty band 82.3 mm under the ink of a 98 mm cell (84.0 %; limit 30 % = 29.4 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain review M p1 cell 3",
+   "msg": "empty band 35 mm under the ink of a 109.8 mm cell (31.9 %; limit 30 % = 32.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems S p1 cell 1",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems S p1 cell 2",
+   "msg": "empty band 33 mm under the ink of a 76.5 mm cell (43.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems S p1 cell 3",
+   "msg": "empty band 34.7 mm under the ink of a 76.5 mm cell (45.4 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems M p1 cell 1",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems M p1 cell 2",
+   "msg": "empty band 26.8 mm under the ink of a 76.5 mm cell (35.0 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_word_problems_plain word-problems M p1 cell 3",
+   "msg": "empty band 28.4 mm under the ink of a 76.5 mm cell (37.1 %; limit 30 % = 22.9 mm) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_wp_change_unknown lesson S p2 cell 5",
+   "msg": "empty band 43.3 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_wp_change_unknown lesson M p2 cell 5",
+   "msg": "empty band 43.3 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model S p1 cell 2",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_wp_change_unknown scripted-model S p1 cell 2",
+   "msg": "empty band 26.6 mm beside the ink of a 92.3 mm wide cell (31 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model S p1 cell 4",
+   "msg": "empty band 37 mm under the ink of a 55.6 mm cell (66.5 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model S p2 cell 2",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "addition:add_wp_change_unknown scripted-model S p2 cell 2",
+   "msg": "empty band 28.2 mm beside the ink of a 92.3 mm wide cell (33 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model S p2 cell 4",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model M p1 cell 2",
+   "msg": "empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model M p1 cell 4",
+   "msg": "empty band 39.4 mm under the ink of a 60 mm cell (65.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model M p2 cell 2",
+   "msg": "empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model M p2 cell 4",
+   "msg": "empty band 39.4 mm under the ink of a 60 mm cell (65.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model L p1 cell 2",
+   "msg": "empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model L p1 cell 4",
+   "msg": "empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model L p2 cell 2",
+   "msg": "empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown scripted-model L p2 cell 4",
+   "msg": "empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems S p1 cell 1",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems S p1 cell 2",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems S p1 cell 3",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems M p1 cell 1",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems M p1 cell 2",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems M p1 cell 3",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems L p1 cell 2",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "addition:add_wp_change_unknown word-problems L p1 cell 3",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p1 cell 2",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p1 cell 2",
+   "msg": "empty band 31.1 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p1 cell 4",
+   "msg": "empty band 37 mm under the ink of a 55.6 mm cell (66.5 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p2 cell 2",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p2 cell 2",
+   "msg": "empty band 32.7 mm beside the ink of a 92.3 mm wide cell (38 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model S p2 cell 4",
+   "msg": "empty band 41.7 mm under the ink of a 55.6 mm cell (75.0 %; limit 30 % = 16.7 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model M p1 cell 2",
+   "msg": "empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model M p1 cell 4",
+   "msg": "empty band 39.4 mm under the ink of a 60 mm cell (65.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model M p2 cell 2",
+   "msg": "empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model M p2 cell 4",
+   "msg": "empty band 45.4 mm under the ink of a 60 mm cell (75.7 %; limit 30 % = 18.0 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model L p1 cell 2",
+   "msg": "empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model L p1 cell 4",
+   "msg": "empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model L p2 cell 2",
+   "msg": "empty band 49.3 mm under the ink of a 65 mm cell (75.8 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown scripted-model L p2 cell 4",
+   "msg": "empty band 42.5 mm under the ink of a 65 mm cell (65.4 %; limit 30 % = 19.5 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown stretch M p1 cell 1",
+   "msg": "empty band 107.1 mm under the ink of a 230 mm cell (46.6 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown stretch L p1 cell 1",
+   "msg": "empty band 89.1 mm under the ink of a 229 mm cell (38.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems S p1 cell 1",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems S p1 cell 2",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems S p1 cell 3",
+   "msg": "empty band 36.5 mm under the ink of a 61.8 mm cell (59.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems M p1 cell 1",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems M p1 cell 2",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems M p1 cell 3",
+   "msg": "empty band 32.9 mm under the ink of a 61.8 mm cell (53.2 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems L p1 cell 1",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems L p1 cell 2",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_change_unknown word-problems L p1 cell 3",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_compare_smaller lesson S p2 cell 5",
+   "msg": "empty band 43.1 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_compare_smaller lesson M p2 cell 5",
+   "msg": "empty band 43.1 mm beside the ink of a 122.9 mm wide cell (37 %) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p1 cell 2",
+   "msg": "empty band 40.3 mm under the ink of a 54.2 mm cell (74.4 %; limit 30 % = 16.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p1 cell 2",
+   "msg": "empty band 31.1 mm beside the ink of a 92.3 mm wide cell (36 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p1 cell 4",
+   "msg": "empty band 35.6 mm under the ink of a 54.2 mm cell (65.7 %; limit 30 % = 16.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p2 cell 2",
+   "msg": "empty band 40.3 mm under the ink of a 54.2 mm cell (74.4 %; limit 30 % = 16.3 mm) []"
+  },
+  {
+   "rule": "EB-SIDE",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p2 cell 2",
+   "msg": "empty band 32.7 mm beside the ink of a 92.3 mm wide cell (38 %) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model S p2 cell 4",
+   "msg": "empty band 40.3 mm under the ink of a 54.2 mm cell (74.4 %; limit 30 % = 16.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model M p1 cell 2",
+   "msg": "empty band 44.6 mm under the ink of a 59.2 mm cell (75.3 %; limit 30 % = 17.8 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model M p1 cell 4",
+   "msg": "empty band 38.6 mm under the ink of a 59.2 mm cell (65.2 %; limit 30 % = 17.8 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model M p2 cell 2",
+   "msg": "empty band 44.6 mm under the ink of a 59.2 mm cell (75.3 %; limit 30 % = 17.8 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model M p2 cell 4",
+   "msg": "empty band 44.6 mm under the ink of a 59.2 mm cell (75.3 %; limit 30 % = 17.8 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model L p1 cell 2",
+   "msg": "empty band 48.5 mm under the ink of a 64.2 mm cell (75.5 %; limit 30 % = 19.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model L p1 cell 4",
+   "msg": "empty band 41.7 mm under the ink of a 64.2 mm cell (65.0 %; limit 30 % = 19.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model L p2 cell 2",
+   "msg": "empty band 48.5 mm under the ink of a 64.2 mm cell (75.5 %; limit 30 % = 19.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller scripted-model L p2 cell 4",
+   "msg": "empty band 41.7 mm under the ink of a 64.2 mm cell (65.0 %; limit 30 % = 19.3 mm) []"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller stretch M p1 cell 1",
+   "msg": "empty band 122.5 mm under the ink of a 230 mm cell (53.3 %; limit 30 % = 69.0 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller stretch L p1 cell 1",
+   "msg": "empty band 107.4 mm under the ink of a 229 mm cell (46.9 %; limit 30 % = 68.7 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems S p1 cell 1",
+   "msg": "empty band 41.2 mm under the ink of a 61.8 mm cell (66.7 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems S p1 cell 2",
+   "msg": "empty band 41.2 mm under the ink of a 61.8 mm cell (66.7 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems S p1 cell 3",
+   "msg": "empty band 41.2 mm under the ink of a 61.8 mm cell (66.7 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems M p1 cell 1",
+   "msg": "empty band 38.4 mm under the ink of a 61.8 mm cell (62.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems M p1 cell 2",
+   "msg": "empty band 38.4 mm under the ink of a 61.8 mm cell (62.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems M p1 cell 3",
+   "msg": "empty band 38.4 mm under the ink of a 61.8 mm cell (62.1 %; limit 30 % = 18.5 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems L p1 cell 1",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems L p1 cell 2",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  },
+  {
+   "rule": "EB-BAND",
+   "where": "subtraction:sub_wp_compare_smaller word-problems L p1 cell 3",
+   "msg": "empty band 22.7 mm under the ink of a 61.5 mm cell (36.9 %; limit 30 % = 18.4 mm) [word-work]"
+  }
+ ],
+ "notes": [
+  "addition:add_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 10 + hosts card, worksheet, quiz",
+  "addition:add_word_problems card 390: no kit cell on the host (legacy screen item?)",
+  "addition:add_word_problems card 820: no kit cell on the host (legacy screen item?)",
+  "addition:add_word_problems card 1280: no kit cell on the host (legacy screen item?)",
+  "addition:add_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz",
+  "addition:add_word_problems_plain card 390: no kit cell on the host (legacy screen item?)",
+  "addition:add_word_problems_plain card 820: no kit cell on the host (legacy screen item?)",
+  "addition:add_word_problems_plain card 1280: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz",
+  "subtraction:sub_word_problems card 390: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems card 820: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems card 1280: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems_plain: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz",
+  "subtraction:sub_word_problems_plain card 390: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems_plain card 820: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_word_problems_plain card 1280: no kit cell on the host (legacy screen item?)",
+  "addition:add_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz",
+  "addition:add_wp_change_unknown card 390: no kit cell on the host (legacy screen item?)",
+  "addition:add_wp_change_unknown card 820: no kit cell on the host (legacy screen item?)",
+  "addition:add_wp_change_unknown card 1280: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz",
+  "subtraction:sub_wp_change_unknown card 390: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_change_unknown card 820: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_change_unknown card 1280: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_compare_smaller: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x S/M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz",
+  "subtraction:sub_wp_compare_smaller card 390: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_compare_smaller card 820: no kit cell on the host (legacy screen item?)",
+  "subtraction:sub_wp_compare_smaller card 1280: no kit cell on the host (legacy screen item?)"
+ ],
+ "renders": 392,
+ "cells": 2058
+}
