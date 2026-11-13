@@ -104,15 +104,18 @@ export function prepare(it, info = {}) {
     // ("The missing number is 110." / "The missing number is 1010."), side by side; the response row under them, its answer
     // slot as wide as the wrong number (answerPlace above reads it)
     if (wrong.text) {
-        const statement = (isRight) => `<div class="mq-frame" style="padding-left:9mm">${esc(isRight ? wrong.rightStatement : wrong.statement)}</div>`;
-        const respT = (c) => `<div class="mq-abresp" style="grid-column:1 / -1;flex-direction:row;align-items:center;justify-content:center;gap:10mm">`
+        // (A over B in the left column, each statement on its own line, the response beside them: side by side the two
+        // sentences ran out of a half-cell at L, and a response row under them cost the cell its height at M - ws-cell-checks
+        // OVERFLOW, precritic r5)
+        const statement = (isRight) => `<div class="mq-frame" style="padding-left:9mm;white-space:normal">${esc(isRight ? wrong.rightStatement : wrong.statement)}</div>`;
+        const respT = (c) => `<div class="mq-abresp" style="grid-column:2;grid-row:1 / 3;flex-direction:column;align-items:flex-start;justify-content:center;gap:3mm">`
             + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
             + (place.kind !== 'one' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}.</div>`)
             + `</div>`;
-        const renderT = (c, o = {}) => `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { prompt: false }))}</div>`
-            + `<div class="mq-ab" data-ws-misc="${esc(wrong.misconception || '')}" style="margin-top:auto;margin-bottom:auto;grid-template-columns:1fr 1fr;row-gap:4mm">`
-            + `<div class="mq-abbox"><span class="mq-abtag">A</span>${statement(aRight)}</div>`
-            + `<div class="mq-abbox"><span class="mq-abtag">B</span>${statement(!aRight)}</div>`
+        const renderT = (c, o = {}) => `<div class="mq-abstory" style="margin-bottom:2mm;">${it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { prompt: false }))}</div>`
+            + `<div class="mq-ab" data-ws-misc="${esc(wrong.misconception || '')}" style="margin-top:auto;margin-bottom:auto;grid-template-columns:minmax(0,1fr) auto;row-gap:2mm;column-gap:6mm">`
+            + `<div class="mq-abbox" style="grid-column:1;grid-row:1"><span class="mq-abtag">A</span>${statement(aRight)}</div>`
+            + `<div class="mq-abbox" style="grid-column:1;grid-row:2"><span class="mq-abtag">B</span>${statement(!aRight)}</div>`
             + respT(c) + `</div>`;
         return Object.assign({}, it, {
             render: renderT, key, measured: null, drawsAnswer: true,

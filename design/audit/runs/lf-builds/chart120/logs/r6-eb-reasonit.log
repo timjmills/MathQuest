@@ -1,0 +1,15 @@
+note: composing:chart_to_120: slot ink on; card --roles; 1 roles x S/M/L + 0 option variant(s) of 0 + hosts none
+EB-BAND  PASS
+EB-SIDE  PASS
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  PASS
+EB-GDPCAP PASS
+(1 skill(s), 3 renders, 6 cells, 11 s; 0 finding(s) within the pin design/audit/baselines/empty-band.json)
+ws-empty-band: OK
