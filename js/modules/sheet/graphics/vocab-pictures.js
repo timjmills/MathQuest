@@ -968,7 +968,7 @@ export function vocabPictureFit(id, wMm = 46, hMm, set) {
  * marks. In the screen twin the same drawing at the host's --mq-k2 scale (one drawing, two scales, SP-1).
  * @returns {string} an inline SVG ('' for a word the library has no picture of)
  */
-export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {}) {
+export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printFloor = false } = {}) {
     if (!hasVocabPicture(id)) return '';
     const e = vocabPictureExtent(id);
     const fit = vocabPictureFit(id, wMm, hMm, set);
@@ -980,7 +980,10 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set } = {})
     const ar = `aspect-ratio:${r2(e.w)} / ${r2(e.h)};`;
     // (a base-ten picture's screen floor is the set's: the hundred's floor, the ten and one in proportion - one unit)
     if (minPx && BASE10_IDS.includes(String(id))) minPx = minPx * e.w / Math.max(...base10UnitSet(id, set).map((b) => vocabPictureExtent(b).w));
-    const size = isTwin(ctx) ? `width:${minPx ? `max(${minPx}px, ${L(ctx, w)})` : L(ctx, w)};max-width:100%;height:auto;${ar}` : `width:${r2(w)}mm;max-width:100%;height:auto;${ar}`;
+    // (`printFloor`, lf-vocab r14: a screen twin never narrower than the same picture on paper - the twin unit is 3.4 px, under a
+    // CSS mm - so its marks are at least their print size, ws-screen-ink-size SIZE-INK)
+    const floors = [minPx ? `${minPx}px` : '', L(ctx, w), printFloor ? `${r2(w)}mm` : ''].filter(Boolean);
+    const size = isTwin(ctx) ? `width:${floors.length > 1 ? `max(${floors.join(', ')})` : floors[0]};max-width:100%;height:auto;${ar}` : `width:${r2(w)}mm;max-width:100%;height:auto;${ar}`;
     return `<svg class="mq-vpic" data-vpic="${esc(id)}" viewBox="${r2(e.x)} ${r2(e.y)} ${r2(e.w)} ${r2(e.h)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(PICS[id].alt)}"`
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }

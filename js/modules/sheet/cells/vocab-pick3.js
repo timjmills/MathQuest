@@ -110,9 +110,14 @@ register(PICK3_TEMPLATE, {
         const picW = beside ? Math.max(34, Math.min(pick3PicW(p), 76 - 3 - bankMm)) : pick3PicW(p);
         // the picture fills a box as tall as before and as wide as the cell allows, so a flat picture (the ten rod, a line of
         // digits) prints large (r3, rule 5: critic r2 #2 - the ten rod 3.4 mm tall in a 90 mm cell; ws-vocab-unit V9)
-        const box = twin ? { wMm: picW } : beside ? { wMm: Math.max(picW, 76 - 3 - bankMm), hMm: eaS ? 28 : 24 } : { wMm: 72, hMm: picW * 2 / 3 - (ctx.state === 'wrong' ? 3.5 : 0) };   // (Error analysis: 3 a page at L, critic r3 #3)   // (76 stuck out 0.4 mm at S: precritic r4)
+        // (lf-vocab r14, ws-screen-ink-size SIZE-INK: the screen twin drew every picture 38 mm wide - 220 px - while paper fits a
+        // flat picture to its 72 x 25 mm box, so "equal groups" showed its rings and dots at 81 % of their print size. The twin
+        // now fits the box the SAME item has on paper - the beside box for grades 4-5, the 72 mm box below them - and is never
+        // drawn narrower than that paper width: printFloor)
+        const paperBox = gc === 2 ? { wMm: Math.max(pick3PicW(p), 76 - 3 - bankMm), hMm: 24 } : { wMm: 72, hMm: pick3PicW(p) * 2 / 3 };
+        const box = twin ? paperBox : beside ? { wMm: Math.max(picW, 76 - 3 - bankMm), hMm: eaS ? 28 : 24 } : { wMm: 72, hMm: picW * 2 / 3 - (ctx.state === 'wrong' ? 3.5 : 0) };   // (Error analysis: 3 a page at L, critic r3 #3)   // (76 stuck out 0.4 mm at S: precritic r4)
         // (the item is its one picture: a "one" or a "ten" alone prints at the ten rod's unit, owner ruling OQ-1)
-        const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0, set: [p.word] }));
+        const pic = vocabPictureSVG(ctx, p.word, Object.assign(box, { minPx: twin ? 220 : 0, printFloor: twin, set: [p.word] }));
         const pad = `padding:${L(ctx, 1)} ${L(ctx, 1)} ${L(ctx, 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};`;
         const root = `class="mq-vp k2-cell" data-ws-vocab="pick3" data-ws-inplace${twin ? ' data-mq-k2="1"' : ''}`;
         if (beside) {
