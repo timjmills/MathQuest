@@ -340,3 +340,21 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - The pv rows are re-pointed (fail 16014137, pass 668f6a8c / 1f18505d) and PASS. Both EB-PARITY rows PASS.
   - Backtests: 27 of 28 live rows PASS. eb-fact-roles is still red (facts lane). Self-test, precritic-plan, ws-screen-answer, ws-phone-card, boot-smoke and the facts pin are OK (no re-pin).
   - The pv debt (combine, unit_form, expand): EB-BAND 205, EB-SIDE 16 (221 in all; the shown lines are combine and expand).
+- Lead rulings 11-13 (a) FOCUS-GAP and (b) EB-FOOT scope (builder, Opus medium; commits 2a25a4c58, f546697be, 6cd9668cc + this one):
+  - (a) All three --focus-gap-all findings came from the SHARED ring styling, not per-skill markup, so they are fixed centrally (additive css/screen-cell.css, end of file). --focus-gap-all is now clean.
+    - Online worksheet: `.online-edition .problem-card.mq-wscard .mq-scell input:focus` (css/screen-cell.css:663, offset 1 px) outranked the in-box cell-slot rule `.mq-scell [data-mq-cell] > input.mq-cellslot:focus` (line 676, offset -4 px). So every boxed cell slot drew its ring 3 px outside its box: arrays_groups -0.2 px, function_table_hard 1.4 px, elapsed_find_duration 3.3 px. The fix keeps the -4 px offset on that host. Row sa-focus-gap-cellslot-ws.
+    - Practice card: the inline-blanks box `.mq-scell input.ib-cell` (line 693; 6 px side margin, its own border) drew its ring 4 px outside it, 2 px from "rows of" (arrays_groups). It now thickens inward (offset -3 px). Row sa-focus-gap-ibcell-card.
+    - Both rows: FAIL 8dc176e6, OK 2a25a4c58.
+    - Nothing goes to lf-ops or lf-algebra.
+  - (b) EB-FOOT now judges EVERY cell of a grid-role page against the items it holds (data-eb-item). The kit may write a list ("3,4") for a plan item holding several questions (`qs`).
+    - A multi-item cell is judged against the bridge's measure of that combination. The bridge gives none today, so such a cell is a NOTE, never a silent pass. So are an unindexed cell and an index out of range.
+    - gridCols reads a re-laid grid's real column count.
+    - Self-test: 15 pairing cases.
+    - No fix commit exists, so row eb-foot-review-add-facts is PENDING until lf-ops fixes the cells.
+    - The facts pin run (add_facts, mult_facts, div_facts; every role and host) raised no EB-FOOT note: every grid-role cell on those pages is indexed.
+  - add_facts Review EB-FOOT findings, REAL by lead ruling, for lf-ops (12; drawn vs footprint at 2 across):
+    - review S p1 cells 13, 14, 15, 16 (items 25-28): drawn 14.6 mm, footprint 12.5 mm (+17 %);
+    - review M p1 cells 7, 8, 9, 10 (items 19-22): drawn 18.2 mm, footprint 15 mm (+21 %);
+    - review L p1 cells 7, 8, 9, 10 (items 19-22): drawn 19.7 mm, footprint 16 mm (+23 %).
+    - In every case the cells are the 4 cells of the Mixed Review band.
+  - Re-pin (facts-lane debt, lead ruling): only `addition:add_facts review S|EB-FOOT`, `review M|EB-FOOT` and `review L|EB-FOOT`, at 4 each. The facts pin is then OK. Its "tighten the pin" notes were there before this change and are left alone.
