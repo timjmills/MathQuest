@@ -104,6 +104,19 @@ Test trees: lf-algebra 2d03850fc + this lane (scratch alg), then (lead) lf-algeb
   a ruled capacity (RI two-step 1 a page) or an exemption in LONE-PAGE.
 Times: r9, start 2026-11-13T21:00Z, end 2026-11-13T23:10Z, profile mq-opus-medium (rebuild after a failed precritic)
 
+## Round 9c - lead rulings on r9 (2026-11-13, all four as recommended; logged in design/decisions/LEAD_DECISIONS.md)
+- PT-OPN-10 (PAGE_TYPES.md, additive): the spill page's continuation header is titled with its part(s) - "Guided Practice" /
+  "Guided Practice and Your turn"; its rows are sized to the stories PLACED (not the deal's tallest spare), top-aligned; it keeps
+  7 mm + the strips' wrap in hand before placing an Independent row (rendered page 2 ran 2.2-6.2 mm over without it). Check:
+  ws-roles-unit OPENER-SPILL header assertion (FAIL on 693d19dbd); backtest opener-spill re-pointed (pass 8d41853f1).
+- Capacity 1 ruled: the 7 two-step Reason It pages and multi_step_word test, M / L (capacity.json `ruled`); ws-cell-checks LONE-PAGE
+  reads `ruled` (a ruled page passes with a note; --lone-page-probe). Backtest lone-page-ruled (fixture: unruled FAIL, ruled OK).
+- The 2 passed Review pages (div_facts_long review M, sub_2d_1d review L): accepted.
+- Visual Opener L page 2: the story at the top under "Guided Practice", its cell its own height.
+- Merged origin/master 88cc98b00 (lf-placevalue w2 636afcd84): guided.js hsOf keeps both (r9 drawn levels, then w2's inkHMm rows);
+  the plan's ko term keeps `!inkRow(r)`, the fit's koFit (r8c) is unchanged - koMm is dropped once. Passed-skill pages (30 skills x
+  11 roles x M / L) vs origin/master: 658 / 660 identical, the 2 accepted Review pages differ.
+
 ## Round 11 (2026-11-13; critic r6c FAIL -> fixes)
 - Critic r6c (design/status/lf-roles/r6c/critic-r6c.md): Guided tightRows PASS; Reason It A over B FAIL - D1 one item a page
   (H5), D2 centred stack, D3 the stack fired on work that fits side by side. P1 (process): the pack's "before" (c8c81172)
