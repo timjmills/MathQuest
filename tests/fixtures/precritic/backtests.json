@@ -3902,6 +3902,88 @@
   }
  },
  {
+  "id": "lesson-pm-h13-spot",
+  "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-cont",
+  "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-CONT",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-tab-clear",
+  "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples TAB-CLEAR",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-sheet-2pg",
+  "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples SHEET-2PG",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
+  },
+  "pending": true,
+  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
   "id": "roles-fix-minimal",
   "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
   "kind": "commit-pair",
@@ -3941,5 +4023,5 @@
    "pass": "OK"
   }
  }
-]
+ ]
 }
