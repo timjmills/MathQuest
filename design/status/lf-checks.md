@@ -306,3 +306,14 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
    - option-panel screenshots as a gate.
    Coordinate the kit- and role-level items with lf-roles.
 4. V-AMBIG into precritic once lf-vocab merges.
+- Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
+  - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
+    threshold; fixture row.
+  - D2 (legibility): the focus ring of the unit_form slot touches the next word "tens" (0 px). From 0f1a0bda's CSS. Check:
+    ws-screen-answer focus ring >= 4 px from the nearest word.
+  - D3: the CL-4b centring branch can never trigger inside the (c3) cap (blank under 22 % < 30 %). Remove it with a recorded ruling,
+    or keep a row that sets it.
+  - m1: the row-sort guard treats equal row heights as sorted. Pair by a kit-written data-eb-item index.
+  - Noted: (c3) box bottoms in a row no longer line up at 820/1280. Honest, but ask whether the owner minds.
+  - Verified: self-test, precritic-plan, ws-screen-answer, ws-phone-card OK. 11 of 12 eb-* rows PASS; eb-fact-roles is routed to
+    the facts lane.
