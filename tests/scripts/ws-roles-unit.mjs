@@ -23,7 +23,13 @@
 //
 //   KEY-TRUE-BLANK a True statement's key leaves the frame empty (PT-TOF-2; critic r1/r2 R5).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK]
+//   GUIDED-MODEL-SPAN a Guided page of narrow column stacks at S (4 columns, the ceiling 10 tries) whose plain grid the
+//                 ceiling trims to Model + 7 (S 8 < M 9, ws-capacity-pin SIZE-ORDER; subtraction sub_50 / sub_100 no regroup,
+//                 sub_2d_1d) lays the worked Model over TWO cells of row 1, its working written beside it, so Model + 10
+//                 tries fill 3 whole rows (lead ruling (e), 2026-11-13). Control: at M (3 columns, 9 cells fill the grid)
+//                 the Model keeps one cell.
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -40,6 +46,7 @@ const CO = await mod('roles/compose.js');
 const SM = await mod('roles/scripted-model.js');
 const PSC = await mod('roles/pre-skill-check.js');
 const TS = await mod('roles/test.js');
+const GD = await mod('roles/guided.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -312,6 +319,38 @@ if (on('REVIEW-MIXED')) {
         const plS = RV.plan({ ctx: { size: 'S' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [...main, ...earlier], titleLinesOf: (t2, z) => ((z || 'S') === 'L' && t2.length > 50 ? 2 : 1) });
         if (/next term of a growing/.test(pageText(plS))) findings.push('REVIEW-MIXED: S printed the long topic title that L cannot hold (one title at every size, PT-FRM-6)');
     } catch (e) { findings.push(`REVIEW-MIXED: ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+}
+
+if (on('GUIDED-MODEL-SPAN')) {
+    // lead ruling (e) 2026-11-13 (ws-capacity-pin SIZE-ORDER on Guided: three subtraction stack pages printed S 8 < M 9): a planted
+    // column stack (24 mm wide, 38 mm tall: 3 columns leave 31 % beside it, 4 columns hold it) with worked steps of its own
+    try {
+        registerSkill('rolesunit:gspan', {
+            workedSteps: () => [{ text: 'Ones: 8 − 3 = 5. Write 5.' }, { text: 'Tens: 4 − 2 = 2. Write 2.' }, { text: 'The answer is 25.' }, { text: 'Check: 25 + 23 = 48.' }],
+            wrongAnswer: () => ({ value: '35', misconception: 'planted', basis: 'rule' }),
+        });
+    } catch (e) { /* re-run */ }
+    const stackItem = (i, size) => {
+        const h = { S: 38, M: 46.9, L: 55.7 }[size];
+        const q = { categoryId: 'rolesunit', skillId: 'gspan', ans: '25', text: `48 − 23 = ?`, answerType: 'number', seed: i, cell: { template: 'stack', payload: {} } };
+        const render = (c, o = {}) => `<div class="ws-cell-work">48<br>− 23<br>${esc(o.shown !== undefined ? o.shown : (c.state === 'blank' ? '' : '25'))}</div>`;
+        const measured = Object.fromEntries([1, 2, 3, 4, 5].map((c) => [c, { hMm: h, fits: true, slackMm: (186 / c - 24) / 2 }]));
+        return { q, key: { value: '25', display: '25', slots: {} }, render, template: 'stack', pool: 'main', measured, footprint: { wMm: 24, hMm: h, maxCols: 4 }, fclass: 'standard' };
+    };
+    for (const [size, want, span] of [['S', 11, true], ['M', 9, false]]) {
+        checks++;
+        try {
+            const input = { ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'gspan', iCan: 'I Can subtract in columns', grade: 2 }], items: Array.from({ length: 16 }, (_, i) => stackItem(i, size)) };
+            const pl = GD.plan(input);
+            const n = pl && pl.meta && pl.meta.items;
+            const html = (pl.pages || []).map((pg) => (pg.sections || []).map((s) => (s.content && s.content.items ? s.content.items.map((c) => `<i style="${c.style || ''}">${c.render ? c.render(Object.assign({}, resolveCtx({ size }), { state: 'blank' })) : ''}</i>`).join('') : '')).join('')).join('');
+            const hasSpan = /grid-column:\s*span 2/.test(html);
+            if (n !== want) findings.push(`GUIDED-MODEL-SPAN ${size}: the page holds ${n} cells (want ${want}: ${span ? 'the Model over two cells + 10 tries, 3 whole rows' : 'Model + 8, 3 whole rows'})`);
+            if (hasSpan !== span) findings.push(`GUIDED-MODEL-SPAN ${size}: the Model ${hasSpan ? 'spans' : 'does not span'} two cells (want ${span ? 'two' : 'one'})`);
+            if (span && hasSpan && !/Ones: 8 − 3 = 5\./.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the two-cell Model has no working beside it (an empty band either side of the stack, EB-SIDE)`);
+            if (span && /Write 5/.test(html)) findings.push(`GUIDED-MODEL-SPAN ${size}: the working beside the Model repeats "Write 5." (the traced digit says it)`);
+        } catch (e) { findings.push(`GUIDED-MODEL-SPAN ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);
