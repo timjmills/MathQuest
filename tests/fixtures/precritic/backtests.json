@@ -4328,6 +4328,46 @@
    "fail": "ERROR(2)",
    "pass": "OK"
   }
+ },
+ {
+  "id": "sa-focus-gap-cellslot-ws",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): on the online worksheet a boxed cell slot (input.mq-cellslot inside its [data-mq-cell] box) keeps its inset ring, >= 4 px from the word beside it (arrays_groups, function_table_hard, elapsed_find_duration)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the worksheet host's input:focus rule (offset 1 px) outranks the cell slot's inset ring: -0.2 px to \"groups of\", 1.4 px to \"n\", 3.3 px to \"h\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: the cell slot's -4 px offset holds on the worksheet host"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups,algebra:function_table_hard,measurement:elapsed_find_duration --hosts worksheet --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-ibcell-card",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): the inline-blanks box (input.ib-cell, practice card) thickens inward on focus, its ring >= 4 px from the word beside it (multiplication:arrays_groups)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the ib-cell ring sits 4 px outside a box with a 6 px margin: 2 px to \"rows of\" / \"make\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: outline-offset -3 px on the focused ib-cell"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups --hosts card --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
