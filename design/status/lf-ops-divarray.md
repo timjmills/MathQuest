@@ -304,3 +304,18 @@ working tree under running browser gates: fetch, and merge only when the remote 
 - Not this lane's, seen while extending the reader to + / − (rules kept to × / ÷ so nothing new gates): add / sub number-line
   cue text is 0.20-0.24 x the screen fact digit vs 0.30 on paper (SCREEN-CUE-SIZE), and the sub_facts tile worksheet places one
   card's tile beside, the rest under (SCREEN-SUPPORT-PLACE). Routed to the lead.
+
+## Critic divarray r2 (a4d6d970e, independent Opus medium, LAST round under the cap) - FAIL, lowest 5
+Report design/audit/runs/lf-ops/critic-divarray-r2.md. r1 D1-D4 gone; div_facts passes every printed role at M/L in both bands except D6.
+| Finding | Check that would have caught it |
+|---|---|
+| D1 (critical) mult Scripted model draws the band frame miniaturised (~1 mm pitch, 0.5 mm dots) | PRINT-NO-SHRINK (rendered width = declared mm) + paper ARRAY-DOT-MIN on every role |
+| D2 (critical) mult Fact probe with array spills pages (12s M 6/6/6/2, last 55 % empty) | PAGEFILL + orphan on fact-probe via --fill-roles |
+| D3 (major) Guided / Opener / Lesson hint "a groups of b" contradicts the turned array (providers/multiplication.js:42-44) | ARRAY-CAPTION on printed hint text |
+| D4 (major) mult Opener M 12s: 0 independent, 25 % empty foot; M < L | Opener count M >= L |
+| D5 (major) mult Mixed practice M 6 vs L 8 | SIZE-ORDER on mixed-practice with array opts |
+| D6 (major) div Scripted model L 10s: trace jots overflow the cell rule | overflow gate on scripted-model L with supports, on precritic's path |
+| D7 (major) div worksheet 820 mixes beside / under answer places, 3 cell heights (from 898f800d7) | SCREEN-ANSWER-PLACE: one answer place a worksheet, equal kit cell heights |
+| D8 (major) mult / add worksheet digits 40 px vs 56 / 48 (brief) - LEAD_DECISIONS says 29 px floor: ruling needed | ws-screen-slots --digit-widths |
+| D9 (major) mult touch worksheet shrinks 2-digit facts (29 px, no dots) | SCREEN-DIGIT per card within a sheet |
+| minor: SCC-T10 mult Guided answer zone moves 26.7 -> 31.2 mm | existing SCC-T10 on guided |
