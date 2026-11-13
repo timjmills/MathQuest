@@ -6964,6 +6964,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "nos-runtime-s-button",
+  "check": "lead decision NOS-DOCS-ADVISORY (2026-11-13; critic nos r3): the docs token rule only reports, so the BROWSER gate must still fail an S option added by JS at runtime (a MutationObserver button, no S in any source line the static rules read)",
+  "kind": "fixture",
+  "rule": "ws-no-size-s --browser (VISIBLE: no visible or clickable S option), run via --plant",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/nos-runtime-s.fail.txt",
+   "state": "mutation r3-runtime-s-button planted in a copy of the served tree: the browser gate FAILs (VISIBLE simple print shows S)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/nos-runtime-s.pass.txt",
+   "state": "the unplanted copy: the browser gate is OK"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --plant $(cat {fixture})",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

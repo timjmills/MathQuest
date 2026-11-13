@@ -886,7 +886,7 @@ build_list() {
   node_gate 1 ws-text-vs-gen ws-text-vs-gen.mjs
   node_gate 1 "ws-backtest --kind fixture" ws-backtest.mjs --kind fixture
   node_gate 1 ws-conflict-markers ws-conflict-markers.mjs   # no merge conflict markers in tracked files (lf-hosts critic r1 F2)
-  node_gate 1 ws-no-size-s ws-no-size-s.mjs --docs   # (+ live instruction docs, critic nos r1 F4) no size picker offers S, no gate default runs S; S decodes as M (owner 2026-11-13, plan item 9)
+  node_gate 1 ws-no-size-s ws-no-size-s.mjs --docs-advisory   # (+ live instruction docs, critic nos r1 F4) no size picker offers S, no gate default runs S; S decodes as M (owner 2026-11-13, plan item 9)
   node_gate 1 "ws-precritic-plan --checks-from-critics" ws-precritic-plan.mjs --checks-from-critics   # every ledger finding has a backtest id on the path (owner 2026-11-13)
   node_gate 1 ws-lessonfit ws-lessonfit.mjs   # WRM site lessons, every year (critic 2026-10-30 Y4 F1)
   # the options-verify pin (critic r4 D1): the deploy READS the nightly's options-pin results (read-only, node only, no

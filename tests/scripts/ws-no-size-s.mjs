@@ -330,6 +330,9 @@ export const MUTATIONS = [
     // the builder's own (round-cap r3)
     { id: 'own-css-override', src: 'own: CSS display override (critic r2 N1 itself)', file: 'css/simple-print.css', find: '.sp-root .sp-sizes[hidden] { display: none; }', to: '/* removed */', modes: ['browser'], expect: 'FIXED simple print (compact)' },
     { id: 'own-no-quoted-s', src: 'own: an S option built with no quoted S', file: 'js/modules/teacher-sheet.js', all: true, find: "seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size')", to: "seg('size', S.opts.size, [['M', 'M'], ['L', 'L'], [String.fromCharCode(83), String.fromCharCode(83)]], 'Size')", modes: ['browser'], expect: 'VISIBLE worksheet sheet: no visible or clickable S option' },
+    // lead NOS-DOCS-ADVISORY (critic nos r3: its runtime S button): an S option added by JS at RUNTIME, no S in any source
+    // line the static rules read; only the browser gate sees it (row nos-runtime-s-button, `--plant`)
+    { id: 'r3-runtime-s-button', src: 'critic nos r3 (runtime MutationObserver)', file: 'js/modules/simple-print.js', add: "if (typeof document !== 'undefined') new MutationObserver(() => { for (const g of document.querySelectorAll('.sp-sizes:not([data-nos-s])')) { g.setAttribute('data-nos-s', '1'); const r = g.querySelector('[role=radio]'); const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false'); if (r) b.className = r.className; b.textContent = String.fromCharCode(83); g.prepend(b); } }).observe(document.documentElement, { childList: true, subtree: true });", modes: ['browser'], expect: 'VISIBLE simple print' },
     { id: 'own-renamed-label', src: 'own: a renamed size label with an S option', file: 'js/modules/teacher-sheet.js', find: "row('Size', 'Bigger digits, fewer problems', seg('size', S.opts.size, [['M', 'M'], ['L', 'L']], 'Size'))", to: "row('Digits', 'Bigger digits, fewer problems', seg('digits', S.opts.size, [['S', 'S'], ['M', 'M'], ['L', 'L']], 'Digits'))", modes: ['static'] },
     { id: 'own-new-picker-array', src: 'own: a new picker array', file: 'js/modules/teacher-library.js', find: "import { offeredSize } from './sheet/tokens.js';", to: "import { offeredSize } from './sheet/tokens.js'; export const PRINT_SIZES = ['S', 'M', 'L'];", modes: ['static'] },
     { id: 'own-gate-default-list', src: 'own: an S default in a gate', file: 'tests/scripts/ws-lesson-check.cjs', find: "const SIZES = (arg('sizes', 'L,M') || 'L,M')", to: "const SIZES = (arg('sizes', 'L,M') || 'L,M,S')", modes: ['static'] },
@@ -386,11 +389,12 @@ function mutationSelfTest() {
     return bad;
 }
 /** --self-test --browser: every browser row planted together in a copy of the served tree; each row's check must FAIL. */
-async function mutationBrowserSelfTest() {
+async function mutationBrowserSelfTest(only) {
     const { mkdtempSync, cpSync, writeFileSync: wf, rmSync } = await import('node:fs');
     const { tmpdir } = await import('node:os');
     const { spawnSync } = await import('node:child_process');
-    const rows = MUTATIONS.filter((m) => m.modes.includes('browser'));
+    const rows = MUTATIONS.filter((m) => m.modes.includes('browser') && (!only || m.id === only));
+    if (only && only !== 'none' && !rows.length) { console.log(`  FAIL no browser mutation row ${only}`); return [only]; }
     const dir = mkdtempSync(join(tmpdir(), 'nos-mut-'));
     try {
         for (const n of readdirSync(ROOT)) if (!['.git', 'node_modules', 'design', 'tests'].includes(n)) cpSync(join(ROOT, n), join(dir, n), { recursive: true });
@@ -409,6 +413,7 @@ async function mutationBrowserSelfTest() {
             if (!hit) bad.push(m.id);
             console.log(`  ${hit ? 'ok  ' : 'FAIL'} mut ${m.id} (${m.src}) browser: ${hit ? hit.slice(0, 110) : `"${m.expect}" did not FAIL`}`);
         }
+        if (only === 'none' && failed.length) { console.log(`  FAIL the unplanted copy fails: ${failed[0].slice(0, 110)}`); bad.push('none'); }
         if (!failed.length) console.log(out.split('\n').slice(-8).join('\n'));
         return bad;
     } finally { rmSync(dir, { recursive: true, force: true }); }
@@ -464,6 +469,16 @@ async function selfTest() {
 
 async function main() {
     if (args.includes('--self-test')) return selfTest();
+    // --plant <row id|none>: ONE browser mutation row planted in a copy of the served tree; FAIL when the gate does not catch it
+    // (or, with none, when the unplanted copy fails); it prints the gate's verdict on that copy. The backtest row nos-runtime-s-button runs it on its two fixtures.
+    if (args.includes('--plant')) {
+        const id = args[args.indexOf('--plant') + 1];
+        // prints the GATE's verdict on the planted copy: a caught plant is the gate FAILING that tree; none must be OK
+        const bad = await mutationBrowserSelfTest(id);
+        const gateFails = id === 'none' ? bad.length > 0 : bad.length === 0;
+        console.log(`${TOOL} --plant: ${gateFails ? 'FAIL' : 'OK'} (${id}: ${id === 'none' ? (gateFails ? 'the unplanted copy fails' : 'the unplanted copy passes') : (gateFails ? 'the browser gate fails the planted tree' : 'NOT caught: the planted tree passes')})`);
+        process.exit(gateFails ? 1 : 0);
+    }
     if (args.includes('--browser')) return browserMain();
     const li = args.indexOf('--lines');
     if (li >= 0) {
@@ -492,6 +507,13 @@ async function main() {
     if (existsSync(join(ROOT, 'index.html'))) scan(join(ROOT, 'index.html'), appLineFindings);
     const gateFiles = [...walk(join(ROOT, 'tests/scripts'), (n) => /\.(cjs|mjs|js|sh)$/.test(n) && n !== 'ws-no-size-s.mjs'), ...walk(join(ROOT, 'tests/lib'), (n) => /\.(cjs|mjs|js)$/.test(n))];
     for (const f of gateFiles) scan(f, gateLineFindings);
+    // NOS-DOCS-ADVISORY (lead 2026-11-13; critic nos r3 D1-D4): --docs-advisory scans the docs like --docs but its DOC
+    // findings (and stale DOC allow entries) REPORT only; the browser gate and the app / gate code guard stay blocking.
+    // Known hole (critic nos r3 D2): the code guard reads lines, so a gate default built another way (Object.keys({S:1,..}))
+    // passes it; the --browser gate covers the BEHAVIOUR (every Size control offers M / L only). Parked: one shared SIZES
+    // constant every gate reads, per-span DOC exemptions, per-line row expects (design/status/lf-checks.md).
+    const docsAdvisory = args.includes('--docs-advisory');
+    if (docsAdvisory && !args.includes('--docs')) args.push('--docs');
     if (args.includes('--docs')) for (const d of docTexts()) for (const [n, t] of d.lines) for (const f of docLineFindings(t)) {
         const a = ALLOW.findIndex((x) => x.file === d.file && (!x.rule || x.rule === f.rule) && (x.has === '*' || t.includes(x.has)));
         if (a >= 0) { used.add(a); continue; }
@@ -511,6 +533,12 @@ async function main() {
     // (the alias exists), so an old checkout reports its real findings, not ALLOW drift
     const era = findings.every((f) => f.rule !== 'APP-ALIAS');
     if (era) ALLOW.forEach((x, i) => { if (!used.has(i) && (x.rule !== 'DOC' || args.includes('--docs'))) findings.push({ file: x.file, line: 0, rule: 'ALLOW-STALE', msg: `allow-list entry matches nothing: ${x.has.slice(0, 70)}` }); });
+    const advisory = docsAdvisory ? findings.filter((f) => f.rule === 'DOC' || (f.rule === 'ALLOW-STALE' && ALLOW.some((x) => x.rule === 'DOC' && x.file === f.file && f.msg.includes(x.has.slice(0, 70))))) : [];
+    if (advisory.length) {
+        console.log(`  ADVISORY (NOS-DOCS-ADVISORY, not blocking): ${advisory.length} doc finding(s)`);
+        for (const f of advisory.slice(0, 25)) console.log(`    ${f.file}:${f.line} ${f.rule} ${f.msg}`);
+        for (const f of advisory) findings.splice(findings.indexOf(f), 1);
+    }
     const by = {};
     for (const f of findings) (by[f.rule] = by[f.rule] || []).push(f);
     for (const [rule, fs] of Object.entries(by)) {

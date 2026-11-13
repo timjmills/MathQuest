@@ -556,3 +556,19 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
     PASS.
   - ws-precritic-plan --checks-from-critics: 107 pass / 24 exempt / 15 fail. The 15 are the same older rows; none dropped.
   - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK; node --check on teacher-print.js and both scripts.
+
+## 2026-11-13 — no size S after critic nos r3 (round cap): NOS-DOCS-ADVISORY
+
+- Critic nos r3 (df9682751): FAIL C1 9 / C2 7 / C3 9 / C4 9; the app change and the browser gate pass; the text guards miss
+  phrasings (third round on doc phrasing).
+- Lead decision NOS-DOCS-ADVISORY: precritic and deploy session 1 run `ws-no-size-s --docs-advisory` (doc findings report as
+  ADVISORY, never block). `--docs` alone still blocks (the old rows keep their meaning). The --browser visibility gate and the
+  app / gate code guard stay blocking. New `--plant <row|none>` runs one browser mutation in a copy of the served tree; row
+  `nos-runtime-s-button` proves the browser gate FAILs an S button added by JS at runtime and is OK unplanted.
+- KNOWN HOLE (D2), beside the browser gate: the code guard reads lines, so a gate default built another way
+  (`Object.keys({S:1,M:1,L:1})`, `String.fromCharCode(83)`) passes it; the browser gate covers the behaviour (every Size control
+  offers M / L only), not a gate's own --sizes default.
+- PARKED under FOCUS (D1-D4): one shared SIZES constant every gate reads, checked on the resolved `--dry-run` sizes (D2);
+  per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
+  `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
+- CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
