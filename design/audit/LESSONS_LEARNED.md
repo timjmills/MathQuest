@@ -433,3 +433,16 @@ white on any other role.
   the sub sheet's Independent stacks draw heads + boxes from a payload override, safe because the main pool is measured at
   level 3 (LR-17b `indepFrame`).
 
+### lf-engine PC fix pass (2026-11-13, builder): LR-6 and H13 on the forced-on check
+- **LR-6 (sub check 11 - 3 twice, a place item's 39 twice):** the refs' `lr6` / `distinctAnswer` are read only by the
+  Practice dealer; the routed check sliced each pool as dealt. Fix: `pre-skill-check.js poolItems` (routed only) drops an
+  item whose GIVEN numbers (`itemNumberKey`: text + payload n / a / b / operands / values / frame) repeat an earlier item of
+  the question. Check: PC-LR6 reads the DRAWN cell text (a place item's 39 is drawn, not in q.text). Backtest
+  `lesson-check-lr6` (FAIL e6ea3e940 / PASS 00eee8a57).
+- **H13 (one-line items 31-38 % bands):** root cause was NOT row height: `mq-lvcenter` lost to CL-4b's top start
+  (computed `justify-content: flex-start`), and pv / strip cells keep CL-40's (tab - 2 mm) spacer, so 7 of a 22 mm row was
+  empty above the item. Fix (route CSS only): centre routed cells (`mq-lprectr`), drop the spacer where the content clears
+  the tab sideways or downwards (`mq-lprefree`), and let rows grow to 1.15 x capped by content (`ROUTE_BAND` 0.29).
+- **Rule:** before resizing a row for H13, read the computed style of the cell (justify-content, ::before height): a class
+  that "centres" can be losing a specificity fight. **Check:** PC-H13 on the forced-on render (already on precritic).
+

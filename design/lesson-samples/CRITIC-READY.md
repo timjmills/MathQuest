@@ -32,11 +32,20 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
   12.1 / PAGE_TYPES Independent: whole rows, never a smaller cell to fill the page); round L Practice still shows a 49 %
   band inside its rounding cells - left for the critic to rule on, no page-type rule asks for more items.
 
-## Known open (from `ws-lesson-samples --check --force-check`)
-PC-H13 only: add L cell 2 (the shorter of a pair, 38 % tall); sub L cell 5 and round L cell 8 / round S cell 10 (a lone
-short item in its measured row, 31-33 %); sub S cell 5 (a lone expanded form across the full width, 33 % wide); sub S
-check foot 9 %; lesson sheet feet add S 9 %, sub S 11 % (as on master). LR-6: sub check repeats an item (11 - 3; 39) -
-N4's LR-6 flags do not reach these refs.
+## This pass (lf-engine PC fix, 2026-11-13; check pages and their keys only - every other page unchanged)
+- **LR-6**: the sub check no longer prints 11 - 3 twice or 39 twice: a routed question drops an item whose given numbers
+  repeat an earlier one (`itemNumberKey`). Sub Q2 now prints one expanded form, Q3 three subtractions. Gate PC-LR6,
+  backtest `lesson-check-lr6`.
+- **H13**: routed cells are now really centred (CL-4b's top start was winning over `mq-lvcenter`) and drop CL-40's tab
+  spacer where the content clears the tab; rows grow up to 1.15 x, capped so a centred item's band stays under 29 %
+  (LR-17a (5) updated). Cleared: add L cell 2 (38 %), sub L lone expanded form (32 %), round L cell 8 (31 %), sub S check foot.
+
+## Known open (`ws-lesson-samples --check --force-check`, two attempts each - rule 7)
+- round S check cell 10 (34 % tall): "10 less than 15 is __" at S under a two-digit tab: content 80.5 of a 92 mm cell
+  leaves no room beside the w2 tab, so CL-40's spacer stays, and the page has no height to grow that row to the 19.5 mm
+  that would let it drop.
+- sub S check cell 1 (31 % wide): the two "circle ones / tens" items (two-choice: floor 2) are 36 mm wide in 92 mm cells.
+- Lesson sheet feet add S 9 %, sub S 11 % (pupil-p3): as on master, not part of the check.
 
 ## r2 side by side
 `git show 7744c2b4:design/lesson-samples/<packet>/pupil-p1.png > /tmp/r2-p1.png` (same for any page / `S/`), or

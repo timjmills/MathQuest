@@ -964,3 +964,11 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | check 2 pages at L once the N2 floor landed (all 3 samples) | `ws-lesson-samples --check --force-check` PC-H13 (+ a page-count row to add) | not yet a row: FAIL d34311d5 (forced) / PASS needs the new item forms | no: precritic renders the check OFF; add `--force-check` to its lesson-samples step | 1 (found before the critic) |
 | N7 sub check title dropped its topic | title carries `checkTopic` (seen at L in the forced render) | not yet a row | no | 0.5 |
 | Speed-up: `prereqsForce` render override means no record flip is needed to render a switched-off part | | | | |
+
+### lf-engine PC fix pass (2026-11-13, builder)
+| finding | check | backtest | on precritic path | rounds saved |
+|---|---|---|---|---|
+| LR-6: sub check printed 11 - 3 twice and 39 twice | PC-LR6 (drawn cell numbers, check page) | lesson-check-lr6 (FAIL e6ea3e940 / PASS 00eee8a57) | yes (lesson-samples --force-check) | 1 |
+| H13: routed cells top-started despite mq-lvcenter (CL-4b specificity) + CL-40 spacer | PC-H13 (existing) | not a new row: PC-H13 8 -> 4 at seed 4242 | yes | 0.5 |
+| Speed-up: dump computed style (justify-content, ::before) of a flagged cell before changing geometry; 3 of 5 sizing attempts were spent on the wrong cause | | | | |
+

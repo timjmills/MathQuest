@@ -517,3 +517,4 @@ Lane D restart R3-1 fix (2026-10-31): fixed + backtested; widened precritic rows
 | L2 rounding rows (roundOne, 8e285251 / 08ee129e) on nearest_10 | same + ws-lesson-unit independentBand off/on rows | same | same | (same) |
 | Proof: 1,556 hashes, 11 min 28 s; 0 differ | | | | |
 | lf-engine PC (2026-11-12) | builder, one session | live baseline 1,556 hashes 10 m 48 s, 0 differ; forced baseline 334 hashes 4 m 35 s; forced samples render 53 s | N7 done, N6 done (no paired unit in the samples at the floor), N2 re-choice / N5 / N8 / fill not done: check runs to 2 pages |
+| lf-engine PC fix (2026-11-13) | builder, one session (budget $15) | live baseline 1,556 hashes 10 m 49 s (write) ; samples check 1 seed ~4 m; precritic --role lesson ~20 m | LR-6 fixed + gated; PC-H13 8 -> 4 (left: round S w2-tab frame 34 %, sub S place pair 31 % wide, lesson sheet feet add S 9 % / sub S 11 % pre-existing) |
