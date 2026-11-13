@@ -254,7 +254,11 @@ function factModel(input, ctx, frame, m) {
             // the later marks need is over it rather than under it - but not so low that the band over the problem reaches 30 %:
             // critic r3 S5, div_facts L 30.4-31.0 %, so 7 mm, not 10, and 5.5 mm, not 1.5, from the problem to its first mark, EB-GAP; the more gap also keeps state 1's
             // band under its last mark below 35 % on the pixels, PT-MOD-3)
-            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
+            // (critic divarray r2 D6: a ÷ fact with its support drawn - the landscape array - stacks the fact, the array under it and
+            // the jots in the state's body under its 5 mm top pad and 1.5 mm gaps, which natural() does not count: at L the 10s band's
+            // third jot ran onto the cell rule with 25 % of the page free. Those rows take the pad and gaps into their need.)
+            const padOf = (it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; return pl && (pl.op === '/' || pl.op === '÷') && it.supportsBox && it.supportsBox.plan ? 5 + 2 * 1.5 : 0; };
+            const H1 = Math.min(Math.min(room, roomC) / rowsEx, Math.max(natural(1) + Math.max(...exs.slice(0, 2).map(padOf)), ((FACT_FILL + 0.03) * m.body - m.strip) / rowsEx));
             const pages = exs.slice(0, 2).map((ex, e) => {
                 const grid = gridPart(exampleCells(ex, e, across, textMm, stepsOf, rowsEx, ex.template === 'fact' ? 'beside' : 'low'), { cols: across, rows: rowsEx, cellH: H1, labels: 'none' });
                 const sections = [{ kind: 'band', label: 'Model:', instr: instructionText('trace-say'), content: grid }];
