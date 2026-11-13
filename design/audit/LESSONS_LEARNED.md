@@ -429,3 +429,24 @@ white on any other role.
   named error), so it cannot see the provider's own gap; backtest a new check on the failed commit BEFORE writing the table row.
 - Lesson: a skill moved onto a new card brings its family's past critic findings into the card's scope (21 rule ids here): add them
   in the same change, or the re-sign stalls.
+
+## lf-placevalue number_word_form r2-r3 (2026-11-13): findings -> checks
+| Finding | Check (new / extended) | Backtest row (FAIL old -> PASS fix) | Path | Saved |
+|---|---|---|---|---|
+| N1 2-digit names: no named wrong answer | ws-words-checks WORDS-WRONG-RATE (new; reads the real provider) | pv-words-provider (2ccd5b21 -> 1e3b128e) | precritic opt-in | 1 round |
+| N3 false hundreds steps under 100 | ws-words-checks WORDS-STEPS-TRUE (new) | pv-words-provider | precritic opt-in | 1 round |
+| N2 TF claim not printed with H T O | ws-cell-checks --words-rules CLAIM-INK (new) | pv-words-claim | precritic opt-in | 1 round |
+| N4 / N10 / N10b row answer places out of line | ws-cell-checks --words-rules ROW-SLOT-Y (new; lesson + guided rows; band 1,000 + zeroPlace always row) | pv-words-rowy, pv-words-rowy-1000 (706d940a -> 5a4ca828) | precritic opt-in (2 rows) | 2 rounds (N4 class came back as N10) |
+| N5 model never shows its answer | ws-cell-checks --words-rules MODEL-ANSWER (new) | pv-words-model | precritic opt-in | 1 round |
+| N6 chant vs slots; lesson ignored its practice opts | ws-lesson-unit chant-box (new, always on) | pv-words-chant | ws-lesson-unit (gate) | 1 round |
+| N7 dropped space at the highlight split | ws-cell-checks --words-rules WORDS-TEXT (new) | pv-words-text | precritic opt-in | 1 round |
+| N8 "seven / hundred eight" breaks | ws-cell-checks --words-rules WORDS-BREAK (new) | pv-words-break | precritic opt-in | 1 round |
+| N9 card drew the legacy visual (2 answer places) | ws-empty-band --screen-parity EB-PARITY (new, lead ruling) | pv-words-parity | precritic opt-in | 1 round |
+| N11 numeral-to-words one across at S | ws-empty-band EB-SIDE on the to_words option (exists; backtest added) | pv-words-towords-side (706d940a -> 5a4ca828) | precritic options variants | 1 round |
+| band 20 S stretched rows | ws-empty-band EB-BAND (exists) | (builder r2 row) | precritic | 1 round |
+| N12 "1 ones" step plural (minor, open) | PROPOSED: step-string lint \b1 (ones|tens|hundreds)\b | none | - | - |
+| guided Model tab row 2.5-3.2 mm (guided.js, D3) | ROW-SLOT-Y records, does not judge the Model row | none | - | 0 - engine |
+| card EB-SIDE 36-42 % (host width, D3) | ws-empty-band EB-SIDE (exists) | none | - | 0 - hosts |
+- Lesson: a row-alignment fix keyed to ONE item's length (>= 15 letters) misses the item of the same row it does not cover ('one
+  thousand', 12): key it to what the PAGE deals (the band) so every cell of the row gets the same box.
+- Lesson: getProvider takes (category, skill); one string silently reads the defaults - a provider check must assert real members.
