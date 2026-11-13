@@ -13,7 +13,21 @@
 //                    lacks reads MISSING
 //   --seeds a,b      seeds (default 4242,1001; detailed lessons 4242 unless --all-lessons)
 //   --sizes L,S      sizes (default L,M)
-// --verbose prints each build with its time. Prints `ws-lesson-baseline: OK (n hashes identical)` / `FAIL (n differ)`. Not a design gate: a refactor guard.
+//   --unpinned       (with --all-lessons --check) a lesson the tree prints that the baseline does not pin (a new key of
+//                    LESSONS or a new detailed lesson) reads UNPINNED and fails: a new lesson is new pages nobody has seen
+// --verbose prints each build with its time. Prints `ws-lesson-baseline: OK (n hashes identical)` / `FAIL (n differ)`.
+//
+// THE DEPLOY GATE (lead ruling 2026-11-13, LESSONS_LEARNED process rule 0c; ws-deploy-gates.sh session 4, ≈ 13 min):
+//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson --unpinned \
+//        --check design/audit/baselines/lesson-baseline.json
+// The pinned baseline design/audit/baselines/lesson-baseline.json holds every page of every lesson master prints. No lesson
+// page changes unseen: a tree whose lesson pages differ from the pin FAILS the deploy.
+// RE-PIN PROTOCOL: a deploy whose lesson pages change ON PURPOSE re-writes the baseline in the same deploy commit,
+//   node tests/scripts/ws-lesson-baseline.cjs --all-lessons --sizes L,S --seeds 4242,1 --per-lesson \
+//        --write design/audit/baselines/lesson-baseline.json
+// and that commit's message names the changed lessons / pages (the CHANGED / NEW / MISSING / UNPINNED lines of the failing
+// --check, e.g. "lesson pages re-pinned: number_sense:nearest_10 L/S pupil-p2, key-p2 (vocab zoom, critic r3 PASS)").
+// The gate fails until then: that is the point. Never re-pin to make an unexplained difference go away; find its cause.
 const fs = require('fs');
 const crypto = require('crypto');
 const { open } = require('../lib/ws-harness.cjs');
@@ -27,11 +41,18 @@ const SAMPLES = [
     { id: 'round', skill: { categoryId: 'number_sense', skillId: 'nearest_10' } },
 ];
 const ALL = process.argv.includes('--all-lessons');
+const UNPINNED = process.argv.includes('--unpinned');
+const unpinned = [];   // (--unpinned) lessons the tree prints that the baseline does not pin
 const SEEDS = (arg('seeds') || '4242,1001').split(',').map(Number);
 const SIZES = (arg('sizes') || 'L,M').split(',');
 const sha = (s) => crypto.createHash('sha1').update(String(s)).digest('hex');
 const t0 = Date.now();
 const log = (s) => { if (process.argv.includes('--verbose')) console.log(`  [${((Date.now() - t0) / 1000).toFixed(0)} s] ${s}`); };
+
+/** Exit once stdout has drained (lf-engine ledger backtest, 2026-11-13): a long CHANGED list piped to a log was cut off by
+ *  process.exit before its verdict line, so a runner reading the last "ws-lesson-baseline: OK|FAIL" line saw none and
+ *  reported ERROR. A write's callback fires after every earlier write to the pipe has been handled. */
+function exitAfterFlush(code) { process.stdout.write('', () => process.exit(code)); }
 
 /** Run `fn(arg)` in the page without one long protocol call (a detailed lesson can take minutes): start, then poll. */
 async function inPage(page, fn, arg) {
@@ -85,7 +106,7 @@ async function inPage(page, fn, arg) {
         } finally { await app.close(); }
         for (const f of fails) console.log(`  ${f}`);
         console.log(fails.length ? `ws-lesson-baseline --parts: FAIL (${fails.length})` : `ws-lesson-baseline --parts: OK (${SAMPLES.length} lessons x every part: alone = packet page; refresh changes only its part)`);
-        process.exit(fails.length ? 1 : 0);
+        return exitAfterFlush(fails.length ? 1 : 0);
     }
     try {
         let lessons = SAMPLES.slice();
@@ -115,7 +136,15 @@ async function inPage(page, fn, arg) {
             out[`${k}/keyHtml`] = sha(r.whole[1]);
         }
         const prevIds = ALL && CHECK ? JSON.parse(fs.readFileSync(CHECK, 'utf8')).__detailed : null;
-        const ids = prevIds || await app.page.evaluate(async () => (await import('./js/modules/lessons/detailed/index.js')).detailedLessonList().map((d) => d.id));
+        const treeIds = await app.page.evaluate(async () => { try { return (await import('./js/modules/lessons/detailed/index.js')).detailedLessonList().map((d) => d.id); } catch (e) { return []; } });
+        const ids = prevIds || treeIds;
+        if (ALL && CHECK && UNPINNED) {
+            // (--unpinned) every lesson the tree prints must be in the pin: a new lesson is new pages nobody has seen
+            const keys = await app.page.evaluate(async () => { try { return Object.keys((await import('./js/modules/lessons/prereqs.js')).LESSONS); } catch (e) { return []; } });
+            const pinned = new Set(lessons.map((l) => l.id));
+            for (const k of keys) if (!pinned.has(k)) unpinned.push(k);
+            for (const id of treeIds) if (!(prevIds || []).includes(id)) unpinned.push(`detailed/${id}`);
+        }
         if (ALL) out.__detailed = ids;
         for (const id of ids) for (const seed of (ALL ? SEEDS : [4242])) {
             const pre = ALL ? `detailed/${id}/${seed}` : `detailed/${id}`;
@@ -147,6 +176,9 @@ async function inPage(page, fn, arg) {
         for (const k of keys) { const g = k.startsWith('detailed/') ? k.split('/')[1] : k.split('/')[0]; const e = (per[g] = per[g] || { n: 0, d: 0 }); e.n++; if (base[k] !== out[k]) e.d++; }
         for (const [g, e] of Object.entries(per)) console.log(`  [${g}] ${e.n - e.d}/${e.n} identical`);
     }
-    console.log(diff.length ? `ws-lesson-baseline: FAIL (${diff.length} of ${keys.length} differ)` : `ws-lesson-baseline: OK (${keys.length} hashes identical)`);
-    process.exit(diff.length ? 1 : 0);
+    for (const u of unpinned) console.log(`  ${u}: UNPINNED (the tree prints this lesson; ${CHECK} does not pin it)`);
+    const bad = diff.length + unpinned.length;
+    if (bad && ALL) console.log(`  (on purpose? re-pin in the same commit: --all-lessons --sizes ${SIZES.join(',')} --seeds ${SEEDS.join(',')} --per-lesson --write ${CHECK}, and name the changed lessons / pages in the commit message)`);
+    console.log(bad ? `ws-lesson-baseline: FAIL (${diff.length} of ${keys.length} differ${unpinned.length ? `; ${unpinned.length} lesson(s) UNPINNED` : ''})` : `ws-lesson-baseline: OK (${keys.length} hashes identical${UNPINNED && ALL ? '; every lesson the tree prints is pinned' : ''})`);
+    exitAfterFlush(bad ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

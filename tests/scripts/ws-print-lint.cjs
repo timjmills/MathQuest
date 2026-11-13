@@ -179,6 +179,7 @@ const { pathToFileURL } = require('url');
 const puppeteer = require('puppeteer');
 const { ROOT, chromePath, startServer, open, waitFor, listSkills, renderPrint, hideOverlays } = require('../lib/ws-harness.cjs');
 const { GEOM_PROBE, MIN_SEG_MM, HEAD_GAP_MM } = require('../lib/ws-geom-probe.cjs');
+const FONTS = require('../lib/ws-fonts.cjs');
 
 const argv = process.argv.slice(2);
 // --jobs: while one job of a jobs file runs, its flags are read in place of the command line's
@@ -1987,6 +1988,10 @@ async function lintDocument(page, { id, mode, printBackground = false, notes = [
     await page.setViewport({ width: Math.round((mode === 'legacy' ? contentW : Math.max(box.w, 210)) * PX_PER_MM), height: 1400, deviceScaleFactor: 1 });
     await sleep(120);
     await page.evaluate(() => document.fonts && document.fonts.ready);
+    // L-FONT asserts Andika 400 + 700: wait for them (bounded retry, tests/lib/ws-fonts.cjs). A face the document declares
+    // that never arrives is an environment ERROR, not a page FAIL; a document declaring no Andika still fails L-FONT.
+    const fontWait = await FONTS.awaitFonts(page, { faces: ['400 20px Andika', '700 20px Andika'] });
+    if (FONTS.isEnvError(fontWait)) { console.log(`${TOOL}: ERROR (fonts: the web font never arrived - environment, not the page) ${id}: ${FONTS.describe(fontWait)}`); process.exit(2); }
     const dom = await page.evaluate(wsLintPage, { mode, printBackground, contentWidthPx: contentW * PX_PER_MM, arcGapMm: Number(process.env.MQ_ARC_GAP_MM) || 0, optRules: rules || optRules() });
     const pdfPath = tmpFile(`${id.replace(/[^\w.-]+/g, '_')}.pdf`);
     await page.pdf({ path: pdfPath, format: 'A4', printBackground, preferCSSPageSize: true });

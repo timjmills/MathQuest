@@ -39,6 +39,7 @@ import {
     checkLine, slotKey, slotOnly, JUDGE_LABELS, esc, blank, judgeGroup, opOf, opGlyphOf, operandsOf, isProseAnswer,
 } from './compose.js';
 import { gridHeightMm, SAFETY_H_MM } from '../layout.js';
+import { scorePoints } from '../paginate.js';
 import { coinSVG } from '../cells/tmkit.js';
 import { gridSlots } from '../cells/mult-grid.js';
 import { getProvider, resolveCtx, getCell, hasCell } from '../index.js';
@@ -279,6 +280,9 @@ function partLabels(it, parts, c) {
     if (it.template === 'coins' && every(/^n\d+$/) && Array.isArray(p.values) && p.values.length === n) {
         return p.values.map((v) => { try { return c ? { html: coinSVG(c, v, { compact: true }) } : { text: String(v) }; } catch (e) { return { text: String(v) }; } });
     }
+    // Match 3 pictures (lane lf-vocab, critic r1 D1): each fix box is named by its WORD, never A / B / C (those are the
+    // pictures' letters, so a lettered fix box read as the answer)
+    if (it.template === 'vocab-match3' && every(/^letter-\d+$/) && Array.isArray(p.words)) return (p.order || [0, 1, 2]).map((i) => ({ text: String(p.words[i]) }));
     if ((it.template === 'clock' || it.template === 'coins') && every(/^o\d+$/)) return parts.map((_, i) => ({ text: place(i) }));
     if (it.template === 'clock' && every(/^r\d+$/) && Array.isArray(p.given)) {
         const given = new Set(p.given.map(Number));
@@ -691,7 +695,9 @@ export function prepare(it, info = {}) {
         // D1: div_facts_long S lost its padding and the label started 0.5 mm off the cell rule)
         const cellIn = LIVE_W_MM / Math.max(1, Number(o.cols) || 1) - 6 - 6;
         const widen = Number(o.workW) > 0 && !story && Number(o.workW) + 6 + judgeMin(c.size) <= cellIn;
-        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:center` : '';
+        // (a REDO item - a count row, a strip - is written again in a zone under it that starts at the cell's left: its work starts
+        // there too, never centred over it - lf-algebra critic r2 G2, the copy train 60 px left of the original)
+        const workW = widen ? `;min-width:min(${Number(o.workW).toFixed(1)}mm,100%);align-items:${kind === 'redo' ? 'flex-start' : 'center'}` : '';
         const shownWork = `<div class="mq-judge-work" style="position:relative${workW}"><span class="mq-pupiltag${story ? ' mq-pupiltag-flow' : ''}"${story ? '' : ` style="top:auto;bottom:calc(100% + ${(c.size === 'S' ? 1.25 : 0.75) + (TAG_LIFT[it.template] || 0)}mm);left:0"`}>${esc(who)} ${verb}:</span>${task}${noLeadMargin(kind === 'draw' ? body : pupilInk(body))}`
             + (work ? `<div class="mq-pupilwork mq-pupil" data-ws-ink="solid">${esc(work)}</div>` : '') + '</div>';
         const box = (id, w, text) => blank({ id, kind: 'number', shape: 'box', widthMm: w, graded: false }, c, slotOnly(key, id)) + (text ? '' : '');
@@ -776,9 +782,13 @@ export function prepare(it, info = {}) {
         // (a page whose items differ in width but cannot widen its work in this cell: the judgement stands against the cell's right
         // padding instead, so it still starts at one x a column - R15 / EA-ROWX, CL-8 kept)
         const spread = Number(o.workW) > 0 && !story && !widen && mode === 'beside' ? ';justify-content:space-between' : '';
+        // (a REDO item - count rows plan one footprint whatever their length, so no page work width lines them up - stands its
+        // judgement against the cell's right padding: the judgement column GREW into the free width (flex-grow 1) and its boxes
+        // started right after the work, 69.5 vs 131.5 mm beside a 4- and an 8-term train; ws-cell-checks EA-ROWX, root cause r16)
+        const judgeAt = !story && !widen && kind === 'redo' ? judge.replace('<div class="mq-judge-row ', '<div style="flex:0 0 auto;margin-left:auto" class="mq-judge-row ') : judge;
         return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
             + shownWork
-            + judge
+            + judgeAt
             + (below ? fix : '')
             + `</div>`;
     };
@@ -1034,7 +1044,8 @@ export function plan(input = {}) {
     // shape (critic regrade 5: a box on one item, a line on the next). Stable: deal order kept.
     const isPick = (it) => (it.thinking && it.thinking.kind === 'choice' ? 1 : 0);
     const items = (M ? M.items : balanced(all, L.perPage)).slice().sort((a, b) => isPick(a) - isPick(b));
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: items.length });
+    // (Q-C: a per-word template scores its words; every other item 1 - paginate.js scorePoints; lf-vocab r5)
+    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Check it', score: scorePoints(items) });
     const rows = Math.max(1, Math.ceil(items.length / L.cols));
     // one fix width for every cell of the page: the widest item's (critic pv-r2)
     const pageRoom = Math.max(0, ...items.map((it) => Number(it.fixRoom) || 0));
@@ -1067,7 +1078,7 @@ export function plan(input = {}) {
     // some fixes are written and some checked (a graph page: "How many?" and "Which has the most?")
     const someChecked = items.some((it) => it.thinking && it.thinking.kind === 'choice');
     return assemble(ROLE_ID, input, frame, [{ sections: [instructionPart(drawn ? 'check-fix-draw' : marked ? 'check-fix-mark' : checked ? 'check-fix-check' : someChecked ? 'check-fix-mixed' : 'check-fix-write'), grid] }], {
-        meta: { items: items.length, scoreOutOf: items.length, wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
+        meta: { items: items.length, scoreOutOf: scorePoints(items), wrongShare, fits: [Object.assign(fit, { line: fitsLine(fit) })], notes: L.note ? [L.note] : [] },
     });
 }
 

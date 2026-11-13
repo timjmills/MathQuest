@@ -759,3 +759,32 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - Scripted Model: earlier steps black, only the newest step grey (MOD-MARKS-INK); Error Analysis label offsets on tables / count rows (PUPILTAG, EA-PAD, EA-ROWX); Pre-skill Check at L splits 2+2 with full headers (PSC-2PG-BALANCE, lead ruling R13); FIX-MINIMAL.
 - Gates on the deploy tree: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (732), redesign-passed (27), simple-print (OK on re-run; first run a one-off FAIL), screen-answer, backtest self-test, roles-unit (75), capacity-pin (648, 0 rises), detailed-lesson g3-oa9 OK.
 - Passed skills: every role byte-identical except 36 two-page Pre-skill Check pages (R13). Lessons 1560/1596 identical; the 36 differ by attribute only (g3-oa9), pixel-identical.
+
+## 2026-11-13 — Deploy EB-FOOT item pairing (lf-checks ebitem, narrow critic PASS 9/9/8/9)
+- The kit writes data-eb-item on every grid cell (pupil page and key); master's ws-empty-band pairs each cell with its own item(s) by it; fallbacks print a note. No pixel/layout change (critic: 32 sheets + keys byte-identical with the attribute removed). arrays_groups EB-FOOT 35 → 0 (reordered pages read correctly). Unblocks lf-ops -props critic.
+- Gates: boot-smoke, code-snapshot (732), redesign-passed (27), backtest self-test, empty-band self-test (15 EB-FOOT cases), simple-print.
+
+## 2026-11-13 — Deploy vocabulary (lf-vocab, narrow critic r14 PASS, min 8; both skills redesign-passed)
+- grade_pictures + pick3_words: r5 print, R-1 (highlight after answering, screen only), R-2 (spoken explanation on a wrong answer), O-1 blue next-answer box, O-2/O-3 unambiguous pictures that never fit a distractor, rounds r9–r14 (V-NUM, V-PLACE, V-TWIN, screen picture at print size). Known: 4 SIZE-REF gate-gap findings per lead ruling (same-word proof in the packet; gate fix with lf-checks).
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, backtest self-test, capacity-pin (648), roles-unit (75), vocab-unit, empty-band self-test. Merged with master 70fa12c2 (EB-FOOT pairing; comment conflict resolved, backtests unioned 261 rows).
+
+## 2026-11-13 — Owner rule: lesson design at high effort
+- Owner: "the lesson design piece could use high effort". Builders/fixers of the lesson design work (lf-engine lesson pages and Prerequisite Check, lf-partopts lesson part settings) run on the new profile `mq-opus-high`; critics stay medium; all other lanes stay medium. CLAUDE.md "Agents" updated.
+
+## 2026-11-13 — Deploy shared page roles deploy-4: Reason It (lf-roles, critics r6e + r6g PASS, 0 counted defects)
+- Reason It: work wider than half the room stands A over B (never shrunk); work that fits half a cell keeps A | B with the response as a full-width row under them; a column word story prints once over A and B; "__ is correct." dropped (PT-RSN-4: "Circle A or B. The answer is __."); one answer line length for every word answer (LINE-TELL); KEYFIT (a letter answer takes the word line); Guided tightRows; LONE-PAGE. Checks: RI-LAYOUT, RI-ONEANSWER, RI-DISTINCT, LINE-TELL, KEYFIT, ABTAG, LONE-PAGE, ri-overflow-stack / ri-countrow-overflow / ri-stack-band backtests; overflow non-pinnable in precritic.
+- Passed skills: all 81 RI pages change (F8), TF identify + fact_family_sort (word lines), 9 guided pages; capacity 0 drops, 17 rises, 1 ruled pin (sub_1m RI M = 2). Vocab Guided 6/6 identical. Lessons identical.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit (78), backtest self-test, capacity-pin, empty-band self-test.
+
+## 2026-11-13 — Owner rule: everything becomes an automatic check
+- Owner: "make sure you are saving everything to automatic checks as well". Sent to all 9 lanes: every critic / owner / lead-ruling finding ships with a failing-then-passing check, a proven backtest row, a place on precritic's path and a CHECKS_FROM_CRITICS row; each lane lists today's gaps in its next report and closes them before its next critic. lf-checks builds a ledger sweep so the rule enforces itself.
+- 2026-11-13 ~12:25 owner on the 7-day usage warning: "we will go back to the limits later but for now just let things be" - no slow-down; lanes continue as they are.
+
+## 2026-11-13 — Deploy lf-checks: pixel empty-band tool (critic r7 PASS 9/8/8/8) + findings→checks ledger sweep
+- ws-empty-band reads the PIXELS (border box; a screen slot counts as its drawn edges + one digit; a faint edge is not ink), EB-FOOT paired by data-eb-item on every indexed cell, --slot-ink off ported; app: CL-4b row cap (worksheet.js), kit slot-input drawn at digit height (48 px target outside the box), central FOCUS-GAP ring fix (additive CSS); precritic defaults (SCREEN-DIGIT on every skill, --page-fill, cell-checks, capacity per role); font-load helper in 5 gates.
+- Owner rule "everything to automatic checks": ws-precritic-plan --checks-from-critics (ledger rows need a backtest id on precritic's path; blocking on a lane's own rows now, warning globally until 2026-11-14 13:00 UTC) and the NO-DROPPED-ROW guard (always blocking). Today: 44 pass / 16 exempt / 16 open (warning), routed by lane.
+- Gates: boot-smoke, teacher-wrm, pdf-preview, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, roles-unit, backtest self-test, capacity-pin, empty-band self-test, precritic-plan + self-test (46), no row dropped.
+
+## 2026-11-13 — Deploy shared page roles deploy-5 (lf-roles, critic r7a PASS, 0 counted defects)
+- npr Error Analysis S: the Correct / Fix it column keeps its own width (was flex-grow, judgement at 69.5 vs 131.5 mm); EA redo work left-aligned like its copy (G2, EA-REDO-ALIGN); owner rule batch: 11 backtest rows, ws-cell-checks --fixture, ws-precritic --overflow-fixture, per-role precritic plans (duplicate per-role gate removed so --model-states stays); teacher-preview F8 ledger row closed against options-panel-sample. r17 (widened capacity pin) NOT included - ships with the Guided S round.
+- Gates: boot-smoke, roles-unit (80), precritic-plan (156 on path; no row dropped), capacity-pin, code-snapshot (734), redesign-passed (29), simple-print, screen-answer, vocab-unit, empty-band self-test. 0 passed EA pages change.

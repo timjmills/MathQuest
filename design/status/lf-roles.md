@@ -35,7 +35,58 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   Nits N1 (fte step 5 text says "every row" while one mark is new), N2 (npr Model steps 1-2 add no mark; pre-existing).
 - Lesson baseline --all-lessons vs master 8a7c5d43: 1560/1596 identical; the 36 are g3-oa9-input-output-rule (the function
   table's vertical-align attribute) and its 23 pages are pixel-identical.
-- Next: deploy-3; then Reason It F2 / compare band 999999 (A over B), overflow not pinnable, F7; F8 needs a PT-RSN-4 ruling.
+- Deploy-3: PR #43 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ b25479c5), gates green on the deploy tree.
+- r10 (244a84b6): Reason It A over B for any template whose true work width passes half the room; a column story prints once
+  over A and B (word-work storyOnly / noStory, lf-builds' file); RI-DISTINCT; ws-precritic never pins an overflow; 3 ruled
+  capacity pins. Backtest ri-overflow-stack PASS (34 OVERFLOW on b25479c5 -> 0). Passed RI pages: only the 3 that overflowed
+  change. Compare at band 999999 stacks once pv supplies footprint.inkWMm (its wMm carries slack, so it is not trusted).
+  F7 (an added answer under -): not reproducible on master (the sentence-layout change_unknown stories are on the
+  lf-builds-stories branch; here add_wp_change_unknown deals a column sum). SIGNMATCH (RI + EA) 0 on the 5 story skills here;
+  True or False? is not in SIGNMATCH's roles (a false statement may be any false sum) - lf-builds' wrongAnswer slots fix it at
+  the source. F8 waits on a PT-RSN-4 ruling.
+- r10 guided (8307219c): a Guided page of tightRows items keeps rows at their measured height (compare precritic r2 item 1).
+  compare guided EB-BAND 46 -> 22 (rest: pv's measured height + its one-line hint row); expand / unit_form / combine guided
+  EB-BAND 2 -> 0 (9 passed pages change). Backtest guided-tight-rows PASS. compare EA S: 0 now. compare Model EB-SIDE 5 = its
+  beside step-text cells, which PT-MOD-5 excuses but ws-empty-band does not yet skip (lf-checks). Opener is not this lane's.
+
+## Round 11 (2026-11-13; critic r6c FAIL -> fixes)
+- Critic r6c (design/status/lf-roles/r6c/critic-r6c.md): Guided tightRows PASS; Reason It A over B FAIL - D1 one item a page
+  (H5), D2 centred stack, D3 the stack fired on work that fits side by side. P1 (process): the pack's "before" (c8c81172)
+  already held the change - every RI pair identical. Fix to the process: "before" is the parent of the lane's earliest commit
+  in scope; a changed pair that is byte-identical stops the pack (r6d checked: 0 identical pairs).
+- r11 (df83248e): A | B side by side over a full-width response row when the work fits half the cell; stacking (top start)
+  only for wider work. F8 (lead ruling): "__ is correct." dropped, PT-RSN-4 amended. Word answers one 6-digit line (no
+  length tell; "hundreds" fits). Checks RI-ONEANSWER, RI-LAYOUT, LINE-TELL (ws-roles-unit), KEYFIT (ws-cell-checks default);
+  backtests ri-one-answer / ri-layout / line-tell / key-fit PASS. sub_1m RI M 2 (ruled; the pinned 3 overflowed), sub_100k /
+  sub_1m L back to 2.
+- F3 (lf-algebra r1, npr Model L 6 mm overrun): reproduced only in a PRINTED PDF at 47b1f2a86 (screen and emulated print media
+  lay it out clean, so ws-cell-checks / ws-grade-render pass it); gone at this head (the Model is 2 pages, PDF checked). A
+  check needs the PDF raster (as LP-RASTER does for lessons) - proposed to lf-checks via the lead.
+- Critic r6d (design/status/lf-roles/r6d/critic-r6d.md): FAIL on one counted defect - sub_word_problems RI L one item a page
+  (H5); D2 / D3 / F8 / word lines clean; 9 of 10 sets 8+. E1 (number line tell) and N1 (response row left) raised.
+- r12 (c42f7504, faeb7759): a story's response stands BESIDE the story, the A | B panels under both - sub / add_word_problems
+  RI 2 a page at S / M / L; the sentence stories (add / sub_wp_10 / _20 + plain, passed) take the same layout instead of the
+  A-over-B stack (add_wp_10 RI 1 -> 2; 17 capacity rises, no drop). Number lines hold the longer of right / wrong (E1);
+  the no-story response row centres (N1). Checks: LONE-PAGE (ws-cell-checks default: one item a page where the role holds
+  2+; it found add_wp_10), LINE-TELL extended; backtests lone-page, line-tell-number PASS.
+- Critic r6e: PASS (0 counted). r13: npr RI count-row trains stack (OVERFLOW 18 -> 0), a list's response column takes its
+  own width; critic r6f FAIL (S band 33 %) -> the A / B tag in a left gutter at S / M -> npr RI 3 / 3 / 2; critic r6g PASS.
+  ABTAG check (self-test pair). Backtests ri-countrow-overflow, ri-stack-band PASS.
+- Deploy-4: PR #45 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ 329273de); gates green; lessons 1596/1596 identical.
+- Deploy-4 re-merged with master 89abfbb3 (lead: vocab conflicts): head e86ed3517 on -lf-roles-deploy / PR #45. guided.js:
+  tightRows only where the host sets it, vocab evenRows otherwise; reason-it: vocab-match3 keeps its centred stack (legacy);
+  backtests union. KEYFIT found the passed vocab_grade_pictures TF / RI M keys ("C, A, B" on a 2-digit line): a letter answer
+  takes the word line. Gates: roles-unit 78, vocab-unit, boot, code-snapshot, redesign-passed 29, capacity 0 drops / 17
+  rises, cell-checks 0 on 696 passed pages; vocab Guided 6/6 identical to master. Also in: inkWMm vs the panel's INNER
+  width (ri-ink-inner; no passed page changes).
+- Deploy-4 live on master e4d12d6a (PR #45 merged).
+- r15: lf-algebra G2 (EA L copy train 60 px left of the original, seen on their tree): a widened REDO work was centred while
+  its redraw zone starts at the left -> it starts at the left (EA-REDO-ALIGN, backtest ea-redo-align; 0 passed EA pages move).
+  OPEN, pre-existing: npr EA S EA-ROWX (judgement at 69.5 vs 131.5 mm beside a 4- vs 8-term train; count rows plan one
+  footprint so no page work width is set). Neither space-between, align-self:stretch nor margin-left:auto on the judgement
+  moved it - the cause is in the redo flex flow, not found yet; next round.
+- lf-algebra r2 queue: G4 fte RI 2 at every size here (npr fixed); G3 npr RI S 3; G2 not reproduced at the default seed
+  (seed asked); G10 / pattern_features / growing / fgr not in this tree; F3 gone at head (print-raster check -> lf-checks).
 
 ## Round 7 (2026-11-13, +$40; owner: keep going)
 - R4 / N4: RULED capacities in capacity.json ('ruled', with reasons); ws-capacity-pin measures them when the skill is in the tree.

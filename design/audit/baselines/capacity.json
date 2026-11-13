@@ -2944,6 +2944,10 @@
   }
  },
  "ruled": {
+  "subtraction:sub_1m_no_regroup reason-it M": {
+   "items": 2,
+   "reason": "7-digit column work is about 59 mm wide: A and B stand side by side over a full-width response row, never shrunk; the pinned 3 overflowed the cell (lead ruling 2026-11-13, critic r6c D3)"
+  },
   "algebra:function_table_easy true-false L": {
    "items": 2,
    "reason": "items taller than the page allows: a 4-row In/Out table + its judgement at L (lead ruling 2026-11-13, critic r1-r3 R4)"

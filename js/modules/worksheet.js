@@ -14,10 +14,11 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
+import { speakExplanation } from './hints-speech.js';
 
 // Build a static (non-interactive) visual for a grid-fill question so that
 // worksheet/print modes can show the grid without the live widget. Blank
@@ -1064,7 +1065,7 @@ function _wsEvenRows(cards) {
     // The bordered cells fill their card (flex), so a card that also carries a touch-numeral count line
     // (SF-34) has a shorter box than its neighbour: every box of the row takes the row's shortest box,
     // or the tallest content when that needs more, and the card keeps the rest as white under the box.
-    cells.forEach(([, v]) => { v.style.minHeight = ''; v.style.maxHeight = ''; });
+    cells.forEach(([, v]) => { v.style.minHeight = ''; v.style.maxHeight = ''; v.removeAttribute('data-mq-stretched'); });
     const rows = new Map();
     for (const [c, v] of cells) {
         if (c.classList.contains('mq-span-row')) continue;
@@ -1082,9 +1083,19 @@ function _wsEvenRows(cards) {
             return bottom - top + sideY(v);
         });
         const tgt = Math.max(Math.min(...hs), ...need);
+        // (c3, lead ruling 2026-11-13): the bordered box is stretched to the row only up to the RUBRIC H13 limit - its content
+        // to its bottom fills at least 78 % of it (its padding counts as white: under the 30 % band limit with room); the card keeps the row height and the rest stays white
+        // outside the box, as for a touch-numeral card above. CL-4b centring still applies inside the capped box (kept by lead ruling 2026-11-13; with the cap it rarely fires).
         vs.forEach((v, i) => {
-            if (hs[i] > tgt + 0.5) v.style.maxHeight = `${tgt}px`;
-            else if (hs[i] < tgt - 0.5) v.style.minHeight = `${tgt}px`;
+            const h = Math.min(tgt, Math.max(need[i], (need[i] - sideY(v)) / 0.78));   // hs[i] is already the stretched row height; the box's own bottom padding is white too, so the content (to its bottom) fills >= 78 % of the box
+            if (hs[i] > h + 0.5) v.style.maxHeight = `${h}px`;
+            else if (hs[i] < h - 0.5) v.style.minHeight = `${h}px`;
+        });
+        // CL-4b as amended (owner, 2026-11-12): a fitted cell starts at the top unless its row stretches it by 30 % or more of
+        // its own height; then it is centred (css/screen-cell.css reads data-mq-stretched)
+        vs.forEach((v, i) => {
+            const h = v.getBoundingClientRect().height;
+            if (h > 0 && h - need[i] >= 0.30 * h) v.setAttribute('data-mq-stretched', '1');
         });
     }
 }
@@ -2593,6 +2604,7 @@ export function checkWorksheetAnswer(idx, settled) {
         // a second-try correct; a worksheet awards no per-item XP or streak, so it is recorded on the item)
         if (itemWasHelped(card)) q._helped = true;
         input.disabled = true;
+        try { markVocabFeedback(card, q, true); } catch (e) { /* optional */ }   // owner R-1 (lf-vocab r7)
         wsRecordAnswer(idx, true);
 
         if (!worksheetConfettiTriggered.has(idx)) {
@@ -2606,6 +2618,8 @@ export function checkWorksheetAnswer(idx, settled) {
         const lad = worksheetLadderWrong(idx, q, value);
         if (lad && (lad.wait || !lad.spent)) {
             if (!lad.wait) { markTried(input); wsRecordAnswer(idx, false); try { markMissingDigits(card); } catch (e) { /* optional */ } }
+            // owner R-2 (lf-vocab r7): a judged wrong vocabulary answer shows its explanation on every try, ladder or not
+            if (!lad.wait) { try { markVocabFeedback(card, q, false, { speak: speakExplanation }); } catch (e) { /* optional */ } }
             input.style.borderColor = "";
             input.style.background = "";
             card.style.background = "";
@@ -2619,6 +2633,8 @@ export function checkWorksheetAnswer(idx, settled) {
         card.style.border = "2px solid var(--incorrect)";
         markBoxSubmitted(input, false);
         try { markMissingDigits(card); } catch (e) { /* optional */ }   // Wave 1 / A3
+        // owner R-1 / R-2 (lf-vocab r7): the focal part, the right word and the explanation, read aloud once
+        try { markVocabFeedback(card, q, false, { speak: speakExplanation }); } catch (e) { /* optional */ }
         wsRecordAnswer(idx, false);
     }
 }
@@ -2673,6 +2689,7 @@ export function checkAllWorksheet() {
     let skipped = 0;
     let helped = 0;
     const totalAll = state.worksheetQs.length;
+    let vocabSpoken = false;
 
     state.worksheetQs.forEach((q, idx) => {
         const card = document.getElementById(`ws_card_${idx}`);
@@ -3112,10 +3129,15 @@ export function checkAllWorksheet() {
             card.style.border = "2px solid var(--incorrect)";
         }
 
+        // owner R-1 / R-2 (lf-vocab r7): shown on every vocabulary card; the first wrong one's explanation is read aloud, once
+        // (several at once would talk over each other)
+        try { markVocabFeedback(card, q, isCorrect, { speak: vocabSpoken ? null : (t) => { vocabSpoken = true; speakExplanation(t); } }); } catch (e) { /* optional */ }
         if (isCorrect) correct++;
         if (isCorrect && q._helped) helped++;
         wsLogProgress(q, card, isCorrect, _pre);
     });
+    // lf-vocab r12 (critic r11 #4): Check leaves no caret in any card's vocab slot, a card judged or not
+    try { blurVocabSlots(document); } catch (e) { /* optional */ }
 
     // Skipped problems are excluded from the denominator so percent reflects
     // only attempted answers. They're surfaced separately as "Skipped: N".

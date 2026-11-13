@@ -1,0 +1,2 @@
+ws-grade-render --gate (reason-it): PASS (baseline)
+3 found, all pinned, 0 new (H6 card targets 40x44)

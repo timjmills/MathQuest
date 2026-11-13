@@ -30,7 +30,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
@@ -71,7 +71,13 @@ function selfTest() {
         { name: 'grey pupil work under "Sam wrote:" (PUPILTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div style="position:relative"><span class="mq-pupiltag" style="display:block;font:10pt sans-serif;line-height:1">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:2mm;font:20pt sans-serif;line-height:1;color:#949494">48</span></div></div></div>')), want: null, rules: ['PUPILTAG'] },
         { name: 'a "Sam wrote:" label 20 mm over its work (PUPILTAG distance)', html: page(cell({ h: 60, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:20mm;color:#949494">48</span></div></div></div>')), want: 'PUPILTAG' },
         { name: 'an added answer under the minus sign (SIGNMATCH)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 13</div></div></div>')), want: 'SIGNMATCH', role: 'reason-it' },
+        { name: 'Reason It panels A and B show the same work (RI-DISTINCT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 29</div></div></div>')), want: 'RI-DISTINCT', role: 'reason-it' },
+        { name: 'a Reason It tag on the first term (ABTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:5mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">x</div></div></div>')), want: 'ABTAG', role: 'reason-it' },
+        { name: 'a Reason It tag clear of the work (ABTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:12mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">y</div></div></div>')), want: null, role: 'reason-it', rules: ['ABTAG'] },
+        { name: 'Reason It panels differ (RI-DISTINCT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 39</div></div></div>')), want: null, role: 'reason-it', rules: ['RI-DISTINCT'] },
         { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
+        { name: 'a key word past its line (KEYFIT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:8mm;white-space:nowrap;overflow:visible">hundreds</span></div></div>')), want: 'KEYFIT', key: true },
+        { name: 'a key word on its line (KEYFIT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:40mm;white-space:nowrap">hundreds</span></div></div>')), want: null, key: true, rules: ['KEYFIT'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
@@ -82,6 +88,21 @@ function selfTest() {
 }
 
 (async () => {
+    // --fixture f.html [--fixture-role r] [--fixture-key] [--rules R,..]: the checks on ONE saved page (ws-backtest fixture rows - a
+    // finding with no failing commit, e.g. RI-DISTINCT / ABTAG); `ws-cell-checks: OK` / `FAIL - n finding(s)`
+    if (arg('fixture', null)) {
+        const app = await H.open({});
+        const sheet = await app.browser.newPage();
+        await sheet.setViewport({ width: 900, height: 1200 });
+        const html = fs.readFileSync(path.resolve(arg('fixture')), 'utf8');
+        await sheet.setContent(html, { waitUntil: 'load' });
+        const r = await sheet.evaluate(cellChecksInPage, { role: arg('fixture-role', ''), key: has('fixture-key'), h13abs: false });
+        const got = [...(r.problems.length ? r.problems.map((m) => ({ rule: 'OVERFLOW', msg: m })) : []), ...r.findings].filter((f) => RULES.includes(f.rule));
+        for (const f of got) console.log(`  FAIL ${f.rule} ${f.msg}`);
+        console.log(got.length ? `ws-cell-checks: FAIL - ${got.length} finding(s) on the fixture` : 'ws-cell-checks: OK (fixture, no finding)');
+        await app.close();
+        process.exit(got.length ? 1 : 0);
+    }
     if (has('self-test')) {
         const app = await H.open({});
         const sheet = await app.browser.newPage();
@@ -140,7 +161,7 @@ function selfTest() {
             try {
                 const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: cat, skillId: id }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' });
                 const f = Array.isArray(r.fits) ? r.fits[0] : (r.fits && r.fits.sections ? r.fits.sections[0] : r.fits);
-                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, cols: f && f.cols, pages: r.pageCount };
+                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
@@ -151,6 +172,11 @@ function selfTest() {
         const here = [
             ...p.problems.map((m) => ({ rule: 'OVERFLOW', msg: `pupil ${m}` })), ...kk.problems.map((m) => ({ rule: 'OVERFLOW', msg: `key ${m}` })),
             ...p.findings, ...kk.findings,
+            // LONE-PAGE (critic r6c / r6d D1, H5): a page that holds ONE item where its role's ceiling is 2 or more and 2 or more were
+            // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
+            // only the passed skills)
+            ...(Number(built.perPage) === 1 && Number(built.ceiling) >= 2
+                ? [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${built.ceiling} (H5)` }] : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
         runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });
