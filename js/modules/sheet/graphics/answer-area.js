@@ -54,8 +54,9 @@ export function answerArea(ctx, o = {}) {
         // (on paper a word wider than its box hangs from the box's RIGHT edge, never past it: centred, "stickers" under a
         // 2-digit box ran 1.9 mm from the cell rule of an Error analysis cell at L - word-stories precritic r3, EA-PAD / CL-8)
         const wordMm = String(unit).length * (textPt(ctx) + 2) * 0.6 * PT_MM;
-        const pin = !isTwin(ctx) && wordMm > w ? 'right:0;' : 'left:50%;transform:translateX(-50%);';
-        const hung = word.replace('style="flex:none;', `style="position:absolute;${pin}top:100%;margin-top:2px;flex:none;`);
+        const hung = !isTwin(ctx) && wordMm > w
+            ? word.replace('style="flex:none;', 'style="position:absolute;right:0;top:100%;margin-top:2px;flex:none;')
+            : word.replace('style="flex:none;', 'style="position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:2px;flex:none;');
         return `<span class="mq-gl-answerarea" style="position:relative;display:inline-flex;align-items:center;flex:none;">${box}${hung}</span>`;
     }
     return `<span class="mq-gl-answerarea" style="display:inline-flex;align-items:center;gap:${L(ctx, 2)};flex:none;">${box}${word}</span>`;

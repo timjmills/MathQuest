@@ -1,0 +1,4 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g1-oa1-bar-model-wp-20 --repeats  [a8cff55cf]
+g1-oa1-bar-model-wp-20 repeats: 32 places read, 0 finding(s)
+ws-detailed-lesson --repeats: OK
+exit 0

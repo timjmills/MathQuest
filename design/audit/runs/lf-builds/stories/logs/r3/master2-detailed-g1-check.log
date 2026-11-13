@@ -1,0 +1,1 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-detailed-lesson.cjs --lesson g1-oa1-bar-model-wp-20 --check  [76bc11c61]

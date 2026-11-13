@@ -1,0 +1,5 @@
+$ node tests/scripts/ws-backtest.mjs --row card-not-offered-word-stories,tf-eval-word-stories,max-number-band-word-stories,story-ladder-word-stories,vq-live-bands-word-stories,eb-guided-word-stories,f7-signmatch-word-stories,f11-stretch-story-word-stories,f12-coins-word-stories,inplace-rows-m-word-stories,inplace-rows-l-word-stories,model-across-word-stories,wp-bar-word-stories,stretch-cell-word-stories,lesson-guided-centre-word-stories,ea-pad-unit-word-stories,pupiltag-column-word-stories,eb-pin-hosts-word-stories,fixit-words-word-stories,lesson-nocap-rows-word-stories  [a8cff55cf]
+ws-backtest row card-not-offered-word-stories: PASS  fail state FAIL 0.3s, pass state OK 0.3s
+ws-backtest row tf-eval-word-stories: PASS  fail state FAIL 3.7s, pass state OK 3.6s
+ws-backtest: killed by SIGTERM
+exit 130

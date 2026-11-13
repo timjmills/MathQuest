@@ -1249,9 +1249,10 @@ function sentenceLayout(p, ctx) {
     }
     // (a column too narrow for the word beside the box hangs the word UNDER the box: a lesson's two-across
     // cells and the page grids both hold it, nothing sticks out - PG-12)
-    // (`data-ww-storybar`: a change / compare story's bar stack - a lesson's lone Guided cell centres it across its 2/3-page
-    // cell, lesson-css.js, instead of leaving 37 % of the width empty beside it: word-stories precritic r3, EB-SIDE)
-    return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read${p.storyBar ? ' data-ww-storybar' : ''} style="width:100%;${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
+    // (a change / compare story's bar stack stands centred in its cell, as wide as it draws - a lesson's lone Guided cell is 2/3
+    // of the page, and the stack left 37 % of the width empty beside it: word-stories precritic r3, EB-SIDE. Inline, so no page
+    // of another skill carries a new style rule)
+    return `<div class="${cls}" data-ww-ops="${st.op}" data-ws-inplace data-read${p.storyBar ? ' data-ww-storybar' : ''} style="${p.storyBar && !twin ? 'width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;' : 'width:100%;'}${base}padding-left:${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};padding-top:${twin ? L(ctx, 1.5) : '0'};${twin ? 'text-align:left;' : ''}">`
         + `${storyHTML(ctx, p, true)}${pictureRow(ctx, p.pic, !twin)}${kb}<div style="margin-top:${L(ctx, 3)};display:flex;${twin ? 'justify-content:center;' : ''}">${work}</div></div>`;
 }
 

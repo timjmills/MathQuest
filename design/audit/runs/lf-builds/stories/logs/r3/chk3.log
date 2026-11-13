@@ -1,0 +1,57 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --sizes M,L --hosts card,worksheet,quiz --vocab-ink --page-fill --no-baseline; for z in L M; do tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size $z --skills addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller; done  [a8cff55cf]
+note: slot ink on: an empty PRINT answer slot is ink over its whole box (the writing room)
+note: addition:add_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x M/L + 6 option variant(s) of 9 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_change_unknown: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x M/L + 6 option variant(s) of 12 + hosts card, worksheet, quiz
+note: subtraction:sub_wp_compare_smaller: slot ink on; card design/cards/word-stories/word-stories.md; 15 roles x M/L + 6 option variant(s) of 13 + hosts card, worksheet, quiz
+EB-BAND  FAIL 2
+   addition:add_wp_change_unknown guided L p1 cell 2: empty band 45.2 mm under the ink of a 138.7 mm cell (32.6 %; limit 30 % = 41.6 mm; the 3.0 mm top pad excluded) [word-work]
+   subtraction:sub_wp_compare_smaller lesson M p2 cell 1: empty band 15.8 mm under the ink of a 50.7 mm cell (31.1 %; limit 30 % = 15.2 mm; the 2.5 mm top pad excluded) [lesson-vocab]
+EB-SIDE  FAIL 2
+   addition:add_wp_change_unknown pre-skill-check M p1 cell 5: 28.0 mm empty beside the ink of a 92.3 mm wide cell interior (30.3 %; limit 30 %) [family-check]
+   addition:add_wp_change_unknown pre-skill-check M p1 cell 6: 28.0 mm empty beside the ink of a 92.3 mm wide cell interior (30.3 %; limit 30 %) [family-check]
+EB-EDGE  PASS
+MOD-MARKS PASS
+MOD-LINES PASS
+MOD-GRID PASS
+EB-GAP   PASS
+EB-FOOT  PASS
+EB-ROLE  PASS
+EB-READ  PASS
+EB-VOCAB PASS
+EB-PAGE  FAIL 5
+   addition:add_wp_change_unknown pre-skill-check L p1: 51 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_change_unknown pre-skill-check M p1: 56 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_change_unknown pre-skill-check L p1: 51 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_compare_smaller pre-skill-check M p1: 62 % of the page body is empty under its last block (not the last page; limit 30 %)
+   subtraction:sub_wp_compare_smaller pre-skill-check L p1: 57 % of the page body is empty under its last block (not the last page; limit 30 %)
+EB-GDPCAP PASS
+EB-PARITY PASS
+EB-ITEMKEY PASS
+EB-ITEMPARITY PASS
+(3 skill(s), 213 renders, 825 cells, 411 s)
+ws-empty-band: FAIL (9)
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+exit 0

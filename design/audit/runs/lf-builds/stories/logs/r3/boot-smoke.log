@@ -1,0 +1,3 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-boot-smoke.cjs  [a8cff55cf]
+ws-boot-smoke: OK
+exit 0

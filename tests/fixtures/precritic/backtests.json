@@ -7199,7 +7199,7 @@
     "commit": "e197c6cb7",
     "state": "OK"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_wp_compare_smaller --roles lesson --size M,L --opts '{\"forms\":[3,4,5]}'",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_wp_compare_smaller --card --card-opts",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
