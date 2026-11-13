@@ -343,8 +343,10 @@ const PICS = {
     /* ---- Grade 4: number and shape patterns (4.OA.C.5) */
     'ones digit': {
         ccss: ['1.NBT.B.2', '2.NBT.A.1', '4.OA.C.5'], op: 'place',
-        alt: 'the number 473 with the 3 in a heavy box',
-        draw: () => tx(16, 20, 0, '4', { size: 13 }) + tx(26, 20, 0, '7', { size: 13 }) + rect(31, 9, 13, 22, W.heavy) + tx(37.5, 20, 0, '3', { size: 13 }),
+        // (r14, critic r13 #1: 47[3] read as odd - one boxed odd number, and the ones digit decides odd / even - so the boxed ones
+        // digit is EVEN, 47[6]; no set deals ones digit with even, ws-vocab-unit V-NUM)
+        alt: 'the number 476 with the 6 in a heavy box',
+        draw: () => tx(16, 20, 0, '4', { size: 13 }) + tx(26, 20, 0, '7', { size: 13 }) + rect(31, 9, 13, 22, W.heavy) + tx(37.5, 20, 0, '6', { size: 13 }),
     },
     repeat: {
         ccss: ['4.OA.C.5'], op: 'pattern',
@@ -473,7 +475,7 @@ const PICS = {
 const PIC_FEAT = Object.freeze({
     even: ['dots', 'pairs-ringed', 'groups-of:2'],
     odd: ['dots', 'lone-mark', 'pairs-ringed', 'groups-of:2'],
-    product: ['boxed-answer', 'boxed-number', 'equals', 'times-sign', 'number-sentence'],
+    product: ['boxed-answer', 'boxed-number', 'equals', 'times-sign', 'number-sentence', 'marked-even'],
     factor: ['boxed-number', 'boxed-operand', 'equals', 'times-sign', 'number-sentence'],
     row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
     column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
@@ -494,29 +496,29 @@ const PIC_FEAT = Object.freeze({
     'count on': ['rising-run', 'step:1', 'number-track', 'forward-hop', 'hops'],
     'one more': ['dots', 'lone-mark', 'ringed-new'],
     'one less': ['crossed-mark', 'dots'],
-    before: ['boxed-first-of-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'back-hop'],
-    after: ['boxed-in-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'forward-hop'],
+    before: ['boxed-first-of-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'back-hop', 'marked-even'],
+    after: ['boxed-in-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'forward-hop', 'marked-even'],
     'hundred chart': ['table', 'rising-run', 'step:1', 'step:10'],
     hundred: ['base10-flat'],
     ten: ['base10-rod'],
     one: ['base10-unit'],
-    digit: ['digit-ringed'],
+    digit: ['digit-ringed', 'marked-odd'],
     'expanded form': ['plus-sign', 'expanded-sum'],
     'number name': ['number-words'],
-    'ones digit': ['boxed-number', 'last-digit-boxed'],
+    'ones digit': ['boxed-number', 'last-digit-boxed', 'marked-even'],
     repeat: ['repeated-block', 'bracket'],
     sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
     cycle: ['loop-arrows', 'loop-shapes'],
     grow: ['shapes-growing'],
-    term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4'],
-    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count'],
+    term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
+    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count', 'marked-even'],
     'times as many': ['times-sign', 'times-bar', 'bar-pair', 'bracket'],
     compare: ['bar-pair', 'double-arrow'],
     equation: ['equals', 'times-sign', 'number-sentence'],
     remainder: ['dots', 'lone-mark', 'groups-of:4'],
-    quotient: ['boxed-answer', 'boxed-number', 'divide-sign', 'equals', 'number-sentence'],
-    divisor: ['boxed-number', 'divide-sign', 'boxed-divisor'],
-    dividend: ['boxed-number', 'divide-sign', 'boxed-dividend'],
+    quotient: ['boxed-answer', 'boxed-number', 'divide-sign', 'equals', 'number-sentence', 'marked-odd'],
+    divisor: ['boxed-number', 'divide-sign', 'boxed-divisor', 'marked-even'],
+    dividend: ['boxed-number', 'divide-sign', 'boxed-dividend', 'marked-odd'],
     'round up': ['dots', 'grouped-boxes', 'groups-of:4'],
 });
 /**
@@ -596,8 +598,8 @@ export const VOCAB_FEATURES = Object.freeze([
     'rising-run', 'falling-run', 'step:<d>', 'skip-count', 'boxed-number', 'boxed-question', 'op-box', 'boxed-answer',
     'boxed-operand', 'boxed-divisor', 'boxed-dividend', 'boxed-first-of-run', 'boxed-in-run', 'row-ringed', 'column-ringed', 'in-ringed', 'out-ringed',
     'crossed-mark', 'lone-mark', 'loop-arrows', 'loop-numbers', 'arrow-into-box', 'arrow-out-of-box', 'numbers-at-ends',
-    // (r13 V-NUM: two or more numbers ringed or boxed, all even / all odd)
-    'all-even', 'all-odd',
+    // (r13 V-NUM: two or more numbers ringed or boxed, all even / all odd; r14: exactly one, marked-even / marked-odd)
+    'all-even', 'all-odd', 'marked-even', 'marked-odd',
     // declared only (not read from the markup)
     'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
     'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
@@ -640,9 +642,14 @@ export function vocabReadFeatures(body) {
     }
     const heavy = rects.filter((r) => r.sw >= 2 && r.fill === 'none');
     // V-NUM (r13, critic r12 #1): the numbers the picture rings or boxes; two or more, all even or all odd, read as even / odd
-    const marked = heavy.flatMap((r) => texts.filter((t) => inR(t, r)).map((t) => t.t.trim())).filter((t) => /^\d+$/.test(t)).map(Number);
+    // (r14, critic r13 #1: the boundary - ONE ringed or boxed number is a parity feature too, marked-even / marked-odd; a ring is
+    // a circle with no fill round one text, as a box is a heavy rect)
+    const ringsT = circles.filter((c) => c.fill === 'none').map((c) => ({ c, inside: texts.filter((t) => Math.hypot(t.x - c.x, t.y - c.y) < c.r) }));
+    const markedT = [...heavy.flatMap((r) => texts.filter((t) => inR(t, r))), ...ringsT.filter((q) => q.inside.length === 1).map((q) => q.inside[0])];
+    const marked = markedT.map((t) => t.t.trim()).filter((t) => /^\d+$/.test(t)).map(Number);
     if (marked.length >= 2 && marked.every((n) => n % 2 === 0)) f.add('all-even');
     if (marked.length >= 2 && marked.every((n) => n % 2 === 1)) f.add('all-odd');
+    if (marked.length === 1) f.add(marked[0] % 2 === 0 ? 'marked-even' : 'marked-odd');
     const eqX = texts.filter((t) => t.t.trim() === '=' || /\s=\s/.test(t.t)).map((t) => t);
     for (const r of heavy) {
         const inside = texts.filter((t) => inR(t, r));

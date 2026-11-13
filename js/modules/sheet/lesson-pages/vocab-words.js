@@ -22,9 +22,9 @@
 
 /** Every word: meaning, the wrong-answer explanation, the words it is never offered with. */
 export const VOCAB_WORDS = Object.freeze({
-    even: { meaning: 'makes pairs, none left over', explain: 'Even means the dots make pairs, with none left over.', notWith: ['equal groups'] },
-    odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left', 'grow'] },
-    product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation', 'multiple', 'row', 'column'] },
+    even: { meaning: 'makes pairs, none left over', explain: 'Even means the dots make pairs, with none left over.', notWith: ['equal groups', 'product'] },
+    odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left', 'grow', 'quotient', 'dividend'] },
+    product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation', 'multiple', 'row', 'column', 'even'] },
     factor: { meaning: 'a number you multiply', explain: 'Factor means a number you multiply: the 4 and the 3 in boxes.', notWith: ['equation', 'divisor', 'quotient', 'ones digit'] },
     row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive', 'product'] },
     column: { meaning: 'a line going down', explain: 'Column means a line going down, like the one drawn round.', notWith: ['multiple', 'pattern', 'rule', 'commutative', 'distributive', 'product'] },
@@ -54,7 +54,7 @@ export const VOCAB_WORDS = Object.freeze({
     digit: { meaning: 'one of the numbers 0 to 9', explain: 'Digit means one of the numbers 0 to 9, like the 7 in 472.', notWith: ['ones digit'] },
     'expanded form': { meaning: 'the number split by place', explain: 'Expanded form means the number split by place: 300 plus 40 plus 7.', notWith: [] },
     'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, like forty-seven.', notWith: ['hundred'] },
-    'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 3 in 473.', notWith: ['digit', 'factor', 'quotient'] },
+    'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 6 in 476.', notWith: ['digit', 'factor', 'quotient'] },
     repeat: { meaning: 'the part comes back', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
     sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term'] },
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round to the start again: circle, square, triangle, diamond, circle.', notWith: ['repeat', 'pattern'] },
@@ -67,9 +67,9 @@ export const VOCAB_WORDS = Object.freeze({
     compare: { meaning: 'find which is more, and by how much', explain: 'Compare means find which bar is longer, and by how much.', notWith: ['times as many'] },
     equation: { meaning: 'two sides that are equal', explain: 'Equation means both sides are equal: 12 is the same as 3 times 4.', notWith: [] },
     remainder: { meaning: 'what is left after equal groups', explain: 'Remainder means what is left over after making the groups.', notWith: ['odd', 'equal groups', 'round up'] },
-    quotient: { meaning: 'the answer when you divide', explain: 'Quotient means the answer when you divide, like the 3 in the box.', notWith: ['round up', 'equation', 'factor', 'ones digit'] },
+    quotient: { meaning: 'the answer when you divide', explain: 'Quotient means the answer when you divide, like the 3 in the box.', notWith: ['round up', 'equation', 'factor', 'ones digit', 'odd'] },
     divisor: { meaning: 'the number you divide by', explain: 'Divisor means the number you divide by, like the 4 in the box.', notWith: ['factor'] },
-    dividend: { meaning: 'the number you divide up', explain: 'Dividend means the number you divide up, like the 13 in the box.', notWith: [] },
+    dividend: { meaning: 'the number you divide up', explain: 'Dividend means the number you divide up, like the 13 in the box.', notWith: ['odd'] },
     'round up': { meaning: 'use one more group for what is left', explain: 'Round up means use one more group for what is left over.', notWith: ['remainder', 'equal groups', 'quotient'] },
 });
 
@@ -81,8 +81,9 @@ export const VOCAB_WORDS = Object.freeze({
  */
 export const VOCAB_DEFS = Object.freeze({
     // (r13 V-NUM, critic r12 #1: a picture whose ringed or boxed numbers are all even reads as even - 2, 4, 6, 8 ringed)
-    even: [['pairs-ringed', '!lone-mark'], ['all-even']],
-    odd: [['pairs-ringed', 'lone-mark'], ['all-odd']],
+    // (r14 V-NUM, critic r13 #1: the boundary - ONE ringed or boxed number reads as even / odd too: 47[3])
+    even: [['pairs-ringed', '!lone-mark'], ['all-even'], ['marked-even']],
+    odd: [['pairs-ringed', 'lone-mark'], ['all-odd'], ['marked-odd']],
     // (r13, critic r12 #2: every cell of a times table is a product, as it is a multiple)
     product: [['boxed-answer', 'times-sign'], ['table', 'skip-count']],
     factor: [['boxed-operand', 'times-sign']],
@@ -193,6 +194,8 @@ export const VOCAB_SETS = Object.freeze([
         // (r13, critic r12 #3: rule, term and first term all clash now (V-TWIN) - first term gave way to odd, named by the set's
         // standard (4.OA.C.5 "alternate between odd and even"); trios {rule, odd, ones digit} / {term, repeat, grow}; edited in
         // place, the set keeps its position - V7)
+        // (r14, critic r13 #1: ones digit now boxes an EVEN digit, 47[6], so it no longer reads as odd (V-NUM one mark); the
+        // words stay, the set keeps its position - V7)
         words: ['rule', 'odd', 'ones digit', 'term', 'repeat', 'grow'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],
         // (r9, critic r7 #6: equation gave way to total: factor, product and unknown each draw a number sentence ("=", V-AMBIG+); edited in place, the set keeps its position - V7)

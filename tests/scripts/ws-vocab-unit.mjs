@@ -29,7 +29,8 @@
 // V-HATCH (r11, the escape hatch) a set's noPicture words are never drawn for it (Match 3, the 1 picture, 3 words picture);
 //     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
 // V7-ALL (r13) every bank dealtBanks lists is judged (V-FEAT reading + today's notWith); V-NUM ringed/boxed numbers all
-//     even / all odd read as even / odd; V-TWIN pictures of one feature class share their notWith lists
+//     even / all odd read as even / odd (r14: one ringed or boxed number too); V-TWIN pictures of one feature class share their
+//     notWith lists
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
@@ -263,11 +264,15 @@ const ambig = [];
         for (const [f, b] of [['all-even', 'even'], ['all-odd', 'odd']]) {
             if (a !== b && read.includes(f) && pl.words.includes(b) && W.compatible([a, b])) fail(`V-NUM ${pl.name}: the "${a}" picture rings or boxes only ${b} numbers, and it may be dealt with "${b}"`);
         }
+        // (r14, critic r13 #1: the boundary case - exactly ONE ringed or boxed number is a parity feature too: 47[3] reads odd)
+        for (const [f, b] of [['marked-even', 'even'], ['marked-odd', 'odd']]) {
+            if (a !== b && read.includes(f) && pl.words.includes(b) && W.compatible([a, b])) fail(`V-NUM ${pl.name}: the "${a}" picture rings or boxes one number, ${b}, and it may be dealt with "${b}" (one mark)`);
+        }
     }
     // V-TWIN (r13, critic r12 #3: first term missed the term / rule pin): two pictures of one pool with the same feature
     // class (their features less the box position and skip-count, every step:n as step) are notWith the same other words.
     {
-        const cls = (id) => [...new Set(featOf(id).filter((f) => !['boxed-first-of-run', 'boxed-in-run', 'skip-count', 'all-even', 'all-odd'].includes(f)).map((f) => (f.startsWith('step:') ? 'step' : f)))].sort().join(' ');
+        const cls = (id) => [...new Set(featOf(id).filter((f) => !['boxed-first-of-run', 'boxed-in-run', 'skip-count', 'all-even', 'all-odd', 'marked-even', 'marked-odd'].includes(f)).map((f) => (f.startsWith('step:') ? 'step' : f)))].sort().join(' ');
         const nw = (a, b) => ((W.VOCAB_WORDS[a] || {}).notWith || []).includes(b) || ((W.VOCAB_WORDS[b] || {}).notWith || []).includes(a);
         const seenT = new Set();
         for (const pl of pools) for (let i = 0; i < pl.pics.length; i++) for (let j = i + 1; j < pl.pics.length; j++) {
