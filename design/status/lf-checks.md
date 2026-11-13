@@ -437,3 +437,6 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     - lf-ops: add_facts / sub_facts {support line} number-line labels at 7.6 pt, under 8 pt at 390; mult_facts {skip} strip labels at 96 % of print; div_facts {boxsign} "divide" at 8.9 pt vs 10 pt.
     - lf-placevalue: identify card / quiz secondary digit 30.4 px vs 40-56; unit_form / value worksheet words 14 pt vs 16 pt.
   - Not on master (route): growing quiz G9 goes to the quiz host; number_patterns_rule is fixed on -props.
+
+### Queue moved to lf-hosts (lead, 11-13, session_013pHDnQ4fgVajj5vZ6fwpwV)
+lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 touch targets (10); G9 quiz labels (16/17); the two-step host items (23); SIZE-REF same-word (14); and SIZE-WIDTH by unit (15). Builders A and B were already mid-way on these; their commits are offered to lf-hosts as a hand-off, pending the lead's ruling. lf-checks keeps: the checker tools, LP-RASTER for role pages (13: done, ws-grade-render --raster-fit), the -r2 narrow critic, and tool support for lf-hosts.
