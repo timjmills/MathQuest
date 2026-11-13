@@ -6142,7 +6142,7 @@
  },
  {
   "id": "guided-model-span",
-  "check": "a Guided page of narrow column stacks at S whose one-cell-Model grid the ceiling trims to Model + 7 lays the Model over two cells of row 1, its working beside it, and holds Model + 10 in 3 whole rows; at M the Model keeps one cell (lead ruling (e) 2026-11-13, lf-roles r8a)",
+  "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - a Guided page of narrow column stacks at S whose one-cell-Model grid the ceiling trims to Model + 7 lays the Model over two cells of row 1, its working beside it, and holds Model + 10 in 3 whole rows; at M the Model keeps one cell (lead ruling (e) 2026-11-13, lf-roles r8a)",
   "kind": "commit-pair",
   "rule": "ws-roles-unit GUIDED-MODEL-SPAN",
   "browser": false,
@@ -6162,7 +6162,7 @@
  },
  {
   "id": "guided-size-order-s",
-  "check": "Guided SIZE-ORDER on the three subtraction stack pages: S prints at least as many items a page as M (lead 2026-11-13: S 8 < M 9 on sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d; fixed by the two-cell Model, ruling (e))",
+  "check": "SUPERSEDED (owner S drop, plan item 9, master 76bc11c6: an S-only check, kept as a regression guard) - Guided SIZE-ORDER on the three subtraction stack pages: S prints at least as many items a page as M (lead 2026-11-13: S 8 < M 9 on sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d; fixed by the two-cell Model, ruling (e))",
   "kind": "commit-pair",
   "rule": "ws-capacity-pin SIZE-ORDER (guided)",
   "browser": true,
