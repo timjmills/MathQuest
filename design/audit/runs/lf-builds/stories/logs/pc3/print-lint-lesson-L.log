@@ -1,0 +1,40 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --baseline design/audit/baselines/print-lint.json
+
+mq-browser-run: slot 2 after 54s
+ws-print-lint: source kit, 7 skill(s)
+  addition:add_word_problems#lesson: 8+4 pages, 0 finding(s)
+  addition:add_word_problems_plain#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems_plain#lesson: 8+4 pages, 0 finding(s)
+  addition:add_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller#lesson: 6+3 pages, 2 finding(s)
+
+document                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_word_problems#lesson               8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_word_problems_plain#lesson         8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems#lesson            8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems_plain#lesson      8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_wp_change_unknown#lesson           6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller#lesson       6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    2  FAIL
+TOTAL                                                   .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    2
+
+addition:add_word_problems#lesson (Addition Word Problems (lesson))
+
+addition:add_word_problems_plain#lesson (Addition Word Problems (No Pictures) (lesson))
+
+subtraction:sub_word_problems#lesson (Subtraction Word Problems (lesson))
+
+subtraction:sub_word_problems_plain#lesson (Subtraction Word Problems (No Pictures) (lesson))
+
+addition:add_wp_change_unknown#lesson (Addition Word Problems: How Many Were Added? (lesson))
+
+subtraction:sub_wp_change_unknown#lesson (Subtraction Word Problems: How Many Went? (lesson))
+
+subtraction:sub_wp_compare_smaller#lesson (Compare Stories: Find the Smaller Amount (lesson))
+  [L-WRAP WRAP-OP major] x2 (p2,5) a wrapped line ends in "=": "difference=" / "smaller..." - an expression never breaks after its operator (join it with no-break spaces or give it the width) (C1, TY rules)
+      e.g. <(no cell)> "difference="
+
+ws-print-lint: FAIL - ratchet: 1 count(s) rose above design/audit/baselines/print-lint.json
+  - subtraction:sub_wp_compare_smaller#lesson L-WRAP WRAP-OP: 0 -> 2

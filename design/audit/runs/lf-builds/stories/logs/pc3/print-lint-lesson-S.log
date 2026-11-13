@@ -1,0 +1,40 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size S --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --baseline design/audit/baselines/print-lint.S.json
+
+mq-browser-run: slot 2 after 83s
+ws-print-lint: source kit, 7 skill(s)
+  addition:add_word_problems#lesson: 8+4 pages, 0 finding(s)
+  addition:add_word_problems_plain#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems#lesson: 8+4 pages, 0 finding(s)
+  subtraction:sub_word_problems_plain#lesson: 8+4 pages, 4 finding(s)
+  addition:add_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown#lesson: 6+3 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller#lesson: 6+3 pages, 0 finding(s)
+
+document                                      pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_word_problems#lesson               8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_word_problems_plain#lesson         8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems#lesson            8+4k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems_plain#lesson      8+4k    .     .    .    .        .     .       4    .     .       .     .    .      .       .        .       .    .  FAIL
+addition:add_wp_change_unknown#lesson           6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown#lesson        6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller#lesson       6+3k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                                   .     .    .    .        .     .       4    .     .       .     .    .      .       .        .       .    .
+
+addition:add_word_problems#lesson (Addition Word Problems (lesson))
+
+addition:add_word_problems_plain#lesson (Addition Word Problems (No Pictures) (lesson))
+
+subtraction:sub_word_problems#lesson (Subtraction Word Problems (lesson))
+
+subtraction:sub_word_problems_plain#lesson (Subtraction Word Problems (No Pictures) (lesson))
+  [L-DENSITY H13 major] x4 (p2,6 cells 2,3,2,3) one empty band 30.9 mm wide in a 91.8 mm cell (34%): the content is pinned to one side (RUBRIC H13)
+      e.g. <div.ws-cell.fact[data-ws-cell="fact"]> "2 1 2 − 6" | <div.ws-cell.fact[data-ws-cell="fact"]> "3 2 0 − 1 3"
+
+addition:add_wp_change_unknown#lesson (Addition Word Problems: How Many Were Added? (lesson))
+
+subtraction:sub_wp_change_unknown#lesson (Subtraction Word Problems: How Many Went? (lesson))
+
+subtraction:sub_wp_compare_smaller#lesson (Compare Stories: Find the Smaller Amount (lesson))
+
+ws-print-lint: FAIL - ratchet: 1 count(s) rose above design/audit/baselines/print-lint.S.json
+  - subtraction:sub_word_problems_plain#lesson L-DENSITY H13: 0 -> 4

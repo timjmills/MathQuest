@@ -14,3 +14,6 @@ ws-precritic: 40 gate(s) (27 browser), logs /home/user/MathQuest/.claude/worktre
   PASS            ws-presets-unit (93 s, waited 87 s for a slot)
   PASS            ws-print-lint --source kit --size L (independent defaults; duplicates the matrix's single/defaults row) (58 s, waited 31 s for a slot)
   PASS            ws-print-lint --source kit --size S (independent defaults; duplicates the matrix's single/defaults row) (106 s, waited 77 s for a slot)
+  PASS            ws-print-lint --source kit --size M (independent defaults; duplicates the matrix's single/defaults row) (116 s, waited 88 s for a slot)
+  FAIL            ws-print-lint --source kit --roles lesson --size L (the lane skills' own lesson pages: H13, WRAP-OP, ...) (91 s, waited 54 s for a slot)
+  FAIL            ws-print-lint --source kit --roles lesson --size S (the lane skills' own lesson pages: H13, WRAP-OP, ...) (122 s, waited 83 s for a slot)
