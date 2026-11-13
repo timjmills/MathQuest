@@ -15,8 +15,8 @@
 //
 // ELIGIBILITY (per skill S)
 //   - S's DRAWINGS are what its generator emits: the kit cell template (q.cell.template through print-generate's
-//     kitCellSpec) PLUS every payload discriminator the template draws by (DRAWING_KEYS kind / task / layout / mode / type /
-//     form: 'pv/kind=compare' is not 'pv/kind=expand'; critic lf-tools r1 B1). Scanned on 8 seeded items at its defaults and
+//     kitCellSpec) drawn as a SKELETON (drawingOf: template + a hash of the rendered cell's normalised skeleton, so
+//     'pv@a93668' (compare) is not 'pv@deb461' (expand) and stack op '*' is not op '-'; critic lf-tools r1 B1, r2 D1). Scanned on 8 seeded items at its defaults and
 //     8 per option value (more, up to 24, while new drawings still turn up: scanDrawings, B6) its card offers (ws-card-plan
 //     variants; a skill with no card: every non-default value of offeredOptionsFor's set / enum / bool options). A skill
 //     whose items draw the legacy cell, or whose generation errors on every item, is not eligible (no kit template passed).
@@ -53,18 +53,24 @@ export const DEFAULT_HOSTS = ['practice-card', 'online-worksheet', 'quiz'];
 // every default screen width (tests/lib/ws-screen-widths.cjs: 1280, 1366 computer / Chromebook, 820, 1024 tablets; critic
 // lf-tools r1 B2: the sample showed only 1280 / 820, and in a batch only 1280)
 export const WIDTHS = [...createRequire(import.meta.url)('../lib/ws-screen-widths.cjs').SCREEN_WIDTHS];
-// THE DRAWING (critic lf-tools r1 B1): a template draws different pictures by a payload discriminator (pv kind=compare vs
-// kind=expand, word-work layout=frames vs none, a clock task, a timeline mode ...). A skill is keyed by DRAWING =
-// template + every discriminator its payload carries, so an anchor must have drawn the SAME drawing, not just the template.
-export const DRAWING_KEYS = ['kind', 'task', 'layout', 'mode', 'type', 'form'];
-/** The drawing key of one kit cell: 'pv/kind=compare', 'word-work/layout=frames', 'fact'. Pure. */
-export function drawingOf(template, payload) {
-    const p = payload && typeof payload === 'object' ? payload : {};
-    const parts = DRAWING_KEYS.filter((k) => ['string', 'number', 'boolean'].includes(typeof p[k]) && String(p[k]) !== '').map((k) => `${k}=${p[k]}`);
-    return [String(template), ...parts].join('/');
+// THE DRAWING (critic lf-tools r1 B1, r2 D1; round-cap root cause): a template draws different pictures from one payload
+// (pv kind=compare vs kind=expand; stack op '*' vs '-', a missing-digit box, a carry row, four addend rows; a word-work bar
+// kind ...). r1 and r2 keyed the drawing on a HAND-KEPT list of payload fields (kind / task / layout / mode / type / form), and
+// every template that draws by a field off the list slipped through (r2: stack op / unknown / regroup / rows). The key is now
+// DERIVED FROM WHAT THE CELL RENDERS: template + a hash of its normalised skeleton (tests/lib/ws-drawing-skeleton.mjs: tags,
+// class tokens, slot count and shape, SVG primitive kinds, operator glyphs; digits and words masked; a run of identical
+// siblings is one or many). An anchor must have drawn the SAME skeleton. ws-drawing-key (on precritic's path) proves it:
+// for every registered template it mutates one corpus payload field at a time and FAILs when the skeleton changes but the key
+// does not.
+export { drawingKey, drawingLabel, cellSkeleton } from '../lib/ws-drawing-skeleton.mjs';
+import { drawingKey as _drawingKey, drawingLabel } from '../lib/ws-drawing-skeleton.mjs';
+/** The drawing key of one kit cell: '<template>@<skeleton hash>' (kit = js/modules/sheet/index.js, which draws it). */
+export function drawingOf(template, payload, kit, question = null) {
+    if (!kit || typeof kit.renderCell !== 'function') throw new Error('drawingOf: the sheet kit is needed (the key is the rendered skeleton)');
+    return _drawingKey(kit, template, payload, question);
 }
 /** The template of a drawing key. Pure. */
-export const templateOfDrawing = (d) => String(d).split('/')[0];
+export const templateOfDrawing = (d) => String(d).split(/[@/]/)[0];
 /**
  * Scan a generator for the drawings it emits (critic lf-tools r1 B6: 2 items per option value missed a drawing an option
  * deals rarely). `draw(i)` -> a drawing key ('legacy' / 'error' too). Scans `n` items; while the LAST QUARTER of what was
@@ -102,7 +108,8 @@ export function eligibility(info, passed) {
         const cands = passed.filter((p) => p.key !== info.key && (p.templates || {})[T] > 0);
         if (!cands.length) {
             const sameTpl = passed.filter((p) => p.key !== info.key && Object.keys(p.templates || {}).some((d) => templateOfDrawing(d) === templateOfDrawing(T)));
-            reasons.push(`template ${T} never passed (no skill in redesign-passed.js draws it${T.includes('/') && sameTpl.length ? `; ${templateOfDrawing(T)} passed only as ${[...new Set(sameTpl.flatMap((p) => Object.keys(p.templates).filter((d) => templateOfDrawing(d) === templateOfDrawing(T))))].join(', ')}: a new drawing gets the full critic` : ''})`);
+            const lab = info.labels && info.labels[T] ? ` [${info.labels[T]}]` : '';
+            reasons.push(`drawing ${T}${lab} never passed (no skill in redesign-passed.js draws this skeleton${/[@/]/.test(T) && sameTpl.length ? `; ${templateOfDrawing(T)} passed only as ${((l) => (l.length > 6 ? [...l.slice(0, 6), `${l.length - 6} more`] : l))([...new Set(sameTpl.flatMap((p) => Object.keys(p.templates).filter((d) => templateOfDrawing(d) === templateOfDrawing(T)).map((d) => (p.labels && p.labels[d] ? `${d} [${p.labels[d]}]` : d))))]).join(', ')}: a new drawing gets the full critic` : ''})`);
             continue;
         }
         const judged = cands.map((p) => {
@@ -179,9 +186,12 @@ export function buildSample(skills, { cap, shared = skills.length > 1 } = {}) {
     }
     // B2: every default screen width at least once (one skill, or across the batch): add screen pages until there are as
     // many as widths (hosts rotated, given to the skill with the fewest pages); widths are dealt in page order ACROSS skills
-    const screenN = () => per.reduce((n, p) => n + p.pages.filter((x) => x.host !== 'print').length, 0);
+    // r2 D3: NOT a batch (one skill, or several skills each with its own narrow critic brief): EVERY skill gets every width
+    const screenOf = (p) => p.pages.filter((x) => x.host !== 'print').length;
+    const screenN = () => per.reduce((n, p) => n + screenOf(p), 0);
     let rot = 0;
-    while (screenN() && screenN() < WIDTHS.length) {
+    if (!shared) for (const p of per) { const hs = p.s.hosts || []; for (let r = 0; hs.length && screenOf(p) < WIDTHS.length; r++) p.pages.push({ role: null, host: hs[r % hs.length] }); }
+    while (shared && screenN() && screenN() < WIDTHS.length) {
         const withHosts = per.filter((p) => (p.s.hosts || []).length);
         const p = fewest(withHosts);
         p.pages.push({ role: null, host: p.s.hosts[rot++ % p.s.hosts.length] });
@@ -203,6 +213,7 @@ export function buildSample(skills, { cap, shared = skills.length > 1 } = {}) {
     for (const p of per) {
         const base = 10000 + (fnv(p.s.key) % 80000);
         let si = 0;
+        if (!shared) wi = 0;   // D3: each skill's own sample deals the widths from the first
         p.pages = p.pages.map((x, i) => {
             const screen = x.host !== 'print';
             return { n: i + 1, role: x.role, size: screen ? null : SIZES[si++ % 3], seed: base + i, host: x.host, width: screen ? WIDTHS[wi++ % WIDTHS.length] : null, option: x.option || null, value: x.value === undefined ? null : x.value, opts: x.opts || null };
@@ -247,9 +258,13 @@ export function briefLint(name, text, names) {
 }
 
 /* ============================================================== self-test */
-function selfTest() {
+/** The sheet kit alone (pure ES modules: no DOM, no state), for drawingOf in the self-test. */
+async function loadKit(root) { return import(pathToFileURL(join(root, 'js', 'modules', 'sheet', 'index.js')).href); }
+async function selfTest() {
+    const KIT = await loadKit(resolve(HERE, '..', '..'));
     const bad = [];
-    const eq = (name, got, want) => { if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
+    let n = 0;
+    const eq = (name, got, want) => { n++; if (JSON.stringify(got) !== JSON.stringify(want)) bad.push(`${name}: got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`); };
     const R3 = ['independent', 'guided', 'test'];
     const anchor = { key: 'addition:add_facts', templates: { fact: 8 }, roles: [...R3, 'fact-rows'], hosts: DEFAULT_HOSTS, hasCard: true };
     const stackA = { key: 'subtraction:sub_50_no_regroup', templates: { stack: 8 }, roles: R3, hosts: DEFAULT_HOSTS, hasCard: true };
@@ -261,7 +276,7 @@ function selfTest() {
     eq('eligible', [e1.eligible, e1.anchors], [true, [{ template: 'fact', anchor: 'addition:add_facts' }]]);
     // 2 a template that never passed
     const e2 = eligibility(sk('geometry:new_thing', { 'bar-model': 8 }), passed);
-    eq('template never passed', [e2.eligible, /template bar-model never passed/.test(e2.reasons[0])], [false, true]);
+    eq('template never passed', [e2.eligible, /drawing bar-model never passed/.test(e2.reasons[0])], [false, true]);
     // 3 a role the anchor's card does not offer
     const e3 = eligibility(sk('addition:add_facts_wp', { fact: 8 }, [...R3, 'word-problems']), passed);
     eq('role not offered', [e3.eligible, /role word-problems not on the anchor addition:add_facts's card/.test(e3.reasons[0])], [false, true]);
@@ -308,18 +323,39 @@ function selfTest() {
     eq('batch option values on their skill', vs.every((v) => sb.skills[0].pages.some((p) => p.option === v.option)), true);
     // ---- critic lf-tools r1 (each FAILs on f3ae7acca's rules)
     // B1: a drawing is template + payload discriminator; pv/kind=compare is not anchored by a skill that drew pv/kind=expand
-    eq('drawingOf pv compare', drawingOf('pv', { kind: 'compare', a: 34 }), 'pv/kind=compare');
-    eq('drawingOf word-work frames', drawingOf('word-work', { layout: 'frames', words: [] }), 'word-work/layout=frames');
-    eq('drawingOf no discriminator', drawingOf('fact', { a: 3, b: 4, op: '+' }), 'fact');
-    eq('drawingOf an object is not a discriminator', drawingOf('clock', { task: 'read', mode: { x: 1 } }), 'clock/task=read');
-    const pvAnchor = { key: 'placevalue:unit_form', templates: { 'pv/kind=expand': 8 }, roles: R3, hosts: DEFAULT_HOSTS, hasCard: true };
-    const pvc = eligibility(sk('placevalue:compare', { 'pv/kind=compare': 8 }), [...passed, pvAnchor]);
-    eq('B1 pv/compare vs pv/expand: NOT ELIGIBLE', [pvc.eligible, /template pv\/kind=compare never passed.*pv passed only as pv\/kind=expand/.test(pvc.reasons[0])], [false, true]);
-    eq('B1 pv/expand vs pv/expand: ELIGIBLE', eligibility(sk('placevalue:other', { 'pv/kind=expand': 8 }), [...passed, pvAnchor]).eligible, true);
+    // B1 / r2 D1 / D4: the drawing is the RENDERED skeleton (real kit, real payloads), not a hand-kept field list
+    const d = (t, p) => drawingOf(t, p, KIT);
+    const SUB = { operands: [48, 23], op: '-', ans: 25, regroup: false, answer: 'boxes', heads: true, ansDigits: 2, wideTracks: true };
+    const sub50 = d('stack', SUB);
+    eq('D4 stack: other digits, same drawing', d('stack', { ...SUB, operands: [36, 21], ans: 15 }), sub50);
+    eq('D4 stack: op * is a new drawing', d('stack', { operands: [81, 8], op: '*', ansDigits: 3 }) !== sub50 && d('stack', { ...SUB, op: '*' }) !== sub50, true);
+    eq('D4 stack: a missing-digit box is a new drawing', d('stack', { ...SUB, unknown: { row: 'a', index: 2 } }) !== sub50, true);
+    eq('D4 stack: a carry row is a new drawing', d('stack', { operands: [48, 37], op: '+', regroup: 'add', heads: false, answer: 'boxes', ansDigits: 2 }) !== d('stack', { operands: [48, 37], op: '+', regroup: false, heads: false, answer: 'boxes', ansDigits: 2 }), true);
+    eq('D4 stack: three addend rows is a new drawing', d('stack', { operands: [48, 37, 19], op: '+', regroup: false, heads: false, answer: 'boxes', ansDigits: 3 }) !== d('stack', { operands: [48, 37], op: '+', regroup: false, heads: false, answer: 'boxes', ansDigits: 3 }), true);
+    const stackA2 = { key: 'subtraction:sub_50_no_regroup', templates: { [sub50]: 8 }, roles: R3, hosts: DEFAULT_HOSTS, hasCard: true };
+    const mult = eligibility(sk('multiplication:mult_2by1_column', { [d('stack', { operands: [81, 8], op: '*', ansDigits: 3 })]: 8 }), [...passed, stackA2]);
+    eq('D4 stack op * vs op - anchor: NOT ELIGIBLE', [mult.eligible, /^drawing stack@\w+ .*never passed.*stack passed only as/.test(mult.reasons[0])], [false, true]);
+    eq('D4 stack op - (other digits) vs op - anchor: ELIGIBLE', eligibility(sk('subtraction:sub_copy', { [d('stack', { ...SUB, operands: [36, 21], ans: 15 })]: 8 }), [...passed, stackA2]).eligible, true);
+    const pvE = { keyValue: '400 + 30 + 1', kind: 'expand', n: 431, parts: [400, 30, 1], inPlace: true };
+    const pvC = { keyValue: '<', kind: 'compare', a: 722, b: 892 };
+    eq('B1 pv compare and pv expand draw differently', d('pv', pvC) !== d('pv', pvE), true);
+    const ck = { kind: 'read', h: 5, m: 5, precision: 5, ring: 'auto', numerals: 'all' };
+    eq('time: a clock read at 5:05 and 8:05 is one drawing; a draw-hands clock is another', [d('clock', ck) === d('clock', { ...ck, h: 8 }), d('clock', ck) !== d('clock', { ...ck, kind: 'draw' })], [true, true]);
+    const pvAnchor = { key: 'placevalue:unit_form', templates: { [d('pv', pvE)]: 8 }, roles: R3, hosts: DEFAULT_HOSTS, hasCard: true };
+    const pvc = eligibility(sk('placevalue:compare', { [d('pv', pvC)]: 8 }), [...passed, pvAnchor]);
+    eq('B1 pv compare vs pv expand anchor: NOT ELIGIBLE', [pvc.eligible, /drawing pv@\w+ never passed.*pv passed only as pv@/.test(pvc.reasons[0])], [false, true]);
+    eq('B1 pv expand (other number) vs pv expand anchor: ELIGIBLE', eligibility(sk('placevalue:other', { [d('pv', { ...pvE, n: 562, parts: [500, 60, 2], keyValue: '500 + 60 + 2' })]: 8 }), [...passed, pvAnchor]).eligible, true);
+    // r2 D1: the stack batch add_column_multi + add_missing_digit + sub_missing_digit (anchor sub_50_no_regroup) FAILS
+    const stB = [sk('addition:add_column_multi', { [d('stack', { operands: [48, 37, 19], op: '+', regroup: 'add', heads: false, answer: 'boxes', ansDigits: 3 })]: 8 }),
+        sk('addition:add_missing_digit', { [d('stack', { operands: [9, 88], op: '+', ans: 97, answer: 'solid', regroup: false, heads: false, unknown: { row: 'a', index: 2 } })]: 8 }),
+        sk('subtraction:sub_missing_digit', { [d('stack', { operands: [48, 23], op: '-', ans: 25, answer: 'solid', regroup: false, heads: false, unknown: { row: 'b', index: 1 } })]: 8 })];
+    const stBv = batchCheck(stB, stB.map((i) => eligibility(i, [...passed, stackA2])));
+    eq('D1 stack batch (column multi + missing digits) FAILS', [stBv.ok, stBv.reasons.filter((r) => /is not copy-light eligible/.test(r)).length], [false, 3]);
     // B1 batch: one shared TEMPLATE, each drawing anchored (mixed pv drawings with one never passed fail)
-    const pvB = [sk('pv:a', { 'pv/kind=expand': 8 }), sk('pv:b', { 'pv/kind=expand': 8 }), sk('pv:c', { 'pv/kind=compare': 8 })];
+    const PE = d('pv', pvE), PC = d('pv', pvC);
+    const pvB = [sk('pv:a', { [PE]: 8 }), sk('pv:b', { [PE]: 8 }), sk('pv:c', { [PC]: 8 })];
     eq('B1 batch with a never-passed pv drawing FAILS', batchCheck(pvB, pvB.map((i) => eligibility(i, [...passed, pvAnchor]))).ok, false);
-    const pvB2 = pvB.slice(0, 2).concat([sk('pv:d', { 'pv/kind=expand': 6, fact: 2 })]);
+    const pvB2 = pvB.slice(0, 2).concat([sk('pv:d', { [PE]: 6, fact: 2 })]);
     eq('B1 batch on pv, one skill also drawing fact', [batchCheck(pvB2, pvB2.map((i) => eligibility(i, [...passed, pvAnchor]))).ok, batchCheck(pvB2, pvB2.map((i) => eligibility(i, [...passed, pvAnchor]))).template], [true, 'pv']);
     // B6: a second drawing dealt rarely by an option value (item 5 of 8; then item 13) is found; 2 items would miss it
     const rare = (i) => (i === 5 || i === 13 ? 'pv/kind=support' : 'pv/kind=round');
@@ -347,9 +383,12 @@ function selfTest() {
     const newBrief = 'the four RUBRIC criteria: **C1 Ease of use** (alone), **C2 Educational value**, **C3 Spacing and layout** and **C4 Standard fidelity**. For C3 and C4 the inherited';
     eq('B4 the RUBRIC names pass', briefLint('b', newBrief, RN), []);
     eq('B4 a brief with no criteria line is not judged', briefLint('b', 'C1 something else', RN), []);
-    const n = 24 + 20 + 4;
+    // r2 D3: several skills in ONE copy-light run (not a batch): each skill's sample has all four widths
+    const D3 = buildSample([{ key: 'multiplication:mult_2by1_column', roles: R3, hosts: DEFAULT_HOSTS, variants: vs }, { key: 'addition:add_column_multi', roles: R3, hosts: DEFAULT_HOSTS, variants: [] }, { key: 'addition:add_missing_digit', roles: ['independent'], hosts: ['quiz'], variants: [] }], { cap: 12, shared: false });
+    eq('D3 copy-light, 3 skills: every skill has 1280, 1366, 820 and 1024', D3.skills.map((x) => [...new Set(x.pages.filter((p) => p.host !== 'print').map((p) => p.width))].sort()), [0, 1, 2].map(() => [1024, 1280, 1366, 820].sort()));
+    eq('D3 copy-light, 3 skills: the r2 dealing (widths across skills) is gone', D3.skills.every((x) => x.pages.filter((p) => p.width).length >= WIDTHS.length), true);
     for (const b of bad) console.log(`  self-test FAIL: ${b}`);
-    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length} of ${n})` : `OK (${n} cases: eligibility 9, batch 4, sample 11, critic lf-tools r1: drawing 8, rare scan 3, no card 2, widths 5, brief names 4)`}`);
+    console.log(`${TOOL} --self-test: ${bad.length ? `FAIL (${bad.length} of ${n})` : `OK (${n} cases: eligibility, batch, sample; critic lf-tools r1 drawing / rare scan / no card / widths / brief names; r2 D1 / D4 stack, pv and clock drawings from the rendered skeleton, D3 per-skill widths)`}`);
     return bad.length ? 1 : 0;
 }
 
@@ -369,7 +408,8 @@ async function loadApp(root) {
         const so = await import(M('skill-options.js'));
         const rp = await import(M('redesign-passed.js'));
         const roles = await import(M('sheet/roles/index.js'));
-        return { gq, data, pg, so, rp, allRoles: ['independent', 'more-practice', ...Object.keys(roles.ROLE_MODULES)], quiet };
+        const kit = await import(M('sheet/index.js'));
+        return { gq, data, pg, so, rp, kit, allRoles: ['independent', 'more-practice', ...Object.keys(roles.ROLE_MODULES)], quiet };
     } finally { Object.assign(console, quiet); }
 }
 
@@ -405,6 +445,7 @@ async function skillInfo(app, root, key) {
         }
     }
     const templates = {};
+    const labels = {};
     let items = 0;
     // each item's DRAWING (template + payload discriminators, B1); the defaults and EVERY option value scanned 8 items, more
     // while new drawings still turn up (scanDrawings, B6)
@@ -413,7 +454,10 @@ async function skillInfo(app, root, key) {
             try {
                 const q = app.gq.generateQuestionFor({ category: cat, skill: id, opts, seed: seed0 + i, itemIndex: i });
                 const c = q && app.pg.kitCellSpec(Object.assign({ skillId: id, categoryId: cat }, q));
-                return c ? drawingOf(c.template, c.payload) : 'legacy';
+                if (!c) return 'legacy';
+                const d = drawingOf(c.template, c.payload, app.kit, Object.assign({ skillId: id, categoryId: cat }, q));
+                if (!(d in labels)) labels[d] = drawingLabel(c.payload);
+                return d;
             } catch (e) { return 'error'; }
         }, 8, 24);
         items += r.items;
@@ -425,7 +469,7 @@ async function skillInfo(app, root, key) {
         variants.forEach((v, k) => scan(v.opts, 5000 + 100 * k));
     } finally { Object.assign(console, q); }
     return {
-        key, templates, items,
+        key, templates, labels, items,
         roles: hasCard ? plan.roles : app.allRoles.slice(),
         rolesFrom: hasCard ? `card ${plan.cards.join(', ')}` : cards.length ? `every buildSheet role (card ${cards.map((c) => c.file).join(', ')} has no §7a role lines)` : 'every buildSheet role (no signed card lists it: CLAUDE.md, any skill on any page type)',
         hosts: hostLines.length ? hostLines : DEFAULT_HOSTS.slice(),
@@ -437,7 +481,7 @@ async function skillInfo(app, root, key) {
 async function main() {
     const a = process.argv.slice(2);
     const get = (k) => { const i = a.indexOf(k); return i >= 0 && i + 1 < a.length && !/^--/.test(a[i + 1]) ? a[i + 1] : null; };
-    if (a.includes('--self-test')) process.exit(selfTest());
+    if (a.includes('--self-test')) process.exit(await selfTest());
     const root = resolve(get('--root') || process.env.MQ_ROOT || join(HERE, '..', '..'));
     // the brief name lint (B4): every critic brief's four criteria carry RUBRIC's names; run on every --skill / --batch too
     const lintBriefs = () => {

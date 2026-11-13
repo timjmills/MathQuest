@@ -50,7 +50,9 @@ export const ALLOW = {
     'tests/scripts/ws-teacher-preview.cjs': TEACHER_PHONE,
     'tests/scripts/ws-pdf-preview.cjs': TEACHER_PHONE + ' (the teacher PDF preview)',
     'tests/scripts/ws-simple-print.cjs': TEACHER_PHONE + ' (the teacher print dialog)',
-    'tests/scripts/ws-share-options.cjs': TEACHER_PHONE + ' (the teacher share dialog)',
+    // critic lf-tools r2 D2: its pupil steps (the Quick Start grid shot, the Direct Play landing and twelve practice-card
+    // answers) ran at 390 under this allow; they now run at 1024 x 768. Only the teacher steps keep 390.
+    'tests/scripts/ws-share-options.cjs': 'its 390 px lines are TEACHER steps only (the teacher Sets screen and the Mixed Settings dialog, SHOTS screenshots of the teacher\'s own phone layout); its pupil steps run at 1280 and 1024 x 768 (critic lf-tools r2 D2 moved them off 390). Dropping a teacher phone check is an owner / lead call',
 };
 /** The files to scan, from the plan sources' texts ({file: text}) and the files that exist (exists(path) -> bool). Pure. */
 export function scanList(sources, exists) {
@@ -81,6 +83,15 @@ export function readSource(text) {
         if (/['"`][^'"`]*\bcard-390\b[^'"`]*['"`]/.test(code) && !/\$\{/.test(code.match(/['"`][^'"`]*\bcard-390\b[^'"`]*['"`]/)[0])) hit('NP-HOST');
     });
     return out;
+}
+/**
+ * NP-PUPIL (critic lf-tools r2 D2): ALLOW is per file, so a pupil step at 390 inside a teacher-allowed file passed unseen
+ * (ws-share-options played twelve pupil practice-card questions at 390 under "no pupil screen host"). In an allowed file, a
+ * 390 finding whose line or the 6 lines above it name a pupil is NOT allowed. -> the findings that stay. Pure.
+ */
+export function pupilInAllowed(text, xs) {
+    const lines = String(text).split('\n');
+    return xs.filter((x) => /\b(pupil|student)s?\b/i.test(lines.slice(Math.max(0, x.line - 7), x.line).join('\n'))).map((x) => ({ ...x, rule: 'NP-PUPIL', text: `a pupil step at 390 in a teacher-allowed file: ${x.text}` }));
 }
 /** Findings on a doc: the RUBRIC host row / touch lines and the brief template. Pure. */
 export function readDoc(name, text) {
@@ -148,6 +159,11 @@ function selfTest() {
         ['a teacher phone test is allow-listed with a reason', typeof ALLOW['tests/scripts/ws-teacher-wrm.cjs'] === 'string' && ALLOW['tests/scripts/ws-teacher-wrm.cjs'].length > 40, true],
         ['the pupil explorer is NOT allow-listed (it is a pupil screen)', 'tests/scripts/ws-student-explorer.cjs' in ALLOW, false],
     ];
+    // r2 D2: a pupil step at 390 inside a teacher-allowed file is a finding (fac8e03a0's ws-share-options pupil 3)
+    const shareOld = "    // ---- pupil 3: the Direct Play link through the landing modal ----\n    const dPath = '/x';\n    const p3 = await open({ pagePath: dPath, viewport: { width: 390, height: 844, deviceScaleFactor: 1 } });";
+    const teacherOnly = "    // ---- teacher builds the set ----\n    if (SHOTS) {\n        await tp.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });";
+    scan.push(['D2 a pupil 390 step in an allowed file is NP-PUPIL', pupilInAllowed(shareOld, readSource(shareOld)).map((x) => x.rule).join(), 'NP-PUPIL']);
+    scan.push(['D2 a teacher 390 step stays allowed', pupilInAllowed(teacherOnly, readSource(teacherOnly)).length, 0]);
     for (const [name, got, want] of scan) if (got !== want) bad.push(`${name}: ${got}, want ${want}`);
     const total = cases.length + docs.length + libs.length + scan.length;
     for (const b of bad) console.log(`  FAIL ${b}`);
@@ -167,8 +183,14 @@ function main() {
     const allowed = [];
     for (const f of files) {
         read++;
-        const xs = readSource(readFileSync(join(root, f), 'utf8'));
-        if (ALLOW[f]) { if (xs.length) allowed.push(`${f} (${xs.length} line(s)): ${ALLOW[f]}`); continue; }
+        const text = readFileSync(join(root, f), 'utf8');
+        const xs = readSource(text);
+        if (ALLOW[f]) {
+            const pup = f === 'tests/scripts/ws-no-phone-width.mjs' ? [] : pupilInAllowed(text, xs);
+            for (const x of pup) findings.push({ file: f, ...x });
+            if (xs.length > pup.length) allowed.push(`${f} (${xs.length - pup.length} line(s)): ${ALLOW[f]}`);
+            continue;
+        }
         for (const x of xs) findings.push({ file: f, ...x });
     }
     for (const a of allowed) console.log(`  allowed  ${a}`);

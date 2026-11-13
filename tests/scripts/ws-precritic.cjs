@@ -373,7 +373,11 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const clLine = String(cl.stdout || '').trim().split('\n').pop();
     if (cl.status !== 0) { bad.push(['copy-light', clLine, 'OK']); console.log(String(cl.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')})`}`);
+    // ... and the drawing key's skeleton cases (critic lf-tools r2 D1) in ws-drawing-key --self-test
+    const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+    const dkLine = String(dk.stdout || '').trim().split('\n').pop();
+    if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -821,6 +825,9 @@ function buildPlan(ctx) {
         const clArgs = ctx.batch.length ? ['--batch', ctx.batch.join(','), ...(keys.filter((k) => !ctx.batch.includes(k)).length ? ['--skill', keys.filter((k) => !ctx.batch.includes(k)).join(',')] : [])] : ['--skill', keys.join(',')];
         if (ctx.copyLight) clArgs.push('--require', '--sample-out', ctx.samplePath, ...(ctx.sampleCap ? ['--sample-cap', ctx.sampleCap] : []));
         add(gate('copy-light', `ws-copy-light (copy-light eligibility${ctx.copyLight ? `, ${ctx.batch.length ? 'batch' : 'required'}; sample ${rel(ctx.samplePath)}` : ': report'})`, scope, 'node', 'ws-copy-light', clArgs, { missingMsg: 'ws-copy-light is not in this tree' }));
+        // (critic lf-tools r2 D1, the round-cap machine check) the copy-light DRAWING KEY is complete: for every registered sheet
+        // template, a payload field that changes the rendered skeleton changes the key (corpus payloads, one field mutated at a time)
+        add(gate('drawing-key', 'ws-drawing-key (every template: a skeleton change is a drawing-key change; critic lf-tools r2 D1)', 'every sheet template', 'node', 'ws-drawing-key', [], { missingMsg: 'ws-drawing-key is not in this tree' }));
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
@@ -956,7 +963,7 @@ function buildPlan(ctx) {
         const plans = cardPlans(keys);
         const carded = keys.filter((k) => plans[k] && plans[k].cards.length);
         // (every skill keeps the lesson / test / independent gate; a carded skill's other offered roles render in a gate of its own)
-        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; card-820 / 1024 targets >= 48 px)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
+        add(gate('render-gate', 'ws-grade-render --gate (lesson / test / independent pages at S, M, L: no overflow; answer boxes >= 48 px on the practice card, online worksheet and quiz at 820 / 1024)', `${scope} × lesson, test, independent × S/M/L + screen hosts`, 'browser', 'ws-grade-render',
             ['--skills', keys.join(','), '--roles', 'lesson,test,independent', '--size', 'S,M,L', '--gate', '--out', path.join(ctx.logs, 'render-gate')], { needFlags: ['gate'], parse: PARSE.gradeRender, expectUnits: keys.length }));
         const BASE_ROLES = ['lesson', 'test', 'independent'];
         // LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3: the npr Scripted Model's Say band ran 6 mm past
