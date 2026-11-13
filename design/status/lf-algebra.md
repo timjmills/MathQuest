@@ -3,12 +3,17 @@ Title: Lessons-first wave 1: the patterns and algebra skills of the CCSS BUILD l
 Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
-State: fix r9 done (merged master 8a7c5d43 + lf-ops' count-row fix); critic r2 grades the clean rows only (Precritic r9)
-Updated: 2026-11-13 r9 (merge master 8a7c5d43, drop 2cfeb1d7, cherry-pick 77187c6e8, precritic r9). Before: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
+State: fix r10 done (critic r2 G5 / G6 / G8 fixed; G11 + the rest handed by owner); precritic-clean rule + ws-patterns-cells added
+Updated: 2026-11-13 r10 (after critic r2: Fix-it letters, card feature tiles, growing two across at S, precritic-clean). Before: 2026-11-13 r9 (merge master 8a7c5d43, drop 2cfeb1d7, cherry-pick 77187c6e8, precritic r9). Before: 2026-11-13 (fix r8 after critic r1: hints off on Test / quiz, chart states progress, steps follow the preset and the lesson, growing title)
 Builder profile: mq-opus-medium
-Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
+Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-13 fix r10 (mq-opus-medium, rebuild after critic r2): ours fixed - G5 (pattern_features Fix-it letters), G6 (feature tiles
+  at the card's 10 / 11.5 / 13 mm), G8 (growing two across at S: 10 a page, was 5). G11 / F8 traced to lf-partopts' two transforms
+  (repro + patch below). New checks: ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S) and ws-precritic-clean (the lead's rule: a
+  clean list never names a page with an open critic finding or a role no print-lint ran on), both gates on precritic's --skill plan,
+  both backtested. See "Fixes after critic r2" and "Red, by owner" there.
 - 2026-11-13 fix r9 (mq-opus-low): merged origin/master 8a7c5d438 (74bff0abb); dropped the interim revert (af74c6b04 = git revert
   2cfeb1d7); cherry-picked lf-ops' 77187c6e8 onto master's reason-it (a2fecb0aa); count-row.js brought to -props' logic (b859e11a6:
   the restored columns-keyed train wrap overflowed the npr / fgr lesson chart); notice ringed-word room (a6b1e8151, EB-EDGE).
@@ -83,6 +88,7 @@ Critic rounds: 1 (r1 2026-11-13: all six FAIL; fix r8)
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r10 (critic r2 G5 Fix-it letters, G6 card feature tiles, G8 growing two across at S; ws-patterns-cells + ws-precritic-clean + backtests; precritic r10 the two skills), start 2026-11-13T10:10Z, end 2026-11-13T13:20Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r9 (merge master, revert + cherry-pick lf-ops 77187c6e8, precritic r9, count-row + notice fixes), start 2026-11-13T05:40Z, end 2026-11-13T09:00Z, profile mq-opus-low
 Times: fix r8 (critic r1 findings F1 F5 F6 F6b F7 + lead items + minors; precritic r8), start 2026-11-13T02:25Z, end 2026-11-13T04:55Z, profile mq-opus-medium (rebuild after a failed critic)
 Times: fix r7 (function-table lesson chart states + precritic), start 2026-11-13T01:36Z, end 2026-11-13T02:20Z, profile mq-opus-low
@@ -93,6 +99,280 @@ Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-m
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
+
+## Fixes after critic r2 (fix r10, 2026-11-13, mq-opus-medium)
+A finding closes only by a line here (ws-precritic-clean reads `- <ID> fixed`).
+- G5 fixed: pattern_features Error analysis - every feature sentence now prints its letter A / B / C (sheet/cells/notice.js
+  sentenceList: a `mq-nt-letter` beside each [sentence][box] pair, `data-ws-letter`). On paper the letter hangs in the item-tab
+  keep-out, so the sentences keep their width (a letter column inside the width wrapped them and EA S fell from 6 items to 4); on
+  screen it takes a narrow column outside the pair, so wireTickBoxes still reads each row by its sentence. Not on the anchor chart's
+  64 mm state (ntTight). Nothing was needed from lf-roles: roles/error-analysis.js choicesOf already offers "the letter the item
+  prints beside the option". Check: ws-patterns-cells LABEL-REF (S / M / L, paper and screen).
+- G6 fixed: the feature track tiles are the card's §3 size, square: S 10, M 11.5, L 13 mm (+2.5 mm wide for 3 digits), from
+  `FEATURE_TILE_MM` in notice.js; the anchor-chart state keeps its 9 x 8.5 mm picture tiles (a fixed 64 mm drawing nobody writes in).
+  Check: ws-patterns-cells TILE-CARD (reads the card's sentence, measures the Test-state working tiles at S / M / L).
+- G8 fixed: growing practice pages at S print two cells across (independent / more practice / test / review S 2 x 5 = 10, was
+  1 x 5; guided S 2 x 4). Cause: the half-width cell wrapped the 4-term row 2 + 2 behind a fixed tab + 1 mm left keep-out (row 82.8 mm
+  + 6 mm in an 86 mm cell); the bridge measured that as a reflow and held S to one column. Now the keep-out is
+  `clamp(0mm, 100% - row, tab + 1 mm)`: a full-width cell keeps it, a two-across cell keeps what is left beside the row (the Term
+  labels are centred over 19.5 mm boxes, clear of the tab). Unit kept at S 2.5 / M 2.8 / L 3.3 mm and every term box 7.8 u (card
+  §3); the Term 4 box stays the card's 19.5 mm at S (a bigger Term 4 box would tell its size, L3). Check: ws-patterns-cells ROW2-S
+  (node); in the browser ws-columns --templates growing-pattern --sizes S reaches 2 (proposed for the plan).
+- G11 / F8 handed (not fixed): see "Red, by owner -> lf-partopts".
+- Lead rule (after critic r2): ws-precritic-clean + gate precritic-clean; backtest row precritic-clean-list.
+
+### Red, by owner (after critic r2)
+- **lf-partopts** (teacher-preview.js, skill-options-ui.js): **G11 / F8, option-panel sample blank** on growing_shape_patterns and
+  pattern_features. Repro: 1280 x 1000, teacher mode, Sets, the skill's Options button (ws-options-shots), then read
+  `#skillOptionsPopover .tv-sko-frame > .tvp-stage` after 1.5 s. The frame is 398 x 140 px. teacher-preview `fit()` finds
+  s = min(1, fw / w, fh / h) under MIN_LEGIBLE 0.3 (growing stage 380 x 730 px, s = 0.17; pattern_features 400 x 423, s = 0.298), fh < 200
+  and no `.tvp-pop`, so it adds `is-cropped` (stage left / top 6 px, transform-origin top left) with `scale(0.45)`. skill-options-ui
+  `_tidySample` (at once and again at +950 ms) then sets `translate(-50%, -50%) scale(k)` on the same stage WITHOUT removing
+  `is-cropped`: the stage lands at (-183, -358) px in the frame (pattern_features (-193, -205)) and nothing is visible. notice (s 0.55)
+  and function_table (0.42) are never cropped, so they show. Our part: the screen twins are tall by design (growing: 3 terms + the
+  308 px Term 4 tap grid of 44 px targets; pattern_features: rule, track, 3 sentences wrapped in the 400 px stage) - nothing in our
+  cells has a percent svg width or a missing intrinsic size (the term svgs sit in fixed-size boxes). Proposed patch (two lines):
+  (1) teacher-preview.js fit(): `if (s < MIN_LEGIBLE && fh < 200 && !frame.closest('.tvp-pop, .tv-sko-sample'))` - the options
+  panel shows the whole problem, as the pinned preview does (owner 2026-10-30); (2) skill-options-ui.js _tidySample, before setting
+  the transform: `frame.classList.remove('is-cropped');`. Proposed check: ws-options-shots as a gate - after 1.5 s the stage's rect
+  lies inside the frame's (or covers >= 90 % of it) and the frame crop holds ink (> 0.5 % dark pixels); backtest on d20c8a003
+  (growing, pattern_features) must FAIL.
+- **lf-ops**: G1 (= r1 F2) the npr / fgr screen count-row train on card and worksheet (wrap 4 + 4, box overlap, caption overprint,
+  18-20 px digits, rule box clipped). Proposed check (critic): ws-screen-slots BOX-OVERLAP / TEXT-OVERLAP / CELL-CLIP + a digit-px
+  floor per host.
+- **lf-roles**: G2 error analysis L "wrote" train vs rewrite train not aligned (npr, fgr; check EA-ALIGN); G3 npr Reason It S 2 where
+  fgr holds 3 (ws-capacity-pin SIBLING-SIZE); G4 Reason It one item a page (ft M / L, pf S / M / L, growing S / M / L: A and B stack
+  full width; side by side fits; check: ws-print-lint --roles reason-it,true-false,error-analysis LONE + PAGEFILL on precritic's path);
+  G10 growing scripted model S two pages about 55 % used (size the state to its content; check: PAGEFILL on --roles scripted-model).
+- **lf-engine**: G7 growing lesson p2 warm-up cells 54 % empty band (H13) and p4 43-46 % used (H5; 6 practice items split 4 + 2).
+  Note: precritic r9's lesson print-lint (S and L) PASSED these pages, so that lint missed both - it needs a backtest on the critic
+  r2 PNGs (lesson-S-p2.png, lesson-S-p4.png, lesson-L-p4.png).
+- **quiz host (screen-cell / quiz)**: G9 growing quiz Term labels about 8.6 pt, the drawing scaled to about 55 % of the card (check:
+  ws-screen-ink-size TEXT-PT >= 15 px on the quiz host).
+- **lead (note, not a critic finding)**: the pattern_features practice card shows the three sentence buttons under the tick rows
+  (two answer areas, VQ-2); it was so on d20c8a003 too (critic r2 graded the card 8): q.options was set on the lead's r8 request.
+
+## Critic r2 (2026-11-13, mq-opus-medium, independent; HEAD d20c8a003): no skill passes; notice_patterns clean on its graded pages
+Copied from the verdict (scratchpad critic-r2/verdict.md; PNGs in r/ and panels/ beside it).
+
+Branch claude/sweet-newton-c8wrv1-lf-algebra, HEAD d20c8a003. Grading date 2026-11-13.
+Renders: `ws-grade-render --roles lesson,scripted-model,guided,independent,more-practice,review,test,mixed-practice,error-analysis,true-false,reason-it --size S,M,L` plus the screen hosts. It was one browser run, 538 pages, 1449 s. Log: `log-render.txt`.
+PNG root: `/tmp/claude-0/-home-user-MathQuest/ddf8a20a-aa76-5111-8f71-96dbc22bf54b/scratchpad/critic-r2/r/<category>__<skill>/<role>-<S|M|L>-p<n>.png`. The screen PNGs are `card-1280/820/390.png`, `worksheet-1280.png` and `quiz-1280.png`.
+Option panels: `critic-r2/panels/*.png`. These come from a scratch copy of ws-options-shots with its output path redirected, so no repo file was written. `git status` is clean.
+Every function-table page was re-rendered, so the lf-roles 3.6 mm wrapper move is included.
+
+Scores are C1 ease, C2 teaching, C3 spacing and C4 standard. Each score is the lowest across S, M and L unless a size is named. A page passes only at 8 or more on all four.
+
+### Verdict
+
+| Skill | Graded pages | Result | What fails |
+|---|---|---|---|
+| algebra:function_table_easy | independent, test, more-practice, error-analysis, true-or-false, reason-it, card, worksheet, panel | **FAIL** | Reason It at M and L puts one item on the page (H5, G4). Every other graded page passes. |
+| patterns:number_patterns_rule | independent, test, reason-it, error-analysis, true-or-false, card, worksheet, panel | **FAIL** | F2 is still open: the practice card and the worksheet fail (G1). Error analysis L has misaligned trains (G2). Reason It S holds 2 where its preset holds 3 (G3). |
+| patterns:follow_given_rule | same set | **FAIL** | F2 is still open on the card and the worksheet (G1). Error analysis L has misaligned trains (G2). |
+| patterns:notice_patterns | independent, test, error-analysis, true-or-false, reason-it, card, worksheet, panel | **PASS on the graded pages** | None. The skill still needs its NOT GRADED pages (lesson, model, guided, quiz) before it can pass overall. |
+| patterns:pattern_features | independent, test, error-analysis, true-or-false, reason-it, card, worksheet, panel | **FAIL** | Error analysis: the Fix-it row asks for A / B / C, but the sentences carry no letters (H2, G5). Reason It has one item a page at every size (H5, G4). On the Test at S the working tiles are 8.7 mm (G6). The panel sample is blank (G11). |
+| patterns:growing_shape_patterns | every print role, card, worksheet, quiz, panel | **FAIL** | Lesson p2 has warm-up cells 54 % empty (H13) and lesson p4 is 43 % used (H5) (G7). Reason It has one item a page (H5, G4). Practice pages at S use 45 % of the row width and give a 17.5 mm box to draw in (G8). Quiz labels are 8.6 pt (G9). The model at S is two pages about 55 % used (G10). The panel sample is still blank (F8 / G11). |
+
+No skill passes. notice_patterns is clean on every page this round could grade.
+
+### Score tables
+
+#### algebra:function_table_easy
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Independent S / M / L | 9 | 8 | 8 | 9 | S 12, M 6, L 6. The wrapper sits at the top. L cells keep a 28 % bottom band, just under H13 (independent-L-p1.png). At S, item 9's table sits 6 px above items 10-12 in row 3 (minor). |
+| More practice | 9 | 8 | 8 | 9 | Same as independent. The L bottom band is 28 % (more-practice-L-p1.png). |
+| Test + key | 9 | 9 | 8 | 9 | No worked column. The S key was read item by item and is correct (test-S-key-p1.png). The L bottom band is 28 %. |
+| Error analysis | 8 | 8 | 8 | 8 | Three right, three wrong, one wrong cell each. The wrong items are rule-twice (7 + 4 + 4 = 15, M-FT4) and a digit slip (10 → 1). Bands are 20 % / 21 %. |
+| True or false | 8 | 8 | 8 | 8 | 2 true : 2 false. The Answer line asks for every Out (a writing load, but a role decision). |
+| Reason It S | 8 | 8 | 8 | 8 | 2 items (reason-it-S-p1.png). |
+| Reason It M / L | 8 | 8 | **5** | 8 | **G4 / H5:** one item on the page (log `reason-it-M 1x1`, `reason-it-L 1x1`). The cell has about 19 % empty above the panels and 19 % below, and the page ends about 12 % early (reason-it-L-p1.png). |
+| Practice card 1280 / 820 / 390 | 8 | 8 | 8 | 8 | Digits are big. In-column digits sit low in their rows ("6" is 6 px off the rule; card-1280.png). Minor. |
+| Online worksheet | 8 | 8 | 8 | 8 | Even cells. The rule text is about 12 pt. |
+| Option panel | 8 | 8 | 8 | 8 | The Task select still truncates "write each Ou", but the full text prints right under it. The sample is a small thumbnail. |
+
+#### patterns:number_patterns_rule (default options)
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Independent S / M / L | 8 | 8 | 8 | 8 | S 9: two ÷ items sit two-up, then 7 full rows. The key is correct (independent-S-key-p1.png). Slots fit 3 digits. Minor: "Rule: add / subtract" prints the operation word, so the pupil supplies only the step. |
+| Test + key | 8 | 8 | 8 | 8 | The key was checked on all 8 items, including ×2: 15, 30, 60 → 120, 240, 480 (test-S-key-p1.png). |
+| Error analysis S | 8 | 8 | 8 | 8 | Item 1's right band is about 40 % of the cell width (the short ÷ train). Under H13 for its row. Minor. |
+| Error analysis L | 8 | 8 | **7** | 8 | **G2:** the "Sam wrote:" train starts at x 120, but the "Fix it: write it again" train starts at x 60. The pupil cannot compare the two box by box. The cell also has a 65 px empty band at the top (error-analysis-L-p1.png). |
+| True or false | 8 | 8 | 8 | 8 | 2 : 2 (true-false-S-p1.png). The key leaves True items' Answer line blank; the pupil instruction does not say "if false" (role wording). |
+| Reason It S | 8 | 8 | **7** | 8 | **G3:** 2 items with about 20 % empty bands above and below the panels. The preset follow_given_rule holds 3 at S with the same count-row cell (reason-it-S-p1.png against follow_given_rule/reason-it-S-p1.png). PT-RSN-1 wants 4 / 3 / 2. |
+| Reason It M / L | 8 | 8 | 8 | 8 | |
+| Practice card 1280 / 820 / 390 | **5** | 7 | **5** | 7 | **G1 = F2 still open:** the 8-box train wraps 4 + 4. Digits are about 18-20 px against a 40 / 56 px floor. The rule box's bottom edge is clipped by the cell frame (card-1280.png, card-390.png). |
+| Online worksheet | **4** | 7 | **4** | 7 | **G1, H2:** the 4th box of row 1 overlaps the 2nd row. "After each number, press Space." is overprinted by boxes in cards 2, 4, 5 and 6. Card 3 (÷) is drawn at a different scale (worksheet-1280.png). |
+| Option panel | 8 | 8 | 8 | 8 | The sample shows the wrapped train (the screen defect, counted under G1). |
+
+#### patterns:follow_given_rule (preset, default options)
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Independent S / M / L | 8 | 8 | 8 | 8 | S 10. Item 10's train is offset 7 px right (minor; independent-S-p1.png). |
+| Test + key | 8 | 8 | 8 | 8 | The L key was checked on all 8 items (test-L-key-p1.png). |
+| Error analysis S / M | 8 | 8 | 8 | 8 | |
+| Error analysis L | 8 | 8 | **7** | 8 | **G2**, the same as npr (error-analysis-L-p1.png). |
+| True or false | 8 | 8 | 8 | 8 | 3 false : 2 true (true-false-S-p1.png). |
+| Reason It | 8 | 8 | 8 | 8 | S holds 3 (reason-it-S-p1.png). |
+| Practice card | **5** | 7 | **5** | 7 | **G1 / F2**, as for npr. |
+| Online worksheet | **4** | 7 | **4** | 7 | **G1 / F2**: boxes overlap and the caption is overprinted (worksheet-1280.png). |
+| Option panel | 8 | 8 | 8 | 8 | |
+
+#### patterns:notice_patterns
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Independent S / M / L | 9 | 8 | 8 | 9 | The hint (on by default, P5) is grey under the factors (independent-L-p1.png). |
+| More practice | 9 | 8 | 8 | 9 | |
+| Test + key | 9 | 9 | 8 | 9 | **F1 fixed:** there is no even / odd hint on the Test. The S key was checked on all 15 items (7 odd, 8 even). Minor: a ringed word shifts about 8 px sideways on the key (test-S-key-p1.png). |
+| Error analysis | 8 | 8 | 8 | 8 | Bands are 21 % / 21 %. Minor: the Fix-it order is "Odd, Even" while the item order is "Even, Odd" (error-analysis-S-p1.png). |
+| True or false | 8 | 8 | 8 | 8 | 3 : 3. |
+| Reason It | 8 | 8 | 8 | 8 | 2 a page at S and L. The page is 85 % used. |
+| Practice card | 8 | 8 | 8 | 8 | The card still drops "Tap one." (r1 minor; the worksheet and the quiz have it). |
+| Online worksheet | 8 | 8 | 8 | 8 | The hint words are now grey on screen (r1 paper ≠ screen minor fixed). |
+| Option panel | 8 | 8 | 8 | 8 | |
+
+#### patterns:pattern_features (preset)
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Independent S / M / L | 8 | 8 | 8 | 8 | Exactly one true sentence per item, checked on all 4 at L. At L a short sentence ends about 105 mm before its tick box (minor). |
+| More practice | 8 | 8 | 8 | 8 | |
+| Test S | **7** | 8 | 8 | 8 | **F1 fixed:** only the start number is printed. **G6:** the pupil must now write five numbers in working tiles 33 px = 8.7 mm wide. Card §3 says 10 mm, and the writing-room floor is 14 mm (test-S-p1.png). Key correct, 8/8. |
+| Test M / L | 8 | 8 | 8 | 8 | L tile 40 px = 10.6 mm, against 13 mm on the card (note). |
+| Error analysis | **4** | 7 | 8 | 8 | **G5 / H2:** "Fix it [ ] A [ ] B [ ] C", but the three sentences are not lettered A / B / C. The pupil cannot say which one is right (error-analysis-S-p1.png, error-analysis-L-key-p1.png). The key marks by position and is correct. |
+| True or false | 8 | 8 | 8 | 8 | 3 : 3 (true-false-S-p1.png). |
+| Reason It S / M / L | 8 | 8 | **5** | 8 | **G4 / H5:** one item a page at every size. A and B are stacked full width; side by side they fit (a 6-tile track is about 85 mm). The cell has about 19 % empty above the panels (reason-it-S-p1.png). |
+| Practice card / worksheet | 8 | 8 | 8 | 8 | |
+| Option panel | **4** | 7 | 8 | 8 | **G11:** the Sample question box is blank (panels/patterns-pattern_features.png). This is a regression from r1. "Numbers to: 100 (tables to 10 × 10)" still names tables on a pattern page (r1 minor). |
+
+#### patterns:growing_shape_patterns
+| Page / host | C1 | C2 | C3 | C4 | Note |
+|---|---|---|---|---|---|
+| Lesson anchor p1 | 8 | 8 | 8 | 8 | The states progress (state 3 traces Term 4). The purple accent is allowed under INK-30. |
+| Lesson p2 (vocab, warm-up, guided) S / M / L | 8 | 8 | **6** | 8 | **G7 / H13:** the warm-up cells (7 + 6, 18 − 7) leave a 115 px = 54 % empty band under the sum, measured at S. L is the same at about 50 % (lesson-S-p2.png, lesson-L-p2.png). The page also ends about 18 % early with one guided item. |
+| Lesson p3-p4 S / M / L | 8 | 8 | **5** | 8 | **G7 / H5:** 6 practice items split 4 + 2. p4 is 43 % (S, M) and 46 % (L) used (lesson-S-p4.png). Items 2 and 3 on p3 are both +1 lines (3, 4, 5 and 2, 3, 4). |
+| Scripted model S | 8 | 8 | **7** | 8 | **G10:** two pages, 56 % / 54 % used. Each state is 62 mm tall around 49 mm of content, and 4 × 49 mm plus the Say band fits one page at S (scripted-model-S-p1/p2.png). The Say band is whole. State 3 ("Draw Term 3 again and add 2") still shows an empty Term 4. |
+| Scripted model M / L | 8 | 8 | 8 | 8 | 2 pages, 59-69 % used. 2 × 2 is impossible under the F4 ruling and 4 states do not fit one column. |
+| Guided S / M / L | 8 | 8 | 8 | 8 | Steps match the anchor's four. The hint line fades after item 2. M / L run to 2 pages and are full. |
+| Independent / more practice S | **7** | 8 | **7** | 8 | **G8:** the 4-term drawing takes 313 of 698 px (45 %) of each full-width row, with side bands of 29 % and 26 %. Two items across would hold 10, not 5. The Term 4 box is 7 × 2.5 mm = 17.5 mm square for up to 19 hand-drawn dots (independent-S-p1.png). |
+| Independent / more practice M / L | 8 | 8 | 8 | 8 | L drawing is 60 % of the row and the box is 23 mm. |
+| Review S / M / L | 8 | 8 | 8 | 8 | **F7 fixed:** the title reads "Review: finding the next term of a growing pattern". The S row has the same 45 % width use as G8, but the review mixes in a 3-up spiral row, so it is graded 8. |
+| Test + key S | **7** | 8 | **7** | 8 | **F1 fixed** (counts hidden, thin count boxes to write). **F7 fixed.** G8 as independent S. The S key was checked on all 5 items: 13, 10, 8, 12, 15. |
+| Test M / L | 8 | 8 | 8 | 8 | test-L-p1.png |
+| Error analysis | 8 | 7 | 8 | 8 | Every wrong item is M-G2 (doubles the last term). M-G1, M-G3 and M-G4 never appear (error-analysis-S-p1.png). Minor: 7. |
+| True or false | 8 | 8 | 8 | 8 | 3 a page at S and M. |
+| Reason It S / M / L | 8 | 8 | **5** | 8 | **G4 / H5:** one item a page at every size. A and B are stacked full width, and at S each train is 315 px, so side by side fits (reason-it-S-p1.png). |
+| Practice card 1280 / 820 / 390 | 8 | 8 | 8 | 8 | Screen dot pitch is 19 px = 5.0 mm, at or above the print unit. |
+| Online worksheet 1280 | 8 | 8 | 8 | 8 | **Unit ruling applied** (SIZE-WIDTH not counted): measured dot pitch 12.5 px = 3.3 mm at 96 dpi (card 4, Term 3 row: runs at 939 / 951 / 964 / 976 / 989 / 1001 px). Print unit is S 2.5 / M 2.8 / L 3.3 mm, so the worksheet unit equals L print and exceeds S and M. The r1 "dots ~6 px" remark does not hold (dot diameter about 10 px). Minor: the worksheet says "Make Term 4 on the grid. Type how many it has." while the card says "Look at Terms 1, 2 and 3. How many dots does Term 4 have?". |
+| Quiz 1280 | **7** | 8 | 8 | 8 | **F1 fixed** (no counts in the quiz). **G9:** the drawing is scaled to about 55 % of the card. The "Term 1-4" labels are 8 px cap height, about 11.5 px / 8.6 pt, under the 11 pt reading floor (quiz-1280.png). |
+| Option panel | **4** | 6 | 7 | 8 | **F8 / G11 still open:** the Sample question box is blank, although its DOM holds "Term 1 \| 5 \| Term 2 \| 7 …" (log-panels.txt). |
+
+### Findings, each with the automatic check that would catch it
+
+- **G1. F2: the screen count-row train (npr, fgr), still open.** Owner: lf-ops, per precritic r9.
+  - What it is: the train wraps 4 + 4 on the card and the worksheet. On the worksheet the 4th box of row 1 overlaps row 2, and the caption is overprinted. Card digits are about 18-20 px against a 40 / 56 px floor. The rule box's bottom border is clipped by the cell frame.
+  - PNGs: r/patterns__number_patterns_rule/card-1280.png, card-390.png, worksheet-1280.png; r/patterns__follow_given_rule/worksheet-1280.png.
+  - Why it got through: precritic r9 called the card and worksheet "clean" because ws-screen-slots, chromebook-fit and phone-card measure slot size and scroll, not overlap.
+  - **Check:** add three probes to ws-screen-slots:
+    - BOX-OVERLAP: any two `data-mq-cell` inputs intersect.
+    - TEXT-OVERLAP: a text node's rect intersects a slot.
+    - CELL-CLIP: a slot's rect extends past its cell's clientRect.
+  - Add a digit-px floor per host: card 40 / 48 / 56, worksheet 29. Backtest on d20c8a003; it must fail.
+- **G2. Error analysis L: the "wrote" train and the rewrite train are not aligned (npr, fgr).** Owner: lf-roles (EA role) or the count-row cell.
+  - What it is: x 120 against x 60, plus a 65 px top band.
+  - PNGs: r/patterns__number_patterns_rule/error-analysis-L-p1.png, r/patterns__follow_given_rule/error-analysis-L-p1.png.
+  - **Check:** ws-cell-checks EA-ALIGN. In an error-analysis cell, the first slot of the pupil-work block and the first slot of the "write it again" block share their x-origin within 1 mm.
+- **G3. npr Reason It S holds 2 where follow_given_rule holds 3 with the same cell.** Owner: lf-roles / count-row footprint.
+  - **Check:** ws-capacity-pin SIBLING-SIZE. A preset and its host on the same template and role must have the same S capacity (or the gap is pinned with a reason). Also add PT-RSN-1: when the rendered item height × (n + 1) fits the body at S, n is under capacity.
+- **G4. Reason It: one item on a page (ft M / L, pf S / M / L, growing S / M / L; H5).** Owner: lf-roles (Reason It "which is correct" layout).
+  - What it is: A and B stack full width whenever the drawing is wider than a half panel's rule, and each cell keeps about 19 % empty above the panels. pf's 6-tile track (about 85 mm) and growing's S train (about 83 mm) fit side by side in two 88 mm panels.
+  - PNGs: r/patterns__pattern_features/reason-it-S-p1.png, r/patterns__growing_shape_patterns/reason-it-S-p1.png, r/algebra__function_table_easy/reason-it-L-p1.png.
+  - Why it got through: precritic does not lint the Reason It role for LONE / PAGEFILL.
+  - **Check:** ws-print-lint `--roles reason-it,true-false,error-analysis` with LONE + PAGEFILL on precritic's path, and an EB-BAND on the space above the A panel.
+- **G5. pattern_features error analysis: Fix-it offers A / B / C, but the sentences are unlettered (H2, C1 ≤ 4).** Owner: lf-algebra (patterns provider / notice cell `feature` in the EA adapter) or lf-roles if the EA role adds the letters.
+  - PNGs: r/patterns__pattern_features/error-analysis-S-p1.png, error-analysis-L-key-p1.png.
+  - **Check:** ws-cell-checks LABEL-REF. Every choice label printed in a Fix-it row (A, B, C …) must also be printed as a label inside the same cell's item.
+- **G6. pattern_features working tiles are smaller than card §3 (S 8.7 mm against 10; L 10.6 mm against 13).** On the Test the pupil writes in them.
+  - PNG: r/patterns__pattern_features/test-S-p1.png.
+  - **Check:** ws-card-rulings numeric `featureTileMm` measured from the printed cell rect at S / M / L against §3 (10 / 11.5 / 13), and a writing-room floor for any tile the Test leaves empty.
+- **G7. Growing lesson pages.** Owner: lf-engine (lesson.js).
+  - p2: warm-up cells keep a 54 % empty band (H13).
+  - p4: the 6 practice items split 4 + 2, so the last page is 43-46 % used (H5) at S, M and L.
+  - PNGs: r/patterns__growing_shape_patterns/lesson-S-p2.png, lesson-S-p4.png, lesson-L-p4.png.
+  - Why it got through: precritic r9 reported print-lint lesson S / L as PASS for growing, so its lint missed both.
+  - **Check:** backtest ws-print-lint lesson H13 (warm-up cells) and PAGEFILL on this render. Make the lesson packer balance the practice count to the page capacity (6 → 5 + 5, or 4 + 4).
+- **G8. Growing practice pages at S: half the row is blank and the draw box is 17.5 mm.** Owner: lf-algebra (growing-pattern footprint / columns at S).
+  - What it is: on independent, more practice and test at S, the drawing is 45 % of the row width, with side bands of 29 % and 26 %. S holds 5 where two across would hold 10. Term 4's 7 × 7 box is 17.5 mm for up to 19 hand-drawn dots.
+  - PNGs: r/patterns__growing_shape_patterns/independent-S-p1.png, test-S-p1.png.
+  - **Check:** ws-empty-band EB-SIDE-SUM. Fail when left + right side bands of a cell are ≥ 50 % of its width while two items fit across. Add a DRAW-ROOM ruling: the Term 4 box ≥ 4 mm × the largest Term 4 column count.
+- **G9. Growing quiz: Term labels about 8.6 pt; the drawing is scaled to about 55 % of the card.** Owner: quiz host / screen-cell.
+  - PNG: r/patterns__growing_shape_patterns/quiz-1280.png.
+  - **Check:** ws-screen-ink-size TEXT-PT on the quiz host. Any text node inside the cell must be ≥ 15 px.
+- **G10. Growing scripted model S: two pages about 55 % used, where one page fits.** Owner: lf-roles.
+  - What it is: 4 states × 49 mm of content plus the Say band fits about 240 mm. This is not F4 (no 2 × 2 asked); the fix is to size the state to its content at S.
+  - PNG: r/patterns__growing_shape_patterns/scripted-model-S-p1.png, scripted-model-S-p2.png.
+  - **Check:** ws-print-lint PAGEFILL on `--roles scripted-model` at S (r1 speed item 1, still not on precritic's path).
+- **G11. Option-panel sample blank (growing: F8 still open; pattern_features: new regression).** Owner: lf-algebra / skill-options panel.
+  - What it is: the DOM has the text, but nothing is drawn.
+  - PNGs: panels/patterns-growing_shape_patterns.png, panels/patterns-pattern_features.png.
+  - **Check:** turn ws-options-shots into a gate. Assert that the sample element has a non-zero bounding box and that the screenshot crop holds ink pixels (> 0.5 % dark).
+
+Minors (none fails alone):
+- ft: S row-3 item 9 is offset 6 px.
+- ft: L bottom band is 28 %, close to H13.
+- ft: card digits sit low in their rows.
+- notice: the card has no "Tap one."
+- notice: ringed words shift on the key.
+- notice: the EA Fix-it order is reversed.
+- count-row EA wrong answers read oddly ("14, 20, 20, 23": skip-then-repeat).
+- growing EA uses only one misconception.
+- pf L tick boxes sit about 105 mm from short sentences.
+- growing card and worksheet prompts differ.
+
+### r1 findings re-verified on the r2 renders
+
+| r1 | Status | Evidence |
+|---|---|---|
+| F1 hints on Test / quiz | **FIXED** | notice test (S and L, no hint) and notice quiz (no hint); pf test (start only); growing test (counts hidden) and growing quiz (no counts). |
+| F2 screen train | **OPEN** | Worse on the worksheet: boxes overlap. npr / fgr card-1280, card-390 and worksheet-1280 (G1). |
+| F3 Say band clipped (npr model L) | **OPEN** (page not graded) | crop-npr-model-L-say.png: the Say line is still cut by the frame. |
+| F4 model on two half pages | **DROPPED** by the lead | Growing S is filed as G10, a different fix. |
+| F5 anchor states never show their step | **ft FIXED**; **npr OPEN** (not graded) | small-ft-lesson.png progresses. small-npr-lesson.png: states 1-3 are the same picture, and "Write 4" / "Write 15" are never shown. |
+| F6 pf guided parity steps | **FIXED** | crop-pf-guided-S.png: "Read the rule. Write the numbers / Test a sentence / Test the next one / Check the true one". |
+| F6b guided steps ≠ lesson steps | **notice FIXED** | crop-notice-guided-S.png matches the anchor's four. npr guided was not opened (not graded). |
+| F7 growing title "drawing and count" | **FIXED** | test-L-p1.png, review-S-p1.png: "finding the next term of a growing pattern". |
+| F8 growing panel sample blank | **OPEN**, and now also on pattern_features | G11. |
+| F9 minors | slot width: npr now sizes slots from the band's widest number (OK). notice hint grey on screen: FIXED. Growing worksheet dots: OK at 3.3 mm. notice lesson "40": FIXED (step 4 rings Even, no product). ft review L stub: not re-graded (review not in scope). | |
+
+### NOT GRADED (red in precritic r9, owner named)
+
+- Lesson pages of function_table_easy, npr, fgr, notice and pattern_features. Owner: lf-engine / lf-ops (chartWide packing, count-row chart overflow). The growing lesson was graded because r9 had it green.
+- Scripted model and guided of ft, npr, fgr, notice and pattern_features. Owner: lf-roles. Growing's model and guided were graded, as its brief line says every print page type.
+- Pre-skill-check, all six skills. Owner: lf-roles (EB-SIDE word-work).
+- Quiz host of ft, npr, fgr, notice and pattern_features. Owner: the quiz host (EB-SIDE legacy cell). The growing quiz was graded.
+- Sections pages-2. Owner: the section engine.
+- Growing worksheet 1280 SIZE-WIDTH. This is the gate gap the lead ruled on. The worksheet was graded on unit size instead (see the growing table: 3.3 mm, which passes).
+- sibling-compare and screen-support-eq. Owner: lf-checks.
+- Not offered or out of scope: mixed-practice (card §7a: graded on the mixed-pages card); review on ft / npr / fgr / notice / pf (not in the brief's list); option pages other than the defaults for npr / fgr (places ≥ 100, shape circle / hex / mixed; lf-ops).
+
+### Speed reflection
+
+1. **A precritic "clean" list is not an evidence list.** Three of the five failure classes this round sat on pages precritic r9 called clean:
+   - G1: F2 was known and still listed as clean.
+   - G4: Reason It LONE.
+   - G7: growing lesson H13 / PAGEFILL.
+
+   Rule: a page is "clean for the critic" only when every r1 finding on that host or role is closed. Precritic should read the r1 table and refuse to list a page that has an open finding.
+2. **Role-level lints still run on the lane's two favourite roles only.** G4, G7 and G10 are the r1 speed item 1 again: LONE / PAGEFILL / H13 must run on every role the card offers (§7a). Make ws-precritic-plan derive the roles from the card, and backtest it against these PNGs.
+3. **Shared roles need a cross-skill sweep.** G4 hits three skills and G2 hits two, through one role. A single `ws-print-lint --roles reason-it,error-analysis --skills <family>` run would have flagged all five in about one minute.
+4. **Labels the pupil must quote (G5) are a contract between two parts of a cell.** The LABEL-REF check is about 20 lines in ws-cell-checks and catches this class family-wide.
+5. **The panel gate (F8) was proposed in r1 and never built, and the defect spread to a second skill (G11).** When a critic asks for a check, the check is part of the fix round's definition of done.
+6. **Cost and time.** One `--size S,M,L` run of 11 roles × 6 skills plus hosts took 1449 s in one browser session, against about 18 minutes for S alone in r1. Most reading time went on pages that a pixel scan settles in seconds:
+   - page fill (the < 75 % scan here found G7 and G10 at once);
+   - band height (H13);
+   - side bands (G8).
+
+   Give critics a `ws-grade-render --scan` that prints these three numbers per PNG, so the critic opens only the flagged pages and one sample per role.
 
 ## Critic r1 (2026-11-13, mq-opus-medium, independent; HEAD 47b1f2a86): all six skills FAIL
 Copied from the verdict (PNGs: /tmp/claude-0/-home-user-MathQuest/ddf8a20a-aa76-5111-8f71-96dbc22bf54b/scratchpad/critic-r1/).
@@ -285,6 +565,31 @@ clue). The notice hint is black on screen and grey on paper. Growing worksheet d
    `--out` and asserts nothing: give it `--out` and make it a gate (F8).
 6. **Waits:** each S/M/L role render took ~6 min for 6 skills. Most of the wait was the three sizes running one after another; with
    `--size S,M,L` in one browser session (the flag already takes a list in golden mode), the boot happens once.
+
+## Precritic r10 (2026-11-13; pattern_features + growing_shape_patterns after the r10 cell fixes; HEAD 82e2cd927; --strict --browser-jobs 1; logs /tmp/mq-precritic/r10-lf-algebra)
+Scope: the two skills this round's fixes touched. ws-grade-render --gate (independent, test, error-analysis, more-practice,
+review, lesson, guided at S / M / L + card / worksheet / quiz) OK on both (no overflow, no sub-44 px target); ws-cell-checks
+--card --card-opts OK (pf 126 pages, growing 141 pages, 0 findings); ws-card-rulings, ws-spec-card --check-signed OK on both cards;
+ws-patterns-cells OK (LABEL-REF, TILE-CARD, ROW2-S). ws-print-lint --source kit --size S on the roles below.
+
+| Gate | pattern_features | growing_shape_patterns |
+|---|---|---|
+| node-lint, providers, roles-unit, patterns-cells, content-audit, options-verify, presets, capacity-pin, card-rulings x2, dealer-uniform, visual-quality, spec-card signed, code-snapshot, boot-smoke | PASS | PASS |
+| ws-print-lint --source kit --roles independent,more-practice,test,review --size S | PASS (0) | PASS (0) |
+| ws-print-lint --roles error-analysis,true-false --size S | FAIL AK-2 (key True / Correct slots blank: lf-roles) | FAIL AK-2 (lf-roles) |
+| ws-grade-render --gate every role S / M / L + screen hosts | PASS | PASS |
+| cell-checks --card --card-opts | PASS | PASS |
+| screen hosts (card 1280 / 820 / 390, worksheet) | PASS | PASS (quiz G9 open: quiz host) |
+| ws-precritic-clean | this section (below) | this section (below) |
+
+Clean for the critic (no open critic r2 finding, print-lint-clean at S): independent, more-practice, test, review and the card and
+worksheet on patterns:pattern_features and patterns:growing_shape_patterns. NOT clean: reason-it (G4, lf-roles); error-analysis and
+true-or-false (AK-2 key slots, lf-roles; pf error-analysis's G5 letters are fixed but the key-slot lint is a role matter); the lesson
+and scripted-model of growing (G7 lf-engine, G10 lf-roles); the growing quiz (G9 quiz host); the option panel of both (G11 lf-partopts).
+
+Red, by owner: see "Red, by owner (after critic r2)" under "Fixes after critic r2" above. The npr / fgr / notice / function_table
+rows of this lane are unchanged from Precritic r9 (below) and were not re-run this round (their r10-relevant findings G1 / G2 / G3
+are all owned elsewhere).
 
 ## Precritic r9 (2026-11-13; --strict --browser-jobs 1; run A 6 skills on a2fecb0aa, logs /tmp/mq-precritic/20261113-054906-3413; run B npr + fgr after b859e11a6, /tmp/mq-precritic/20261113-073410-26955; run C notice + pf, logs under /tmp/mq-precritic (third run), then the notice fix rechecked gate by gate)
 Run A: 34 PASS, 13 FAIL of 47 (npr / fgr rows superseded by run B). Run B: 29 PASS, 9 FAIL, 1 N/A of 39. Run C: 28 PASS, 8 FAIL, 3 N/A of 39
@@ -705,6 +1010,29 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 r10 (mq-opus-medium, rebuild after critic r2): OURS fixed, in lane files only.
+  (1) G5 pattern_features Error analysis: each feature sentence now prints its letter A / B / C (sheet/cells/notice.js sentenceList,
+  `mq-nt-letter` / `data-ws-letter`); the letter hangs in the item-tab keep-out on paper (no width lost: a letter column inside the
+  width wrapped the sentences and EA S fell 6 -> 4 items), takes its own column on screen (wireTickBoxes still reads each row by its
+  sentence); not on the 64 mm anchor state. lf-roles needed nothing: choicesOf already lettered the Fix-it row.
+  (2) G6 feature track tiles at the card's §3 size (S 10 / M 11.5 / L 13 mm, square; FEATURE_TILE_MM); the anchor state keeps 9 x 8.5 mm.
+  (3) G8 growing practice pages at S print two across (10 a page, was 5): the half-width cell wrapped the 4-term row behind a fixed
+  tab + 1 mm left keep-out (82.8 + 6 mm in an 86 mm cell), which the bridge read as a reflow; the keep-out is now
+  clamp(0mm, 100% - row, tab + 1 mm). Unit kept S 2.5 / M 2.8 / L 3.3 mm, Term 4 box 19.5 mm at S (a bigger box would tell its size, L3).
+  Checks: ws-patterns-cells (LABEL-REF, TILE-CARD, ROW2-S; node, 0.3 s) + backtest patterns-cells-g5-g6-g8 (FAIL d20c8a003 -> OK 5eb41b2a1).
+- 2026-11-13 r10 (lead rule, coordinator): ws-precritic-clean (new) - a lane's "Clean for the critic" list may name only pages with no
+  open finding of the latest critic (closed by a `- <ID> fixed` line under "## Fixes after critic rN") and only print roles a print-lint
+  row of that precritic run linted, plus a screen gate for a claimed host. Gate precritic-clean on precritic's --skill plan; backtest
+  precritic-clean-list (FAIL fixture = r9-style clean list with F2 open; PASS fixture = F2 closed + the roles linted). Appended the
+  critic r2 speed reflection to design/status/speed-audit.md and the per-lane row to design/status/metrics.md 7.1 / the reflection table.
+- 2026-11-13 r10: HANDED ON. G11 / F8 (option-panel sample blank, growing + pattern_features) -> lf-partopts (teacher-preview.js fit()
+  + skill-options-ui.js _tidySample: is-cropped left on the stage; repro + two-line patch under "Red, by owner (after critic r2)"); G1
+  (= F2) screen count-row train -> lf-ops; G2 / G3 / G4 / G10 -> lf-roles; G7 growing lesson (precritic lesson print-lint passed it,
+  needs a backtest) -> lf-engine; G9 growing quiz labels -> quiz host.
+- 2026-11-13 r10 precritic r10 (the two skills): precritic-clean PASS (after the r10 section's honest clean list), patterns-cells PASS,
+  cell-checks --card --card-opts PASS (pf 126, growing 141, 0 findings), grade-render --gate PASS every role S/M/L + hosts,
+  card-rulings / spec-card signed PASS both cards, boot-smoke / code-snapshot (736) PASS. Red left are all by owner (empty-band guided /
+  scripted-model = lf-roles; screen-ink-size = lf-checks pin + quiz host; sibling-compare = first family), as Precritic r9.
 - 2026-11-13 08:55 fix r9 (mq-opus-low): (1) merge origin/master 8a7c5d438 -> 74bff0abb: only backtests.json conflicted (rows unioned
   by id, master's text + our dealer-declared-set row; checked: JSON parses, no duplicate id); no generated file changed on both sides.
   boot-smoke OK, code-snapshot OK (736). (2) git revert 2cfeb1d7 -> af74c6b04; cherry-pick 77187c6e8 -> a2fecb0aa, reason-it.js resolved

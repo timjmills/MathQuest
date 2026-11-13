@@ -31,7 +31,8 @@ export const PAGES = [
     ['error-analysis', /\berror[- ]analysis\b|\bEA\b/i], ['true-false', /\btrue[- ](?:or[- ])?false\b/i], ['reason-it', /\breason[- ]it\b/i],
     ['lesson', /\blesson\b|\banchor\b|\bwarm-up\b/i], ['scripted-model', /\bscripted[- ]model\b|\bmodel\b/i], ['guided', /\bguided\b/i],
     ['review', /\breview\b/i], ['pre-skill-check', /\bpre[- ]skill[- ]check\b/i],
-    ['card', /\b(?:practice )?card(?:[- ]\d{3,4})?\b(?!\s*(?:§|'s|roles|rulings|file|\.md))/i], ['worksheet', /\b(?:online )?worksheet\b/i],
+    // "card" as a scale reference ("55 % of the card", a quiz finding) is not a claim about the card page
+    ['card', /(?<!of (?:the|a) )\b(?:practice )?card(?:[- ]\d{3,4})?\b(?!\s*(?:§|'s|roles|rulings|file|\.md))/i], ['worksheet', /\b(?:online )?worksheet\b/i],
     ['quiz', /\bquiz\b/i], ['panel', /\b(?:option[- ])?panels?\b/i],
 ];
 const HOSTS = new Set(['card', 'worksheet', 'quiz', 'panel']);
@@ -117,7 +118,7 @@ export function lintCover(body) {
     const names = String(body).split('\n').filter((l) => /^\|/.test(l)).map((l) => l.split('|')[1] || '');
     const linted = new Set();
     for (const n of names) if (/print-lint/i.test(n)) for (const p of pagesIn(n)) linted.add(p);
-    const screen = names.some((n) => /screen-|chromebook|phone-card/i.test(n));
+    const screen = names.some((n) => /\bscreen\b|screen-|chromebook|phone-card|card 1280|card \/ worksheet/i.test(n));
     return { linted, screen };
 }
 
