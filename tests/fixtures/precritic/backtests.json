@@ -3383,6 +3383,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-wsheet-cl4b-stretch",
+   "check": "placevalue:unit_form on the online-worksheet host at every option variant (rename=more): no tile has an empty band of 30 % or more above, between or under its ink; a cell its row stretches >= 30 % is centred (CL-4b amended 2026-11-12) and the 48 px host input that takes the kit slot reads as the slot (data-ws-slot)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND on host:worksheet (CL-4b amended)",
+   "browser": true,
+   "fail": {
+    "commit": "35df47d7",
+    "state": "EB-BAND 3 on worksheet 1280px {rename: more}: 36.6 / 46.3 % above (82 px cells), 46.3 % under a stretched cell"
+   },
+   "pass": {
+    "commit": "da17b9ba",
+    "state": "0 findings: stretched cells centred (data-mq-stretched) and the adopted input keeps data-ws-slot"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
