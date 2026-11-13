@@ -298,9 +298,10 @@ function planOnce(input = {}) {
                 const add = Math.min(left, g.h * g.capIfEmpty);
                 if (add <= 0) continue;
                 left -= add;
-                // (critic r4 N6: the grown Vocabulary match spends the height in its line-drawing gap - `mq-lvgrow`, lesson-css.js -
+                // (critic r4 N6: the grown Vocabulary match spends the height in its line-drawing gap - vocab.js `item.fill` -
                 // not as a 30 % band under its words)
-                for (const part of g.grid) { part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`; part.cls = `${part.cls || ''} mq-lvgrow`.trim(); }
+                for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;
+                { const vg = groups.find((x) => x.sections[0] && x.sections[0].label === 'Vocabulary:'); if (vocab && vg && vg.grow === g) vocab.fill = true; }
             }
         }
     }

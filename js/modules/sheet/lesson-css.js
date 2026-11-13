@@ -100,12 +100,6 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol>.ws-instrline{padding-left:3mm;padding-right:2mm}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol.mq-lwarm2>.ws-instrline{height:calc(var(--ws-instr) * 1.75);line-height:1.2;align-items:center}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol .ws-grid{border-left-width:0}
-/* lf-engine PC critic r4 N3: an anchor-chart panel far shorter than its row (chart.js CHART_MID) is centred in it */
-:is(.ws-page,.ws-sheet) .ws-grid.mq-chartgrid>.ws-cell.mq-cmid{justify-content:safe center !important}
-/* lf-engine PC critic r4 N6: a Vocabulary match grown on a check-on sheet takes the height in its line-drawing gap */
-:is(.ws-page,.ws-sheet) .ws-grid.mq-lvgrow>.ws-cell.mq-lvocabcell{justify-content:stretch !important}
-:is(.ws-page,.ws-sheet) .ws-grid.mq-lvgrow>.ws-cell.mq-lvocabcell>.mq-lvocab{flex:1 1 auto}
-:is(.ws-page,.ws-sheet) .ws-grid.mq-lvgrow .mq-lvocab>.mq-lvgap{flex:1 1 auto}
 `;
 
 /**

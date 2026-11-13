@@ -143,8 +143,10 @@ export function vocabItem(vocab, seed) {
             return `<line x1="${((i + 0.5) * 100) / n}" y1="0" x2="${((j + 0.5) * 100) / n}" y2="100" stroke="#000" stroke-width="1pt" vector-effect="non-scaling-stroke" data-ws-ink="solid"/>`;
         }).join('') : '';
         // (`item.zoom`, critic r2 N1: roles/lesson.js draws the match smaller so one Independent row fits; absent = 1)
-        return `<div class="mq-lvocab" style="--n:${n}${item.zoom ? `;zoom:${item.zoom}` : ''}"><div class="mq-lvrow">${pics}</div>`
-            + `<div class="mq-lvgap" data-ws-slot="match" data-ws-shape="draw">${lines ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>` : ''}</div>`
+        // (`item.fill`, lf-engine PC critic r4 N6: a match grown on a check-on sheet - roles/lesson.js - fills its cell and spends the
+        // height in its line gap, not as a 30 % band under the words; absent: as before)
+        return `<div class="mq-lvocab" style="--n:${n}${item.zoom ? `;zoom:${item.zoom}` : ''}${item.fill ? ';flex:1 1 auto' : ''}"><div class="mq-lvrow">${pics}</div>`
+            + `<div class="mq-lvgap" data-ws-slot="match" data-ws-shape="draw"${item.fill ? ' style="flex:1 1 auto"' : ''}>${lines ? `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>` : ''}</div>`
             + `<div class="mq-lvrow">${words}</div></div>`;
     };
     const item = {
