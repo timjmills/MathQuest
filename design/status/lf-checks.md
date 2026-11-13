@@ -290,3 +290,19 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - Row eb-foot-gridcols-patterns is PENDING: pattern_features exists only on lf-algebra's branch, so it is armed on that merge.
   - This also answers lf-algebra's "bridge 2 columns vs cell max 1" item. lf-roles reverts its hunk.
 - precritic mention matcher (lf-vocab, 11-13): a skill key is bounded by space or list punctuation, so "a:b, c:d ... OK" on one line names both. `ws-precritic --self-test` holds 6 cases. precritic-plan OK.
+
+### Next-round queue (lead, 11-13; cap next round)
+1. The practice card honours ?seed in the render tool, plus a check that the same seed gives the same card twice (lf-ops).
+2. Backtest rows name their check ids and run only those: the 12 rows red from check growth (lf-engine log on master).
+3. lf-algebra r1 speed reflection, L25: the precritic plan takes roles and hosts from each card's OFFERED roles and hosts (top
+   item). Then:
+   - HINT-ON-TEST: hints stripped at scaffold 0, ideally in the kit;
+   - a text-over-slot probe, plus a digit-px floor per screen host;
+   - a scripted-model / guided render gate at S/M/L, plus a text-clip probe;
+   - PAGEFILL on scripted-model;
+   - an anchor state-diff check;
+   - node-lint STEPS-FOLLOW-PRESET;
+   - VQ-TITLE: both verbs take -ing;
+   - option-panel screenshots as a gate.
+   Coordinate the kit- and role-level items with lf-roles.
+4. V-AMBIG into precritic once lf-vocab merges.
