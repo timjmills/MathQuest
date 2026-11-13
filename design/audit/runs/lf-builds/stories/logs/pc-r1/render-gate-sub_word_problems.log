@@ -1,0 +1,19 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_word_problems --roles more-practice,scripted-model,guided,opener,error-analysis,review,pre-skill-check,mixed-practice,true-false,reason-it,stretch,word-problems --size S,M,L --gate --no-screen --out /tmp/mq-precritic/20261113-005634-1166/render-gate-sub_word_problems
+
+mq-browser-run: slot 1 after 56s
+ws-grade-render: 1 skills -> ../../../../../../tmp/mq-precritic/20261113-005634-1166/render-gate-sub_word_problems
+  [1/1] subtraction:sub_word_problems  more-practice-S 1p+1k 2x3  more-practice-M 1p+1k 2x2  more-practice-L 1p+1k 2x2  scripted-model-S 2p+2k 2x6  scripted-model-M 3p+3k 2x6  scripted-model-L 3p+3k 2x6  guided-S 1p+1k 2x2  guided-M 2p+2k 2x1  guided-L 2p+2k 2x1  opener-S 1p+1k 2x1  opener-M 1p+1k 2x1  opener-L 1p+1k 2x1  error-analysis-S 1p+1k 2x2  error-analysis-M 1p+1k 1x2  error-analysis-L 1p+1k 1x2  review-S 1p+1k 2x3  review-M 1p+1k 2x3  review-L 1p+1k 2x2  pre-skill-check-S 1p+1k 4x2  pre-skill-check-M 1p+1k 4x2  pre-skill-check-L 1p+1k 4x2  mixed-practice-S 1p+1k 8x3  mixed-practice-M 1p+1k 6x2  mixed-practice-L 1p+1k 4x2  true-false-S 1p+1k 2x2  true-false-M 1p+1k 2x2  true-false-L 1p+1k 2x1  reason-it-S 1p+1k 1x2 OVERFLOW  reason-it-M 1p+1k 1x2 OVERFLOW  reason-it-L 1p+1k 1x2 OVERFLOW  stretch-S 1p+1k 1x2  stretch-M 1p+1k 1x1  stretch-L 1p+1k 1x1  word-problems-S 1p+1k 1x3  word-problems-M 1p+1k 1x3  word-problems-L 1p+1k 1x3  189s
+ws-grade-render: done, 1 units, 86 pages, 189s
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-S pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-S pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-S key: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-S key: page 1 cell 2: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-M pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-M pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-M key: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-M key: page 1 cell 2: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-L pupil: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-L pupil: page 1 cell 2: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-L key: page 1 cell 1: <div class="mq-ww"> leaves the cell
+  FAIL OVERFLOW subtraction:sub_word_problems reason-it-L key: page 1 cell 2: <div class="mq-ww"> leaves the cell
+ws-grade-render: FAIL - 12 finding(s) (12 overflow, 0 small target) in 1 unit(s)

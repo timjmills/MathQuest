@@ -1,0 +1,12 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-screen-support-eq.cjs --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+mq-browser-run: slot 2 after 41s
+addition:add_word_problems: no supports (nothing to compare)
+addition:add_word_problems_plain: no supports (nothing to compare)
+subtraction:sub_word_problems: no supports (nothing to compare)
+subtraction:sub_word_problems_plain: no supports (nothing to compare)
+addition:add_wp_change_unknown: no supports (nothing to compare)
+subtraction:sub_wp_change_unknown: no supports (nothing to compare)
+subtraction:sub_wp_compare_smaller: no supports (nothing to compare)
+ws-screen-support-eq: addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller — no renders
+ws-screen-support-eq: OK

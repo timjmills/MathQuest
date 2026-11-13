@@ -1,0 +1,10 @@
+$ node tests/scripts/ws-card-rulings.mjs --skill addition:add_word_problems --skill addition:add_word_problems_plain --skill subtraction:sub_word_problems --skill subtraction:sub_word_problems_plain --skill addition:add_wp_change_unknown --skill subtraction:sub_wp_change_unknown --skill subtraction:sub_wp_compare_smaller --check rulings
+
+ws-card-rulings: design/cards/word-stories/word-stories.md on this tree; 7 skill(s), 300 items per ruling
+  no rulings for: addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller (not checked)
+  design/cards/word-stories/word-stories.md: rulings block present, 9 prose ruling(s) not machine-checked (§5.1, §5.2, §5.3, §9.1, §9.2, §9.3, §9.4, §9.5, §9.6)
+  no ruling applies to addition:add_word_problems (not checked)
+  no ruling applies to addition:add_word_problems_plain (not checked)
+  no ruling applies to subtraction:sub_word_problems (not checked)
+  no ruling applies to subtraction:sub_word_problems_plain (not checked)
+ws-card-rulings: NO-RULINGS (the blocks hold no rulings for the skills in scope; nothing checked)

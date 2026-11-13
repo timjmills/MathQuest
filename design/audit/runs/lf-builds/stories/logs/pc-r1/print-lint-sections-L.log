@@ -1,0 +1,14 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size L --lints L-DENSITY --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain
+
+mq-browser-run: slot 1 after 72s
+ws-print-lint: source kit, 4 skill(s), kind sections
+  sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain: 10+5 pages, 1 finding(s)
+
+document                                                                                                                                  pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain     10+5k    .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                                                                                                                               .     .    .    .        .     .       1    .     .       .     .    .      .       .        .       .    .
+
+sections:addition:add_word_problems+addition:add_word_problems_plain+subtraction:sub_word_problems+subtraction:sub_word_problems_plain (4 skills as sections)
+  [L-DENSITY PAGEFILL major] (p1) page 1: an empty strip 125 mm tall under the problems (53% of the problem area): fill the page with more problems or spread the rows (RUBRIC H13, owner 2026-09-25)
+
+ws-print-lint: FAIL - 1 document(s), source kit; 1 finding(s) in 1 document(s)

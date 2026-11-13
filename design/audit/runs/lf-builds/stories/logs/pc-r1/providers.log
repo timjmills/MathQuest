@@ -1,0 +1,8 @@
+$ node tests/scripts/ws-providers-unit.mjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+  --skill: 0 of 7 skill(s) checked; not covered (no item maker in this test): addition:add_word_problems, addition:add_word_problems_plain, subtraction:sub_word_problems, subtraction:sub_word_problems_plain, addition:add_wp_change_unknown, subtraction:sub_wp_change_unknown, subtraction:sub_wp_compare_smaller
+ws-providers-unit: OK (453 checks, 32 time and money + 24 re-graded skills + 9 siblings + 41 place-value / rounding / estimation + 4 count-by)
+(node:1246) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/js/modules/sheet/index.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)

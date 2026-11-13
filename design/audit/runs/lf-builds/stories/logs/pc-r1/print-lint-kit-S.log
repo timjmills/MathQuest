@@ -1,0 +1,23 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size S --skills addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller
+
+mq-browser-run: slot 2 after 54s
+ws-print-lint: source kit, 7 skill(s)
+  addition:add_word_problems: 2+1 pages, 0 finding(s)
+  addition:add_word_problems_plain: 2+1 pages, 0 finding(s)
+  subtraction:sub_word_problems: 2+1 pages, 0 finding(s)
+  subtraction:sub_word_problems_plain: 2+1 pages, 0 finding(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                               pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_word_problems               2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_word_problems_plain         2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems            2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_word_problems_plain      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+addition:add_wp_change_unknown           2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown        2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                            .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (7 document(s), source kit; 0 finding(s) in 0 document(s))

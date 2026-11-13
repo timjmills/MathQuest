@@ -1,0 +1,28 @@
+$ node tests/scripts/ws-node-lint.mjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --rules LESSON-DATA,OPTION-HELP,WRONG-FITS --baseline tests/fixtures/precritic/node-lint-s1.baseline.json --json /tmp/mq-precritic/20261113-005634-1166/node-lint-s1.json
+
+ws-node-lint: 7 skill(s), 30 items each, page 12, root /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee
+
+rule        skills   items  findings  skills hit  skipped
+LESSON-DATA       7       7         7           7  -
+OPTION-HELP       7      40         0           0  -
+WRONG-FITS       0       0         0           0  7 no item with a declared box count and a number wrong answer (skills)
+
+baseline: tests/fixtures/precritic/node-lint-s1.baseline.json (7 finding keys pinned at n=30, page=12)
+NEW findings not in the baseline (7; key = rule|kind|#item|signature):
+  addition:add_word_problems LESSON-DATA|no-lesson-data|#1|addition:add_word_problems
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for addition:add_word_problems (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  addition:add_word_problems_plain LESSON-DATA|no-lesson-data|#1|addition:add_word_problems_plain
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for addition:add_word_problems_plain (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  addition:add_wp_change_unknown LESSON-DATA|no-lesson-data|#1|addition:add_wp_change_unknown
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for addition:add_wp_change_unknown (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  subtraction:sub_word_problems LESSON-DATA|no-lesson-data|#1|subtraction:sub_word_problems
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for subtraction:sub_word_problems (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  subtraction:sub_word_problems_plain LESSON-DATA|no-lesson-data|#1|subtraction:sub_word_problems_plain
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for subtraction:sub_word_problems_plain (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  subtraction:sub_wp_change_unknown LESSON-DATA|no-lesson-data|#1|subtraction:sub_wp_change_unknown
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for subtraction:sub_wp_change_unknown (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+  subtraction:sub_wp_compare_smaller LESSON-DATA|no-lesson-data|#1|subtraction:sub_wp_compare_smaller
+      the lesson page falls back: lessons/prereqs.js LESSONS has no entry for subtraction:sub_wp_compare_smaller (the sheet prints "No lesson data for this skill yet"; the Warm-up deals the skills listed before it)
+json: /tmp/mq-precritic/20261113-005634-1166/node-lint-s1.json
+time: load 0.2 s, lint 0.2 s, total 0.4 s
+ws-node-lint: FAIL (7)
