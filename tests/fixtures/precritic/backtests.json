@@ -5510,6 +5510,66 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "f7-signmatch-word-stories",
+   "check": "F7 (word-stories critic r1): a False claim on True or False? never prints the other sign's answer under the story's own sign",
+   "kind": "commit-pair",
+   "rule": "ws-key-arith SIGNMATCH (RUBRIC C2, M-W1)",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "785 findings ('6 - 3 = 9')"
+   },
+   "pass": {
+    "commit": "4707017e0",
+    "state": "0 findings: TF draws the claim with its wrong answer's slots"
+   },
+   "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --only signmatch",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "f11-stretch-story-word-stories",
+   "check": "F11 (word-stories critic r1): the compare preset's Stretch keeps its story (its people and its noun)",
+   "kind": "commit-pair",
+   "rule": "ws-key-arith stretch (L6)",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "432 findings: 'Two numbers have a difference of 8'"
+   },
+   "pass": {
+    "commit": "453bff211",
+    "state": "0 findings: provider open() for compare stories"
+   },
+   "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --only stretch",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "f12-coins-word-stories",
+   "check": "F12 (word-stories critic r1): money stories count coins, never a currency (P-WP-22)",
+   "kind": "commit-pair",
+   "rule": "ws-key-arith story P-WP-22",
+   "browser": false,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "276 findings ('dollars')"
+   },
+   "pass": {
+    "commit": "453bff211",
+    "state": "0 findings: the hosts tell money as coins"
+   },
+   "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --only story",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
