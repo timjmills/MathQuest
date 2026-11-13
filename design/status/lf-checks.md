@@ -321,3 +321,4 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - Verified: self-test, precritic-plan, ws-screen-answer, ws-phone-card OK. 11 of 12 eb-* rows PASS; eb-fact-roles is routed to
     the facts lane.
 - r5 D3, ruled by the lead: KEEP the centring branch; recorded in WORKSHEET_DESIGN_STANDARD CL-4b (it rarely fires under the cap). Top-aligned boxes with unequal bottoms are fine (lead default, put to the owner).
+- SCREEN-INK-SIZE critic sis-r3 (138f43d9): PASS, 9 · 9 · 9 · 8. Deploy branch claude/sweet-newton-c8wrv1-lf-checks-inksize @ fd7b4cc2 (master ebd565c8 merged). Its gates are green; precritic-plan's 21 failing rows are master's own. Sent to the lead. Queued: r3 D1 (the SIZE-REF wording for a screen-only ring), m1-m4.
