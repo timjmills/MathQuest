@@ -6,7 +6,11 @@
 // For each library lesson (a fact lesson, a rounding / place-value lesson and a multi-digit lesson by default):
 //   <id>-1280.png    the real Print screen's Lesson parts at 1280 px (the full-width table under the preview, F9)
 //   <id>-390.png     the same at phone width (one compact row per part, F5)
-//   <id>-<M|L>-<min|max>-p<k>.png   the packet with every part at its min / its max (the values the screen offers), each page
+//   <id>-<M|L>-<min|max|combo>-p<k>.png   the packet with every part at its min / its max (the values the screen offers), and
+//                   the critic's combination reached step by step (Vocabulary 0, Remember off, We Do one down), each page
+//   critic A r2: N3 the lesson sheet caption names the preview's own lesson-sheet pages (M and L), a multi-page Practice / Mixed
+//   says its pages; N5 a locked tick says why in visible text; N6 no "a page" on a total, "or 0 to leave it off" wherever the
+//   stepper reaches 0, no lone word wrapped onto a line at 390
 // It asserts what the screen must do (critic A r1, each finding's check):
 //   F3  switching the section's skill clears its part settings: no Reset link, Vocabulary back at its default
 //   F4  a stepper at 0 keeps + live, and stepping up ticks the part again; - is disabled at the stepper's first value
@@ -25,7 +29,9 @@ const { open } = require('../lib/ws-harness.cjs');
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const OUT = path.resolve(arg('out', path.join(__dirname, '..', '..', 'design', 'partopts', 'shots-A2')));
-const LESSONS = arg('lessons', 'Y1.B2.S9,Y4.B1.S14,Y2.B2.S18').split(',');
+// (the four lessons critic A r2 graded; `skill:<category>:<skill>` opens a skill's own lesson - a story lesson with no library id)
+const LESSONS = arg('lessons', 'Y1.B2.S9,Y4.B1.S14,Y4.B2.S5,skill:addition:add_wp_10').split(',');
+const skillOf = (id) => (id.startsWith('skill:') ? { categoryId: id.split(':')[1], skillId: id.split(':')[2] } : null);
 const fails = [];
 const check = (ok, msg) => { if (!ok) fails.push(msg); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -40,7 +46,50 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         many: (r.querySelector('.tv-part-many') || {}).textContent.trim(), tick: !!r.querySelector('[data-act="part-on"]'), on: (r.querySelector('[data-act="part-on"]') || {}).getAttribute ? r.querySelector('[data-act="part-on"]').getAttribute('aria-checked') === 'true' : null,
         minus: !!(r.querySelector('.tv-part-many [data-dir="-1"]') || {}).disabled, plus: !!(r.querySelector('.tv-part-many [data-dir="1"]') || {}).disabled, hasStep: !!r.querySelector('.tv-part-many [data-dir="1"]'),
         refresh: !!r.querySelector('[data-act="part-new"]'),
+        locked: !!r.querySelector('[data-act="part-on"][disabled]'),
+        tickOn: !!r.querySelector('[data-act="part-on"]:not([disabled])'),
+        visText: [...r.querySelectorAll('.tv-part-range, .tv-part-note')].filter((x) => x.offsetParent && x.getBoundingClientRect().width > 0).map((x) => x.textContent.replace(/\s+/g, ' ').trim()).join(' | '),
     })));
+    // (critic A r2 N3) the lesson sheet's caption against the preview's own lesson-sheet pages
+    const captionCheck = async (where) => {
+        const got = await page.evaluate(() => {
+            const cap = [...document.querySelectorAll('.tv-part-group .tv-part-range')].filter((x) => x.offsetParent).map((x) => x.textContent.replace(/\s+/g, ' '))[0] || '';
+            const fr = document.querySelector('#tvPreviewFrame');
+            let sheet = -1, mixed = -1, practice = -1;
+            try { const d = fr.contentDocument; sheet = d.querySelectorAll('.ws-page[data-ws-sheet="lesson-sheet"]').length; mixed = d.querySelectorAll('.ws-page[data-ws-sheet="lesson-mixed"]').length; practice = d.querySelectorAll('.ws-page[data-ws-sheet="lesson-practice"]').length; } catch (e) { /* */ }
+            const txt = (p) => { const r = document.querySelector(`.tv-part[data-part-row="${p}"] .tv-part-many`); return r ? r.textContent.replace(/\s+/g, ' ') : ''; };
+            return { cap, sheet, mixed, practice, mixedT: txt('mixed'), practiceT: txt('practice'), rowsT: txt('rows') };
+        });
+        const N = { one: 1, two: 2, three: 3 };
+        const said = (t) => { const a = /\b(one|1) page\b/.exec(t); if (a) return 1; const b = /\b(\d+|two|three) pages\b/.exec(t); return b ? (N[b[1]] || Number(b[1])) : null; };
+        check(got.sheet > 0 && said(got.cap) === got.sheet, `${where}: the lesson sheet caption "${got.cap}" - the preview has ${got.sheet} lesson-sheet page(s) (N3)`);
+        if (/fills the page/.test(got.rowsT)) check(got.sheet === 1, `${where}: rows "${got.rowsT}" over a ${got.sheet}-page sheet (N3)`);
+        for (const [k, n, t] of [['mixed', got.mixed, got.mixedT], ['practice', got.practice, got.practiceT]]) if (n > 1) check(said(t) === n, `${where}: ${k} prints ${n} pages, its row says "${t}" (N3)`);
+        return got;
+    };
+    // (critic A r2 N5, N6) a locked tick says why in its row; one form of range text; no lone wrapped word
+    const textLint = async (rows, where, phone) => {
+        for (const r of rows) {
+            if (r.locked) check(/needed|always/i.test(r.visText), `${where} ${r.part}: a locked tick with no visible reason ("${r.visText}") (N5)`);
+            check(!/\d+ a page\b/.test(r.visText), `${where} ${r.part}: "${r.visText}" ("a page" on a total, N6)`);
+            if (['vocab', 'wedo', 'rows', 'practice', 'mixed'].includes(r.part) && r.hasStep && r.tickOn) check(/or 0 to leave it off/.test(r.visText), `${where} ${r.part}: its stepper reaches 0, the text "${r.visText}" does not say "or 0 to leave it off" (N6)`);
+        }
+        if (phone) {
+            const lone = await page.evaluate(() => {
+                const out = [];
+                for (const el of document.querySelectorAll('.tv-section .tv-parts .tv-part-range, .tv-section .tv-parts .tv-part-note')) {
+                    if (!el.offsetParent) continue;
+                    const lines = new Map();
+                    const walk = (n) => { for (const c of n.childNodes) { if (c.nodeType === 3) { const t = c.textContent; const re = /\S+/g; let m; while ((m = re.exec(t))) { const rg = document.createRange(); rg.setStart(c, m.index); rg.setEnd(c, m.index + m[0].length); const b = rg.getClientRects()[0]; if (b) { const k = Math.round(b.top); lines.set(k, (lines.get(k) || 0) + 1); } } } else walk(c); } };
+                    walk(el);
+                    const ks = [...lines.keys()].sort((a, b) => a - b);
+                    if (ks.length > 1 && ks.slice(1).some((k) => lines.get(k) === 1)) out.push(el.textContent.replace(/\s+/g, ' ').trim());
+                }
+                return out;
+            });
+            check(!lone.length, `${where}: a lone word wrapped onto its own line: ${lone.slice(0, 3).map((x) => `"${x}"`).join(', ')} (N6)`);
+        }
+    };
     const click = async (sel) => { const b = await page.$(sel); if (!b || await b.evaluate((x) => x.disabled)) return false; await b.click(); await sleep(150); return true; };
     // (F5) overlapping boxes inside a part row
     const overlaps = () => page.evaluate(() => {
@@ -73,7 +122,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         for (const id of LESSONS) {
             const tag = id.replace(/[^A-Za-z0-9]+/g, '_');
             await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
-            await page.evaluate((id) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith([{ role: 'lesson', lessonId: id }]); }, id);
+            const sk = skillOf(id);
+            await page.evaluate(({ id, sk }) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith(sk ? [sk] : [{ role: 'lesson', lessonId: id }]); }, { id, sk });
+            await sleep(500);
+            if (sk) { await click('[data-act="role"][data-sec="0"][data-v="lesson"]'); }
+            await click('[data-act="size"][data-v="M"]');
             await idle();
             // (F9) the full-width card
             const card = await page.$('#tvPartsWide:not([hidden]) .tv-parts');
@@ -81,6 +134,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const rows0 = await rowsOf();
             console.log(`${id}\n` + rows0.map((r) => `  ${r.part}: ${r.val || '-'} | ${r.range}`).join('\n'));
             lint(rows0, `${id} 1280`);
+            await textLint(rows0, `${id} 1280 M`, false);
+            console.log('  M caption:', JSON.stringify(await captionCheck(`${id} 1280 M`)));
+            // (N3 at L: the size the critic found "one page" over a two-page sheet)
+            await click('[data-act="size"][data-v="L"]');
+            await idle();
+            await textLint(await rowsOf(), `${id} 1280 L`, false);
+            console.log('  L caption:', JSON.stringify(await captionCheck(`${id} 1280 L`)));
+            await page.evaluate(() => document.querySelector('#tvPartsWide').scrollIntoView({ block: 'start' }));
+            await page.screenshot({ path: path.join(OUT, `${tag}-1280-L.png`), clip: await page.evaluate(() => { const r = document.querySelector('#tvPartsWide').getBoundingClientRect(); return { x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height }; }), captureBeyondViewport: true });
+            await click('[data-act="size"][data-v="M"]');
+            await idle();
             const ph = await page.evaluate(() => { const e = document.querySelector('#tvPartsWide .tv-parts'); return e ? Math.round(e.getBoundingClientRect().height) : 0; });
             check(ph > 0 && ph <= 700, `${id} 1280: Parts ${ph} px tall (limit 700)`);
             check(!(await page.$('.tv-part-chip')), `${id}: a Supports pill (F8)`);
@@ -115,6 +179,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const ov3 = await overlaps(); check(!ov3.length, `${id} 390 overlaps: ${ov3.slice(0, 3).join('; ')}`);
             const sm3 = await small(true); check(!sm3.length, `${id} 390: controls under 44 px ${JSON.stringify(sm3.slice(0, 3))}`);
             lint(await rowsOf(), `${id} 390`);
+            await textLint(await rowsOf(), `${id} 390`, true);
             const pw = await page.evaluate(() => Math.round(document.querySelector('.tv-section .tv-parts').getBoundingClientRect().width));
             console.log(`  390: Parts ${pw} px wide`);
             const box = await page.evaluate(() => { const s = document.querySelector('.tv-section .tv-parts-wrap'); s.scrollIntoView({ block: 'start' }); const r = s.getBoundingClientRect(); return { y: r.top + window.scrollY, h: r.height }; });
@@ -146,25 +211,35 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         // offered snaps), each pupil page
         const po = await page.evaluate(async () => import('./js/modules/sheet/part-opts.js'));
         void po;
-        for (const id of LESSONS) for (const size of ['M', 'L']) for (const which of ['min', 'max']) {
-            const html = await page.evaluate(async ({ id, size, which }) => {
+        for (const id of LESSONS) for (const size of ['M', 'L']) for (const which of ['min', 'max', 'combo']) {
+            const html = await page.evaluate(async ({ id, size, which, sk }) => {
                 const P = await import('./js/modules/sheet/part-opts.js');
                 const lib = await import('./js/modules/lessons/library.js');
-                const ref = lib.practiceRef(id);
-                const req = { role: 'lesson', lessonId: id, sections: [{ skills: [{ categoryId: ref.categoryId, skillId: ref.skillId, opts: ref.opts || {} }] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true };
+                const ref = sk || lib.practiceRef(id);
+                const req = Object.assign(sk ? {} : { lessonId: id }, { role: 'lesson', sections: [{ skills: [{ categoryId: ref.categoryId, skillId: ref.skillId, opts: ref.opts || {} }] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true });
                 let r = await window.buildSheet(req);
-                const lims = P.allPartLimits(r.lesson.partFit);
+                let lims = P.allPartLimits(r.lesson.partFit);
                 const want = {};
+                if (which === 'combo') {
+                    // (the screen's steps: Vocabulary to 0 if offered, then Remember off if offered, then We Do one down if offered)
+                    let cur = {};
+                    const step = async (p, o) => { const lim = lims[p]; if (!lim) return; const nx = P.normalizePartOpts(Object.assign({}, cur, { [p]: o(lim) }), lims); if (JSON.stringify(nx) === JSON.stringify(cur)) return; cur = nx; r = await window.buildSheet(Object.assign({}, req, { partOpts: cur })); lims = P.allPartLimits(r.lesson.partFit); cur = P.normalizePartOpts(cur, lims); };
+                    await step('vocab', (l) => (l.canOff !== false ? { on: false } : { n: P.offeredValues(l)[0] }));
+                    await step('remember', () => ({ on: false }));
+                    await step('wedo', (l) => { const v = P.offeredValues(l); const at = v.indexOf(l.dflt); return at > 0 ? { n: v[at - 1] } : (l.canOff !== false ? { on: false } : { n: l.dflt }); });
+                    Object.assign(want, cur);
+                } else {
                 for (const [p, lim] of Object.entries(lims)) {
                     const vals = P.offeredValues(lim);
                     if (which === 'min') { if (['vocab', 'rows', 'wedo'].includes(p) && lim.canOff && !lim.none) want[p] = { on: false }; else if (lim.toggle && lim.canOff) want[p] = { on: false }; else if (vals.length) want[p] = { n: vals[0] }; }
                     else if (vals.length && !lim.toggle) want[p] = { n: vals[vals.length - 1] };
                 }
+                }
                 let cur = P.normalizePartOpts(want, null);
                 for (let k = 0; k < 4; k++) { r = await window.buildSheet(Object.assign({}, req, { partOpts: cur })); const nx = P.normalizePartOpts(cur, P.allPartLimits(r.lesson.partFit)); if (JSON.stringify(nx) === JSON.stringify(cur)) break; cur = nx; }
                 window.__po = { cur, teach: r.lesson.teach && { guided: r.lesson.teach.guided, independent: r.lesson.teach.independent, fill: r.lesson.teach.fill }, pages: r.pageCount };
                 return window.sheetDocument(r.pupilHtml, 'Lesson', { paper: 'A4' });
-            }, { id, size, which });
+            }, { id, size, which, sk: skillOf(id) });
             console.log(`packet ${id} ${size} ${which}:`, JSON.stringify(await page.evaluate(() => window.__po)));
             const sh = await browser.newPage();
             await sh.setViewport({ width: 794, height: 1123, deviceScaleFactor: 1 });
