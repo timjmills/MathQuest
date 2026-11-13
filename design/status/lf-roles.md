@@ -258,3 +258,5 @@ Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medi
   Nits not taken (each would move a page the critic passed): n1 (working lines only on a spanning Model: sub_1k / sub_10k M) and
   n2 (3-line cap drops "Check:" on sub_1k / sub_10k L).
 Times: r8c, start 2026-11-13T20:05Z, end 2026-11-13T21:00Z, profile mq-opus-medium
+
+- 2026-11-13 lead: deploy-6 (c4bac87bf) deploying; SIZE-ORDER now M >= L only (S dropped; S stays pinned for CAPACITY-NO-DROP). EB-REFILL minors R1-R4 queued. R2 ruling: a part row is allowed when its cell is one the Model also draws as a part row; otherwise flag it (EB-REFILL-SLOT).
