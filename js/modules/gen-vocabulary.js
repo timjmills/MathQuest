@@ -38,7 +38,7 @@ import {
 } from './svg-geometry.js';
 import { createAnalogClockSVG, createDigitalClockHTML } from './svg-clock.js';
 // The vocabulary redesign (lane lf-vocab, 2026-11-07): the lesson word sets and the kit cells.
-import { VOCAB_SETS, VOCAB_WORDS, vocabSetAt, gradeWords, compatible, VOCAB_GRADES } from './sheet/lesson-pages/vocab-words.js';
+import { VOCAB_SETS, VOCAB_WORDS, vocabSetAt, gradeWords, compatible, VOCAB_GRADES, pictureWords } from './sheet/lesson-pages/vocab-words.js';
 import { k2Twin as _vk2Twin } from './sheet/index.js';
 import { onNewPage as _vOnNewPage } from './page-deal.js';
 
@@ -609,10 +609,12 @@ function _freshFirst(pool, need) {
 function _pictureWords() {
     const o = (state.skillOptions || {});
     const set = o.vocabSet !== null && o.vocabSet !== undefined ? vocabSetAt(o.vocabSet) : null;
-    if (set) return { words: set.words.slice(), grade: set.grade, ccss: set.ccss.slice() };
+    // (r11 hatch: `words` are the words drawn as pictures - a set's noPicture words are never drawn for it - and `bank` every
+    // word of the pool, so a dropped word still sits in a 1 picture, 3 words bank)
+    if (set) return { words: pictureWords(set), bank: set.words.slice(), grade: set.grade, ccss: set.ccss.slice() };
     const g = VOCAB_GRADES.includes(Number(o.vocabGrade)) ? Number(o.vocabGrade) : 3;
     const ccss = [...new Set(VOCAB_SETS.filter((s) => s.grade === g).flatMap((s) => s.ccss))];
-    return { words: gradeWords(g), grade: g, ccss };
+    return { words: gradeWords(g), bank: gradeWords(g), grade: g, ccss };
 }
 /** `n` words from `pool` that may sit together, starting with `first` when given; this page's unused words first. */
 function _compatiblePick(pool, n, first) {
@@ -630,7 +632,7 @@ function _compatiblePick(pool, n, first) {
 function _genPictureTask(q) {
     const o = (state.skillOptions || {});
     const task = o.vocabTask === 'pick3' ? 'pick3' : 'match3';
-    const { words, grade, ccss } = _pictureWords();
+    const { words, bank: bankWords, grade, ccss } = _pictureWords();
     // the page's footer names the dealt words' grade and standards, not the skill's grade-3 tags (owner ruling Q-A;
     // sheet/sheet-tags.js applySheetTags, read by print-sheet skillMeta)
     q.sheetTags = { grade, ccss };
@@ -670,9 +672,10 @@ function _genPictureTask(q) {
         return;
     }
     const pickFrom = words.length >= 3 ? words : gradeWords(grade);
+    const bankFrom = words.length >= 3 ? bankWords : gradeWords(grade);
     const target = pick(_freshFirst(pickFrom, 1));
     _vtUsed.add(target);
-    const three = _compatiblePick(pickFrom, 3, target) || [target].concat(pickFrom.filter((w) => w !== target).slice(0, 2));
+    const three = _compatiblePick(bankFrom, 3, target) || [target].concat(bankFrom.filter((w) => w !== target).slice(0, 2));
     const bank = shuffle(three.slice());
     const payload = { word: target, bank, grade };
     q.cell = { template: 'vocab-pick3', v: 1, payload };

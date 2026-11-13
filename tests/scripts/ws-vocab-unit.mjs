@@ -23,6 +23,8 @@
 //     declares its defining features (vocab-words.js VOCAB_DEFS). A picture of A dealt with B (the same set or grade pool, one
 //     item) whose features satisfy B's definition FAILS unless A and B are notWith. An older tree (backtest rows) declares
 //     none: its pictures take today's declaration where the drawing is today's, else the features its markup shows.
+// V-HATCH (r11, the escape hatch) a set's noPicture words are never drawn for it (Match 3, the 1 picture, 3 words picture);
+//     V6 / V7 / V5 judge the words drawn as pictures (pictureWords): five picture words split into a trio and a pair
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
 // V28 (lead ruling 2026-11-12) the Guided MIN_ITEMS counts SCORED ANSWERS: the Model + ONE Match 3 try (3 answers) meets it,
@@ -69,13 +71,15 @@ for (const s of W.VOCAB_SETS) {
         if (!e) { fail(`V1 ${s.lesson}: "${w}" has no VOCAB_WORDS entry`); continue; }
         if (String(e.meaning).split(/\s+/).length > 8) fail(`V1 "${w}": meaning over 8 words`);
     }
-    if (!W.compatible(s.words.slice(0, 3))) fail(`V6 ${s.lesson}: the first three words clash (notWith)`);
-    // V7: the six words split into two trios with no notWith pair inside (a Match 3 page shows every word once)
-    const ws = s.words;
+    // (r11 hatch: V6 / V7 judge the words dealt as pictures - a set's noPicture words are never drawn for it)
+    const ws = typeof W0.pictureWords === 'function' ? W0.pictureWords(s) : s.words;
+    if (!W.compatible(ws.slice(0, 3))) fail(`V6 ${s.lesson}: the first three words clash (notWith)`);
+    // V7: the six words split into two trios with no notWith pair inside (a Match 3 page shows every word once); five
+    // picture words (a hatch drop) split into a trio and a pair
     let split = false;
     for (let a = 0; a < ws.length && !split; a++) for (let b = a + 1; b < ws.length && !split; b++) for (let c = b + 1; c < ws.length && !split; c++) {
         const t = [ws[a], ws[b], ws[c]], rest = ws.filter((w) => !t.includes(w));
-        if (W.compatible(t) && (rest.length !== 3 || W.compatible(rest))) split = true;
+        if (W.compatible(t) && (rest.length > 3 || W.compatible(rest))) split = true;
     }
     if (!split) fail(`V7 ${s.lesson}: the words cannot split into two clash-free trios`);
 }
@@ -102,6 +106,8 @@ const runs = [];
 for (const g of W.VOCAB_GRADES) runs.push({ opts: { vocabGrade: g } });
 W.VOCAB_SETS.forEach((_, i) => runs.push({ opts: { vocabSet: i } }));
 let items = 0;
+// V-HATCH (r11): a set's noPicture words are never drawn for it (pictureWords), on any task
+const hatched = (o) => (o.vocabSet !== undefined && W.VOCAB_SETS[o.vocabSet] ? W.VOCAB_SETS[o.vocabSet].noPicture || [] : []);
 for (const r of runs) {
     for (const [skill, task] of [['vocab_grade_pictures', 'match3'], ['vocab_pick3_words', 'pick3']]) {
         const qs = deal(skill, r.opts, task === 'match3' ? 4 : 8, 9000);
@@ -116,16 +122,18 @@ for (const r of runs) {
                 if (!W.compatible(p.words)) fail(`V3 ${tag}: notWith words together (${p.words})`);
                 if (p.order.some((wi, n) => wi === n)) fail(`V3 ${tag}: a word under its own picture (${p.order})`);
                 if (q.ans !== p.order.map((i) => LET[i]).join(', ')) fail(`V3 ${tag}: key ${q.ans} is not the picture letters`);
+                if (hatched(r.opts).some((w) => p.words.includes(w))) fail(`V-HATCH ${tag}: a noPicture word drawn in Match 3 (${p.words})`);
                 seen.push(...p.words);
             } else {
                 if (!p.bank.includes(p.word) || new Set(p.bank).size !== 3) fail(`V4 ${tag}: bank ${p.bank} for ${p.word}`);
                 if (p.bank.some((w) => w !== p.word && !W.compatible([p.word, w]))) fail(`V4 ${tag}: a bank word reads as the picture (${p.bank} / ${p.word})`);
                 if (q.ans !== p.word) fail(`V4 ${tag}: key ${q.ans} is not ${p.word}`);
+                if (hatched(r.opts).includes(p.word)) fail(`V-HATCH ${tag}: the noPicture word "${p.word}" drawn as the picture`);
                 seen.push(p.word);
             }
         }
         // V5: no repeat before the pool is used up
-        const pool = r.opts.vocabSet !== undefined ? W.VOCAB_SETS[r.opts.vocabSet].words : W.gradeWords(r.opts.vocabGrade);
+        const pool = r.opts.vocabSet !== undefined ? (typeof W.pictureWords === 'function' ? W.pictureWords(W.VOCAB_SETS[r.opts.vocabSet]) : W.VOCAB_SETS[r.opts.vocabSet].words) : W.gradeWords(r.opts.vocabGrade);
         const firstRun = seen.slice(0, pool.length);
         if (new Set(firstRun).size !== firstRun.length && seen.length >= 2) {
             // a Match 3 page of 6 words takes 2 trios: only flag a repeat inside the first pool-length words
@@ -175,7 +183,7 @@ const ambig = [];
     for (const w of Object.keys(W.VOCAB_WORDS)) if (!HERE_W.VOCAB_DEFS[w]) fail(`V-FEAT "${w}": the word declares no defining features (VOCAB_DEFS)`);
     // (a picture reads as its own word: a declaration that does not is a wrong declaration or a wrong definition)
     if (typeof P.vocabPictureFeatures === 'function') for (const id of P.VOCAB_PICTURE_IDS) if (HERE_W.VOCAB_DEFS[id] && !HERE_W.featuresSatisfy(featOf(id), id)) fail(`V-FEAT "${id}": its features (${featOf(id).join(' ')}) do not satisfy its own word's definition`);
-    const picsOf = (s) => s.words;
+    const picsOf = (s) => (typeof W.pictureWords === 'function' ? W.pictureWords(s) : s.words);
     const pools = W.VOCAB_SETS.map((s) => ({ name: `set "${s.title}"`, pics: picsOf(s), words: s.words }))
         .concat(W.VOCAB_GRADES.map((g) => ({ name: `grade ${g}`, pics: W.gradeWords(g), words: W.gradeWords(g) })));
     const seenClash = new Set();

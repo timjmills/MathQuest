@@ -21,7 +21,7 @@ import { renderCell, getCell } from '../registry.js';
 import '../cells/vocab-match3.js';
 import '../cells/vocab-pick3.js';
 import { gradeClass } from '../cells/vocab-pick3.js';
-import { VOCAB_SETS, vocabSetFor, vocabSetAt, compatible } from './vocab-words.js';
+import { VOCAB_SETS, vocabSetFor, vocabSetAt, compatible, pictureWords } from './vocab-words.js';
 
 /** The lesson's word set: the record's `vocabSet` (a BUILD lesson's site id or a set index), or null. */
 export function lessonVocabSet(data) {
@@ -36,7 +36,11 @@ function trios(words, r) {
     if (b.length === 3 && compatible(a) && compatible(b)) return [a, b];
     for (let t = 0; t < 40; t++) {
         const s = shuffle(r, words.slice());
-        if (compatible(s.slice(0, 3)) && compatible(s.slice(3, 6))) return [s.slice(0, 3), s.slice(3, 6)];
+        if (compatible(s.slice(0, 3)) && compatible(s.slice(3, 6))) {
+            // (r11 hatch: five picture words - the second trio takes one word of the first that may sit with its two)
+            if (s.length === 5) { const add = s.slice(0, 3).find((w) => compatible(s.slice(3).concat([w]))); if (add) return [s.slice(0, 3), s.slice(3).concat([add])]; continue; }
+            return [s.slice(0, 3), s.slice(3, 6)];
+        }
     }
     return [a, b.length === 3 ? b : a];
 }
@@ -54,12 +58,13 @@ export function planVocabPage(input, ctx, frame) {
     if (!set) return [];
     const r = rng(deriveSeed(input.seed === undefined ? 0 : input.seed, 'vocab-page', set.lesson));
     const m = bandMetrics(ctx, layoutHeader(frame.header));
-    const [t1, t2] = trios(set.words, r);
+    const pics = pictureWords(set);
+    const [t1, t2] = trios(pics, r);
     const match = [t1, t2].map((words) => cellItem('vocab-match3', { words, order: r() < 0.5 ? [1, 2, 0] : [2, 0, 1], grade: set.grade }));
     const gc = gradeClass(set.grade);
     const nPick = gc === 2 ? 4 : 2;
     // the set's LATER words (the first are the Match band's first trio; critic r1 D16: even / odd matched, then named again)
-    const pickWords = set.words.slice(-nPick).reverse();
+    const pickWords = pics.slice(-nPick).reverse();
     const pick = pickWords.map((w) => {
         const others = shuffle(r, set.words.filter((x) => x !== w && compatible([w, x])));
         let bank = [w, ...others.slice(0, 2)];

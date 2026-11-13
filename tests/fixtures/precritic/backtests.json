@@ -4118,6 +4118,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "vocab-r11-hatch",
+   "check": "V-HATCH / V7: a set whose words cannot split into two clash-free trios is legal once a word is dropped from its PICTURE items (noPicture), instead of one more redraw (lead ruling, lf-vocab r11 item 2)",
+   "kind": "fixture",
+   "rule": "vocab-words.js pictureWords; ws-vocab-unit V6 / V7 / V5 judge the picture words, V-HATCH: a noPicture word is never drawn",
+   "fail": {
+    "fixture": "tests/fixtures/precritic/vocab-hatch.fail.mjs",
+    "state": "term, first term and rule mutually notWith in one set, no hatch"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/vocab-hatch.pass.mjs",
+    "state": "the same set with noPicture: ['first term']"
+   },
+   "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture} --only V7",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

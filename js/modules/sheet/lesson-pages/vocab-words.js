@@ -200,6 +200,13 @@ export const VOCAB_STANDARD_OPS = Object.freeze({
     '4.OA.C.5': ['pattern', 'rule'],
     '5.NBT.B.6': ['divide'],
 });
+/**
+ * The words of a set dealt AS PICTURES (Match 3 pictures, the 1 picture, 3 words picture): its words less its `noPicture`
+ * (the r11 escape hatch, lead ruling: a word that cannot get a picture passing V-FEAT against its set is dropped from the
+ * set's picture items - it stays in the set's words, its banks and its explanations - and is never redrawn again; each drop
+ * carries a comment in the set). No set needs a drop today (r11: term and first term redrawn as falling runs pass V-FEAT).
+ */
+export const pictureWords = (set) => (set ? set.words.filter((w) => !(set.noPicture || []).includes(w)) : []);
 /** The set of a BUILD lesson (by site id), or null. */
 export const vocabSetFor = (lessonId) => VOCAB_SETS.find((s) => s.lesson === String(lessonId)) || null;
 /** The set at an option value (index), or null. */
@@ -233,4 +240,4 @@ export function vocabHowSteps(template, word, wrong = []) {
         ? ['Read the three words in the box.', `Tap ${word}.`]
         : ['Say what each picture shows.', `Write ${wrong.map((w) => `${w.letter} next to ${w.word}`).join(' and ')}.`];
 }
-export default { VOCAB_DEFS, featuresSatisfy, vocabWordsReading, VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
+export default { VOCAB_DEFS, featuresSatisfy, vocabWordsReading, pictureWords, VOCAB_STANDARD_OPS, vocabHowSteps, vocabExplainLine, VOCAB_WORDS, VOCAB_SETS, vocabSetFor, vocabSetAt, gradeWords, compatible, VOCAB_GRADES };
