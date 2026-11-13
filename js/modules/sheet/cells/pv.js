@@ -705,28 +705,9 @@ function pvRender(p, ctx0) {
     const h = pvRenderBody(p, ctx0);
     // (`noTabSpacer`, a detailed lesson's ref - cellPayload, 2026-11-08 ws-detailed-lesson E11 / E9c: its rows centre the equation
     // clear of the number tab, so the CL-40 top spacer of sheet-kit.css is left off - on the page and on the measuring cell alike)
-    return p.noTabSpacer || compareClearOfTab(p, ctx0) ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
+    return p.noTabSpacer ? String(h).replace(/^<div class="pv-cell"/, '<div class="pv-cell pv-nospacer"') : h;
 }
 
-/**
- * lf-placevalue compare r2 (pixel EB-BAND on the Guided rows; lead 2026-11-13: "the compare cell's measured height carries
- * 6-7 mm of pad around a one-line compare"): the CL-40 top spacer keeps a cell's first line clear of its number tab. On a
- * scaffolded page (Guided, Opener, Model: level 2-3) a compare line centred across a cell whose white each side is wider
- * than the widest tab (22 mm: an "Example" tab and its keep-out; sibling-compare CL40-INK) cannot meet the tab, so the spacer is left off - on the page and the
- * measuring cell alike. The practice pages keep it (their rows are laid to the page fill, and the spacer is part of it).
- */
-function compareClearOfTab(p, ctx) {
-    if (!p || p.kind !== 'compare' || p._marks || !ctx || ctx.mode === 'screen' || (Number(ctx.scaffoldLevel) || 0) < 2) return false;
-    const cols = Number(ctx.columns) || 0;
-    if (!cols) return false;
-    const size = ctx.size || 'M';
-    const em = (Number(ctx.metrics && ctx.metrics.digitPt) || { S: 16, M: 22, L: 28 }[size] || 22) * 25.4 / 72;
-    const txt = fmt(p.a) + fmt(p.b);
-    const bare = 0.606 * em * txt.replace(/[^0-9]/g, '').length + 0.324 * em * txt.replace(/[^,]/g, '').length + ({ S: 8, M: 10, L: 12 }[size] || 10);
-    const cell = 186 / cols - 1;
-    const gap = size === 'L' && cols >= 3 ? 3 : cols <= 2 ? Math.max(4, Math.min(10, (0.46 * cell - bare) / 2)) : 4;
-    return (cell - bare - 2 * gap) / 2 >= 22;
-}
 
 function pvRenderBody(p, ctx0) {
     {
@@ -1082,6 +1063,9 @@ register('pv', {
     // Guided cell 1 of a lesson sheet is drawn at step 1 (lesson-pages/we-do.js): the digit counts traced grey. Read
     // only through stepTemplateOf, so only the compare item - the one kind with step states - takes it.
     guidedStepOne: true,
+    // (a practice page's example strip - anchors.js, --anchors - draws the compare item whole: its states with their count
+    // labels cost the page a row, ws-coverage-matrix single/ex-group PAGEFILL)
+    anchorStates: false,
     /** State k as a payload variant (`_marks`) and the answer's ink ('trace' | 'solid' | null): the Scripted Model draws it. */
     statePayload(p, steps, k) {
         const mk = {};
