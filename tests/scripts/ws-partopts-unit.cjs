@@ -248,7 +248,8 @@ async function browser() {
     const ids = ['PO-2a', 'PO-2b', 'PO-2c', 'PO-2d'];
     for (const id of ids) { const f = fails.filter((x) => x.startsWith(id + ' ')); console.log(`${id} ${f.length ? `FAIL ${f.length}` : 'PASS'}`); for (const x of f.slice(0, Number(arg('show', 25)))) console.log(`   ${x}`); }
     // F2 (critic A r1): how many lesson x size cases offer a real We Do range and a real Practice range (2 values or more)
-    const floorW = Number(arg('floor-wedo', 0.4)), floorP = Number(arg('floor-practice', 0.9));
+    // PO-2e We Do floor = the measured 7/52 (lead, 2026-11-13): a ratchet, raise it only (a wider We Do layout is its own entry).
+    const floorW = Number(arg('floor-wedo', 7 / 52)), floorP = Number(arg('floor-practice', 0.9));
     const cw = cover.cases ? cover.wedo / cover.cases : 1, cp = cover.cases ? cover.practice / cover.cases : 1;
     if (has('verbose')) for (const x of cover.list) console.log(`   ${x}`);
     const covOk = !cover.cases || arg('lessons') || (cw >= floorW && cp >= floorP);

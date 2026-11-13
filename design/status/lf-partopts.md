@@ -43,3 +43,5 @@ Fix-round decisions (for the critic):
 - We Do ranges stay rare (7 of 52): stacks (25.9 mm ink in a 58 mm cell), stories (fit 1) and Steps-stretched bands cannot lose a cell without an EB-SIDE / EB-BAND band. Facts (add_facts, nearest_10 M, sub_1k M, sub_100_regroup L) offer 2-3. Widening the coverage needs a different We Do layout (cells that keep their width) - a scope question for the lead.
 - PO-2 excuses a cell finding only when the standard packet draws a cell of the same template, sheet and size with that finding (F11b defects of other lanes); EB-PAGE has no excuse but an identical page.
 - Practice totals are equal pages only (no unequal last page); a total between them rounds with the note "Rounded to n so no page is under half full".
+
+| 2026-11-13 | Lead decisions after the fix round | We Do accepted as mostly fixed in step A ("Fixed: n (why)"); the PO-2e We Do floor is set to the measured 7/52, a ratchet that may only rise. Follow-up entry **partopts-wedo-layout**: a We Do layout (stacks, word problems, Steps-stretched bands) that frees more counts without an EB-SIDE or EB-BAND failure. +$25 for critic r2. |
