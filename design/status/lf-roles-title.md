@@ -106,3 +106,14 @@ addition:add_facts) and `dialog-teacher-print-1280.png`, `dialog-simple-print-12
 - Pin: no-option pages still 196/196 identical to origin/master a6883082c (T2 touches only above pages).
 - Backtest `title-ui-caret` (aaafcfb67 FAIL → a2460c266 OK) PASS; `title-ui` gate on precritic `--teacher`; ledger rows added.
 - PNGs refreshed: `dialog-{teacher,simple}-print-{1280,1024}.png`, the page PNGs (above pages show T2).
+
+## Merge with origin/master a8258e3f3 (no size S) — after re-critic r2 PASS
+- Merge `20a957050`: conflicts in css/simple-print.css (both blocks kept), js/modules/simple-print.js (only the import line:
+  `printsCompactOnePage` + `fitTitle`; master's M/L size row and `offeredSize` S-as-M decode and this lane's title field, Title
+  place, QP1 title fields and caret restore all kept), backtests.json and CHECKS_FROM_CRITICS.md (union, master's text first).
+- Critic nit: the teacher Print screen's Title place caption says "Title is off …" while Header › Title is unticked.
+- Gates on the merged tree: ws-frame-title OK (196/196 identical to the a6883082c pin; master did not change those pages, no
+  re-pin) · ws-title-code OK · ws-frame-title-ui OK at 1280 and 1024 · ws-no-size-s OK (static, --docs, --browser,
+  --self-test --browser) · ws-code-snapshot OK · ws-boot-smoke OK · ws-roles-unit OK (87) · ws-precritic-plan OK (197 rows) ·
+  ws-lesson-baseline --all-lessons OK (1732) · ws-stamp-assets --check FAIL (report only: index.html stamp is stale; stamped at
+  deploy).
