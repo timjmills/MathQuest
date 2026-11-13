@@ -2341,13 +2341,24 @@ function _vocabForms() {
     return _P12_VOCAB;
 }
 
+// A value of the host's control that a preset does not offer (it would deal the same page as the preset's default). The
+// value is gone from the preset's panel and normalizeOptions reads an old code's copy as the default, so codes still decode.
+// Two-step card, lead ruling 2026-11-13 (band 50, ruling (a)): on ÷-last and the letter equation only ~6 % of items
+// (37 / 600, 38 / 600) pass 50, so "Numbers to 50" printed the "to 30 / as dealt" page under a different name.
+export const PRESET_HIDE_VALUES = {
+    'algebra:two_step_add_then_div': { band: [50] },
+    'algebra:two_step_letter_equation': { band: [50] },
+};
 // A PRESET skill (skill-presets.js) shows its HOST's controls with the preset values as their
 // defaults: "preset values under any explicit opts", and a share code packs only the changes.
 function _presetDefs(categoryId, skillId, fn) {
     const p = presetOf(categoryId, skillId);
     if (!p) return null;
+    const hide = PRESET_HIDE_VALUES[`${categoryId}:${skillId}`] || null;
     return fn(categoryId, p.skillId).map((o) => (o && o.id in p.opts
-        ? { ...o, default: JSON.parse(JSON.stringify(p.opts[o.id])), presetValue: true } : o));
+        ? { ...o, default: JSON.parse(JSON.stringify(p.opts[o.id])), presetValue: true } : o))
+        .map((o) => (o && hide && hide[o.id] && Array.isArray(o.values)
+            ? { ...o, values: o.values.filter((v) => !hide[o.id].includes(v.v)) } : o));
 }
 
 /** A skill's own declared options: its registry entry, else its mixed-pool control, else none. */
