@@ -291,7 +291,7 @@ async function checkMain() {
     if (has('all-lessons')) {
         const keys = await page.evaluate(async () => Object.keys((await import('./js/modules/lessons/prereqs.js')).LESSONS));
         for (const k of keys) { const [categoryId, skillId] = k.split(':'); if (LESSONS.some((l) => l.skill.categoryId === categoryId && l.skill.skillId === skillId && !l.skill.opts)) continue;
-            LESSONS.push({ id: k, dir: skillId, spot: true, skill: { categoryId, skillId } }); }
+            if (!ONLY || ONLY.split(',').includes(k)) LESSONS.push({ id: k, dir: skillId, spot: true, skill: { categoryId, skillId } }); }
     }
     const F = (rule, where, msg) => findings.push({ rule, where, msg });
     try {
