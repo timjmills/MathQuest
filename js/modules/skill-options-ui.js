@@ -509,6 +509,8 @@ function _tidySample(frame) {
     // The centred scale below is the panel's fit: a thumbnail crop (teacher-preview fit's `is-cropped`, origin top-left)
     // under it puts the stage off the frame (lf-algebra F8/G11), so it never survives a tidy.
     frame.classList.remove('is-cropped');
+    frame.classList.remove('is-scroll');
+    stage.style.left = ''; stage.style.top = ''; stage.style.transformOrigin = '';
     _sampleShowAll(stage);     // each tidy starts from the whole item, at the panel's own frame height (re-runs are idempotent)
     _sampleSaidOnce(stage);    // a question line the drawn item already says is hidden (critic-panel-r2 F6)
     _sampleChoices(stage);     // answer choices: lettered, figures two to a row (critic-panel-r2 F2)
@@ -532,8 +534,22 @@ function _tidySample(frame) {
         return frame.clientHeight - SAMPLE_PAD;
     };
     const place = (w, h, fh, need = 1) => {
-        const k = Math.min(_sampleZoom(need), fw / w, fh / h);
-        stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
+        let k = Math.min(_sampleZoom(need), fw / w, fh / h);
+        if (k >= need - 0.001) {
+            stage.style.transform = `translate(-50%, -50%) scale(${k.toFixed(4)})`;
+            return k;
+        }
+        // (critic-panel-r3 N1) Too big to read whole even as one part: drawn WHOLE at the legibility floor (its smallest
+        // word or digit at 9 px), the frame grown toward its cap, and the frame scrolls - never a crop through the drawing.
+        k = need;
+        fh = setInner(h * k, cap2);
+        const cw = frame.clientWidth, ch = frame.clientHeight;
+        frame.classList.add('is-scroll');
+        stage.style.transformOrigin = '0 0';
+        stage.style.left = `${Math.max(SAMPLE_PAD / 2, (cw - w * k) / 2)}px`;
+        stage.style.top = `${Math.max(SAMPLE_PAD / 2, (ch - h * k) / 2)}px`;
+        stage.style.transform = `scale(${k.toFixed(4)})`;
+        frame.scrollLeft = 0; frame.scrollTop = 0;
         return k;
     };
     _sampleUnclip(stage);      // a box inside the item that clips its own content is opened up (critic-panel-r2 F1)
@@ -686,7 +702,8 @@ function _sampleOverhang(stage) {
     const r = stage.getBoundingClientRect();
     let l = 0, t = 0, rr = 0, b = 0;
     for (const el of stage.querySelectorAll('*')) {
-        if (el.parentElement && el.parentElement.closest('svg')) continue;
+        // (an SVG label drawn past its own drawing's edge counts too: the sample shows drawings unclipped - critic-panel-r3 N1)
+        if (el.parentElement && el.parentElement.closest('svg') && el.tagName.toLowerCase() !== 'text') continue;
         const q = el.getBoundingClientRect();
         if (!(q.width > 0 && q.height > 0)) continue;
         l = Math.max(l, r.left - q.left); rr = Math.max(rr, q.right - r.right);
@@ -753,10 +770,8 @@ function _sampleLeaves(el, fits, splits) {
             return tiles;
         }
     }
-    if (el.tagName.toLowerCase() === 'svg' && !(el.parentElement && el.parentElement.closest('svg'))) {
-        const slices = _sampleSvgSlices(el, fits);
-        if (slices) { splits.push(el); return slices; }
-    }
+    // (critic-panel-r3 N1: a drawing is never cut into viewBox slices - a slice cut its labels and axes. A drawing too
+    // wide to read whole is one part, drawn whole at the 9 px floor in a frame that scrolls: _tidySample's place.)
     const kids = [...el.children].filter(_sampleDrawn);
     const cs = getComputedStyle(el);
     const loose = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
@@ -778,52 +793,18 @@ function _sampleLeaves(el, fits, splits) {
     return kids.flatMap((k) => _sampleLeaves(k, fits, splits));
 }
 
-const _leafEl = (l) => (l && (l.table || l.svg)) || l;
-const _isTile = (l) => !!(l && (l.table || l.svg));
-function _sampleTileShow(t) { if (t.table) _sampleTileApply(t); else _sampleSliceApply(t); }
-/**
- * A drawing too wide to read whole (a number line, a row of shapes, a grid whose labels are under 9 px when it spans the
- * frame) is paged in SLICES of its viewBox, `{svg, x: [from, to], y: [from, to]}` in its own units, read like a page, each
- * overlapping the next by a tenth so a label on a cut is whole on one of them (critic-panel-r2 F3: "scale or page them"). Null: no split.
- */
-function _sampleSvgSlices(svg, fits) {
-    const vb = svg.viewBox && svg.viewBox.baseVal;
-    if (!vb || !(vb.width > 0) || !(vb.height > 0) || !svg.querySelector('text')) return null;
-    const cuts = (len, n) => { const step = len / n, lap = step * 0.1; return [...Array(n).keys()].map((i) => [Math.max(0, i * step - lap), Math.min(len, (i + 1) * step + lap)]); };
-    // the fewest slices that are all legible: across first, then down, then both (a tall grid is cut into quarters)
-    for (const [nx, ny] of [[2, 1], [3, 1], [1, 2], [4, 1], [2, 2], [1, 3], [3, 2], [2, 3], [3, 3]]) {
-        const tiles = [];
-        for (const y of cuts(vb.height, ny)) for (const x of cuts(vb.width, nx)) tiles.push({ svg, x, y });
-        if (tiles.every((t) => fits(svg, t))) return tiles;
-    }
-    return null;
-}
-/** Show only a slice of a drawing: its viewBox narrowed to the slice, its width narrowed in step (same units per px). */
-function _sampleSliceApply(tile) {
-    const svg = tile.svg;
-    if (svg.dataset.skoVb === undefined) {
-        const r = svg.getBoundingClientRect();
-        const k = svg.closest('.tvp-stage') ? (svg.closest('.tvp-stage').getBoundingClientRect().width / (svg.closest('.tvp-stage').offsetWidth || 1)) || 1 : 1;
-        svg.dataset.skoVb = svg.getAttribute('viewBox') || '';
-        svg.dataset.skoWh = `${svg.style.width}|${svg.style.height}|${svg.style.maxWidth}|${r.width / k}|${r.height / k}`;
-    }
-    const [x, y, w, h] = svg.dataset.skoVb.split(/[\s,]+/).map(Number);
-    const [, , , pw, ph] = svg.dataset.skoWh.split('|');
-    const sw = tile.x[1] - tile.x[0], sh = tile.y[1] - tile.y[0];
-    svg.setAttribute('viewBox', `${x + tile.x[0]} ${y + tile.y[0]} ${sw} ${sh}`);
-    svg.style.maxWidth = 'none';
-    svg.style.width = `${(Number(pw) * sw) / w}px`;
-    svg.style.height = `${(Number(ph) * sh) / h}px`;
-}
+const _leafEl = (l) => (l && l.table) || l;
+const _isTile = (l) => !!(l && l.table);
+function _sampleTileShow(t) { _sampleTileApply(t); }
+/** (critic-panel-r3 N1) Undo a viewBox slice a previous build of the panel left on a drawing (none are made now). */
 function _sampleSliceRestore(stage) {
     for (const svg of stage.querySelectorAll('svg[data-sko-vb]')) {
         if (svg.dataset.skoVb) svg.setAttribute('viewBox', svg.dataset.skoVb); else svg.removeAttribute('viewBox');
-        const [w, h, mw] = svg.dataset.skoWh.split('|');
-        svg.style.width = w; svg.style.height = h; svg.style.maxWidth = mw;
+        const [w, h, mw] = (svg.dataset.skoWh || '').split('|');
+        svg.style.width = w || ''; svg.style.height = h || ''; svg.style.maxWidth = mw || '';
         delete svg.dataset.skoVb; delete svg.dataset.skoWh;
     }
 }
-
 
 /** A table's tiles: as many columns as fit across, then as many rows as fit down, both split evenly. Null: no split. */
 function _sampleTiles(table, fits) {

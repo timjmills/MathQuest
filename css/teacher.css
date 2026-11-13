@@ -1031,3 +1031,10 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     .tv-part-many { flex-direction: row; align-items: center; gap: 4px 12px; }
     .tv-part-sup-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+/* critic-panel-r3 N1 (additive): a sample drawing too wide to read whole at 9 px is drawn whole at that floor and its
+   frame scrolls (skill-options-ui _tidySample place); it is never cut into viewBox slices. */
+.tv-sko-frame.is-scroll { overflow: auto !important; overscroll-behavior: contain; }
+/* (N1) a label a drawing sets past its own edge ("minutes" left of a double number line) is drawn whole in the sample, never
+   clipped to "inutes"; the stage pads out to it (skill-options-ui _sampleOverhang). */
+.tv-sko-frame .tvp-stage svg { overflow: visible; }
