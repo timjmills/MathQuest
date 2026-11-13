@@ -904,6 +904,9 @@ function buildPlan(ctx) {
         // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
         // elements at least their print size, a drawing wide before tall
         add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz at 820 / 1024 / 1280 / 1366)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
+        // (lf-algebra, lf-engine roles critic N4 "Mia needs 187 shells. He already has ..."; lead ruling A 2026-11-13: a story's
+        // pronoun agrees with its name, P-WP-19 repeat the name; node, every template statically plus the --skill samples)
+        add(gate('story-pronouns', 'ws-story-pronouns (STATIC-PRONOUN, PRONOUN-AGREE, PRONOUN-ONE, UNMAPPED)', scope, 'node', 'ws-story-pronouns', ['--skill', keys.join(',')], { missingMsg: 'ws-story-pronouns is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own

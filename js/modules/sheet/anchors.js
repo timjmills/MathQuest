@@ -133,7 +133,11 @@ export function stepTemplateOf(it) {
     const id = q.cell && q.cell.template;
     if (!id || id === 'legacy' || !hasCell(id)) return null;
     const t = getCell(id);
-    return typeof t.stepState === 'function' ? t : null;
+    if (typeof t.stepState !== 'function') return null;
+    // (a template that draws step states for SOME of its kinds says which: `hasStepState(payload)`; the pv template draws the
+    // compare item's - lf-placevalue compare r2 - and every other pv kind keeps the whole-cell fallback below)
+    if (typeof t.hasStepState === 'function' && !t.hasStepState(q.cell.payload || {})) return null;
+    return t;
 }
 
 /**
@@ -155,7 +159,10 @@ function stateHtml(it, merged, k, c, twinCols, whole, size, level = 3) {
     // The state is drawn at the anchor's own (smaller) preset: the templates read ctx.metrics and
     // the kit's size custom properties, which the wrapper's `ws-<size>` class sets (anchorHtml).
     const ctx = resolveCtx(Object.assign({}, c, { size, metrics: undefined, state: 'blank', scaffoldLevel: level, options: Object.assign({}, c.options || {}, { factColumns: twinCols }) }));
-    if (t && !whole) {
+    // (`anchorStates: false`: a template whose step states teach on the lesson chart and the Scripted Model but are too tall for
+    // a practice page's example strip - the pv compare item, lf-placevalue compare r2: the strip cost a row, ws-coverage-matrix
+    // single/ex-group PAGEFILL 24 % - is drawn whole here, as before)
+    if (t && !whole && t.anchorStates !== false) {
         const payload = Object.assign({}, it.q.cell.payload || {});
         // A fact's digit size follows the fact ladder, not the preset: pin it to the anchor's size.
         if (it.q.cell.template === 'fact' && !payload.pt) payload.pt = ctx.metrics.digitPt;

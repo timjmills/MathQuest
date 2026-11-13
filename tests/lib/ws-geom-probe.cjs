@@ -110,7 +110,8 @@ function GEOM_PROBE(cfg) {
 
     /* ---- WRAP-OP: a wrapped line that ends in an operator */
     if (!cfg || cfg.wraps !== false) {
-        const OPS = '−+×÷=';
+        // (`wrapOps`, opt-in, lf-placevalue compare r4 / critic r2: "7 >" / "5." - a caller may add the comparison signs < >)
+        const OPS = cfg && typeof cfg.wrapOps === 'string' && cfg.wrapOps ? cfg.wrapOps : '−+×÷=';
         // the nearest ancestor that lays out its own lines: an inline box flows in its parent's lines; an inline-block,
         // inline-flex or flex / grid item makes its own (its computed display is not `inline`)
         const blockOf = (n) => { let e = n.parentElement; while (e && ['inline', 'contents'].includes(getComputedStyle(e).display)) e = e.parentElement; return e; };
