@@ -232,6 +232,36 @@ export const ROUTINES = Object.freeze({
         },
         example: { match: '[\\s\\S]' },
     },
+    // ------------------------------------------------------------- Count by the tables (lane lf-ops build #4, 3.OA.C.7 prep)
+    // count_by_tables (count-row card, signed 2026-11-12): one count-by row per table, a jump arrow between numbers; the
+    // pupil reads the jump, adds it to get the next number and writes each missing number. Its four steps are the four
+    // worked states of countby.js rowSteps (the jump; the first gap; the next gap; every gap, each jump checked).
+    'mult-count-by-table': {
+        archetype: 'count',
+        casesPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): written from the count-row card (signed 2026-11-12) and the provider steps; its cases are declared when the lesson is carded (lessons-first).',
+        concepts: [
+            { id: 'jump', text: 'Every jump is the same size: the number in the box.' },
+            { id: 'add-jump', text: 'Add the jump to a number to get the next one.' },
+            { id: 'table', text: 'Counting by a number says its times table.' },
+        ],
+        vocab: [
+            { word: 'count by', meaning: 'say every 5th (or 2nd, 3rd ...) number', picture: { kind: 'text', text: '5, 10, 15' } },
+            { word: 'jump', meaning: 'how much is added each time', picture: { kind: 'text', text: '+ 5' } },
+            { word: 'missing', meaning: 'a number not written yet: an empty box', picture: { kind: 'text', text: '10, __, 20' } },
+        ],
+        steps: [
+            { icon: 'look', text: 'Read the jump.' },
+            { icon: 'count', text: 'Add the jump.' },
+            { icon: 'write', text: 'Write the missing number.' },
+            { icon: 'check', text: 'Check every jump.' },
+        ],
+        chant: '',
+        format: {
+            kind: 'icons + very short steps',
+            why: 'Four actions, one icon each; the count itself ("I count by 5: 5, 10, 15") is the Say band, so a chant would only repeat it.',
+        },
+        example: { match: 'Count by' },
+    },
 });
 
 export const LESSONS = Object.freeze({
@@ -254,6 +284,16 @@ export const LESSONS = Object.freeze({
             { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: how a row of dots is counted fast.' },
         ],
         mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
+    },
+    'skill:multiplication:count_by_tables': {
+        routine: 'mult-count-by-table',
+        practice: { skill: 'multiplication:count_by_tables' },
+        prereqsPending: 'Lane lf-ops build #4 r5 (node-lint LESSON-DATA): a Warm-up of the skip counts it extends until its Prerequisite Check is written (LR-17).',
+        warmup: [
+            { key: 'counting:number_seq_fill', opts: { step: 2, dir: 'forward' }, why: 'Skip counting by 2s: a count-by row with the smallest jump.' },
+            { key: 'counting:number_seq_fill', opts: { step: 5, dir: 'forward' }, why: 'Skip counting by 5s: the count-by row most pupils know first.' },
+        ],
+        mixWith: [{ key: 'counting:number_seq_fill', opts: { step: 10, dir: 'forward' } }, { key: 'addition:add_facts', opts: { band: 20 } }],
     },
     'skill:multiplication:mult_properties': {
         routine: 'mult-turn-array',
