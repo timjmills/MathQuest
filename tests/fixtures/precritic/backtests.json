@@ -3919,6 +3919,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
- }
+ },
+  {
+   "id": "vocab-r10-rule-machine",
+   "check": "lf-vocab r10 item 1: critic r9 #2: a picture with an arrow into and out of a box and a number at both ends (2 -> [+3] -> 5) derives input and output; rule may not share a bank with them",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-AMBIG+ (function machine)",
+   "browser": false,
+   "fail": {
+    "commit": "605fa9f0",
+    "state": "lf-vocab r10 base (r9 + master merge): rule drawn 2 -> [+3] -> 5"
+   },
+   "pass": {
+    "commit": "0c3d4c59",
+    "state": "rule drawn as the box and arrows only"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+ 2>&1 | grep -q '\"rule\": its drawing also shows \"\\(input\\|output\\)\"' && echo 'rule-machine: FAIL' || echo 'rule-machine: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r10-cycle-loop",
+   "check": "lf-vocab r10 item 2: critic r9 #3: a loop of three or more numbers derives sequence and pattern; cycle may not share a bank with sequence",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-AMBIG+ (loop of numbers)",
+   "browser": false,
+   "fail": {
+    "commit": "0c3d4c59",
+    "state": "cycle drawn as a 2, 4, 8, 6 ring"
+   },
+   "pass": {
+    "commit": "856aba09",
+    "state": "cycle drawn as a loop of four shapes"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG+ 2>&1 | grep -q '\"cycle\": its drawing also shows' && echo 'cycle-loop: FAIL' || echo 'cycle-loop: OK')",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r10-v-fit",
+   "check": "lf-vocab r10 items 3 + 5: critic r9 #4 (rule 5 root cause): every core word's picture teaches its set's standard (ccss / op); total's additive 5 + 3 bar fails the 4.OA.A.1 times-as-many core",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FIT",
+   "browser": false,
+   "fail": {
+    "commit": "6ae462d1",
+    "state": "lf-vocab r9: times as many = times as many, total, factor, ..."
+   },
+   "pass": {
+    "commit": "4200e2c0",
+    "state": "times as many = times as many, factor, product, compare, multiple, unknown"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "vocab-r10-v-fit6",
+   "check": "lf-vocab r10 item 4: critic r9 #5: a set's other words teach its standard too (pinned misfits apart): output (input-output tables) in follow a rule and total (additive bar) in growing patterns fail",
+   "kind": "commit-pair",
+   "rule": "ws-vocab-unit V-FIT6",
+   "browser": false,
+   "fail": {
+    "commit": "4200e2c0",
+    "state": "r9 sets 7 / 8 with total and output"
+   },
+   "pass": {
+    "commit": "6adc77cb",
+    "state": "growing patterns takes odd, follow a rule takes grow"
+   },
+   "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT6",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  }
 ]
 }
