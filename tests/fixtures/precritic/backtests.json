@@ -6816,8 +6816,8 @@
    "state": "the owner's ruling commit: teacher print, simple print, worksheet sheet and print settings offer S; printDefaults keeps a stored S; no S -> M alias; precritic, empty-band, cell-checks, capacity-pin and the rest default to S,M,L (52 findings)"
   },
   "pass": {
-   "commit": "a3b128cd1",
-   "state": "lf-tools-nos: M and L pickers, offeredSize at every restore, gates default to M,L, each S kept on purpose on the reasoned allow-list"
+   "commit": "32689e907",
+   "state": "lf-tools-nos r3: M and L pickers, offeredSize at every restore, gates default to M,L, each S kept on purpose on the reasoned allow-list (moved from a3b128cd1 in r3: the r3 TOKEN rule rightly fails a3b's fitsNotes \"Small\", critic nos r2 nit)"
   },
   "command": "node tests/scripts/ws-no-size-s.mjs --root {root}",
   "expect": {
@@ -6856,8 +6856,8 @@
    "state": "lf-tools-nos r1 head: applyPrintSettings copies a stored S raw (saved set, &set= link, tray), decodeSetParam keeps S, the Library says Size S, the worksheet sheet shows M / L with neither checked, and the one-page option draws an unchecked M / L radiogroup under \"Size fixed ... smaller digits\" and \"Small\" (17 findings)"
   },
   "pass": {
-   "commit": "6b59329af",
-   "state": "lf-tools-nos r2: offeredSize on every restore and display path; the compact one-page label everywhere"
+   "commit": "32689e907",
+   "state": "lf-tools-nos r3: offeredSize on every restore and display path; the compact one-page label everywhere, and no visible picker under it (moved from 6b59329af in r3: the visibility gate rightly fails 6b59's live Big / Medium buttons in simple print, critic nos r2 N1)"
   },
   "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
   "expect": {
@@ -6896,10 +6896,70 @@
    "state": "PRE-FLIGHT items 1-2 \"at S and L\", RUBRIC scope \"S and L\", PT-DLG-5 \"S, M, L\" (4 findings)"
   },
   "pass": {
-   "commit": "6b59329af",
-   "state": "M and L, with the date S was dropped"
+   "commit": "32689e907",
+   "state": "M and L, with the date S was dropped (moved from 6b59329af in r3: the r3 DOC token rule rightly fails 6b59's WORKSHEET_DESIGN_STANDARD / EXTENSION_PLAYBOOK S / M / L definitions, critic nos r2 N3)"
   },
   "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-size-s-n1-4a8e",
+  "check": "ws-no-size-s --browser VISIBLE / FIXED / WORKS (round cap after critic nos r2 N1): every size surface in every mode, simple print's compact \"All rows on one page\" included, is judged by what is visible and clickable (computed style, box, elementFromPoint), never the hidden attribute: no visible S option, no visible size picker where the layout is fixed, and every visible size option clicked changes the size the preview page is built at; on every ws-precritic run and in deploy session 1",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s --browser FIXED / WORKS / VISIBLE",
+  "browser": true,
+  "fail": {
+   "commit": "4a8e539b4",
+   "state": "lf-tools-nos r2 head: simple print compact shows the label AND a live Big / Medium picker (.sp-root .sp-sizes { display: grid } overrides [hidden]); clicking Big or Medium leaves the page at the compact size (3 findings)"
+  },
+  "pass": {
+   "commit": "32689e907",
+   "state": "lf-tools-nos r3: .sp-root .sp-sizes[hidden] { display: none } (additive): one label, no picker"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --browser --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-size-s-r3-static-4a8e",
+  "check": "ws-no-size-s --docs TOKEN rules (round cap after critic nos r2 N2 / N3 / nit): APP-TOKEN and GATE-TOKEN flag any size-letter string or quoted S / Small on a size line; DOC scans every non-record *.md (CLAUDE.md and WORKSHEET_DESIGN_STANDARD.md included) for a size-S token beside M / L, after size / at / --sizes, or Small beside Medium / Large; only dropped / alias / history lines or a nos marker pass",
+  "kind": "commit-pair",
+  "rule": "ws-no-size-s APP-TOKEN / GATE-TOKEN / DOC",
+  "browser": false,
+  "fail": {
+   "commit": "4a8e539b4",
+   "state": "lf-tools-nos r2 head: WORKSHEET_DESIGN_STANDARD.md:22 and EXTENSION_PLAYBOOK.md:72 define S / M / L with no note, LESSONS_LEARNED L2 says S/M/L, the live docs offer S in ~180 lines, teacher-print fitsNotes names S \"Small\""
+  },
+  "pass": {
+   "commit": "32689e907",
+   "state": "lf-tools-nos r3: instructions rewritten to M / L, token values marked as the compact token / decode alias, findings logs marked history, fitsNotes says the compact layout; CLAUDE.md's two lines allow-listed for the owner"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --docs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-size-s-r2-mutations",
+  "check": "ws-no-size-s line rules (critic nos r2 C / D / E, N2's three missed phrasings, N3's three lines): an S picker from 'SML'.split(''), \"at size S and at L\", \"Small and Large\", \"--sizes S,M,L\" in a doc and an S / M / L definition with no note each FAIL",
+  "kind": "fixture",
+  "rule": "ws-no-size-s APP-TOKEN / DOC",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-fail.json",
+   "state": "the critic's r2 mutations and the N3 lines as they stood on 4a8e539b4"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/no-size-s/r2-mutations-pass.json",
+   "state": "the same lines at M and L, and N3 as fixed"
+  },
+  "command": "node tests/scripts/ws-no-size-s.mjs --lines {fixture}",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"

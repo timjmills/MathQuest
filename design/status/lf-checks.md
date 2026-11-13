@@ -517,3 +517,42 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK.
   - node --check on every edited module.
   - ws-node-lint FAIL 50, identical on the base.
+
+### lf-tools-nos r3 (2026-11-13, ROUND CAP: fresh builder, Opus medium; critic r1 and r2 both failed on reintroduced S)
+- **Root cause.** The static and doc guards listed PHRASINGS with regexes, so every new spelling ('SML'.split(''), "at size S
+  and at L", "Small and Large") slipped through. The browser gate read ATTRIBUTES (`hidden`, `aria-label="Size"`), not what
+  is VISIBLE, so a CSS rule (`.sp-root .sp-sizes { display: grid }`) that put a hidden picker back on screen passed (N1).
+- **Checks first** (each FAILs on 4a8e539b4 or on a planted mutation):
+  - `ws-no-size-s --browser` judges visibility: computed style up the tree, a box, and elementFromPoint at the centre. It
+    finds a size option by what it does (data-act/sp/k "size") or says (S M L Small Medium Large Big under a size label),
+    not by aria-label. Surfaces: Settings, the worksheet sheet, the Print screen, and simple print (fact rows, quick print,
+    cells, compact). In each it asserts no visible or clickable S option, no visible picker where the layout is fixed, and
+    that every visible option, clicked with the mouse, changes the preview page's data-ws-size. 4a8e539b4: FAIL 3 (N1). The
+    head passes 73 checks.
+  - TOKEN rules replace phrase lists: APP-TOKEN, GATE-TOKEN, and DOC over every non-record *.md (records: DOC_RECORDS with
+    reasons). Exemptions are explicit: dropped / alias / compact token / history wording, or a `<!-- nos: why -->` marker
+    (one line, one block, or a `nos-section` for a dated findings log).
+  - A MUTATION corpus of 29 rows: the critic's r1 code mutations, r2 A-F and E, the six N2 doc phrasings, and our own (a CSS
+    display override, a new picker array, an S built with String.fromCharCode, a renamed label, S defaults in a gate, plus
+    doc lines in CLAUDE.md, an agent brief and PEDAGOGY). Every run of this tree plants the static rows (precritic and deploy
+    session 1), so the self-test is on precritic's path. `--self-test --browser` plants the 9 browser rows in a copy of the
+    served tree. All 29 are caught.
+  - Backtest rows (text insertion; none deleted, 347 -> 350): `no-size-s-n1-4a8e` (browser), `no-size-s-r3-static-4a8e` and
+    `no-size-s-r2-mutations` (fixture). Three older rows had a pass commit that the stricter check now rightly fails:
+    a3b128cd1 (fitsNotes "Small") and 6b59329af (N1, N3). Their pass side moves to 32689e907, and each row's state says so.
+  - CHECKS_FROM_CRITICS: 3 rows (N1, N2, N3 + nit).
+- **Fixes.** N1: additive `.sp-root .sp-sizes[hidden] { display: none; }`. Screenshot:
+  `design/status/lf-checks/no-size-s/r3-simple-print-compact.png` shows the one label, with no picker. N3: WDS:22 and
+  EXTENSION_PLAYBOOK:72 now say "S dropped as a choice; the token stays as the decode alias and the compact layout". L2 now
+  reads "M and L". The other live docs: instructions are rewritten to M / L, and token values are marked. The nit:
+  fitsNotes maps S to the compact label, never "Small".
+- **Owner file.** CLAUDE.md:60 ("Size S ignored") and :461 ("Tokens (sizes S/M/L ...") fail the DOC rule. They are not
+  edited, are reported to the lead, and are allow-listed with that reason. These entries go stale, and so FAIL, once the
+  owner rewrites the lines.
+- **Coordinator item.** ws-simple-print's student-view COLSFIT/OPTKEY step now runs at 1024, not 390. ws-simple-print OK.
+- **Verified:**
+  - ws-no-size-s (default, --docs, --self-test, --self-test --browser, --browser): all OK.
+  - Backtests: no-size-s-76bc / -docs-c81 / -r1-mutations / -browser-c81 / -n1-4a8e / -r3-static-4a8e / -r2-mutations all
+    PASS.
+  - ws-precritic-plan --checks-from-critics: 107 pass / 24 exempt / 15 fail. The 15 are the same older rows; none dropped.
+  - ws-code-snapshot OK (734, nothing moved); ws-boot-smoke OK; node --check on teacher-print.js and both scripts.
