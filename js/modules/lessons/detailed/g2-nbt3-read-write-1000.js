@@ -12,7 +12,9 @@
 // (`cellPayload.noTabSpacer`, lf-placevalue 2026-11-08: the pack's rows centre the equation clear of the number tab, so the pv
 // cell's CL-40 top spacer is left off - self-check E11 / E9c, as the pack printed before the spacer came in)
 const PV = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 999, zeroPlace: 'some' }, opts || {}), minNum: 101, maxNum: 999, cellPayload: { noTabSpacer: true } }, extra || {});
-const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 1000, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto' } : {}, opts || {}), minNum: 101, maxNum: 999 }, extra || {});
+const WORDS = (way, extra, opts) => Object.assign({ categoryId: 'composing', skillId: 'number_word_form', opts: Object.assign({ wordform: [way], band: 1000, zeroPlace: 'some' }, way === 'to_number' ? { answerSlot: 'hto' } : {}, opts || {}), minNum: 101, maxNum: 999, cellPayload: { inPlace: false } }, extra || {});
+// (`cellPayload.inPlace: false`, lf-placevalue w2: the number-name cells keep the rows the pack was signed off with - the words
+// cell is in place on the skill's own pages since 2026-11-12, which left P0 / P4-2 E9b / E11 red)
 // P1's bank types (V22 §9.2, critic D11): 2-digit prior knowledge, never today's new skill.
 const NS = (skillId, opts, extra) => Object.assign({ categoryId: 'placevalue', skillId, opts: Object.assign({ band: 99 }, opts || {}), minNum: 10, maxNum: 99 }, extra || {});
 
@@ -138,7 +140,7 @@ export default {
     prerequisites: [
         // Routes (critic D22): the site has no lesson for these yet, so each names the CCSS code and a
         // short title (V22 Appendix H); `routeNote` says so on T2b.
-        { atom: 1, items: 4, ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 100, zeroPlace: 'none' }, minNum: 21, maxNum: 99 },
+        { atom: 1, items: 4, ref: { categoryId: 'composing', skillId: 'number_word_form', opts: { wordform: ['to_number'], band: 100, zeroPlace: 'none' }, minNum: 21, maxNum: 99, cellPayload: { inPlace: false } },
             lesson: { id: '1.NBT.A.1', title: 'Read and write numbers to 120' } },
         { atom: 2, items: 3, ref: PV('unit_form'), lesson: { id: '2.NBT.A.1', title: 'Hundreds, tens and ones' } },
         { atom: 3, items: 2, ref: PV('value'), lesson: { id: '2.NBT.A.1', title: 'The value of a digit' } },
