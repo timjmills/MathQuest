@@ -4158,7 +4158,10 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     });
     const wrap = document.createElement('div');
     wrap.appendChild(tpl.content);
-    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${wrap.innerHTML}</div>`;
+    // (lf-placevalue compare round, ws-empty-band EB-PARITY: the compare twin is the paper's kit cell on every host - marked
+    // [data-ws-cell="pv"] as the words twin is; an inline block, so the mark is the drawing's own box, centred as before)
+    const inner = p.kind === 'compare' ? `<div data-ws-cell="pv" style="display:inline-block;max-width:100%;padding:0 2mm;box-sizing:border-box;">${wrap.innerHTML}</div>` : wrap.innerHTML;
+    const body = `<div class="ws-sheet ws-L ws-ican mq-kit mq-kittwin" data-mq-kit="pv" data-mq-kind="${attr(p.kind)}">${inner}</div>`;
     const instr = printInstructionFor(q, categoryId) || plainText(q.text);
     // a chart's digits make ONE number: the host checks the number, not a list of parts
     return { mode, html: body, instr, count: mode === 'slots' && !chart && !order ? slots.length : 0, kit: 'pv' };
