@@ -49,9 +49,34 @@ for (const c of changed) console.log(`  set ${c.i} ${c.s.title} (grade ${c.s.gra
 if (process.argv.includes('--list') || !OUT) { console.log('ws-vocab-set-renders: OK'); process.exit(0); }
 // (r13, critic r11 / r12: the dealt-pairs table) EVERY bank a 1 picture, 3 words item of each set can deal (vocab-words.js
 // dealtBanks: the picture plus the other two words of a vetted trio), written to manifest.json so the critic reads them all
+// (r14, critic r13 speed-up: a column of the numbers each picture marks and their places, so number readings show without
+// opening the picture) marked: the numbers in a heavy box or a ring, read from the drawing; parity / place / run: the
+// reader's features (vocabReadFeatures) for them
+const marksOf = (id) => {
+    const body = svg(P1, id);
+    if (!body) return null;
+    const texts = [...body.matchAll(/<text([^>]*)>([^<]*)<\/text>/g)].map((m) => ({ x: Number((m[1].match(/ x="([^"]*)"/) || [])[1]), y: Number((m[1].match(/ y="([^"]*)"/) || [])[1]), t: m[2].trim() }));
+    const marked = [];
+    for (const [, a] of body.matchAll(/<rect([^>]*)\/>/g)) {
+        const g = (k) => Number((a.match(new RegExp(` ${k}="([^"]*)"`)) || [])[1]);
+        if (!(g('stroke-width') >= 2) || !/fill="none"/.test(a)) continue;
+        const inn = texts.filter((t) => t.x > g('x') && t.x < g('x') + g('width') && t.y > g('y') && t.y < g('y') + g('height'));
+        marked.push(...inn.filter((t) => /^\d+$/.test(t.t)).map((t) => `${t.t} (box${inn.length > 1 ? ` of ${inn.length}` : ''})`));
+    }
+    for (const [, a] of body.matchAll(/<circle([^>]*)\/>/g)) {
+        if (!/fill="none"/.test(a)) continue;
+        const g = (k) => Number((a.match(new RegExp(` ${k}="([^"]*)"`)) || [])[1]);
+        const inn = texts.filter((t) => Math.hypot(t.x - g('cx'), t.y - g('cy')) < g('r'));
+        if (inn.length === 1 && /^\d+$/.test(inn[0].t)) marked.push(`${inn[0].t} (ring)`);
+    }
+    const f = P1.vocabReadFeatures(body);
+    return { marked, parity: f.filter((x) => /^(marked|all)-/.test(x)), place: f.filter((x) => x.startsWith('place:')).map((x) => x.slice(6)),
+        run: f.filter((x) => /-run$|^step:/.test(x)) };
+};
 const dealt = W1.VOCAB_SETS.map((s, i) => ({ set: i, title: s.title, grade: s.grade, words: s.words.slice(), noPicture: (s.noPicture || []).slice(),
     trios: typeof W1.vettedTrios === 'function' ? W1.vettedTrios(s) : [],
-    banks: typeof W1.dealtBanks === 'function' ? W1.dealtBanks(s).map((b) => ({ picture: b.picture, bank: b.bank })) : [] }));
+    pictureMarks: Object.fromEntries(s.words.map((w) => [w, marksOf(w)])),
+    banks: typeof W1.dealtBanks === 'function' ? W1.dealtBanks(s).map((b) => ({ picture: b.picture, bank: b.bank, marks: marksOf(b.picture) })) : [] }));
 execFileSync('mkdir', ['-p', OUT]);
 writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify({ since: SINCE, changed: changed.map((c) => ({ set: c.i, title: c.s.title, why: c.why })), dealtBanks: dealt }, null, 1));
 console.log(`  dealt-pairs table: ${dealt.reduce((n, d) => n + d.banks.length, 0)} banks over ${dealt.length} sets -> ${path.join(OUT, 'manifest.json')}`);
