@@ -3441,6 +3441,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-ink-size-ring",
+  "check": "a ring is its own mark: a screen ring group paper does not draw FAILS as SIZE-REF and is never paired with the print dots (critic sis-r2 D1: 12 rings of 0.8 mm read as \"dot (array) 40 %\")",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra.fail.html",
+   "state": "the screen array at 3 mm dots plus 12 small black rings (0.8 mm); paper draws the array only"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array matches its print item, no rings"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-ring-large",
+  "check": "a screen ring group LARGER than the print dots, which paper does not draw, FAILS as SIZE-REF instead of passing silently; a ring paper draws too is matched to the print ring (critic sis-r2 D1)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra-large.fail.html",
+   "state": "the screen array plus 12 grey keyline rings of 3.5 mm; paper draws the array only"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-matched.pass.html",
+   "state": "paper and screen both draw the 12 rings of 3.5 mm under the array"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

@@ -87,13 +87,15 @@ function widthFinding(name, w, h, freeW, min = WIDTH_MIN) {
 }
 
 // D8: every mark is named by a noun of this list, every picture by a name of PICTURES; nothing else reaches a message.
-const NOUNS = ['dot', 'touch dot', 'counter', 'frame cell', 'tile', 'cube', 'base-10 rod', 'bar', 'square', 'box', 'picture mark', 'block'];
+const NOUNS = ['dot', 'touch dot', 'ring', 'touch ring', 'counter', 'frame cell', 'tile', 'cube', 'base-10 rod', 'bar', 'square', 'box', 'picture mark', 'block'];
 const PICTURES = ['array', 'ten frame', 'dot tile', 'digit', 'skip-count strip', 'base-10 blocks', 'five-dot groups', 'number track', 'picture'];
 /** The noun of a mark from its drawing's label / class and its own tag / class (D8). */
 function nounOf({ label = '', cls = '', glyph = false, mark = '' }) {
     const [tag, ...mc] = String(mark).split('.');
     const t = `${label} ${cls} ${mc.join(' ')}`.toLowerCase();
     const round = /^(circle|ellipse)$/.test(tag);
+    // a ring (no fill, a dark stroke: the reader keys it "<tag>.ring") is its own mark, never a "dot" (critic sis-r2 D1)
+    if (round && mc.includes('ring')) return glyph || /\bws-td\b|ws-td-|touch/.test(t) ? 'touch ring' : 'ring';
     if (glyph || /\bws-td\b|ws-td-|touch/.test(t)) return round ? 'touch dot' : 'block';
     if (/frame/.test(t)) return round ? 'counter' : 'frame cell';
     if (/counter/.test(t)) return 'counter';
@@ -121,14 +123,24 @@ function pictureOf({ label = '', cls = '', glyph = false }) {
     if (/k2-svg|picture|\(/.test(t)) return 'picture';
     return '';
 }
-/** "dot (array)": the mark's noun and, when known, its picture. */
-const markName = (d, g) => { const n = nounOf({ label: d.label, cls: d.cls, glyph: d.glyph, mark: g.mark }); const p = pictureOf(d); return p ? `${n} (${p})` : n; };
+/** The picture of a supports-model `support` value, for a drawing whose label names none (critic sis-r2 D3). */
+const SUPPORT_PICTURES = { array: 'array', frame: 'ten frame', tenframe: 'ten frame', ten_frame: 'ten frame', tile: 'dot tile', dots: 'dot tile',
+    skip: 'skip-count strip', strip: 'skip-count strip', base10: 'base-10 blocks', blocks: 'base-10 blocks', fives: 'five-dot groups', track: 'number track', touch: 'digit' };
+const supportPicture = (v) => (v ? SUPPORT_PICTURES[v] || 'picture' : '');
+/** "dot (array)": the mark's noun and its picture; a support drawing with no picture of its own takes its support's (D3). */
+const markName = (d, g, support = '') => {
+    const p = pictureOf(d) || supportPicture(support);
+    const n = nounOf({ label: `${d.label} ${pictureOf(d) ? '' : p}`.trim(), cls: d.cls, glyph: d.glyph, mark: g.mark });
+    return p ? `${n} (${p})` : n;
+};
 /** A drawing's name for SIZE-WIDTH: its picture, else "<noun> picture". */
-const drawingName = (d) => pictureOf(d) || `${nounOf({ label: d.label, cls: d.cls, glyph: d.glyph, mark: (d.groups[0] || {}).mark })} picture`;
+const drawingName = (d, support = '') => pictureOf(d) || supportPicture(support) || `${nounOf({ label: d.label, cls: d.cls, glyph: d.glyph, mark: (d.groups[0] || {}).mark })} picture`;
 
 /** The print reference of screen drawing sd's group g among the print drawings (D2, D3); null when none. */
 function matchRef(sd, g, prints) {
-    const all = prints.flatMap((p) => p.groups.map((pg) => ({ p, g: pg })));
+    // a ring is its own mark: it is paired only with a print ring, and a dot only with a print dot (critic sis-r2 D1)
+    const ringy = (m) => /\.ring$/.test(m);
+    const all = prints.flatMap((p) => p.groups.map((pg) => ({ p, g: pg }))).filter((c) => ringy(c.g.mark) === ringy(g.mark));
     const pick = (cs, how) => (cs.length ? { printMm: median(cs.map((c) => c.g.sizeMm)), how } : null);
     if (sd.sig) {
         const same = all.filter((c) => c.p.sig === sd.sig);
@@ -172,6 +184,29 @@ function judgePin(pin, findings) {
         else if (c.worst < p.worst - PIN_SLACK) over.push({ key: k, why: `worst ${c.worst} % < ${p.worst} % pinned` });
     }
     return over;
+}
+
+/** D2: the printed finding lines, each prefixed OVER (breaks the pin, or no pin) or pinned (the pin holds its key). */
+function findingLines(findings, over) {
+    const ov = over ? new Set(over.map((o) => o.key)) : null;
+    return findings.map((x) => `${!ov || ov.has(pinKey(x)) ? 'OVER  ' : 'pinned'} ${x.rule} ${x.where}${x.at}: ${x.msg}`);
+}
+/** D2: the pin's totals over the keys THIS run judged (a key whose skill / option / host / width was rendered here). */
+function pinScope(pin, visited, findings) {
+    const ks = Object.keys(pin).filter((k) => visited.has(k.split('|')[0]));
+    const now = new Set(findings.map(pinKey));
+    return { keys: ks.length, findings: ks.reduce((a, k) => a + pin[k].n, 0), cleared: ks.filter((k) => !now.has(k)).length };
+}
+/** D5: the sweep report's header totals against the pin's own totals and its keys; [] when they agree. */
+function sweepPinDrift(sweepText, pj) {
+    const m = /\*\*(\d+) keys, (\d+) findings\*\*/.exec(sweepText || '');
+    const keys = Object.keys(pj.keys || {}); const n = keys.reduce((a, k) => a + pj.keys[k].n, 0);
+    const out = [];
+    if (!m) return ['the sweep has no "**N keys, M findings**" header'];
+    if (+m[1] !== keys.length || +m[2] !== n) out.push(`sweep ${m[1]} keys / ${m[2]} findings, pin keys ${keys.length} / ${n}`);
+    if ((pj.totals || {}).keys !== keys.length || (pj.totals || {}).findings !== n) out.push(`pin totals ${JSON.stringify(pj.totals)} != its keys ${keys.length} / ${n}`);
+    for (const k of keys) if (!(sweepText.includes(`| ${k.split('|')[2]} | ${k.split('|')[3]} | ${pj.keys[k].n} | ${pj.keys[k].worst} % |`))) { out.push(`sweep has no row for ${k}`); break; }
+    return out;
 }
 
 function selfTest() {
@@ -239,6 +274,41 @@ function selfTest() {
     eq('noun: the old "count by rect"', markName({ label: 'count by', cls: '' }, { mark: 'rect' }), 'box (skip-count strip)');
     eq('noun: touch dots', markName({ label: '', cls: 'ws-td-svg', glyph: true }, { mark: 'circle' }), 'touch dot (digit)');
     eq('noun: ten frame counter', markName({ label: 'ten frame: 7', cls: '' }, { mark: 'circle' }), 'counter (ten frame)');
+    // D1 (critic sis-r2): a ring is its own mark - never paired with print dots, named "ring", matched with a print ring
+    const dotsOnly = [{ sig: '12,4', kind: 'array', groups: [{ mark: 'circle', n: 12, sizeMm: 2 }] }];
+    eq('ring vs dots only, same item and count: no ref (SIZE-REF)', matchRef({ sig: '12,4', kind: 'svg' }, { mark: 'circle.ring', n: 12 }, dotsOnly), null);
+    eq('ring vs dots only, no item: no ref', matchRef({ sig: '', kind: 'array' }, { mark: 'circle.ring', n: 12 }, dotsOnly), null);
+    const withRing = dotsOnly.concat([{ sig: '12,4', kind: 'svg', groups: [{ mark: 'circle.ring', n: 12, sizeMm: 3.5 }] }]);
+    eq('ring vs print ring: matched', matchRef({ sig: '12,4', kind: 'svg' }, { mark: 'circle.ring', n: 12 }, withRing), { printMm: 3.5, how: 'same item' });
+    eq('dot vs print dots and rings of the same count: the dots', matchRef({ sig: '12,4', kind: 'other' }, { mark: 'circle', n: 12 }, withRing.slice().reverse()), { printMm: 2, how: 'same item' });
+    eq('noun: ring', markName({ label: '', cls: '' }, { mark: 'circle.ring' }), 'ring');
+    eq('noun: array ring', markName({ label: 'array, 3 rows of 4', cls: '' }, { mark: 'circle.ring' }), 'ring (array)');
+    eq('noun: touch ring', markName({ label: '', cls: 'ws-td-svg', glyph: true }, { mark: 'circle.ring' }), 'touch ring (digit)');
+    // D3: a support drawing with no picture name of its own takes its support's picture; never a bare "dot"
+    eq('noun: add_facts frame support', markName({ label: '', cls: '' }, { mark: 'circle' }, 'frame'), 'counter (ten frame)');
+    eq('noun: add_facts tile support', markName({ label: '', cls: '' }, { mark: 'circle' }, 'tile'), 'dot (dot tile)');
+    eq('noun: own picture wins over the support', markName({ label: 'array, 2 rows of 3', cls: '' }, { mark: 'circle' }, 'tile'), 'dot (array)');
+    eq('noun: unknown support', markName({ label: '', cls: '' }, { mark: 'circle' }, 'zzz'), 'dot (picture)');
+    eq('drawing: support picture', drawingName({ label: '', cls: '', groups: [{ mark: 'circle' }] }, 'frame'), 'ten frame');
+    const bare = [];
+    for (const sup of ['array', 'frame', 'tile', 'skip', 'base10', 'fives', 'zzz']) for (const label of labels) for (const mark of marks) {
+        const nm = markName({ label, cls: '', glyph: false }, { mark }, sup);
+        if (!/ \((.+)\)$/.test(nm) || !PICTURES.includes(/ \((.+)\)$/.exec(nm)[1])) bare.push(`${sup}: ${nm}`);
+    }
+    eq('every support mark name carries a listed picture', bare.slice(0, 5), []);
+    // D2: a pinned finding prints "pinned", one over the pin "OVER  "; totals count the keys judged here only
+    const fa = f(90); const fb = f(50, 'counter (ten frame)');
+    const lines = findingLines([fa, fb], judgePin(pin, [fa, fb]));
+    eq('lines: pinned / OVER prefixes', lines.map((l) => l.slice(0, 6)), ['pinned', 'OVER  ']);
+    eq('lines: no pin -> every line OVER', findingLines([fa], null).map((l) => l.slice(0, 6)), ['OVER  ']);
+    const pin2 = Object.assign({}, pin, { 'x:y {defaults} card 390px|SIZE-INK|dot (array)|1.5-2.5 mm': { n: 7, worst: 80 } });
+    eq('totals: the keys judged here only', pinScope(pin2, new Set(['a:b {defaults} card 390px']), [fa]), { keys: 1, findings: 2, cleared: 0 });
+    eq('totals: a judged key with no finding now is clear', pinScope(pin2, new Set(['a:b {defaults} card 390px', 'x:y {defaults} card 390px']), [fa]), { keys: 2, findings: 9, cleared: 1 });
+    // D5: the committed sweep report agrees with the committed pin (totals and every key's row)
+    const sweepFile = path.join(ROOT_DIR, 'design/status/lf-checks/screen-ink-size-sweep.md');
+    const pinFile = path.join(ROOT_DIR, 'design/audit/baselines/screen-ink-size.json');
+    eq('sweep report matches the pin', fs.existsSync(sweepFile) && fs.existsSync(pinFile) ? sweepPinDrift(fs.readFileSync(sweepFile, 'utf8'), JSON.parse(fs.readFileSync(pinFile, 'utf8'))) : ['sweep or pin missing'], []);
+    eq('sweep drift caught', sweepPinDrift('**38 keys, 99 findings**', { totals: { keys: 1, findings: 2 }, keys: { 'a|SIZE-INK|dot|b': { n: 2, worst: 90 } } }).length > 0, true);
     for (const b of bad) console.log('  ' + b);
     console.log(`${NAME} --self-test: ${n - bad.length}/${n}`);
     console.log(`${NAME}: ${bad.length ? 'FAIL' : 'OK'}`);
@@ -391,11 +461,11 @@ function readDrawingsInPage({ scope, cellSel }) {
 
 /* ------------------------------------------------------------------ judging a host's drawings */
 
-function judgeHost({ where, detail, drawings, prints, F, notes }) {
+function judgeHost({ where, detail, drawings, prints, F, notes, support = '' }) {
     for (const d of drawings) {
         const at = `${detail || ''}${d.item ? ` [${d.item}]` : d.sig ? ` [${d.sig}]` : ''}`;
         for (const g of d.groups) {
-            const name = markName(d, g);
+            const name = markName(d, g, support);
             if (d.screenOnly) { notes.add(`${where}: ${name} is marked screen-only (not compared)`); continue; }
             const m = matchRef(d, g, prints);
             if (!m) { F({ rule: 'SIZE-REF', where, at, name, bucket: '-', pct: 0, msg: `${name}: ${g.n} marks of ${g.sizeMm.toFixed(2)} mm have no print counterpart (no same item, no print drawing of the same marks and count)` }); continue; }
@@ -403,7 +473,7 @@ function judgeHost({ where, detail, drawings, prints, F, notes }) {
             if (f) F({ rule: 'SIZE-INK', where, at, name, bucket: inkBucket(m.printMm), pct: Math.round(g.sizeMm / m.printMm * 100), msg: `${f} [print: ${m.how}]` });
         }
         if (d.hasCell && !d.glyph) {
-            const name = drawingName(d);
+            const name = drawingName(d, support);
             const f = widthFinding(name, d.wMm, d.hMm, d.freeMm);
             if (f) F({ rule: 'SIZE-WIDTH', where, at, name, bucket: widthBucket(d.wMm, d.hMm), pct: Math.round(d.wMm / d.freeMm * 100), msg: `${f} (cell content ${d.cellMm} mm)` });
         }
@@ -457,7 +527,7 @@ function sweepReport({ skills, findings, notes, renders, secs, pinFile, pin, ser
 async function main() {
     const { open } = require('../lib/ws-harness.cjs');
     const ONLY = arg('only', null) ? arg('only').split(',').map((s) => s.trim().toUpperCase()) : null;
-    const findings = []; const notes = new Set(); let renders = 0;
+    const findings = []; const notes = new Set(); let renders = 0; const visited = new Set();
     const F = (x) => { if (!ONLY || ONLY.includes(x.rule)) findings.push(x); };
     const SEED = parseInt(arg('seed', '7'), 10);
     const SIZE = arg('size', 'M');
@@ -480,6 +550,7 @@ async function main() {
             if (pr.error || sc.error) throw new Error(pr.error || sc.error);
             renders += 2;
             if (!sc.drawings.length) F({ rule: 'SIZE-READ', where: path.basename(HTML), at: '', name: '-', bucket: '-', pct: 0, msg: 'no screen drawing read' });
+            visited.add(path.basename(HTML));
             judgeHost({ where: path.basename(HTML), detail: '', drawings: sc.drawings, prints: pr.drawings, F, notes });
         }
         for (const key of SKILLS) {
@@ -494,7 +565,7 @@ async function main() {
                     } catch (e) { return null; }
                 }, { cat, skill });
                 variants = [{ tag: 'defaults', opts: null }];
-                if (def) for (const v of def.render) variants.push({ tag: `support ${v}`, opts: Object.assign({ support: [v] }, def.base[v] || {}) });
+                if (def) for (const v of def.render) variants.push({ tag: `support ${v}`, support: v, opts: Object.assign({ support: [v] }, def.base[v] || {}) });
             }
             for (const v of variants) {
                 const tag = `${key} {${v.tag}}`;
@@ -548,12 +619,13 @@ async function main() {
                         renders++;
                         await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) { /* ignore */ } });
                         if (sc.error) { notes.add(`${tag} ${host} ${w}: ${sc.error}`); continue; }
+                        visited.add(`${tag} ${host} ${w}px`);
                         if (!sc.drawings.length) continue;
-                        judgeHost({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', drawings: sc.drawings, prints, F, notes });
+                        judgeHost({ where: `${tag} ${host} ${w}px`, detail: host === 'card' ? ` item ${i}` : '', drawings: sc.drawings, prints, F, notes, support: v.support || '' });
                     }
                 }
                 const ref = {};
-                for (const d of prints) for (const g of d.groups) (ref[markName(d, g)] = ref[markName(d, g)] || []).push(g.sizeMm);
+                for (const d of prints) for (const g of d.groups) (ref[markName(d, g, v.support)] = ref[markName(d, g, v.support)] || []).push(g.sizeMm);
                 if (Object.keys(ref).length) notes.add(`${tag}: print ${SIZE} ${Object.keys(ref).map((k) => `${k} ${Math.min(...ref[k]).toFixed(2)}${Math.max(...ref[k]) > Math.min(...ref[k]) + 0.005 ? '-' + Math.max(...ref[k]).toFixed(2) : ''} mm`).join(', ')}`);
             }
             await page.evaluate(() => { try { window.clearSetOptions({ silent: true }); } catch (e) { /* ignore */ } });
@@ -561,7 +633,6 @@ async function main() {
         if (app.problems.length) notes.add(`console: ${app.problems.slice(0, 3).map((p) => p.text).join(' | ')}`);
     } finally { await app.close(); }
     for (const n of notes) console.log(`note: ${n}`);
-    for (const x of findings) console.log(`${x.rule} ${x.where}${x.at}: ${x.msg}`);
     const secs = ((Date.now() - T0) / 1000).toFixed(0);
     console.log(`(${SKILLS.length} skill(s)${HTML ? ' + fixture' : ''}, ${renders} renders, ${secs} s)`);
     if (arg('json', null)) fs.writeFileSync(path.resolve(process.cwd(), arg('json')), JSON.stringify({ skills: SKILLS, findings, notes: [...notes], renders }, null, 1));
@@ -573,16 +644,20 @@ async function main() {
         fs.writeFileSync(path.resolve(process.cwd(), arg('write-baseline')), JSON.stringify({ note: 'ws-screen-ink-size pin: per key (skill {option} host width|rule|mark name|size bucket) the count and the WORST % accepted (lead ruling 2026-11-13, keyed per critic sis-r1 D5); a new key, a higher count or a worse % FAILS. The owning lane shrinks it. Re-pin only with a STATUS note.', written: new Date().toISOString().slice(0, 10), commit: servedAt, totals: { keys: Object.keys(cur).length, findings: total }, skills: SKILLS, keys: cur }, null, 1) + '\n');
         console.log(`wrote ${arg('write-baseline')}: ${Object.keys(cur).length} keys, ${total} findings`);
     }
-    let judged = findings; let pinUsed = cur; let pinFile = arg('write-baseline', '(none)');
+    let judged = findings; let pinUsed = cur; let pinFile = arg('write-baseline', '(none)'); let over = []; let pj = null;
     if (PIN && fs.existsSync(PIN) && !arg('write-baseline', null)) {
-        const pj = JSON.parse(fs.readFileSync(PIN, 'utf8'));
-        const pin = pj.keys || {};
-        const over = judgePin(pin, findings);
+        pj = JSON.parse(fs.readFileSync(PIN, 'utf8'));
+        over = judgePin(pj.keys || {}, findings);
         const overKeys = new Set(over.map((o) => o.key));
         judged = findings.filter((x) => overKeys.has(pinKey(x)));
+        pinUsed = pj.keys || {}; pinFile = path.relative(ROOT_DIR, PIN);
+    }
+    // D2: a finding over the pin prints "OVER  ", one the pin holds "pinned" (with no pin every finding is over)
+    for (const l of findingLines(findings, pj ? over : null)) console.log(l);
+    if (pj) {
         for (const o of over) console.log(`  over the pin: ${o.key}: ${o.why}`);
-        console.log(`(${findings.length - judged.length} finding(s) within the pin ${path.relative(ROOT_DIR, PIN)}: ${(pj.totals || {}).keys || 0} keys, ${(pj.totals || {}).findings || 0} findings)`);
-        pinUsed = pin; pinFile = path.relative(ROOT_DIR, PIN);
+        const sc = pinScope(pj.keys || {}, visited, findings);
+        console.log(`(${findings.length - judged.length} finding(s) within the pin ${pinFile}; judged here: ${sc.keys} of its keys, ${sc.findings} pinned findings${sc.cleared ? `, ${sc.cleared} key(s) now clear` : ''})`);
     }
     if (arg('sweep', null)) {
         fs.writeFileSync(path.resolve(process.cwd(), arg('sweep')), sweepReport({ skills: SKILLS, findings, notes, renders, secs, pinFile, pin: pinUsed, servedAt }));
@@ -595,4 +670,4 @@ async function main() {
 
 if (require.main === module && !has('self-test')) main().catch((e) => { console.error(e); console.log(`${NAME}: FAIL`); process.exit(1); });
 
-module.exports = { median, inkFinding, widthFinding, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, inkBucket, widthBucket, NOUNS, PICTURES };
+module.exports = { median, inkFinding, widthFinding, matchRef, nounOf, pictureOf, markName, drawingName, pinOf, judgePin, findingLines, pinScope, sweepPinDrift, supportPicture, inkBucket, widthBucket, NOUNS, PICTURES };
