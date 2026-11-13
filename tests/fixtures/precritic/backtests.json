@@ -3822,6 +3822,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-packet-grey",
+  "check": "Every committed lesson packet's chart-grey.png is its CHART page in grey (design/lesson-samples add / sub / round, L and S)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples --verify-grey; critic lf-engine-pc r4 N8",
+  "browser": true,
+  "fail": {
+   "commit": "6a9c268ce",
+   "state": "chart-grey.png is pupil-p1, the check page (RASTER_PY's grey page index 0 with the check first)"
+  },
+  "pass": {
+   "commit": "35e38fe80",
+   "state": "render grey page = the chart part's first page; packet re-rendered"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --verify-grey",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
