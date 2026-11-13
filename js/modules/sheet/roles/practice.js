@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows,
+    tightRows, rowStretches,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -675,7 +675,7 @@ export const SPREAD_CAP = 1.7;
  * SPREAD_CAP x its shortest problem, the grid no taller than the page's grid less 1 mm (PG-12). null when
  * the grid already fills four fifths of the page or nothing is measured.
  */
-export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
+export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0, cap = SPREAD_CAP) {
     if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.9 * availMm) return null;
     const w = [], mins = [];
     for (let r = 0; r < rows; r++) {
@@ -687,8 +687,8 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
     if (!(S > 0)) return null;
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
-    const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r]))));
+    const k = Math.min(cap, (availMm - 1) / S);
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, cap * mins[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
@@ -1139,6 +1139,28 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // score) and then its 3-4 problems; the labels run on across the blocks.
                 const list = (anchors.bySection[part.section] || []);
                 let at = start;
+                // (lf-placevalue compare r3, coverage single/ex-group L PAGEFILL: a lone section of example bands whose problems
+                // name `spreadMax` - the compare line - shares the page's spare height among its problem rows, each row no taller
+                // than spreadMax x its shortest problem (the band under the line stays under 30 %, CL-4d centres it). The stretch
+                // is the FIRST page's, so a cell keeps one height on every page of the section (PT-ENG-6). r2's whole example strip
+                // was 1.8 mm shorter a block than 16748cd8's, which left L's three blocks a 48 mm (21 %) strip.)
+                let blockRowMm = L.cellH;
+                {
+                    const secIts = sheetItems[part.section];
+                    const sm = lone && tightRows(secIts) && secIts.length && secIts.every((it) => Number((it.footprint || {}).spreadMax) > 1)
+                        ? Math.min(SPREAD_CAP, ...secIts.map((it) => Number(it.footprint.spreadMax))) : 0;
+                    const ch0 = (laidOut.chunksBySection[part.section] || [])[0];
+                    const c0 = ch0 && ch0.blocks ? ch0 : part.chunk;
+                    const rows0 = c0.blocks.reduce((a, b) => a + b.rows, 0);
+                    const base0 = c0.blocks.length * L.anchorMm + rows0 * L.cellH;
+                    const avail0 = L.gridH - c0.blocks.length * 2 * GRID_BORDERS_MM;
+                    if (sm && rows0 > 0 && base0 < 0.85 * avail0) {
+                        const hs = secIts.map((it) => measuredH(it, L.cols)).filter((h) => h > 0);
+                        const lo = hs.length ? Math.min(...hs) : 0;
+                        const want = L.cellH + (0.9 * avail0 - base0) / rows0;
+                        if (lo > 0) blockRowMm = Math.max(L.cellH, Math.min(want, sm * lo));
+                    }
+                }
                 for (const b of part.chunk.blocks) {
                     const bi = Math.floor(b.from / Math.max(1, L.blocks.perBlock));
                     const a = list[bi % list.length];
@@ -1148,8 +1170,9 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     });
                     sections.push({
                         kind: 'grid', cols: L.cols, rows: b.rows, labels: labelStyle, start: at, cls: 'fixed',
-                        height: `${Math.round(b.rows * L.cellH * 1000) / 1000}mm`,
+                        height: `${Math.round(b.rows * blockRowMm * 1000) / 1000}mm`,
                         items: sheetItems[part.section].slice(b.from, b.from + b.count).map((it) => planItem(it, level, L.cols)),
+                        _its: sheetItems[part.section].slice(b.from, b.from + b.count),
                     });
                     at += b.count;
                 }
@@ -1185,16 +1208,22 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const chunks = laidOut.chunksBySection[part.section] || [];
             let spread = null;
             // (`tightRows` - layout.tightRows, lf-placevalue pv debt: an in-place section that asks for it is never spread)
-            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && !tightRows(its)) {
-                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
+            // (`spreadMax`, lf-placevalue compare round: a `tightRows` section whose every footprint names how far its rows may
+            // grow and keep the band under them below RUBRIC H13's 30 % is spread to that cap - "408 ( ) 666" held to its ink
+            // left 22-37 % of the Independent page white under the grid, ws-print-lint PAGEFILL; stretched freely it was 35 %
+            // empty under the line, ws-empty-band EB-BAND)
+            const spreadMax = tightRows(its) && its.length && its.every((it) => Number((it.footprint || {}).spreadMax) > 1)
+                ? Math.min(SPREAD_CAP, ...its.map((it) => Number(it.footprint.spreadMax))) : null;
+            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && (!tightRows(its) || spreadMax)) {
+                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin, spreadMax || SPREAD_CAP);
                 else if (chunks.every((c) => !c.blocks)) {
                     // a section over several pages: the FIRST page's stretch, applied to every page
                     // of the section, so a cell keeps one height across its pages (PT-ENG-6)
                     const c0 = chunks[0];
                     const its0 = sheetItems[part.section].slice(c0.from, c0.from + c0.count);
                     const sh0 = c0.gridMm ? c0.gridMm : (rowShape(its0, L.cols, c0.rows, L.cellH) || {}).heightMm || c0.rows * L.cellH;
-                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin);
-                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
+                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin, spreadMax || SPREAD_CAP);
+                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin, spreadMax || SPREAD_CAP);
                 }
             }
             sections.push({
@@ -1220,6 +1249,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // (`capFillCont`, lesson 3a P1d r3 - critic H13: cells stretched to the shared height hold their content in the MIDDLE)
                 items: its.map((it) => { const pi = planItem(it, level, L.side4 ? L.drawCols : L.cols); return capFill && sec.capFillCont ? Object.assign({}, pi, { style: `${pi.style || ''}justify-content:center;` }) : pi; }),
                 _its: its,
+                // (CL-4d: a grid that fills its page by flex has no height here; the stretch mark below reads the page's grid)
+                _flexMm: fillByFlex && !spread && !gap.gap && !shape ? avail : 0,
             });
         }
         // SPREAD across parts (wave 1 lane D): a page of several grids (a mixed pool dealt by height
@@ -1278,7 +1309,25 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 fill = Math.round((used / area) * 1000) / 1000;
             }
         }
-        for (const x of sections) delete x._its;
+        // CL-4d (lead, delegated approval, 2026-11-13; lf-placevalue compare r3): a pv cell whose row stretches it by 30 % or more
+        // (layout.rowStretches) carries `ws-rowstretch`; css/sheet-kit.css centres it down the box only when its template opted in
+        // (`data-ws-stretchmid`), so an unstretched row keeps the top of the box (CL-4b) and L-TOPSTART judges both.
+        for (const x of sections) {
+            const gridMm = parseFloat(x.height) > 0 ? parseFloat(x.height) : Number(x._flexMm) || 0;
+            if (x.kind !== 'grid' || !x._its || !(gridMm > 0) || /mq-anchorgrid/.test(x.cls || '')) continue;
+            const r = Math.ceil(x.items.length / Math.max(1, x.cols));
+            const fr = x.rowsTpl ? String(x.rowsTpl).split(/\s+/).map((t) => parseFloat(t) || 1) : Array(r).fill(1);
+            if (fr.length !== r) continue;
+            const sum = fr.reduce((a, b) => a + b, 0);
+            const net = gridMm - (Number(x.rowGap) || 0) * (r - 1);
+            x.items.forEach((pi, i) => {
+                const it = x._its[i];
+                if (!it || it.anchor || (it.template || (it.q && it.q.cell && it.q.cell.template)) !== 'pv') return;
+                const R = net * fr[Math.floor(i / x.cols)] / sum;
+                if (rowStretches(it, x.cols, R)) pi.cls = `${pi.cls || ''} ws-rowstretch`.trim();
+            });
+        }
+        for (const x of sections) { delete x._its; delete x._flexMm; }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
         // (its height stays reserved, so every page keeps one geometry).
         // A part split off a section ("full width, at the bottom": splitOf) belongs to that section

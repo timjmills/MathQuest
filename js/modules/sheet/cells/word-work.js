@@ -733,7 +733,7 @@ function columnWork(ctx, st, show, idx, p = {}, isAnswer = false) {
         }
         r++;
     }
-    return `<div class="mq-wwcols" role="group" aria-label="column work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols" role="group" aria-label="column work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};${isTwin(ctx) ? `--mq-wwgap:${L(ctx, GAP)};` : ''}row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
 }
 
 /** The ÷ frame: divisor boxes, the bracket, dividend boxes, quotient boxes, the working, R. */
@@ -796,7 +796,7 @@ function divisionWork(ctx, st, show, idx, p = {}, isAnswer = false) {
             html += `<span style="grid-row:${row};grid-column:${c0 + i};${er.minus ? `border-bottom:${B(ctx, 0.75)} solid ${INK};padding-bottom:${L(ctx, 0.6)};` : ''}">${wbox(ctx, { id: `w${idx}-wk${k}-${i}`, value: v, expect: e, w: bx, h: bx, pt })}</span>`;
         }
     });
-    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
+    return `<div class="mq-wwcols mq-wwdiv" role="group" aria-label="division work"${isAnswer && isTwin(ctx) ? ' data-mq-join=""' : ''} style="display:inline-grid;grid-template-columns:${cols};column-gap:${L(ctx, GAP)};${isTwin(ctx) ? `--mq-wwgap:${L(ctx, GAP)};` : ''}row-gap:${L(ctx, 0.5)};align-items:end;">${html}</div>`;
 }
 
 /** The width (mm) of one step's work block: the wider of its sign row and its columns. */

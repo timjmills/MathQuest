@@ -1,0 +1,5 @@
+{
+ "about": "lf-hosts critic r3 (WS-REFLOW per-slot x, tolerance 1.5 px): card 1's second answer place 1 px right of master's (the r1 F4 4 px gap's move). OK.",
+ "baseline": { "cols": 2, "cardH": 300, "cardW": 300, "boxW": 144, "boxH": 192, "digit": 29, "cardHs": [300, 290], "digits": [29, 40], "slotXs": [[40, 100], [40]] },
+ "measured": { "cols": 2, "cardH": 300, "cardW": 300, "boxW": 144, "boxH": 192, "digit": 29, "cardHs": [300, 290], "digits": [29, 40], "slotXs": [[40, 101], [40]] }
+}

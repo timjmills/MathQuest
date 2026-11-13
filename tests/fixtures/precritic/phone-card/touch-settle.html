@@ -1,0 +1,7 @@
+<!doctype html><meta charset="utf-8"><style>body{margin:0;font:24px sans-serif}#questionCard{width:780px;margin:40px 20px}#questionPaper{min-height:120px}input{width:56px;height:56px;box-sizing:border-box}</style>
+<!-- lf-checks TOUCH-HIT de-flake: a page whose layout SETTLES after the first blur (as the app's focusout / active-box handlers
+     do): the first focusout moves the card 80 px down on the next task, once. A tap point read in the same task as the blur
+     (the old single tap, --no-retap) is stale and misses; a point read after the page holds still hits. Nothing is ever
+     drawn over the box: a correct check reports OK. -->
+<div id="questionCard"><div id="questionText">Add.</div><div id="questionPaper" data-ws-cell="fact"><span>3 + 4 =</span> <input data-ws-slot="ans-0"></div></div>
+<script>window.__MQ_KIND_MOD = "data:text/javascript,export%20function%20cellKindFor(q)%20%7B%20return%20q%20%26%26%20%2F%C3%97%2F.test(q.text)%20%3F%20%7B%20kind%3A%20'fact'%20%7D%20%3A%20null%3B%20%7D"; window.state = { currentQ: { answerType: 'number', text: '3 + 4 = ?' } }; { const b = document.querySelector('#questionPaper input'); let once = false; b.addEventListener('focusout', () => { if (once) return; once = true; setTimeout(() => { document.getElementById('questionCard').style.marginTop = '120px'; }, 0); }); b.focus(); }</script>

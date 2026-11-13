@@ -109,20 +109,27 @@ export const EB_FLAGS = ['--model-states', '--vocab-ink', '--page-fill'];
 // the ws-grade-render modes that switch a check on (lf-checks queue 13: --raster-fit is LP-RASTER on role pages; a plain
 // render of the same role is not that check)
 export const GR_FLAGS = ['--raster-fit'];
+// tools whose gate with NO --roles flag renders every offered role of the skill (ws-empty-band: "every offered role x
+// S/M/L + hosts"), so that line plans any one role R when no card roles are given (lf-placevalue checks pass, 2026-11-13)
+const EVERY_ROLE_TOOLS = new Set(['ws-empty-band']);
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and on role R when given: `--roles` names R in its
- *  comma list, or - `cardRoles` given - the line has no --roles and so renders every role the signed card offers, R among
- *  them), carrying every flag of `flags`. Pure. */
+ *  comma list, or the line has no --roles and so renders every role - `cardRoles` given: the roles the signed card offers,
+ *  R among them; not given: any role, for an EVERY_ROLE_TOOLS tool), carrying every flag of `flags`. `roles` may itself be a
+ *  comma list `a,b`: every role must be planned by some line. Pure. */
 export function planHas(planText, { tool, skills, roles, flags = [], cardRoles = null }) {
     const esc = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
+    const lines = planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
         .filter((l) => skills.every((k) => l.includes(k) || l.includes(k.split(':')[1])))
-        .filter((l) => {
-            if (!roles) return true;
-            const cmd = l.slice(l.indexOf(`tests/scripts/${tool}.`));
-            if (new RegExp(`--roles?[ =](?:[^\\s,]+,)*${esc(roles)}(?:,|\\s|$)`).test(cmd)) return true;
-            return !!cardRoles && cardRoles.includes(roles) && !/--roles?[ =]/.test(cmd);
-        })
         .filter((l) => flags.every((f) => l.slice(l.indexOf(`tests/scripts/${tool}.`)).includes(f)));
+    if (!roles) return lines;
+    const covers = (l, r) => {
+        const cmd = l.slice(l.indexOf(`tests/scripts/${tool}.`));
+        if (new RegExp(`--roles?[ =](?:[^\\s,]+,)*${esc(r)}(?:,|\\s|$)`).test(cmd)) return true;
+        if (/--roles?[ =]/.test(cmd)) return false;
+        return cardRoles ? cardRoles.includes(r) : EVERY_ROLE_TOOLS.has(tool);
+    };
+    const want = String(roles).split(',').filter(Boolean);
+    return want.every((r) => lines.some((l) => covers(l, r))) ? lines.filter((l) => want.some((r) => covers(l, r))) : [];
 }
 
 function selfTest() {
@@ -149,6 +156,12 @@ function selfTest() {
     eq('flag missing', planHas(eb.split('\n')[0], { tool: 'ws-empty-band', skills: ['addition:add_facts'], roles: 'scripted-model', flags: ['--model-states'], cardRoles: ['scripted-model'] }).length, 0);
     eq('grade-render raster flag carried', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model,guided --raster-fit', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 1);
     eq('grade-render raster flag missing', planHas('x node tests/scripts/ws-grade-render.cjs --skills a:b --roles scripted-model --gate', { tool: 'ws-grade-render', skills: ['a:b'], roles: 'scripted-model', flags: GR_FLAGS }).length, 0);
+    const eb2 = '  [browser] eb — node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --grid-foot\n  [browser] gf — node tests/scripts/ws-empty-band.cjs --roles independent,more-practice --sizes S --skills placevalue:compare';
+    eq('every-role empty-band line plans a role', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:combine'], roles: 'test' }).length, 1);
+    eq('role list held by a planned list', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'more-practice' }).length, 1);
+    eq('role list: a role the list lacks', planHas(eb2, { tool: 'ws-empty-band', skills: ['placevalue:compare'], roles: 'test' }).length, 0);
+    eq('no every-role reading for print-lint', planHas('  x — node tests/scripts/ws-print-lint.cjs --source kit --skills a:b', { tool: 'ws-print-lint', skills: ['a:b'], roles: 'test' }).length, 0);
+    eq('role list: every role needed', planHas(plan, { tool: 'ws-print-lint', skills: ['subtraction:sub_50_no_regroup'], roles: 'lesson,test' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
     // lane rows (lf-partopts): no skill, no detailed lesson - the tool and its scope flag
     eq('lane bt row', readLaneCommand('/tmp/mq-browser-run.sh node tests/scripts/ws-partopts-unit.cjs --bt-only --only FILL-BT'), { tool: 'ws-partopts-unit', scope: ['--role', 'lesson'], flag: '--bt-only' });
