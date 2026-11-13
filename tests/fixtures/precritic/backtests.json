@@ -3554,7 +3554,7 @@
    "state": "itemNumberKey drops exact repeats only: sub S check 77 / 27 / 71, round 75 / 45"
   },
   "pass": {
-   "commit": "TBD-F13",
+   "commit": "6fccd7134",
    "state": "pre-skill-check poolItems: a near twin of an item already taken goes to the end of its question"
   },
   "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --rules PC-LR6",
@@ -3574,7 +3574,7 @@
    "state": "add S lesson sheet, check on: 9 % of the body blank at the bottom (the Vocabulary band grows only on a page with no Independent rows)"
   },
   "pass": {
-   "commit": "TBD-F13",
+   "commit": "6fccd7134",
    "state": "roles/lesson.js: with a live check the spare left by the bands goes to the Vocabulary band up to its capIfEmpty"
   },
   "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --only add --rules PC-H13",
