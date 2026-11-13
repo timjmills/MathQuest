@@ -1,6 +1,6 @@
 # lf-vocab r15 builder brief: the three critic r14 minors (lead, 2026-11-13). Vocabulary is deployed on master a3eb9d25.
 
-Branch: claude/lf-vocab-r15, cut from master a3eb9d25. Step: follow-on fixes on an approved, deployed model (Opus low).
+Branch: claude/lf-vocab-r15, cut from master a3eb9d25. Step: follow-on fixes on an approved, deployed model (Opus MEDIUM, owner rule 2026-11-13: every lane builder and critic runs at medium).
 The lane's manifest is part of master now; ws-integrate is a no-op.
 
 Read design/lanes/lf-vocab/critic-r14-narrow.md, then:
