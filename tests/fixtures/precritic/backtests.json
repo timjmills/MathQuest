@@ -2415,12 +2415,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "aacae5ea",
-    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure (1c64a449): combine S/M/L EB-BAND 140 (S 37.6 %, review S 40.1 %)"
    },
    "pass": {
-    "commit": "deb9e426",
-    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+    "commit": "668f6a8c",
+    "state": "tightRows: in-place rows held to their ink on every role; worst S band 21.1 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
    "expect": {
@@ -2475,12 +2475,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "8573c66a",
-    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure: rename=more EB-BAND 12 + EB-SIDE 3 (test S band 39.3 %, review S side 30.6 %)"
    },
    "pass": {
-    "commit": "64f70063",
-    "state": "rename frames' write line two digits longer at S"
+    "commit": "1f18505d",
+    "state": "standard and rename rows tightRows; rename write line +4 digits at S; worst side 26.8 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
    "expect": {
@@ -2968,12 +2968,12 @@
    "rule": "ws-empty-band EB-SIDE --margin 2",
    "browser": true,
    "fail": {
-    "commit": "2fe21f2b",
-    "state": "r4 head on master: worst side band 29.9 %"
+    "commit": "16014137",
+    "state": "pixel measure: worst rename=more S side band 28.3-30.6 %"
    },
    "pass": {
-    "commit": "a1c8d595",
-    "state": "write line +3 digits after the fixed slot width: worst 27 %"
+    "commit": "1f18505d",
+    "state": "worst side band 26.8 % (clears the limit by 3.2 points)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --sizes S --hosts none --no-baseline --margin 2 --only EB-SIDE",
    "expect": {
