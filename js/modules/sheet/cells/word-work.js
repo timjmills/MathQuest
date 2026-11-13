@@ -1402,7 +1402,10 @@ function renderWork(p, ctx) {
         ? `<div style="display:flex;align-items:flex-start;gap:${L(ctx, 5)};margin-top:${L(ctx, 1.2)};">${blocks}${answer ? answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '', true) : ''}</div>`
         : narrow
         ? `<div style="display:flex;flex-direction:column;align-items:${twin ? 'center' : 'flex-start'};gap:${L(ctx, 3)};margin-top:${L(ctx, 3)};">${two ? `<div style="display:flex;flex-wrap:wrap;gap:${L(ctx, 6)};justify-content:${twin ? 'center' : 'flex-start'};">${blocks}</div>` : blocks}${answer}</div>`
-        : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
+        // (lf-algebra r13, precritic two-step r12 EB-SIDE 31-38 %: a full-width two-step cell's two step columns are 107-126 mm of a
+        // 185 mm interior; left-packed they left one 57-70 mm band on the right. Centred under the story, the space splits into
+        // two 30-39 mm margins, each under the H13 30 % - the steps still read Step 1 then Step 2, left to right.)
+        : `<div style="display:flex;align-items:flex-end;gap:${L(ctx, 8)};${two && !answer ? 'justify-content:center;' : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
     // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
     // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
     // it as not fitting the column and prints it in the full-width group at the bottom
