@@ -34,7 +34,9 @@
 //                so >= 0.752; add_wp_10_plain L (planned 0.762) prints well, so <= 0.762; add_facts M Vocabulary off (0.712,
 //                31 % empty) stays refused. 0.75 or 0.77: FAIL.
 //     ROWFIT-BT  ROWFIT_SLACK_MM 12: the printed foot reads 1.5-15.9 mm more than the plan's free height; a row fits in print at
-//                plan gaps up to 10.2 mm (expand L Remember off: must be refused) and not at 13.2 (value L rows 0: must be kept).
+//                plan gaps up to 11.4 mm (value M We Do 1: must be refused) and not at 13.5 (combine L rows 0: must be kept).
+//                (re-pinned on the lf-partopts deploy merge, 2026-11-13: master's lesson sheets moved the old pair - expand L
+//                Remember off 10.2 -> 15.9 mm, its foot no longer holds a row; value L rows 0 13.2 -> 26.4 mm.)
 //                10 or 14 mm: FAIL.
 //     BAND-BT    BAND_SLACK_MM 2: a planned cell band reads up to 1.0 mm narrower than printed near 30 % (div_facts M Vocabulary +
 //                Remember off, 26.8 % planned / 31.4 % printed: must be flagged, needs >= 0.8 mm); div_facts M We Do 1 prints
@@ -622,16 +624,18 @@ async function browser() {
                 BT('FILL-BT', !bad.b.error && bad.b.teach.fill[0] < K.FILL && bad.last.empty >= 30, `add_facts M Vocabulary off: plan ${bad.b.teach && bad.b.teach.fill}, printed ${bad.last && bad.last.empty} % empty - a bad sheet the floor ${K.FILL} lets through`);
                 console.log(`FILL-BT ${fails.some((x) => x.startsWith('FILL-BT ')) ? 'FAIL' : 'PASS'}: gap ${gap.toFixed(3)} (floor >= ${(0.70 + gap).toFixed(3)}), good sheet planned ${ok.b.teach && ok.b.teach.fill[0]} (floor <=), bad sheet planned ${bad.b.teach && bad.b.teach.fill[0]} (floor >) - SHEET_FILL_MIN ${K.FILL}`);
             }
-            // ROWFIT-BT: ROWFIT_SLACK_MM 12. (1) placevalue:expand L Remember off: no rows, plan free 21.7 / row 31.9 mm (10.2 apart),
-            // printed foot 31.1 >= one row and head 29.4 - the gate must refuse it (moved to 10 mm: FAIL). (2) placevalue:value L
-            // rows 0: plan free 30.6 / row 43.8 (13.2 apart), printed foot 33.2 < 47.1 - the gate must keep it (moved to 14: FAIL).
+            // ROWFIT-BT: ROWFIT_SLACK_MM 12. (1) placevalue:value M We Do 1: no rows, plan free 24.8 / row 36.2 mm (11.4 apart),
+            // printed foot 35.0 >= one row and head 33.7 - the gate must refuse it (moved to 10 mm: FAIL). (2) placevalue:combine L
+            // rows 0: plan free 18.4 / row 31.9 (13.5 apart), printed foot 28.5 < 29.4 - the gate must keep it (moved to 14: FAIL).
+            // (deploy merge 2026-11-13: re-pinned from expand L Remember off / value L rows 0, which master's sheets moved to
+            //  15.9 / 26.4 mm; the pair was found by a 672-state sweep of the merged tree.)
             if (runBt('ROWFIT-BT')) {
-                const a = await printed('placevalue:expand', 'L', { remember: { on: false } });
+                const a = await printed('placevalue:value', 'M', { wedo: { n: 1 } });
                 const aFits = a.rowNeed && a.last.emptyMm >= a.rowNeed;
-                BT('ROWFIT-BT', !a.b.error && !(a.b.teach.independent > 0) && aFits && po.rowFits(a.b.teach.freeMm, a.b.teach.rowMm, K.ROW), `expand L Remember off: plan free ${a.b.teach && a.b.teach.freeMm} / row ${a.b.teach && a.b.teach.rowMm} mm, printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed} - margin ${K.ROW} lets a sheet whose foot holds a row through`);
-                const v = await printed('placevalue:value', 'L', { rows: { n: 0 } });
+                BT('ROWFIT-BT', !a.b.error && !(a.b.teach.independent > 0) && aFits && po.rowFits(a.b.teach.freeMm, a.b.teach.rowMm, K.ROW), `value M We Do 1: plan free ${a.b.teach && a.b.teach.freeMm} / row ${a.b.teach && a.b.teach.rowMm} mm, printed foot ${a.last && a.last.emptyMm} / row ${a.rowNeed} - margin ${K.ROW} lets a sheet whose foot holds a row through`);
+                const v = await printed('placevalue:combine', 'L', { rows: { n: 0 } });
                 const vFits = v.rowNeed && v.last.emptyMm >= v.rowNeed;
-                BT('ROWFIT-BT', !v.b.error && !vFits && !po.rowFits(v.b.teach.freeMm, v.b.teach.rowMm, K.ROW), `value L rows 0: plan free ${v.b.teach && v.b.teach.freeMm} / row ${v.b.teach && v.b.teach.rowMm} mm, printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed} - margin ${K.ROW} refuses a sheet whose foot holds no row`);
+                BT('ROWFIT-BT', !v.b.error && !vFits && !po.rowFits(v.b.teach.freeMm, v.b.teach.rowMm, K.ROW), `combine L rows 0: plan free ${v.b.teach && v.b.teach.freeMm} / row ${v.b.teach && v.b.teach.rowMm} mm, printed foot ${v.last && v.last.emptyMm} / row ${v.rowNeed} - margin ${K.ROW} refuses a sheet whose foot holds no row`);
                 console.log(`ROWFIT-BT ${fails.some((x) => x.startsWith('ROWFIT-BT ')) ? 'FAIL' : 'PASS'}: must-refuse gap ${a.b.teach ? (a.b.teach.rowMm - a.b.teach.freeMm).toFixed(1) : '-'} mm (margin >=), must-keep gap ${v.b.teach ? (v.b.teach.rowMm - v.b.teach.freeMm).toFixed(1) : '-'} mm (margin <) - ROWFIT_SLACK_MM ${K.ROW}`);
             }
             // BAND-BT: BAND_SLACK_MM 2. (1) division:div_facts M Vocabulary and Remember off: We Do cells planned 24.6 mm with 6.6 mm
