@@ -309,6 +309,10 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 5. The font-load race (lf-engine, 11-13): ws-detailed-lesson E2 ("Andika 700/400 not loaded") flakes under load, because document.fonts.check runs before the web font arrives (g2-nbt3, g3-oa8, g4-nbt1). Fix: await document.fonts.load for both faces with a bounded retry; a font that never loads is an ERROR, not a page FAIL. Apply to every browser gate that checks fonts.
 7. Precritic print-lint over every role the SIGNED CARD offers (lf-ops 11-13): mult_properties more-practice was never run, so CL40-INK x4 (an array dot inside the 7 x 7 mm label keep-out, cells 1 and 5 of p1/p2) went unseen. Backtest row: fail claude/sweet-newton-c8wrv1-lf-ops-props fc981d0c7, pass commit from lf-ops. This joins the queue-3 top item (roles and hosts from the card).
 8. PT-MOD-5 (lead ruling, PAGE_TYPES; from lf-roles): on a ONE-page beside Scripted Model, ws-empty-band skips the step-text cell (.mq-stepcell); state cells stay under H13. Fixture row: a real band in a state cell still FAILs.
+9. From lf-algebra (lead, 11-13):
+   - (a) EB-FOOT pairs cells with items[i] by POSITION, not with their own item. This blocks arming eb-foot-gridcols-patterns, and it is the same fix as r5 m1: data-eb-item written by the kit.
+   - (b) the precritic screen-support-eq gate misses 5 of 6 skills in its output: check its output or the mention matcher.
+   - (c) adopt their HINT-ON-TEST check into precritic; backtest FAIL 47b1f2a86 / PASS 796952c03.
 6. Empty-band r5 D1 (faint slot edge), D2 (the focus ring touches "tens"), m1 (pair by data-eb-item).
 - Critic eb-r5 (3cea85a7): FAIL, C1 7 · C2 8 · C3 8 · C4 7 (lf-checks/critic-eb-r5.md). Queued for next round:
   - D1: a faint slot edge (#eee) counts as drawn, so it hides a band. Count an edge only when it is darker than the 225 ink
