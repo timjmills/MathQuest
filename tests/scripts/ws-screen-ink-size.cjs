@@ -132,7 +132,7 @@ function matchRef(sd, g, prints) {
     const pick = (cs, how) => (cs.length ? { printMm: median(cs.map((c) => c.g.sizeMm)), how } : null);
     if (sd.sig) {
         const same = all.filter((c) => c.p.sig === sd.sig);
-        for (const f of [(c) => c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark, (c) => c.g.n === g.n]) {
+        for (const f of [(c) => c.p.kind === sd.kind && c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark && c.g.n === g.n, (c) => c.g.mark === g.mark, (c) => c.g.n === g.n]) {
             const r = same.filter(f); if (r.length) return pick(r, 'same item');
         }
     }
@@ -203,6 +203,9 @@ function selfTest() {
     eq('ref same item (false alarm under the median)', matchRef({ sig: '100,10', kind: 'array' }, { mark: 'circle', n: 100 }, prints), { printMm: 1, how: 'same item' });
     eq('ref same drawing, other item', matchRef({ sig: '8,2', kind: 'array' }, { mark: 'circle', n: 100 }, prints), { printMm: 1, how: 'same drawing' });
     // D3: a relabelled picture is judged by its marks; no counterpart at all is null (SIZE-REF)
+    // a touch numeral in the same item is compared with the SAME digit (8 + 4: the 8's centre dots, never a median with the 4's)
+    const tn = [{ sig: '8,4', kind: 'digit 8', groups: [{ mark: 'circle', n: 4, sizeMm: 0.79 }] }, { sig: '8,4', kind: 'digit 4', groups: [{ mark: 'circle', n: 4, sizeMm: 1.58 }] }];
+    eq('ref same item, same digit', matchRef({ sig: '8,4', kind: 'digit 8' }, { mark: 'circle', n: 4 }, tn), { printMm: 0.79, how: 'same item' });
     eq('ref relabelled', matchRef({ sig: '', kind: 'dots for' }, { mark: 'circle', n: 6 }, prints), { printMm: 4, how: 'same marks, label differs' });
     eq('ref nearest count', matchRef({ sig: '', kind: 'array' }, { mark: 'circle', n: 90 }, prints), { printMm: 1, how: 'nearest print drawing' });
     eq('ref none', matchRef({ sig: '', kind: 'tiles' }, { mark: 'rect', n: 5 }, prints), null);
