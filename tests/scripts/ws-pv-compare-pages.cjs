@@ -4,7 +4,7 @@
 // its DOM - every ".pv-compare" problem: its two numbers and the sign it shows.
 //
 //   tests/scripts/mq-browser-run.sh node tests/scripts/ws-pv-compare-pages.cjs
-//   ... --only M6-SHOWN,EQ-MODEL,STATE-MARKS   --sizes S,L   --seeds 3
+//   ... --only M6-SHOWN,EQ-MODEL,STATE-MARKS,MODEL-RESERVE   --sizes S,L   --seeds 3
 //   MQ_ROOT=<tree> ... (ws-backtest commit-pair)
 //
 // M6-SHOWN (F3)      on Error analysis, True or False? and Reason It, at every size, on the default deal and lengths=mixed: at
@@ -15,6 +15,9 @@
 //                    Opener Model and the lesson's anchor. r1: the Guided page's only Model was "691 = 691".
 // STATE-MARKS (F2)   the Scripted Model's states and the lesson anchor's first four panels each draw something new: no two
 //                    consecutive states are the same drawing. r1: "States 1 and 2 draw the same picture."
+// MODEL-RESERVE      (lf-roles review of compare r3, b2) the Guided page's Model row - the Model beside the hinted tries - reserves
+//                    max(the Model tab's clearance, the hint line), never their sum: its fullest cell leaves at most 3 mm white
+//                    under its ink. 023cafca: the row 41 / 54 / 61 mm at S / M / L, 21-25 mm white under the hint line.
 // Prints `ws-pv-compare-pages: OK` / `FAIL (n)` last; exits 1 on FAIL.
 const H = require('../lib/ws-harness.cjs');
 
@@ -113,6 +116,37 @@ const m6Of = (a, b, sign) => {
             }
         }
         console.log('  STATE-MARKS: scripted-model, lesson anchor checked');
+    }
+    if (on('MODEL-RESERVE')) {
+        // (lf-roles review of compare r3, 2026-11-13, item b2: the Guided page's Model row - the Model beside the hinted tries
+        // of a `tightRows` host - reserves the LARGER of the Model's tab clearance and the tries' hint line, never their sum;
+        // the sum left the row 38 mm at M for 10 mm of ink, 023cafca. Read: the row's fullest cell leaves at most 3 mm white
+        // under its ink inside its bottom pad.)
+        for (const size of SIZES) for (const seed of seedsFor('guided')) {
+            await build('guided', size, seed, null);
+            const r = await sheet.evaluate(() => {
+                const MM = 96 / 25.4;
+                const m = document.querySelector('.ws-page .mq-modelcell');
+                if (!m) return { error: 'no Model cell' };
+                const mr = m.getBoundingClientRect();
+                const row = [...m.parentElement.children].filter((c) => c.classList.contains('ws-cell')).filter((c) => { const r = c.getBoundingClientRect(); return Math.abs(r.top - mr.top) < 0.5 * MM && Math.abs(r.height - mr.height) < 0.5 * MM; });
+                const white = row.map((c) => {
+                    const cr = c.getBoundingClientRect();
+                    let low = -Infinity;
+                    for (const d of c.querySelectorAll('*')) {
+                        if (d.closest('.ws-modeltab, .ws-tab, .ws-letter, [data-ws-label]')) continue;
+                        const ink = [...d.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img)$/i.test(d.tagName);
+                        if (!ink) continue;
+                        const r = d.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom);
+                    }
+                    return (cr.bottom - parseFloat(getComputedStyle(c).paddingBottom) - low) / MM;
+                });
+                return { h: mr.height / MM, cells: row.length, minWhite: Math.min(...white) };
+            });
+            if (r.error) { bad.push(`MODEL-RESERVE guided ${size} seed ${seed}: ${r.error}`); continue; }
+            if (r.minWhite > 3) bad.push(`MODEL-RESERVE guided ${size} seed ${seed}: the Model row (${r.h.toFixed(1)} mm, ${r.cells} cells) leaves ${r.minWhite.toFixed(1)} mm white under its fullest cell's ink (over 3 mm: the row reserves the tab clearance AND the hint line, or is stretched past its content)`);
+        }
+        console.log('  MODEL-RESERVE: guided Model row at ' + SIZES.join('/'));
     }
     await app.close();
     for (const b of bad.slice(0, 30)) console.log(`  FAIL ${b}`);
