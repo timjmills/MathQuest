@@ -3402,7 +3402,9 @@
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
-   }
+   },
+   "pending": true,
+   "pendingReason": "critic eb-r4 D1 (2026-11-13): the pass commit da17b9ba only re-labelled the 48 px underline-only input as a slot; 2 of 6 unit_form rename=more tiles are 47.9 % empty above the digits as a pupil sees them. The label was reverted; re-arm with a real app fix (lead ruling pending, rule 7 hand-over)"
   },
   {
    "id": "screen-ink-size-ink",

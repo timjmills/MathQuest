@@ -1615,12 +1615,7 @@ function _wsRenderCard(grid, q, i) {
         if (!kind && answerRow && (!(q.options && q.options.length) || (twin && twin.kit) || q.answerType === 'symbol')) {
             const row = cellEl.querySelector(':scope > .mq-answerrow');
             const inp = row && row.querySelector(`#ws_input_${i}`);
-            if (inp && adoptVisualBlank(cellEl, inp)) {
-                // the input took the paper's answer slot (the kit twin's data-ws-slot line / box): it keeps that mark, so its
-                // 48 px writing box reads as the slot it is (CL-4b / RUBRIC H13: a slot is the item's writing room, not a band)
-                if (!inp.hasAttribute('data-ws-slot')) inp.setAttribute('data-ws-slot', 'answer');
-                row.remove(); wireSignCircle(cellEl, inp, { signs: signsFor(q) });
-            }
+            if (inp && adoptVisualBlank(cellEl, inp)) { row.remove(); wireSignCircle(cellEl, inp, { signs: signsFor(q) }); }
             else if (inp && (q.answerType === 'number' || !q.answerType) && adoptSvgBlank(cellEl, inp)) row.remove();
             // several blanks in one drawing: an input in each, feeding the (hidden) card input
             else if (inp && wireCellSlots(cellEl, inp)) row.style.display = 'none';

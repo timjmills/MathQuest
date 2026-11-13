@@ -441,7 +441,7 @@ function measureVocab(scope) {
 function judge(cells, where, F, role) {
     cells.forEach((c, i) => {
         // a cell with no ink at all (critic eb-r3 D2: it was dropped, so a blank cell beside a good one read OK)
-        if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with nothing drawn in it) [${c.tmpl}]`); return; }
+        if (c.noInk) { F('EB-READ', `${where} p${c.page} cell ${c.label || c.cell}`, `cell ${c.cell} has no ink (a ${c.hMm} mm kit cell with no pixel darker than the ink threshold 225 of 255: blank, or only ink too faint to count, e.g. #eee) [${c.tmpl}]`); return; }
         // compared unrounded (critic eb-r1 D5); the largest of the bands under, between and above the ink (critic eb-r1 D2)
         const lim = BAND * c.hRaw;
         // (a Scripted Model's interior band - step text to the problem, room kept for a later mark - is EB-GAP's, read on the
@@ -450,7 +450,7 @@ function judge(cells, where, F, role) {
         const [where2, band] = bands[0];
         if (band >= lim && !modBandOk(role, cells, i)) F('EB-BAND', `${where} p${c.page} cell ${c.label || c.cell}`, `empty band ${band.toFixed(1)} mm ${where2} the ink of a ${c.hMm} mm cell (${(band / c.hRaw * 100).toFixed(1)} %; limit ${(BAND * 100).toFixed(0)} % = ${lim.toFixed(1)} mm) [${c.tmpl}]`);
         if (c.tmpl !== 'screen-cell' && !String(role || '').startsWith('host:') && Number.isFinite(c.edgeMm) && c.edgeMm < EDGE_MM) F('EB-EDGE', `${where} p${c.page} cell ${c.label || c.cell}`, `ink ${c.edgeMm < 0 ? `${-c.edgeMm} mm across` : `${c.edgeMm} mm from`} the cell's border (a divider or the page frame; limit ${EDGE_MM} mm) [${c.tmpl}]`);
-        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${Math.round(c.sideMm / c.innerW * 100)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
+        if (c.sideMm >= SIDE * c.innerW) F('EB-SIDE', `${where} p${c.page} cell ${c.label || c.cell}`, `${c.tmpl === 'screen-cell' || String(role || '').startsWith('host:') ? 'content pinned to one side: ' : ''}${c.sideMm.toFixed(1)} mm empty beside the ink of a ${c.innerW.toFixed(1)} mm wide cell interior (${(c.sideMm / c.innerW * 100).toFixed(1)} %; limit ${(SIDE * 100).toFixed(0)} %) [${c.tmpl}]`);
     });
 }
 

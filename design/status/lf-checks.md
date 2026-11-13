@@ -228,3 +228,24 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
     fixed: the lead routes. The deploy gate is RED until they are fixed.
 - The CL-4b fixer's da17b9ba (the worksheet input that adopts a kit slot keeps data-ws-slot) is accepted: in print the slot is
   writing room, not a band. Critic r4 is asked to judge it from a screenshot.
+
+### Critic eb-r4 (53ba39fb): FAIL. C1 7 · C2 8 · C3 7 · C4 7 (lf-checks/critic-eb-r4.md). r3's D1, D2 and D5 and the minors are verified fixed.
+- r4 D1, rule-7 STOP: the unit_form worksheet band survived two fixes at medium (my centring, then the fixer's slot label).
+  - The label (da17b9ba: the 48 px underline-only input kept data-ws-slot) is REVERTED. It hid a band a pupil sees: 2 of 6
+    rename=more tiles are 47.9 % empty above the digits.
+  - Row eb-wsheet-cl4b-stretch is set back to pending.
+  - Root cause: a line slot becomes a 48 px touch input with only an underline, digits at its bottom.
+  - Fix options for a ruling:
+    - (a) the tool counts a screen slot as its drawn extent plus one written digit's height (the critic's check);
+    - (b) the app sizes that input to the digit plus its underline, keeping the 48 px touch target by padding outside the drawn box;
+    - (c) the tile row height.
+- r4 D2: placevalue:unit_form at head FAILs 305 (302 EB-BAND at S, 32.5 %, real on the pixels, 0 pinned). The pixel measure moved
+  it, and I did not report it. Routed to lf-placevalue. Rule: when a measure changes, re-run every redesign-passed skill the lane
+  touches and report the counts.
+- r4 D3 FIXED: EB-SIDE prints its % to one decimal ("30 %; limit 30 %" was 30.4 %).
+- r4 D4 FIXED: EB-READ names the 225 ink threshold (faint #eee ink is not counted).
+- The critic's minor (not scored; it needs a lead ruling): the bands include the kit's mandatory top pad, so a 15 mm strip cell
+  fails about 1 mm off centre.
+- SCREEN-INK-SIZE pin (lead ruling): design/audit/baselines/screen-ink-size.json, written with --passed on this tree. 25 skills,
+  552 renders, 69 findings in 28 keys. The 11-13 sweep's 97 was on the master tree f5c03405, with 26 passed skills. The gate fails
+  on a new key or a rising count.
