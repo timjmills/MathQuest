@@ -589,3 +589,33 @@ Final precritic --strict on 9e3f2cd9 (pin in place): vocab_grade_pictures 2 FAIL
 both FAIL only sibling-compare (structural) and ws-screen-ink-size (the 4 ruled SIZE-REF findings: distributive on Match 3;
 pick3 answer-choice ring / picture marks). empty-band and next-box PASS inside precritic. ws-backtest --row vones, vkey, vpage:
 3 PASS. Hundred chart key: r15/hundred-chart/hundred-chart-key-seed143869.png (middle row grey, inside its cells).
+
+## r16b fix (2026-11-13, Opus medium): gates red after r16
+
+1. **L-TOPSTART (CL-4b) regression.** Bisected (print-lint, independent L, vocabGrade 1, MQ_ROOT per commit): 7d720ad3 /
+   0defd42f / 9878b2a6 OK, 47100ca2 (r16 item 7) FAIL. Item 7 capped the practice work at 50 mm and raised the L footprint to
+   48 mm, so independent L and the lesson's practice pages hold 3 a page (72.5-76 mm rows); the picture row, centred in the work
+   (margin:auto 0), started 3.4 mm+ below the top pad, and on the lesson pages the cell centred the work 10.7-13 mm down.
+   Fix b52eac93: the picture row hangs from the work's top, and the capped work takes margin-bottom:auto. V-LETTER still OK.
+   Backtest vocab-r16b-topstart-l (FAIL 9fa898ed, PASS b52eac93). Note: 3 a page at L (was 4 at r15) is item 7's footprint
+   choice, which the r15 + r16 critic saw and passed; this fix does not change it.
+2. **V23 re-pin (36 pages).** The r15 pin (ade0824c8) holds on 7d720ad3 (0 of 60 differ). The moves, by r16 commit (hashes on
+   every r16 commit that touches js/, MQ_ROOT):
+   | commit | item | pupil pages moved |
+   |---|---|---|
+   | afca8041 | 3 V-NAMES (error-analysis.js names) | grade_pictures error-analysis S 143869 |
+   | 0defd42f | 1 V-LETTER (pics align flex-start) | grade_pictures independent / guided / more-practice / test / error-analysis, S M L, both seeds (30) |
+   | 223174ce | 2 V-BOX390 (screen CSS) | none |
+   | 9878b2a6 | 4 V-CAPTION (one caption size) | the same 30 grade_pictures pages again |
+   | 36f9dbfa | 5 V-GLINE (pick3 Guided line) | pick3_words guided S M L, both seeds (6) |
+   | 47100ca2 | 7 EB-FOOT (work max 50 mm, L 48) | grade_pictures independent / more-practice / test S M L, guided S M (22) |
+   | b52eac93 / 15b4a933 | r16b fixes 1 and 3 | the same 22 grade_pictures pages; pick3 none |
+   Union 36 = 30 grade_pictures + 6 pick3 guided. Every move is an r16 drawing change in the lane's own cells / roles; none is
+   master markup. Re-pinned on 15b4a933 (60 pages).
+3. **ws-empty-band --slot-ink off FAIL (3)**: EB-BAND on pick3 Scripted Model L (p1 cells 1-2, p2 cell 1, 28.9 mm of 96 mm,
+   30.1 %). Cause: r16 item 5 (36f9dbfa) anchored the pick3 line to the cell bottom wherever scaffoldLevel >= 2, which the
+   Scripted Model (level 3) shares. Fix 15b4a933: anchor by payload guidedRow alone (guided.js passes it to the Model stage too);
+   the Scripted Model is back to its r15 geometry (line 80.5 mm, bank 57.7 mm, identical to 7d720ad3), the Guided page unchanged
+   (V-GLINE / V18 / V18M OK, pick3 guided hashes unchanged by the fix). Backtest vocab-r16b-ebband-model-l (FAIL 9fa898ed, PASS
+   15b4a933).
+Owner rule received mid-fix (master 76bc11c6): print size S dropped; S-only findings are noted, not fixed or counted.
