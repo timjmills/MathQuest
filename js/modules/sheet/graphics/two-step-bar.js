@@ -3,9 +3,10 @@
 // SCHEMATIC two-step bar model, WDS 18.1 / RP-70 / RP-71 / RP-72. A Step 1 bar (equal groups when the
 // first step is × / ÷, part-whole when it is + / −) sits over a Step 2 bar whose whole or first part is
 // the Step 1 answer; a 0.75 pt arrow labelled "Step 1 answer" runs from Step 1 to the cell that carries
-// it. The bars stand side by side (the arrow between) when they fit the cell's room, else one over the
-// other (the arrow down); the screen twin always stacks. Each bar has exactly ONE unknown (card §3, LS-3 / RP-70): a solid cell with the zone-label
-// `?` in its top-left corner, never dashed.
+// it. The bars stand side by side, the arrow between; in a narrower cell (a lesson's Guided cell, a phone)
+// the arrow and the Step 2 bar wrap under the Step 1 bar together (one flex row; never shrunk). Each bar
+// has exactly ONE unknown (card §3, LS-3 / RP-70): a solid cell with the zone-label `?` in its top-left
+// corner, never dashed.
 //
 // Schematic and fixed (RP-72: a bar length never draws which number is bigger): equal groups are `n`
 // equal segments (at most 6 drawn), a part-whole bar is split 60 / 40 (first part 60), whatever the
@@ -94,10 +95,11 @@ export function twoStepBarSize(ctx, steps, maxW = 0) {
     const arrowW = ARROW_W[size] || 16;
     const twin = isTwin(ctx);
     const wide = Ws[0] + arrowW + Ws[1] + 3;
-    const across = !twin && Number(maxW) > 0 && wide <= Number(maxW);
+    // (side by side when the room given holds them; else the Step 2 bar wraps under - the drawing is one flex row)
+    const across = Number(maxW) > 0 ? wide <= Number(maxW) : !twin;
     const capH = zonePt(ctx) * 0.3528 * 1.3;
-    const hMm = across ? capH + 2 * segH + 1.2 : 4 * segH + 2 * 1.2 + 8;
-    return { bars, lw, gw, Ws, segH, capW, arrowW, across, wMm: across ? wide : capW + 2 + Math.max(...Ws), hMm };
+    const hMm = across ? capH + 2 * segH + 1.2 : 2 * (capH + 2 * segH + 1.2) + 2;
+    return { bars, lw, gw, Ws, segH, capW, arrowW, across, wMm: across ? wide : arrowW + 1.5 + Math.max(...Ws), hMm };
 }
 
 /**
@@ -108,7 +110,7 @@ export function twoStepBar(ctx, o = {}) {
     const g = twoStepBarSize(ctx, o.steps, o.maxW);
     if (!g) return '';
     const { show = false, ink = null } = o;
-    const { bars, lw, gw, Ws, segH, capW, arrowW, across } = g;
+    const { bars, lw, gw, Ws, segH, arrowW } = g;
     const size = sizeOf(ctx);
     const twin = isTwin(ctx);
     const hw = BOX_H[size] || 10;
@@ -123,45 +125,30 @@ export function twoStepBar(ctx, o = {}) {
     const segHcss = twin ? `max(50px, ${L(ctx, segH)})` : L(ctx, segH);
     // one outlined cell (1.5 pt, RP-70) w mm wide, holding its box (none: an equal group's other segments)
     const seg = (w, cell, id, first, bw) => `<span${cell && cell.unknown ? ' data-ws-unknown="1"' : ''} style="position:relative;flex:none;display:flex;align-items:center;justify-content:${cell && cell.unknown ? 'flex-end' : 'center'};box-sizing:border-box;width:${twin ? `max(${cell ? 56 : 14}px, ${L(ctx, w)})` : L(ctx, w)};height:${segHcss};border:${B(ctx, 1.5)} solid ${INK};${first ? '' : 'border-left:none;'}background:#fff;padding:0 ${L(ctx, 0.8)};">${cell && cell.unknown ? qMark : ''}${cell ? box(cell, id, bw) : ''}</span>`;
-    const capt = (k) => `<span class="mq-ts2bar-cap" style="flex:none;${across ? '' : `width:${L(ctx, capW)};padding-top:${L(ctx, 1)};`}font-size:${P(ctx, zp)};font-weight:700;line-height:1.3;">Step ${k}</span>`;
+    const capt = (k) => `<span class="mq-ts2bar-cap" style="flex:none;font-size:${P(ctx, zp)};font-weight:700;line-height:1.3;">Step ${k}</span>`;
     const drawBar = (bar, k) => {
-        const W = across ? Ws[k - 1] : Math.max(...Ws);
+        const W = Ws[k - 1];
         const id = (x) => `ts${k}-${x}`;
         const whole = `<div style="display:flex;">${seg(W, bar.whole, id('w'), true, lw)}</div>`;
         const parts = bar.kind === 'groups'
             ? Array.from({ length: bar.n }, (_, i) => seg(W / bar.n, i === 0 ? bar.parts[0] : null, id('p0'), i === 0, gw(bar))).join('')
             : seg(0.6 * W, bar.parts[0], id('p0'), true, lw) + seg(0.4 * W, bar.parts[1], id('p1'), false, lw);
         const body = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 1.2)};">${whole}<div style="display:flex;">${parts}</div></div>`;
-        return across
-            ? `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 0.4)};">${capt(k)}${body}</div>`
-            : `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="display:flex;gap:${L(ctx, 2)};align-items:flex-start;">${capt(k)}${body}</div>`;
+        return `<div class="mq-ts2bar-row" data-ts-bar="${k}" data-ts-kind="${bar.kind}" style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 0.4)};">${capt(k)}${body}</div>`;
     };
     const lab = (t) => `<span style="font-size:${P(ctx, zp)};font-weight:700;color:${INK};line-height:1.1;white-space:nowrap;">${t}</span>`;
     const b2 = bars[1];
-    let arrow;
-    if (across) {
-        // → into the Step 2 cell that carries the answer: the whole row, or the parts row (its first part)
-        const svg = `<svg aria-hidden="true" width="${L(ctx, arrowW - 2)}" height="${L(ctx, 3)}" viewBox="0 0 ${arrowW - 2} 3" style="flex:none;overflow:visible;">`
-            + `<path d="M0.3 1.5 L${(arrowW - 2.4).toFixed(2)} 1.5 M${(arrowW - 3.6).toFixed(2)} 0.3 L${(arrowW - 2.3).toFixed(2)} 1.5 L${(arrowW - 3.6).toFixed(2)} 2.7" fill="none" stroke="${INK}" stroke-width="0.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-        const blk = `<div style="height:${L(ctx, segH)};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${L(ctx, 0.3)};">${lab('Step 1')}${lab('answer')}${svg}</div>`;
-        const row = b2.whole.carry ? 0 : 1;
-        arrow = `<div class="mq-ts2bar-arrow" style="flex:none;width:${L(ctx, arrowW)};display:flex;flex-direction:column;gap:${L(ctx, 1.2)};padding-top:${L(ctx, zp * 0.3528 * 1.3 + 0.4)};">`
-            + (row === 0 ? blk + `<div style="height:${L(ctx, segH)};"></div>` : `<div style="height:${L(ctx, segH)};"></div>` + blk) + '</div>';
-        return `<div class="mq-ts2bar-wrap" style="margin-top:${L(ctx, 1.5)};"><div class="mq-ts2bar" role="group" aria-label="two-step bar model" data-ts-across="1" style="display:inline-flex;align-items:flex-start;gap:${L(ctx, 1.5)};">`
-            + `${drawBar(bars[0], 1)}${arrow}${drawBar(bars[1], 2)}</div></div>`;
-    }
-    // ↓ from Step 1 to the Step 2 cell that carries its answer, standing over that cell
-    const W = Math.max(...Ws);
-    const carryX = b2.whole.carry ? W / 2 : (b2.kind === 'groups' ? W / b2.n / 2 : 0.3 * W);
-    const ah = 5;
-    arrow = `<div class="mq-ts2bar-arrow" style="display:flex;align-items:center;gap:${L(ctx, 1.5)};padding-left:${L(ctx, capW + 2 + carryX - 2)};height:${L(ctx, ah + 1)};">`
-        + `<svg aria-hidden="true" width="${L(ctx, 4)}" height="${L(ctx, ah)}" viewBox="0 0 4 ${ah}" style="flex:none;overflow:visible;">`
-        + `<path d="M2 0.3 L2 ${ah - 0.4} M0.7 ${ah - 1.6} L2 ${ah - 0.3} L3.3 ${ah - 1.6}" fill="none" stroke="${INK}" stroke-width="0.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-        + `${lab('Step 1 answer')}</div>`;
-    const inner = `<div class="mq-ts2bar" role="group" aria-label="two-step bar model" style="flex:none;display:inline-flex;flex-direction:column;align-items:flex-start;gap:${L(ctx, 0.6)};">`
-        + `${drawBar(bars[0], 1)}${arrow}${drawBar(bars[1], 2)}</div>`;
-    // (a phone card narrower than the bars scrolls the drawing inside the cell, as the number line does; never shrinks it)
-    return twin
-        ? `<div class="mq-ts2bar-wrap" style="max-width:100%;overflow-x:auto;margin-top:${L(ctx, 1.5)};text-align:left;">${inner}</div>`
-        : `<div class="mq-ts2bar-wrap" style="margin-top:${L(ctx, 1.5)};">${inner}</div>`;
+    // → "Step 1 answer" into the Step 2 cell that carries it: level with the whole row, or with the parts row (its first part)
+    const svg = `<svg aria-hidden="true" width="${L(ctx, arrowW - 2)}" height="${L(ctx, 3)}" viewBox="0 0 ${arrowW - 2} 3" style="flex:none;overflow:visible;">`
+        + `<path d="M0.3 1.5 L${(arrowW - 2.4).toFixed(2)} 1.5 M${(arrowW - 3.6).toFixed(2)} 0.3 L${(arrowW - 2.3).toFixed(2)} 1.5 L${(arrowW - 3.6).toFixed(2)} 2.7" fill="none" stroke="${INK}" stroke-width="0.26" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const segHc = twin ? `max(50px, ${L(ctx, segH)})` : L(ctx, segH);
+    const blk = `<div style="height:${segHc};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${L(ctx, 0.3)};">${lab('Step 1')}${lab('answer')}${svg}</div>`;
+    const row = b2.whole.carry ? 0 : 1;
+    const arrow = `<div class="mq-ts2bar-arrow" style="flex:none;width:${L(ctx, arrowW)};display:flex;flex-direction:column;gap:${L(ctx, 1.2)};padding-top:${L(ctx, zp * 0.3528 * 1.3 + 0.4)};">`
+        + (row === 0 ? blk + `<div style="height:${segHc};"></div>` : `<div style="height:${segHc};"></div>` + blk) + '</div>';
+    // The two bars stand side by side, the arrow between; where the cell is narrower (a lesson's Guided cell beside its
+    // Steps, a phone card) the arrow and the Step 2 bar wrap UNDER the Step 1 bar together - the drawing never shrinks,
+    // and the arrow still points into the bar that carries the Step 1 answer. The page measures the drawn height.
+    return `<div class="mq-ts2bar-wrap" style="margin-top:${L(ctx, 1.5)};${twin ? 'text-align:left;max-width:100%;overflow-x:auto;' : ''}"><div class="mq-ts2bar" role="group" aria-label="two-step bar model" style="display:flex;flex-wrap:wrap;align-items:flex-start;column-gap:${L(ctx, 1.5)};row-gap:${L(ctx, 2)};">`
+        + `${drawBar(bars[0], 1)}<div style="flex:none;display:flex;align-items:flex-start;gap:${L(ctx, 1.5)};">${arrow}${drawBar(bars[1], 2)}</div></div></div>`;
 }
