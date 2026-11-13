@@ -142,14 +142,17 @@ register('chartwindow', {
     footprint(p) {
         // The window's width at L: a 1-100 window (85 mm) shares a row; a row of ten or a window
         // of four- and five-digit numbers takes the whole row (the host's measurement decides at S).
-        if (p && isWhole(p)) return { wMm: 10 * WHOLE.w + 4, hMm: null, measure: true, factLike: false, maxCols: 1 };
+        // `points` (SCORE-SLOTS, lf-roles critic r8b n5): the page's Score counts every empty square the pupil writes, not
+        // one a window (Score /3 over three windows holding 5 squares); paginate.js scorePoints reads it
+        const points = Math.max(1, (p && p.blanks ? p.blanks.length : 1));
+        if (p && isWhole(p)) return { wMm: 10 * WHOLE.w + 4, hMm: null, measure: true, factLike: false, maxCols: 1, points, slotPoints: true };
         // (`inkWMm`: a window past 100 never squeezes - its true width, so a host laying cells beside other work knows it)
         const w = (p && p.cols ? p.cols.length : 5) * cellW(p || {}, 'L', 28 * 0.8);
         // `hardCap`: the chart's tracks have a 12 mm floor its measurement cannot see (the table
         // squeezes rather than overflowing), so its 2 columns hold at every size (critic guided-r1).
-        if (w <= 90 && topOf(p || {}) > 100) return { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true };
-        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true }
-            : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1 };
+        if (w <= 90 && topOf(p || {}) > 100) return { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true };
+        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true }
+            : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1, points, slotPoints: true };
     },
     inputs(p) {
         return (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, scopes: ['full', 'answer-only'] }));

@@ -812,7 +812,9 @@ export function prepare(it, info = {}) {
             : kind === 'value' ? (ownLine ? 'line' : 'box') : kind === 'parts' ? 'boxes' : kind,
         // The judgement column sits beside the work; a word problem or a wide picture keeps its
         // own single column (PT-WPR-1).
-        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(3, (it.footprint && it.footprint.maxCols) || 3) }),
+        // (a template that scores each empty slot - `slotPoints`, chartwindow: SCORE-SLOTS - is ONE judgement here: the pupil
+        // marks the shown work and fixes it, never fills its squares; lf-builds chart_120, lf-roles critic r8b n5)
+        footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: Math.min(3, (it.footprint && it.footprint.maxCols) || 3) }, it.footprint && it.footprint.slotPoints ? { points: 1 } : {}),
         fclass: it.fclass === 'word' || it.fclass === 'wide' ? it.fclass : 'standard', thinking: { shown, correct, isWrong, basis: wrong ? wrong.basis : '', kind, redraw },
         cellCls: [it.cellCls || '', 'mq-thinkcell mq-eacell'].join(' ').trim(),
     });

@@ -984,6 +984,10 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
                 q.distractorTags[blanks.map((x, i) => (i === tt ? w : x)).join(', ')] = `wrote ${n} as it is said (${w}): ${n} has three digits, 1 hundred, ${Math.floor((n - 100) / 10)} ten${Math.floor((n - 100) / 10) === 1 ? '' : 's'} and ${n % 10} one${n % 10 === 1 ? '' : 's'}`;
             }
         }
+        // GUIDED-MODEL-ECHO (lf-roles critic r8b D5): two windows over the same squares are the SAME problem, whatever their
+        // gaps - the Model's 96-120 window with 100 traced came back as a try with 100 blank, and the pupil copied it. The
+        // dealer's duplicate key is the window, so no page deals one window twice while another is left (6 at band 120).
+        q.dupKey = `chartwindow:${rows[0]}-${rows[rows.length - 1]}:${cols[0]}-${cols[cols.length - 1]}`;
         _kSetCell(q, 'chartwindow', { rows, cols, blanks });
         q.skillLabel = big ? "Number Chart Fill" : _to120 ? "120-Chart Fill" : "100-Chart Fill";
         q.printFormat = "hundreds-chart-fill";
