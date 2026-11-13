@@ -289,3 +289,4 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - --self-test "EB-FOOT columns" holds 3 cases. eb-foot-div-facts still PASSES.
   - Row eb-foot-gridcols-patterns is PENDING: pattern_features exists only on lf-algebra's branch, so it is armed on that merge.
   - This also answers lf-algebra's "bridge 2 columns vs cell max 1" item. lf-roles reverts its hunk.
+- precritic mention matcher (lf-vocab, 11-13): a skill key is bounded by space or list punctuation, so "a:b, c:d ... OK" on one line names both. `ws-precritic --self-test` holds 6 cases. precritic-plan OK.

@@ -310,13 +310,30 @@ const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output ($
 const listShort = (a, n = 6) => `${a.slice(0, n).join(', ')}${a.length > n ? `, … ${a.length - n} more` : ''}`;
 const fmtMin = (m) => String(+(+m).toFixed(3));
 
+// a skill key named in a tool's output: whole key, bounded by space, start/end, or list punctuation (lf-vocab 2026-11-13:
+// ws-screen-support-eq prints "no supports for a:b, c:d ... OK" on ONE line; the space-only boundary read a:b as absent)
+const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
+
+if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
+        ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
+        ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
+        ['in parentheses', mentioned('(addition:add_facts)', 'addition:add_facts'), true],
+        ['a longer id is not the key', mentioned('vocabulary:vocab_grade_pictures OK', 'vocabulary:vocab_grade'), false],
+        ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
+    const bad = t.filter(([, got, want]) => got !== want);
+    for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases)`}`);
+    process.exit(bad.length ? 1 : 0);
+}
+
 function generic(g, out, code) {
     const v = lastVerdict(out, g.script);
     if (!v) return unparsed(`no "${g.script}: OK" or "${g.script}: FAIL" line`, out);
     if (v[1] !== 'OK') return { result: 'FAIL', findings: v[0].slice(0, 160), detail: out.split('\n').filter((l) => /FAIL|NEW|Error|error|✗|^\s+- /.test(l) && !NOISE.test(l)).slice(0, 10), explainsExit: true };
     // a per-skill gate must name every skill in scope somewhere in its output, or it checked something else
     const mention = (g.expect && g.expect.mention) || [];
-    const miss = mention.filter((k) => !new RegExp(`(^|\\s)${reEsc(k)}(\\s|$)`, 'm').test(out));
+    const miss = mention.filter((k) => !mentioned(out, k));
     if (miss.length) return { result: 'FAIL', findings: `${miss.length} of ${mention.length} skill(s) in scope absent from the output (checked nothing for them): ${listShort(miss)}`, detail: tailLines(out), explainsExit: false };
     return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
 }
