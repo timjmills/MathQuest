@@ -5387,6 +5387,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "vocab-r16b-ebband-model-l",
+  "check": "EB-BAND (--slot-ink off): the 1 picture, 3 words cell on the Scripted Model at L leaves no band over 30 % (r16 V-GLINE anchored its line to the cell bottom wherever scaffoldLevel >= 2, the Model included: 28.9 mm in a 96 mm cell, 30.1 %, p1 cells 1-2, p2 cell 1)",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "ws-empty-band EB-BAND --slot-ink off (lf-vocab r16b fix 3)",
+  "fail": {
+   "commit": "9fa898ed",
+   "state": "r15+r16 critic pass head: pick3 Guided layout on every level >= 2 cell"
+  },
+  "pass": {
+   "commit": "15b4a933",
+   "state": "pick3 anchors by guidedRow alone (guided.js passes it to the Model stage too)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_pick3_words --roles scripted-model --sizes L --hosts none --no-baseline --slot-ink off --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
