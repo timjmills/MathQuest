@@ -23,6 +23,15 @@ import {
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
 export const ROLE_ID = 'opener';
+/**
+ * SPILL (lf-roles r9, lf-algebra precritic two-step r11: Opener OVERFLOW / EB-EDGE at M / L): the plain try of a word-work story is
+ * also measured at level 1 (`measured[c].atLevel`, print-sheet.js measureLo), so an Independent row after a spilled Guided page is
+ * sized by what it draws.
+ */
+export const MEASURE_LO = (it) => {
+    const p = (it && it.q && it.q.cell && it.q.cell.payload) || {};
+    return it && it.template === 'word-work' && p.layout !== 'sentence' ? [1] : null;
+};
 /** Item 7: the first item is the Model; it wraps to the half-width Model cell (count-row reads ctx.wrapToCell). */
 export const WRAP_TO_CELL = (index) => index === 0;
 /** critic r2 N4: a one-page count row's air (vpad, spread over the one-page SHEET) is not drawn here; the cell is the row's height. */
@@ -57,11 +66,15 @@ function geometry(items, input, cap = {}) {
     const twoModels = items.length >= 2 && fitsAt(items.slice(0, 2), 4, ctx);
     // Item 7 (LESSONS_LEARNED L11): a count row too wide for the half-width Model cell even wrapped (1,000,000 by 100,000)
     // takes the whole width, with the Steps band underneath; every other Model keeps the Model | Steps row.
-    const modelFull = !twoModels && !!first && first.template === 'count-row' && steps.length > 0 && !fitsAt([first], 2, ctx);
+    // (SPILL, lf-roles r9: a Model the host MEASURED running out of the half-width cell - a two-step story's two step columns
+    // and bar, 107-132 mm - takes the full width too (PT-OPN-4: a visual wider than 93 mm is one full-width worked row); in the
+    // 93 mm zone it ran off the page's left edge)
+    const halfOver = !!first && !!first.measured && !!first.measured[2] && first.measured[2].fits === false && first.template === 'word-work';
+    const modelFull = !twoModels && !!first && ((steps.length > 0 && first.template === 'count-row' && !fitsAt([first], 2, ctx)) || halfOver);
     const mc = twoModels ? 4 : modelFull ? 1 : 2;
     const modelH = hMinAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
     const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
-    const modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
+    const modelBand = modelFull ? m.strip + modelH + (steps.length ? m.strip + stepsH : 0) : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
     // critic r5 N13: a count-row page sizes its practice rows from the practice items only - the Model row is drawn in the Model
     // cell, so a taller Model row never blocks a practice row (other skills keep the probe-wide sizing they always had)
@@ -73,6 +86,23 @@ function geometry(items, input, cap = {}) {
     // 12.6 mm at S / M / L), not the generic estimate (Hw + 4.5): with the taller practice rows its 2 mm decide whether a row fits
     const sayMm = first && first.template === 'count-row' ? m.writeMm + 2.6 : m.say;
     let used = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm + m.strip + gH;
+    // SPILL (lf-roles r9): a full-width Model whose page cannot also hold its Guided row (a two-step story: 135 mm Model, 135 mm
+    // Guided try at M against a 236 mm budget) never runs off the page: the Model, its Steps and the Say band fill page 1, and
+    // the Guided row - with the Independent rows that fit, each at the height it draws - goes to page 2 under the continuation
+    // header (content never shrinks; PT-OPN-1's band order is kept across the two pages)
+    if (modelFull && used > m.budget && halfOver) {
+        const m2 = bandMetrics(ctx, layoutHeader(frame.contHeader), { cont: true });
+        const p1 = (whatsNew ? m.strip + 2 : 0) + modelBand + sayMm;
+        const lv1 = practice.every((it) => it.measured && it.measured[gc] && it.measured[gc].atLevel && Number(it.measured[gc].atLevel[1]) > 0)
+            ? Math.max(...practice.map((it) => Number(it.measured[gc].atLevel[1]))) + 1 : gH;
+        const iH = Math.min(gH, lv1);
+        let used2 = m2.strip + gH;
+        let iRows = 0;
+        const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
+        while (iRows < iMax && used2 + (iRows ? 0 : m2.strip) + iH <= m2.budget) { used2 += (iRows ? 0 : m2.strip) + iH; iRows++; }
+        return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true,
+            overBudget: p1 > m.budget || used2 > m2.budget, used: p1, used2 };
+    }
     let iRows = 0;
     // Item 7: a count row's band labels wrap to two lines at L ("Independent / Practice:"), which the strip height does not
     // count; a page of count rows keeps that much in hand before it adds an Independent row (it ran 4.8 mm over at L)
@@ -174,16 +204,27 @@ export function plan(input = {}) {
         });
     } else sections.push(modelBandPart);
     sections.push({ kind: 'say', frame: oralFrameOf(items[0] || {}), digits: 2 });
-    sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
+    // SPILL (lf-roles r9): page 2 holds the Guided row and the Independent rows, each row at the height it draws
+    const page2 = [];
+    if (g.spill) {
+        page2.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
+            content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH, labels: 'none' }) });
+        if (indep.length) {
+            page2.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
+                content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.iH, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
+        }
+    }
+    if (!g.spill) sections.push({ kind: 'band', label: 'Guided Practice:', instr: instructionText(key, items),
         content: gridPart(guided.map((it) => planItem(it, { cols: g.gc, level: 2, nolabel: true })), { cols: g.gc, rows: Math.max(1, Math.ceil(guided.length / g.gc)), cellH: g.gH + g.grow, labels: 'none' }) });
-    if (indep.length) {
+    if (indep.length && !g.spill) {
         sections.push({ kind: 'band', label: 'Independent Practice:', instr: instructionText(key, items),
             content: gridPart(indep.map((it) => planItem(it, { cols: g.gc, level: 1 })), { cols: g.gc, rows: Math.max(1, Math.ceil(indep.length / g.gc)), cellH: g.gH + g.grow, labels: labelStyleOf(ctx.look, input.labels), start: 1 }) });
     }
     const notes = [];
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
-    return assemble(ROLE_ID, input, frame, [{ sections }], {
+    if (g.spill) notes.push('The Model and its Guided row do not fit one page at this size: the Guided and Independent rows continue on page 2.');
+    return assemble(ROLE_ID, input, frame, g.spill ? [{ sections }, { sections: page2 }] : [{ sections }], {
         meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });

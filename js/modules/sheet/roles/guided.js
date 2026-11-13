@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, koMm } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, tightRows, koMm, oneRowCapOf } from '../layout.js';
 import { scorePoints } from '../paginate.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
@@ -150,6 +150,25 @@ const cueRowFits = (pool, c) => ordered(pool, c).slice(0, c).every((it) => {
 });
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
+/**
+ * DRAWN-FIT (lf-roles r9, lf-algebra precritic two-step r11: every two-step Guided page held ONE story): every Guided item is
+ * measured at the Model's level 3, but a hinted try draws at level 2 and a plain try at level 1 - a two-step story's Model draws
+ * both bars and the worked frames (126-140 mm at M), its plain try only the story and the two step columns (85-98 mm). A
+ * word-work story (not the sentence layout, whose tries draw at level 2) is also measured at levels 2 and 1
+ * (`measured[c].atLevel`, print-sheet.js measureLo), and a one-column page that would hold one story a page is fitted at the
+ * heights its cells DRAW (drawnMm).
+ */
+export const MEASURE_LO = (it) => {
+    const p = (it && it.q && it.q.cell && it.q.cell.payload) || {};
+    return it && it.template === 'word-work' && p.layout !== 'sentence' ? [2, 1] : null;
+};
+/** An item's row height at `cols` as the page draws it at scaffold `level` (3 the Model, 2 a hinted try, 1 a plain try). */
+const drawnMm = (it, cols, level) => {
+    const m = it && it.measured && it.measured[cols];
+    if (!m || !Number.isFinite(m.hMm)) return 0;
+    const at = m.atLevel && Number(m.atLevel[level]);
+    return (level < 3 && Number.isFinite(at) && at > 0 ? Math.min(m.hMm, at) : m.hMm) + 1;
+};
 /**
  * The probe the page is chosen from: wider than the page, so a mixed pool offers the Model's kind
  * of problem (pageSet) three more times, and one-column items can be left out.
@@ -469,6 +488,12 @@ function fitRows(items, cols, ctx, input, { noSpan = false, noHint = false, noLi
  */
 function sheetFit(items, cols, ctx, input, limit = Infinity) {
     const a = sheetFitPlain(items, cols, ctx, input, limit);
+    // DRAWN-FIT (lf-roles r9): a one-column sheet whose continuation pages hold ONE story each is fitted again at the heights its
+    // plain tries draw (level 1, MEASURE_LO); taken when it holds more on fewer or as many pages. Every other page is unchanged.
+    if (cols === 1 && a.pages.length > 1 && a.pages.slice(1).some((p) => p.cap === 1) && items.some((it) => it.measured && it.measured[1] && it.measured[1].atLevel)) {
+        const d = sheetFitWith(items, cols, ctx, input, !a.span, !a.hint, limit, !!a.noLines, 0, true);
+        if (d.total > a.total || (d.total === a.total && d.pages.length < a.pages.length)) return d;
+    }
     // GUIDED-MODEL-SPAN (lead ruling (e), 2026-11-13; ws-capacity-pin SIZE-ORDER): the ceiling trims a grid whose Model takes one
     // cell to whole rows (S, 4 columns: Model + 10 tries is 11 cells, so the last part-row went and S printed 8 < M 9). Where
     // the Model over TWO cells of row 1 completes the last row and keeps the ceiling, the Model spans two cells - its drawing at
@@ -522,7 +547,7 @@ function sheetFitPlain(items, cols, ctx, input, limit = Infinity) {
     return a;
 }
 
-function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = Infinity, noLines = false, span2 = 0) {
+function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = Infinity, noLines = false, span2 = 0, drawn = false) {
     const first = fitRows(items, cols, ctx, input, { noSpan, noHint, noLines, span2 });
     // (the cells row 1 gives up to the Model: all but one under a full-row Model, one beside a two-cell Model)
     const lead = first.span ? cols - 1 : first.span2 ? first.span2 - 1 : 0;
@@ -532,10 +557,15 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     const all = hMinAt(items, cols, ctx);
     // A page's rows are sized by the items that page holds (a tall coin set on page 2 does not
     // cost page 1 a row). Past the end of the probe the tallest probe item stands in.
+    // (DRAWN-FIT: the items past the hinted tries are plain tries, sized at the height they draw; the Model and the hinted tries
+    // keep the level-3 measure)
+    const pEndD = drawn ? (mixModels(items) > 1 ? mixPartialEnd(mixModels(items), cols, ceilFor(ctx, items)) : partialEndOf(cols, first.span, Math.min(items.length, ceilFor(ctx, items)), first.span2)) : 0;
     const hOf = (from, n) => {
         const slice = items.slice(from, from + n);
-        const h = slice.length ? hMinAt(slice, cols, ctx) : all;
-        return slice.length < n ? Math.max(h, all) : h;
+        const nMD = mixModels(items);
+        const dh = drawn && slice.length ? slice.map((it, k) => drawnMm(it, cols, from + k < nMD ? 3 : from + k < pEndD ? 2 : 1)) : null;
+        const h = dh && dh.every((x) => x > 0) ? Math.max(...dh) : slice.length ? hMinAt(slice, cols, ctx) : all;
+        return slice.length < n ? Math.max(h, drawn ? 0 : all) : h;
     };
     const pages = [];
     let total = 0;
@@ -605,7 +635,7 @@ function sheetFitWith(items, cols, ctx, input, noSpan, noHint = false, limit = I
     // (a cell scoring several tries - Match 3 - in one column: a continuation page holding ONE cell alone gives it up, as the
     // ceiling counted in tries leaves it nothing to share its page with; lf-vocab r9, L-LONE / PG-23)
     if (pointsOf(items) > 1 && cols === 1 && pages.length > 1 && pages[pages.length - 1].cap === 1) { total -= 1; pages.pop(); }
-    return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total) });
+    return Object.assign(first, { pages, rows: pages[0].rows, total: Math.min(most(), total), drawn: !!drawn });
 }
 
 /* ================================================================== the worked trace */
@@ -1166,7 +1196,7 @@ export function plan(input = {}) {
         const rowItems = (r) => (spanHere ? (r === 0 ? host.slice(0, 1) : host.slice(1 + (r - 1) * cols, 1 + r * cols))
             : span2Here ? (r === 0 ? host.slice(0, cols - lead2) : host.slice(cols - lead2 + (r - 1) * cols, cols - lead2 + r * cols))
             : host.slice(r * cols, (r + 1) * cols));
-        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
+        const hsOf = (r) => rowItems(r).map((it) => { const mm = it.measured && it.measured[cols]; return mm && mm.atLevel && Number.isFinite(mm.hMm) ? drawnMm(it, cols, use.indexOf(it) < nModels ? 3 : use.indexOf(it) < Math.max(partialEnd, nModels + 1) ? 2 : 1) : mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : pg.h; });
         const hintRow = pi === 0 && fit.hint ? partialRowOf(cols, spanHere, nModels, span2Here ? fit.span2 : 0) : -1;
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
@@ -1218,6 +1248,12 @@ export function plan(input = {}) {
             // content needs about 90 mm; lf-vocab r6, critic r4 #2, ws-vocab-unit V18 measures the rendered rows)
             Hr = Hr.map(() => (even * rows <= pg.avail + 0.5 ? even : Math.max(Hr.reduce((a, b) => a + b, 0), pg.avail) / rows));
         }
+        // ONE-ROW (layout.oneRowCapOf, lf-roles r9 item 4 on Guided): a page of ONE row - a two-step story's Model or hinted try
+        // alone, 136 mm in a 197-200 mm row at M (31-32 %) - stops where the band under its work stays under 30 %; the white under
+        // the grid is the Guided page's accepted white (PT-GDP / PAGE_TYPES 12.1). Only a one-column page of word-work stories
+        // measured at their drawn levels (MEASURE_LO), whose row heights are what they draw.
+        // (and every row of such a page: a row of plain tries drawn at level 1 - 52 mm letter stories in 105 mm rows - is held the same way)
+        if (cols === 1 && host.length && host.every((it) => it.template === 'word-work' && it.measured && it.measured[1] && it.measured[1].atLevel)) Hr = Hr.map((x, r) => Math.min(x, oneRowCapOf(w[r])));
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

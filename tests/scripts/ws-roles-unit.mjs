@@ -39,6 +39,17 @@
 //                41 % / 32 % on multi_step_word (Visual)), and its grid carries mq-onerow (PAGEFILL / EB-PAGE accept the strip).
 //                Control: a page of two rows keeps its own layout.
 //
+//   GUIDED-DRAWN-FIT a one-column Guided page of two-step stories (every item measured 135 mm at the Model's level 3, its plain try
+//                93 mm at level 1: lf-roles r9 item 1, lf-algebra precritic two-step r11 "Guided 1 story a page") holds two plain tries
+//                on a page where they fit, sized at the height they draw; no row past its ink / 0.72 (EB-BAND). Control: stories
+//                that draw as tall as they measure (Visual: bar on at level 1, 125 mm) still hold one a page.
+//   OPENER-SPILL a two-step story whose Model runs out of the half-width Model cell (measured fits:false at 2 columns) takes the
+//                full width (PT-OPN-4), and when the Model and its Guided row cannot share the page (135 + 135 mm at M) the Guided
+//                row and the Independent rows go to page 2 - never a page over its budget (lf-roles r9 item 2: Opener OVERFLOW /
+//                EB-EDGE at M / L).
+//   RI-TWOSTEP   a two-step column story on Reason It prints its story once and stands A over B at the cell's full width (its
+//                step columns are 107-115 mm, wider than half the cell: side by side they ran out of it; r9 item 3, OVERFLOW).
+//
 //   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
@@ -58,6 +69,7 @@ const PSC = await mod('roles/pre-skill-check.js');
 const TS = await mod('roles/test.js');
 const GD = await mod('roles/guided.js');
 const IND = await mod('roles/independent.js');
+const OPN = await mod('roles/opener.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -459,6 +471,58 @@ if (on('ONE-ROW-CAP')) {
         const g = gridOf(pl);
         if (g && /mq-onerow/.test(g.cls || '')) findings.push(`ONE-ROW-CAP control: a ${g.rows}-row page is marked mq-onerow`);
     } catch (e) { findings.push(`ONE-ROW-CAP control: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+}
+
+// a planted two-step story: word-work, two steps, measured at the Model's level and (atLevel) at the levels it draws
+const twoStep = (i, { h3 = 135, h1 = 93, half = false } = {}) => {
+    const q = { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted two-step story', answerType: 'number', seed: i,
+        cell: { template: 'word-work', payload: { steps: [{ op: '+', top: 16, bottom: 25, ans: 41 }, { op: '+', top: 41, bottom: 1, ans: 42 }], unit: 'apples' } } };
+    const render = (c, o = {}) => `<div class="ws-cell-work">${o.payload && o.payload.storyOnly ? 'story' : `story ${esc(o.shown !== undefined ? o.shown : '')}`}</div>`;
+    const measured = Object.fromEntries([1, 2, 3, 4].map((c) => [c, c === 1 || half ? { hMm: h3, fits: c === 1 || !half ? c === 1 : false, slackMm: 3, atLevel: { 2: h3, 1: h1 } } : { hMm: h3 - 5, fits: false, slackMm: -14, atLevel: { 2: h3, 1: h1 } }]));
+    return { q, key: { value: '42', display: '42', slots: {} }, render, template: 'word-work', pool: 'main', measured, footprint: { measure: true, wMm: 93, hMm: null, maxCols: 2, restacks: true }, fclass: 'standard' };
+};
+const SK1 = [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }];
+
+if (on('GUIDED-DRAWN-FIT')) {
+    for (const [tag, h1, want2] of [['plain', 93, true], ['visual', 125, false]]) {
+        checks++;
+        try {
+            const pl = GD.plan({ ctx: { size: 'M' }, skills: SK1, items: Array.from({ length: 8 }, (_, i) => twoStep(i, { h1 })) });
+            const per = pl.pages.map((pg) => ((pg.sections || []).map((x) => x.content).find((c) => c && c.items) || { items: [] }).items.length);
+            if (want2 && !per.some((n) => n >= 2)) findings.push(`GUIDED-DRAWN-FIT ${tag} M: one story a page (${per.join(' + ')}) - two ${h1} mm plain tries fit a continuation page`);
+            if (!want2 && per.some((n) => n >= 2)) findings.push(`GUIDED-DRAWN-FIT ${tag} M: ${per.join(' + ')} - two ${h1} mm tries do not fit a page`);
+            // no row past its ink / 0.72 (EB-BAND): a one-row page of the 135 mm Model
+            const g0 = (pl.pages[0].sections || []).map((x) => x.content).find((c) => c && c.items);
+            const h0 = parseFloat(g0 && g0.height) || ((pl.meta.fits[0] || {}).cellH * ((g0 && g0.rows) || 1));
+            if (g0 && g0.rows === 1 && h0 > (136 - 7) / 0.72 + 30) findings.push(`GUIDED-DRAWN-FIT ${tag} M: the Model's one-row page stretched to ${h0.toFixed(1)} mm (EB-BAND)`);
+            const fits = pl.meta.fits || [];
+            fits.forEach((f, i) => { if (f.rows === 1 && f.cellH > 190) findings.push(`GUIDED-DRAWN-FIT ${tag} M p${i + 1}: a one-row page's row stretched to ${f.cellH.toFixed(1)} mm (a 30 % band under a ${i ? h1 : 135} mm story)`); });
+        } catch (e) { findings.push(`GUIDED-DRAWN-FIT ${tag}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('OPENER-SPILL')) {
+    for (const size of ['M', 'L']) {
+        checks++;
+        try {
+            const pl = OPN.plan({ ctx: { size }, skills: SK1, items: Array.from({ length: 6 }, (_, i) => twoStep(i, { half: true })) });
+            const notes = (pl.meta.notes || []).join(' ');
+            if (/taller than the page budget/.test(notes)) findings.push(`OPENER-SPILL ${size}: the Model and Guided bands run over the page budget (${pl.pages.length} page(s)) - OVERFLOW`);
+            const mb = (pl.pages[0].sections || []).find((x) => x.kind === 'band' && x.label === 'Model:') || ((pl.pages[0].sections || []).find((x) => x.kind === 'row') || { parts: [] }).parts.find((x) => x.label === 'Model:');
+            if (mb && (pl.pages[0].sections || []).some((x) => x.kind === 'row' && x.cls === 'mq-modelrow')) findings.push(`OPENER-SPILL ${size}: a Model measured over the half-width cell stays in the 93 mm Model zone`);
+        } catch (e) { findings.push(`OPENER-SPILL ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+    }
+}
+
+if (on('RI-TWOSTEP')) {
+    checks++;
+    try {
+        const p = RI.prepare(twoStep(1), { seed: 1, index: 0 });
+        const html = p.render(resolveCtx({ mode: 'print', size: 'M', state: 'blank', scaffoldLevel: 1 }), { cols: 1 });
+        const ab = (/class="mq-ab" style="([^"]*)"/.exec(html) || [])[1] || '';
+        if (!/grid-template-columns:1fr;/.test(ab)) findings.push(`RI-TWOSTEP: A and B of a two-step story stand side by side (${ab.slice(0, 80)}) - its 107-115 mm step columns run out of a half cell`);
+        if ((html.match(/story/g) || []).length !== 1 + 2 && !/>story</.test(html)) findings.push('RI-TWOSTEP: the story is not printed once over A and B');
+    } catch (e) { findings.push(`RI-TWOSTEP: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);

@@ -4522,7 +4522,26 @@ async function buildRoleSheet(n, metaOf) {
         if (noRepeat) { out.counts = counts; out.short = Math.max(0, want - out.length); }
         return out;
     };
-    const measure = (items) => measureItems(items, { size: n.size, look: n.look, colsList });
+    // (lf-roles r9, Guided DRAWN-FIT: a role that measures at its tallest level - the Model's - may also ask, item by item
+    // (`MEASURE_LO(item)` -> the lower scaffold levels it draws the item at, or null), for the height the item draws at each:
+    // `measured[c].atLevel[level]`. Guided reads it for the tries of a page that would otherwise hold one story a page.
+    // Measurement only: no drawing changes.)
+    const measureLo = (items) => {
+        if (typeof mod.MEASURE_LO !== 'function') return;
+        const asks = items.map((it) => [it, it.measured ? [].concat(mod.MEASURE_LO(it) ?? []).filter((lv) => Number.isFinite(lv)) : []]).filter(([, lvs]) => lvs.length);
+        const levels = [...new Set(asks.flatMap(([, lvs]) => lvs))];
+        for (const lv of levels) {
+            const mine = asks.filter(([, lvs]) => lvs.includes(lv)).map(([it]) => it);
+            const clones = mine.map((it) => Object.assign({}, it, { measureLevel: lv, measured: undefined }));
+            measureItems(clones, { size: n.size, look: n.look, colsList });
+            mine.forEach((it, i) => {
+                for (const [c, m] of Object.entries(clones[i].measured || {})) {
+                    if (it.measured[c] && m && Number.isFinite(m.hMm)) it.measured[c].atLevel = Object.assign({}, it.measured[c].atLevel || {}, { [lv]: m.hMm });
+                }
+            });
+        }
+    };
+    const measure = (items) => { measureItems(items, { size: n.size, look: n.look, colsList }); measureLo(items); };
     // A mixed page of 1 x 1 fact cells may run the whole lattice across (8 Daily / 10 I Can at S,
     // the TY-30 fact ladder; critic M1 r1 D1), so its cells are measured at 8 and 10 too.
     const measureMixed = (items) => measureItems(items, { size: n.size, look: n.look, colsList: [...new Set([...colsList, 7, 8, 9, 10])] });
