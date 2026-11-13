@@ -438,3 +438,20 @@ The lead reported $24.95 (~1.25 %) at 07:58Z. This container shows no cost_usd. 
 - 2026-11-07: critic r1 fixes: error analysis on both tasks, one-word-a-line bank, fixed answer place, screen picture floor, look-alike pairs, redrawn pictures. Precritic r3: 1 FAIL (sibling-compare).
 - 2026-11-07: owner signed the card (Q1, Q2 rulings); r2: per-grade picture cell (4 / 6 / 8 a page measured on A4), 3-step charts, ws-vocab-unit on precritic's path with a backtest row. Precritic r2: 1 FAIL.
 - 2026-11-07: build 1; precritic r1 7 FAIL.
+
+## r10 builder (fresh, Opus medium, rule 5; brief design/lanes/lf-vocab/r10-builder-brief.md), 2026-11-13
+Merged origin/master 88753326 first (605fa9f0). One commit per item, pushed.
+| item | check | backtest row (fail -> pass) | on precritic's path |
+|---|---|---|---|
+| 1 rule drawn as arrow in, [+3], arrow out (no numbers) | V-AMBIG+ function-machine rule (this checkout's rules over the checked tree's drawings) | vocab-r10-rule-machine 605fa9f0 -> 0c3d4c59 | y (vocab-unit) |
+| 2 cycle drawn as a loop of four shapes | V-AMBIG+ loop-of-numbers rule | vocab-r10-cycle-loop 0c3d4c59 -> 856aba09 | y |
+| 3 times as many = times as many, factor, product, compare, multiple, unknown | V-FIT | vocab-r10-v-fit 6ae462d1 -> 4200e2c0 | y |
+| 4 follow a rule: output -> grow; growing patterns: total -> odd (4.OA.C.5's own word) | V-FIT6 | vocab-r10-v-fit6 4200e2c0 -> 6adc77cb | y |
+| 5 every picture declares ccss / op; VOCAB_STANDARD_OPS | V-FIT (core), V-FIT6 (others, 4 pinned misfits for the lead) | as 3 / 4 | y |
+| 6 focused wrong vocab box keeps red dashed edge, no ring; quiz badges | ws-next-box NB8 | vocab-r10-nb8-wrong-focus-tick b502c983 -> bae5c32e | y (next-box) |
+| 7 ws-lesson-render: named lesson's band pages, LR-TITLE / LR-BODY / LR-BAND | ws-lesson-render | vocab-r10-lesson-render (fixtures) | n (render tool) |
+V23 re-pinned: 40 of 60 pupil pages (every one draws the redrawn rule picture). Gates: ws-vocab-unit OK, --browser OK;
+ws-next-box OK; ws-empty-band both skills OK, --slot-ink off OK; ws-boot-smoke OK; precritic --strict both skills: only
+sibling-compare FAIL (no approved sibling; next-box once flaked on addition:add NB1 under load, OK standalone and in run 2).
+Lead decisions: V-FIT6 pins (G4 cycle set "product", growing set "equation", times-as-many "compare" - its picture is an
+additive difference arrow - and "unknown" (8 + ? = 13)); set 7 took "odd" (standard's own example word).
