@@ -50,6 +50,7 @@ export const ALLOW = {
     'tests/scripts/ws-teacher-preview.cjs': TEACHER_PHONE,
     'tests/scripts/ws-pdf-preview.cjs': TEACHER_PHONE + ' (the teacher PDF preview)',
     'tests/scripts/ws-simple-print.cjs': TEACHER_PHONE + ' (the teacher print dialog)',
+    'tests/scripts/ws-partopts-shots.cjs': TEACHER_PHONE + ' (the teacher lesson-parts panel #tvPartsWide; lead 2026-11-13 at the lf-tools deploy)',
     // critic lf-tools r2 D2: its pupil steps (the Quick Start grid shot, the Direct Play landing and twelve practice-card
     // answers) ran at 390 under this allow; they now run at 1024 x 768. Only the teacher steps keep 390.
     'tests/scripts/ws-share-options.cjs': 'its 390 px lines are TEACHER steps only (the teacher Sets screen and the Mixed Settings dialog, SHOTS screenshots of the teacher\'s own phone layout); its pupil steps run at 1280 and 1024 x 768 (critic lf-tools r2 D2 moved them off 390). Dropping a teacher phone check is an owner / lead call',
