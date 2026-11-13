@@ -3292,8 +3292,8 @@
     "state": "4632 findings on the 7 skills: the add missing-part kinds' finish line '19 + 3 = 16' (q.op '+' paired with the cell's [whole, part]); a column cell drew the step's own answer under a False claim ('41 - 23 = 18' keyed False) and Reason It's A and B the same work"
    },
    "pass": {
-    "commit": "87462276f",
-    "state": "0 findings: opOf takes the sign from the payload that names the operands; the column answer row writes the shown value"
+    "commit": "453bff211",
+    "state": "0 findings: opOf takes the sign from the payload that names the operands; the column answer row writes the shown value (87462276f); money told as coins, P-WP-22 story rule (453bff211, critic r1 F12)"
    },
    "command": "node tests/scripts/ws-key-arith.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
    "expect": {
@@ -3356,6 +3356,26 @@
     "state": "0 findings on the 7 skills at every band value; the hosts unpinned (IN_SCOPE)"
    },
    "command": "node tests/scripts/ws-visual-quality.mjs --root {root} --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "eb-guided-word-stories",
+   "check": "every non-model Guided cell of the word-stories presets (and the hosts at forms 3 / 4) is judged ABSOLUTELY by EB-BAND at S and L - no sibling exemption (word-stories critic r1 F5, L23, lf-builds 2026-11-13)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (RUBRIC H13)",
+   "browser": true,
+   "fail": {
+    "commit": "e82499a5e",
+    "state": "10 findings: the cell beside the Model stretched to the Model's height (35-46 %), the page-2 tries stretched to fill"
+   },
+   "pass": {
+    "commit": "453bff211",
+    "state": "0 findings: each cell's own height in the Model row, story rows unstretched, the bar on every try"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --roles guided --sizes S,L --hosts none",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
