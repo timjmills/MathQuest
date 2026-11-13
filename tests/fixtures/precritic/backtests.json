@@ -6976,7 +6976,7 @@
    "state": "one 125 mm story stretched to 214 mm (independent) / 184 mm (test): 41 % / 32 % under it"
   },
   "pass": {
-   "commit": "2157224a1",
+   "commit": "140e27245",
    "state": "OK"
   },
   "command": "node tests/scripts/ws-roles-unit.mjs --only ONE-ROW-CAP",
