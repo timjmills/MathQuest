@@ -3235,7 +3235,7 @@
     "commit": "3d927dbf",
     "state": "the kit words cell on every host, the input in its line"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles independent --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3255,7 +3255,7 @@
     "commit": "3d927dbf",
     "state": "the claim one digit a box"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles true-false --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules CLAIM-INK",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3275,7 +3275,7 @@
     "commit": "3d927dbf",
     "state": "the answer traced in grey"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles scripted-model,guided,opener --rules MODEL-ANSWER",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3295,7 +3295,7 @@
     "commit": "3d927dbf",
     "state": "the name one inner span"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles lesson,guided --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3315,7 +3315,7 @@
     "commit": "3d927dbf",
     "state": "'seven hundred' kept on one line"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles independent --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3335,7 +3335,7 @@
     "commit": "3d927dbf",
     "state": "only a name long enough to wrap takes the two-line box"
    },
-   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --roles test,independent --size S,M,L --rules ROW-SLOT-Y",
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
