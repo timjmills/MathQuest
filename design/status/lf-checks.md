@@ -505,3 +505,19 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
     div_facts' 40 px worksheet numerals pass). NOTE for `screen-digit-npr-worksheet` (PENDING, lf-ops): its fail state cited
     number_patterns_rule's 29 px worksheet digits, which now pass by the lead's ruling; it also named count_by_tables' 26-29 px
     arcs train. lf-ops: re-run its fail side with today's tool before the pass commit lands (it may need a new fail state).
+  - A4, the 9 rows moved to 820 (ws-backtest, this tree):
+    | row | outcome |
+    |---|---|
+    | vocab-r9-nb6-quiz-red, vocab-r9-nb7-pick3-line, vocab-r10-nb8-wrong-focus-tick, vocab-r12-nb9-every-card | PASS at 820 (critic r1's run; unchanged) |
+    | vocab-o1-next-box-blue | was red at both commits (NB6-NB9, built later, fail on 5d8fe328). Verdict now NB1-NB5 only (`ws-next-box --rules`, new): **PASS** at 820 |
+    | vocab-v23-v25-screen-feedback | was red (today's V25, tightened by r8, and the re-pinned pupil hashes fail df31bcb3 at any width). `--only V23 --no-pupil-pin` (new flag): **PASS** at 820. V25 is proven by the r8 row |
+    | vocab-v23-painted | same scope: **PASS** |
+    | vocab-r8-v25plus-v26-v27 | was red (today's V26 / V27 are r9 checks). `--only V25 --no-pupil-pin`: **PASS** |
+    | vocab-r11-nb9-blur | **UNPROVEN, still red** at both commits: NB9 fails on the WORKSHEET (1280, a width this change did not touch) and the card at 7c8fee58; the critic found the same red with the 390 tool from 91182e61. ws-next-box has no 390 card any more, and 390 was red too, so keeping 390 would prove nothing. Routed to lf-vocab |
+  - Verify: self-tests OK (ws-copy-light 48, ws-no-phone-width 26, ws-screen-slots, ws-grade-render --touch 9 / --sample 5,
+    ws-precritic, ws-precritic-plan 48). ws-backtest: copy-light-eligibility, copy-light-drawing-batch, copy-light-sample-widths,
+    copy-light-brief-names, no-phone-width-derived, no-phone-width-default, and the 4 re-scoped rows PASS. ws-no-phone-width OK
+    (75 files). ws-precritic-plan OK (158 on path); --checks-from-critics: none dropped (314 → 320), 75 pass / 30 exempt / 15
+    fail, none lf-tools or lf-checks (10 ledger rows added). ws-boot-smoke OK.
+  - Routed reds: unit_form worksheet answer boxes 50 x 46 at 820 / 1024 (lf-hosts); unit_form thumbnail NODUP in
+    ws-student-explorer (pre-existing; lf-placevalue / lf-hosts); vocab-r11-nb9-blur (lf-vocab).
