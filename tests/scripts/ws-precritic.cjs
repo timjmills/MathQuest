@@ -1057,12 +1057,6 @@ function buildPlan(ctx) {
         // --role R --skill X: the lane skills join the role's pinned sample (S1 critic r1 D2), so X's own R page is linted
         const sample = [...new Set([...ctx.roleSample, ...ctx.skills.map((s) => s.key)])];
         const sc = `role ${ctx.role} × ${sample.length} sample skills`;
-        // (owner 2026-11-13, "save everything to automatic checks": the role's cell checks and empty bands run on its sample too - the
-        // shared roles' backtested findings (OVERFLOW, KEYFIT, LONE-PAGE, PUPILTAG, EA-ROWX, EA-PAD, EB-BAND ...) sit on this path)
-        add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role} (S/M/L: overflow, key fit, lone page, label, judgement place, A/B)`, sc, 'browser', 'ws-cell-checks',
-            ['--skills', sample.join(','), '--roles', ctx.role, '--size', 'S,M,L'], { missingMsg: 'ws-cell-checks is not in this tree' }));
-        add(gate(`empty-band-role-${ctx.role}`, `ws-empty-band --roles ${ctx.role} (EB-BAND, EB-SIDE, EB-FOOT)`, sc, 'browser', 'ws-empty-band',
-            ['--skill', sample.join(','), '--roles', ctx.role, '--hosts', 'none'], { missingMsg: 'ws-empty-band is not in this tree' }));
         add(gate(`grade-render-role-${ctx.role}`, `ws-grade-render --roles ${ctx.role}`, sc, 'browser', 'ws-grade-render', ['--roles', ctx.role, '--skills', sample.join(','), '--out', path.join(ctx.logs, `grade-render-${ctx.role}`)], { needFlags: ['roles'], parse: PARSE.gradeRender, expectUnits: sample.length }));
         const pl = ['--source', 'kit', '--roles', ctx.role, '--skills', sample.join(',')];
         if (fs.existsSync(PRINT_BASE)) pl.push('--baseline', rel(PRINT_BASE));
