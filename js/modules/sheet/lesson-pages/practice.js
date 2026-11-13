@@ -88,7 +88,12 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // Check is live - phase0On; every other packet prints as master did)
         const roundRows = phase0On(data, 'roundOneNum');
         const roundOne = (it) => roundRows && it.template === 'pv' && !!(it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind === 'round');
-        const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it)));
+        // (lf-partopts critic r4 M1: a mult_facts lesson sheet's Independent band capped at 6 fact rows left a 32 % foot - a
+        // kit `fact` cell is a one-number answer like a div fact, so a fact lesson sheet fills to the one-number ceiling. Gated
+        // to lessons with no library record (`data` null) - a default lesson such as mult_facts - so every carded lesson's
+        // sheet prints as master did; ws-lesson-samples LS-FILL, ws-lesson-baseline.)
+        const factOne = (it) => !data && it.template === 'fact';
+        const oneNum = indepPool.length && indepPool.every((it) => it.q && (it.q.divForm || divFact(it) || roundOne(it) || factOne(it)));
         // A band of many short fact rows (up to 7 at S) keeps 3 mm for its frame and its rules, which
         // six rows of bracket facts ran 2 mm past at S; taller problems keep the room they had.
         const safety = oneNum ? 3 : 0;

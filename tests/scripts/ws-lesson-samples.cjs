@@ -35,19 +35,20 @@
 //                by >= 2 mm (1 mm for an across fact: the kit's CL-40 contract) (finding 4: the "1" tab touched the "T" head of a rounding cell); ink, not boxes: a drawing by
 //                its shapes, text by its own run (a Range, not its element) from its glyphs' top (canvas text metrics)
 //     SHEET-2PG  a lesson sheet printed on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages ~38 % empty)
-//     LS-WARM    (lf-engine G7, lf-algebra critic r2: the growing lesson's Warm-up cells 54 % empty under the rule, passed by
-//                print-lint because CL-4b reads the band under a top cell as writing room and H13-ROW only compares a cell with
-//                its row) every Warm-up cell of the lesson sheet: the empty band under its lowest ink (text, a drawing, a
-//                stroked box; an answer slot, empty or written, counts as the item) to the cell's DRAWN bottom edge (the paper
-//                the pupil sees, the pad included) is < 30 % of the cell (RUBRIC H13)
-//     LS-FILL    (lf-engine G7 + DIV: the growing lesson's Practice 3 + 3 on two half-used pages; lf-partopts critic r3 P4: the
-//                div_facts anchor chart 49 % empty at M and L) every page of the packet - the anchor chart, the Prerequisite
-//                Check, the lesson sheet, Practice and Mixed - is >= 70 % used (the body above its blank foot), except the
-//                LAST page of a part printed on two or more pages (that one is PM-CONT's / SHEET-2PG's). 70 %: the lead's
-//                page-use floor (SHEET-2PG, live-pm r2 item 6; PT-OPN-7 / RUBRIC H5 "a page wasted" at 50 % is the hard cap,
-//                WDS PG-11 / PG-23: every page but a section's last is filled)
+//     LS-WARM    (lf-engine G7, lf-algebra critic r2: the growing lesson's Warm-up cells 54 % empty, passed by print-lint
+//                because CL-4b reads the band under a top cell as writing room and H13-ROW only compares a cell with its row)
+//                a UNIFORM Warm-up row the planner grew past its content: when EVERY Warm-up cell on the page keeps an empty
+//                band >= 30 % (the band under its lowest ink - text, a drawing, a stroked box, an answer slot - to the cell's
+//                DRAWN bottom edge; RUBRIC H13) it fails. A row where one cell is short beside a taller FILLED neighbour (a fact
+//                beside a stack) is H13-ROW's / print-lint's, so LS-WARM stays silent when any Warm-up cell fills (< 30 %).
+//     LS-FILL    (lf-partopts critic r3 P4: the div_facts anchor chart 49 % empty at M and L; lf-engine G7: the growing
+//                lesson's Practice 3 + 3 on two half-used pages) the anchor CHART is >= 60 % used (RUBRIC H5's 50 % is the hard
+//                cap; the critic called 49 % empty a defect; PT-ANC-1 lets a poster keep spare height, so not the sheet's 70 %),
+//                and a SINGLE-page Practice or Mixed part is >= 70 % used (the lead's page-use floor, SHEET-2PG). A multi-page
+//                lesson sheet is SHEET-2PG's, a Practice / Mixed continuation page PM-CONT's, the Prerequisite Check PC-H13's.
 //   --all-lessons adds every lesson of lessons/prereqs.js LESSONS (layout rules only), e.g. --all-lessons --rules PM-CONT,SHEET-2PG
 //   --rules PC-X,PC-Y counts only those rules (backtest rows); --only add,sub,round as for the render.
+//   --layout-seeds a,b  the packet seeds the layout rules build (default 4242).
 //   The content rules (RANGE, NAME) read --seeds builds per lesson (seed 4242 + 1000 + 37 k); the layout rules the
 //   4242 build at every size. A tree with no Prerequisite Check (no lesson.prereqCheck) prints the rules N/A.
 const fs = require('fs');
@@ -64,6 +65,8 @@ const DPI = parseInt(arg('dpi', '110'), 10);
 const PRACTICE = parseInt(arg('pages', '1'), 10);
 const CHECK = has('check');
 const NSEEDS = Math.max(1, parseInt(arg('seeds', '8'), 10));
+// the layout rules' packet seeds (default 4242; lf-engine G7: --layout-seeds 973079 is the seed the lf-algebra critic r2 graded)
+const LAYOUT_SEEDS = String(arg('layout-seeds', '4242')).split(',').map((x) => Number(x.trim())).filter((x) => Number.isFinite(x));
 const LP = require('../lib/ws-lesson-lp.cjs');
 // the route step's title and its block's name, by step id (Y1.B1.S6 -> "Count on from any number", "Place value (within 10)")
 const STEPS = (() => { const m = new Map(); try { const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/curriculum/wrm-steps.json'), 'utf8'));
@@ -112,6 +115,8 @@ const LESSONS = [
     { id: 'subwp', dir: 'sub-wp-10', spot: true, skill: { categoryId: 'subtraction', skillId: 'sub_wp_10' } },
     { id: 'ffs', dir: 'fact-family-sort', spot: true, skill: { categoryId: 'addition', skillId: 'fact_family_sort' } },
     { id: 'addwp', dir: 'add-wp-20', spot: true, skill: { categoryId: 'addition', skillId: 'add_wp_20' } },
+    // (lf-partopts critic r4 M1: a default lesson - no library record - whose fact sheet left a 32 % foot; LS-FILL teach floor)
+    { id: 'multf', dir: 'mult-facts', spot: true, skill: { categoryId: 'multiplication', skillId: 'mult_facts' } },
 ].filter((l) => (ONLY ? ONLY.split(',').includes(l.id) : (CHECK || !l.spot)));
 // --skill cat:skill (render mode): render that one lesson (proof PNGs of any lesson, e.g. --skill addition:add_wp_10)
 if (arg('skill', '')) { const [categoryId, skillId] = arg('skill').split(':'); LESSONS.length = 0; LESSONS.push({ id: skillId, dir: skillId, skill: { categoryId, skillId } }); }
@@ -348,10 +353,11 @@ async function checkMain() {
                     for (const m of nameCheck(it, pre)) F('PC-NAME', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m);
                 }
             }
-            // layout: seed 4242 at every size
-            for (const size of SIZES) {
-                const built = await page.evaluate(async ({ skill, size }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true });
-                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size });
+            // layout: seed 4242 (or --layout-seeds a,b: the seed a critic graded, e.g. ws-grade-render's) at every size
+            for (const lseed of LAYOUT_SEEDS) for (const size0 of SIZES) {
+                const size = size0;
+                const built = await page.evaluate(async ({ skill, size, lseed }) => { try { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: lseed, key: true, practicePages: 1, mixed: true });
+                    return { pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, lseed });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
                 const read2 = async (html) => { const sh = await page.browser().newPage(); try { await sh.setViewport({ width: 900, height: 1200, deviceScaleFactor: 1 }); await sh.goto(page.url(), { waitUntil: 'domcontentloaded' });
                     await sh.setContent(html, { waitUntil: 'networkidle0', timeout: 60000 }); await sh.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
@@ -361,7 +367,7 @@ async function checkMain() {
                 // page index -> part, pupil and key
                 const map = (key) => { const o = []; for (const p of built.parts) for (let i = 0; i < (key ? p.keyPages : p.pages); i++) o.push({ part: p.part, i }); return o; };
                 const pm = map(false), km = map(true);
-                const where = (k, n) => `${l.id} ${size} ${k}-p${n + 1}`;
+                const where = (k, n) => `${l.id} ${size} ${k}-p${n + 1}${lseed !== 4242 ? ` [layout s${lseed}]` : ''}`;
                 // the sheetCheck rows, per page (page N of the doc)
                 const bandsOf = (sc, n) => sc.bands.filter((x) => x.startsWith(`page ${n + 1} `) || x.startsWith(`page ${n + 1}:`));
                 pm.forEach((m, n) => {
@@ -385,12 +391,24 @@ async function checkMain() {
                 // SHEET-2PG (lead, live-pm r2 item 6): a lesson sheet of two or more pages has at least one page >= 70 % used
                 { const tp = pm.map((m, n) => ({ m, n })).filter((x) => x.m.part === 'teach'); const st = tp.map((x) => (P.sc.stats || [])[x.n]).filter(Boolean);
                     if (tp.length > 1 && st.length === tp.length && st.every((x) => x.blank > 30)) F('SHEET-2PG', where('pupil', tp[0].n), `the lesson sheet prints on ${tp.length} pages, each under 70 % used (blank at the foot ${st.map((x) => `${x.blank} %`).join(', ')})`); }
-                // LS-WARM (lf-engine G7): no Warm-up cell of the lesson sheet keeps an empty band >= 30 % under its item (to its
-                // drawn edge; RUBRIC H13) - CL-4b's "writing room under a top cell" never excuses a cell the planner grew
-                pm.forEach((m, n) => { if (m.part !== 'teach') return; for (const c of (P.bm[n] || [])) if (/^Warm-up/.test(c.head) && c.pct >= 30) F('LS-WARM', where('pupil', n), `Warm-up cell ${c.cell}: an empty band ${c.belowMm} mm under the item of a ${c.hMm} mm cell (${c.pct} %; limit 30 %) [${c.tmpl}]`); });
-                // LS-FILL (lf-engine G7 / DIV): every page >= 70 % used but the last page of a part printed on 2+ pages
+                // LS-WARM (lf-engine G7, lf-algebra critic r2): a UNIFORM Warm-up row the planner grew past its content - EVERY
+                // Warm-up cell on the page keeps an empty band >= 30 % under its item (to its drawn edge; RUBRIC H13). This is the
+                // case CL-4b's "writing room under a top cell" hides and H13-ROW cannot see (equal cells keep equal bands). A row
+                // where ONE cell is short beside a taller, FILLED neighbour (a fact beside a stack) is H13-ROW's / print-lint's,
+                // not this: when any Warm-up cell fills (band < 30 %) the row's height is justified, so LS-WARM stays silent.
+                pm.forEach((m, n) => { if (m.part !== 'teach') return; const warm = (P.bm[n] || []).filter((c) => /^Warm-up/.test(c.head));
+                    if (warm.length && warm.every((c) => c.pct >= 30)) for (const c of warm) F('LS-WARM', where('pupil', n), `Warm-up cell ${c.cell}: an empty band ${c.belowMm} mm under the item of a ${c.hMm} mm cell (${c.pct} %; limit 30 %), and every Warm-up cell on the page is as empty (the row was grown past its content) [${c.tmpl}]`); });
+                // LS-FILL (lf-engine G7 / DIV): the anchor CHART is >= 60 % used (H5's 50 % is the hard cap; the critic P4 called
+                // 49 % empty a defect; PT-ANC-1 lets a poster keep some spare height, so the floor is not the sheet's 70 %), and a
+                // SINGLE-page Practice / Mixed part is >= 70 % used. A multi-page lesson SHEET is SHEET-2PG's; a Practice / Mixed
+                // continuation page is PM-CONT's; the Prerequisite Check is PC-H13's: LS-FILL does not re-judge them.
                 { const np = Object.fromEntries(built.parts.map((p) => [p.part, p.pages]));
-                    pm.forEach((m, n) => { if (np[m.part] > 1 && m.i === np[m.part] - 1) return; const st = (P.sc.stats || [])[n]; if (st && 100 - st.blank < 70) F('LS-FILL', where('pupil', n), `${m.part}${np[m.part] > 1 ? ` page ${m.i + 1} of ${np[m.part]}` : ''}: ${100 - st.blank} % used (${st.blank} % of the body blank at the foot; floor 70 %)`); }); }
+                    pm.forEach((m, n) => { const st = (P.sc.stats || [])[n]; if (!st) return; const used = 100 - st.blank;
+                        if (m.part === 'chart' && used < 60) F('LS-FILL', where('pupil', n), `chart: ${used} % used (${st.blank} % of the body blank at the foot; the anchor chart floor is 60 %, H5 / critic P4)`);
+                        // a SINGLE-page lesson sheet ('teach') is judged at 70 % too (lf-partopts critic r4 M1: mult_facts M sheet 32 % foot);
+                        // a 2+ page sheet is SHEET-2PG's
+                        else if (m.part === 'teach' && np.teach === 1 && used < 70) F('LS-FILL', where('pupil', n), `lesson sheet: ${used} % used (${st.blank} % of the body blank at the foot; floor 70 %)`);
+                        else if (['practice', 'mixed'].includes(m.part) && np[m.part] === 1 && used < 70) F('LS-FILL', where('pupil', n), `${m.part}: ${used} % used (${st.blank} % of the body blank at the foot; floor 70 %)`); }); }
                 if (l.spot) continue;
                 if (has('debug')) console.log(JSON.stringify({ lesson: l.id, size, pupil: P.st.map((x) => x.strips), key: K.st.map((x) => x.strips) }));
                 // strips covered; pupil vs key twin
