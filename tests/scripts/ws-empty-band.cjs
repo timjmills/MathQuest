@@ -64,6 +64,8 @@
 //             critic r1 S3: 23-42 % used; lead ruling 2026-11-12: a second worked example fills it). Guided is EXEMPT from
 //             EB-PAGE (lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1: the white under a Guided grid is accepted; the tries
 //             stay at the 10 / 8 / 6 ceiling, EB-GDPCAP).
+//   EB-PARITY (opt-in --screen-parity, --rule-skills) a kit-template skill's card / worksheet / quiz host draws no kit cell of its
+//             print template, or no answer place inside it, or an empty legacy box beside it (lf-placevalue critic nwf r1 N9).
 //   EB-VOCAB  (opt-in --vocab-ink) a lesson vocabulary picture drawn in under 70 % of its own box (see measureVocab).
 // Cells under 10 mm are not judged (a tick box, a choice ring). A finding names role, size (or host and width), page, cell.
 //
@@ -112,7 +114,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-PARITY'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 const RULE_CASES = ['EB-BAND (above)', 'EB-BAND (between)', 'EB-SIDE (screen)', 'EB-BAND (screen slot)', 'EB-BAND (top pad)'];
 // a rule with no row, and why: EB-ROLE judges buildSheet against the signed card (a role the card offers that the app cannot
@@ -647,6 +649,30 @@ async function main() {
                 await new Promise((r) => setTimeout(r, 450));
                 const cells = await pixRead(page, await page.evaluate(measureCells, ok), true);
                 renders++; cellsRead += cells.length;
+                // EB-PARITY (opt-in --screen-parity; lf-placevalue critic nwf r1 N9, lead ruling: screen parity is a contract rule): a
+                // skill whose print cell is a kit template draws THAT cell on every screen host ([data-ws-cell="<template>"]), never a
+                // legacy cell, and its answer is written in it (the host's input or the cell's own boxes inside the cell) - one answer
+                // place: no second, empty legacy box beside the input. Judged on --rule-skills.
+                if (has('screen-parity') && (!arg('rule-skills', null) || arg('rule-skills').split(',').includes(key))) {
+                    const par = await page.evaluate(({ c, k, SEED, scope }) => {
+                        let tpl = null;
+                        try { const q = window.generateQuestionFor({ category: c, skill: k, seed: SEED, itemIndex: 0 }); tpl = q && q.cell && q.cell.template; } catch (e) { tpl = null; }
+                        if (!tpl || tpl === 'legacy') return { tpl: null };
+                        const root = document.querySelector(scope);
+                        const vis = (e) => { const r = e.getBoundingClientRect(); const cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.display !== 'none' && cs.visibility !== 'hidden'; };
+                        const kit = root ? [...root.querySelectorAll(`[data-ws-cell="${tpl}"]`)].filter(vis) : [];
+                        const inputs = kit.flatMap((e) => [...e.querySelectorAll('input, textarea, [data-mq-cell], .mq-kblank')]).filter(vis);
+                        // a legacy empty box: a bordered block with no text and no input, outside the kit cell (the old place chart)
+                        const scr = root;
+                        const legacyBoxes = scr ? [...scr.querySelectorAll('div[style*="border"]')].filter((e) => vis(e) && !e.closest('[data-ws-cell="' + tpl + '"]') && !e.textContent.trim() && !e.querySelector('input, svg, img')).length : 0;
+                        return { tpl, kit: kit.length, inputs: inputs.length, legacyBoxes };
+                    }, { c: categoryId, k: skillId, SEED, scope: ok });
+                    if (par.tpl) {
+                        if (!par.kit) F('EB-PARITY', `${key} ${host} ${w}px`, `the print cell is the kit "${par.tpl}" template but the host draws no [data-ws-cell="${par.tpl}"] (a legacy cell)`);
+                        else if (!par.inputs) F('EB-PARITY', `${key} ${host} ${w}px`, `the kit "${par.tpl}" cell holds no answer place (the answer is written outside the cell)`);
+                        if (par.legacyBoxes) F('EB-PARITY', `${key} ${host} ${w}px`, `${par.legacyBoxes} empty legacy box(es) beside the kit cell: a second answer place`);
+                    }
+                }
                 // a host that reads no cell is a failure (critic eb-r1 D1: the card was silently unmeasured)
                 if (!cells.length) { F('EB-READ', `${key} ${host} ${w}px${ho.tag}`, 'no kit cell and no screen cell (.mq-scell) read on the host'); continue; }
                 judge(cells, `${key} ${host} ${w}px${ho.tag}`, F, `host:${host}`);

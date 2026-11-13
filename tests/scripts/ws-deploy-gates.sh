@@ -826,7 +826,7 @@ build_list() {
   # the pupil skill explorer (owner 2026-11-05; ~30 s): by grade / by area, picks reach the bottom row, Print and Play
   browser_gate 1 ws-student-explorer ws-student-explorer.cjs
   browser_gate 1 ws-share-options ws-share-options.cjs
-  # SCREEN-INK-SIZE on every redesign-passed skill (lead 2026-11-13): screen pictures at print size, drawings wide before tall
+  # SCREEN-INK-SIZE on every redesign-passed skill (lead 2026-11-13), against its pin: screen pictures at print size, drawings wide before tall
   browser_gate 1 "ws-screen-ink-size --passed" ws-screen-ink-size.cjs --passed
   # the S2 repeats check, per detailed lesson (each lesson file in js/modules/lessons/detailed/, index.js out)
   local lf lid

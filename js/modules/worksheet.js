@@ -1003,13 +1003,40 @@ export function layoutWorksheetGrid(grid) {
     const w = grid.clientWidth;
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     _wsOneDigit(cards);
+    _wsOneSupportPlace(cards, true);
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
         for (const c of cards) { if (!_wsFitCard(c)) { ok = false; if (cols > 1) break; } }
         if (ok) break;
     }
+    _wsOneSupportPlace(cards);
     _wsEvenRows(cards);
+}
+
+/**
+ * One support place per worksheet (lf-ops div_facts screen critic r1 D4: the touch tally stood under "22 ÷ 11" and
+ * "110 ÷ 10", where the screen pane wrapped, and beside the narrower facts). A ÷ fact's support drawn beside it on
+ * screen wraps under it when the card is too narrow; when any card of the sheet wraps, every ÷ card puts it under.
+ * `reset` clears the choice before the columns are measured again.
+ */
+function _wsOneSupportPlace(cards, reset = false) {
+    const wps = cards.map((c) => {
+        const eq = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+        return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="beside"]') : null;
+    }).filter(Boolean);
+    if (reset) {
+        wps.forEach((wp) => { if (wp.dataset.mqOnePlace) { delete wp.dataset.mqOnePlace; wp.style.flexDirection = ''; wp.style.alignItems = ''; } });
+        return;
+    }
+    if (wps.length < 2) return;
+    const wrapped = (wp) => {
+        const prob = wp.querySelector(':scope > .ws-pane-problem');
+        const pane = prob && prob.nextElementSibling;
+        return !!pane && pane.getBoundingClientRect().height > 0 && pane.getBoundingClientRect().top >= prob.getBoundingClientRect().bottom - 2;
+    };
+    if (!wps.some(wrapped)) return;
+    wps.forEach((wp) => { wp.dataset.mqOnePlace = 'under'; wp.style.flexDirection = 'column'; wp.style.alignItems = 'center'; });
 }
 
 /**
