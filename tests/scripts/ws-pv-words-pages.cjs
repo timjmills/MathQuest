@@ -30,7 +30,12 @@ const SIZES = list(arg('sizes', 'M,L'));   // (owner, 2026-11-13: print size S i
 const NSEED = Number(arg('seeds', 3));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const seedsFor = (role) => Array.from({ length: NSEED }, (_, k) => (hash(`composing__number_word_form:${role}`) + k * 7919) % 1000000);
-const DEALS = [['default', null], ['band 20', { band: 20 }], ['band 100', { band: 100 }], ['band 1000', { band: 1000 }]];
+// (critic live1 N1 / N2: the to_words deals and the H T O boxes at 1,000 too - the first version read only words to numeral)
+const DEALS = [['default', null], ['band 20', { band: 20 }], ['band 100', { band: 100 }], ['band 1000', { band: 1000 }],
+    ['band 1000 hto', { band: 1000, answerSlot: 'hto' }], ['band 100 hto', { band: 100, answerSlot: 'hto' }],
+    ['to_words', { wordform: ['to_words'] }], ['to_words band 20', { wordform: ['to_words'], band: 20 }], ['to_words band 1000', { wordform: ['to_words'], band: 1000 }]];
+// (critic live1 N3: the Opener's Guided band - its items share the Model's kind)
+const ROLES = list(arg('roles', 'guided,opener'));
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen',
     'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
@@ -55,31 +60,54 @@ function placeBuilt(text) {
     for (const m of String(text).matchAll(/\b(\d+)\s+(thousand|hundred|ten|one)s?\b/gi)) { sum += Number(m[1]) * PLACE[m[2].toLowerCase()]; k++; }
     return k >= 2 ? sum : null;
 }
-/** Does the hint give the answer n away: its place phrases build n, or it names every digit of n? */
-function leak(hint, n) {
+/**
+ * Does the hint give the answer away? Words to numeral (answer n): its place phrases build n, or it names ANY digit of n outside
+ * a ruled gap (critic live1 N1, PT 2.3 "holds NONE of its answer": '"two hundred": 2 in the hundreds.' under 262 named the 2).
+ * Numeral to words (answer: the name): it names any WORD of the name - its place-unit words after a count ("2 tens", "1 one")
+ * are the counting, not the name.
+ */
+function leak(hint, n, way, name) {
     const t = String(hint).replace(/,(?=\d{3}\b)/g, '');
+    if (way === 'to_words') {
+        const own = new Set(String(name || '').toLowerCase().split(/[\s-]+/).filter(Boolean));
+        const said = t.toLowerCase().replace(/\d+\s+(ones?|tens?|hundreds?|thousands?)\b/g, ' ').replace(/[^a-z\s-]/g, ' ').split(/[\s-]+/).filter(Boolean);
+        const hit = said.find((w) => own.has(w));
+        return hit ? `it names "${hit}", a word of the answer "${name}"` : '';
+    }
     if (placeBuilt(t) === n) return 'its place phrases build ' + n;
-    const have = (t.match(/\d+/g) || []).join('').split('');
-    const need = String(n).split('');
-    const pool = have.slice();
-    if (need.every((d) => { const i = pool.indexOf(d); if (i < 0) return false; pool.splice(i, 1); return true; })) return 'it names every digit of ' + n;
+    const digits = new Set(String(n).split(''));
+    const named = (t.match(/\d/g) || []).find((d) => digits.has(d));
+    if (named) return `it names ${named}, a digit of ${n}, outside a gap`;
     return '';
 }
-const kindOf = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
-/** The kinds a Steps band covers, read from its words. */
+/** GUIDED-HINT-GARBLE: a hint that does not read as English - a template filled with 'no' ("the no is"), a doubled word, a hole. */
+function garble(hint) {
+    const t = String(hint);
+    const m = /\bthe no\b|\bno is\b|\b(\w+)\s+\1\b|undefined|NaN|\$\{|\bnull\b/i.exec(t);
+    return m ? m[0] : '';
+}
+const kindOfN = (n) => (n < 10 ? 'one-word' : n < 20 && n !== 10 ? 'teen' : n < 100 && n % 10 === 0 ? 'decade' : n < 100 ? 'two-word' : n < 1000 ? 'hundreds' : 'thousand');
+const kindOf = (n) => (n === 10 || n === 20 ? 'decade-to-20' : kindOfN(n));
+/** The kinds a Steps band covers, read from its words (both ways round). */
 function covered(steps) {
     const s = String(steps).toLowerCase();
     const k = new Set();
+    if (/say the number|write its word/.test(s)) k.add('one-word');
+    // (every name from zero to twenty is one word: Steps that say so cover all of them)
+    if (/one word up to twenty/.test(s)) ['one-word', 'teen', 'decade-to-20'].forEach((x) => k.add(x));
+    if (/teen word/.test(s)) k.add('teen');
+    if (/tens word alone|no ones/.test(s)) { k.add('decade'); k.add('decade-to-20'); }
+    if (/say the hundreds word/.test(s)) k.add('hundreds');
     if (/hundreds word/.test(s)) { k.add('hundreds'); }
     if (/thousand/.test(s)) k.add('thousand');
     if (/tens word/.test(s) && /ones word/.test(s)) k.add('two-word');
-    if (/tens word/.test(s) && /no (tens or )?ones word|write 0/.test(s)) k.add('decade');
+    if (/tens word/.test(s) && /no (tens or )?ones word|write 0/.test(s)) { k.add('decade'); k.add('decade-to-20'); }
     if (/eleven to nineteen|teen/.test(s)) k.add('teen');
     if (/read the word|its digit/.test(s)) k.add('one-word');
     return k;
 }
 
-/** In the page: the Steps band text and every cell's name, hint and whether it is the Model. */
+/** In the page: the Steps band text, every cell (name, hint, Model?) and the cells of each band by its label. */
 function readPage() {
     const steps = [...document.querySelectorAll('.ws-page')].slice(0, 1).map((pg) => {
         const b = [...pg.querySelectorAll('*')].find((e) => /^\s*Steps:/.test(e.textContent || '') && (e.textContent || '').length < 400);
@@ -91,7 +119,10 @@ function readPage() {
         const hl = c.querySelector('.mq-hintline');
         const clone = c.cloneNode(true);
         clone.querySelectorAll('.mq-hintline, .ws-trace, [data-ws-ink="trace"], .ws-modeltab, .ws-tab, [data-ws-label]').forEach((e) => e.remove());
-        cells.push({ name: (clone.textContent || '').replace(/\s+/g, ' ').trim(), hint: hl ? hl.textContent.replace(/\s+/g, ' ').trim() : '', model: !!c.querySelector('.ws-modeltab') || c.classList.contains('mq-modelcell') });
+        const band = c.closest('.ws-band');
+        const lab = band && band.querySelector('.ws-strip b, b');
+        cells.push({ name: (clone.textContent || '').replace(/\s+/g, ' ').trim(), hint: hl ? hl.textContent.replace(/\s+/g, ' ').trim() : '', model: !!c.querySelector('.ws-modeltab') || c.classList.contains('mq-modelcell'),
+            band: lab ? lab.textContent.replace(/[:\s]+$/, '').trim() : '' });
     }
     return { steps, cells };
 }
@@ -104,35 +135,50 @@ function readPage() {
     await sheet.goto(page.url(), { waitUntil: 'domcontentloaded' });
     const bad = [];
     let hints = 0, pages = 0, items = 0;
-    for (const size of SIZES) for (const [tag, opts] of DEALS) for (const seed of seedsFor('guided')) {
-        const r = await page.evaluate(async ({ size, seed, opts }) => {
+    for (const role of ROLES) for (const size of SIZES) for (const [tag, opts] of DEALS) for (const seed of seedsFor(role)) {
+        // (the Opener on the deals it is graded on: the default and band 20, both ways round)
+        if (role === 'opener' && !['default', 'band 20', 'to_words', 'to_words band 20'].includes(tag)) continue;
+        const r = await page.evaluate(async ({ role, size, seed, opts }) => {
             try {
-                const r = await window.buildSheet({ role: 'guided', sections: [{ skills: [Object.assign({ categoryId: 'composing', skillId: 'number_word_form' }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true });
+                const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: 'composing', skillId: 'number_word_form' }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true });
                 return { html: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }) };
             } catch (e) { return { error: String((e && e.message) || e).slice(0, 200) }; }
-        }, { size, seed, opts });
-        const at = `guided ${size} ${tag} seed ${seed}`;
+        }, { role, size, seed, opts });
+        const at = `${role} ${size} ${tag} seed ${seed}`;
         if (r.error) { bad.push(`BUILD ${at}: ${r.error}`); continue; }
         await sheet.setContent(r.html, { waitUntil: 'load', timeout: 60000 });
         const pg = await sheet.evaluate(readPage);
         pages++;
-        const named = pg.cells.map((c) => ({ ...c, n: nameValue(c.name) })).filter((c) => c.n !== null);
+        const way = opts && opts.wordform && opts.wordform[0] === 'to_words' ? 'to_words' : 'to_number';
+        // (a cell's text less its H T O / Th H T O heads; numeral to words shows the numeral itself)
+        const valueOf = (c) => { const t = c.name.replace(/(?:Th)?H?T?O\b|\b(?:Th|H|T|O)\b/g, ' ').replace(/\s+/g, ' ').trim(); return way === 'to_words' ? (/^[\d,]+$/.test(t) ? Number(t.replace(/,/g, '')) : null) : nameValue(t); };
+        const named = pg.cells.map((c) => ({ ...c, n: valueOf(c) })).filter((c) => c.n !== null);
         items += named.length;
-        if (!named.length) { bad.push(`READ ${at}: no number name read on the page`); continue; }
-        if (on('GUIDED-HINT-LEAK')) for (const c of named) {
+        if (!named.length) { bad.push(`READ ${at}: no number read on the page`); continue; }
+        const nameOf = (n) => { const ONES0 = ONES; const two = (v) => (v < 20 ? ONES0[v] : Object.keys(TENS).find((k) => TENS[k] === Math.floor(v / 10) * 10) + (v % 10 ? '-' + ONES0[v % 10] : ''));
+            return n === 1000 ? 'one thousand' : n < 100 ? two(n) : `${ONES0[Math.floor(n / 100)]} hundred${n % 100 ? ' ' + two(n % 100) : ''}`; };
+        for (const c of named) {
             if (!c.hint) continue;
             hints++;
-            const why = leak(c.hint, c.n);
-            if (why) bad.push(`GUIDED-HINT-LEAK ${at}: the hint "${c.hint}" under "${c.name}" gives the answer away (${why})`);
+            if (on('GUIDED-HINT-LEAK')) { const why = leak(c.hint, c.n, way, nameOf(c.n)); if (why) bad.push(`GUIDED-HINT-LEAK ${at}: the hint "${c.hint}" under "${c.name}" gives the answer away (${why})`); }
+            if (on('GUIDED-HINT-GARBLE')) { const g = garble(c.hint); if (g) bad.push(`GUIDED-HINT-GARBLE ${at}: the hint "${c.hint}" under "${c.name}" does not read ("${g}")`); }
         }
         if (on('GUIDED-ONE-KIND')) {
+            // (the Guided page: every cell; the Opener: the Model and its Guided band - the Independent band may mix)
+            const judged = role === 'opener' ? named.filter((c) => /^(Model|Guided Practice)$/.test(c.band)) : named;
             const cov = covered(pg.steps);
-            const off = named.filter((c) => !cov.has(kindOf(c.n)));
-            const kinds = [...new Set(named.map((c) => kindOf(c.n)))];
-            if (off.length) bad.push(`GUIDED-ONE-KIND ${at}: the Steps "${pg.steps.slice(0, 90)}" do not cover ${off.map((c) => `"${c.name}" (${kindOf(c.n)})`).slice(0, 3).join(', ')}; kinds on the page: ${kinds.join(', ')}`);
+            const kinds = [...new Set(judged.map((c) => kindOf(c.n)))];
+            const off = judged.filter((c) => !cov.has(kindOf(c.n)));
+            if (off.length) bad.push(`GUIDED-ONE-KIND ${at}: the Steps "${pg.steps.slice(0, 90)}" do not cover ${off.map((c) => `"${c.name}" (${kindOf(c.n)})`).slice(0, 3).join(', ')}; kinds: ${kinds.join(', ')}`);
+            // (critic live1 N2: Steps that name a place no item has - "Say the hundreds" over 53, 26, 99)
+            const st = pg.steps.toLowerCase();
+            if (/hundred/.test(st) && !judged.some((c) => c.n >= 100)) bad.push(`GUIDED-ONE-KIND ${at}: the Steps name the hundreds ("${pg.steps.slice(0, 70)}") but no item has a hundreds digit`);
+            if (/\btens?\b/.test(st) && judged.length && judged.every((c) => c.n < 10)) bad.push(`GUIDED-ONE-KIND ${at}: the Steps name the tens but no item has one`);
+            // (the Opener's Model and Guided band: a kind its Steps do not cover is caught above with the Model's own Steps - the
+            // band's Steps are read off the Model - so "twenty" beside a teen Model fails there)
         }
     }
-    console.log(`  ${pages} Guided pages (${SIZES.join('/')} x ${DEALS.length} deals x ${NSEED} seeds), ${items} items, ${hints} hints read`);
+    console.log(`  ${pages} pages (${ROLES.join(', ')} x ${SIZES.join('/')} x ${DEALS.length} deals x ${NSEED} seeds), ${items} items, ${hints} hints read`);
     await app.close();
     for (const b of bad.slice(0, 20)) console.log(`  FAIL ${b}`);
     if (bad.length > 20) console.log(`  ... ${bad.length - 20} more`);

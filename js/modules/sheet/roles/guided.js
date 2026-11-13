@@ -720,6 +720,15 @@ export function hintOf(it) {
     const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
     const all = providerWorkedSteps(it, 6).map((st) => String(st.text || '').trim())
         .filter((t) => t && !/^(Write|Check|Say)\b/i.test(t) && t.length <= 70);
+    // (lf-placevalue critic live1 N1, the CLASS: a number name written as a numeral - the `words` template, words to numeral -
+    // has an answer made only of its place counts, so ANY count in a hint is an answer digit ('"two hundred": 2 in the hundreds.'
+    // under 262). Its hint is always the first step's frame with every count a gap: '"two hundred": ___ in the hundreds.')
+    const wp = (q.cell && q.cell.payload) || {};
+    if (it.template === 'words' && wp.way !== 'to_words') {
+        const first = all.find((t) => /\d/.test(t));
+        if (!first) return '';
+        return first.replace(/,(?=\d{3}\b)/g, '').replace(/\d+/g, '___').replace(/___(\s+)(thousand|hundred|ten|one)\b(?!s)/gi, '___$1$2s');
+    }
     const steps = all.filter((t) => !hintGivesAnswer(t, it));
     if (steps.length) return steps.find(own) || steps[0];
     // Every step names part of the answer (a clock's first step gives its hour): the first step
