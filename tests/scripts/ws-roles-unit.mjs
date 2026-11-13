@@ -33,7 +33,13 @@
 //   GUIDED-MODEL-ROW a Model whose worked lines run under it never makes the try beside it sit in a row it fills under 70 %
 //                 (lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %; r8b (a)).
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW]
+//   ONE-ROW-CAP  a practice page (independent / test) that holds ONE row of a tall measured story (125 mm at M, the bar model
+//                above the column work: card capacity 1, lead ruling R1 / R4a 2026-11-13) does not stretch that row to its page -
+//                the row is at most its measured height / 0.7 (band under the work < 30 %, H13; ws-two-step --print CAP-BAND found
+//                41 % / 32 % on multi_step_word (Visual)), and its grid carries mq-onerow (PAGEFILL / EB-PAGE accept the strip).
+//                Control: a page of two rows keeps its own layout.
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE,MOD-ACROSS,INSTR-FOLLOWS,REVIEW-MIXED,KEY-TRUE-BLANK,GUIDED-MODEL-SPAN,GUIDED-STACK-SIDE,GUIDED-MODEL-ROW,ONE-ROW-CAP]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -51,6 +57,7 @@ const SM = await mod('roles/scripted-model.js');
 const PSC = await mod('roles/pre-skill-check.js');
 const TS = await mod('roles/test.js');
 const GD = await mod('roles/guided.js');
+const IND = await mod('roles/independent.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -420,6 +427,38 @@ if (on('GUIDED-MODEL-ROW')) {
             if (pl.meta.items < 4) findings.push(`GUIDED-MODEL-ROW ${size}: ${pl.meta.items} cells (want the Model and 3 tries at least)`);
         } catch (e) { findings.push(`GUIDED-MODEL-ROW ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
+}
+
+if (on('ONE-ROW-CAP')) {
+    // lf-roles r9 item 4 (lead ruling R1 / R4a): one tall story a page (a 125 mm cell at M, one column) on Independent and Test.
+    const item = (i, hMm) => {
+        const q = { categoryId: 'rolesunit', skillId: 'one', ans: '42', text: 'planted story', answerType: 'number', seed: i };
+        const render = () => '<div class="ws-cell-work">story 42</div>';
+        const measured = { 1: { hMm, fits: true, slackMm: 3 }, 2: { hMm, fits: false, slackMm: -14 }, 3: { hMm, fits: false }, 4: { hMm, fits: false } };
+        return { q, key: { value: '42', display: '42', slots: {} }, render, template: 'planted', pool: 'main', section: 0, measured, footprint: { measure: true, wMm: 93, hMm: null, maxCols: 2, restacks: true }, fclass: 'standard' };
+    };
+    const gridOf = (pl) => (pl.pages[0].sections || []).map((x) => (x.kind === 'grid' ? x : x.content)).find((x) => x && x.items && x.items.length);
+    for (const [role, R] of [['independent', IND], ['test', TS]]) {
+        for (const size of ['M', 'L']) {
+            checks++;
+            try {
+                const pl = R.plan({ ctx: { size }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can solve two-step stories', grade: 3 }], items: [item(1, 125)], seed: 1, sections: [{ columns: 'auto' }] });
+                const g = gridOf(pl);
+                const h = g && g.height ? parseFloat(g.height) : Infinity;
+                const lim = 126 / 0.7;
+                if (!g || g.rows !== 1) findings.push(`ONE-ROW-CAP ${role} ${size}: no one-row grid (${g ? g.rows : 'none'} rows)`);
+                else if (!(h <= lim)) findings.push(`ONE-ROW-CAP ${role} ${size}: one 125 mm story stretched to ${g.height || 'the page (flex)'} (cap ${lim.toFixed(1)} mm: ${Math.round((1 - 126 / h) * 100)} % of the cell empty under it, H13 >= 30 %)`);
+                else if (!/mq-onerow/.test(g.cls || '')) findings.push(`ONE-ROW-CAP ${role} ${size}: the one-row grid is not marked mq-onerow (PAGEFILL / EB-PAGE read its strip as unfilled)`);
+            } catch (e) { findings.push(`ONE-ROW-CAP ${role} ${size}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
+        }
+    }
+    // control: two 60 mm rows on an Independent page keep their own (multi-row) layout - never marked one-row
+    checks++;
+    try {
+        const pl = IND.plan({ ctx: { size: 'M' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan: 'I Can add', grade: 3 }], items: [item(1, 60), item(2, 60)], seed: 1, sections: [{ columns: 1 }] });
+        const g = gridOf(pl);
+        if (g && /mq-onerow/.test(g.cls || '')) findings.push(`ONE-ROW-CAP control: a ${g.rows}-row page is marked mq-onerow`);
+    } catch (e) { findings.push(`ONE-ROW-CAP control: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);

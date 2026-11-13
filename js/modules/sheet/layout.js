@@ -991,6 +991,20 @@ const legacyH = (it, cols, cellH) => {
 };
 
 /**
+ * ONE-ROW (lead ruling R1 / R4a, 2026-11-13, on the owner's capacity pin): a practice page (independent, more practice, test)
+ * that holds ONE grid row - a story whose card capacity is 1 at M / L, the bar model above the column work - is never
+ * stretched to its page. Its row stops where the band under the work would reach 30 % of the cell (RUBRIC H13): at most
+ * the row's tallest MEASURED cell / ONE_ROW_FILL, its content top-aligned; the rest of the page stays under the grid (the
+ * grid carries `mq-onerow`, so PAGEFILL / EB-PAGE read the strip as ruled, not as a page left unfilled).
+ */
+export const ONE_ROW_FILL = 0.72;
+/** The tallest a one-row grid of `items` at `cols` may stand, in mm (0 when a cell is unmeasured: the grid is left as it was). */
+export const oneRowMm = (items, cols) => {
+    const hs = (items || []).map((it) => measuredH(it, cols));
+    return hs.length && hs.every((h) => h > 0) ? Math.round((Math.max(...hs) / ONE_ROW_FILL) * 100) / 100 : 0;
+};
+
+/**
  * Rows of the same content stand at the same height (round 5 D-E: number_families_add S printed
  * rows of 200 / 282 px for the same families, because each row's stretch was capped by its own
  * shortest problem). Rows whose tallest problem is the same height (within 0.5 mm) all take the

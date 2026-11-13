@@ -830,6 +830,8 @@ async function main() {
                     // (Guided is exempt from EB-PAGE: lead ruling 2026-11-12, PT-GDP / PAGE_TYPES §12.1 - white under its grid is accepted)
                     if (has('page-fill') && j.role !== 'guided') {
                         const pf = await sh.evaluate((scope) => [...document.querySelectorAll(scope)].map((pg) => {
+                            // (ONE-ROW, lead ruling R1 / R4a: a page of one row held to its work - layout.oneRowMm, mq-onerow - keeps the ruled strip)
+                            if (pg.querySelector('.ws-grid.mq-onerow')) return 0;
                             const body = pg.querySelector('.ws-body') || pg; const br = body.getBoundingClientRect();
                             const kids = [...body.children].filter((x) => x.getBoundingClientRect().height > 0 && !/ws-foot|ws-footer/.test(x.className));
                             const last = kids.length ? Math.max(...kids.map((x) => x.getBoundingClientRect().bottom)) : br.top;

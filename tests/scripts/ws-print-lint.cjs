@@ -1598,6 +1598,9 @@ function wsLintPage(cfg) {
             const grids = [...pg.querySelectorAll('.ws-grid, .ws-gridrows')].filter(g => g.getBoundingClientRect().height > 0);
             const gridBottom = grids.length ? Math.max(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)).map(r => r[1] + r[3])) : null;
             const gridTop = grids.length ? Math.min(...grids.map(g => mmRect(g.getBoundingClientRect(), pr)[1])) : null;
+            // (ONE-ROW, lead ruling R1 / R4a 2026-11-13: a practice page of ONE row held to its work - layout.oneRowMm, `mq-onerow` -
+            // leaves the ruled strip under it; PAGEFILL does not read that strip as a page left unfilled)
+            const oneRow = grids.length > 0 && grids.every(g => g.classList.contains('mq-onerow'));
             // L-DENSITY HOLE (wave 1 lane D round 5, critic r4 D-B): a bordered empty run of grid
             // tracks after the last problem (the kit's .ws-cell.blankrun, or any empty bordered cell)
             const holes = [...pg.querySelectorAll('.ws-grid > .ws-cell')].filter(e => {
@@ -1684,7 +1687,7 @@ function wsLintPage(cfg) {
                 accentOk: !!pg.querySelector('[data-mq-accent]') && (pg.classList.contains('mq-lesson') || !!pg.querySelector('[data-mq-lesson-strip]')),
                 pageId: (footParts[2] || '').split('·').map(s => s.trim()).filter(s => /^\d\d-[A-Z]\d?$/.test(s))[0] || '',
                 w: mm(pr.width), h: mm(pr.height), padB: mm(parseFloat(cs.paddingBottom)), padT: mm(parseFloat(cs.paddingTop)),
-                footRect, cells, items: items.length, gridBottom, gridTop, holes, repeats,
+                footRect, cells, items: items.length, gridBottom, gridTop, oneRow, holes, repeats,
                 // L-ANSAREA DOUBLE: a cell that carries the adapter's "Answer:" row AND its own
                 // option list / check boxes (two answer places, H8)
                 doubled: ri.cells.filter(c => c.querySelector('.ws-legacy-answer') && c.querySelector('.opt-list, input[type="checkbox"], [data-ws-shape="check"], [data-ws-shape="circle"]')).length,
@@ -2223,7 +2226,7 @@ function lintKitGeometry(dom, pdf, info, F) {
             // ONE problem a page): a mixed pool's Auto page is a review, at least three problems
             if (info.pool && info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.items > 0 && p.items < 3 && !shortOk)
                 F('L-DENSITY', 'POOL-MIN', 'major', { page: p.idx }, `page ${p.idx} of a mixed pool holds ${p.items} problem(s): a review page holds at least three (RUBRIC H5 / C3, LESSONS L2)`, 'pool page under three problems');
-            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk) {
+            if (info.mode === 'kit' && arg('count', 'auto') === 'auto' && !pt.key && /^(independent|more-practice)$/.test(p.role) && p.footRect && p.gridBottom !== null && p.gridTop !== null && !shortOk && !p.oneRow) {
                 // measured against the PROBLEM AREA (the grid's top to the footer), not the whole
                 // page above the footer: a 53 mm strip was 23 % of the problem area but under 20 %
                 // of the page, and passed (wave 1 lane D round 5, critic r4 D-E)

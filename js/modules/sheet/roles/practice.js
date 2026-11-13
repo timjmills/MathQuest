@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows,
+    tightRows, oneRowMm,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -1194,7 +1194,19 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                     if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
                 }
             }
-            sections.push({
+            // ONE-ROW (layout.oneRowMm, lead ruling R1 / R4a): a lone page of ONE row is held where the band under its work stays
+            // under 30 %, top-aligned - never spread, gapped or flexed to the page; the strip under it is the ruled one-row page's.
+            let oneRow = 0;
+            if (lone && part.chunk.rows === 1 && !noCapSec && !capFill && !its.some((it) => it.anchor) && !L.blocks && !(L.cols === 2 && L.pairs)) {
+                const cap = oneRowMm(its, L.cols);
+                const drawn = spread ? spread.heightMm : gap.gap ? gap.heightMm : shape ? shape.heightMm : fillByFlex ? avail : part.chunk.rows * L.cellH;
+                if (cap > 0 && drawn > cap + 0.05) oneRow = cap;
+            }
+            if (oneRow) sections.push({
+                kind: 'grid', cols: L.cols, rows: 1, labels: labelStyle, start, cls: 'fixed mq-spread mq-onerow', height: `${oneRow}mm`, rowsTpl: '',
+                rowGap: 0, availMm: avail, items: its.map((it) => planItem(it, level, L.cols)), _its: its,
+            });
+            else sections.push({
                 kind: 'grid',
                 cols: L.cols,
                 rows: part.chunk.rows,

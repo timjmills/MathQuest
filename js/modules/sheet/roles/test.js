@@ -17,7 +17,7 @@ import {
     poolItems, topicOf, labelStyleOf, resolveSectionLayout, LIVE_W_MM, fitsLine, rng, shuffle, deriveSeed,
     hMinAt, splitByWidth,
 } from './compose.js';
-import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL } from '../layout.js';
+import { groupByHeight, rowShape, rowGapFor, SAFETY_H_MM, FILL_CAP, fillLimit, tightRows, IN_PLACE_FILL, oneRowMm } from '../layout.js';
 import { GRID_BORDERS_MM } from './practice.js';
 import { scorePoints } from '../paginate.js';
 
@@ -297,6 +297,13 @@ export function plan(input = {}) {
     if (sections[1].height) {
         const g = rowGapFor(rows, parseFloat(sections[1].height), L.gridH);
         if (g.gap) { sections[1].rowGap = g.gap; sections[1].height = `${g.heightMm}mm`; }
+    }
+    // ONE-ROW (layout.oneRowMm, lead ruling R1 / R4a): a Test of ONE row is held where the band under its work stays under 30 %,
+    // top-aligned; the strip under it is the ruled one-row page's (multi_step_word (Visual) M: one story in a 184 mm cell, 32 %).
+    if (rows === 1) {
+        const cap = oneRowMm(items, L.cols);
+        const drawn = sections[1].height ? parseFloat(sections[1].height) : L.gridH;
+        if (cap > 0 && drawn > cap + 0.05) Object.assign(sections[1], { height: `${cap}mm`, rowsTpl: '', rowGap: 0, cls: `${sections[1].cls === '' ? 'fixed' : sections[1].cls || 'fixed'} mq-onerow` });
     }
     return assemble(ROLE_ID, Object.assign({}, input, { form }), frame, [{ sections }], {
         scaffoldLevel: 0,
