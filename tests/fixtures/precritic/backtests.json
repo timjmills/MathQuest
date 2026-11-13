@@ -8586,6 +8586,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+ {
+  "id": "precritic-mode-verdict",
+  "check": "lf-ops 2026-11-13 (count_by_tables): precritic --strict marked no-size-s-browser 'unparsed output' though its log ends 'ws-no-size-s --browser: OK (73 checks)'; the verdict reader only accepted '<tool>: OK|FAIL', so every lane's --strict run was red",
+  "kind": "commit-pair",
+  "rule": "ws-precritic lastVerdict: '<tool>[ --mode]*: OK|FAIL' (self-test: 6 verdict cases)",
+  "browser": false,
+  "fail": {
+   "commit": "7a5bc902c",
+   "state": "lastVerdict('... ws-no-size-s --browser: OK (73 checks)', 'ws-no-size-s') = null -> unparsed output"
+  },
+  "pass": {
+   "commit": "70d347578",
+   "state": "the mode verdict line reads OK"
+  },
+  "command": "node -e \"const s=require('fs').readFileSync(process.argv[1],'utf8');const f=new Function(s.match(/const reEsc = .*\\n/)[0]+s.match(/const lastVerdict = .*\\n/)[0]+';return lastVerdict;')();const v=f('  ok   no page errors\\nws-no-size-s --browser: OK (73 checks)\\n','ws-no-size-s');console.log(v&&v[1]==='OK'?'mode-verdict: OK':'mode-verdict: FAIL (unparsed)')\" {root}/tests/scripts/ws-precritic.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
   }
+ }
  ]
 }

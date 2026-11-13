@@ -711,3 +711,10 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   per-span DOC exemptions instead of line-wide (D3); case-insensitive size words (D1); per-line expects in the docs rows and the
   `--lines` fixtures (D4). Then lift NOS-DOCS-ADVISORY.
 - CLAUDE.md lines 60 / 461: the lead fixes them at deploy (their allow entries then go ALLOW-STALE under `--docs`).
+
+## 2026-11-13 — precritic "unparsed" verdict fix (lead, urgent; reported by lf-ops)
+
+- `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output": precritic's verdict reader accepted only
+  `<tool>: OK|FAIL`. It now accepts `<tool>[ --mode]*: OK|FAIL` (self-test: 6 verdict cases). Row `precritic-mode-verdict`.
+- copy-light "unparsed": NOT reproduced on master 7a5bc902c (precritic's parser reads `ws-copy-light --skill
+  multiplication:count_by_tables` as PASS); asked the lead for lf-ops' log line and branch.
