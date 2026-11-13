@@ -1284,10 +1284,10 @@ function colBar(ctx, p, put, narrow) {
     if (p.storyBar && p.steps.length === 1 && (p.bar || (!twin && Number(ctx.scaffoldLevel) >= 2))) {
         const st = p.steps[0];
         const digits = Math.max(2, ...[st.top, st.bottom, st.ans].map((v) => digitsOf(v).length));
-        // (`barInk: 'trace'`, a lesson chart's panel - lesson-arch/story.js columnPanel: the known numbers written grey, the
-        // newest marks, while the work under it is still blank)
-        const show = !twin && (put || p.barInk === 'trace');
-        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show, ink: !show ? null : p.barInk === 'trace' ? 'trace' : inkOf(ctx) })}</div>`;
+        // (`barInk`, a lesson chart's panel - lesson-arch/story.js columnPanel: the known numbers written grey ('trace', the
+        // newest marks) or black ('solid', written on an earlier panel) while the work under it is still blank)
+        const show = !twin && (put || p.barInk === 'trace' || p.barInk === 'solid');
+        return `<div style="margin-top:${L(ctx, 2)};">${storyBar(ctx, { kind: p.storyBar, top: st.top, bottom: st.bottom, ans: st.ans, who: p.who, wMm: narrow ? 52 : 64, digits, show, ink: !show ? null : p.barInk || inkOf(ctx) })}</div>`;
     }
     return p.bar ? barModel(ctx, p) : '';
 }

@@ -187,8 +187,9 @@ export function columnPanel(it, groups, k) {
     const p = cl && cl.template === 'word-work' ? cl.payload : null;
     if (!p || !Array.isArray(p.steps) || p.steps.length !== 1 || p.neutral || (p.layout && p.layout !== 'column') || groups.length < 4) return null;
     // panel 1 the story (read, find what it knows); panel 2 the story bar with the numbers found written grey, over the
-    // sign row and the columns; panels 3+ the work (write, solve) - no story, no bar
+    // sign row and the columns; panels 3+ the work (write, solve)
     if (k === 0) return { pic: null, kb: false, noWork: true, noBar: true };
+    // (the bar is not repeated on the second row: with it a panel of two merged steps overflowed its 114 mm row by a few mm)
     return k === 1 ? { pic: null, kb: false, lines: [], barInk: 'trace' } : { pic: null, kb: false, lines: [], noBar: true };
 }
 
