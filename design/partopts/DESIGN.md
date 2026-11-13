@@ -220,3 +220,17 @@ pack declares the part's range (a `partLimits` entry in the lesson file); until 
 
 Build order approved: A (How many everywhere, Parts UI, PO-1/2/4) → one critic round → B (supports, `off`, panel,
 PO-3/5). Caps: $70 for A and its critic; $55 for B after A passes.
+
+## 8. Amendment after critic A r1 (lead, delegated approval, 2026-11-13)
+
+The planners size counts to fill the page, so a lower count left the sheet's foot blank (critic F1), and avoiding that
+fixed almost every count (F2). Resolved:
+
+- **(a) Practice / Mixed: How many is the TOTAL** number of problems, offered in whole rows; the pages re-paginate and the
+  last page is rebalanced. A count that would leave any page under half used is rounded to the nearest one that does not,
+  with a note ("Rounded to 24 so no page is under half full").
+- **(b) Lesson sheet: freed height goes back to the page.** Turning Vocabulary, Remember or We Do down gives its height
+  to more Independent rows, then to roomier cells up to the growth cap. A value that still cannot fill the page is not
+  offered.
+- **(c) We Do re-flows** to fewer, wider cells where the step's ink allows, instead of a fixed floor.
+- Every page, including each sheet's last, is judged on its own, with parts changed together (F12).
