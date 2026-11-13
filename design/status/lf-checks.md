@@ -451,3 +451,6 @@ lf-hosts now owns: the host 0-cell guard + card [data-ws-cell] (20); the 390 tou
   False-positive sweep on head: 84 sheets (7 skills x 4 roles x S/M/L) all OK, 796 s.
 - no-dropped-row baseline FIXED (lf-checks 11-13): it compared with origin/master's tip, so a lane branch behind master read master's newer rows as dropped (13 false drops on -r2). Now the merge base of HEAD and origin/master; a deploy tree (master merged in) is unchanged.
 - The -r2 narrow critic was STOPPED by the weekly usage limit before its verdict; its partial report is committed as PARTIAL. Resume after 2026-11-19 22:00 UTC. All lf-checks work is paused until then.
+- CRITIC r2-narrow (aa214cc4): PASS, C1 9 · C2 8 · C3 8 · C4 8 (lf-checks/critic-r2-narrow.md). PR #47 is deploy-ready.
+  - m2 fixed before handing over: the ledger's duplicate owner / lead-deploys rows (old "pending" copies beside their exempted rows) are removed; the sweep is back to 11 fail (other lanes).
+  - Queued (minors): m1 FOCUS-GAP should keep only characters that overlap the ring sideways (a line's metrics still read "Tall" beside "wer"; no live hit); m2b the sweep flags DUPLICATE ledger rows and a FAIL count above the merge base's; m3 RR-CLIP skips spans lighter than the ink threshold (a #d0d0d0 self-test PDF); m4 a self-test on a pure baselineRef for the merge-base fix.
