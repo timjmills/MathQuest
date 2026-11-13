@@ -150,7 +150,7 @@ function geometry(g, p) {
     // The two arrays side by side, the two facts under them, one line each (the array first,
     // then its turn): two facts side by side are wider than a 2-column cell at M and L.
     const a = dotsSvg(g, N(p.rows), N(p.cols), 'solid', ''), b = dotsSvg(g, N(p.cols), N(p.rows), 'solid', '');
-    return { wMm: Math.max(a.wMm + GAP + b.wMm, fw), pictures: true, pairW: a.wMm + GAP + b.wMm, dropMm: Math.max(0, b.hMm - a.hMm) };
+    return { wMm: Math.max(a.wMm + GAP + b.wMm, fw), pictures: true, dropMm: Math.max(0, b.hMm - a.hMm) };
 }
 
 /** Render one turn cell. `sv` = {slot: {value, ink}} from a step state, else the state's ink. */
@@ -181,24 +181,21 @@ export function turnRender(p, ctx) {
         const A = dotsSvg(g, N(p.rows), N(p.cols), inkA, `${p.rows} rows of ${p.cols} dots`);
         const B = dotsSvg(g, N(p.cols), N(p.rows), inkB, `${p.cols} rows of ${p.rows} dots`);
         const showF2 = !sv || sv.turn;
-        inner = `<div style="display:flex;justify-content:center;align-items:flex-end;gap:${g.em(GAP)}">${A.svg}${B.svg}</div>`
+        // (lf-ops-props r3b, CL-40: when the FIRST array's top-left dot is the pair's top - that array the taller, or < 4 mm
+        // lower - the pair is set in from the left by the label keep-out (--ws-koin + 0.5 mm), not pushed down: the cell keeps
+        // its height and its top start (CL-4b), and 'safe center' keeps a pair that fills the cell from crossing its left edge.
+        // A grid role's ctx does not carry its real column count, so no width test is made: first dot 6.8 -> >= 7.5 mm across.)
+        const firstTall = N(p.rows) >= N(p.cols) || (geom.dropMm !== undefined && geom.dropMm < 4);
+        const inset = !g.twin && firstTall ? 'padding-left:calc(var(--ws-koin, 0mm) + 0.5mm);box-sizing:border-box;' : '';
+        inner = `<div style="display:flex;justify-content:${inset ? 'safe center' : 'center'};align-items:flex-end;gap:${g.em(GAP)};${inset}">${A.svg}${B.svg}</div>`
             // (a known fact's printed line is a text line, not a box: 1 mm closer, so the lesson sheet's two
             // stacked Guided cells - lesson 3a r2 - keep the page)
             + `<div style="margin-top:${g.em(p.type === 'known' ? 1.5 : 3)};display:flex;flex-direction:column;align-items:center;gap:${g.em(2)}">`
             + `<div>${factLine(g, f1, at)}</div><div style="visibility:${showF2 ? 'visible' : 'hidden'}">${factLine(g, f2, at)}</div></div>`;
     }
-    // (lane lf-ops, CL-40: a pictured array's first dot reached 4.6 mm across, 4.5 mm down - inside the number tab's
-    // keep-out - at M and L. The pair stands on one base line, so the FIRST array's top-left dot is at the cell's top
-    // only when that array is the taller one (rows >= its row length) and the pair spans the column; then, on paper,
-    // the drawing starts below the keep-out (--ws-koin, the kit's CL-40 edge). A split array is one array: always.)
-    // (lf-ops-props r3, CL40-INK more-practice L: a grid role renders with no `ctx.columns`, so colW was 0 and a pair that
-    // spans its 2-column cell drew its first dot 6.8 mm across, 4.8 mm down. A pictured pair is held to 2 columns (maxCols),
-    // so that is the narrowest cell it prints in. The first dot sits (colW - pair) / 2 in from the content edge; the keep-out
-    // reaches ~4 mm past the 3 mm pad, so a gap under 9 mm (4.5 mm a side) or a first array that stands < 4 mm lower takes it.)
-    const colW = Number(ctx.columns) > 0 ? 186 / Number(ctx.columns) - 6 : geom.pictures ? 186 / 2 - 6 : 0;
-    const pairW = geom.pairW || geom.wMm;
-    const firstTall = N(p.rows) >= N(p.cols) || (geom.dropMm !== undefined && geom.dropMm < 4);
-    if (geom.pictures && !g.twin && (p.type === 'split' || (colW && colW - pairW < 9 && firstTall))) inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
+    // (lane lf-ops, CL-40: a split array is one array - its first dot is the cell's top-left - so it starts below the
+    // keep-out (--ws-koin). A pictured pair is set in from the left instead, above.)
+    if (geom.pictures && !g.twin && p.type === 'split') inner = `<div style="height:max(0mm, var(--ws-koin, 0mm))"></div>${inner}`;
     return root(g, 'arrays-turn', inner, 'text-align:center;width:100%;', turnFootprint(p, ctx).wMm);
 }
 
