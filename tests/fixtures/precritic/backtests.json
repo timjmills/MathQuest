@@ -7542,6 +7542,86 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-words-guided-hint-leak",
+   "check": "number_word_form Guided: no grey hint gives the answer away - its place phrases built together ('2 tens, 6 ones' -> 26), or every digit of the answer named; the allowed form is the first step's gapped frame (lf-roles critic r8b D3, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-HINT-LEAK",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M / L, default and every band: '\"twenty-six\": 2 tens, 6 ones.' under twenty-six, 26 more hints"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "guided.js hintGivesAnswer reads place phrases; the frame '\"twenty-six\": ___ tens, ___ ones.'"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-HINT-LEAK --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-one-kind",
+   "check": "number_word_form Guided: one kind of problem per page - no item (teen, tens word alone, one word, two words, hundreds) whose kind the page's Steps do not cover (lf-roles critic r8b D4, PT 2.3)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-words-pages GUIDED-ONE-KIND",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "Guided M default: 'eleven' under 'Read the tens word. Read the ones word.'; band 20 pages mixing one-word, teen and decade names"
+   },
+   "pass": {
+    "commit": "ae83dfbc",
+    "state": "teens, tens words alone and one-word names have their own Steps, so the Guided page keeps one kind"
+   },
+   "command": "node tests/scripts/ws-pv-words-pages.cjs --only GUIDED-ONE-KIND --seeds 2 --skills composing:number_word_form",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-guided-eb-band",
+   "check": "number_word_form Guided M / L: no cell 30 % or more empty under its ink (lf-roles critic r8b D2: 35-50 % in all 15 cells)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-BAND (--roles guided)",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "EB-BAND 15: M 35-50 %, L 35-59 % (rows stretched to the page)"
+   },
+   "pass": {
+    "commit": "878f5325",
+    "state": "words footprint guidedTight: rows at their measured height, the Model row the larger of its work line and the hint: EB-BAND 0"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --roles guided --sizes M,L --hosts none --no-baseline --only EB-BAND",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-expand-ws-numeral",
+   "check": "placevalue:expand on the online worksheet: the number sentence's numerals set and drawn at >= 29 px (the worksheet digit floor), Andika 700, no operator left at a line's end (lf-hosts critic via the lead 2026-11-13: 18 px)",
+   "kind": "commit-pair",
+   "rule": "ws-pv-screen-numeral WS-NUMERAL / WS-WRAP-OP",
+   "browser": true,
+   "fail": {
+    "commit": "ffcba24b",
+    "state": "worksheet 1280 / 820 / 390: '144 =' set at 18 px weight 400 (drawn 22 px at 390), '+' alone at a line's end at 390"
+   },
+   "pass": {
+    "commit": "77b6ce24",
+    "state": "inlineBlanksHTML numeric: the sentence at --mq-digit (29 px), bold, each operator kept with its box"
+   },
+   "command": "node tests/scripts/ws-pv-screen-numeral.cjs --skills placevalue:expand",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
