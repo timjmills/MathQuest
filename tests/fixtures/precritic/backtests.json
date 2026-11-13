@@ -7533,6 +7533,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "story-pronouns-p-wp-19",
+   "check": "ws-story-pronouns: a story's gendered pronoun agrees with its name (STATIC-PRONOUN over every template that interpolates a name; PRONOUN-AGREE / PRONOUN-ONE / UNMAPPED on sampled stories)",
+   "kind": "commit-pair",
+   "rule": "ws-story-pronouns (lf-engine roles critic 8266326ba N4 \"Mia needs 187 shells. He already has ...\"; lead ruling A 2026-11-13; PEDAGOGY P-WP-19 repeat the name)",
+   "fail": {
+    "commit": "71d4e8ac7",
+    "state": "6 gen-algebraic templates hard-code He / She beside a name picked from a mixed list (\"James had 49 cookies. She bought 7 more\")"
+   },
+   "pass": {
+    "commit": "1092fa665",
+    "state": "the 6 templates repeat the name instead of a pronoun"
+   },
+   "command": "node tests/scripts/ws-story-pronouns.mjs --root {root} --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:tape_diagram,algebra:write_equation",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
