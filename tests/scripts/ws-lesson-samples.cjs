@@ -202,16 +202,8 @@ print(json.dumps(pages))
 
 /** LIVE-PART (F6): per key page, the carry / regroup boxes (a stack's `.rg[data-ws-seg]`, counted from the ones) that NO
  *  stack of their section (`.ws-grid`) fills - a dead part (H15). One message per (section, box place). */
-/** LR-6 near twins on drawn check cells (critic r3 F13): keys of sorted numbers that differ in ONE number, a near pair:
- *  reordered or within 2 anywhere on the page; one place different (shared digit not 0) inside one question. */
-function nearKeyPair(k1, k2, sameQ) {
-    const near = (x, y) => { if (!(x >= 10 && y >= 10) || x === y) return false; if (Math.abs(x - y) <= 2) return true; const a = String(x), b = String(y);
-        if (a.length !== b.length) return false; if ([...a].sort().join('') === [...b].sort().join('')) return true; if (!sameQ) return false; let d = 0, z = true; for (let i = 0; i < a.length; i++) { if (a[i] !== b[i]) d++; else if (a[i] !== '0') z = false; } return d === 1 && !z; };
-    const a = String(k1).split(',').filter(Boolean).map(Number), b = String(k2).split(',').filter(Boolean).map(Number);
-    if (!a.length || a.length !== b.length) return false;
-    for (let i = a.length - 1; i >= 0; i--) { const j = b.indexOf(a[i]); if (j >= 0) { b.splice(j, 1); a.splice(i, 1); } }
-    return a.length === 1 && b.length === 1 && near(a[0], b[0]);
-}
+/** (PC-LR6 near twins on drawn check cells, critic r3 F13, read with sheet/near-twins.js nearKeys - r6, critic r5: the gate's own
+ *  copy, nearKeyPair, is gone: one definition) */
 function carryMeasure() {
     return [...document.querySelectorAll('.ws-page')].map((pg) => {
         const dead = [];
@@ -386,6 +378,9 @@ function pcMeasure() {
     return [...document.querySelectorAll('body > section.ws-page, body > .ws-page')].map((pg) => {
         const body = pg.querySelector('.ws-body');
         const out = { frame: null, ink: [], pv: [], gaps: [], instr: [] };
+        // (r6, critic r5 R3: the body's top-level cells in printed order - PC-PVHEADS aligns them with the plan's items)
+        const tops = body ? [...body.querySelectorAll('.ws-cell')].filter((c) => !c.parentElement.closest('.ws-cell') && !c.classList.contains('blankrun')) : [];
+        out.ncells = tops.length;
         // (critic r4 N6, PC-GAPS) a band-wide cell - no number tab, >= 80 % of the body wide: its empty gap above the ink and below
         const bodyW = body ? body.getBoundingClientRect().width : 0;
         if (body) for (const c of body.querySelectorAll('.ws-cell')) { if (c.parentElement.closest('.ws-cell') || c.querySelector(':scope > [data-ws-label], :scope > .ws-letter')) continue;
@@ -401,7 +396,9 @@ function pcMeasure() {
             const tops = [...new Set(words.map((x) => x.top))]; const last = words.filter((x) => x.top === tops[tops.length - 1]);
             const cells = [...bd.querySelectorAll('.ws-cell')].filter((x) => !x.parentElement.closest('.ws-cell'));
             const slots = cells.map((x) => [...x.querySelectorAll('[data-ws-slot]')].filter((e) => !/^(ring|check)$/.test(e.getAttribute('data-ws-shape') || '') && !/^c\d|choice|match/.test(e.getAttribute('data-ws-slot') || '')).length);
-            out.instr.push({ text: sp.textContent.trim(), lines: tops.length, widow: tops.length > 1 && last.length === 1 ? last[0].w : null, slots }); }
+            // (r6, critic r5 R3: PC-INSTR value slot - each cell's "Value ____" slots)
+            const values = cells.filter((x) => !x.classList.contains('blankrun')).map((x) => x.querySelectorAll('[data-ws-slot="value"]').length);
+            out.instr.push({ text: sp.textContent.trim(), lines: tops.length, widow: tops.length > 1 && last.length === 1 ? last[0].w : null, slots, values }); }
         if (body) { const br = body.getBoundingClientRect(); const ib = inkBottom(body);
             // (and each band's own frame: a cell drawn past its grid / band bottom hides the band's bottom rule - sub L sheet
             // Independent cells 69 mm in a 64.8 mm row, cut by the grid: the body's ink stayed inside the body)
@@ -434,7 +431,7 @@ function pcMeasure() {
             const PLACES = /^(ones|tens|hundreds|thousands|ten thousands|hundred thousands|millions)$/i;
             const bank = c.querySelector('.pv-bank');
             const named = (ring && [...ring.querySelectorAll('.pv-choice')].some((x) => PLACES.test(x.textContent.trim()))) || (bank && /\b(ones|tens|hundreds)\b/i.test(bank.textContent));
-            const rec = { cell: (lab && lab.textContent.trim()) || String(k + 1), heads: rows > 1, named: !!named };
+            const rec = { cell: (lab && lab.textContent.trim()) || String(k + 1), heads: rows > 1, named: !!named, top: tops.findIndex((t) => t === c || t.contains(c)) };
             const ul = [...tracks.querySelectorAll('span')].find((s) => parseFloat(getComputedStyle(s).borderBottomWidth) > 0);
             const ch = ring ? [...ring.querySelectorAll('.pv-choice')] : [];
             if (ul && ch.length === 2) {
@@ -465,6 +462,49 @@ function pageTurns(placed) {
         else if (!was) by.set(k, x);
     }
     return out;
+}
+/** In the page, on the build the last evaluate left at window.__mqLs (r6, critic r5 R1-R3: ONE read of every lesson page for
+ *  the dealing rules, check on AND off, every lesson - these reads ran with the check forced only, so live pages kept twins):
+ *   lr67   PG-LR67: LR-6 / LR-7 per page on the lesson skill's items of the sheet, Practice and Mixed (lesson-rules.js, the
+ *          library's page caps)
+ *   oneNum PG-LR6: per page and skill, the one-number items (sheet/near-twins.js reads them)
+ *   pvpat  PC-PV pattern: per pupil page and band, the answers of its "name the place" items in printed order
+ *   pages  per part, per pupil page, its grid items in printed order: {skill, place} (PC-PVHEADS aligns them with the cells) */
+async function collectReads({ skill }) {
+    const r = window.__mqLs; if (!r) return {};
+    const LR = await import('./js/modules/sheet/lesson-rules.js'); const LIB = await import('./js/modules/lessons/library.js');
+    const lid = (LIB.defaultLessonForSkill(skill.categoryId, skill.skillId) || {}).id; const caps = (lid && (LIB.lessonRules(lid) || {}).caps) || {};
+    const own = `${skill.categoryId}:${skill.skillId}`;
+    const plain = (t) => String(t || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const gridsOf = (node, out = []) => { if (!node) return out; if (node.kind === 'grid') out.push(node); if (node.content) gridsOf(node.content, out); (node.contents || []).forEach((c) => gridsOf(c, out)); (node.parts || []).forEach((c) => gridsOf(c, out)); return out; };
+    const byPg = new Map(); const one = new Map(); const pvpat = []; const pages = {}; let pg = 0;
+    for (const pp of r.partPlans || []) (pp.plans || []).forEach((pl, pi) => { for (const page of (pl && pl.pages) || []) {
+        pg++;
+        const rows = [];
+        (page.sections || []).forEach((sc, si) => {
+            const seq = [];
+            for (const g of gridsOf(sc)) for (const it of g.items || []) {
+                if (!it || !it.q) continue;
+                const p = it.q.cell && it.q.cell.payload; const place = !!(p && /^place/.test(String(p.kind || '')) && typeof it.q.ans === 'string');
+                rows.push({ skill: it.skill || '', place, model: !!it.model });
+                if (it.model) continue;
+                if (place) seq.push(it.q.ans);
+                if (it.skill === own && ['teach', 'practice', 'mixed'].includes(pp.part)) { const t = plain(it.q.text); const m = /^(\d+)\s*[−-]\s*(\d+)/.exec(t); const k = `${pp.part}#${pg}`; if (!byPg.has(k)) byPg.set(k, []); byPg.get(k).push({ text: t, ops: m ? [Number(m[1]), Number(m[2])] : [] }); }
+                if (p && Number(p.n) >= 10 && ['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) { const k = `${pp.part}#${pg}|${it.skill || ''}`; if (!one.has(k)) one.set(k, []);
+                    const a = typeof it.q.ans === 'object' || it.q.ans === null || it.q.ans === undefined ? '' : String(it.q.ans).replace(/,/g, '').trim(); one.get(k).push({ n: Number(p.n), ans: /^\d+$/.test(a) ? Number(a) : null, text: plain(it.q.text) }); }
+            }
+            if (pi === 0 && seq.length && pp.part !== 'prereq') pvpat.push({ part: pp.part, page: (pages[pp.part] || []).length + 1, band: si + 1, seq });
+        });
+        if (pi === 0) (pages[pp.part] = pages[pp.part] || []).push(rows.filter((x) => !x.model));
+    } });
+    const lr67 = [];
+    for (const [k, its] of byPg) {
+        const subs = its.filter((x) => LR.opOfItem(x) === '-' && x.ops.length >= 2);
+        for (let i = 0; i < subs.length; i++) for (let j = i + 1; j < subs.length; j++) if (LR.nearTwins(subs[i].ops, subs[j].ops)) lr67.push({ part: k, msg: `LR-6 ${subs[i].text} and ${subs[j].text} are near twins` });
+        const ans = subs.map((x) => x.ops[0] - x.ops[1]); if (new Set(ans).size < ans.length) lr67.push({ part: k, msg: 'LR-6 two answers alike' });
+        for (const [c, max] of Object.entries(caps)) { const n = its.filter((x) => LR.casesOf(x).includes(c)).length; if (n > max) lr67.push({ part: k, msg: `LR-7 ${n} ${c} items (at most ${max} a page)` }); }
+    }
+    return { lr67, oneNum: [...one.entries()], pvpat, pages, own };
 }
 const ONLY_RULES0 = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 
@@ -497,43 +537,32 @@ async function checkMain() {
                     const placed = []; let pgN = 0; const walk = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) placed.push({ part, page: pgN, t: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); }); if (node.content) walk(node.content, part); (node.contents || []).forEach((c) => walk(c, part)); (node.parts || []).forEach((c) => walk(c, part)); };
                     // (PG-TURN reads every part's pages, the check and the chart included; PC-LR5 the sheet, Practice and Mixed)
                     for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pgN++; (pg.sections || []).forEach((sc) => walk(sc, pp.part)); }
-                    // (PG-LR67, lf-engine PC r4: LR-6 / LR-7 per page on the lesson skill's items - the sheet always, Practice and
-                    // Mixed with the check on - read by lesson-rules.js as ws-lesson-check reads them, the library's page caps)
-                    const LR = await import('./js/modules/sheet/lesson-rules.js'); const LIB = await import('./js/modules/lessons/library.js');
-                    const lid = (LIB.defaultLessonForSkill(skill.categoryId, skill.skillId) || {}).id; const caps = (lid && (LIB.lessonRules(lid) || {}).caps) || {};
-                    const own = `${skill.categoryId}:${skill.skillId}`; const lr67 = []; const byPg = new Map(); let pg2 = 0;
-                    const walk2 = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model && it.skill === own) { const t = String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(); const m = /^(\d+)\s*[−-]\s*(\d+)/.exec(t); const k = `${part}#${pg2}`; if (!byPg.has(k)) byPg.set(k, []); byPg.get(k).push({ text: t, ops: m ? [Number(m[1]), Number(m[2])] : [] }); } }); if (node.content) walk2(node.content, part); (node.contents || []).forEach((c) => walk2(c, part)); (node.parts || []).forEach((c) => walk2(c, part)); };
-                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pg2++; if (pp.part === 'teach' || (FORCE && ['practice', 'mixed'].includes(pp.part))) (pg.sections || []).forEach((sc) => walk2(sc, pp.part)); }
-                    for (const [k, its] of byPg) {
-                        const subs = its.filter((x) => LR.opOfItem(x) === '-' && x.ops.length >= 2);
-                        for (let i = 0; i < subs.length; i++) for (let j = i + 1; j < subs.length; j++) if (LR.nearTwins(subs[i].ops, subs[j].ops)) lr67.push({ part: k, msg: `LR-6 ${subs[i].text} and ${subs[j].text} are near twins` });
-                        const ans = subs.map((x) => x.ops[0] - x.ops[1]); if (new Set(ans).size < ans.length) lr67.push({ part: k, msg: 'LR-6 two answers alike' });
-                        for (const [c, max] of Object.entries(caps)) { const n = its.filter((x) => LR.casesOf(x).includes(c)).length; if (n > max) lr67.push({ part: k, msg: `LR-7 ${n} ${c} items (at most ${max} a page)` }); }
-                    }
-                    // (critic r4 N4 / N5, PG-LR6: every lesson page's one-number items, per page and skill - chart examples left out)
-                    const one = new Map(); let pg3 = 0;
-                    const walk3 = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; if (!it || it.model || !pl || !(Number(pl.n) >= 10)) return; const k = `${part}#${pg3}|${it.skill || ''}`; if (!one.has(k)) one.set(k, []);
-                        const a = typeof it.q.ans === 'object' || it.q.ans === null || it.q.ans === undefined ? '' : String(it.q.ans).replace(/,/g, '').trim(); one.get(k).push({ n: Number(pl.n), ans: /^\d+$/.test(a) ? Number(a) : null, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() }); });
-                        if (node.content) walk3(node.content, part); (node.contents || []).forEach((c) => walk3(c, part)); (node.parts || []).forEach((c) => walk3(c, part)); };
-                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pg3++; if (['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) (pg.sections || []).forEach((sc) => walk3(sc, pp.part)); }
+                    window.__mqLs = r;   // (collectReads below reads the build: LR-6 / LR-7, one-number twins, place patterns)
+                    const LIB = await import('./js/modules/lessons/library.js'); const lid = (LIB.defaultLessonForSkill(skill.categoryId, skill.skillId) || {}).id;
                     // (critic r4 N1: the route refs' declared floors, as the library records them)
                     const ld = lid && LIB.lessonData ? LIB.lessonData(lid) : null; const floors = ((ld && ld.prereqs) || []).map((p) => p.ref || null);
                     // (critic r4 N7: the check's PRINTED items, by question - r.items holds every item dealt, a routed check deals 8 a question)
                     const printed = []; const walkP = (node) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) printed.push({ pool: it.pool, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.q.ans === 'object' ? JSON.stringify(it.q.ans) : String(it.q.ans) }); }); if (node.content) walkP(node.content); (node.contents || []).forEach(walkP); (node.parts || []).forEach(walkP); };
                     for (const pp of r.partPlans || []) if (pp.part === 'prereq') for (const pl of (pp.plans || []).slice(0, 1)) for (const pg of (pl && pl.pages) || []) (pg.sections || []).forEach(walkP);
                     { const qs = ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs); let at = 0; qs.forEach((len, q) => { for (let j = 0; j < len && at < printed.length; j++) printed[at++].pool = `q${q}`; }); }
-                    return { placed, lr67, oneNum: [...one.entries()], floors, printed, pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
+                    return { placed, floors, printed, pre: (r.lesson && r.lesson.prereqCheck) || null, items: r.items.filter((it) => it.part === 'prereq').map((it) => ({ pool: it.pool, text: String(it.text).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.ans === 'object' ? JSON.stringify(it.ans) : String(it.ans) })) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, seed, FORCE });
                 if (b.error) { F('PC-BUILD', `${l.id} seed ${seed}`, b.error.slice(0, 160)); continue; }
+                Object.assign(b, await page.evaluate(collectReads, { skill: l.skill }));
                 // PC-LR5 (critic r3 F4; LR-5): no item of the lesson sheet printed again on Practice or Mixed
                 { const sheet = new Set((b.placed || []).filter((x) => x.part === 'teach' && /\d/.test(x.t)).map((x) => x.t));
                     for (const x of b.placed || []) if (['practice', 'mixed'].includes(x.part) && sheet.has(x.t)) F('PC-LR5', `${l.id} seed ${seed} ${x.part}`, `"${x.t}" is on the lesson sheet and on ${x.part}`); }
                 for (const m of pageTurns(b.placed)) F('PG-TURN', `${l.id} seed ${seed} ${m.part}`, m.msg);
                 for (const m of b.lr67 || []) F('PG-LR67', `${l.id} seed ${seed} ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
-                if (!b.pre) { na++; break; }
+                // (r6, critic r5 R2: PG-LR6 reads every page - check on OR off - before the no-check break)
+                for (const [k, its] of b.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} seed ${seed} ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
+                // PC-PV pattern (r6, critic r5 R1): every lesson page's "name the place" items, per band - never all one place, never
+                // strictly alternating (sheet/near-twins.js placeRunBad; the check page keeps its per-question PC-PV below)
+                for (const x of b.pvpat || []) for (const m of NT.placeRunBad(x.seq)) F('PC-PV', `${l.id} seed ${seed} ${x.part.replace(/^teach/, 'sheet')} p${x.page} band ${x.band}`, m);
+                // (r6: a lesson with no check reads every seed too - the dealing rules above run on live pages)
+                if (!b.pre) { if (seed === seeds[0]) na++; continue; }
                 // PG-LR6 (critic r4 N4 / N5): one threshold set, the engine's own module (sheet/near-twins.js)
                 { const byQ = new Map(); for (const it of b.printed || []) { const o = /^(\d+)\s*[−-]\s*(\d+)/.exec(it.text || ''); if (!o) continue; if (!byQ.has(it.pool)) byQ.set(it.pool, []); byQ.get(it.pool).push([Number(o[1]), Number(o[2])]); }
                     for (const [q, os] of byQ) for (let x = 0; x < os.length; x++) for (let y = x + 1; y < os.length; y++) if (NT.nearSubs(os[x], os[y])) F('PG-LR6', `${l.id} seed ${seed} check ${q}`, `take-away near twins ${os[x].join(' - ')} / ${os[y].join(' - ')}`); }
-                for (const [k, its] of b.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} seed ${seed} ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
                 for (const it of b.items) {
                     const k = Number(String(it.pool).replace(/\D/g, '')); const pre = b.pre[k]; if (!pre) continue; read++;
                     for (const m of rangeCheck(it, pre)) F('PC-RANGE', `${l.id} seed ${seed} Q${k + 1} (${pre.lesson})`, m);
@@ -553,16 +582,15 @@ async function checkMain() {
                     const preItems = []; const walkP = (node) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { if (it && it.q && !it.model) preItems.push({ pool: it.pool, text: String(it.q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ans: typeof it.q.ans === 'object' ? JSON.stringify(it.q.ans) : String(it.q.ans) }); }); if (node.content) walkP(node.content); (node.contents || []).forEach(walkP); (node.parts || []).forEach(walkP); };
                     for (const pp of r.partPlans || []) if (pp.part === 'prereq') for (const pl of (pp.plans || []).slice(0, 1)) for (const pg of (pl && pl.pages) || []) (pg.sections || []).forEach(walkP);
                     { const qs = ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs); let at = 0; qs.forEach((len, q) => { for (let j = 0; j < len && at < preItems.length; j++) preItems[at++].pool = `q${q}`; }); }
-                    // (PG-LR6 at THIS size too - r5 own read: round S Mixed printed "8 5" twice; the --seeds builds are L only)
-                    const one = new Map(); let pg3 = 0;
-                    const walk3 = (node, part) => { if (!node) return; if (node.kind === 'grid') (node.items || []).forEach((it) => { const pl = it && it.q && it.q.cell && it.q.cell.payload; if (!it || it.model || !pl || !(Number(pl.n) >= 10)) return; const k = `${part}#${pg3}|${it.skill || ''}`; if (!one.has(k)) one.set(k, []);
-                        const a = typeof it.q.ans === 'object' || it.q.ans === null || it.q.ans === undefined ? '' : String(it.q.ans).replace(/,/g, '').trim(); one.get(k).push({ n: Number(pl.n), ans: /^\d+$/.test(a) ? Number(a) : null }); });
-                        if (node.content) walk3(node.content, part); (node.contents || []).forEach((c) => walk3(c, part)); (node.parts || []).forEach((c) => walk3(c, part)); };
-                    for (const pp of r.partPlans || []) for (const pl of pp.plans || []) for (const pg of (pl && pl.pages) || []) { pg3++; if (['prereq', 'teach', 'practice', 'mixed'].includes(pp.part)) (pg.sections || []).forEach((sc) => walk3(sc, pp.part)); }
-                    return { placed, floors, preItems, oneNum: [...one.entries()], prePre: (r.lesson && r.lesson.prereqCheck) || null, pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
+                    window.__mqLs = r;   // (collectReads: the same reads as the --seeds builds, at THIS size - r5 own read: round S Mixed printed "8 5" twice)
+                    return { placed, floors, preItems, prePre: (r.lesson && r.lesson.prereqCheck) || null, pupil: window.sheetDocument(r.pupilHtml, r.title, { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, r.title, { paper: 'A4' }), parts: (r.lesson && r.lesson.parts) || [], pre: !!(r.lesson && r.lesson.prereqCheck), qs: ((r.lesson && r.lesson.prereqLayout && r.lesson.prereqLayout.units) || []).flatMap((u) => u.qs) }; } catch (e) { return { error: String((e && e.message) || e) }; } }, { skill: l.skill, size, FORCE });
                 if (built.error) { F('PC-BUILD', `${l.id} ${size}`, built.error.slice(0, 160)); continue; }
+                Object.assign(built, await page.evaluate(collectReads, { skill: l.skill }));
+                for (const x of built.pvpat || []) for (const m of NT.placeRunBad(x.seq)) F('PC-PV', `${l.id} ${size} seed 4242 ${x.part.replace(/^teach/, 'sheet')} p${x.page} band ${x.band}`, m);
+                // (r6, critic r5 R2: PG-LR67 on the spot / --all-lessons lessons too - they have no --seeds builds; check on or off)
+                if (l.spot) for (const m of built.lr67 || []) F('PG-LR67', `${l.id} ${size} seed 4242 ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
                 for (const m of pageTurns(built.placed)) F('PG-TURN', `${l.id} ${size} seed 4242 ${m.part}`, m.msg);
-                if (FORCE && !l.spot) for (const [k, its] of built.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} ${size} seed 4242 ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
+                for (const [k, its] of built.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} ${size} seed 4242 ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
                 // PC-RANGE / PC-NAME at this size (critic r4 N1, N7: the S check dealt "20 - 11", the L check one "10 more" item)
                 if (built.prePre) { for (const it of built.preItems || []) { const k = Number(String(it.pool).replace(/\D/g, '')); const pre = built.prePre[k]; if (!pre) continue;
                     for (const m of floorCheck(it, (built.floors || [])[k])) F('PC-RANGE', `${l.id} ${size} seed 4242 Q${k + 1} (${pre.lesson})`, m); }
@@ -604,7 +632,21 @@ async function checkMain() {
                     if (tp.length > 1 && st.length === tp.length && st.every((x) => x.blank > 30)) F('SHEET-2PG', where('pupil', tp[0].n), `the lesson sheet prints on ${tp.length} pages, each under 70 % used (blank at the foot ${st.map((x) => `${x.blank} %`).join(', ')})`); }
                 // PC-PVHEADS (lead ruling 2026-11-13, N9): no "name the place" item on a Check or Mixed page prints place heads (the letter
                 // over the underlined digit is the answer); Practice keeps them (the support)
-                pm.forEach((m, n) => { if (!['prereq', 'mixed'].includes(m.part)) return; for (const c of ((P.pc || [])[n] || {}).pv || []) if (c.named && c.heads) F('PC-PVHEADS', where('pupil', n), `${m.part === 'prereq' ? 'check' : m.part} cell ${c.cell}: place heads over a "name the place" numeral`); });
+                // (r6, critic r5 R3 - lead ruling: the lesson's OWN skill keeps its heads on Mixed, as its Practice prints them, since its
+                // steps read them ("Read the letter above it"); a partner of another skill prints none. Each cell's skill from the plan,
+                // aligned by printed order - a page whose cells and items do not align fails loudly.)
+                { const pracHeads = pm.some((m, n) => m.part === 'practice' && (((P.pc || [])[n] || {}).pv || []).some((c) => c.named && c.heads));
+                    pm.forEach((m, n) => { if (!['prereq', 'mixed'].includes(m.part)) return; const pc = (P.pc || [])[n] || {}; const rows = ((built.pages || {})[m.part] || [])[m.i] || null;
+                        const named = (pc.pv || []).filter((c) => c.named);
+                        if (named.length && m.part === 'mixed' && (!rows || rows.length !== pc.ncells)) { F('PC-PVHEADS', where('pupil', n), `mixed: ${pc.ncells} cells, ${rows ? rows.length : 'no'} plan items - cannot tell whose place cell is whose`); return; }
+                        for (const c of named) { const ownCell = m.part === 'mixed' && rows && rows[c.top] && rows[c.top].skill === built.own;
+                            if (ownCell && pracHeads && !c.heads) F('PC-PVHEADS', where('pupil', n), `mixed cell ${c.cell}: the lesson's own place item lost the heads its Practice prints (its steps read them)`);
+                            if (!ownCell && c.heads) F('PC-PVHEADS', where('pupil', n), `${m.part === 'prereq' ? 'check' : m.part} cell ${c.cell}: place heads over a "name the place" numeral`); } }); }
+                // PC-INSTR value slot (r6, critic r5 R3): on every page, a band that says "Write the value" has a value slot in every cell
+                pm.forEach((m, n) => { for (const x of ((P.pc || [])[n] || {}).instr || []) if (/\bWrite the value\b/i.test(x.text) && (x.values || []).some((v) => !v)) F('PC-INSTR', where('pupil', n), `${m.part}: "${x.text}" over ${(x.values || []).filter((v) => !v).length} of ${(x.values || []).length} cells with no value slot`); });
+                // PM-FOOT (r6, critic r5 R4 / R5): a library lesson's Mixed page leaves at most 15 % of its body blank at the foot (every
+                // page of the part; the detailed lessons' Mixed has its own fill, growLast)
+                pm.forEach((m, n) => { if (m.part !== 'mixed') return; const st = (P.sc.stats || [])[n]; if (st && st.blank > 15) F('PM-FOOT', where('pupil', n), `mixed page ${m.i + 1}: ${st.blank} % of the body blank at the foot (at most 15 %)`); });
                 // PC-FRAME (critic r3 F3; r5: on the spot / --all-lessons lessons too - sub_2d_1d L Mixed cut at the frame): every page of the packet, pupil and key, ends inside its body (no band cut at the foot)
                 for (const [doc, mm, k] of [[P, pm, 'pupil'], [K, km, 'key']]) (doc.pc || []).forEach((pg, n) => { if (pg.frame && pg.frame.over > 0.3) F('PC-FRAME', where(k, n) + ` (${(mm[n] || {}).part || '?'})`, `${pg.frame.what === 'body' ? 'ink runs' : `a cell runs past its ${pg.frame.what} by`} ${pg.frame.over} mm${pg.frame.what === 'body' ? " past the body's bottom" : ''} (the band has no bottom rule inside the frame)`); });
                 if (l.spot) continue;
@@ -650,7 +692,7 @@ async function checkMain() {
                     if (!k) return; if (seenK.has(k)) F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `the same numbers (${k}) as Q${seenK.get(k).n}`); else {
                         // (critic r3 F13: near twins too - 77 / 27 / 71, round 75 / 45: one number different, and that pair the
                         // same digits reordered, one place different, or within 2; both 10 or more. Independent of the dealer's copy.)
-                        for (const [k2, q2] of seenK) if (nearKeyPair(k2, k, qOf[i] !== undefined && qOf[i] === qOf[q2.i])) { F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `near twin of Q${q2.n} (${k2} / ${k})`); break; }
+                        for (const [k2, q2] of seenK) if (NT.nearKeys(k2, k, qOf[i] !== undefined && qOf[i] === qOf[q2.i])) { F('PC-LR6', `${l.id} ${size} check Q${c.letter || i + 1}`, `near twin of Q${q2.n} (${k2} / ${k})`); break; }
                         seenK.set(k, { n: c.letter || i + 1, i }); } }); }
                 // (lf-engine PC r5, PC-LR6: two take-aways of one question a pupil does the same way - LR-6, sheet/near-twins.js
                 // nearSubs: the sub check printed 11 - 3 beside 11 - 5)
@@ -676,7 +718,7 @@ async function checkMain() {
         if (!merged.has(k)) merged.set(k, Object.assign({}, x, { where: w, seeds: [] })); if (seed) merged.get(k).seeds.push(seed); }
     findings.length = 0; for (const x of merged.values()) findings.push(Object.assign(x, { where: x.seeds.length ? `${x.where} (seeds ${x.seeds.join(', ')})` : x.where }));
     const ONLY_RULES = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean).map((x) => (x === 'PC-H13P' ? 'PM-H13' : x));
-    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PG-TURN', 'PG-LR67', 'PG-LR6', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PVHEADS', 'CHART-H13', 'PC-GAPS', 'PC-INSTR', 'PC-PAGES', 'PM-H13', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
+    const rules = ['PC-RANGE', 'PC-NAME', 'PC-SLOTS', 'PC-SCAFFOLD', 'PC-LR5', 'PC-LR6', 'PG-TURN', 'PG-LR67', 'PG-LR6', 'PC-H13', 'PC-CLIP', 'PC-FRAME', 'PC-PV', 'PC-PVHEADS', 'CHART-H13', 'PC-GAPS', 'PC-INSTR', 'PC-PAGES', 'PM-H13', 'PM-FOOT', 'LIVE-PART', 'PM-CONT', 'TAB-CLEAR', 'SHEET-2PG', 'PC-BUILD'].filter((r) => !ONLY_RULES.length || ONLY_RULES.includes(r) || r === 'PC-BUILD');
     { const keep = findings.filter((x) => rules.includes(x.rule)); findings.length = 0; findings.push(...keep); }
     // KNOWN opens (one explicit entry per lesson, never a rule-wide waiver): printed as KNOWN, not counted as FAIL, never OK
     const KNOWN = [

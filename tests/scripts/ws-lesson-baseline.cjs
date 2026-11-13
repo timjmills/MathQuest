@@ -15,6 +15,11 @@
 //   --sizes L,S      sizes (default L,M)
 //   --unpinned       (with --all-lessons --check) a lesson the tree prints that the baseline does not pin (a new key of
 //                    LESSONS or a new detailed lesson) reads UNPINNED and fails: a new lesson is new pages nobody has seen
+//   PARTPAGES (r6, critic lf-engine-pc r5 R4): with --check, no lesson part prints MORE pages than the pin holds - each build's
+//                    `/parts` ("chart:1 teach:1 practice:1 mixed:1", written by --write); against a pin written before /parts, the
+//                    build's pupil / key page totals (sub_2d_1d L Mixed went 1 -> 2 pages inside "176 hashes changed")
+//   --pages-only     (with --check) judge only PARTPAGES, not the hashes (backtest rows; a live diff is listed by --check itself)
+//   --only a,b       only these lesson ids of the list (and no detailed lesson unless named "detailed/<id>")
 // --verbose prints each build with its time. Prints `ws-lesson-baseline: OK (n hashes identical)` / `FAIL (n differ)`.
 //
 // THE DEPLOY GATE (lead ruling 2026-11-13, LESSONS_LEARNED process rule 0c; ws-deploy-gates.sh session 4, ≈ 13 min):
@@ -44,6 +49,8 @@ const ALL = process.argv.includes('--all-lessons');
 // --force-check: build the lessons with buildSheet's render-only `prereqsForce` (their Prerequisite Check on).
 const FORCE = process.argv.includes('--force-check');
 const UNPINNED = process.argv.includes('--unpinned');
+const PAGES_ONLY = process.argv.includes('--pages-only');
+const ONLY = (arg('only') || '').split(',').map((x) => x.trim()).filter(Boolean);
 const unpinned = [];   // (--unpinned) lessons the tree prints that the baseline does not pin
 const SEEDS = (arg('seeds') || '4242,1001').split(',').map(Number);
 const SIZES = (arg('sizes') || 'L,M').split(',');
@@ -121,12 +128,13 @@ async function inPage(page, fn, arg) {
             }
             out.__lessons = lessons;
         }
+        if (ONLY.length) lessons = lessons.filter((l) => ONLY.includes(l.id));
         for (const l of lessons) for (const size of SIZES) for (const seed of SEEDS) {
             const r = await inPage(app.page, async ({ skill, size, seed, FORCE }) => {
                 try {
                     const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed, key: true, practicePages: 1, mixed: true, prereqsForce: FORCE });
                     const split = (h) => { const d = document.createElement('div'); d.innerHTML = h; return [...d.querySelectorAll('.ws-page')].map((p) => p.outerHTML); };
-                    return { pupil: split(r.pupilHtml), key: split(r.keyHtml), whole: [r.pupilHtml, r.keyHtml] };
+                    return { pupil: split(r.pupilHtml), key: split(r.keyHtml), whole: [r.pupilHtml, r.keyHtml], parts: ((r.lesson && r.lesson.parts) || []).map((p) => `${p.part}:${p.pages}`).join(' ') };
                 } catch (e) { return { error: (e && e.stack) || String(e) }; }
             }, { skill: l.skill, size, seed, FORCE });
             const k = `${l.id}/${size}/${seed}`;
@@ -136,10 +144,11 @@ async function inPage(page, fn, arg) {
             r.key.forEach((h, i) => { out[`${k}/key-p${i + 1}`] = sha(h); });
             out[`${k}/pupilHtml`] = sha(r.whole[0]);
             out[`${k}/keyHtml`] = sha(r.whole[1]);
+            out[`${k}/parts`] = r.parts;
         }
         const prevIds = ALL && CHECK ? JSON.parse(fs.readFileSync(CHECK, 'utf8')).__detailed : null;
         const treeIds = await app.page.evaluate(async () => { try { return (await import('./js/modules/lessons/detailed/index.js')).detailedLessonList().map((d) => d.id); } catch (e) { return []; } });
-        const ids = prevIds || treeIds;
+        const ids = (prevIds || treeIds).filter((id) => !ONLY.length || ONLY.includes(`detailed/${id}`));
         if (ALL && CHECK && UNPINNED) {
             // (--unpinned) every lesson the tree prints must be in the pin: a new lesson is new pages nobody has seen
             const keys = await app.page.evaluate(async () => { try { return Object.keys((await import('./js/modules/lessons/prereqs.js')).LESSONS); } catch (e) { return []; } });
@@ -170,7 +179,22 @@ async function inPage(page, fn, arg) {
         return;
     }
     const base = JSON.parse(fs.readFileSync(CHECK, 'utf8'));
-    const keys = Object.keys(base).filter((k) => !k.startsWith('__')).sort();   // (a key the baseline lacks is not compared)
+    const keys = Object.keys(base).filter((k) => !k.startsWith('__') && (!ONLY.length || ONLY.some((id) => k.startsWith(`${id}/`)))).sort();   // (a key the baseline lacks is not compared; --only: those lessons')
+    // PARTPAGES (r6): no part prints more pages than the pin - per part where the pin has `/parts`, else the page totals
+    const grew = [];
+    { const builds = [...new Set(Object.keys(out).filter((k) => !k.startsWith('__')).map((k) => k.replace(/\/(pupil-p\d+|key-p\d+|pupilHtml|keyHtml|parts|p\d+|html|error)$/, '')))];
+        const count = (o, b, re) => Object.keys(o).filter((k) => k.startsWith(`${b}/`) && re.test(k.slice(b.length + 1))).length;
+        for (const b of builds) {
+            if (base[`${b}/parts`] !== undefined && out[`${b}/parts`] !== undefined) {
+                const was = Object.fromEntries(String(base[`${b}/parts`]).split(' ').filter(Boolean).map((x) => x.split(':')).map(([p, n]) => [p, Number(n)]));
+                for (const [p, n] of String(out[`${b}/parts`]).split(' ').filter(Boolean).map((x) => x.split(':'))) if (Number(n) > (was[p] || 0)) grew.push(`${b}: PARTPAGES ${p} ${was[p] || 0} -> ${n} pages`);
+            } else for (const [what, re] of [['pupil', /^pupil-p\d+$/], ['key', /^key-p\d+$/], ['page', /^p\d+$/]]) {
+                const was = count(base, b, re), now = count(out, b, re);
+                if (was && now > was) grew.push(`${b}: PARTPAGES ${now} ${what} pages, the pin ${was}`);
+            }
+        }
+        for (const g of grew) console.log(`  ${g}`); }
+    if (PAGES_ONLY) { console.log(grew.length ? `ws-lesson-baseline --pages-only: FAIL (${grew.length} grew)` : `ws-lesson-baseline --pages-only: OK (no part printed more pages than the pin)`); return exitAfterFlush(grew.length ? 1 : 0); }
     const diff = keys.filter((k) => base[k] !== out[k]);
     for (const k of diff) console.log(`  ${k}: ${base[k] === undefined ? 'NEW' : out[k] === undefined ? 'MISSING' : 'CHANGED'}`);
     if (process.argv.includes('--per-lesson')) {
@@ -179,8 +203,8 @@ async function inPage(page, fn, arg) {
         for (const [g, e] of Object.entries(per)) console.log(`  [${g}] ${e.n - e.d}/${e.n} identical`);
     }
     for (const u of unpinned) console.log(`  ${u}: UNPINNED (the tree prints this lesson; ${CHECK} does not pin it)`);
-    const bad = diff.length + unpinned.length;
+    const bad = diff.length + unpinned.length + grew.length;
     if (bad && ALL) console.log(`  (on purpose? re-pin in the same commit: --all-lessons --sizes ${SIZES.join(',')} --seeds ${SEEDS.join(',')} --per-lesson --write ${CHECK}, and name the changed lessons / pages in the commit message)`);
-    console.log(bad ? `ws-lesson-baseline: FAIL (${diff.length} of ${keys.length} differ${unpinned.length ? `; ${unpinned.length} lesson(s) UNPINNED` : ''})` : `ws-lesson-baseline: OK (${keys.length} hashes identical${UNPINNED && ALL ? '; every lesson the tree prints is pinned' : ''})`);
+    console.log(bad ? `ws-lesson-baseline: FAIL (${diff.length} of ${keys.length} differ${unpinned.length ? `; ${unpinned.length} lesson(s) UNPINNED` : ''}${grew.length ? `; ${grew.length} PARTPAGES` : ''})` : `ws-lesson-baseline: OK (${keys.length} hashes identical${UNPINNED && ALL ? '; every lesson the tree prints is pinned' : ''})`);
     exitAfterFlush(bad ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

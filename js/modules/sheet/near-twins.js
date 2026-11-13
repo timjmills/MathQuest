@@ -6,6 +6,7 @@
 // check and the sheet were clean). ONE module, ONE threshold set, read by the Prerequisite Check, the lesson sheet (Guided and
 // Independent together), Practice and Mixed, and by the gate (tests/scripts/ws-lesson-samples.cjs PG-LR6).
 // Pure module (SCC-01): no window, no DOM, no state, no Math.random.
+import { rng, shuffle } from './rng.js';
 
 /**
  * The thresholds (one set, documented). Two one-number items (a rounding / place-value item's number, 10 or more) are near
@@ -116,4 +117,59 @@ export function nearSplit(pool, taken = [], keep = null) {
     return { clean, later };
 }
 
-export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit };
+/* ------------------------------------------------- the place-answer pattern (r6, critic lf-engine-pc r5 R1; PEDAGOGY 4.1a) */
+
+/** A "name the place" item's answer (its place word: "tens"), else null. Items are host items ({q}) or generated q's. */
+export function placeAnsOf(it) {
+    const q = it && it.q ? it.q : it;
+    const p = (q && q.cell && q.cell.payload) || {};
+    return /^place/.test(String(p.kind || '')) && typeof (q && q.ans) === 'string' ? q.ans : null;
+}
+
+/**
+ * The pattern faults of one band's place answers in printed order (the gate's and the dealer's ONE reading): 3 or more items
+ * all one place; 3 or more strictly alternating (a b a ...: the period-2 pattern the r5 critic read as T O T O T O); 6 or more
+ * cycling through three places (H T O H T O). A pupil who spots the pattern answers without reading the digit. Returns messages.
+ */
+export function placeRunBad(seq) {
+    const a = (seq || []).filter((x) => x !== null && x !== undefined);
+    const n = a.length;
+    if (n < 3) return [];
+    if (new Set(a).size === 1) return [`every underlined place is "${a[0]}" (${n} items)`];
+    if (a[0] !== a[1] && a.every((x, i) => i < 2 || x === a[i - 2])) return [`the underlined places strictly alternate (${a.join(' ')})`];
+    if (n >= 6 && new Set(a.slice(0, 3)).size === 3 && a.every((x, i) => i < 3 || x === a[i - 3])) return [`the underlined places cycle (${a.join(' ')})`];
+    return [];
+}
+
+/**
+ * A band's items with its place items reordered among their own positions when their answers make a pattern (placeRunBad):
+ * the first seeded shuffle (sheet/rng.js, `seed`) that leaves none. A band with no pattern is returned as it is - the same
+ * array - so a page that already reads well prints exactly as before. Pure.
+ */
+export function placeOrder(its, seed) {
+    const at = []; (its || []).forEach((it, i) => { if (placeAnsOf(it) !== null) at.push(i); });
+    if (at.length < 3 || !placeRunBad(at.map((i) => placeAnsOf(its[i]))).length) return its;
+    const r = rng(seed >>> 0);
+    for (let t = 0; t < 64; t++) {
+        const order = shuffle(r, at);
+        if (!placeRunBad(order.map((i) => placeAnsOf(its[i]))).length) { const out = its.slice(); at.forEach((pos, k) => { out[pos] = its[order[k]]; }); return out; }
+    }
+    return its;
+}
+
+/**
+ * The first `n` items of a dealt pool for one band, held to the pattern rule: when they are all one place and the pool deals
+ * another place further on, its first such item takes the last place item's slot (the pool was dealt as one run, so its items
+ * keep the near-twin rules among themselves); then placeOrder. Pure.
+ */
+export function placePick(pool, n, seed) {
+    const take = (pool || []).slice(0, n);
+    const ans = take.map(placeAnsOf).filter((x) => x !== null);
+    if (ans.length >= 3 && new Set(ans).size === 1) {
+        const j = (pool || []).findIndex((it, i) => i >= n && placeAnsOf(it) !== null && placeAnsOf(it) !== ans[0]);
+        if (j >= 0) { let last = -1; take.forEach((it, i) => { if (placeAnsOf(it) !== null) last = i; }); take[last] = pool[j]; }
+    }
+    return placeOrder(take, seed);
+}
+
+export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit, placeAnsOf, placeRunBad, placeOrder, placePick };
