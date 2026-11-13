@@ -1040,3 +1040,12 @@ cells of the critic's spot lessons were never read; the rounding fix reached Pra
 | Lost time: a first near-twin rule (one place different, page-wide) cornered every pool - 8 dealt items all twins; reading the dealt pool (dump of r.items by pool) showed it in one run. Speed-up: dump the dealt pool before tuning a dealing rule. | | | | |
 | Lost time: two tries at the chart-turnaround finding (hardAvoid, then an avoidPlus filter) - a number bond has no fact key and the role deals off a different path; reverted, listed. Speed-up: find which dealer a role uses before adding an avoid. | | | | |
 | Speed-up: ws-lesson-check --dump f.json gives the forced / unforced diff by class in seconds; the raw forced count (194, then 354) misled two rounds. | | | | |
+
+### lf-engine PC r4 (2026-11-13, builder, lead ruling on the check's dealing)
+| Finding | Check | Backtest | On precritic | Rounds saved |
+|---|---|---|---|---|
+| add Practice (check on) turned its own items round, +41 | PG-TURN (every page, every lesson, forced + unforced) | lesson-pg-turn | yes (lesson-samples-check, lesson-samples-all) | 1 |
+| sub check-on sheet LR-6 +9 / LR-7 +9 | PG-LR67 | lesson-pg-lr67 | yes (lesson-samples-check) | 1 |
+| Lost time: the Mixed fix went into the 'turn' rung of the Mixed ladder first - a lesson Mixed page deals in sections, never on the ladder. Speed-up: print which deal path a page takes (keepPrompts / arrangement) before editing one. | | | | |
+| Lost time: a pool filter moved a chart example out of the Guided pool and pickWeDo then chose 47 / 74 (it reorders by case). Speed-up: probe the dealt parts (a 20-line item dump per part) after every dealing change, not only the rule counts. | | | | |
+| Speed-up: the class table of `ws-lesson-check --dump` (forced r3, unforced, forced now) answered "every delta <= 0" in one step. | | | | |

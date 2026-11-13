@@ -544,3 +544,5 @@ Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, 
 | F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
 
 | lf-engine PC r3 rebuild (2026-11-13) | builder, one session (budget ~$15) | merge live-pm2; F13 + add S foot; triage forced 354 vs unforced 428; live baseline 1,556 identical (write on 1b2d38f05 ~11 m, check ~12 m); ws-lesson-samples --check --force-check 8 seeds OK |
+
+| lf-engine PC r4 (2026-11-13) | builder, one session (~$25, ~0.9 % of the weekly limit) | lead ruling: dry-pool fallback order, PG-TURN + PG-LR67 (2 backtests PASS); ws-lesson-check forced 354 -> 118 (unforced 428, unchanged); live baseline 1,556 identical (written on be9528776) |

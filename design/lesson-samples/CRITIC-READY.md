@@ -14,6 +14,27 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p4 / key-p5 | Practice |
 | pupil-p5 / key-p6 | Mixed |
 
+## r4 pass (lf-engine PC r4, 2026-11-13): the check's dealing held to the lead ruling
+Rendered again (check forced on, seed 4242, L root, S at M in `S/`). Changed pages: add pupil-p4 / p5 (Practice, Mixed) and
+keys, round pupil-p3 / p4 / p5 (sheet, Practice, Mixed) and keys, sub S pupil-p5 (Mixed) and key; every other page as r3.
+- **(a) a dry pool never turns its own item round** (lead ruling): the re-dealt sheet's facts are given up first (turned round
+  before exact), then the chart's, one place at a time; the check's own facts never; never outside the declared range (no
+  "0 + 2"), never a same-page turnaround. Gate: ws-lesson-samples **PG-TURN** (every page, every lesson, forced and unforced;
+  backtest lesson-pg-turn). add Practice turnarounds of its own items: 41 -> 0.
+- **(b) the sheet's Independent band keeps LR-6 / LR-7** (near twins, an answer twice, the library's caps) and no chart
+  example; Practice / Mixed lesson items too (check on). Gate: **PG-LR67** (backtest lesson-pg-lr67). sub sheet LR-6 9 -> 0,
+  LR-7 9 -> 0.
+- **(c)** a number bond read as a sum is keyed as that sum: the check puts the chart's sums last (add L 1629), Mixed partners
+  never print the lead's sum turned round; the sheet's Guided cells leave out a chart example and one-number near twins
+  (round L had the chart's 96, then 47 / 74).
+
+`ws-lesson-check` forced vs unforced (25 seeds, L / S): **118 vs 428 findings, every class at or below master's**; the 19
+LR-5 left are the LR-18 part-refresh builds, which run unforced (identical to master). Cross-page soft repeats (a sheet
+fact turned round on Practice) 337 vs 159 unforced: the ruling's step 2, by design.
+
+Known, for the critic to rule on (not rule reds): round sheet Independent 43 / 34 (the 6-item pool has no other); round
+Practice 11 / 12 and 97 / 98 (Practice near numbers are not an LR-6 rule for rounding); sub chart cell 6 30 % band (as r3).
+
 ## Every page of the packet, its gate, the r3 finding it closes (lf-engine PC r3 rebuild, 2026-11-13)
 Rendered on branch `claude/sweet-newton-c8wrv1-lf-engine-pc` after merging lf-engine-live-pm2 (1b2d38f05). Check forced on,
 seed 4242, L at the packet root, S printed at M in `S/`. "Rule-gated" = `ws-lesson-samples --check --force-check` (8 seeds,
@@ -34,11 +55,8 @@ Live packets (check off, `prereqsLive: false`): `ws-lesson-baseline --all-lesson
 
 ## Known open (not closed by this pass)
 - r3 F8-F12, F14 were not in this brief (see the r3 REPORT); F13 is closed.
-- `ws-lesson-check --force-check` (not on precritic): 354 findings vs 428 unforced on the same tree. Forced-only classes left:
-  add Practice turn-arounds of its own items (+41; the hard avoid of the sheet's keys moved 46 exact sheet / Practice
-  repeats into them - the add_facts band-10 pool is too small for an L Practice page under LR-5), sub check-on sheet LR-6
-  near twins (+9) and LR-7 underTen 3 a page (+9; the engine is never handed the caps - lessons/library), round chart /
-  sheet repeats (+6), one chart turn-around on the add L check (seed 1629: a number bond has no fact key).
+- `ws-lesson-check --force-check` (not on precritic): r4 118 findings vs 428 unforced (r3: 354); no forced-only class left
+  (see "r4 pass" above).
 - precritic `--role lesson --strict` reds identical on 1b2d38f05: print-lint role lesson L (28 counts above the pin) and S
   (29), lesson-samples-key-L (nearest_10 L, 12 findings, live packet).
 
