@@ -489,3 +489,6 @@ another order (dupKey carries the bank order). V23: all 60 pupil hashes re-pinne
 pick3 banks now vetted trios). Gates: vocab-unit OK (+browser OK), next-box OK, empty-band OK both skills (+self-test OK),
 boot-smoke OK, 4 backtest rows PASS, precritic --strict: sibling-compare FAIL only (known). Renders: scratchpad r13/sets (9 of 11
 sets; sets 4 and 5 unchanged by the tool's diff, their banks listed in manifest.json).
+
+## r14 builder (Opus medium, rebuild after narrow critic r13 FAIL min 7; brief design/lanes/lf-vocab/r14-builder-brief.md), 2026-11-13
+Merged origin/master 8a7c5d43 first (838b9f76; backtests.json merged by row id), manifest re-applied. In progress.
