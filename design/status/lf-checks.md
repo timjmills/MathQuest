@@ -249,3 +249,13 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
 - SCREEN-INK-SIZE pin (lead ruling): design/audit/baselines/screen-ink-size.json, written with --passed on this tree. 25 skills,
   552 renders, 69 findings in 28 keys. The 11-13 sweep's 97 was on the master tree f5c03405, with 26 passed skills. The gate fails
   on a new key or a rising count.
+- lf-ops-props' EB-FOOT change (a46344e1..73c2ed14), ruled by the tool owner (lead's request 11-13): ACCEPTED, with a guard, and
+  ported into this tool (their base was the old tool). lf-ops reverts its hunk when it merges.
+  - (1) EB-FOOT skips the centring offset above a centred cell's first block. That space is the row's shared-out room, not drawn
+    height, and EB-BAND still judges it.
+  - (2) Pairing by height is used only when every page's ROW heights are non-increasing (the page really sorted its rows) and the
+    sorted pairing fits every cell; otherwise cells pair in dealt order.
+  - eb-foot-div-facts (a real foot band) still FAILs on its fail commit, and the row PASSes.
+  - arrays_groups on this tree: by-height pairing clears 3 renders. The remaining EB-FOOT findings are real (pages not sorted, or
+    sizes that do not match), for lf-ops.
+  - The --dump option was not taken (unreviewed convenience); lf-ops can propose it separately.

@@ -262,7 +262,9 @@ function measureCells(scope) {
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
             out.push({ page: pi + 1, cell: ci + 1, label, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
+                // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
+                // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
+                neededMm: +(((box.b - cr.top - ((() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })())) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
                 screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
         });
     });
@@ -556,7 +558,16 @@ async function main() {
                         // each cell against the measure at ITS row's count across (lf-placevalue 2026-11-08: mixed-practice's
                         // fits[0].cols is the lattice size N, not the cells across; the role sizes a row from measured[k])
                         const across = (c) => cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length;
-                        cells.forEach((c, i) => { const k = across(c); const fp = m[i][k] != null ? m[i][k] : m[i][b.cols]; if (fp == null) return;
+                        const fpAt = (i, k) => (m[i][k] != null ? m[i][k] : m[i][b.cols]);
+                        const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
+                        // pair BY HEIGHT (lf-ops-props 2026-11-13, accepted by lf-checks with a guard): only when the page really sorts its
+                        // rows tallest first (layout groupByHeight: every page's drawn heights non-increasing), and only when that pairing
+                        // fits every cell; otherwise dealt order, as before. A real foot band still fails (row eb-foot-div-facts).
+                        const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
+                        const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpAt(y, b.cols) || 0) - (fpAt(x, b.cols) || 0));
+                        const byH = sortedPages && cells.some((c, i) => off(c, fpAt(i, across(c)))) && !cs2.some((c, q) => off(c, fpAt(ord[q], across(c))));
+                        if (byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page sorts its rows tallest first)`);
+                        if (!byH) cells.forEach((c, i) => { const k = across(c); const fp = fpAt(i, k); if (fp == null) return;
                             if (Math.abs(c.neededMm - fp) > FOOT * fp) F('EB-FOOT', `${key} ${j.tag} p${c.page} cell ${c.label || c.cell}`, `drawn ${c.neededMm} mm, footprint hMm ${fp} mm at ${k} across (${Math.round((c.neededMm - fp) / fp * 100)} %; limit ${FOOT * 100} %)`); });
                     } else if (j.role === 'independent' && !j.opts) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
                 } finally { await sh.close(); }
