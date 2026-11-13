@@ -3456,7 +3456,11 @@ for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
     }
     // `forms` (the four + / − orders) applies when the first step is + / − (card §7a): the panel hides it on the × / ÷ presets.
     for (const key of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
-        if (P12_OPTIONS[key]) P12_OPTIONS[key] = P12_OPTIONS[key].map((x) => (x.id === 'forms' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } } : x));
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'forms' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } } : x));
+        // msCheck estimates + / − stories only (card decision 8): hidden on the x / ÷ presets; wpFrames is the column fade,
+        // so it applies where the letter or the estimate (already one sentence a step) is off - caught by ws-options-verify
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'msCheck' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } }
+            : x.id === 'wpFrames' ? { ...x, appliesTo: (cur) => !cur.msLetter && !cur.msCheck, appliesBase: { msLetter: false, msCheck: false } } : x));
     }
 }
 
