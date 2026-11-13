@@ -1,0 +1,19 @@
+ws-backtest row c120r2-wrong-multi: PASS  fail state FAIL 1.8s, pass state OK 1.8s
+ws-backtest row c120r2-steps-all-slots: PASS  fail state FAIL 1.3s, pass state OK 1.6s
+ws-backtest row c120r2-say-agree: PASS  fail state FAIL 1.4s, pass state OK 1.6s
+ws-backtest row c120r2-hint-all: PASS  fail state FAIL 1.4s, pass state OK 1.5s
+ws-backtest: c120r2-tf-false (fail state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 19254 (up 275 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-lesson-baseline.cjs --all-lessons --check /tmp/claude-0/-home-user-MathQuest/a287
+    slot.1: pid 21802 (up 138 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fil
+    queue: pid 22039 (up 129 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-ink-size.cjs --skill composing:hundreds_chart_
+    queue: pid 22428 (up 110 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-HjsJrV/jobs-0.jso
+    queue: pid 22429 (up 110 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-print-lint.cjs --source kit --jobs /tmp/mq-slotclip-HjsJrV/jobs-1.jso
+    queue: pid 22432 (up 110 s) flock 10
+    queue: pid 22434 (up 110 s) flock 10
+    queue: pid 23128 (up 0 s) sleep 1
+ws-backtest row c120r2-tf-false: PASS  fail state FAIL 214.7s, pass state OK 158.0s
+ws-backtest row c120r2-ea-pattern: PASS  fail state FAIL 107.4s, pass state OK 151.9s
+ws-backtest row c120r2-score-roles: PASS  fail state FAIL 63.7s, pass state OK 39.2s
+ws-backtest row c120r2-cross-giveaway: PASS  fail state FAIL 71.9s, pass state OK 143.9s
+ws-backtest row c120r2-strip-numbers: PASS  fail state FAIL 20.2s, pass state OK 95.2s
+ws-backtest: killed by SIGTERM

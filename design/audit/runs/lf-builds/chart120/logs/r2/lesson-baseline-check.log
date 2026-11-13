@@ -1,0 +1,11 @@
+Error: waitForFunction failed: frame got detached.
+    at IsolatedWorld.dispose (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Realm.js:40:39)
+    at [nodejs.dispose] (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/api/Realm.js:44:14)
+    at [nodejs.dispose] (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/IsolatedWorld.js:156:45)
+    at [nodejs.dispose] (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/Frame.js:330:87)
+    at #removeFramesRecursively (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/FrameManager.js:452:45)
+    at #onClientDisconnect (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/FrameManager.js:82:42)
+    at /home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/cdp/FrameManager.js:66:37
+    at onceHandler (/home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/puppeteer/common/EventEmitter.js:94:13)
+    at /home/user/MathQuest/node_modules/puppeteer-core/lib/cjs/third_party/mitt/mitt.js:62:7
+    at Array.map (<anonymous>)
