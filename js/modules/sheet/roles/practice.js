@@ -1246,6 +1246,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 // (`capFillCont`, lesson 3a P1d r3 - critic H13: cells stretched to the shared height hold their content in the MIDDLE)
                 items: its.map((it) => { const pi = planItem(it, level, L.side4 ? L.drawCols : L.cols); return capFill && sec.capFillCont ? Object.assign({}, pi, { style: `${pi.style || ''}justify-content:center;` }) : pi; }),
                 _its: its,
+                // (CL-4d: a grid that fills its page by flex has no height here; the stretch mark below reads the page's grid)
+                _flexMm: fillByFlex && !spread && !gap.gap && !shape ? avail : 0,
             });
         }
         // SPREAD across parts (wave 1 lane D): a page of several grids (a mixed pool dealt by height
@@ -1308,12 +1310,13 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
         // (layout.rowStretches) carries `ws-rowstretch`; css/sheet-kit.css centres it down the box only when its template opted in
         // (`data-ws-stretchmid`), so an unstretched row keeps the top of the box (CL-4b) and L-TOPSTART judges both.
         for (const x of sections) {
-            if (x.kind !== 'grid' || !x._its || !(parseFloat(x.height) > 0) || /mq-anchorgrid/.test(x.cls || '')) continue;
+            const gridMm = parseFloat(x.height) > 0 ? parseFloat(x.height) : Number(x._flexMm) || 0;
+            if (x.kind !== 'grid' || !x._its || !(gridMm > 0) || /mq-anchorgrid/.test(x.cls || '')) continue;
             const r = Math.ceil(x.items.length / Math.max(1, x.cols));
             const fr = x.rowsTpl ? String(x.rowsTpl).split(/\s+/).map((t) => parseFloat(t) || 1) : Array(r).fill(1);
             if (fr.length !== r) continue;
             const sum = fr.reduce((a, b) => a + b, 0);
-            const net = parseFloat(x.height) - (Number(x.rowGap) || 0) * (r - 1);
+            const net = gridMm - (Number(x.rowGap) || 0) * (r - 1);
             x.items.forEach((pi, i) => {
                 const it = x._its[i];
                 if (!it || it.anchor || (it.template || (it.q && it.q.cell && it.q.cell.template)) !== 'pv') return;
@@ -1321,7 +1324,7 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
                 if (rowStretches(it, x.cols, R)) pi.cls = `${pi.cls || ''} ws-rowstretch`.trim();
             });
         }
-        for (const x of sections) delete x._its;
+        for (const x of sections) { delete x._its; delete x._flexMm; }
         // Wave 5.2: a page none of whose sections asked for the number line prints without it
         // (its height stays reserved, so every page keeps one geometry).
         // A part split off a section ("full width, at the bottom": splitOf) belongs to that section
