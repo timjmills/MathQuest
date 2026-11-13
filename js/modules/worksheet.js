@@ -14,7 +14,7 @@ import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
-    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback,
+    screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor, markVocabFeedback, blurVocabSlots,
     fitCellDigits, capDotArrays, cellDigitTarget, canFitDigits, screenInstruction, workRowsHTML, adoptSvgBlank, unifyFactTracks,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
 } from './screen-cell.js';
@@ -3126,6 +3126,8 @@ export function checkAllWorksheet() {
         if (isCorrect && q._helped) helped++;
         wsLogProgress(q, card, isCorrect, _pre);
     });
+    // lf-vocab r12 (critic r11 #4): Check leaves no caret in any card's vocab slot, a card judged or not
+    try { blurVocabSlots(document); } catch (e) { /* optional */ }
 
     // Skipped problems are excluded from the denominator so percent reflects
     // only attempted answers. They're surfaced separately as "Skipped: N".

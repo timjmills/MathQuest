@@ -1106,6 +1106,14 @@ function _liveBindFn(el, fn, group = [], want = null) {
     return true;
 }
 
+/** lf-vocab r12 (critic r11 #4): blur the focused vocabulary slot, whichever card holds it, so Check leaves no caret in a box. */
+export function blurVocabSlots(doc) {
+    try {
+        const ae = doc && doc.activeElement;
+        if (ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line') && typeof ae.blur === 'function') ae.blur();
+    } catch (e) { /* no document */ }
+}
+
 /**
  * THE VOCABULARY FEEDBACK (owner rulings R-1 and R-2, 2026-11-09; lane lf-vocab r7). After the pupil's answer is judged on a
  * screen host (the practice card, the online worksheet, the quiz with instant feedback), a twin vocabulary cell
@@ -1191,10 +1199,8 @@ export function markVocabFeedback(root, q, ok, { speak = null } = {}) {
     }
     // (lf-vocab r11, critic r10 #4: Check leaves no caret in a vocab slot - a focused wrong box showed a text caret inside its
     // red edge; ws-next-box NB9)
-    try {
-        const ae = cell.ownerDocument && cell.ownerDocument.activeElement;
-        if (ae && cell.contains(ae) && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line') && typeof ae.blur === 'function') ae.blur();
-    } catch (e) { /* no document */ }
+    // (r12, critic r11 #4: the caret moved to card 3 - Check blurs a vocab slot on EVERY card, not only this one)
+    blurVocabSlots(cell.ownerDocument);
     if (ok || !wrong.length) return '';
     // the line names the RESPONSE the pupil gives: pick3 writes the word ("The answer is step!"), Match 3 writes the letter
     // ("Input is picture C!"); then the word's explanation (R-2)

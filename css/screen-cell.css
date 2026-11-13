@@ -2036,3 +2036,5 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) .mq-vm .mq-vm-box.mq-vm-box:has(> input.mq-live-wrong) {
     box-shadow: none !important; animation: none !important;
 }
+/* lf-vocab r12 (critic r11 #4): a wrong vocab slot shows no text caret, on every host (additive) */
+html body :is(.mq-vm-box, .mq-vp-line) input.mq-live-wrong, html body input.mq-vp-line.mq-live-wrong { caret-color: transparent !important; }

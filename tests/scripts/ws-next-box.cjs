@@ -16,8 +16,8 @@
 // NB8  (lf-vocab r10, critic r9 #1) Match 3 answered wrong on the worksheet: a FOCUSED wrong letter box keeps the red dashed
 //      edge (no black / purple focus outline) and its box no next ring; the quiz, answered with one right box: the right box is
 //      green and carries the card's tick badge (.mq-live-badge), each wrong box its cross badge
-// NB9  (lf-vocab r11, critic r10 #4) Match 3 on the worksheet: after Check the active element is not a vocab slot (Check blurs
-//      the slots, so no caret shows inside a red box)
+// NB9  (lf-vocab r11, critic r10 #4; r12, critic r11 #4) Match 3 on the worksheet (EVERY card focused in turn) and the card:
+//      after Check the active element is not a vocab slot (Check blurs every slot) and each wrong slot's caret is transparent
 const { open } = require('../lib/ws-harness.cjs');
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
@@ -231,6 +231,63 @@ const YELLOW = 'rgb(242, 194, 0)';
                     if (fw.pfirst === fw.swc || fw.first === fw.swc) fails.push('NB8 worksheet Match 3 box 1 (wrong, focused): it carries the blue next ring');
                     console.log(`${'vocabulary:vocab_grade_pictures ws-wrong-focus'.padEnd(44)} focused ${fw.focused} outline ${fw.style} ${fw.color} box ring ${fw.pfirst || 'none'}`);
                 }
+            }
+            // NB9 (lf-vocab r12, critic r11 #4: the caret moved to card 3): on the Match 3 worksheet, for EVERY card, focus its
+            // slot and Check: the active element is no vocab slot after Check, and every wrong slot's caret is transparent; the
+            // same on the practice card
+            {
+                await page.reload({ waitUntil: 'networkidle2' });
+                await page.waitForFunction(() => typeof window.generateQuestionFor === 'function' && !!window.SKILLS, { timeout: 30000 });
+                await page.evaluate(() => { const st = window.state; st.ttsEnabled = false; st.category = 'vocabulary'; st.skill = 'vocab_grade_pictures'; st.gameMode = 'worksheet'; st.isMixedMode = false; st.problemCount = 3; window.initWorksheet(); });
+                await sleep(900);
+                const n = await page.evaluate(() => window.state.worksheetQs.length);
+                for (let k = 0; k < n; k++) {
+                    const r = await page.evaluate((k) => {
+                        window.state.worksheetQs.forEach((q, j) => {
+                            const v = q.cell.payload.order.map((wi) => 'ABC'[wi]); const t = v[0]; v[0] = v[1]; v[1] = t;
+                            [...document.querySelectorAll(`#ws_card_${j} .mq-vm-box input`)].forEach((el, m) => { el.value = v[m]; el.dispatchEvent(new Event('input', { bubbles: true })); });
+                        });
+                        const el = document.querySelector(`#ws_card_${k} .mq-vm-box input`);
+                        if (!el) return { error: 'no slot' };
+                        el.focus();
+                        window.checkAllWorksheet();
+                        return new Promise((res) => setTimeout(() => {
+                            const ae = document.activeElement;
+                            const wrong = [...document.querySelectorAll('#worksheetView .mq-vm-box input.mq-live-wrong')];
+                            res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => getComputedStyle(w).caretColor).filter((c) => !/transparent|rgba\(0, 0, 0, 0\)/.test(c)) });
+                        }, 400));
+                    }, k);
+                    judged++;
+                    if (r.error) fails.push(`NB9 worksheet Match 3 card ${k + 1}: ${r.error}`);
+                    else {
+                        if (r.slot) fails.push(`NB9 worksheet Match 3 card ${k + 1}: after Check the focus (the caret) is still in a vocab slot`);
+                        if (!r.wrongN) fails.push(`NB9 worksheet Match 3 card ${k + 1}: no wrong slot marked`);
+                        if (r.carets.length) fails.push(`NB9 worksheet Match 3 card ${k + 1}: ${r.carets.length} wrong slot(s) show a caret (${r.carets[0]})`);
+                    }
+                    console.log(`${('vocabulary:vocab_grade_pictures ws-nb9-card' + (k + 1)).padEnd(44)} slot ${r.slot} wrong ${r.wrongN} caret ${r.carets ? r.carets.length : '-'}`);
+                }
+                const c = await page.evaluate(() => {
+                    const st = window.state; st.quizMode = false; st.category = 'vocabulary'; st.skill = 'vocab_grade_pictures'; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+                    window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: 'vocabulary', skill: 'vocab_grade_pictures', seed: 11 }); window.renderQuestion();
+                    const v = st.currentQ.cell.payload.order.map((wi) => 'ABC'[wi]); const t = v[0]; v[0] = v[1]; v[1] = t;
+                    const ins = [...document.querySelectorAll('#questionCard .mq-vm-box input')];
+                    if (ins.length !== 3) return { error: `${ins.length} letter boxes` };
+                    ins.forEach((el, m) => { el.value = v[m]; el.dispatchEvent(new Event('input', { bubbles: true })); });
+                    ins[2].focus();
+                    window.submitAnswer();
+                    return new Promise((res) => setTimeout(() => {
+                        const ae = document.activeElement;
+                        const wrong = [...document.querySelectorAll('#questionCard .mq-vm-box input.mq-live-wrong')];
+                        res({ slot: !!(ae && ae.closest && ae.closest('.mq-vm-box, .mq-vp-line')), wrongN: wrong.length, carets: wrong.map((w) => getComputedStyle(w).caretColor).filter((x) => !/transparent|rgba\(0, 0, 0, 0\)/.test(x)) });
+                    }, 400));
+                });
+                judged++;
+                if (c.error) fails.push(`NB9 card Match 3: ${c.error}`);
+                else {
+                    if (c.slot) fails.push('NB9 card Match 3: after Check the focus (the caret) is still in a vocab slot');
+                    if (c.carets.length) fails.push(`NB9 card Match 3: ${c.carets.length} wrong slot(s) show a caret (${c.carets[0]})`);
+                }
+                console.log(`${'vocabulary:vocab_grade_pictures card-nb9'.padEnd(44)} slot ${c.slot} wrong ${c.wrongN} caret ${c.carets ? c.carets.length : '-'}`);
             }
             const lineRead = (sel) => page.evaluate((sel) => {
                 const line = document.querySelector(`${sel} .mq-vp-line`);
