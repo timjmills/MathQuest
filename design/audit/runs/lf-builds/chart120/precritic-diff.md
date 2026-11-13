@@ -74,3 +74,29 @@ hundreds_chart_fill band=120 thinking roles re-checked clean (`logs/r6-hcf-band1
   EB-SIDE 4 (review S, pre-skill-check S; `counters` cells) — was routed to lf-roles as master debt, now out of scope.
   The lesson EB-BAND lines and the guided EB-BAND lines are at M/L too, so they stay as listed above.
 - **390 px dropped**: `card-390.png` is replaced by the card at 820 (`card-820.png`); `independent-S.png` by `independent-M.png`.
+
+## Diagnosis 2026-11-13: lesson EB-BAND p1 cells 1, 2, 4 (M / L): ROUTED to lf-engine
+
+The 9 lines are the Count on to 120 lesson's **anchor-chart page** (`js/modules/sheet/lesson-pages/chart.js` `chartPage`, the
+shared lesson engine): a 2 x 2 grid (`.ws-grid.mq-chartgrid`) of four state panels (`.mq-cstatecell`, no `data-ws-cell`
+template: they are the engine's own panels around the chart drawing). Measured on the branch head (probe: buildSheet
+`role: lesson`, seed 1; chartPage's sizing values read by a temporary log, reverted, never committed). M and L are identical
+(the page sizes from its own body room; mode `one`, zoom z = zMax = 1):
+
+| Panel | Asked (base = hOf(state) + 1) | Drawn (ink bottom + 3 mm pad) | Planned row (rowH) | Row on the page | White | Share |
+|---|---|---|---|---|---|---|
+| 1 "The number before is 91." | 82.3 mm | 80.3 mm | 109.75 mm | 114.5 mm | 34.5 mm | 30.1 % FAIL |
+| 2 "One more is 92." | 77.1 mm | 75.0 mm | 109.75 mm | 114.5 mm | 39.7 mm | 34.7 % FAIL |
+| 3 "The number below is 102 ..." | 89.9 mm | 87.9 mm | 109.75 mm | 114.5 mm | 26.6 mm | 23 % ok |
+| 4 "Write 92." | 77.1 mm | 75.0 mm | 109.75 mm | 114.5 mm | 39.7 mm | 34.7 % FAIL |
+
+- **The cell is correct:** each panel asks 2.0-2.1 mm more than it draws (the engine's own +1 mm and line rounding, 2-3 %,
+  inside EB-FOOT's 10 %). The chartwindow drawing does not over-ask; no chartwindow / provider change can remove the white.
+- **The page's row sizing stretches it:** `rowH = max(H(z), min(room / rows, 1.25 H(z)))` = min(219.5 / 2, 1.25 x 89.9) =
+  109.75 mm, then `fill` (rows x rowH >= room - 2) hands the grid the whole body by flex, 114.5 mm a row. Every panel takes
+  its row's height, so the panels 7-13 mm shorter than the tallest (panel 3) cross 30 %. Not in chartwindow's files; the
+  lane does not change shared lesson code (brief).
+- **Routed to lf-engine** (lesson engine page, `chartPage` grid sizing): the pages are composing:chart_to_120 lesson M p1
+  cells 1, 2, 4 and lesson L p1 cells 1, 2, 4 (S out of scope). Suggested root fixes for the engine: size each row to its
+  tallest panel without the 25 % growth when the panels of a row differ, or let the spare go to the chant / Say band, or
+  top-align shorter panels with a shared drawing baseline so the white is not counted as one band per panel.
