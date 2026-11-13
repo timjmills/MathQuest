@@ -7420,6 +7420,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120-screen-digit",
+   "check": "a chart window's screen numerals reach their host's floor: practice card and quiz 48 px at 820 / 1024, 56 px at 1280 / 1366; online worksheet 29 px (LEAD_DECISIONS 2026-11-13). They were 29-34 px on the card and quiz and 24.7 px on the worksheet at 1024",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (chart window)",
+   "browser": true,
+   "fail": {
+    "commit": "34419f4d1",
+    "state": "card@1280 34 px, quiz@820 28.9 px, worksheet@1024 24.7 px"
+   },
+   "pass": {
+    "commit": "4b464e322",
+    "state": "squares sized from the digits on the card / quiz (48 / 56 px) and the worksheet (30 px), scoped to the window"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
