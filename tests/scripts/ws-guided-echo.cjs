@@ -165,10 +165,12 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                         }
                         if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
                         if (on('STRIP-NUMBERS') && role === 'lesson') pp.forEach((pg, pi) => {
-                            const strip = pg.htmls.filter((h) => /mq-lstrip|mq-lstepszone|mq-lsteps\b/.test(h)).join(' ');
+                            // (the step names only: the strip's and the zone's list items, their step numerals left out)
+                            const doc = new DOMParser().parseFromString(`<div>${pg.htmls.join(' ')}</div>`, 'text/html');
+                            const strip = [...doc.querySelectorAll('.mq-lstrip li span, .mq-lstepszone li span, ol.mq-lsteps li span')].map((e) => e.textContent).join(' ');
                             if (!strip) return;
                             const have = new Set(); pg.items.forEach((it) => itemNums(it.q).forEach((n) => have.add(n)));
-                            const stray = [...new Set(nums(strip.replace(/<em class="mq-lnum"[^>]*>\d+<\/em>/g, '')).filter((n) => n >= 11 && !have.has(n)))];
+                            const stray = [...new Set(nums(strip).filter((n) => n >= 11 && !have.has(n)))];
                             if (stray.length) out.push(`STRIP-NUMBERS ${key} lesson ${size} seed ${s} p${pi + 1}: the Steps name ${stray.join(', ')}, printed in no cell of the page`);
                         });
                     }

@@ -958,9 +958,10 @@ const cwParse = (k) => { const [, r, c, g] = k.split(':'); const L = (x) => (x ?
 /** Does window `c` print `n` as a chart number (in it, and not one of its own empty squares)? */
 const cwPrints = (c, n) => !c.gaps.includes(n) && c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10);
 /**
- * Would `q` give an answer away to, or take one from, a window already kept on the sheet? `same`: only a window of the SAME
- * squares counts (the one-window charts - the hard rule); without it an overlapping window counts too (the dealer's
- * preference: band 120's 30 squares cannot hold six windows that never overlap, so overlap is avoided while tries remain).
+ * Would `q` give an answer away to, or take one from, a window already kept on the sheet? `same` (the hard rule): is a
+ * window of the SAME squares already kept - with other gaps it gives the answers away, with the same gaps it is the same
+ * problem (GUIDED-MODEL-ECHO). Without it, an overlapping window that prints a kept window's answer counts (the dealer's
+ * preference only: band 120's 30 squares cannot hold six windows that never overlap, so overlap is avoided while tries remain).
  */
 export function chartGivesAway(q, seen, { same = false } = {}) {
     const a = chartOfQ(q);
@@ -968,7 +969,8 @@ export function chartGivesAway(q, seen, { same = false } = {}) {
     for (const k of seen) {
         if (typeof k !== 'string' || !k.startsWith('cw:')) continue;
         const b = cwParse(k);
-        if (same && (a.rows.join('.') !== b.rows.join('.') || a.cols.join('.') !== b.cols.join('.'))) continue;
+        const twin = a.rows.join('.') === b.rows.join('.') && a.cols.join('.') === b.cols.join('.');
+        if (same) { if (twin) return true; continue; }
         if (a.gaps.some((n) => cwPrints(b, n)) || b.gaps.some((n) => cwPrints(a, n))) return true;
     }
     return false;
@@ -1100,7 +1102,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
-        // (CROSS-GIVEAWAY: every try gave an answer away - a one-window chart already on the sheet - so this item is not dealt)
+        // (CROSS-GIVEAWAY: every try drew a window of squares already on the sheet - a one-window chart, or more items than the
+        // chart has windows - so this item is not dealt)
         if (chartGivesAway(q, seen, { same: true })) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
