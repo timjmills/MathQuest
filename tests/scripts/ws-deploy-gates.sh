@@ -38,7 +38,7 @@
 # ("acceptedNotYet"). Only NOT YET gates can be accepted; an unknown name is an error. SKIPPED is never acceptable.
 #
 # Session 1  every node gate (in parallel with the browser gates; 4 cores = 2 browsers + 2 node workers):
-#            ws-code-snapshot, ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
+#            ws-code-snapshot, ws-no-phone-width (no 390 px screen-gate default; owner 2026-11-13), ws-codec-registry, ws-standards, ws-search-terms, ws-providers-unit, ws-layout-unit,
 #            ws-panes-unit, ws-supports-unit, ws-ink-unit, ws-plain-words --check, ws-node-lint, ws-envelope
 #            --self-test, ws-text-vs-gen (claims vs the generator), ws-precritic-plan --checks-from-critics (every CHECKS_FROM_CRITICS
 #            finding row names a backtest id on precritic's path, or an exemption), ws-backtest --kind fixture (the S2 checks still
@@ -869,6 +869,7 @@ build_list() {
   browser_gate 1 ws-anchors-unit ws-anchors-unit.mjs
   browser_gate 1 ws-boot-smoke ws-boot-smoke.cjs
   node_gate 1 ws-code-snapshot ws-code-snapshot.mjs
+  node_gate 1 ws-no-phone-width ws-no-phone-width.mjs   # owner 2026-11-13: no 390 px default in a screen gate
   node_gate 1 ws-codec-registry ws-codec-registry.mjs
   node_gate 1 ws-standards ws-standards.cjs
   node_gate 1 ws-search-terms ws-search-terms.cjs

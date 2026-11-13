@@ -5,7 +5,7 @@
 //   paper   every form at S / M / L: every item on the form's template (standard + vertical: fact,
 //           long: division, fraction: equation), the pupil page draws that form, the key is printed
 //           with every answer; Vertical also on a 10-column fact-rows page at S / M / L.
-//   screen  the practice card at 390 and 1280 draws the same form (same template markers), and a
+//   screen  the practice card at 820 and 1280 (owner 2026-11-13: no phone width) draws the same form (same template markers), and a
 //           right answer typed into it scores.
 //   mix     a 6- and a 9-item Mix page is exactly one third each of standard / long / fraction; the
 //           same page reproduces from its seed; Vertical never appears in Mix.
@@ -118,7 +118,7 @@ const MARK = {
 
         // ---------------------------------------------------------------- screen (practice card)
         for (const form of FORMS) {
-            for (const w of [390, 1280]) {
+            for (const w of [820, 1280]) { // owner 2026-11-13: no phone width (was 390)
                 await page.setViewport({ width: w, height: 900, deviceScaleFactor: 1 });
                 await page.reload({ waitUntil: 'networkidle2' });
                 await page.waitForFunction(() => typeof window.generateQuestion === 'function' && !!window.SKILLS, { timeout: 30000 });
