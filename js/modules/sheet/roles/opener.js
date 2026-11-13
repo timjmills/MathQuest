@@ -73,7 +73,12 @@ function geometry(items, input, cap = {}) {
     const modelFull = !twoModels && !!first && ((steps.length > 0 && first.template === 'count-row' && !fitsAt([first], 2, ctx)) || halfOver);
     const mc = twoModels ? 4 : modelFull ? 1 : 2;
     const modelH = hMinAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
-    const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
+    // (SPILL: under a full-width word-work Model the Steps print in two columns, 1 2 / 3 4 - the guided Steps band's mq-steps-rows -
+    // so the Model, its Steps and the Say band share page 1: one column of four steps cost 45 mm and ran page 1 over at L)
+    const stepPairs = halfOver && steps.length > 2;
+    const stepsH = stepPairs
+        ? Array.from({ length: Math.ceil(steps.length / 2) }, (_, i) => Math.max(stepLines([steps[2 * i]], m.textPt), steps[2 * i + 1] ? stepLines([steps[2 * i + 1]], m.textPt) : 1)).reduce((a, b) => a + b, 0) * (m.pitch + 1.2) + Math.ceil(steps.length / 2) * 2.2 + 4
+        : stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
     const modelBand = modelFull ? m.strip + modelH + (steps.length ? m.strip + stepsH : 0) : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
     // critic r5 N13: a count-row page sizes its practice rows from the practice items only - the Model row is drawn in the Model
@@ -100,7 +105,7 @@ function geometry(items, input, cap = {}) {
         let iRows = 0;
         const iMax = Math.min(2, cap.iMax === undefined ? 2 : cap.iMax);
         while (iRows < iMax && used2 + (iRows ? 0 : m2.strip) + iH <= m2.budget) { used2 += (iRows ? 0 : m2.strip) + iH; iRows++; }
-        return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true,
+        return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows: 1, iRows, grow: 0, iH, spill: true, stepPairs,
             overBudget: p1 > m.budget || used2 > m2.budget, used: p1, used2 };
     }
     let iRows = 0;
@@ -122,7 +127,7 @@ function geometry(items, input, cap = {}) {
     const spare = Math.max(0, m.budget - used - held);
     const rowsThatGrow = gRows + iRows;
     const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first));
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used, stepPairs };
 }
 
 const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
@@ -138,6 +143,14 @@ const countRowFirst = (items) => !!(items[0] && items[0].template === 'count-row
  */
 function bestGeometry(items, input) {
     const all = geometry(items, input);
+    // SPILL (lf-roles r9): a spilled word-work page takes the SHORTEST stories of its deal for the Model and the rows (counts() deals
+    // spares): a stacked two-step bar draws 181-196 mm at L, and with the Steps and Say bands that Model ran 27 mm over page 1
+    if (all.spill) {
+        const h1 = (it) => { const m = it && it.measured && it.measured[1]; return m && Number.isFinite(m.hMm) ? m.hMm : Infinity; };
+        const sorted = items.map((it, i) => [it, i]).sort((a, b) => h1(a[0]) - h1(b[0]) || a[1] - b[1]).map((x) => x[0]);
+        const g = geometry(sorted, input);
+        return g.spill ? { g, items: sorted } : { g: all, items };
+    }
     if (!countRowFirst(items)) return { g: all, items };
     const nModel = all.twoModels ? 2 : 1;
     const models = items.slice(0, nModel), practice = items.slice(nModel);
@@ -164,6 +177,8 @@ export function counts(pools, input) {
     // a count-row page asks for the most it could hold (2 Guided rows, 2 Independent rows); the plan places what fits
     // (critic r5 N13: and one spare row more, so a taller row can be left out without the page coming up short)
     if (countRowFirst(probe)) return { main: (g.twoModels ? 2 : 1) + 5 * g.gc };
+    // (SPILL: three spare stories, so the plan can take the shortest - bestGeometry)
+    if (g.spill) return { main: needOf(g) + 3 };
     return { main: needOf(g) };
 }
 
@@ -193,7 +208,7 @@ export function plan(input = {}) {
     const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) };
     if (g.steps.length && g.modelFull) {
         sections.push(modelBandPart);
-        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });
+        sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${g.stepPairs ? stepsHtml(g.steps, { cls: 'mq-steps-rows' }) : stepsHtml(g.steps)}</div>` });
     } else if (g.steps.length) {
         sections.push({
             kind: 'row', widths: ['1fr', '1fr'], cls: 'mq-modelrow',
