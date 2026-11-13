@@ -6299,6 +6299,266 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "cbt-r1-d2-trainfit",
+   "check": "D2: the online worksheet count row stacked ONE number a line in a third of the 1280 grid; every line of a count-row train holds >= 3 numbers (a short last line excepted) at 820 / 1280 (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots TRAIN-FIT numbers a line",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills multiplication:count_by_tables --train-fit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d3-warmup",
+   "check": "D3: the lesson Warm-up shape-train cells stood 2.3 x their ink (34-35 % bands); ROW-STRETCH now reads the ink and judges Warm-up in-place cells (any skill) (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint ROW-STRETCH (lesson Warm-up)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size M --rules ROW-STRETCH --lints ROW-STRETCH --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d4-guided",
+   "check": "D4: the Guided role rows stood 1.33-1.6 x their ink (31-32 % bands at L p2); ROW-STRETCH reads the ink, not the empty reserve block (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint ROW-STRETCH (guided, ink)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles guided --size L --rules ROW-STRETCH --lints ROW-STRETCH --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d5-mixed",
+   "check": "D5: Mixed practice M printed 6 + 1 (a lone item on page 2); the lane runs L-DENSITY LONE / PG-23 on mixed-practice (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY LONE / PG-23 (mixed-practice)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles mixed-practice --size M --lints L-DENSITY --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d6-slotfit",
+   "check": "D6: Reason It A/B count-row boxes squeezed to 8-10 mm, two-digit key numbers touching the sides; every count-row box keeps >= 1 mm each side of its number (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint SLOT-FIT (new, opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles reason-it --size M --rules SLOT-FIT --lints SLOT-FIT --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d7-cl40",
+   "check": "D7: Reason It A panel painted in the label keep-out (CL40-INK x6 at M); the lane lints reason-it with L-OVERLAP (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-OVERLAP CL40-INK (reason-it)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles reason-it --size M --lints L-OVERLAP --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d8-chart",
+   "check": "D8: with times labels or 15 jumps the chart row was zoomed to 13 pt in 60 % of its panel; the chart row spans >= 80 % of a full-width panel (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint CHART-WIDTH (new, opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --opts '{\"times\":\"each\"}' --rules CHART-WIDTH --lints CHART-WIDTH --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-d9-jumps15",
+   "check": "D9: lesson jumps=15 L - sheet page 1 half empty, Guided pushed over with one Independent row, no Practice page (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint L-DENSITY (lesson, jumps=15)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --opts '{\"jumps\":15}' --lints L-DENSITY --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-m1-title",
+   "check": "m1: a one-page count of the default rows dealt 2s to 7s under the title \"count by 2s to 12s\"; the title names the rows dealt (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint TITLE-ROWS (new, opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles more-practice,test --size L --count 6 --rules TITLE-ROWS --lints TITLE-ROWS --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-m2-shape",
+   "check": "m2: the Warm-up mixed circles and hexagons as writing places; a Warm-up cell writes in one shape (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint SHAPE-ONE (new, opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-m4-review",
+   "check": "m4: the Review mixed in 8 x 100 and 80 x 7 = 560 beside count rows ending at 132; the Mixed Review stays within the skill ladder (key page) (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-print-lint REVIEW-LADDER (new, opt-in)",
+   "browser": true,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles review --size M --rules REVIEW-LADDER --lints REVIEW-LADDER --skills multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "ss-npr-ws-digit",
+   "check": "lf-hosts via the lead: the number_patterns_rule online-worksheet train numeral 26.5 px, under the worksheet floor; the worksheet card holding a wrapping count-row train keeps the host digit size (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (worksheet)",
+   "browser": true,
+   "fail": {
+    "commit": "fdfddfdd2",
+    "state": "origin/master (no worksheet train CSS)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "cbt-r1-m3-wording",
+   "check": "m3: 'the number in the box' named the step tab with the word every answer place uses; the count_by_tables steps never say it (critic cbt r1, lf-ops-props r5)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit FORBIDDEN (count_by_tables)",
+   "browser": false,
+   "fail": {
+    "commit": "a33ff1a5b",
+    "state": "critic cbt r1 FAIL tree (count_by_tables, master merged)"
+   },
+   "pass": {
+    "commit": "a144edd8f",
+    "state": "lf-ops-props cbt r2 fixes"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill multiplication:count_by_tables",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

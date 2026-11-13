@@ -152,6 +152,7 @@
 //   ROW-STRETCH (lf-ops-props r4, lead ruling 2026-11-12 (b)) a row of `noStretch` templates (arrays, arrays-turn,
 //              count-row: answered in place, top-started) is at most 1.25 x its tallest item's height (1.42 on a pageCap
 //              page, grid class mq-pagecap, PT-GDP), and its shortest item's band is at most 20 % of the row (H13).
+//   CHART-WIDTH (critic cbt r1 D8) a lesson chart's count row spans >= 80 % of its full-width panel.
 //   TITLE-ROWS (critic cbt r1 m1) a count-by page's title names exactly the steps its rows print.
 //   REVIEW-LADDER (critic cbt r1 m4) the Review's Mixed Review numbers stay within the skill's own (key page).
 //   SHAPE-ONE  (critic cbt r1 m2) a lesson Warm-up cell writes in one shape.
@@ -202,7 +203,7 @@ const has = k => curArgv().includes('--' + k);
 // document, so a job can set its own.
 const kitSize = () => (['S', 'M', 'L'].includes(arg('size', 'L')) ? arg('size', 'L') : 'L');
 // OPT-IN rules (--rules) and the skills they judge (--rule-skills); default off (lead ruling D1, 2026-11-07)
-const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED', 'SLOT-FIT', 'SHAPE-ONE', 'REVIEW-LADDER', 'TITLE-ROWS'];
+const OPT_RULES_KNOWN = ['H13-ABS', 'GRID-EVEN-ALL', 'ROW-STRETCH', 'ROW-MIXED', 'SLOT-FIT', 'SHAPE-ONE', 'REVIEW-LADDER', 'TITLE-ROWS', 'CHART-WIDTH'];
 const optRules = () => {
     const want = String(arg('rules', '') || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
     const bad = want.filter(r => !OPT_RULES_KNOWN.includes(r));
@@ -1399,6 +1400,23 @@ function wsLintPage(cfg) {
             if (k > lim + 0.03) F('L-DENSITY', 'ROW-STRETCH', 'major', tall.c, `row ${mm(a.H)} mm is ${k.toFixed(2)} x the tallest item it holds (${mm(tall.need)} mm): a row of items answered in place (noStretch) is at most ${lim} x its content (lead ruling 2026-11-12 (b)${lim > 1.25 ? ', PT-GDP' : ''}; ROW-STRETCH)`, 'noStretch row stretched');
             const band = (a.H - short.need) / a.H;
             if (a.H - short.need > 0.2 * a.H + PX) F('L-DENSITY', 'ROW-STRETCH', 'major', short.c, `the shortest item of its row needs ${mm(short.need)} mm of a ${mm(a.H)} mm row: a ${Math.round(band * 100)} % band under it (limit 20 % for a cell answered in place, RUBRIC H13; ROW-STRETCH)`, 'noStretch row band over 20 %');
+        }
+    }
+    /* CHART-WIDTH (OPT-IN, --rules CHART-WIDTH; critic cbt r1 D8): a lesson anchor chart's full-width panel draws its count row across
+       at least 80 % of the panel's width - with the times labels or 15 jumps the row was zoomed to 13 pt in 60 % of the panel. */
+    if (optOn('CHART-WIDTH')) {
+        for (const ri of rootInfo.filter(r => !r.key)) {
+            for (const cell of ri.el.querySelectorAll('.mq-chartgrid > [data-ws-cell], .mq-chartgrid .mq-cstatecell')) {
+                const row = cell.querySelector('.k2-countrow');
+                if (!row) continue;
+                const cr = cell.getBoundingClientRect(), cs = getComputedStyle(cell);
+                const innerW = cr.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+                let l = Infinity, r = -Infinity;
+                for (const e of row.querySelectorAll('*')) { const q = e.getBoundingClientRect(); if (q.width && q.height) { l = Math.min(l, q.left); r = Math.max(r, q.right); } }
+                if (l === Infinity || !(innerW > 0)) continue;
+                const k = (r - l) / innerW;
+                if (k < 0.8) F('L-DENSITY', 'CHART-WIDTH', 'major', cell, `the chart's count row spans ${Math.round(k * 100)} % of its ${mm(innerW)} mm panel (at least 80 %: the row keeps the chart's working size; critic cbt r1 D8)`, 'chart row shrunk');
+            }
         }
     }
     /* TITLE-ROWS (OPT-IN, --rules TITLE-ROWS; critic cbt r1 m1): a count-by page's "I Can count by ..." title names exactly the
