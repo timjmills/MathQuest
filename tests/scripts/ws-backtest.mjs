@@ -52,11 +52,13 @@ if (onlyKind) rows = rows.filter((r) => r.kind === onlyKind);
 
 const pad = (s, w) => { const t = String(s); return t.length >= w ? t.slice(0, w - 1) + ' ' : t.padEnd(w); };
 const stateName = (s) => (s && (s.fixture || s.commit)) || '-';
+/** A commit-pair row whose side is a fixture, not a commit (critic sis-r2 D4): re-point it when the fixing commit lands. */
+const fixtureSide = (r) => (r.kind === 'commit-pair' ? ['fail', 'pass'].filter((k) => r[k] && !r[k].commit && r[k].fixture) : []);
 
 if (has('--list')) {
     console.log(`${pad('row', 28)}${pad('kind', 13)}${pad('fail state', 46)}${pad('pass state', 46)}status`);
     for (const r of rows) {
-        console.log(`${pad(r.id, 28)}${pad(r.kind, 13)}${pad(stateName(r.fail), 46)}${pad(stateName(r.pass), 46)}${r.pending ? 'PENDING (no command yet)' : r.browser ? 'ready (browser)' : 'ready'}`);
+        console.log(`${pad(r.id, 28)}${pad(r.kind, 13)}${pad(stateName(r.fail), 46)}${pad(stateName(r.pass), 46)}${r.pending ? 'PENDING (no command yet)' : r.browser ? 'ready (browser)' : 'ready'}${fixtureSide(r).length ? `; ${fixtureSide(r).join(' + ')} side is a fixture: re-point when a fix lands` : ''}`);
     }
     process.exit(0);
 }
@@ -111,7 +113,7 @@ try {
         } else if (r.kind === 'commit-pair') {
             mkdirSync(tmpBase, { recursive: true });
             const state = (s, label) => {
-                if (!s.commit && s.fixture) return runCheck((s.command || r.command).replaceAll('{fixture}', isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture)), { browser: !!r.browser });
+                if (!s.commit && s.fixture) return Object.assign(runCheck((s.command || r.command).replaceAll('{fixture}', isAbsolute(s.fixture) ? s.fixture : resolve(ROOT, s.fixture)).replaceAll('{root}', ROOT), { browser: !!r.browser }), { fixture: true });
                 let dir;
                 try { dir = addWorktree(s.commit, tmpBase, `${r.id}-${label}`); } catch (e) { return { result: 'ERROR(checkout)', ms: 0, line: e.message }; }
                 made.push(dir);
@@ -140,11 +142,12 @@ try {
 
 console.log(`ws-backtest: ${rows.length} row(s) from ${tableFile.replace(ROOT + '/', '')}`);
 console.log('');
-console.log(`${pad('row', 28)}${pad('kind', 13)}${pad('fail state', 16)}${pad('pass state', 16)}verdict`);
+console.log(`${pad('row', 28)}${pad('kind', 13)}${pad('fail state', 20)}${pad('pass state', 20)}verdict`);
 for (const x of results) {
-    const t = (run) => (run ? ` ${(run.ms / 1000).toFixed(1)}s` : '');
-    console.log(`${pad(x.r.id, 28)}${pad(x.r.kind, 13)}${pad(x.fail + t(x.failRun), 16)}${pad(x.pass + t(x.passRun), 16)}${x.verdict}`);
+    const t = (run) => (run ? `${run.fixture ? ' (fixture)' : ''} ${(run.ms / 1000).toFixed(1)}s` : '');
+    console.log(`${pad(x.r.id, 28)}${pad(x.r.kind, 13)}${pad(x.fail + t(x.failRun), 20)}${pad(x.pass + t(x.passRun), 20)}${x.verdict}`);
 }
+for (const x of results.filter((y) => fixtureSide(y.r).length)) console.log(`  ${x.r.id}: ${fixtureSide(x.r).join(' + ')} side is a fixture: re-point when a fix lands`);
 const bad = results.filter((x) => x.verdict !== 'PASS');
 for (const x of bad.filter((b) => b.verdict === 'FAIL')) {
     console.log(`\n${x.r.id}: expected ${JSON.stringify(Object.assign({ fail: 'FAIL', pass: 'OK' }, x.r.expect || {}))}`);

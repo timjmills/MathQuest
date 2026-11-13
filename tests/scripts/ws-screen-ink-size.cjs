@@ -24,7 +24,11 @@
 //               The free width is the cell's content-box width less every block beside the drawing that HOLDS INK, at each
 //               level from the drawing up to the cell (D4: an empty spacer is not beside it).
 // Only INK marks are sizes: a white or unfilled shape with no dark stroke (the touch numeral's halo and keyline) is not a mark,
-// and a ring (no fill, a dark stroke) is its own mark beside the solid dots (lf-ops 2026-11-13). A touch numeral's kind is
+// and a ring (no fill, a dark stroke) is its own mark beside the solid dots (lf-ops 2026-11-13): it is named "ring" and is
+// paired only with a print ring, so a screen ring paper does not draw is SIZE-REF (critic sis-r2 D1). A support drawing whose
+// label names no picture takes its `support` value's picture ("counter (ten frame)", "dot (dot tile)"; D3).
+// Output (D2): each finding line starts "OVER  " (it breaks the pin, or no pin is read) or "pinned" (the pin holds it); the
+// pin totals printed are those of the keys this run judged. --self-test also checks that the sweep report agrees with the pin (D5). A touch numeral's kind is
 // its digit ("digit 7"), so its dots are compared with the same digit on paper.
 // Drawings under 4 mm across both ways are not judged (a tick, a ring). A numeral drawing (an svg with data-digit: the touch
 // dots laid on a digit) is judged by SIZE-INK only: its shape is the digit's, so SIZE-WIDTH does not apply. A mark group needs
