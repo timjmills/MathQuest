@@ -1,4 +1,4 @@
-# Short lessons: Prerequisite Check ON (lf-engine PC round, 2026-11-12)
+# Short lessons: Prerequisite Check ON (lf-engine PC round, 2026-11-12; r3 rebuild 2026-11-13)
 
 Rendered with the check forced on (`node tests/scripts/ws-lesson-samples.cjs --force-check`, buildSheet `prereqsForce`;
 the committed records keep `prereqsLive: false` until this critic passes). Seed 4242. L in `<packet>/`, S printed at M in
@@ -14,26 +14,33 @@ the committed records keep `prereqsLive: false` until this critic passes). Seed 
 | pupil-p4 / key-p5 | Practice |
 | pupil-p5 / key-p6 | Mixed |
 
-## This pass (lf-engine PC r3 fix, 2026-11-13; critic r3 F1-F4 - the check pages, the sub sheet and the deal; check-on only)
-- **F1** routed check place cells ("circle the place of the underlined digit", sub Q1-3, round): no T O heads (they named the
-  answer) and the words in the number's place order, tens before ones, one row under the number (`prepare()`). Gate PC-PV.
-- **F2** a routed check also measures its items at 3 columns (`measureCols(ctx.routed)`): rows laid 3 across were sized from
-  the 4-column measure - sub S "15 - 6" cells drew 38-40 mm in a 37.6 mm row and hid their tag. Gates PC-CLIP on ink (each
-  band's grid ink above its tag, every tag drawn) and PC-FRAME.
-- **F3** sub sheet Independent row at least a Guided cell's measured height (LR-17b `indepFrame`: same heads, exchange row and
-  boxes) - it was 64.8 mm for 68.7 mm cells and the PDF drew them past the band's bottom rule. Gate PC-FRAME (every page, pupil
-  and key: no fixed grid row shorter than its cells' natural height - the screen squeezes, the PDF does not).
-- **F4** with the check on the sheet re-deals; its fact keys (hard) and texts (soft) are avoided by Practice and the Mixed
-  partners: no "50 - 36" twice. Gate PC-LR5 (placed sheet items vs Practice / Mixed, 8 seeds).
-- **F5 not changed here**: the add L Mixed 52 % band is on the live packet too (`ws-lesson-samples --check` without
-  --force-check) - the live-fix builder owns it, with F6 / F7. PC-H13P (new, Practice and Mixed) lists them.
-- Live packets: `ws-lesson-baseline --all-lessons` 1,556 hashes identical.
+## Every page of the packet, its gate, the r3 finding it closes (lf-engine PC r3 rebuild, 2026-11-13)
+Rendered on branch `claude/sweet-newton-c8wrv1-lf-engine-pc` after merging lf-engine-live-pm2 (1b2d38f05). Check forced on,
+seed 4242, L at the packet root, S printed at M in `S/`. "Rule-gated" = `ws-lesson-samples --check --force-check` (8 seeds,
+L / S; precritic `lesson-samples-check`), every rule PASS on this tree. Print-lint = `ws-print-lint --roles lesson` (L-KEY,
+L-OVERLAP; precritic `lesson-samples-key-L / -S`).
 
-## Known open (`ws-lesson-samples --check --force-check`, 8 seeds)
-- PC-H13P (live pages, owned by the live-fix branch): add L Mixed 52 % (F5), add S Practice 30 %, round L / S Practice 49 % (F7).
-  F6 (dead hundreds carry box) is the live-fix builder's too.
-- PC-H13 add S lesson sheet foot 9 % (F8, as on master).
-- F13 (near-twin numbers in a check question: 77 / 27 / 71) not changed: `itemNumberKey` still drops exact repeats only.
+| Page (pupil / key) | Part | Gates | r3 findings closed here |
+|---|---|---|---|
+| pupil-p1 / key-p1 | Prerequisite Check (one page) | PC-RANGE, PC-NAME, PC-SLOTS, PC-SCAFFOLD, PC-LR6 (exact + near twins), PC-H13 (bands, gaps, foot), PC-CLIP (headings, ink above each tag), PC-FRAME, PC-PV, PC-PAGES; print-lint L-KEY / L-OVERLAP | F1 (PC-PV), F2 (PC-CLIP ink, PC-FRAME), F13 (PC-LR6 near twins: sub S now 77 / 51, not 77 / 27 / 71; round 75 / 45 no longer together) |
+| key-p2 | routing page "Prerequisite Check: where next" | PC-FRAME, PC-CLIP twin geometry; print-lint L-KEY | - |
+| pupil-p2 / key-p3 | anchor chart (and chart-grey.png) | PC-CLIP, PC-FRAME; print-lint | - |
+| pupil-p3 / key-p4 | lesson sheet (Vocabulary, Remember, Guided, Independent) | PC-H13 (blank foot), PC-FRAME, PC-CLIP, SHEET-2PG, PC-LR5 (its items not again on Practice / Mixed); print-lint L-DENSITY H13 | F3 (PC-FRAME), F4 (PC-LR5); add S foot 9 % (carried into r3 as a known red) now filled - with the check on, the Vocabulary band takes the spare |
+| pupil-p4 / key-p5 | Practice | PM-H13, TAB-CLEAR, PM-CONT, LIVE-PART, PC-FRAME, PC-LR5 | F5 / F7 (PM-H13, fixed on live-pm2, merged), F6 (LIVE-PART) |
+| pupil-p5 / key-p6 | Mixed | PM-H13, TAB-CLEAR, PM-CONT, LIVE-PART, PC-FRAME, PC-LR5 | F5 (merged); the check's printed facts are now a hard avoid of the Mixed partners (ws-lesson-check: "on prereq and mixed" 8 -> 0) |
+
+Live packets (check off, `prereqsLive: false`): `ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --per-lesson
+--check` against a baseline written on 1b2d38f05: OK, 1,556 hashes identical.
+
+## Known open (not closed by this pass)
+- r3 F8-F12, F14 were not in this brief (see the r3 REPORT); F13 is closed.
+- `ws-lesson-check --force-check` (not on precritic): 354 findings vs 428 unforced on the same tree. Forced-only classes left:
+  add Practice turn-arounds of its own items (+41; the hard avoid of the sheet's keys moved 46 exact sheet / Practice
+  repeats into them - the add_facts band-10 pool is too small for an L Practice page under LR-5), sub check-on sheet LR-6
+  near twins (+9) and LR-7 underTen 3 a page (+9; the engine is never handed the caps - lessons/library), round chart /
+  sheet repeats (+6), one chart turn-around on the add L check (seed 1629: a number bond has no fact key).
+- precritic `--role lesson --strict` reds identical on 1b2d38f05: print-lint role lesson L (28 counts above the pin) and S
+  (29), lesson-samples-key-L (nearest_10 L, 12 findings, live packet).
 
 ## What changed since r2 (7744c2b4)
 - **One-page check (lead ruling A, LR-17a (2))**: after the N2 floor the check ran to two pages at L (all three) and at S
