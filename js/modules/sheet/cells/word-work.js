@@ -1029,6 +1029,17 @@ function shownSteps(p, ctx) {
     // It's A or B, Error analysis's wrong answer - is the one written in the answer box; critic visual-quality r2 N4:
     // the sentence frame wrote p.ans, so every "False" claim printed the true answer)
     const wv = w && w.value !== undefined && w.value !== null && w.value !== '' ? String(w.value) : null;
+    // (lf-algebra r13, lead ruling D: a two-step ÷-last story's wrong work is shown at STEP 1 - `op0`, the wrong sign for the
+    // change (M-TS4), the share then done right on that result - or with a story number carried into Step 2 - `from` (M-TS3);
+    // both write a quotient as wide as the answer, so the box never tells. providers/word-work.js wordWorkWrong.)
+    const w0 = w && w.slots && opKey(w.slots.op0);
+    const wfrom = w && w.slots && w.slots.from !== undefined && w.slots.from !== null ? Number(w.slots.from) : null;
+    if (w && p.steps.length === 2 && (w0 || wfrom !== null)) {
+        const [s1, s2] = p.steps;
+        const n1 = w0 ? (w0 === '-' ? makeStep(Math.max(s1.top, s1.bottom), '-', Math.min(s1.top, s1.bottom)) : makeStep(s1.top, w0, s1.bottom)) : s1;
+        const n2 = n1 ? makeStep(wfrom !== null ? wfrom : (n1.op === '/' ? n1.q : n1.ans), s2.op, s2.bottom) : null;
+        if (n1 && n2) return { steps: [n1, n2], picks: [n1.op, n2.op], ans: wv !== null ? wv : String(n2.op === '/' ? n2.q : n2.ans) };
+    }
     if (!wop) return { steps: p.steps, picks: p.steps.map((s) => s.op), ans: wv !== null ? wv : String(p.ans) };
     const out = p.steps.map((s, i) => {
         if (i !== p.steps.length - 1) return s;

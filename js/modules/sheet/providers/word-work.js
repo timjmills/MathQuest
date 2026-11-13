@@ -145,6 +145,28 @@ export function wordWorkWrong(q) {
     const p = payloadOf(q);
     if (!p) return null;
     const st = p.steps[p.steps.length - 1];
+    // A two-step story whose LAST step is ÷ (two_step_add_then_div): its wrong operation (14 ÷ 2 read as 14 × 2 = 28) cannot be
+    // written in the quotient box, which is sized to the true answer, so Error analysis refused the skill (precritic two-step
+    // r12, EB-ROLE; lead ruling D). The wrong answer is the card's M-TS4 at Step 1 instead - the wrong operation for the change
+    // (3 + 11 worked as 11 − 3), then the share done right: (11 − 3) ÷ 2 = 4 - a quotient as wide as the answer, so the box
+    // never tells. Then M-TS3 (Step 2 with a story number: 12 ÷ 2). Only values that fit; else the old wrong operation.
+    if (p.steps.length === 2 && st.op === '/' && (p.steps[0].op === '+' || p.steps[0].op === '-')) {
+        const s1 = p.steps[0], d = st.bottom, ans = st.q;
+        const fits = (v) => Number.isInteger(v) && v > 0 && v !== ans && String(v).length <= String(ans).length;
+        const w1 = s1.op === '+' ? Math.abs(s1.top - s1.bottom) : s1.top + s1.bottom;
+        const hi1 = Math.max(s1.top, s1.bottom), lo1 = Math.min(s1.top, s1.bottom);
+        const cands = [];
+        if (d && w1 % d === 0 && fits(w1 / d)) cands.push({
+            value: w1 / d, misconception: 'wrong-operation', slots: { answer: String(w1 / d), op0: GLYPH[WRONG_OP[s1.op]] },
+            work: `${s1.op === '+' ? `${hi1} − ${lo1}` : `${s1.top} + ${s1.bottom}`} = ${w1}, ${w1} ÷ ${d} = {v}`,
+            explain: `${s1.op === '+' ? 'Took away' : 'Added'} in Step 1 when the story asks to ${s1.op === '+' ? 'add' : 'take away'}.`,
+        });
+        for (const n of [s1.top, s1.bottom]) if (d && n % d === 0 && fits(n / d) && !cands.some((c) => c.value === n / d)) cands.push({
+            value: n / d, misconception: 'ms-story-number', slots: { answer: String(n / d), from: n },
+            work: `${n} ÷ ${d} = {v}`, explain: 'Did Step 2 with a story number, not the Step 1 answer.',
+        });
+        if (cands.length) return chooseWrong(q, cands.slice(0, 1), { rotate: false });
+    }
     const wop = WRONG_OP[st.op];
     const hi = Math.max(st.a, st.b), lo = Math.min(st.a, st.b);
     const v = wop === '+' ? st.a + st.b : wop === '-' ? hi - lo : wop === '*' ? st.a * st.b : null;
