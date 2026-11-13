@@ -3960,6 +3960,202 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "pv-compare-thinking-bands",
+  "check": "ws-cell-checks --card --card-opts renders every thinking role (true-false, reason-it, error-analysis, opener, scripted-model, guided) under every offered option value: the lf-placevalue opt-in --opt-roles (critic compare r1 F1: precritic missed reason-it at band 999,999, its numerals over the A / B boxes)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW (--opt-roles, opt-in lf-placevalue cell-checks-compare)",
+  "browser": true,
+  "pending": true,
+  "pendingReason": "lead ruling 2026-11-13: lf-roles owns the Reason It A / B geometry and will stack A over B when the problem is wider than half the box (it reads the compare footprint's drawnWMm). The fail state runs today: reason-it L at band 9,999 / 99,999 / 999,999 OVERFLOW on 16748cd8. Set pass.commit when the lf-roles stack lands.",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "reason-it L band 9,999+: the numerals leave the A / B boxes and the cell (OVERFLOW 4 a page)"
+  },
+  "pass": {
+   "commit": null,
+   "state": "lf-roles stack not built (roles/reason-it.js)"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:compare --card --card-opts --opt-roles reason-it --rules OVERFLOW --size S,L",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-eq-live",
+  "check": "live play never pins the compare \"=\" to one position (critic compare r1 F4: card, worksheet and quiz all opened on \"897 = 897\")",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal EQ-LIVE",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "20 of 20 live sessions dealt \"=\" as item 1"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "the live blockOrder mixes on a per-session value"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-LIVE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-close-depth",
+  "check": "closeness=close spreads the deciding place over place 2 .. the last (critic compare r1 F5: every close 6-digit pair decided at the 2nd digit)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal CLOSE-DEPTH",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "91 of 100 close 6-digit items decided at place 2, none past place 3"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "comparePair shares 1 .. nd-1 digits"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only CLOSE-DEPTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-mixed-1digit",
+  "check": "lengths=mixed deals one digit apart, a 1-digit number at most one item in five, and the bigger first digit on the shorter number a quarter of the time (critic compare r1 F6, M6)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal MIXED-1DIGIT",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "61 of 120 mixed items held a 1-digit number"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "1 in 6, 60 of 120 the 89 / 312 trap"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only MIXED-1DIGIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-m6-wrong",
+  "check": "every wrong answer compare names is the card's M6 (M-C2 / M-C3), M-C3 on a quarter of a mixed deal (critic compare r1 F3)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal M6-WRONG",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "M-C1 on 72 of 120 default items"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "M6 only; an item M6 gets right has none"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only M6-WRONG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-worked-step-does",
+  "check": "no worked step restates the item and a step naming digits marks them (critic compare r1 F2)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-deal WORKED-STEP-DOES",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "\"Compare 487 and 858.\"; \"The first different digits are 4 and 8.\" unmarked"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "count / boxed digits / bigger digit / sign, every step marked"
+  },
+  "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only WORKED-STEP-DOES",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-m6-shown",
+  "check": "Error analysis, True or False? and Reason It show the card's M6 in at least half their errors at S / M / L, and the first-digit form on a lengths=mixed page (critic compare r1 F3)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages M6-SHOWN",
+  "browser": true,
+  "fail": {
+   "commit": "16748cd8",
+   "state": "reason-it L default: 0 of 2 errors M6; mixed pages: no 89 > 312"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "every shown error M6, the first-digit form on every mixed page"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only M6-SHOWN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-eq-model",
+  "check": "\"=\" is never a worked model: Guided, Scripted Model, Opener, lesson anchor (critic compare r1 F4)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages EQ-MODEL",
+  "browser": true,
+  "fail": {
+   "commit": "16748cd8",
+   "state": "guided S / M / L: the Model is \"691 = 691\""
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "unequal same-length Models (4 worked steps; noModel)"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-MODEL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-state-marks",
+  "check": "the Scripted Model's states and the lesson anchor's panels each draw a new mark (critic compare r1 F2: states 1 and 2 the same picture)",
+  "kind": "commit-pair",
+  "rule": "ws-pv-compare-pages STATE-MARKS",
+  "browser": true,
+  "fail": {
+   "commit": "16748cd8",
+   "state": "scripted-model and lesson S / M / L: state 2 = state 1"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "count, boxed digits, underline, sign"
+  },
+  "command": "node tests/scripts/ws-pv-compare-pages.cjs --only STATE-MARKS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-compare-chant-fit",
+  "check": "a lesson's chant decides at least half the items its practice deals (critic compare r1 F2 LESSON-CHANT-FIT: \"More digits, bigger number.\" decided 8 of 33)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-unit chant-fit",
+  "fail": {
+   "commit": "16748cd8",
+   "state": "chant decides 40 % of the practice deal"
+  },
+  "pass": {
+   "commit": "1240f552",
+   "state": "the chant names both rules"
+  },
+  "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-fit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
