@@ -73,6 +73,12 @@ Critic rounds: 4, r4 PASS (D6/N2/D7); 3, r3 FAIL (passed skills set a PASS, 0 wo
   own width; critic r6f FAIL (S band 33 %) -> the A / B tag in a left gutter at S / M -> npr RI 3 / 3 / 2; critic r6g PASS.
   ABTAG check (self-test pair). Backtests ri-countrow-overflow, ri-stack-band PASS.
 - Deploy-4: PR #45 (claude/sweet-newton-c8wrv1-lf-roles-deploy @ 329273de); gates green; lessons 1596/1596 identical.
+- Deploy-4 re-merged with master 89abfbb3 (lead: vocab conflicts): head e86ed3517 on -lf-roles-deploy / PR #45. guided.js:
+  tightRows only where the host sets it, vocab evenRows otherwise; reason-it: vocab-match3 keeps its centred stack (legacy);
+  backtests union. KEYFIT found the passed vocab_grade_pictures TF / RI M keys ("C, A, B" on a 2-digit line): a letter answer
+  takes the word line. Gates: roles-unit 78, vocab-unit, boot, code-snapshot, redesign-passed 29, capacity 0 drops / 17
+  rises, cell-checks 0 on 696 passed pages; vocab Guided 6/6 identical to master. Also in: inkWMm vs the panel's INNER
+  width (ri-ink-inner; no passed page changes).
 - lf-algebra r2 queue: G4 fte RI 2 at every size here (npr fixed); G3 npr RI S 3; G2 not reproduced at the default seed
   (seed asked); G10 / pattern_features / growing / fgr not in this tree; F3 gone at head (print-raster check -> lf-checks).
 
