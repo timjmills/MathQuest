@@ -103,11 +103,11 @@ register(MATCH3_TEMPLATE, {
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
         // (lf-vocab r14, ws-screen-ink-size SIZE-INK: a 96 px slot drew the row / column table's cells at 94 % of their print size
-        // on the online worksheet; 104 px holds every picture at or over its print size)
+        // on the online worksheet; 100 px holds every picture at or over its print size and the answer box above a Chromebook fold)
         const tileCss = twin ? '<style>.mq-wspaper .mq-vm .mq-vm-pics{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}'
-            + '.mq-wspaper .mq-vm .mq-vm-pic{flex:none!important;height:104px;align-items:center!important;justify-content:flex-start!important;min-width:0}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic{flex:none!important;height:100px;align-items:center!important;justify-content:flex-start!important;min-width:0}'
             + '.mq-wspaper .mq-vm .mq-vm-pic > span:last-child{flex:1 1 0!important;min-width:0}'
-            + '.mq-wspaper .mq-vm .mq-vm-pic svg{max-height:104px;max-width:100%;margin:0 auto}'
+            + '.mq-wspaper .mq-vm .mq-vm-pic svg{max-height:100px;max-width:100%;margin:0 auto}'
             + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important}'
             + '.mq-wspaper .mq-vm .mq-vm-word{flex:none!important;justify-content:flex-end!important;padding-right:14%}'
             + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:12px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
