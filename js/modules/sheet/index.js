@@ -66,7 +66,7 @@ export {
     CONTRACT_MEMBERS, OPTIONAL_MEMBERS,
     INSTRUCTION_LIBRARY, JUDGE_LABELS, PRINT_VERBS, BANNED_INSTRUCTION_WORDS,
     instructionFor, instructionKeyOf, isLibraryInstruction, toScreenInstruction, lintInstruction,
-    registerSkill, getProvider, hasProvider, listProviders,
+    registerSkill, getProvider, hasProvider, listProviders, roleOptions,
     installDefaultAdapters, defaultAdapters, adaptersInstalled,
     QUALITY, coverageFor, summariseCoverage, worstOffenders,
 } from './contract.js';
