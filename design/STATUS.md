@@ -797,3 +797,7 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 
 ## 2026-11-13 ~17:00 UTC — Owner: usage back at 0 %; cap 70 % for now
 - All 10 lanes told to resume from their saved resume points. Budget: 70 % ≈ $1,960 (1 % ≈ $28), split per lane in design/status/usage-week-2026-11-13.md with each session's cost_usd baseline.
+
+## 2026-11-13 — Deploy lf-checks -r2 (narrow critic PASS 9/8/8/8)
+- Checker minors (FOCUS-GAP per line, EB-SIDE between, slot-ink / EB-FOOT notes, EB-ITEMKEY / EB-ITEMPARITY), LP-RASTER on role pages (ws-grade-render --raster-fit), no-dropped-row merge-base fix. Checks only; 50/50 builds byte-identical.
+- Gates: boot-smoke, precritic-plan (+ self-test, none dropped), backtest / empty-band self-tests, code-snapshot, redesign-passed, screen-answer, simple-print.
