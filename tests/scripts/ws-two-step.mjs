@@ -30,6 +30,9 @@
 //              Also (lf-algebra R4) two_step_letter_equation with wpBar at L, five seeds: at least 1 a page (card: bar model L 1)
 //              and no 30 % band (the options-render "letter + wpBar L PAGEFILL": the one story stretched 1.8x to 172 mm).
 //              `--html F --size M` measures one saved pupil page instead (the backtest's PASS fixture).
+//   BAND-BITES (lead ruling B 2026-11-13) every OFFERED band value changes >= 10 % of the items, each dealt alone (300 seeds),
+//              against the default; a band hidden on a preset (band 50 on add_then_div / letter_equation) reads an old code's value
+//              as the default
 // Skills outside the card print OK (n/a).
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
@@ -73,7 +76,8 @@ const short = (k) => k.split(':')[1];
 for (const key of mine) {
     const sk = short(key);
     const addsub = /^multi_step_word|estimate/.test(sk);
-    const bands = addsub ? [null, 30, 50] : [30, 50];
+    const offered = new Set(((app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band') || { values: [] }).values.map((x) => x.v));
+    const bands = (addsub ? [null, 30, 50] : [30, 50]).filter((b) => b === null || offered.has(b));   // a band hidden on a preset is not dealt
     for (const band of bands) {
         const cap = band || 100;
         const bad = [], story = [];
@@ -215,15 +219,43 @@ for (const key of mine) {
     }
 }
 
+// BAND-BITES (lead ruling B 2026-11-13, band 50 ruling (a)): every band value a skill OFFERS changes at least 10 % of the items,
+// each dealt alone (itemIndex 0, 300 seeds) against the skill's default - a value that leaves ~94 % of the items as they were
+// prints the default page under another name (band=50 on two_step_add_then_div 37 / 600, two_step_letter_equation 38 / 600),
+// so the card hides it on that preset; an old code carrying the hidden value still decodes (normalizeOptions reads the default).
+for (const key of mine) {
+    const sk = short(key);
+    const band = (app.so.offeredOptionsFor('algebra', sk) || []).find((d) => d.id === 'band');
+    if (!band) continue;
+    const sig = (q) => (q ? `${q.text}|${JSON.stringify(q.ans)}` : 'none');
+    const deal = (opts, i) => { try { return app.gq.generateQuestionFor({ category: 'algebra', skill: sk, opts, seed: (fnv(`bites:${sk}`) + i) >>> 0, itemIndex: 0 }); } catch (e) { return null; } };
+    const M = 300;
+    // PENDING a lead ruling (lf-algebra r13, found by this rule): band 50 on these two presets also acts on under 10 % of items
+    // (5.7 % / 9.3 % at 300 seeds); ruling (a) named only add_then_div and letter_equation. Printed, not failed, until ruled.
+    const PENDING = new Set(['two_step_mult_div_first:50', 'two_step_add_then_mult:50']);
+    const base = []; for (let i = 0; i < M; i++) base.push(sig(deal({}, i)));
+    for (const val of band.values || []) {
+        if (val.v === null || val.v === undefined || val.v === band.default) continue;
+        let k = 0; for (let i = 0; i < M; i++) if (sig(deal({ band: val.v }, i)) !== base[i]) k++;
+        if (k < 0.1 * M && PENDING.has(`${sk}:${val.v}`)) console.log(`  PENDING (lead ruling) BAND-BITES ${sk}: band ${val.v} changes ${k} / ${M} items`);
+        else if (k < 0.1 * M) fail('BAND-BITES', `${sk}: band ${val.v} is offered but changes ${k} / ${M} items (${Math.round(1000 * k / M) / 10} %, under 10 %)`);
+    }
+    for (const hid of [50]) {
+        if ((band.values || []).some((x) => x.v === hid)) continue;
+        const n = app.so.normalizeOptions('algebra', sk, { band: hid });
+        if (n.band === hid) fail('BAND-BITES', `${sk}: band ${hid} is hidden but an old code's band ${hid} still reads as ${hid}`);
+    }
+}
+
 // --rules A,B: only those rules' findings count (a backtest row proves its own rules on commits before later rules existed)
 const ONLY = String(arg('--rules', '')).split(',').map((x) => x.trim()).filter(Boolean);
 if (ONLY.length) for (let i = fails.length - 1; i >= 0; i--) if (!ONLY.includes(fails[i].split(' ')[0])) fails.splice(i, 1);
 const byRule = {};
 for (const f of fails) { const r = f.split(' ')[0]; byRule[r] = (byRule[r] || 0) + 1; }
-for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
+for (const r of ['WITHIN-N', 'ANS-STORY', 'BAR-DRAWN', 'VISUAL', 'HINT-L0', 'BAND-ALIAS', 'PART-FRAMES', 'PAGE-FRESH', 'BAND-BITES']) console.log(`${r.padEnd(10)} ${byRule[r] ? `FAIL ${byRule[r]}` : 'PASS'}`);
 for (const f of fails.slice(0, 40)) console.log(`  ${f}`);
 if (fails.length > 40) console.log(`  ... and ${fails.length - 40} more`);
-console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH)`);
+console.log(fails.length ? `${TOOL}: FAIL (${fails.length} finding(s), ${mine.length} skill(s))` : `${TOOL}: OK (${mine.length} skill(s): WITHIN-N, ANS-STORY, BAR-DRAWN, VISUAL, HINT-L0, BAND-ALIAS, PART-FRAMES, PAGE-FRESH, BAND-BITES)`);
 process.exit(fails.length ? 1 : 0);
 
 /** CAP-BAND (browser): the ruled capacity of the (Visual) practice pages and the band under each cell's ink. Exits. */
