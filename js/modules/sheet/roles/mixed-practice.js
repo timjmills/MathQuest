@@ -36,7 +36,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY, deriveSeed,
 } from './compose.js';
-import { placePick } from '../near-twins.js';
+import { placePick, pageUnique, oneNumOf } from '../near-twins.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
@@ -665,7 +665,9 @@ export function counts(pools, input) {
     if (input.arrangement === 'mixed') return Object.assign({}, mixedPacking(pools, input).deal.counts);
     const p = packing(pools, input);
     const out = {};
-    for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per;
+    // (r6, critic r5 R1 / "78 twice": a lesson page's one-number pool is dealt one shelf deeper, so plan()'s placePick / pageUnique have
+    // a spare to take - another place, a number no other band printed. The pool's deal takes no item count: its first items are as before.)
+    for (const id of p.ids) out[id] = p.shelf[id].n * p.shelf[id].per + (input.lessonFit && (pools[id] || []).length && pools[id].every((it) => oneNumOf(it) !== null) ? p.shelf[id].per : 0);
     return out;
 }
 
@@ -679,12 +681,15 @@ export function plan(input = {}) {
     // Lay the shelves out skill by skill (GROUPED), paginating whole shelves.
     const shelves = [];
     const A = input.anchors && input.anchors.byPool ? input.anchors : null;
+    const printedNums = new Set();
     for (const id of p.ids) {
         const sh = p.shelf[id];
         // (r6, critic r5 R1 - PEDAGOGY 4.1a: a lesson's Mixed page is where the support has faded, so a band's "name the place"
         // items never read all one place or strictly alternate - T O T O T O: placePick takes another place from the pool, then a
         // seeded order; a band with no pattern prints as before)
-        const its = input.lessonFit ? placePick(pools[id], sh.n * sh.per, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, sh.n * sh.per);
+        // (r6, critic r5 "78 twice": and no band repeats a number an earlier band printed - pageUnique swaps in a pool spare)
+        const its = input.lessonFit ? placePick(pageUnique(pools[id].slice(0, sh.n * sh.per), pools[id], sh.n * sh.per, printedNums), pools[id], sh.n * sh.per, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, sh.n * sh.per);
+        for (const it of its) { const v = oneNumOf(it); if (v !== null) printedNums.add(v); }
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).

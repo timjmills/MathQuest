@@ -172,4 +172,24 @@ export function placePick(pool, n, seed) {
     return placeOrder(take, seed);
 }
 
-export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit, placeAnsOf, placeRunBad, placeOrder, placePick };
+/**
+ * The first `n` items of a band's dealt pool with no one-number item repeating a number another band of the page printed
+ * (`printed`, a Set of numbers): such an item gives its slot to the pool's next item further on whose number is new and is no
+ * near twin of the band's others (the pool was dealt as one run, so it keeps the run's rules); none left: it stays. r6, critic r5
+ * "78 twice" - the rounding 78 and the place-value 78 on one Mixed page. Pure.
+ */
+export function pageUnique(take, pool, n, printed) {
+    const out = (take || []).slice();
+    const used = new Set(out);
+    out.forEach((it, i) => {
+        const v = oneNumOf(it);
+        if (v === null || !printed || !printed.has(v)) return;
+        const others = out.filter((x, k) => k !== i).map(oneNumOf).filter((x) => x !== null);
+        const j = (pool || []).findIndex((c, k) => k >= n && !used.has(c) && oneNumOf(c) !== null && !printed.has(oneNumOf(c))
+            && !others.includes(oneNumOf(c)) && !others.some((x) => nearNumbers(x, oneNumOf(c))) && (placeAnsOf(c) === null) === (placeAnsOf(it) === null));
+        if (j >= 0) { used.add(pool[j]); out[i] = pool[j]; }
+    });
+    return out;
+}
+
+export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit, placeAnsOf, placeRunBad, placeOrder, placePick, pageUnique };
