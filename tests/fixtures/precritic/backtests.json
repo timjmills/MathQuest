@@ -3403,6 +3403,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "screen-ink-size-ink",
+   "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
+    "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "screen-ink-size-width",
+   "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
+   "kind": "fixture",
+   "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+   "browser": true,
+   "fail": {
+    "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
+    "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
+   },
+   "pass": {
+    "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+    "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
+   },
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
