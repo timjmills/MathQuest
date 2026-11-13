@@ -5193,7 +5193,7 @@
  },
  {
   "id": "guided-tight-rows",
-  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its ink: no 30 % band under it (RUBRIC H13; lf-placevalue compare precritic r2 via the lead; re-pointed lf-roles r8a: lf-checks' pixel read found 34-37 % bands still on 8307219c, the rows sized with the measure's label keep-out)",
   "kind": "commit-pair",
   "rule": "ws-empty-band EB-BAND on guided",
   "browser": true,
@@ -5202,8 +5202,8 @@
    "state": "EB-BAND 2 on expand / unit_form / combine guided"
   },
   "pass": {
-   "commit": "8307219c",
-   "state": "EB-BAND PASS"
+   "commit": "ae8511168",
+   "state": "EB-BAND PASS (tries at most 26.4 %: keep-out dropped, try centred in its row)"
   },
   "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
   "expect": {
@@ -6114,6 +6114,46 @@
    "state": "a page per grid role"
   },
   "command": "node tests/scripts/ws-precritic-plan.mjs --capacity-pin {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-model-span",
+  "check": "a Guided page of narrow column stacks at S whose one-cell-Model grid the ceiling trims to Model + 7 lays the Model over two cells of row 1, its working beside it, and holds Model + 10 in 3 whole rows; at M the Model keeps one cell (lead ruling (e) 2026-11-13, lf-roles r8a)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit GUIDED-MODEL-SPAN",
+  "browser": false,
+  "fail": {
+   "commit": "a8303f6e4",
+   "state": "S page holds 8 cells, no two-cell Model"
+  },
+  "pass": {
+   "commit": "ae8511168",
+   "state": "S 11 cells, Model spans two with its working; M 9, one-cell Model"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only GUIDED-MODEL-SPAN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-size-order-s",
+  "check": "Guided SIZE-ORDER on the three subtraction stack pages: S prints at least as many items a page as M (lead 2026-11-13: S 8 < M 9 on sub_50_no_regroup, sub_100_no_regroup, sub_2d_1d; fixed by the two-cell Model, ruling (e))",
+  "kind": "commit-pair",
+  "rule": "ws-capacity-pin SIZE-ORDER (guided)",
+  "browser": true,
+  "fail": {
+   "commit": "a8303f6e4",
+   "state": "3 x S 8 < M 9 items a page"
+  },
+  "pass": {
+   "commit": "ae8511168",
+   "state": "S 11 >= M 9"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --roles guided --skills subtraction:sub_50_no_regroup,subtraction:sub_100_no_regroup,subtraction:sub_2d_1d",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
