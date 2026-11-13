@@ -8,7 +8,11 @@
 //                 lf-algebra's pattern_features / function_table_easy / number_patterns_rule pages, lf-algebra r6).
 //                 Control: a one-number answer keeps its one frame slot with the number in it.
 //
-//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE]
+//   REVIEW-TITLE  a Review budgets its body under the title it PRINTS ("Review: <topic>", measured by the bridge through
+//                 input.titleLinesOf), never under a one-line "Review" (lf-algebra growing_shape_patterns Review L: the body
+//                 ran 1.3 mm over under a two-line title). Also: "draw and count" titles as "drawing and counting".
+//
+//   node tests/scripts/ws-roles-unit.mjs [--only KEYJOIN-ROLE,REVIEW-TITLE]
 // Last line `ws-roles-unit: OK (...)` / `ws-roles-unit: FAIL - n finding(s)`; exit 1 on FAIL.
 // MQ_ROOT=<tree> checks another checkout's roles (ws-backtest commit-pair rows).
 import path from 'path';
@@ -20,6 +24,8 @@ const { resolveCtx } = await mod('tokens.js');
 const TF = await mod('roles/true-false.js');
 const RI = await mod('roles/reason-it.js');
 const EA = await mod('roles/error-analysis.js');
+const RV = await mod('roles/review.js');
+const CO = await mod('roles/compose.js');
 
 const argv = process.argv.slice(2);
 const ONLY = argv.includes('--only') ? argv[argv.indexOf('--only') + 1].split(',') : null;
@@ -84,6 +90,19 @@ if (on('KEYJOIN-ROLE')) {
             if (id === 'prose' && role === 'error-analysis' && !/data-ws-slot="ea-draw"/.test(html)) findings.push(`${tag}: a sentence answer's fix is not the item again (redo zone)`);
         } catch (e) { findings.push(`${tag}: ERROR ${String(e && e.stack || e).split('\n').slice(0, 2).join(' ')}`); }
     }
+}
+
+if (on('REVIEW-TITLE')) {
+    checks += 2;
+    const iCan = 'I Can draw and count the next term of a growing pattern';
+    const t = CO.topicOf(iCan);
+    if (t !== 'drawing and counting the next term of a growing pattern') findings.push(`REVIEW-TITLE: topicOf("${iCan}") = "${t}" (want "drawing and counting ...")`);
+    const asked = [];
+    const it = Object.assign(itemOf('one'), { pool: 'main' });
+    try {
+        RV.plan({ ctx: { size: 'L' }, skills: [{ categoryId: 'rolesunit', skillId: 'one', iCan, grade: 4 }], items: [it, it, it, it, it, it].map((x) => Object.assign({}, x)), titleLinesOf: (txt) => { asked.push(txt); return 2; } });
+    } catch (e) { findings.push(`REVIEW-TITLE: plan ERROR ${String(e && e.message || e).slice(0, 120)}`); }
+    if (!asked.some((x) => /^Review: /.test(x))) findings.push(`REVIEW-TITLE: the Review never measured its printed title "Review: <topic>" (asked: ${JSON.stringify(asked).slice(0, 80)})`);
 }
 
 for (const f of findings) console.log(`  FAIL ${f}`);

@@ -66,8 +66,10 @@ export function topicOf(iCan) {
     const verbs = new Set(['add', 'subtract', 'multiply', 'divide', 'count', 'compare', 'order', 'round', 'estimate',
         'read', 'write', 'tell', 'measure', 'find', 'make', 'build', 'show', 'solve', 'name', 'use', 'draw', 'identify', 'sort']);
     if (!verbs.has(v) || GERUND_SKIP.has(v)) return t;
-    const ing = /e$/.test(v) && !/ee$/.test(v) ? `${v.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(v) && v.length <= 3 ? `${v}${v.slice(-1)}ing` : `${v}ing`;
-    return `${ing}${m[2]}`;
+    const gerund = (w) => (/e$/.test(w) && !/ee$/.test(w) ? `${w.slice(0, -1)}ing` : /^(?:[^aeiou]*[aeiou])[^aeiouwxy]$/.test(w) && w.length <= 3 ? `${w}${w.slice(-1)}ing` : `${w}ing`);
+    // "draw and count the next term" -> "drawing and counting ...", never "drawing and count" (lf-roles, growing review)
+    const rest = m[2].replace(/^(\s+and\s+)([a-z]+)\b/i, (all, and, w) => (verbs.has(w.toLowerCase()) ? `${and}${gerund(w.toLowerCase())}` : all));
+    return `${gerund(v)}${rest}`;
 }
 
 /**

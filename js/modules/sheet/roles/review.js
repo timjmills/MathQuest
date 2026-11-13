@@ -120,7 +120,15 @@ function geometry(pools, input) {
     const ctx = ctxOf(input);
     const main = mainSet(pools.main || [], ctx);
     const earlier = pools.earlier || [];
-    const frame = frameOf({ skills: input.skills || [], input, tabId: 'Review 1', title: 'Review', score: 1 });
+    // the header the page prints: "Review: <topic>" of the skill under review, so a title that wraps to two lines takes
+    // its line off the body here too (lf-roles: growing_shape_patterns L ran 1.3 mm over the body under a 2-line title)
+    const skills0 = (input.skills || []).slice(0, 1);
+    const topic = topicOf((skills0[0] || {}).iCan || '');
+    const h0 = input.header || {};
+    const title = h0.title === false ? '' : typeof h0.title === 'string' && h0.title.trim() ? h0.title.trim() : `Review: ${topic}`;
+    // the bridge measures it (input.titleLinesOf); a host with no measure keeps the old one-line budget
+    const titleLines = !title ? 0 : typeof input.titleLinesOf === 'function' ? input.titleLinesOf(title) : 1;
+    const frame = frameOf({ skills: skills0.length ? skills0 : input.skills || [], input: Object.assign({}, input, { header: Object.assign({}, input.header || {}, { titleLines }) }), tabId: 'Review 1', title, score: 1 });
     const m = bandMetrics(ctx, layoutHeader(frame.header));
     const bands = earlier.length ? 2 : 1;
     // A wrapped instruction takes its extra line off the page too.

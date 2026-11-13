@@ -4201,6 +4201,8 @@ async function buildRoleSheet(n, metaOf) {
     const input = {
         items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
+        // (lf-roles: the title's MEASURED lines, for a role whose title it composes itself - review.js "Review: <topic>")
+        titleLinesOf: (text) => measureTitleLines(text, n.size),
         columns: (n.sections[0] && n.sections[0].columns) || 'auto',
         count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
         targetSkill: metaOf(reqSkills[0]),
