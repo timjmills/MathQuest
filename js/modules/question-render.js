@@ -16,7 +16,7 @@ import {
 import {
     cellKindFor, kindHTML, instructionForKind, screenSupportsFor, screenSupportExtrasHTML,
     answerDigits, wireStackEntry, hideScreenOnlyCaptions, visualRepeatsText, monoCell,
-    regroupFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
+    regroupFor, screenOffFor, screenTextLine, hideRepeatedPrompt, wireTickBoxes, adoptVisualBlank, releaseVisualBlank, wireCellSlots,
     clozeHTML, wireClozeBanks, ringParts, ringCellHTML, wireRingGroups, workRowsHTML, fitCellDigits, cellDigitTarget, isNumberLineItem, NUMBER_LINE_INSTRUCTION,
     screenInstruction, canFitDigits, adoptSvgBlank, mountModel, kitCellTwin, wireSignCircle, printInstructionFor, skillDisplayLabel, fitTwinRows, wireLiveCorrect, unwireLiveCorrect, markLegacyBlanks, signsFor, screenCellVerbs, kitTwinPrompt,
     familyScreenVisual, FAMILY_SCREEN_INSTRUCTION,
@@ -1639,7 +1639,7 @@ function _applyScreenCell() {
         if (kind.kind === 'stack') {
             // The legacy column visual already answers through digit boxes; the kit stack keeps
             // that path (column-answer-input) and adds heads, regroup boxes and SP-20 entry.
-            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind) });
+            visualAid.innerHTML = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), supports: _supportsOf(q, kind), off: screenOffFor(q) });
             visualAid.style.display = 'block';
             wireStackEntry(visualAid, { autofocus: !state.hasAnswered });
         } else {

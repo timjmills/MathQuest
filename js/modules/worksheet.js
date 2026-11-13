@@ -11,7 +11,7 @@ import { generateQuestion, generateQuestionFor } from './generate-question.js';
 import { deriveSeed } from './sheet/index.js';
 import { syncWorksheetRefLine } from './refline-screen.js';
 import {
-    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor,
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry, screenSupportsFor, screenOffFor,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, plainText, hideRepeatedPrompt,
     wireTickBoxes, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireClozeBanks, slotAnswerMatches, slotsFilled, wireSignCircle, skillDisplayLabel, fitTwinRows, wireLiveCorrect, markBoxSubmitted, markMissingDigits, itemWasHelped, wireCellInputs, signsFor,
@@ -1517,7 +1517,7 @@ function _wsRenderCard(grid, q, i) {
     try { _wsSupports = kind ? screenSupportsFor(q, kind, { index: i, total: state.problemCount > 0 ? state.problemCount : 10, categoryId: state.category, skillId: state.skill }) : null; } catch (e) { _wsSupports = null; }
     if (kind) {
         if (kind.kind === 'stack') {
-            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}`, supports: _wsSupports });
+            questionDisplay = kindHTML(kind, { regroup: regroupFor(q.skillId || state.skill), idPrefix: `ws${i}`, supports: _wsSupports, off: screenOffFor(q) });
         } else {
             questionDisplay = kindHTML(kind, { slotHtml: inputHtml, supports: _wsSupports }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');
             slotInCell = true;

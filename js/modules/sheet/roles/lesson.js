@@ -462,6 +462,8 @@ function planOnce(input = {}) {
             // (lf-partopts: each part's own fit before the teacher's counts - print-sheet.js reports it as res.lesson.partFit)
             // (lf-partopts: each sheet page's used share after the bands grew - sheetOffers reads it; We Do's ink check)
             sheetFill: part === 'chart' ? [] : pages.map((pg) => +((pg.used + (pg.grown || 0)) / pg.budget).toFixed(3)), weDoSideOk: env.weDoSideOk, weDoStretch: env.weDoStretch,
+            // (lf-partopts B: cell 1 draws its first step in grey - the We Do part's hint, print-sheet.js lessonSupportDecl)
+            weDoFirst: !!env.weDoFirstDrawn,
             // (critic A r2 N1: the last sheet page's free height and the height one Independent row with its head takes)
             sheetFreeMm: part === 'chart' || !pages.length ? null : +Math.max(0, pages[pages.length - 1].budget - pages[pages.length - 1].used - (pages[pages.length - 1].grown || 0)).toFixed(1),
             indepRowMm: pages.length ? pages[pages.length - 1].indepRowMm || null : null,

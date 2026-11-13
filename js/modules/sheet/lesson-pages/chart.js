@@ -329,7 +329,9 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const chantH = chant ? { S: 13, M: 15, L: 17 }[ctx.size] + 1.5 : 0;
     const cols = lay.cols === 2 ? 2 : 1;
     const tailH = tailItem ? Math.max(12, hOf(tailItem, 1)) : 0;
-    const availAll = m.body - m.say - chantH - 2;
+    // (lf-partopts B: the Say band is a part setting - `lesson.partSup.say === false` leaves it off and gives its height to the panels)
+    const sayOff = !!(lesson.partSup && lesson.partSup.say === false);
+    const availAll = m.body - (sayOff ? 0 : m.say) - chantH - 2;
     const avail = availAll - tailH;
     // The second example's row: one cell per state, sized to its tallest drawing.
     const k2 = second.length;
@@ -446,7 +448,7 @@ export function chartPage(input, ctx, data, example, states, draws, second, tail
     const sayN = data && data.sayWords ? pvNumberOf(example) : null;
     // (`chartSay(q)`, lesson data - the detailed lesson maker, lesson 5 r3: the chart's Say in the lesson's own words, In / Out)
     const ownSay = data && typeof data.chartSay === 'function' && example ? (() => { try { return data.chartSay(example.q); } catch (e) { return ''; } })() : '';
-    sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
+    if (!sayOff) sections.push({ kind: 'say', frame: ownSay || (sayN !== null ? `${sayN} is ${numberWords(sayN)}.` : oralFrameOf(example || {}, { fill: true })), digits: 2 });
     if (chant) sections.push({ kind: 'html', html: `<div class="ws-band mq-cchantband" style="height:${chantH - 1.5}mm"><div class="mq-cchant"><b>Rule:</b><span>${esc(chant)}</span></div></div>` });
     const shown = mode === 'row' ? 1 : mode === 'final' ? finShown.length : mode === 'grid3' ? fin.length : 0;
     return {

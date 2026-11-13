@@ -205,7 +205,7 @@ async function browser() {
         const cellKey = (m, c, rule) => `${(m.pages[c.page - 1] || {}).sheet}|${rule}|${c.tmpl}|${Math.round(c.wMm)}`;
         const stdOf = (m) => { const keys = new Set(); for (const c of m.cells) judge([c], '', (rule) => keys.add(cellKey(m, c, rule)), 'lesson'); return { keys, pages: new Set(m.pages.map((p) => p.h)), inked: m.pages.reduce((o, p) => { o[p.sheet] = (o[p.sheet] || 0) + p.inked; return o; }, {}) }; };
         // the support marks a sheet draws (key parity, and "asked = printed")
-        const MARKS = { regroup: /data-ws-seg="/g, heads: /<span class="head">[A-Za-z]/g, say: /\bSay:/g, steps: /data-mq-lesson-strip/g };
+        const MARKS = { regroup: /class="rg[^"]*" data-ws-seg="/g, heads: /<span class="head">[A-Za-z]/g, say: /\bSay:/g, steps: /data-mq-lesson-strip/g };
         const marks = (html) => Object.fromEntries(Object.entries(MARKS).map(([k, re]) => [k, ((html || '').match(re) || []).length]));
         const cellsN = (html) => ((html || '').match(/data-ws-cell="/g) || []).length;
         const SHEET_OF = { prereq: 'lesson-prereq', chart: 'lesson-chart', sheet: 'lesson-sheet', wedo: 'lesson-sheet', practice: 'lesson-practice', mixed: 'lesson-mixed' };
@@ -237,7 +237,8 @@ async function browser() {
                         if (r.error) { F('PO-5', `${where} ${x.part}.${x.id}: does not build: ${r.error}`); continue; }
                         const sh = SHEET_OF[x.part];
                         ok('PO-5', r.sheets[sh] !== std.sheets[sh], `${where} ${x.part}.${x.id} ${J(d)}: its part's pupil pages (${sh}) did not change - the support is declared but not drawn`);
-                        ok('PO-5', r.keySheets[sh] !== std.keySheets[sh], `${where} ${x.part}.${x.id}: the key (${sh}) did not change - the key does not follow the pupil page`);
+                        // (a structure or a band is drawn on the key too; a hint on a cell the key shows fully worked may leave the key as it was)
+                        if (x.kind !== 'hint') ok('PO-5', r.keySheets[sh] !== std.keySheets[sh], `${where} ${x.part}.${x.id}: the key (${sh}) did not change - the key does not follow the pupil page`);
                         for (const other of Object.keys(std.sheets)) if (other !== sh) ok('PO-5', r.sheets[other] === std.sheets[other], `${where} ${x.part}.${x.id}: another sheet (${other}) changed - a part's delta is its own`);
                     }
                 }
@@ -342,7 +343,7 @@ async function browser() {
                 if (sk === 'sub_100_regroup' && role === 'independent') ok('PO-5', r.decl.includes('regroup'), `${where}: the regroup boxes are not declared`);
                 if (sk === 'add_facts') ok('PO-5', r.decl.some((x) => x === 'touch' || x === 'tile'), `${where}: the Support option's hints are not declared`);
                 for (const x of r.out) {
-                    ok('PO-5', x.changed && x.keyChanged, `${where} ${x.id}: flipping it changes ${x.changed ? 'only the pupil page' : 'nothing on the pupil page'}${x.keyChanged ? '' : ' and not the key'}`);
+                    ok('PO-5', x.changed && (x.keyChanged || x.kind === 'hint'), `${where} ${x.id}: flipping it changes ${x.changed ? 'only the pupil page' : 'nothing on the pupil page'}${x.keyChanged ? '' : ' and not the key'}`);
                     if (role === 'test' && x.kind === 'hint') ok('PO-5', x.std === false, `${where} ${x.id}: a quiz hint is on by default`);
                 }
             }
@@ -362,10 +363,10 @@ async function browser() {
                         q.skillOptions = Object.assign({}, q.skillOptions || {}, opts);
                         const k = SC.cellKindFor(q);
                         const html = k ? SC.kindHTML(k, { regroup: SC.regroupFor('sub_100_regroup'), off: SC.screenOffFor(q) }) : '';
-                        screenRg += (html.match(/mq-carry|data-ws-seg=/g) || []).length;
+                        screenRg += (html.match(/mq-carry/g) || []).length;
                     }
                     const b = await window.buildSheet({ role: 'independent', sections: [{ skills: [{ categoryId: 'subtraction', skillId: 'sub_100_regroup', opts }], count: 4 }], size: 'M', paper: 'A4', seed: 901, key: true });
-                    paperRg = (b.pupilHtml.match(/data-ws-seg="/g) || []).length;
+                    paperRg = (b.pupilHtml.match(/class="rg[^"]*" data-ws-seg="/g) || []).length;
                     out[name] = { screenRg, paperRg };
                 }
                 return out;
@@ -425,8 +426,8 @@ async function ui() {
             ok('PO-UI', /Custom: 1 off/.test(after.chip), `${where}: chip after one off: "${after.chip.trim()}"`);
             ok('PO-UI', after.print, `${where}: Print is blocked`);
             if (width === 390) ok('PO-UI', after.wide <= 0, `${where}: ${after.wide} px sideways scroll with the panel open`);
-            const prev = await page.evaluate(async () => { const s = window.__tvLastBuild || null; return s ? { rg: ((s.pupilHtml || '').split('data-ws-sheet="lesson-sheet"').slice(1).join('').match(/data-ws-seg="/g) || []).length } : null; });
-            ok('PO-UI', prev && prev.rg === 0, `${where}: the rebuilt lesson sheet still draws regroup boxes: ${J(prev)}`);
+            const prev = await page.evaluate(async () => { const T = await import("./js/modules/teacher-print.js"); if (typeof T.printScreenSnapshot !== "function") return null; const s = T.printScreenSnapshot(); const pages = (s.pupilHtml || "").split(/(?=<section\b)/).filter((x) => /data-ws-sheet="lesson-sheet"/.test(x.slice(0, 400))); return { pages: pages.length, rg: (pages.join("").match(/class="rg[^"]*" data-ws-seg="/g) || []).length, po: s.partOpts[0] }; });
+            ok('PO-UI', prev && prev.pages > 0 && prev.rg === 0, `${where}: the rebuilt lesson sheet still draws regroup boxes: ${J(prev)}`);
         }
         // the Quiz sheet: each skill's hints unticked by default
         await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });

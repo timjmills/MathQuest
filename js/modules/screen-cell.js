@@ -444,8 +444,13 @@ function spokenOp(op) {
 }
 
 /** The kit drawing for a kind, with the answer slot the host supplies. */
-export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input', supports = null } = {}) {
+export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answerClass = 'column-answer-input', supports = null, off = null } = {}) {
     if (!k) return '';
+    // (lf-partopts B, paper = screen: the role-drawn supports the skill turned off - its `off` option, screenOffFor - are not
+    // drawn on the practice card, the online worksheet or the quiz either)
+    const offL = Array.isArray(off) ? off : [];
+    if (offL.includes('regroup')) regroup = false;
+    if (offL.includes('heads') && k.heads === true) k = Object.assign({}, k, { heads: false });
     // S2: the item's supports (screenSupportsFor): touch dots on the digits, and the cues, tally
     // row and panes drawn round the problem by the same code as paper (support-draw.js).
     const kk = supports && supports.on && supports.on.length ? Object.assign({}, k, { supports }) : k;
@@ -460,6 +465,15 @@ export function kindHTML(k, { slotHtml = '', idPrefix = '', regroup = true, answ
 }
 
 /* ------------------------------------------------------------------ S2 supports on screen */
+
+/**
+ * lf-partopts B: the role-drawn supports an item's skill turned off (its hidden `off` option: regroup, heads, firststep), from
+ * q.skillOptions or the set's options - the same values print-sheet.js draws the paper cell with. [] when none.
+ */
+export function screenOffFor(q, options = null) {
+    const o = (q && q.skillOptions) || options || {};
+    return Array.isArray(o.off) ? o.off.filter((x) => typeof x === 'string') : [];
+}
 
 const SCREEN_TEMPLATE = { eq: 'equation', fact: 'fact', stack: 'stack', division: 'division' };
 

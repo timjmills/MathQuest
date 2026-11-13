@@ -49,7 +49,7 @@ import { lessonPart, lessonPartIds, buildPluggedParts, orderParts } from './shee
 import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
-import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP, practiceSplit } from './sheet/part-opts.js';
+import { normalizePartOpts, partOptsEmpty, lessonPartN, PRACTICE_GROW_CAP, practiceSplit, OFF_IDS, withSupDelta, normalizeSupDelta, SUPPORT_CATALOGUE, BAND_LABELS } from './sheet/part-opts.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
 import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
@@ -1722,6 +1722,8 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         q.__factLike = FACT_FORMAT_RE.test(String(q0.printFormat || '')) || /^(add|sub|mult|div)_facts$/.test(String(q0.skillId || ''));
     }
     const legacy = template === 'legacy';
+    // (lf-partopts B: the role-drawn supports this item's skill turned off - its hidden `off` option)
+    const offIds = g.skill && g.skill.opts && Array.isArray(g.skill.opts.off) ? g.skill.opts.off.filter((x) => OFF_IDS.includes(x)) : [];
     const printSize = getSkillPrintSize(q0.skillId || '', q0.printFormat || '');
     // S2: the supports this item may carry. Until the sheet is allocated it draws the worst case
     // (every support it could carry), which is what it is measured at; the allocation then swaps
@@ -1776,6 +1778,10 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
             else { st = 'wrong'; wrong = { value: v, slots: Object.assign({}, shownSlots || {}) }; }
         }
         const ctx = Object.assign({}, atL(c), { state: legacy && hasShown ? 'blank' : st, wrong, columns: cols, wrapToCell: !!item.wrapToCell, tightRows: !!item.tightRows, options: Object.assign({}, c.options || {}, { factColumns: cols }) });
+        // (lf-partopts B: the skill's `off` - the role-drawn supports its part turned off - with any the role adds, read by the
+        // template as ctx.off; absent when nothing is off, so every standard cell's context is exactly as before)
+        const offC = offIds.length || (Array.isArray(c.off) && c.off.length) ? [...new Set([...(Array.isArray(c.off) ? c.off : []), ...offIds])] : null;
+        if (offC) ctx.off = offC;
         // `payload`: a role asks the template for a variant of this cell (Error analysis asks a drawn
         // model for its redraw zone, `fix: 'draw'`); the item itself is never changed. S2: the
         // item's supports ride in the payload the same way (`supports`), so the pupil page, the key
@@ -1883,6 +1889,8 @@ function hostItem(g, sectionIndex, size, { supports: withSupports = true, mix = 
         arrayDropped: withSupports && arrayDroppedFor(g.skill, q),
         skillRef: g.skill,
     };
+    // (lf-partopts B: the role draws some cells through a template's stepState directly - it reads the item's `off` too)
+    if (offIds.length) item.off = offIds;
     return item;
 }
 
@@ -3961,7 +3969,7 @@ async function buildSheetDeal(req = {}) {
         keyPageCount: n.key ? out.keyPages.length : 0,
         fits,
         items: hostItems.map((it) => ({
-            skill: it.skill, section: it.section, letter: it.letter, template: it.template,
+            skill: it.skill, section: it.section, letter: it.letter, template: it.template, cell: cellRefOf(it),
             text: String(it.q.text || ''), ans: it.q.ans, fclass: it.fclass, measured: it.measured, measureWhy: it.measureWhy, hClass: !!it.hClass, sig: signature(it.q),
         })),
         gaps: out.gaps,
@@ -4695,7 +4703,7 @@ async function buildRoleSheet(n, metaOf) {
         numberLine,
         fits: { cols: f0.cols, rows: f0.rows, perPage: f0.perPage, pages: out.pupilPages.length, note: [line, ...notes.filter((t) => !line.includes(t))].filter(Boolean).join(' '), sections: fitsList },
         items: items.map((it) => ({
-            skill: it.skill, section: 0, pool: it.pool, template: it.template,
+            skill: it.skill, section: 0, pool: it.pool, template: it.template, cell: cellRefOf(it),
             kind: (it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.kind) || undefined,
             text: String((it.q && it.q.text) || ''), ans: it.q && it.q.ans, fclass: it.fclass, dealtAs: it.dealtAs, measured: it.measured, measureWhy: it.measureWhy,
             sig: it.q ? signature(it.q) : undefined,
@@ -4785,6 +4793,92 @@ function planLastFill(res) {
     return top > 0 ? +(used[used.length - 1] / top).toFixed(3) : 1;
 }
 
+/* ------------------------------------------------- lf-partopts B: what a part's items draw (the Supports declarations) */
+
+/** The role-drawn supports one item draws at a level: a stack's regroup row and its place-value letters (stack.js scaffoldOf). */
+function drawnSupportsOf(it, level) {
+    const c = cellOfItem(it);
+    if (!c || c.template !== 'stack' || !c.payload) return { regroup: false, heads: false, needs: false };
+    const p = c.payload;
+    return {
+        regroup: p.regroup !== undefined ? !!p.regroup : level >= 1,
+        heads: p.heads !== undefined ? !!p.heads : level >= 2,
+        needs: !!stackRegroups(p),
+    };
+}
+/** An item's cell spec: a host item's own, or the one a build result's item summary carries (`cell`). */
+const cellOfItem = (it) => (it && it.q && it.q.cell) || (it && it.cell) || null;
+/** The cell spec a build result's item summary carries (lf-partopts B: what the Supports declarations read). */
+const cellRefOf = (it) => (it && it.q && it.q.cell && it.q.cell.template ? { template: it.q.cell.template, payload: it.q.cell.payload } : undefined);
+/** A declaration entry of the catalogue (sheet/part-opts.js SUPPORT_CATALOGUE). */
+const supEntry = (id, extra = {}) => Object.assign({ id, kind: SUPPORT_CATALOGUE[id].kind, label: SUPPORT_CATALOGUE[id].label, from: 'role' }, extra);
+/** The structural declarations of a list of items drawn at the given levels. */
+function structuralDecl(items, levels) {
+    const out = [];
+    const d = (items || []).flatMap((it) => levels.map((L) => drawnSupportsOf(it, L)));
+    const needs = d.some((x) => x.needs);
+    if (d.some((x) => x.regroup)) out.push(supEntry('regroup', needs ? { needs: true } : {}));
+    if (d.some((x) => x.heads)) out.push(supEntry('heads'));
+    return out;
+}
+/** The S2 Support option's hints a skill can draw on these items (its `support` set, the values its items can carry). */
+function optionHintDecl(sk, items) {
+    if (!sk) return [];
+    let def = null;
+    try { def = optionsFor(sk.categoryId, sk.skillId).find((d) => d.id === 'support' && d.supportsModel) || null; } catch (e) { def = null; }
+    if (!def) return [];
+    const its = (items || []).filter((it) => cellOfItem(it) && cellOfItem(it).template !== 'legacy');
+    return def.values.filter((v) => def.render.includes(v.v) && its.some((it) => { try { return canDraw(v.v, cellOfItem(it).payload || {}, cellOfItem(it).template); } catch (e) { return false; } }))
+        .map((v) => ({ id: v.v, kind: 'hint', label: v.l, from: { option: 'support', value: v.v } }));
+}
+/**
+ * The Supports declarations of a lesson packet, per part (DESIGN §2.2: the build says what the page CAN draw; PO-5 renders each
+ * on and off). Parts: prereq, chart (its Say band), sheet (the lesson sheet's structure: We Do at level 2, rows at 1), wedo
+ * (cell 1's first step in grey), practice (structure at level 1, the Support option's hints, the Steps strip), mixed.
+ */
+function lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml }) {
+    const resOf = (part) => allParts.filter((p) => p.part === part).map((p) => p.res);
+    const itemsOf = (part) => resOf(part).flatMap((r) => r.items || []);
+    const out = {};
+    if (prereqs && resOf('prereq').length) out.prereq = structuralDecl(itemsOf('prereq'), [0]);
+    const chartSay = chart && /class="[^"]*ws-say|\bSay:/.test(chart.pupilHtml || '');
+    out.chart = chartSay ? [{ id: 'say', kind: 'band', label: BAND_LABELS.say, from: 'band' }] : [];
+    const meta = (teach && teach.plan && teach.plan.meta) || {};
+    const main = (teach && teach.items || []).filter((it) => it.pool === 'main');
+    const levels = [...(meta.guided > 0 ? [2] : []), ...(meta.independent > 0 ? [1] : [])];
+    out.sheet = levels.length ? structuralDecl(main, levels) : [];
+    out.wedo = meta.guided > 0 && meta.weDoFirst ? [supEntry('firststep')] : [];
+    const prac = itemsOf('practice');
+    if (prac.length) {
+        out.practice = structuralDecl(prac, [1]).concat(optionHintDecl(practiceSk || sk, prac));
+        const strip = resOf('practice').some((r) => /data-mq-lesson-strip/.test(r.pupilHtml || ''));
+        if (stripHtml && strip) out.practice.push({ id: 'steps', kind: 'band', label: BAND_LABELS.steps, from: 'band' });
+    }
+    const mix = itemsOf('mixed');
+    if (mix.length) out.mixed = structuralDecl(mix, [1]);
+    return out;
+}
+
+/**
+ * The Supports declarations of a Practice or Quiz PAPER for one skill (DESIGN §1.3): a few of its items generated as the paper
+ * deals them (seeded), read at the paper's level - Practice the skill's own level (default 1), Quiz 0 - plus the Support
+ * option's hints. The Practice / Quiz sheets show these ticks; the values go into the skill's own options.
+ */
+export function paperSupportDecl(ref, paper = 'practice') {
+    if (!ref || !ref.categoryId || !ref.skillId) return [];
+    const o = normalizeOptions(ref.categoryId, ref.skillId, ref.opts || {});
+    const lv = Array.isArray(o.level) && o.level.length ? o.level.map(Number) : [1];
+    const levels = paper === 'quiz' ? [0] : [...new Set(lv)];
+    const items = [];
+    for (let k = 0; k < 6; k++) {
+        try {
+            const q = generateQuestionFor({ category: ref.categoryId, skill: ref.skillId, opts: Object.assign({}, ref.opts || {}, { off: [] }), seed: 7001 + k * 31 });
+            if (q) items.push(hostItem({ q, skill: Object.assign({}, ref, { opts: Object.assign({}, ref.opts || {}, { off: [], support: [] }) }) }, 0, 'M', { supports: false }));
+        } catch (e) { /* a skill that cannot deal here declares what the others show */ }
+    }
+    return structuralDecl(items, levels).concat(optionHintDecl(ref, items));
+}
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     // The lesson record (plan phase 0.4): a detailed lesson's own `lessonData`; else the library lesson asked for by
@@ -4824,6 +4918,11 @@ async function buildLesson(n, metaOf) {
     const prereqsAll = !n.lessonData && prereqCheckLive(data) ? data.prereqs : null;
     // (lf-partopts: `partOpts.prereq.n` - the first n questions; the routing table routes only the printed ones)
     const po = n.partOpts || null;
+    // (lf-partopts B, design/partopts/DESIGN.md §2.2: each part's supports are OPTION VALUES written over that part's skill refs -
+    // `off` / `support` / `cover` - and part settings for its bands; nothing changes where a part has no delta)
+    const supOf = (p) => (po ? normalizeSupDelta(po[p]) : null);
+    const supSk = (ref, p) => { const d = supOf(p); return d && d.opts && ref ? Object.assign({}, ref, { opts: withSupDelta(ref.opts || {}, d) }) : ref; };
+    const bandOff = (p, b) => { const d = supOf(p); return !!(d && d.bands && d.bands[b] === false); };
     const prereqs = prereqsAll && po && po.prereq && Number.isFinite(po.prereq.n) ? prereqsAll.slice(0, Math.max(1, Math.min(prereqsAll.length, po.prereq.n))) : prereqsAll;
     const warmSkills = prereqs ? [] : data ? data.skills.map(skillRef) : earlierSkills(sk, 2);
     let st = { ccss: [], ee: [], approx: false };
@@ -4849,6 +4948,12 @@ async function buildLesson(n, metaOf) {
     // (lf-partopts: the counts the lesson role reads - chart examples, vocabulary words, Remember, We Do cells, rows)
     const partN = lessonPartN(po);
     if (partN) lessonInput.partN = partN;
+    // (lf-partopts B: the role's own supports - We Do's first step done in grey, the anchor chart's Say band)
+    {
+        const wd = supOf('wedo');
+        const ps = Object.assign({}, wd && wd.opts && wd.opts.off && wd.opts.off.includes('firststep') ? { wedoFirst: false } : {}, bandOff('chart', 'say') ? { say: false } : {});
+        if (Object.keys(ps).length) lessonInput.partSup = ps;
+    }
     // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
     // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
     // whole packet, so the parts before it are built too (they are what it avoids); a REFRESHED part (its seed not the
@@ -4867,9 +4972,11 @@ async function buildLesson(n, metaOf) {
     let chart = await buildRoleSheet(Object.assign({}, nz, {
         size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
+    // (lf-partopts B: the lesson sheet's cells - We Do and rows, one measured pool - carry the sheet's structure delta)
+    const sheetSections = supOf('sheet') ? { sections: [Object.assign({}, nz.sections[0], { skills: [supSk(sk, 'sheet')] }), ...nz.sections.slice(1)] } : {};
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
-    }), metaOf);
+    }, sheetSections), metaOf);
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
@@ -4877,7 +4984,7 @@ async function buildLesson(n, metaOf) {
         // when the page would not hold it; `checks` is what the question asks, the routing table's words - critic r1 D12)
         seed, role: 'pre-skill-check', header, look: 'ican', perQuestion: prereqs.map((p) => Number(p.items) || 2), checkFor: meta,
         // (critic r2 N4: the check holds LR-6 on its page - no answer twice, no near twins, no subtrahend or first addend twice)
-        sections: [{ skills: prereqs.map((p) => avoid(Object.assign({ lr6: true, distinctAnswer: true }, p.ref))) }],
+        sections: [{ skills: prereqs.map((p) => avoid(supSk(Object.assign({ lr6: true, distinctAnswer: true }, p.ref), 'prereq'))) }],
         routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
         lessonInput: undefined,
     }), metaOf);
@@ -4930,7 +5037,10 @@ async function buildLesson(n, metaOf) {
         && Number.isFinite(it.measured[1].hMm) && Number.isFinite(it.measured[c].hMm) && it.measured[c].hMm > it.measured[1].hMm * 1.25);
     const besideCap = [4, 3, 2].find((c) => !reflow(c)) || 1;
     // The practice section and its grid shapes (sheet/lesson-pages/practice.js, the shared builder, §8c).
-    const section = practiceSection({ skill: practiceSk, facts, rounding, divFactsOnly, besideCap });
+    // (lf-partopts B: the Practice pages' skill carries the Practice part's supports delta; the Mixed lead keeps its own)
+    const practiceSkP = supSk(practiceSk, 'practice');
+    const section = practiceSection({ skill: practiceSkP, facts, rounding, divFactsOnly, besideCap });
+    const stepsOff = bandOff('practice', 'steps');
     const stackShapes = practiceStackShapes(data);
     // Lessons r3: fifteen rounding cells fill an M page with cells three times their content (a
     // 33 % empty band); the same fifteen print at L type, which fills them - the page holds the
@@ -4941,7 +5051,7 @@ async function buildLesson(n, metaOf) {
     // shape, the step strip once at the top (sheet/lesson-pages/practice.js practiceBlockSections). Absent: as before.
     const blocks = practiceBlocksOf(data);
     const practiceReq = (pages, withStrip, shape = stackShapes[stackShapes.length - 1], seed = (n.seed + 7919) >>> 0, sec = section) => practiceRequest({
-        common, size, practiceSize, lessonNo, section: sec, facts, pages, withStrip, shape,
+        common, size, practiceSize, lessonNo, section: sec, facts, pages, withStrip: withStrip && !stepsOff, shape,
         seed, strip, stripH, stripHtml,
         ...(blocks ? { blocks: practiceBlockSections(blocks, sec.skills[0]) } : {}),
     });
@@ -5047,10 +5157,10 @@ async function buildLesson(n, metaOf) {
     // skill its own section, the page filled in one frame per section.
     const buildMixed = (seed, avoid = (r) => r, avoidTexts = practiceTexts) => {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
-        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(avoid);
+        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(avoid).map((w) => supSk(w, 'mixed'));
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
         return buildSheetInner(mixedRequest({
-            common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
+            common, lookAsked: n.lookAsked, lead: supSk(practiceSk, 'mixed'), partners: withSkills, practiceTexts: avoidTexts, packNums,
             mixedLattice: n.mixedLattice, mixedLeadDrop: n.mixedLeadDrop, seed,
             stripHtml, stripH, mixedStrip: n.mixedStrip, packTab: n.packTab,
         }));
@@ -5106,11 +5216,11 @@ async function buildLesson(n, metaOf) {
         if (dx && !dx.core && typeof dx.build === 'function') res = await dx.build(Object.assign({}, partApi, { part: dx, seed: seeds[x], avoid }));
         else if (x === 'prereq') res = await buildPrereq(seeds.prereq, avoid);
         else if (x === 'chart' || x === 'sheet' || parts[at].role === 'lesson') {
-            res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(sk)] }), ...nz.sections.slice(1)] });
+            res = await lessonRolePart(x, seeds[x], { lessonInput: { warmSkills: warmSkills.map(avoid) }, sections: [Object.assign({}, nz.sections[0], { skills: [avoid(x === 'sheet' ? supSk(sk, 'sheet') : sk)] }), ...nz.sections.slice(1)] });
             if (x === 'chart') chart = res;
             if (x === 'sheet') teach = res;
         } else if (x === 'practice') {
-            res = await buildPractice(seeds.practice, practiceSection({ skill: avoid(practiceSk), facts, rounding, divFactsOnly, besideCap }));
+            res = await buildPractice(seeds.practice, practiceSection({ skill: avoid(practiceSkP), facts, rounding, divFactsOnly, besideCap }));
         } else res = await buildMixed(seeds.mixed, avoid, others);
         parts[at] = Object.assign({}, parts[at], { res }, key === 'practice' ? { strip: /data-mq-lesson-strip/.test(res.pupilHtml) } : {});
     }
@@ -5192,6 +5302,9 @@ async function buildLesson(n, metaOf) {
                 indepH: Object.fromEntries([1, 2, 3, 4].map((c) => [c, (teach.extras || []).filter((x) => x && x.lessonIndepOf && x.measured && x.measured[c] && x.measured[c].fits !== false).map((x) => x.measured[c].hMm)])) } : null,
             // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
             // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
+            // lf-partopts B (sheet/part-opts.js resolveSupports): what each part's items really DRAW - read from the built items'
+            // templates and payloads and the part's level, never typed - the Supports panels' ticks (lessonSupportDecl).
+            partSup: lessonSupportDecl({ allParts, chart, teach, prereqs, practiceSk, sk, stripHtml }),
             partFit: (() => {
                 const cm = (chart.plan && chart.plan.meta && chart.plan.meta.partFit) || {};
                 const tm = (teach.plan && teach.plan.meta && teach.plan.meta.partFit) || {};

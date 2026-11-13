@@ -42,7 +42,7 @@ import {
 } from './sheet/index.js';
 import { declaredSupports } from './sheet/providers/util.js';
 import { renderPane, PANES } from './sheet/cells/panes/index.js';
-import { cellKindFor, kindHTML, binaryParts, regroupFor, screenSupportsFor } from './screen-cell.js';
+import { cellKindFor, kindHTML, binaryParts, regroupFor, screenSupportsFor, screenOffFor } from './screen-cell.js';
 
 /* ------------------------------------------------------------------ the teacher's setting */
 
@@ -453,7 +453,7 @@ function redrawKit(root, q, ids, ctx) {
     if (tbl != null) supports.table = tbl;
     const oldInputs = Array.from(old.querySelectorAll('input, select, textarea'));
     const html = kind.kind === 'stack'
-        ? kindHTML(kind, { regroup: regroupFor(q.skillId || ctx.skillId || state.skill), supports })
+        ? kindHTML(kind, { regroup: regroupFor(q.skillId || ctx.skillId || state.skill), supports, off: screenOffFor(q, ctx.options || null) })
         : kindHTML(kind, { slotHtml: '<span class="mq-slothost"></span>', supports });
     const tpl = document.createElement('template');
     tpl.innerHTML = html;

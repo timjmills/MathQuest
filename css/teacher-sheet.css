@@ -293,3 +293,16 @@ body.teacher-mode.tvs-open { overflow: hidden; }
 #teacherApp .tvs-often-ctl { display: inline-flex; align-items: center; gap: var(--sp-8); flex-wrap: wrap; min-width: 0; }
 #teacherApp .tvs-share-btn { font-family: var(--font-mono); white-space: nowrap; }
 #teacherApp .tvs-share-of { color: var(--text-2); }
+
+/* lane lf-partopts step B: each skill's Supports on the Worksheet and Quiz sheets (design/partopts/DESIGN.md §1.3). Additive;
+   the chip and panel themselves are css/teacher.css .tv-part-chip / .tv-sup-*. */
+.tvs-sup-rows { display: flex; flex-direction: column; gap: 0; }
+.tvs-sup-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px 0; border-top: 1px solid var(--tv-rule); }
+.tvs-sup-row:first-child { border-top: 0; }
+.tvs-sup-name { margin: 0; font-size: 14px; line-height: 20px; font-weight: 600; color: var(--tv-text); overflow-wrap: anywhere; }
+.tvs-sup-row .tv-part-chip { justify-self: start; }
+@media (min-width: 720px) {
+    .tvs-sup-row { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+    .tvs-sup-row .tv-sup-panel { grid-column: 1 / -1; }
+    .tvs-sup-row .tv-sup-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+}

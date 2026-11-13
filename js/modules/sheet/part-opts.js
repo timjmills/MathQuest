@@ -338,6 +338,11 @@ export function normalizePartOpts(partOpts, limits = {}) {
         }
         if (Object.keys(o).length) out[p] = o;
     }
+    // (step B: each part's supports delta - `opts` {off, support, cover} and `bands` - cleaned, kept beside its counts)
+    for (const p of SUP_PART_IDS) {
+        const d = normalizeSupDelta(src[p]);
+        if (d) out[p] = Object.assign(out[p] || {}, d);
+    }
     return out;
 }
 
@@ -379,4 +384,202 @@ export function lessonPartN(po) {
     return Object.keys(o).length ? o : null;
 }
 
-export default { snapNote, BAND_SLACK_MM, EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+/* ============================================================== SUPPORTS (step B, DESIGN §2) */
+//
+// A part's supports are skill OPTION values, never page hacks (§2.2):
+//   - the role-drawn supports a template or role draws from the level are switched off through the universal hidden
+//     option `off` (skill-options.js offOption: a set of the ids below; default empty, so every code, set and quiz is
+//     unchanged). The template / role reads `ctx.off` (print-sheet.js hostItem draws every item with its skill's `off`, so
+//     the pupil page, the key and the measurement agree; screen-cell.js kindHTML reads the same values on screen).
+//   - the hints that already have an option (the S2 `support` set: touch dots, dot tiles, ten frames ...) are switched
+//     through that option (`support`, with its `cover`).
+//   - page bands (Steps strip, Say band) are part settings (`bands`), not cell supports.
+// The build DECLARES what each part's items really draw (print-sheet.js buildLesson `res.lesson.partSup`, read from the
+// items' templates and payloads - never typed), so a panel never offers a support the page cannot draw; PO-5
+// (ws-partopts-supports) renders each declared id on and off and fails when the DOM does not change.
+
+/** The role-drawn supports `off` can switch (append-only: the codec tokens of `off` are in skill-option-keys.js). */
+export const OFF_IDS = Object.freeze(['regroup', 'heads', 'firststep']);
+/** Each support id: its kind and the teacher's words. */
+export const SUPPORT_CATALOGUE = Object.freeze({
+    regroup: Object.freeze({ kind: 'structural', label: 'Regroup boxes' }),
+    heads: Object.freeze({ kind: 'structural', label: 'Place-value letters (H T O)' }),
+    firststep: Object.freeze({ kind: 'hint', label: 'First problem: its first step done in grey' }),
+});
+/** The page bands a part may turn off (part anatomy, §2.2.4). */
+export const BAND_LABELS = Object.freeze({ steps: 'Steps strip', say: 'Say band' });
+/** The parts with a Supports chip on the Print screen ('sheet' = the lesson sheet's cells, We Do and rows together). */
+export const SUP_PART_IDS = Object.freeze(['prereq', 'chart', 'sheet', 'wedo', 'practice', 'mixed']);
+/** The PAGE_TYPES fade per part (§2.3): the scaffold level its cells are drawn at. */
+export const PART_LEVEL = Object.freeze({ prereq: 0, chart: 3, sheet: 1, wedo: 2, rows: 1, practice: 1, mixed: 1, quiz: 0 });
+
+/** The warning when a support the step teaches with is ticked off (§2.4: a warning, never a block). */
+export const NEEDS_TEXT = Object.freeze({
+    regroup: 'This step teaches with the regroup boxes. Without them, pupils must hold the carried ten in their head. The page still prints.',
+    heads: 'This step teaches with the place-value letters. Without them, pupils must name each column themselves. The page still prints.',
+});
+/** The warning when every structural support of a part is ticked off (§2.4). */
+export const NO_STRUCTURE_TEXT = 'No structure left: the cell is the problem and the answer slot only.';
+/** The quiz paper's line when a hint is ticked (owner answer 3: offered, off by default). */
+export const QUIZ_HINTS_TEXT = 'Hints are on for this quiz: they print on the quiz and its key, and show on the online quiz.';
+
+const uniq = (a) => [...new Set(a)];
+const asList = (v) => (Array.isArray(v) ? v : v === undefined || v === null ? [] : [v]);
+const isOptHint = (x) => !!(x && x.from && typeof x.from === 'object' && x.from.option === 'support');
+
+/**
+ * One part's supports delta, cleaned: `opts.off` only known ids (in OFF_IDS order), `opts.support` a list (the skill's own
+ * option normalises its values), `opts.cover` a string, `bands` only known bands, set false. Null when empty.
+ */
+export function normalizeSupDelta(v) {
+    if (!v || typeof v !== 'object') return null;
+    const out = {};
+    const o = v.opts && typeof v.opts === 'object' ? v.opts : null;
+    if (o) {
+        const oo = {};
+        const off = OFF_IDS.filter((id) => asList(o.off).includes(id));
+        if (off.length) oo.off = off;
+        if (Array.isArray(o.support)) oo.support = uniq(o.support.filter((x) => typeof x === 'string' || typeof x === 'number'));
+        if (typeof o.cover === 'string' && o.cover) oo.cover = o.cover;
+        if (Object.keys(oo).length) out.opts = oo;
+    }
+    const b = v.bands && typeof v.bands === 'object' ? v.bands : null;
+    if (b) {
+        const bb = {};
+        for (const k of Object.keys(BAND_LABELS)) if (b[k] === false) bb[k] = false;
+        if (Object.keys(bb).length) out.bands = bb;
+    }
+    return Object.keys(out).length ? out : null;
+}
+
+/**
+ * The supports of one part, resolved (§2.2): `decl` the part's declaration (the build's `partSup[part]`: a list of
+ * {id, kind: 'structural' | 'hint' | 'band', label, from: 'role' | 'band' | {option: 'support', value}, needs?}),
+ * `roleLevel` the part's level (PART_LEVEL), `delta` the part's partOpts entry (a paper: {opts: the skill's opts}),
+ * `base` the skill's own options (an option-backed hint's standard is the skill's own tick: off unless the skill has it).
+ * Returns { level, off, opts: {support?, cover?}, bands, ticks: {id: bool}, std: {id: bool}, changed, warnings } where
+ * `off` / `opts` / `bands` are what the page is built with, `ticks` the panel's boxes and `std` the standard's. It never
+ * blocks: a warning is a line on the panel; the values print as asked.
+ */
+export function resolveSupports(decl, roleLevel, delta = null, base = {}) {
+    const d = normalizeSupDelta(delta) || {};
+    const o = d.opts || {};
+    const list = Array.isArray(decl) ? decl : [];
+    const baseSupport = asList(base && base.support);
+    const ticks = {}, std = {};
+    for (const x of list) {
+        if (x.kind === 'band') { std[x.id] = true; ticks[x.id] = !(d.bands && d.bands[x.id] === false); continue; }
+        if (isOptHint(x)) {
+            std[x.id] = baseSupport.includes(x.from.value);
+            ticks[x.id] = Array.isArray(o.support) ? o.support.includes(x.from.value) : std[x.id];
+            continue;
+        }
+        std[x.id] = true;
+        ticks[x.id] = !asList(o.off).includes(x.id);
+    }
+    const off = list.filter((x) => x.from === 'role' && ticks[x.id] === false).map((x) => x.id);
+    const opts = {};
+    const optHints = list.filter(isOptHint);
+    if (optHints.length && Array.isArray(o.support)) opts.support = optHints.filter((x) => ticks[x.id]).map((x) => x.from.value);
+    if (o.cover) opts.cover = o.cover;
+    const bands = {};
+    for (const x of list) if (x.kind === 'band' && ticks[x.id] === false) bands[x.id] = false;
+    const changed = list.filter((x) => ticks[x.id] !== std[x.id]).length;
+    const warnings = [];
+    for (const x of list) if (x.needs && ticks[x.id] === false && NEEDS_TEXT[x.id]) warnings.push(NEEDS_TEXT[x.id]);
+    const structural = list.filter((x) => x.kind === 'structural');
+    if (structural.length && structural.every((x) => ticks[x.id] === false)) warnings.push(NO_STRUCTURE_TEXT);
+    return { level: roleLevel, off, opts, bands, ticks, std, changed, warnings };
+}
+
+/** The Supports chip's words for a part (§1.1): "None to choose", "Standard: ..." or "Custom: n off, n on". */
+export function supportsChip(decl, r) {
+    const list = Array.isArray(decl) ? decl : [];
+    if (!list.length) return 'None to choose';
+    if (!r || !r.changed) {
+        const on = list.filter((x) => (r && r.ticks ? r.ticks[x.id] : true));
+        const kinds = new Set(on.map((x) => x.kind));
+        const words = [kinds.has('structural') ? 'structure' : '', kinds.has('hint') ? 'hints' : '', kinds.has('band') ? 'page bands' : ''].filter(Boolean);
+        return `Standard: ${words.length ? words.join(', ').replace(/, ([^,]*)$/, ' and $1') : 'no hints'}`;
+    }
+    const offN = list.filter((x) => r.std[x.id] && !r.ticks[x.id]).length;
+    const onN = list.filter((x) => !r.std[x.id] && r.ticks[x.id]).length;
+    return `Custom: ${[offN ? `${offN} off` : '', onN ? `${onN} on` : ''].filter(Boolean).join(', ')}`;
+}
+
+/** The delta a panel's ticks write back: only what differs from the standard; null for the standard. */
+export function supDeltaFromTicks(decl, ticks, std, cover) {
+    const list = Array.isArray(decl) ? decl : [];
+    const off = list.filter((x) => x.from === 'role' && ticks[x.id] === false).map((x) => x.id);
+    const optHints = list.filter(isOptHint);
+    const supChanged = optHints.some((x) => !!ticks[x.id] !== !!std[x.id]);
+    const bands = {};
+    for (const x of list) if (x.kind === 'band' && ticks[x.id] === false) bands[x.id] = false;
+    const opts = {};
+    if (off.length) opts.off = off;
+    if (supChanged) opts.support = optHints.filter((x) => ticks[x.id]).map((x) => x.from.value);
+    if (cover && optHints.some((x) => ticks[x.id])) opts.cover = cover;
+    return normalizeSupDelta({ opts, bands });
+}
+
+/**
+ * A skill's option values with a part's delta over them: `off`, `support` and `cover` replace; the skill's other options
+ * are kept. print-sheet.js puts it on the part's skill refs; the Practice / Quiz sheets on a skill's own opts.
+ */
+export function withSupDelta(opts, delta) {
+    const d = normalizeSupDelta(delta);
+    if (!d || !d.opts) return opts;
+    const out = Object.assign({}, opts || {});
+    if (d.opts.off) out.off = d.opts.off.slice();
+    if (d.opts.support) out.support = d.opts.support.slice();
+    if (d.opts.cover) out.cover = d.opts.cover;
+    return out;
+}
+
+/* ------------------------------------------------- the per-size offer gate (lead, lf-partopts B) */
+
+/**
+ * Option values offered only at some sizes: {'category:skill': {optionId: {value: {sizes, why}}}}. A value listed here is
+ * not offered at the other sizes (skill-options.js offeredOptionsFor leaves it out while the screen's size is one of them)
+ * and a teacher's choice of it is put back to the option's default there, with the reason (`gateBySize`). Lesson data and
+ * the engine are not gated (lesson 3a deals band 36 at L by its own record).
+ */
+export const SIZE_OFFERS = Object.freeze({
+    'multiplication:mult_properties': Object.freeze({
+        band: Object.freeze({ 36: Object.freeze({ sizes: Object.freeze(['S']), why: 'Order factors to 6 is offered at size S only, pending re-measure.' }) }),
+    }),
+});
+
+/** True when option `optId` = `value` of a skill is offered at `size` (no size: every value is). */
+export function offeredAtSize(categoryId, skillId, optId, value, size) {
+    if (!size) return true;
+    const t = SIZE_OFFERS[`${categoryId}:${skillId}`];
+    const e = t && t[optId] && t[optId][String(value)];
+    return !e || e.sizes.includes(size);
+}
+
+/**
+ * A skill's chosen options through the size gate: a value not offered at `size` goes back to `defaults[optId]` (a set
+ * loses the member). Returns { opts, notes }: the reasons, empty when nothing changed (then `opts` is the same object).
+ */
+export function gateBySize(categoryId, skillId, opts, size, defaults = {}) {
+    const t = SIZE_OFFERS[`${categoryId}:${skillId}`];
+    if (!t || !opts || !size) return { opts, notes: [] };
+    let out = opts;
+    const notes = [];
+    for (const optId of Object.keys(t)) {
+        if (!(optId in opts)) continue;
+        const v = opts[optId];
+        if (Array.isArray(v)) {
+            const drop = v.filter((x) => !offeredAtSize(categoryId, skillId, optId, x, size));
+            if (drop.length) { out = Object.assign({}, out, { [optId]: v.filter((x) => !drop.includes(x)) }); drop.forEach((x) => notes.push(t[optId][String(x)].why)); }
+        } else if (!offeredAtSize(categoryId, skillId, optId, v, size)) {
+            notes.push(t[optId][String(v)].why);
+            out = Object.assign({}, out);
+            if (optId in defaults) out[optId] = defaults[optId]; else delete out[optId];
+        }
+    }
+    return { opts: out, notes };
+}
+
+export default { OFF_IDS, SUPPORT_CATALOGUE, BAND_LABELS, SUP_PART_IDS, PART_LEVEL, NEEDS_TEXT, NO_STRUCTURE_TEXT, QUIZ_HINTS_TEXT, normalizeSupDelta, resolveSupports, supportsChip, supDeltaFromTicks, withSupDelta, SIZE_OFFERS, offeredAtSize, gateBySize, snapNote, BAND_SLACK_MM, EB_BAND_MAX, EB_MIN_CELL_MM, bandFails, ROWFIT_SLACK_MM, rowFits, shortestRowMm, NOT_ADDED_STD, VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

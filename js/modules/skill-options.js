@@ -1,5 +1,6 @@
 // skill-options.js — the options a skill carries with it.
 import { normalizeRows } from './count-rows.js';
+import { offeredAtSize } from './sheet/part-opts.js';   // pure, imports nothing (lf-partopts B: the per-size offer gate)
 import { presetOf } from './skill-presets.js';   // pure table, imports nothing   // pure, imports nothing: node still loads this file bare
 //
 // Owner's rule (2026-09-19): options live ON THE SKILL, not on the page. A skill declares what
@@ -3646,7 +3647,18 @@ export const skipAfterOption = () => ({
     tip: 'Skip: how many wrong tries before the pupil may skip a question (0 = never).',
     group: PLAY_GROUP, summary: (v) => (Number(v) ? `Skip after ${Number(v)}` : 'Skip off'),
 });
-export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption()];
+// `off` (lane lf-partopts step B, design/partopts/DESIGN.md §2.2): the role-drawn supports turned OFF for this skill - the
+// regroup boxes, the place-value letters over the columns, the first problem's first step done in grey. A HIDDEN set (never a
+// control of its own: the Supports panels of the Print screen and the Practice / Quiz sheets write it), empty by default, so
+// every code, saved set and quiz written before is unchanged. The templates and roles read it as `ctx.off`; the screen hosts
+// as screenOffFor(q). Values append-only (codec tokens in skill-option-keys.js).
+export const offOption = () => ({
+    id: 'off', label: 'Supports turned off', type: 'set', default: [], hidden: true, group: 'support',
+    values: [{ v: 'regroup', l: 'Regroup boxes' }, { v: 'heads', l: 'Place-value letters (H T O)' },
+        { v: 'firststep', l: 'First problem: its first step done in grey' }],
+    help: 'The supports the Supports panel turned off for this skill.',
+});
+export const UNIVERSAL_OPTIONS = [levelOption(), calculatorOption(), skipAfterOption(), offOption()];
 
 // ---------------------------------------------------------------------------
 // MEASURED OPTIONS — every skill gets the settings its generator was seen to read
@@ -3867,7 +3879,18 @@ export function optionsFor(categoryId, skillId) {
  * the measurement saw it change the problems. A control that changes nothing is a lie on the
  * teacher's screen.
  */
-export function offeredOptionsFor(categoryId, skillId) {
+// The size the teacher's screen prints at (lf-partopts B, the per-size offer gate): an option value offered only at some sizes
+// (sheet/part-opts.js SIZE_OFFERS) is left out of offeredOptionsFor while it is another size. null: every value is offered.
+let OFFER_SIZE = null;
+/** The Print screen and the Practice / Quiz sheets say which size they print at; null clears it. */
+export function setOfferSize(size) { OFFER_SIZE = size === 'S' || size === 'M' || size === 'L' ? size : null; }
+const _sizeGated = (categoryId, skillId, defs, size) => defs.map((d) => {
+    if (!Array.isArray(d.values) || d.values.every((x) => offeredAtSize(categoryId, skillId, d.id, x.v, size))) return d;
+    return Object.assign({}, d, { values: d.values.filter((x) => offeredAtSize(categoryId, skillId, d.id, x.v, size)) });
+});
+export function offeredOptionsFor(categoryId, skillId, o = {}) {
+    const size = o && o.size !== undefined ? o.size : OFFER_SIZE;
+    if (size) return _sizeGated(categoryId, skillId, offeredOptionsFor(categoryId, skillId, { size: null }), size);
     const pre = _presetDefs(categoryId, skillId, offeredOptionsFor);
     if (pre) return pre;
     const own = ownOptionsFor(categoryId, skillId);

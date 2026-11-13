@@ -25,7 +25,9 @@
 //
 // Light only; tokens from css/teacher-tokens.css; styles in css/teacher-sheet.css (.tvs-*).
 
-import { buildSheet, sheetDocument } from './print-sheet.js';
+import { buildSheet, sheetDocument, paperSupportDecl } from './print-sheet.js';
+import { resolveSupports, supportsChip, QUIZ_HINTS_TEXT, gateBySize } from './sheet/part-opts.js';
+import { setOfferSize, defaultOptions } from './skill-options.js';
 import {
     icon, esc, toast, copyText, currentSet, findSkill, skillLabel, readStore, writeStore, printDefaults,
     addToCurrentSet, pupilCode,
@@ -153,7 +155,10 @@ function perPageFor(list) { return perLearned.get(perBase(list)) || PER_PAGE[S.o
 /* ================================================================= requests (the engine mapping) */
 
 function skillRef(it, weight, force = false) {
-    const o = { categoryId: it.categoryId, skillId: it.skillId, opts: it.opts || {} };
+    // (lf-partopts B, the per-size offer gate: a value offered only at another size goes back to its default for this paper)
+    let opts = it.opts || {};
+    try { opts = gateBySize(it.categoryId, it.skillId, opts, S.opts.size, defaultOptions(it.categoryId, it.skillId)).opts; } catch (e) { /* ungated */ }
+    const o = { categoryId: it.categoryId, skillId: it.skillId, opts };
     if (weight > 1 || (force && weight > 0)) o.weight = weight;
     return o;
 }
@@ -554,6 +559,70 @@ function byGrade(list) {
     return GRADE_ORDER.filter((g) => by[g]).map((g) => ({ grade: g, list: by[g] }));
 }
 
+/* ================================================================= Supports (lane lf-partopts step B, DESIGN §1.3) */
+
+// Each skill's supports on the paper: the ticks it can draw at the paper's level (print-sheet.js paperSupportDecl - Practice the
+// skill's own level, default 1; Quiz 0), written into THE SKILL'S OWN OPTIONS (`off` for the role-drawn ones, `support` for the
+// Support option's hints), so they go with the skill to the online worksheet, the quiz and its share code. On a Quiz the
+// hints are offered and off by default (owner answer 3): they are the skill's `support` ticks, which no skill has by default.
+const SUP_GROUPS_P = [['structural', 'Structure', 'stays at every level'], ['hint', 'Hints', '']];
+const supCache = new Map();
+function paperDecl(it, quiz) {
+    const k = `${keyOf(it)}|${quiz ? 'q' : 'p'}|${JSON.stringify((it.opts && it.opts.level) || null)}`;
+    if (!supCache.has(k)) { let d = []; try { d = paperSupportDecl({ categoryId: it.categoryId, skillId: it.skillId, opts: it.opts || {} }, quiz ? 'quiz' : 'practice'); } catch (e) { d = []; } supCache.set(k, d); }
+    return supCache.get(k);
+}
+const paperLevel = (it, quiz) => (quiz ? 0 : 1);
+function paperResolved(it, quiz) {
+    const o = it.opts || {};
+    return resolveSupports(paperDecl(it, quiz), paperLevel(it, quiz), { opts: { off: o.off || [], support: Array.isArray(o.support) ? o.support : [] } }, {});
+}
+function supportsHTML(list, quiz) {
+    const shown = list.filter((x) => !x.leftOut).slice(0, CHIP_MAX);
+    if (!shown.length || isBig(list)) return '';
+    const rows = shown.map((it) => {
+        const decl = paperDecl(it, quiz);
+        const k = keyOf(it);
+        const r = paperResolved(it, quiz);
+        const open = S.supOpen === k && decl.length;
+        const chip = decl.length
+            ? `<button type="button" class="tv-part-chip${r.changed ? ' is-custom' : ''}" data-act="supopen" data-v="${esc(k)}" aria-expanded="${!!open}"><span>${esc(r.changed ? supportsChip(decl, r) : `${quiz ? 'Quiz' : 'Practice'} standard: ${supportsChip(decl, r).replace(/^Standard: /, '')}`)}</span>${icon('chevD', 14, open ? ' style="transform:rotate(180deg)"' : '')}</button>`
+            : '<span class="tvs-muted">None to choose</span>';
+        let panel = '';
+        if (open) {
+            const groups = SUP_GROUPS_P.map(([kind, title, sub]) => {
+                const l = decl.filter((x) => x.kind === kind);
+                if (!l.length) return '';
+                const subT = kind === 'hint' && quiz ? 'off on a quiz unless you tick them' : sub;
+                return `<div class="tv-sup-group"><p class="tv-sup-group-h">${esc(title)}${subT ? ` <span class="tv-sup-group-s">${esc(subT)}</span>` : ''}</p>${l.map((x) => `<button type="button" class="tv-check tv-sup-tick" role="checkbox" aria-checked="${!!r.ticks[x.id]}" data-act="suptick" data-v="${esc(k)}" data-sup="${esc(x.id)}" data-sup-kind="${x.kind}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span class="tv-sup-l">${esc(x.label)}${x.needs ? ' <span class="tv-sup-tag">the skill teaches with it</span>' : ''}</span></button>`).join('')}</div>`;
+            }).join('');
+            const hinted = quiz && decl.some((x) => x.kind === 'hint' && r.ticks[x.id]);
+            panel = `<div class="tv-sup-panel" role="group" aria-label="Supports: ${esc(it.label)}"><div class="tv-sup-groups">${groups}</div>${hinted ? `<p class="tv-sup-quizline" role="status">${esc(QUIZ_HINTS_TEXT)}</p>` : ''}${r.warnings.map((w) => `<p class="tv-sup-warn" role="status">${icon('info', 14)}<span>${esc(w)}</span></p>`).join('')}</div>`;
+        }
+        return `<div class="tvs-sup-row"><p class="tvs-sup-name">${esc(it.label)}</p>${chip}${panel}</div>`;
+    }).join('');
+    return row('Supports', `Each skill's supports go with it to paper${quiz ? ', the online quiz' : ', the online worksheet'} and its share code.`, `<div class="tvs-sup-rows">${rows}</div>`);
+}
+function supTick(k, id) {
+    const it = currentSet().find((x) => `${x.categoryId}:${x.skillId}` === k);
+    const view = items().find((x) => keyOf(x) === k);
+    if (!it || !view) return;
+    const quiz = S.sheet === 'quiz';
+    const decl = paperDecl(view, quiz);
+    const r = paperResolved(view, quiz);
+    const ticks = Object.assign({}, r.ticks, { [id]: !r.ticks[id] });
+    const o = Object.assign({}, it.opts || {});
+    const off = decl.filter((x) => x.from === 'role' && ticks[x.id] === false).map((x) => x.id);
+    const hintVals = decl.filter((x) => x.from && typeof x.from === 'object').map((x) => x.from.value);
+    const keepSup = (Array.isArray(o.support) ? o.support : []).filter((v) => !hintVals.includes(v));
+    const sup = keepSup.concat(decl.filter((x) => x.from && typeof x.from === 'object' && ticks[x.id]).map((x) => x.from.value));
+    if (off.length) o.off = off; else delete o.off;
+    if (sup.length) o.support = sup; else delete o.support;
+    it.opts = Object.keys(o).length ? o : undefined;
+    if (!it.opts) delete it.opts;
+    window.skillQueue = [...currentSet()];
+}
+
 /* ================================================================= markup helpers */
 
 const gradeName = (g) => (g === 'K' ? 'Kindergarten' : g === 'M' ? 'Mixed levels' : `Grade ${g}`);
@@ -677,6 +746,7 @@ function render() {
 function renderMain() {
     const box = root && root.querySelector('#tvsMain');
     if (!box) return;
+    try { setOfferSize(S.opts.size); } catch (e) { /* no gate */ }
     const keep = box.scrollTop;
     // a share button that had focus (or was just committed) gets it back after the redraw
     const ae = document.activeElement;
@@ -717,6 +787,7 @@ function optionsHTML() {
     }
     if (quiz) h += `<div class="tvs-field"><label class="tvs-label" for="tvsQuizName">Quiz name</label><input id="tvsQuizName" class="tvs-input" data-in="quizname" value="${esc(S.quiz.name || autoQuizName(list))}"></div>`;
     h += skillsHTML(list);
+    h += supportsHTML(list, quiz);
     if (!quiz && EXTRA && EXTRA.html) { try { h += EXTRA.html(list) || ''; } catch (e) { console.warn('[teacher-sheet] extra', e); } }
     const p = plan(list);
     const k = p.kind;
@@ -1218,6 +1289,9 @@ function onClick(e) {
         case 'keyversions': S.opts.keyVersions = v === 'end' ? 'end' : 'after'; changed(); return;
         case 'points': S.quiz.points = Number(v) === 2 ? 2 : 1; changed(false); renderSide(); return;
         case 'examples': S.opts.examples = v; changed(); return;
+        // (lf-partopts B: a skill's Supports - one panel open at a time; a tick writes the skill's own options)
+        case 'supopen': S.supOpen = S.supOpen === v ? null : v; renderMain(); return;
+        case 'suptick': supTick(v, b.dataset.sup); S.refocus = null; changed(); { const nb = root && root.querySelector(`[data-act="suptick"][data-v="${CSS.escape(v)}"][data-sup="${CSS.escape(b.dataset.sup)}"]`); if (nb) nb.focus(); } return;
         case 'each': S.opts.each = v; changed(); return;
         case 'layout': S.opts.layout = v; changed(); return;
         case 'factcols': S.opts.factCols = v; changed(); return;

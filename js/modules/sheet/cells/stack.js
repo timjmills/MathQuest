@@ -346,10 +346,14 @@ export function stackSeps(p, t) {
 /** The scaffold the ladder asks for, resolved once (SCC-Q10: the ctx decides, not the generator). */
 function scaffoldOf(p, ctx) {
     const level = ctx && ctx.scaffoldLevel !== undefined ? ctx.scaffoldLevel : 1;
-    const heads = p.heads !== undefined ? p.heads : level >= 2;
-    const regroup = p.regroup !== undefined ? p.regroup : (level >= 1 && (p.op === '-' ? 'sub' : 'add'));
+    // (lf-partopts B: a support the teacher turned off - the skill's `off` option, read as ctx.off - is not drawn, on the
+    // pupil page, its key and its measurement alike; design/partopts/DESIGN.md §2.2)
+    const heads = offHas(ctx, 'heads') ? false : p.heads !== undefined ? p.heads : level >= 2;
+    const regroup = offHas(ctx, 'regroup') ? false : p.regroup !== undefined ? p.regroup : (level >= 1 && (p.op === '-' ? 'sub' : 'add'));
     return { level, heads, regroup };
 }
+/** True when the cell's skill turned support `id` off (the universal hidden option `off`, print-sheet.js / screen-cell.js). */
+const offHas = (ctx, id) => !!(ctx && Array.isArray(ctx.off) && ctx.off.includes(id));
 
 /**
  * One digit place of the answer row. DOM order stays left to right; SCC-T14 puts the FOCUS
@@ -487,14 +491,14 @@ register('stack', {
     footprint(p, ctx) {
         const t = tracksOf(p);
         const s = SIZES[ctx.size];
-        const regroup = p.regroup !== undefined ? !!p.regroup : ctx.scaffoldLevel >= 1;
+        const regroup = offHas(ctx, 'regroup') ? false : p.regroup !== undefined ? !!p.regroup : ctx.scaffoldLevel >= 1;
         const hEm = headTrackEm(p, ctx, scaffoldOf(p, ctx).heads, t);
         const emMm = EM_MM[ctx.metrics.digitPt] || (ctx.metrics.digitPt / 72) * 25.4;
         const track = Math.max(trackMm(ctx.metrics.digitPt, ctx.size, ctx.look, regroup || wideOf(p)), hEm * emMm);
         const hx = headEmsOf(p, ctx, scaffoldOf(p, ctx).heads, t);
         const headExtraMm = hx ? Object.values(hx).reduce((acc, em) => acc + Math.max(0, em * emMm - track), 0) : 0;
         const digitH = (ctx.metrics.digitPt / 72) * 25.4 * 1.15;   // TY-13 digit line-height 1.15
-        const hMm = (p.heads || ctx.scaffoldLevel >= 2 ? s.headsMm : 0)
+        const hMm = (!offHas(ctx, 'heads') && (p.heads || ctx.scaffoldLevel >= 2) ? s.headsMm : 0)
             + (regroup ? (p.op === '-' ? s.headroomMm : s.regroupMm) : 0)
             + digitH * (p.operands ? Math.max(2, p.operands.length) : 2) + 3 + s.answerMm
             + (p.check && isSub(p) ? (ctx.metrics.textPt / 72) * 25.4 * 1.6 + 4 : 0);

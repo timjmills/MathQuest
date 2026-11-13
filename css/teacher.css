@@ -1015,3 +1015,44 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
     #tvPageTabs { display: flex; flex-wrap: wrap; align-content: flex-start; }
     #tvPageTabs > button { flex: 1 1 auto; min-width: 0; }
 }
+
+/* lane lf-partopts step B: the Supports chip and its panel (design/partopts/DESIGN.md §1.1-1.3, mock.html). Additive. */
+.tv-part-chip {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; max-width: 100%; padding: 6px 12px;
+    border: 1px solid var(--tv-border); border-radius: 999px; background: var(--tv-surface); color: var(--tv-text);
+    font: inherit; font-size: 13px; line-height: 18px; font-weight: 500; text-align: left; cursor: pointer;
+}
+.tv-part-chip.is-custom { border-color: var(--tv-text); font-weight: 700; }
+.tv-part-chip:hover { background: var(--tv-subtle); }
+.tv-part-chip:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; }
+.tv-part-chip svg { flex: none; }
+.tv-part.has-sup-panel { grid-template-areas: 'print name ref' '. many many' '. sup sup' 'warn warn warn' 'panel panel panel'; }
+.tv-sup-panel {
+    grid-area: panel; display: flex; flex-direction: column; gap: 8px; min-width: 0; margin-top: 4px; padding: 10px 12px;
+    border: 1px solid var(--tv-border); border-radius: 8px; background: var(--tv-subtle-2);
+}
+.tv-sup-groups { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.tv-sup-group { min-width: 0; }
+.tv-sup-group-h { margin: 0 0 2px; font-size: 13px; line-height: 18px; font-weight: 700; color: var(--tv-text); }
+.tv-sup-group-s { font-weight: 500; color: var(--tv-text-2); }
+.tv-check.tv-sup-tick { width: 100%; min-height: 44px; padding: 0 4px; align-items: center; }
+.tv-sup-l { min-width: 0; overflow-wrap: anywhere; }
+.tv-sup-tag { display: block; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tv-text-2); }
+.tv-sup-cover { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tv-sup-cover .tv-sup-group-h { flex-basis: 100%; }
+.tv-sup-cv {
+    min-height: 44px; padding: 0 12px; border: 1px solid var(--tv-border); border-radius: 8px; background: var(--tv-surface);
+    font: inherit; font-size: 13px; line-height: 18px; color: var(--tv-text); cursor: pointer;
+}
+.tv-sup-cv[aria-checked="true"] { background: var(--tv-selected); border-color: var(--tv-selected); color: var(--tv-on-selected); }
+.tv-sup-std { margin: 0; font-size: 12px; line-height: 16px; color: var(--tv-text-2); }
+.tv-sup-warn {
+    display: flex; align-items: flex-start; gap: 6px; margin: 0; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--tv-text); background: var(--tv-surface); font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text);
+}
+.tv-sup-warn svg { flex: none; margin-top: 2px; }
+.tv-sup-quizline { margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text); }
+@container (min-width: 720px) {
+    .tv-part.has-sup-panel { grid-template-areas: 'print name many sup ref' '. warn warn warn warn' '. panel panel panel panel'; }
+    .tv-sup-groups { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+}

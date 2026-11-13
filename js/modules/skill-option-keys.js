@@ -228,7 +228,8 @@ export const MULTI_KEYS = Object.freeze({
     // (Lane D 2026-10-16 had 5P / 5Q, which main gave to answerSlot / winRows; the port moved them to 5V / 5W.)
     amEdges: '5V',       // area models: the numbers around the box given / pupil writes them / mixed (2026-10-16)
     amForm: '5W',        // area-model division: the problem shown as ÷ sign / long division / fraction (a set)
-    // NEXT FREE IN BLOCK 5: 5X (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors).
+    off: '5X',           // every skill (lf-partopts B): the role-drawn supports turned off (a hidden set: regroup, heads, firststep)
+    // NEXT FREE IN BLOCK 5: 5Y (5P-5U are taken above: answerSlot, winRows, winCols, minFactor, ftTrap, ftFactors).
 
     // Block 6 — O2 easier / harder ladders (design/audit/OPTIONS-CRITIC-R2.md §5 #5, #13; 2026-09-25).
     // The other new ladders reuse `band` (B, a scalar: every number on the item, the answer too).
@@ -421,6 +422,8 @@ export const VALUE_TOKENS = Object.freeze({
         '1/2': 'B', '1/3': 'C', '1/4': 'D', '1/5': 'E', '1/6': 'G', '1/8': 'I', '1/10': 'J', '1/12': 'L', '0.1': 'M', '0.01': 'N' }),
     nlLabels: Object.freeze({ auto: 'A', all: 'L', 2: '2', 5: '5', 10: 'T', ends: 'E', none: 'N' }),
     nlMinor: Object.freeze({ auto: 'A', 0: '0', 2: '2', 4: '4', 5: '5', 10: 'T' }),
+    // lf-partopts B: the role-drawn supports turned off (APPEND-ONLY)
+    off: Object.freeze({ regroup: 'R', heads: 'H', firststep: 'F' }),
 });
 
 // Every member a numeric SET option takes on any skill, written as itself in base 36 (7 -> "7",

@@ -277,7 +277,7 @@ function weDoBandOwn(env) {
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
-    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i), nolabel: true }));
+    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
     const zoneCtx = resolveCtx({ size: ctx.size, look: ctx.look, mode: 'print' });
     const weBand = {
         kind: 'row', cls: 'mq-modelrow mq-lwedorow', widths: ['1fr', `${WEDO_W_MM}mm`],
@@ -289,7 +289,7 @@ function weDoBandOwn(env) {
     // The Guided cells take little of the page's spare height: they are sized to their problems
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
-        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i), nolabel: true }));
+        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i, weDoFirstOn(input)), nolabel: true }));
         const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the
@@ -312,6 +312,12 @@ function weDoBandOwn(env) {
         env.weDoCells = { grid: weBand.parts[0].content, items: weDo.filter((it) => !isRound(it)), cols: gcols };
     }
     env.weDo = weDo;
+    // (lf-partopts B: does cell 1 draw its first step in grey? The We Do part offers that hint only where it does - read from the
+    // drawing itself, cell 1 with and without it, never typed)
+    try {
+        const c1 = Object.assign({}, ctx, { state: 'blank' });
+        env.weDoFirstDrawn = weDo.length > 0 && weDoRender(weDo[0], 0, true)(c1, { cols: gcols }) !== weDoRender(weDo[0], 0, false)(c1, { cols: gcols });
+    } catch (e) { env.weDoFirstDrawn = false; }
     return env;
 }
 
@@ -321,8 +327,20 @@ function weDoBandOwn(env) {
  * cut underlined): the partial scaffold that fades across the row. A count-on fact keeps its dot
  * tile (the count cue) on every Guided cell.
  */
-export function weDoRender(it, i) {
-    return (c, o) => {
+/**
+ * lf-partopts B (design/partopts/DESIGN.md §2): the We Do part's hint "First problem: its first step done in grey" - on in the
+ * standard packet; the teacher turns it off through the part's supports (`lesson.partSup.wedoFirst === false`, from the part's
+ * `off: ['firststep']`). Off, cell 1 is drawn as every other Guided cell, on the pupil page and its key alike.
+ */
+export const weDoFirstOn = (input) => !(input && input.lesson && input.lesson.partSup && input.lesson.partSup.wedoFirst === false);
+
+export function weDoRender(it, i0, first = true) {
+    // (lf-partopts B: with the first step off, no cell is "cell 1" - every i === 0 hint below is skipped)
+    const i = first ? i0 : -1;
+    return (c0, o) => {
+        // (lf-partopts B: the skill's own `off` - its structure turned off - reaches the templates this function draws through
+        // stepState directly, not only through it.render)
+        const c = it.off && it.off.length ? Object.assign({}, c0, { off: [...new Set([...(Array.isArray(c0.off) ? c0.off : []), ...it.off])] }) : c0;
         const answered = c.state && c.state !== 'blank';
         if (isRound(it)) {
             // Lessons r1: the chart's number line reaches the Guided cells - a blank 10-tick line

@@ -11,7 +11,7 @@ import { renderMultiSelectCheck, multiSelectMatches, multiSelectAnswerText } fro
 import { saveResult, decompressTestFromURL, migrateTestToSections, getAllQuestionsFlat, getTotalQuestionCount } from './quiz-storage.js';
 import { broadcastQuizJoin, broadcastQuizAnswer, broadcastQuizSubmit } from './quiz-monitor.js';
 import {
-    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, wireStackEntry,
+    cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, screenOffFor, wireStackEntry,
     hideScreenOnlyCaptions, visualRepeatsText, screenTextLine, monoCell, hideRepeatedPrompt, adoptVisualBlank, wireCellSlots,
     screenTwin, mountBuild, mountModel, wireRingGroups, wireDrawnAnswers, wireTickBoxes, wireClozeBanks, slotAnswerMatches, workRowsHTML, saveWorking, restoreWorking, wireSignCircle, skillDisplayLabel, fitTwinRows, wireCellInputs, signsFor,
     fitCellDigits, cellDigitTarget, canFitDigits, screenInstruction, adoptSvgBlank, screenSupportsFor,
@@ -391,7 +391,7 @@ function renderQuizQuestion(qItem, flatIdx) {
         // Digit boxes (right-to-left entry, SP-20) feed a hidden #qtAnswerInput, which every
         // save path of this module already reads.
         const hidden = `<input type="hidden" id="qtAnswerInput" value="${escHtml(String(answer.studentAnswer || ''))}">`;
-        cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit', supports: qtSupports }) + hidden;
+        cellBody = kindHTML(kind, { regroup: regroupFor(q.skillId), answerClass: 'mq-qt-digit', supports: qtSupports, off: screenOffFor(qd) }) + hidden;
         instrHtml = instructionForKind(kind);
     } else if (kind) {
         cellBody = kindHTML(kind, { slotHtml: inputHtml, supports: qtSupports }) + (kind.kind === 'division' ? workRowsHTML(kind) : '');

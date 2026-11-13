@@ -22,7 +22,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack, lessonPartSeed } from './print-sheet.js';
-import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, snapNote, totalPages } from './sheet/part-opts.js';
+import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, snapNote, totalPages, PART_LEVEL, resolveSupports, supportsChip, supDeltaFromTicks, gateBySize } from './sheet/part-opts.js';
 import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -32,7 +32,7 @@ import { tvpAttrs, infoButtonHTML } from './teacher-preview.js';
 import { skillHasOfferedOptions } from './skill-options-ui.js';
 import { generateQuestionFor } from './generate-question.js';
 import { getSetOptions } from './skill-option-store.js';
-import { normalizeOptions } from './skill-options.js';
+import { normalizeOptions, setOfferSize, defaultOptions } from './skill-options.js';
 import { getProvider } from './sheet/index.js';
 import { stretchWhy, hasOwnOpen, NO_STRETCH_REASON } from './sheet/roles/stretch.js';
 // The detailed lesson maker (V22, 2026-10-16): its lessons, picked by name (no skill choice).
@@ -352,6 +352,15 @@ function onClick(e) {
         case 'part-on': partToggle(sec(d.sec), d.part); renderParts(d.sec, b); scheduleBuild(); break;
         case 'part-step': partStep(sec(d.sec), d.part, Number(d.dir)); renderParts(d.sec, b); scheduleBuild(); break;
         case 'part-new': partNewNumbers(sec(d.sec), d.part); renderParts(d.sec, b); scheduleBuild(); break;
+        // (lf-partopts B: the Supports panel - one open at a time; a tick writes the part's delta and the page rebuilds)
+        case 'sup-open': { const s = sec(d.sec); s.supOpen = s.supOpen === d.part ? null : d.part; renderParts(d.sec, b); break; }
+        case 'sup-tick': {
+            const s = sec(d.sec);
+            const r = supResolved(s, d.part);
+            setPartSup(s, d.part, Object.assign({}, r.ticks, { [d.sup]: !r.ticks[d.sup] }), r.opts.cover);
+            renderParts(d.sec, b); scheduleBuild(); break;
+        }
+        case 'sup-cover': { const s = sec(d.sec); const r = supResolved(s, d.part); setPartSup(s, d.part, r.ticks, d.v === 'whole' ? null : d.v); renderParts(d.sec, b); scheduleBuild(); break; }
         case 'parts-reset': { const s = sec(d.sec); const std = s.partStd || { pages: 1, mixed: false }; s.partOpts = {}; s.partRefresh = {}; s.pages = std.pages; s.mixed = std.mixed; delete s.parts; delete s.partNote; renderParts(d.sec, null); root.querySelector(`[data-act="part-on"][data-sec="${d.sec}"]`)?.focus(); scheduleBuild(); break; }
         case 'remove-skill': sec(d.sec).skills.splice(Number(d.idx), 1); renderWhat(); scheduleBuild(); break;
         case 'skill-options': openOptions(Number(d.sec), Number(d.idx), b); break;
@@ -409,6 +418,7 @@ function onChange(e) {
 
 function renderWhat() {
     const box = root.querySelector('#tvSections');
+    try { setOfferSize(pr.size); } catch (e) { /* no gate */ }   // (lf-partopts B: the skill options offer what this size prints)
     pr.sections.forEach(partsKeyCheck);
     box.innerHTML = pr.sections.map((s, i) => sectionHTML(s, i)).join('');
     renderPartsWide();
@@ -645,7 +655,7 @@ function partsKeyCheck(s) {
         const std = s.partStd;
         if (std) { s.pages = std.pages; s.mixed = std.mixed; }
         s.partOpts = {}; s.partRefresh = {};
-        delete s.partStd; delete s.partFit; delete s.partLast; delete s.partNote; delete s.parts;
+        delete s.partStd; delete s.partFit; delete s.partLast; delete s.partNote; delete s.parts; delete s.partSup; delete s.supOpen;
     }
     s.partKey = key;
 }
@@ -683,6 +693,65 @@ function renderParts(i, btn) {
 const bindTail = (t) => esc(String(t || '')).replace(/(\d+) (pages?) of (\d+)/g, '$1\u00a0$2\u00a0of\u00a0$3').replace(/ (\S+)$/, '\u00a0$1');
 /** Why a part's tick may not be cleared, said in its row (critic A r2 N5: a hover title is no reason at 390). */
 const LOCK_WHY = 'Needed to fill the sheet';
+
+/* ------------------------------------------------------------ lf-partopts B: the Supports chip and panel (DESIGN §1.1, §2) */
+
+/** The part whose Supports a row shows ('sheet': the Lesson sheet row - the structure of the We Do and lesson-row cells). */
+const SUP_ROW = Object.freeze({ prereq: 'prereq', chart: 'chart', wedo: 'wedo', practice: 'practice', mixed: 'mixed', sheet: 'sheet' });
+const SUP_NAME = Object.freeze({ prereq: 'the Prerequisite Check', chart: 'the anchor chart', sheet: 'the lesson sheet', wedo: 'We Do', practice: 'Practice', mixed: 'Mixed' });
+const SUP_GROUPS = Object.freeze([['structural', 'Structure', 'stays at every level'], ['hint', 'Hints', 'fade by page'], ['band', 'On the page', '']]);
+const COVER_CHOICES = Object.freeze([['whole', 'Every problem'], ['needed', 'Only those that need it'], ['fade', 'Fade down the page']]);
+/** A part's declarations, from the section's last build (`res.lesson.partSup`): what its items really draw. */
+const supDecl = (s, p) => (s.partSup && Array.isArray(s.partSup[p]) ? s.partSup[p] : []);
+/** The section skill's own options (an option-backed hint's standard is the skill's own tick). */
+const supBase = (s) => (s.skills && s.skills[0] && s.skills[0].opts) || {};
+/** A part's supports, resolved from its declarations and the section's delta (sheet/part-opts.js resolveSupports). */
+const supResolved = (s, p) => resolveSupports(supDecl(s, p), PART_LEVEL[p], sectionPartOpts(s)[p] || null, supBase(s));
+
+/** The Supports cell of a row: a chip that opens the panel, or "None to choose" (§1.1). */
+function supChipHTML(s, i, p) {
+    const decl = supDecl(s, p);
+    if (!s.partSup) return '<span class="tv-part-sup-t">Measured after the page is built</span>';
+    if (!decl.length) return '<span class="tv-part-sup-t"><span class="tv-part-sup-l">Supports: </span>None to choose</span>';
+    const r = supResolved(s, p);
+    const open = s.supOpen === p;
+    return `<button type="button" class="tv-part-chip${r.changed ? ' is-custom' : ''}" data-act="sup-open" data-sec="${i}" data-part="${p}" aria-expanded="${open}" aria-controls="tvSup${i}_${p}"><span class="tv-part-sup-l">Supports: </span><span>${esc(supportsChip(decl, r))}</span>${icon('chevD', 14, open ? ' style="transform:rotate(180deg)"' : '')}</button>`;
+}
+
+/** The Supports panel of a part, under its row (one open at a time): Structure, Hints, On the page; which problems; warnings. */
+function supPanelHTML(s, i, p) {
+    if (s.supOpen !== p) return '';
+    const decl = supDecl(s, p);
+    if (!decl.length) return '';
+    const r = supResolved(s, p);
+    const std = resolveSupports(decl, PART_LEVEL[p], null, supBase(s));
+    const groups = SUP_GROUPS.map(([kind, title, sub]) => {
+        const list = decl.filter((x) => x.kind === kind);
+        if (!list.length) return '';
+        return `<div class="tv-sup-group"><p class="tv-sup-group-h">${esc(title)}${sub ? ` <span class="tv-sup-group-s">${esc(sub)}</span>` : ''}</p>${list.map((x) => `<button type="button" class="tv-check tv-sup-tick" role="checkbox" aria-checked="${!!r.ticks[x.id]}" data-act="sup-tick" data-sec="${i}" data-part="${p}" data-sup="${esc(x.id)}" data-sup-kind="${x.kind}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span><span class="tv-sup-l">${esc(x.label)}${x.needs ? ' <span class="tv-sup-tag">the step teaches with it</span>' : ''}</span></button>`).join('')}</div>`;
+    }).join('');
+    const optHinted = decl.some((x) => x.from && typeof x.from === 'object' && r.ticks[x.id]);
+    const cover = optHinted ? (r.opts.cover || supBase(s).cover || 'whole') : null;
+    const coverHTML = cover ? `<div class="tv-sup-cover" role="radiogroup" aria-label="Which problems get the hints"><p class="tv-sup-group-h">Which problems</p>${COVER_CHOICES.map(([v, l]) => `<button type="button" class="tv-sup-cv" role="radio" aria-checked="${cover === v}" data-act="sup-cover" data-sec="${i}" data-part="${p}" data-v="${v}">${esc(l)}</button>`).join('')}</div>` : '';
+    const warns = r.warnings.map((w) => `<p class="tv-sup-warn" role="status">${icon('info', 14)}<span>${esc(w)}</span></p>`).join('');
+    return `<div class="tv-sup-panel" id="tvSup${i}_${p}" role="group" aria-label="Supports: ${esc(SUP_NAME[p] || p)}">
+    <div class="tv-sup-groups">${groups}</div>${coverHTML}
+    <p class="tv-sup-std">Standard for ${esc(SUP_NAME[p] || p)}: ${esc(supportsChip(decl, std).replace(/^Standard: /, ''))}.</p>${warns}
+  </div>`;
+}
+
+/** Write a part's supports delta (the panel's ticks, only what differs from the standard), keeping its counts. */
+function setPartSup(s, p, ticks, cover) {
+    const decl = supDecl(s, p);
+    const std = resolveSupports(decl, PART_LEVEL[p], null, supBase(s));
+    const delta = supDeltaFromTicks(decl, ticks, std.std, cover);
+    const po = Object.assign({}, sectionPartOpts(s));
+    const keep = {};
+    if (po[p]) for (const k of ['on', 'n']) if (po[p][k] !== undefined) keep[k] = po[p][k];
+    const next = Object.assign(keep, delta || {});
+    if (Object.keys(next).length) po[p] = next; else delete po[p];
+    setPartOpts(s, po);
+}
 
 /** The Parts table of a Lesson section (DESIGN §1.1; one compact row per part at phone width, §1.2). */
 function partsHTML(s, i) {
@@ -723,17 +792,18 @@ function partsHTML(s, i) {
       </span><span class="tv-part-range">${bindTail(partRowText(p, lim, n))}</span>${note}`;
             }
         }
-        // (step B opens the Supports panel here; step A states the standard as plain text - F8)
-        const supports = (SHEET_GROUP.has(p) && p !== 'wedo' && p !== 'rows') || none ? '' : '<span class="tv-part-sup-t"><span class="tv-part-sup-l">Supports: </span>Standard</span>';
+        // (lf-partopts B: the Supports chip - the lesson rows' cells take the Lesson sheet row's structure)
+        const supports = (SHEET_GROUP.has(p) && p !== 'wedo' && p !== 'rows') || none ? '' : p === 'rows' ? '<span class="tv-part-sup-t"><span class="tv-part-sup-l">Supports: </span>Set on the Lesson sheet row</span>' : supChipHTML(s, i, SUP_ROW[p] || p);
+        const panel = SUP_ROW[p] ? supPanelHTML(s, i, SUP_ROW[p]) : '';
         const refresh = SHEET_GROUP.has(p) || none ? '' : `<button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="${p}" aria-label="New numbers: ${esc(name)}" title="New numbers"${on ? '' : ' disabled'}>${icon('reset', 18)}</button>`;
         const warn = p === 'prereq' && on && lim && partCount(s, p, lim, po) < Math.min(PREREQ_WARN_BELOW, lim.max) ? `<p class="tv-part-warn" role="status">${icon('info', 14)}<span>${esc(PREREQ_FEW_WARNING)}</span></p>` : '';
-        return `<div class="tv-part${on && !none ? '' : ' is-off'}${SHEET_GROUP.has(p) ? ' is-sheet' : ''}" role="group" aria-labelledby="${id}" data-part-row="${p}">
+        return `<div class="tv-part${on && !none ? '' : ' is-off'}${SHEET_GROUP.has(p) ? ' is-sheet' : ''}${panel ? ' has-sup-panel' : ''}" role="group" aria-labelledby="${id}" data-part-row="${p}">
     <div class="tv-part-print">${tick}</div>
     <div class="tv-part-name"><span id="${id}">${esc(name)}</span>${why}</div>
     <div class="tv-part-many">${many}</div>
     <div class="tv-part-sup">${supports}</div>
     <div class="tv-part-ref">${refresh}</div>
-    ${warn}
+    ${warn}${panel}
   </div>`;
     };
     let rows = '';
@@ -742,10 +812,11 @@ function partsHTML(s, i) {
         if (SHEET_GROUP.has(p) && !grouped) {
             grouped = true;
             // (F10: the lesson sheet's parts share one seed - one New numbers, for the whole sheet)
-            rows += `<div class="tv-part tv-part-group" role="group" aria-labelledby="tvPartG${i}">
+            const sheetPanel = supPanelHTML(s, i, 'sheet');
+            rows += `<div class="tv-part tv-part-group${sheetPanel ? ' has-sup-panel' : ''}" role="group" aria-labelledby="tvPartG${i}">
     <div class="tv-part-print"></div>
     <div class="tv-part-name"><span id="tvPartG${i}">Lesson sheet</span><span class="tv-part-range">${bindTail(sheetCaption(fit))}</span></div>
-    <div class="tv-part-many"></div><div class="tv-part-sup"></div>
+    <div class="tv-part-many"></div><div class="tv-part-sup">${supChipHTML(s, i, 'sheet')}</div>${sheetPanel}
     <div class="tv-part-ref"><button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="sheet" aria-label="New numbers: the whole lesson sheet" title="New numbers for the whole lesson sheet">${icon('reset', 18)}</button></div>
   </div>`;
         }
@@ -1104,6 +1175,9 @@ function requestFor(s, i) {
         // set up only when it is given no options at all).
         const o = { categoryId: k.categoryId, skillId: k.skillId, opts: k.opts && typeof k.opts === 'object' ? k.opts : {} };
         if (k.weight > 1) o.weight = k.weight;
+        // (lf-partopts B, the per-size offer gate: a value offered only at another size goes back to its default on this page;
+        // a lesson's own record is never gated - lesson 3a deals mult_properties band 36 at L by its record)
+        if (s.role !== 'lesson') { try { o.opts = gateBySize(k.categoryId, k.skillId, o.opts, pr.size, defaultOptions(k.categoryId, k.skillId)).opts; } catch (e) { /* ungated */ } }
         return o;
     });
     const h = pr.header;
@@ -1220,6 +1294,12 @@ async function runBuild() {
             const si = req.idx ? req.idx[k] : k;
             const s = pr.sections[si];
             const fit = p.res && p.res.lesson && p.res.lesson.partFit;
+            // (lf-partopts B: what each part's items draw - the Supports panels' ticks; a change redraws the Parts table)
+            const sup = p.res && p.res.lesson && p.res.lesson.partSup;
+            if (s && s.role === 'lesson' && sup && JSON.stringify(sup) !== JSON.stringify(s.partSup || null)) {
+                s.partSup = sup;
+                if (!fit || JSON.stringify(fit) === JSON.stringify(s.partFit || null)) { const box = root.querySelector(`#tvParts${si}`); const focus = box && box.contains(document.activeElement) ? document.activeElement : null; if (box) renderParts(si, focus && focus.dataset && focus.dataset.act ? focus : null); }
+            }
             if (!s || s.role !== 'lesson' || !fit || JSON.stringify(fit) === JSON.stringify(s.partFit || null)) return;
             s.partFit = fit;
             s.partLast = Object.assign({}, s.partLast);
@@ -1491,3 +1571,9 @@ onSkillSearchReady(() => {
         root.querySelectorAll('input[data-pick]').forEach((inp) => { if (inp.value.trim()) renderPickResults(Number(inp.dataset.pick), inp.value); });
     } catch (e) { /* screen gone */ }
 });
+
+/** Read-only snapshot for the screen checks (lf-partopts B, ws-partopts-supports --ui): each section's part settings and the
+ * last built packet's pupil HTML. Changes nothing. */
+export function printScreenSnapshot() {
+    return { partOpts: pr ? pr.sections.map((s) => JSON.parse(JSON.stringify(s.partOpts || {}))) : [], pupilHtml: last && last.parts ? last.parts.map((p) => (p.res && p.res.pupilHtml) || '').join('\n') : '' };
+}
