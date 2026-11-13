@@ -68,7 +68,11 @@ const poolItems = (input, id) => {
     // (critic r3 F13: near twins too - sub S printed 77 / 27 / 71, round 75 / 45. A near twin of an item already taken, on
     // this question or an earlier one, is left out; exact repeats stay dropped)
     const took = [], first = [], later = [];
-    for (const it of kept) { const k = itemNumberKey(it); if (k && (earlier.some((t) => nearKeys(t, k)) || took.some((t) => nearKeys(t, k, true)))) later.push(it); else { first.push(it); if (k) took.push(k); } }
+    // (lf-engine PC r4: an item that prints a chart example's sum or product, turned round or not - `avoidSums`, the lesson's
+    // "+a,b" / "×a,b" keys - goes last too: add L seed 1629 printed the bond "2 + 6 = ?" under the chart's "6 + 2 = ?")
+    const avoidSums = Array.isArray(input.avoidSums) ? input.avoidSums : [];
+    const sumOf = (it) => { const m = /^(\d+)\s*([+×x*])\s*(\d+)\s*=\s*\?$/.exec(String(((it && it.q) || {}).text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()); return m ? `${m[2] === '+' ? '+' : '×'}${[Number(m[1]), Number(m[3])].sort((a, b) => a - b).join(',')}` : null; };
+    for (const it of kept) { const k = itemNumberKey(it); if ((avoidSums.length && avoidSums.includes(sumOf(it))) || (k && (earlier.some((t) => nearKeys(t, k)) || took.some((t) => nearKeys(t, k, true))))) later.push(it); else { first.push(it); if (k) took.push(k); } }
     // (a near twin is printed only to keep a question at ROUTE_ITEMS: the pool can hold no more clean items - sub S dealt
     // 77, 27, 71, 72 for one question - and a third twin is never laid to fill a row)
     return first.length >= ROUTE_ITEMS ? first : first.concat(later.slice(0, ROUTE_ITEMS - first.length));

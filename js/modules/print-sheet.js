@@ -25,7 +25,7 @@
 import { generateQuestionFor as _generateQuestionFor, configuredItem } from './generate-question.js';
 import { resetPageDeals, setDealPin } from './page-deal.js';
 import { solvePracticeFromPack } from './lessons/pack-solve.js';
-import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits } from './sheet/lesson-rules.js';
+import { repeatKeysOf as dlRepeatKeys, practiceUnits as dlPracticeUnits, nearTwins as lrNearTwins, casesOf as lrCasesOf, opOfItem as lrOpOf } from './sheet/lesson-rules.js';
 // Print keeps a review item's asked-for pair (critic nl-r5 D1: live items carry their real category).
 const generateQuestionFor = (req) => configuredItem(_generateQuestionFor(req), req && req.category);
 import { factSetTitle, optionsFor, normalizeOptions, numberLineFits, divFactsMaxDividend, DIV_ARRAY_MAX } from './skill-options.js';
@@ -50,7 +50,7 @@ import { guidedRowsOf } from './sheet/lesson-pages/we-do.js';
 import { chartSizingOf } from './sheet/lesson-pages/chart.js';
 import { PREREQ_CHECK_TITLE } from './sheet/roles/pre-skill-check.js';
 import { lessonFor, skillRef } from './lessons/prereqs.js';
-import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive } from './lessons/library.js';
+import { lessonById, lessonData as libraryLessonData, practiceRef, defaultLessonForSkill, prereqCheckLive, lessonRules } from './lessons/library.js';
 import { detailedLessonFor, validateDescription, fillPlaceholders } from './lessons/detailed/index.js';
 import { teacherBands, paginateTeacher, renderTeacherPage, measureShell, wordProblemPlan, exitSlipPlan, numberSensePlan, DETAILED_PUPIL_CSS, LIFT_MAX_CHARS, TEACHER_BODY_MM } from './sheet/roles/detailed-lesson.js';
 import { TEACHER_CSS, RCDWS_CSS, teacherParts, numberWords, pageRepeats, factOf, stackRegroups, stackCarryTop } from './sheet/index.js';
@@ -476,11 +476,14 @@ function repeatKeys(q) {
  * What a Mixed practice PAGE may never print twice (critic M1 r3 D1): the same fact, and for + and
  * x the same fact turned round (3 + 7 after 7 + 3). Kept page-wide, never relaxed.
  */
-function exactKeys(q) {
+function exactKeys(q, bondSums = false) {
     if (!q) return [];
     const p = (q.cell && q.cell.payload) || {};
-    const op = opKeyOf(p.op || q.op);
-    const ops = refOperands(q);
+    // (`bondSums`, lf-engine PC r4 - a lesson Mixed page with its check on: a number bond read as a sum, "9 + 1 = ?", is the +
+    // fact it prints, so the lead's "1 + 9 = ?" is its turnaround - PG-TURN, add L seed 1074)
+    const bs = bondSums && sumKeyOf(q) !== null;
+    const op = bs ? '+' : opKeyOf(p.op || q.op);
+    const ops = bs ? [Number(p.a), Number(p.b)] : refOperands(q);
     if (ops.length !== 2 || !op) return [`text:${String(q.text || '')}`];
     const keys = [`ex:${op}:${ops.join(',')}`];
     if (op === '+' || op === '*') keys.push(`turn:${op}:${ops.slice().sort((a, b) => a - b).join(',')}`);
@@ -529,7 +532,39 @@ function refOperands(q) {
  *   maxSmall       at most this many items with a one-place second operand
  *   avoidTexts     never an item another page of the packet printed
  */
+/** What a pool that ran dry still never gives up (lf-engine PC r4, lead ruling): the ref's declared range (its operand floors)
+ *  and the page's own items - no item again, none turned round. */
+function refCoreOk(sk, cand, key, seen) {
+    if (Array.isArray(sk.reuseAvoid) && sumIdOf(cand) && seen.has(`sum:${sumIdOf(cand)}`)) return false;
+    const ops = refOperands(cand);
+    if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
+    if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
+    if (sk.maxTop !== undefined && !(ops[0] <= Number(sk.maxTop))) return false;
+    if (sk.maxBottom !== undefined && !(ops[1] <= Number(sk.maxBottom))) return false;
+    if (sk.zeroOnes && !(ops[0] % 10 === 0)) return false;
+    if (sk.minN !== undefined && !(Number(cand.cell && cand.cell.payload && cand.cell.payload.n) >= Number(sk.minN))) return false;
+    if (sk.noTurnaround && ops.length >= 2 && seen.has(`pair:${key}:${ops.slice().sort((x, y) => x - y).join(',')}`)) return false;
+    return !seen.has(signature(cand));
+}
+
+/** (`pageRules` {caps}, lf-engine PC r4 - a lesson ref with its Prerequisite Check on: LR-6 near twins of a − item and the
+ *  library's LR-7 page caps, lesson-rules.js, as the packet check reads them) the plain item of a candidate. */
+const lrPlain = (q) => ({ text: String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ops: refOperands(q) });
+function pageRulesOk(sk, cand, key, kept) {
+    const x = lrPlain(cand);
+    for (const [c, max] of Object.entries(sk.pageRules.caps || {})) if (lrCasesOf(x).includes(c) && (kept.get(`cap:${key}:${c}`) || 0) >= Number(max)) return false;
+    if (lrOpOf(x) === '-' && x.ops.length >= 2) for (const o of kept.get(`subs:${key}`) || []) if (lrNearTwins(x.ops, o) || x.ops[0] - x.ops[1] === o[0] - o[1]) return false;
+    return true;
+}
+function pageRulesRecord(sk, q, key, kept) {
+    const x = lrPlain(q);
+    for (const c of Object.keys(sk.pageRules.caps || {})) if (lrCasesOf(x).includes(c)) kept.set(`cap:${key}:${c}`, (kept.get(`cap:${key}:${c}`) || 0) + 1);
+    if (lrOpOf(x) === '-' && x.ops.length >= 2) kept.set(`subs:${key}`, [...(kept.get(`subs:${key}`) || []), x.ops]);
+}
+
 function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) {
+    if (sk.pageRules && !pageRulesOk(sk, cand, key, kept)) return false;
+    if (Array.isArray(sk.reuseAvoid) && sumIdOf(cand) && seen.has(`sum:${sumIdOf(cand)}`)) return false;
     const ops = refOperands(cand);
     if (sk.minOperand !== undefined && ops.some((v) => v < Number(sk.minOperand))) return false;
     if (sk.minTop !== undefined && !(ops[0] >= Number(sk.minTop))) return false;
@@ -618,7 +653,13 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
-export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys) || Array.isArray(sk.hardAvoid));
+export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys) || Array.isArray(sk.hardAvoid) || Array.isArray(sk.reuseAvoid) || Array.isArray(sk.lastAvoid));
+/** An item's fact key or its turn-around in an avoid list (a number bond read as a sum - "1 + 2 = ?" - by its sum key too). */
+const avoidHit = (list, cand, exactOnly = false) => {
+    if (!Array.isArray(list) || !list.length) return false;
+    for (const k of [factKeyOf(cand), sumKeyOf(cand)]) if (k !== null && (list.includes(k) || (!exactOnly && list.includes(plusTurn(k))))) return true;
+    return false;
+};
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
     // (`allHard`, lesson 4 r3: the ref's `allTest` is a HARD bound - a window never takes a 10 row on a relaxed try)
@@ -643,6 +684,13 @@ export function refHardOk(sk, cand) {
     // on every other ref of the pack, so no relaxed last try (the lesson sheet's pool, the chart examples drawn from it) takes one;
     // absent on every other ref: unchanged)
     if (Array.isArray(sk.hardAvoid)) { const hk = factKeyOf(cand); if (hk !== null && (sk.hardAvoid.includes(hk) || sk.hardAvoid.includes(plusTurn(hk)))) return false; }
+    // (lf-engine PC r4, lead ruling: with the Prerequisite Check on, `hardAvoid` holds the CHECK's facts (never dealt again, a bond
+    // read as a sum by its sum key too); `reuseAvoid` the re-dealt lesson sheet's facts and `lastAvoid` the chart's - both avoided
+    // until the skill's pool runs dry, then given up in that order, one place at a time (generateRun's tiers): a cross-page
+    // repeat (LR-5) is less bad than a same-page turnaround (LR-6). Absent on every other ref.)
+    if (Array.isArray(sk.hardAvoid) && sumKeyOf(cand) !== null && avoidHit(sk.hardAvoid, cand)) return false;
+    // (`reuseExact`: the first tier given up takes a sheet fact only TURNED round - a soft LR-5 repeat, not an exact one)
+    if (avoidHit(sk.reuseAvoid, cand, !!sk.reuseExact) || avoidHit(sk.lastAvoid, cand)) return false;
     if (Array.isArray(sk.boardOnly) && sk.boardOnly.length) {
         const bo = sk.boardOnly.map(Number);
         const a = String(dlAns(cand)).replace(/,(?=\d{3})/g, '');
@@ -769,6 +817,22 @@ export const gridNear = (k, keys, sameShape = false, anyTask = false) => {
  * An item's FACT key for the pack's pool (LR-5): an operation item is its operands and sign
  * ("7+6"); anything else is its number (305). null when neither can be read.
  */
+/** A number bond read as a sum ("1 + 2 = ?", the whole unknown) keyed as the + fact it prints ("1+2"); null for any other
+ *  item (lf-engine PC r4: add L seed 1629 printed "2 + 6 = ?" on the check under the chart's "6 + 2 = ?"). */
+export function sumKeyOf(q) {
+    const p = (q && q.cell && q.cell.payload) || {};
+    if (p.unknown !== 'whole' || p.whole === undefined) return null;
+    const a = Number(p.a), b = Number(p.b);
+    return Number.isFinite(a) && Number.isFinite(b) ? `${a}+${b}` : null;
+}
+
+/** The unordered pair of a + fact or a number bond read as a sum ("1,9" for 1 + 9, 9 + 1 and the bond "9 + 1 = ?"), else null. */
+export function sumIdOf(q) {
+    const k = sumKeyOf(q) || factKeyOf(q);
+    const m = String(k === null || k === undefined ? '' : k).match(/^(\d+)\+(\d+)$/);
+    return m ? [Number(m[1]), Number(m[2])].sort((a, b) => a - b).join(',') : null;
+}
+
 export function factKeyOf(q) {
     if (!q) return null;
     // (`q.factKey`, lesson 6: a generator that names the fact the pupil produces - the digit and the place pair of a
@@ -900,6 +964,8 @@ const nearKeyOf = (q) => (composeOpOf(q) || turnedKeyOf(q) !== null ? null : ite
 
 /** Records what `refAccepts` checks the next items against. */
 function refRecord(sk, q, key, seen, kept, pg = '', row = '') {
+    if (sk.pageRules) pageRulesRecord(sk, q, key, kept);
+    if (Array.isArray(sk.reuseAvoid) && sumIdOf(q)) seen.add(`sum:${sumIdOf(q)}`);
     const ops = refOperands(q);
     if (sk.factorCap !== undefined) for (const f of new Set(ops)) kept.set(`fac:${key}:${f}`, (kept.get(`fac:${key}:${f}`) || 0) + 1);
     if (sk.distinctFirst) seen.add(`first:${key}:${ops[0]}`);
@@ -971,7 +1037,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         let q = null;
         // A lesson ref's floors can need many tries to meet (a 0 in the ones AND a one-place
         // bottom number): `tries` raises the budget for that ref only.
-        const tries = Math.max(RETRIES, Math.min(600, Number(sk.tries) || 0));
+        // (a PC r4 tiered ref - the check on: a pool near its end has few facts left, so the budget is 200 before a tier is given up)
+        const tries = Math.max(RETRIES, Math.min(600, Number(sk.tries) || 0), Array.isArray(sk.reuseAvoid) || Array.isArray(sk.lastAvoid) ? 200 : 0);
         // The detailed lesson (V22 §9.5, ★★★): `edgeLast` {per, cols} makes the last `cols` places
         // of every `per` places edge cases only (the last row of each Practice page).
         // `wants` [case per edge place] names the case test of each place of that row (1,000 first);
@@ -992,7 +1059,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // solved facts, the last row only its edge facts - the sheet's FIRST page, the one the set was solved for (a probe's longer deal past it
         // deals as before); absent on every other ref: skH is sk)
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
-        const pass = (rotate, relaxLast, soft, words = true) => {
+        // (`hs`: the ref whose hard bounds a pass holds - a tier of the PC r4 avoid lists given up; `soft` 'core': the soft
+        // floors dropped but refCoreOk held)
+        const pass = (rotate, relaxLast, soft, words = true, hs = skH) => {
             let got = null;
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
@@ -1014,8 +1083,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 // A lesson's skill ref (lessons r2-r3): floors on what the packet deals. Not skill
                 // options - the packet's; the last try takes what it gets (a hard bound excepted).
                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
-                const strict = soft && !(relaxLast && k === tries);
-                if (hard && !refHardOk(skH, cand)) continue;
+                const strict = soft === true && !(relaxLast && k === tries);
+                if (hard && !refHardOk(hs, cand)) continue;
+                if (soft === 'core' && !refCoreOk(skR, cand, key, seen)) continue;
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's
@@ -1045,7 +1115,13 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (an `lr6` ref then drops only the story-words rule before it relaxes the soft floors)
         // (an `lr6` story ref first drops the unit word only, keeping the story's people apart - lesson 2 r5)
         const wordsOff = () => (sk.lr6 ? (sk.lr6Names ? pass(true, false, true, 'names') : null) || pass(true, false, true, false) || pass(true, false, true, 'none') : null);
-        q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
+        // (lf-engine PC r4, lead ruling - a pool that runs dry: 1) any unused fact of the declared range, 2) a lesson-sheet fact
+        // again (`reuseAvoid`), then a chart fact (`lastAvoid`), one place at a time; never the check's own (`hardAvoid`), never
+        // outside the range, never a same-page turnaround (refCoreOk))
+        const tiered = Array.isArray(sk.reuseAvoid) || Array.isArray(sk.lastAvoid);
+        const tier = (n) => Object.assign({}, skH, n === 1 ? { reuseExact: true } : { reuseAvoid: undefined }, n > 2 ? { lastAvoid: undefined } : {});
+        q = hard && tiered ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, true, true, tier(1)) || pass(true, false, true, true, tier(2)) || pass(true, false, true, true, tier(3)) || pass(true, false, 'core', true, tier(3)))
+            : hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
@@ -4248,6 +4324,8 @@ async function buildRoleSheet(n, metaOf) {
         routes: n.routes || undefined,
         checkTopic: n.checkTopic || undefined,
         checkFor: n.checkFor || undefined,
+        // (a lesson's Prerequisite Check: the chart's sums / products it puts last - lf-engine PC r4)
+        avoidSums: Array.isArray(n.avoidSums) && n.avoidSums.length ? n.avoidSums : undefined,
         growLast: !!n.growLast || undefined,
         // IMPROVEMENT_PLAN 3.3: 'mixed' only once the probe shows the skills share a size class.
         arrangement: 'sections',
@@ -4310,10 +4388,12 @@ async function buildRoleSheet(n, metaOf) {
         // host notes it. Related facts are never used to fill unless `families` allows them. Each
         // item records its rung (`out.counts`). Grouped pages keep their four passes and no rule.
         const noRepeat = keepPrompts;
+        // (`bondSums`: also no 'turn' rung - lead ruling, PC r4: a same-page turnaround is never the fill)
+        const bondSums = (n.sections || []).some((sec) => (sec.skills || []).some((r) => r && Array.isArray(r.reuseAvoid)));
         const shareSeen = new Set();
         const pageSeen = pageFam || new Set();
         const famSeen = pageFam || new Set();
-        const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? ['turn', 'repeat'] : [])];
+        const rungs = ['unique', 'answers', ...(n.families === 'allow' ? ['related'] : []), ...(n.fill !== false ? [...(bondSums ? [] : ['turn']), 'repeat'] : [])];
         // (the generator deals up to the turnaround rung; a repeat is never taken from it - a
         // random batch repeats whatever it happens to draw, critic M1 r4: "2 + 4" three times while
         // other facts came once. Repeats come only from the even cycle below.)
@@ -4343,7 +4423,7 @@ async function buildRoleSheet(n, metaOf) {
             // must sit in the cell's own slot, or the pupil sees two answer places (C1).
             if (needsShow && (pass < 3 || strictShow) && !it.canShow()) return false;
             const rk = noRepeat ? repeatKeys(g.q) : null;
-            const xk = noRepeat ? exactKeys(g.q) : null;
+            const xk = noRepeat ? exactKeys(g.q, bondSums) : null;
             const rung = cap;
             const fk = noRepeat ? familyKey(g.q) : '';
             let kind = 'unique';
@@ -4530,6 +4610,7 @@ async function buildRoleSheet(n, metaOf) {
     // word twice on the page. Each later skill is dealt against the items already placed.)
     // (and the detailed lesson's Prerequisite Check - `perQuestion`, lf-placevalue 2026-11-08, ported to the lane lf-engine 2026-11-09:
     // its questions are pools of one page, so lesson 2's count 16 and + fact 13 + 3 were twins E24b read; every other page deals as before)
+    const pageSum = n.role === 'mixed-practice' && pools.some((p) => p.skills.some((s) => s && Array.isArray(s.reuseAvoid))) ? new Set() : null;
     const pageLr6 = (n.role === 'mixed-practice' || (n.role === 'pre-skill-check' && n.perQuestion)) && pools.some((p) => p.skills.some((s) => s.lr6)) ? new Set() : null;
     // A Mixed practice page (critic M1 r2) is dealt pool after pool against the fact families
     // already on the page, and its answer zones follow the widest fact DEALT: should a dealt item
@@ -4622,9 +4703,13 @@ async function buildRoleSheet(n, metaOf) {
         };
     } else pools.forEach((p, pi) => {
         const w = Math.max(0, Math.min(MAX_ITEMS, Math.floor(Number(want[p.id]) || 0)));
-        let its = w <= probe[p.id].length && !mod.wrongFlags && !(pageLr6 && pi > 0) ? coverSlice(p, probe[p.id], w) : null;
-        if (!its) { its = dealPool(p, pi, w, pageLr6 && pi > 0 ? pageLr6 : null); measure(its); }
+        // (`pageSum`, lf-engine PC r4 - a lesson's Mixed page with its check on: a later skill never prints the turnaround of an
+        // earlier skill's sum on the page - the bond "9 + 1 = ?" beside the lead's "1 + 9 = ?", add L seed 1074, PG-TURN)
+        const seen0 = pi > 0 && (pageLr6 || pageSum) ? new Set([...(pageLr6 || []), ...(pageSum || [])]) : null;
+        let its = w <= probe[p.id].length && !mod.wrongFlags && !seen0 ? coverSlice(p, probe[p.id], w) : null;
+        if (!its) { its = dealPool(p, pi, w, seen0); measure(its); }
         if (pageLr6) for (const it of its) { lr6Record(it.q, `pool:${pi}`, pageLr6); pageLr6.add(`ansAll:${dlAns(it.q).replace(/[^0-9a-z<>=]/gi, '')}`); }
+        if (pageSum) for (const it of its) { const k = sumIdOf(it.q); if (k) pageSum.add(`sum:${k}`); }
         items = items.concat(its);
     });
     input.items = items;
@@ -4824,7 +4909,11 @@ async function buildLesson(n, metaOf) {
     // (Shown in the print panel beside the Size control, not only under "Why?": lessons r2.)
     const sizeNote = size !== n.size ? [LESSON_SIZE_NOTE] : [];
     const nz = Object.assign({}, n, { size });
-    const lessonInput = { data, warmSkills, tagLine, number: lessonNo };
+    // (lf-engine PC r4: with the Prerequisite Check on, the sheet's Independent band keeps LR-6 / LR-7 - the library's page caps,
+    // lessonRules - sheet/lesson-pages/practice.js indepRuled; a lesson without the check deals as before)
+    const indepCaps = prereqs && libId ? ((lessonRules(libId) || {}).caps || {}) : null;
+    const indepRules = indepCaps ? { caps: indepCaps, chartTexts: [] } : null;
+    const lessonInput = { data: indepRules ? Object.assign({}, data, { indepRules }) : data, warmSkills, tagLine, number: lessonNo };
 
     // THE PARTS (LR-18): what prints, what is built, and each part's seed. Without `parts` or `lessonSeeds` the
     // request's practicePages / mixed decide, exactly as before. A part printed alone is the same page it is in the
@@ -4844,10 +4933,15 @@ async function buildLesson(n, metaOf) {
     let chart = await buildRoleSheet(Object.assign({}, nz, {
         size: 'L', role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'chart' }),
     }), metaOf);
+    // (lf-engine PC r4: the re-dealt sheet's Guided and Independent cells print no chart example again - round L printed the
+    // chart's "Round 96" in its Guided band; the chart and the sheet pick their fourth example apart once the Warm-up is gone)
+    if (indepRules) indepRules.chartTexts = ((chart.plan && chart.plan.meta && chart.plan.meta.exampleQs) || []).map((q) => String((q && q.text) || '')).filter(Boolean);
     let teach = await buildRoleSheet(Object.assign({}, nz, {
         role: 'lesson', header, look: 'ican', lessonInput: Object.assign({}, lessonInput, { part: 'sheet' }),
     }), metaOf);
     let parts = [{ part: 'chart', role: 'lesson', res: chart }, { part: 'teach', role: 'lesson', res: teach }];
+    // (lf-engine PC r4: the chart's sums / products, "+a,b" - the check deals none of them, turned round or not)
+    const chartSums = () => { const out = []; for (const q of (chart.plan && chart.plan.meta && chart.plan.meta.exampleQs) || []) { const m = /^(\d+)\s*([+×x*])\s*(\d+)\s*=\s*\?$/.exec(String((q && q.text) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()); if (m) out.push(`${m[2] === '+' ? '+' : '×'}${[Number(m[1]), Number(m[3])].sort((a, b) => a - b).join(',')}`); } return out; };
     // The Prerequisite Check (LR-17): first in the packet; its key ends with the routing table.
     const buildPrereq = (seed, avoid = (r) => r) => buildRoleSheet(Object.assign({}, nz, {
         // (LR-17: each question deals its `items`, ROUTE_ITEMS = 2 by default and its floor - the role gives a question's extra items up, never below 2,
@@ -4858,6 +4952,7 @@ async function buildLesson(n, metaOf) {
         routes: prereqs.map((p) => ({ lesson: p.lesson, title: p.title || '', checks: p.checks || '' })),
         // (critic r2 N7: the check's title always carries a topic - the lesson's short `checkTopic` when the long one wraps)
         checkTopic: data && data.checkTopic ? String(data.checkTopic) : undefined,
+        avoidSums: chartSums(),
         lessonInput: undefined,
     }), metaOf);
     if (prereqs && built.includes('prereq')) parts.unshift({ part: 'prereq', role: 'pre-skill-check', res: await buildPrereq(lessonPartSeed(n.seed, 'prereq')) });
@@ -4896,12 +4991,23 @@ async function buildLesson(n, metaOf) {
     // (lf-engine PC r3 F4, LR-5: with the Prerequisite Check on, the sheet has no Warm-up and re-deals its Guided and
     // Independent cells, so Practice and Mixed could deal one of them again - sub L / S printed "50 - 36" on both. Its fact keys
     // go into the hard avoid set of the practice ref and of the Mixed partners; a lesson without the check deals exactly as before.)
-    const sheetHard = prereqs && !packNums ? planKeys(teach) : [];
+    // (lf-engine PC r4, lead ruling: a cross-page repeat is less bad than a same-page turnaround. The sheet's keys are no longer a
+    // HARD bound - the add_facts band-10 pool (21 facts) could not fill an L Practice page without them, and its last relaxed try
+    // dealt "3 + 1" under "1 + 3", even "0 + 2": they are `reuseAvoid`, given up first and one place at a time; the chart's facts
+    // `lastAvoid`, given up next; the CHECK's printed facts `hardAvoid`, never. A number bond read as a sum is keyed by its sum.)
+    const sumKeys = (res) => { const out = []; for (const pl of (res && (res.keyPlans || [res.plan])) || []) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { const k = it && it.q ? sumKeyOf(it.q) : null; if (k !== null) out.push(k); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); } return out; };
+    const sheetHard = prereqs && !packNums ? [...planKeys(teach), ...sumKeys(teach)] : [];
+    const chartAvoid = sheetHard.length ? [...planKeys(chart), ...sumKeys(chart), ...chartQs.flatMap((q) => [factKeyOf(q), sumKeyOf(q)])].filter((k) => k !== null) : [];
+    const preRes0 = (parts.find((p) => p.part === 'prereq') || {}).res;
+    const checkHard = sheetHard.length && preRes0 ? [...planKeys(preRes0), ...sumKeys(preRes0)] : [];
     // (and the sheet's item texts, soft: a Mixed number bond "2 + 2 = ?" has no fact key - add seed 1222)
     const sheetTexts = [];
     if (sheetHard.length) for (const pl of teach.keyPlans || [teach.plan]) for (const pg of (pl && pl.pages) || []) { const walk = (part) => { if (!part) return; if (part.kind === 'grid') (part.items || []).forEach((it) => { if (it && it.q) sheetTexts.push(refText(it.q)); }); if (part.content) walk(part.content); (part.contents || []).forEach(walk); (part.parts || []).forEach(walk); }; (pg.sections || []).forEach(walk); }
-    const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...sheetHard], avoidTexts: [...(Array.isArray(r.avoidTexts) ? r.avoidTexts : []), ...sheetTexts.filter(Boolean)] }) : r);
+    const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { reuseAvoid: [...(Array.isArray(r.reuseAvoid) ? r.reuseAvoid : []), ...sheetHard], lastAvoid: [...(Array.isArray(r.lastAvoid) ? r.lastAvoid : []), ...chartAvoid], avoidTexts: [...(Array.isArray(r.avoidTexts) ? r.avoidTexts : []), ...sheetTexts.filter(Boolean)] }, checkHard.length ? { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...checkHard] } : {}) : r);
     practiceSk = withSheetHard(practiceSk);
+    // (lf-engine PC r4: with the check on, the Practice and Mixed lesson items keep LR-6 / LR-7 on their page - near twins, an
+    // answer twice and the library's page caps, sub L printed three answers under 10; a lesson without the check: as before)
+    if (sheetHard.length) practiceSk = Object.assign({}, practiceSk, { pageRules: { caps: indepCaps || {} } });
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.

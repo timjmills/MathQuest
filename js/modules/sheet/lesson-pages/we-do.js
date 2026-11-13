@@ -179,7 +179,9 @@ export function weDoBand(env) {
     const forceStack = data && Number(data.guidedStack) >= 2 && rest.length >= Number(data.guidedStack) ? Math.min(3, Number(data.guidedStack)) : 0;
     const stackRows = forceStack || (zH > 0 && rest.length >= 3 && fitsWidth(rest.slice(0, 3), 2) && shortH * 1.8 <= zH && Math.floor(zH / shortH) >= 2 ? Math.min(3, Math.floor(zH / shortH)) : 0);
     if (stackRows) gk = stackRows;
-    const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4);
+    // (lf-engine PC r4, `indepRules.chartTexts` - the check on only: no chart example again in the Guided cells)
+    const chartT = data && data.indepRules && Array.isArray(data.indepRules.chartTexts) ? data.indepRules.chartTexts : [];
+    const weDoPool = main.filter((it) => it !== example2 && it !== example3 && it !== example4 && (it === example || !chartT.includes(String((it.q && it.q.text) || ''))));
     const exOthers = [example2, example3, example4].filter(Boolean);
     let weDo = example ? pickWeDo(weDoPool, example, data, gk, exOthers) : rest.slice(0, gk);
     const gcols = stackRows ? 2 : colsFor(weDo.length || 1);

@@ -6,7 +6,8 @@
 // supplies the data (design/SKILL_CELL_CONTRACT.md §3.9). Moved verbatim from roles/lesson.js (lessons-phase0 0.5: the
 // sample lessons and the detailed lessons render byte-identical). Pure module (SCC-01): no window, no DOM, no Math.random.
 
-import { bestCols, planItem, gridPart, instructionKeyOf, instructionText, answerOf, opOf, stripExtraMm, esc } from '../roles/compose.js';
+import { bestCols, planItem, gridPart, instructionKeyOf, instructionText, answerOf, opOf, operandsOf, stripExtraMm, esc } from '../roles/compose.js';
+import { nearTwins, casesOf, opOfItem } from '../lesson-rules.js';
 import { resolveCtx } from '../index.js';
 import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
@@ -40,6 +41,34 @@ export function stripItem(data, steps) {
  * whole rows of the skill filling the last page `cur` (PT-OPN-7, H5), lettered on from `letter`.
  * Returns the items placed.
  */
+/**
+ * LR-6 / LR-7 on the lesson sheet's Independent band (lf-engine PC r4: with the Prerequisite Check on the sheet re-deals, and
+ * sub L printed "74 - 68" beside "71 - 68" and three answers under 10 - the pool's own floors know neither). `data.indepRules`
+ * ({caps}: the library's page caps, lessons/library.js lessonRules; set by the host only with the check on): the pool is
+ * reordered so the items taken first keep, with the Guided cells, no near twins (lesson-rules nearTwins: the same number taken
+ * away, or both within 3), no answer twice and every cap, and no chart example again (`chartTexts`); the rest follow, in
+ * order, for a page that needs more. Absent: the
+ * pool as it was. Pure.
+ */
+export function indepRuled(pool, weDo, data) {
+    const rules = data && data.indepRules;
+    if (!rules) return pool;
+    const caps = rules.caps || {};
+    const plainOf = (it) => { const q = (it && it.q) || {}; return { text: String(q.text || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), ops: operandsOf(q) }; };
+    const sub = (x) => (opOfItem(x) === '-' && x.ops.length >= 2 ? x.ops.map(Number) : null);
+    const taken = (weDo || []).filter(Boolean).map(plainOf);
+    const ok = (x) => {
+        const o = sub(x);
+        if (o) for (const y of taken) { const p = sub(y); if (p && (nearTwins(o, p) || o[0] - o[1] === p[0] - p[1])) return false; }
+        for (const [c, max] of Object.entries(caps)) if (casesOf(x).includes(c) && taken.filter((y) => casesOf(y).includes(c)).length >= Number(max)) return false;
+        return true;
+    };
+    const chartT = Array.isArray(rules.chartTexts) ? rules.chartTexts : [];
+    const first = [], later = [];
+    for (const it of pool) { const x = plainOf(it); if (!chartT.includes(String((it.q && it.q.text) || '')) && ok(x)) { first.push(it); taken.push(x); } else later.push(it); }
+    return first.concat(later);
+}
+
 export function independentBand({ input, ctx, m, data, main, example, example2, example3, example4, weDo, extrasList, cur, labels, letter }) {
     const used = new Set([example, example2, example3, example4, ...weDo]);
     const indepPool0 = main.filter((it) => !used.has(it));
@@ -52,7 +81,8 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         const hit = t ? indepPool0.find((it) => !indepFirst.includes(it) && t(it) && ![...weDo, ...indepFirst].some((y) => winShare(it, y))) : null;
         if (hit) indepFirst.push(hit);
     }
-    const indepPool = indepFirst.concat(indepPool0.filter((it) => !indepFirst.includes(it)));
+    const indepPool1 = indepFirst.concat(indepPool0.filter((it) => !indepFirst.includes(it)));
+    const indepPool = indepRuled(indepPool1, weDo, data);
     const icWanted = AUTO_COLS[ctx.size];
     // One across look on the page (critic R3 N-2): the Guided cells keep a division fact's line
     // beside the sentence, so the Independent band takes only columns where it stays beside.
