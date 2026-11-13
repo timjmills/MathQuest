@@ -4430,6 +4430,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "screen-digit-npr-worksheet",
+  "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: screen digits >= 40 / 48 / 56 px at 390 / 820 / 1280 on every host",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots SCREEN-DIGIT (default since lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8d7343c0f",
+   "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
+  },
+  "pass": {
+   "commit": "TBD-lf-ops-npr-digits",
+   "state": "lf-ops' fix (pass commit to come)"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }

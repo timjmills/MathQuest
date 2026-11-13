@@ -46,11 +46,6 @@
       "--draw-cap"
      ]
     },
-    "screen-slots": {
-     "args": [
-      "--screen-digit"
-     ]
-    },
     "options-render": {
      "args": [
       "--bands",
