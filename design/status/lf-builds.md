@@ -12,7 +12,7 @@ Critic rounds: 1, word-stories r1 FAIL
 - PAUSED at budget (cost_usd ≈ $125 of $140). word-stories critic r1 FAIL (design/audit/runs/lf-builds/stories/critic-r1.md, e82499a5e on claude/sweet-newton-c8wrv1-lf-builds-stories). Lowest: True or False? on add C2 3 (F1, NEW on branch: q.op '+' on every missing-part kind, 632748196); hosts' Reason It 4-3-6-6 (F2, master too); card 390 C1 5 (F3); guided / band-10 / column cell C3 6 (F4, F5); Reason It C4 6 (F8, engine).
 - Content passed the critic's read (432 items): forms 1–5 deal their labels, the trap is worded right, bands bound the answer, drawings follow RP-70/72.
 - Next round (medium fixer, rule 7 re-brief): F1 first (with the TF-EVAL check), F9 (No-limit bound), F6 (preset page mix), F4/F5; F2/F3 are master defects on offered roles/hosts: the lead decides whether this lane fixes them or the card hides those roles/hosts. F7/F8 belong to lf-roles.
-- Open: lesson g3-oa8 6 of 1556 pages differ with or without this branch's band change (logs/lb/): possible flake, rule 5.
+- g3-oa8 6-page baseline diff: CAUSED BY THIS BRANCH (lf-engine diagnosis 2026-11-13: sentenceState step-wise bar slots + columnPanel in lesson-arch/story.js; master baselines 0 of 1,598 differ). My probe only ruled out the band option. Fix r2 decides: intended change with named before/after pages and r2 critic scope, or gate it off for detailed lessons.
 - chart_120 precritic red, paused; times-as-many and partition not started.
 ## Owner go
 
