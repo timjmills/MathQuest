@@ -12,6 +12,7 @@ import { stepIcon } from '../lesson-icons.js';
 import { CASE_TESTS } from '../lesson-arch/index.js';
 import { winShare } from '../lesson-arch/grid.js';
 import { reflowsAt, CL8_MM, namedSteps, stepMarker, hAt, phase0On } from './common.js';
+import { shortestRowMm } from '../part-opts.js';
 
 export const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
@@ -34,6 +35,13 @@ export function stripItem(data, steps) {
         template: 'lesson-strip', skill: '', pool: 'extra', lessonStrip: true,
     };
 }
+
+/** The margin past CL-8 a row keeps from its cell's side on a sheet the teacher changed. Critic A r2 N1: 1.5 mm here kept
+ * the standard sheet's own rows (nearest_10 at L, 3.3 mm, the same cells the standard sheet draws) off a sheet whose foot then
+ * stood 62 mm empty; the cells' own CL-8 (icKeep) is the rule, and ws-partopts-unit PO-2d judges EB-EDGE on every page. */
+export const INK_EDGE_MM = 0;
+/** ... except a written equation fact (div_facts M: its measured slack read 1.5 mm wider than it drew, EB-EDGE 0.7 mm). */
+export const EQ_EDGE_MM = 1.5;
 
 /**
  * The lesson sheet's Independent Practice rows (roles/lesson.js planOnce, after the bands are packed):
@@ -63,6 +71,18 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
     const cramped = (it, c) => { const m = it.measured && it.measured[c]; return !!m && Number.isFinite(m.slackMm) && m.slackMm < CL8_MM; };
     const icKeep = icOpts.filter((c) => c === 1 || !indepPool.slice(0, 21).some((it) => reflowsAt(it, c) || cramped(it, c)));
     const ic = bestCols(indepPool.slice(0, 6), icKeep.length ? icKeep : icOpts, ctx);
+    // (lf-partopts §8b: rows that appear in height the teacher freed keep each cell's ink at half its width or more - a 26 mm
+    // stack in a 62 mm cell left a 30 % side, EB-SIDE; else no row - more, narrower columns put a fact 0.7 mm from its border)
+    const pn0 = input.lesson && input.lesson.partN;
+    const freed0 = !!pn0 && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn0[k] !== undefined);
+    let inkShort = false;
+    if (freed0) {
+        // (and 1.5 mm more than CL-8 from its sides: a fact the We Do band used to hold came 0.7 mm from its border, EB-EDGE)
+        // (critic A r2 N1: one column across is the standard sheet's own full-width cell - its slack is the design's, as icKeep
+        // keeps it; the extra 1.5 mm stays for narrower columns only where the slack is near CL-8)
+        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && (c === 1 || !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + (it.template === 'equation' ? EQ_EDGE_MM : INK_EDGE_MM)))); });
+        if (!inkOk(ic)) inkShort = true;
+    }
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
     const hI = hAt(indepPool.slice(0, ic * 3).map((it) => twins.get(it) || it), ic);
     let indep = [];
@@ -96,11 +116,28 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (S holds more than L, LESSONS L1 - critic R3 N-3: 12 at S left 41 % of p2 blank - and the
         // rows are whole rows of the pool the lesson dealt, never a last row of one)
         const oneCeil = ctx.size === 'L' ? 12 : 21;   // (an S packet draws its lesson sheet at M type)
-        let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : 6) / ic)), Math.floor(room / hI));
+        // (lf-partopts §8b: on a sheet whose bands the teacher turned down, the height they gave up goes to more rows - as many
+        // whole rows as the pool dealt and the room holds; the 6 of 12.1 is the standard sheet's)
+        const pn = input.lesson && input.lesson.partN;
+        const freed = !!pn && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn[k] !== undefined) && !inkShort;
+        let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : freed ? Math.max(6, indepPool.length) : 6) / ic)), Math.floor(room / hI));
+        if (freed && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         if (oneNum && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
         const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));
         while (rows > 1 && rows * hRows(rows) > room) rows--;
+        // (lf-partopts: the rows that fit are the part's fit - the Parts table's max; `lesson.partN.rows` caps them, 0 = none)
+        cur.indepFit = { rows: rows >= 1 && hRows(rows) <= room ? rows : 0, ic };
+        // (critic A r2 N1, EB-ROWFIT: the height ONE row and its band head take - roles/lesson.js offers no sheet whose foot holds
+        // one and prints none, and says "no room" only where one does not fit)
+        // (the SHORTEST row the pool could make - its ic shortest problems - as ws-partopts-unit EB-ROWFIT measures it)
+        // (part-opts.js shortestRowMm: the one rule the unit gate measures the printed foot with)
+        const hShort = shortestRowMm(indepPool.map((it) => hAt([twins.get(it) || it], ic)), ic);
+        const hRowMin = hShort !== null ? Math.min(hRows(1), hShort) : hRows(1);
+        cur.indepRowMm = +(hRowMin + m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + safety).toFixed(1);
+        const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
+        if (rN === 0 || inkShort) return indep;
+        if (rN !== null && rN < rows) rows = rN;
         // (critic r2 N1: how far ONE row is short of the room - roles/lesson.js frees it before it ever drops the row)
         cur.indepShort = rows >= 1 && hRows(rows) <= room ? 0 : hRows(1) - room;
         if (rows >= 1 && hRows(rows) <= room) {
@@ -109,11 +146,16 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
             const hTop = hRows(r);
             // The rows take the page's spare height (an Independent page's cells fill the grid,
             // PG-11), never more than half a cell again (H13: no cell mostly empty).
-            const cellH = Math.min(room / r, hTop * 1.15);
+            // (lf-partopts: on a sheet the teacher changed, the rows fill with whole rows, not taller cells - a grown one-number cell
+            // passed a 30 % band, div_facts; the standard sheet keeps its fill)
+            const cellH = Math.min(room / r, hTop * (freed ? 1.0 : 1.15));
+            const grid = gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter });
             cur.sections.push({
                 kind: 'band', label: 'Independent Practice:', instr: instructionText(instructionKeyOf(indep, input.skills), indep),
-                content: gridPart(indep.map((it) => planItem(it, { cols: ic })), { cols: ic, rows: r, cellH, labels, start: letter }),
+                content: grid,
             });
+            // (lf-partopts A r3: the rows' cells, for the offer gate's EB-BAND prediction - roles/lesson.js cellBands)
+            (cur.bandCells || (cur.bandCells = [])).push({ grid, items: indep.map((it) => twins.get(it) || it), cols: ic });
             cur.used += m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + r * cellH + safety;
         }
     }
