@@ -39,7 +39,7 @@ export const blankRun = (fromColumn) => `<div class="ws-cell blankrun" style="--
 // `relay` (default true): false keeps the lattice - a short last row stays on the full rows' columns
 // and the rest is the unruled blank run (PG-15). Fact rows: one cell width per section (Lane D restart
 // critic r1 R1-2: a re-laid 9-cell last row was 20.7 mm wide under 18.6 mm cells).
-export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true } = {}) {
+export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', height = '', unlabelled = [], rowsTpl = '', colsTpl = '', spanFirst = false, rowGap = 0, relay: relayOk = true, style = '' } = {}) {
     const n = cols * (rows || Math.ceil(cells.length / cols));
     // `spanFirst`: the first cell spans the whole first row (the Guided model with its lines).
     // a cell that spans tracks (grid-column:span N in its style) fills them: no blank run for them
@@ -84,7 +84,7 @@ export function grid(cells, { cols, rows, labels = 'none', start = 1, cls = '', 
         }
         return `<div class="ws-gridrows" data-ws-rowgap="${rowGap}" style="flex:none;">${rowsHtml.join('')}</div>`;
     }
-    return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}">${out.join('')}</div>`;
+    return `<div class="ws-grid ${cls}" style="grid-template-columns:${colsTpl || `repeat(${cols},1fr)`};grid-template-rows:${rowsTpl || `repeat(${r},1fr)`};${height ? `height:${height};` : ''}${style ? `${style};` : ''}">${out.join('')}</div>`;
 }
 
 /**

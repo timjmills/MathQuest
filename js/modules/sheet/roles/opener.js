@@ -19,6 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm,
 } from './compose.js';
+import { tightRows, IN_PLACE_FILL } from '../layout.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -31,6 +32,15 @@ export const TIGHT_ROWS = true;
  * height stays blank at the foot - where a row with boxes grows as before. */
 const isLinesRow = (it) => !!(it && it.template === 'count-row' && it.q && it.q.cell && it.q.cell.payload && it.q.cell.payload.lines);
 const GROWCAP = (first) => (isLinesRow(first) ? 0 : Infinity);
+/**
+ * lf-engine roles (lf-placevalue compare r2 finding 1, ws-empty-band EB-BAND on the Opener: 30-67 % white under the ink): a
+ * section whose every item declares `tightRows` in its footprint (layout.tightRows: an in-place line answered in its boxes or
+ * circle) keeps its rows at IN_PLACE_FILL x their measured height here too, as the practice / Test / Review roles do: the
+ * PT-ENG-3 grow (up to 8 mm a row) is capped there, and the spare height stays at the page foot. The Model cell is held the
+ * same way and is not stretched to the Steps column beside it (that white stays in the Model band, outside the cell).
+ * `hm` is a hMinAt height (the measured height + 1 mm of grid rule).
+ */
+const tightCapMm = (hm) => Math.max(0, (IN_PLACE_FILL - 1) * (hm - 1));
 const AUTO_COLS = { S: 4, M: 3, L: 3 };
 
 export const sources = (skills) => [{ id: 'main', skills }];
@@ -57,9 +67,13 @@ function geometry(items, input, cap = {}) {
     const twoModels = items.length >= 2 && fitsAt(items.slice(0, 2), 4, ctx);
     // Item 7 (LESSONS_LEARNED L11): a count row too wide for the half-width Model cell even wrapped (1,000,000 by 100,000)
     // takes the whole width, with the Steps band underneath; every other Model keeps the Model | Steps row.
-    const modelFull = !twoModels && !!first && first.template === 'count-row' && steps.length > 0 && !fitsAt([first], 2, ctx);
-    const mc = twoModels ? 4 : modelFull ? 1 : 2;
-    const modelH = hMinAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
+    // (lf-engine roles: and ANY Model that cannot lay out in the half-width cell at all - hMinAt Infinity, its footprint one
+    // column only, e.g. an expanded-form row - takes the whole width the same way; it was sized Infinity mm, the page then
+    // dropped every Independent row and said the bands were over budget)
+    const halfOk = !!first && Number.isFinite(modelHAt([first], 2, ctx));
+    const modelFull = !twoModels && !!first && steps.length > 0 && ((first.template === 'count-row' && !fitsAt([first], 2, ctx)) || !halfOk);
+    const mc = twoModels ? 4 : modelFull || (first && !halfOk) ? 1 : 2;
+    const modelH = modelHAt(items.slice(0, twoModels ? 2 : 1), mc, ctx);
     const stepsH = stepLines(steps, m.textPt, modelFull ? 186 : 93) * (m.pitch + 1.2) + steps.length * 2.2 + 4;
     const modelBand = modelFull ? m.strip + modelH + m.strip + stepsH : m.strip + Math.max(modelH, stepsH);
     const gcWanted = AUTO_COLS[ctx.size];
@@ -91,8 +105,23 @@ function geometry(items, input, cap = {}) {
     if (first && first.template === 'count-row' && gc === 1 && (cap.gMax === undefined || cap.gMax >= 2) && used + gH + held <= m.budget) { gRows = 2; used += gH; }
     const spare = Math.max(0, m.budget - used - held);
     const rowsThatGrow = gRows + iRows;
-    const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first));
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
+    const tight = tightRows(practice);
+    const grow = Math.min(8, spare / rowsThatGrow, GROWCAP(first), tight ? tightCapMm(gH) : Infinity);
+    // (the Model cell of a tightRows page: its own height plus the same cap, never the Steps column's height)
+    const modelTight = tightRows(items.slice(0, twoModels ? 2 : 1)) ? modelH + tightCapMm(modelH) : null;
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > m.budget, used };
+}
+
+/**
+ * The Model row's height at `cols` (hMinAt). A footprint held to one column on the practice pages (maxCols 1 + hardCap: an
+ * expanded-form row, a unit-form frame) makes hMinAt Infinity at 2, though the host MEASURED the item in the half-width Model cell
+ * and it fits there (DN-10): the Model cell takes that measurement (+ 1 mm of rule, as hMinAt). Infinity only when it does not fit.
+ */
+function modelHAt(items, cols, ctx) {
+    const h = hMinAt(items, cols, ctx);
+    if (Number.isFinite(h) || !items.length) return h;
+    const ms = items.map((it) => it.measured && it.measured[cols]);
+    return ms.every((m) => m && m.fits !== false && Number(m.hMm) > 0) ? Math.max(...ms.map((m) => Number(m.hMm))) + 1 : Infinity;
 }
 
 const needOf = (g) => (g.twoModels ? 2 : 1) + g.gc * g.gRows + g.iRows * g.gc;
@@ -160,7 +189,8 @@ export function plan(input = {}) {
     const modelContentH = g.modelFull ? g.modelH : g.modelBand - m.strip;
     // SCC 3.8: the Steps come from the skill's provider; a skill with none gets no Steps box
     // (generic operation steps were wrong for half the skills), and the Model takes the row.
-    const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelContentH, labels: 'none' }) };
+    const modelCellH = g.modelTight ? Math.min(modelContentH, g.modelTight) : modelContentH;
+    const modelBandPart = { kind: 'band', label: 'Model:', instr: '', content: gridPart(modelItems, { cols: nModel, rows: 1, cellH: modelCellH, labels: 'none', style: modelCellH < modelContentH ? 'flex:none' : '' }) };
     if (g.steps.length && g.modelFull) {
         sections.push(modelBandPart);
         sections.push({ kind: 'band', label: 'Steps:', instr: '', html: `<div class="mq-stepszone" style="height:${g.stepsH.toFixed(2)}mm">${stepsHtml(g.steps)}</div>` });

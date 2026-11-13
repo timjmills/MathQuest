@@ -384,6 +384,8 @@ function gridPart(part, ctx, report) {
         spanFirst: !!part.spanFirst,
         rowGap: Number(part.rowGap) || 0,
         relay: part.relay !== false,
+        // (`style`, lf-engine roles: extra inline style on the grid, e.g. an Opener Model held to its own height)
+        style: part.style || '',
     });
 }
 
