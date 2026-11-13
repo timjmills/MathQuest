@@ -23,4 +23,6 @@ ws-options-shots: OK (2 skills x 2 widths)
 
 Branch base 389a69c, full run before the fix (before-base-389a69c-full.log, dark = luma < 128 at the time):
 725 skills x 2 widths, 3 workers, 819 s: FAIL (410) = 330 the same off-frame stage (every sample whose fit is under 0.3),
-80 sparse but legible drawings (number bonds, long division) that luma < 128 under-counted -> dark = luma < 192.
+80 sparse but legible drawings (number bonds, long division) that luma < 128 under-counted -> dark = luma < 192,
+then luma < 230 inside a 3 px inset (grey fraction-of-set counters and coordinate grids in a grown frame read 0.45-0.50 %).
+Re-run with the final metric: d20c8a003 FAIL (4), 0.00 % ink each; d20c8a003 + fix OK; HEAD full run OK (after-full.log).
