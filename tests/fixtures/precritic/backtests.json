@@ -3483,6 +3483,28 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "eb-foot-gridcols-patterns",
+   "check": "ws-empty-band EB-FOOT pairs each cell with the measure of the grid that lays it (a full-width problem in its own 1-column grid at 1 column; a lone last-row cell of a 2-column grid at 2)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-FOOT (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13)",
+   "browser": true,
+   "fail": {
+    "commit": "lf-algebra head before 2a7e74b9",
+    "state": "pattern_features independent M: 5 EB-FOOT, 3 of them full-width cells paired with the 2-column measure"
+   },
+   "pass": {
+    "commit": "lf-algebra 2a7e74b9 with this tool",
+    "state": "EB-FOOT 2 (the notice cell's own measure, lf-algebra's)"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill <cat>:pattern_features --roles independent --sizes M --only EB-FOOT --no-baseline",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "FAIL"
+   },
+   "pending": true,
+   "pendingReason": "pattern_features lives only on lf-algebra's branch; arm on its merge with real commits (the pairing rule itself is in --self-test 'EB-FOOT columns')"
   }
- ]
+]
 }

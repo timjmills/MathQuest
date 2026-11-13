@@ -282,3 +282,10 @@ Cost: session cost_usd $74.96 at 23:23Z (critic r3 ~175k tokens included), ≈ 2
   - D3: the tile/frame marks are a bare "dot".
   - D4: a fixture pass side prints a plain OK.
   - D5: the sweep is not tied to the pin.
+- lf-roles 4e8eca14 (EB-FOOT: pair each cell with the measure of its own grid's column count), ruled by the tool owner on 11-13:
+  ACCEPTED and ported, because their base was the old tool.
+  - footCols(c, cells) gives the laying grid's column count. With no grid read, it falls back to the cells across the row, which
+    is the old rule: wrong for a lone last-row cell of a 2-column grid.
+  - --self-test "EB-FOOT columns" holds 3 cases. eb-foot-div-facts still PASSES.
+  - Row eb-foot-gridcols-patterns is PENDING: pattern_features exists only on lf-algebra's branch, so it is armed on that merge.
+  - This also answers lf-algebra's "bridge 2 columns vs cell max 1" item. lf-roles reverts its hunk.

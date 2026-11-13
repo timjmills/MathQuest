@@ -126,6 +126,10 @@ function uncovered(rows) {
     const names = (id) => mine.some((r) => (/\(/.test(id) ? String(r.rule || '').includes(id) : new RegExp(`(^|[^\\w-])${id}([^\\w-]|$)`).test(String(r.rule || ''))));
     return [...RULES, ...RULE_CASES].filter((id) => !RULE_EXEMPT[id] && !names(id));
 }
+// EB-FOOT's column count for a cell (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13): the column count of the grid that
+// lays it (a lone last-row cell of a 2-column grid is still at 2; a full-width problem in its own 1-column grid at 1); with no
+// grid read, the cells across its row (lf-placevalue 2026-11-08: mixed-practice's fits[0].cols is not the cells across)
+function footCols(c, cells) { return c.gridCols || cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length; }
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
         const t = [['all named', uncovered([{ command: 'node tests/scripts/ws-empty-band.cjs --html x', rule: `${RULES.join(' ')} ${RULE_CASES.join(' ')}` }]).length, 0],
@@ -139,6 +143,14 @@ if (argv.includes('--self-test')) {
         for (const id of miss) console.log(`self-test FAIL: ${id} has no live backtest row (tests/fixtures/precritic/backtests.json, its \`rule\` field) and no exemption`);
         if (tb.length || miss.length) { console.log(`ws-empty-band self-test: FAIL (rule coverage)`); process.exit(1); }
         console.log(`rule coverage: ${RULES.length + RULE_CASES.length - Object.keys(RULE_EXEMPT).length} rules / cases with a row; exempt ${Object.entries(RULE_EXEMPT).map(([k, v]) => `${k} (${v})`).join('; ')}`);
+    }
+    {   // EB-FOOT column count (lf-roles 4e8eca14): lone last-row cell of a 2-column grid -> 2; full-width cell in a 1-column grid -> 1; no grid -> across
+        const a = { page: 1, topPx: 10, gridCols: 2 }, b = { page: 1, topPx: 10, gridCols: 2 }, lone = { page: 1, topPx: 300, gridCols: 2 }, wide = { page: 1, topPx: 500, gridCols: 1 };
+        const n1 = { page: 1, topPx: 10, gridCols: 0 }, n2 = { page: 1, topPx: 12, gridCols: 0 };
+        const fc = [['lone last-row cell', footCols(lone, [a, b, lone, wide]), 2], ['full-width cell', footCols(wide, [a, b, lone, wide]), 1], ['no grid: across', footCols(n1, [n1, n2]), 2]];
+        const fbad = fc.filter(([, got, want]) => got !== want);
+        for (const [n, got, want] of fbad) console.log(`self-test FAIL: EB-FOOT columns ${n}: ${got}, want ${want}`);
+        if (fbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT columns)`); process.exit(1); }
     }
     {   // EB-GAP: 30.5 % never inked (FAIL, the div_facts r3 state) / 27 % (OK) / reserved and inked later (OK) / not the Model (OK)
         const g = (step, gapAtMm, gapMm, iv) => ({ step, gapAtMm, gapMm, hMm: 81.2, iv });
@@ -270,7 +282,10 @@ function measureCells(scope) {
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
                 neededMm: +(((box.b - cr.top - ((() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })())) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
-                screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
+                screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1),
+                // the column count of the grid that LAYS this cell (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13): a lone cell
+                // on a 2-column grid's last row is still laid at 2 columns; a full-width problem in its own 1-column grid at 1
+                gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; return t && t !== 'none' ? t.trim().split(/\s+/).length : 0; })() });
         });
     });
     return out;
@@ -588,7 +603,7 @@ async function main() {
                     if (GRID_ROLES.has(j.role) && b.sections <= 1 && m.length === cells.length && m.every((x) => x != null)) {
                         // each cell against the measure at ITS row's count across (lf-placevalue 2026-11-08: mixed-practice's
                         // fits[0].cols is the lattice size N, not the cells across; the role sizes a row from measured[k])
-                        const across = (c) => cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length;
+                        const across = (c) => footCols(c, cells);
                         const fpAt = (i, k) => (m[i][k] != null ? m[i][k] : m[i][b.cols]);
                         const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
                         // pair BY HEIGHT (lf-ops-props 2026-11-13, accepted by lf-checks with a guard): only when the page really sorts its
