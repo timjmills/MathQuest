@@ -6598,6 +6598,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "screen-digit-ws-divfacts",
+   "check": "the div_facts online-worksheet numeral is at least the host digit floor for its width - 56 px at 1366 / 1280, 48 px at 1024 / 820 - as the card and quiz are (lead 2026-11-13, lf-checks' tablet-width sweep: it was 40 px, the touch floor)",
+   "kind": "commit-pair",
+   "rule": "ws-screen-slots SCREEN-DIGIT (--digit-widths)",
+   "browser": true,
+   "fail": {
+    "commit": "850b686b5",
+    "state": "origin/master: worksheet numeral 40 px at 1366 / 1280 / 1024 / 820"
+   },
+   "pass": {
+    "commit": "898f800d7",
+    "state": "0 misses: the div_facts worksheet cell takes the host floor (data-mq-host-floor)"
+   },
+   "command": "node tests/scripts/ws-screen-slots.cjs --skills division:div_facts --screen-digit --digit-widths 1366,1280,1024,820 --rule-skills division:div_facts",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
