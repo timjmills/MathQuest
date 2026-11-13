@@ -92,12 +92,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 for (let k = 0; k < 5; k++) if (!await click('#tvPartsWide .tv-part[data-part-row="vocab"] [data-dir="-1"]')) break;
                 await idle();
                 let v = (await rowsOf()).find((r) => r.part === 'vocab');
-                check(v.val === '0' && v.on === false && !v.plus && v.minus, `${id}: Vocabulary at 0 - ${JSON.stringify(v)}`);
+                // (0 is offered only where the sheet still fills without the band: at the stepper's first value - is disabled,
+                // + is live, and at 0 the tick is cleared)
+                check(v.minus && !v.plus && (v.val !== '0' || v.on === false), `${id}: Vocabulary at its first value - ${JSON.stringify(v)}`);
                 await page.screenshot({ path: path.join(OUT, `${tag}-1280-vocab0.png`), clip: await page.evaluate(() => { const r = document.querySelector('#tvPartsWide').getBoundingClientRect(); return { x: r.left, y: r.top + window.scrollY, width: r.width, height: r.height }; }), captureBeyondViewport: true });
                 await click('#tvPartsWide .tv-part[data-part-row="vocab"] [data-dir="1"]');
                 await idle();
                 v = (await rowsOf()).find((r) => r.part === 'vocab');
-                check(v.on === true && Number(v.val) >= 1, `${id}: + from 0 did not tick Vocabulary again - ${JSON.stringify(v)}`);
+                check(v.on === true && Number(v.val) >= 1, `${id}: + from the first value did not step up (or tick Vocabulary again) - ${JSON.stringify(v)}`);
                 lint(await rowsOf(), `${id} 1280 changed`);
             }
             await page.evaluate(() => document.querySelector('#tvPartsWide').scrollIntoView({ block: 'start' }));
