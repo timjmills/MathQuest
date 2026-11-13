@@ -112,7 +112,10 @@ register(MATCH3_TEMPLATE, {
         // from the cell's top to its ink's bottom with the pad, against a 50 mm footprint, EB-FOOT 15 %. The work now stays at most
         // 50 mm, at the top of a taller row - footprint L 48 + pads, so EB-FOOT holds with room, and the band under it stays under
         // 30 % (28.5 % at review L); ws-empty-band EB-FOOT / EB-BAND)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:50mm;';
+        // (lf-vocab r16b, CL-4b: and the capped work sits at the TOP of a taller cell - margin-bottom:auto wins over a cell that
+        // centres its content (the lesson's practice pages, 76 mm rows: the 50 mm work started 10.7 mm below the top pad);
+        // ws-print-lint L-TOPSTART)
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:50mm;margin-bottom:auto;';
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
@@ -138,7 +141,10 @@ register(MATCH3_TEMPLATE, {
             // (lf-vocab r16, critic r5 nit 3: the pictures hang from one top line, so every letter sits at the same anchor - the
             // top-left of its picture - whatever the picture's height; bottom-aligned, a short picture's letter sat at mid-height
             // beside the others; ws-vocab-unit V-LETTER)
-            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-start;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:auto 0;' : ''}">${pics}</div>`
+            // (lf-vocab r16b, CL-4b: the picture row starts at the top of the box and the free height sits under it, over the words.
+            // Centred (margin:auto 0), the r16 50 mm work put 3.4 mm over a full-height row - and more over a flat one (grade 1, 2, 4
+            // and the lesson sets) - so the first printed row started 3.4-10.7 mm below the top pad: ws-print-lint L-TOPSTART)
+            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-start;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:0 0 auto;' : ''}">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },
     answerKey(p) {
