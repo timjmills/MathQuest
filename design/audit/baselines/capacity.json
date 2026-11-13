@@ -1923,7 +1923,7 @@
    "pages": 1
   },
   "placevalue:expand true-false S": {
-   "items": 4,
+   "items": 5,
    "pages": 1
   },
   "placevalue:expand true-false M": {
@@ -2115,7 +2115,7 @@
    "pages": 1
   },
   "placevalue:unit_form true-false S": {
-   "items": 4,
+   "items": 5,
    "pages": 1
   },
   "placevalue:unit_form true-false M": {
@@ -2208,6 +2208,102 @@
   },
   "placevalue:unit_form more-practice L": {
    "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form true-false S": {
+   "items": 8,
+   "pages": 1
+  },
+  "composing:number_word_form true-false M": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form true-false L": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it S": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it M": {
+   "items": 3,
+   "pages": 1
+  },
+  "composing:number_word_form reason-it L": {
+   "items": 2,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis S": {
+   "items": 6,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis M": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form error-analysis L": {
+   "items": 4,
+   "pages": 1
+  },
+  "composing:number_word_form pre-skill-check S": {
+   "items": 10,
+   "pages": 2
+  },
+  "composing:number_word_form pre-skill-check M": {
+   "items": 6,
+   "pages": 2
+  },
+  "composing:number_word_form pre-skill-check L": {
+   "items": 6,
+   "pages": 2
+  },
+  "composing:number_word_form review S": {
+   "items": 16,
+   "pages": 1
+  },
+  "composing:number_word_form review M": {
+   "items": 12,
+   "pages": 1
+  },
+  "composing:number_word_form review L": {
+   "items": 10,
+   "pages": 1
+  },
+  "composing:number_word_form test S": {
+   "items": 20,
+   "pages": 1
+  },
+  "composing:number_word_form test M": {
+   "items": 15,
+   "pages": 1
+  },
+  "composing:number_word_form test L": {
+   "items": 12,
+   "pages": 1
+  },
+  "composing:number_word_form independent S": {
+   "items": 28,
+   "pages": 1
+  },
+  "composing:number_word_form independent M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form independent L": {
+   "items": 15,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice S": {
+   "items": 28,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice M": {
+   "items": 21,
+   "pages": 1
+  },
+  "composing:number_word_form more-practice L": {
+   "items": 15,
    "pages": 1
   },
   "placevalue:value true-false S": {
@@ -2379,7 +2475,7 @@
    "pages": 1
   },
   "placevalue:combine independent S": {
-   "items": 28,
+   "items": 27,
    "pages": 1
   },
   "placevalue:combine independent M": {
@@ -2391,7 +2487,7 @@
    "pages": 1
   },
   "placevalue:combine more-practice S": {
-   "items": 28,
+   "items": 27,
    "pages": 1
   },
   "placevalue:combine more-practice M": {
