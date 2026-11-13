@@ -236,3 +236,16 @@ Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-
   all PASS. Debt seen, not changed: these stack Guided pages keep EB-SIDE 32.4 % at S / 31.7 % at M (stack in a 4- / 3-column
   cell; 5 columns at S would hold 27.7 %) and EB-BAND 34.8 % at L - pre-existing on base, untouched pages.
 Times: r8a, start 2026-11-13T13:45Z, end 2026-11-13T15:10Z, profile mq-opus-medium (rebuild after a failed check)
+
+- 2026-11-13 r8b (lead: the pages r8a changed pass their own band checks; (a) chart_to_120 Guided bands; (b) skipped by the lead's
+  priority order). Stack Guided pages of the 7 no-regroup subtraction skills: ws-empty-band OK at S/M/L (was EB-SIDE 57, EB-BAND 30).
+  How: a measured column stack whose every offered grid leaves >= 30 % beside it (measured slack) takes one column more (S 5, M 4);
+  the Model spans the fewest cells (2 .. the whole row) that complete the grid at the ceiling - on a full row the drawing and its
+  working each in the middle of one half; every stack cell centred in its row. Capacity: S 11, M 9, L 7 (L rose from 6); no drop.
+  (a) GUIDED-MODEL-ROW: the Model's row is held to what the try beside it fills (0.8), never under the Model's need, only where the
+  try would fill under 70 % and holding it passes - chart_to_120 Guided M/L pass (worktree of lf-builds e1389d1f3); the 8 add_wp /
+  sub_wp Guided S pages' first try (40-42 %) now passes; number_word_form row 1 57/50 % -> 47/37 % (its other rows pre-existing).
+  Checks: ws-roles-unit GUIDED-STACK-SIDE, GUIDED-MODEL-ROW; backtests guided-stack-side(-unit), guided-model-row(-wp): PASS.
+  Hash vs r8a: 29 of 87 passed guided pages changed (the 7 subtraction skills' 17 pages; 8 word-problem S, vocab_pick3_words S,
+  number_word_form S/M/L by the model-row rule); ws-lesson-baseline --all-lessons 1732 identical.
+Times: r8b, start 2026-11-13T15:20Z, end 2026-11-13T19:30Z, profile mq-opus-medium (rebuild after a failed check)
