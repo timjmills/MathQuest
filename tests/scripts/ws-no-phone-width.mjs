@@ -4,7 +4,8 @@
 // tablet 820-1024 px; there is no phone width; answer boxes keep 48 px touch targets for tablets).
 //
 // An explicit `--widths 390` / `--sizes 390x844` on a command line still runs (backtest rows that prove a phone fixture keep
-// it), so only DEFAULTS are judged: what a gate renders when nobody passes a width. Read from the source, per file in FILES:
+// it), so only DEFAULTS are judged: what a gate renders when nobody passes a width. Read from the source, per file of scanList()
+// (every script precritic / the deploy gates / the opt-in rules name, plus EXTRA; ALLOW lists exceptions with reasons):
 //   NP-ARRAY    a numeric width list holding 390 (`[390, 820, 1280]`, `[[1280, 900], [390, 844]]`, `[390, 1280]`)
 //   NP-ARGDEF   an argument default naming 390 (`arg('sizes', '390x844,390x664')`, `arg('widths', '390,...')`)
 //   NP-VIEWPORT a fixed viewport at 390 (`width: 390`, `{ w: 390 ...}`)
@@ -28,14 +29,39 @@ const HERE = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 && argv[i + 1] !== undefined ? argv[i + 1] : d; };
 
-// the screen gates (every gate that renders a pupil screen host), the precritic planner and the deploy gates
-export const FILES = [
+// WHICH FILES (critic lf-tools r1 A2: a hand-kept list let a new screen gate with a 390 default pass): EVERY script that
+// ws-precritic, ws-deploy-gates.sh or precritic's opt-in rules name (derived: each `ws-<name>` token in those three files
+// that is a tests/scripts/<name>.cjs|.mjs|.sh), plus the screen gates in EXTRA (the per-skill gates that backtests and lanes
+// call by hand). A file in ALLOW is read but its findings are reported as allowed, each with its reason.
+export const PLAN_SOURCES = ['tests/scripts/ws-precritic.cjs', 'tests/scripts/ws-deploy-gates.sh', 'tests/fixtures/precritic/opt-in-rules.json'];
+export const EXTRA = [
     'tests/scripts/ws-empty-band.cjs', 'tests/scripts/ws-screen-ink-size.cjs', 'tests/scripts/ws-screen-slots.cjs',
     'tests/scripts/ws-screen-answer.cjs', 'tests/scripts/ws-phone-card.cjs', 'tests/scripts/ws-chromebook-fit.cjs',
     'tests/scripts/ws-grade-render.cjs', 'tests/scripts/ws-next-box.cjs', 'tests/scripts/ws-screen-support-eq.cjs',
     'tests/scripts/ws-vocab-unit.mjs', 'tests/scripts/ws-ldiv-hug.cjs', 'tests/scripts/ws-touchdots.cjs',
     'tests/scripts/ws-div-facts-forms.cjs', 'tests/scripts/ws-precritic.cjs', 'tests/scripts/ws-deploy-gates.sh',
 ];
+const TEACHER_PHONE = 'a TEACHER screen test: its 390 px steps check the teacher\'s own phone layout on purpose (touch, slide-over, no sideways scroll); no pupil screen host is rendered at 390. The owner rule 2026-11-13 names pupil screens; dropping a teacher phone check is an owner / lead call (lf-tools no-phone-width status, "Not changed")';
+export const ALLOW = {
+    'tests/scripts/ws-no-phone-width.mjs': 'this check: its self-test plants 390 lines on purpose',
+    'tests/scripts/ws-teacher-wrm.cjs': TEACHER_PHONE,
+    'tests/scripts/ws-teacher-shell.cjs': TEACHER_PHONE,
+    'tests/scripts/ws-teacher-library.cjs': TEACHER_PHONE,
+    'tests/scripts/ws-teacher-preview.cjs': TEACHER_PHONE,
+    'tests/scripts/ws-pdf-preview.cjs': TEACHER_PHONE + ' (the teacher PDF preview)',
+    'tests/scripts/ws-simple-print.cjs': TEACHER_PHONE + ' (the teacher print dialog)',
+    'tests/scripts/ws-share-options.cjs': TEACHER_PHONE + ' (the teacher share dialog)',
+};
+/** The files to scan, from the plan sources' texts ({file: text}) and the files that exist (exists(path) -> bool). Pure. */
+export function scanList(sources, exists) {
+    const out = [];
+    const add = (f) => { if (!out.includes(f)) out.push(f); };
+    for (const text of Object.values(sources)) for (const m of String(text).matchAll(/\bws-[a-z0-9]+(?:-[a-z0-9]+)*/g)) {
+        for (const ext of ['.cjs', '.mjs', '.sh']) { const f = `tests/scripts/${m[0]}${ext}`; if (exists(f)) add(f); }
+    }
+    for (const f of EXTRA) if (exists(f)) add(f);
+    return out;
+}
 export const DOCS = ['design/audit/RUBRIC.md', 'design/lessons-first/briefs/README.md'];
 
 const isComment = (l) => /^\s*(\/\/|\*|\/\*|#(?!!))/.test(l);
@@ -111,7 +137,19 @@ function selfTest() {
         ['a lib with 390 back', { SCREEN_WIDTHS: [1280, 820, 390], TABLET_WIDTHS: [820, 1024], DIGIT_FLOOR: { 1280: 56, 1366: 56, 820: 48, 1024: 48 } }, 1],
         ['a lib missing', null, 1]];
     for (const [name, lib, n] of libs) { const got = readLib(lib).length; if (got !== n) bad.push(`${name}: ${got} finding(s), want ${n}`); }
-    const total = cases.length + docs.length + libs.length;
+    // A2 (critic lf-tools r1): the list is DERIVED - a gate precritic names is scanned without editing this file
+    const fake = new Set(['tests/scripts/ws-new-gate.cjs', 'tests/scripts/ws-deploy-only.mjs', 'tests/scripts/ws-teacher-wrm.cjs', 'tests/scripts/ws-grade-render.cjs']);
+    const lst = scanList({ p: "add(gate('new', 'ws-new-gate --skills', scope, 'browser', 'ws-new-gate', []))", d: 'browser_gate 1 ws-deploy-only ws-deploy-only.mjs\nbrowser_gate 1 ws-teacher-wrm ws-teacher-wrm.cjs', o: '{"tool": "ws-not-a-file"}' }, (f) => fake.has(f));
+    const scan = [
+        ['a precritic gate is scanned (hand list at f3ae7acca missed it)', lst.includes('tests/scripts/ws-new-gate.cjs'), true],
+        ['a deploy gate is scanned', lst.includes('tests/scripts/ws-deploy-only.mjs'), true],
+        ['a name with no file is not', lst.some((f) => /not-a-file/.test(f)), false],
+        ['EXTRA screen gates stay scanned', lst.includes('tests/scripts/ws-grade-render.cjs'), true],
+        ['a teacher phone test is allow-listed with a reason', typeof ALLOW['tests/scripts/ws-teacher-wrm.cjs'] === 'string' && ALLOW['tests/scripts/ws-teacher-wrm.cjs'].length > 40, true],
+        ['the pupil explorer is NOT allow-listed (it is a pupil screen)', 'tests/scripts/ws-student-explorer.cjs' in ALLOW, false],
+    ];
+    for (const [name, got, want] of scan) if (got !== want) bad.push(`${name}: ${got}, want ${want}`);
+    const total = cases.length + docs.length + libs.length + scan.length;
     for (const b of bad) console.log(`  FAIL ${b}`);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${total})` : `${TOOL}: OK (self-test, ${total} cases)`);
     process.exit(bad.length ? 1 : 0);
@@ -123,12 +161,17 @@ function main() {
     if (!existsSync(join(root, 'tests', 'scripts'))) { console.log(`${TOOL}: --root ${root} is not a MathQuest checkout`); console.log(`${TOOL}: FAIL (usage)`); process.exit(2); }
     const findings = [];
     let read = 0;
-    for (const f of FILES) {
-        const p = join(root, f);
-        if (!existsSync(p)) continue;
+    const sources = {};
+    for (const f of PLAN_SOURCES) if (existsSync(join(root, f))) sources[f] = readFileSync(join(root, f), 'utf8');
+    const files = scanList(sources, (f) => existsSync(join(root, f)));
+    const allowed = [];
+    for (const f of files) {
         read++;
-        for (const x of readSource(readFileSync(p, 'utf8'))) findings.push({ file: f, ...x });
+        const xs = readSource(readFileSync(join(root, f), 'utf8'));
+        if (ALLOW[f]) { if (xs.length) allowed.push(`${f} (${xs.length} line(s)): ${ALLOW[f]}`); continue; }
+        for (const x of xs) findings.push({ file: f, ...x });
     }
+    for (const a of allowed) console.log(`  allowed  ${a}`);
     for (const f of DOCS) {
         const p = join(root, f);
         if (!existsSync(p)) continue;
@@ -141,7 +184,7 @@ function main() {
     for (const x of readLib(lib)) findings.push({ file: 'tests/lib/ws-screen-widths.cjs', ...x });
     for (const x of findings) console.log(`  ${x.rule.padEnd(11)} ${x.file}${x.line ? `:${x.line}` : ''}  ${x.text}`);
     if (!read) { console.log(`${TOOL}: FAIL (no gate file read under ${root})`); process.exit(1); }
-    console.log(findings.length ? `${TOOL}: FAIL (${findings.length}: a phone width 390 in a gate default, brief or host; owner rule 2026-11-13)` : `${TOOL}: OK (${read} files: no 390 default; the shared widths 1280 / 1366 / 820 / 1024)`);
+    console.log(findings.length ? `${TOOL}: FAIL (${findings.length}: a phone width 390 in a gate default, brief or host; owner rule 2026-11-13)` : `${TOOL}: OK (${read} files, ${files.length} scripts derived from ${Object.keys(sources).length} plan sources: no 390 default${allowed.length ? `; ${allowed.length} allow-listed with a reason` : ''}; the shared widths 1280 / 1366 / 820 / 1024)`);
     process.exit(findings.length ? 1 : 0);
 }
-main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

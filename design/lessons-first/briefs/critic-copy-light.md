@@ -20,8 +20,9 @@ Template: `<template>`. Anchor: `<anchor cat:skill>`, which passed this template
    reads NOT ELIGIBLE, or is missing, STOP: this skill needs the full critic.
 2. The sample is `<logs>/copy-light-sample.json` (written by that run). Grade EXACTLY its pages: each entry
    `{n, role, size, seed, host, width, option, value, opts}` is one page (print: `role` at `size` with `seed`, `opts`; a screen
-   host: `host` at `width` px with `opts`). Render with `node tests/scripts/ws-grade-render.cjs` (or the lane's render
-   command) on those values. Each page's key is part of the page.
+   host: `host` at `width` px with `opts`). Render exactly those pages with
+   `node tests/scripts/ws-grade-render.cjs --sample <logs>/copy-light-sample.json --out <dir>` (one directory per page,
+   `<skill>__ep<n>`, its meta.json naming the seed and width). Each page's key is part of the page.
 
 ## What you grade — the skill's OWN content only
 
@@ -39,9 +40,11 @@ host chrome. Do not re-grade them unless you see a defect in them (below). Grade
 
 ## The four criteria and the bar
 
-Score each sampled page 1–10 on the four RUBRIC criteria (C1 correct maths and answers, C2 teaches one thing at a time,
-C3 matches the design contract, C4 works for the pupil on print and screen). For C3 and C4 the inherited layout scores
-as the anchor's grade unless you file a defect. **8 or more on all four criteria on every sampled page; one 7 is a FAIL.**
+Score each sampled page 1–10 on the four RUBRIC criteria, by their RUBRIC names (`design/audit/RUBRIC.md` "### C1" to
+"### C4"): **C1 Ease of use** (can the pupil do it alone?), **C2 Educational value** (does it teach the named skill well?
+the answers, the ladder and the words above are graded here), **C3 Spacing and layout** and **C4 Standard fidelity**. For
+C3 and C4 the inherited layout scores as the anchor's grade unless you file a defect. (`ws-copy-light --brief-lint` holds
+these names to RUBRIC's.) **8 or more on all four criteria on every sampled page; one 7 is a FAIL.**
 
 > **Legibility is scored.** Anything you notice that is small, hard to read, cramped, faint or thin (dots, digits, labels,
 > strokes, a tall narrow drawing in a wide cell) is a numbered defect with its criterion and hard cap, never an "unscored note".

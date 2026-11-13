@@ -21,13 +21,16 @@ Template: `<template>`. Anchor(s): `<anchor cat:skill>` (`js/modules/redesign-pa
    skills) means no batch: each skill goes on its own route.
 2. The sample is `<logs>/copy-light-batch-sample.json`: ONE shared sample budget for the whole batch. Each role is graded
    once in the batch (on one of the skills that offers it), every skill has at least one screen host, all of its own option
-   values and at least two pages. Grade exactly those pages.
+   values and at least two pages; the screen pages cover every width 1280 / 1366 / 820 / 1024 across the batch. Grade
+   exactly those pages: `node tests/scripts/ws-grade-render.cjs --sample <logs>/copy-light-batch-sample.json --out <dir>`
+   renders each with its own role, size, seed, host, width and opts.
 
 ## What you grade
 
 The same as `critic-copy-light.md`: each skill's OWN content only (answers, ladder / one new thing, words and instruction
-strings, option behaviour) on its sampled pages; layout and drawing are inherited from the anchor. The four criteria and
-the bar are unchanged: **8 or more on all four criteria on every sampled page of a skill; one 7 fails that skill.**
+strings, option behaviour) on its sampled pages; layout and drawing are inherited from the anchor. The four criteria are
+RUBRIC's, by name (**C1 Ease of use**, **C2 Educational value**, **C3 Spacing and layout**, **C4 Standard fidelity**), and
+the bar is unchanged: **8 or more on all four criteria on every sampled page of a skill; one 7 fails that skill.**
 
 > **Legibility is scored.** Anything you notice that is small, hard to read, cramped, faint or thin (dots, digits, labels,
 > strokes, a tall narrow drawing in a wide cell) is a numbered defect with its criterion and hard cap, never an "unscored note".
