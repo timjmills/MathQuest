@@ -46,7 +46,10 @@ export function prepare(it, info = {}) {
     const sentence = it.template === 'word-work' && pl.layout === 'sentence';
     // (a sentence story prints ONCE, over both panels; each panel holds its number sentence only - critic r3 N12: a
     // panel that repeated the story held one item a page at L. `noFrame` + `bar: false`: the story with no work zone)
-    const work = (c, o, v) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, sentence ? { payload: { noStory: true } } : {}));
+    // the WRONG panel draws with the wrong answer's own slots (its sign, its numbers), as Error Analysis does: given only the value,
+    // a word-work story printed an "added" wrong answer under the item's minus sign (11 - 2 = 13; lf-builds via the lead, SIGNMATCH)
+    const wrongSlots = wrong.slots && typeof wrong.slots === 'object' ? wrong.slots : null;
+    const work = (c, o, v, slots) => it.render(Object.assign({}, c, { state: 'blank' }), Object.assign({}, o, { cols: sentence ? 2 : 3, shown: v, prompt: false }, slots ? { shownSlots: slots } : {}, sentence ? { payload: { noStory: true } } : {}));
     const story = (c) => (sentence ? `<div class="mq-abstory" style="margin-bottom:3mm;">${it.render(Object.assign({}, c, { state: 'blank' }), { cols: 2, prompt: false, payload: { noFrame: true, bar: false } })}</div>` : '');
     // A worked line wider than half the room beside the response (an across "72 ÷ 9 = 8" at L:
     // div_facts' Standard form, critic R1 follow-up) puts B UNDER A, so neither runs out of its
@@ -56,8 +59,8 @@ export function prepare(it, info = {}) {
     // the A / B block centres in a cell its row stretches (the cell is 57 / 76 / 113.5 mm by PT-RSN-1 whatever the problem's
     // height): the white splits above and below, never one band under short work (critic r1/r2 R11; owner CL-4b, 2026-11-12)
     const render = (c, o = {}) => story(c) + `<div class="mq-ab" style="margin-top:auto;margin-bottom:auto${wide ? ';grid-template-columns:1fr minmax(52mm,auto);row-gap:3mm' : ''}">`
-        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value)}</div>`
-        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct)}</div>`
+        + `<div class="mq-abbox"${at(1, 1)}><span class="mq-abtag">A</span>${work(c, o, aRight ? correct : wrong.value, aRight ? null : wrongSlots)}</div>`
+        + `<div class="mq-abbox"${at(1, 2)}><span class="mq-abtag">B</span>${work(c, o, aRight ? wrong.value : correct, aRight ? wrongSlots : null)}</div>`
         // the frames sit just under the A / B ring, not spread to the cell's foot (critic r1/r2 R10: "__ is correct." ~300 px under
         // the ring in a mostly empty column); inline, so only Reason It pages change
         + `<div class="mq-abresp"${wide ? ` style="grid-column:2;grid-row:1 / 3;justify-content:flex-start"` : ' style="justify-content:flex-start"'}>`
