@@ -335,7 +335,11 @@ function measureCells(scope, slotInk = true) {
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1), edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
+                neededMm: +((c.matches('.ws-rowstretch') && c.querySelector(':scope > [data-ws-stretchmid]')
+                    // (CL-4d, lead 2026-11-13: a stretched one-line cell is CENTRED down its box - the white above its line is the row's
+                    // stretch, not height it needs: it needs its pads, the tab clearance it draws (::before) and its line's box, as measured)
+                    ? (inner.t - cr.top) + (() => { const bs = getComputedStyle(c, '::before'); return bs.content && bs.content !== 'none' ? parseFloat(bs.height) || 0 : 0; })() + c.querySelector(':scope > [data-ws-stretchmid]').getBoundingClientRect().height + (cr.bottom - inner.b)
+                    : (box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
                 step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1),
                 // EB-FOOT (critic eb-r5 m1): the bridge's item index(es) the kit wrote on the cell ([] when absent), the cell's top
                 // (its row), and the column count of the grid that LAYS it (a re-laid grid, grid.js PG-15, is cut into lcm tracks:
