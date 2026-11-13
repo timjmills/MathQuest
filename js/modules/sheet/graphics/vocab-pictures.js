@@ -502,10 +502,10 @@ const PIC_FEAT = Object.freeze({
     hundred: ['base10-flat'],
     ten: ['base10-rod'],
     one: ['base10-unit'],
-    digit: ['digit-ringed', 'marked-odd'],
+    digit: ['digit-ringed', 'marked-odd', 'place:tens'],
     'expanded form': ['plus-sign', 'expanded-sum'],
     'number name': ['number-words'],
-    'ones digit': ['boxed-number', 'last-digit-boxed', 'marked-even'],
+    'ones digit': ['boxed-number', 'last-digit-boxed', 'marked-even', 'place:ones'],
     repeat: ['repeated-block', 'bracket'],
     sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
     cycle: ['loop-arrows', 'loop-shapes'],
@@ -600,6 +600,8 @@ export const VOCAB_FEATURES = Object.freeze([
     'crossed-mark', 'lone-mark', 'loop-arrows', 'loop-numbers', 'arrow-into-box', 'arrow-out-of-box', 'numbers-at-ends',
     // (r13 V-NUM: two or more numbers ringed or boxed, all even / all odd; r14: exactly one, marked-even / marked-odd)
     'all-even', 'all-odd', 'marked-even', 'marked-odd',
+    // (r14 V-PLACE: the place of a ringed or boxed digit inside a number)
+    'place:ones', 'place:tens', 'place:hundreds',
     // declared only (not read from the markup)
     'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
     'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
@@ -650,6 +652,19 @@ export function vocabReadFeatures(body) {
     if (marked.length >= 2 && marked.every((n) => n % 2 === 0)) f.add('all-even');
     if (marked.length >= 2 && marked.every((n) => n % 2 === 1)) f.add('all-odd');
     if (marked.length === 1) f.add(marked[0] % 2 === 0 ? 'marked-even' : 'marked-odd');
+    // V-PLACE (r14, critic r13 #2): a ringed or boxed DIGIT inside a number (one-digit texts side by side on one line, nothing
+    // between them) has a place - place:ones / tens / hundreds - which satisfies one / ten / hundred
+    const PLACES = ['ones', 'tens', 'hundreds', 'thousands'];
+    const singles = [...heavy.map((r) => texts.filter((t) => inR(t, r))), ...ringsT.map((q) => q.inside)].filter((x) => x.length === 1).map((x) => x[0]);
+    for (const m of singles) {
+        if (!/^\d$/.test(m.t.trim())) continue;
+        const line = texts.filter((t) => Math.abs(t.y - m.y) < 2).sort((a, b) => a.x - b.x);
+        let k = line.indexOf(m), lo = k, hi = k;
+        const dig = (t) => t && /^\d$/.test(t.t.trim());
+        while (dig(line[lo - 1]) && line[lo].x - line[lo - 1].x < 18) lo--;
+        while (dig(line[hi + 1]) && line[hi + 1].x - line[hi].x < 18) hi++;
+        if (hi > lo) f.add(`place:${PLACES[hi - k] || 'big'}`);
+    }
     const eqX = texts.filter((t) => t.t.trim() === '=' || /\s=\s/.test(t.t)).map((t) => t);
     for (const r of heavy) {
         const inside = texts.filter((t) => inR(t, r));

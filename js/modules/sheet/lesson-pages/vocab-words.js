@@ -48,10 +48,10 @@ export const VOCAB_WORDS = Object.freeze({
     before: { meaning: 'the number just behind', explain: 'Before means the number just behind, so 104 comes before 105.', notWith: ['one less'] },
     after: { meaning: 'the number just ahead', explain: 'After means the number just ahead, so 106 comes after 105.', notWith: ['one more', 'count on'] },
     'hundred chart': { meaning: 'numbers in rows of ten', explain: 'Hundred chart means numbers in rows of ten, each row ten more.', notWith: [] },
-    hundred: { meaning: '100: ten tens', explain: 'Hundred means 100: ten tens make one big square.', notWith: ['number name', 'array'] },
-    ten: { meaning: '10: ten ones', explain: 'Ten means 10: ten ones in one long rod.', notWith: [] },
-    one: { meaning: '1: a single one', explain: 'One means 1: a single small square.', notWith: [] },
-    digit: { meaning: 'one of the numbers 0 to 9', explain: 'Digit means one of the numbers 0 to 9, like the 7 in 472.', notWith: ['ones digit'] },
+    hundred: { meaning: '100: ten tens', explain: 'Hundred means 100: ten tens make one big square.', notWith: ['number name', 'array', 'digit'] },
+    ten: { meaning: '10: ten ones', explain: 'Ten means 10: ten ones in one long rod.', notWith: ['digit'] },
+    one: { meaning: '1: a single one', explain: 'One means 1: a single small square.', notWith: ['digit'] },
+    digit: { meaning: 'one of the numbers 0 to 9', explain: 'Digit means a single number from 0 to 9, like the 7 in 472.', notWith: ['ones digit', 'one', 'ten', 'hundred'] },
     'expanded form': { meaning: 'the number split by place', explain: 'Expanded form means the number split by place: 300 plus 40 plus 7.', notWith: [] },
     'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, like forty-seven.', notWith: ['hundred'] },
     'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 6 in 476.', notWith: ['digit', 'factor', 'quotient'] },
@@ -113,9 +113,10 @@ export const VOCAB_DEFS = Object.freeze({
     before: [['back-hop']],
     after: [['forward-hop']],
     'hundred chart': [['table', 'step:10']],
-    hundred: [['base10-flat']],
-    ten: [['base10-rod']],
-    one: [['base10-unit']],
+    // (r14 V-PLACE, critic r13 #2: a ringed or boxed digit inside a number names its place - 4(7)2 reads as ten)
+    hundred: [['base10-flat'], ['place:hundreds']],
+    ten: [['base10-rod'], ['place:tens']],
+    one: [['base10-unit'], ['place:ones']],
     digit: [['digit-ringed'], ['last-digit-boxed']],
     'expanded form': [['expanded-sum']],
     'number name': [['number-words']],
@@ -169,6 +170,9 @@ export const VOCAB_SETS = Object.freeze([
     { lesson: 'G1|-|countonto120', title: 'Count on to 120', grade: 1, round: 1, ccss: ['1.NBT.A.1'],
         words: ['count on', 'before', 'digit', 'after', 'one less', 'hundred chart'] },
     { lesson: 'G2|-|readandwritenumbersto1000inwordsnumeralsandexpandedform', title: 'Read and write numbers to 1,000', grade: 2, round: 1, ccss: ['2.NBT.A.3'],
+        // (r14, critic r13 #2: the digit picture rings the 7 of 472, the tens digit, so it read as ten (V-PLACE) - digit is notWith
+        // one, ten and hundred; the only vetted split is the core {digit, expanded form, number name} (2.NBT.A.3's three ways to
+        // write a number) / {hundred, ten, one} (its base-ten units); the words stay, the set keeps its position - V7)
         words: ['digit', 'expanded form', 'number name', 'hundred', 'ten', 'one'] },
     { lesson: 'G4|-|findemergentfeaturesegunitsdigitcycle', title: 'Find emergent features (units digit cycle)', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         // (r12, critic r11 #2: product / multiple notWith; the critic's {multiple, sequence, repeat} holds two notWith pairs, so the
