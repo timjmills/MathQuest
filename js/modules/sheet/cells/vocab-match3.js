@@ -111,7 +111,12 @@ register(MATCH3_TEMPLATE, {
             + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important}'
             + '.mq-wspaper .mq-vm .mq-vm-word{flex:none!important;justify-content:flex-end!important;padding-right:14%}'
             + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:12px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
-        const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
+        // (lf-vocab r16, critic r5 nit 4: on a phone the three words wrap 2 + 1 and each box followed its centred word, x 230 / 260 /
+        // 225 px at 390 px. A narrow screen takes the online worksheet's layout: one word a row in a centred column, each row
+        // right-aligned, so every letter box stands at the same x; ws-vocab-unit V-BOX390)
+        const narrowCss = twin ? '<style>@media (max-width: 600px){.mq-vm[data-mq-k2] .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;align-self:center;gap:8px!important}'
+            + '.mq-vm[data-mq-k2] .mq-vm-word{flex:none!important;justify-content:flex-end!important}}</style>' : '';
+        const wrapCss = tileCss + narrowCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
             + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${L(ctx, 2)} ${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
             // (a practice cell's free height goes above AND below the pictures - the row centred in the room over the words, which
