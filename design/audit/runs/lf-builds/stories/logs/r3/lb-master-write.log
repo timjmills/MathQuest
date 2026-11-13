@@ -1,0 +1,3 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-lesson-baseline.cjs --all-lessons --write /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/lb-master-1db0.json  [1db0e3309]
+ws-lesson-baseline: wrote 1732 hashes to /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/lb-master-1db0.json
+exit 0
