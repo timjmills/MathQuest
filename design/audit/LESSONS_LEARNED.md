@@ -536,3 +536,16 @@ rule-by-rule, class-by-class diff of the two runs (`--dump`), never the forced c
 | add S lesson sheet with the check on: 9 % blank foot (the Warm-up gone, the Vocabulary grew only on a page with no rows) - a lane red at 7ff8a87ab that the r3 packet carried | PC-H13 (existing, forced) | lesson-check-sheet-foot-forced (7ff8a87ab FAIL → 6fccd7134 OK) | precritic lesson-samples-check | 1 round |
 | "? + 2 = 6" / "How many triangles" on the check AND on Mixed (soft text avoid relaxed) | ws-lesson-check --force-check LR-5 "on prereq and mixed" (8 → 0) | - (ws-lesson-check is not on precritic: delta not 0, see below) | no | 0.5 |
 | ws-lesson-check --force-check is not wired into precritic: its delta on the samples is not 0 (LR-6 +8 and LR-7 +11 on the sub check-on sheet; add Practice turn-arounds +41 for -46 sheet repeats) | the triage table (CRITIC-READY.md) | - | no (by rule: wire only at delta 0) | - |
+
+### lf-engine PC r4 (2026-11-13, builder): a dry pool's fallback order, and every forced delta at or below master
+Rule (lead ruling, from this round): **when a skill's pool runs dry, give up avoids in a declared order and never the page
+itself.** 1) any unused fact of the declared range; 2) a fact another page printed (the lesson sheet first, turned round
+before exact, then the chart), one place at a time; never the check's own facts; never outside the range; never a
+same-page turnaround. A last "take what you get" try is a defect: it printed "3 + 1" under "1 + 3" and "0 + 2" in an
+add 1-3 lesson.
+
+| Finding | Check that catches it | Backtest row | On precritic path | Rounds saved |
+|---|---|---|---|---|
+| add Practice (check on) turns round its own items, +41 vs unforced: the sheet's hard avoid left the 21-fact pool dry and the last try dropped noTurnaround and the operand floor | ws-lesson-samples PG-TURN (every page, every lesson, forced and unforced) | lesson-pg-turn (be9528776 FAIL → 15fe4f6de OK) | precritic lesson-samples-check (forced) and lesson-samples-all (unforced, every lesson) | 1 round |
+| sub check-on lesson sheet: near twins (74 - 68 / 71 - 68) and 3 underTen a page - the sheet's Independent band read neither LR-6 nor the library's caps | ws-lesson-samples PG-LR67 (sheet always; Practice / Mixed with the check on) | lesson-pg-lr67 (be9528776 FAIL → 15fe4f6de OK) | precritic lesson-samples-check | 1 round |
+| a check number bond "2 + 6 = ?" under the chart's "6 + 2" (add L 1629); a Mixed bond "9 + 1 = ?" beside the lead's "1 + 9" - a bond had no fact key | PG-TURN (same page); ws-lesson-check --force-check LR-5 (chart, cross page) | lesson-pg-turn covers the Mixed case | lesson-samples-check | 0.5 |

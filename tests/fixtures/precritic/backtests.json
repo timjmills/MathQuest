@@ -3582,6 +3582,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "lesson-pg-turn",
+  "check": "No page of a sample lesson packet (check forced on) prints one of its own sums turned round (1 + 3 and 3 + 1; a number bond read as a sum too)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PG-TURN; lead ruling lf-engine PC r4 (a cross-page repeat is less bad than a same-page turnaround)",
+  "browser": true,
+  "fail": {
+   "commit": "be9528776",
+   "state": "add Practice turns round its own items (3 + 1 under 1 + 3): the sheet's hard avoid left the band-10 pool dry and the last try dropped noTurnaround"
+  },
+  "pass": {
+   "commit": "15fe4f6de",
+   "state": "reuseAvoid / lastAvoid tiers, refCoreOk on the last try; Mixed pageSum for bonds read as sums"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 2 --only add --sizes L --rules PG-TURN",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pg-lr67",
+  "check": "With the check forced on, the sub lesson sheet (and Practice / Mixed) keeps LR-6 (no near twins, no answer twice) and LR-7 (at most 2 underTen a page)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PG-LR67; LESSON_RULES LR-6 / LR-7",
+  "browser": true,
+  "fail": {
+   "commit": "be9528776",
+   "state": "sub L check-on sheet: 74 - 68 / 71 - 68 near twins, 3 underTen items (seeds 1037, 1074, 1185, 1222, 1259)"
+  },
+  "pass": {
+   "commit": "15fe4f6de",
+   "state": "practice.js indepRuled orders the Independent pool by LR-6 / LR-7 against the Guided cells; pageRules on Practice / Mixed"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 8 --only sub --sizes L --rules PG-LR67",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
