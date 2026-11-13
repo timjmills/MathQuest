@@ -44,7 +44,7 @@
 // Pure module (SCC-01): no window, no DOM, no state, no Math.random.
 
 import { register } from '../registry.js';
-import { esc } from '../cell.js';
+import { esc, gradeSlots } from '../cell.js';
 import { blankWidth } from '../tokens.js';
 import { L, P, B, INK, GREY, KEY_FEATURES, isTwin, sizeOf, digitPt, textPt, zonePt, shapeOf, n2, checkBox } from './k2kit.js';
 import { divisionSteps } from './long-division.js';
@@ -1150,7 +1150,7 @@ function framesLayout(p, ctx) {
         // answer place, `data-ws-slot="equation"` - and n the second; its boxes are drawn heavy, as an answer place is)
         const first = `${box('fr0-a', String(x(s1)), String(x(s1)).length, false, true)}${sign('op0', s1.op)}${box('fr0-b', String(y(s1)), String(y(s1)).length, false, true)}`;
         const eqn = two ? `${brk ? sym('(') : ''}${first}${brk ? sym(')') : ''}${sign('op1', s2.op)}${box('fr1-b', String(s2.bottom), String(s2.bottom).length, false, true)}` : first;
-        const eqGroup = twin ? `${eqn}${sym('=')}${sym('n')}` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
+        const eqGroup = twin ? `<span data-mq-part="equation" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>` : `<span data-ws-slot="equation" data-ws-shape="group"${ink ? ` data-ws-ink="${ink}"` : ''} style="display:inline-flex;align-items:center;gap:${L(ctx, 2.2)};">${eqn}${sym('=')}${sym('n')}</span>`;
         parts.eq = row(eqGroup); parts.n = row(`${sym('n')}${sym('=')}${box('answer', String(p.ans), String(p.ans).length, true, true)}`);
         rows = parts.eq + parts.n;
     } else {
@@ -1166,8 +1166,8 @@ function framesLayout(p, ctx) {
     if (p.check) {
         const c = p.check;
         // (two-step card decision 8: the estimate is the second graded answer on paper - a heavy box, graded; on the screen
-        // it is a typed box marked as it is filled, the host scoring the answer)
-        const esBox = (v, d) => (twin ? box('es-r', v, d, false, true)
+        // it is a typed box marked as it is filled, AND graded: `data-mq-part` puts it in the host's value, wordWorkVerdict - lf-hosts)
+        const esBox = (v, d) => (twin ? `<span data-mq-part="es-r" style="display:inline-flex;">${box('es-r', v, d, false, true)}</span>`
             : box('es-r', v, d, false, true).replace(' data-ws-graded="0"', ''));
         const est = row(`${cap('Estimate:')}${box('es-a', String(c.a), String(c.a).length)}${sign('es-op0', p.steps[0].op)}${box('es-b', String(c.b), String(c.b).length)}`
             + (two ? `${sign('es-op1', p.steps[1].op)}${box('es-c', String(c.c), String(c.c).length)}` : '') + `${sym('=')}${esBox(String(c.est), String(c.est).length)}`);
@@ -1186,7 +1186,9 @@ function framesLayout(p, ctx) {
     }
     // (the two-step bar model on the teaching cells and with wpBar, above the sentences; the middle question over Step 1)
     if (two && !p.letter) { const mq = midQuestion(p, ctx); if (mq) rows = mq + rows; }
-    const work = `<div style="flex:none;display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
+    // (lf-hosts 2026-11-13, ws-phone-card CLIP-X: on screen the work column may shrink to the cell, so its rows wrap at 390 px
+    // instead of running 18-34 px past the phone's edge; paper keeps its one-line rows)
+    const work = `<div style="${twin ? 'flex:1 1 auto;min-width:0;' : 'flex:none;'}display:flex;flex-direction:column;gap:${L(ctx, 2.2)};">${rows}</div>`;
     const tsBar = two ? twoStepBarFor(p, ctx) : '';
     // (the unit word PRINTED beside the answer box, as the bar layout does: the compact cell asks for the numbers)
     const unit = p.unit && !p.check ? `<span style="font-size:${P(ctx, textPt(ctx) + 1)};font-weight:700;line-height:1.1;padding-bottom:${L(ctx, 2)};">${esc(p.unit)}</span>` : '';
@@ -1402,7 +1404,7 @@ function renderWork(p, ctx) {
  */
 const KO = (ctx, mm) => `max(${L(ctx, mm)}, var(--ws-koin, 0mm))`;
 
-register(WW_TEMPLATE, {
+const WW_DEF = {
     render(p, ctx) {
         const html = renderWork(p, ctx);
         // `caption` (a story dealt onto a pool page whose one instruction is "Solve."): the
@@ -1444,7 +1446,12 @@ register(WW_TEMPLATE, {
                 const brk = (s1.op === '+' || s1.op === '-') && (s2.op === '*' || s2.op === '/');
                 const x = (st) => (st.op === '*' ? st.a : st.top), y = (st) => (st.op === '*' ? st.b : st.bottom);
                 const eq = `${brk ? '(' : ''}${x(s1)} ${GLYPH[s1.op]} ${y(s1)}${brk ? ')' : ''} ${GLYPH[s2.op]} ${s2.bottom} = n`;
-                slots.equation = { value: eq, graded: true, accept: [eq.replace(/\s+/g, '')] };
+                // (lf-hosts 2026-11-13, PT-G-15 / PAGE_TYPES word problems "commutative equations are accepted": the Step 1
+                // numbers turned around when Step 1 adds or multiplies - 9 × 5 + 13 = n for 5 × 9 + 13 = n - is the same
+                // equation; the boxes fix every other place. Paper and screen read this one list.)
+                const turn = (s1.op === '+' || s1.op === '*') && String(x(s1)) !== String(y(s1))
+                    ? [`${brk ? '(' : ''}${y(s1)}${GLYPH[s1.op]}${x(s1)}${brk ? ')' : ''}${GLYPH[s2.op]}${s2.bottom}=n`] : [];
+                slots.equation = { value: eq, graded: true, accept: [eq.replace(/\s+/g, ''), ...turn] };
             }
             if (p.check) {
                 const c = p.check;
@@ -1479,7 +1486,44 @@ register(WW_TEMPLATE, {
         return out;
     },
     layout() { return { card: 'card-wide-visual', checker: 'value' }; },
-});
+};
+register(WW_TEMPLATE, WW_DEF);
+
+/* ============================================================== screen grading of the two-step parts */
+// (lane lf-hosts 2026-11-13, two-step card decisions 7 / 8: on paper the letter equation and the estimate are graded answers
+// of their own - the key's `equation` and `es-r` slots. The screen grades them the SAME way: the host composes the cell's
+// answer and each graded part into one value, "58 | equation: 5×9+13=n" / "58 | es-r: 60", and the verdict is the paper
+// key's own gradeSlots on that value, so screen and paper accept exactly the same forms.)
+
+/** The graded parts beyond the answer that a word-work payload's screen twin carries ([] for none). */
+export function wordWorkGradedParts(p) {
+    if (!p || p.layout !== 'frames' || !Array.isArray(p.steps)) return [];
+    const out = [];
+    if (p.letter && p.steps.length === 2) out.push('equation');
+    if (p.check) out.push('es-r');
+    return out;
+}
+/** {answer, <part>: value} from a composed screen value ("58 | equation: 5×9+13=n"). Pure. */
+export function wordWorkScreenValues(value) {
+    const s = String(value == null ? '' : value);
+    const cut = s.split(/\s*\|\s*(?=[\w-]+:)/);
+    const out = { answer: String(cut[0] || '').trim() };
+    for (const seg of cut.slice(1)) { const m = /^([\w-]+):\s*([\s\S]*)$/.exec(seg); if (m) out[m[1]] = m[2].replace(/\s+/g, ''); }
+    return out;
+}
+/** Every graded place of the item filled (the answer and each part's boxes). Pure. */
+export function wordWorkFilled(value, p) {
+    const v = wordWorkScreenValues(value);
+    return !!v.answer && wordWorkGradedParts(p).every((id) => !!v[id] && !/[?_]/.test(v[id]));
+}
+/** The screen verdict of a word-work item with graded parts: the PAPER key's gradeSlots on the composed value; null when
+ *  the item has no graded part beyond the answer (the host's own number check stands). Pure. */
+export function wordWorkVerdict(value, p) {
+    if (!wordWorkGradedParts(p).length) return null;
+    return gradeSlots(WW_DEF.answerKey(p), wordWorkScreenValues(value)).correct;
+}
+/** The paper key's verdict on a pupil's written values ({answer, equation, 'es-r'}): the same function the screen uses. */
+export function wordWorkKeyVerdict(values, p) { return gradeSlots(WW_DEF.answerKey(p), values || {}); }
 
 /* ============================================================== screen twin */
 
