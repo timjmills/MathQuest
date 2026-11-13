@@ -211,3 +211,77 @@ Notes:
 - Check 1 (print-lint) and check 4 (EB-SUPBAND) run on the existing fact-support / empty-band precritic gates (no new gate).
 - Could not be checked automatically: the practice CARD host renders no `[data-ws-cell]` for mult_facts, so EB-SUPBAND and
   the screen slot-rule read nothing there (a screen-parity gap, not this check's). The worksheet and quiz hosts are covered.
+
+## r2 fix (builder Opus medium, rebuild after critic r1 FAIL; lead rulings 2026-11-13)
+
+Card: the rulings are recorded on the facts card (f31aceddf, re-generated unsigned); the lead signed it at 12317e6be.
+
+| Ruling | Fix (commit ecc8342e8) |
+|---|---|
+| 1. Test = Independent for mult_facts, every support | `print-sheet.js` buildSheetInner builds a one-skill mult_facts Test (Auto count and columns) on its Independent page's grid (`_indFit`: columns, count, cell height); `test.js` takes it. ws-capacity-pin TEST-EQ-IND is ON by default (`--no-test-eq-ind` turns it off); `testEqOpts` holds mult_facts array / touch / skip / boxsign / none and div_facts array. |
+| 2. One frame per band for × arrays | `skill-options.js` multFactsArrayFrame (rows = the band's largest smaller factor, columns = its largest larger factor, read as the generator deals); `print-sheet.js` supportPlanFor and `screen-cell.js` screenSupportsFor hand it in (paper = screen); `fact.js` draws every × array top-left in that frame, a × 0 fact the empty frame; `support-draw.js` pitch S 2.6 / M 3.2 / L 3.3 mm (never under the print dot; the 12 x 12 frame stays BESIDE the fact at every size - at L a 4.4 mm pitch put it under the fact and printed 4 a page). |
+| 3. Review S touch back to 16 | `review.js` geometry: a band of supported × facts at S tries the other column counts and takes one only when it prints MORE (touch: 5 x 2 + 5 = 15 -> 4 x 3 + 4 = 16). capacity.json ruled 16 (the 16 -> 15 re-pin withdrawn); the array Review S stays ruled 13 (master 12). |
+| 4. "1 row of n" | `fact.js` row / rows in every array caption (÷ too). |
+
+Before -> after (default seeds):
+
+| Page | e3aa95d32 (critic r1) | ecc8342e8 |
+|---|---|---|
+| mult_facts {array} Independent S / M / L | 10 / 10 / 10 | 10 / 8 / 8 |
+| mult_facts {array} Test S / M / L | 12 / 12 / 12 | 10 / 8 / 8 (= Independent) |
+| mult_facts {array} More practice S / M / L | 10 / 10 / 10 | 10 / 8 / 8 |
+| mult_facts {array} Review S / M / L | 13 / 9 / 9 | 13 / 9 / 9 |
+| mult_facts {array, constant 2} Independent / Test S / M / L | - | 12 / 12 / 10 each |
+| mult_facts {touch} Test S / M / L vs Independent | 20 / 16 / 12 vs 25 / 20 / 12 | 25 / 20 / 12 = Independent |
+| mult_facts {boxsign} Test S / M / L vs Independent | 12 / 12 / 12 vs 15 / 15 / 12 | 15 / 15 / 12 |
+| mult_facts default Test S / M / L | 20 / 16 / 12 | 25 / 20 / 12 (= Independent; capacity-pin "rise") |
+| mult_facts {touch} Review S | 15 (73 mm strip, 31 %) | 16, no strip |
+
+Hash check (print-lint --save-html, port-normalised, 108 documents: div_facts and add_facts with supports all / array / touch / none,
+independent / more-practice / test / review, S / M / L): every div_facts and add_facts page byte-identical. Changed: mult_facts Test
+(none S/M/L, touch S/M/L) and mult_facts Review S touch, as intended.
+
+### The r2 checks red -> green (ws-backtest, each row run directly)
+
+| Row | FAIL state | PASS state |
+|---|---|---|
+| support-not-slot-multfacts-array | e3aa95d32: 3 (1 framed + 9 unframed, paper S/M/L) | ecc8342e8: 0 |
+| pagefill-review-multfacts-touch | e3aa95d32 | ecc8342e8 |
+| size-order-opt-multfacts-array | e3aa95d32: S == L | ecc8342e8 |
+| supband-below-support-multfacts-array (now on the Test role) | e3aa95d32 | ecc8342e8 |
+| array-caption-grammar-multfacts | e3aa95d32 | ecc8342e8 |
+| test-eq-ind-multfacts (no flag) | e3aa95d32 | ecc8342e8 |
+| capacity-ruled-review-touch-multfacts (new) | e3aa95d32: 15 under ruled 16 | ecc8342e8: 16 |
+| array-caption-multfacts (re-pointed: CAPTION now holds N1) | 88753326 | ecc8342e8 |
+
+Tool changes this round, each one reason:
+- ws-screen-support-eq: `--only NOTSLOT` skipped the paper pages, so the NOTSLOT backtest read only the screen hosts and passed on the critic's tree; fixed. ARRAY-FRAME: a × 0 fact draws its band's empty frame (square on the 12 x 12 band), so the rule is "empty, never portrait"; captions read `rows? of`.
+- ws-empty-band EB-SUPBAND: a support BESIDE taller ink (the fact beside the band frame) has no band under it (the strip holds the fact's lower rows; the band under the cell's last ink is EB-BAND's). The backtest runs the Test role, where D4 was graded: the Scripted Model's own tall step cells (34 % under the frame at S) are the page-types lane's (facts card ruling 2026-10-31) - left, reported.
+- ws-precritic `--role R --skill X` now also runs ws-empty-band and ws-capacity-pin on X's R pages, so the Review stack-side, the Test support band and the ruled Review capacity are on precritic's path.
+
+### Owner check rule (2026-11-13): every finding a check, a backtest, on precritic's path, a ledger row
+
+- The div_facts r6 / r7 page checks (EB-PAGE test / fade, EB-PAD, EB-COLS, EB-TESTEQ, EB-GAP, EB-FACTX) were dropped from master when the
+  deploy cherry-pick kept master's tests/: the fix shipped (4c5de5a27), the checks did not. Restored as `tests/scripts/ws-fact-pages.cjs`
+  (the lane's tool as b43bf8b99 had it, under its own name, since master's ws-empty-band is a different rewrite) with the 8 backtest rows,
+  pass re-pointed to 4c5de5a27 (an ancestor of origin/master); precritic plans it on div_facts (gate `fact-pages`).
+- R5-3 (no 5-group gap): ws-screen-support-eq ARRAY-GAP (new), row array-gap-divfacts (FAIL 9a8acc59c -> PASS 4c5de5a27).
+- R5-5 / R5-7: exempt with reason in the ledger (measurable, not built; fixed in round 5, unchanged since).
+- design/lessons-first/CHECKS_FROM_CRITICS.md: the lf-ops rows name real ids; an lf-ops-divarray section. lf-checks' sweep
+  (`ws-precritic-plan.mjs --checks-from-critics`, their 503ad16c, run from a scratch copy): no lf-ops / lf-ops-divarray row fails.
+
+### Findings -> checks (r2)
+
+| Finding | Check that now catches it |
+|---|---|
+| D1 × 0 frame reads as an answer slot | SUPPORT-NOT-SLOT (paper + screen), ARRAY-FRAME |
+| D2 Review S touch 15, 30 % strip | PAGEFILL on review / test (--fill-roles), ruled capacity 16 |
+| D3 same page at S / M / L | SIZE-ORDER-OPT |
+| D4 small × arrays in tall cells | EB-SUPBAND (Test role) |
+| N1 "1 rows" | ARRAY-CAPTION grammar |
+| Q1 Test != Independent | TEST-EQ-IND (default on) |
+| r2 tool gap: `--only NOTSLOT` read no paper | the NOTSLOT backtest now fails on e3aa95d32 (it passed there before the fix) |
+
+Speed notes: (1) a check's backtest must be re-run after every tool edit on the lane, not only after the code fix - the NOTSLOT and
+CAPTION rows had silently drifted. (2) `git pull --rebase` on a branch holding a merge commit replays master's commits and swaps the
+working tree under running browser gates: fetch, and merge only when the remote branch is ahead.
