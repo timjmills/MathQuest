@@ -672,7 +672,7 @@ export const SPREAD_CAP = 1.7;
  * SPREAD_CAP x its shortest problem, the grid no taller than the page's grid less 1 mm (PG-12). null when
  * the grid already fills four fifths of the page or nothing is measured.
  */
-export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
+export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0, cap = SPREAD_CAP) {
     if (!(rows >= 1) || !(availMm > 0) || baseMm >= 0.9 * availMm) return null;
     const w = [], mins = [];
     for (let r = 0; r < rows; r++) {
@@ -684,8 +684,8 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0) {
     if (!(S > 0)) return null;
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
-    const k = Math.min(SPREAD_CAP, (availMm - 1) / S);
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, SPREAD_CAP * mins[r]))));
+    const k = Math.min(cap, (availMm - 1) / S);
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, cap * mins[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };
@@ -1181,16 +1181,22 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             const chunks = laidOut.chunksBySection[part.section] || [];
             let spread = null;
             // (`tightRows` - layout.tightRows, lf-placevalue pv debt: an in-place section that asks for it is never spread)
-            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && !tightRows(its)) {
-                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
+            // (`spreadMax`, lf-placevalue compare round: a `tightRows` section whose every footprint names how far its rows may
+            // grow and keep the band under them below RUBRIC H13's 30 % is spread to that cap - "408 ( ) 666" held to its ink
+            // left 22-37 % of the Independent page white under the grid, ws-print-lint PAGEFILL; stretched freely it was 35 %
+            // empty under the line, ws-empty-band EB-BAND)
+            const spreadMax = tightRows(its) && its.length && its.every((it) => Number((it.footprint || {}).spreadMax) > 1)
+                ? Math.min(SPREAD_CAP, ...its.map((it) => Number(it.footprint.spreadMax))) : null;
+            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && (!tightRows(its) || spreadMax)) {
+                if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin, spreadMax || SPREAD_CAP);
                 else if (chunks.every((c) => !c.blocks)) {
                     // a section over several pages: the FIRST page's stretch, applied to every page
                     // of the section, so a cell keeps one height across its pages (PT-ENG-6)
                     const c0 = chunks[0];
                     const its0 = sheetItems[part.section].slice(c0.from, c0.from + c0.count);
                     const sh0 = c0.gridMm ? c0.gridMm : (rowShape(its0, L.cols, c0.rows, L.cellH) || {}).heightMm || c0.rows * L.cellH;
-                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin);
-                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin);
+                    const sp0 = spreadRows(its0, L.cols, c0.rows, sh0, L.gridH, L.hMin, spreadMax || SPREAD_CAP);
+                    if (sp0) spread = c0 === part.chunk ? sp0 : spreadRows(its, L.cols, part.chunk.rows, baseMm, Math.min(avail, baseMm * sp0.heightMm / sh0 + 1), L.hMin, spreadMax || SPREAD_CAP);
                 }
             }
             sections.push({

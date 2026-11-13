@@ -975,8 +975,10 @@ register('pv', {
             // (tightRows), at most three across (hardCap: at S a fourth column put the numbers against the cell's edges), fewer where
             // the measured line is wider - band 999,999 - so a Test never stands wider than its Independent page, EB-GRIDFOOT;
             // `keepCols`: the page is never re-laid in fewer, wider columns to fill it - print-sheet's re-seat put it 2 x 14 at S,
-            // a 31 % band each side)
-            if (p.kind === 'compare') return { wMm: 62, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, ...tight };
+            // a 31 % band each side; `spreadMax`: on the practice pages its rows may still grow - the band under the line stays
+            // under 30 % - so the grid fills the page, ws-print-lint PAGEFILL. 1.2 x at S and M; at L the 3 x 6 page needs 1.38 x: 1.3 x
+            // left 23 % of the page white, 1.4 x 31 % of each cell under the line - the dense layout takes no 2 x 8 there (1 x 10))
+            if (p.kind === 'compare') return { wMm: 62, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.2, ...tight };
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
             // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
