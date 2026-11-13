@@ -394,6 +394,13 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 - **PT-MOD-2.** State cell width = max(`footprint.wMm`, 62); the text column takes the rest. Step text is cell-text size, 2 lines at most.
 - **PT-MOD-3.** Steps beyond the page capacity continue on a page whose band label again reads "Model:" (band labels come only from the fixed vocabulary; the page number shows the continuation), same title, same row height.
 - **PT-MOD-4.** The page ends with the `Say:` band (PT-OPN-9): the skill's oral frame filled in for this problem. The band is on by default and follows the same dialog option as the Opener's.
+- **PT-MOD-5** (lead, delegated approval 2026-11-13, lf-roles r2 ruling 1). On a Model laid BESIDE (a state, its step text in the
+  next column), the step-text cell is judged by its text (2 lines at most, PT-MOD-2), NOT by the empty band under or beside it:
+  that column is as tall as its state by construction. The STATE cells stay under H13 (EB-BAND / EB-SIDE, PT-MOD-3's reserved-mark
+  room as ruled). A Model that would spill to a second page beside its text lays its states side by side, each step text over
+  its state, when that grid fits one page (lf-roles fix 5); one that cannot (function_table_easy at L) keeps the beside layout
+  over its pages, excused here, each page still meeting the state-cell bands. Check: ws-empty-band skips `.mq-stepcell` on a
+  beside Model (lf-checks); ws-roles-unit MOD-ACROSS.
 
 **Teacher options.** One or two examples (the second uses identical wording); arrows and callouts on or off; `Say:` band on or off (on by default).
 **Skill supplies.** `workedSteps(q)` with `marks` per step; `renderCell` with `state: traced` and `ctx.step = {index: i, marks}`; `strings.oralFrame`. Default adapter: states before the last show the blank problem, the last shows it answered.

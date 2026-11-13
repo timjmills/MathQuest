@@ -733,6 +733,8 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
+        add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
         const ovJson = path.join(ctx.logs, 'options-verify.json');
         add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--deadline', OV_DEADLINE, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));

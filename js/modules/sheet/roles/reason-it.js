@@ -58,8 +58,12 @@ export function prepare(it, info = {}) {
         + `<div class="mq-abresp"${at(2, '1 / 3')}>`
         + `<div class="mq-abchoice">${blank({ id: 'ri-a', kind: 'choice', shape: 'choice', text: 'A' }, c, key)}${blank({ id: 'ri-b', kind: 'choice', shape: 'choice', text: 'B' }, c, key)}</div>`
         + `<div class="mq-frame">${writeLine('ri-who', c, key, 1)} is correct.</div>`
-        + (place.kind === 'none' ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
-        + `</div></div>`;
+        + (place.kind === 'none' || place.words ? '' : `<div class="${answerFrameCls(place, 56)}">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}${place.kind === 'list' ? '' : '.'}</div>`)
+        + `</div>`
+        // a unit-form answer ("[2] hundreds [9] tens [7] ones") is wider than the response column: its frame is a full-width
+        // row under A and B (in the column it wrapped to three lines and cost the page an item at S: ws-capacity-pin 4 -> 3)
+        + (place.words ? `<div class="mq-frame" style="grid-column:1 / -1;padding-left:2mm">The answer is ${answerPlaceHtml(place, 'ri-ans', c, key)}</div>` : '')
+        + `</div>`;
     return Object.assign({}, it, {
         render, key, measured: null, drawsAnswer: true,
         footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 1 }),

@@ -3339,6 +3339,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "capacity-no-drop",
+  "check": "a page never prints fewer items than the pinned master page, per skill x role x size (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3; unit_form Reason It S 4 -> 3 found by it)",
+  "kind": "fixture",
+  "rule": "ws-capacity-pin CAPACITY-NO-DROP",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/capacity/fail.json",
+   "state": "the pin holds one item more than the page prints"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/capacity/pass.json",
+   "state": "the pin as master prints it"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --pin {fixture} --skills placevalue:unit_form --roles reason-it --sizes S",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
