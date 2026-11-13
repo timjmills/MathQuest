@@ -407,7 +407,12 @@ function ftStepState(p, steps, k, ctx) {
     const c = Object.assign({}, ctx, { state: whole ? 'answered' : last ? 'traced' : 'blank' });
     p = Object.assign({}, p, { _noMerge: true });   // the chart's states write the tried rule in the machine's box
     const plain = p.task === 'rule' && rule.length === 1 && !p.check && n === 4 && rows.length >= 2 && p.machine;
-    if (!plain) return this.render(p, c);
+    if (!plain) {
+        // (the Check row from the state whose step works the Check - rule-check's "Check: 8 − 1 = 7" panel - else the last)
+        const chkAt = (Array.isArray(steps) ? steps : []).findIndex((s) => ((s && s.marks) || []).some((m) => m && m.slot === 'chk'));
+        const withCheck = last || whole || (chkAt >= 0 && chkAt < n - 1 && k >= chkAt);
+        return this.render(chartState(p, c, last || whole, withCheck), Object.assign(c, { ftChart: true }));
+    }
     const G = { '+': '+', '-': '−', x: '×', '/': '÷' };
     const r0 = rule[0];
     const addish = r0.op === '+' || r0.op === '-';
@@ -441,6 +446,40 @@ function ftStepState(p, steps, k, ctx) {
         }
     }
     return this.render(Object.assign({}, p, mt ? { machineText: mt } : {}, last ? {} : { _noRuleLine: true }), c);
+}
+
+/*
+ * THE CHART STATE of any other table (r7; ws-cell-checks OVERFLOW on the function_table_easy lesson, precritic r6: on
+ * ftTask make / outputs-check / rule-check / inputs-check / mixed-check, band 1000 and ftTable 51 / 52 the 2 x 2 chart fell
+ * back to zoom 1 and its panels ran 4-9 mm over at S). A 2 x 2 panel is about 84 mm wide, and its drawing has about
+ * 88 mm of height under a one-line step name and a one-line words line (measured at S and M). Nothing shrinks; the state
+ * keeps one place for each thing:
+ *   - the worked column ("3 + 7") only while the table fits the panel's width (band 1000: "386 − 200" ran 10 mm past it;
+ *     the words line under the drawing works the same row out);
+ *   - the Check row on the LAST state only (the states before it work the rows; the last one fills in every row and the
+ *     Check) - or from the state whose step works the Check (rule-check) - beside the table when the table and the Check
+ *     fit the panel side by side;
+ *   - one rule place: with the worked column, its head names the rule, so the machine is left out when the drawing
+ *     would run past the panel's height with it (five rows, or a Check under the table).
+ */
+const CHART_PANEL_MM = 84, CHART_DRAW_MM = 88, CHART_SIDE_GAP_MM = 5;
+function chartState(p, c, last, withCheck = last) {
+    const g = geo(c);
+    let q = withFade(Object.assign({}, p), c);
+    if (hasExprCol(q) && tableWidth(q, dims(q, g)) > CHART_PANEL_MM) q._noExpr = true;
+    if (!withCheck) q._noCheck = true;
+    // (find the rule with a Check: as the plain chart, one rule place a state - no empty rule line before the last state,
+    // and the last writes the rule IN the machine when the machine row fits the panel)
+    if (q.task === 'rule' && !last) q._noRuleLine = true;
+    if (q.task === 'rule' && last) { q._noMerge = false; c.ftMerge = true; }
+    const d = dims(q, g);
+    const side = !!q.check && !q._noCheck && tableWidth(q, d) + CHART_SIDE_GAP_MM + sideW(d) <= CHART_PANEL_MM;
+    if (side) q._chartSide = true;
+    const tableH = d.headH + (q.rows || []).length * d.rowH + 2;
+    const checkH = q.check && !q._noCheck && !side ? 1 + d.boxH + 2.5 + 1 : 0;
+    const ruleH = q.task === 'rule' && !q._noRuleLine && !ruleInMachine(q, g, d, c) ? 1.2 + d.signW + 2 : 0;
+    if (q.machine && hasExprCol(q) && tableH + checkH + ruleH + d.machineH + 0.8 > CHART_DRAW_MM) q._noMachine = true;
+    return q;
 }
 
 /** The width a cell gives its content at the section's column count (unknown: one column). */
@@ -499,8 +538,8 @@ const checkInline = (d, ctx) => 6 * 0.55 * d.textMm + 2 + checkW(d).inW + checkW
  * scales to the phone as one column).
  */
 const sideW = (d) => Math.max(6 * 0.55 * d.textMm, checkW(d).inW + checkW(d).outW);
-const checkSide = (p, g, d, ctx) => !!p.check && !g.twin && !fixMode(ctx) && Number(ctx && ctx.columns) > 0
-    && tableWidth(p, d) + 7 + sideW(d) <= availMm(ctx);
+const checkSide = (p, g, d, ctx) => !p._noCheck && (!!p._chartSide || (!!p.check && !g.twin && !fixMode(ctx) && Number(ctx && ctx.columns) > 0
+    && tableWidth(p, d) + 7 + sideW(d) <= availMm(ctx)));
 
 function checkRow(p, g, d, vals, ink, slotsById, ctx, side = false, fx = { on: false }) {
     const s = slotsById.chk;
@@ -593,22 +632,22 @@ register('function-table', {
         }
         const merged = ruleInMachine(p, g, d, ctx);
         if (merged) inner += machine(p, g, d, wMm, ruleAnswer(p, g, d, vals, ink, slots, ctx, fx, 'merged'));
-        else if (p.machine) inner += machine(p, g, d, wMm);
-        else if (p.task !== 'rule') inner += `<div style="text-align:center;margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>`;
+        else if (p.machine && !p._noMachine) inner += machine(p, g, d, wMm);
+        else if (p.task !== 'rule' && !p._noMachine) inner += `<div style="text-align:center;margin-bottom:${g.em(1.5)}">${txt(g, `Rule: ${ruleHtml(p.rule)}`, { bold: true })}</div>`;
         const side = checkSide(p, g, d, ctx) && !!slotsById.chk;
         if (side) {
             // DOM order stays the reading order (table, rule, Check), the grid places the Check
             // beside the table
             inner += `<div style="display:grid;grid-template-columns:auto auto;grid-template-areas:'table check' 'rule rule';`
-                + `column-gap:${g.em(7)};justify-content:center;align-items:end">`
+                + `column-gap:${g.em(p._chartSide ? CHART_SIDE_GAP_MM : 7)};justify-content:center;align-items:end">`
                 + `<div style="grid-area:table">${tableHtml(p, g, d, vals, ink, slotsById, ctx, fx)}</div>`
-                + (p.task === 'rule' && !merged ? `<div style="grid-area:rule">${ruleAnswer(p, g, d, vals, ink, slots, ctx, fx)}</div>` : '')
+                + (p.task === 'rule' && !merged && !p._noRuleLine ? `<div style="grid-area:rule">${ruleAnswer(p, g, d, vals, ink, slots, ctx, fx)}</div>` : '')
                 + checkRow(p, g, d, vals, ink, slotsById, ctx, true)
                 + '</div>';
         } else {
             inner += tableHtml(p, g, d, vals, ink, slotsById, ctx, fx);
             if (p.task === 'rule' && !merged && !p._noRuleLine) inner += ruleAnswer(p, g, d, vals, ink, slots, ctx, fx);
-            if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
+            if (p.check && slotsById.chk && !p._noCheck) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;
         return root(g, 'function-table', `<div data-mq-join=", " style="display:inline-block;vertical-align:top;text-align:center${koPad(g)}">${inner}</div>`, 'text-align:center;', this.footprint(p, ctx).wMm);
@@ -634,9 +673,9 @@ register('function-table', {
         const w = Math.max(tableWidth(p, d) + (checkSide(p, g, d, ctx) ? 7 + sideW(d) : 0), p.machine ? (merged ? mergedW(g, d) : 52) : 0, p.task === 'rule' && !merged ? (p.support === 'line' ? lineW(d) + 6 : d.frameW + 2) : 0);
         let h = d.headH + (p.rows || []).length * d.rowH + 2;
         if (merged) h += mergedH(d) + 0.4;
-        else if (p.machine || p.task !== 'rule') h += d.machineH + 0.8;
-        if (p.task === 'rule' && !merged) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
-        if (p.check && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
+        else if ((p.machine || p.task !== 'rule') && !p._noMachine) h += d.machineH + 0.8;
+        if (p.task === 'rule' && !merged && !p._noRuleLine) h += 1.2 + d.signW + (ruleInline(p, g, d, ctx) ? 0 : Math.max(11, g.pt * g.zoneEm) * PT_MM + 0.6);
+        if (p.check && !p._noCheck && !checkSide(p, g, d, ctx)) h += 1 + d.boxH + 2.5 + (checkInline(d, ctx) ? 0 : d.textMm * 1.4);
         if (p.note) h += 1.7 + d.textMm * 1.3;
         return { wMm: Math.ceil(w + 4), hMm: Math.ceil(h + 4 + (g.screen ? 0 : 2.5)), measure: true, factLike: false, maxCols: 3 };
     },

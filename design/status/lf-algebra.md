@@ -4,11 +4,15 @@ Session: session_013pHDnKpNaW4JzSJ8QNo1H7
 Branch: claude/sweet-newton-c8wrv1-lf-algebra
 Owner of files: gen-algebraic.js (not the number_word_form blocks: lf-placevalue), gen-function-table.js, gen-patterns-notice.js, sheet/cells/{function-table,notice,growing-pattern}.js, sheet/providers/{function-table,patterns}.js, genNumberPatterns + the number_patterns_rule provider block (released by lf-ops), design/cards/{function-table,patterns}/
 State: paused
-Updated: 2026-11-12 (fix r5: merge master, growing sizes, precritic r5)
+Updated: 2026-11-13 (fix r7: function-table lesson chart states, precritic r7)
 Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
 ## Now
+- 2026-11-13 fix r7: function_table_easy lesson anchor chart fits its 2 x 2 panels on every option value but ftTask=rule-check
+  (cell-checks lesson findings 354 -> 18; skill total 371 -> 35). Precritic r7 (below, function_table_easy only): 27 PASS, 3 FAIL
+  (empty-band 39 and cell-checks 35, both the r6 role-owned rows plus rule-check; sibling-compare). rule-check panels 1 and 2 stay
+  2.4 / 0.8 mm over: needs lf-engine (see "Red, by owner" under Precritic r7).
 - 2026-11-13 fix r6 (patterns card signed bd6c6cc6 by the lead): KEYJOIN on the feature sentences cleared (the check slot is the
   box column, not the printed sentences); lesson anchor-chart overflows cleared on notice patTask=feature / band=25,
   pattern_features patTask=truefalse / band=50 and function_table_easy ftTask=rule. Precritic r6 (below): 27 PASS, 16 FAIL;
@@ -63,6 +67,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r7 (function-table lesson chart states + precritic), start 2026-11-13T01:36Z, end 2026-11-13T02:20Z, profile mq-opus-low
 Times: fix r6 (KEYJOIN + lesson chart overflows + empty-band triage + precritic), start 2026-11-12T23:30Z, end 2026-11-13T01:35Z, profile mq-opus-low
 Times: fix r5 (merge master + growing sizes + precritic), start 2026-11-12T21:55Z, end 2026-11-12T23:40Z, profile mq-opus-medium
 Times: fix r4, start 2026-11-07T12:13Z, end 2026-11-07T12:50Z, profile mq-opus-medium
@@ -132,6 +137,33 @@ Remaining non-green rows, cause by cause:
   function_table_easy ftTask=make S: REPEAT (two make tables with the same rule look identical - no numbers printed) - ours,
   open.
 - spec-card INCOMPLETE: both cards unsigned by design (owner answers recorded; cards ready to sign).
+
+## Precritic r7 (2a7e74b9 + r7 fix, algebra:function_table_easy, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261113-014922-7147, wall 1400 s)
+27 PASS (1 on the baseline), 3 FAIL, 1 N/A.
+| Gate | r6 | r7 | Automatic check that caught it / what changed |
+|---|---|---|---|
+| cell-checks function_table_easy | FAIL 371 (KEYJOIN 15, OVERFLOW 356) | FAIL 35 (KEYJOIN 15, OVERFLOW 20) | ws-cell-checks OVERFLOW (--card-opts); non-lesson rows identical to r6 (true-false / reason-it KEYJOIN, guided L mixed) |
+| - lesson ftTask=make S / M / L | 4 / 4 / 4 | 0 / 0 / 0 | last step name one line ("Same rule again.") |
+| - lesson ftTask=outputs-check | 16 / 16 / 16 | 0 / 0 / 0 | Check row on the last state only; there the machine is left out (the worked column's head names the rule) |
+| - lesson ftTask=inputs-check | 16 / 16 / 16 | 0 / 0 / 0 | Check row on the last state, beside the table |
+| - lesson ftTask=mixed-check | 16 / 16 / 16 | 0 / 0 / 0 | same as inputs-check |
+| - lesson ftTask=rule-check | 18 / 18 / 18 | **6 / 6 / 6** | no empty rule line before the last state, rule IN the machine on the last, Check row from the Check step on, beside the table; panels 1-2 still 2.4 / 0.8 mm over (lf-engine, below) |
+| - lesson band=1000 | 16 / 16 / 16 | 0 / 0 / 0 | the worked column left out when the table is wider than the 84 mm panel ("386 − 200" ran it to 94.5 mm); the words line works the row |
+| - lesson ftTable=51 / 52 | 16 / 16 / 16 each | 0 / 0 / 0 | five rows + the machine ran past the panel's 88 mm drawing room: one rule place, the worked column's head |
+| ws-empty-band | FAIL 157 (6 skills; ft 36 lines) | FAIL 39 (ft only; the same 36 lines as r6) | no lesson row; role-owned rows as triaged in r6 |
+| sibling-compare | FAIL | FAIL (0 worse) | lead: first family |
+| ws-detailed-lesson --check (shares ftStepState) | OK | OK | |
+| everything else on the plan (node-lint, providers, content-audit, print-lint lesson S/L + independent S/M/L, grade-render --gate + other roles, screen-slots/answer, chromebook-fit, phone-card, slot-clip, options-verify --render, card rulings, spec-card, boot-smoke, code-snapshot 736) | | PASS | |
+
+Red, by owner (r7 changes only; the r6 list below stands for the rest):
+- **lf-engine (was ours)**: function_table_easy lesson ftTask=rule-check, chart panels 1 and 2 at 2.4 / 0.8 mm over (S, M, L
+  alike). Cause: the provider deals five worked steps (look, bigger/smaller, test, Check, write) and the routine
+  'function-table-use-rule' names four, so namedSteps (lesson-pages/common.js) falls back to the provider's sentences as step
+  NAMES, and the 2 x 2 chart puts steps 1 + 2 in panel 1: 32 mm of heading (30.5 in panel 2) over a 77 mm machine + table.
+  Needs ONE of: (a) option-aware lesson steps - a routine's `steps` chosen by the skill's option values (e.g. `stepsBy:
+  {ftTask: {'rule-check': [5 steps]}}` read by namedSteps), so each panel gets a one-line name and its words line; or (b) the
+  chart's layout chosen per option (chartWide rows when the provider's step count differs from the routine's). Dropping the
+  Check step from the provider would fit it in-lane but loses the Check step on every role (P-1), so it was not done.
 
 ## Precritic r6 (bd6c6cc6 + r6 fixes, 6 skills, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261112-235836-14314, wall ~5400 s)
 27 PASS (spec-card --check-signed now PASS: patterns card signed), 16 FAIL.
@@ -351,6 +383,20 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 02:20: fix r7 (precritic r7 above). One target: the function_table_easy lesson chart on 8 option values.
+  `sheet/cells/function-table.js` chartState (ftStepState's path for every table that is not the plain find-the-rule one):
+  Check row on the last state only (or from the state whose step marks `chk`), beside the table when table + 5 mm + Check fit
+  the 84 mm panel; the worked column left out when wider than the panel; the machine left out when the worked column's head
+  names the rule and the drawing would pass the panel's 88 mm; find-the-rule-with-Check gets r6's one rule place (no empty
+  rule line before the last state, rule in the machine on the last). `lessons/families/algebra.js` routine step 4 "Same rule,
+  every row." -> "Same rule again." (it wrapped to two lines in every last panel: 5.2 mm). Nothing shrinks: zoom 1, metrics
+  as before. Each finding was caught by ws-cell-checks OVERFLOW (--card-opts, lesson role); measured per panel with a scratch
+  probe (panel 114.6 mm, padding 9.7, drawing room 88 under one-line name + words). Checks: node --check on both files,
+  ws-cell-checks full card + options (371 -> 35), ws-detailed-lesson --check OK, boot-smoke OK, code-snapshot OK (736),
+  precritic r7. Speed reflection: the r6 fix covered one option value of a class that spans eight; the per-option table in
+  the precritic log was the map. Proposal for lf-checks: a chart-state budget unit check (render every stepState of a
+  template's card option values at zoom 1 in a node DOM-less estimate via footprint(), fail when h > the 2 x 2 panel's
+  drawing room) so a chart class is closed across every option value in one round, not per value.
 - 2026-11-13 01:35: fix r6 (precritic r6 above). Pulled bd6c6cc6 (patterns card signed); design/cards/* untouched. Fixes 1-3 in
   notice.js and function-table.js; boot-smoke OK, code-snapshot OK (736). Speed reflection: the KEYJOIN class (a check slot that
   wraps printed choice text) and the chart-zoom reflow class (a stretchy drawing zoomed by the anchor chart) each cost a round;

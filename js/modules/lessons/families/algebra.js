@@ -36,7 +36,7 @@ export const ROUTINES = Object.freeze({
             { icon: 'look', text: 'Read the rule.' },
             { icon: 'start', text: 'Do it to the In.' },
             { icon: 'write', text: 'Write the Out.' },
-            { icon: 'check', text: 'Same rule, every row.' },
+            { icon: 'check', text: 'Same rule again.' },
         ],
         chant: '',
         format: {
