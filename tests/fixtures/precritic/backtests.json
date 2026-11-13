@@ -6944,6 +6944,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "guided-tight-refill",
+  "check": "a one-page Guided page whose next whole row of tries stays within the §12.1 ceiling never leaves a drawn try row white under its grid: the fit counts tightRows rows at their drawn height (lf-roles critic r8b D1: expand / unit_form M 6 tries with 42-54 mm under the grid, L 5; combine L 5)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-REFILL (GUIDED-TIGHT-REFILL)",
+  "browser": true,
+  "fail": {
+   "commit": "e62f1da34",
+   "state": "EB-REFILL 5 (expand M/L, unit_form M/L, combine L)"
+  },
+  "pass": {
+   "commit": "6cfa329ee",
+   "state": "OK"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --sizes M,L --hosts none --no-baseline --only EB-REFILL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
