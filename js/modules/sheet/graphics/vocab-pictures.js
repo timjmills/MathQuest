@@ -1002,15 +1002,30 @@ export function vocabPictureFit(id, wMm = 46, hMm, set) {
 }
 
 /**
+ * The print size (pt) of a picture's largest text when it is fitted to a `wMm` x `hMm` box (null: the picture prints no text).
+ * Match 3 sets one caption size per row from it (lf-vocab r16, critic r5 nit 6; ws-vocab-unit V-CAPTION).
+ */
+export function vocabPictureTextPt(id, wMm = 46, hMm, set) {
+    if (!hasVocabPicture(id)) return null;
+    const sizes = [...bodyFor(id, '').matchAll(/<text\b[^>]*\sfont-size="([-\d.]+)"/g)].map((m) => Number(m[1])).filter((x) => x > 0);
+    if (!sizes.length) return null;
+    const fit = vocabPictureFit(id, wMm, hMm, set);
+    return Math.max(...sizes) * fit.scale / 0.3528;
+}
+
+/**
  * The picture of a word, fitted to a `wMm` x `hMm` box (wMm 34-82 mm; hMm by default 2 : 3 of wMm), cropped to its own
  * marks. In the screen twin the same drawing at the host's --mq-k2 scale (one drawing, two scales, SP-1).
  * @returns {string} an inline SVG ('' for a word the library has no picture of)
  */
-export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printFloor = false } = {}) {
+export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printFloor = false, textPt = 0 } = {}) {
     if (!hasVocabPicture(id)) return '';
     const e = vocabPictureExtent(id);
     const fit = vocabPictureFit(id, wMm, hMm, set);
-    const w = fit.wMm;
+    // (`textPt`: the row's one caption size - a picture whose text would print larger is drawn at the scale that prints it at
+    // that size, never larger than its box allows; lf-vocab r16 V-CAPTION)
+    const own = textPt > 0 ? vocabPictureTextPt(id, wMm, hMm, set) : null;
+    const w = own && own > textPt ? r2(fit.wMm * textPt / own) : fit.wMm;
     const body = bodyFor(id, focalMode(ctx));
     // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
     // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
@@ -1026,4 +1041,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printF
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabReadMarks, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { vocabPictureTextPt, vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabReadMarks, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

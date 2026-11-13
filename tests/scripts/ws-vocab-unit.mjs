@@ -862,25 +862,7 @@ async function browserChecks() {
             if (got.score == null) fail(`V11R ${skillId} ${role} ${size}: no Score on the page`);
             else if (got.score !== got.cells * pts) fail(`V11R ${skillId} ${role} ${size}: Score /${got.score} for ${got.cells} scored cells (owner Q-C: /${got.cells * pts})`);
         }
-        // V18 (critic r1 #6, r2 #4, r3 #6, r4 #2): the 1 picture, 3 words Guided rows are equal at S, M AND L (within 1 mm),
-        // measured on the RENDERED ROW BOXES of the printed page (the band's grid rows, from one row's top to the next row's
-        // top, the last to the grid's bottom) - never the planned cell height, with no "when there is room" exemption. Seeds:
-        // 7 and ws-grade-render's guided seed (the critic's page: a two-line meaning hint made row 1 377 px, row 2 290 px).
-        for (const size of ['S', 'M', 'L']) for (const [opts, seed] of [[{ vocabGrade: 3 }, 7], [null, 7], [null, 143869], [{ vocabGrade: 2 }, 143869], [{ vocabGrade: 4 }, 143869], [{ vocabGrade: 1 }, 143869]]) {
-            const b = await build('vocab_pick3_words', 'guided', size, opts, seed);
-            if (b.error) { fail(`V18 guided ${size}: not composed (${b.error})`); continue; }
-            const hs = await sheet(b.html, () => {
-                const out = [];
-                for (const pg of document.querySelectorAll('body > section.ws-page, body > .ws-page')) {
-                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
-                    const tops = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))].sort((a, b) => a - b);
-                    const bottom = Math.max(...cells.map((c) => c.getBoundingClientRect().bottom));
-                    if (tops.length > 1) out.push(tops.map((t, i) => ((i + 1 < tops.length ? tops[i + 1] : bottom) - t) * 25.4 / 96));
-                }
-                return out;
-            });
-            for (const rows of hs) if (Math.max(...rows) - Math.min(...rows) > 1) fail(`V18 guided ${size} ${JSON.stringify(opts)} seed ${seed}: rows ${rows.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
-        }
+        // V18: see r16Checks (lf-vocab r16 extended it to Match 3)
         // V20 (critic r4 #3, H13 "sized for a taller item than it holds"): on Error analysis, a cell at S whose content is
         // smaller than at L is shorter than at L - cell height at S <= 0.9 x the height at L when the S ink is under 0.95 x
         // the L ink (Match 3 EA at S drew L's 76 mm cell round 60 mm of work: 24-28 % empty). Median top-level cell; ink =
@@ -979,7 +961,13 @@ async function pageRepeatChecks(page, fail) {
 //           short picture while B and C sat at the top: Match 3 S independent item 3; card-1280 A at the baseline)
 // V-BOX390  (nit 4) on the practice card at 390 px the three Match 3 letter boxes stand in one column: their left x within 4 px
 //           (they followed the centred words, x 230 / 260 / 225 px); worksheet-1280 already holds this (V19)
-function r16List() { return ['V-NAMES', 'V-LETTER', 'V-BOX390']; }   // (a function: browserChecks runs before this line, top-level await)
+// V-CAPTION (nit 6) the captions of one Match 3 picture row print at one size: each picture's largest text, in pt as printed,
+//           within 1 pt across the row's pictures that print text ("2 x 3 = 3 x 2" at 13 pt beside "5 x 1 = 5" at 20 pt)
+// V-GLINE   (nit 2) on a 1 picture, 3 words Guided page the write lines of one row stand at one y (bottom within 0.5 mm), the
+//           Model and the hinted try included (row 1: the hint cell's line 560 px, the Model's 605 px at L)
+// V18 / V18M (r1-r4; V18M r16 for nit 1) the Guided rows are equal at S, M and L within 1 mm, measured on the rendered row
+//           boxes - 1 picture, 3 words (V18) and Match 3 (V18M: rows were model 252 / hint 267 / plain 227 px at S)
+function r16List() { return ['V-NAMES', 'V-LETTER', 'V-BOX390', 'V-CAPTION', 'V-GLINE', 'V18', 'V18M']; }   // (a function: browserChecks runs before this line, top-level await)
 function R16_FNV(x) { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
 // the seeds a page is judged at: 7, V23's 143869 and ws-grade-render's seed for the role (the critic's page)
 function r16Seeds(skillId, role) { return [...new Set([7, 143869, R16_FNV(`vocabulary__${skillId}:${role}`) % 1000000])]; }
@@ -1008,6 +996,35 @@ async function r16Checks(page, fail, sheet, build) {
             });
         }
         if (!pages) fail('V-NAMES: no Error analysis page shows a pupil name');
+    }
+    // V18 (critic r1 #6, r2 #4, r3 #6, r4 #2; r5 nit 1 extends it to Match 3): the Guided rows are equal at S, M AND L (within
+    // 1 mm), measured on the RENDERED ROW BOXES of the printed page (the band's grid rows, from one row's top to the next row's
+    // top, the last to the grid's bottom) - never the planned cell height, with no "when there is room" exemption. Seeds:
+    // 7 and ws-grade-render's guided seeds (the critic's pages). V-GLINE on the same pages: the write lines of a row at one y.
+    // (V18M is the Match 3 half - its own id, so V18's older backtest rows keep judging the 1 picture, 3 words rows only)
+    const v18 = (skillId) => (skillId === 'vocab_grade_pictures' ? 'V18M' : 'V18');
+    if (want('V18') || want('V18M') || want('V-GLINE')) {
+        const MM = 96 / 25.4;
+        for (const skillId of SK.filter((k) => want(v18(k)) || (want('V-GLINE') && k === 'vocab_pick3_words'))) for (const size of ['S', 'M', 'L']) for (const [opts, seed] of [[{ vocabGrade: 3 }, 7], [null, 7], [null, 143869], [null, 43858], [{ vocabGrade: 2 }, 143869], [{ vocabGrade: 4 }, 143869], [{ vocabGrade: 1 }, 143869]]) {
+            const b = await build(skillId, 'guided', size, opts, seed);
+            const tag = `${skillId} guided ${size} ${JSON.stringify(opts)} seed ${seed}`;
+            if (b.error) { fail(`${v18(skillId)} ${tag}: not composed (${b.error})`); continue; }
+            const pgs = await sheet(b.html, () => {
+                const out = [];
+                for (const pg of document.querySelectorAll('body > section.ws-page, body > .ws-page')) {
+                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    const tops = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))].sort((a, b) => a - b);
+                    const bottom = Math.max(...cells.map((c) => c.getBoundingClientRect().bottom));
+                    const lines = tops.map((t) => cells.filter((c) => Math.round(c.getBoundingClientRect().top) === t).map((c) => { const l = c.querySelector('.mq-vp-line'); return l ? l.getBoundingClientRect().bottom : null; }).filter((x) => x !== null));
+                    out.push({ rows: tops.length > 1 ? tops.map((t, i) => ((i + 1 < tops.length ? tops[i + 1] : bottom) - t) * 25.4 / 96) : [], lines });
+                }
+                return out;
+            });
+            pgs.forEach((pg, pi) => {
+                if (want(v18(skillId)) && pg.rows.length && Math.max(...pg.rows) - Math.min(...pg.rows) > 1) fail(`${v18(skillId)} ${tag} page ${pi + 1}: rows ${pg.rows.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
+                if (want('V-GLINE')) pg.lines.forEach((ys, r) => { if (ys.length > 1 && Math.max(...ys) - Math.min(...ys) > 0.5 * MM) fail(`V-GLINE ${tag} page ${pi + 1} row ${r + 1}: the write lines stand at ${ys.map((y) => y.toFixed(0)).join(' / ')} px (want one y, within 0.5 mm)`); });
+            });
+        }
     }
     // (in the page) every Match 3 cell's letter anchors: [{lines: [[{lt, st, gap}]]}] in CSS px, the slots grouped into lines by
     // vertical overlap (a wrapped card puts one picture a line)
@@ -1044,20 +1061,36 @@ async function r16Checks(page, fail, sheet, build) {
         }, { k: skillId });
         await new Promise((r) => setTimeout(r, 250));
     };
-    if (want('V-LETTER')) {
-        let lines = 0;
+    // (in the page) each Match 3 cell's pictures' largest text in pt as printed (null: no text)
+    const CAPTIONS = () => [...document.querySelectorAll('.mq-vm')].map((c) => [...c.querySelectorAll('svg.mq-vpic')].map((sv) => {
+        const pts = [...sv.querySelectorAll('text')].map((t) => parseFloat(getComputedStyle(t).fontSize) * (t.getScreenCTM() ? t.getScreenCTM().a : 1) * 0.75);
+        return { pic: sv.getAttribute('data-vpic'), pt: pts.length ? Math.max(...pts) : null };
+    }));
+    if (want('V-LETTER') || want('V-CAPTION')) {
+        let lines = 0, rows = 0;
         const MM = 96 / 25.4;
-        for (const role of ['independent', 'more-practice', 'test', 'guided', 'error-analysis', 'review']) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds('vocab_grade_pictures', role)) {
-            const b = await build('vocab_grade_pictures', role, size, null, seed);
-            const tag = `print ${role} ${size} seed ${seed}`;
+        // (VOCAB_ROLES=error-analysis,guided: a quicker run while a fix is built; the gate runs every role)
+        const roles = process.env.VOCAB_ROLES ? process.env.VOCAB_ROLES.split(',') : ['independent', 'more-practice', 'test', 'guided', 'error-analysis', 'review'];
+        for (const role of roles) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds('vocab_grade_pictures', role)) for (const opts of [null, { vocabGrade: 2 }, { vocabGrade: 4 }]) {
+            const b = await build('vocab_grade_pictures', role, size, opts, seed);
+            const tag = `print ${role} ${size} seed ${seed}${opts ? ` ${JSON.stringify(opts)}` : ''}`;
             if (b.error) { fail(`V-LETTER ${tag}: not composed (${b.error})`); continue; }
-            lines += judgeLetters(tag, await sheet(b.html, LETTERS), 0.5 * MM);
+            const got = await sheet(b.html, (fns) => ({ letters: eval(`(${fns[0]})`)(), caps: eval(`(${fns[1]})`)() }), [LETTERS.toString(), CAPTIONS.toString()]);
+            if (want('V-LETTER')) lines += judgeLetters(tag, got.letters, 0.5 * MM);
+            if (want('V-CAPTION')) got.caps.forEach((row, ci) => {
+                const t = row.filter((x) => x.pt);
+                if (t.length < 2) return;
+                rows++;
+                const v = t.map((x) => x.pt);
+                if (Math.max(...v) - Math.min(...v) > 1) fail(`V-CAPTION ${tag} cell ${ci + 1}: captions print at ${t.map((x) => `${x.pic} ${x.pt.toFixed(1)} pt`).join(', ')} (want one size, within 1 pt)`);
+            });
         }
-        for (const width of [1280, 820, 390]) for (let k = 0; k < 6; k++) {
+        if (want('V-CAPTION') && !rows) fail('V-CAPTION: no Match 3 row with two captioned pictures');
+        for (const width of want('V-LETTER') ? [1280, 820, 390] : []) for (let k = 0; k < 6; k++) {
             await card('vocab_grade_pictures', width, k);
             lines += judgeLetters(`card-${width} question ${k + 1}`, await page.evaluate(LETTERS), 2);
         }
-        if (!lines) fail('V-LETTER: no Match 3 picture row measured');
+        if (want('V-LETTER') && !lines) fail('V-LETTER: no Match 3 picture row measured');
     }
     if (want('V-BOX390')) {
         let cells = 0;

@@ -23,7 +23,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, isTwin, sizeOf, textPt, KEY_FEATURES, S, slotValue } from './k2kit.js';
-import { vocabPictureSVG, BASE10_IDS } from '../graphics/vocab-pictures.js';
+import { vocabPictureSVG, vocabPictureTextPt, BASE10_IDS } from '../graphics/vocab-pictures.js';
 
 export const MATCH3_TEMPLATE = 'vocab-match3';
 const LET = ['A', 'B', 'C'];
@@ -63,9 +63,17 @@ register(MATCH3_TEMPLATE, {
         const noHundred = !words.includes('hundred');
         const wideOf = (w) => !twin && noHundred && BASE10_IDS.includes(String(w));
         const boxW = (w) => (wideOf(w) ? 52.5 : picW);
-        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : wideOf(w) ? '1 1 0' : words.some(wideOf) ? '0 0 auto' : '1 1 0'};min-width:0;">`
+        // (lf-vocab r16, critic r5 nit 6: each picture was fitted alone, so "2 x 3 = 3 x 2" printed 13 pt beside "5 x 1 = 5" at 20 pt.
+        // On paper the row takes ONE caption size, the smallest its pictures print when fitted - a larger caption's picture is
+        // drawn at the scale that prints its text at that size; nothing is made smaller than the row's smallest fitted caption;
+        // ws-vocab-unit V-CAPTION)
+        const caps = twin ? [] : words.map((w) => vocabPictureTextPt(w, boxW(w), picH, words)).filter((x) => x > 0);
+        const rowPt = caps.length > 1 ? Math.min(...caps) : 0;
+        // (and on paper each slot is as wide as its picture, shrinking in proportion when a narrow work - Error analysis - has
+        // less room than the row: equal thirds capped the wide pictures and not the narrow ones, so their captions parted again)
+        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : wideOf(w) ? '1 1 0' : words.some(wideOf) ? '0 0 auto' : '0 1 auto'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
-            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: boxW(w), hMm: picH, minPx: twin ? 160 : 0, set: words })}</span></div>`).join('');
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: boxW(w), hMm: picH, minPx: twin ? 160 : 0, set: words, textPt: rowPt })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + (ea ? 0 : 2);
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
