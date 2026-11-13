@@ -365,7 +365,8 @@ export const chartSay = (q) => {
  * pointed the pupil at a number that is not on the page).
  * EVERY gap is worked (chart_120 critic r1 F3, lead ruling 2026-11-13: a multi-gap window's steps ended "Write <first gap>."
  * and the second and third gaps were never named): one gap - the relation in two steps (the guided fade), then "Write t.";
- * two or three gaps - for each gap its relation, then "Write t." in that gap's own square (slot b<k>), 4 or 6 steps.
+ * two gaps - each gap's relation, then "Write t." in its own square (slot b<k>); three - each relation, then one Write; four
+ * or more - one step a run of rows naming every gap it writes, then the check.
  */
 function chartSteps(q) {
     const parts = chartGaps(q);
@@ -414,12 +415,22 @@ function chartSteps(q) {
         out.push(step('Check: across, each number is 1 more. Down, each number is 10 more.'));
         return out;
     }
+    // FOUR short states for two or three gaps, as a one-gap window has (a Scripted Model lays four states out in its rows; three
+    // or six states, or long ones, left its step-text cells 70 % empty, ws-empty-band EB-BAND / EB-SIDE): two gaps - each its
+    // relation, then "Write t." in its own square; three gaps - each its relation, then "Write a, b and c.".
+    // (a gap with no printed neighbour cannot be dealt - gen-counting keeps one beside every gap - but its step still names it)
+    // (short relations, one line in a Guided Model's work column: "One more than 3 is 4." - the long two-sentence form wrapped
+    // there and grew the Model's row, ws-empty-band EB-BAND on the try beside it)
+    const short = (x) => x.replace(/^The number before is (\d+)\. One more is (\d+)\.$/, 'One more than $1 is $2.')
+        .replace(/^The number above is (\d+)\. Ten more is (\d+)\.$/, 'Ten more than $1 is $2.')
+        .replace(/^The number below is (\d+)\. Ten less is (\d+)\.$/, 'Ten less than $1 is $2.')
+        .replace(/^The number after is (\d+)\. One less is (\d+)\.$/, 'One less than $1 is $2.');
+    const rel = (t) => { const r = relation(t); return r.length ? short(r[0]) : `Count on from the numbers beside it to ${t}.`; };
     parts.forEach((t, k) => {
-        const r = relation(t);
-        // (a gap with no printed neighbour cannot be dealt - gen-counting keeps one beside every gap - but its step still names it)
-        out.push(step(r.length ? r[0] : `Count on from the numbers beside it to ${t}.`));
-        out.push(step(`Write ${t}.`, [{ slot: `b${k}`, value: String(t) }]));
+        out.push(step(rel(t)));
+        if (parts.length === 2) out.push(step(`Write ${t}.`, [{ slot: `b${k}`, value: String(t) }]));
     });
+    if (parts.length === 3) out.push(step(`Write ${andList(parts)}.`, parts.map((t, k) => ({ slot: `b${k}`, value: String(t) }))));
     return out;
 }
 
@@ -454,12 +465,14 @@ const HC_DEF = {
         iCan: 'I Can find missing numbers on a hundreds chart',
         // A window has one to three empty cells (payload `blanks`), so the page asks for numbers.
         instructionKey: 'missing-many',
+        // (short, so the lesson's Steps zone - which now shows these beside the Guided cells, chart_120 critic r1 F5 - keeps the
+        // height the example's own steps had: the long forms wrapped to 3 lines each and opened 42 % white round the windows)
         steps: [
-            'Look left: the number before. Add 1.',
-            'Look up: the number above. Add 10.',
+            'Look left. Add 1.',
+            'Look up. Add 10.',
             // Round-4 re-grade: a gap in the window's top row has no number above; its worked
             // steps read the number below, so the Steps band names that way too.
-            'Top row? Look down: the number below. Take away 10.',
+            'Top row? Look down. Take away 10.',
             'Write the missing number.',
         ],
         say: 'The missing number is __.',
