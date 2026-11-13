@@ -4,7 +4,8 @@
 //   print-p1.png ... print-pN.png   the pupil pages, exactly as the teacher's print dialog produces
 //                                   them, printed to an A4 PDF by Chrome and rasterised
 //   key-p1.png ...                  the answer-key pages of the same print
-//   card-1280.png card-820.png card-390.png   the practice card (student view)
+//   card-1280.png card-1366x768.png card-820.png card-1024.png   the practice card (student view; owner 2026-11-13:
+//                                   no phone width, --widths 390 renders card-390 on request)
 //   worksheet-1280.png              the online worksheet grid (student view)
 //   quiz-1280.png                   the quiz-taking view
 //   meta.json                       what the renderer measured (colours, fonts, overflow, targets)
@@ -14,6 +15,9 @@
 //   node tests/scripts/ws-grade-render.cjs --family operations
 //   node tests/scripts/ws-grade-render.cjs --skills addition:add_20_regroup,composing:base10_build
 //   node tests/scripts/ws-grade-render.cjs --sample 24 --out tests/audit-runs/baseline
+//   node tests/scripts/ws-grade-render.cjs --sample <copy-light-sample.json> --out <dir>
+//                                          # EXACTLY the pages ws-copy-light sampled (each page's role, size, seed, host,
+//                                          # width and opts; critic lf-tools r1 B3) for the narrow / batch critic
 //   node tests/scripts/ws-grade-render.cjs --count 6 --no-screen      # print only, 6 items
 //   node tests/scripts/ws-grade-render.cjs --resume                   # skip skills already rendered
 //   node tests/scripts/ws-grade-render.cjs --range 1000 --skills number_sense:nearest_100
@@ -22,7 +26,10 @@
 //                                          # the PAGE ENGINE (P7.2): each role through window.buildSheet
 //
 // --gate         a GATE, not only a render: FAIL (exit 1) when any rendered role page or key overflows (a cell, the body or
-//                the page: check.problems) or a card-390 / card-820 touch target is under 44 x 44 px (RUBRIC H6); last line
+//                the page: check.problems) or a touch target on a TABLET host is too small: the card, the online worksheet
+//                and the quiz are rendered at 820 and 1024 too (critic lf-tools r1 A1), an answer box under 48 px or another
+//                control under 44 px fails (RUBRIC H6; owner 2026-11-13: no phone width, card-390 only on --widths 390 at
+//                its old 44 px; --touch-self-test checks the rule on planted measures, no browser); last line
 //                `ws-grade-render: OK|FAIL`. ws-precritic --skill runs it on the lane skills' lesson, test and independent
 //                pages at S, M and L (visual-quality critic r1: F3 and F4 were measured here and failed nothing)
 // --raster-fit  LP-RASTER on ROLE pages (lf-checks queue 13; lf-algebra critic F3, a Scripted Model whose Say band ran
@@ -73,7 +80,7 @@
 // --golden write    renders into design/audit/golden/<name>/renders/ (git-ignored PNGs) and writes
 //                   design/audit/golden/<name>/manifest.json: one entry per page — print pages per
 //                   (role, size, pupil|key, page n) and the screen hosts (practice card 1280 / 820 /
-//                   390 and 1366 x 768, online worksheet 1280, quiz 1280) — with its render path, its
+//                   1024 and 1366 x 768, online worksheet 1280, quiz 1280) — with its render path, its
 //                   CONTENT HASH (sha256 of the canonical cell/page DOM, ids renamed; not pixels), the
 //                   seed, the measured numbers, and the per-criterion scores with their source (critic
 //                   run + round) and the RULE-SET VERSION they were given under. A page whose hash is
@@ -95,7 +102,7 @@
 // --contact-sheet   composes <out>/contact/*.png for a batch reading (§1.6.3 step 3): the A4 pages at
 //                   150 dpi (≈ 1240 px wide) two to a sheet with the measured numbers beside each
 //                   (digit size, answer-slot sizes, the largest empty band in a cell, free space at
-//                   the foot), and one screen sheet per skill (1280 / 820 / 390 / 1366 x 768,
+//                   the foot), and one screen sheet per skill (1280 / 820 / 1024 / 1366 x 768,
 //                   worksheet, quiz); <out>/contact/index.md lists them.
 // --envelope <template>--<kind>  renders the all-pairs sample `node tests/scripts/ws-envelope.mjs
 //                   --envelope <pair> --out <file>` writes, or the file given with --sample <file.json>.
@@ -128,6 +135,7 @@ const hashOf = (html, file) => { if (process.env.MQ_GOLDEN_DUMP && file) fs.writ
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > -1 ? process.argv[i + 1] : d; };
 const has = k => process.argv.includes('--' + k);
 const RR = require('../lib/ws-role-raster.cjs');
+const SW = require('../lib/ws-screen-widths.cjs');
 const RASTER_FIT = has('raster-fit');
 if (has('raster-self-test')) {
     const r = RR.selfTest();
@@ -177,6 +185,78 @@ const NO_SCREEN = has('no-screen');
 const NO_PRINT = has('no-print');
 // --gate: end with `ws-grade-render: OK | FAIL` on the measured overflow and phone / tablet card targets (see the run's end)
 const GATE = has('gate');
+// the online worksheet and quiz ALSO at 820 and 1024 (the tablets) - under --gate always, else on --tablet-hosts
+const TABLET_HOSTS = GATE || has('tablet-hosts');
+/**
+ * TOUCH-TARGET findings on one unit's meta (owner 2026-11-13: answer boxes keep 48 px touch targets for tablets; RUBRIC H6,
+ * SP-10). Every screen host at a TABLET width - the practice card AND the online worksheet and the quiz (critic lf-tools
+ * r1 A1: at f3ae7acca only card-820 / card-1024 were judged, so unit_form's 50 x 46 px worksheet answer boxes passed) -
+ * holds an answer box to 48 px and every other control (buttons, choices, regroup / carry boxes) to 44 px. An explicit
+ * 390 render (--widths 390) keeps its old 44 px floor. Pure.
+ */
+function touchFindings(m) {
+    const out = [];
+    for (const [k, v] of Object.entries((m && m.screen) || {})) {
+        const tm = /^(card|worksheet|quiz)-(\d+)$/.exec(k);
+        const floor = tm && SW.TABLET_WIDTHS.includes(+tm[2]) ? 48 : tm && +tm[2] < 500 ? 44 : 0;
+        if (!floor || !v || !v.measure) continue;
+        const fl = (t) => (floor === 48 && t.answer === false ? 44 : floor);   // non-answer controls: SP-10's 44 px
+        for (const t of (v.measure.smallTargets || []).filter((t) => Math.min(t.w, t.h) < fl(t))) out.push(`TARGET ${m.skill} ${k}: <${t.tag} class="${t.cls}"> ${t.w} x ${t.h} px (under ${fl(t)} px${fl(t) === 48 ? ', an answer box' : ''}, H6)`);
+    }
+    return out;
+}
+/** ws-copy-light's sample -> one render unit per page, with that page's own role / size / seed / host / width / opts. Pure. */
+function copyLightUnits(json) {
+    const units = [];
+    for (const sk of json.skills || []) {
+        const [categoryId, skillId] = String(sk.skill || '').split(':');
+        if (!categoryId || !skillId) throw new Error('copy-light sample: an entry with no skill ("cat:skill")');
+        for (const p of sk.pages || []) {
+            const opts = p.opts && Object.keys(p.opts).length ? p.opts : null;
+            if (p.host === 'print') units.push({ categoryId, skillId, role: p.role || 'independent', size: p.size || 'M', opts, req: null, hosts: null, seed: p.seed, width: null, index: `p${p.n}` });
+            else units.push({ categoryId, skillId, role: null, size: null, opts, req: null, hosts: [p.host], seed: p.seed, width: p.width, index: `p${p.n}` });
+        }
+    }
+    return units;
+}
+if (has('sample-self-test')) {
+    // critic lf-tools r1 B3: at f3ae7acca a copy-light sample read as the older list (json.pages is a number): no unit, no
+    // seed, no width. Now each page is one unit carrying exactly its sampled values.
+    const j = { tool: 'ws-copy-light', mode: 'batch', skills: [{ skill: 'placevalue:more_less_10', pages: [
+        { n: 1, role: 'guided', size: 'M', seed: 12345, host: 'print', width: null, opts: { band: '20' } },
+        { n: 2, role: null, size: null, seed: 12346, host: 'practice-card', width: 1024, opts: null },
+        { n: 3, role: null, size: null, seed: 12347, host: 'quiz', width: 1366, opts: { support: ['touch'] } }] }] };
+    const u = copyLightUnits(j);
+    const want = [
+        ['3 units', u.length, 3],
+        ['print page role / size / seed / opts', [u[0].role, u[0].size, u[0].seed, u[0].opts && u[0].opts.band, u[0].hosts], ['guided', 'M', 12345, '20', null]],
+        ['card page host / width / seed', [u[1].role, u[1].hosts, u[1].width, u[1].seed], [null, ['practice-card'], 1024, 12346]],
+        ['quiz page width / opts', [u[2].hosts, u[2].width, u[2].opts && u[2].opts.support], [['quiz'], 1366, ['touch']]],
+        ['skill split', [u[0].categoryId, u[0].skillId], ['placevalue', 'more_less_10']],
+    ];
+    let bad = 0;
+    for (const [name, got, w] of want) { const ok = JSON.stringify(got) === JSON.stringify(w); if (!ok) bad++; console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${JSON.stringify(got)}`); }
+    console.log(bad ? `ws-grade-render --sample-self-test: FAIL (${bad} of ${want.length})` : `ws-grade-render --sample-self-test: OK (${want.length} cases)`);
+    process.exit(bad ? 1 : 0);
+}
+if (has('touch-self-test')) {
+    const T = (w, h, answer = true, cls = 'ws-answer') => ({ tag: 'input', cls, w, h, answer });
+    const cases = [
+        ['unit_form worksheet-820 answer 50 x 46 (passed at f3ae7acca: worksheet never judged on a tablet)', { 'worksheet-820': { measure: { smallTargets: [T(50, 46)] } } }, 1],
+        ['unit_form worksheet-1024 answer 50 x 46', { 'worksheet-1024': { measure: { smallTargets: [T(50, 46)] } } }, 1],
+        ['quiz-820 answer 47 x 60', { 'quiz-820': { measure: { smallTargets: [T(47, 60)] } } }, 1],
+        ['quiz-1024 button 45 x 45 (a control, 44 px)', { 'quiz-1024': { measure: { smallTargets: [{ tag: 'button', cls: 'qt-next', w: 45, h: 45, answer: false }] } } }, 0],
+        ['worksheet-820 carry box 44 x 44 (SP-23 scratch box, 44 px)', { 'worksheet-820': { measure: { smallTargets: [T(44, 44, false, 'carry')] } } }, 0],
+        ['worksheet-820 carry box 40 x 44', { 'worksheet-820': { measure: { smallTargets: [T(40, 44, false, 'carry')] } } }, 1],
+        ['worksheet-1280 answer 50 x 46 (a computer: no touch floor)', { 'worksheet-1280': { measure: { smallTargets: [T(50, 46)] } } }, 0],
+        ['card-820 answer 47 x 60 (as before)', { 'card-820': { measure: { smallTargets: [T(47, 60)] } } }, 1],
+        ['worksheet-820 answer 48 x 52 passes', { 'worksheet-820': { measure: { smallTargets: [T(48, 52)] } } }, 0],
+    ];
+    let bad = 0;
+    for (const [name, screen, want] of cases) { const got = touchFindings({ skill: 'x:y', screen }).length; const ok = got === want; if (!ok) bad++; console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${name}: ${got} finding(s), want ${want}`); }
+    console.log(bad ? `ws-grade-render --touch-self-test: FAIL (${bad} of ${cases.length})` : `ws-grade-render --touch-self-test: OK (${cases.length} cases)`);
+    process.exit(bad ? 1 : 0);
+}
 const RESUME = has('resume');
 const ROLES = (arg('roles', '') || '').split(',').map(s => s.trim()).filter(Boolean);
 if (GOLDEN_MODE && !ROLES.length) ROLES.push('independent');
@@ -299,7 +379,10 @@ function measure(page, selector) {
             if (!r.width || !r.height) continue;
             const s = getComputedStyle(el);
             if (s.display === 'none' || s.visibility === 'hidden') continue;
-            if (Math.min(r.width, r.height) < 44) targets.push({ tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 40), w: Math.round(r.width), h: Math.round(r.height), text: (el.innerText || el.value || '').trim().slice(0, 24) });
+            // an ANSWER box (a typed input that is not a regroup / carry scratch box, SP-23) is held to 48 px on a tablet; every
+            // other control (buttons, choices, regroup boxes) to SP-10's 44 px (owner 2026-11-13)
+            const answer = /^(input|textarea)$/i.test(el.tagName) && !/^(button|submit|checkbox|radio|hidden|range)$/i.test(el.type || '') && !/carry|regroup/i.test(String(el.className || '') + ' ' + (el.getAttribute('data-ws-slot') || ''));
+            if (Math.min(r.width, r.height) < 48) targets.push({ tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 40), w: Math.round(r.width), h: Math.round(r.height), answer, text: (el.innerText || el.value || '').trim().slice(0, 24) });
         }
         const de = document.documentElement;
         return {
@@ -318,7 +401,7 @@ async function viewport(page, width, height) {
 }
 
 // ---------------------------------------------------------------- the three screen hosts
-async function renderCard(page, skill, width, height, file, fitOnly = false) {
+async function renderCard(page, skill, width, height, file, fitOnly = false, seedOver = null) {
     await viewport(page, width, height);
     await hideOverlays(page);
     const info = await page.evaluate(({ skill, seed }) => {
@@ -335,18 +418,21 @@ async function renderCard(page, skill, width, height, file, fitOnly = false) {
             window.scrollTo(0, 0);
             return { answerType: q.answerType || '', printFormat: q.printFormat || '', text: String(q.text || '').slice(0, 200), ans: String(q.ans).slice(0, 80) };
         } catch (e) { return { error: e.message || String(e) }; }
-    }, { skill, seed: hash(slug(skill) + ':card') });
+    }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':card') });
     if (info.error) return { error: info.error };
     await sleep(300);
-    const el = await page.$('#gameView');
+    let el = await page.$('#gameView');
+    // a short landscape screen (1366 x 768, and the 1024 x 768 tablet) lays the play view out with #gameView as
+    // display: contents - no box of its own to shoot, so the page is shot instead (owner 2026-11-13: 1024 is a host)
+    if (el && !(await el.boundingBox())) el = null;
     // the Chromebook fit (1366 x 768): what one screen shows, not the whole card
     if (fitOnly) await page.screenshot({ path: file });
     else await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
-    return { ...info, seed: hash(slug(skill) + ':card'), contentHash: hashOf(await page.evaluate(G.canonicalHostInPage, '#questionCard'), file), measure: await measure(page, '#questionCard') };
+    return { ...info, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':card'), contentHash: hashOf(await page.evaluate(G.canonicalHostInPage, '#questionCard'), file), measure: await measure(page, '#questionCard') };
 }
 
-async function renderWorksheet(page, skill, file) {
-    await viewport(page, 1280, 900);
+async function renderWorksheet(page, skill, file, width = 1280, height = 900, seedOver = null) {
+    await viewport(page, width, height);
     await hideOverlays(page);
     const info = await page.evaluate(({ skill, seed }) => {
         try {
@@ -358,18 +444,20 @@ async function renderWorksheet(page, skill, file) {
             window.scrollTo(0, 0);
             return { cards: document.querySelectorAll('#worksheetGrid .problem-card').length };
         } catch (e) { return { error: e.message || String(e) }; }
-    }, { skill, seed: hash(slug(skill) + ':worksheet') });
+    }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':worksheet') });
     if (info.error) return { error: info.error };
     await sleep(400);
     // the grid's scheduled layout passes (worksheet.js, up to 900 ms) end with data-mq-laid-out="1"
     await page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
-    const el = await page.$('#worksheetView');
+    let el = await page.$('#worksheetView');
+    // a short landscape screen (1366 x 768, 1024 x 768) lays the view out with no box of its own: shoot the page
+    if (el && !(await el.boundingBox())) el = null;
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
-    return { ...info, seed: hash(slug(skill) + ':worksheet'), contentHash: hashOf(await page.evaluate(G.canonicalHostInPage, '#worksheetGrid'), file), measure: await measure(page, '#worksheetGrid') };
+    return { ...info, width, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':worksheet'), contentHash: hashOf(await page.evaluate(G.canonicalHostInPage, '#worksheetGrid'), file), measure: await measure(page, '#worksheetGrid') };
 }
 
-async function renderQuiz(page, skill, file) {
-    await viewport(page, 1280, 900);
+async function renderQuiz(page, skill, file, width = 1280, height = 900, seedOver = null) {
+    await viewport(page, width, height);
     await hideOverlays(page);
     const info = await page.evaluate(async ({ skill, seed }) => {
         try {
@@ -395,16 +483,17 @@ async function renderQuiz(page, skill, file) {
             window.scrollTo(0, 0);
             return { questions: questions.length };
         } catch (e) { return { error: e.message || String(e) }; }
-    }, { skill, seed: hash(slug(skill) + ':quiz') });
+    }, { skill, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':quiz') });
     if (info.error) return { error: info.error };
     await sleep(400);
-    const el = await page.$('#quizTakeView');
+    let el = await page.$('#quizTakeView');
+    if (el && !(await el.boundingBox())) el = null;   // (as the worksheet: no box of its own at 768 px tall)
     await (el || page).screenshot({ path: file, ...(el ? {} : { fullPage: true }) });
     const m = await measure(page, '#quizTakeView');
     const contentHash = hashOf(await page.evaluate(G.canonicalHostInPage, '#quizTakeView'), file);
     // leave quiz mode so the next host starts clean
     await page.evaluate(() => { try { window.state.quizMode = false; } catch (e) {} });
-    return { ...info, seed: hash(slug(skill) + ':quiz'), contentHash, measure: m };
+    return { ...info, width, seed: seedOver !== null ? seedOver : hash(slug(skill) + ':quiz'), contentHash, measure: m };
 }
 
 // ---------------------------------------------------------------- the printed sheet
@@ -521,10 +610,10 @@ async function printDoc(page, html, pdfPath) {
     } finally { await sheet.close(); }
 }
 
-async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts = null, prefix = role, unitReq = null } = {}) {
+async function renderRole(page, skill, role, dir, { size = ROLE_SIZE, unitOpts = null, prefix = role, unitReq = null, seedOver = null } = {}) {
     await viewport(page, 1280, 900);
     await applyRange(page);
-    const seed = hash(slug(skill) + ':' + role) % 1000000;
+    const seed = seedOver !== null ? seedOver : hash(slug(skill) + ':' + role) % 1000000;
     const set = skill.set || [{ categoryId: skill.categoryId, skillId: skill.skillId }];
     // an envelope unit's kind options (examples, pages, fade, key; loadEnvelopeSample) override the command line's
     const U = unitReq || {};
@@ -616,6 +705,13 @@ function loadEnvelopeSample() {
         json = JSON.parse(fs.readFileSync(tmp, 'utf8'));
         fs.unlinkSync(tmp);
         from = `ws-envelope --envelope ${ENVELOPE}`;
+    }
+    // ws-copy-light's page sample (critic lf-tools r1 B3): {tool: 'ws-copy-light', skills: [{skill, pages: [{n, role, size,
+    // seed, host, width, option, value, opts}]}]} -> one unit per page, rendered EXACTLY as sampled: a print page is its role
+    // at its size with its seed and opts; a screen page is its host at its width with its seed and opts
+    if (json && json.tool === 'ws-copy-light') {
+        const units = copyLightUnits(json);
+        return { units, from: `${from} [ws-copy-light ${json.mode || ''} sample, ${units.length} pages]`, skipped: [] };
     }
     const kindOfPair = ENVELOPE ? ENVELOPE.split('--')[1] : (json.kind || null);
     const skillOf = (e, i) => {
@@ -905,7 +1001,7 @@ function numbersHtml(p) {
     } else {
         rows.push(['viewport', `${p.width}${p.height ? ' × ' + p.height : ''}`]);
         rows.push(['h-scroll', m.hScroll ? `${m.hScroll} px` : 'none']);
-        rows.push(['targets < 44 px', m.smallTargets ?? '—']);
+        rows.push(['targets < 48 px', m.smallTargets ?? '—']);
         rows.push(['non-grey colours', m.colours ?? '—']);
         rows.push(['fonts', (m.fonts || []).join(', ')]);
     }
@@ -956,7 +1052,7 @@ td{padding:3px 0;word-break:break-word}`;
         if (!scr.has(k)) scr.set(k, []);
         scr.get(k).push(p);
     }
-    const ORDER = ['card|1280', 'card|820', 'card|390', 'card|1366', 'worksheet|1280', 'quiz|1280'];
+    const ORDER = ['card|1280', 'card|1366', 'card|820', 'card|1024', 'card|390', 'worksheet|1280', 'quiz|1280'];
     for (const [k, list] of scr) {
         list.sort((a, b) => ORDER.indexOf(`${a.host}|${a.width}`) - ORDER.indexOf(`${b.host}|${b.width}`));
         const inner = `<div class="row">${list.map((p) => `<div class="screen"><img src="${dataUri(path.join(G.REPO, p.render))}">${numbersHtml(p)}</div>`).join('')}</div>`;
@@ -1044,7 +1140,7 @@ td{padding:3px 0;word-break:break-word}`;
             // ws-envelope's own screen rows name their hosts; the older list renders the hosts once a skill
             const screens = e.hosts ? true : !hasScreenRows && !screened.has(sk);
             if (!e.hosts) screened.add(sk);
-            return { skill: s, roles: e.role ? [e.role] : [], sizes: [e.size], opts: e.opts, req: e.req, hosts: e.hosts, screens, dirName: `${slug(s)}__e${e.index}${ok ? '-o' + ok : ''}` };
+            return { skill: s, roles: e.role ? [e.role] : [], sizes: [e.size], opts: e.opts, req: e.req, hosts: e.hosts, screens, seed: e.seed ?? null, width: e.width || null, dirName: `${slug(s)}__e${e.index}${ok ? '-o' + ok : ''}` };
         });
     } else {
         units = skills.map((s) => ({ skill: s, roles: ROLES, sizes: ROLE_SIZES, opts: null, screens: true, dirName: slug(s) }));
@@ -1055,7 +1151,12 @@ td{padding:3px 0;word-break:break-word}`;
     const manifest = [];
     const records = [];
     const t0 = Date.now();
-    const HOSTS = [[1280, 900], [820, 1180], [390, 844], ...(CHROMEBOOK ? [[1366, 768, true]] : [])];
+    // owner 2026-11-13 (CLAUDE.md "Fastest-implementation plan" 7): no phone width. The practice card at 1280, 1366 x 768 (the
+    // Chromebook fit host, always on now; --chromebook is kept as a no-op), 820 and 1024 (tablets). --widths overrides
+    // (`--widths 390` still renders card-390 on request).
+    const HOSTS = SW.widthsArg(process.argv).map((w) => (w === 1366 ? [1366, 768, true] : [w, SW.heightOf(w)]));
+    const HOSTS_ALL = [...SW.SCREEN_WIDTHS, 390].map((w) => (w === 1366 ? [1366, 768, true] : [w, SW.heightOf(w)]));
+    void CHROMEBOOK;
     for (const [i, unit] of units.entries()) {
         const s = unit.skill;
         const dir = path.join(OUT, unit.dirName);
@@ -1069,6 +1170,7 @@ td{padding:3px 0;word-break:break-word}`;
         const meta = { skill: `${s.categoryId}:${s.skillId}`, category: s.categoryId, skillId: s.skillId, label: s.label, grade: s.grade, dir: path.relative(OUT, dir) };
         if (unit.opts) meta.opts = unit.opts;
         if (unit.req) meta.req = unit.req;     // an envelope row's kind options (examples, pages, fade, key)
+        if (unit.seed !== undefined && unit.seed !== null) { meta.sampleSeed = unit.seed; meta.sampleWidth = unit.width || null; meta.sampleHosts = unit.hosts || null; }
         try {
             if (!NO_PRINT && LEGACY_PRINT && !s.set) meta.print = await renderPrinted(page, s, dir);
         } catch (e) { meta.print = { error: e.message }; }
@@ -1077,7 +1179,7 @@ td{padding:3px 0;word-break:break-word}`;
             for (const role of unit.roles) {
                 for (const size of unit.sizes) {
                     const key = roleKey(role, size);
-                    try { meta.roles[key] = await renderRole(page, s, role, dir, { size, unitOpts: unit.opts, prefix: key, unitReq: unit.req || null }); } catch (e) { meta.roles[key] = { error: e.message }; }
+                    try { meta.roles[key] = await renderRole(page, s, role, dir, { size, unitOpts: unit.opts, prefix: key, unitReq: unit.req || null, seedOver: unit.seed ?? null }); } catch (e) { meta.roles[key] = { error: e.message }; }
                 }
             }
         }
@@ -1086,12 +1188,20 @@ td{padding:3px 0;word-break:break-word}`;
             meta.screen = {};
             await storeSupports(page, s, unit.opts);
             const wants = (h) => !unit.hosts || unit.hosts.includes(h);   // an envelope screen row: its host only
-            if (wants('practice-card')) for (const [w, h, fit] of HOSTS) {
+            // a --sample (ws-copy-light) screen page names ONE width and seed: only that render
+            const cardHosts = unit.width ? HOSTS_ALL.filter(([w]) => w === unit.width).slice(0, 1) : HOSTS;
+            if (wants('practice-card')) for (const [w, h, fit] of cardHosts) {
                 const k = fit ? `card-${w}x${h}` : `card-${w}`;
-                try { meta.screen[k] = await renderCard(page, s, w, h, path.join(dir, `${k}.png`), !!fit); } catch (e) { meta.screen[k] = { error: e.message }; }
+                try { meta.screen[k] = await renderCard(page, s, w, h, path.join(dir, `${k}.png`), !!fit, unit.seed ?? null); } catch (e) { meta.screen[k] = { error: e.message }; }
             }
-            if (wants('online-worksheet')) try { meta.screen['worksheet-1280'] = await renderWorksheet(page, s, path.join(dir, 'worksheet-1280.png')); } catch (e) { meta.screen['worksheet-1280'] = { error: e.message }; }
-            if (wants('quiz')) try { meta.screen['quiz-1280'] = await renderQuiz(page, s, path.join(dir, 'quiz-1280.png')); } catch (e) { meta.screen['quiz-1280'] = { error: e.message }; }
+            // the online worksheet and the quiz at 1280; under --gate / --tablet-hosts ALSO at the tablet widths 820 and 1024,
+            // where the 48 px answer-box touch target is judged (critic lf-tools r1 A1: only the card was gated on a tablet)
+            const gridWidths = unit.width ? [unit.width] : [1280, ...(TABLET_HOSTS ? SW.TABLET_WIDTHS : [])];
+            for (const w of gridWidths) {
+                const h = SW.heightOf(w);
+                if (wants('online-worksheet')) try { meta.screen[`worksheet-${w}`] = await renderWorksheet(page, s, path.join(dir, `worksheet-${w}.png`), w, h, unit.seed ?? null); } catch (e) { meta.screen[`worksheet-${w}`] = { error: e.message }; }
+                if (wants('quiz')) try { meta.screen[`quiz-${w}`] = await renderQuiz(page, s, path.join(dir, `quiz-${w}.png`), w, h, unit.seed ?? null); } catch (e) { meta.screen[`quiz-${w}`] = { error: e.message }; }
+            }
         }
         meta.consoleErrors = problems.slice(errorsBefore).map(p => p.text).slice(0, 10);
         fs.writeFileSync(path.join(dir, 'meta.json'), JSON.stringify(meta, null, 2));
@@ -1137,25 +1247,22 @@ td{padding:3px 0;word-break:break-word}`;
     if (GATE) {
         // --gate (visual-quality critic r1, root cause of F3 / F4): what this renderer MEASURES but nothing failed on -
         // a cell, the body or the page overflowing on any rendered role page or its key (`check.problems`: content in
-        // the cell's pad counts, scrollHeight > clientHeight), and a touch target under 44 x 44 px on the phone and
-        // tablet practice cards (card-390, card-820; RUBRIC H6). Precritic runs it on every --skill scope.
+        // the cell's pad counts, scrollHeight > clientHeight), and a touch target under 48 x 48 px on the tablet practice
+        // cards (card-820, card-1024; RUBRIC H6, owner 2026-11-13). Precritic runs it on every --skill scope.
         const bad = [];
         for (const m of manifest) {
             for (const [k, v] of Object.entries(m.roles || {})) {
                 if (!v || v.error || v.unsupported) continue;
                 for (const [side, ch] of [['pupil', v.check], ['key', v.keyCheck]]) for (const pr of ((ch && ch.problems) || [])) bad.push(`OVERFLOW ${m.skill} ${k} ${side}: ${pr}`);
             }
-            for (const [k, v] of Object.entries(m.screen || {})) {
-                if (!/^card-(390|820)$/.test(k) || !v || !v.measure) continue;
-                for (const t of (v.measure.smallTargets || [])) bad.push(`TARGET ${m.skill} ${k}: <${t.tag} class="${t.cls}"> ${t.w} x ${t.h} px (under 44 px, H6)`);
-            }
+            bad.push(...touchFindings(m));
         }
         bad.push(...rasterBad);
         const units0 = manifest.length;
         for (const b of bad.slice(0, 30)) console.log('  FAIL ' + b);
         if (errs.length) console.log(`ws-grade-render: FAIL - ${errs.length} render error(s)`);
         else if (bad.length) console.log(`ws-grade-render: FAIL - ${bad.length} finding(s) (${bad.filter((b) => /^OVERFLOW/.test(b)).length} overflow, ${bad.filter((b) => /^TARGET/.test(b)).length} small target${RASTER_FIT ? `, ${rasterBad.length} raster` : ''}) in ${units0} unit(s)`);
-        else console.log(`ws-grade-render: OK (${units0} unit(s): no overflow on any role page, no phone / tablet card target under 44 px)`);
+        else console.log(`ws-grade-render: OK (${units0} unit(s): no overflow on any role page, no answer box under 48 px or other target under 44 px on the card, worksheet or quiz at 820 / 1024)`);
         if ((errs.length || bad.length) && !REPORT_ONLY) process.exit(1);
         return;
     }
