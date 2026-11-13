@@ -1,0 +1,40 @@
+ws-backtest row c120-wrong-fits: PASS  fail state FAIL 0.4s, pass state OK 0.4s
+ws-backtest row c120-tagink: PASS  fail state FAIL 38.9s, pass state OK 109.9s
+ws-backtest row c120-lesson-wide: PASS  fail state FAIL 85.1s, pass state OK 116.1s
+ws-backtest row eb-centred-band: PASS  fail state FAIL 0.2s, pass state OK 0.2s
+ws-backtest: c120-title-band (pass state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 13513 (up 244 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-grade-render.cjs --skills composing:hundreds_chart_fi
+    queue: pid 14252 (up 215 s) bash /tmp/mq-browser-run.sh node /home/user/MathQuest/tests/scripts/ws-slot-clip.cjs --probe /tmp/mq-slotclip-WKPDM4/probe.json
+    queue: pid 16147 (up 150 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fil
+    queue: pid 16149 (up 150 s) flock 10
+    queue: pid 19584 (up 0 s) sleep 1
+    slot.1: pid 859 (up 480 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plai
+ws-backtest row c120-title-band: PASS  fail state FAIL 122.4s, pass state OK 291.6s
+ws-backtest: c120-ri-under (fail state) has waited 120 s for a browser slot; holders:
+    slot.1: pid 16147 (up 452 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-cell-checks.cjs --skills composing:hundreds_chart_fil
+    slot.2: pid 21877 (up 202 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_wp_compare_smaller,addition:add_wp_chan
+    queue: pid 23552 (up 116 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-screen-answer.cjs --skills composing:hundreds_chart_f
+    queue: pid 23554 (up 116 s) flock 10
+ws-backtest: c120-ri-under (pass state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 26295 (up 149 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plai
+    slot.1: pid 27009 (up 127 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-chromebook-fit.cjs --skills composing:hundreds_chart_
+    queue: pid 27216 (up 122 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-boot-smoke.cjs
+    queue: pid 29155 (up 1 s) sleep 1
+ws-backtest row c120-ri-under: PASS  fail state FAIL 206.7s, pass state OK 175.8s
+ws-backtest: c120-pupiltag (fail state) has waited 120 s for a browser slot; holders:
+    slot.2: pid 26295 (up 334 s) bash tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill addition:add_word_problems,addition:add_word_problems_plai
+    slot.1: pid 30124 (up 150 s) bash /tmp/mq-browser-run.sh /opt/node22/bin/node /home/user/MathQuest/tests/scripts/ws-options-verify.cjs --render --skill composing:hundred
+ws-backtest row c120-pupiltag: PASS  fail state FAIL 235.8s, pass state OK 189.7s
+ws-backtest: 7 row(s) from tests/fixtures/precritic/backtests.json
+
+row                         kind         fail state          pass state          verdict
+c120-wrong-fits             commit-pair  FAIL 0.4s           OK 0.4s             PASS
+c120-tagink                 commit-pair  FAIL 38.9s          OK 109.9s           PASS
+c120-lesson-wide            commit-pair  FAIL 85.1s          OK 116.1s           PASS
+eb-centred-band             fixture      FAIL 0.2s           OK 0.2s             PASS
+c120-title-band             commit-pair  FAIL 122.4s         OK 291.6s           PASS
+c120-ri-under               commit-pair  FAIL 206.7s         OK 175.8s           PASS
+c120-pupiltag               commit-pair  FAIL 235.8s         OK 189.7s           PASS
+
+7 PASS, 0 FAIL, 0 PENDING, 0 TIMEOUT, 0 ERROR; 1680.2 s
+ws-backtest: OK
