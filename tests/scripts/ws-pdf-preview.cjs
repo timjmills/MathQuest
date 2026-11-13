@@ -24,6 +24,7 @@
 const fs = require('fs');
 const path = require('path');
 const { open, waitFor } = require('../lib/ws-harness.cjs');
+const FONTS = require('../lib/ws-fonts.cjs');
 
 const SHOTS = process.env.SHOTS || '';
 const THROTTLE = Number(process.env.THROTTLE || 4);
@@ -91,6 +92,9 @@ const SKILLS = [
       await p.goto(new URL('__ws-pdf-preview-blank.html', page.url()).href, { waitUntil: 'load' }).catch(() => null);   // a 404 page: only its origin matters
       await p.setContent(doc, { waitUntil: 'networkidle0', timeout: 60000 });
       await p.evaluate(() => (document.fonts ? document.fonts.ready.then(() => 0) : 0));
+      // the gate's own PDF page: wait for Andika (bounded retry); declared but never loaded is an environment ERROR
+      const fw = await FONTS.awaitFonts(p, { faces: ['400 16px Andika', '700 16px Andika'] });
+      if (FONTS.isEnvError(fw)) { console.log(`ws-pdf-preview: ERROR (fonts: the web font never arrived - environment, not the page) ${FONTS.describe(fw)}`); process.exit(2); }
       const fonts = await p.evaluate(() => ({ r: document.fonts.check('400 16px Andika'), b: document.fonts.check('700 16px Andika'), bad: [...document.fonts].filter((f) => /Andika/.test(f.family) && f.status !== 'loaded').length }));
       if (!fonts.r || !fonts.b || fonts.bad) throw new Error(`the PDF page has no Andika ${JSON.stringify(fonts)}`);
       const buf = await p.pdf({ preferCSSPageSize: true, printBackground: true });

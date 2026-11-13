@@ -1,0 +1,9 @@
+<!doctype html>
+<!-- ws-fonts backtest fixture (fonts-never): Andika is declared but its file never arrives (404), as when the font
+     fetch fails in the container. The gate must say ERROR (environment), never a page FAIL. -->
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:"Andika";font-weight:400;src:url("/css/fonts/__missing-Andika-Regular.woff2") format("woff2")}
+@font-face{font-family:"Andika";font-weight:700;src:url("/css/fonts/__missing-Andika-Bold.woff2") format("woff2")}
+body{font-family:"Andika"} b{font-weight:700}
+</style></head><body><p>3 + 4 = <b>7</b></p></body></html>

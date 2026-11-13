@@ -803,7 +803,14 @@ function pvRenderBody(p, ctx0) {
                 // 76 mm of ink at S, 30 % empty each side of a 185 mm cell; their write line takes three more digits at S, AFTER the
                 // skill's fixed width - added before it, two digits moved the band 0.8 mm (29.9 %) - the same on every item, so the
                 // line never tells the answer)
-                const dg = Math.max(digits, Number(p.slotDigits) || 0) + (p.rowOnly && ctx.size === 'S' ? 3 : 0);
+                // (lf-placevalue pv debt: combine three across at S - the page's rows held to their ink fill it in 3 x 9 - draws
+                // "= ____" on its own line, and a two-part "400 + 50" with it was 24 mm of ink in a 61.5 mm cell, 30.4 % empty each
+                // side on the pixels; its write line takes two more digits there, the same on every item, so it never tells the answer)
+                // (and one more in a full-width row: a two-part frame in the three-part ghost box was 83.5 mm of ink in 185, 27.4 %
+                // each side at L, inside the limit by less than the 3-point margin)
+                const wide3 = !p.ghost || p.inPlace === false ? 0 : ctx.size === 'S' && Number(ctx.columns) === 3 ? 2 : Number(ctx.columns) === 1 ? 1 : 0;
+                // (pv debt, --margin 3: unit form's rename rows at S were still 27.6-28.3 % each side with three more digits; four)
+                const dg = Math.max(digits, Number(p.slotDigits) || 0) + (p.rowOnly && ctx.size === 'S' ? 4 : 0) + wide3;
                 const fr = frameHTML(ctx, p.frame, kv, dg, p.ghost ? String(p.ghost).replace(/\s*=\s*_+\s*$/, '') : '');
                 return `<div class="pv-cell">${p.showNumeral ? center(numeral({})) : ''}${fr}</div>`;
             }
@@ -970,10 +977,18 @@ register('pv', {
         // (`inPlace`, layout IN_PLACE_FILL) - the page takes more rows instead of a 34-55 % band in every cell. A frame
         // that may wrap (`inPlace` expand / unit form) is measured at every column count, never forced to one.
         if (p.inPlace) {
+            // (lf-placevalue pv debt, ws-empty-band on the pixels: combine's frames and unit form's rename rows are one or two
+            // short lines whose ink is their measured height less the pads; every role's row stretch - the practice spread, a
+            // Test's fill floor, a Review's page share - left 37-40 % of their cells empty. `tightRows` (layout.tightRows) holds
+            // their rows to IN_PLACE_FILL on every role; the spare height stays under the grid)
+            // (and expand's rows, combine's Mixed Review band: one line of boxes in 19.6 mm rows, 40 % empty under it; and unit
+            // form's standard row "119 = [ ] hundreds [ ] tens [ ] ones", 12 rows flexed to 19 mm on its Test at S, 39 %)
+            const tight = (p.kind === 'frame' && (!!p.ghost || !!p.rowOnly)) || p.kind === 'expand' || (p.kind === 'blanks' && !!p.words)
+                ? { tightRows: true } : {};
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
             // (`rowOnly`, critic r2 N6: unit form's one-line rename frames, one full-width row a line at every size)
-            if (p.rowOnly) return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true, hardCap: true };
+            if (p.rowOnly) return { wMm: 186, hMm: null, measure: true, factLike: false, maxCols: 1, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
             // (lf-placevalue r3, H13 side bands: at S a 2-place expanded row "47 = [ ] + [ ]" is a third of the full width - it
             // may stand more across where the measured fit allows (three across it is drawn on two lines, expandHTML);
             // M and L, and 3 places and more, keep the full-width row: two across the 2-column grid takes 8 rows, and
@@ -986,8 +1001,8 @@ register('pv', {
             const twoPart = p.kind === 'frame' && p.ghost && String(p.ghost).split(/\s+/).filter((w) => /^\d/.test(w)).length <= 2;
             // (lf-placevalue r3 F2: held to 3 across at S, "10 + 4" / "= ____" in a 62 mm cell left 32-35 % each side; four
             // across, the two-line frame fills its 46 mm cell - the layout still takes fewer where the measured fit says so)
-            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true };
-            return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}) };
+            if (twoPart && ctx.size === 'S') return { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 4, denseRoom: 1, inPlace: true, hardCap: true, ...tight };
+            return { wMm: wideIn ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wideIn ? 1 : 2, denseRoom: 1, inPlace: true, ...(wideIn ? { hardCap: true } : {}), ...tight };
         }
         return { wMm: wide ? 186 : 93, hMm: null, measure: true, factLike: false, maxCols: wide ? 1 : 2 };
     },

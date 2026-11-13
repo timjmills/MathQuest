@@ -27,8 +27,9 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
+    tightRows,
 } from '../layout.js';
-import { paginate, labelStarts, lettersFit, scoreDenominator, placeSections } from '../paginate.js';
+import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
 import { deriveSeed } from '../rng.js';
 import { presetOf } from '../../skill-presets.js';   // pure table, SCC-01 safe
@@ -1100,7 +1101,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
     const { starts, notes: labelNotes } = labelStarts(counts, { style: labelStyle, restartEachPage: false, pageOf });
     if (lettersOff) labelNotes.push('More than 26 problems on a page: they are numbered, never lettered past z.');
     // Every cell on these roles is scored (none is a Model or a Guided cell, CL-14).
-    const score = scoreDenominator(counts);
+    // (points, not items: a template may score more than one point a cell - Q-C, vocab-match3 scores 3)
+    const score = scoreDenominator(partsInOrder.map((p) => scorePoints(sheetItems[p.section].slice(p.chunk.from, p.chunk.from + p.chunk.count))));
     const { first, cont } = sheetHeaders(input, { ...words }, score);
     first.titleLines = titleLines;
 
@@ -1179,7 +1181,8 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             // (one-page sections only: a section over several pages keeps one cell height, PT-ENG-6)
             const chunks = laidOut.chunksBySection[part.section] || [];
             let spread = null;
-            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks) {
+            // (`tightRows` - layout.tightRows, lf-placevalue pv debt: an in-place section that asks for it is never spread)
+            if (!gap.gap && lone && baseMm && !noCapSec && !noStretchSec && !its.some((it) => it.anchor) && !L.blocks && !tightRows(its)) {
                 if (chunks.length === 1) spread = spreadRows(its, L.cols, part.chunk.rows, baseMm, avail, L.hMin);
                 else if (chunks.every((c) => !c.blocks)) {
                     // a section over several pages: the FIRST page's stretch, applied to every page

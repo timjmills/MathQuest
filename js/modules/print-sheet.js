@@ -34,6 +34,7 @@ import { mergedLine } from './refline-screen.js';
 import { opsRoutedSkill } from './gen-operations.js';
 import { getSkillGrade, getSkillPrintSize, SKILL_FULL_LABELS, SKILLS, isMixedMetaSkill, getMixedPoolSkills, DOMAINS } from './data.js';
 import { kitCellSpec } from './print-generate.js';
+import { applySheetTags } from './sheet/index.js';
 import { renderCell, cellAnswerKey, cellFootprint, resolveCtx, SIZES, INSTRUCTION_LIBRARY, getProvider, cellMinSize, sizeFloor, nlResolveLine, nlLineNumbers, nlStepName as stepName, refLineHTML, legacyReadFig, hasCell, getCell } from './sheet/index.js';
 import { plan as independentPlan } from './sheet/roles/independent.js';
 import { plan as morePracticePlan, letterSeed } from './sheet/roles/more-practice.js';
@@ -2824,6 +2825,8 @@ function skillMeta(sk, q) {
         const span = spanGrades(sk);
         if (span.length) { meta.grades = span; meta.grade = span[0]; }
     }
+    // (Q-A: an item that carries its own standards - a vocabulary page dealt from one lesson's word set - prints them)
+    applySheetTags(meta, q);
     // Wave 1 lane C2: count_by_tables titles itself from its options (a typed step, counting back, a typed start).
     let titleOpts = {};
     if (sk.skillId === 'count_by_tables') {
@@ -3195,6 +3198,31 @@ function numberLineRequest(n) {
  * Round 9 (critic r7 D7-2): every deal starts in a task of its own, so a sheet that is dealt
  * several times never blocks the page for the whole search, and the work is counted (`stats`).
  */
+/**
+ * Each grid cell of a plan carries its item's index in the bridge's returned `items` (critic eb-r5 m1): `ebItem` on the plan
+ * item, written by the kit's grid as data-eb-item on the cell. ws-empty-band EB-FOOT pairs each cell with ITS OWN item's
+ * measured footprint by it (a page that reorders its items is never judged against another item's footprint). Matched by the
+ * item's question object; a plan item with no match carries nothing. Nothing draws from it.
+ */
+function tagItemIndex(plan, items) {
+    const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
+    const walk = (s) => {
+        if (!s || typeof s !== 'object') return;
+        // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        if (s.kind === 'grid') for (const pi of s.items || []) {
+            if (!pi) continue;
+            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
+            if (many.length > 1) pi.ebItem = many;
+            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
+            else if (many.length) pi.ebItem = many[0];
+        }
+        if (Array.isArray(s.contents)) s.contents.forEach(walk);
+        if (s.content) walk(s.content);
+        if (Array.isArray(s.parts)) s.parts.forEach(walk);
+    };
+    for (const sh of (plan && plan.sheets && plan.sheets.length ? plan.sheets : [plan || {}])) for (const pg of (sh.pages && sh.pages.length ? sh.pages : [{ sections: sh.sections || [] }])) (pg.sections || []).forEach(walk);
+}
+
 const BUILD_STATS = { deals: 0, dealMs: 0, checks: 0, checkMs: 0, measured: 0, measureHits: 0, measureMs: 0, layouts: 0 };
 const nowMs = () => (typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now());
 /** Resolve in a NEW macrotask (the page paints and answers input in between). */
@@ -3569,6 +3597,26 @@ async function buildSheetDeal(req = {}) {
                     left -= give;
                 }
             }
+            // (`wholeRows` on a template's footprint, opt-in so no other template's page changes - lf-vocab r9, print-lint
+            // sections L-DENSITY DN-2 / LONE at S and L: a one-column member whose share held ONE row and a half took
+            // the page's whole share as one tall cell, so a two-skill sheet printed one Match 3 alone on page 1. Such a
+            // member takes one more whole row from the others' spare room, when they keep the rows they had.)
+            members.forEach((si, k) => {
+                const its = probesOf(si) || [];
+                if (!its.length || !its.every((it) => it && it.footprint && it.footprint.wholeRows)) return;
+                const row = layouts[si].hMin;
+                if (!(row > 0)) return;
+                const rowsNow = Math.max(1, Math.floor((h[k] - 1 - band(si)) / row + 1e-6));
+                const want = (rowsNow + 1) * row + 1 + band(si) - h[k];
+                if (want <= 0) return;
+                const rowsOf = (j) => { const r = layouts[members[j]].hMin; return r > 0 ? Math.max(1, Math.floor((h[j] - 1 - band(members[j])) / r + 1e-6)) : 1; };
+                const keep = (j) => rowsOf(j) * layouts[members[j]].hMin + 1 + band(members[j]);
+                const spare = members.reduce((a, _, j) => a + (j === k ? 0 : Math.max(0, h[j] - Math.max(need[j], keep(j)))), 0);
+                if (spare + 1e-6 < want) return;
+                let left = want;
+                members.forEach((_, j) => { if (j === k || left <= 0) return; const give = Math.min(left, Math.max(0, h[j] - Math.max(need[j], keep(j)))); h[j] -= give; left -= give; });
+                h[k] += want;
+            });
             members.forEach((si, k) => {
                 const sec = n.sections[si];
                 sec.gridH = Math.max(need[k], Math.floor(h[k] * 1000) / 1000);
@@ -4016,6 +4064,7 @@ async function buildSheetDeal(req = {}) {
         const t = trimToPages(plan, hostItems, wanted, (items) => { input.items = items; return independentPlan(input); });
         plan = t.plan; trimmed = t.trimmed;
     }
+    tagItemIndex(plan, hostItems);
     const out = renderPlan(plan, { key: n.key });
     // NARROW CELLS: problems that print in a cell so much wider than they are that a third of the
     // cell is empty on each side (RUBRIC H13: a two-digit column sum in a 92 mm cell beside a
@@ -4327,6 +4376,8 @@ async function buildRoleSheet(n, metaOf) {
     const input = {
         items: [], skills: allSkills, pools: pools.map((p) => ({ id: p.id, weight: p.weight || 1 })),
         ctx, header, form: n.form, seed: n.seed, labels: n.labels, lesson: n.lesson,
+        // (lf-roles: the title's MEASURED lines, for a role whose title it composes itself - review.js "Review: <topic>")
+        titleLinesOf: (text, size) => measureTitleLines(text, size || n.size),
         columns: (n.sections[0] && n.sections[0].columns) || 'auto',
         count: n.sections[0] && n.sections[0].count ? n.sections[0].count : undefined,
         targetSkill: metaOf(reqSkills[0]),
@@ -4777,6 +4828,7 @@ async function buildRoleSheet(n, metaOf) {
     }
     const numberLine = nline ? drawNumberLine(nline, items.some((it) => nline.keys.has(String(it.skill))) ? items.filter((it) => nline.keys.has(String(it.skill))) : items, n.size, header) : null;
     const plan = mod.plan(input);
+    tagItemIndex(plan, items);
     const out = renderPlan(plan, { key: n.key });
     // A plan's own teacher page after its key (a Prerequisite Check's routing table, `meta.routePlan`).
     if (n.key && plan.meta && plan.meta.routePlan) {
@@ -4881,10 +4933,21 @@ async function buildLesson(n, metaOf) {
     // ws-lesson-baseline; the print screen never sets it. A shallow copy carries the override, so no shared record changes.
     const recordOf0 = (s1) => n.lessonData || (libId ? libraryLessonData(libId) : null) || lessonFor(s1.categoryId, s1.skillId);
     const recordOf = (s1) => { const r = recordOf0(s1); if (n.prereqsForce === true && r && r.prereqsLive === false && !n.lessonData) { const c = Object.assign({}, r); delete c.prereqsLive; return c; } return r; };
-    const data0 = recordOf(sk0);
+    // (opt-in `dealPracticeOpts` on a library lesson, lf-placevalue critic nwf r1 N6: a lesson asked for by its skill alone - no
+    // options on the request - deals its OWN practice options (the LESSONS record's `practice.opts`), so its chant and steps
+    // describe what the pages deal. Every other lesson keeps the request's options as before.)
+    {
+        const lib = libId ? lessonById(libId) : null;
+        if (lib && lib.dealPracticeOpts && lib.practice && lib.practice.opts && !sk0.opts && lib.practice.skill === `${sk0.categoryId}:${sk0.skillId}`) {
+            const sk1 = Object.assign({}, sk0, { opts: JSON.parse(JSON.stringify(lib.practice.opts)) });
+            n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk1, ...n.sections[0].skills.slice(1)] }), ...n.sections.slice(1)] });
+        }
+    }
+    const sk0b = n.sections[0].skills[0];
+    const data0 = recordOf(sk0b);
     // The lesson's floor on its own operands (lessons r2: "add 1-3" never deals + 0), on every part.
     const flags = {};
-    if (data0 && data0.minOperand !== undefined && sk0.minOperand === undefined) flags.minOperand = data0.minOperand;
+    if (data0 && data0.minOperand !== undefined && sk0b.minOperand === undefined) flags.minOperand = data0.minOperand;
     if (data0 && data0.distinctFirst) flags.distinctFirst = true;
     if (data0 && data0.minTop !== undefined) flags.minTop = data0.minTop;
     if (data0 && data0.maxTop !== undefined) flags.maxTop = data0.maxTop;
@@ -4893,7 +4956,7 @@ async function buildLesson(n, metaOf) {
     if (data0 && data0.distinctAnswer) flags.distinctAnswer = true;
     if (data0 && data0.maxSmall !== undefined) flags.maxSmall = data0.maxSmall;
     if (data0) flags.noTurnaround = true;
-    let sk = Object.keys(flags).length ? Object.assign({}, sk0, flags) : sk0;
+    let sk = Object.keys(flags).length ? Object.assign({}, sk0b, flags) : sk0b;
     // Practice-page supports a lesson never draws (critic visual-quality r2 N1): the blank family chart is working
     // space for the practice pages; on the lesson's model, steps and guided frames it crowds the step column off
     // the sheet. The lesson draws the bare family-check cell; the option stays on the skill for every other role.
@@ -4903,7 +4966,7 @@ async function buildLesson(n, metaOf) {
     if (sk.opts && offOpts.some((k) => sk.opts[k] === true)) {
         sk = Object.assign({}, sk, { opts: Object.assign({}, sk.opts, Object.fromEntries(offOpts.map((k) => [k, false]))) });
     }
-    if (sk !== sk0) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
+    if (sk !== sk0b) n = Object.assign({}, n, { sections: [Object.assign({}, n.sections[0], { skills: [sk] }), ...n.sections.slice(1)] });
     const meta = metaOf(sk);
     const data = recordOf(sk);
     // LR-17 (plan §8b, lead D1): a lesson whose record declares `prereqs` opens with its PREREQUISITE CHECK - one
