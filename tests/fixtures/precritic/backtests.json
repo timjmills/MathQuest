@@ -8379,6 +8379,202 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120r2-wrong-multi",
+   "check": "every chart window, every gap count the skill deals, has a wrong answer that is a number in every slot and differs from the key in exactly one slot (chart_120 critic r1 F1: num('91, 101') was NaN, no multi-gap window had a wrong answer, True or False? dealt all True; L27)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit WRONG-MULTI",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "wrongAnswer null on every 2- and 3-gap window"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "chartWrong: one gap written wrong per candidate, the others kept"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules WRONG-MULTI",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-steps-all-slots",
+   "check": "a chart window's worked steps name EVERY gap's value in grammatical sentences (critic r1 F3: steps ended 'Write <first gap>.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit STEPS-ALL-SLOTS",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the second and third gaps never named"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "chartSteps works every gap (relation + Write per gap; row runs for 4+ gaps)"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules STEPS-ALL-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-say-agree",
+   "check": "the Say line names every gap and agrees in number ('The missing numbers are 101 and 104.'; critic r1 F3: 'The missing number is 101, 104.')",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit SAY-AGREE",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "'The missing number is 101, 104.'"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "sayValues: chartSay"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules SAY-AGREE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-hint-all",
+   "check": "the Guided Model's grey work lines name every traced gap (critic r1 F3b: hints explained only 100 of 100, 107, 117)",
+   "kind": "commit-pair",
+   "rule": "ws-providers-unit HINT-ALL",
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "work lines name the first gap only"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "one relation line per gap"
+   },
+   "command": "node tests/scripts/ws-providers-unit.mjs --skill composing:chart_to_120,composing:hundreds_chart_fill --only-rules HINT-ALL",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-tf-false",
+   "check": "True or False? deals True and False statements on every chart page (2+ statements) and 35-65 % False over the seeds (critic r1 F1, PT-TOF-1)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo TF-FALSE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "4 of 4 True on chart_to_120 pages"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "per-slot wrong answers deal False on multi-gap windows"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only TF-FALSE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-ea-pattern",
+   "check": "Error analysis cannot be answered by counting gaps: windows of 2+ gaps are judged both Correct and Fix it over the seeds (critic r1 F2)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo EA-PATTERN",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "every multi-gap window Correct"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "per-slot wrong answers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 6 --only EA-PATTERN",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-score-roles",
+   "check": "Score /N counts answer slots on opener, review, mixed-practice, pre-skill-check and lesson as on independent / test (critic r1 F6: opener /2 over 4 squares, mixed /6 over 13)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS (every scored role)",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "opener / review / mixed / pre-skill-check / lesson count windows"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "paginate.js slotScore on those roles"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 3 --only SCORE-SLOTS --score-roles opener,review,mixed-practice,pre-skill-check,lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-cross-giveaway",
+   "check": "no chart window prints, as a chart number, an empty square of another window of the same squares on the sheet - every band x grid value (critic r1 F4: band 120 grid=rows, one window, items copying each other's answers; F9: band 10)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CROSS-GIVEAWAY --variants",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "band 120 rows and band 10 pages give answers away item to item"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "the dealer never deals a window of squares already on the sheet"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes L --variants --only CROSS-GIVEAWAY",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-strip-numbers",
+   "check": "a lesson sheet's Steps zone and strip name no number (11+) that is not printed in, or a key of, a cell of its page (critic r1 F5: 'The number before is 109 ... Write 110.' beside windows with no 109 / 110)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo STRIP-NUMBERS",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "the strip walks the example, not on the page"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "stripStepsFor: the skill's general steps when the example's steps name its own numbers"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120,composing:hundreds_chart_fill --seeds 2 --only STRIP-NUMBERS --score-roles lesson",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120r2-chart-square",
+   "check": "a chart window on Reason It / True or False? / Error analysis is never squeezed under the 14 mm writing floor (critic r1 F10: band 100 Reason It L at 10.4 mm squares)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo CHART-SQUARE",
+   "browser": true,
+   "fail": {
+    "commit": "28096aaa7",
+    "state": "hundreds_chart_fill reason-it L 10.4 mm"
+   },
+   "pass": {
+    "commit": "5bc02de7e",
+    "state": "chartwindow footprint states inkWMm for a 1-100 window, so Reason It takes its wide form"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:hundreds_chart_fill --seeds 2 --sizes M,L --only CHART-SQUARE --score-roles reason-it,true-false,error-analysis",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
