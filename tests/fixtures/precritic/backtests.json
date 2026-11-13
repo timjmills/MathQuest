@@ -2415,12 +2415,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "aacae5ea",
-    "state": "critic r3: EB-SIDE 28 (independent / more-practice L 30-34 %, test M 30-31 %)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure (1c64a449): combine S/M/L EB-BAND 140 (S 37.6 %, review S 40.1 %)"
    },
    "pass": {
-    "commit": "deb9e426",
-    "state": "expression centred in the ghost box; stepped two-line frame where one line cannot fit"
+    "commit": "668f6a8c",
+    "state": "tightRows: in-place rows held to their ink on every role; worst S band 21.1 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:combine --roles independent,more-practice,test,review --hosts none",
    "expect": {
@@ -2475,12 +2475,12 @@
    "rule": "ws-empty-band EB-SIDE",
    "browser": true,
    "fail": {
-    "commit": "8573c66a",
-    "state": "EB-SIDE 27 (independent / more-practice / test / review S)"
+    "commit": "16014137",
+    "state": "lf-checks pixel measure: rename=more EB-BAND 12 + EB-SIDE 3 (test S band 39.3 %, review S side 30.6 %)"
    },
    "pass": {
-    "commit": "64f70063",
-    "state": "rename frames' write line two digits longer at S"
+    "commit": "1f18505d",
+    "state": "standard and rename rows tightRows; rename write line +4 digits at S; worst side 26.8 %"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --hosts none --no-baseline",
    "expect": {
@@ -2968,12 +2968,12 @@
    "rule": "ws-empty-band EB-SIDE --margin 2",
    "browser": true,
    "fail": {
-    "commit": "2fe21f2b",
-    "state": "r4 head on master: worst side band 29.9 %"
+    "commit": "16014137",
+    "state": "pixel measure: worst rename=more S side band 28.3-30.6 %"
    },
    "pass": {
-    "commit": "a1c8d595",
-    "state": "write line +3 digits after the fixed slot width: worst 27 %"
+    "commit": "1f18505d",
+    "state": "worst side band 26.8 % (clears the limit by 3.2 points)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --opts '{\"rename\":\"more\"}' --roles independent,more-practice,test,review --sizes S --hosts none --no-baseline --margin 2 --only EB-SIDE",
    "expect": {
@@ -3055,7 +3055,7 @@
     "commit": "6e962016",
     "state": "0 findings: Guided fact rows at their measured height with more tries and the narrow facts off the grid; Scripted Model states side by side"
    },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline",
+   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles guided,scripted-model --hosts none --no-baseline --only EB-BAND,EB-SIDE",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3161,46 +3161,2704 @@
     "pass": "OK"
    }
   },
-  {
-   "id": "model-grid-facts",
-   "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
-   "kind": "commit-pair",
-   "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
-   "browser": true,
-   "fail": {
-    "commit": "f960e549",
-    "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
-   },
-   "pass": {
-    "commit": "966292ff",
-    "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
-   },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
+ {
+  "id": "model-grid-facts",
+  "check": "a Scripted Model grid of the five fact skills has no empty state cell: 4 states lay 2 + 2, the second example on a continuation page (lf-ops facts-roles critic r2 S4)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band MOD-GRID (PAGE_TYPES PT-MOD-1, RUBRIC C3)",
+  "browser": true,
+  "fail": {
+   "commit": "f960e549",
+   "state": "4 findings: mult_facts / div_facts Model L, 4 states laid 3 + 1, cells 5 and 6 empty (61 x 101-104 mm)"
   },
-  {
-   "id": "model-interior-band-facts",
-   "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
-   "kind": "commit-pair",
-   "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
-   "browser": true,
-   "fail": {
-    "commit": "9f7983dd",
-    "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
-   },
-   "pass": {
-    "commit": "04683166",
-    "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
-   },
-   "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
-   "expect": {
-    "fail": "FAIL",
-    "pass": "OK"
-   }
+  "pass": {
+   "commit": "966292ff",
+   "state": "0 findings: 4 states 2 + 2, the second example on a continuation page"
   },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only MOD-GRID",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+  },
+ {
+  "id": "model-interior-band-facts",
+  "check": "a Scripted Model state of the fact skills keeps the band between its step text and its problem under 30 % of the cell (lf-ops facts-roles critic r3 S5)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GAP (RUBRIC H13, PT-MOD-3)",
+  "browser": true,
+  "fail": {
+   "commit": "9f7983dd",
+   "state": "8 findings: div_facts Model L, 24.6-25.1 mm of 81 mm (30.4-31.0 %) in all 8 state cells; mult_facts 27.2 %"
+  },
+  "pass": {
+   "commit": "04683166",
+   "state": "0 findings: div_facts Model L 25.8-26.8 %, mult_facts 27.2 %"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts,subtraction:sub_facts,multiplication:mult_facts,division:div_facts_long,division:div_facts --roles scripted-model --hosts none --no-baseline --model-states --only EB-GAP",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-eq-divfacts",
+  "check": "div_facts' screen supports draw paper's structure: the framed true array (rows x cols of the item), an empty frame on 0 ÷ n, the same tally and strip (lf-ops div_facts screen critic r1 D1, D2)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-EQ (VQ-8, RP-2, H13)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "22 findings: array a loose counter pane on card / worksheet / quiz, nothing on 0 ÷ 2 in the quiz"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-cue-size-divfacts",
+  "check": "a ÷ skip strip / think box on screen stands to the fact digit at >= 0.9 x paper's ratio (lf-ops div_facts screen critic r1 D3)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-CUE-SIZE (RUBRIC C1, RP-2)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "44 findings: skip 0.19-0.27, think 0.22-0.31 x the fact digit (paper 0.37 / 0.46)"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-support-place-divfacts",
+  "check": "one support place (beside / under) on every card of one online worksheet (lf-ops div_facts screen critic r1 D4)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq SCREEN-SUPPORT-PLACE (RUBRIC C3, AX-4)",
+  "browser": true,
+  "fail": {
+   "commit": "1428a84c",
+   "state": "2 findings: touch worksheet 1280 / 820, cards 2 and 5 under, the rest beside"
+  },
+  "pass": {
+   "commit": "d377e32b",
+   "state": "0 findings: every ÷ card under once one wraps"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "runner-orphan-slot",
+  "check": "a child that outlives the two-slot runner command (an orphaned, detached Chrome of a killed gate) holds no browser-slot lock: lf-engine 2026-11-12, a full ws-backtest run hung 7,000 s silent with both slots held",
+  "kind": "fixture",
+  "rule": "mq-browser-run.sh slot fd closed for the command; ws-backtest --timeout / slot-holder warning",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/runner-orphan/mq-browser-run.fail.sh",
+   "state": "master 7e0c074b runner: the command inherits the slot fd"
+  },
+  "pass": {
+   "fixture": "tests/scripts/mq-browser-run.sh",
+   "state": "lf-engine-bt: \"$@\" {fd}>&-"
+  },
+  "command": "node tests/scripts/ws-backtest.mjs --runner-orphan {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-ink",
+  "check": "a picture on a screen host (dots, counters, blocks) is drawn at least at its PRINT size in CSS mm, 5 % tolerance (owner, 2026-11-13: division:div_facts screen arrays of tiny dots; on master 73e96fc1 the array dot is 1.77 mm on every card / worksheet / quiz host against 1.96 mm on the Independent page at M, 90 %)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/tiny-dots.fail.html",
+   "state": "a landscape screen array of 3 rows of 4 whose dots are 1 mm, its print dots 2 mm (50 %)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array drawn at 1.5 x print: dots 3 mm, 24 x 18 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-width",
+  "check": "a screen drawing uses at least 60 % of its cell's free width before it grows taller than wide (owner, 2026-11-13: division:div_facts screen arrays were tall narrow strips; on master 73e96fc1 the array is 10.8 x 32.3 mm in a 94.5 mm free width on the 1280 card, 11 %)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/tall-strip.fail.html",
+   "state": "a 6 rows of 2 strip 8 x 24 mm beside the fact in a 190 mm screen cell (6 % of the free width, taller than wide)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "3 rows of 4 laid across, 24 x 18 mm (wider than tall)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-inkbox",
+  "check": "SIZE-WIDTH measures the drawing's INK (the union of its painted shapes), not its svg box (critic sis-r1 D1: a tall viewBox in a width:100% svg drew a centred strip and passed)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/strip-in-box.fail.html",
+   "state": "a 6 rows of 2 viewBox in a full-width svg 30 mm tall: the box is 182 mm wide, the ink a 10 x 30 mm strip"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "3 rows of 4 laid across, 24 x 18 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-sameitem",
+  "check": "SIZE-INK compares a screen item with ITS OWN print item (the same fact), never a median over the page (critic sis-r1 D2: a miss and a false alarm by construction)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/same-item-miss.fail.html",
+   "state": "print 2 x 3 at 4 mm and 10 x 10 at 1 mm dots; the screen 2 x 3 at 2.6 mm (65 % of its own item; the old page median 2.5 mm passed it)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/same-item-ok.pass.html",
+   "state": "the same print page; the screen 10 x 10 at 1 mm and the 2 x 3 at 4 mm, each at its own print size (the old median raised \"40 %\" on the 10 x 10)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-relabel",
+  "check": "a screen picture labelled differently from print is still judged, by geometry (the same marks, the same count) (critic sis-r1 D3: \"dots for 12\" at 50 % passed with a note)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.fail.html",
+   "state": "the screen \"dots for 12\" (print \"array, 3 rows of 4\"), 1 mm dots against 2 mm, no fact text to match the item"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/relabelled.pass.html",
+   "state": "the same relabelled picture at 2 mm dots"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-noref",
+  "check": "a screen mark group with NO print counterpart FAILS as SIZE-REF, never a note only (critic sis-r1 D3)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/no-print-ref.fail.html",
+   "state": "the screen draws 5 tiles; paper holds only a 12-dot array"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array matches its print item"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-spacer",
+  "check": "an empty block (no ink) beside a drawing does not cut its cell's free width (critic sis-r1 D4: a flex:1 spacer read the free width as 20 mm of 181.5 mm)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.fail.html",
+   "state": "a 19 x 57 mm strip beside the fact and an empty flex:1 spacer (free width 141 mm, 12 %; the old reading 31 mm passed it at 61 %)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/beside-spacer.pass.html",
+   "state": "the same cell and spacer, the array laid across 40 x 30 mm"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-WIDTH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-divfacts",
+  "check": "the owner's case on the real tree: division:div_facts screen arrays of small dots in tall strips (critic sis-r1 D6)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK + SIZE-WIDTH (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "commit": "73e96fc1",
+   "state": "master as the owner caught it: the array dot 1.77 mm on every card / worksheet / quiz host against 1.96 mm on paper (90 %), a 10.8 x 32.3 mm strip in a 23-108 mm free width"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/div-facts-wide.pass.html",
+   "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
+   "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-h13",
+  "check": "every Practice and Mixed page of a short lesson has no cell band >= 30 % (lf-engine-pc critic r3 F5: add L Mixed Addition row 55 %; F7: round L / S Practice 49 % in all 15 cells)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 (H13 on Practice / Mixed, blocking)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "PM-H13 FAIL 4: add L Mixed 52 %, add S Practice 30 %, round L / S Practice 49 %"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "PM-H13 PASS: rounding Practice cells and Mixed / Practice fact + count cells centred"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-halo",
+  "check": "SIZE-INK sizes INK marks only: a white halo / keyline circle (white or no fill, no dark stroke) is not a mark, so a small ink dot still FAILS beside its halo and an ink dot at print size passes (lf-ops 2026-11-13: pooled halos read add_facts / mult_facts touch dots at 1.64 vs 1.76 mm; ink-only they are 1.69 vs 1.58 mm single, 2.30 vs 1.97 mm ring, 0.85 vs 0.79 mm centre)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-INK (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/halo-small-ink.fail.html",
+   "state": "touch dots of 1.6 mm ink on screen against 2.0 mm on paper (80 %), each on a white halo circle"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/halo-ink-ok.pass.html",
+   "state": "the ink dots 2.0 mm on both, a hairline halo on screen and a 0.4 mm halo on paper (the old pooled reading 2.13 vs 2.40 mm = 89 % FAILED it)"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-ring",
+  "check": "a ring is its own mark: a screen ring group paper does not draw FAILS as SIZE-REF and is never paired with the print dots (critic sis-r2 D1: 12 rings of 0.8 mm read as \"dot (array) 40 %\")",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra.fail.html",
+   "state": "the screen array at 3 mm dots plus 12 small black rings (0.8 mm); paper draws the array only"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/sized-right.pass.html",
+   "state": "the screen array matches its print item, no rings"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-ink-size-ring-large",
+  "check": "a screen ring group LARGER than the print dots, which paper does not draw, FAILS as SIZE-REF instead of passing silently; a ring paper draws too is matched to the print ring (critic sis-r2 D1)",
+  "kind": "fixture",
+  "rule": "ws-screen-ink-size SIZE-REF (check SCREEN-INK-SIZE)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-extra-large.fail.html",
+   "state": "the screen array plus 12 grey keyline rings of 3.5 mm; paper draws the array only"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/screen-ink/ring-matched.pass.html",
+   "state": "paper and screen both draw the 12 rings of 3.5 mm under the array"
+  },
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture} --only SIZE-INK,SIZE-REF",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-live-carry",
+  "check": "every carry / regroup box a lesson key page draws is filled by >= 1 stack of its section (lf-engine-pc critic r3 F6: sub / round Mixed, add_100_regroup partner, a hundreds carry box no sum < 100 reaches)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples LIVE-PART (H15 dead part)",
+  "browser": true,
+  "fail": {
+   "commit": "cf1e5abe",
+   "state": "LIVE-PART FAIL 4: sub L / S, round L / S Mixed, the hundreds box filled on none"
+  },
+  "pass": {
+   "commit": "ce1d96f5",
+   "state": "LIVE-PART PASS: stack carryTop per section (markSectionWriteAbove)"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --rules LIVE-PART",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-provider",
+  "check": "composing:number_word_form provider: at least a third of the items on every band (20 / 100 / 1,000) get a NAMED wrong answer, and every quoted phrase of a worked step is part of the name (critic nwf r1 N1, N3)",
+  "kind": "commit-pair",
+  "rule": "ws-words-checks WORDS-WRONG-RATE / WORDS-STEPS-TRUE",
+  "browser": false,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "band 100: 1 of 120 with a named wrong answer; 'seventeen hundred' steps"
+  },
+  "pass": {
+   "commit": "1e3b128e",
+   "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
+  },
+  "command": "node tests/scripts/ws-words-checks.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-parity",
+  "check": "composing:number_word_form on the practice card / worksheet / quiz draws the kit words cell with its answer place inside it, and no empty legacy box beside it (critic nwf r1 N9, lead ruling: screen parity is a contract rule)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band --screen-parity EB-PARITY",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "the legacy place chart: no [data-ws-cell=words] on the card, empty tens / ones boxes beside the input"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "the kit words cell on every host, the input in its line"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-claim",
+  "check": "composing:number_word_form True or False? with answerSlot hto prints the claimed number in its boxes (critic nwf r1 N2)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules CLAIM-INK",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "every H T O box empty on the pupil page; the key marks False against nothing"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "the claim one digit a box"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --card-opts --opt-roles true-false --rules CLAIM-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-model",
+  "check": "composing:number_word_form Scripted Model / Guided / opener write the Model's answer (critic nwf r1 N5)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules MODEL-ANSWER",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "the traced state drew an empty answer line on every Model"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "the answer traced in grey"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules MODEL-ANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-text",
+  "check": "composing:number_word_form: every word space of a printed name is visible (critic nwf r1 N7, 'one hundredthirteen' in the lesson's Guided model)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules WORDS-TEXT",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "the two-line name box was a flex box: the space between the text run and the underlined span dropped"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "the name one inner span"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size M --opts '{\"wordform\":[\"to_number\"],\"band\":1000,\"zeroPlace\":\"some\",\"answerSlot\":\"hto\"}' --rules WORDS-TEXT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-break",
+  "check": "composing:number_word_form: a name over two lines breaks after 'hundred' (critic nwf r1 N8)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules WORDS-BREAK",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "'seven / hundred eight', 'seven / hundred nine' at band 1000"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "'seven hundred' kept on one line"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --size S,L --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --rules WORDS-BREAK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-rowy",
+  "check": "composing:number_word_form: the answer places of one grid row sit within 1 mm up and down (critic nwf r1 N4)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+  "browser": true,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "'one hundred' in a two-line box, its line 5 mm under its row (test S)"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "only a name long enough to wrap takes the two-line box"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --words-rules --rule-skills composing:number_word_form --card --rules ROW-SLOT-Y",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-chant",
+  "check": "a routine's chant that names boxes holds for every item its lessons deal (critic nwf r1 N6: 'Three boxes, three digits.' over 2-digit items and 'one thousand')",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-unit chant-box",
+  "browser": false,
+  "fail": {
+   "commit": "2ccd5b21",
+   "state": "the default deal had no boxes; the practice deal gave 1000 four boxes"
+  },
+  "pass": {
+   "commit": "35bc76fe",
+   "state": "'Every box gets a digit.', the lesson deals its practice options"
+  },
+  "command": "node tests/scripts/ws-lesson-unit.mjs --only chant-box",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-rowy-1000",
+  "check": "composing:number_word_form band 1,000 with zeroPlace always: answer places of one grid row within 1 mm, lesson and guided rows included (critic nwf r2 N10 / N10b: 'one thousand' 7 mm high)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+  "browser": true,
+  "fail": {
+   "commit": "706d940a",
+   "state": "one thousand's boxes 6.6-7.2 mm above its row"
+  },
+  "pass": {
+   "commit": "5a4ca828",
+   "state": "twoLine on every band-1,000 name"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "pv-words-towords-side",
+  "check": "composing:number_word_form numeral to words: no side band of 30 % (critic nwf r2 N11: one across, half the page empty)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE",
+  "browser": true,
+  "fail": {
+   "commit": "706d940a",
+   "state": "one across at S"
+  },
+  "pass": {
+   "commit": "5a4ca828",
+   "state": "two across at S where the 70 mm line fits"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --opts '{\"wordform\":[\"to_words\"]}' --roles independent --sizes S --hosts none --no-baseline --only EB-SIDE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-keyjoin-frame",
+  "check": "a shared role writes ONE value a slot: a list answer one part a box, a sentence answer never on a write line (lf-roles; lf-algebra KEYJOIN 340 class)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit KEYJOIN-ROLE",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "24 findings: tf-ans / ri-ans hold the list and the sentence; EA splits the sentence into parts"
+  },
+  "pass": {
+   "commit": "aa200514",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-review-title",
+  "check": "a Review budgets its body under the title it prints, measured (growing_shape_patterns Review L body 1.3 mm over)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit REVIEW-TITLE",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "2 findings: topicOf drawing and count; titleLinesOf never asked"
+  },
+  "pass": {
+   "commit": "2a3ecb9c",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only REVIEW-TITLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-model-across",
+  "check": "a tall-state Scripted Model that needs 2 pages beside its text lays 2 + 2 on one page (fte Model M EB-BAND / EB-SIDE)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit MOD-ACROSS",
+  "browser": false,
+  "fail": {
+   "commit": "eef75f5",
+   "state": "1 finding: 2 pages"
+  },
+  "pass": {
+   "commit": "35c881b6",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-ACROSS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "capacity-no-drop",
+  "check": "a page never prints fewer items than the pinned master page, per skill x role x size (lf-roles critic r1 R3: follow_given_rule True or False? L 4 -> 3; unit_form Reason It S 4 -> 3 found by it)",
+  "kind": "fixture",
+  "rule": "ws-capacity-pin CAPACITY-NO-DROP",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/capacity/fail.json",
+   "state": "the pin holds one item more than the page prints"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/capacity/pass.json",
+   "state": "the pin as master prints it"
+  },
+  "command": "node tests/scripts/ws-capacity-pin.cjs --check --pin {fixture} --skills placevalue:unit_form --roles reason-it --sizes S",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-ri-band-passed",
+  "check": "Reason It cells on passed skills leave no empty band under short work (critic r1/r2 R11): the A/B block centres in the stretched cell",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND (RUBRIC H13)",
+  "browser": true,
+  "fail": {
+   "commit": "5947159d",
+   "state": "4 EB-BAND findings (value / unit_form Reason It)"
+  },
+  "pass": {
+   "commit": "ce4c3eed",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:value,placevalue:unit_form,subtraction:sub_100_no_regroup,multiplication:mult_facts --roles reason-it --hosts none --variants 0 --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-list-rule-named",
+  "check": "a count row's rule part in a role's list frame is named ('Rule: add [ ] each time'), never a sixth unlabelled blank (critic r2 N1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LIST-HOMOGENEOUS",
+  "browser": false,
+  "fail": {
+   "commit": "c93de259",
+   "state": "6 findings"
+  },
+  "pass": {
+   "commit": "3df2b556",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEYJOIN-ROLE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-key-true-blank",
+  "check": "a True statement's key leaves the True or False? frame empty (PT-TOF-2; critic r1/r2 R5)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit KEY-TRUE-BLANK",
+  "browser": false,
+  "fail": {
+   "commit": "c93de259",
+   "state": "the key fills the frame"
+  },
+  "pass": {
+   "commit": "3df2b556",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only KEY-TRUE-BLANK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-ri-signmatch",
+  "check": "a Reason It wrong panel keeps the wrong answer's own operation (add_wp_10 printed '6 + 2 = 4'); lf-builds word-stories",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks SIGNMATCH",
+  "browser": true,
+  "fail": {
+   "commit": "6a1dce95",
+   "state": "SIGNMATCH on add_wp_10 / add_wp_10_plain Reason It S/M/L"
+  },
+  "pass": {
+   "commit": "7a463602",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_10,addition:add_wp_10_plain,subtraction:sub_wp_10 --roles reason-it --rules SIGNMATCH",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-h13-spot",
+  "check": "every Practice / Mixed cell kind of the spot lessons has no band >= 30 % (live-pm critic findings 1, 2, 5: div_facts equation / missing-factor cells 53-54 %, S facts 40 %, S Practice 47 %; sub_wp_10 / add_wp_20 S word problems 37 %)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-H13 on the spot lessons (every cell kind)",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-H13 FAIL 6: div L / S Practice + Mixed, subwp S, addwp S"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-H13 PASS: every cell centred; div facts under-look; band-safe Mixed fill"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only div,subwp,addwp --rules PM-H13",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-pm-cont",
+  "check": "no Practice / Mixed continuation page is >= 50 % blank (live-pm critic finding 3: fact_family_sort L Mixed p5 72 %; lead item 7: add_wp_10 L Mixed)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples PM-CONT",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "PM-CONT FAIL: ffs L p5 72 % (+ add_wp_10 L)"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "PM-CONT PASS: a Mixed spill fills the pages it takes"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --all-lessons --only ffs,addition:add_wp_10 --sizes L --rules PM-CONT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-tab-clear",
+  "check": "the number tab clears the ink of its cell by >= 2 mm on Practice / Mixed pages (1 mm for an across fact, CL-40) (live-pm critic finding 4: nearest_10 L Mixed tab on the T head)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples TAB-CLEAR",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "TAB-CLEAR FAIL 2: round L Mixed cell 1 0.6 mm"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "TAB-CLEAR PASS: L place-value cells start under the tab"
+  },
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules TAB-CLEAR",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lesson-sheet-2pg",
+  "check": "a lesson sheet on 2+ pages has a page >= 70 % used (lead item 6: Y4.B1.S14 L, two pages 38 % / 39 % blank)",
+  "kind": "commit-pair",
+  "rule": "ws-lesson-samples SHEET-2PG",
+  "browser": true,
+  "fail": {
+   "commit": "9135190b",
+   "state": "SHEET-2PG FAIL 1: round L sheet 38 % / 39 %"
+  },
+  "pass": {
+   "commit": "709605bb",
+   "state": "SHEET-2PG PASS: the continuation page takes the one-number rounding rows"
+  },
+  "pending": true,
+  "pendingReason": "item 6 redone separately: the 709605bb sheet re-flow was reverted after the live-pm2 re-critic FAIL (tab over the T head, 27-35 % blank pages); re-arm with the redo commit as pass",
+  "command": "node tests/scripts/ws-lesson-samples.cjs --check --seeds 1 --only round --sizes L --rules SHEET-2PG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "roles-fix-minimal",
+  "check": "an item carries exactly ONE error: a several-part wrong answer's later parts follow the correct rule (lead ruling N9)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit FIX-MINIMAL",
+  "browser": false,
+  "fail": {
+   "commit": "0e37c854",
+   "state": "'12, 15, 19, 22' kept (2 errors)"
+  },
+  "pass": {
+   "commit": "020cdba3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only FIX-MINIMAL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "model-marks-ink",
+  "check": "a Scripted Model state draws only its own new marks in trace grey; earlier steps' marks are black (PT-MOD-1, P-LC-9; lf-roles critic r5b D2)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit MOD-MARKS-INK",
+  "browser": false,
+  "fail": {
+   "commit": "3b324bcc",
+   "state": "states carry no new-mark list: every traceSlots value drawn grey"
+  },
+  "pass": {
+   "commit": "88032a8a",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only MOD-MARKS",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-div-facts",
+  "check": "ws-empty-band EB-FOOT: div_facts Independent at S / M / L draws each cell within 10 % of the footprint the bridge measured for it (lf-checks L25: the supports-off rows were stretched past the measured height). Its fail commit predates data-eb-item, so the row also exercises the position-pairing fallback (its NOTE); the pass commit pairs by index",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "commit": "537c2275",
+   "state": "EB-FOOT 156 on independent (rows stretched past the facts' measured footprint)"
+  },
+  "pass": {
+   "commit": "de8e7531",
+   "state": "rows of 1.1 x the measured height (noStretch): the drawn cell is the footprint"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill division:div_facts --roles independent --hosts none --no-baseline --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-reorder-arrays-groups",
+  "check": "ws-empty-band EB-FOOT pairs each cell with ITS OWN item by the kit's data-eb-item (critic eb-r5 m1): arrays_groups lays its items tallest first, so dealt-order pairing judged each cell against another item's footprint",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (index pairing, critic eb-r5 m1)",
+  "browser": true,
+  "fail": {
+   "commit": "4474a995",
+   "state": "no data-eb-item: position pairing, EB-FOOT 35 false findings on independent / more-practice / test / review (drawn heights are other items' footprints)"
+  },
+  "pass": {
+   "commit": "48e24daa6",
+   "state": "the kit writes data-eb-item: every cell judged against its own item, EB-FOOT 0, no fallback note"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:arrays_groups --hosts none --no-baseline --only EB-FOOT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-sets-split",
+  "check": "Every lesson word set splits into two clash-free Match 3 trios (ws-vocab-unit V7; lane lf-vocab build 1: the G4 remainder set repeated a word on a Match 3 page)",
+  "kind": "fixture",
+  "rule": "ws-vocab-unit V7",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/vocab-sets.fail.mjs",
+   "state": "remainder, round up and equal groups in one set: they all read as each other (notWith)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/vocab-sets.pass.mjs",
+   "state": "equation for equal groups: two clash-free trios"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-vocab-match3-guided",
+  "check": "Match 3 pictures on the GUIDED page: 32-35 % empty bands under the ink at S and L (lf-vocab critic r3)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND (30 % of the cell under the ink, every offered role / host)",
+  "browser": true,
+  "fail": {
+   "commit": "bebf5b36",
+   "state": "lf-vocab critic r3 FAIL head; ws-empty-band FAIL 4 (guided S Model 35.0 %, cell 2 32.4 %; guided L Model 33.5 %), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5: Match 3 guided cells fill their row (EB-BAND OK at S and L), 2026-11-08"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --roles guided --sizes S,L --hosts none --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v11r-score-roles",
+  "check": "The per-word Score (Match 3: 3 a cell) on guided, more-practice, test and error-analysis too (critic r3 #2: guided /5 and /4 for 15 and 12 words)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V11R",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V11R",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v14-hint-unique",
+  "check": "A Guided cue hint picks out exactly one bank word (critic r3 #5: \"starts with c\" with column and commutative in the bank)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V14",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V14",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v15-writeline",
+  "check": "The 1 picture, 3 words answer line >= 1.2 x the widest bank word; grades 4-5 >= 55 mm (critic r3 #7: ~36 mm for \"times as many\")",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V15",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V15",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v16-base10-unit",
+  "check": "one, ten and hundred print one unit square (critic r3 #8: a \"one\" bigger than a unit of the ten)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V16",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v17-lookalikes",
+  "check": "Every critic-found look-alike pair is notWith, append-only (critic r3 #9: grow with sequence in the bank)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V17",
+  "browser": false,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v18-guided-rows",
+  "check": "1 picture, 3 words Guided rows equal at S, M and L (critic r3 #6: 379 / 291 px at L)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V18",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v19-ws-tiles",
+  "check": "One worksheet-1280 tile layout per template (critic r1 #10, r2 #7, r3 #4: 2 + 1 words, pills wrapping, line y varying)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V19",
+  "browser": true,
+  "fail": {
+   "commit": "8c9034bb",
+   "state": "lf-vocab critic r3 FAIL head (r5 start), 2026-11-08"
+  },
+  "pass": {
+   "commit": "6cec18b7",
+   "state": "lf-vocab r5 fix"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V19",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v16-base10-per-item",
+  "check": "Base-ten one / ten print a >= 5 mm unit when no hundred is in the item, one unit within an item (owner OQ-1; critic r4: a 2.5 mm \"one\" on grade 2)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V16",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V16",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-vocab-pick3-ea-s-critic",
+  "check": "1 picture, 3 words error analysis at S: 30.1-30.2 % empty while ws-empty-band passed (critic r4 #1); the critic-aligned band (--slot-ink off)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band --slot-ink off EB-BAND",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_pick3_words --roles error-analysis --sizes S --hosts none --slot-ink off",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v18-rendered-rows",
+  "check": "1 picture, 3 words Guided rows unequal at L, 377 / 290 px, measured on the rendered row boxes (critic r4 #2, 4th round)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V18",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V18",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v20-ea-s-height",
+  "check": "Match 3 error analysis at S drawn in L's 76 mm cell, 24-28 % empty (critic r4 #3): S cell <= 0.9 x L when its content is smaller",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V20",
+  "browser": true,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V20",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v17-printed-text",
+  "check": "\"number name\" offered with \"hundred\" while its picture prints \"three hundred forty-seven\" (critic r4 #4)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V17",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V17",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v21-referent",
+  "check": "The \"left\" picture marks what goes, not what stays (critic r4 #5): a declared referent carries the heavy mark",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V21",
+  "browser": false,
+  "fail": {
+   "commit": "90e2eee4",
+   "state": "lf-vocab critic r4 FAIL head (r6 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "4cb3fd66",
+   "state": "lf-vocab r6 fix, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V21",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v22-focal",
+  "check": "Owner R-1: every picture declares a focal part, drawn targetable on the key (single grey) and screen (hidden halo), never on the pupil page",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V22",
+  "browser": false,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v24-explain",
+  "check": "Owner R-2: every bank word has an explain naming its word, no notWith word, <= 14 words",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V24",
+  "browser": false,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "b4a249b6",
+   "state": "lf-vocab r7 build, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V24",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v23-v25-screen-feedback",
+  "check": "Owner R-1 / R-2: card-390 and worksheet-1280 highlight the focal part and the right word only after the answer; a wrong answer shows and speaks the right word's explanation once (not with sound off); pupil print pages byte-identical to 70cdbaf9",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V23 + V25",
+  "browser": true,
+  "fail": {
+   "commit": "70cdbaf9",
+   "state": "lf-vocab card with owner R-1 / R-2 (r7 start), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 build with the render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-v23-painted",
+  "check": "r7 render: the key painted the focal halo and the wrapped focal marks in the key ink, and the screen's yellow halo was repainted grey by the black-and-white ink pass; V23 measures the PAINTED colours",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V23",
+  "browser": true,
+  "fail": {
+   "commit": "b4a249b6",
+   "state": "lf-vocab r7 first build (key orange, screen halo grey), 2026-11-09"
+  },
+  "pass": {
+   "commit": "df31bcb3",
+   "state": "lf-vocab r7 render fixes, 2026-11-09"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V23,V25",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-o1-next-box-blue",
+  "check": "Owner O-1: the next answer box on the card, the worksheet and the quiz is the switch's blue ring (--mq-next-color) on white, flips to yellow by html.mq-next-yellow, a wrong box stays red, reduced motion is static, the current worksheet card has no yellow ring",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB1-NB5",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 start: the 2026-10-04 yellow next box, no switch"
+  },
+  "pass": {
+   "commit": "5d8fe328",
+   "state": "lf-vocab r8 step A: the O-1 switch"
+  },
+  "command": "node tests/scripts/ws-next-box.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v25plus-v26-v27",
+  "check": "critic r6 #1-#5: the Match 3 wrong line names the right LETTER and only the wrongly matched pictures glow, each letter lit; a pick3 wrong line carries box-wrong; after the explanation 'Here is how' never repeats it, has no first-letter rung or blank and names the word; every wrong worksheet card shows the same feedback blocks",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V25+ V26 V27",
+  "browser": true,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --browser --only V25,V26,V27",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v22plus-v24plus",
+  "check": "critic r6 #6, #7: the key's grey highlight never strokes a glyph or a dot (unstroked underlays); an explanation uses no hard word (figure(s), amount ...) and is at least 6 words",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V22+ V24+",
+  "browser": false,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V22,V24",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r8-v-ambig",
+  "check": "owner O-2 / O-3: every library picture and lesson-band picture declares alsoShows; a picture that could show another word of its bank, Match 3 cell or lesson band fails (the staircase step with column; the identify band's H T O beside ones and four cubes beside place)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG",
+  "browser": false,
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start (master merged): the r7 screen feedback, staircase step, 7 digit, H T O / four cubes band"
+  },
+  "pass": {
+   "commit": "3127258f",
+   "state": "lf-vocab r8 steps B + C"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-v26-preskills",
+  "check": "lf-vocab r9 item 1 (precritic render-gate / cell-checks): the Pre-skill check of a picture vocabulary task tests 1-2 picture vocabulary tasks at its grade or below (provider preSkills), never the Grade 6 definition-matching skills before it in data.js (legacy cells overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V26",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base: master pre-skill-check role offered for the vocab skills"
+  },
+  "pass": {
+   "commit": "6e140668",
+   "state": "lf-vocab r9 item 1"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V26",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-guided-s-set8",
+  "check": "lf-vocab r9 item 2 (precritic cell-checks): the Match 3 Guided page at S with vocabSet 8 gives every row one share (footprint evenRows), so no row of flat pictures is shorter than its cell draws",
+  "kind": "commit-pair",
+  "rule": "ws-grade-render --gate (guided S vocabSet 8)",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "002e071f",
+   "state": "lf-vocab r9 item 2"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-grade-render.cjs --skills vocabulary:vocab_grade_pictures --roles guided --size S --opts '{\"vocabSet\":8}' --gate --no-screen --out /tmp/mq-bt-guided-s8 | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-sections-density",
+  "check": "lf-vocab r9 item 3 (precritic print-lint-sections S / L): a two-skill Sections sheet of Match 3 + 1 picture 3 words never prints one Match 3 alone on a page (DN-2, LONE, PAGEFILL): Match 3 takes whole rows of a shared page (footprint wholeRows, print-sheet.js shareRows)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint --kind sections L-DENSITY",
+  "browser": true,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "bbd73b28",
+   "state": "lf-vocab r9 item 3"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-print-lint.cjs --source kit --kind sections --pages 2 --size S --lints L-DENSITY --skills vocabulary:vocab_grade_pictures,vocabulary:vocab_pick3_words | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-gdpcap",
+  "check": "lf-vocab r9 item 3b (precritic ws-empty-band EB-GDPCAP, master's rule): the Match 3 Guided page holds at most the 10 / 8 / 6 scored tries (3 a cell) plus the Model at S / M / L",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-GDPCAP",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master d34311d5 merge (EB-GDPCAP arrived with it)"
+  },
+  "pass": {
+   "commit": "b28f3960",
+   "state": "lf-vocab r9 item 3b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-empty-band.cjs --skill vocabulary:vocab_grade_pictures --only EB-GDPCAP | tail -1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-nb6-quiz-red",
+  "check": "lf-vocab r9 item 4: critic r7 #1: the quiz, Match 3 answered wrong (instant feedback) - every wrong letter box red, none with the blue next ring",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB6",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+  },
+  "pass": {
+   "commit": "69564628",
+   "state": "lf-vocab r9 items 4 + 4b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB6 ' && echo 'nb6: FAIL' || echo 'nb6: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-nb7-pick3-line",
+  "check": "lf-vocab r9 item 4b: lead default for critic r7 note 2: the pick3 answer line carries the next outline before an answer on card / worksheet / quiz, none after a tap",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB7",
+  "browser": true,
+  "fail": {
+   "commit": "7e09577a",
+   "state": "lf-vocab r9 after the master merge (before items 4 / 4b)"
+  },
+  "pass": {
+   "commit": "69564628",
+   "state": "lf-vocab r9 items 4 + 4b"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB7 ' && echo 'nb7: FAIL' || echo 'nb7: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r9-v-ambig-plus",
+  "check": "lf-vocab r9 item 5: critic r7 #6 (O-3): alsoShows derived from each picture's drawing; every same-grade pair compatible() allows fails",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "b52eb44c",
+   "state": "lf-vocab r9 items 5 + 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\)\" picture reads as \"\\(pattern\\|multiple\\)\"\\|the \"array\" picture reads as \"\\(row\\|column\\)\"' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: V-AMBIG+ (the derived-rule list) was replaced by V-FEAT; the row judges the same r7 cases through V-FEAT"
+ },
+ {
+  "id": "vocab-r9-v27-minors",
+  "check": "lf-vocab r9 item 6: critic r7 #3-#5: no two key dot underlays overlap (one per group); the pick3 'Here is how' uses the screen verb (Tap); no broken comparison in an explanation",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V27",
+  "browser": false,
+  "fail": {
+   "commit": "3d90097d",
+   "state": "lf-vocab r8 base"
+  },
+  "pass": {
+   "commit": "b52eb44c",
+   "state": "lf-vocab r9 items 5 + 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V27",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-minitems-answers",
+  "check": "lead ruling 2026-11-12 (precritic vocab-unit): the Guided MIN_ITEMS counts SCORED ANSWERS per cell (footprint points, the EB-GDPCAP count), so the Match 3 Guided page at L (Model + ONE try = 3 answers) meets 'Model + 3 tries'; a single-answer page still needs the Model + 3 tries",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V28",
+  "browser": false,
+  "fail": {
+   "commit": "08d0a5ce",
+   "state": "lf-vocab r9 base: MIN_ITEMS counts cells, Match 3 Guided L = Model + 1 try held short"
+  },
+  "pass": {
+   "commit": "d7f708a0",
+   "state": "guided.js minMet counts answers"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V28",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-rule-machine",
+  "check": "lf-vocab r10 item 1: critic r9 #2: a picture with an arrow into and out of a box and a number at both ends (2 -> [+3] -> 5) derives input and output; rule may not share a bank with them",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+ (function machine)",
+  "browser": false,
+  "fail": {
+   "commit": "605fa9f0",
+   "state": "lf-vocab r10 base (r9 + master merge): rule drawn 2 -> [+3] -> 5"
+  },
+  "pass": {
+   "commit": "0c3d4c59",
+   "state": "rule drawn as the box and arrows only"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"rule\" picture reads as \"\\(input\\|output\\)\"' && echo 'rule-machine: FAIL' || echo 'rule-machine: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
+ },
+ {
+  "id": "vocab-r10-cycle-loop",
+  "check": "lf-vocab r10 item 2: critic r9 #3: a loop of three or more numbers derives sequence and pattern; cycle may not share a bank with sequence",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-AMBIG+ (loop of numbers)",
+  "browser": false,
+  "fail": {
+   "commit": "0c3d4c59",
+   "state": "cycle drawn as a 2, 4, 8, 6 ring"
+  },
+  "pass": {
+   "commit": "856aba09",
+   "state": "cycle drawn as a loop of four shapes"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"cycle\" picture reads as' && echo 'cycle-loop: FAIL' || echo 'cycle-loop: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "note": "r11: judged through V-FEAT (V-AMBIG+ removed)"
+ },
+ {
+  "id": "vocab-r10-v-fit",
+  "check": "lf-vocab r10 items 3 + 5: critic r9 #4 (rule 5 root cause): every core word's picture teaches its set's standard (ccss / op); total's additive 5 + 3 bar fails the 4.OA.A.1 times-as-many core",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FIT",
+  "browser": false,
+  "fail": {
+   "commit": "6ae462d1",
+   "state": "lf-vocab r9: times as many = times as many, total, factor, ..."
+  },
+  "pass": {
+   "commit": "4200e2c0",
+   "state": "times as many = times as many, factor, product, compare, multiple, unknown"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-v-fit6",
+  "check": "lf-vocab r10 item 4: critic r9 #5: a set's other words teach its standard too (pinned misfits apart): output (input-output tables) in follow a rule and total (additive bar) in growing patterns fail",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FIT6",
+  "browser": false,
+  "fail": {
+   "commit": "4200e2c0",
+   "state": "r9 sets 7 / 8 with total and output"
+  },
+  "pass": {
+   "commit": "6adc77cb",
+   "state": "growing patterns takes odd, follow a rule takes grow"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-vocab-unit.mjs --only V-FIT6",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-nb8-wrong-focus-tick",
+  "check": "lf-vocab r10 item 6: critic r9 #1: a focused wrong Match 3 letter box keeps its red dashed edge and no next ring (worksheet); the quiz right box is green with the card's tick badge, wrong boxes their cross",
+  "kind": "commit-pair",
+  "rule": "ws-next-box NB8",
+  "browser": true,
+  "fail": {
+   "commit": "b502c983",
+   "state": "lf-vocab r10 before item 6"
+  },
+  "pass": {
+   "commit": "bae5c32e",
+   "state": "lf-vocab r10 item 6"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB8 ' && echo 'nb8: FAIL' || echo 'nb8: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r10-lesson-render",
+  "check": "lf-vocab r10 item 7: critic r9 #6: a lesson render handed to a critic carries the NAMED lesson's title and a body that is not nearly empty, and its vocabulary band holds ink",
+  "kind": "fixture",
+  "rule": "ws-lesson-render LR-TITLE / LR-BODY / LR-BAND",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/lesson-render.fail.html",
+   "state": "the r9 evidence: another lesson's page (expand, 'I Can write a number in expanded form') with an empty body, judged as placevalue:identify"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/lesson-render.pass.html",
+   "state": "the placevalue:identify lesson's band page"
+  },
+  "command": "node tests/scripts/ws-lesson-render.cjs --lesson placevalue:identify --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r7-row-pattern",
+  "check": "V-FEAT: the r7 look-alikes (row / column read as pattern and multiple; array as row / column) are clashes: critic r7 #6",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "d17f8d6a",
+   "state": "lf-vocab r8 start: row, column, array dealt with pattern / multiple / row"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "V-FEAT, the r11 notWith and redraws"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(row\\|column\\|array\\)\" picture reads as' && echo 'r7-lookalikes: FAIL' || echo 'r7-lookalikes: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r9-rule-cycle",
+  "check": "V-FEAT: the r9 cases, rule (2 -> [+3] -> 5) read as input / output and cycle (2, 4, 8, 6 ring) as sequence: critic r9 #2, #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "6ae462d1",
+   "state": "lf-vocab r9 head"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "V-FEAT"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(rule\\|cycle\\)\" picture reads as \"\\(input\\|output\\|sequence\\)\"' && echo 'r9-rule-cycle: FAIL' || echo 'r9-rule-cycle: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-feat-r10-term",
+  "check": "V-FEAT: the r10 cases, term / first term (4, [7], 10 / [3], 7, 11) read as grow and term as rule: critic r10 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r11 item 1)",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "718740e4",
+   "state": "term 18, [14], 10 and first term [30], 25, 20"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'the \"\\(term\\|first term\\)\" picture reads as \"\\(grow\\|rule\\)\"' && echo 'r10-term: FAIL' || echo 'r10-term: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-hatch",
+  "check": "V-HATCH / V7: a set whose words cannot split into two clash-free trios is legal once a word is dropped from its PICTURE items (noPicture), instead of one more redraw (lead ruling, lf-vocab r11 item 2)",
+  "kind": "fixture",
+  "rule": "vocab-words.js pictureWords; ws-vocab-unit V6 / V7 / V5 judge the picture words, V-HATCH: a noPicture word is never drawn",
+  "fail": {
+   "fixture": "tests/fixtures/precritic/vocab-hatch.fail.mjs",
+   "state": "term, first term and rule mutually notWith in one set, no hatch"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/vocab-hatch.pass.mjs",
+   "state": "the same set with noPicture: ['first term']"
+  },
+  "command": "node tests/scripts/ws-vocab-unit.mjs --fixture {fixture} --only V7",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-vref",
+  "check": "V-REF: every mark a wrong-answer explanation points at is drawn in its own picture and in no picture dealt with it: critic r10 R-2 #2 (cycle's 'ones digits' beside shapes), #3 (unknown's 'the one in the box' beside factor's boxed 4 and 3)",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-REF (lf-vocab r11 item 3)",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "7c8fee58",
+   "state": "cycle and unknown explains reworded; factor / divisor / dividend / first term point at boxed marks"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-REF 2>&1 | grep -q '\"cycle\": its explanation points at \"ones digits\"\\|\"unknown\".s explanation points at \"the one in the box\", and the \"factor\"' && echo 'vref: FAIL' || echo 'vref: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r11-nb9-blur",
+  "check": "NB9: after Check on the worksheet, the active element is not a vocab slot (no caret in a red box): critic r10 Match 3 #4",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "screen-cell.js markVocabFeedback blurs the vocab slots; ws-next-box NB9",
+  "fail": {
+   "commit": "03eddcc2",
+   "state": "lf-vocab r10 head"
+  },
+  "pass": {
+   "commit": "7c8fee58",
+   "state": "Check blurs the vocab slots"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-vstd-product-multiple",
+  "check": "V-STD: a set's standards text (3.OA.C.7 / 4.OA.B.4) names product and multiple together, and the product picture reads as multiple: critic r11 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-STD (lf-vocab r12 item 1)",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "fe6dfdaa",
+   "state": "product / multiple notWith; sets 0 and 6 re-picked"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-STD 2>&1 | grep -q 'V-STD .*\"product\" and \"multiple\"\\|V-STD .*\"multiple\" and \"product\"' && echo 'vstd: FAIL' || echo 'vstd: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-feat-term-rule",
+  "check": "V-AMBIG: the term picture (18, [14], 10) could also show the rule 'take 4', and the two may share a bank: critic r11 #3",
+  "kind": "commit-pair",
+  "rule": "vocab-pictures.js VOCAB_ALSO_SHOWS term +rule; term / rule notWith",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "b3d5d9f4",
+   "state": "term / rule notWith; set 7 re-picked"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-AMBIG 2>&1 | grep -q 'V-AMBIG \"term\": its picture could also show \"rule\"' && echo 'termrule: FAIL' || echo 'termrule: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r12-nb9-every-card",
+  "check": "NB9: on the Match 3 worksheet, every card focused in turn, and the card: after Check no vocab slot holds the focus and no wrong slot shows a caret: critic r11 #4",
+  "kind": "commit-pair",
+  "browser": true,
+  "rule": "screen-cell.js blurVocabSlots + caret-color transparent; ws-next-box NB9",
+  "fail": {
+   "commit": "8d955045",
+   "state": "lf-vocab r11 head"
+  },
+  "pass": {
+   "commit": "20f00492",
+   "state": "Check blurs every vocab slot; wrong slots have no caret"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-next-box.cjs 2>&1 | grep -q ' - NB9 ' && echo 'nb9: FAIL' || echo 'nb9: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-v7all",
+  "check": "V7-ALL: every bank a set can deal is judged; set 0 deals row with even, sets 7/8 first term with rule: critic r12 root cause",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V7-ALL (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "pick3 deals only vetted trios"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V7-ALL 2>&1 | grep -q 'V7-ALL set \\(0\\|7\\) ' && echo 'v7-all: FAIL' || echo 'v7-all: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-vnum",
+  "check": "V-NUM: the row picture rings 2, 4, 6, 8 (all even) and is dealt with even: critic r12 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-NUM (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "row rings 3, 6, 9, 12"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"row\"' && echo 'v-num: FAIL' || echo 'v-num: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-feat-product-row",
+  "check": "V-FEAT: a times table reads as product, row/column dealt with product: critic r12 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-FEAT (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "product notWith row, column; set 0 product -> factor"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-FEAT 2>&1 | grep -q 'V-FEAT .*\"row\" picture reads as \"product\"' && echo 'v-feat: FAIL' || echo 'v-feat: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r13-vtwin",
+  "check": "V-TWIN: term and first term draw one feature class, only term notWith rule: critic r12 #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-TWIN (lf-vocab r13)",
+  "fail": {
+   "commit": "a35dbd72",
+   "state": "lf-vocab r12 head"
+  },
+  "pass": {
+   "commit": "86c844fd",
+   "state": "first term notWith rule"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*first term' && echo 'v-twin: FAIL' || echo 'v-twin: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vnum-one",
+  "check": "V-NUM one mark: a single ringed or boxed number is a parity feature; ones digit 47[3] dealt with odd in set 8: critic r13 #1",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-NUM (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "8506cbaa",
+   "state": "ones digit boxes 47[6]; even / product, odd / quotient, odd / dividend notWith"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-NUM 2>&1 | grep -q 'V-NUM .*\"ones digit\".*one mark' && echo 'v-num-one: FAIL' || echo 'v-num-one: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vplace",
+  "check": "V-PLACE: a ringed or boxed digit inside a number reads as one / ten / hundred; digit 4(7)2 dealt with ten in set 5: critic r13 #2",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-PLACE (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "b57960c6",
+   "state": "digit notWith one, ten, hundred"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-PLACE 2>&1 | grep -q 'V-PLACE .*\"digit\"' && echo 'v-place: FAIL' || echo 'v-place: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-vtwin-run",
+  "check": "V-TWIN run: every run picture (grow's 1, 3, 5 squares read from its drawing) reads as rule; grow dealt with rule in sets 7 and 8: critic r13 #3",
+  "kind": "commit-pair",
+  "rule": "ws-vocab-unit V-TWIN (lf-vocab r14)",
+  "fail": {
+   "commit": "905528f2",
+   "state": "lf-vocab r13 head"
+  },
+  "pass": {
+   "commit": "2e8a59a3",
+   "state": "grow / rule, sequence / rule notWith"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && (node tests/scripts/ws-vocab-unit.mjs --only V-TWIN 2>&1 | grep -q 'V-TWIN .*\"grow\" draws a run' && echo 'v-twin-run: FAIL' || echo 'v-twin-run: OK')",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-sis-pick3",
+  "check": "pick3 screen twin draws equal groups' rings and dots at 81 % of print (card 390 / 820 / 1280)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+  "browser": true,
+  "fail": {
+   "commit": "9c83c24f",
+   "state": "lf-vocab r14 status head"
+  },
+  "pass": {
+   "commit": "75b0e131",
+   "state": "twin fits the paper box, printFloor"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "vocab-r14-sis-match3-tile",
+  "check": "Match 3 online worksheet draws the row / column table cells at 94 % of print",
+  "kind": "commit-pair",
+  "rule": "ws-screen-ink-size SIZE-INK (lf-vocab r14)",
+  "browser": true,
+  "fail": {
+   "commit": "9c83c24f",
+   "state": "lf-vocab r14 status head"
+  },
+  "pass": {
+   "commit": "75b0e131",
+   "state": "worksheet picture slot 104 px"
+  },
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-overflow-stack",
+  "check": "Reason It A / B work never leaves its cell: work wider than half the room stands A over B (lead ruling 2026-11-13; word-stories critic r1 F2, compare F1)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "b25479c5",
+   "state": "34 OVERFLOW on sub/add_word_problems + sub_1m_no_regroup RI S/M/L"
+  },
+  "pass": {
+   "commit": "244a84b6",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_word_problems,subtraction:sub_1m_no_regroup --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "guided-tight-rows",
+  "check": "a Guided page of tightRows (in-place) items keeps each row at its measured height: no 30 % band under the ink (RUBRIC H13; lf-placevalue compare precritic r2 via the lead)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on guided",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "EB-BAND 2 on expand / unit_form / combine guided"
+  },
+  "pass": {
+   "commit": "8307219c",
+   "state": "EB-BAND PASS"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:expand,placevalue:unit_form,placevalue:combine --roles guided --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-one-answer",
+  "check": "a Reason It item asks for the answer once: circle A or B, 'The answer is __.' (lead ruling F8, PT-RSN-4)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-ONEANSWER",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'__ is correct.' + ri-who on every item"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-ONEANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-layout",
+  "check": "Reason It work within half the cell keeps A and B side by side over a full-width response row; only wider work stacks, from the top (critic r6c D1 / D3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "85 mm work stacked (one item a page)"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell",
+  "check": "a word answer's line is one width whatever the word (no tell; holds 'hundreds')",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'no' 2 digits, 'yes' 6"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "key-fit",
+  "check": "a key's written answer stays inside its slot (identify's 'hundreds' on a 2-digit line)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks KEYFIT",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "KEYFIT on identify RI S/M/L, TF"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:identify --roles reason-it,true-false --size S,M,L --rules KEYFIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "lone-page",
+  "check": "a role page never holds ONE item where its ceiling is 2+ (H5; critic r6c / r6d D1: a Grade 2 story one a sheet)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks LONE-PAGE",
+  "browser": true,
+  "fail": {
+   "commit": "df83248e",
+   "state": "sub_word_problems RI L 1 item"
+  },
+  "pass": {
+   "commit": "faeb7759",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems,addition:add_wp_10 --roles reason-it --size L --rules LONE-PAGE",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell-number",
+  "check": "a number answer line holds the longer of the right and the wrong answer (critic r6d E1)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "df83248e",
+   "state": "29 against 141: a 2-digit line"
+  },
+  "pass": {
+   "commit": "c42f7504",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-countrow-overflow",
+  "check": "a Reason It count-row train never leaves its A / B panel (lf-algebra critic r2 G4 area; npr overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "c5235768",
+   "state": "npr RI OVERFLOW 18"
+  },
+  "pass": {
+   "commit": "7b33c7e3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-stack-band",
+  "check": "a stacked Reason It pair leaves no 30 % band under its work: the A / B tag stands in a gutter at S / M (critic r6f F1, H13)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "39213c4b",
+   "state": "npr RI S: 33 % under each cell"
+  },
+  "pass": {
+   "commit": "87b0c18c",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill patterns:number_patterns_rule --roles reason-it --hosts none --no-baseline --only EB-BAND",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-ink-inner",
+  "check": "Reason It holds a true ink width (inkWMm) to the panel's inner width: 61 mm of compare ink goes under, not beside (lf-placevalue 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "d8baca1e",
+   "state": "61.2 mm ink laid out beside a 57.5 mm panel"
+  },
+  "pass": {
+   "commit": "8d757936",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-band",
+  "check": "ws-empty-band EB-BAND: an empty band of >= 30 % of the cell under the ink fails, a cell sized to its item passes (the shared check of LESSONS_LEARNED L25; the real-head rows are in backtests-empty-band.json, pending each lane's fix)",
+  "kind": "fixture",
+  "rule": "ws-empty-band --html (measureCells + judge on a saved page)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/fail.html",
+   "state": "seeded: two 60 mm fact cells, ink ends at ~30 mm (45 % band)"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-svg-black",
+  "check": "ws-empty-band reads black SVG ink (critic eb-r2 D7: rgb(0, 0, 0) was classed as transparent, so a black array drawing read as a 60 % band and the pin was inflated): a black drawing with ~44 mm empty under it FAILS, the same drawing filling its cell passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band measureCells paints() + EB-BAND",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/svg-black.fail.html",
+   "state": "seeded: black SVG array + answer box in a 100 mm cell"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/svg-black.pass.html",
+   "state": "the same in a 60 mm cell (FAILED before the D7 fix: band read \"above\" the invisible drawing)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "mc-make-a-ten-choice",
+  "check": "content-audit MC-ALL P-29: a Make a Ten CHOICE item prints its four choices on paper (it printed the written Step 1-3 scaffold while the screen offered buttons; new pair algebra_mixed:algebraic_all [make-a-ten/multiple-choice] on master d34311d5)",
+  "kind": "commit-pair",
+  "rule": "ws-content-audit --mc-all (P-29 / RM-P-01)",
+  "browser": true,
+  "fail": {
+   "commit": "d34311d5",
+   "state": "master: 1 new (skill, kind) pair, algebraic_all make-a-ten/multiple-choice"
+  },
+  "pass": {
+   "commit": "b4095bd5",
+   "state": "print-generate make-a-ten prints the choices of a multiple-choice item"
+  },
+  "command": "node tests/scripts/ws-content-audit.cjs --mc-all --category algebra_mixed --skill algebraic_all",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-padding-leading",
+  "check": "ws-empty-band EB-BAND reads the visible band (border box or pixels), not padding box to line box",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (critic eb-r3 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/padding-leading.fail.html",
+   "state": "60 mm cell, padding-bottom 25 mm, line-height 2: the tool reads 28.5 %, the visible band is over 65 % (before the pixel read); the pixels read 73 %"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": false
+ },
+ {
+  "id": "eb-fixture-blank-cell",
+  "check": "ws-empty-band EB-READ: a kit cell with no ink fails (never dropped)",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-READ (critic eb-r2 D7, eb-r3 D2)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/blank-cell.fail.html",
+   "state": "one good cell beside a blank cell: the tool reads OK (before the D2 fix); now EB-READ \"cell 2 has no ink\""
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "every cell inked"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": false
+ },
+ {
+  "id": "eb-fixture-band-above",
+  "check": "ws-empty-band EB-BAND reads the band ABOVE the ink (critic eb-r3 D5: no row held it): ink at the bottom of a 50 mm cell with ~40 % empty above fails, a cell sized to its item passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (above) (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/above.fail.html",
+   "state": "seeded: two 50 mm fact cells, the fact and its answer box at the bottom: 20.4 mm (41 %) above the ink"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-band-between",
+  "check": "ws-empty-band EB-BAND reads the band BETWEEN two blocks of ink (critic eb-r3 D5): the fact at the top and its answer box at the bottom of a 50 mm cell, ~39 % between them, fails",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (between) (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/between.fail.html",
+   "state": "seeded: two 50 mm fact cells, 19.3 mm (39 %) between the fact and its answer box"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-screen-side",
+  "check": "ws-empty-band EB-SIDE on a SCREEN cell (.mq-scell in #gameView): content pinned to one side of the card fails; the same content centred (a wide, even margin) passes (critic eb-r3 D5)",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (screen) (critic eb-r3 D5)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.fail.html",
+   "state": "seeded: a 160 mm practice-card cell, the fact and its box pinned left: 103 mm (65 %) empty on the right"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred: about 53 mm each side, not pinned"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-screen-slot",
+  "check": "ws-empty-band reads a SCREEN answer slot by what it draws (critic eb-r4 D1, lead ruling 2026-11-13 (a)): its inked edges plus one written digit (Hw = 0.75 x its font size), never its whole touch box. A centred one-line problem whose answer is a 48 px underline-only input (data-ws-slot kept) in a 140 px online-worksheet cell FAILS; the same input drawn at the digit height, the touch target kept as transparent padding outside the drawn box, in a cell sized to its content, passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (screen slot) (critic eb-r4 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-slot.fail.html",
+   "state": "seeded: 140 px .mq-scell in #worksheetView, \"970 = ___ tens 0 ones\" centred, the 48 px input draws only its 2 px underline: 12.1 mm (32.6 %) above the ink beyond the 3 mm top pad"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-slot.pass.html",
+   "state": "the input drawn at 1.15em with its underline at the foot, 48 px touch target as padding pulled out by a negative margin (css/screen-cell.css kit LINE slot rule); the cell sized to its content"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-toppad-real-band",
+  "check": "ws-empty-band takes the kit's mandatory top pad (CL-40: 3 mm, or the label side + 1 mm) off the band above the ink (lead ruling 2026-11-13 on critic eb-r4's minor), and a real band beyond the pad is still caught: two 56 mm fact cells with a 7 mm top pad and the fact at the bottom FAIL (36 % beyond the pad); cells sized to their items pass",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (top pad) (critic eb-r4 minor)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/toppad.fail.html",
+   "state": "seeded: 56 mm cells, 6 mm tab, padding-top 7 mm, ink at the bottom: 20.3 mm (36.3 %) above the ink beyond the 7 mm pad"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/pass.html",
+   "state": "the same items in 36 mm cells"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-wsheet-cl4b-stretch",
+  "check": "placevalue:unit_form on the online-worksheet host at every option variant (rename=more): no tile has an empty band of 30 % or more above, between or under its ink; a cell its row stretches >= 30 % is centred (CL-4b amended 2026-11-12) and the 48 px host input that takes the kit slot reads as the slot (data-ws-slot)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-BAND on host:worksheet (CL-4b amended)",
+  "browser": true,
+  "fail": {
+   "commit": "35df47d7",
+   "state": "EB-BAND 3 on worksheet 1280px {rename: more}: 36.6 / 46.3 % above (82 px cells), 46.3 % under a stretched cell"
+  },
+  "pass": {
+   "commit": "990e66a8",
+   "state": "kit line slot drawn at digit height (0f1a0bda) + the bordered box capped at its row only while content fills >= 78 % (c3, lead 2026-11-13)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill placevalue:unit_form --roles none --hosts worksheet --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-gridcols-patterns",
+  "check": "ws-empty-band EB-FOOT pairs each cell with the measure of the grid that lays it (a full-width problem in its own 1-column grid at 1 column; a lone last-row cell of a 2-column grid at 2)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "lf-algebra head before 2a7e74b9",
+   "state": "pattern_features independent M: 5 EB-FOOT, 3 of them full-width cells paired with the 2-column measure"
+  },
+  "pass": {
+   "commit": "lf-algebra 2a7e74b9 with this tool",
+   "state": "EB-FOOT 2 (the notice cell's own measure, lf-algebra's)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill <cat>:pattern_features --roles independent --sizes M --only EB-FOOT --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "FAIL"
+  },
+  "pending": true,
+  "pendingReason": "pattern_features lives only on lf-algebra's branch; arm on its merge with real commits (the pairing rule itself is in --self-test 'EB-FOOT columns'; since eb-r5 m1 EB-FOOT pairs each cell by the kit's data-eb-item, so a reordered page no longer pairs by position; still not on master 8a7c5d43)"
+ },
+ {
+  "id": "eb-fixture-faint-slot",
+  "check": "ws-empty-band counts a SCREEN slot's edge as drawn only when it is darker than the 225 pixel ink threshold (critic eb-r5 D1, probe p3): a 150 px input with a 1 px #eee closed border in a 200 px online-worksheet cell, \"970 =\" at the foot, FAILS EB-BAND; the same box drawn in black (a real writing box) passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-BAND (faint slot edge) (critic eb-r5 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/faint-slot.fail.html",
+   "state": "seeded: the #eee box read as one 150 px block of ink (OK at 3cea85a7); read as one written digit, 18.5 mm (35.0 %) between the blocks"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/faint-slot.pass.html",
+   "state": "the same box with a 1 px #000 border: a drawn closed box is the writing room"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-unit-form",
+  "check": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, legibility): the focused kit LINE slot's focus ring keeps >= 4 px from the nearest word beside it (placevalue:unit_form rename=more, online worksheet)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2)",
+  "browser": true,
+  "fail": {
+   "commit": "0f1a0bda",
+   "state": "the LINE slot's negative side margin pulls \"tens\" under the ring: 0.5 px (worksheet items 1 and 3)"
+  },
+  "pass": {
+   "commit": "2af22377",
+   "state": "additive css/screen-cell.css: each side margin leaves ring + offset + 4 px (9 px) beyond the drawn box"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills placevalue:unit_form --opts '{\"rename\":\"more\"}' --hosts worksheet --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fonts-late",
+  "check": "Font-load race (lf-engine 2026-11-13, ws-detailed-lesson E2 flakes on g2-nbt3 / g3-oa8 / g4-nbt1): a gate checks Andika only after loading it (tests/lib/ws-fonts.cjs, 3 tries over ~10 s, then fonts.ready)",
+  "kind": "commit-pair",
+  "rule": "ws-fonts awaitFonts (ws-detailed-lesson E2, ws-print-lint L-FONT, ws-grade-render, ws-pdf-preview, ws-touchdots-raster)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture} --old",
+   "state": "the old one-shot document.fonts.check after networkidle0 + fonts.ready, on a page whose Andika arrives 2.5 s late: a false page FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+   "state": "the same page through awaitFonts: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "fonts-never",
+  "check": "A declared web font that never arrives is an environment ERROR, never a page FAIL (tests/lib/ws-fonts.cjs)",
+  "kind": "fixture",
+  "rule": "ws-fonts isEnvError",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/fonts-never.html",
+   "state": "Andika declared, its woff2 files 404: ERROR (exit 2), not FAIL"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/fonts-late.html",
+   "state": "Andika arrives late: OK"
+  },
+  "command": "node tests/lib/ws-fonts.cjs --probe {fixture}",
+  "expect": {
+   "fail": "ERROR(2)",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-cellslot-ws",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): on the online worksheet a boxed cell slot (input.mq-cellslot inside its [data-mq-cell] box) keeps its inset ring, >= 4 px from the word beside it (arrays_groups, function_table_hard, elapsed_find_duration)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the worksheet host's input:focus rule (offset 1 px) outranks the cell slot's inset ring: -0.2 px to \"groups of\", 1.4 px to \"n\", 3.3 px to \"h\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: the cell slot's -4 px offset holds on the worksheet host"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups,algebra:function_table_hard,measurement:elapsed_find_duration --hosts worksheet --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "sa-focus-gap-ibcell-card",
+  "check": "ws-screen-answer FOCUS-GAP --focus-gap-all (lead 11-13): the inline-blanks box (input.ib-cell, practice card) thickens inward on focus, its ring >= 4 px from the word beside it (multiplication:arrays_groups)",
+  "kind": "commit-pair",
+  "rule": "ws-screen-answer FOCUS-GAP (critic eb-r5 D2, every box)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "the ib-cell ring sits 4 px outside a box with a 6 px margin: 2 px to \"rows of\" / \"make\""
+  },
+  "pass": {
+   "commit": "2a25a4c58",
+   "state": "additive css/screen-cell.css: outline-offset -3 px on the focused ib-cell"
+  },
+  "command": "node tests/scripts/ws-screen-answer.cjs --skills multiplication:arrays_groups --hosts card --focus-gap-all --no-live",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-foot-review-add-facts",
+  "check": "ws-empty-band EB-FOOT on every cell of a grid-role page, against the items it holds (data-eb-item; lead ruling 2026-11-13): a Review that deals 28 and draws 16, with a Mixed Review band, is judged cell by cell",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (widened scope, lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "addition:add_facts review S/M/L: 12 EB-FOOT, cells drawn 17-23 % over their own items' footprints (12.5/15/16 mm drawn 14.6/18.2/19.7 mm)"
+  },
+  "pass": {
+   "commit": "the lf-ops fix of the add_facts review cells",
+   "state": "EB-FOOT 0 on add_facts review"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles review --hosts none --only EB-FOOT --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": true,
+  "pendingReason": "no commit has fixed the add_facts review footprints yet (routed to lf-ops, pinned facts debt); arm with lf-ops' fix commit. The widened pairing itself is in --self-test 'EB-FOOT pairing' (15 cases: a Review dealing 4 / drawing 2, two sections at their own column counts, a multi-item cell with and without a bridge measure, an unindexed cell)"
+ },
+ {
+  "id": "eb-fixture-wide-slot-faint",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q5): a practice card with its content pinned left plus a 95 mm input with a 1 px #eee border to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-faint.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "eb-fixture-wide-slot-invisible",
+  "check": "ws-empty-band counts a SCREEN slot as ink across its WIDTH only where it draws a dark (< 225) top / bottom line or side edge; otherwise as one written digit at its text start (critic eb-r6 D1, probe q6): a practice card with its content pinned left plus a 95 mm borderless white input to the right of the answer box FAILS EB-SIDE (about 97 mm, 61 %); the same content centred passes",
+  "kind": "fixture",
+  "rule": "ws-empty-band EB-SIDE (slot width) (critic eb-r6 D1)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/empty-band/wide-slot-invisible.fail.html",
+   "state": "seeded: OK at 8dc176e6 (the slot's whole 95 mm width read as ink, proven with that tree's tool 2026-11-13); FAIL EB-SIDE after the fix"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/empty-band/screen-side.pass.html",
+   "state": "the same content centred in the card"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --html {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "screen-digit-npr-worksheet",
+  "check": "ws-screen-slots SCREEN-DIGIT on precritic's default --skill path: screen digits >= 40 / 48 / 56 px at 390 / 820 / 1280 on every host",
+  "kind": "commit-pair",
+  "rule": "ws-screen-slots SCREEN-DIGIT (default since lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8d7343c0f",
+   "state": "lf-ops-props: patterns:number_patterns_rule worksheet digits at 29 px (one --mq-digit per sheet, worksheet.js:1052); count_by_tables arcs train 26-29 px"
+  },
+  "pass": {
+   "commit": "TBD-lf-ops-npr-digits",
+   "state": "lf-ops' fix (pass commit to come)"
+  },
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-dropped-row",
+  "check": "ws-precritic-plan --checks-from-critics: a deploy tree never DROPS a backtest row id the baseline (origin/master, or --rows-before) held; blocks always, whatever the ledger's warning date",
+  "kind": "fixture",
+  "rule": "ws-precritic-plan no-dropped-row (lead 2026-11-13, lf-ops: 7 div_facts rows lost in a deploy cherry-pick)",
+  "browser": false,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/no-dropped-row/fail.json",
+   "state": "the baseline holds a row id this tree lacks"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/no-dropped-row/pass.json",
+   "state": "every baseline id is in this tree"
+  },
+  "command": "node tests/scripts/ws-precritic-plan.mjs --checks-from-critics --skills zz_probe:zz_no_such_skill_q7 --rows-before {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
   {
    "id": "partopts-f1-sheet-foot",
    "check": "A lower part count may not leave the lesson sheet's foot blank: EB-PAGE absolute on EVERY page, last pages included (critic A r1 F1: 23-77 % empty feet)",
@@ -3746,5 +6404,5 @@
     "pass": "OK"
    }
   }
- ]
+]
 }

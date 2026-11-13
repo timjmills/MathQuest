@@ -31,6 +31,7 @@ import * as practice from './practice.js';
 import * as mixed from './mixed.js';
 import * as common from './common.js';
 import { PREREQ_CHECK_TITLE } from '../roles/pre-skill-check.js';
+import { VOCAB_PAGE_PART } from './vocab-pages.js';
 
 export { chart, vocab, warmUp, weDo, practice, mixed, common };
 
@@ -81,6 +82,8 @@ registerLessonPart({ core: true, id: 'chart', order: 10, role: 'lesson', name: '
 registerLessonPart({ core: true, id: 'sheet', order: 20, role: 'lesson', name: 'Lesson', sheet: 'lesson-sheet', offset: 0 });
 registerLessonPart({ core: true, id: 'practice', order: 30, role: 'independent', name: 'Practice', sheet: 'lesson-practice', offset: 7919, inPacket: (n) => n.practicePages > 0 });
 registerLessonPart({ core: true, id: 'mixed', order: 40, role: 'mixed-practice', name: 'Mixed', sheet: 'lesson-mixed', offset: 15838, inPacket: (n) => !!n.mixed });
+// The vocabulary page that opens a lesson (lane lf-vocab, the vocabulary redesign): only a lesson whose record names a `vocabSet`.
+registerLessonPart(VOCAB_PAGE_PART);
 
 /**
  * Build the PLUGGED parts of a packet (every registered part that is not core), in packet order (critic r1 D18): a part's

@@ -13,6 +13,8 @@
 //   node tests/scripts/ws-cell-checks.cjs --skills k --roles reason-it,test --size S,L --opts '{"forms":[1]}'
 //   node tests/scripts/ws-cell-checks.cjs --rules OVERFLOW,TAGINK   # only these rules count
 //   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --h13-abs [--rule-skills k]   # + H13-ABS on option pages (opt-in, N6)
+//   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --words-rules [--rule-skills k]  # + the number-name rules
+//                                          CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y (opt-in, critic nwf r1)
 //   node tests/scripts/ws-cell-checks.cjs --self-test              # planted pages, each rule must fire / stay quiet
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows); the card plan is read from that tree.
 // Last line `ws-cell-checks: OK (...)` / `FAIL - n finding(s) ...`; exit 1 on FAIL (--report-only: 0).
@@ -21,19 +23,26 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const H = require('../lib/ws-harness.cjs');
 const { cellChecksInPage, sizeSFindings } = require('../lib/ws-cell-checks.cjs');
+const { wordsChecksInPage } = require('../lib/ws-words-cells.cjs');
 
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const has = (k) => argv.includes('--' + k);
 const ROOT = H.ROOT;
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
-const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S'));
+const RULES = list(arg('rules', 'OVERFLOW,TAGINK,KEYJOIN,SIZE-S,PUPILTAG,SIGNMATCH,EA-ROWX,EA-PAD,RI-DISTINCT,KEYFIT,LONE-PAGE,ABTAG'));
 // --h13-abs (OPT-IN; critic lf-placevalue r2 N6, lead ruling D1): H13-ABS counts too, measured on every OPTION-VALUE page
 // (--card-opts; --h13-abs-all: every page); --rule-skills a:b,c:d limits it to those skills (ws-precritic opt-in-rules.json)
 const H13ABS = has('h13-abs') || has('h13-abs-all');
 if (H13ABS && !RULES.includes('H13-ABS')) RULES.push('H13-ABS');
 const RULE_SKILLS = list(arg('rule-skills', ''));
 const h13On = (j) => H13ABS && (has('h13-abs-all') || !!j.variant) && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
+// --words-rules (OPT-IN; critic lf-placevalue nwf r1 N2 / N4 / N5 / N7 / N8, lead ruling D1): the number-name cell's checks
+// (tests/lib/ws-words-cells.cjs: CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y), judged on --rule-skills
+const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', 'ROW-SLOT-Y'];
+// (an explicit --rules list stays the list: a backtest row proves one rule alone)
+if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
+const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 const SIZES = list(arg('size', 'S,M,L'));
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -43,7 +52,9 @@ async function checkDoc(sheet, html, ctx) {
     await sheet.setContent(html, { waitUntil: 'load', timeout: 60000 });
     await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
     await sheet.evaluate(() => document.fonts && document.fonts.ready);
-    return sheet.evaluate(cellChecksInPage, ctx);
+    const r = await sheet.evaluate(cellChecksInPage, ctx);
+    if (ctx.words) r.findings = r.findings.concat(await sheet.evaluate(wordsChecksInPage, { role: ctx.role, key: ctx.key }));
+    return r;
 }
 
 function selfTest() {
@@ -55,6 +66,18 @@ function selfTest() {
         { name: 'tag over the grey answer (TAGINK)', html: page(cell({ h: 36, val: '<span style="color:#888">10</span>', tag: 'A', w: 15 })), want: 'TAGINK' },
         { name: 'tag outside the box (TAGINK control)', html: page(cell({ h: 36, val: '<span style="color:#888;padding-left:8mm">10</span>', tag: 'A', w: 22 })), want: null, rules: ['TAGINK'] },
         { name: 'two answers in one key slot (KEYJOIN)', html: page(cell({ h: 36, val: '15, 15' })), want: 'KEYJOIN', key: true },
+        { name: 'a redraw zone printing a list (KEYJOIN open-zone control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="ea-draw" data-ws-shape="open">12, 15, 18</span></div></div>')), want: null, key: true, rules: ['KEYJOIN'] },
+        { name: 'grey pupil work with no label (PUPILTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span class="mq-pupil" style="color:#949494">48</span></div></div>')), want: 'PUPILTAG' },
+        { name: 'grey pupil work under "Sam wrote:" (PUPILTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div style="position:relative"><span class="mq-pupiltag" style="display:block;font:10pt sans-serif;line-height:1">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:2mm;font:20pt sans-serif;line-height:1;color:#949494">48</span></div></div></div>')), want: null, rules: ['PUPILTAG'] },
+        { name: 'a "Sam wrote:" label 20 mm over its work (PUPILTAG distance)', html: page(cell({ h: 60, val: '' }).replace('</div></div>', '<div><span class="mq-pupiltag" style="display:block">Sam wrote:</span><span class="mq-pupil" style="display:block;margin-top:20mm;color:#949494">48</span></div></div></div>')), want: 'PUPILTAG' },
+        { name: 'an added answer under the minus sign (SIGNMATCH)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 13</div></div></div>')), want: 'SIGNMATCH', role: 'reason-it' },
+        { name: 'Reason It panels A and B show the same work (RI-DISTINCT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 29</div></div></div>')), want: 'RI-DISTINCT', role: 'reason-it' },
+        { name: 'a Reason It tag on the first term (ABTAG)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:5mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">x</div></div></div>')), want: 'ABTAG', role: 'reason-it' },
+        { name: 'a Reason It tag clear of the work (ABTAG control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox" style="position:relative;padding:0"><span class="mq-abtag" style="position:absolute;left:0;top:0;width:8mm;height:8mm">A</span><span style="display:inline-block;margin-left:12mm;border:1px solid #000;width:10mm">9</span></div><div class="mq-abbox">y</div></div></div>')), want: null, role: 'reason-it', rules: ['ABTAG'] },
+        { name: 'Reason It panels differ (RI-DISTINCT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox"><span class="mq-abtag">A</span>85 - 56 = 29</div><div class="mq-abbox"><span class="mq-abtag">B</span>85 - 56 = 39</div></div></div>')), want: null, role: 'reason-it', rules: ['RI-DISTINCT'] },
+        { name: 'a miscount under its own sign (SIGNMATCH control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<div class="mq-abbox">11 − 2 = 8</div></div></div>')), want: null, role: 'reason-it', rules: ['SIGNMATCH'] },
+        { name: 'a key word past its line (KEYFIT)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:8mm;white-space:nowrap;overflow:visible">hundreds</span></div></div>')), want: 'KEYFIT', key: true },
+        { name: 'a key word on its line (KEYFIT control)', html: page(cell({ h: 36, val: '' }).replace('</div></div>', '<span data-ws-slot="x" class="ws-line" style="display:inline-block;width:40mm;white-space:nowrap">hundreds</span></div></div>')), want: null, key: true, rules: ['KEYFIT'] },
         { name: 'one answer a key slot (KEYJOIN control)', html: page(cell({ h: 36, val: '15' })), want: null, key: true, rules: ['KEYJOIN'] },
         // (cell 60 mm: dots 20 mm + gap 2 + slot 9 = 31 mm of ink, a 29 mm band >= 0.30 x 60 = 18 mm; the 36 mm control: 5 mm < 10.8 mm)
         { name: 'empty band under the lowest ink (H13-ABS, opt-in)', html: page(cell({ h: 60, val: '7' })), want: 'H13-ABS', h13abs: true },
@@ -123,17 +146,22 @@ function selfTest() {
             try {
                 const r = await window.buildSheet({ role, sections: [{ skills: [Object.assign({ categoryId: cat, skillId: id }, opts ? { opts } : {})], columns: 'auto' }], size, look: 'auto', paper: 'A4', seed, form: 'A', key: true, anchors: 'off' });
                 const f = Array.isArray(r.fits) ? r.fits[0] : (r.fits && r.fits.sections ? r.fits.sections[0] : r.fits);
-                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, cols: f && f.cols, pages: r.pageCount };
+                return { pupil: window.sheetDocument(r.pupilHtml, r.title || 't', { paper: 'A4' }), key: window.sheetDocument(r.keyHtml, 'key', { paper: 'A4' }), title: r.title, perPage: f && f.perPage, ceiling: f && f.ceiling, count: f && f.count, cols: f && f.cols, pages: r.pageCount };
             } catch (e) { return e && e.unsupported ? { unsupported: e.message } : { error: String((e && e.stack) || e).slice(0, 300) }; }
         }, { cat, id, role: j.role, size: j.size, seed, opts: j.opts });
         const tag = `${j.k} ${j.role} ${j.size}${j.opts ? ' ' + optsKey(j.opts) : ''}`;
         if (built.unsupported) { console.log(`  n/a  ${tag}: ${built.unsupported.slice(0, 100)}`); continue; }
         if (built.error) { findings.push({ rule: 'ERROR', msg: `${tag}: ${built.error}` }); continue; }
-        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j) });
-        const kk = await checkDoc(sheet, built.key, { role: j.role, key: true });
+        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j), words: wordsOn(j) });
+        const kk = await checkDoc(sheet, built.key, { role: j.role, key: true, words: wordsOn(j) });
         const here = [
             ...p.problems.map((m) => ({ rule: 'OVERFLOW', msg: `pupil ${m}` })), ...kk.problems.map((m) => ({ rule: 'OVERFLOW', msg: `key ${m}` })),
             ...p.findings, ...kk.findings,
+            // LONE-PAGE (critic r6c / r6d D1, H5): a page that holds ONE item where its role's ceiling is 2 or more and 2 or more were
+            // dealt - a Grade 2 story printed one a sheet; content never shrinks, so the LAYOUT must fit them (ws-capacity-pin reads
+            // only the passed skills)
+            ...(Number(built.perPage) === 1 && Number(built.ceiling) >= 2
+                ? [{ rule: 'LONE-PAGE', msg: `one item a page where the role holds ${built.ceiling} (H5)` }] : []),
         ].filter((f) => RULES.includes(f.rule)).map((f) => Object.assign({}, f, { msg: `${tag}: ${f.msg}` }));
         findings.push(...here);
         runs.push({ skill: j.k, role: j.role, size: j.size, optsKey: optsKey(j.opts), perPage: built.perPage, cols: built.cols, cells: p.cells });

@@ -21,7 +21,11 @@ while :; do
       waited=$(( $(date +%s) - start ))
       [ "${MQ_BROWSER_WAIT_LOG:-0}" = 1 ] && [ $waited -gt 0 ] && echo "mq-browser-run: slot $s after ${waited}s" >&2
       export MQ_BROWSER_SLOT=$s
-      "$@"
+      # The command runs WITHOUT the slot's fd (lf-engine 2026-11-12): a child that outlives it - puppeteer's Chrome is
+      # launched detached, so a killed gate leaves it running - would otherwise hold the slot's flock forever, and with
+      # both slots held every later browser gate waited without end (a 7,000 s silent ws-backtest hang). This shell
+      # alone holds the slot, and frees it when the command exits.
+      "$@" {fd}>&-
       rc=$?
       exec {fd}>&-
       exit $rc

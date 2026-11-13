@@ -18,6 +18,8 @@ export { sentenceFrame, sentenceFrameWidthMm, CIRCLE_D } from './sentence-frame.
 export { partWholeBar, BAR_SEG_H } from './part-whole-bar.js';
 export { familyChart, familyChartSize, familyFacts } from './family-chart.js';
 export { INK, GREY, PAPER, stroke, NUM_FEATURES } from './units.js';
+// ---- the vocabulary pictures (lane lf-vocab, 2026-11-07): one shared set for lesson pages and practice
+export { vocabPictureSVG, vocabPictureAlt, hasVocabPicture, VOCAB_PICTURE_IDS, PIC_CANVAS, PIC_WIDTHS } from './vocab-pictures.js';
 
 // ---- approved drawings that already exist in their templates: RE-EXPORTED, never redrawn
 export { frameHTML as tenFrame } from '../cells/tenframe.js';

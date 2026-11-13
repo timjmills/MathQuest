@@ -79,7 +79,7 @@ export {
 } from './adapters.js';
 
 /* ------------------------------------------------- cell templates (register on load) */
-export { stack, stackTabStep, stackAnswerSlot, needsRegroup, stackRegroups } from './cells/stack.js';
+export { stack, stackTabStep, stackAnswerSlot, needsRegroup, stackRegroups, stackCarryTop } from './cells/stack.js';
 export { fact, factPadTop, factWidthMm, factFillOfColumn, factWriteMm, FACT_GEOMETRY, factCue } from './cells/fact.js';
 export { equation, equationParts, equationColumns, frac, mixed } from './cells/equation.js';
 // S1 touch numerals: the digit drawn with its touch dots on the strokes (design/SUPPORTS.md §S1).
@@ -188,6 +188,9 @@ import { FIGURE_TEMPLATE_IDS } from './cells/figures.js';
 export { RCDWS_ROWS, RCDWS_CSS } from './cells/rcdws.js';
 // composing:number_word_form's kit cell (a number and its name).
 export { numberWords } from './cells/words.js';
+// The vocabulary redesign (lane lf-vocab, 2026-11-07): Match 3 pictures and 1 picture 3 words.
+export { MATCH3_TEMPLATE, match3Letters } from './cells/vocab-match3.js';
+export { PICK3_TEMPLATE, PICK3_PER_PAGE, gradeClass as vocabGradeClass } from './cells/vocab-pick3.js';
 export * as teacherParts from './teacher-parts.js';
 export { TEACHER_CSS } from './teacher-parts.js';
 export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
@@ -195,7 +198,7 @@ export { teacherIcon, routineIcon, TEACHER_ICON_IDS } from './teacher-icons.js';
 /** Which cell templates this build carries. `legacy` is registered by `adapters.js`. */
 export const TEMPLATE_IDS = ['legacy', 'stack', 'fact', 'equation', 'pv',
     'counters', 'tenframe', 'base10', 'bond', 'chartwindow', 'seqstrip', 'compare', 'wordpic', 'word-work',
-    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words'];
+    ...OPS_TEMPLATE_IDS, ...TM_TEMPLATE_IDS, 'function-table', ...FIGURE_TEMPLATE_IDS, 'words', 'vocab-match3', 'vocab-pick3'];
 
 export { wordWorkWrongs } from './providers/word-work.js';
 /* ------------------------------------------------- skill providers (register on load) */
@@ -212,3 +215,6 @@ export {
     rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN,
     PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages,
 } from './part-opts.js';
+
+/* ------------------------------------------------------------------------ the footer hook (lane lf-vocab r3, Q-A) */
+export { applySheetTags, shortCcss } from './sheet-tags.js';

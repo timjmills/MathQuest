@@ -394,6 +394,13 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 - **PT-MOD-2.** State cell width = max(`footprint.wMm`, 62); the text column takes the rest. Step text is cell-text size, 2 lines at most.
 - **PT-MOD-3.** Steps beyond the page capacity continue on a page whose band label again reads "Model:" (band labels come only from the fixed vocabulary; the page number shows the continuation), same title, same row height.
 - **PT-MOD-4.** The page ends with the `Say:` band (PT-OPN-9): the skill's oral frame filled in for this problem. The band is on by default and follows the same dialog option as the Opener's.
+- **PT-MOD-5** (lead, delegated approval 2026-11-13, lf-roles r2 ruling 1). On a Model laid BESIDE (a state, its step text in the
+  next column), the step-text cell is judged by its text (2 lines at most, PT-MOD-2), NOT by the empty band under or beside it:
+  that column is as tall as its state by construction. The STATE cells stay under H13 (EB-BAND / EB-SIDE, PT-MOD-3's reserved-mark
+  room as ruled). A Model that would spill to a second page beside its text lays its states side by side, each step text over
+  its state, when that grid fits one page (lf-roles fix 5); one that cannot (function_table_easy at L) keeps the beside layout
+  over its pages, excused here, each page still meeting the state-cell bands. Check: ws-empty-band skips `.mq-stepcell` on a
+  beside Model (lf-checks); ws-roles-unit MOD-ACROSS.
 
 **Teacher options.** One or two examples (the second uses identical wording); arrows and callouts on or off; `Say:` band on or off (on by default).
 **Skill supplies.** `workedSteps(q)` with `marks` per step; `renderCell` with `state: traced` and `ctx.step = {index: i, marks}`; `strings.oralFrame`. Default adapter: states before the last show the blank problem, the last shows it answered.
@@ -403,6 +410,8 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 
 **Purpose.** "We do" with many repetitions while the steps stay in view.
 **Look.** I Can. Cells are **unlabelled** (CL-14: the band names them; round-4 re-grade, superseding round 2's quiet letters) and scored: the Score counts every cell but the worked example, which carries the `Model` tab. The fade: cell 1 fully traced (answer and working); the first try row the first step of the working in grey - a column stack's ones digit and carried ten, the count cue (a grey dot tile for + and −, the missing-factor think line for ÷), or a grey hint line: the problem's own first worked step that holds none of its answer (when every step names part of the answer, as a clock's hour does, the first step as a frame with the answer left as a gap: "The short hand has passed ___."); later rows blank. When every try sits in that one row, only the FIRST try is hinted, so the page fades to "none". A lone grey digit or half the blanks is never traced. One kind of problem per page (the kind the pool deals most), so the Steps fit every item; the Model is the forward item whose worked steps are the most (it exercises every printed step), and it draws that working in trace grey: a subtraction's cross-outs and new numbers, a remainder's rings round each group, a fact's skip count, a table's answers. A Model too tall to leave a row of tries under it takes a cell of its own with a hinted try beside it, never a page alone. A column stack keeps its black digit grid on every try.
+
+**Minimum (MIN_ITEMS, counted in scored answers).** A Guided page holds the Model plus at least three tries, counted in SCORED ANSWERS, not cells (lead ruling 2026-11-12): a cell that scores several answers (Match 3, `footprint.points` 3) counts each, by the same count as the page ceiling (EB-GDPCAP). So the Match 3 Guided page at L (Model + ONE try = 3 answers) meets it; a single-answer cell counts 1, as before (`guided.js` `minMet`; check `ws-vocab-unit` V28).
 
 ```
 +=======================================================================+
@@ -550,6 +559,10 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 - **PT-ERR-1.** 40 to 60% of the shown answers are wrong, each from `wrongAnswer(q)` (a real misconception, never a random number).
 - **PT-ERR-2.** The fix slot has the skill's answer-slot shape and is scored only on wrong items; a correct item left unfixed scores its point from the check mark alone.
 - **PT-ERR-3.** Counts offered: 2 (1 x 2, long algorithms with shown working), 4 or 6, never above the design-standard ceiling for the size (6 / 4 / 4).
+- **PT-ERR-4** (lead ruling N10, 2026-11-13). The other pupil's work prints in the single grey (#949494), ALWAYS under a printed
+  "<Name> wrote:" label ("chose:" / "drew:" / "marked:" by the item's shape). The grey is the design, not a trace prompt; the label is
+  what keeps it from reading as "trace me". Check: ws-cell-checks PUPILTAG (default rule, + self-test). Critics score the grey work
+  with its label as correct (C4).
 
 **Teacher options.** Count; share wrong; show full working or the answer only; multiply-to-check grid for division.
 **Skill supplies.** `wrongAnswer(q)`, `renderCell` with `state: answered | wrong`, optional `workedSteps` for shown working.
@@ -1704,6 +1717,15 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 - **PT-TOF-1.** 40 to 60% of statements are false; each false statement comes from `wrongAnswer(q)`.
 - **PT-TOF-2.** The frame is scored only with the check mark: a correct "True" needs no correction; a "False" needs the frame's number.
 - **PT-TOF-3.** The check-box row and frame row sit at the same y in every cell of a row.
+- **PT-TOF-4** (lead, delegated approval 2026-11-13, lf-roles). The frame holds ONE value a line. A list answer (a number
+  pattern's terms, a function table's outputs: "12, 15, 18") writes one line a part, joined by commas, and wraps under the frame's
+  words in a narrow cell. A sentence answer ("The ones digits go 0, 2, 4, 6, 8.") prints no frame row: the judgement is the
+  answer. The same holds for Reason It's "The answer is ____." (its "__ is correct." names the sentence) and for an Error
+  Analysis fix: a sentence answer is fixed by checking the right choice, or the item is skipped when it has no choices.
+  Check: `ws-roles-unit` KEYJOIN-ROLE; ws-cell-checks KEYJOIN.
+  Reason It (lead, delegated approval 2026-11-13, critic r3 D1/D2/D5): a LIST answer prints no "The answer is" frame either - the
+  panel the pupil names in "__ is correct." holds every part (H16); a unit form ("[ ] hundreds [ ] tens [ ] ones") keeps its frame,
+  full width under A and B. A count row's rule part is named with the item's own words ("Rule: add [ ] each time.").
 
 **Teacher options.** Count; share false; frame on or off. **Skill supplies.** `renderCell` with `state: answered | wrong`, `wrongAnswer`, a frame id from `strings`. Default adapter: the generic frame "The answer is ____." **Screen.** Tap True or False; the frame input opens after "False"; feedback on Check.
 
@@ -1729,7 +1751,7 @@ ALWAYS / SOMETIMES / NEVER
 - **PT-RSN-1.** Default page: one format per page (one of each only when the teacher chooses Mixed; pedagogy standard 9.4, design standard SF-61), 1 column x 4 / 3 / 2 rows at S / M / L (cells 186 x 57 / 76 / 113.5; design-standard ceiling 4 / 3 / 2). Long algorithms use 2 rows at every size.
 - **PT-RSN-2.** Spot the mistake: the solution is `workedSteps(q)` with exactly one step replaced by the misconception behind `wrongAnswer(q)`; step rings are outlined circles at least Hw + 2 across.
 - **PT-RSN-3.** Odd one out: four boxed items, three sharing a property the skill names; the pupil circles one and completes the frame "__ does not belong. It is not ______ ." with a word from a printed bank of at most 4 words (pedagogy standard 9.4, P-TH-15).
-- **PT-RSN-4.** Which is correct: two worked solutions labelled "A" and "B" (never named characters, P-TH-14), side by side at the same cell size; the pupil circles A or B and completes "__ is correct. The answer is __ ."
+- **PT-RSN-4.** Which is correct: two worked solutions labelled "A" and "B" (never named characters, P-TH-14), side by side at the same cell size; the pupil circles A or B and completes "The answer is __ ." (lead ruling F8, 2026-11-13: "Circle A or B. The answer is __." - the old "__ is correct." asked the same choice a second time, H16; a list answer, whose circled panel already holds every part, prints no answer frame, PT-TOF-4; check ws-roles-unit RI-ONEANSWER)
 - **PT-RSN-5.** Always / sometimes / never needs a skill-supplied claim with its verdict and an example frame (two frames for "sometimes": one example that works and one that does not, P-TH-16); it is offered only when the skill declares `claims[]`.
 
 **Teacher options.** Format (one, or Mixed); count up to the ceiling for the size (4 / 3 / 2). **Skill supplies.** `wrongAnswer` (with the step it belongs to), `workedSteps`, optional `claims[]` and property tags. Default adapters cover spot the mistake and which is correct for every skill; odd one out falls back to "three correct statements and one wrong". **Screen.** Find-the-mistake mode: tap the step, the box or the solution; number inputs for frames; feedback on Check.

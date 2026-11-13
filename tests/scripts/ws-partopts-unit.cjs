@@ -207,7 +207,9 @@ async function unit() {
         const { judge } = require('./ws-empty-band.cjs');
         const cases = [[20, 6], [20, 5.99], [40, 12], [40, 11.9], [9.9, 9], [10, 3]];
         for (const [h, b] of cases) {
-            let j = false; judge([{ page: 1, cell: 1, hMm: h, belowMm: b, sideMm: 0, innerW: 100, wMm: 100 }], 'x', (rule) => { if (rule === 'EB-BAND') j = true; }, 'lesson');
+            let j = false; judge([{ page: 1, cell: 1, hMm: h, hRaw: h, belowMm: b, aboveMm: 0, betweenMm: 0, sideMm: 0, innerW: 100, wMm: 100 }], 'x', (rule) => { if (rule === 'EB-BAND') j = true; }, 'lesson');
+            // (lf-checks 2026-11-13 changed the judge: it reads the unrounded height `hRaw` and the largest of the bands under,
+            // between and above the ink - so the probe cell carries hRaw and no other band, and the edge is still the band under)
             const jj = h >= 10 && j;   // (the judge's cells come from measureCells, which drops cells under 10 mm)
             if (jj !== po.bandFails(b, h)) F('PO-4', `EB-BAND predicate: part-opts bandFails(${b}, ${h}) = ${po.bandFails(b, h)}, ws-empty-band judge = ${jj}`);
         }
