@@ -194,6 +194,11 @@ function measureCells(scope) {
             }
             if (!box) return;
             const H = inner.b - inner.t, W = inner.r - inner.l;
+            // (lf-ops-props 2026-11-13: a cell whose content is CENTRED in a taller row - LESSONS_LEARNED P4-2, the arrays /
+            // arrays-turn / count-row cells - is judged by EB-FOOT without the centring offset above its first block: the free
+            // space a row shares out is not drawn height, and the cell a top-anchored item needs is the same either way)
+            const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0);
+            const centOff = /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0;
             const hwVar = parseFloat(getComputedStyle(c).getPropertyValue('--ws-hw')) || 0;
             const hw = /mm/.test(getComputedStyle(c).getPropertyValue('--ws-hw')) ? hwVar * MM : hwVar;
             const below = Math.max(inner.b - box.b, 0);
@@ -202,7 +207,7 @@ function measureCells(scope) {
             const edge = Math.min(box.l - cr.left, cr.right - box.r);
             out.push({ page: pi + 1, cell: ci + 1, label: ((c.querySelector('[data-ws-label], .ws-letter') || {}).textContent || '').trim(), hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: +(H / MM).toFixed(1), belowMm: +(below / MM).toFixed(1), sideMm: +(side / MM).toFixed(1), hwMm: +(hw / MM).toFixed(1), innerW: +(W / MM).toFixed(1), edgeMm: +(edge / MM).toFixed(1),
-                neededMm: +(((box.b - cr.top) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
+                neededMm: +(((box.b - cr.top - centOff) + (cr.bottom - inner.b)) / MM).toFixed(1), tmpl: c.getAttribute('data-ws-cell') || '',
                 step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN), inkMm: +((box.b - cr.top) / MM).toFixed(1) });
         });
     });

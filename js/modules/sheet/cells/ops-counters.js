@@ -236,7 +236,7 @@ register('arrays', {
         const sentKind = SENTENCE_KINDS.includes(p.kind);
         // (S: the sentence lines at S type, boxes 14 mm, are about 50 mm: three columns - critic lf-ops r1 D-AG-2)
         const s3 = sentKind && g.size === 'S';
-        return { wMm: Math.ceil(Math.max(pic.wMm, s3 ? 50 : 66) + 6), hMm: null, measure: true, factLike: false, maxCols: s3 ? 3 : 2, ...(sentKind && !g.twin ? { inPlace: true } : {}) };
+        return { wMm: Math.ceil(Math.max(pic.wMm, s3 ? 50 : 66) + 6), hMm: null, measure: true, factLike: false, maxCols: s3 ? 3 : 2, noStretch: true, ...(sentKind && !g.twin ? { inPlace: true } : {}) };   // (noStretch: lf-ops-props ruling (b), D-AG-1)
     },
     /** The lesson chart's state k (provider marks: first / second / total; `groups` / `size` read as first / second). */
     lessonStepState(p, steps, k, ctx) {

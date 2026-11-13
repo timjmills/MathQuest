@@ -765,7 +765,7 @@ register('count-row', {
         const h = g.rows * (g.arcH + (g.axisH || 0) + g.h + g.lblH) + (g.rows - 1) * lg + (g.tight && g.tabAbove ? tabLineH(g, ctx) + g.lblH + lg : 0) + (p.rule ? 8 : 0) + (p.ruleBox ? g.h + 3 : 0) + 3;
         // denseRoom 1: a page of count-by rows packs one row per table, 9-12 at M (owner), each cell
         // exactly its measured height (the arcs and the pads are already in it).
-        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1 };
+        return { wMm: Math.ceil(w), hMm: Math.ceil(h + 2 * (vpadOf(p, ctx))), measure: true, factLike: false, maxCols: w <= 90 ? 2 : 1, denseRoom: 1, noStretch: true };   // (noStretch: lf-ops-props ruling (b), D-CB-4/5)
     },
     inputs(p) {
         const out = (p.blanks || []).map((_, i) => ({ id: `b${i}`, kind: 'number', shape: 'box', graded: true, order: i, inputmode: 'numeric', scopes: ['full', 'answer-only'] }));

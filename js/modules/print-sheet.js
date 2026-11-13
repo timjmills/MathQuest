@@ -227,7 +227,9 @@ function normaliseRequest(req = {}) {
         ? (Number(req.seed) >>> 0) : (Math.floor(Math.random() * 900000) + 100000);
     const sections = (Array.isArray(req.sections) ? req.sections : [])
         .map((s) => ({
-            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId),
+            // (`twoAcross`, lf-ops-props D-MP-1 / D-MP-3: the page's size and look travel on each ref, so the dealer can keep an
+            // array and its turn to a pair two of which stand across a row - turnFitsTwo)
+            skills: (s && Array.isArray(s.skills) ? s.skills : []).filter((k) => k && k.categoryId && k.skillId).map((k) => Object.assign({}, k, { twoAcross: { size, look } })),
             count: s && s.count !== undefined && s.count !== null && s.count !== 'auto' ? clampInt(s.count, 1, MAX_ITEMS, null) : null,
             pages: s && s.pages ? clampInt(s.pages, 1, 10, 1) : null,
             columns: s && s.columns && s.columns !== 'auto' ? clampInt(s.columns, 1, 10, 'auto') : 'auto',
@@ -613,6 +615,21 @@ function refAccepts(sk, cand, key, seen, kept, pg = '', row = '', words = true) 
  * the soft floors these are never relaxed, not even on a ref's last try (critic r3 S1: the last try
  * "took what it got" and printed 1,000 on a pupil page past `maxNum: 999`).
  */
+/**
+ * lf-ops-props (critic lf-ops r1 D-MP-1 / D-MP-3; lead ruling 2026-11-12): an `arrays-turn` order pair (two arrays side by
+ * side) is dealt only when two such pairs stand across a row at the page's size - at L a 4 x 5 pair (93 mm) or 5 x 5
+ * (102 mm) is wider than a two-column cell (92.3 mm), so the page planned one-column rows for every pair and stretched them
+ * (27 empty bands at L). The split array, the facts-only item and a ref without `twoAcross` deal as before.
+ */
+export function turnFitsTwo(cand, sk) {
+    const ta = sk && sk.twoAcross;
+    const spec = cand && cand.cell;
+    if (!ta || !spec || spec.template !== 'arrays-turn') return true;
+    const p = spec.payload || {};
+    if (p.type === 'split' || p.draw === 'none' || p.type === 'missing') return true;
+    const fp = cellFootprint(cand, { size: ta.size, look: ta.look, mode: 'print' });
+    return !(Number(fp && fp.wMm) > cellWidthMm(2, LIVE_W_MM, ta.look).inner);
+}
 export const refHasHard = (sk) => !!sk && (!!sk.allHard || sk.minNum !== undefined || sk.maxNum !== undefined || (Array.isArray(sk.boardOnly) && sk.boardOnly.length > 0) || sk.partMin !== undefined || Array.isArray(sk.noPart) || !!sk.crossTen || Array.isArray(sk.onlyKeys) || Array.isArray(sk.hardAvoid));
 export function refHardOk(sk, cand) {
     if (!refHasHard(sk)) return true;
@@ -1011,6 +1028,9 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 const skR = edgeAt >= 0 ? Object.assign({}, sk, { edge: true }, edgeWant ? { edgeTest: edgeWant } : {}) : sk;
                 const strict = soft && !(relaxLast && k === tries);
                 if (hard && !refHardOk(skH, cand)) continue;
+                // (lf-ops-props D-MP-1 / D-MP-3: a pictured array and its turn too wide for two across a row is dealt again - the
+                // DEALT factor range is capped at the page's size, the drawing never shrinks; the last try keeps what it gets)
+                if (k < tries && !turnFitsTwo(cand, sk)) { if (!got) got = cand; continue; }
                 if (strict && !refAccepts(skR, cand, key, seen, kept, pg, rowK, words)) continue;
                 // (R5, lf-engine P1b: when a detailed pack's pool is spent and the soft floors are dropped, a chart example -
                 // or its turn - and an item already on this page are still the last thing taken: lesson 3a dealt the chart's

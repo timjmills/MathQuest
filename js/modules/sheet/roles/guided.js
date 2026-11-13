@@ -39,7 +39,7 @@ import {
 } from './compose.js';
 import { getProvider } from '../index.js';
 import { stepTemplateOf } from '../anchors.js';
-import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM } from '../layout.js';
+import { FILL_CAP, groupByHeight, fillLimit, CELL_PAD_MM, NO_STRETCH_ROOM } from '../layout.js';
 
 /** The model first, then the tries grouped by height (H13: rows hold problems of one height). */
 const isMixItem = (it) => !!(it && it.q && it.q.divMix);
@@ -1055,7 +1055,12 @@ export function plan(input = {}) {
         const tF = w.map((x, r) => (pi === 0 && (r === 0 || r === hintRow) ? x : Math.max(x, FACT_STRETCH * Math.max(1, mins[r] - CELL_PAD_MM))));
         const sumT = tF.reduce((x, y) => x + y, 0);
         const lam = sumT > sumW ? Math.max(0, Math.min(1, (room - sumW) / (sumT - sumW))) : 0;
-        const Hr = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        // (lf-ops-props, lead ruling 2026-11-12 (b): a row of templates answered in place - footprint `noStretch`: an array and
+        // its turn, an array and its sentence, a count row - keeps its measured height and NO_STRETCH_ROOM at most, under
+        // PT-GDP's 1.42 x content; the spare height stays under the grid. D-MP-1 / D-AG-1 / D-CB-4)
+        const noSt = host.length > 0 && host.every((it) => it && it.footprint && it.footprint.noStretch);
+        const Hr0 = w.map((x, r) => (facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
+        const Hr = noSt ? Hr0.map((h, r) => Math.min(h, w[r] * NO_STRETCH_ROOM)) : Hr0;
         const gridH = Hr.reduce((a, b) => a + b, 0);
         const cellH = gridH / rows;
         const sections = [];

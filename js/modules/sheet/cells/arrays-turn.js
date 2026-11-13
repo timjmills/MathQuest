@@ -213,7 +213,9 @@ export function turnFootprint(p, ctx) {
     // full width at L broke the detailed lesson g3-oa5's practice grid (E12, E24b); a known finding for the next round)
     // (not `inPlace`: held to its content the pair left a 18-22 % strip under the detailed lesson's practice grid - E9b - and
     // the height grouping moved its edge case off the last row - E24b; D-MP-1's bands stay a known finding)
-    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures || p.type === 'split' ? 2 : 3 };
+    // (`noStretch`, lf-ops-props, lead ruling 2026-11-12 (b): answered in place, so a row is its measured height and
+    // NO_STRETCH_ROOM - never stretched to the page; D-MP-1)
+    return { wMm: Math.ceil(geom.wMm + 6), hMm: null, measure: true, factLike: false, maxCols: geom.pictures || p.type === 'split' ? 2 : 3, noStretch: true };
 }
 
 export function turnInputs(p) {
