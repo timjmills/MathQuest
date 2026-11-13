@@ -33,6 +33,7 @@
 //     notWith lists (r14: and every run picture, grow's squares included, is notWith rule); V-PLACE (r14) a ringed or boxed
 //     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
 //     reads as cycle
+// --browser V-PAGE (r15) no two Match 3 cells of one printed page put the same pictures in the same places
 // V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
 //     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
@@ -841,7 +842,9 @@ async function browserChecks() {
     };
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
+        if (ONLY && ONLY.every((k) => ['V-PAGE'].includes(k))) { await pageRepeatChecks(page, fail); return; }
         if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
+        await pageRepeatChecks(page, fail);
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -935,6 +938,33 @@ async function browserChecks() {
     } finally { await app2.close(); }
 }
 
+// V-PAGE (r15, critic r14 #3: set 5 Match 3 page 1 showed items 2 and 3 with the same pictures in the same A / B / C places,
+// only the word row changed): no two Match 3 cells of one printed page match the same pictures to the same letters. Every set
+// and grade pool, the roles that print Match 3 cells, S / M / L, seed 7 and the render seed (ws-grade-render's, as the critic
+// sees the page).
+async function pageRepeatChecks(page, fail) {
+    const fnv = (x) => { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+    const runs = [{}, ...W.VOCAB_GRADES.map((g) => ({ vocabGrade: g })), ...W.VOCAB_SETS.map((_, i) => ({ vocabSet: i }))];
+    let cells = 0;
+    for (const opts of runs) for (const role of ['independent', 'more-practice', 'test', 'guided']) for (const size of ['S', 'M', 'L']) {
+        for (const seed of [7, fnv(`vocabulary__vocab_grade_pictures:${role}`) % 1000000]) {
+            const r = await page.evaluate(async (a) => {
+                try {
+                    const x = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'vocabulary', skillId: 'vocab_grade_pictures', opts: a.opts }] }], size: a.size, paper: 'A4', seed: a.seed, form: 'A', key: false });
+                    return { pupil: x.pupilHtml };
+                } catch (e) { return { error: String(e && e.message || e) }; }
+            }, { role, size, seed, opts });
+            const tag = `${JSON.stringify(opts)} ${role} ${size} seed ${seed}`;
+            if (r.error) { fail(`V-PAGE ${tag}: not composed (${r.error})`); continue; }
+            r.pupil.split(/<section class="ws-page\b/).slice(1).forEach((pg, pi) => {
+                const maps = pg.split('data-ws-cell="vocab-match3"').slice(1).map((c) => [...c.matchAll(/data-vpic="([^"]*)"/g)].slice(0, 3).map((m) => m[1]).join(' | '));
+                cells += maps.length;
+                maps.forEach((m, i) => { const j = maps.indexOf(m); if (j < i) fail(`V-PAGE ${tag} page ${pi + 1}: Match 3 items ${j + 1} and ${i + 1} put the same pictures in the same places (${m})`); });
+            });
+        }
+    }
+    if (!cells) fail('V-PAGE: no Match 3 cell printed');
+}
 async function r7Checks(page, fail, sheet) {
     // the pupil print pages' sha256, per skill / role / size / seed (V23: byte-identical to 70cdbaf9); the pin is read from THIS
     // checkout's tests (a backtest row runs today's checks on an old tree with MQ_ROOT)

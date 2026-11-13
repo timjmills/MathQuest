@@ -598,7 +598,17 @@ const _VT_LET = ['A', 'B', 'C'];
 // Words already shown on this printed page: a page uses every word of its pool once before any comes back
 // (critic pre-check 2026-11-07: "column" printed in two Match 3 cells of one page). Forgotten at each new page.
 let _vtUsed = new Set();
-_vOnNewPage(() => { _vtUsed = new Set(); });
+// The picture orders (A, B, C) of this page's Match 3 cells (r15, critic r14 #3: a set with one clash-free split deals each
+// trio twice on a four-cell page, and items 2 and 3 of set 5 showed the same pictures in the same places - only the word row
+// changed). A trio whose picture order one of the three slots before it holds takes another order: a rotation first, so every
+// picture moves to another letter. Kept per page SLOT (state.itemIndex), not per page: a More Practice run deals every letter's
+// items in one run with one reset, so a page-wide set filled with all 12 orders by letter B and stopped helping; any 4
+// consecutive slots - a page's 4 Match 3 cells - then never repeat an order. A trio has 6 orders and 3 are ever barred, so one is
+// always left. Deterministic (no Math.random): a slot whose order is clear deals exactly as before (ws-vocab-unit V-PAGE).
+const _VT_NEAR = 3;
+let _vtSlots = new Map();
+let _vtSeq = 0;
+_vOnNewPage(() => { _vtUsed = new Set(); _vtSlots = new Map(); _vtSeq = 0; });
 /** The pool with this page's unused words first (all words again once every one has been shown). */
 function _freshFirst(pool, need) {
     const fresh = pool.filter((w) => !_vtUsed.has(w));
@@ -652,6 +662,13 @@ function _genPictureTask(q) {
         }
         trio = trio || _compatiblePick(words, 3) || words.slice(0, 3);
         trio.forEach((w) => _vtUsed.add(w));
+        const slot = Number.isFinite(state.itemIndex) ? state.itemIndex : _vtSeq++;
+        const near = new Set(Array.from({ length: _VT_NEAR }, (_, d) => _vtSlots.get(slot - d - 1)).filter(Boolean));
+        if (near.has(trio.join('|'))) {
+            const t0 = trio;
+            trio = [[1, 2, 0], [2, 0, 1], [0, 2, 1], [2, 1, 0], [1, 0, 2]].map((p) => p.map((i) => t0[i])).find((t) => !near.has(t.join('|'))) || t0;
+        }
+        _vtSlots.set(slot, trio.join('|'));
         // the word row: a rotation, so no word sits under its own picture
         const order = Math.random() < 0.5 ? [1, 2, 0] : [2, 0, 1];
         const letters = order.map((i) => _VT_LET[i]);
