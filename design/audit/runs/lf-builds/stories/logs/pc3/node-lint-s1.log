@@ -1,0 +1,14 @@
+$ node tests/scripts/ws-node-lint.mjs --skill addition:add_word_problems,addition:add_word_problems_plain,subtraction:sub_word_problems,subtraction:sub_word_problems_plain,addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller --rules LESSON-DATA,OPTION-HELP,WRONG-FITS --baseline tests/fixtures/precritic/node-lint-s1.baseline.json --json design/audit/runs/lf-builds/stories/logs/pc3/node-lint-s1.json
+
+ws-node-lint: 7 skill(s), 30 items each, page 12, root /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee
+
+rule        skills   items  findings  skills hit  skipped
+LESSON-DATA       7       7         4           4  -
+OPTION-HELP       7      40         0           0  -
+WRONG-FITS       0       0         0           0  7 no item with a declared box count and a number wrong answer (skills)
+
+baseline: tests/fixtures/precritic/node-lint-s1.baseline.json (11 finding keys pinned at n=30, page=12)
+no finding beyond the baseline
+json: /home/user/MathQuest/.claude/worktrees/agent-a27a2a804bd6edcee/design/audit/runs/lf-builds/stories/logs/pc3/node-lint-s1.json
+time: load 0.3 s, lint 0.4 s, total 0.7 s
+ws-node-lint: OK

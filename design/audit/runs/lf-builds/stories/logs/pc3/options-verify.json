@@ -1,0 +1,7588 @@
+{
+ "counts": {
+  "skillsLive": 7,
+  "skillsWithOptions": 7,
+  "skillsWithoutOptions": 0,
+  "values": 356,
+  "valuesPass": 351,
+  "valuesFail": 5,
+  "skillsPass": 0,
+  "skillsFail": 7,
+  "gated": 0,
+  "bySurface": {
+   "trip": 0,
+   "gen": 0,
+   "print": 5,
+   "screen": 0
+  }
+ },
+ "results": [
+  {
+   "key": "addition:add_word_problems",
+   "categoryId": "addition",
+   "skillId": "add_word_problems",
+   "label": "Addition Word Problems",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [
+    "band: default null is not one of its values"
+   ],
+   "options": [
+    {
+     "id": "response",
+     "label": "How the pupil answers",
+     "type": "enum",
+     "n": 2,
+     "default": "standard"
+    },
+    {
+     "id": "pictures",
+     "label": "Pictures",
+     "type": "bool",
+     "n": 2,
+     "default": true
+    },
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 4,
+     "default": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "response",
+     "label": "How the pupil answers",
+     "value": "which-numbers",
+     "valueLabel": "Pick the numbers the story needs (no answer)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ethan is 11 years old. Ethan won 6 marbles. Then Ethan found 13 more m = [\"opt1\",\"opt0\"]",
+      "Priya is 5 years old. Priya traded for 20 cards. Then Priya collected  = [\"opt1\",\"opt0\"]"
+     ]
+    },
+    {
+     "option": "pictures",
+     "label": "Pictures",
+     "value": false,
+     "valueLabel": "false",
+     "fails": [
+      "print: printed sheet identical to the default sheet"
+     ],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "fail",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 67 dollars. Kofi gets 66 more dollars. How many dollars does  = 133",
+      "Ben had some buttons. Ben got 27 more buttons. Now Ben has 75 buttons. = 48"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "The total (Sam has 5 and gets 3 more)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Tom has 32 dollars. Sam has 25 dollars. How many dollars do they have  = 57",
+      "Sam has 74 beads. Sam gets 37 more beads. How many beads does Sam have = 111"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The start (Sam had some, got 3, now has 8)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana had some dollars. Ana got 8 more dollars. Now Ana has 34 dollars.  = 26",
+      "Noor had some crayons. Noor got 27 more crayons. Now Noor has 75 crayo = 48"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "A part (8 in all, 5 are red)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena has 34 dollars for books and games. 9 dollars are for books. How  = 25",
+      "Yuki has 75 buttons. 28 of them are red. The rest are blue. How many b = 47"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      3
+     ],
+     "valueLabel": "How many were added? (had 8, got some, now 13)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena had 9 dollars. Lena got some more. Now Lena has 34 dollars. How m = 25",
+      "Yuki had 28 buttons. Yuki got some more. Now Yuki has 75 buttons. How  = 47"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Tom has 32 dollars. Sam has 25 dollars. How many dollars do they have  = 57",
+      "Sam has 74 beads. Sam gets 37 more beads. How many beads does Sam have = 111"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 6 dollars. Ben has 3 dollars. How many dollars do they have i = 9",
+      "Ben had some buttons. Ben got 3 more buttons. Now Ben has 9 buttons. H = 6"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 13 dollars. Ben has 5 dollars. How many dollars do they have  = 18",
+      "Ben had some buttons. Ben got 6 more buttons. Now Ben has 16 buttons.  = 10"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 66 dollars. Kofi gets 23 more dollars. How many dollars does  = 89",
+      "Ben had some buttons. Ben got 27 more buttons. Now Ben has 75 buttons. = 48"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 67 dollars. Kofi gets 66 more dollars. How many dollars does  = 133",
+      "Ben had some buttons. Ben got 27 more buttons. Now Ben has 75 buttons. = 48"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "addition:add_word_problems_plain",
+   "categoryId": "addition",
+   "skillId": "add_word_problems_plain",
+   "label": "Addition Word Problems (No Pictures)",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [
+    "band: default null is not one of its values"
+   ],
+   "options": [
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 4,
+     "default": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "The total (Sam has 5 and gets 3 more)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 18 stamps. Noor has 99 stamps. How many stamps do they have in = 117",
+      "Noor has 17 beads. Noor gets 13 more beads. How many beads does Noor h = 30"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The start (Sam had some, got 3, now has 8)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi had some cookies. Kofi got 20 more cookies. Now Kofi has 21 cooki = 1",
+      "Ben had some buttons. Ben got 3 more buttons. Now Ben has 19 buttons.  = 16"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "A part (8 in all, 5 are red)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi has 21 cookies. 19 of them are red. The rest are blue. How many c = 2",
+      "Ben has 19 buttons. 3 of them are red. The rest are blue. How many but = 16"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      3
+     ],
+     "valueLabel": "How many were added? (had 8, got some, now 13)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Kofi had 19 cookies. Kofi got some more. Now Kofi has 21 cookies. How  = 2",
+      "Ben had 3 buttons. Ben got some more. Now Ben has 19 buttons. How many = 16"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 18 stamps. Noor has 99 stamps. How many stamps do they have in = 117",
+      "Noor has 17 beads. Noor gets 13 more beads. How many beads does Noor h = 30"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam had some pencils. Sam got 8 more pencils. Now Sam has 9 pencils. H = 1",
+      "Leo had some apples. Leo got 1 more apple. Now Leo has 5 apples. How m = 4"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam had some pencils. Sam got 15 more pencils. Now Sam has 16 pencils. = 1",
+      "Leo had some apples. Leo got 1 more apple. Now Leo has 7 apples. How m = 6"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam had some pencils. Sam got 75 more pencils. Now Sam has 76 pencils. = 1",
+      "Leo had some apples. Leo got 3 more apples. Now Leo has 19 apples. How = 16"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam had some pencils. Sam got 75 more pencils. Now Sam has 76 pencils. = 1",
+      "Leo had some apples. Leo got 3 more apples. Now Leo has 19 apples. How = 16"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "addition:add_wp_change_unknown",
+   "categoryId": "addition",
+   "skillId": "add_wp_change_unknown",
+   "label": "Addition Word Problems: How Many Were Added?",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "response",
+     "label": "How the pupil answers",
+     "type": "enum",
+     "n": 2,
+     "default": "standard"
+    },
+    {
+     "id": "pictures",
+     "label": "Pictures",
+     "type": "bool",
+     "n": 2,
+     "default": true
+    },
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 4,
+     "default": [
+      3
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": 20
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "response",
+     "label": "How the pupil answers",
+     "value": "which-numbers",
+     "valueLabel": "Pick the numbers the story needs (no answer)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "In 2026, Jamal had 11 marbles. Jamal is 8 years old now and found 12 m = [\"opt1\",\"opt0\"]",
+      "Jin is 8 years old. Jin baked 13 cookies. Then Jin made 19 more cookie = [\"opt1\",\"opt0\"]"
+     ]
+    },
+    {
+     "option": "pictures",
+     "label": "Pictures",
+     "value": false,
+     "valueLabel": "false",
+     "fails": [
+      "print: printed sheet identical to the default sheet"
+     ],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "fail",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had 10 books. Aya got some more. Now Aya has 13 books. How many bo = 3",
+      "Ravi had 4 stickers. Ravi got some more. Now Ravi has 9 stickers. How  = 5"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "The total (Sam has 5 and gets 3 more)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 11 apples. Noor has 9 apples. How many apples do they have in  = 20",
+      "Noor has 6 cookies. Omar has 6 cookies. How many cookies do they have  = 12"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The start (Sam had some, got 3, now has 8)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had some books. Aya got 11 more books. Now Aya has 13 books. How m = 2",
+      "Ravi had some stickers. Ravi got 3 more stickers. Now Ravi has 9 stick = 6"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "A part (8 in all, 5 are red)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya has 13 books. 10 of them are red. The rest are blue. How many book = 3",
+      "Ravi has 9 stickers. 4 of them are red. The rest are blue. How many st = 5"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 11 apples. Noor has 9 apples. How many apples do they have in  = 20",
+      "Noor has 6 cookies. Omar has 6 cookies. How many cookies do they have  = 12"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had 6 books. Aya got some more. Now Aya has 8 books. How many book = 2",
+      "Ravi had 3 stickers. Ravi got some more. Now Ravi has 6 stickers. How  = 3"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had 49 pencils. Aya got some more. Now Aya has 57 pencils. How man = 8",
+      "Ravi had 11 apples. Ravi got some more. Now Ravi has 31 apples. How ma = 20"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had 10 books. Aya got some more. Now Aya has 13 books. How many bo = 3",
+      "Ravi had 4 stickers. Ravi got some more. Now Ravi has 9 stickers. How  = 5"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "subtraction:sub_word_problems",
+   "categoryId": "subtraction",
+   "skillId": "sub_word_problems",
+   "label": "Subtraction Word Problems",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [
+    "band: default null is not one of its values"
+   ],
+   "options": [
+    {
+     "id": "response",
+     "label": "How the pupil answers",
+     "type": "enum",
+     "n": 2,
+     "default": "standard"
+    },
+    {
+     "id": "pictures",
+     "label": "Pictures",
+     "type": "bool",
+     "n": 2,
+     "default": true
+    },
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 6,
+     "default": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "response",
+     "label": "How the pupil answers",
+     "value": "which-numbers",
+     "valueLabel": "Pick the numbers the story needs (no answer)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Zara wears a size 12 shoe. Zara had 10 stickers and used 4. Zara is 6  = [\"opt1\",\"opt0\"]",
+      "Tariq is 5 years old. Tariq had 24 stickers. Then Tariq used 13 of the = [\"opt1\",\"opt0\"]"
+     ]
+    },
+    {
+     "option": "pictures",
+     "label": "Pictures",
+     "value": false,
+     "valueLabel": "false",
+     "fails": [
+      "print: printed sheet identical to the default sheet"
+     ],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "fail",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Mia had some pencils. Mia gave away 27 pencils. Now Mia has 56 pencils = 83",
+      "Ana has 89 apples. Noor has 16 apples. How many more apples does Ana h = 73"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "What is left (had 9, gave away 4)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "There are 87 cookies in a box. Sam takes 8 cookies out. How many cooki = 79",
+      "Leo has 90 buttons. Leo gives 17 buttons to Mia. How many buttons does = 73"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The difference (how many more?)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam has 86 cookies. Leo has 7 cookies. How many more cookies does Sam  = 79",
+      "Leo has 89 buttons. Mia has 16 buttons. How many more buttons does Leo = 73"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "The start (had some, gave away 4, has 5)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Sam had some crayons. Sam gave away 79 crayons. Now Sam has 7 crayons. = 86",
+      "Leo had some stamps. Leo gave away 73 stamps. Now Leo has 16 stamps. H = 89"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      3
+     ],
+     "valueLabel": "How many went? (had 15, some went, 9 left)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben had 87 buttons. Ben gave some away. Now Ben has 79 buttons. How ma = 8",
+      "Lena had 90 crayons. Lena gave some away. Now Lena has 73 crayons. How = 17"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      4
+     ],
+     "valueLabel": "The smaller amount: fewer than (Tom has 6 fewer than Maya)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 86 buttons. Lena has 8 fewer buttons than Ben. How many button = 78",
+      "Lena has 89 crayons. Yuki has 17 fewer crayons than Lena. How many cra = 72"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      5
+     ],
+     "valueLabel": "The smaller amount: more than (Maya has 6 more than Tom)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 86 buttons. Ben has 8 more buttons than Lena. How many buttons = 78",
+      "Lena has 89 crayons. Lena has 17 more crayons than Yuki. How many cray = 72"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "There are 87 cookies in a box. Sam takes 8 cookies out. How many cooki = 79",
+      "Leo has 90 buttons. Leo gives 17 buttons to Mia. How many buttons does = 73"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Zara had some cards. Zara gave away 3 cards. Now Zara has 6 cards. How = 9",
+      "Tom has 10 marbles. Sam has 2 marbles. How many more marbles does Tom  = 8"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Zara had some cards. Zara gave away 6 cards. Now Zara has 12 cards. Ho = 18",
+      "Tom has 19 marbles. Sam has 4 marbles. How many more marbles does Tom  = 15"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Mia had some pencils. Mia gave away 27 pencils. Now Mia has 56 pencils = 83",
+      "Ana has 89 apples. Noor has 16 apples. How many more apples does Ana h = 73"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Mia had some pencils. Mia gave away 27 pencils. Now Mia has 56 pencils = 83",
+      "Ana has 89 apples. Noor has 16 apples. How many more apples does Ana h = 73"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "subtraction:sub_word_problems_plain",
+   "categoryId": "subtraction",
+   "skillId": "sub_word_problems_plain",
+   "label": "Subtraction Word Problems (No Pictures)",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [
+    "band: default null is not one of its values"
+   ],
+   "options": [
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 6,
+     "default": [
+      0,
+      1,
+      2
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": null
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "What is left (had 9, gave away 4)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 76 apples. Ana gives 12 apples to Noor. How many apples does A = 64",
+      "There are 15 cookies in a box. Noor takes 10 cookies out. How many coo = 5"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The difference (how many more?)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 75 apples. Noor has 11 apples. How many more apples does Ana h = 64",
+      "Noor has 11 cookies. Omar has 7 cookies. How many more cookies does No = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "The start (had some, gave away 4, has 5)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had some books. Aya gave away 64 books. Now Aya has 11 books. How  = 75",
+      "Ravi had some stickers. Ravi gave away 4 stickers. Now Ravi has 7 stic = 11"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      3
+     ],
+     "valueLabel": "How many went? (had 15, some went, 9 left)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki had 76 marbles. Yuki gave some away. Now Yuki has 65 marbles. How = 11",
+      "Aya had 15 books. Aya gave some away. Now Aya has 5 books. How many bo = 10"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      4
+     ],
+     "valueLabel": "The smaller amount: fewer than (Tom has 6 fewer than Maya)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki has 75 marbles. Aya has 11 fewer marbles than Yuki. How many marb = 64",
+      "Aya has 11 books. Ravi has 7 fewer books than Aya. How many books does = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      5
+     ],
+     "valueLabel": "The smaller amount: more than (Maya has 6 more than Tom)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki has 75 marbles. Yuki has 11 more marbles than Aya. How many marbl = 64",
+      "Aya has 11 books. Aya has 7 more books than Ravi. How many books does  = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 76 apples. Ana gives 12 apples to Noor. How many apples does A = 64",
+      "There are 15 cookies in a box. Noor takes 10 cookies out. How many coo = 5"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena has 8 pencils. Yuki has 3 pencils. How many more pencils does Len = 5",
+      "Yuki has 5 apples. Aya has 3 apples. How many more apples does Yuki ha = 2"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena has 14 pencils. Yuki has 6 pencils. How many more pencils does Le = 8",
+      "Yuki has 6 apples. Aya has 4 apples. How many more apples does Yuki ha = 2"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena has 59 pencils. Yuki has 25 pencils. How many more pencils does L = 34",
+      "Yuki has 11 apples. Aya has 7 apples. How many more apples does Yuki h = 4"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Lena has 59 pencils. Yuki has 25 pencils. How many more pencils does L = 34",
+      "Yuki has 11 apples. Aya has 7 apples. How many more apples does Yuki h = 4"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [
+      "screen/worksheet: no card is graded by a typed entry: worksheet per-card count not exercised"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "subtraction:sub_wp_change_unknown",
+   "categoryId": "subtraction",
+   "skillId": "sub_wp_change_unknown",
+   "label": "Subtraction Word Problems: How Many Went?",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "response",
+     "label": "How the pupil answers",
+     "type": "enum",
+     "n": 2,
+     "default": "standard"
+    },
+    {
+     "id": "pictures",
+     "label": "Pictures",
+     "type": "bool",
+     "n": 2,
+     "default": true
+    },
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 6,
+     "default": [
+      3
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": 20
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "response",
+     "label": "How the pupil answers",
+     "value": "which-numbers",
+     "valueLabel": "Pick the numbers the story needs (no answer)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aisha is 6 years old. Aisha collected 21 cards. Then Aisha traded away = [\"opt1\",\"opt0\"]",
+      "Noor wears a size 9 shoe. Noor picked 25 apples and ate 12. Noor is 8  = [\"opt1\",\"opt0\"]"
+     ]
+    },
+    {
+     "option": "pictures",
+     "label": "Pictures",
+     "value": false,
+     "valueLabel": "false",
+     "fails": [
+      "print: printed sheet identical to the default sheet"
+     ],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "fail",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana had 13 stamps. Ana gave some away. Now Ana has 9 stamps. How many  = 4",
+      "Noor had 6 beads. Noor gave some away. Now Noor has 4 beads. How many  = 2"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "What is left (had 9, gave away 4)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki has 13 stamps. Yuki gives 4 stamps to Aya. How many stamps does Y = 9",
+      "Aya has 6 beads. Aya gives 2 beads to Ravi. How many beads does Aya ha = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The difference (how many more?)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki has 13 stamps. Aya has 3 stamps. How many more stamps does Yuki h = 10",
+      "Aya has 6 beads. Ravi has 1 bead. How many more beads does Aya have th = 5"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "The start (had some, gave away 4, has 5)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki had some shells. Yuki gave away 10 shells. Now Yuki has 3 shells. = 13",
+      "Aya had some cards. Aya gave away 5 cards. Now Aya has 1 card. How man = 6"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      4
+     ],
+     "valueLabel": "The smaller amount: fewer than (Tom has 6 fewer than Maya)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 13 stamps. Noor has 4 fewer stamps than Ana. How many stamps d = 9",
+      "Noor has 6 beads. Omar has 2 fewer beads than Noor. How many beads doe = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      5
+     ],
+     "valueLabel": "The smaller amount: more than (Maya has 6 more than Tom)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 13 stamps. Ana has 4 more stamps than Noor. How many stamps do = 9",
+      "Noor has 6 beads. Noor has 2 more beads than Omar. How many beads does = 4"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki has 13 stamps. Yuki gives 4 stamps to Aya. How many stamps does Y = 9",
+      "Aya has 6 beads. Aya gives 2 beads to Ravi. How many beads does Aya ha = 4"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Yuki had 8 shells. Yuki gave some away. Now Yuki has 5 shells. How man = 3",
+      "Aya had 5 cards. Aya gave some away. Now Aya has 3 cards. How many car = 2"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana had 58 stamps. Ana gave some away. Now Ana has 44 stamps. How many = 14",
+      "Noor had 17 beads. Noor gave some away. Now Noor has 14 beads. How man = 3"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana had 13 stamps. Ana gave some away. Now Ana has 9 stamps. How many  = 4",
+      "Noor had 6 beads. Noor gave some away. Now Noor has 4 beads. How many  = 2"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  },
+  {
+   "key": "subtraction:sub_wp_compare_smaller",
+   "categoryId": "subtraction",
+   "skillId": "sub_wp_compare_smaller",
+   "label": "Compare Stories: Find the Smaller Amount",
+   "stable": true,
+   "coarseStable": true,
+   "statics": [],
+   "options": [
+    {
+     "id": "response",
+     "label": "How the pupil answers",
+     "type": "enum",
+     "n": 2,
+     "default": "standard"
+    },
+    {
+     "id": "pictures",
+     "label": "Pictures",
+     "type": "bool",
+     "n": 2,
+     "default": true
+    },
+    {
+     "id": "forms",
+     "label": "What is missing",
+     "type": "set",
+     "n": 6,
+     "default": [
+      4,
+      5
+     ]
+    },
+    {
+     "id": "band",
+     "label": "Numbers to",
+     "type": "enum",
+     "n": 3,
+     "default": 20
+    },
+    {
+     "id": "wpBar",
+     "label": "Bar model",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlOn",
+     "label": "Show the number line",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "nlFrom",
+     "label": "Starts at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlTo",
+     "label": "Ends at",
+     "type": "int",
+     "n": 2,
+     "default": null
+    },
+    {
+     "id": "nlStep",
+     "label": "Step between ticks",
+     "type": "enum",
+     "n": 20,
+     "default": "auto"
+    },
+    {
+     "id": "nlLabels",
+     "label": "Numbers under the ticks",
+     "type": "enum",
+     "n": 7,
+     "default": "auto"
+    },
+    {
+     "id": "nlMinor",
+     "label": "Small ticks between",
+     "type": "enum",
+     "n": 6,
+     "default": "auto"
+    },
+    {
+     "id": "nlHops",
+     "label": "Hop arrows over each step",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "calculator",
+     "label": "Calculator",
+     "type": "bool",
+     "n": 2,
+     "default": false
+    },
+    {
+     "id": "skipAfter",
+     "label": "Skip appears after",
+     "type": "int",
+     "n": 2,
+     "default": 5
+    }
+   ],
+   "results": [
+    {
+     "option": "response",
+     "label": "How the pupil answers",
+     "value": "which-numbers",
+     "valueLabel": "Pick the numbers the story needs (no answer)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Eli is 6 years old. Eli picked 15 apples. Then Eli ate 2 of them. How  = [\"opt1\",\"opt0\"]",
+      "Noor wears a size 6 shoe. Noor collected 11 marbles and lost 9. Noor i = [\"opt1\",\"opt0\"]"
+     ]
+    },
+    {
+     "option": "pictures",
+     "label": "Pictures",
+     "value": false,
+     "valueLabel": "false",
+     "fails": [
+      "print: printed sheet identical to the default sheet"
+     ],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "fail",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 8 apples. Lena has 4 fewer apples than Ben. How many apples do = 4",
+      "Lena has 16 cookies. Yuki has 8 fewer cookies than Lena. How many cook = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0
+     ],
+     "valueLabel": "What is left (had 9, gave away 4)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "There are 8 stickers in a box. Ana takes 5 stickers out. How many stic = 3",
+      "There are 16 pencils in a box. Noor takes 8 pencils out. How many penc = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      1
+     ],
+     "valueLabel": "The difference (how many more?)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ana has 8 stickers. Noor has 4 stickers. How many more stickers does A = 4",
+      "Noor has 16 pencils. Omar has 8 pencils. How many more pencils does No = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      2
+     ],
+     "valueLabel": "The start (had some, gave away 4, has 5)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Aya had some crayons. Aya gave away 4 crayons. Now Aya has 4 crayons.  = 8",
+      "Ravi had some stamps. Ravi gave away 8 stamps. Now Ravi has 8 stamps.  = 16"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      3
+     ],
+     "valueLabel": "How many went? (had 15, some went, 9 left)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben had 8 apples. Ben gave some away. Now Ben has 4 apples. How many a = 4",
+      "Lena had 16 cookies. Lena gave some away. Now Lena has 8 cookies. How  = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      4
+     ],
+     "valueLabel": "The smaller amount: fewer than (Tom has 6 fewer than Maya)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 8 apples. Lena has 4 fewer apples than Ben. How many apples do = 4",
+      "Lena has 16 cookies. Yuki has 8 fewer cookies than Lena. How many cook = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      5
+     ],
+     "valueLabel": "The smaller amount: more than (Maya has 6 more than Tom)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 8 apples. Ben has 4 more apples than Lena. How many apples doe = 4",
+      "Lena has 16 cookies. Lena has 8 more cookies than Yuki. How many cooki = 8"
+     ]
+    },
+    {
+     "option": "forms",
+     "label": "What is missing",
+     "value": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "valueLabel": "All of them, mixed",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "There are 8 stickers in a box. Ana takes 5 stickers out. How many stic = 3",
+      "There are 16 pencils in a box. Noor takes 8 pencils out. How many penc = 8"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 10,
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 6 apples. Lena has 3 fewer apples than Ben. How many apples do = 3",
+      "Lena has 9 cookies. Yuki has 4 fewer cookies than Lena. How many cooki = 5"
+     ]
+    },
+    {
+     "option": "band",
+     "label": "Numbers to",
+     "value": 100,
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 25 apples. Lena has 13 fewer apples than Ben. How many apples  = 12",
+      "Lena has 76 cookies. Yuki has 37 fewer cookies than Lena. How many coo = 39"
+     ]
+    },
+    {
+     "option": "wpBar",
+     "label": "Bar model",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     },
+     "sample": [
+      "Ben has 8 apples. Lena has 4 fewer apples than Ben. How many apples do = 4",
+      "Lena has 16 cookies. Yuki has 8 fewer cookies than Lena. How many cook = 8"
+     ]
+    },
+    {
+     "option": "nlOn",
+     "label": "Show the number line",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlFrom",
+     "label": "Starts at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": -1000000,
+     "valueLabel": "-1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlTo",
+     "label": "Ends at",
+     "value": 1000000,
+     "valueLabel": "1000000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1",
+     "valueLabel": "1",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "2",
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "5",
+     "valueLabel": "5",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "10",
+     "valueLabel": "10",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "20",
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "25",
+     "valueLabel": "25",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "50",
+     "valueLabel": "50",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "100",
+     "valueLabel": "100",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1000",
+     "valueLabel": "1,000",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/2",
+     "valueLabel": "Halves",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/3",
+     "valueLabel": "Thirds",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/4",
+     "valueLabel": "Quarters",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/5",
+     "valueLabel": "Fifths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/6",
+     "valueLabel": "Sixths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/8",
+     "valueLabel": "Eighths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/10",
+     "valueLabel": "Tenths (fractions)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "1/12",
+     "valueLabel": "Twelfths",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.1",
+     "valueLabel": "0.1 (decimal tenths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlStep",
+     "label": "Step between ticks",
+     "value": "0.01",
+     "valueLabel": "0.01 (decimal hundredths)",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "all",
+     "valueLabel": "Every tick",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "2",
+     "valueLabel": "Every 2nd tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "5",
+     "valueLabel": "Every 5th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "10",
+     "valueLabel": "Every 10th tick",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "ends",
+     "valueLabel": "The two ends only",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlLabels",
+     "label": "Numbers under the ticks",
+     "value": "none",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "0",
+     "valueLabel": "None",
+     "fails": [],
+     "warns": [
+      "print: printed sheet identical to the line with this control on Auto, which already chose this value for the page"
+     ],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "2",
+     "valueLabel": "Halves of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "4",
+     "valueLabel": "Quarters of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "5",
+     "valueLabel": "Fifths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlMinor",
+     "label": "Small ticks between",
+     "value": "10",
+     "valueLabel": "Tenths of a step",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "nlHops",
+     "label": "Hop arrows over each step",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     },
+     "base": {
+      "range": 100,
+      "decimals": 0
+     }
+    },
+    {
+     "option": "calculator",
+     "label": "Calculator",
+     "value": true,
+     "valueLabel": "true",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 0,
+     "valueLabel": "0",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 2,
+     "valueLabel": "2",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    },
+    {
+     "option": "skipAfter",
+     "label": "Skip appears after",
+     "value": 20,
+     "valueLabel": "20",
+     "fails": [],
+     "warns": [],
+     "checks": {
+      "trip": "ok",
+      "gen": "ok",
+      "print": "ok",
+      "screen": "ok"
+     }
+    }
+   ],
+   "genFile": "gen-operations.js"
+  }
+ ],
+ "noOptions": []
+}
