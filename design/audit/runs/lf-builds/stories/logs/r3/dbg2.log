@@ -11,3 +11,35 @@ subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .
 TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
 
 ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 16 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .      16    .     .       .     .    .      .       .        .       .    .  FAIL
+TOTAL                                           .     .    .    .        .     .      16    .     .       .     .    .      .       .        .       .    .
+
+subtraction:sub_wp_compare_smaller (Compare Stories: Find the Smaller Amount)
+  [L-DENSITY H13 major] x16 (p1,2 cells 1,2,3,4,5,6,7,8...) one empty band 8.5 mm tall in a 28 mm cell (30%): the row is sized for a taller item than it holds (RUBRIC H13)
+      e.g. <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "1 Zara has 14 crayons. Tom h..." | <div.ws-cell.mqt--word-work[data-ws-cell="word-work"]> "2 Tom has 10 stamps. Sam has..."
+
+ws-print-lint: FAIL - 3 document(s), source kit; 16 finding(s) in 1 document(s)
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-grade-render: 1 skills -> ../../../../../../tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg2
+  [1/1] subtraction:sub_wp_compare_smaller  independent-S 1p+1k 1x11  independent-M 1p+1k 1x9  independent-L 1p+1k 2x3  22s
+ws-grade-render: done, 1 units, 6 pages, 22s
+exit 0

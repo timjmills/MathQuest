@@ -1,0 +1,8 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_word_problems --roles error-analysis --size M --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg4b; cd /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/../r2/master && tests/scripts/mq-browser-run.sh node tests/scripts/ws-grade-render.cjs --skills subtraction:sub_word_problems --roles error-analysis --size M --no-screen --out /tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg4m  [159dfbca3]
+ws-grade-render: 1 skills -> ../../../../../../tmp/claude-0/-home-user-MathQuest/a28793f0-3a8c-5932-9bc9-4eb414e6d9a8/scratchpad/r3/dbg4b
+  [1/1] subtraction:sub_word_problems  error-analysis 1p+1k 1x2  11s
+ws-grade-render: done, 1 units, 2 pages, 11s
+ws-grade-render: 1 skills -> ../../r3/dbg4m
+  [1/1] subtraction:sub_word_problems  error-analysis 1p+1k 1x2  10s
+ws-grade-render: done, 1 units, 2 pages, 10s
+exit 0

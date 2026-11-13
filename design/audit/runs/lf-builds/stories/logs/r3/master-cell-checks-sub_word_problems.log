@@ -1,0 +1,1 @@
+$ tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills subtraction:sub_word_problems --card --card-opts  [1db0e3309]

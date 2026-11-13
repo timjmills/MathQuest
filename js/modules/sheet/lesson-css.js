@@ -94,6 +94,7 @@ ${ICON_CSS}
 :is(.ws-page,.ws-sheet) .mq-lwarmrow .mq-rowcol+.mq-rowcol{border-left:var(--ws-hair) solid var(--ws-ink)}
 :is(.ws-page,.ws-sheet) .mq-lwarmcol{display:flex;flex-direction:column;min-width:0}
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter{justify-content:center}
+:is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter .mq-wwsentence[data-ww-storybar]{width:fit-content!important;max-width:100%;margin-left:auto;margin-right:auto}
 /* CL-4b (s3 precritic-2): a Guided cell carries no tab, so a stack that is not write-above keeps no
    tab clearance above it: its digits start at the top pad. Write-above stacks keep their centring. */
 :is(.ws-page,.ws-sheet) .ws-cell.mq-lvcenter:not(:has(> .ws-tab, > .ws-letter, > .ws-modeltab, > [data-ws-label])) > .ws-stack:not([data-ws-writeabove]){margin-top:0}

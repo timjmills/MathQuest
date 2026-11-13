@@ -25,6 +25,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cardPlanFor } from '../lib/ws-card-plan.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TOOL = 'ws-precritic-plan';
@@ -61,6 +62,18 @@ export function planHasLesson(planText, { lesson, mode }) {
     return planText.split('\n').filter((l) => l.includes('tests/scripts/ws-detailed-lesson.') && new RegExp(`--lesson ${lesson}(\\s|$)`).test(l) && new RegExp(`--${mode}\\b`).test(l));
 }
 
+/**
+ * ws-empty-band with NO --roles renders every role the skill's signed card offers (tests/lib/ws-card-plan.mjs), so a row's
+ * `ws-empty-band --roles R` check is on the --skill plan's empty-band gate when every row skill's card offers R (word-stories
+ * r3: eb-guided-word-stories ran `--roles guided` and no plan line carried that flag). `offered` maps skill -> roles. Pure.
+ */
+export function planHasCardRoles(planText, { tool, skills, roles }, offered) {
+    if (tool !== 'ws-empty-band' || !roles) return [];
+    const want = String(roles).split(',').filter(Boolean);
+    if (!skills.every((k) => want.every((r) => ((offered && offered[k]) || []).includes(r)))) return [];
+    return planHas(planText, { tool, skills, roles: null }).filter((l) => !/--roles?[ =]/.test(l));
+}
+
 /** The plan lines of a dry run that run `tool` on every skill of `skills` (and with --roles R when given). Pure. */
 export function planHas(planText, { tool, skills, roles }) {
     return planText.split('\n').filter((l) => l.includes(`tests/scripts/${tool}.`))
@@ -84,6 +97,11 @@ function selfTest() {
     eq('lesson lp planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'lp' }).length, 1);
     eq('lesson sweep not planned', planHasLesson(lplan, { lesson: 'g3-oa8-two-step-wp', mode: 'sweep' }).length, 0);
     eq('not planned for another skill', planHas(plan, { tool: 'ws-dealer-uniform', skills: ['addition:add'], roles: null }).length, 0);
+    const ebPlan = '  [browser] empty-band — tests/scripts/mq-browser-run.sh node tests/scripts/ws-empty-band.cjs --skill a:x,a:y';
+    eq('eb role on the card plan', planHasCardRoles(ebPlan, { tool: 'ws-empty-band', skills: ['a:x'], roles: 'guided' }, { 'a:x': ['independent', 'guided'] }).length, 1);
+    eq('eb role the card does not offer', planHasCardRoles(ebPlan, { tool: 'ws-empty-band', skills: ['a:x'], roles: 'stretch' }, { 'a:x': ['independent', 'guided'] }).length, 0);
+    eq('eb role, a skill with no card', planHasCardRoles(ebPlan, { tool: 'ws-empty-band', skills: ['a:x', 'a:y'], roles: 'guided' }, { 'a:x': ['guided'] }).length, 0);
+    eq('eb role, another tool', planHasCardRoles(ebPlan.replace('ws-empty-band', 'ws-cell-checks'), { tool: 'ws-cell-checks', skills: ['a:x'], roles: 'guided' }, { 'a:x': ['guided'] }).length, 0);
     console.log(bad.length ? `${TOOL}: FAIL (self-test, ${bad.length} of ${n})\n  ${bad.join('\n  ')}` : `${TOOL}: OK (self-test, ${n} cases)`);
     process.exit(bad.length ? 1 : 0);
 }
@@ -130,11 +148,19 @@ else {
         const via = `ws-precritic --skill ${c.skills.join(',')}${role ? ` --role ${role}` : ''}`;
         if (!p.ok) { fails.push(`${row.id}: ${via} --dry-run failed: ${p.text.trim().split('\n').slice(-1)[0]}`); continue; }
         let hit = planHas(p.text, c);
+        // (an empty-band role check is on the plain --skill plan's card-planned empty-band gate when the card offers the role)
+        let viaCard = false;
+        if (!hit.length && c.tool === 'ws-empty-band' && c.roles) {
+            const base = plan(c.skills, null);
+            const offered = {};
+            for (const k of c.skills) { try { offered[k] = (await cardPlanFor(ROOT, k)).roles || []; } catch (e) { offered[k] = []; } }
+            if (base.ok) { hit = planHasCardRoles(base.text, c, offered); viaCard = hit.length > 0; }
+        }
         // deploy path only for a tool precritic never plans (e.g. ws-viewport-check), and never for a role check: a tool that
         // precritic DOES plan must be planned on this skill (and role), or the check is off the lane's path
         const onDeploy = !hit.length && !c.roles && !p.text.includes(`tests/scripts/${c.tool}.`) && deploy.includes(`${c.tool}.`);
         if (onDeploy) hit = ['deploy'];
-        console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : role ? ` (via --role ${role})` : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}`);
+        console.log(`  ${hit.length ? 'OK  ' : 'FAIL'} ${row.id.padEnd(30)} ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} on ${c.skills.join(',')}${onDeploy ? ' (deploy path: ws-deploy-gates.sh)' : viaCard ? ' (via the --skill empty-band gate: every role the card offers)' : role ? ` (via --role ${role})` : ''}${gone.length ? ` (not live here, dropped: ${gone.join(',')})` : ''}`);
         if (!hit.length) fails.push(`${row.id}: ${via} plans no ${c.tool}${c.roles ? ` --roles ${c.roles}` : ''} gate on it (the check is backtested but not on the lane's path)`);
     }
     console.log(`  not applicable (no skill in the command): ${na.join(', ')}`);

@@ -374,16 +374,21 @@ export function plan(input = {}) {
     const rowMarks = !!marks && it.q && it.q.cell && it.q.cell.template === 'count-row';
     const tallBeside = !factRows(input) && !rowMarks && !story && cols === 2 && steps.length >= 2 && steps.length <= 5
         && hMinAt([it], 2, ctx) * 0.7 >= textH2 && deal.length > 1;
+    // A SENTENCE STORY over two pages (word-stories precritic r3, critic r1 F10: two states a page, each step text beside its
+    // frame 65-75 % empty, page 1 half empty): its frames stand side by side too, each with its step text over it, under the
+    // story printed once - one page when that grid fits it.
+    const storyAcross = !!story && cols === 2 && steps.length >= 2 && steps.length <= 4 && deal.length > 1;
     const acrossOk = (a, em = 0.5) => {
-        if (!tallBeside) return true;
+        if (!tallBeside && !storyAcross) return true;
         const colW = 186 / a - 6 - 9.5;
         const charMm = em * m.textPt * (25.4 / 72);
         const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
-        return lines <= 2 && Math.ceil(steps.length / a) * (hMinAt([it], a, ctx) + lines * m.textPt * 1.3 * (25.4 / 72) + 4) <= room1;
+        // (a story's step texts are sentences: three lines over a half-width frame at L, where two lines held them at S / M)
+        return lines <= (storyAcross ? 3 : 2) && Math.ceil(steps.length / a) * (hMinAt([it], a, ctx) + lines * m.textPt * 1.3 * (25.4 / 72) + 4) <= room1;
     };
     // (FIVE states - a provider's five worked steps, function_table_easy since its PT-MOD-1 marks: 3 + 2, a row of three over a
     // row of two, never a 2 x 3 grid with an empty state cell, MOD-GRID; lf-roles r8)
-    const acrossAt = (factRows(input) || tallBeside) && !rowMarks && !story && steps.length >= 2 && steps.length <= 4
+    const acrossAt = (factRows(input) || tallBeside || storyAcross) && !rowMarks && (!story || storyAcross) && steps.length >= 2 && steps.length <= 4
         ? [steps.length, 2].find((a) => steps.length % a === 0 && fitsAt([it], a, ctx) && acrossOk(a))
         : tallBeside && steps.length === 5 && fitsAt([it], 3, ctx) && acrossOk(3, 0.6)
             // (the state draws the SAME at three columns as at two - a word bank that wraps narrower changes the drawing from
@@ -397,8 +402,22 @@ export function plan(input = {}) {
         textMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
         H = hMinAt([it], across, ctx) + textMm;
         deal = [steps.length];
+    } else if (storyAcross && steps.length % 2 === 0 && fitsAt([it], 2, ctx)) {
+        // (a sentence story whose four frames do not fit ONE page side by side - L: the story and three-line step texts -
+        // still stands them two across, a row of two a page: beside its step text each frame left the text cell 65-75 %
+        // empty; the pages are dealt by whole rows, the Say band on the last)
+        const colW = 186 / 2 - 6 - 9.5;
+        const charMm = 0.5 * m.textPt * (25.4 / 72);
+        const lines = Math.max(...steps.map((t) => Math.max(1, Math.ceil((String(t).length * charMm) / colW))));
+        const tMm = lines * m.textPt * 1.3 * (25.4 / 72) + 4;
+        const H2 = hMinAt([it], 2, ctx) + tMm;
+        const r1 = Math.floor(room1 / H2), rC = Math.floor(roomC / H2);
+        if (lines <= 3 && r1 >= 1 && rC >= 1) {
+            across = 2; textMm = tMm; H = H2;
+            deal = dealOf(steps.length, 2 * r1, 2 * rC);
+            if (deal.some((c) => c % 2)) deal = Array.from({ length: Math.ceil(steps.length / 2) }, () => 2);
+        }
     }
-    const acrossRows = across ? Math.ceil(steps.length / across) : 0;
     const ans = answerOf(it);
     // the sentence story: the step that first writes each place (the provider's worked-step marks)
     const writtenAt = new Map();
@@ -424,7 +443,7 @@ export function plan(input = {}) {
         const cells = [];
         for (const k of take) { cells.push(stateItem(k)); if (cols === 2 && !across) cells.push(textItem(k)); }
         const split = across && take.length % across !== 0;
-        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: acrossRows, cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
+        const grid = split ? null : across ? gridPart(cells, { cols: across, rows: Math.ceil(take.length / across), cellH: H, labels: 'none' }) : gridPart(cells, { cols, rows: take.length, cellH: H, labels: 'none' });
         // (3 + 2: the full rows in `across` columns, the rest in a grid of their own count, same row height)
         const grids = split ? [gridPart(cells.slice(0, across * Math.floor(take.length / across)), { cols: across, rows: Math.floor(take.length / across), cellH: H, labels: 'none' }),
             gridPart(cells.slice(across * Math.floor(take.length / across)), { cols: take.length % across, rows: 1, cellH: H, labels: 'none' })] : null;

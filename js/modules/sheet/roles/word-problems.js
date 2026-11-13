@@ -139,8 +139,14 @@ export function prepare(it, info = {}) {
     // The word-work cell (every whole-number story, owner ruling 2026-09-25) is the page's cell as
     // it is: story, sign row, column boxes and the answer with its unit bank.
     if (it.template === 'word-work') {
+        // (a one-step story in the SENTENCE layout is answered in its boxes and kept no working space: three to a page left
+        // 37-67 % of each cell empty - word-stories precritic r3, EB-BAND. The page's work space then holds the story's own
+        // bar - the part-whole bar, or the change / compare bars - blank on the pupil page and worked on the key, as a
+        // named model is drawn in a word problem's work space, PAGE_TYPES 3.7)
+        const pl = (it.q && it.q.cell && it.q.cell.payload) || {};
+        const barIt = pl.layout === 'sentence' && Array.isArray(pl.steps) && pl.steps.length === 1;
         return Object.assign({}, it, {
-            render: (c, o = {}) => it.render(c, o),
+            render: (c, o = {}) => it.render(c, barIt ? Object.assign({}, o, { payload: Object.assign({}, o.payload, { bar: true }) }) : o),
             measured: null, footprint: Object.assign({}, it.footprint || {}, { measure: true, hMm: null, maxCols: 2 }),
             fclass: 'word', story: true, wordWork: true,
         });

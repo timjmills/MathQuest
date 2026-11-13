@@ -1,0 +1,43 @@
+$ for z in L M S; do tests/scripts/mq-browser-run.sh node tests/scripts/ws-print-lint.cjs --source kit --size $z --skills addition:add_wp_change_unknown,subtraction:sub_wp_change_unknown,subtraction:sub_wp_compare_smaller; done; tests/scripts/mq-browser-run.sh node tests/scripts/ws-cell-checks.cjs --skills addition:add_wp_change_unknown --roles error-analysis --size S,M,L  [159dfbca3]
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-print-lint: source kit, 3 skill(s)
+  addition:add_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_change_unknown: 2+1 pages, 0 finding(s)
+  subtraction:sub_wp_compare_smaller: 2+1 pages, 0 finding(s)
+
+document                              pages   INK EMOJI FONT SIZE OVERFLOW SPLIT DENSITY  KEY VERBS ANSAREA INPUT CCSS ANCHOR SUPPORT TOPSTART OVERLAP WRAP  result
+addition:add_wp_change_unknown          2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_change_unknown       2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+subtraction:sub_wp_compare_smaller      2+1k    .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .  ok
+TOTAL                                           .     .    .    .        .     .       .    .     .       .     .    .      .       .        .       .    .
+
+ws-print-lint: OK (3 document(s), source kit; 0 finding(s) in 0 document(s))
+ws-cell-checks: 3 page(s) - addition:add_wp_change_unknown
+  ok   addition:add_wp_change_unknown error-analysis S: 1p 2x? per 6
+  ok   addition:add_wp_change_unknown error-analysis M: 1p 1x? per 4
+  ok   addition:add_wp_change_unknown error-analysis L: 1p 2x? per 4
+ws-cell-checks: OK (3 page(s), no finding; 8s)
+exit 0

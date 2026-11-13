@@ -615,6 +615,7 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             why: (res.find((r) => !r.fits) || {}).why || (f && f.fits === false ? 'width' : f && auto && f.autoFits === false ? 'fill' : ''),
             hMin,
             ko: meas ? koMm(size) : 0,
+            hs: res.map((r) => r.hMin), fH,
         };
     };
 
@@ -787,6 +788,11 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
             if (gridOverride && section.sharedPage && c > cols && pc.hMin > 0 && pc.hMin + 1 > G && probe(cols, false).hMin + 1 <= G) continue;
             // (free rows: the rows take the problems' own measured height, buildSheet checks the page)
             let rr = Math.max(1, Math.min(Math.floor((G - SAFETY_H_MM) / (section.freeRows ? pc.hMin : roomed(pc, room))), Math.floor(dCeil / c)));
+            // (an IN-PLACE page whose items differ in height - a 4-line story among 3-line ones: word-stories precritic r3,
+            // H13 30 % in every 3-line row at M - counts its rows from the items' OWN heights, tallest first, as rows
+            // of nearly one height do below: sizing every row for its one tallest item left each shorter row's cell a
+            // third empty. Rows past the sample count as the tallest the skill can print.)
+            if (!section.freeRows && room <= 1) rr = Math.max(rr, Math.min(inPlaceRows(infos, pc, c, G - SAFETY_H_MM), Math.floor(dCeil / c)));
             if (c === 2 && !section.freeRows) rr = TWO_COL_ROWS.find((x) => x <= rr) || rr;
             // (an in-place cell at the same count prefers MORE rows: one row of half-page cells is mostly empty paper)
             const tie = rr * c === best.perPage && best.cols !== c && ((sideBand(best.cols) >= 0.25 && sideBand(c) < sideBand(best.cols)) || (c0 < cols && rr > (best.rows || 0)));
@@ -941,6 +947,31 @@ export default {
     itemInfo, sectionClass, resolveSectionLayout, fitsLine,
 };
 
+/**
+ * The rows an IN-PLACE section (every footprint `inPlace`) of UNEVEN items holds at `c` columns, counted from the items'
+ * own measured heights (`pc.hs`, the probe's per-item heights), tallest first; rows past the sample count as the tallest
+ * the skill can print (the probe's floor, `pc.fH`). 0 when the section is not in place or its items are one height (the
+ * grid's own count stands). Pure.
+ */
+export function inPlaceRows(infos, pc, c, budgetMm) {
+    if (!Array.isArray(infos) || !infos.length || !infos.every((i) => i && i.fp && i.fp.inPlace)) return 0;
+    const hs = (pc && pc.hs) || [];
+    if (hs.length !== infos.length || hs.some((h) => !(h > 0))) return 0;
+    const desc = hs.slice().sort((a, b) => b - a);
+    if (desc[0] - desc[desc.length - 1] < 2) return 0;
+    const top = Math.max(desc[0], Number(pc.fH) || 0);
+    let sum = 0, nr = 0;
+    for (let i = 0; i < desc.length; i += c) {
+        if (sum + desc[i] > budgetMm) return nr;
+        sum += desc[i]; nr++;
+    }
+    while (sum + top <= budgetMm) { sum += top; nr++; }
+    return nr;
+}
+
+/** Every item of the row set is answered IN PLACE (its footprint's `inPlace`): its rows stop at IN_PLACE_FILL x the shortest. */
+export const inPlaceItems = (items) => items.length > 0 && items.every((it) => !!it && !!((it.fp || it.footprint || {}).inPlace));
+
 /* ============================================================ rows sized to what they hold */
 
 /** The measured height (mm) of a host item at `cols`, or 0 when unknown. */
@@ -1028,13 +1059,17 @@ export function rowShape(items, cols, rows, cellH, fillRefH = 0) {
     // Each row stretches by the page's share (k) but no further than its own shortest problem
     // allows, and never below its tallest (1).
     const k = Math.max(1, Math.min((rows * cellH) / S, FILL_CAP));
-    let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]))));
+    // (an IN-PLACE row stretches no further than its SHORTEST item x IN_PLACE_FILL - a 3-line story beside a 4-line one
+    // keeps no working space under it: word-stories precritic r3, H13 33 % at L)
+    const ip = inPlaceItems(items);
+    const cap = (r) => (ip ? mins[r] * IN_PLACE_FILL : Infinity);
+    let H = w.map((x, r) => Math.max(x, Math.min(k * x, fillLimit(mins[r]), cap(r))));
     // The same fallback as the layout's cell height: when the fill limit would leave more than a
     // fifth of the grid it was given under the rows, they take up to FILL_CAP x their content
     // (critic guided-r1 lint: a compare page at L left an 80 mm strip under 18 short rows).
     // (`fillRefH`, Wave 5.2 critic nl-r4 D2: the cell height the grid had without the number-line
     // band, so the band's 13 mm never tips a page across this threshold and doubles its cost.)
-    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * Math.max(cellH, Number(fillRefH) || 0)) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r])));
+    if (H.reduce((a, b) => a + b, 0) < 0.8 * rows * Math.max(cellH, Number(fillRefH) || 0)) H = w.map((x, r) => Math.max(x, Math.min(k * x, FILL_CAP * mins[r], cap(r))));
     H = evenRows(w, H);
     const total = H.reduce((a, b) => a + b, 0);
     return { rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' '), heightMm: Math.round(total * 100) / 100 };
