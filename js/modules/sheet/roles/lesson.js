@@ -115,7 +115,10 @@ export function counts(pools, input) {
     // repeats and turns its own facts round, PG-TURN)
     // (r6, critic r5 R2: and with the check off - `nearRules`, every library lesson: live round L printed 43 / 34 on its sheet)
     if (input && input.lesson && input.lesson.data && (input.lesson.data.indepRules || input.lesson.data.nearRules) && mainPool.length && mainPool.every((it) => oneNumOf(it) !== null)) out.main = Math.max(out.main, 2 * PROBE);
-    for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1);
+    // (r6, critic r5 R2: a one-number Warm-up pool on a near-ruled sheet is dealt twice as deep, so warm-up.js's near-twin split has
+    // clean items to take first - live round printed identify 61 / 63 in its Warm-up at 4 of 64 seeds)
+    const nearSheet = !!(input && input.lesson && input.lesson.data && (input.lesson.data.indepRules || input.lesson.data.nearRules));
+    for (const [id, s] of Object.entries(shape)) out[id] = s.k * (s.rows || 1) * (nearSheet && (pools[id] || []).length && pools[id].every((it) => oneNumOf(it) !== null) ? 2 : 1);
     // (split rows per kind may fall back to the shared row in `plan`: deal enough for either)
     if (Object.values(shape).some((s) => s.split)) for (const [id, s] of Object.entries(warmShape(pools, Object.assign({}, input, { _warmShared: true })))) out[id] = Math.max(out[id] || 0, s.k * (s.rows || 1));
     for (const id of Object.keys(pools)) if (/^x/.test(id)) out[id] = 3;
