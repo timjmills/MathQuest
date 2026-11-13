@@ -3639,6 +3639,46 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "review-zero-row-multfacts-array",
+  "check": "a x 0 fact on an array-support page draws the short empty landscape frame, so its Review row is not sized round an absent array (lead ruling 2026-11-13)",
+  "kind": "commit-pair",
+  "rule": "ws-print-lint L-DENSITY H13-ROW (RUBRIC H13); ws-screen-support-eq ARRAY-FRAME",
+  "browser": true,
+  "fail": {
+   "commit": "05875e169",
+   "state": "1 finding: \"4 × 0\" p1 cell 8, 22.7 mm empty under the item in a 62.8 mm cell (32 %), H13-ROW"
+  },
+  "pass": {
+   "commit": "792e5ca30",
+   "state": "0 findings: \"4 × 0\" draws the empty frame"
+  },
+  "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports array --size S --roles review --skills multiplication:mult_facts --lints L-DENSITY",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "array-frame-multfacts",
+  "check": "every fact of an array-support band draws its array or frame - a x 0 fact the short empty frame - on paper S / M / L and every screen host",
+  "kind": "commit-pair",
+  "rule": "ws-screen-support-eq ARRAY-FRAME (lead ruling 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "669c41cea",
+   "state": "11 findings: 8 x 0 on paper S / M / L, 10 x 0 on the card and quiz draw nothing"
+  },
+  "pass": {
+   "commit": "792e5ca30",
+   "state": "0 findings"
+  },
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only FRAME,EQ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
