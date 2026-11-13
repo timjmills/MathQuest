@@ -810,3 +810,4 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 ## 2026-11-13 — Deploy lesson part settings, step A (lf-partopts, critic r4 PASS: 8+ everywhere)
 - Per-part settings for lessons, practice and quiz: how many problems per part and which supports, with the screen only offering settings the page checks pass. Default identity: all 1,732 default lesson pages byte-identical to master.
 - Gates: boot-smoke, code-snapshot, redesign-passed, teacher-wrm, pdf-preview, simple-print, screen-answer, capacity-pin, roles-unit, precritic-plan (none dropped), conflict-markers.
+- 2026-11-13 ~18:45 UTC owner: drop print size S; keep M and L (plan item 9 in CLAUDE.md). S settings / codes fall back to M.
