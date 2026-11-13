@@ -4073,8 +4073,8 @@
     "state": "49 findings: caption \"b rows of a\" (portrait on a < b) without the fact"
    },
    "pass": {
-    "commit": "393db090",
-    "state": "0 findings: \"3 rows of 7, for 7 × 3\" on paper S / M / L and every screen host"
+    "commit": "ecc8342e8",
+    "state": "0 findings: x arrays min rows of max, the fact named, and one row reads \"1 row of n\" (re-pointed from 393db090: CAPTION now also holds the r1 N1 grammar, which 393db090 broke - \"1 rows of 1\")"
    },
    "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
    "expect": {
@@ -4173,8 +4173,8 @@
     "state": "3 paper findings (S/M/L): 1 framed and 9 unframed array supports in one band - the x 0 frame reads as the lone slot-like box"
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "0 findings: the x 0 support no longer draws a closed slot-like box"
+    "commit": "ecc8342e8",
+    "state": "0 findings: every x array draws in the band's one frame and the x 0 fact draws that frame empty - no lone slot-like box"
    },
    "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only NOTSLOT",
    "expect": {
@@ -4193,8 +4193,8 @@
     "state": "3 findings (card 1280/820/390): caption \"1 rows of 1, for 1 x 1\" says \"1 rows\""
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "0 findings: the one-row caption says \"1 row of 1\""
+    "commit": "ecc8342e8",
+    "state": "0 findings: the one-row caption says \"1 row of 1, for 1 x 1\""
    },
    "command": "node tests/scripts/ws-screen-support-eq.cjs --skills multiplication:mult_facts --only CAPTION",
    "expect": {
@@ -4213,8 +4213,8 @@
     "state": "3 findings: mult_facts {support:array} independent/test/more-practice S==L (10/10/10, 12/12/12) - same page at every size. (master also fails: pre-existing, 10/10/10)"
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "0 findings: the x array page sizes from its cells, S > L"
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array page sizes from its measured band-frame cells - Independent / Test / More practice S 10 > M 8 >= L 8"
    },
    "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
    "expect": {
@@ -4224,19 +4224,19 @@
   },
   {
    "id": "test-eq-ind-multfacts",
-   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1). DISABLED behind --test-eq-ind pending the lead's ruling on whether the div_facts rule (2026-11-09) extends to mult_facts",
+   "check": "a fact skill's Test count follows its Independent count on each support (critic divarray r1 Q1; lead ruling 2026-11-13: the div_facts rule of 2026-11-09 extends to mult_facts - TEST-EQ-IND runs by default)",
    "kind": "commit-pair",
-   "rule": "ws-capacity-pin TEST-EQ-IND (--test-eq-ind)",
+   "rule": "ws-capacity-pin TEST-EQ-IND (on by default)",
    "browser": true,
    "fail": {
     "commit": "e3aa95d32",
     "state": "mult_facts array Test 12 != Independent 10 (S/M/L); touch Test 20/16 != Independent 25/20 (S/M). (master also fails touch 20!=25)"
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "pending the lead's ruling; if ruled, Test == Independent per support"
+    "commit": "ecc8342e8",
+    "state": "0 findings: mult_facts Test = Independent on array, touch, skip, boxsign and no support (S/M/L), div_facts array as before"
    },
-   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --test-eq-ind",
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -4253,8 +4253,8 @@
     "state": "PAGEFILL fires on mult_facts Review S touch: an empty strip ~30% of the problem area under the grid"
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "0 PAGEFILL findings: the Review page fills (4-column 16, or spread rows)"
+    "commit": "ecc8342e8",
+    "state": "0 PAGEFILL findings: Review S touch prints 4 x 3 facts + 4 stacks = 16 and fills the page"
    },
    "command": "node tests/scripts/ws-print-lint.cjs --source kit --supports touch --size S --roles review --fill-roles review --skills multiplication:mult_facts --lints L-DENSITY",
    "expect": {
@@ -4273,8 +4273,8 @@
     "state": "EB-SUPBAND fires 114 across the default roles on mult_facts {support:array} (e.g. Test S cell 4 ~38%); div_facts array PASSes (the frame fills). master also fails (pre-existing unframed x array, 2 at S)"
    },
    "pass": {
-    "commit": "TBD-divarray-r2",
-    "state": "0 findings: the x array gets a band frame (or the rows size to the items)"
+    "commit": "ecc8342e8",
+    "state": "0 findings: the x array draws in the band frame beside the fact (no band under a short array)"
    },
    "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --sizes S,M,L --roles independent,more-practice,test,review,guided,opener,error-analysis --hosts none --no-baseline --opts '{\"support\":[\"array\"]}' --only EB-SUPBAND",
    "expect": {
@@ -5425,6 +5425,26 @@
     "state": "worksheet picture slot 104 px"
    },
    "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "capacity-ruled-review-touch-multfacts",
+   "check": "a RULED option page prints at least its ruled count: mult_facts Review S with touch is ruled 16 (master's count; lead ruling 2026-11-13 withdrew the 16 -> 15 re-pin that left a 30 % blank strip, critic divarray r1 D2)",
+   "kind": "commit-pair",
+   "rule": "ws-capacity-pin ruled page (CAPACITY-NO-DROP)",
+   "browser": true,
+   "fail": {
+    "commit": "e3aa95d32",
+    "state": "mult_facts review S {support:[touch]}: 15 items, under its RULED 16"
+   },
+   "pass": {
+    "commit": "ecc8342e8",
+    "state": "16 items: 4 x 3 facts + 4 stacks (review.js geometry)"
+   },
+   "command": "node tests/scripts/ws-capacity-pin.cjs --check --skills multiplication:mult_facts --roles review --sizes S --no-test-eq-ind",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"

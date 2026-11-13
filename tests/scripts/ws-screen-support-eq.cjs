@@ -304,7 +304,8 @@ function readCellsInPage({ sel, cellSel }) {
                 };
                 const paper = await paperAt('M');
                 // ARRAY-ORIENT on paper: the Independent page at S, M and L
-                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME')) && sup === 'array') {
+                // (r2: NOTSLOT judges these paper pages too - `--only NOTSLOT` skipped them, so its backtest read only the screen hosts)
+                if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME') || ONLY.includes('NOTSLOT')) && sup === 'array') {
                     for (const size of ['S', 'M', 'L']) {
                         const pr = size === 'M' ? paper : await paperAt(size);
                         if (ONLY.includes('FRAME')) for (const c of (pr.cells || []).filter((x) => x.item)) {
