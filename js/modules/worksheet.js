@@ -1005,6 +1005,7 @@ export function layoutWorksheetGrid(grid) {
     const maxCols = w >= 960 ? 3 : w >= 620 ? 2 : 1;
     _wsOneDigit(cards);
     _wsOneSupportPlace(cards, true);
+    _wsOneAnswerPlace(cards, true);
     for (let cols = maxCols; cols >= 1; cols--) {
         grid.style.setProperty('--mq-wscols', String(cols));
         let ok = true;
@@ -1012,9 +1013,46 @@ export function layoutWorksheetGrid(grid) {
         if (ok) break;
     }
     _wsOneSupportPlace(cards);
+    _wsOneAnswerPlace(cards);
     _wsEvenRows(cards);
 }
 
+/**
+ * One answer place per worksheet (critic divarray r2 D7; ws-screen-support-eq SCREEN-ANSWER-PLACE): a ÷ sentence's answer
+ * line stands beside its "=" while the row has room and wraps under the sentence when it has not - at 820 px with the 48 px
+ * digit floor a 1-digit dividend kept it beside and a 2-digit one wrapped, so one sheet had two answer places and three cell
+ * heights. When any ÷ card of the sheet wraps, every ÷ card puts its answer line under its sentence (the slot takes the
+ * full line, its box centred, as a natural wrap draws it). `reset` clears the choice before the columns are measured again.
+ */
+function _wsOneAnswerPlace(cards, reset = false) {
+    const eqs = cards.map((c) => c.querySelector('.ws-card-visual .ws-eq.mq-eq[aria-label*="divided by"]')).filter(Boolean);
+    const slotOf = (eq) => eq.querySelector(':scope > .mq-eqslot');
+    if (reset) eqs.forEach((eq) => { const sl = slotOf(eq); if (sl && sl.dataset.mqOnePlace) { delete sl.dataset.mqOnePlace; sl.style.flexBasis = ''; sl.style.justifyContent = ''; } });
+    // (the same for the sign box drawn BEFORE a ÷ sentence: on screen it wraps above a sentence too wide for the row - "108 ÷ 12"
+    // at 1280 - so when one card's sign box wraps above, every ÷ card's does, one support place and one cell height)
+    const befores = cards.map((c) => {
+        const eq = c.querySelector('.ws-card-visual .ws-eq[aria-label*="divided by"]');
+        return eq ? eq.closest('.ws-with-pane[data-ws-pane-place="before"]') : null;
+    }).filter(Boolean);
+    if (reset) {
+        befores.forEach((wp) => { if (wp.dataset.mqOnePlace) { delete wp.dataset.mqOnePlace; wp.style.flexDirection = ''; wp.style.alignItems = ''; } });
+    } else if (befores.length >= 2) {
+        const above = (wp) => {
+            const prob = wp.querySelector(':scope > .ws-pane-problem');
+            const pane = prob && prob.previousElementSibling;
+            return !!pane && pane.getBoundingClientRect().height > 0 && prob.getBoundingClientRect().top >= pane.getBoundingClientRect().bottom - 2;
+        };
+        if (befores.some(above)) befores.forEach((wp) => { wp.dataset.mqOnePlace = 'above'; wp.style.flexDirection = 'column'; wp.style.alignItems = 'center'; });
+    }
+    if (reset || eqs.length < 2) return;
+    const wrapped = (eq) => {
+        const slot = slotOf(eq), first = eq.firstElementChild;
+        if (!slot || !first || slot === first) return false;
+        return slot.getBoundingClientRect().top >= first.getBoundingClientRect().bottom - 2;
+    };
+    if (!eqs.some(wrapped)) return;
+    eqs.forEach((eq) => { const sl = slotOf(eq); if (sl) { sl.dataset.mqOnePlace = 'under'; sl.style.flexBasis = '100%'; sl.style.justifyContent = 'center'; } });
+}
 
 /**
  * One support place per worksheet (lf-ops div_facts screen critic r1 D4: the touch tally stood under "22 ÷ 11" and

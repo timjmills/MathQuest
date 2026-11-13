@@ -171,6 +171,8 @@ function answerPlaceFinding(id, cards) {
 }
 /** In the page: each worksheet card's answer place (the slot's top against the sentence's first token) and its kit cell height. */
 function readAnswerPlaces() {
+    // (the focused answer box draws taller than an idle answer line - a transient focus style, not the sheet's layout)
+    try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (e) { /* none */ }
     const cards = [...document.querySelectorAll('#worksheetGrid > .problem-card')];
     return cards.map((card) => {
         const cell = card.querySelector('.ws-card-visual.mq-scell') || card.querySelector('.ws-card-visual');
