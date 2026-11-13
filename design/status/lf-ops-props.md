@@ -301,3 +301,65 @@ A 1.25 cap would re-deal a third of the items, i.e. cut the easy or the hard end
 - (a) on top adds nothing measurable (C 4 vs D 3) unless the boundary rows are avoided (leave a cell empty, or let the deal even
   the class counts), which the "nothing dropped, same count" rule forbids.
 - Strictly under 20 % needs (b) at 1.25 x (a third of the items re-dealt, the ladder cut per page) or a row room under 1.25 x.
+
+## Round r4b (2026-11-13, fresh builder, Opus medium) - BUILT ruling (b) + (a); the band fixes, the screen train, the checks
+
+Head after the work: see `git log`. The r4b probe (step 1) confirmed the main cause: row STRETCH, not mixed heights.
+
+### The fixes
+| # | Fix | File |
+|---|---|---|
+| 1 | **ROW-STRETCH** (ws-print-lint, opt-in `--rules ROW-STRETCH`): a row of `noStretch` templates (arrays, arrays-turn, count-row) is at most 1.25 x its tallest content (1.42 on a `pageCap` page, class `mq-pagecap`), and its shortest cell's band is <= 20 % (H13); a cell's need is its own content or, when larger, its facsimile key cell's. Backtest `pl-row-stretch-mp-s`. Wired on precritic (opt-in-rules.json: print-lint-kit L/S/M + print-lint-rowstretch-L/S/M + the lesson rows). | `tests/scripts/ws-print-lint.cjs` |
+| 2 | **spreadRows honours the footprint's noStretch** (practice.js): a lone page's rows of noStretch cells grow to NO_STRETCH_ROOM x their shortest, not SPREAD_CAP; `capFillShape` caps a capFill page's rows the same way, but ONLY when the page still fills to 92 % (E9b); the GUIDED rows (guided.js) and the MIXED-PRACTICE shelves (mixed-practice.js) cap the same way. | practice.js, guided.js, mixed-practice.js |
+| 3 | **Score-chosen height order (ruling (a)) for noStretch sections** (layout.js groupByHeight): a noStretch section takes the row order (tallest-first classes / deal order / short-to-tall height classes) with the lowest bands - only where it is strictly better; nothing dropped, same count, boundary rows stay mixed. Also in test.js (rows set short-to-tall when their own heights overrun the grid - the arrays_groups Test M +2.6 mm overflow) and mixed-practice.js. | layout.js, test.js, mixed-practice.js |
+| 4 | **noStretch pages keep their columns** (print-sheet.js): the fill relay no longer re-lays an arrays page from 4 problems in 2 columns to 3 in 1 (a 31 % band beside each array). | print-sheet.js |
+| 5 | **The count-row SCREEN train** (lead ruling (a) 2026-11-13): a box train (number_patterns_rule) draws its numerals at the host digit size (SCREEN-DIGIT 40/48/56 px) and its tiles hold the 44 px input - no overprinted caption, no clipped rule box; the ARCS train (count_by_tables) wraps at the digit floor (3-4 a line, the jump arrow carrying the count on, print's pair form), no swipe row, no horizontal scroll. Worksheet cards holding a wrapping train keep the host digit size (CSS `:has(.k2-countrow-wrap)`). | count-row.js, shapes.js, k2kit (D), screen-cell.css |
+| 6 | **TRAIN-FIT** (ws-screen-slots, with `--screen-digit` or `--train-fit`): a count-row screen train at the SCREEN-DIGIT floor, no sideways scroll, no ink past its cell, on card 390/820/1280 + worksheet + quiz. Backtest `ss-train-fit-cbt`. Opt-in on precritic (screen-slots `--screen-digit`). | ws-screen-slots.cjs |
+| 7 | **Guided noStretch cells** (we-do.js): a Guided cell of a noStretch template is at most 1.25 x its content, not the Steps list's height beside it (number_patterns_rule / count_by_tables lesson p2 EB-BAND 45-56 %). | we-do.js |
+
+### Numbers, before (8f0e93e2a) -> after
+ws-print-lint `--rules ROW-STRETCH --lints ROW-STRETCH` on the 6 grid roles, with the 1 mm measurement tolerance (ROW-STRETCH / H13 / other):
+| Size | before ROW-STRETCH | after | before H13 | after | notes |
+|---|--:|--:|--:|--:|---|
+| S | 24 | 11 | 10 | 4 | mult_properties more-practice S 6 -> 0; guided H13 2 -> 0 |
+| M | 17 | 9 | 0 | 0 | |
+| L | 22 | 15 | 8 | 8 | arrays_groups guided 5 -> 4 |
+
+Probe model (per grid page, EB-BAND >= 30 % / > 20 %, measured in the browser, tools/model.js): A now (before) **16 / 53**; after the build (rows-after.json) **4 / 34**. The spread no longer stretches one-class rows.
+
+ws-empty-band (master's NEW data-eb-item tool, merged 70fa12c2 / a3eb9d25), all three skills, every role + hosts, after:
+EB-BAND 71, EB-SIDE 11, EB-EDGE 10, EB-FOOT 26 (mult_properties independent 18, count_by_tables review 8), the rest PASS. The EB-BAND
+that remain are on roles this lane's steps do not size (opener, pre-skill-check, scripted-model, reason-it) and the lesson
+pages below; the array / grid practice-role bands that were the r4 finding are gone.
+
+### Cells still > 20 % that need a LEAD ruling (not decided here, per the brief)
+- **mult_properties / arrays_groups MIXED rows** (mixed-practice S/M/L, test M, independent S/M): a 2-column page with 3 short +
+  3 tall noStretch items keeps ONE boundary row mixed; its short cell sits at 21-45 %. Grouping cannot avoid it without dropping
+  an item or re-dealing (forbidden). Needs: a per-page height cap (b) or a row allowance.
+- **The lesson pages** (mult_properties lesson 12, count_by_tables lesson 10, mult_properties independent 16 at L): the `pageCap`
+  Practice page and the chart / Warm-up cells can bands when the page must both fill and keep rows under 1.42 x content. The
+  capFill guard keeps E9b green (fill wins); the band is reported. Needs: the (b) per-page height cap, or the row allowance.
+- **EB-FOOT mult_properties independent 18** at 12 %: the `forms: 3` equation form (times 1 / times 0, an equation not an array)
+  draws 19.5 mm where its static footprint says 17.4 mm - a footprint-accuracy fix on the equation form, not a stretch defect.
+- **count_by_tables arcs train on paper** (lesson ROW-STRETCH 2, PAGEFILL, PG-23, TY-12): pre-existing on 8f0e93e2a (same counts on
+  the before tree); the arcs Guided row and the count-row label clipping are a separate count-by paper item.
+
+### Findings -> checks (r4b)
+| Finding | Check that catches it | Backtest |
+|---|---|---|
+| a lone page's noStretch rows stretched to 1.28-1.47 x their content (the spread ignores the footprint's noStretch) | ws-print-lint `--rules ROW-STRETCH` | pl-row-stretch-mp-s (PASS) |
+| the count-row screen train shrunk under SCREEN-DIGIT / swiped / ran past its cell | ws-screen-slots TRAIN-FIT (`--screen-digit` / `--train-fit`) | ss-train-fit-cbt (PASS) |
+| ws-empty-band paired cells in DEAL order (false EB-FOOT on a height-grouped page) | master's data-eb-item pairing (70fa12c2 / a3eb9d25), now merged | - (its own self-test) |
+| the capFill row cap traded a cell band for a PAGEFILL / E9b strip | the capFill 92 %-fill guard; ws-detailed-lesson --check E9b | - |
+
+### D-MP-6 (the wrong-answer frame wording from fix4 8586745a8) - NOT needed on this branch
+master's True or False? / Reason It now use the `answerPlace` / `answerFrameCls` system (per-slot answers): a multi-box item
+writes ONE value a box, never "15, 15" in one blank. That replaces fix4's `wrong.frame` wording. The merge took master's
+true-false.js and reason-it.js; the providers still carry the `frame: {stem, value}` fields, now harmless dead data (chooseWrong
+passes them through, no role reads them). So D-MP-6 is closed by master's frames; no port needed.
+
+### Screen-ink-size gap (reported to main, for lf-checks)
+ws-screen-ink-size does NOT flag the count-row card digits (18-29 px): its rules judge repeated PICTURE marks only (SVG groups,
+HTML leaf marks) and touch numerals (svg[data-digit]); the count-row train's digits are plain text, so no rule sees them and
+SIZE-REF never fires (no mark group). The check that DOES catch them is ws-screen-slots `--screen-digit` (SCREEN-DIGIT) and the
+new TRAIN-FIT. lf-checks is making SCREEN-DIGIT default-on in precritic.
