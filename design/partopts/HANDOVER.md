@@ -9,12 +9,12 @@ options-panel sample are now owned by **lf-engine**. This page is the resume poi
 |---|---|---|
 | Step A: How many and on/off for every lesson part (`sheet/part-opts.js`, `teacher-print.js` Parts table) | master 1fe1e6ef | LIVE (critic A r4 PASS) |
 | Follow-up: F1 doc count (PO-DOC), F2 count kept across a size round trip, P6 every page tab (wraps past 8), FU-1 rebuild after a re-snap | `claude/sweet-newton-c8wrv1-lf-partopts` @ cb761d6fa | critic panel r4: follow-up PASS (8/9/8/8 at 1280 and 820); the lead ships it on the next train |
-| Options-panel sample (paged sample, "1 of N", lettered choices, 9 px floor, unclip, whole drawings, scroll cue) | `claude/sweet-newton-c8wrv1-lf-partopts-panel` | critic r4 FAIL on C1 at 1024/820 only (no scroll cue); N1-cue fixed after it at 05c287e1 with check [scroll-cue] + backtest row `options-panel-scroll-cue`; a narrow critic on C1 is the last step |
+| Options-panel sample (paged sample, "1 of N", lettered choices, 9 px floor, unclip, whole drawings, scroll cue) | `claude/sweet-newton-c8wrv1-lf-partopts-panel` | **critic r5 PASS** @ 33a488c94 (every criterion ≥ 8 at 1280/1366/1024/820; C1 7→8 at the tablet widths by the scroll cue, check [scroll-cue], backtest row `options-panel-scroll-cue`). Ships on the next train with the follow-up |
 | P1 hotfix (the "?" hit area swallowed clicks on its row) | master b9414a659 | LIVE; its [hit] check and backtest row ship with the panel branch |
 | Part B: supports checkboxes per part | lane branch (611ec04c9, c282bdafb; merged at 219e8d907) | PAUSED (FOCUS rule). Resume notes below |
 
 Critic reports: `design/partopts/critic-A-r2.md` … `r4`, `critic-panel-r1.md`, `r2` (panel branch), `r3`
-(branch `…-panel-critic-r3` @ 3938812c1), `r4` (branch `…-panel-critic-r4` @ 8986e103d).
+(branch `…-panel-critic-r3` @ 3938812c1), `r4` (branch `…-panel-critic-r4` @ 8986e103d), `r5` PASS (branch `…-panel-critic-r5` @ f2d6c8e0b).
 
 ## Open items (each with its pending check in `design/lessons-first/CHECKS_FROM_CRITICS.md`)
 
@@ -32,6 +32,10 @@ Critic reports: `design/partopts/critic-A-r2.md` … `r4`, `critic-panel-r1.md`,
    lf-roles agreed, on condition that row `options-panel-sample` stays green (it is). If growing_shape_patterns or
    pattern_features (lf-algebra, not yet on master) fail the sweep, restore that one line at the top of `_tidySample`'s fit
    step: `if (typeof window.tvFitSample === 'function') { window.tvFitSample(frame); return; }`.
+4b. **Critic r5 nits (scroll cue).** R5-n1: a cue for a two-way scroll starts with ↔ alone (words right); R5-n2: the cue
+   does not change once scrolled to the end (lead to decide if a fixed cue is fine); R5-n3: the frame (`role="img"`) has no
+   `aria-describedby` to the cue; R5-n4: the always-drawn scrollbar is unconfirmed on a headed ChromeOS / Android host. Each
+   has its pending check in the ledger.
 5. **Carried nits (critic panel r3/r4):** near-empty parts (pie_chart parts 1 and 4, build_bar_graph part 2,
    probability_basic part 3); small whole samples while the frame has spare height (ratio tables, function tables,
    vocabulary matches); the scrolling frame is `role="img"` yet a Tab stop.
