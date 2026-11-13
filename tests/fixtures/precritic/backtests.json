@@ -6259,6 +6259,25 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "no-phone-width-default",
+  "check": "ws-no-phone-width (owner rule 2026-11-13, CLAUDE.md Fastest-implementation plan 7: no phone width): no screen gate DEFAULT, RUBRIC practice-card host row, touch-target line or critic brief template holds 390 px; the shared widths are 1280 / 1366 / 820 / 1024 with SP digit floors 56 / 56 / 48 / 48",
+  "kind": "commit-pair",
+  "rule": "ws-no-phone-width NP-ARRAY / NP-ARGDEF / NP-VIEWPORT / NP-HOST / NP-LIB / NP-DOC",
+  "fail": {
+   "commit": "91182e61b",
+   "state": "every screen gate defaulted to card 390 (ws-empty-band, ws-screen-ink-size, ws-screen-slots, ws-grade-render, ws-phone-card 390x844, ws-next-box card-390 ...), RUBRIC listed '390 phone': 21 findings"
+  },
+  "pass": {
+   "commit": "29ef1eb21",
+   "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts"
+  },
+  "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
- ]
+]
 }
