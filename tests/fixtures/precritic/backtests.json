@@ -7650,6 +7650,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-ri-distinct-frames",
+   "check": "ws-cell-checks RI-DISTINCT (+ KEYFIT) on two_step_letter_equation / two_step_estimate_check Reason It at M / L: the frames cell draws the work it is shown, so A and B differ and the wrong value fits its box",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks RI-DISTINCT (lf-roles r9, two-step round 3b: the frames layout drew the model's work in A and B and ignored the shown wrong value)",
+   "browser": true,
+   "fail": {
+    "commit": "a663b229a",
+    "state": "Reason It panels A and B show the same work on letter_equation / estimate_check (framesLayout ignored ctx.state 'wrong')"
+   },
+   "pass": {
+    "commit": "b1da0079e",
+    "state": "framesLayout draws shownSteps and the shown value; the estimate ring judges it; boxes hold the written number"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills algebra:two_step_letter_equation,algebra:two_step_estimate_check --roles reason-it --size M,L --rules RI-DISTINCT,KEYFIT --show 20",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
