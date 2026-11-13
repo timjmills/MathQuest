@@ -43,7 +43,7 @@ const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', '
 // (an explicit --rules list stays the list: a backtest row proves one rule alone)
 if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
 const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
-const SIZES = list(arg('size', 'S,M,L'));
+const SIZES = list(arg('size', 'M,L')); // owner 2026-11-13: sizes M and L (S dropped; an explicit S still runs)
 const OPT_ROLES = list(arg('opt-roles', 'lesson,independent,guided,test,review'));
 const hash = (s) => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const optsKey = (o) => (o ? JSON.stringify(o) : '');

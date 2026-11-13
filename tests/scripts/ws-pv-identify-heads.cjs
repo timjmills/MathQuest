@@ -38,7 +38,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 const ONLY = arg('only', '') ? list(arg('only')) : null;
 const on = (id) => !ONLY || ONLY.includes(id);
-const SIZES = list(arg('sizes', 'S,M,L'));
+const SIZES = list(arg('sizes', 'M,L'));
 const NSEED = Number(arg('seeds', 2));
 const UNAIDED = ['review', 'test', 'pre-skill-check'];
 const TAUGHT = ['independent', 'mixed-practice'];
