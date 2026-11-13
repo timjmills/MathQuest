@@ -972,6 +972,30 @@ function wsLintPage(cfg) {
            and the key's answer stamp excluded); the band is measured inside the cell's padding. */
         if (!isLegacy) {
             const topRows = [];   // H13-ROW: the top cells of this page, judged against their row after the loop
+            /* CL-4b / CL-4d TWIN ROW (lead ruling (a), 2026-11-13 13:35; lf-placevalue checks pass): H13 exempts the white
+               above and below a CL-4d centred one-line cell (data-ws-stretchmid, the cell's own line, centred) when its row's
+               height is set by a SIBLING's measured ink - another cell of the row (same top and height within 1 mm; a model /
+               worked twin included, which the band loop itself skips) whose ink is taller and fills its own box (inside
+               its pads) to under 30 % white - and each band is at most 40 % of the cell. A row stretched by page fill (no taller sibling) still
+               counts, and so does a band over 40 %. */
+            const inkOf = (c) => {
+                let t = Infinity, b = -Infinity;
+                for (const d of c.querySelectorAll('*')) {
+                    if (!visible(d) || d.closest('[data-ws-label], .ws-letter, .ws-tab, .ws-modeltab, .ws-legacy-answer')) continue;
+                    const ds = getComputedStyle(d);
+                    if (ds.position === 'absolute') continue;
+                    const ink = [...d.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()) || /^(svg|img|canvas)$/i.test(d.tagName)
+                        || ['Top', 'Bottom', 'Left', 'Right'].some(k => parseFloat(ds[`border${k}Width`]) > 0 && ds[`border${k}Style`] !== 'none');
+                    if (!ink) continue;
+                    const r = d.getBoundingClientRect();
+                    if (!r.width && !r.height) continue;
+                    t = Math.min(t, r.top); b = Math.max(b, r.bottom);
+                }
+                return t === Infinity ? 0 : b - t;
+            };
+            const rowCells = ri.cells.map(c => { const r = c.getBoundingClientRect(); const cs = getComputedStyle(c); return { c, top: r.top, H: r.height, inkH: inkOf(c), innerH: r.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) }; });
+            const twinSizes = (c, top, H, inkH) => rowCells.some(b => b.c !== c && Math.abs(b.top - top) <= PX && Math.abs(b.H - H) <= PX
+                && b.inkH > inkH + PX && (b.innerH - b.inkH) < 0.3 * b.innerH);
             for (const c of ri.cells) {
                 if (c.classList.contains('blankrun') || c.closest('.mq-anchorgrid') || c.querySelector('[data-ws-anchor]')) continue;
                 const cr = c.getBoundingClientRect();
@@ -1066,7 +1090,13 @@ function wsLintPage(cfg) {
                 const topCell = judged && !wa && getComputedStyle(c).justifyContent === 'flex-start' && !inPlace;
                 // (an in-place cell's band is read to its drawn edge, the bottom pad included: the empty paper the pupil sees -
                 // the critic's pixel scan - not the padding box; a 41 mm story in a 57 mm cell read 28 % inside its pads)
-                const vBand = topCell ? Math.max(box.t - inner.t, 0) : inPlace ? Math.max(box.t - inner.t, cr.bottom - box.b, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                const vBand0 = topCell ? Math.max(box.t - inner.t, 0) : inPlace ? Math.max(box.t - inner.t, cr.bottom - box.b, 0) : Math.max(box.t - inner.t, inner.b - box.b, 0);
+                // CL-4d twin row (ruling above): a centred stretchmid line in a row its taller sibling sizes, each band <= 40 %
+                const twinMid = smMark && judged && fits && !wa && stretch >= 1.3
+                    && Math.abs(((box.t + box.b) / 2) - ((inner.t + inner.b) / 2)) <= 2 * PX
+                    && Math.max(box.t - inner.t, 0) <= 0.4 * H && Math.max(inner.b - box.b, 0) <= 0.4 * H
+                    && twinSizes(c, cr.top, H, inkBot - inkTop);
+                const vBand = twinMid ? 0 : vBand0;
                 const hBand = Math.max(box.l - inner.l, inner.r - box.r, 0);
                 if (vBand >= 0.3 * H) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(vBand)} mm tall in a ${mm(H)} mm cell (${Math.round((vBand / H) * 100)}%): the row is sized for a taller item than it holds (RUBRIC H13)`, 'empty band in cell');
                 else if (hBand >= 0.3 * W) F('L-DENSITY', 'H13', 'major', c, `one empty band ${mm(hBand)} mm wide in a ${mm(W)} mm cell (${Math.round((hBand / W) * 100)}%): the content is pinned to one side (RUBRIC H13)`, 'empty band in cell');
@@ -1075,7 +1105,7 @@ function wsLintPage(cfg) {
                    kit cell of a pupil page, judged absolutely - at least 30 % of the cell height less the answer's own
                    writing room Hw is a row sized for more than the item draws (value L 34 % in every cell of every row,
                    which H13-ROW cannot see). */
-                if (optOn('H13-ABS') && !ri.key && c.hasAttribute('data-ws-cell') && inkBot > -Infinity) {
+                if (optOn('H13-ABS') && !ri.key && c.hasAttribute('data-ws-cell') && inkBot > -Infinity && !twinMid) {
                     const hw = hwPx(c);
                     // the answer's own room counts as content: an open slot (a fact's answer row, a stack's write-under
                     // zone) is a box with no ink, so the lowest of the ink and every EMPTY slot box is where the item ends (a slot that holds
@@ -2976,6 +3006,27 @@ const SELF_TESTS = [
     } },
     // CL-4d (lead 2026-11-13): a one-line cell that opts in (data-ws-stretchmid) is centred when its row stretches it by 30 % or
     // more, keeps the top of the box when it does not; the opt-in TOPSTART-STRETCH judges an unmarked one-line cell the same way.
+    // CL-4d TWIN ROW (lead ruling (a) 2026-11-13 13:35): the centred stretchmid line beside a taller sibling that sizes the row
+    // (compare's ex-each worked twin) is exempt from H13 while each band is at most 40 % of the cell; a band over 40 %, or a row
+    // stretched by page fill with no taller sibling, still counts. (rowMm: the row; twinMm: the sibling's drawn box, 0 = a second
+    // one-line cell)
+    ...[['twin-sized centred line, bands <= 40 % (CL-4d twin row): exempt', 48, 40, null],
+        ['twin-sized centred line, one band > 40 % (CL-4d twin row): counts', 80, 72, ['L-DENSITY', 'H13']],
+        ['page-fill centred line, no taller sibling (CL-4d twin row): counts', 48, 0, ['L-DENSITY', 'H13']]].map(([name, rowMm, twinMm, want]) => ({
+        name, expect: want || [], absent: want ? undefined : ['L-DENSITY', 'H13'], fn: new Function(`
+        const MM = 96 / 25.4;
+        const c = document.querySelector('.ws-page [data-ws-cell]');
+        const g = c.closest('.ws-grid');
+        let d = c.nextElementSibling; while (d && !d.matches('[data-ws-cell]')) d = d.nextElementSibling;
+        if (!d) { d = c.cloneNode(true); c.after(d); }
+        g.style.gridTemplateColumns = '44mm 44mm';
+        const line = '<div data-ws-stretchmid="1" style="text-align:center"><div class="ws-eq" style="font-size:22pt;line-height:1.1">47 &lt; 74</div></div>';
+        for (const k of [c, d]) { k.setAttribute('data-ws-cell', 'pv'); [...k.children].forEach(x => x.remove()); k.style.setProperty('justify-content', 'center', 'important'); }
+        c.insertAdjacentHTML('beforeend', line);
+        d.insertAdjacentHTML('beforeend', ${twinMm} ? '<div style="height:${twinMm}mm;width:36mm;margin:0 auto;border:0.75pt solid #000"></div>' : line);
+        [...g.children].forEach(x => { if (x !== c && x !== d) x.remove(); });
+        g.style.gridTemplateRows = (${rowMm} * MM) + 'px';
+    `) })),
     { name: 'stretched one-line cell centred (CL-4d)', expect: [], absent: ['L-TOPSTART', 'CL-4d'], fn: () => {
         const c = document.querySelector('.ws-page [data-ws-cell]');
         c.setAttribute('data-ws-cell', 'pv');
