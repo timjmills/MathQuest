@@ -4182,6 +4182,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ri-countrow-overflow",
+  "check": "a Reason It count-row train never leaves its A / B panel (lf-algebra critic r2 G4 area; npr overflowed every size)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks OVERFLOW on reason-it",
+  "browser": true,
+  "fail": {
+   "commit": "c5235768",
+   "state": "npr RI OVERFLOW 18"
+  },
+  "pass": {
+   "commit": "7b33c7e3",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills patterns:number_patterns_rule --roles reason-it --size S,M,L --rules OVERFLOW",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
