@@ -27,7 +27,7 @@
 import { generateQuestionFor } from './generate-question.js';
 import {
     cellKindFor, kindHTML, instructionForKind, answerDigits, regroupFor, hideScreenOnlyCaptions,
-    hideRepeatedPrompt, monoCell, unmonoCell, screenGlyphs, screenTextLine, plainText,
+    hideRepeatedPrompt, visualRepeatsText, monoCell, unmonoCell, screenGlyphs, screenTextLine, plainText,
 } from './screen-cell.js';
 import { formatProblemForPrint } from './print-generate.js';
 import { esc, icon, findSkill, levelText, optionsSummary, readStore, writeStore, skillCatalogue } from './teacher-ui.js';
@@ -264,7 +264,10 @@ function mountBuilt(frame, s, name, what = 'Sample question', opts = {}) {
         if (line) {
             screenTextLine(line);
             const vis = cell.querySelector('.tvp-visual');
-            if (vis) hideRepeatedPrompt(vis, line.textContent);
+            // Said once, as live play does (question-render's mq-dup): a copy inside the visual is hidden, or, when the
+            // visual says it as part of a larger block (a word problem's story, one sentence a line), the line is hidden
+            // instead (critic-panel-r2 F6: the sample printed the story twice).
+            if (vis && !hideRepeatedPrompt(vis, line.textContent) && visualRepeatsText(vis, line.textContent)) line.style.display = 'none';
         }
         monoCell(cell);
         // The mono pass re-reads the cell for ~0.7 s while styles settle; a static sample then

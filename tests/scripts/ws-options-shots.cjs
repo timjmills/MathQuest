@@ -192,7 +192,8 @@ function measure(page) {
             return out;
         };
         const rectOf = (a) => {
-            if (a.n.nodeType === 3) { const rg = document.createRange(); rg.selectNodeContents(a.n); const rs = [...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0); if (!rs.length) return null; return { left: Math.min(...rs.map((r) => r.left)), top: Math.min(...rs.map((r) => r.top)), right: Math.max(...rs.map((r) => r.right)), bottom: Math.max(...rs.map((r) => r.bottom)) }; }
+            if (a.n.nodeType === 3) { const rg = document.createRange(); rg.selectNodeContents(a.n); const rs = [...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0); if (!rs.length) return null; const top = Math.min(...rs.map((r) => r.top)), bottom = Math.max(...rs.map((r) => r.bottom)); const ih = Math.min(...rs.map((r) => r.height)) * 0.2; return { left: Math.min(...rs.map((r) => r.left)), top: top + ih, right: Math.max(...rs.map((r) => r.right)), bottom: bottom - ih }; }
+            // (a text's glyph box overhangs a tight line box by a pixel or two: its middle 60 % of a line is what must show)
             const r = a.n.getBoundingClientRect();
             return r.width > 0 && r.height > 0 ? r : null;
         };

@@ -41,8 +41,9 @@
 //             ws-phone-card --skills (the practice card at 390 x 844 and 390 x 664: nothing cut off sideways, the
 //               first answer box focused and in view),
 //             ws-options-shots --skill --skip-no-panel --workers 1 (lf-partopts, from lf-algebra F8/G11, 2026-11-13: the
-//               Options panel's live sample, opened the teacher's way at 1280 and 390 px, lies inside its frame and holds
-//               ink; a scope skill with no options panel is skipped and named, and a scope where none has one is N/A;
+//               Options panel's live sample, opened the teacher's way at 1280x1000, 1366x768, 1024x768 and 820x1180 (owner
+//               scope 2026-11-13; 390 dropped), lies inside its frame, holds ink, is legible (HTML and SVG text >= 9 px),
+//               unclipped, whole across its parts, its answer choices one lettered part; a scope skill with no options panel is skipped and named, and a scope where none has one is N/A;
 //               the whole 725 x 2 sweep is deploy session 4),
 //             ws-card-rulings --check rulings (the spec card's numeric rulings against 300 seeded items a skill) and
 //             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
@@ -363,14 +364,14 @@ const PARSE = {
         return { result: 'FAIL', findings: rows.length ? listShort(rows.map((r) => r.slice(0, 140)), 3) : v[0].slice(0, 160), detail: rows.slice(0, 12), explainsExit: true };
     },
     // ws-options-shots --skip-no-panel: `ok   <key> @<w>: ...` per checked width, `skip <key>: no options panel`, `FAIL <key>
-    // @<w>: ...`; every scope skill must be checked at both widths or skipped by name (else it checked something else)
+    // @<w>: ...`; every scope skill must be checked at every width or skipped by name (else it checked something else)
     optionsShots(g, out, code) {
         const v = lastVerdict(out, 'ws-options-shots');
         if (!v) return unparsed('no "ws-options-shots: OK|FAIL" line', out);
         const fails = out.split('\n').filter((l) => /^FAIL /.test(l)).map((l) => l.trim());
         if (v[1] !== 'OK') return { result: 'FAIL', findings: fails.length ? `${fails.length} panel sample(s) failed: ${listShort(fails.map((l) => l.slice(5, 150)), 3)}` : v[0].slice(0, 160), detail: fails.slice(0, 10), explainsExit: code === 1 };
         const keys = g.keys || [], want = (g.expect && g.expect.skills) || keys.length;
-        const widths = (g.expect && g.expect.widths) || [1280, 390];
+        const widths = (g.expect && g.expect.widths) || [1280, 1366, 1024, 820];
         const skipped = keys.filter((k) => new RegExp(`^skip ${reEsc(k)}: no options panel`, 'm').test(out));
         const checked = keys.filter((k) => widths.every((w) => new RegExp(`^ok   ${reEsc(k)} @${w}:`, 'm').test(out)));
         const absent = keys.filter((k) => !skipped.includes(k) && !checked.includes(k));
@@ -924,10 +925,10 @@ function buildPlan(ctx) {
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
         add(gate('phone-card', 'ws-phone-card (practice card at 390 px: clip, first-box focus)', `${scope} × 390x844, 390x664`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
-        // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280 and 390 px, the lane's skills
+        // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280, 1366, 1024 and 820 px, the lane's skills
         // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by
         // name (--skip-no-panel); a scope with none is N/A. The full 725 x 2 sweep is ws-deploy-gates session 4.
-        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 390 / 1280x720 px and after an option change: inside its frame, inked, text >= 9 px, panel controls in the window, no page error)', `${scope} × 1280, 390 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 390] } }));
+        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 1366 / 1024 / 820 / 1280x720 px and after an option change: inside its frame and unclipped, whole across its parts, inked, HTML and SVG text >= 9 px, answer choices one lettered part, no sentence twice, panel controls and summary reachable, no page error)', `${scope} × 1280, 1366, 1024, 820 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 1366, 1024, 820] } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));

@@ -9,7 +9,7 @@
 //   card-not-offered on a card with NO rulings block                        -> SKIPPED (no rulings), unchanged
 //   card-rulings (--check rulings) NO-RULINGS                               -> SKIPPED (no rulings), unchanged
 // Cases (lf-partopts, the options-shots row, 2026-11-13):
-//   options-shots: both skills ok at 1280 and 390                            -> PASS
+//   options-shots: both skills ok at 1280, 1366, 1024 and 820                -> PASS
 //   options-shots: one skill ok, one `skip ...: no options panel`            -> PASS, the skipped skill named
 //   options-shots: every skill skipped (no options panel)                    -> N/A
 //   options-shots: a `FAIL <key> @<w>` line, verdict FAIL, exit 1            -> FAIL, explained by the findings
@@ -45,13 +45,15 @@ t(r3.result === 'SKIPPED (no rulings)', `rulings row, no block: SKIPPED (got ${r
 let N = 3;
 if (PARSE.optionsShots) {
     const keys = ['patterns:pattern_features', 'patterns:growing_shape_patterns'];
-    const osGate = { id: 'options-shots', keys, expect: { skills: 2, widths: [1280, 390] } };
+    const W4 = [1280, 1366, 1024, 820];   // the panel's widths (owner scope 2026-11-13; 390 dropped)
+    const osGate = { id: 'options-shots', keys, expect: { skills: 2, widths: W4 } };
+    const all = (k) => W4.map((w) => ok(k, w));
     const ok = (k, w) => `ok   ${k} @${w}: ink 3.27 %, covers 26.7 %`;
-    const both = [...keys.flatMap((k) => [ok(k, 1280), ok(k, 390)]), '  2 skills × 2 widths (1280, 390 px), 1 worker(s), 14 s', 'ws-options-shots: OK (2 skills × 2 widths)'].join('\n');
-    const oneSkip = [`skip ${keys[1]}: no options panel (not checked)`, ok(keys[0], 1280), ok(keys[0], 390), 'ws-options-shots: OK (1 skills × 2 widths; 1 skipped, no options panel)'].join('\n');
-    const allSkip = [`skip ${keys[0]}: no options panel (not checked)`, `skip ${keys[1]}: no options panel (not checked)`, '  0 skills × 2 widths (1280, 390 px), 1 worker(s), 3 s', 'ws-options-shots: OK (0 skills × 2 widths; 2 skipped, no options panel)'].join('\n');
-    const red = [`FAIL ${keys[0]} @1280: stage (-193,-205) 119×126 is neither inside the 398×140 frame nor over 90 % of it (covers 0.0 %)`, ok(keys[1], 1280), ok(keys[1], 390), `FAIL ${keys[0]} @390: the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)`, 'ws-options-shots: FAIL (2)'].join('\n');
-    const half = [ok(keys[0], 1280), ok(keys[0], 390), ok(keys[1], 1280), 'ws-options-shots: OK (2 skills × 2 widths)'].join('\n');
+    const both = [...keys.flatMap((k) => all(k)), '  2 skills × 4 widths (1280, 1366, 1024, 820 px), 1 worker(s), 28 s', 'ws-options-shots: OK (2 skills × 4 widths)'].join('\n');
+    const oneSkip = [`skip ${keys[1]}: no options panel (not checked)`, ...all(keys[0]), 'ws-options-shots: OK (1 skills × 4 widths; 1 skipped, no options panel)'].join('\n');
+    const allSkip = [`skip ${keys[0]}: no options panel (not checked)`, `skip ${keys[1]}: no options panel (not checked)`, '  0 skills × 4 widths (1280, 1366, 1024, 820 px), 1 worker(s), 3 s', 'ws-options-shots: OK (0 skills × 4 widths; 2 skipped, no options panel)'].join('\n');
+    const red = [`FAIL ${keys[0]} @1280: stage (-193,-205) 119×126 is neither inside the 398×140 frame nor over 90 % of it (covers 0.0 %)`, ...all(keys[1]), `FAIL ${keys[0]} @820: the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)`, 'ws-options-shots: FAIL (2)'].join('\n');
+    const half = [...all(keys[0]), ok(keys[1], 1280), ok(keys[1], 1366), ok(keys[1], 1024), 'ws-options-shots: OK (2 skills × 4 widths)'].join('\n');
     const o1 = PARSE.optionsShots(osGate, both, 0);
     t(o1.result === 'PASS', `options-shots, both checked: PASS (got ${o1.result} ${o1.findings})`);
     const o2 = PARSE.optionsShots(osGate, oneSkip, 0);

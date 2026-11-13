@@ -767,6 +767,13 @@ html.dark body.teacher-mode .tv-sko { box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
    filled a phone's sheet and pushed Done off the window (ws-options-shots, algebra_all at 390 after an option change).
    The whole summary is the line's title. */
 .tv-sko-head .tv-sko-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+/* critic-panel-r2 F5: a cut summary has a "Show all" button (touch and keyboard), and opens to its full text. */
+.tv-sko-head .tv-sko-sum.is-open { display: block; -webkit-line-clamp: unset; line-clamp: none; overflow: visible; }
+.tv-sko-more { margin: 2px 0 0; padding: 0; min-height: 24px; border: 0; background: none; font: inherit; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-accent); cursor: pointer; text-decoration: underline; }
+.tv-sko-more[hidden] { display: none; }
+.tv-sko-more:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: 2px; border-radius: 4px; }
+/* critic-panel-r2 F2: a figure answer choice in the option panel's sample carries its letter (black and white, Andika). */
+.tv-sko-frame .tv-sko-optletter { font-family: 'Andika', sans-serif; font-weight: 700; font-size: var(--mq-text, 22px); line-height: 1; color: #000; margin-right: 8px; align-self: flex-start; }
 
 /* ---------------------------------------------------------------- board code overlay */
 .tv-boardcode {
