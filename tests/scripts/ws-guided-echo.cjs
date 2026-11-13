@@ -49,7 +49,11 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const app = await H.open({});
     let res;
     try {
-        res = await app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, variants }) => {
+        // (one evaluate per key x size x seed, and per key x band for --variants: a whole run in one call passed the browser's
+        // protocol timeout once --variants was added; the TF / EA / overlap tallies live on window.__geState between calls)
+        const call = (part) => app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, part }) => {
+            const { seedFrom = 1, seedTo = N, vBand = null, finalize = false } = part || {};
+            const variantsOnly = vBand !== null;
             const on = (id) => !only || only.includes(id);
             const pageRule = ['SCORE-SLOTS', 'TF-FALSE', 'EA-PATTERN', 'CROSS-GIVEAWAY', 'STRIP-NUMBERS', 'CHART-SQUARE'].some(on);
             const out = []; let pages = 0;
@@ -107,9 +111,8 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                 nums(Array.isArray(q && q.ans) ? q.ans.join(' ') : q && q.ans).forEach((n) => s.add(n));
                 return s;
             };
-            const tf = { pages: 0, falseN: 0, all: 0 };
-            const ea = { multiCorrect: 0, multiFix: 0 };
-            let overlap = 0;
+            const st = window.__geState || (window.__geState = { tf: { pages: 0, falseN: 0, all: 0 }, ea: { multiCorrect: 0, multiFix: 0 }, overlap: 0 });
+            const tf = st.tf, ea = st.ea;
             const judgeGiveaway = (label, items) => {
                 const ws = items.map((it) => winOf(it.q)).filter(Boolean);
                 for (let i = 0; i < ws.length; i++) for (let j = 0; j < ws.length; j++) {
@@ -118,24 +121,24 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     const hit = a.gaps.filter((n) => printsN(b, n));
                     if (!hit.length) continue;
                     if (a.rows.join() === b.rows.join() && a.cols.join() === b.cols.join()) out.push(`CROSS-GIVEAWAY ${label}: window ${i + 1}'s answer ${hit.join(', ')} is printed in window ${j + 1} (the same squares)`);
-                    else overlap++;
+                    else st.overlap++;
                 }
             };
             for (const key of keys) {
                 const [categoryId, skillId] = key.split(':');
-                if (variants && on('CROSS-GIVEAWAY') && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(skillId)) {
+                if (variantsOnly && on('CROSS-GIVEAWAY') && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(skillId)) {
                     const base = skillId === 'chart_to_120' ? { band: 120 } : {};
                     // (the chart's option values, card chartwindow §7a: "Numbers to" and the grid)
                     const bands = skillId === 'chart_to_120' ? [120] : skillId === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : [undefined];
                     const grids = skillId === 'number_chart_fill' ? [undefined] : ['window', 'rows', 'whole'];
-                    for (const band of bands) for (const grid of grids) for (const role of ['independent', 'more-practice']) for (let s = 1; s <= Math.min(N, 4); s++) {
+                    for (const band of bands.filter((b) => vBand === 'all' || String(b) === String(vBand))) for (const grid of grids) for (const role of ['independent', 'more-practice']) for (let s = 1; s <= Math.min(N, 4); s++) {
                         const opts = Object.assign({}, base, band !== undefined ? { band } : {}, grid ? { grid } : {});
                         let r; try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, opts }] }], size: 'L', paper: 'A4', seed: s, key: false }); } catch (e) { continue; }
                         pages++;
                         planPages(r.plan).forEach((pg, pi) => judgeGiveaway(`${key} ${JSON.stringify(opts)} ${role} L seed ${s} p${pi + 1}`, pg.items));
                     }
                 }
-                for (const size of sizes) for (let s = 1; s <= N; s++) {
+                if (!variantsOnly && !finalize) for (const size of sizes) for (let s = seedFrom; s <= seedTo; s++) {
                     for (const role of pageRule ? scoreRoles : ['guided']) {
                         if (role !== 'guided' && !pageRule) continue;
                         let r;
@@ -191,11 +194,22 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                     }
                 }
             }
-            if (on('TF-FALSE') && tf.all) { const sh = tf.falseN / tf.all; if (sh < 0.35 || sh > 0.65) out.push(`TF-FALSE ${keys.join(',')}: ${tf.falseN} of ${tf.all} statements False over ${tf.pages} pages (${Math.round(sh * 100)} %, PT-TOF-1 40-60 %)`); }
-            if (on('EA-PATTERN') && ea.multiCorrect + ea.multiFix >= 4 && (!ea.multiCorrect || !ea.multiFix)) out.push(`EA-PATTERN ${keys.join(',')}: windows of 2+ gaps judged Correct ${ea.multiCorrect}, Fix it ${ea.multiFix} - the judgement follows the gap count`);
-            out.push(`OVERLAP-INFO ${overlap} answer(s) shared by overlapping (not identical) windows; TF ${tf.falseN}/${tf.all} False; EA multi-gap Correct ${ea.multiCorrect} / Fix it ${ea.multiFix}`);
+            if (finalize && on('TF-FALSE') && tf.all) { const sh = tf.falseN / tf.all; if (sh < 0.35 || sh > 0.65) out.push(`TF-FALSE ${keys.join(',')}: ${tf.falseN} of ${tf.all} statements False over ${tf.pages} pages (${Math.round(sh * 100)} %, PT-TOF-1 40-60 %)`); }
+            if (finalize && on('EA-PATTERN') && ea.multiCorrect + ea.multiFix >= 4 && (!ea.multiCorrect || !ea.multiFix)) out.push(`EA-PATTERN ${keys.join(',')}: windows of 2+ gaps judged Correct ${ea.multiCorrect}, Fix it ${ea.multiFix} - the judgement follows the gap count`);
+            if (finalize) out.push(`OVERLAP-INFO ${st.overlap} answer(s) shared by overlapping (not identical) windows; TF ${tf.falseN}/${tf.all} False; EA multi-gap Correct ${ea.multiCorrect} / Fix it ${ea.multiFix}`);
             return { out, pages };
-        }, { keys, N, sizes, only, scoreTpl, scoreRoles, variants });
+        }, { keys: (part && part.keys) || keys, N, sizes: (part && part.sizes) || sizes, only, scoreTpl, scoreRoles, part });
+        res = { out: [], pages: 0 };
+        const add = (r) => { res.out.push(...r.out); res.pages += r.pages; };
+        for (const key of keys) {
+            const sk = key.split(':')[1];
+            if (variants && (!only || only.includes('CROSS-GIVEAWAY')) && /^(hundreds_chart_fill|chart_to_120|number_chart_fill)$/.test(sk)) {
+                const bands = sk === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : ['all'];
+                for (const b of bands) add(await call({ keys: [key], vBand: b, seedFrom: 1, seedTo: 0 }).then((r) => r, (e) => ({ out: [`${key} band ${b}: not composed (${String(e && e.message || e).slice(0, 120)})`], pages: 0 })));
+            }
+        }
+        for (const key of keys) for (const size of sizes) for (let s = 1; s <= N; s++) add(await call({ keys: [key], sizes: [size], seedFrom: s, seedTo: s }));
+        add(await call({ finalize: true }));
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
