@@ -1008,16 +1008,16 @@ register('pv', {
             // under 30 % - so the grid fills the page, ws-print-lint PAGEFILL. 1.3 x at S and M (compare round 2: 1.2 x left a pages-3 M
             // page 22 % white; 1.38 x was 30-32 % under the line at S and M); at L the 3 x 6 page needs 1.38 x: 1.3 x
             // left 23 % of the page white, 1.4 x 31 % of each cell under the line - the dense layout takes no 2 x 8 there (1 x 10))
-            // (`drawnWMm`, lf-placevalue compare r2 / critic r1 F1: the TRUE width of "a ( ) b" as drawn - Andika bold digits 0.606 em,
+            // (`inkWMm`, lf-placevalue compare r2 / critic r1 F1 - the interface lf-roles set: the TRUE ink width of "a ( ) b" as drawn - Andika bold digits 0.606 em,
             // a comma 0.324 em, two 4 mm gaps, the sign circle - measured in Chrome at S / M / L, within 0.3 mm. `wMm` stays the
-            // layout's nominal cell; a role that lays the problem out in a box of its own (Reason It's A / B panels) reads this)
+            // layout's nominal cell; Reason It reads inkWMm and stacks A over B when it is wider than half the room)
             if (p.kind === 'compare') {
                 const em = (Number(ctx.metrics && ctx.metrics.digitPt) || { S: 16, M: 22, L: 28 }[ctx.size] || 22) * 25.4 / 72;
                 const txt = fmt(p.a) + fmt(p.b);
                 const dg = txt.replace(/[^0-9]/g, '').length, cm = txt.replace(/[^,]/g, '').length;
                 const circle = { S: 8, M: 10, L: 12 }[ctx.size] || 10;
-                const drawnWMm = Math.round((0.606 * em * dg + 0.324 * em * cm + 8 + circle + 0.5) * 10) / 10;
-                return { wMm: 62, drawnWMm, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
+                const inkWMm = Math.round((0.606 * em * dg + 0.324 * em * cm + 8 + circle + 0.5) * 10) / 10;
+                return { wMm: 62, inkWMm, hMm: null, measure: true, factLike: false, maxCols: 3, denseRoom: 1, inPlace: true, hardCap: true, keepCols: true, spreadMax: ctx.size === 'L' ? 1.38 : 1.3, ...tight };
             }
             // (an expanded-form row is one line of boxes: one row a line, the boxes never wrapped below 4 places, so its
             // cell is the full width at every size - two half-width columns held 2 x 8 at S over half-empty cells)
