@@ -2996,8 +2996,8 @@ const _o2Add = (key, ...defs) => {
     // A tape diagram's whole runs to about twice the Max Number: it draws at half the band.
     ['algebra:tape_diagram', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
     ['algebra:tape_diagram_plain', _o2RangeBand([20, 50], { asRange: b => Math.max(10, Math.floor(b / 2)) })],
-    ['algebra:multi_step_word', _o2RangeBand([30, 50])],
-    ['algebra:multi_step_word_plain', _o2RangeBand([30, 50])],
+    ['algebra:multi_step_word', _o2RangeBand([30, 50, 100])],   // 100 appended (two-step card decision 2: the G2 lesson's band)
+    ['algebra:multi_step_word_plain', _o2RangeBand([30, 50, 100])],   // 100 appended (two-step card decision 2: the G2 lesson's band)
     ['algebra:algebra_word_mixed_plain', _o2RangeBand([20, 50])],
     ['algebra:solve_unknown', _o2RangeBand([10, 20])],
     ['algebra:balance_addsub', _o2RangeBand([10, 20])],
@@ -3445,7 +3445,19 @@ for (const k of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
 {
     const k = 'algebra:multi_step_word';
     const o = (SKILL_OPTIONS[k] || []).find((x) => x.id === 'wpBar');
-    if (o) o.default = true;
+    if (o) { o.default = true; o.help = 'The two-step bar model under each story: the Step 1 bar (equal groups or parts and whole) and the Step 2 bar that uses the Step 1 answer, with empty boxes to fill. On by default on this skill; the plain twin draws none.'; }
+    const op = (SKILL_OPTIONS['algebra:multi_step_word_plain'] || []).find((x) => x.id === 'wpBar');
+    if (op) op.help = 'The two-step bar model under each story: the Step 1 bar (equal groups or parts and whole) and the Step 2 bar that uses the Step 1 answer, with empty boxes to fill.';
+    // The keyword supports are hidden on the two-step stories (two-step card §7a, lead ruling 2026-10-31, P-21): a keyword list
+    // teaches "in all means +" instead of the two steps' structure. `hidden` keeps them in the model, so a share code or a
+    // saved page that carries them still decodes; the teacher is no longer shown them.
+    for (const key of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+        if (SKILL_OPTIONS[key]) SKILL_OPTIONS[key] = SKILL_OPTIONS[key].map((x) => (x.id === 'wpCues' || x.id === 'wpBank' ? { ...x, hidden: true } : x));
+    }
+    // `forms` (the four + / − orders) applies when the first step is + / − (card §7a): the panel hides it on the × / ÷ presets.
+    for (const key of ['algebra:multi_step_word', 'algebra:multi_step_word_plain']) {
+        if (P12_OPTIONS[key]) P12_OPTIONS[key] = P12_OPTIONS[key].map((x) => (x.id === 'forms' ? { ...x, appliesTo: (cur) => !cur.msOps || cur.msOps === 'addsub', appliesBase: { msOps: 'addsub' } } : x));
+    }
 }
 
 // ================ O6 · APPEARANCE: OPERATIONS, CLOCKS, MONEY  (lane AP4, 2026-09-25) ================
