@@ -70,6 +70,13 @@ SLOT-W-EQUAL, DRAW-CAP, SCREEN-DIGIT, options-render bands).
 - A card with no hidden option (R2): ws-card-rulings --check offered SKIPPED "every §7a option offered; no notOffered" is green.
 
 ## Log
+- 2026-11-13 **compare critic r1 FAIL** (`design/audit/runs/lf-placevalue/critic-compare1.md`, head 16748cd8). Holding: F1 reason-it at
+  band=999999 overflows the A/B boxes at S and L (H2; ws-cell-checks --card-opts passed it: the thinking roles are not rendered under
+  every band); F2 the chant / worked steps do not teach the deciding place (chant decides 8 of 33 items); F3 M6 never the shown error
+  (lengths=mixed deals shared leading digits, gen-pv.js:851); F4 live play pins '=' to item 1 (blockOrder with run 0); F5 close
+  6-digit pairs always decided at the 2nd digit; F6 lengths=mixed is 16 / 30 one-digit-vs-three-digit pairs. Minor F7 / F9 / F10;
+  engine F8 (D3). Proposed checks: LESSON-CHANT-FIT, WORKED-STEP-DOES, M6-SHOWN, dealer-uniform on symbol answers (+ no '=' model),
+  CLOSE-DEPTH, MIXED-1DIGIT, thinking roles x every offered band in ws-cell-checks --card-opts.
 - 2026-11-13 **pv debt PASSED** (narrow critic pvdebt, Opus medium, `design/audit/runs/lf-placevalue/critic-pvdebt.md`): fixes 668f6a8c
   (combine) + 1f18505d (unit_form), footprint flag `tightRows`. combine / unit_form / expand x independent / more-practice / test /
   review at S (M / L for combine and unit_form, L for expand), rename=more S, and the combine lesson M / L: all >= 8, keys match.
