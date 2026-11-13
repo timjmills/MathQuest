@@ -17,3 +17,5 @@ answers; every such decision is listed here so the owner can review it and ask f
 | 2026-11-13 | Online worksheet: CL-4b centring branch kept (dormant inside the 30 % stretch cap); top-aligned boxes may end at different heights in a row | lead, delegated (owner told; can reverse) | lf-checks eb-r5 |
 | 2026-11-13 | arrays / arrays-turn cells: CL-4b top-start wins over the lane's centring once rows stop stretching | lead, applies owner rule CL-4b | lf-ops -props |
 | 2026-11-13 | -live-pm deployed as a strict improvement (carry boxes, rounding and mixed centring) though the spot critic was below 8 on pages with older defects; those defects are the next live round | lead | lf-engine -live-pm |
+| 2026-11-13 | Error Analysis: another pupil's work prints in the single grey under a "<Name> wrote:" label (PT-ERR-4; PUPILTAG check) — design, not a defect | lead, delegated (owner had seen the layout) | lf-roles r4 |
+| 2026-11-13 | PT-TOF-4 extended: a Reason It LIST answer prints no "The answer is" frame (the named panel already holds every part) | lead, delegated | lf-roles r5 000f6eb5 |
