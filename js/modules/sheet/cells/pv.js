@@ -1079,7 +1079,7 @@ register('pv', {
      * keeps the anchor's whole-cell fallback (anchors.js stepTemplateOf reads `hasStepState`).
      */
     hasStepState(p) { return !!p && p.kind === 'compare'; },
-    // Guided cell 1 of a lesson sheet is drawn at step 1 (P-LC-7; lesson-pages/we-do.js): the digit counts traced grey. Read
+    // Guided cell 1 of a lesson sheet is drawn at step 1 (lesson-pages/we-do.js): the digit counts traced grey. Read
     // only through stepTemplateOf, so only the compare item - the one kind with step states - takes it.
     guidedStepOne: true,
     /** State k as a payload variant (`_marks`) and the answer's ink ('trace' | 'solid' | null): the Scripted Model draws it. */
