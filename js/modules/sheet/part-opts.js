@@ -3,7 +3,7 @@
 //
 // A lesson section may carry `partOpts` - per part, only the values that differ from the standard packet:
 //
-//   { prereq: {on, n}, chart: {on, n}, vocab: {n}, remember: {on}, wedo: {on, n}, rows: {n}, practice: {n} }
+//   { prereq: {on, n}, chart: {on, n}, vocab: {on, n}, remember: {on}, wedo: {on, n}, rows: {on, n}, practice: {n}, mixed: {n} }
 //
 //   prereq    the Prerequisite Check: the first n questions (the routing table routes only those)
 //   chart     the anchor chart: n worked examples (1 .. the chart's own design)
@@ -11,8 +11,10 @@
 //   remember  the Remember strip: on / off
 //   wedo      the We Do (Guided) band: n cells (on: false = no We Do band)
 //   rows      the lesson sheet's own Independent Practice rows: n whole rows (0 = none)
-//   practice  the Practice pages: n problems a page, in whole rows (the page count stays `practicePages`)
-//   mixed     fixed in step A (the Mixed page fills its page shelf by shelf: its count is the page's)
+//   practice  the Practice pages: n problems IN ALL (§8a), offered as P equal pages of whole rows - the pages follow from n
+//   mixed     the Mixed pages: n problems in all, a whole number of Mixed pages (each fills its page shelf by shelf)
+//   (the lesson sheet's parts - vocab, remember, wedo, rows - are probed by the lesson role with the others as asked: a
+//   value whose sheet would not fill its page is not offered, §8b-c; roles/lesson.js sheetOffers)
 //
 // THE RANGES ARE NEVER HAND-TYPED: the lesson build reports each part's fit (print-sheet.js buildLesson
 // `res.lesson.partFit`, measured by the part's own planner at the chosen size: the We Do cells that fit beside the
@@ -34,7 +36,7 @@ export const PART_OPT_NAMES = Object.freeze({
 /** The unit a count is in (singular, plural). */
 const UNIT = Object.freeze({
     prereq: ['question', 'questions'], chart: ['worked example', 'worked examples'], vocab: ['word', 'words'],
-    wedo: ['problem', 'problems'], rows: ['row', 'rows'], practice: ['a page', 'a page'], mixed: ['problems', 'problems'],
+    wedo: ['problem', 'problems'], rows: ['row', 'rows'], practice: ['problem', 'problems'], mixed: ['problem', 'problems'],
 });
 
 /** The warning under the Prerequisite Check when fewer than the lesson's questions print (DESIGN §3, owner answer 1). */
@@ -51,10 +53,44 @@ export const PRACTICE_GROW_CAP = 1.35;
 
 const int = (v) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : NaN);
 
+/** The most Practice pages (and Mixed pages) a total may take. */
+export const PRACTICE_MAX_PAGES = 5;
+export const MIXED_MAX_PAGES = 3;
+
+/**
+ * The totals a Practice part offers (DESIGN §8a): P pages (1 .. PRACTICE_MAX_PAGES) of k problems each, k whole rows from the
+ * fewest whose cells, grown to fill the page, stay under PRACTICE_GROW_CAP to the page's own fit - every page the same, so no
+ * page (the last included) is under half used. Sorted, unique.
+ */
+export function practiceTotals(f, maxPages = PRACTICE_MAX_PAGES) {
+    const per = int(f.perPage), cols = Math.max(1, int(f.cols) || 1);
+    if (!(per >= 1)) return [];
+    const rows = Math.max(1, Math.ceil(per / cols));
+    const minRows = Math.max(1, Math.min(rows, int(f.minRows) || rows));
+    const ks = [];
+    for (let r = minRows; r < rows; r++) ks.push(r * cols);
+    ks.push(per);
+    const set = new Set();
+    for (let P = 1; P <= maxPages; P++) for (const k of ks) set.add(P * k);
+    return [...set].sort((x, y) => x - y);
+}
+
+/** How a Practice total prints: {pages, per} - the fewest pages, then the most per page, whose product is the total. */
+export function practiceSplit(total, f, maxPages = PRACTICE_MAX_PAGES) {
+    const per = int(f.perPage), cols = Math.max(1, int(f.cols) || 1);
+    const rows = Math.max(1, Math.ceil(per / cols));
+    const minRows = Math.max(1, Math.min(rows, int(f.minRows) || rows));
+    const ks = [per]; for (let r = rows - 1; r >= minRows; r--) ks.push(r * cols);
+    for (let P = 1; P <= maxPages; P++) for (const k of ks) if (P * k === total) return { pages: P, per: k };
+    return null;
+}
+
 /**
  * The range of one part's count. `ctx`: { fit } - the lesson build's `res.lesson.partFit` (or that object itself).
  * Returns null when the lesson has no such part (it is not listed), else
- * { min, max, dflt, step, fixed?, note?, unit, toggle? } - `toggle` for a part with no count (Remember).
+ * { min, max, dflt, step, values?, canOff?, fixed?, note?, unit, toggle?, none? } - `values` the counts the stepper offers
+ * (the engine's own list where the part probed them: a count whose page would not fill is not in it), `canOff` whether its
+ * Print tick may be cleared, `toggle` a part with no count (Remember), `none` a part with no room on this sheet.
  */
 export function partLimits(part, ctx = {}) {
     const fit = (ctx && ctx.fit) || ctx || {};
@@ -62,51 +98,60 @@ export function partLimits(part, ctx = {}) {
     if (!f) return null;
     const unit = UNIT[part] || ['', ''];
     const out = (o) => Object.assign({ step: 1, unit }, o);
+    // (a probed part: its own values; one value is fixed, the reason said once)
+    const listed = (vals, dflt, canOff, why, extra = {}) => {
+        const v = [...new Set((vals || []).map(int).filter((x) => x >= 1))].sort((x, y) => x - y);
+        if (!v.includes(dflt)) v.push(dflt), v.sort((x, y) => x - y);
+        return out(Object.assign({ min: v[0], max: v[v.length - 1], dflt, values: v, canOff: canOff !== false }, v.length === 1 ? { fixed: true, note: why } : {}, extra));
+    };
     switch (part) {
         case 'prereq': {
             const t = int(f.total);
             if (!(t >= 1)) return null;
-            return out({ min: 1, max: t, dflt: t, fixed: t === 1 || undefined, note: t === 1 ? 'One question (the lesson has one prerequisite)' : undefined });
+            return out({ min: 1, max: t, dflt: t, fixed: t === 1 || undefined, note: t === 1 ? 'Fixed: 1 (the lesson has one prerequisite)' : undefined });
         }
         case 'chart': {
             const d = Math.max(1, int(f.designed) || 1);
             const lo = Math.max(1, Math.min(d, int(f.min) || 1));
-            return out(lo === d ? { min: d, max: d, dflt: d, fixed: true, note: `${d} worked example${d === 1 ? '' : 's'} (fixed by the chart)` } : { min: lo, max: d, dflt: d });
+            return out(lo === d ? { min: d, max: d, dflt: d, fixed: true, note: `Fixed: ${d} (the chart's design)` } : { min: lo, max: d, dflt: d });
         }
         case 'vocab': {
             const w = int(f.words);
             if (!(w >= 1)) return null;
-            return out({ min: 0, max: w, dflt: w });
+            if (!Array.isArray(f.values)) return out({ min: 0, max: w, dflt: w, canOff: true });
+            return listed(f.values, w, f.canOff, `Fixed: ${w} (fewer would leave the page short)`);
         }
         case 'remember':
-            return f.has ? out({ min: 0, max: 1, dflt: 1, toggle: true, fixed: true, note: '' }) : null;
+            return f.has ? out({ min: 0, max: 1, dflt: 1, toggle: true, fixed: true, note: '', canOff: f.canOff !== false }) : null;
         case 'wedo': {
             const k = int(f.fit);
             if (!(k >= 1)) return null;
-            // (min 2, or the fit's own `min` - the fewest cells whose problems fill half their width: one We Do cell alone stands across the band with a 30 % empty side - EB-SIDE, ws-partopts-unit PO-2d - and
-            // two cells let the hint fade, DESIGN §3)
-            const lo = Math.max(2, Math.min(k, int(f.min) || k));
-            return out(lo >= k ? { min: k, max: k, dflt: k, fixed: true, note: `${k} problem${k === 1 ? '' : 's'} (fixed: fewer would leave the cells half empty)` } : { min: lo, max: k, dflt: k });
+            if (!Array.isArray(f.values)) return out({ min: 1, max: k, dflt: k, canOff: true });
+            return listed(f.values, k, f.canOff, `Fixed: ${k} (fills the band)`);
         }
         case 'rows': {
             const r = Math.max(0, int(f.fit) || 0);
             const per = Math.max(1, int(f.perRow) || 1);
-            return out(r === 0 ? { min: 0, max: 0, dflt: 0, fixed: true, perRow: per, note: 'No row fits under the bands' } : { min: 0, max: r, dflt: r, perRow: per });
+            // (F7: no row fits on this sheet - the part is not on it: no tick, no New numbers)
+            if (r === 0) return out({ min: 0, max: 0, dflt: 0, fixed: true, none: true, perRow: per, canOff: false, note: 'Not on this lesson sheet (no room)' });
+            if (!Array.isArray(f.values)) return out({ min: 1, max: r, dflt: r, perRow: per, canOff: true });
+            return listed(f.values, r, f.canOff, `Fixed: ${r} (fills the page)`, { perRow: per });
         }
         case 'practice': {
             const per = int(f.perPage);
             if (!(per >= 1)) return null;
             const cols = Math.max(1, int(f.cols) || 1);
-            const max = per;
-            const minRows = Math.max(1, Math.min(Math.ceil(max / cols), int(f.minRows) || Math.ceil(max / cols)));
-            const min = Math.min(max, minRows * cols);
-            // (a page whose count is not whole rows - the engine's own page fill - steps from its max down in whole rows)
-            return out(min === max ? { min, max, dflt: per, step: cols, fixed: true, cols, note: `${per} a page (the fewest rows that fill the page)` } : { min, max, dflt: per, step: cols, cols });
+            const pages = Math.max(1, int(f.pages) || 1);
+            const dflt = per * pages;
+            const vals = practiceTotals(f);
+            if (!vals.includes(dflt)) vals.push(dflt), vals.sort((x, y) => x - y);
+            return out({ min: vals[0], max: vals[vals.length - 1], dflt, values: vals, step: cols, cols, perPage: per, total: true, canOff: true });
         }
         case 'mixed': {
             const c = int(f.count);
             if (!(c >= 1)) return null;
-            return out({ min: c, max: c, dflt: c, fixed: true, note: `${c} problems (the Mixed page fills its page)` });
+            const vals = Array.from({ length: MIXED_MAX_PAGES }, (_, i) => c * (i + 1));
+            return out({ min: c, max: vals[vals.length - 1], dflt: c, values: vals, step: c, perPage: c, total: true, canOff: true });
         }
         default: return null;
     }
@@ -119,17 +164,18 @@ export function allPartLimits(fit) {
     return o;
 }
 
-/** The values a stepper offers: min, min + step ... max (never outside [min, max]). */
+/** The values a stepper offers: the part's own list, else min, min + step ... max (never outside [min, max]). */
 export function offeredValues(lim) {
     if (!lim) return [];
     if (lim.fixed) return [lim.dflt];
+    if (Array.isArray(lim.values)) return lim.values.slice();
     const out = [];
     for (let v = lim.max; v >= lim.min; v -= lim.step) out.unshift(v);
     if (out[0] !== lim.min) out.unshift(lim.min);
     return out;
 }
 
-/** The nearest offered value to n (clamped to [min, max], snapped to the stepper's values). */
+/** The nearest offered value to n (clamped to [min, max], snapped to the stepper's values; a tie takes the smaller). */
 export function snapCount(n, lim) {
     const vals = offeredValues(lim);
     if (!vals.length) return n;
@@ -140,20 +186,29 @@ export function snapCount(n, lim) {
     return best;
 }
 
-/** The range text under a stepper ("2 to 4 problems", "8 to 16 a page, in rows of 4"). */
+/** The range text under a stepper ("2 to 4 problems", "12 to 75 problems, in rows of 3"); a fixed count says it once. */
 export function rangeText(part, lim) {
     if (!lim) return '';
     if (lim.fixed) return lim.note || '';
     const [one, many] = lim.unit || ['', ''];
-    if (part === 'practice') return `${lim.min} to ${lim.max} ${one}, in rows of ${lim.step}`;
+    if (part === 'practice') return `${lim.min} to ${lim.max} problems, in rows of ${lim.step}`;
+    if (part === 'mixed') return `${lim.min} to ${lim.max} problems, ${lim.perPage} a page`;
     if (part === 'rows') return `${lim.min} to ${lim.max} ${lim.max === 1 ? one : many} (${lim.perRow} a row)`;
     return `${lim.min} to ${lim.max} ${lim.max === 1 ? one : many}`;
 }
 
+/** The pages a Practice or Mixed total prints on ({pages, per}), or null. */
+export function totalPages(part, n, lim) {
+    if (!lim || !lim.total) return null;
+    if (part === 'mixed') return { pages: Math.max(1, Math.round(n / lim.perPage)), per: lim.perPage };
+    return practiceSplit(n, { perPage: lim.perPage, cols: lim.cols, minRows: lim.values ? Math.ceil(lim.values[0] / lim.cols) : undefined });
+}
+
 /**
- * Clean a partOpts object: each count clamped to its limits and snapped to its stepper, every value equal to its
- * default dropped (on: true, n = dflt), empty parts dropped. `limits`: {part: partLimits(...)} (allPartLimits); a part
- * without limits keeps its values, only sanitised (the UI has not measured it yet). Returns {} for the standard packet.
+ * Clean a partOpts object: each count snapped to its stepper's values, every value equal to its default dropped (on: true,
+ * n = dflt), a tick cleared where its part may not be off (`canOff` false: the page would not fill), a count of 0 read as
+ * the tick off, empty parts dropped. `limits`: {part: partLimits(...)} (allPartLimits); a part without limits keeps its
+ * values, only sanitised (the UI has not measured it yet). Returns {} for the standard packet.
  */
 export function normalizePartOpts(partOpts, limits = {}) {
     const src = partOpts && typeof partOpts === 'object' ? partOpts : {};
@@ -163,11 +218,13 @@ export function normalizePartOpts(partOpts, limits = {}) {
         if (!v || typeof v !== 'object') continue;
         const lim = limits ? limits[p] : null;
         const o = {};
-        if (v.on === false) o.on = false;
-        if (v.n !== undefined && v.n !== null && Number.isFinite(Number(v.n))) {
+        let off = v.on === false || ((p === 'vocab' || p === 'rows' || p === 'wedo') && v.n !== undefined && v.n !== null && Number(v.n) === 0);
+        if (off && lim && (lim.canOff === false || lim.none)) off = false;
+        if (off) o.on = false;
+        else if (v.n !== undefined && v.n !== null && Number.isFinite(Number(v.n))) {
             let n = int(v.n);
             if (lim) {
-                n = Math.max(lim.min, Math.min(lim.max, n));
+                if (!lim.values) n = Math.max(lim.min, Math.min(lim.max, n));
                 n = snapCount(n, lim);
                 if (!(lim.fixed || n === lim.dflt)) o.n = n;
             } else if (n >= 0) o.n = n;
@@ -205,14 +262,14 @@ export function lessonPartN(po) {
     if (!po) return null;
     const o = {};
     if (po.chart && Number.isFinite(po.chart.n)) o.chart = po.chart.n;
-    if (po.vocab && po.vocab.on === false) o.vocab = 0;
+    if (po.vocab && (po.vocab.on === false || po.vocab.n === 0)) o.vocab = 0;
     else if (po.vocab && Number.isFinite(po.vocab.n)) o.vocab = po.vocab.n;
     if (po.remember && po.remember.on === false) o.remember = false;
-    if (po.wedo && po.wedo.on === false) o.wedo = 0;
+    if (po.wedo && (po.wedo.on === false || po.wedo.n === 0)) o.wedo = 0;
     else if (po.wedo && Number.isFinite(po.wedo.n)) o.wedo = po.wedo.n;
-    if (po.rows && po.rows.on === false) o.rows = 0;
+    if (po.rows && (po.rows.on === false || po.rows.n === 0)) o.rows = 0;
     else if (po.rows && Number.isFinite(po.rows.n)) o.rows = po.rows.n;
     return Object.keys(o).length ? o : null;
 }
 
-export default { PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+export default { PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

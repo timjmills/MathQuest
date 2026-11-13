@@ -22,7 +22,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack, lessonPartSeed } from './print-sheet.js';
-import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, rangeText, normalizePartOpts, partOptsFromSection, partsListOf } from './sheet/part-opts.js';
+import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, rangeText, normalizePartOpts, partOptsFromSection, partsListOf, totalPages } from './sheet/part-opts.js';
 import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -285,7 +285,8 @@ function shellHTML() {
     <p class="tv-fits" id="tvFits"></p>
   </section>
   <section class="tv-card tv-flush" aria-labelledby="tvSetupH" id="tvSetup"></section>
-</div>`;
+</div>
+<section class="tv-card tv-parts-card" id="tvPartsWide" aria-label="Lesson parts" hidden></section>`;
 }
 
 function wire() {
@@ -296,6 +297,9 @@ function wire() {
         if (e.target.dataset.pick !== undefined) renderPickResults(Number(e.target.dataset.pick), e.target.value);
     });
     window.addEventListener('resize', () => fitPreview());
+    // (F9: the Parts move between the section body and the full-width card when the screen crosses 1000 px)
+    let wideWas = partsWide();
+    window.addEventListener('resize', () => { const w = partsWide(); if (pr && w !== wideWas) { wideWas = w; renderWhat(); } });
     document.addEventListener('click', (e) => {
         if (!pr) return;
         if (e.target.closest('.tv-menu-wrap')) return;
@@ -347,9 +351,8 @@ function onClick(e) {
         }
         case 'part-on': partToggle(sec(d.sec), d.part); renderParts(d.sec, b); scheduleBuild(); break;
         case 'part-step': partStep(sec(d.sec), d.part, Number(d.dir)); renderParts(d.sec, b); scheduleBuild(); break;
-        case 'part-pages': { const s = sec(d.sec); s.pages = Math.max(1, Math.min(5, (Number(s.pages) || 1) + Number(d.dir))); renderParts(d.sec, b); scheduleBuild(); break; }
         case 'part-new': partNewNumbers(sec(d.sec), d.part); renderParts(d.sec, b); scheduleBuild(); break;
-        case 'parts-reset': { const s = sec(d.sec); const std = s.partStd || { pages: 1, mixed: false }; s.partOpts = {}; s.partRefresh = {}; s.pages = std.pages; s.mixed = std.mixed; delete s.parts; renderParts(d.sec, null); root.querySelector(`[data-act="part-on"][data-sec="${d.sec}"]`)?.focus(); scheduleBuild(); break; }
+        case 'parts-reset': { const s = sec(d.sec); const std = s.partStd || { pages: 1, mixed: false }; s.partOpts = {}; s.partRefresh = {}; s.pages = std.pages; s.mixed = std.mixed; delete s.parts; delete s.partNote; renderParts(d.sec, null); root.querySelector(`[data-act="part-on"][data-sec="${d.sec}"]`)?.focus(); scheduleBuild(); break; }
         case 'remove-skill': sec(d.sec).skills.splice(Number(d.idx), 1); renderWhat(); scheduleBuild(); break;
         case 'skill-options': openOptions(Number(d.sec), Number(d.idx), b); break;
         case 'pick': { const s = sec(d.sec); s.picking = !s.picking; s.menu = ''; renderWhat(); if (s.picking) root.querySelector(`[data-pick="${d.sec}"]`)?.focus(); break; }
@@ -406,7 +409,9 @@ function onChange(e) {
 
 function renderWhat() {
     const box = root.querySelector('#tvSections');
+    pr.sections.forEach(partsKeyCheck);
     box.innerHTML = pr.sections.map((s, i) => sectionHTML(s, i)).join('');
+    renderPartsWide();
 }
 
 /**
@@ -434,9 +439,17 @@ function stretchBlocked(skills) {
     return ok ? '' : NO_STRETCH_REASON;
 }
 
+/** A lesson section's Practice pages: its total's pages (§8a), else its own pages. */
+function lessonPracticePages(s) {
+    const po = s.partOpts || {};
+    const lim = s.partFit && (Number(s.pages) || 0) > 0 && po.practice && Number.isFinite(po.practice.n) ? sectionLimits(s).practice : null;
+    const tp = lim ? totalPages('practice', po.practice.n, lim) : null;
+    return tp ? tp.pages : Number(s.pages) || 0;
+}
+
 /** The line under a section's name: its page type and pages. */
 function sectionSub(s) {
-    return `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${s.pages} practice page${s.pages === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
+    return `${ROLE_NAME[s.role] || ''}${s.role === 'more-practice' ? ` · ${s.letters.length} page${s.letters.length === 1 ? '' : 's'}` : s.role === 'independent' ? ` · ${s.pages} page${s.pages === 1 ? '' : 's'}` : s.role === 'lesson' ? ` · ${lessonPracticePages(s)} practice page${lessonPracticePages(s) === 1 ? '' : 's'}${s.mixed ? ' + mixed' : ''}` : ''}`;
 }
 
 function sectionHTML(s, i) {
@@ -525,7 +538,7 @@ function sectionHTML(s, i) {
   </div>
   ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div>${colsField}</div></div>${pagesField}`
         : `<div class="tv-fields-cols"><div>${colsField}</div>${pagesField}</div>`}
-  ${s.role === 'lesson' ? `<div class="tv-divided tv-parts-wrap" id="tvParts${i}">${partsHTML(s, i)}</div>` : ''}
+  ${s.role === 'lesson' ? (partsWide() ? `<p class="tv-cap tv-divided">Lesson parts: set under the preview.</p>` : `<div class="tv-divided tv-parts-wrap" id="tvParts${i}">${partsHTML(s, i)}</div>`) : ''}
 </div>`;
 }
 
@@ -533,21 +546,41 @@ function sectionHTML(s, i) {
 
 /** A lesson section's part options as the screen reads them: its own, plus a saved section's older `parts` list. */
 function sectionPartOpts(s) { return partOptsFromSection(s); }
-/** The limits of each part, from the last build of this section (null before the first build). */
-function sectionLimits(s) { return s.partFit ? allPartLimits(s.partFit) : null; }
+/**
+ * The limits of each part, from the last build of this section (null before the first build). A part that is not printed
+ * (Practice at 0 pages, Mixed off) keeps the limits it last had, so its stepper can step it back on (F4).
+ */
+function sectionLimits(s) {
+    if (!s.partFit) return null;
+    const fit = Object.assign({}, s.partFit);
+    for (const p of ['practice', 'mixed']) if (!fit[p] && s.partLast && s.partLast[p]) fit[p] = s.partLast[p];
+    return allPartLimits(fit);
+}
+
+/** The parts whose count 0 is the part off (the tick follows the stepper, F4 / F7). */
+const ZERO_OFF = new Set(['vocab', 'wedo', 'rows', 'practice', 'mixed']);
+/** The lesson sheet's own parts: one sheet, one seed - one New numbers for the group (F10). */
+const SHEET_GROUP = new Set(['vocab', 'remember', 'wedo', 'rows']);
 
 /** Is a part printed? */
 function partOn(s, p, po = sectionPartOpts(s)) {
     if (p === 'practice') return (Number(s.pages) || 0) > 0;
     if (p === 'mixed') return !!s.mixed;
-    if (p === 'vocab' || p === 'rows') return !(po[p] && (po[p].on === false || po[p].n === 0));
+    if (p === 'vocab' || p === 'rows' || p === 'wedo') return !(po[p] && (po[p].on === false || po[p].n === 0));
     return !(po[p] && po[p].on === false);
 }
 
-/** The count a part's stepper shows. */
+/** The count a part's stepper shows (0 when the part is off). */
 function partCount(s, p, lim, po = sectionPartOpts(s)) {
+    if (ZERO_OFF.has(p) && !partOn(s, p, po)) return 0;
     const v = po[p] && Number.isFinite(po[p].n) ? po[p].n : lim.dflt;
     return offeredValues(lim).includes(v) ? v : lim.dflt;
+}
+
+/** The values a part's stepper walks: 0 (off) where the part may be off, then the counts on offer. */
+function stepperValues(p, lim) {
+    const vals = offeredValues(lim);
+    return ZERO_OFF.has(p) && lim.canOff !== false ? [0, ...vals.filter((v) => v > 0)] : vals;
 }
 
 function setPartOpts(s, po) {
@@ -555,12 +588,16 @@ function setPartOpts(s, po) {
     delete s.parts;   // (a saved section's `parts` list now lives in partOpts)
 }
 
-function partToggle(s, p) {
-    if (p === 'practice') { if (s.pages > 0) { s.pagesWas = s.pages; s.pages = 0; } else s.pages = Number(s.pagesWas) > 0 ? s.pagesWas : 1; return; }
-    if (p === 'mixed') { s.mixed = !s.mixed; return; }
+/** Turn a part on or off (the tick); `on` forces a state. */
+function partToggle(s, p, on) {
+    const now = partOn(s, p);
+    const want = on === undefined ? !now : on;
+    if (want === now) return;
+    if (p === 'practice') { if (!want) { s.pagesWas = s.pages; s.pages = 0; } else s.pages = Number(s.pagesWas) > 0 ? s.pagesWas : ((s.partStd && s.partStd.pages) || 1); return; }
+    if (p === 'mixed') { s.mixed = want; return; }
     const po = sectionPartOpts(s);
     const o = Object.assign({}, po[p]);
-    if (partOn(s, p, po)) o.on = false;
+    if (!want) o.on = false;
     else { delete o.on; if (o.n === 0) delete o.n; }
     po[p] = o;
     setPartOpts(s, po);
@@ -568,17 +605,22 @@ function partToggle(s, p) {
 
 function partStep(s, p, dir) {
     const lim = (sectionLimits(s) || {})[p];
-    if (!lim || lim.fixed) return;
+    if (!lim || lim.fixed && !ZERO_OFF.has(p)) return;
+    const vals = stepperValues(p, lim);
+    const at = vals.indexOf(partCount(s, p, lim));
+    const next = vals[Math.max(0, Math.min(vals.length - 1, (at < 0 ? vals.length - 1 : at) + (dir < 0 ? -1 : 1)))];
+    if (s.partNote) delete s.partNote[p];
+    if (next === 0) { partToggle(s, p, false); return; }
+    // (stepping up from 0 turns the part back on at the count asked - the tick follows the stepper)
+    partToggle(s, p, true);
     const po = sectionPartOpts(s);
-    const vals = offeredValues(lim);
-    const at = vals.indexOf(partCount(s, p, lim, po));
-    const next = vals[Math.max(0, Math.min(vals.length - 1, at + (dir < 0 ? -1 : 1)))];
     po[p] = Object.assign({}, po[p], { n: next });
+    delete po[p].on;
     setPartOpts(s, po);
 }
 
 /** The registry part a row's New numbers refreshes (the lesson sheet's bands are one sheet). */
-const refreshPartOf = (p) => (p === 'wedo' || p === 'rows' || p === 'vocab' || p === 'remember' ? 'sheet' : p);
+const refreshPartOf = (p) => (SHEET_GROUP.has(p) || p === 'sheet' ? 'sheet' : p);
 
 function partNewNumbers(s, p) {
     const x = refreshPartOf(p);
@@ -589,6 +631,36 @@ function partNewNumbers(s, p) {
 function partsChanged(s) {
     const std = s.partStd || { pages: 1, mixed: false };
     return Object.keys(sectionPartOpts(s)).length > 0 || Object.keys(s.partRefresh || {}).length > 0 || Number(s.pages) !== std.pages || !!s.mixed !== std.mixed;
+}
+
+/**
+ * F3 (owner answer 2, "per lesson only"): a section's part settings belong to its lesson. When the section's lesson or its
+ * skill changes, they go back to the standard packet of the new lesson.
+ */
+function partsKeyCheck(s) {
+    if (s.role !== 'lesson') return;
+    const k = s.skills && s.skills[0] ? `${s.skills[0].categoryId}:${s.skills[0].skillId}` : '';
+    const key = `${s.lessonId && lessonSkillKept(s) ? s.lessonId : ''}|${k}`;
+    if (s.partKey !== undefined && s.partKey !== key) {
+        const std = s.partStd;
+        if (std) { s.pages = std.pages; s.mixed = std.mixed; }
+        s.partOpts = {}; s.partRefresh = {};
+        delete s.partStd; delete s.partFit; delete s.partLast; delete s.partNote; delete s.parts;
+    }
+    s.partKey = key;
+}
+
+/** Wide screens (F9): the Lesson sections' Parts sit in one full-width card under the preview, as the mock's table. */
+const partsWide = () => !!(window.matchMedia && window.matchMedia('(min-width: 1000px)').matches);
+
+/** The full-width Parts card (one table per Lesson section) - empty and hidden on narrow screens. */
+function renderPartsWide() {
+    const card = root && root.querySelector('#tvPartsWide');
+    if (!card) return;
+    const list = partsWide() ? pr.sections.map((s, i) => [s, i]).filter(([s]) => s.role === 'lesson') : [];
+    card.hidden = !list.length;
+    card.innerHTML = list.map(([s, i]) => `<h2 class="tv-h2 tv-parts-title" id="tvPartsH${i}">Section ${String.fromCharCode(65 + i)} · Lesson parts</h2>
+  <div class="tv-parts-wrap is-wide" id="tvParts${i}">${partsHTML(s, i)}</div>`).join('');
 }
 
 /** Re-render a section's Parts table only, keeping the focus on the control that was pressed. */
@@ -607,52 +679,77 @@ function renderParts(i, btn) {
     }
 }
 
-/** The Parts table of a Lesson section (DESIGN §1.1; one card per part at phone width, §1.2). */
+/** The pages a Practice / Mixed total prints on, for the screen ("2 pages of 15"). */
+function pagesNote(s, p, lim, n) {
+    const tp = n > 0 ? totalPages(p, n, lim) : null;
+    return tp ? `${tp.pages} page${tp.pages === 1 ? '' : 's'} of ${tp.per}` : '';
+}
+
+/** The Parts table of a Lesson section (DESIGN §1.1; one compact row per part at phone width, §1.2). */
 function partsHTML(s, i) {
     // (the section's standard packet - pages and Mixed as it was opened: a lesson from the Lesson library opens with Mixed)
     if (!s.partStd) s.partStd = { pages: Number(s.pages) || 1, mixed: !!s.mixed };
     const fit = s.partFit;
     if (!fit) return '<span class="tv-label">Parts</span><p class="tv-cap">Measuring the parts of this lesson…</p>';
     const po = sectionPartOpts(s);
-    const lims = allPartLimits(fit);
+    const lims = sectionLimits(s);
     const listed = PART_OPT_IDS.filter((p) => lims[p] || p === 'practice' || p === 'mixed');
-    const rows = listed.map((p) => {
+    const row = (p) => {
         const lim = lims[p] || null;
         const on = partOn(s, p, po);
         const name = PART_OPT_NAMES[p];
         const id = `tvPart${i}_${p}`;
-        const tick = `<button type="button" class="tv-check tv-part-tick" role="checkbox" aria-checked="${on}" data-act="part-on" data-sec="${i}" data-part="${p}" aria-label="Print ${esc(name)}"><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
-        let many;
-        if (!lim || lim.toggle) many = `<span class="tv-part-none">—</span>${!lim && on ? '<span class="tv-part-range">Measured after the page is built</span>' : ''}`;
-        else if (lim.fixed) many = `<span class="tv-part-fixed">${on ? lim.dflt : 0}</span><span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+        const none = !!(lim && lim.none);
+        // (F7: a part with no room on this sheet has no tick; a part whose page would not fill without it has a locked tick)
+        const locked = on && lim && lim.canOff === false;
+        const tick = none ? '' : `<button type="button" class="tv-check tv-part-tick" role="checkbox" aria-checked="${on}" data-act="part-on" data-sec="${i}" data-part="${p}" aria-label="Print ${esc(name)}"${locked ? ` disabled title="Needed to fill the lesson sheet"` : ''}><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
+        let many = '';
+        if (none) many = `<span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+        else if (!lim) many = on ? '<span class="tv-part-range">Measured after the page is built</span>' : '';
+        else if (lim.toggle) many = locked ? '<span class="tv-part-range">Needed to fill the lesson sheet</span>' : '';
         else {
-            const n = partCount(s, p, lim, po);
-            const vals = offeredValues(lim);
-            const at = vals.indexOf(n);
-            many = `<span class="tv-stepper" role="group" aria-label="How many: ${esc(name)}">
-        <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="-1" aria-label="Fewer: ${esc(name)}"${!on || at <= 0 ? ' disabled' : ''}>${icon('minus', 16)}</button>
-        <output class="tv-step-val" aria-live="polite">${on ? n : 0}</output>
-        <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="1" aria-label="More: ${esc(name)}"${!on || at >= vals.length - 1 ? ' disabled' : ''}>${icon('plus', 16)}</button>
-      </span><span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+            const vals = stepperValues(p, lim);
+            if (vals.length <= 1) many = `<span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+            else {
+                const n = partCount(s, p, lim, po);
+                const at = vals.indexOf(n);
+                const pn = (p === 'practice' || p === 'mixed') ? pagesNote(s, p, lim, n) : '';
+                const note = s.partNote && s.partNote[p] ? `<span class="tv-part-note" role="status">${esc(s.partNote[p])}</span>` : '';
+                many = `<span class="tv-stepper" role="group" aria-label="How many: ${esc(name)}">
+        <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="-1" aria-label="Fewer: ${esc(name)}"${at <= 0 ? ' disabled' : ''}>${icon('minus', 16)}</button>
+        <output class="tv-step-val" aria-live="polite">${n}</output>
+        <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="1" aria-label="More: ${esc(name)}"${at >= vals.length - 1 ? ' disabled' : ''}>${icon('plus', 16)}</button>
+      </span><span class="tv-part-range">${esc(lim.fixed ? rangeText(p, lim) : rangeText(p, lim))}${pn ? ` · ${esc(pn)}` : ''}</span>${note}`;
+            }
         }
-        const pages = p === 'practice' && on ? `<span class="tv-part-pages"><span class="tv-stepper tv-stepper-sm" role="group" aria-label="Practice pages">
-        <button type="button" class="tv-step-btn" data-act="part-pages" data-sec="${i}" data-part="practice" data-dir="-1" aria-label="Fewer practice pages"${s.pages <= 1 ? ' disabled' : ''}>${icon('minus', 14)}</button>
-        <output class="tv-step-val" aria-live="polite">${s.pages}</output>
-        <button type="button" class="tv-step-btn" data-act="part-pages" data-sec="${i}" data-part="practice" data-dir="1" aria-label="More practice pages"${s.pages >= 5 ? ' disabled' : ''}>${icon('plus', 14)}</button>
-      </span><span class="tv-part-range">${s.pages === 1 ? 'page' : 'pages'}</span></span>` : '';
-        // (step B opens the Supports panel here; step A shows the standard, read-only)
-        const supports = `<span class="tv-part-chip">${p === 'remember' || p === 'vocab' ? 'None to choose' : 'Standard'}</span>`;
-        const refresh = p === 'vocab' || p === 'remember' ? '' : `<button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="${p}" aria-label="New numbers: ${esc(name)}${refreshPartOf(p) === 'sheet' ? ' (the whole lesson sheet)' : ''}" title="New numbers"${on ? '' : ' disabled'}>${icon('reset', 18)}</button>`;
+        // (step B opens the Supports panel here; step A states the standard as plain text - F8)
+        const supports = SHEET_GROUP.has(p) && p !== 'wedo' && p !== 'rows' ? '' : '<span class="tv-part-sup-t">Supports: standard</span>';
+        const refresh = SHEET_GROUP.has(p) || none ? '' : `<button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="${p}" aria-label="New numbers: ${esc(name)}" title="New numbers"${on ? '' : ' disabled'}>${icon('reset', 18)}</button>`;
         const warn = p === 'prereq' && on && lim && partCount(s, p, lim, po) < Math.min(PREREQ_WARN_BELOW, lim.max) ? `<p class="tv-part-warn" role="status">${icon('info', 14)}<span>${esc(PREREQ_FEW_WARNING)}</span></p>` : '';
-        return `<div class="tv-part${on ? '' : ' is-off'}" role="group" aria-labelledby="${id}" data-part-row="${p}">
+        return `<div class="tv-part${on && !none ? '' : ' is-off'}${SHEET_GROUP.has(p) ? ' is-sheet' : ''}" role="group" aria-labelledby="${id}" data-part-row="${p}">
     <div class="tv-part-print">${tick}</div>
-    <div class="tv-part-name"><span id="${id}">${esc(name)}</span>${pages}</div>
+    <div class="tv-part-name"><span id="${id}">${esc(name)}</span></div>
     <div class="tv-part-many">${many}</div>
     <div class="tv-part-sup">${supports}</div>
     <div class="tv-part-ref">${refresh}</div>
     ${warn}
   </div>`;
-    }).join('');
+    };
+    let rows = '';
+    let grouped = false;
+    for (const p of listed) {
+        if (SHEET_GROUP.has(p) && !grouped) {
+            grouped = true;
+            // (F10: the lesson sheet's parts share one seed - one New numbers, for the whole sheet)
+            rows += `<div class="tv-part tv-part-group" role="group" aria-labelledby="tvPartG${i}">
+    <div class="tv-part-print"></div>
+    <div class="tv-part-name"><span id="tvPartG${i}">Lesson sheet</span><span class="tv-part-range">Vocabulary, Remember, We Do and practice rows: one page</span></div>
+    <div class="tv-part-many"></div><div class="tv-part-sup"></div>
+    <div class="tv-part-ref"><button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="sheet" aria-label="New numbers: the whole lesson sheet" title="New numbers for the whole lesson sheet">${icon('reset', 18)}</button></div>
+  </div>`;
+        }
+        rows += row(p);
+    }
     return `<span class="tv-label" id="tvPartsL${i}">Parts</span>
   <div class="tv-parts" role="group" aria-labelledby="tvPartsL${i}">
     <div class="tv-parts-head" aria-hidden="true"><span>Print</span><span>Part</span><span>How many</span><span>Supports</span><span>New numbers</span></div>
@@ -994,6 +1091,7 @@ function dlSkills(s, force) {
 }
 
 function requestFor(s, i) {
+    partsKeyCheck(s);   // (F3: a section's part settings belong to its lesson)
     if (s.role === 'detailed-lesson') {
         dlSkills(s, false);
         // (`sections` names the lesson's skill for the screen's own checks; the pack ignores it.)
@@ -1123,7 +1221,21 @@ async function runBuild() {
             const fit = p.res && p.res.lesson && p.res.lesson.partFit;
             if (!s || s.role !== 'lesson' || !fit || JSON.stringify(fit) === JSON.stringify(s.partFit || null)) return;
             s.partFit = fit;
-            if (s.partOpts) s.partOpts = normalizePartOpts(s.partOpts, allPartLimits(fit));
+            s.partLast = Object.assign({}, s.partLast);
+            for (const x of ['practice', 'mixed']) if (fit[x]) s.partLast[x] = fit[x];
+            if (s.partOpts) {
+                // (a count the new limits no longer offer snaps to the nearest that is, and says so under its stepper - §8a)
+                const before = s.partOpts;
+                s.partOpts = normalizePartOpts(s.partOpts, sectionLimits(s));
+                for (const [x, v] of Object.entries(before)) {
+                    const now = s.partOpts[x];
+                    if (!Number.isFinite(v.n) || (now && now.n === v.n)) continue;
+                    const lim = sectionLimits(s)[x];
+                    const got = now && Number.isFinite(now.n) ? now.n : lim ? lim.dflt : v.n;
+                    if (got === v.n) continue;
+                    s.partNote = Object.assign({}, s.partNote, { [x]: x === 'practice' || x === 'mixed' ? `Rounded to ${got} so no page is under half full` : `Now ${got}: ${v.n} would leave the lesson sheet short` });
+                }
+            }
             const box = root.querySelector(`#tvParts${si}`);
             const focus = box && box.contains(document.activeElement) ? document.activeElement : null;
             if (box) renderParts(si, focus && focus.dataset && focus.dataset.act ? focus : null);

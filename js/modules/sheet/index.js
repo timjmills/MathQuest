@@ -210,4 +210,5 @@ export {
 export {
     PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount,
     rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN,
+    PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages,
 } from './part-opts.js';

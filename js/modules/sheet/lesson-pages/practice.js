@@ -96,7 +96,12 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         // (S holds more than L, LESSONS L1 - critic R3 N-3: 12 at S left 41 % of p2 blank - and the
         // rows are whole rows of the pool the lesson dealt, never a last row of one)
         const oneCeil = ctx.size === 'L' ? 12 : 21;   // (an S packet draws its lesson sheet at M type)
-        let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : 6) / ic)), Math.floor(room / hI));
+        // (lf-partopts §8b: on a sheet whose bands the teacher turned down, the height they gave up goes to more rows - as many
+        // whole rows as the pool dealt and the room holds; the 6 of 12.1 is the standard sheet's)
+        const pn = input.lesson && input.lesson.partN;
+        const freed = !!pn && ['vocab', 'remember', 'wedo', 'rows'].some((k) => pn[k] !== undefined);
+        let rows = Math.min(Math.max(1, Math.floor((oneNum ? oneCeil : freed ? Math.max(6, indepPool.length) : 6) / ic)), Math.floor(room / hI));
+        if (freed && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         if (oneNum && indepPool.length >= ic) rows = Math.min(rows, Math.floor(indepPool.length / ic));
         // Each row as tall as the TALLEST problem the rows hold (R-1), re-checked against the room.
         const hRows = (k) => Math.max(hI, hAt(indepPool.slice(0, k * ic).map((it) => twins.get(it) || it), ic));

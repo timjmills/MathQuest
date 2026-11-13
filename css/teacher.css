@@ -946,26 +946,31 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 /* Checker 2026-10-30: inset is measured from the padding box of the bordered 28 px button, so -8px gave 42 px. */
 .tv-sko .sko-tip::after { inset: -9px; }
 
-/* ---- Lesson parts table (lane lf-partopts step A, design/partopts/DESIGN.md §1.1-1.2): additive classes only ----
-   The Print screen's section column is narrow (about 410 px beside the preview at 1280), so the parts are cards by default -
-   tick, name and New numbers; the stepper and its range; the Supports chip - and become the table's rows only where the
-   section itself is wide (a container query, never the viewport). */
+/* ---- Lesson parts table (lane lf-partopts step A, design/partopts/DESIGN.md §1.1-1.2; fix round A2): additive classes only ----
+   In a section column (phone, tablet) each part is one compact row - tick, name, New numbers; the stepper and its range
+   under the name - separated by rules, no nested card (critic A r1 F5). At 1000 px and wider the Lesson sections' Parts sit
+   in one full-width card under the preview as the mock's table (F9). */
 .tv-parts-wrap { container-type: inline-size; }
-.tv-parts { display: flex; flex-direction: column; gap: 10px; }
+.tv-parts { display: flex; flex-direction: column; gap: 0; }
 .tv-parts-head { display: none; }
 .tv-part {
-    display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; grid-template-areas: 'print name ref' 'many many many' 'sup sup sup' 'warn warn warn';
-    align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--tv-border); border-radius: 12px; background: var(--tv-surface);
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; grid-template-areas: 'print name ref' '. many many' '. sup sup' 'warn warn warn';
+    align-items: center; gap: 4px 8px; padding: 8px 0; border-top: 1px solid var(--tv-rule);
 }
+.tv-part:first-of-type { border-top: 0; }
 .tv-part-print { grid-area: print; } .tv-part-ref { grid-area: ref; } .tv-part-sup { grid-area: sup; } .tv-part-warn { grid-area: warn; }
+.tv-part-print:empty, .tv-part-ref:empty, .tv-part-sup:empty, .tv-part-many:empty { display: none; }
 .tv-part-print .tv-part-tick { width: 44px; height: 44px; justify-content: center; }
-.tv-part-name { grid-area: name; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 15px; line-height: 20px; font-weight: 700; color: var(--tv-text); min-width: 0; }
+.tv-part-print .tv-part-tick[disabled] { opacity: .55; cursor: not-allowed; }
+.tv-part-name { grid-area: name; display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 20px; font-weight: 700; color: var(--tv-text); min-width: 0; }
 .tv-part.is-off .tv-part-name { color: var(--tv-text-2); font-weight: 500; }
+.tv-part.is-sheet .tv-part-name { padding-left: 12px; }
+.tv-part-group { background: var(--tv-subtle-2); }
+.tv-part-group .tv-part-name .tv-part-range { font-weight: 500; }
 .tv-part-many { grid-area: many; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-width: 0; }
-.tv-part-pages { display: inline-flex; align-items: center; gap: 6px; }
 .tv-part-range { font-size: 12px; line-height: 16px; color: var(--tv-text-2); font-weight: 500; }
-.tv-part-none, .tv-part-fixed { font-size: 16px; line-height: 24px; font-weight: 700; color: var(--tv-text); padding-left: 4px; }
-.tv-part-none { color: var(--tv-text-2); font-weight: 500; }
+.tv-part-note { flex-basis: 100%; font-size: 12px; line-height: 16px; color: var(--tv-text); font-weight: 600; }
+.tv-part-sup-t { font-size: 12px; line-height: 16px; color: var(--tv-text-2); font-weight: 500; }
 .tv-stepper { display: inline-flex; align-items: stretch; border: 1px solid var(--tv-control-soft); border-radius: 8px; overflow: hidden; background: var(--tv-surface); }
 .tv-step-btn {
     display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0;
@@ -975,11 +980,6 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 .tv-step-btn[disabled] { color: var(--tv-control); cursor: not-allowed; opacity: .55; }
 .tv-step-btn:focus-visible { outline: 2px solid var(--tv-accent); outline-offset: -2px; }
 .tv-step-val { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0 4px; font-size: 18px; font-weight: 700; color: var(--tv-text); font-variant-numeric: tabular-nums; }
-.tv-stepper-sm .tv-step-val { min-width: 32px; font-size: 15px; }
-.tv-part-chip {
-    display: inline-flex; align-items: center; width: 100%; min-height: 44px; padding: 4px 14px; border: 1px solid var(--tv-control-soft);
-    border-radius: 999px; font-size: 13px; line-height: 18px; font-weight: 600; color: var(--tv-text-2); background: var(--tv-surface);
-}
 .tv-part-ref .tv-part-new { width: 44px; height: 44px; }
 .tv-part-ref .tv-part-new[disabled] { opacity: .45; cursor: not-allowed; }
 .tv-part-warn {
@@ -988,15 +988,21 @@ html.dark body.teacher-mode #worksheetView.online-edition .game-header { backgro
 }
 .tv-part-warn svg { flex: none; margin-top: 2px; color: var(--tv-caption); }
 .tv-parts-reset { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; text-decoration: underline; }
-/* a wide section: the Parts TABLE of the mock (Print · Part · How many · Supports · New numbers) */
+/* the full-width card under the Print screen's columns (F9) */
+.tv-parts-card { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+.tv-parts-card[hidden] { display: none; }
+/* phone: the Parts take the section's side padding back (one box fewer around them, F5) */
+@media (max-width: 640px) { .tv-section .tv-parts-wrap { margin-inline: -12px; } }
+.tv-parts-title { margin: 0; }
+/* a wide Parts block: the Parts TABLE of the mock (Print · Part · How many · Supports · New numbers) */
 @container (min-width: 720px) {
-    .tv-parts { gap: 0; border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface); }
+    .tv-parts { border: 1px solid var(--tv-border); border-radius: 10px; background: var(--tv-surface); }
     .tv-parts-head, .tv-part {
-        display: grid; grid-template-columns: 44px minmax(0, 1.2fr) minmax(170px, 1.6fr) minmax(0, 1fr) 52px; grid-template-areas: 'print name many sup ref' '. warn warn warn warn';
-        align-items: center; gap: 8px; padding: 8px 10px; border: 0; border-radius: 0;
+        display: grid; grid-template-columns: 52px minmax(180px, 1.1fr) minmax(260px, 1.8fr) minmax(140px, 1fr) 72px; grid-template-areas: 'print name many sup ref' '. warn warn warn warn';
+        align-items: center; gap: 8px; padding: 8px 12px;
     }
+    .tv-part-print:empty, .tv-part-ref:empty, .tv-part-sup:empty, .tv-part-many:empty { display: block; }
     .tv-parts-head { grid-template-areas: none; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--tv-text-2); border-bottom: 1px solid var(--tv-rule); }
-    .tv-part + .tv-part { border-top: 1px solid var(--tv-rule); }
-    .tv-part-many { flex-direction: column; align-items: flex-start; gap: 2px; }
-    .tv-part-chip { width: auto; min-height: 36px; }
+    .tv-part:first-of-type { border-top: 1px solid var(--tv-rule); }
+    .tv-part-many { flex-direction: row; align-items: center; gap: 4px 12px; }
 }

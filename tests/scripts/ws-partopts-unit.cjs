@@ -33,24 +33,42 @@ const F = (id, msg) => fails.push(`${id} ${msg}`);
 
 async function unit() {
     const po = await import(pathToFileURL(path.join(ROOT, 'js/modules/sheet/part-opts.js')).href);
-    const fit = { prereq: { total: 4 }, chart: { designed: 2, min: 1 }, vocab: { words: 3 }, remember: { has: true }, wedo: { fit: 3, min: 2 }, rows: { fit: 2, perRow: 3 }, practice: { perPage: 15, cols: 3, rows: 5, minRows: 4 }, mixed: { count: 10 } };
+    const fit = { prereq: { total: 4 }, chart: { designed: 2, min: 1 }, vocab: { words: 3, values: [1, 2, 3], canOff: true }, remember: { has: true, canOff: true }, wedo: { fit: 3, values: [1, 2, 3], canOff: true }, rows: { fit: 2, perRow: 3, values: [1, 2], canOff: true }, practice: { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 1 }, mixed: { count: 10 } };
     const lims = po.allPartLimits(fit);
     let n = 0;
     for (const [p, lim] of Object.entries(lims)) {
         const vals = po.offeredValues(lim);
         if (vals.some((v) => v < lim.min || v > lim.max)) F('PO-4', `${p}: offered ${vals} outside [${lim.min}, ${lim.max}]`);
         if (lim.fixed) continue;
-        if (p === 'practice' && vals.some((v) => v % lim.step)) F('PO-4', `practice: ${vals} not whole rows of ${lim.step}`);
+        if ((p === 'practice' || p === 'mixed') && vals.some((v) => v % lim.step)) F('PO-4', `${p}: ${vals} not whole rows / pages of ${lim.step}`);
         const lo = po.normalizePartOpts({ [p]: { n: lim.min - 1 } }, lims)[p];
         const hi = po.normalizePartOpts({ [p]: { n: lim.max + 1 } }, lims)[p];
-        if (!(lo && lo.n === lim.min) && lim.min !== lim.dflt) F('PO-4', `${p}: min - 1 normalised to ${JSON.stringify(lo)}, not ${lim.min}`);
+        const offAt0 = ['vocab', 'wedo', 'rows'].includes(p) && lim.min - 1 <= 0;   // (0 = the part's tick off, F4 / F7)
+        if (offAt0 ? !(lo && lo.on === false) : (!(lo && lo.n === lim.min) && lim.min !== lim.dflt)) F('PO-4', `${p}: min - 1 normalised to ${JSON.stringify(lo)}, not ${offAt0 ? 'off' : lim.min}`);
         if (hi !== undefined && lim.max === lim.dflt) F('PO-4', `${p}: max + 1 kept as ${JSON.stringify(hi)} (max is the default: nothing stored)`);
         if (Object.keys(po.normalizePartOpts({ [p]: { n: lim.dflt } }, lims)).length) F('PO-4', `${p}: the default count was stored`);
         n++;
     }
     if (Object.keys(po.normalizePartOpts({}, lims)).length || !po.partOptsEmpty({ wedo: {} })) F('PO-4', 'a standard lesson stores something');
+    // §8a: Practice and Mixed counts are TOTALS - equal pages of whole rows, the pages follow; an old section's pages x the page
+    {
+        const pf = { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 2 };
+        const pl = po.partLimits('practice', { fit: { practice: pf } });
+        if (pl.dflt !== 30 || pl.values.some((v) => v % 3) || !pl.values.includes(12) || !pl.values.includes(75) || pl.values.includes(27)) F('PO-4', `practice totals ${pl.values} (default ${pl.dflt})`);
+        for (const v of pl.values) { const sp = po.practiceSplit(v, pf); if (!sp || sp.pages * sp.per !== v || sp.per > 15 || sp.per < 12) F('PO-4', `practice ${v} splits as ${JSON.stringify(sp)}`); }
+        if (JSON.stringify(po.normalizePartOpts({ practice: { n: 27 } }, { practice: pl })) !== JSON.stringify({ practice: { n: 24 } })) F('PO-4', 'practice 27 does not round to 24 (no page under half full)');
+        const ml = po.partLimits('mixed', { fit: { mixed: { count: 12 } } });
+        if (JSON.stringify(ml.values) !== '[12,24,36]') F('PO-4', `mixed totals ${ml.values}`);
+        // a probed part: only its values; a tick that may not be cleared (the page would not fill) is dropped
+        const wl = po.partLimits('wedo', { fit: { wedo: { fit: 3, values: [2, 3], canOff: false } } });
+        if (JSON.stringify(po.offeredValues(wl)) !== '[2,3]' || Object.keys(po.normalizePartOpts({ wedo: { on: false } }, { wedo: wl })).length) F('PO-4', 'We Do values / canOff not honoured');
+        if (JSON.stringify(po.normalizePartOpts({ wedo: { n: 1 } }, { wedo: wl })) !== JSON.stringify({ wedo: { n: 2 } })) F('PO-4', 'We Do 1 not snapped to 2');
+        const rl = po.partLimits('rows', { fit: { rows: { fit: 0, perRow: 3 } } });
+        if (!rl.none || rl.canOff !== false || Object.keys(po.normalizePartOpts({ rows: { on: false } }, { rows: rl })).length) F('PO-4', 'rows with no room is not "none" (F7)');
+        if (/^\d+ · /.test(po.rangeText('rows', rl)) || !/^Fixed: /.test(po.rangeText('wedo', po.partLimits('wedo', { fit: { wedo: { fit: 3, values: [3] } } })))) F('PO-4', 'a fixed count is not written once as "Fixed: n (...)" (F6)');
+    }
     // the save / load round trip: a section's partOpts as JSON, read back, normalised again
-    const sec = { role: 'lesson', pages: 2, mixed: true, partOpts: po.normalizePartOpts({ prereq: { n: 2 }, wedo: { n: 2 }, rows: { n: 0 }, remember: { on: false }, practice: { n: 12 }, chart: { on: false } }, lims) };
+    const sec = { role: 'lesson', pages: 2, mixed: true, partOpts: po.normalizePartOpts({ prereq: { n: 2 }, wedo: { n: 2 }, rows: { n: 0 }, remember: { on: false }, practice: { n: 24 }, mixed: { n: 20 }, chart: { on: false } }, lims) };
     const back = JSON.parse(JSON.stringify(sec));
     const again = po.partOptsFromSection(back);
     if (JSON.stringify(again) !== JSON.stringify(sec.partOpts)) F('PO-4', `save/load changed the partOpts: ${JSON.stringify(sec.partOpts)} -> ${JSON.stringify(again)}`);
@@ -63,7 +81,7 @@ async function unit() {
     const pn = po.lessonPartN({ wedo: { on: false }, vocab: { n: 0 }, rows: { n: 1 }, remember: { on: false } });
     if (!pn || pn.wedo !== 0 || pn.vocab !== 0 || pn.rows !== 1 || pn.remember !== false) F('PO-4', `lessonPartN ${JSON.stringify(pn)}`);
     if (po.lessonPartN({}) !== null) F('PO-4', 'lessonPartN of the standard packet is not null');
-    console.log(`PO-4 ${fails.length ? 'FAIL' : 'PASS'} (${n} counted parts, save/load, old sections, parts list)`);
+    console.log(`PO-4 ${fails.length ? "FAIL" : "PASS"} (${n} counted parts, save/load, old sections, parts list)`); for (const x of fails) console.log(`   ${x}`);
 }
 
 async function browser() {
@@ -133,16 +151,21 @@ async function browser() {
         // packet. EB-PAGE: a page 30 % or more empty under its last block fails; the last page of a sheet of 2 or more pages
         // fails under half used (H5). EB-BAND / EB-SIDE / EB-EDGE: absolute, on every cell not drawn exactly (same markup, same size) as a
         // cell of the standard packet (an unchanged cell is the standard packet's, graded by its own lane - critic A r1 F11b).
+        const cellKey = (m, c, rule) => `${(m.pages[c.page - 1] || {}).sheet}|${rule}|${c.tmpl}|${Math.round(c.wMm)}|${rule === 'EB-BAND' ? Math.round(c.hMm) : ''}`;
+        const stdKeys = (m) => { const out = new Set(); for (const c of m.cells) judge([c], '', (rule) => out.add(cellKey(m, c, rule)), 'lesson'); return out; };
         const findingsOf = (m, where, std) => {
             const out = [];
             const changed = (pi) => !std || !std.pages.has((m.pages[pi - 1] || {}).h);
-            // (EB-SIDE / EB-EDGE read the width: the same markup at the same width is the standard's cell; EB-BAND reads the height too)
-            const cellNew = (pi, ci, rule) => { const sg = ((m.sigs[pi - 1] || [])[ci - 1]) || '-'; return changed(pi) && !(std && std.cells.has(rule === 'EB-BAND' ? sg : sg.replace(/\|\d+$/, ''))); };
-            judge(m.cells.map((c) => Object.assign({}, c, { label: `${c.label || ''}#${c.cell}` })), where, (rule, w, msg) => {
-                const pi = Number((/ p(\d+) /.exec(w + ' ') || [])[1]);
-                const ci = Number((/#(\d+)/.exec(w) || [])[1]);
-                if (['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule) && cellNew(pi, ci, rule)) out.push(`${rule} ${w}: ${msg}`);
-            }, 'lesson');
+            for (const c of m.cells) {
+                if (!changed(c.page)) continue;
+                judge([c], where, (rule, w, msg) => {
+                    if (!['EB-BAND', 'EB-SIDE', 'EB-EDGE'].includes(rule)) return;
+                    // (a cell of the same template, sheet and size that the STANDARD packet already draws with this finding is the
+                    // standard's own defect - critic A r1 F11b, another lane's - not one a count made)
+                    if (std && std.cellKeys.has(cellKey(m, c, rule))) return;
+                    out.push(`${rule} ${w}: ${msg}`);
+                }, 'lesson');
+            }
             m.pages.forEach((p, i) => {
                 const nx = m.pages[i + 1], pv = m.pages[i - 1];
                 const lastOfMany = (!nx || nx.sheet !== p.sheet) && pv && pv.sheet === p.sheet;
@@ -170,7 +193,7 @@ async function browser() {
             const b0 = await build(l.skill, size, undefined); builds++;
             if (b0.error) { F('PO-2a', `${where0} standard packet: ${b0.error}`); continue; }
             const m0 = await measure(b0.doc);
-            const std = { pages: new Set(m0.pages.map((p) => p.h)), cells: new Set(m0.sigs.flat().flatMap((x) => [x, x.replace(/\|\d+$/, '')])) };
+            const std = { pages: new Set(m0.pages.map((p) => p.h)), cellKeys: stdKeys(m0) };
             const lims = po.allPartLimits(b0.fit);
             // (F2 coverage: a real range - two values or more - on We Do and on Practice)
             cover.cases++;
@@ -182,7 +205,7 @@ async function browser() {
             if (!onlyCombos) for (const [p, lim] of Object.entries(lims)) {
                 if (onlyParts && !onlyParts.includes(p)) continue;
                 if (lim.toggle) { jobs.push({ p, partOpts: { [p]: { on: false } }, tag: `${p} off` }); continue; }
-                if (p === 'wedo') jobs.push({ p, partOpts: { wedo: { on: false } }, tag: 'wedo off' });
+                if (['vocab', 'wedo', 'rows'].includes(p) && !lim.none) jobs.push({ p, partOpts: { [p]: { on: false } }, tag: `${p} off` });
                 if (lim.fixed) continue;
                 const vals = li < full ? po.offeredValues(lim) : [lim.min, lim.max];
                 for (const v of [...new Set(vals)]) if (v !== lim.dflt) jobs.push({ p, v, partOpts: { [p]: { n: v } }, tag: `${p} ${v}` });
@@ -190,7 +213,7 @@ async function browser() {
             // (F12: parts changed TOGETHER - every part at its min; the same with We Do off; Vocabulary 0 with We Do off;
             // Remember off with no lesson rows)
             const allMin = {};
-            for (const [p, lim] of Object.entries(lims)) if (lim.toggle) allMin[p] = { on: false }; else if (!lim.fixed) allMin[p] = { n: lim.min };
+            for (const [p, lim] of Object.entries(lims)) if (lim.toggle || (['vocab', 'rows'].includes(p) && !lim.none)) allMin[p] = { on: false }; else if (!lim.fixed) allMin[p] = { n: lim.min };
             jobs.push({ partOpts: allMin, tag: 'everything at min' });
             jobs.push({ partOpts: Object.assign({}, allMin, { wedo: { on: false } }), tag: 'everything at min, We Do off' });
             if (lims.vocab && lims.wedo) jobs.push({ partOpts: { vocab: { n: 0 }, wedo: { on: false } }, tag: 'Vocabulary 0, We Do off' });

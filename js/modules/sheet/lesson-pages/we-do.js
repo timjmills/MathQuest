@@ -154,12 +154,8 @@ export function weDoBand(env) {
     weDoBandOwn(probe);
     env.weDoFit = probe.weDo.length;
     env.weDoMin = probe._weDoMin;
-    // (a count under the band's own minimum prints the minimum: never a half-empty cell)
-    const wN = weDoCap(env.input);
-    if (wN > 0 && Number.isFinite(env.weDoMin) && wN < env.weDoMin) {
-        const pm = Object.assign({}, env.input.lesson.partN, { wedo: env.weDoMin });
-        env.input = Object.assign({}, env.input, { lesson: Object.assign({}, env.input.lesson, { partN: pm }) });
-    }
+    // (§8c: the count asked is drawn - fewer, wider cells; roles/lesson.js sheetOffers offers only the counts whose cells keep
+    // their ink at half their width and whose sheet fills its page)
     return weDoBandOwn(env);
 }
 
@@ -257,7 +253,22 @@ function weDoBandOwn(env) {
     if (wN !== null && weDo.length > wN) {
         // (a strip-over-the-cells set picked its own count: the teacher's count caps it, the rows / columns follow)
         weDo = weDo.slice(0, wN);
-        if (top) top = top.rows ? Object.assign({}, top, { set: weDo, rows: weDo.length }) : Object.assign({}, top, { set: weDo });
+        // (§8c: across the page under the strip, fewer cells are drawn at their own wider column - a rounding cell's number
+        // line takes the width)
+        if (top) top = top.rows ? Object.assign({}, top, { set: weDo, rows: weDo.length }) : Object.assign({}, top, { set: weDo, cols: Math.max(1, Math.min(top.cols, weDo.length)), h: Math.max(20, hAt(weDo, Math.max(1, Math.min(top.cols, weDo.length))) + lineExtra(weDo)) + (cue(weDo) ? 2 : 0) });
+    }
+    // (lf-partopts §8c: fewer cells re-flow WIDER - k cells share the width left of the Steps, or the page's width under a strip.
+    // A count is offered only where every cell's ink - measured at the nearest narrower column width - fills at least half the
+    // cell (a centred problem then leaves under 25 % each side, EB-SIDE 30 %); roles/lesson.js sheetOffers reads it.)
+    if (wN !== null && weDo.length) {
+        const k = top ? (top.rows ? 1 : weDo.length) : stackRows ? 1 : weDo.length;
+        const W = (top ? 186 : 124) / k - 4;
+        // (a rounding cell draws the chart's number line under its problem, as long as its column leaves - weDoRender)
+        const pc = top ? top.cols : stackRows ? 2 : colsFor(weDo.length);
+        const lineW = (it) => (isRound(it) ? Math.max(28, Math.min(62, 186 / pc - 8)) : 0);
+        const inkAt = (it) => { const ms = it.measured || {}; const c = [1, 2, 3, 4].find((x) => ms[x] && ms[x].inkMm > 0 && 186 / x - 4 <= W + 0.5) || 4; return Math.max(lineW(it), ms[c] && ms[c].inkMm > 0 ? ms[c].inkMm + (cue([it]) ? 10 : 0) : 0); };
+        env.weDoSideOk = weDo.every((it) => inkAt(it) >= 0.5 * W);
+        env.weDoInk = weDo.map((it) => [inkAt(it), +W.toFixed(1), it.template, JSON.stringify(Object.fromEntries(Object.entries(it.measured || {}).map(([c, v]) => [c, v.inkMm])))]);
     }
     // (cells answered IN PLACE - footprint `inPlace`: the sentence story, the fact-family check - hold no working space,
     // so a page's spare height grows them by a tenth at most, never a third: visual-quality critic r1 F1, 33 % bands)
