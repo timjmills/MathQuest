@@ -22,6 +22,10 @@ Critic rounds: 1 (FAIL min 5 on B1; rebuild Opus medium 2026-11-13)
   at this size's metrics, and the shelf budget compare takes an epsilon (value / combine S 8 + 1 spill). Pin OK, 0 drops.
 - Known, not this round: coordinates:coordinate_q1 opener L overflows (Model + one Guided taller than the page; master hid
   it as a text collision inside the squashed Model). Lead ruling wanted (RULED capacity or a side-by-side layout).
+- Capacity pin scope (lead 2026-11-13, item 2): lf-roles' pin script checks EVERY grid role by default, but this branch keeps
+  only the mixed-practice pins from lf-roles (plus the eight pre-widening roles master already pinned). ws-precritic's
+  capacity-pin steps run on those pinned roles only (CAPACITY_PIN_ROLES in ws-precritic.cjs), so no unpinned role (opener,
+  guided, scripted-model, ...) adds a red here until lf-roles' pins merge and widen the list.
 - Findings 1-3 (r0), B1/N2/GUARD and MIX-S each a check FAIL-on-bad / PASS-on-fix; backtests all PASS.
 
 ## Owner go

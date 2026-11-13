@@ -133,6 +133,9 @@
 // Last line `ws-precritic: OK: ...` or `ws-precritic: FAIL...`; exit 0 OK, 1 a gate failed, 2 prerequisites or usage,
 // 3 incomplete under --strict (only SKIPPED-NOT-BUILT rows are not green).
 'use strict';
+// The roles design/audit/baselines/capacity.json pins on this branch (lf-engine roles 2026-11-13: the eight pre-widening roles
+// + mixed-practice; lf-roles' merge brings the rest and widens this list).
+const CAPACITY_PIN_ROLES = ['true-false', 'reason-it', 'error-analysis', 'pre-skill-check', 'review', 'test', 'independent', 'more-practice', 'mixed-practice'];
 const path = require('path');
 const fs = require('fs');
 const { spawn, spawnSync, execFileSync } = require('child_process');
@@ -793,7 +796,10 @@ function buildPlan(ctx) {
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
         // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
-        add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), ...(ctx.role ? ['--roles', ctx.role] : [])], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
+        // (lf-engine roles 2026-11-13, lead: lf-roles' widened pin script checks EVERY grid role by default, but this branch pins only
+        // the eight thinking / practice roles and mixed-practice; until lf-roles' pins merge the step runs on the pinned roles only,
+        // so an unpinned role adds no red here)
+        add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), '--roles', ctx.role && CAPACITY_PIN_ROLES.includes(ctx.role) ? ctx.role : CAPACITY_PIN_ROLES.join(',')], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
         const ovJson = path.join(ctx.logs, 'options-verify.json');
         add(gate('options-verify', 'ws-options-verify --skill', scope, 'browser', 'ws-options-verify', ['--skill', ids.join(','), ...catArg, '--deadline', OV_DEADLINE, '--json', ovJson], { parse: PARSE.optionsVerify, jsonOut: ovJson, keys }));
@@ -1065,9 +1071,6 @@ function buildPlan(ctx) {
         const pinnedR = pinnedIds(PRINT_BASE);
         const unpinned = sample.filter((k) => !pinnedR.has(docId(k)));
         add(gate(`print-lint-role-${ctx.role}`, `ws-print-lint --source kit --roles ${ctx.role}`, sc, 'browser', 'ws-print-lint', pl, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpinned.length ? `${unpinned.length} of ${sample.length} role pages not pinned in ${rel(PRINT_BASE)} (an unpinned page must be clean)` : '' }));
-        // (lf-engine roles, lead 2026-11-13: SIZE-ORDER / CAPACITY-NO-DROP on the ROLE a lane touches - Mixed practice at S held
-        // fewer problems a page than at M; the lane skills on that role at S, M and L against the capacity pin)
-        if (ctx.role !== 'lesson' && ctx.skills.length) add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role} (SIZE-ORDER: S holds no fewer items a page than M, M than L)`, `${ctx.skills.length} lane skill(s) × ${ctx.role} × S/M/L`, 'browser', 'ws-capacity-pin', ['--check', '--skills', ctx.skills.map((s) => s.key).join(','), '--roles', ctx.role], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         // L1 "Size S ignored" (pilot-su-c critic r2 N2: the lesson Warm-up H13 was at S and L): the role at S too, against
         // the S pin (print-lint.S.json); a role page that pin does not hold must be clean
         const plS = ['--source', 'kit', '--roles', ctx.role, '--size', 'S', '--skills', sample.join(',')];
@@ -1088,7 +1091,7 @@ function buildPlan(ctx) {
         {
             const rk = ctx.skills.length ? ctx.skills.map((s) => s.key) : sample;
             add(gate(`cell-checks-role-${ctx.role}`, `ws-cell-checks --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-cell-checks', ['--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-cell-checks is not in this tree' }));
-            add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
+            if (CAPACITY_PIN_ROLES.includes(ctx.role)) add(gate(`capacity-pin-role-${ctx.role}`, `ws-capacity-pin --check --roles ${ctx.role}`, `role ${ctx.role} × ${rk.length} skill(s)`, 'browser', 'ws-capacity-pin', ['--check', '--skills', rk.join(','), '--roles', ctx.role], { missingMsg: 'ws-capacity-pin is not in this tree' }));
         }
         add(gate(`print-lint-role-${ctx.role}-S`, `ws-print-lint --source kit --roles ${ctx.role} --size S`, sc, 'browser', 'ws-print-lint', plS, { parse: PARSE.printLint, expect: { ids: sample.map(docId) }, note: unpS.length ? `${unpS.length} of ${sample.length} role pages not pinned in ${rel(baseS)} (an unpinned page must be clean)` : '' }));
         // lessons 6-7 merge (2026-10-31, GATE-MISSED): a detailed lesson's Practice link lost a skill's second use and its
