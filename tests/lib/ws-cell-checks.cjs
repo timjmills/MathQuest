@@ -155,10 +155,38 @@ function cellChecksInPage(opts) {
                     if (lim > 0 && below >= lim) out.findings.push({ rule: 'H13-ABS', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': an empty band ' + mm(below) + ' mm under the lowest ink of a ' + mm(cr.height) + ' mm cell (' + Math.round((below / cr.height) * 100) + '%; limit 30 % of the cell = ' + mm(lim) + ' mm): size the row to the item (RUBRIC H13, H13-ABS; critic lf-placevalue r2 N6)' });
                 }
             }
+            // ---- SIGNMATCH (lf-builds via the lead, 2026-11-13): a shown number sentence "a +/- b = c" whose c is what the OTHER sign
+            // gives (11 - 2 = 13: an "added" wrong answer printed under the minus sign) - the shown work must keep its own operation
+            if (role === 'reason-it' || role === 'error-analysis') {
+                var panes = c.querySelectorAll('.mq-abbox, .mq-judge-work');
+                [].forEach.call(panes.length ? panes : [c], function (pn) {
+                    var t = (pn.textContent || '').replace(/\s+/g, ' ').replace(/[\u2212\u2013]/g, '-');
+                    var re = /(\d+) ?([+-]) ?(\d+) ?= ?(\d+)/g, m;
+                    while ((m = re.exec(t))) {
+                        var a = +m[1], b = +m[3], r = +m[4], here = m[2] === '+' ? a + b : a - b, other = m[2] === '+' ? a - b : a + b;
+                        if (r !== here && r === other) out.findings.push({ rule: 'SIGNMATCH', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': "' + m[0] + '" - the answer is the other sign\'s (the wrong answer printed under the item\'s own sign; pass the wrong answer\'s slots)' });
+                    }
+                });
+            }
+            // ---- PUPILTAG (lead ruling N10, 2026-11-13, PT-ERR-4): grey pupil work always sits under its "<Name> wrote:" label,
+            // so the single grey never reads as "trace me"
+            if (c.querySelector('.mq-pupil') && !/\b(wrote|chose|drew|marked):/.test(((c.querySelector('.mq-pupiltag') || {}).textContent) || '')) {
+                out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': grey pupil work with no "<Name> wrote:" label (PT-ERR-4: the grey must never read as trace)' });
+            }
+            // ...and right over it: a label left at the cell's top while the work centres lower reads as a page note (lf-roles r5)
+            var tg = c.querySelector('.mq-pupiltag');
+            var sib = tg && tg.parentElement ? [].filter.call(tg.parentElement.children, function (e) { return e !== tg && e.getBoundingClientRect().height > 0; }) : [];
+            if (tg && c.querySelector('.mq-pupil') && sib.length) {
+                var top = Math.min.apply(null, sib.map(function (e) { return e.getBoundingClientRect().top; }));
+                var gap = top - tg.getBoundingClientRect().bottom;
+                if (gap > 8 * PX || gap < 1.5 * PX) out.findings.push({ rule: 'PUPILTAG', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the "<Name> wrote:" label sits ' + mm(gap) + ' mm from the work it names (PT-ERR-4: right over it, 1.5-8 mm; critic r3 D6: 1 mm on the H T O heads read as one line)' });
+            }
             // ---- KEYJOIN: one slot, two answers
             if (isKey) {
                 c.querySelectorAll('[data-ws-slot]').forEach(function (s) {
                     if (s.querySelector('[data-ws-slot]')) return;
+                    // an OPEN slot is a zone (a judgement row, an Error Analysis redraw of the item), not one answer (lf-roles)
+                    if (s.getAttribute('data-ws-shape') === 'open') return;
                     var txt = rectsOfText(s, '.mq-slottag').length ? (s.textContent || '') : '';
                     if (/\d\s*,\s+\d/.test(txt)) out.findings.push({ rule: 'KEYJOIN', page: P, cell: no, msg: 'page ' + P + ' cell ' + no + ': the key writes "' + txt.trim().slice(0, 24) + '" into ONE answer slot (H1: one answer a slot, critic lf-ops r1 check 8)' });
                 });

@@ -394,6 +394,13 @@ A lesson packet is one ladder step (or one teacher-chosen skill) printed as a se
 - **PT-MOD-2.** State cell width = max(`footprint.wMm`, 62); the text column takes the rest. Step text is cell-text size, 2 lines at most.
 - **PT-MOD-3.** Steps beyond the page capacity continue on a page whose band label again reads "Model:" (band labels come only from the fixed vocabulary; the page number shows the continuation), same title, same row height.
 - **PT-MOD-4.** The page ends with the `Say:` band (PT-OPN-9): the skill's oral frame filled in for this problem. The band is on by default and follows the same dialog option as the Opener's.
+- **PT-MOD-5** (lead, delegated approval 2026-11-13, lf-roles r2 ruling 1). On a Model laid BESIDE (a state, its step text in the
+  next column), the step-text cell is judged by its text (2 lines at most, PT-MOD-2), NOT by the empty band under or beside it:
+  that column is as tall as its state by construction. The STATE cells stay under H13 (EB-BAND / EB-SIDE, PT-MOD-3's reserved-mark
+  room as ruled). A Model that would spill to a second page beside its text lays its states side by side, each step text over
+  its state, when that grid fits one page (lf-roles fix 5); one that cannot (function_table_easy at L) keeps the beside layout
+  over its pages, excused here, each page still meeting the state-cell bands. Check: ws-empty-band skips `.mq-stepcell` on a
+  beside Model (lf-checks); ws-roles-unit MOD-ACROSS.
 
 **Teacher options.** One or two examples (the second uses identical wording); arrows and callouts on or off; `Say:` band on or off (on by default).
 **Skill supplies.** `workedSteps(q)` with `marks` per step; `renderCell` with `state: traced` and `ctx.step = {index: i, marks}`; `strings.oralFrame`. Default adapter: states before the last show the blank problem, the last shows it answered.
@@ -550,6 +557,10 @@ DECIDE-ONLY                          NOTATE-ONLY                  SET-UP (rewrit
 - **PT-ERR-1.** 40 to 60% of the shown answers are wrong, each from `wrongAnswer(q)` (a real misconception, never a random number).
 - **PT-ERR-2.** The fix slot has the skill's answer-slot shape and is scored only on wrong items; a correct item left unfixed scores its point from the check mark alone.
 - **PT-ERR-3.** Counts offered: 2 (1 x 2, long algorithms with shown working), 4 or 6, never above the design-standard ceiling for the size (6 / 4 / 4).
+- **PT-ERR-4** (lead ruling N10, 2026-11-13). The other pupil's work prints in the single grey (#949494), ALWAYS under a printed
+  "<Name> wrote:" label ("chose:" / "drew:" / "marked:" by the item's shape). The grey is the design, not a trace prompt; the label is
+  what keeps it from reading as "trace me". Check: ws-cell-checks PUPILTAG (default rule, + self-test). Critics score the grey work
+  with its label as correct (C4).
 
 **Teacher options.** Count; share wrong; show full working or the answer only; multiply-to-check grid for division.
 **Skill supplies.** `wrongAnswer(q)`, `renderCell` with `state: answered | wrong`, optional `workedSteps` for shown working.
@@ -1704,6 +1715,15 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
 - **PT-TOF-1.** 40 to 60% of statements are false; each false statement comes from `wrongAnswer(q)`.
 - **PT-TOF-2.** The frame is scored only with the check mark: a correct "True" needs no correction; a "False" needs the frame's number.
 - **PT-TOF-3.** The check-box row and frame row sit at the same y in every cell of a row.
+- **PT-TOF-4** (lead, delegated approval 2026-11-13, lf-roles). The frame holds ONE value a line. A list answer (a number
+  pattern's terms, a function table's outputs: "12, 15, 18") writes one line a part, joined by commas, and wraps under the frame's
+  words in a narrow cell. A sentence answer ("The ones digits go 0, 2, 4, 6, 8.") prints no frame row: the judgement is the
+  answer. The same holds for Reason It's "The answer is ____." (its "__ is correct." names the sentence) and for an Error
+  Analysis fix: a sentence answer is fixed by checking the right choice, or the item is skipped when it has no choices.
+  Check: `ws-roles-unit` KEYJOIN-ROLE; ws-cell-checks KEYJOIN.
+  Reason It (lead, delegated approval 2026-11-13, critic r3 D1/D2/D5): a LIST answer prints no "The answer is" frame either - the
+  panel the pupil names in "__ is correct." holds every part (H16); a unit form ("[ ] hundreds [ ] tens [ ] ones") keeps its frame,
+  full width under A and B. A count row's rule part is named with the item's own words ("Rule: add [ ] each time.").
 
 **Teacher options.** Count; share false; frame on or off. **Skill supplies.** `renderCell` with `state: answered | wrong`, `wrongAnswer`, a frame id from `strings`. Default adapter: the generic frame "The answer is ____." **Screen.** Tap True or False; the frame input opens after "False"; feedback on Check.
 
