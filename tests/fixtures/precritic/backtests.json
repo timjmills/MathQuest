@@ -8723,6 +8723,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "lesson-r6-check-pvsupport",
+   "check": "On a routed check a name-the-place item keeps the side bank and the place pattern rule whatever cell the skill deals it in (pv-support after w2)",
+   "kind": "commit-pair",
+   "rule": "ws-lesson-samples PC-PV (cells with no .pv-tracks read); r6 builder own packet read after the w2 merge",
+   "browser": true,
+   "fail": {
+    "commit": "8904e6ace",
+    "state": "sub / round check: words under the digits, the nearest always wrong; round T O T"
+   },
+   "pass": {
+    "commit": "16fba21b3",
+    "state": "pre-skill-check prepare draws the pv-support place item as the plain place cell"
+   },
+   "command": "node tests/scripts/ws-lesson-samples.cjs --check --force-check --seeds 1 --sizes M,L --rules PC-PV",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
