@@ -3619,6 +3619,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "review-stack-side-multfacts-array",
+  "check": "a Review's Mixed Review of static-width problems (stacks) keeps its own columns, never narrowed so the same ink sits in a wider cell (mult_facts array Review S, lf-ops-divarray)",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-SIDE (RUBRIC H13; print-lint L-DENSITY H13 side band)",
+  "browser": true,
+  "fail": {
+   "commit": "55e7d0f2f",
+   "state": "6 findings: Mixed Review stacks 19.7 mm empty beside the ink of 61.5 mm cells (35 %), 3 columns"
+  },
+  "pass": {
+   "commit": "4e2e4c988",
+   "state": "0 findings: the stacks in their own 4 columns (46 mm cells)"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill multiplication:mult_facts --roles review --sizes S --hosts none --variants 0 --only EB-SIDE --no-baseline --opts '{\"support\":[\"array\"]}'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
 ]
 }
