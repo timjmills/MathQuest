@@ -4062,6 +4062,86 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "ri-one-answer",
+  "check": "a Reason It item asks for the answer once: circle A or B, 'The answer is __.' (lead ruling F8, PT-RSN-4)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-ONEANSWER",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'__ is correct.' + ri-who on every item"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-ONEANSWER",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ri-layout",
+  "check": "Reason It work within half the cell keeps A and B side by side over a full-width response row; only wider work stacks, from the top (critic r6c D1 / D3)",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit RI-LAYOUT",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "85 mm work stacked (one item a page)"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only RI-LAYOUT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "line-tell",
+  "check": "a word answer's line is one width whatever the word (no tell; holds 'hundreds')",
+  "kind": "commit-pair",
+  "rule": "ws-roles-unit LINE-TELL",
+  "browser": false,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "'no' 2 digits, 'yes' 6"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-roles-unit.mjs --only LINE-TELL",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "key-fit",
+  "check": "a key's written answer stays inside its slot (identify's 'hundreds' on a 2-digit line)",
+  "kind": "commit-pair",
+  "rule": "ws-cell-checks KEYFIT",
+  "browser": true,
+  "fail": {
+   "commit": "c8c81172",
+   "state": "KEYFIT on identify RI S/M/L, TF"
+  },
+  "pass": {
+   "commit": "df83248e",
+   "state": "0"
+  },
+  "command": "node tests/scripts/ws-cell-checks.cjs --skills placevalue:identify --roles reason-it,true-false --size S,M,L --rules KEYFIT",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
