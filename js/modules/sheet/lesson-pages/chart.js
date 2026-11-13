@@ -99,7 +99,8 @@ export function stateDrawing(it, steps, groups, k, c) {
     if (isWordSentence(it) && groups.length >= 2) return unslot(sentenceState(it, groups, k, c));
     if (isWordBar(it) && steps.length && /^bar-step-/.test((((steps[0] || {}).marks || [])[0] || {}).slot || '')) return unslot(barState(it, k, c));
     const merged = groups.map((g) => ({ marks: g.marks }));
-    const ctx = resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined }));
+    // (`cellLiveMm`, lf-ops-props: the panel's own width travels past resolveCtx, which keeps only the kit's own keys)
+    const ctx = Object.assign(resolveCtx(Object.assign({}, c, { state: 'blank', scaffoldLevel: 3, metrics: undefined })), Number(c.cellLiveMm) > 0 ? { cellLiveMm: Number(c.cellLiveMm) } : {});
     if (isRound(it)) return unslot(roundState(it, k, ctx, Number(c.chartLineMm) > 0 ? Number(c.chartLineMm) : ({ S: 44, M: 52, L: 58 }[c.size] || 58)));
     if (isExpand(it)) return unslot(expandState(it, merged, k, c));
     // (an even-products window, detailed lesson 4: its own step states - the rows, then the columns, then odd x odd)
@@ -179,7 +180,11 @@ export function stateItems(example, data) {
             // Lessons r3: a panel whose step counts on draws the hops beside its words (the side
             // column has the room; under the fact they would push the panels past the page).
             const hops = v === 'row' ? panelHops(example, steps, groups, k) : '';
-            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, v === 'row' ? c : Object.assign({}, c, { hops: true }))}</div>`;
+            // (lf-ops-props, EB-EDGE: the drawing is measured at the PANEL's own width - a count row in a 2 x 2 panel took the
+            // page's 186 mm and ran 39 mm across the panel's border. `cellLiveMm`, read by count-row, is that width at zoom 1.)
+            const cellLiveMm = ((v === 'row' ? 186 * 0.42 - 4 : 186 / Math.max(1, cols || 2) - 16)) / z;
+            const cz = Object.assign({}, c, { cellLiveMm }, v === 'row' ? {} : { hops: true });
+            const draw = `<div class="mq-cdraw" style="zoom:${z}">${drawing(k, cz)}</div>`;
             return v === 'row'
                 ? `<div class="mq-cstate mq-cstate-row">${draw}<div class="mq-cside"><div class="mq-cheads">${heads}</div>${wordsHtml}${hops}</div></div>`
                 : `<div class="mq-cstate mq-cstate-col${cols >= 3 ? ' mq-cstate-n' : ''}"><div class="mq-cheads">${heads}</div>${draw}${wordsHtml}</div>`;

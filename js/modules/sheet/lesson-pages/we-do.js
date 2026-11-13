@@ -219,7 +219,7 @@ export function weDoBand(env) {
     // Cells taller than their problem (the Steps set the band's height) centre it (H13).
     // Every Guided problem sits in the middle of its cell (the cells may take spare height, H13).
     const centre = true;
-    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i), nolabel: true }));
+    const weItems = weDo.map((it, i) => planItem(centre ? Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }) : it, { cols: gcols, level: 2, render: weDoRender(it, i, (186 - WEDO_W_MM - 10) / Math.max(1, stackRows ? 1 : weDo.length)), nolabel: true }));
     const zoneCtx = resolveCtx({ size: ctx.size, look: ctx.look, mode: 'print' });
     const weBand = {
         kind: 'row', cls: 'mq-modelrow mq-lwedorow', widths: ['1fr', `${WEDO_W_MM}mm`],
@@ -231,7 +231,7 @@ export function weDoBand(env) {
     // The Guided cells take little of the page's spare height: they are sized to their problems
     // (or to the Steps beside them); the Independent rows under them take the rest.
     if (top) {
-        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i), nolabel: true }));
+        const items = weDo.map((it, i) => planItem(Object.assign({}, it, { cellCls: [it.cellCls || '', 'mq-lvcenter'].join(' ').trim() }), { cols: top.cols, level: 2, render: weDoRender(it, i, 186 / Math.max(1, top.rows ? 1 : weDo.length) - 10), nolabel: true }));
         const grid = top.rows ? gridPart(items, { cols: 1, rows: top.rows, cellH: top.h, labels: 'none' }) : gridPart(items, { cols: weDo.length, rows: 1, cellH: top.h, labels: 'none' });
         const stripH = hOf(stripX, 1);
         // The chant: on the Remember line when the sheet has one (it becomes the Rule line - the
@@ -254,8 +254,11 @@ export function weDoBand(env) {
  * cut underlined): the partial scaffold that fades across the row. A count-on fact keeps its dot
  * tile (the count cue) on every Guided cell.
  */
-export function weDoRender(it, i) {
-    return (c, o) => {
+// (`liveMm`, lf-ops-props EB-EDGE: the Guided cell's own width - beside the Steps it is 186 - 62 mm shared - so a count row wraps
+// to it instead of the page's 186 mm; read by count-row as `cellLiveMm`. Absent: as before.)
+export function weDoRender(it, i, liveMm) {
+    return (c0, o) => {
+        const c = Number(liveMm) > 0 && it && it.template === 'count-row' ? Object.assign({}, c0, { cellLiveMm: Number(liveMm) }) : c0;
         const answered = c.state && c.state !== 'blank';
         if (isRound(it)) {
             // Lessons r1: the chart's number line reaches the Guided cells - a blank 10-tick line

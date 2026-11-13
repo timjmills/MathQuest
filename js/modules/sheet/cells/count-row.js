@@ -78,7 +78,8 @@ const TWIN_GAP_MM = 7;   // the screen twin's widest gap between count-by column
  * one-page SHEET's layout, which only a full-width one-column cell holds.
  */
 const narrowCols = (p, ctx) => (ctx && ctx.wrapToCell && !p.noWrap && !isTwin(ctx) && Number(ctx.columns) > 1 ? Number(ctx.columns) : 1);
-const narrowLive = (p, ctx, live) => { const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
+// (`cellLiveMm`, lf-ops-props EB-EDGE: a caller that knows the row's own width - the lesson chart's panel - caps the line at it)
+const narrowLive = (p, ctx, live0) => { const live = ctx && Number(ctx.cellLiveMm) > 0 ? Math.min(live0, Number(ctx.cellLiveMm)) : live0; const c = narrowCols(p, ctx); return c > 1 ? Math.min(live, 186 / c - 14) : live; };
 /** The fewest even lines whose numbers keep `boxW` mm each (and `gap` between) in `avail(rows)` mm. */
 function wrapRows(n, rows0, boxW, gap, avail) {
     for (let rows = rows0; rows <= n; rows++) {
