@@ -234,3 +234,39 @@ fixed almost every count (F2). Resolved:
   offered.
 - **(c) We Do re-flows** to fewer, wider cells where the step's ink allows, instead of a fixed floor.
 - Every page, including each sheet's last, is judged on its own, with parts changed together (F12).
+- **(d) The offer gate and its tuned thresholds (fix round 3b, 2026-11-13).** `roles/lesson.js sheetOffers` offers a value only
+  where the sheet it plans passes the unit gate's own predicates, shared from `sheet/part-opts.js`: `rowFits` (EB-ROWFIT: no
+  rows while the foot holds one row and its head), `bandFails` (EB-BAND, the 30 % of `ws-empty-band`; PO-4 checks the two agree)
+  and `shortestRowMm` (the row's height). The planner sees planned figures, the gate sees printed ones; the three margins between
+  them are measured, not guessed. The sweep: 25 lessons x M / L x 12 part settings (600 sheets, built as asked, printed in print
+  media and measured as the unit gate measures them).
+  - **`SHEET_FILL_MIN` 0.76** (`roles/lesson.js`). The planner's used share reads fuller than the printed page: gap -0.004 to
+    0.064, median 0.029, p95 0.045; within reach of the floor (planned 0.72-0.80) at most **0.052** (placevalue:identify M We Do
+    off: planned 0.797, printed 0.745). So the floor is at least 0.70 + 0.052 = 0.752, rounded up to 0.76. Above it, the lowest
+    planned sheet that prints well is add_wp_10_plain L Vocabulary off + rows 0 (planned 0.762, 24 % empty), so the floor is at
+    most 0.762. The highest-planned sheet that prints a 30 % foot is add_facts M Vocabulary off (planned 0.712, 31 % empty). No
+    swept sheet planned 0.713-0.718 prints a 30 % foot, so the critic r2 note ("0.72 printed a 30 % foot") is kept as the
+    floor's reason, not as a measured case. Backtest **FILL-BT**: 0.75 and 0.77 both FAIL.
+  - **`ROWFIT_SLACK_MM` 12 mm** (`part-opts.js`). The printed foot reads 1.5-15.9 mm (median 7.9, p95 10.9) more than the
+    planner's free height. The A4 body prints 239 mm where the plan budgets 232 at M, and bands print a little shorter than
+    planned. The planner's row, with its two-line head, is never shorter than the printed one. The decision gap is the plan's
+    `row - free` on a sheet with no rows. Wherever a row fits in print it is at most **10.2 mm** (placevalue:expand L Remember
+    off: 21.7 / 31.9 planned, 31.1 mm printed foot >= 29.4 row). Where no row fits it starts at 3.7 mm (placevalue:value L
+    Remember off + rows 0). The two overlap, so the margin takes the safe side: a value refused, never a blank foot. It is
+    10.2 rounded up with headroom, under the 13.2 mm of placevalue:value L rows 0, whose printed foot (33.2 mm) holds no
+    47.1 mm row. Backtest **ROWFIT-BT**: 10 mm and 14 mm both FAIL.
+  - **`BAND_SLACK_MM` 2 mm** (`part-opts.js`, new in 3b). A planned cell's band is its height less the bridge's measured
+    needed height (`measured[c].neededMm`: its lowest ink plus its bottom padding, read with `measureCells`' own ink rule).
+    Near the 30 % line it reads up to 1.0 mm narrower than the printed band (div_facts M Vocabulary + Remember off: planned
+    24.6 / 6.6 mm = 26.8 %, printed 24.2 / 7.6 = 31.4 %). Over all 802 We Do cells the gap is larger only on cells far under the line
+    (word stories, 5.8 mm at 5-15 %). Rounding cells are not predicted: their We Do render adds the chart's number line, which
+    the measured cell has not. At 1-2.5 mm the sweep misses no failing changed sheet and refuses no good one. At 0 mm it misses
+    the div_facts sheet above. From 3 mm, div_facts M We Do 1 (printed 27 %) is refused. Backtest **BAND-BT**: the must-flag sheet needs
+    >= 0.8 mm and the must-keep one < 2.6 mm, so 0 mm and 3 mm both FAIL.
+  - **EB-ROWFIT reads the rows' own problems.** Up to r3 the unit gate took the shortest of ALL the lesson sheet's items,
+    Warm-up included. placevalue:identify's 30.5 mm Warm-up cells read as a 36.5 mm row, where its rows (the main pool's
+    level-1 twins, `res.lesson.teach.indepH`) are 49.3 mm, 55.3 mm with the head. Its "no room" is true (37.8 / 45.7 / 52.4 mm
+    feet), and its 11 r3 failures were the check's. The identify M standard sheet (16 % foot, no rows) is a master state,
+    routed to **lf-engine**. EB-ROWFIT excuses a sheet identical to the standard packet's. PO-NOROOM still judges that sheet's
+    text, which is no print. Where a row would fit on the standard sheet, the text says "Not added: the standard sheet is kept",
+    never "no room".

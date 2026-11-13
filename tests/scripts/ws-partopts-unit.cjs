@@ -24,6 +24,22 @@
 //            draws with that finding (the standard's own defect, critic A r1 F11b - another lane's).
 //     PO-2e  coverage (critic A r1 F2): the lesson x size cases offering a real We Do range and a real Practice range (2+ values),
 //            against floors (--floor-wedo, --floor-practice; full runs only).
+//   EB-ROWFIT / PO-NOROOM (A r2 N1, A r3): the printed foot vs one row of the problems the rows DRAW (the bridge's level-1 twins,
+//            res.lesson.teach.indepH; part-opts.js shortestRowMm) plus the page's printed band head, through part-opts.js rowFits -
+//            the offer gate's own predicate. A sheet identical to the standard packet's is excused in EB-ROWFIT (master, lf-engine);
+//            its rows' TEXT is still judged (no print): "no room" only where no row fits, "the standard sheet is kept" only there.
+//   THRESHOLD BACKTESTS (A r3; design/partopts/DESIGN.md §8d - the measured plan-to-print gaps): fixed sheets on both sides of each
+//   tuned threshold, so a one-step move FAILS.
+//     FILL-BT    SHEET_FILL_MIN 0.76: planner used share reads up to 0.052 fuller than print near the floor (identify M We Do off),
+//                so >= 0.752; add_wp_10_plain L (planned 0.762) prints well, so <= 0.762; add_facts M Vocabulary off (0.712,
+//                31 % empty) stays refused. 0.75 or 0.77: FAIL.
+//     ROWFIT-BT  ROWFIT_SLACK_MM 12: the printed foot reads 1.5-15.9 mm more than the plan's free height; a row fits in print at
+//                plan gaps up to 10.2 mm (expand L Remember off: must be refused) and not at 13.2 (value L rows 0: must be kept).
+//                10 or 14 mm: FAIL.
+//     BAND-BT    BAND_SLACK_MM 2: a planned cell band reads up to 1.0 mm narrower than printed near 30 % (div_facts M Vocabulary +
+//                Remember off, 26.8 % planned / 31.4 % printed: must be flagged, needs >= 0.8 mm); div_facts M We Do 1 prints
+//                under 30 % (must not be, needs < 2.6 mm). 0 or 3 mm: FAIL.
+//   --bt-only runs the backtests alone (21 s); --no-bt skips them; a --lessons run skips them.
 //   Sampling is deterministic (seed 4242).
 // Prints `ws-partopts-unit: OK` / `FAIL (n)`; exits 1 on FAIL.
 'use strict';
@@ -142,7 +158,7 @@ async function browser() {
                 const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: PAGES, mixed: true, partOpts });
                 const prac = (r.items || []).filter((it) => it.part === 'practice');
                 const mixed = (r.items || []).filter((it) => it.part === 'mixed');
-                // (EB-ROWFIT: the shortest whole row of this lesson's own sheet items at c across - the ic shortest measured
+                // (EB-ROWFIT: the shortest whole row at c across of the problems the rows draw - read from the bridge's
                 // heights, the tallest of them - read from the bridge's measurements, not from the planner under test)
                 // (A r3: the problems the rows DRAW - the bridge's level-1 twins of the main pool, `lesson.teach.indepH`; the Warm-up
                 // pools' shorter items never print as lesson rows - identify's 30.5 mm Warm-up cells read a 36.5 mm row where its
