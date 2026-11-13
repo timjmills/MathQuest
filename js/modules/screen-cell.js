@@ -4176,7 +4176,15 @@ export function kitCellTwin(q, { categoryId = '', typedOrder = false } = {}) {
     } catch (e) { return null; }
     if (!html || /data-ws-refused/.test(html)) return null;
     const tpl = document.createElement('template');
-    tpl.innerHTML = _screenSizes(html, digitPt);
+    // (lf-placevalue, lead 15:35 / ws-screen-ink-size TEXT-SIZE: the cell is drawn at L and scaled to the host's digit, so on the
+    // online worksheet (29 px digits) a 16 pt place word - "hundreds", "worth" - fell to 14 pt. A word never prints smaller on
+    // screen than on the M page: its size is the larger of the scaled one and its print size at M (L less the text step).)
+    let textStep = 2;
+    try { const mM = resolveCtx({ mode: 'print', size: 'M', look: 'ican', state: 'blank' }).metrics; const mL = resolveCtx({ mode: 'print', size: 'L', look: 'ican', state: 'blank' }).metrics; textStep = Math.max(0, mL.textPt - mM.textPt); } catch (e) { /* 2 */ }
+    tpl.innerHTML = _screenSizes(html, digitPt).replace(/font-size:calc\(var\(--mq-digit\) \* ([\d.]+)\)/g, (m, r) => {
+        const v = Number(r) * digitPt;
+        return Number(r) < 0.85 && v - textStep > 0 ? `font-size:max(calc(var(--mq-digit) * ${r}), ${(v - textStep).toFixed(1)}pt)` : m;
+    });
     // A unit-form frame ("6,725 = __ thousands __ hundreds __ tens __ ones") keeps its slots on one
     // nowrap line for paper; on a phone that line ran off both edges of the card. On screen each
     // slot and its place word become one unbreakable pair, and the pairs wrap between them, so a

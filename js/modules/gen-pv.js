@@ -239,7 +239,9 @@ function genPlace(q, skill, o) {
     const support = o.support === 'chart' || o.support === 'none' ? o.support : 'labels';
     const drawNumeral = (opt) => support === 'chart' ? placeChartHTML(n, opt)
         : support === 'none' ? plainNumeralHTML(n, opt) : numeralTracksHTML(n, opt);
-    const numeralVis = `<div style="text-align:center;">${drawNumeral({ underline: place })}</div>`;
+    // (screen only - print draws q.cell: the numeral at the host's digit size, --mq-digit, the card / quiz floor 40-56 px and the
+    // worksheet's 29 px; the fixed 1.9em drew it at 30 px everywhere - lead 15:35, ws-screen-ink-size TEXT-SIZE)
+    const numeralVis = `<div style="text-align:center;">${drawNumeral({ underline: place, size: 'var(--mq-digit, 1.9em)' })}</div>`;
     q.visual = numeralVis;
     const readHint = support === 'chart' ? 'Read the place name above the underlined digit.'
         : support === 'none' ? 'Count the places from the right: ones, tens, hundreds, thousands.'
