@@ -6,7 +6,7 @@ Owner of files: js/modules/sheet/roles/{true-false,reason-it,error-analysis,revi
 State: fix (critic r1 FAIL; r2 fixes in, critic r2 waits on lead rulings)
 Updated: 2026-11-13
 Builder profile: lane session (no sub-agent builder)
-Critic rounds: 1, r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
+Critic rounds: 2, r2 FAIL (changes FAIL on N1 + R2; report scratchpad critic-r2.md); r1 FAIL (14 role findings, 8 caused by this lane; report scratchpad critic-r1.md, summary below)
 
 ## Now
 - 5 fixes pushed, each with its check first (FAIL on master eef75f5, OK on the fix); 780 passed-skill pages (26 skills x 10 roles x
@@ -16,6 +16,22 @@ Critic rounds: 1, r1 FAIL (14 role findings, 8 caused by this lane; report scrat
 - Proofs: ws-lesson-baseline --all-lessons --sizes L,S --seeds 4242,1 --check vs master eef75f5: 1556/1556 identical;
   ws-boot-smoke OK; ws-cell-checks --self-test OK; the 3 backtest rows OK.
 - Next: guided / EA / reason-it / pre-skill-check empty bands (72 left, list below); clean precritic on 3 skills a role; critic.
+
+## Critic r2 (2026-11-13, mq-opus-medium, 116 pages): FAIL - 14 role findings (4 new: R2, N1, N5, N6; 10 pre-existing)
+- FIXED and confirmed: R1, R3, R6-R8 (pf EA n/a by ruling), R9, R12 (closed by PT-MOD-5); unit_form Reason It S/M/L PASS 8/8/8/8 (was off
+  the sheet); the 5 subtraction Model L 2 + 2 layout passes as a layout (C2 7 is the subtraction skill's missing step marks, lf-ops).
+- NEW, mine, next: N1 number_patterns_rule list frame = 6 unlabelled blanks, the 6th is the rule (H16; check LIST-HOMOGENEOUS: label
+  mixed parts from the item's slot ids, as EA does); R2 pf True or False? L holds 3 where 4 fit (the "Tall problems" class rule was sized
+  with the frame row; re-measure without it; ws-capacity-pin to gain a RISE row); N5 Review L title bare "Review" while S/M carry the
+  topic (PT-FRM-6); N6 "1 tens" (nit, unscored; plural kept on purpose: FIX-WORDS).
+- PRE-EXISTING role findings, mine, next: R5 key fills the True items' frame (now visible on unit_form), R4 fte TF L 2 items, R10/R11
+  Reason It frame distance and S bands, R13 Pre-skill Check strips (page 2 85 % blank), R15 EA judgement x, N2 S = M capacity on TF/EA
+  S, N3 EA bands unit_form S 32 % / M 33 %, N4 Review total < 8 (growing 7/5/5), N9 list fix rewrites every term; precritic: mult_facts
+  Review with supports S, Mixed Review stack cells 32 % side band (master-red, role changed: 0b).
+- Lead ruling asked: N10 the pupil's work on Error Analysis prints in trace grey on every page (role convention): design or defect?
+- Precritic reds on roles this lane did not touch, confirmed IDENTICAL on master 5947159d: dealer-uniform (mult_facts), spec-card
+  (facts / subtraction cards), node-lint s1 (1), print-lint sections S 6 / L 4, print-lint lesson S ratchet (unit_form H13-ABS),
+  coverage-matrix 6 unit_form single rows. print-lint supports S: 12, all on mult_facts Review (mine, above).
 
 ## Critic r1 (2026-11-13, mq-opus-medium, 82 pages before/after): FAIL
 | Finding | What | Status | Check |
@@ -72,6 +88,8 @@ Critic rounds: 1, r1 FAIL (14 role findings, 8 caused by this lane; report scrat
   the answer; on Reason It "__ is correct" names it); a list answer writes one line a part. Suggested: accept.
 
 ## Times
+Times: r3 (ws-capacity-pin, unit-form RI row, PT-MOD-5, critic r2, master comparison), start 2026-11-13T05:25Z, end 2026-11-13T06:40Z, profile lane session
+Times: critic r2, start 2026-11-13T06:05Z, end 2026-11-13T06:13Z, profile mq-opus-medium
 Times: fix r2 + r2b (critic r1 findings, precritic triage), start 2026-11-13T03:45Z, end 2026-11-13T05:20Z, profile lane session
 Times: critic r1, start 2026-11-13T03:50Z, end 2026-11-13T04:00Z, profile mq-opus-medium
 Times: fix 1-5 (checks first, hash proof), start 2026-11-13T01:35Z, end 2026-11-13T03:40Z, profile lane session
