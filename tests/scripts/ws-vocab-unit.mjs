@@ -31,7 +31,13 @@
 // V7-ALL (r13) every bank dealtBanks lists is judged (V-FEAT reading + today's notWith); V-NUM ringed/boxed numbers all
 //     even / all odd read as even / odd (r14: one ringed or boxed number too); V-TWIN pictures of one feature class share their
 //     notWith lists (r14: and every run picture, grow's squares included, is notWith rule); V-PLACE (r14) a ringed or boxed
-//     digit inside a number reads as one / ten / hundred
+//     digit inside a number reads as one / ten / hundred; V-ONES (r15) a run whose ones digits repeat or whose step divides 10
+//     reads as cycle
+// --browser V-PAGE (r15) no two Match 3 cells of one printed page put the same pictures in the same places
+// --browser r16 (critic r5 nits): V-NAMES no Error analysis page repeats a pupil name while one is unused; V-LETTER the Match 3
+//     letter at one anchor (top-left of its picture) in every slot of a row, print and card; V-BOX390 card-390 boxes in one column
+// V-KEY (r15) every key underlay lies inside the cell, box or ring its mark sits in (+0.5 mm); a whole-drawing focal part on a
+//     structure greys at most 60 % of the picture
 // V-STD (r12) any two of a set's words named in one sentence of its standards' text are notWith or kept apart by V-FEAT
 // V-FIT (r10) every lesson set's core words (the first three) have pictures whose ccss / op teaches the set's standard;
 //     V-FIT6 the other three words too, apart from the pinned misfits awaiting a lead decision (the pin only shrinks; --fit-report)
@@ -115,6 +121,14 @@ const deal = (skill, opts, n, seed) => {
     for (let i = 0; i < n; i++) out.push(app.gq.generateQuestionFor({ category: 'vocabulary', skill, opts, seed: seed + i, itemIndex: i, itemCount: n }));
     return out;
 };
+// (--only with r16's browser checks alone: straight to the browser, so a backtest row can judge an older tree whose node-phase
+// data the later checks no longer read - e.g. V18M on the tree before Match 3's evenRows)
+if (ONLY && process.argv.includes('--browser') && ONLY.every((k) => r16List().includes(k) && k !== 'V18')) {
+    await browserChecks();
+    for (const f of fails.slice(0, Number(process.env.VOCAB_SHOW) || 40)) console.log(`  - ${f}`);
+    console.log(`ws-vocab-unit: ${fails.length ? `FAIL (${fails.length})` : 'OK'}`);
+    process.exit(fails.length ? 1 : 0);
+}
 const runs = [];
 for (const g of W.VOCAB_GRADES) runs.push({ opts: { vocabGrade: g } });
 W.VOCAB_SETS.forEach((_, i) => runs.push({ opts: { vocabSet: i } }));
@@ -281,6 +295,13 @@ const ambig = [];
         for (const [f, b] of [['place:ones', 'one'], ['place:tens', 'ten'], ['place:hundreds', 'hundred']]) {
             if (a !== b && read.includes(f) && pl.words.includes(b) && W.compatible([a, b])) fail(`V-PLACE ${pl.name}: the "${a}" picture marks a digit in the ${f.slice(6)} place, and it may be dealt with "${b}"`);
         }
+    }
+    // V-ONES (r15, critic r14 #1: sequence 5, 10, 15 read as cycle in set 6 - its ones digits go 5, 0, 5): a run whose visible
+    // ones digits repeat, or whose step divides 10 (2, 5, 10), shows a ones-digit cycle (ones-cycle, read from the drawing by
+    // today's reader), which reads as cycle; such a picture may not be dealt with cycle (any pool, any bank) unless notWith
+    for (const pl of pools) for (const a of pl.pics) {
+        if (a === 'cycle' || !P.hasVocabPicture(a) || !pl.words.includes('cycle') || !W.compatible([a, 'cycle'])) continue;
+        if (HERE_P.vocabReadFeatures(svgOf(P, a)).includes('ones-cycle')) fail(`V-ONES ${pl.name}: the "${a}" picture draws a run whose ones digits cycle, and it may be dealt with "cycle"`);
     }
     // V-TWIN (r13, critic r12 #3: first term missed the term / rule pin): two pictures of one pool with the same feature
     // class (their features less the box position and skip-count, every step:n as step) are notWith the same other words.
@@ -715,6 +736,45 @@ const HARD_WORDS = ['figure', 'figures', 'numeral', 'numerals', 'quantity', 'amo
         if (G.minMet(one, 3) || !G.minMet(one, 4)) fail('V28: a single-answer page no longer needs the Model + 3 tries');
     }
 }
+// V-KEY (r15, critic r14 #2: the hundred chart's key grew grey lobes outside its grid, white specks in the cell corners, and
+// greyed the whole chart): every key underlay (an unstroked grey mark of the halo) lies inside the outline its mark sits in -
+// the smallest cell, box or ring of the drawing that holds its centre - within 0.5 mm; and a picture whose focal part is the
+// WHOLE drawing, drawn on a structure (a grid, cells, a track: rects, lines or paths), may not grey more than 60 % of its area
+// (it needs a focal part). A picture that is only words, numbers or dots IS its idea: it greys whole.
+{
+    const at = (t, k) => { const m = new RegExp(`\\s${k}="([^"]*)"`).exec(t); return m ? parseFloat(m[1]) : NaN; };
+    const shapes = (x) => [
+        ...[...x.matchAll(/<rect\b[^>]*>/g)].map(([t]) => ({ t, k: 'rect', x0: at(t, 'x'), y0: at(t, 'y'), x1: at(t, 'x') + at(t, 'width'), y1: at(t, 'y') + at(t, 'height') })),
+        ...[...x.matchAll(/<circle\b[^>]*>/g)].map(([t]) => { const r = at(t, 'r'); return { t, k: 'circle', cx: at(t, 'cx'), cy: at(t, 'cy'), r, x0: at(t, 'cx') - r, y0: at(t, 'cy') - r, x1: at(t, 'cx') + r, y1: at(t, 'cy') + r }; })];
+    for (const id of P.VOCAB_PICTURE_IDS) {
+        const key = P.vocabPictureSVG({ keyPage: true, state: 'answered' }, id, { wMm: 46 });
+        const pupil = P.vocabPictureSVG({}, id, { wMm: 46 });
+        const halo = (/<g class="mq-vhalo[^"]*"[^>]*>([\s\S]*?)<\/g>/.exec(key) || [])[1] || '';
+        const und = shapes(halo).filter((u) => /\sstroke="none"/.test(u.t));
+        if (!und.length) continue;
+        const outl = shapes(pupil).filter((o) => /\sfill="none"/.test(o.t));
+        const fit = P.vocabPictureFit(id, 46), tol = 0.5 / fit.scale;
+        for (const u of und) {
+            const cx = (u.x0 + u.x1) / 2, cy = (u.y0 + u.y1) / 2;
+            const c = outl.filter((o) => cx > o.x0 && cx < o.x1 && cy > o.y0 && cy < o.y1).sort((a, b) => (a.x1 - a.x0) * (a.y1 - a.y0) - (b.x1 - b.x0) * (b.y1 - b.y0))[0];
+            if (c && !(u.x0 >= c.x0 - tol && u.y0 >= c.y0 - tol && u.x1 <= c.x1 + tol && u.y1 <= c.y1 + tol)) {
+                const by = Math.max(c.x0 - u.x0, c.y0 - u.y0, u.x1 - c.x1, u.y1 - c.y1) * fit.scale;
+                fail(`V-KEY "${id}": a key underlay runs ${by.toFixed(1)} mm outside the outline it sits in (${u.t.slice(0, 60)})`);
+                break;
+            }
+        }
+        // (the focal part is the whole drawing when its focal segments make up the pupil drawing)
+        const body = (/<svg[^>]*>([\s\S]*)<\/svg>/.exec(pupil) || [])[1] || '';
+        const focalAll = typeof P.vocabPictureFocal === 'function' && P.vocabPictureFocal(id).join('') === body;
+        const structure = /<(rect|line|path)\b/.test(body);
+        if (!focalAll || !structure) continue;
+        const e = P.vocabPictureExtent(id);
+        let hit = 0, n = 0;
+        const inside = (u, x, y) => (u.k === 'circle' ? Math.hypot(x - u.cx, y - u.cy) <= u.r : x >= u.x0 && x <= u.x1 && y >= u.y0 && y <= u.y1);
+        for (let x = e.x + 0.125; x < e.x + e.w; x += 0.25) for (let y = e.y + 0.125; y < e.y + e.h; y += 0.25) { n++; if (und.some((u) => inside(u, x, y))) hit++; }
+        if (hit / n > 0.6) fail(`V-KEY "${id}": its focal part is the whole drawing and the key greys ${Math.round(100 * hit / n)} % of it (over 60 %: give it a focal part)`);
+    }
+}
 // V27 (critic r7 #3, #4, #5; lf-vocab r9):
 //   key underlays: no two dot underlays of a key picture overlap (one underlay per group, never a ring round each dot);
 //   the ladder verb is the screen task's verb (pick3 says "Tap its word": its "Here is how" says "Tap <word>.");
@@ -795,7 +855,10 @@ async function browserChecks() {
     };
     try {
         // (--only V23,V25: only the r7 screen checks, so a backtest row runs in a minute)
+        if (ONLY && ONLY.every((k) => ['V-PAGE'].includes(k))) { await pageRepeatChecks(page, fail); return; }
+        if (ONLY && ONLY.every((k) => r16List().includes(k))) { await r16Checks(page, fail, sheet, build); return; }
         if (ONLY && ONLY.every((k) => ['V23', 'V25', 'V26', 'V27'].includes(k))) { await r7Checks(page, fail, sheet); return; }
+        await pageRepeatChecks(page, fail);
         // V11R (critic r3 #2, Q-C): the Score is per word on EVERY role the card offers: each page's /N = the scored cells'
         // points (Match 3 3 a cell, 1 picture 3 words 1), the Model unscored.
         for (const [skillId, pts] of [['vocab_grade_pictures', 3], ['vocab_pick3_words', 1]]) for (const role of ['independent', 'guided', 'more-practice', 'test', 'error-analysis']) for (const size of ['S', 'M', 'L']) {
@@ -810,25 +873,7 @@ async function browserChecks() {
             if (got.score == null) fail(`V11R ${skillId} ${role} ${size}: no Score on the page`);
             else if (got.score !== got.cells * pts) fail(`V11R ${skillId} ${role} ${size}: Score /${got.score} for ${got.cells} scored cells (owner Q-C: /${got.cells * pts})`);
         }
-        // V18 (critic r1 #6, r2 #4, r3 #6, r4 #2): the 1 picture, 3 words Guided rows are equal at S, M AND L (within 1 mm),
-        // measured on the RENDERED ROW BOXES of the printed page (the band's grid rows, from one row's top to the next row's
-        // top, the last to the grid's bottom) - never the planned cell height, with no "when there is room" exemption. Seeds:
-        // 7 and ws-grade-render's guided seed (the critic's page: a two-line meaning hint made row 1 377 px, row 2 290 px).
-        for (const size of ['S', 'M', 'L']) for (const [opts, seed] of [[{ vocabGrade: 3 }, 7], [null, 7], [null, 143869], [{ vocabGrade: 2 }, 143869], [{ vocabGrade: 4 }, 143869], [{ vocabGrade: 1 }, 143869]]) {
-            const b = await build('vocab_pick3_words', 'guided', size, opts, seed);
-            if (b.error) { fail(`V18 guided ${size}: not composed (${b.error})`); continue; }
-            const hs = await sheet(b.html, () => {
-                const out = [];
-                for (const pg of document.querySelectorAll('body > section.ws-page, body > .ws-page')) {
-                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
-                    const tops = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))].sort((a, b) => a - b);
-                    const bottom = Math.max(...cells.map((c) => c.getBoundingClientRect().bottom));
-                    if (tops.length > 1) out.push(tops.map((t, i) => ((i + 1 < tops.length ? tops[i + 1] : bottom) - t) * 25.4 / 96));
-                }
-                return out;
-            });
-            for (const rows of hs) if (Math.max(...rows) - Math.min(...rows) > 1) fail(`V18 guided ${size} ${JSON.stringify(opts)} seed ${seed}: rows ${rows.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
-        }
+        // V18: see r16Checks (lf-vocab r16 extended it to Match 3)
         // V20 (critic r4 #3, H13 "sized for a taller item than it holds"): on Error analysis, a cell at S whose content is
         // smaller than at L is shorter than at L - cell height at S <= 0.9 x the height at L when the S ink is under 0.95 x
         // the L ink (Match 3 EA at S drew L's 76 mm cell round 60 mm of work: 24-28 % empty). Median top-level cell; ink =
@@ -884,11 +929,193 @@ async function browserChecks() {
             if (skillId === 'vocab_grade_pictures' && res.some((t) => new Set(t.words.map((w) => w.y)).size !== t.words.length)) fail(`V19 ${skillId} worksheet-1280: the words are not one a row (${sigs[0]})`);
             if (skillId === 'vocab_pick3_words' && res.some((t) => ![1, t.pills.length].includes(new Set(t.pills.map((p) => p.y)).size))) fail(`V19 ${skillId} worksheet-1280: the pills wrap 2 + 1 (${sigs.join(' | ')})`);
         }
+        await r16Checks(page, fail, sheet, build);
         // V23 (owner R-1) + V25 (owner R-2), lf-vocab r7: the screen feedback, and the print pupil pages unchanged
         await r7Checks(page, fail, sheet);
     } finally { await app2.close(); }
 }
 
+// V-PAGE (r15, critic r14 #3: set 5 Match 3 page 1 showed items 2 and 3 with the same pictures in the same A / B / C places,
+// only the word row changed): no two Match 3 cells of one printed page match the same pictures to the same letters. Every set
+// and grade pool, the roles that print Match 3 cells, S / M / L, seed 7 and the render seed (ws-grade-render's, as the critic
+// sees the page).
+async function pageRepeatChecks(page, fail) {
+    const fnv = (x) => { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+    const runs = [{}, ...W.VOCAB_GRADES.map((g) => ({ vocabGrade: g })), ...W.VOCAB_SETS.map((_, i) => ({ vocabSet: i }))];
+    let cells = 0;
+    for (const opts of runs) for (const role of ['independent', 'more-practice', 'test', 'guided']) for (const size of ['S', 'M', 'L']) {
+        for (const seed of [7, fnv(`vocabulary__vocab_grade_pictures:${role}`) % 1000000]) {
+            const r = await page.evaluate(async (a) => {
+                try {
+                    const x = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'vocabulary', skillId: 'vocab_grade_pictures', opts: a.opts }] }], size: a.size, paper: 'A4', seed: a.seed, form: 'A', key: false });
+                    return { pupil: x.pupilHtml };
+                } catch (e) { return { error: String(e && e.message || e) }; }
+            }, { role, size, seed, opts });
+            const tag = `${JSON.stringify(opts)} ${role} ${size} seed ${seed}`;
+            if (r.error) { fail(`V-PAGE ${tag}: not composed (${r.error})`); continue; }
+            r.pupil.split(/<section class="ws-page\b/).slice(1).forEach((pg, pi) => {
+                const maps = pg.split('data-ws-cell="vocab-match3"').slice(1).map((c) => [...c.matchAll(/data-vpic="([^"]*)"/g)].slice(0, 3).map((m) => m[1]).join(' | '));
+                cells += maps.length;
+                maps.forEach((m, i) => { const j = maps.indexOf(m); if (j < i) fail(`V-PAGE ${tag} page ${pi + 1}: Match 3 items ${j + 1} and ${i + 1} put the same pictures in the same places (${m})`); });
+            });
+        }
+    }
+    if (!cells) fail('V-PAGE: no Match 3 cell printed');
+}
+// ---- lf-vocab r16: the critic r5 nits as checks (design/lanes/lf-vocab/r16-builder-brief.md) --------------------------------
+// V-NAMES   (nit 5) no Error analysis page repeats a pupil name while an unused one remains ("Mia wrote" twice on Match 3 EA S
+//           items 3-4, "Sam wrote" twice on Pick 3 EA M items 1 and 4)
+// V-LETTER  (nit 3) a Match 3 picture letter sits at one anchor, the top-left of its picture, on every picture of a row, whatever
+//           the picture's height: in one line of pictures the letters' tops are within 0.5 mm, and the letter's offset from its
+//           picture's top-left (letter top - picture top, picture left - letter right) is the same within 0.5 mm. Every print
+//           role that deals Match 3 (S / M / L) and the practice card at 1280, 820 and 390 px (A sat at mid-height beside a
+//           short picture while B and C sat at the top: Match 3 S independent item 3; card-1280 A at the baseline)
+// V-BOX390  (nit 4) on the practice card at 390 px the three Match 3 letter boxes stand in one column: their left x within 4 px
+//           (they followed the centred words, x 230 / 260 / 225 px); worksheet-1280 already holds this (V19)
+// V-CAPTION (nit 6) the captions of one Match 3 picture row print at one size: each picture's largest text, in pt as printed,
+//           within 1 pt across the row's pictures that print text ("2 x 3 = 3 x 2" at 13 pt beside "5 x 1 = 5" at 20 pt)
+// V-GLINE   (nit 2) on a 1 picture, 3 words Guided page the write lines of one row stand at one y (bottom within 0.5 mm), the
+//           Model and the hinted try included (row 1: the hint cell's line 560 px, the Model's 605 px at L)
+// V18 / V18M (r1-r4; V18M r16 for nit 1) the Guided rows are equal at S, M and L within 1 mm, measured on the rendered row
+//           boxes - 1 picture, 3 words (V18) and Match 3 (V18M: rows were model 252 / hint 267 / plain 227 px at S)
+function r16List() { return ['V-NAMES', 'V-LETTER', 'V-BOX390', 'V-CAPTION', 'V-GLINE', 'V18', 'V18M']; }   // (a function: browserChecks runs before this line, top-level await)
+function R16_FNV(x) { let h = 2166136261; for (const c of String(x)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+// the seeds a page is judged at: 7, V23's 143869 and ws-grade-render's seed for the role (the critic's page)
+function r16Seeds(skillId, role) { return [...new Set([7, 143869, R16_FNV(`vocabulary__${skillId}:${role}`) % 1000000])]; }
+async function r16Checks(page, fail, sheet, build) {
+    const want = (k) => !ONLY || ONLY.includes(k);
+    const SK = ['vocab_grade_pictures', 'vocab_pick3_words'];
+    const pupil = (skillId, role, size, seed, opts) => page.evaluate(async (a) => {
+        try {
+            const x = await window.buildSheet({ role: a.role, sections: [{ skills: [Object.assign({ categoryId: 'vocabulary', skillId: a.skillId }, a.opts ? { opts: a.opts } : {})] }], size: a.size, paper: 'A4', seed: a.seed, key: false });
+            return { pupil: x.pupilHtml };
+        } catch (e) { return { error: String(e && e.message || e) }; }
+    }, { skillId, role, size, seed, opts });
+    if (want('V-NAMES')) {
+        const NAMES = 6;   // error-analysis.js PUPILS
+        let pages = 0;
+        for (const skillId of SK) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds(skillId, 'error-analysis')) for (const opts of [null, { vocabGrade: 2 }, { vocabGrade: 4 }]) {
+            const r = await pupil(skillId, 'error-analysis', size, seed, opts);
+            const tag = `${skillId} error-analysis ${size} seed ${seed}${opts ? ` ${JSON.stringify(opts)}` : ''}`;
+            if (r.error) { fail(`V-NAMES ${tag}: not composed (${r.error})`); continue; }
+            r.pupil.split(/<section class="ws-page\b/).slice(1).forEach((pg, pi) => {
+                const names = [...pg.matchAll(/class="mq-pupiltag[^"]*"[^>]*>([^<]+?) [a-z]+:<\/span>/g)].map((m) => m[1]);
+                if (!names.length) return;
+                pages++;
+                const seen = new Set();
+                names.forEach((n, i) => { if (seen.has(n) && seen.size < NAMES) fail(`V-NAMES ${tag} page ${pi + 1}: "${n} wrote" twice (items ${names.indexOf(n) + 1} and ${i + 1}) while ${NAMES - seen.size} name(s) are unused`); seen.add(n); });
+            });
+        }
+        if (!pages) fail('V-NAMES: no Error analysis page shows a pupil name');
+    }
+    // V18 (critic r1 #6, r2 #4, r3 #6, r4 #2; r5 nit 1 extends it to Match 3): the Guided rows are equal at S, M AND L (within
+    // 1 mm), measured on the RENDERED ROW BOXES of the printed page (the band's grid rows, from one row's top to the next row's
+    // top, the last to the grid's bottom) - never the planned cell height, with no "when there is room" exemption. Seeds:
+    // 7 and ws-grade-render's guided seeds (the critic's pages). V-GLINE on the same pages: the write lines of a row at one y.
+    // (V18M is the Match 3 half - its own id, so V18's older backtest rows keep judging the 1 picture, 3 words rows only)
+    const v18 = (skillId) => (skillId === 'vocab_grade_pictures' ? 'V18M' : 'V18');
+    if (want('V18') || want('V18M') || want('V-GLINE')) {
+        const MM = 96 / 25.4;
+        for (const skillId of SK.filter((k) => want(v18(k)) || (want('V-GLINE') && k === 'vocab_pick3_words'))) for (const size of ['S', 'M', 'L']) for (const [opts, seed] of [[{ vocabGrade: 3 }, 7], [null, 7], [null, 143869], [null, 43858], [{ vocabGrade: 2 }, 143869], [{ vocabGrade: 4 }, 143869], [{ vocabGrade: 1 }, 143869]]) {
+            const b = await build(skillId, 'guided', size, opts, seed);
+            const tag = `${skillId} guided ${size} ${JSON.stringify(opts)} seed ${seed}`;
+            if (b.error) { fail(`${v18(skillId)} ${tag}: not composed (${b.error})`); continue; }
+            const pgs = await sheet(b.html, () => {
+                const out = [];
+                for (const pg of document.querySelectorAll('body > section.ws-page, body > .ws-page')) {
+                    const cells = [...pg.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
+                    const tops = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))].sort((a, b) => a - b);
+                    const bottom = Math.max(...cells.map((c) => c.getBoundingClientRect().bottom));
+                    const lines = tops.map((t) => cells.filter((c) => Math.round(c.getBoundingClientRect().top) === t).map((c) => { const l = c.querySelector('.mq-vp-line'); return l ? l.getBoundingClientRect().bottom : null; }).filter((x) => x !== null));
+                    out.push({ rows: tops.length > 1 ? tops.map((t, i) => ((i + 1 < tops.length ? tops[i + 1] : bottom) - t) * 25.4 / 96) : [], lines });
+                }
+                return out;
+            });
+            pgs.forEach((pg, pi) => {
+                if (want(v18(skillId)) && pg.rows.length && Math.max(...pg.rows) - Math.min(...pg.rows) > 1) fail(`${v18(skillId)} ${tag} page ${pi + 1}: rows ${pg.rows.map((h) => h.toFixed(1)).join(' / ')} mm (need equal within 1 mm)`);
+                if (want('V-GLINE')) pg.lines.forEach((ys, r) => { if (ys.length > 1 && Math.max(...ys) - Math.min(...ys) > 0.5 * MM) fail(`V-GLINE ${tag} page ${pi + 1} row ${r + 1}: the write lines stand at ${ys.map((y) => y.toFixed(0)).join(' / ')} px (want one y, within 0.5 mm)`); });
+            });
+        }
+    }
+    // (in the page) every Match 3 cell's letter anchors: [{lines: [[{lt, st, gap}]]}] in CSS px, the slots grouped into lines by
+    // vertical overlap (a wrapped card puts one picture a line)
+    const LETTERS = () => [...document.querySelectorAll('.mq-vm')].filter((c) => !c.closest('.mq-wspaper')).map((c) => {
+        const slots = [...c.querySelectorAll('.mq-vm-pic')].map((pc) => {
+            const r = pc.getBoundingClientRect(), l = pc.querySelector('.mq-vm-let'), sv = pc.querySelector('svg.mq-vpic');
+            if (!l || !sv) return null;
+            const lr = l.getBoundingClientRect(), sr = sv.getBoundingClientRect();
+            return { top: r.top, bottom: r.bottom, lt: lr.top, st: lr.top - sr.top, gap: sr.left - lr.right, let: l.textContent.trim() };
+        }).filter(Boolean);
+        const lines = [];
+        for (const sl of slots) {
+            const ln = lines.find((g) => g.some((o) => sl.top < o.bottom - 1 && o.top < sl.bottom - 1));
+            if (ln) ln.push(sl); else lines.push([sl]);
+        }
+        return { lines };
+    });
+    const judgeLetters = (tag, cells, tolPx) => {
+        let n = 0;
+        cells.forEach((c, ci) => c.lines.forEach((ln) => {
+            n++;
+            for (const [k, what] of [['lt', 'the letters\' tops'], ['st', 'letter top - picture top'], ['gap', 'picture left - letter right']]) {
+                const v = ln.map((x) => x[k]);
+                if (Math.max(...v) - Math.min(...v) > tolPx) fail(`V-LETTER ${tag} cell ${ci + 1}: ${what} differ across ${ln.map((x) => x.let).join(' / ')} (${v.map((x) => x.toFixed(1)).join(' / ')} px, want within ${tolPx.toFixed(1)})`);
+            }
+        }));
+        return n;
+    };
+    const card = async (skillId, width, k) => {
+        await page.setViewport({ width, height: 900, deviceScaleFactor: 1 });
+        await page.evaluate((a) => {
+            const st = window.state; st.quizMode = false; st.mapMode = false; st.category = 'vocabulary'; st.skill = a.k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
+            window.showView('gameView'); st.currentQ = window.generateQuestion(); window.renderQuestion();
+        }, { k: skillId });
+        await new Promise((r) => setTimeout(r, 250));
+    };
+    // (in the page) each Match 3 cell's pictures' largest text in pt as printed (null: no text)
+    const CAPTIONS = () => [...document.querySelectorAll('.mq-vm')].map((c) => [...c.querySelectorAll('svg.mq-vpic')].map((sv) => {
+        const pts = [...sv.querySelectorAll('text')].map((t) => parseFloat(getComputedStyle(t).fontSize) * (t.getScreenCTM() ? t.getScreenCTM().a : 1) * 0.75);
+        return { pic: sv.getAttribute('data-vpic'), pt: pts.length ? Math.max(...pts) : null };
+    }));
+    if (want('V-LETTER') || want('V-CAPTION')) {
+        let lines = 0, rows = 0;
+        const MM = 96 / 25.4;
+        // (VOCAB_ROLES=error-analysis,guided: a quicker run while a fix is built; the gate runs every role)
+        const roles = process.env.VOCAB_ROLES ? process.env.VOCAB_ROLES.split(',') : ['independent', 'more-practice', 'test', 'guided', 'error-analysis', 'review'];
+        for (const role of roles) for (const size of ['S', 'M', 'L']) for (const seed of r16Seeds('vocab_grade_pictures', role)) for (const opts of [null, { vocabGrade: 2 }, { vocabGrade: 4 }]) {
+            const b = await build('vocab_grade_pictures', role, size, opts, seed);
+            const tag = `print ${role} ${size} seed ${seed}${opts ? ` ${JSON.stringify(opts)}` : ''}`;
+            if (b.error) { fail(`V-LETTER ${tag}: not composed (${b.error})`); continue; }
+            const got = await sheet(b.html, (fns) => ({ letters: eval(`(${fns[0]})`)(), caps: eval(`(${fns[1]})`)() }), [LETTERS.toString(), CAPTIONS.toString()]);
+            if (want('V-LETTER')) lines += judgeLetters(tag, got.letters, 0.5 * MM);
+            if (want('V-CAPTION')) got.caps.forEach((row, ci) => {
+                const t = row.filter((x) => x.pt);
+                if (t.length < 2) return;
+                rows++;
+                const v = t.map((x) => x.pt);
+                if (Math.max(...v) - Math.min(...v) > 1) fail(`V-CAPTION ${tag} cell ${ci + 1}: captions print at ${t.map((x) => `${x.pic} ${x.pt.toFixed(1)} pt`).join(', ')} (want one size, within 1 pt)`);
+            });
+        }
+        if (want('V-CAPTION') && !rows) fail('V-CAPTION: no Match 3 row with two captioned pictures');
+        for (const width of want('V-LETTER') ? [1280, 820, 390] : []) for (let k = 0; k < 6; k++) {
+            await card('vocab_grade_pictures', width, k);
+            lines += judgeLetters(`card-${width} question ${k + 1}`, await page.evaluate(LETTERS), 2);
+        }
+        if (want('V-LETTER') && !lines) fail('V-LETTER: no Match 3 picture row measured');
+    }
+    if (want('V-BOX390')) {
+        let cells = 0;
+        for (let k = 0; k < 8; k++) {
+            await card('vocab_grade_pictures', 390, k);
+            const xs = await page.evaluate(() => [...document.querySelectorAll('#questionCard .mq-vm')].map((c) => [...c.querySelectorAll('.mq-vm-box')].map((b) => Math.round(b.getBoundingClientRect().left))));
+            for (const x of xs) {
+                cells++;
+                if (x.length && Math.max(...x) - Math.min(...x) > 4) fail(`V-BOX390 card-390 question ${k + 1}: the letter boxes stand at x ${x.join(' / ')} px (want one column, within 4 px)`);
+            }
+        }
+        if (!cells) fail('V-BOX390: no Match 3 cell on the card at 390 px');
+    }
+}
 async function r7Checks(page, fail, sheet) {
     // the pupil print pages' sha256, per skill / role / size / seed (V23: byte-identical to 70cdbaf9); the pin is read from THIS
     // checkout's tests (a backtest row runs today's checks on an old tree with MQ_ROOT)

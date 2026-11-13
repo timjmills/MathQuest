@@ -1033,14 +1033,23 @@ function fadeRender(it, stage, ans, { hint = true, lines = true, side = false } 
     // underscore characters (SL-6).
     const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
+    // (and every cell of such a template knows it is on a Guided page - `guidedRow` - so the tries of later rows anchor too)
+    const inside = it.footprint && it.footprint.hintInside ? (o) => Object.assign({}, o, { payload: Object.assign({}, (o && o.payload) || {}, { guidedRow: true, hintHtml: hintLine ? hintHtml : '' }) }) : null;
     return (c, o) => {
         if (c.state !== 'blank') {
+            // (`hintInside` on a template's footprint: the cell draws the hint itself, between its work and its answer place,
+            // so its answer place stays at the y of the row's other cells - lf-vocab r16, critic r5 nit 2: the pick3 hint cell's
+            // write line sat 45 px above the Model's; ws-vocab-unit V-GLINE)
+            if (inside) return cue(it.render(c, inside(o)));
             const html = it.render(c, o);
             if (hintLine) return withHint(cue(html));
             return cue(stage === 'model' && it.template === 'stack' ? traceCarries(html, it) : html);
         }
         if (stage === 'model') {
-            const html = it.render(c, Object.assign({}, o, { shown: ans, ink: 'trace' }));
+            // (lf-vocab r16b: the Model's cell knows it is on a Guided page too - `inside` - so a hintInside template anchors its
+            // answer place by `guidedRow` alone, never by scaffoldLevel, which a Scripted Model shares: ws-empty-band EB-BAND)
+            const mo = Object.assign({}, o, { shown: ans, ink: 'trace' });
+            const html = it.render(c, inside ? inside(mo) : mo);
             return cue(it.template === 'stack' ? traceCarries(html, it) : html);
         }
         if (stage === 'partial' && it.template === 'stack') {
@@ -1055,6 +1064,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true, side = false } 
             } catch (e) { part = null; }
             if (part) return traceCarries(part, it, 1);
         }
+        if (inside) return cue(it.render(c, inside(o)));
         if (hintLine) return withHint(cue(it.render(c, o)));
         return cue(it.render(c, o));
     };

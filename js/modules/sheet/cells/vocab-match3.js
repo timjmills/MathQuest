@@ -23,7 +23,7 @@
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
 import { L, P, B, INK, GREY, isTwin, sizeOf, textPt, KEY_FEATURES, S, slotValue } from './k2kit.js';
-import { vocabPictureSVG, BASE10_IDS } from '../graphics/vocab-pictures.js';
+import { vocabPictureSVG, vocabPictureTextPt, BASE10_IDS } from '../graphics/vocab-pictures.js';
 
 export const MATCH3_TEMPLATE = 'vocab-match3';
 const LET = ['A', 'B', 'C'];
@@ -37,7 +37,9 @@ export const MATCH3_PIC_W = Object.freeze({ S: 38, M: 40, L: 40 });
 export const MATCH3_PIC_BOX = Object.freeze({ S: [43, 25.4], M: [45, 26.7], L: [45, 26.7] });   // (46 / 48 stuck out of the cell by 2.4-2.6 mm: precritic r4 slot-clip)
 
 /** The height a cell draws (mm) by size: the picture box, the letter-box row, the gaps and padding. */
-export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 46 });
+// (L 48, lf-vocab r16 item 7: the L work may grow to 50 mm in a taller row - review - so its footprint says 48 + pads, and the drawing
+// stays within 10 % of it with room to spare: EB-FOOT 15 % at the old 46 and the 52.7 mm cell)
+export const MATCH3_H = Object.freeze({ S: 47, M: 46, L: 48 });
 
 /** The letters, in word-row order: the key. */
 export const match3Letters = (p) => (p.order || [0, 1, 2]).map((i) => LET[i]);
@@ -63,9 +65,17 @@ register(MATCH3_TEMPLATE, {
         const noHundred = !words.includes('hundred');
         const wideOf = (w) => !twin && noHundred && BASE10_IDS.includes(String(w));
         const boxW = (w) => (wideOf(w) ? 52.5 : picW);
-        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : wideOf(w) ? '1 1 0' : words.some(wideOf) ? '0 0 auto' : '1 1 0'};min-width:0;">`
+        // (lf-vocab r16, critic r5 nit 6: each picture was fitted alone, so "2 x 3 = 3 x 2" printed 13 pt beside "5 x 1 = 5" at 20 pt.
+        // On paper the row takes ONE caption size, the smallest its pictures print when fitted - a larger caption's picture is
+        // drawn at the scale that prints its text at that size; nothing is made smaller than the row's smallest fitted caption;
+        // ws-vocab-unit V-CAPTION)
+        const caps = twin ? [] : words.map((w) => vocabPictureTextPt(w, boxW(w), picH, words)).filter((x) => x > 0);
+        const rowPt = caps.length > 1 ? Math.min(...caps) : 0;
+        // (and on paper each slot is as wide as its picture, shrinking in proportion when a narrow work - Error analysis - has
+        // less room than the row: equal thirds capped the wide pictures and not the narrow ones, so their captions parted again)
+        const pics = words.map((w, i) => `<div class="mq-vm-pic" style="display:flex;flex-direction:row;align-items:flex-start;justify-content:center;gap:${L(ctx, 1.5)};flex:${twin ? '1 1 190px' : wideOf(w) ? '1 1 0' : words.some(wideOf) ? '0 0 auto' : '0 1 auto'};min-width:0;">`
             + `<span class="mq-vm-let" style="font-size:${P(ctx, tp + 5)};font-weight:700;line-height:1;flex:none;">${LET[i]}</span>`
-            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: boxW(w), hMm: picH, minPx: twin ? 160 : 0, set: words })}</span></div>`).join('');
+            + `<span style="display:block;flex:0 1 auto;min-width:0;">${vocabPictureSVG(ctx, w, { wMm: boxW(w), hMm: picH, minPx: twin ? 160 : 0, set: words, textPt: rowPt })}</span></div>`).join('');
         const side = (S(ctx).writeMm || 10) + (ea ? 0 : 2);
         const letters = match3Letters({ order });
         const row = order.map((wi, n) => {
@@ -98,7 +108,14 @@ register(MATCH3_TEMPLATE, {
         // (a practice page's cell: at least 44 mm and at most 48 mm, so a row a page stretches (mixed practice, review) keeps the
         // drawing within 10 % of its footprint and leaves under 30 % below it - ws-empty-band EB-FOOT / EB-BAND, r5; 48 mm
         // as a minimum pushed the lesson Warm-up 3.4 mm off its page)
-        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:calc(48mm + max(0mm, (100% - 48mm) / 4));';
+        // (lf-vocab r16, item 7: a review row is 73 mm at L, and the work took a quarter of the extra - 52.7 mm of cell, 57.7 mm
+        // from the cell's top to its ink's bottom with the pad, against a 50 mm footprint, EB-FOOT 15 %. The work now stays at most
+        // 50 mm, at the top of a taller row - footprint L 48 + pads, so EB-FOOT holds with room, and the band under it stays under
+        // 30 % (28.5 % at review L); ws-empty-band EB-FOOT / EB-BAND)
+        // (lf-vocab r16b, top of the box: and the capped work sits at the TOP of a taller cell - margin-bottom:auto wins over a cell that
+        // centres its content (the lesson's practice pages, 76 mm rows: the 50 mm work started 10.7 mm below the top pad);
+        // ws-print-lint L-TOPSTART)
+        const fill = twin || chart || ctx.state === 'wrong' ? '' : guidedRow ? 'height:100%;' : inChart ? '' : 'min-height:44mm;height:100%;max-height:50mm;margin-bottom:auto;';
         // (the online worksheet's tile: ONE fixed layout in every tile - each picture in a slot of one height, scaled to it; the
         // words one a row, right-aligned in one column, so every letter box stands at the same x - critic r1 #10, r2 #7,
         // r3 #4: tiles mixed 2 + 1 and one-a-row words; ws-vocab-unit V19. Scoped to the worksheet paper, the card unchanged)
@@ -111,12 +128,23 @@ register(MATCH3_TEMPLATE, {
             + '.mq-wspaper .mq-vm .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important}'
             + '.mq-wspaper .mq-vm .mq-vm-word{flex:none!important;justify-content:flex-end!important;padding-right:14%}'
             + '.mq-wspaper .mq-vm{justify-content:flex-start!important;gap:12px!important}.mq-wspaper .k2-twin:has(> .mq-vm){align-self:stretch;width:100%}</style>' : '';
-        const wrapCss = tileCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
+        // (lf-vocab r16, critic r5 nit 4: on a phone the three words wrap 2 + 1 and each box followed its centred word, x 230 / 260 /
+        // 225 px at 390 px. A narrow screen takes the online worksheet's layout: one word a row in a centred column, each row
+        // right-aligned, so every letter box stands at the same x; ws-vocab-unit V-BOX390)
+        const narrowCss = twin ? '<style>@media (max-width: 600px){.mq-vm[data-mq-k2] .mq-vm-words{flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;align-self:center;gap:8px!important}'
+            + '.mq-vm[data-mq-k2] .mq-vm-word{flex:none!important;justify-content:flex-end!important}}</style>' : '';
+        const wrapCss = tileCss + narrowCss + (guidedRow ? '<style>:is(.ws-page,.ws-sheet) .mq-workwrap:has(> .mq-vm){flex:1 1 auto;justify-content:center}:is(.ws-page,.ws-sheet) .mq-workwrap > .mq-vm{flex:1 1 auto;height:auto!important}</style>' : '');
         return `<div class="mq-vm k2-cell" data-ws-vocab="match3"${twin ? ' data-mq-k2="1" data-mq-join=", "' : ''} style="color:${INK};${FONT}width:100%;box-sizing:border-box;`
             + `display:flex;flex-direction:column;justify-content:${fill.includes('max-height') ? 'space-between' : 'space-evenly'};${fill}gap:${L(ctx, ctx.state === 'wrong' ? 0.8 : 2)};padding:${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${L(ctx, 2)} ${L(ctx, ea && sizeOf(ctx) === 'S' ? 0 : 1)} ${twin ? '0' : 'calc(var(--ws-tab, 5mm) + 1mm)'};">${wrapCss}`
             // (a practice cell's free height goes above AND below the pictures - the row centred in the room over the words, which
             // stay at one y - so a row of flat pictures leaves no single blank band: ws-empty-band --slot-ink off, lf-vocab r6)
-            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-end;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:auto 0;' : ''}">${pics}</div>`
+            // (lf-vocab r16, critic r5 nit 3: the pictures hang from one top line, so every letter sits at the same anchor - the
+            // top-left of its picture - whatever the picture's height; bottom-aligned, a short picture's letter sat at mid-height
+            // beside the others; ws-vocab-unit V-LETTER)
+            // (lf-vocab r16b, top of the box: the picture row starts at the top of the box and the free height sits under it, over the words.
+            // Centred (margin:auto 0), the r16 50 mm work put 3.4 mm over a full-height row - and more over a flat one (grade 1, 2, 4
+            // and the lesson sets) - so the first printed row started 3.4-10.7 mm below the top pad: ws-print-lint L-TOPSTART)
+            + `<div class="mq-vm-pics" style="display:flex;flex-wrap:${twin ? 'wrap' : 'nowrap'};justify-content:space-around;align-items:flex-start;gap:${L(ctx, 4)};${fill.includes('max-height') ? 'margin:0 0 auto;' : ''}">${pics}</div>`
             + `<div class="mq-vm-words" style="display:flex;justify-content:space-around;align-items:center;gap:${L(ctx, 4)};flex-wrap:${twin ? 'wrap' : 'nowrap'};">${row}</div></div>`;
     },
     answerKey(p) {

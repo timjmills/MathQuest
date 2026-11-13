@@ -292,10 +292,14 @@ const PICS = {
     },
     'hundred chart': {
         ccss: ['1.NBT.A.1', '1.NBT.C.5', '2.NBT.A.2'], op: 'count',
-        focal: 'all',
         // (three rows, so it reads as a chart of rows of ten, not a two-row table - critic r1; three columns, digits 8.5 units - r3)
+        // (r15, critic r14 #2: `focal: 'all'` greyed the whole chart on the key - its focal part is ONE row, the middle one, drawn
+        // row by row so the pupil page is byte for byte the r14 table)
         alt: 'three rows of a number chart: 94 to 96, 104 to 106, 114 to 116, each number ten more than the one above',
-        draw: () => table([[94, 95, 96], [104, 105, 106], [114, 115, 116]], { x0: 7, y0: 3.5, cw: 15.5, ch: 11, size: 8.5 }),
+        draw: () => {
+            const o = { x0: 7, cw: 15.5, ch: 11, size: 8.5 };
+            return table([[94, 95, 96]], { ...o, y0: 3.5 }) + F(table([[104, 105, 106]], { ...o, y0: 14.5 })) + table([[114, 115, 116]], { ...o, y0: 25.5 });
+        },
     },
     /* ---- Grade 2: read and write numbers to 1,000 (2.NBT.A.3) */
     // (one, ten and hundred share ONE unit square, U canvas units, and are scaled together - BASE10_IDS, vocabPictureFit:
@@ -362,8 +366,10 @@ const PICS = {
     sequence: {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         focal: 'all',
-        alt: '5, 10, 15 and so on, numbers in order with commas',
-        draw: () => tx(30, 20, 0, '5, 10, 15…', { size: 9 }),
+        // (r15, critic r14 #1: 5, 10, 15 showed the ones digits 5, 0, 5 - a ones-digit cycle, so it read as cycle in the units-digit
+        // cycle lesson; 4, 7, 10 steps by 3, and its ones digits 4, 7, 0 never come back - V-ONES)
+        alt: '4, 7, 10 and so on, numbers in order with commas',
+        draw: () => tx(30, 20, 0, '4, 7, 10…', { size: 9 }),
     },
     cycle: {
         ccss: ['4.OA.C.5'], op: 'pattern',
@@ -410,8 +416,10 @@ const PICS = {
     'first term': {
         ccss: ['4.OA.C.5', '5.OA.B.3'], op: 'pattern',
         // (r11, critic r10 #1: [3], 7, 11 rose, so it read as grow - now a FALLING run: [30], 25, 20)
-        alt: '30, 25, 20: the 30 at the start in a heavy box',
-        draw: () => rect(3, 11, 15, 18, W.heavy) + tx(10.5, 20, 0, '30', { size: 9 }) + tx(19, 20, 0, ', 25, 20', { size: 9, anchor: 'start' }),
+        // (r15 V-ONES, critic r14 #1's class: 30, 25, 20 showed the ones digits 0, 5, 0, so it read as cycle in the grade 4 pool;
+        // [30], 26, 22 steps by 4, as its twin term does, and its ones digits 0, 6, 2 never come back)
+        alt: '30, 26, 22: the 30 at the start in a heavy box',
+        draw: () => rect(3, 11, 15, 18, W.heavy) + tx(10.5, 20, 0, '30', { size: 9 }) + tx(19, 20, 0, ', 26, 22', { size: 9, anchor: 'start' }),
     },
     /* ---- Grade 4: multiplicative comparison (4.OA.A.1) */
     'times as many': {
@@ -477,13 +485,13 @@ const PIC_FEAT = Object.freeze({
     odd: ['dots', 'lone-mark', 'pairs-ringed', 'groups-of:2'],
     product: ['boxed-answer', 'boxed-number', 'equals', 'times-sign', 'number-sentence', 'marked-even'],
     factor: ['boxed-number', 'boxed-operand', 'equals', 'times-sign', 'number-sentence'],
-    row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
-    column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4'],
+    row: ['table', 'rising-run', 'row-ringed', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4', 'ones-cycle'],
+    column: ['table', 'column-ringed', 'rising-run', 'skip-count', 'step:1', 'step:2', 'step:3', 'step:4', 'ones-cycle'],
     multiple: ['dots', 'rising-run', 'skip-count', 'step:3', 'number-line', 'hops', 'forward-hop'],
     input: ['table', 'column-ringed', 'in-ringed'],
     output: ['table', 'column-ringed', 'out-ringed'],
     rule: ['arrow-into-box', 'arrow-out-of-box', 'op-box', 'plus-sign'],
-    pattern: ['ellipsis', 'plus-sign', 'rising-run', 'skip-count', 'step:2', 'hops', 'forward-hop'],
+    pattern: ['ellipsis', 'plus-sign', 'rising-run', 'skip-count', 'step:2', 'hops', 'forward-hop', 'ones-cycle'],
     array: ['dots', 'array'],
     commutative: ['dots', 'equals', 'times-sign', 'array', 'turn-arrow', 'number-sentence'],
     identity: ['equals', 'times-sign', 'same-number-arc', 'number-sentence'],
@@ -498,7 +506,7 @@ const PIC_FEAT = Object.freeze({
     'one less': ['crossed-mark', 'dots'],
     before: ['boxed-first-of-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'back-hop', 'marked-even'],
     after: ['boxed-in-run', 'boxed-number', 'rising-run', 'step:1', 'number-track', 'forward-hop', 'marked-even'],
-    'hundred chart': ['table', 'rising-run', 'step:1', 'step:10'],
+    'hundred chart': ['table', 'rising-run', 'step:1', 'step:10', 'ones-cycle'],
     hundred: ['base10-flat'],
     ten: ['base10-rod'],
     one: ['base10-unit'],
@@ -507,11 +515,11 @@ const PIC_FEAT = Object.freeze({
     'number name': ['number-words'],
     'ones digit': ['boxed-number', 'last-digit-boxed', 'marked-even', 'place:ones'],
     repeat: ['repeated-block', 'bracket'],
-    sequence: ['ellipsis', 'rising-run', 'skip-count', 'step:5'],
+    sequence: ['ellipsis', 'rising-run', 'step:3'],
     cycle: ['loop-arrows', 'loop-shapes'],
     grow: ['shapes-growing', 'rising-run', 'step:2'],
     term: ['boxed-in-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
-    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:5', 'skip-count', 'marked-even'],
+    'first term': ['boxed-first-of-run', 'boxed-number', 'falling-run', 'step:4', 'marked-even'],
     'times as many': ['times-sign', 'times-bar', 'bar-pair', 'bracket'],
     compare: ['bar-pair', 'double-arrow'],
     equation: ['equals', 'times-sign', 'number-sentence'],
@@ -574,7 +582,7 @@ export const VOCAB_ALSO_SHOWS = Object.freeze({
     cycle: ['repeat', 'circle'],
     grow: ['pattern', 'sequence', 'step'],
     term: ['first term', 'sequence', 'number', 'rule'],  // (r12, critic r11 #3: 18, [14], 10 reads as the rule "take 4")
-    'first term': ['term', 'sequence', 'rule'],  // (r13 V-TWIN, critic r12 #3: the twin of term - [30], 25, 20 reads as "take 5")
+    'first term': ['term', 'sequence', 'rule'],  // (r13 V-TWIN, critic r12 #3: the twin of term - [30], 26, 22 reads as "take 4")
     'times as many': ['compare', 'bar', 'equal parts'],
     compare: ['times as many', 'difference'],
     equation: ['number sentence', 'multiply', 'equal'],
@@ -602,6 +610,8 @@ export const VOCAB_FEATURES = Object.freeze([
     'all-even', 'all-odd', 'marked-even', 'marked-odd',
     // (r14 V-PLACE: the place of a ringed or boxed digit inside a number)
     'place:ones', 'place:tens', 'place:hundreds',
+    // (r15 V-ONES: a run whose ones digits repeat, or whose step divides 10 - 5, 10, 15 - reads as a ones-digit cycle)
+    'ones-cycle',
     // declared only (not read from the markup)
     'pairs-ringed', 'groups-of:<n>', 'array', 'split-line', 'turn-arrow', 'same-number-arc', 'table', 'number-line', 'hops',
     'forward-hop', 'back-hop', 'number-track', 'step-labels', 'bar-whole', 'bar-parts', 'bar-pair', 'bracket', 'double-arrow',
@@ -639,6 +649,11 @@ export function vocabReadFeatures(body) {
         let j = i + 2; while (j + 1 < l.length && l[j + 1].n - l[j].n === d) j++;
         runs.push({ items: l.slice(i, j + 1), d });
         f.add(d > 0 ? 'rising-run' : 'falling-run'); f.add(`step:${Math.abs(d)}`);
+        // V-ONES (r15, critic r14 #1: 5, 10, 15 read as cycle in the units-digit-cycle lesson - its ones digits go 5, 0, 5): a run
+        // whose visible ones digits repeat, or whose step (2, 5 or 10) divides 10, shows a ones-digit cycle. (Step 1 does not:
+        // ten numbers pass before a ones digit comes back, so a drawn run of 1s is a count, never a cycle.)
+        const ones = l.slice(i, j + 1).map((it) => Math.abs(it.n) % 10);
+        if ((Math.abs(d) > 1 && 10 % Math.abs(d) === 0) || new Set(ones).size < ones.length) f.add('ones-cycle');
         if (Math.abs(d) > 1 && (l[i].n === Math.abs(d) || l[i].n === 0 || l[i].n % Math.abs(d) === 0)) f.add('skip-count');
         i = j - 1;
     }
@@ -903,9 +918,32 @@ function mergeDotUnderlays(seg, ink) {
     }
     return seg;
 }
-function haloOf(seg, ink = 'currentColor', key = false) {
+/**
+ * The CELLS of a drawing (r15, critic r14 #2): unfilled rects that hold exactly one text. On the key a text in a cell is
+ * underlaid by its cell - the rect itself, filled grey - never by a font-sized box: the hundred chart's 3-digit boxes were wider
+ * than their cells, so grey lobes grew outside the grid and white specks showed in the cell corners (ws-vocab-unit V-KEY).
+ */
+function cellsOf(body) {
+    const rects = [...String(body).matchAll(/<rect\b([^>]*?)\/?>/g)].filter((m) => /\sfill="none"/.test(m[1]))
+        .map((m) => ({ src: m[0], x: num(m[1], 'x'), y: num(m[1], 'y'), w: num(m[1], 'width'), h: num(m[1], 'height') }));
+    const texts = [...String(body).matchAll(/<text\b([^>]*)>/g)].map((m) => ({ x: num(m[1], 'x'), y: num(m[1], 'y') }));
+    const inR = (t, r) => t.x > r.x && t.x < r.x + r.w && t.y > r.y && t.y < r.y + r.h;
+    return rects.filter((r) => texts.filter((t) => inR(t, r)).length === 1);
+}
+const cellAt = (cells, x, y) => cells.filter((r) => x > r.x && x < r.x + r.w && y > r.y && y < r.y + r.h).sort((a, b) => a.w * a.h - b.w * b.h)[0] || null;
+function haloOf(seg, ink = 'currentColor', key = false, cells = []) {
     if (key) {
-        seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => keyUnderlay('text', attrs, inner, ink))
+        // (r15: a text in a cell takes its cell as its underlay, and the cell's own halo stroke goes - the fill covers it, and a
+        // 6 px stroke would spill over the neighbouring rows)
+        const used = new Set();
+        seg = seg.replace(/<text\b([^>]*)>([\s\S]*?)<\/text>/g, (m, attrs, inner) => {
+            const c = cellAt(cells, num(attrs, 'x'), num(attrs, 'y'));
+            if (!c) return keyUnderlay('text', attrs, inner, ink);
+            used.add(c.src);
+            return `<rect data-vu-cell="1" x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" fill="${ink}" stroke="none"/>`;
+        });
+        for (const src of used) seg = seg.split(src).join('');
+        seg = seg
             .replace(/<circle\b([^>]*?)\/?>/g, (m, attrs) => {
                 const f = (/\sfill="([^"]*)"/.exec(attrs) || [])[1];
                 return f !== undefined && f !== 'none' ? keyUnderlay('circle', attrs, '', ink).replace('<circle', '<circle data-vu="1"') : m;
@@ -931,7 +969,7 @@ function bodyFor(id, mode) {
     const segs = [...fb.matchAll(/\u0001([^\u0001\u0002]*)\u0002/g)].map((m) => m[1]);
     // (screen: the class mq-v-feedback keeps the screen cell's black-and-white ink pass, screen-cell.js monoCell, off the
     // halo - it is feedback chrome, as the host's green and red are; the r7 render drew the yellow halo grey)
-    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor', mode === 'key')).join('')}</g>`;
+    const halo = `<g class="${VOCAB_HALO_CLASS}${mode === 'screen' ? ' mq-v-feedback' : ''}" aria-hidden="true"${mode === 'screen' ? ' visibility="hidden"' : ''} style="color:${GREY}">${segs.map((x) => haloOf(x, mode === 'key' ? GREY : 'currentColor', mode === 'key', mode === 'key' ? cellsOf(fb) : [])).join('')}</g>`;
     // (the key leaves the drawing itself exactly as the pupil page draws it: a key page paints every mark it does not share
     // with the pupil page in its key ink, so a wrapped focal part printed orange - r7 render. Its halo is the targeted mark.)
     if (mode === 'key') return halo + fb.replace(SENT, '');
@@ -964,15 +1002,30 @@ export function vocabPictureFit(id, wMm = 46, hMm, set) {
 }
 
 /**
+ * The print size (pt) of a picture's largest text when it is fitted to a `wMm` x `hMm` box (null: the picture prints no text).
+ * Match 3 sets one caption size per row from it (lf-vocab r16, critic r5 nit 6; ws-vocab-unit V-CAPTION).
+ */
+export function vocabPictureTextPt(id, wMm = 46, hMm, set) {
+    if (!hasVocabPicture(id)) return null;
+    const sizes = [...bodyFor(id, '').matchAll(/<text\b[^>]*\sfont-size="([-\d.]+)"/g)].map((m) => Number(m[1])).filter((x) => x > 0);
+    if (!sizes.length) return null;
+    const fit = vocabPictureFit(id, wMm, hMm, set);
+    return Math.max(...sizes) * fit.scale / 0.3528;
+}
+
+/**
  * The picture of a word, fitted to a `wMm` x `hMm` box (wMm 34-82 mm; hMm by default 2 : 3 of wMm), cropped to its own
  * marks. In the screen twin the same drawing at the host's --mq-k2 scale (one drawing, two scales, SP-1).
  * @returns {string} an inline SVG ('' for a word the library has no picture of)
  */
-export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printFloor = false } = {}) {
+export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printFloor = false, textPt = 0 } = {}) {
     if (!hasVocabPicture(id)) return '';
     const e = vocabPictureExtent(id);
     const fit = vocabPictureFit(id, wMm, hMm, set);
-    const w = fit.wMm;
+    // (`textPt`: the row's one caption size - a picture whose text would print larger is drawn at the scale that prints it at
+    // that size, never larger than its box allows; lf-vocab r16 V-CAPTION)
+    const own = textPt > 0 ? vocabPictureTextPt(id, wMm, hMm, set) : null;
+    const w = own && own > textPt ? r2(fit.wMm * textPt / own) : fit.wMm;
     const body = bodyFor(id, focalMode(ctx));
     // (never wider than its host: a Match 3 cell in a narrow anchor-chart panel scales its pictures to the panel rather
     // than letting them spill over the letters - precritic print-lint lesson L, 2026-11-07: L-OVERFLOW / ILLEGIBLE)
@@ -988,4 +1041,4 @@ export function vocabPictureSVG(ctx, id, { wMm = 46, hMm, minPx = 0, set, printF
         + ` style="display:block;${size}overflow:visible;font-family:'Andika','Open Sans',sans-serif;font-feature-settings:'cv04' 1;font-variant-numeric:lining-nums proportional-nums;" fill="#000">${body}</svg>`;
 }
 
-export default { vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabReadMarks, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };
+export default { vocabPictureTextPt, vocabPictureTeaches, VOCAB_ALSO_SHOWS, vocabPictureAlsoShows, VOCAB_FEATURES, vocabReadFeatures, vocabReadMarks, vocabPictureReadFeatures, vocabPictureFeatures, PIC_CANVAS, PIC_WIDTHS, BASE10_IDS, VOCAB_FOCAL_CLASS, VOCAB_HALO_CLASS, VOCAB_HALO_W, vocabPictureFocal, base10UnitSet, vocabPictureReferent, VOCAB_HEAVY, VOCAB_PICTURE_IDS, hasVocabPicture, vocabPictureAlt, vocabPictureSVG, vocabPictureExtent, vocabPictureFit };

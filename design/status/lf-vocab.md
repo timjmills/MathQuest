@@ -557,3 +557,65 @@ deals its own items (seed 4242), but the paper reference (Independent M seed 7) 
 paper mark to compare. Same-word proof: `ws-screen-ink-size --skill vocabulary:<skill> --opts '{"vocabSet": n}' --no-baseline
 --only SIZE-INK` is OK for both skills × sets 1-4. Log: design/lanes/lf-vocab/size-proof-r14.txt. Gate fix (build the reference for
 the same word) routed to lf-checks by the lead.
+
+## r15 builder (Opus medium, follow-on fixes on the deployed model; brief design/lanes/lf-vocab/r15-builder-brief.md), 2026-11-13
+The three critic r14 minors, each its own commit + push, with a check and a backtest row (FAIL on deploy a3eb9d25, PASS on the fix).
+A container restart stopped the first builder after items 1-2; this builder finished item 3 and ran every gate.
+| item | check id | backtest row (fail a3eb9d25 -> pass) | on precritic's path | rounds saved |
+|---|---|---|---|---|
+| 1 a run whose visible ones digits repeat (5,10,15 -> 5,0,5) or whose step divides 10 reads as `ones-cycle`, which satisfies "cycle"; sequence redrawn 4,7,10 (set 6 split kept), grade-4 first term redrawn [30],26,22 (step 4) | ws-vocab-unit V-ONES | vocab-r15-vones -> 1758caca | y (vocab-unit) | 1 |
+| 2 every key underlay lies inside the cell/box/ring its mark sits in (+0.5 mm); a whole-drawing focal part on a structure greys <= 60 %; the hundred chart key's per-text underlays became the cell rect, focal part = the middle row (pupil drawing byte-identical) | ws-vocab-unit V-KEY (--browser) | vocab-r15-vkey -> 61c136c1 | y (vocab-unit-browser) | 1 |
+| 3 no two Match 3 cells of one printed page put the same pictures in the same A/B/C places; a repeated trio takes a picture order the 3 slots before it do not hold (kept per page SLOT, so a More Practice run's one reset is covered) | ws-vocab-unit V-PAGE (--browser) | vocab-r15-vpage -> 567bf064 | y (vocab-unit-browser) | 1 |
+
+V23: all 60 pupil pages re-pinned (ade0824c8). Cause: the r14 pin (551c4e64) failed all 60 on the deploy base a3eb9d25 ITSELF -
+cell.js/grid.js stamp `data-eb-item` on every kit cell since the master EB-FOOT-pairing merge (markup only, no drawing change).
+Re-taken on a3eb9d25; the same pin then holds on 1758caca, 61c136c1 and 567bf064, so no r15 item moves a pinned pupil page.
+
+EB-FOOT review-L pin (97a5962dc): on the pre-merge pin commit (551c4e64, no data-eb-item) the Match3 review-L cells were an
+unpaired NOTE (EB-FOOT PASS). The master EB-FOOT-pairing merge (data-eb-item) enabled index pairing in deploy a3eb9d25, surfacing
+the real Match3 review-L footprint gap (drawn 57.7 mm vs 50 mm footprint, 15 %) as 3 findings - identical on a3eb9d25, not an r15
+change. Pinned (design/audit/baselines/empty-band.json counts + skillNote); the real match3 review-L footprint fix is routed to the
+EB-FOOT/match3 owner.
+
+Gates (one at a time, after the last fix): ws-vocab-unit OK; --browser OK (V-ONES/V-KEY/V-PAGE/V11R/V18/V19/V23/V25/V26/V27 green,
+after the 60-page V23 re-pin); ws-next-box OK (19 hosts); ws-empty-band both skills OK (3 findings within the pin) and --slot-ink
+off OK; ws-boot-smoke OK; ws-backtest --row each new row PASS (vones, vkey, vpage: FAIL on a3eb9d25, PASS on the fix).
+precritic --strict, both skills: PASS all but sibling-compare (known: no approved sibling) and ws-screen-ink-size (the 4 ruled
+SIZE-REF coverage findings, Known findings above). empty-band and next-box green after the pin (next-box FAILed once inside the
+first precritic on a browser-queue flake - "Cannot set properties of null" at host 10 - and is reliably green standalone, 19 hosts).
+Renders: scratchpad r15/sets (ws-vocab-set-renders --since a3eb9d25: the sets changed by item 1's redraws - set 6 sequence and the
+grade-4 pool); hundred chart key rendered separately (set 4 pick3 item 1).
+Final precritic --strict on 9e3f2cd9 (pin in place): vocab_grade_pictures 2 FAIL / 33 PASS, vocab_pick3_words 2 FAIL / 33 PASS;
+both FAIL only sibling-compare (structural) and ws-screen-ink-size (the 4 ruled SIZE-REF findings: distributive on Match 3;
+pick3 answer-choice ring / picture marks). empty-band and next-box PASS inside precritic. ws-backtest --row vones, vkey, vpage:
+3 PASS. Hundred chart key: r15/hundred-chart/hundred-chart-key-seed143869.png (middle row grey, inside its cells).
+
+## r16b fix (2026-11-13, Opus medium): gates red after r16
+
+1. **L-TOPSTART (CL-4b) regression.** Bisected (print-lint, independent L, vocabGrade 1, MQ_ROOT per commit): 7d720ad3 /
+   0defd42f / 9878b2a6 OK, 47100ca2 (r16 item 7) FAIL. Item 7 capped the practice work at 50 mm and raised the L footprint to
+   48 mm, so independent L and the lesson's practice pages hold 3 a page (72.5-76 mm rows); the picture row, centred in the work
+   (margin:auto 0), started 3.4 mm+ below the top pad, and on the lesson pages the cell centred the work 10.7-13 mm down.
+   Fix b52eac93: the picture row hangs from the work's top, and the capped work takes margin-bottom:auto. V-LETTER still OK.
+   Backtest vocab-r16b-topstart-l (FAIL 9fa898ed, PASS b52eac93). Note: 3 a page at L (was 4 at r15) is item 7's footprint
+   choice, which the r15 + r16 critic saw and passed; this fix does not change it.
+2. **V23 re-pin (36 pages).** The r15 pin (ade0824c8) holds on 7d720ad3 (0 of 60 differ). The moves, by r16 commit (hashes on
+   every r16 commit that touches js/, MQ_ROOT):
+   | commit | item | pupil pages moved |
+   |---|---|---|
+   | afca8041 | 3 V-NAMES (error-analysis.js names) | grade_pictures error-analysis S 143869 |
+   | 0defd42f | 1 V-LETTER (pics align flex-start) | grade_pictures independent / guided / more-practice / test / error-analysis, S M L, both seeds (30) |
+   | 223174ce | 2 V-BOX390 (screen CSS) | none |
+   | 9878b2a6 | 4 V-CAPTION (one caption size) | the same 30 grade_pictures pages again |
+   | 36f9dbfa | 5 V-GLINE (pick3 Guided line) | pick3_words guided S M L, both seeds (6) |
+   | 47100ca2 | 7 EB-FOOT (work max 50 mm, L 48) | grade_pictures independent / more-practice / test S M L, guided S M (22) |
+   | b52eac93 / 15b4a933 | r16b fixes 1 and 3 | the same 22 grade_pictures pages; pick3 none |
+   Union 36 = 30 grade_pictures + 6 pick3 guided. Every move is an r16 drawing change in the lane's own cells / roles; none is
+   master markup. Re-pinned on 15b4a933 (60 pages).
+3. **ws-empty-band --slot-ink off FAIL (3)**: EB-BAND on pick3 Scripted Model L (p1 cells 1-2, p2 cell 1, 28.9 mm of 96 mm,
+   30.1 %). Cause: r16 item 5 (36f9dbfa) anchored the pick3 line to the cell bottom wherever scaffoldLevel >= 2, which the
+   Scripted Model (level 3) shares. Fix 15b4a933: anchor by payload guidedRow alone (guided.js passes it to the Model stage too);
+   the Scripted Model is back to its r15 geometry (line 80.5 mm, bank 57.7 mm, identical to 7d720ad3), the Guided page unchanged
+   (V-GLINE / V18 / V18M OK, pick3 guided hashes unchanged by the fix). Backtest vocab-r16b-ebband-model-l (FAIL 9fa898ed, PASS
+   15b4a933).
+Owner rule received mid-fix (master 76bc11c6): print size S dropped; S-only findings are noted, not fixed or counted.

@@ -56,7 +56,7 @@ export const VOCAB_WORDS = Object.freeze({
     'number name': { meaning: 'the number written in words', explain: 'Number name means the number written in words, like forty-seven.', notWith: ['hundred'] },
     'ones digit': { meaning: 'the digit in the ones place', explain: 'Ones digit means the number in the ones place, like the 6 in 476.', notWith: ['digit', 'factor', 'quotient'] },
     repeat: { meaning: 'the part comes back', explain: 'Repeat means the same part comes again and again.', notWith: ['pattern', 'cycle', 'sequence'] },
-    sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 5, 10, 15.', notWith: ['pattern', 'multiple', 'term', 'first term', 'rule'] },
+    sequence: { meaning: 'numbers in order, one after another', explain: 'Sequence means numbers in order, one after another: 4, 7, 10.', notWith: ['pattern', 'multiple', 'term', 'first term', 'rule'] },
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round to the start again: circle, square, triangle, diamond, circle.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
@@ -123,7 +123,8 @@ export const VOCAB_DEFS = Object.freeze({
     'ones digit': [['last-digit-boxed']],
     repeat: [['repeated-block']],
     sequence: [['rising-run'], ['falling-run'], ['loop-numbers'], ['repeated-block']],
-    cycle: [['loop-shapes'], ['loop-numbers'], ['loop-arrows']],
+    // (r15 V-ONES, critic r14 #1: a run whose ones digits repeat - 5, 10, 15 - shows the units digit cycle)
+    cycle: [['loop-shapes'], ['loop-numbers'], ['loop-arrows'], ['ones-cycle']],
     grow: [['rising-run'], ['shapes-growing']],
     term: [['boxed-in-run'], ['boxed-first-of-run']],
     'first term': [['boxed-first-of-run']],
