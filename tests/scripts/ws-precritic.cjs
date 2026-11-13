@@ -742,6 +742,9 @@ function buildPlan(ctx) {
         // at S / M / L, its option variants, and the screen hosts (card 390 / 820 / 1280, worksheet, quiz), measured for
         // empty bands under / beside the ink and drawn height vs footprint; pinned counts in design/audit/baselines/empty-band.json
         add(gate('empty-band', 'ws-empty-band (every offered role x S/M/L + hosts: EB-BAND, EB-SIDE, EB-FOOT)', `${scope} × card roles × S/M/L + hosts`, 'browser', 'ws-empty-band', ['--skill', keys.join(',')], { missingMsg: 'ws-empty-band is not in this tree' }));
+        // SCREEN-INK-SIZE (owner-caught 2026-11-13, div_facts arrays as thin strips of tiny dots): every screen host, the drawn
+        // elements at least their print size, a drawing wide before tall (pin: design/audit/baselines/screen-ink-size.json)
+        add(gate('screen-ink-size', 'ws-screen-ink-size (SIZE-INK, SIZE-REF, SIZE-WIDTH on card / worksheet / quiz)', scope, 'browser', 'ws-screen-ink-size', ['--skill', keys.join(',')], { missingMsg: 'ws-screen-ink-size is not in this tree' }));
         add(gate('lessonfit', 'ws-lessonfit (WRM site lessons, every year)', 'site lessons Y1, Y4, Y6', 'node', 'ws-lessonfit', []));
         // The matrix takes its own browser slots (--slots: each print-lint process through /tmp/mq-browser-run.sh), so it
         // runs as a NODE gate, as ws-deploy-gates.sh runs it: wrapping it in the runner would hold a slot while its own
@@ -985,7 +988,7 @@ function buildPlan(ctx) {
         // PC-SLOTS D1/D6, PC-SCAFFOLD D8, PC-H13 D4/D9/D11 - sheetCheck now blocking, PC-CLIP D10) and ws-print-lint L-KEY
         // (AK-1..AK-4, D6) + L-OVERLAP (SECTION, D10) on their lesson pages at L and S with NO baseline (blocking)
         if (ctx.role === 'lesson') {
-            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
+            add(gate('lesson-samples-check', 'ws-lesson-samples --check (short-lesson samples: PC-RANGE, NAME, SLOTS, SCAFFOLD, H13, CLIP; PM-H13 + LIVE-PART on every Practice / Mixed page)', 'add_facts, sub_100_regroup, nearest_10 × 8 seeds × L / S', 'browser', 'ws-lesson-samples', ['--check'], { parse: PARSE.lessonSamples, needFlags: ['check'] }));
             // the lesson library's own node gates (lf-engine's, phase 0; SKIPPED-NOT-BUILT in a tree without them)
             add(gate('lesson-unit', 'ws-lesson-unit (lesson engine and library unit checks)', 'lesson library', 'node', 'ws-lesson-unit', [], { missingMsg: 'ws-lesson-unit is not in this tree (lf-engine, phase 0)' }));
             add(gate('lesson-coverage', 'ws-lesson-coverage (lesson library coverage, structural problems)', 'lesson library', 'node', 'ws-lesson-coverage', [], { missingMsg: 'ws-lesson-coverage is not in this tree (lf-engine, phase 0)' }));
@@ -1300,9 +1303,13 @@ async function main() {
     const browserPlanned = rows.some((g) => g.kind === 'browser' && !g.missing);
     let pre = { bad: [] };
     if (browserPlanned) {
-        if (!fs.existsSync(RUNNER)) {
-            fs.copyFileSync(RUNNER_SRC, RUNNER); fs.chmodSync(RUNNER, 0o755);
-            say(`${TOOL}: installed ${RUNNER} from ${rel(RUNNER_SRC)}`);
+        // installed when missing OR older than the repo's copy (lf-engine 2026-11-12: a stale runner kept handing its
+        // slot lock to orphaned Chromes); replaced by rename, so a runner already running keeps its own file
+        const cur = fs.existsSync(RUNNER) ? fs.readFileSync(RUNNER, 'utf8') : null;
+        if (cur !== fs.readFileSync(RUNNER_SRC, 'utf8')) {
+            const tmp = `${RUNNER}.${process.pid}`;
+            fs.copyFileSync(RUNNER_SRC, tmp); fs.chmodSync(tmp, 0o755); fs.renameSync(tmp, RUNNER);
+            say(`${TOOL}: ${cur === null ? 'installed' : 'updated'} ${RUNNER} from ${rel(RUNNER_SRC)}`);
         }
         pre = prerequisites();
         if (pre.bad.length) {

@@ -40,7 +40,7 @@ const PLACE_NAMES = ['O', 'T', 'H', 'Th', 'TTh', 'HTh'];
  * @param {'trace'|'solid'|null} [opts.boxInk]  with `answer: 'boxes'` and `ans`, the digits are
  *        drawn INSIDE the boxes, so a key laid over a Guided page lines up exactly (SCC-T10).
  */
-export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null } = {}) {
+export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'open', grey = false, ans = null, unknown = null, slots = null, unknownSlot = null, regroupSlots = null, boxInk = null, ansTracks = 0, trackInk = null, touch = null, strikes = null, rings = null, seps = null, wide = false, trackEm = 0, headEms = null, carryTop = 0 } = {}) {
     // `a` may be an ARRAY of the rows above the operator row (three or four addends, CM-5/CM-6):
     // every one of them sits on the digit tracks with an empty operator track (VA-2).
     const tops = (Array.isArray(a) ? a : [a]).map(String);
@@ -109,7 +109,7 @@ export function stack(a, b, op, { T, heads = false, regroup = false, answer = 'o
     // every track boundary. `data-ws-seg` says where each track sits in the strip; the
     // stylesheet draws the outline, the dividers and the end radii from it (print and screen).
     if (regroup) {
-        const on = regroupTracks(regroup, t, A.length);
+        const on = regroupTracks(regroup, t, A.length, carryTop);
         html += Array.from({ length: t }, (_, i) => {
             const k = on.indexOf(i);
             // The ones box of a subtraction holds a two-digit number after a regroup (17): it is
@@ -209,9 +209,12 @@ const bottomOf = (p) => { const ops = p.operands || [p.a, p.b]; return ops[ops.l
  * VA-22: subtraction boxes come from the TOP NUMBER's digits only, never from the answer - so
  * their indexes are not the addition ones, which is why this lives in one place.
  */
-function regroupTracks(kind, t, topDigits) {
+function regroupTracks(kind, t, topDigits, carryTop) {
     const all = Array.from({ length: t }, (_, i) => i);
-    if (kind === 'add') return all.filter((i) => i > 0 && i < t - 1);
+    // F6 (live-fix 2026-11-13, H15): `carryTop` (a section's highest place any of its sums carries into, set per section
+    // by print-sheet markSectionWriteAbove) drops the boxes over places no item of the section can carry into - a
+    // hundreds box over sums < 100 is a dead part the key never fills. Absent: every column but the ones (VA-10).
+    if (kind === 'add') return all.filter((i) => i > 0 && i < t - 1 && !(carryTop > 0 && t - 1 - i > carryTop));
     if (kind === 'sub') return all.filter((i) => i > t - 1 - topDigits);
     return [];
 }
@@ -222,6 +225,15 @@ function regroupTracks(kind, t, topDigits) {
  */
 /** CL-4b per section: does this stack payload's own working regroup (its tracks read from it)? */
 export const stackRegroups = (p) => needsRegroup(p, tracksOf(p));
+/** F6 (live-fix 2026-11-13): the highest place this sum carries into (1 = tens, 2 = hundreds ...), 0 when none or not a sum. */
+export function stackCarryTop(p) {
+    if (!p || p.op !== '+') return 0;
+    const t = tracksOf(p);
+    const w = regroupWorking(p, t);
+    let top = 0;
+    w.vals.forEach((v, i) => { if (v) top = Math.max(top, t - 1 - i); });
+    return top;
+}
 
 export function needsRegroup(p, t) {
     if (p.op === '+' || p.op === '-' || p.op === '−') return regroupWorking(p, t).vals.some((v) => v);
@@ -413,7 +425,7 @@ register('stack', {
             boxInk = null;
             if (regroup) {
                 regroupSlots = [];
-                for (const i of regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
+                for (const i of regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length, p.carryTop)) regroupSlots[i] = blank(regroupSlot(i), ctx, key);
             }
         }
         // AK-2 over VA-13 on a key (owner, 2026-09-25): an answered print cell writes the whole
@@ -429,14 +441,14 @@ register('stack', {
             const upTo = Number.isInteger(p.workUpTo) ? p.workUpTo : Infinity;
             const near = (i) => t - 1 - i <= upTo;
             const w = regroupWorking(p, t);
-            const on = regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length);
+            const on = regroupTracks(regroup, t, String(Array.isArray(a) ? a[0] : a).length, p.carryTop);
             regroupSlots = Array.from({ length: t }, (_, i) => (on.includes(i) && w.vals[i] && near(i) ? regroupInk(w.vals[i], wInk) : '<i></i>'));
             if (regroup === 'sub' && w.strikes.length) strikes = w.strikes.map((x, i) => (x && near(i) ? wInk : null));
         }
         const tm = touchMode(p);
         const rowsTd = tm ? touchColumns([...(Array.isArray(a) ? a : [a]), b], t, p.op, tm) : null;
         const drawn = stack(a, b, p.op, {
-            T: t, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
+            T: t, carryTop: p.carryTop, heads, regroup, answer, slots, regroupSlots, unknownSlot, boxInk, ansTracks: nAns, strikes, seps: stackSeps(p, t), wide: wideOf(p), trackEm: headTrackEm(p, ctx, heads, t), headEms: headEmsOf(p, ctx, heads, t),
             touch: rowsTd ? { rows: rowsTd, o: touchOpts(ctx.metrics ? ctx.metrics.digitPt : 28, ctx.mode === 'screen' ? 'px' : 'pt', 'solid', ctx.photocopySafe) } : null,
             grey: level === 2 && ctx.state === 'blank',
             ans: shown === undefined ? null : shown,
@@ -470,7 +482,7 @@ register('stack', {
         const topDigits = String((p.operands || [p.a])[0] ?? '').length;
         const work = regroupWorking(p, t);
         const kind = p.op === '-' || p.op === '−' ? 'sub' : p.op === '+' ? 'add' : null;
-        for (const i of regroupTracks('add', t, topDigits)) slots[`regroup-${i}`] = { value: kind === 'add' ? (work.vals[i] || '') : '', graded: false };
+        for (const i of regroupTracks('add', t, topDigits, p.carryTop)) slots[`regroup-${i}`] = { value: kind === 'add' ? (work.vals[i] || '') : '', graded: false };
         for (const i of regroupTracks('sub', t, topDigits)) slots[`regroup-${i}`] = { value: kind === 'sub' ? (work.vals[i] || '') : '', graded: false };
         if (p.check && isSub(p)) {
             slots['check-ans'] = { value: digits, graded: false };
@@ -519,7 +531,7 @@ register('stack', {
         const screen = ctx && ctx.mode === 'screen' && !ctx.static;
         const out = [];
         const nAns = Math.min(t - 1, Math.max(1, ansDigitsOf(p)));
-        if (regroup) for (const i of regroupTracks(regroup, t, String(a ?? '').length)) out.push(regroupSlot(i));
+        if (regroup) for (const i of regroupTracks(regroup, t, String(a ?? '').length, p.carryTop)) out.push(regroupSlot(i));
         if (screen) for (let i = t - nAns; i < t; i++) out.push(answerSlot(i, t));
         // On paper the answer zone under the sum rule is ONE open slot (VA-11, PG-14).
         else out.push({ id: 'answer', kind: 'number', shape: 'open', graded: true, order: 0, inputmode: 'numeric', scopes: ['full', 'answer-only'] });
