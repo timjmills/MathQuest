@@ -1,0 +1,1316 @@
+[
+ {
+  "run": "1024",
+  "ref": "conversions:double_num_line",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "coordinates:coordinates_read_all",
+  "parts": [
+   {
+    "part": "1 of 3",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 3",
+    "isScroll": true,
+    "ox": 76,
+    "oy": 128,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways and down to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 76,
+     "t": 128
+    },
+    "focused": true,
+    "key": {
+     "l": 76,
+     "t": 0
+    }
+   },
+   {
+    "part": "3 of 3",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "data_analysis:box_plot_intro",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 71,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 71,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 71,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "data_analysis:box_plot_quartiles",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 71,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 71,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 71,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "data_analysis:histogram_read",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "graphs:line_plot",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 17,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 17,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 17,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "shapes_classify:hotspot_quads",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 213,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "drag": {
+     "l": 170,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 213,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "multiplication:mult_chart_easy",
+  "parts": [
+   {
+    "part": "1 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "3 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "4 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "ref": "coordinates:geo_translate",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   }
+  ]
+ },
+ {
+  "run": "1024",
+  "errs": []
+ },
+ {
+  "run": "820",
+  "ref": "conversions:double_num_line",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180,
+    "drag": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "coordinates:coordinates_read_all",
+  "parts": [
+   {
+    "part": "1 of 3",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 3",
+    "isScroll": true,
+    "ox": 73,
+    "oy": 51,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways and down to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180,
+    "drag": {
+     "l": 73,
+     "t": 51
+    },
+    "focused": true,
+    "key": {
+     "l": 73,
+     "t": 0
+    }
+   },
+   {
+    "part": "3 of 3",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "data_analysis:box_plot_intro",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 71,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1097,
+     "bottom": 1141
+    },
+    "outCtrl": 0,
+    "popBottom": 1158,
+    "vh": 1180,
+    "drag": {
+     "l": 71,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 71,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "data_analysis:box_plot_quartiles",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 71,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1097,
+     "bottom": 1141
+    },
+    "outCtrl": 0,
+    "popBottom": 1158,
+    "vh": 1180,
+    "drag": {
+     "l": 71,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 71,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "data_analysis:histogram_read",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180,
+    "drag": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "graphs:line_plot",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 17,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180,
+    "drag": {
+     "l": 17,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 17,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "shapes_classify:hotspot_quads",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 963,
+     "bottom": 1007
+    },
+    "outCtrl": 0,
+    "popBottom": 1024,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 213,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1069,
+     "bottom": 1113
+    },
+    "outCtrl": 0,
+    "popBottom": 1130,
+    "vh": 1180,
+    "drag": {
+     "l": 172,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 213,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "multiplication:mult_chart_easy",
+  "parts": [
+   {
+    "part": "1 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "3 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "4 of 4",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "ref": "coordinates:geo_translate",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 1107,
+     "bottom": 1151
+    },
+    "outCtrl": 0,
+    "popBottom": 1168,
+    "vh": 1180
+   }
+  ]
+ },
+ {
+  "run": "820",
+  "errs": []
+ },
+ {
+  "run": "1280",
+  "ref": "data_analysis:histogram_read",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 927,
+     "bottom": 971
+    },
+    "outCtrl": 0,
+    "popBottom": 988,
+    "vh": 1000
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 927,
+     "bottom": 971
+    },
+    "outCtrl": 0,
+    "popBottom": 988,
+    "vh": 1000,
+    "wheel": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1280",
+  "errs": []
+ },
+ {
+  "run": "1366",
+  "ref": "shapes_classify:hotspot_quads",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 694,
+     "bottom": 738
+    },
+    "outCtrl": 0,
+    "popBottom": 755,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 213,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "wheel": {
+     "l": 200,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 213,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1366",
+  "errs": []
+ },
+ {
+  "run": "1024-classic",
+  "ref": "shapes_classify:hotspot_quads",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 694,
+     "bottom": 738
+    },
+    "outCtrl": 0,
+    "popBottom": 755,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 213,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "wheel": {
+     "l": 200,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 213,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024-classic",
+  "ref": "conversions:double_num_line",
+  "parts": [
+   {
+    "part": "1 of 2",
+    "isScroll": false,
+    "ox": 0,
+    "oy": 0,
+    "gutter": 0,
+    "cue": null,
+    "cueVis": false,
+    "cueFs": null,
+    "cueGapToFrame": null,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768
+   },
+   {
+    "part": "2 of 2",
+    "isScroll": true,
+    "ox": 122,
+    "oy": 0,
+    "gutter": 0,
+    "cue": "↔ Scroll sideways to see the whole drawing",
+    "cueVis": true,
+    "cueFs": "12px",
+    "cueGapToFrame": 10,
+    "tabindex": null,
+    "done": {
+     "inWin": true,
+     "top": 695,
+     "bottom": 739
+    },
+    "outCtrl": 0,
+    "popBottom": 756,
+    "vh": 768,
+    "wheel": {
+     "l": 122,
+     "t": 0
+    },
+    "focused": true,
+    "key": {
+     "l": 122,
+     "t": 0
+    }
+   }
+  ]
+ },
+ {
+  "run": "1024-classic",
+  "errs": []
+ }
+]
