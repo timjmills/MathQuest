@@ -3200,6 +3200,26 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "options-panel-sample",
+  "check": "the Options panel's live sample, opened the teacher's way at 1280 and 390 px, lies inside its frame and holds ink (lf-algebra F8/G11: fit()'s is-cropped under _tidySample's translate(-50%,-50%) scale(k) put the stage off the frame); precritic's scoped options-shots row, and deploy session 4 for all 725 skills",
+  "kind": "commit-pair",
+  "rule": "ws-options-shots (stage inside, or over 90 % of, .tv-sko-frame; > 0.5 % pixels darker than luma 230 in a 3 px inset)",
+  "browser": true,
+  "fail": {
+   "commit": "389a69c6",
+   "state": "lf-partopts branch base: FAIL 4 - add_word_problems and geo_translate at 1280 and 390, stage off the frame, 0.00 % ink. The same defect as lf-algebra d20c8a003 on patterns:pattern_features / growing_shape_patterns (precritic --only options-shots there: FAIL 4; on d20c8a003 + d7847568's fix: PASS); those skills are not on this branch, so the reachable pair is the branch's own base and fix"
+  },
+  "pass": {
+   "commit": "d7847568",
+   "state": "the fix: 0 findings, both samples inside the frame at a legible scale"
+  },
+  "command": "node tests/scripts/ws-options-shots.cjs --skill addition:add_word_problems,coordinates:geo_translate --skip-no-panel --workers 1",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }

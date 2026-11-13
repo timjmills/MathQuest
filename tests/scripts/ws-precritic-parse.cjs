@@ -8,6 +8,12 @@
 //   card-not-offered on a card WITH a rulings block and no notOffered entry -> N/A (every §7a option offered)
 //   card-not-offered on a card with NO rulings block                        -> SKIPPED (no rulings), unchanged
 //   card-rulings (--check rulings) NO-RULINGS                               -> SKIPPED (no rulings), unchanged
+// Cases (lf-partopts, the options-shots row, 2026-11-13):
+//   options-shots: both skills ok at 1280 and 390                            -> PASS
+//   options-shots: one skill ok, one `skip ...: no options panel`            -> PASS, the skipped skill named
+//   options-shots: every skill skipped (no options panel)                    -> N/A
+//   options-shots: a `FAIL <key> @<w>` line, verdict FAIL, exit 1            -> FAIL, explained by the findings
+//   options-shots: verdict OK but a scope skill checked at one width only    -> FAIL (checked something else)
 // Last line `ws-precritic-parse: OK (...)` or `ws-precritic-parse: FAIL - ...`.
 'use strict';
 const path = require('path');
@@ -36,5 +42,28 @@ t(r2.result === 'SKIPPED (no rulings)', `offered row, no block: SKIPPED (got ${r
 const r3 = PARSE.cardRulings(rulingsGate, noBlock, 4);
 t(r3.result === 'SKIPPED (no rulings)', `rulings row, no block: SKIPPED (got ${r3.result})`);
 
-if (fails.length) { for (const f of fails) console.log(`  FAIL ${f}`); console.log(`ws-precritic-parse: FAIL - ${fails.length} of 3 case(s)`); process.exit(1); }
-console.log('ws-precritic-parse: OK (3 cases)');
+let N = 3;
+if (PARSE.optionsShots) {
+    const keys = ['patterns:pattern_features', 'patterns:growing_shape_patterns'];
+    const osGate = { id: 'options-shots', keys, expect: { skills: 2, widths: [1280, 390] } };
+    const ok = (k, w) => `ok   ${k} @${w}: ink 3.27 %, covers 26.7 %`;
+    const both = [...keys.flatMap((k) => [ok(k, 1280), ok(k, 390)]), '  2 skills × 2 widths (1280, 390 px), 1 worker(s), 14 s', 'ws-options-shots: OK (2 skills × 2 widths)'].join('\n');
+    const oneSkip = [`skip ${keys[1]}: no options panel (not checked)`, ok(keys[0], 1280), ok(keys[0], 390), 'ws-options-shots: OK (1 skills × 2 widths; 1 skipped, no options panel)'].join('\n');
+    const allSkip = [`skip ${keys[0]}: no options panel (not checked)`, `skip ${keys[1]}: no options panel (not checked)`, '  0 skills × 2 widths (1280, 390 px), 1 worker(s), 3 s', 'ws-options-shots: OK (0 skills × 2 widths; 2 skipped, no options panel)'].join('\n');
+    const red = [`FAIL ${keys[0]} @1280: stage (-193,-205) 119×126 is neither inside the 398×140 frame nor over 90 % of it (covers 0.0 %)`, ok(keys[1], 1280), ok(keys[1], 390), `FAIL ${keys[0]} @390: the frame's visible crop holds 0.00 % dark pixels (needs > 0.5 %)`, 'ws-options-shots: FAIL (2)'].join('\n');
+    const half = [ok(keys[0], 1280), ok(keys[0], 390), ok(keys[1], 1280), 'ws-options-shots: OK (2 skills × 2 widths)'].join('\n');
+    const o1 = PARSE.optionsShots(osGate, both, 0);
+    t(o1.result === 'PASS', `options-shots, both checked: PASS (got ${o1.result} ${o1.findings})`);
+    const o2 = PARSE.optionsShots(osGate, oneSkip, 0);
+    t(o2.result === 'PASS' && o2.findings.includes(keys[1]), `options-shots, one skipped: PASS naming it (got ${o2.result} ${o2.findings})`);
+    const o3 = PARSE.optionsShots(osGate, allSkip, 0);
+    t(o3.result === 'N/A', `options-shots, all skipped: N/A (got ${o3.result} ${o3.findings})`);
+    const o4 = PARSE.optionsShots(osGate, red, 1);
+    t(o4.result === 'FAIL' && o4.explainsExit && /2 panel sample/.test(o4.findings), `options-shots, FAIL lines: FAIL explained (got ${o4.result} ${o4.findings})`);
+    const o5 = PARSE.optionsShots(osGate, half, 0);
+    t(o5.result === 'FAIL' && o5.findings.includes(keys[1]), `options-shots, one width missing: FAIL naming it (got ${o5.result} ${o5.findings})`);
+    N += 5;
+}
+
+if (fails.length) { for (const f of fails) console.log(`  FAIL ${f}`); console.log(`ws-precritic-parse: FAIL - ${fails.length} of ${N} case(s)`); process.exit(1); }
+console.log(`ws-precritic-parse: OK (${N} cases)`);

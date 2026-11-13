@@ -40,6 +40,10 @@
 //               overlap (H2) probe; after the sibling comparison, so the sibling run is cached),
 //             ws-phone-card --skills (the practice card at 390 x 844 and 390 x 664: nothing cut off sideways, the
 //               first answer box focused and in view),
+//             ws-options-shots --skill --skip-no-panel --workers 1 (lf-partopts, from lf-algebra F8/G11, 2026-11-13: the
+//               Options panel's live sample, opened the teacher's way at 1280 and 390 px, lies inside its frame and holds
+//               ink; a scope skill with no options panel is skipped and named, and a scope where none has one is N/A;
+//               the whole 725 x 2 sweep is deploy session 4),
 //             ws-card-rulings --check rulings (the spec card's numeric rulings against 300 seeded items a skill) and
 //             ws-card-rulings --check offered (the option panel offers nothing the card lists as not offered). A skill
 //               whose card has no machine-readable rulings block makes these two rows SKIPPED (no rulings): not run,
@@ -117,6 +121,10 @@
 //                        (exit 0): the skipped and N/A gates are named in the table AND in the verdict line, never counted
 //                        as passed. (--allow-not-built, the old opt-in, is accepted and now the default.)
 //   --report-only        print everything, exit 0
+//   --only <id,...>      run only these gate rows of the plan (ids as the table and --dry-run name them, e.g.
+//                        options-shots): a quick re-run or a backtest of one row. A row whose plan waits on another
+//                        (`after`) needs that one listed too. The verdict says `--only: n of m gates`; never with --strict
+//                        (a partial run is never the clean-before-critic run).
 //
 // PREREQUISITES (checked first when a browser gate is planned; the run stops with the fix when one is missing)
 //   Chromium in /opt/pw-browsers (or PUPPETEER_EXECUTABLE_PATH), puppeteer, the proxy CA in /root/.pki/nssdb
@@ -353,6 +361,24 @@ const PARSE = {
         if (v[1] === 'OK' && !m.some((x) => x[1] === 'FAIL')) return { result: 'PASS', findings: '-', detail: [], explainsExit: false };
         const rows = out.split('\n').filter((l) => /^(E\w+|LP-[\w-]+)\s+FAIL\b|^\s+(R-\w+|seed \d+)/.test(l)).map((l) => l.trim().replace(/\s+/g, ' '));
         return { result: 'FAIL', findings: rows.length ? listShort(rows.map((r) => r.slice(0, 140)), 3) : v[0].slice(0, 160), detail: rows.slice(0, 12), explainsExit: true };
+    },
+    // ws-options-shots --skip-no-panel: `ok   <key> @<w>: ...` per checked width, `skip <key>: no options panel`, `FAIL <key>
+    // @<w>: ...`; every scope skill must be checked at both widths or skipped by name (else it checked something else)
+    optionsShots(g, out, code) {
+        const v = lastVerdict(out, 'ws-options-shots');
+        if (!v) return unparsed('no "ws-options-shots: OK|FAIL" line', out);
+        const fails = out.split('\n').filter((l) => /^FAIL /.test(l)).map((l) => l.trim());
+        if (v[1] !== 'OK') return { result: 'FAIL', findings: fails.length ? `${fails.length} panel sample(s) failed: ${listShort(fails.map((l) => l.slice(5, 150)), 3)}` : v[0].slice(0, 160), detail: fails.slice(0, 10), explainsExit: code === 1 };
+        const keys = g.keys || [], want = (g.expect && g.expect.skills) || keys.length;
+        const widths = (g.expect && g.expect.widths) || [1280, 390];
+        const skipped = keys.filter((k) => new RegExp(`^skip ${reEsc(k)}: no options panel`, 'm').test(out));
+        const checked = keys.filter((k) => widths.every((w) => new RegExp(`^ok   ${reEsc(k)} @${w}:`, 'm').test(out)));
+        const absent = keys.filter((k) => !skipped.includes(k) && !checked.includes(k));
+        if (absent.length || checked.length + skipped.length < want) return { result: 'FAIL', findings: `only ${checked.length} of ${want} skill(s) checked at ${widths.join(' and ')} px (${skipped.length} skipped, no panel); absent: ${listShort(absent)}`, detail: tailLines(out), explainsExit: false };
+        const unav = (/^ {2}sample unavailable \(reported, not failed\): (.*)$/m.exec(out) || [])[1];
+        const skipNote = skipped.length ? `; ${skipped.length} with no options panel, not checked: ${listShort(skipped, 4)}` : '';
+        if (!checked.length) return { result: 'N/A', findings: `no skill in scope has an options panel${skipNote}`, detail: [], explainsExit: false };
+        return { result: 'PASS', findings: `${checked.length} skill(s) × ${widths.length} widths: the sample is inside its frame and holds ink${skipNote}${unav ? `; sample unavailable (its own message): ${unav}` : ''}`, detail: [], explainsExit: false };
     },
     nodeLint(g, out, code) {
         const v = lastVerdict(out, g.script);
@@ -677,7 +703,7 @@ function cardPlans(keys) {
 }
 
 /* ============================================================== plan */
-function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
+function usage(msg) { if (msg) say(`${TOOL}: ${msg}`); say(`usage: node tests/scripts/${TOOL}.cjs --skill cat:skill [--skill ...] | --template <id> | --role <role> | --lesson <detailed id> | --unit <unit id> | --teacher [--grade G] [--lesson L]  [--json out] [--logs dir] [--timeout min] [--node-jobs N] [--browser-jobs N] [--strict] [--report-only] [--dry-run] [--only gate-id,...]  (--help for all)`); say(`${TOOL}: FAIL (usage)`); process.exit(2); }
 
 const OPT_IN_FILE = path.join(ROOT, 'tests', 'fixtures', 'precritic', 'opt-in-rules.json');
 /** Add each opted-in lane's args to its gate rows (opt-in-rules.json), judged only on the scope's skills of that lane. */
@@ -898,6 +924,10 @@ function buildPlan(ctx) {
         if (matrix.missing && !cl.missing) cl.missing = `needs the coverage matrix's run file (${matrix.missing})`;
         add(cl);
         add(gate('phone-card', 'ws-phone-card (practice card at 390 px: clip, first-box focus)', `${scope} × 390x844, 390x664`, 'browser', 'ws-phone-card', ['--skills', keys.join(',')], { expect: { mention: keys } }));
+        // lf-partopts (lf-algebra F8/G11, 2026-11-13): the Options panel's live sample at 1280 and 390 px, the lane's skills
+        // only (≈ 2 s a skill a width; one browser, inside this row's slot). A skill with no options panel is skipped by
+        // name (--skip-no-panel); a scope with none is N/A. The full 725 x 2 sweep is ws-deploy-gates session 4.
+        add(gate('options-shots', 'ws-options-shots (Options panel sample at 1280 / 390 px: inside its frame, with ink)', `${scope} × 1280, 390 px`, 'browser', 'ws-options-shots', ['--skill', keys.join(','), '--skip-no-panel', '--workers', '1'], { needFlags: ['skip-no-panel'], parse: PARSE.optionsShots, keys, expect: { skills: keys.length, widths: [1280, 390] } }));
         const sk = keys.flatMap((k) => ['--skill', k]);
         add(gate('card-rulings', 'ws-card-rulings --check rulings (spec card numeric rulings, 300 items)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'rulings'], { parse: PARSE.cardRulings }));
         add(gate('card-not-offered', 'ws-card-rulings --check offered (panel offers nothing the card bans)', scope, 'node', 'ws-card-rulings', [...sk, '--check', 'offered'], { parse: PARSE.cardRulings }));
@@ -1137,8 +1167,8 @@ async function pool(items, n, fn) {
 }
 
 /* ============================================================== flags */
-const VALUE_FLAGS = new Set(['skill', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
-const REPEATABLE = new Set(['skill', 'lesson', 'unit']);
+const VALUE_FLAGS = new Set(['only', 'skill', 'template', 'role', 'grade', 'lesson', 'unit', 'json', 'logs', 'browser-jobs', 'node-jobs', 'timeout', 'print-lint-baseline', 'screen-slots-baseline', 'options-verify-baseline', 'matrix-baseline', 'chromebook-fit-baseline', 'out']);
+const REPEATABLE = new Set(['skill', 'lesson', 'unit', 'only']);
 const BOOL_FLAGS = new Set(['teacher', 'dry-run', 'write-role-sample', 'list-live', 'strict', 'allow-not-built', 'report-only', 'help', 'h']);
 /** Every problem with the command line, as messages (empty when it is good). */
 function checkArgs(argv) {
@@ -1163,6 +1193,7 @@ function checkArgs(argv) {
     num('node-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     num('browser-jobs', (x) => Number.isInteger(x) && x >= 1, 'give a whole number >= 1');
     if (seen.has('grade') && !seen.has('teacher')) errs.push('--grade goes with --teacher');
+    if (seen.has('only') && seen.has('strict')) errs.push('--only runs part of the plan: never with --strict');
     // --lesson without --teacher is the detailed-lesson scope (a lesson id); with --teacher it is a WRM site lesson (3:D4:2)
     if (seen.has('teacher') && argAll('lesson').length > 1) errs.push('--teacher takes one --lesson');
     // an explicit pin that does not exist would silently run unpinned: refuse it
@@ -1275,7 +1306,17 @@ async function main() {
         ctx.roleSample = JSON.parse(fs.readFileSync(ROLE_SAMPLE, 'utf8')).skills;
     }
 
-    const rows = buildPlan(ctx);
+    const fullPlan = buildPlan(ctx);
+    const only = argAll('only');
+    let rows = fullPlan;
+    if (only.length) {
+        const unknown = only.filter((id) => !fullPlan.some((g) => g.id === id));
+        if (unknown.length) usage(`--only ${unknown.join(',')}: not a gate of this plan (ids: ${fullPlan.map((g) => g.id).join(', ')})`);
+        rows = fullPlan.filter((g) => only.includes(g.id));
+        const needs = rows.filter((g) => g.after && !only.includes(g.after)).map((g) => `${g.id} needs ${g.after}`);
+        if (needs.length) usage(`--only: ${needs.join('; ')} (list it too)`);
+    }
+    const onlyNote = only.length ? `; --only: ${rows.length} of ${fullPlan.length} gates` : '';
     const commit = git(['rev-parse', '--short=10', 'HEAD']) || 'unknown';
     const branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
     // tracked changes anywhere, plus untracked files under the trees a lane works in
@@ -1285,7 +1326,7 @@ async function main() {
     const scopeLine = [ctx.skills.length && !template ? `--skill ${ctx.skills.map((s) => s.key).join(',')}` : '', template ? `--template ${template} (${ctx.skills.length} skills${scanNote})` : '', template && wantSkills.length ? `--skill ${wantSkills.join(',')}` : '', lessons.length || unitIds.length ? `${unitIds.map((u) => `--unit ${u}`).join(' ')}${lessonScope.length ? ` --lesson ${lessonScope.join(',')}` : ''} (${lessons.length} long lesson(s))` : '', role ? `--role ${role}` : '', teacher ? `--teacher${ctx.grade ? ` --grade ${ctx.grade}` : ''}${ctx.lesson ? ` --lesson ${ctx.lesson}` : ''}` : ''].filter(Boolean).join(' ');
 
     if (dry) {
-        say(`${TOOL} plan: ${scopeLine} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (not created)`);
+        say(`${TOOL} plan: ${scopeLine}${onlyNote} on ${commit}${dirty ? `+dirty (${dirtyFiles.length} file(s))` : ''}; logs would go to ${logs} (not created)`);
         for (const g of rows) {
             if (g.synthetic) { say(`  [self] ${g.name} — ${g.synthetic.result}: ${g.synthetic.findings}`); continue; }
             say(`  [${g.kind}] ${g.name} — ${g.missing ? `SKIPPED-NOT-BUILT (${g.missing})` : shownCmd(g)}`);
@@ -1392,7 +1433,8 @@ async function main() {
     let verdict, exit;
     if (failed.length) { verdict = `FAIL: ${counts} (${named})`; exit = 1; }
     else if ((notBuilt.length || noData.length) && has('strict')) { verdict = `FAIL (incomplete, --strict): ${counts} (${named})`; exit = 3; }
-    else { verdict = `OK: ${counts}${named ? ` (${named})` : ''}`; exit = 0; }
+    else { verdict = `OK: ${counts}${named ? ` (${named})` : ''}${onlyNote}`; exit = 0; }
+    if (exit && onlyNote) verdict += onlyNote;
     table.push('');
     table.push(`${TOOL}: ${verdict}`);
     say('\n' + table.join('\n'));

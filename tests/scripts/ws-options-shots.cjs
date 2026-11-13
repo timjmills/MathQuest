@@ -2,9 +2,11 @@
 // ws-options-shots — GATE: the option panel's live sample shows the problem, for EVERY skill with an options panel.
 //
 //   node tests/scripts/ws-options-shots.cjs                       # every skill with options, at 1280 and 390 px
-//   node tests/scripts/ws-options-shots.cjs --skill algebra:growing [--skill cat:skill ...]
+//   node tests/scripts/ws-options-shots.cjs --skill algebra:growing [--skill cat:skill ...]   (or a comma list)
 //   node tests/scripts/ws-options-shots.cjs --widths 1280 --workers 3 --shots <dir> --save-panels
 //   node tests/scripts/ws-options-shots.cjs algebra:growing ...   # (bare cat:skill refs, as the old screenshot tool took them)
+//   node tests/scripts/ws-options-shots.cjs --skill a:b --skip-no-panel  # a live skill with no options panel is SKIPPED, not FAIL
+//   node tests/scripts/ws-options-shots.cjs --shard 1/2 --workers 1      # every i-th skill of the full list (deploy session 4)
 //
 // Each skill is opened the way a teacher does (lf-algebra F8/G11 repro): teacher mode → Sets → the skill's Options
 // button → the shared editor (#skillOptionsPopover). The panel draws its sample, tidies it at once and again at +950 ms
@@ -16,6 +18,10 @@
 //       the frame's border is not ink: a number bond's hairline legs, a fraction-of-set's grey counters and 20 px digits
 //       count; an off-frame stage leaves 0.00 %) in a screenshot of the frame.
 // A skill whose sample is honestly unavailable (`.tvp-frame.is-unavailable`, its own message) is reported, not failed.
+// A --skill that has no options panel FAILs (a typo or a skill that lost its options); with --skip-no-panel (ws-precritic's
+// scoped row: a lane's skills need not all have options) a LIVE skill with no panel prints `skip <ref>: no options panel`
+// and is not checked, while a skill that is not live (unknown, retired) still FAILs. Every skill skipped: `OK (0 skills ...)`.
+// --shard i/n checks every n-th skill of the full list starting at the i-th (sorted list order; ws-deploy-gates session 4).
 // Prints `ws-options-shots: OK (n skills × w widths)` or `ws-options-shots: FAIL (n)`; exit 1 on FAIL.
 // --shots <dir> saves every frame crop; --fail-shots <dir> (default: scratch-free, off) saves only the failing ones;
 // --save-panels writes the whole panel to design/audit/options-panels/<cat>-<skill>.png (the old tool's P12 evidence).
@@ -29,14 +35,23 @@ const argv = process.argv.slice(2);
 const many = (k) => { const out = []; argv.forEach((a, i) => { if (a === '--' + k && argv[i + 1]) out.push(argv[i + 1]); }); return out; };
 const one = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
 const flag = (k) => argv.includes('--' + k);
-const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-shots']);
+const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-shots', '--shard']);
 const bare = argv.filter((a, i) => /^[a-z0-9_]+:[a-z0-9_]+$/i.test(a) && !valued.has(argv[i - 1]));
-const ONLY = [...many('skill'), ...bare];
+const ONLY = [...new Set([...many('skill').flatMap((v) => v.split(',')).map((v) => v.trim()).filter(Boolean), ...bare])];
 const WIDTHS = String(one('widths', '1280,390')).split(',').map(Number).filter(Boolean);
 const WORKERS = Math.max(1, Number(one('workers', 3)) || 1);
 const SHOTS = one('shots', '') ? path.resolve(one('shots')) : '';
 const FAIL_SHOTS = one('fail-shots', '') ? path.resolve(one('fail-shots')) : '';
 const SAVE_PANELS = flag('save-panels');
+const SKIP_NO_PANEL = flag('skip-no-panel');
+const SHARD = (() => {
+    const v = one('shard', '');
+    if (!v) return null;
+    const m = /^(\d+)\/(\d+)$/.exec(v);
+    if (!m || +m[1] < 1 || +m[1] > +m[2]) { console.log(`ws-options-shots: --shard ${v}: give i/n with 1 <= i <= n`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
+    return { i: +m[1], n: +m[2] };
+})();
+if (SHARD && (many('skill').length || bare.length)) { console.log('ws-options-shots: --shard and --skill do not go together'); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
 const HEIGHT = { 1280: 1000, 390: 844 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const INK_MIN = 0.005, COVER_MIN = 0.9;
@@ -130,9 +145,15 @@ async function checkSkill(app, ref, width) {
         }
         return out;
     });
-    const refs = ONLY.length ? ONLY : all;
-    const missing = ONLY.filter((r) => !all.includes(r));
-    if (missing.length) { console.log(`FAIL no options panel (unknown skill or no options): ${missing.join(', ')}`); await first.close(); console.log(`ws-options-shots: FAIL (${missing.length})`); process.exit(1); }
+    const live = await first.page.evaluate((refs) => refs.filter((r) => { const [c, v] = r.split(':'); return (window.SKILLS[c] || []).some((s) => s && s.v === v && !s.retired); }), ONLY);
+    let missing = ONLY.filter((r) => !all.includes(r));
+    const skipped = SKIP_NO_PANEL ? missing.filter((r) => live.includes(r)) : [];
+    for (const r of skipped) console.log(`skip ${r}: no options panel (not checked)`);
+    missing = missing.filter((r) => !skipped.includes(r));
+    if (missing.length) { console.log(`FAIL no options panel (${SKIP_NO_PANEL ? 'not a live skill' : 'unknown skill or no options'}): ${missing.join(', ')}`); await first.close(); console.log(`ws-options-shots: FAIL (${missing.length})`); process.exit(1); }
+    const refs = ONLY.length ? ONLY.filter((r) => !skipped.includes(r)) : SHARD ? all.filter((_, k) => k % SHARD.n === SHARD.i - 1) : all;
+    const skipNote = skipped.length ? `; ${skipped.length} skipped, no options panel` : '';
+    const shardNote = SHARD ? `; shard ${SHARD.i}/${SHARD.n} of ${all.length}` : '';
     const jobs = [];
     for (const w of WIDTHS) for (const r of refs) jobs.push({ ref: r, width: w });
     const nWorkers = Math.min(WORKERS, Math.max(1, Math.ceil(jobs.length / 20)));
@@ -159,7 +180,7 @@ async function checkSkill(app, ref, width) {
     if (pageErrors.length) console.log(`  page errors: ${pageErrors.slice(0, 5).map((e) => e.text).join(' | ')}`);
     const bad = results.filter((r) => r.fails.length);
     const secs = Math.round((Date.now() - t0) / 1000);
-    console.log(`  ${refs.length} skills × ${WIDTHS.length} widths (${WIDTHS.join(', ')} px), ${apps.length} worker(s), ${secs} s`);
+    console.log(`  ${refs.length} skills × ${WIDTHS.length} widths (${WIDTHS.join(', ')} px), ${apps.length} worker(s), ${secs} s${shardNote}`);
     if (bad.length) { console.log(`ws-options-shots: FAIL (${bad.length})`); process.exit(1); }
-    console.log(`ws-options-shots: OK (${refs.length} skills × ${WIDTHS.length} widths)`);
+    console.log(`ws-options-shots: OK (${refs.length} skills × ${WIDTHS.length} widths${skipNote}${shardNote})`);
 })().catch((e) => { console.error(e); console.log('ws-options-shots: FAIL (1)'); process.exit(1); });
