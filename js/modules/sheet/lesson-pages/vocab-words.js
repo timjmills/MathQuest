@@ -23,7 +23,7 @@
 /** Every word: meaning, the wrong-answer explanation, the words it is never offered with. */
 export const VOCAB_WORDS = Object.freeze({
     even: { meaning: 'makes pairs, none left over', explain: 'Even means the dots make pairs, with none left over.', notWith: ['equal groups'] },
-    odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left'] },
+    odd: { meaning: 'one is left over after making pairs', explain: 'Odd means the dots make pairs and one dot has no partner.', notWith: ['remainder', 'identity', 'equal groups', 'left', 'grow'] },
     product: { meaning: 'the answer when you multiply', explain: 'Product means the answer when you multiply, like the 12 in the box.', notWith: ['equation'] },
     factor: { meaning: 'a number you multiply', explain: 'Factor means a number you multiply, like the 4 and the 3.', notWith: ['equation'] },
     row: { meaning: 'a line going across', explain: 'Row means a line going across, like the one drawn round.', notWith: ['multiple', 'pattern'] },
@@ -60,7 +60,7 @@ export const VOCAB_WORDS = Object.freeze({
     cycle: { meaning: 'goes round and back to the start', explain: 'Cycle means it goes round and back to the start, like ones digits do.', notWith: ['repeat', 'pattern'] },
     // (a growing stack of squares is also a sequence and a pattern: critic r2 #3, r3 #9. A known look-alike is ALWAYS
     // listed; the growing-patterns set's words changed instead - ws-vocab-unit V17)
-    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern'] },
+    grow: { meaning: 'gets bigger each time', explain: 'Grow means it gets bigger each time: 1, then 3, then 5 squares.', notWith: ['sequence', 'pattern', 'odd'] },
     term: { meaning: 'one number in a sequence', explain: 'Term means one number in the list, like the 7 in the box.', notWith: ['first term', 'sequence', 'multiple', 'pattern'] },
     'first term': { meaning: 'the number a sequence starts with', explain: 'First term means the number at the start, like the 3.', notWith: ['term', 'sequence', 'multiple', 'pattern'] },
     'times as many': { meaning: 'the same amount, again and again', explain: 'Times as many means one bar is 3 times as long as the other.', notWith: ['compare'] },
@@ -100,10 +100,15 @@ export const VOCAB_SETS = Object.freeze([
         // (r5: 'sequence' gave way to 'first term' - grow / sequence and grow / pattern are look-alikes, and with sequence
         // the six words had no two clash-free trios; edited in place, the set keeps its position)
         // (r9, critic r7 #6: pattern gave way to total: term and first term now clash with pattern (their number runs show a pattern, V-AMBIG+); edited in place, the set keeps its position - V7)
-        words: ['grow', 'term', 'rule', 'total', 'first term', 'equation'] },
+        // (r10, critic r9 #5: total's 5 + 3 part-whole bar did not match a growing-pattern lesson - total gave way to odd, a word of
+        // the set's own standard (4.OA.C.5: "the terms appear to alternate between odd and even numbers"; the grow picture's 1, 3, 5
+        // squares are odd); odd / grow notWith; edited in place, the set keeps its position - V7)
+        words: ['grow', 'term', 'rule', 'odd', 'first term', 'equation'] },
     { lesson: 'G4|-|followagivenruletoextendanumberpattern', title: 'Follow a given rule to extend a number pattern', grade: 4, round: 1, ccss: ['4.OA.C.5'],
         // (r9, critic r7 #6: pattern gave way to output (what a rule gives): pattern clashed with rule, term, first term and repeat (V-AMBIG+); edited in place, the set keeps its position - V7)
-        words: ['rule', 'first term', 'ones digit', 'term', 'repeat', 'output'] },
+        // (r10, critic r9 #5: output belongs to input-output tables, not to extending a pattern by a rule - output gave way to grow;
+        // trios {rule, first term, ones digit} / {term, repeat, grow}; edited in place, the set keeps its position - V7)
+        words: ['rule', 'first term', 'ones digit', 'term', 'repeat', 'grow'] },
     { lesson: 'G4|-|multiplicativecomparisontimesasmany', title: 'Multiplicative comparison: times as many', grade: 4, round: 1, ccss: ['4.OA.A.1'],
         // (r9, critic r7 #6: equation gave way to total: factor, product and unknown each draw a number sentence ("=", V-AMBIG+); edited in place, the set keeps its position - V7)
         // (r10, critic r9 #4: total's 5 + 3 bar is ADDITIVE part-whole, wrong for a 4.OA.A.1 core trio - total gave way to multiple;
