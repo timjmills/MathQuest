@@ -247,6 +247,23 @@ async function unit() {
         if (!(off.partOpts.wedo && off.partOpts.wedo.on === false)) F('PO-4', `We Do off with an asked 3: re-limited to ${JSON.stringify(off.partOpts)} - an off part must stay off (A4-F2)`);
         console.log(`PO-4 A4-F2: ${n} counts through M -> L -> M`);
     });
+    // (critic-panel-r3 FU-1) the Print screen's re-snap after a build (teacher-print.js runBuild: s.partOpts from s.partAsk at
+    // the new limits) must build again when it CHANGES the counts, or the packet keeps the count built at the size before
+    // (fact_family_sort 45 at M -> L -> M: the stepper said 5 pages, the packet held 1). Read from ROOT's teacher-print.js:
+    // after the resnapPartOpts call, before the Parts table is redrawn, a scheduleBuild() guarded by a before / after compare.
+    blk('PO-4 resnap builds', () => {
+        let src = '';
+        try { src = require('fs').readFileSync(path.join(ROOT, 'js', 'modules', 'teacher-print.js'), 'utf8'); } catch (e) { F('PO-4', 'no js/modules/teacher-print.js (FU-1)'); return; }
+        const a = src.indexOf('resnapPartOpts(s.partOpts');
+        if (a < 0) { console.log('  (not judged: PO-4 FU-1, this teacher-print.js has no resnapPartOpts re-snap)'); return; }
+        const z = src.indexOf('renderParts(si', a);
+        const seg = src.slice(a, z < 0 ? a + 2000 : z);
+        const sched = /scheduleBuild\(/.test(seg);
+        const guarded = /if\s*\([^)]*(?:JSON\.stringify|changed|!==)[^)]*\)\s*\{?[^;]*scheduleBuild\(/.test(seg);
+        if (!sched) F('PO-4', 'teacher-print.js re-snaps s.partOpts after a build without scheduling a build: the packet keeps the count built at the size before (FU-1)');
+        else if (!guarded) F('PO-4', 'teacher-print.js schedules a build after every re-snap, not only one that changed partOpts: a build loop (FU-1)');
+        console.log(`PO-4 FU-1: the re-snap after a build ${sched ? (guarded ? 'schedules a build when it changes partOpts' : 'schedules a build unguarded') : 'schedules NO build'}`);
+    });
     // the save / load round trip: a section's partOpts as JSON, read back, normalised again
     blk('PO-4 save/load', () => {
     const lims = po.allPartLimits({ prereq: { total: 4 }, chart: { designed: 2, min: 1 }, vocab: { words: 3, values: [1, 2, 3], canOff: true }, remember: { has: true, canOff: true }, wedo: { fit: 3, values: [1, 2, 3], canOff: true }, rows: { fit: 2, perRow: 3, values: [1, 2], canOff: true }, practice: { perPage: 15, cols: 3, rows: 5, minRows: 4, pages: 1 }, mixed: { count: 10 } });

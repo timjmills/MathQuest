@@ -30,6 +30,8 @@
 //   and Y4.B1.S14's largest packet (Practice and Mixed at their max at M) -> L -> M gives both back. A4-P6 after the largest
 //   packet, at M and at L, at 1280 and 390: one tab per pupil page, + 1 for the Answer keys when keys are on, and every tab is
 //   in view and opens its page (the strip stopped at 8 tabs: page 9, page 10 and the keys could not be previewed).
+//   critic-panel-r3 FU-1 (tagged A4-F2): after each round trip the PACKET agrees with the screen - the preview's
+//   lesson-practice / lesson-mixed page counts equal the steppers' "n pages", and the tabs are the pupil pages + 1 for keys.
 //
 // Every check's message ends with the finding it comes from - (F3) ... (F10), (N3), (N5), (N6), (R1), (R2), (R4), (H6); a
 // message with no tag is a setup failure (the screen could not be reached) and always counts.
@@ -125,6 +127,34 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     };
     // (critic A r4 P6) the preview's page tabs: one per pupil page (+ the Answer keys when keys are on), each in view, each opens
     // its own page
+    // (critic-panel-r3 FU-1) the packet the preview holds against what the screen says: the preview's lesson-practice and
+    // lesson-mixed pages equal the Practice and Mixed steppers' "n pages", and the tabs are the pupil pages + 1 for the keys.
+    // (a re-snap after a build schedules one more: wait it out first)
+    const packetCheck = async (where, tag = 'A4-F2') => {
+        await sleep(800); await idle();
+        const rows = await rowsOf();
+        const t = await page.evaluate(async () => {
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+            const tabs = () => [...document.querySelectorAll('#tvPageTabs > button')];
+            const first = tabs().find((b) => b.dataset.v === '0');
+            if (first) { first.click(); await sleep(900); }
+            let sheets = [];
+            try { sheets = [...document.querySelector('#tvPreviewFrame').contentDocument.querySelectorAll('.ws-page')].map((pg) => pg.getAttribute('data-ws-sheet') || ''); } catch (e) { /* */ }
+            const keyOn = (document.querySelector('[data-act="key"]') || { getAttribute: () => 'false' }).getAttribute('aria-checked') === 'true';
+            return { sheets, keyOn, n: tabs().length };
+        });
+        const pagesOf = (r) => { if (!r) return null; if (r.on === false || r.val === '0') return 0; const all = [...`${r.range || ''} ${r.many || ''}`.matchAll(/(\d+)\s+pages?\b/g)]; return all.length ? Number(all[all.length - 1][1]) : null; };
+        const got = { practice: t.sheets.filter((x) => x === 'lesson-practice').length, mixed: t.sheets.filter((x) => x === 'lesson-mixed').length };
+        const said = {};
+        for (const p of ['practice', 'mixed']) {
+            const r = rows.find((x) => x.part === p);
+            said[p] = pagesOf(r);
+            if (said[p] == null) continue;
+            check(got[p] === said[p], `${where}: the ${p === 'practice' ? 'Practice' : 'Mixed'} stepper says ${r.val} · ${said[p]} page(s), the preview's packet has ${got[p]} ${p} page(s) (${tag})`);
+        }
+        check(t.n === t.sheets.length + (t.keyOn ? 1 : 0), `${where}: ${t.n} tab(s) for ${t.sheets.length} pupil page(s)${t.keyOn ? ' + the Answer keys' : ''} (${tag})`);
+        console.log(`${tag} packet ${where}: practice ${got.practice} (stepper ${said.practice}), mixed ${got.mixed} (stepper ${said.mixed}), ${t.n} tab(s) for ${t.sheets.length} pupil page(s)`);
+    };
     const tabCheck = async (where) => {
         const t = await page.evaluate(async () => {
             const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -351,6 +381,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                     check(Number(r.val) === asked[p], `${id} ${p} ${asked[p]} at M -> L -> M gives ${r.val}${r.note ? ` ("${r.note}")` : ''}: the count asked is lost (A4-F2)`);
                     check(!r.note, `${id} ${p} back at ${r.val}, yet a note "${r.note}" (A4-F2)`);
                 }
+                await packetCheck(`${id} M -> L -> M (Practice ${asked.practice}, Mixed ${asked.mixed})`);
             }
         }
 
@@ -380,6 +411,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                 check(Number(r.val) === v, `${id} Practice ${v} at M -> L ${atL} -> M ${r.val}${r.note ? ` ("${r.note}")` : ''}: the count asked is lost (A4-F2)`);
                 check(!r.note, `${id} Practice ${v} at M -> L -> M: back at ${r.val}, yet a note "${r.note}" (A4-F2)`);
                 if (Number(r.val) !== v) break;
+                await packetCheck(`${id} Practice ${v} at M -> L ${atL} -> M`);
                 if (!await click(`${P} [data-dir="1"]`)) break;
                 await idle();
             }
