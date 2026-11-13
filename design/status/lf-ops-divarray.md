@@ -65,3 +65,66 @@ declared size (none shrunk); mult_facts array pages keep master's count (Indepen
 
 Speed notes: the card's frame semantics (cols x rows) flipped in four files; one grep for `arrayFrame` found them all. The
 options-verify "render-time support changed the items" FAIL under load did not reproduce alone (flake).
+
+## Pre-critic regression fix: mult_facts Review stacks (2026-11-13, builder Opus medium)
+
+**Regression, from master 114ee8e0b:** `ws-print-lint --source kit --supports array --size S --roles independent,more-practice,test,review
+--skills division:div_facts,multiplication:mult_facts` gave 6 findings on master and 13 on 55e7d0f2f, all on mult_facts#review. 12 of
+them were H13 side bands on the Mixed Review stacks (19.7 mm empty in a 61.5 mm cell, 32 %) and 1 was H13-ROW on "4 × 0".
+
+**Cause (from `git diff origin/master...HEAD -- js/`, no review code in the diff):** the Review composer was not reserving room for
+the stacks. Two steps led to it. (1) Drawn landscape, the × arrays measure shorter at 4 columns, so `review.js` sectionFit moved the
+main band from 2 x 4 to 4 x 2. (2) That freed height. The Review's search then narrowed the Mixed Review from its own 4 columns to 3,
+which let a second row of stacks fit under the 45 % share (8 + 6 = 14). The stacks' ink did not change, but each cell grew from
+46 to 61.5 mm. Master had the same narrowing on the touch / all pages (lf-roles' finding).
+
+**Fix (`js/modules/sheet/roles/review.js`):**
+- Static-width earlier problems (stacks) keep their own column count. A narrower count is offered only while the widest problem
+  still fills 70 % of the cell.
+- At S, a 5th column is taken only when it prints MORE problems. Example: touch has 10 facts + 5 stacks, where 4 columns allowed
+  only one row of 4 under the ceiling. An equal count keeps the step's own columns. Making 5 columns the default for every page
+  was tried and backed out (fcbf82424 -> f32c9aeb2): it freed height that stretched the default mult_facts Review's fact rows
+  (EB-BAND x 13, 34 %).
+- A band of supported facts with the array support is held to FACT_ROOM x its rows' height, as div_facts is. Otherwise the
+  page's spare height stretched a 9 x 7 array's row around a 2 x 5 (EB-BAND 32 %).
+- No content shrinks.
+
+| Command (S unless said) | master 114ee8e0b | 55e7d0f2f | f45a05123 |
+|---|---|---|---|
+| print-lint --supports array (the brief's command) | 6 | 13 | **1** (H13-ROW "4 × 0", below) |
+| print-lint --supports touch | Review stacks flagged (lf-roles) | n/a | **0** |
+| print-lint --supports all | Review stacks flagged (lf-roles) | n/a | **0** |
+| print-lint --supports array, review at M / L | | | 0 / 0 |
+| ws-empty-band review S array, EB-SIDE (raw) | 21 | 6 | 0 |
+
+Review counts by layout, f45a05123:
+
+| Support | S | M | L |
+|---|---|---|---|
+| array | 2 x 4 + 5 = 13 | 2 x 3 + 3 = 9 | 2 x 3 + 3 = 9 |
+| touch | 5 x 2 + 5 = 15 | 3 x 3 + 3 = 12 | 3 x 3 + 3 = 12 |
+
+Before the fix, touch S on master printed 16, using 3-column stacks at 32 % side band. Now the page keeps the room the ceiling
+leaves under its grid.
+
+**Left, and not caused by this branch:** H13-ROW on "4 × 0", array Review S, p1 cell 8. A × fact with a zero factor draws no array
+(0 rows), so its row is sized for the arrays beside it. Master flags the same cell as a side band (2 findings); this branch flags 1.
+The fix needs a card ruling on what a × 0 fact draws (an empty landscape frame, as 0 ÷ n does, or nothing). That ruling is for
+the lead.
+
+**Gates (f45a05123):**
+- ws-screen-support-eq div/mult: OK
+- ws-empty-band mult_facts: OK
+- ws-empty-band div_facts: EB-EDGE 1 (mixed-practice M cell 19, pre-existing, as above)
+- ws-boot-smoke: OK
+- `node --input-type=module --check` review.js: OK
+- print-lint review S, 11 add / sub / fact skills: 0 findings, unchanged from master
+- Backtest row `review-stack-side-multfacts-array`: ws-empty-band EB-SIDE against the pin, FAIL 55e7d0f2f (6 > pin 4) ->
+  PASS 4e2e4c988. Verified PASS.
+
+**Findings -> checks:**
+- The class "a section's columns narrowed so the same ink sits in a wider cell" is now caught by EB-SIDE through that backtest row.
+- Speed note: comparing the Review's `Fits:` lines (ws-grade-render meta, or `--save-html` grids) on master and the branch found the
+  column change in one step.
+
+Renders: `/tmp/claude-0/-home-user-MathQuest/447a1d04-e24b-5c13-8aba-a33c056c9d3a/scratchpad/divarray-renders/mult_facts-review-{array,touch}-{S,M,L}-{p1,key-p1}.png`.
