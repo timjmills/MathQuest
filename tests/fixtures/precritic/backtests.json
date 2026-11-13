@@ -6247,14 +6247,14 @@
   "rule": "ws-copy-light ELIGIBLE / NOT ELIGIBLE + the copy-light page sample (owner rule 2026-11-13)",
   "browser": false,
   "fail": {
-   "commit": "91182e61b",
-   "state": "before the route: ws-precritic has no --copy-light flag (FAIL usage), so no tool says whether a skill may skip the full critic"
+   "commit": "f3ae7acca",
+   "state": "critic lf-tools r1 B1 / B5: f3ae7acca's tool keyed eligibility on the template id only, so placevalue:compare (pv kind=compare, a drawing no passed skill draws) read ELIGIBLE; the row's old fail state (91182e61b, no --copy-light flag) was only a usage error"
   },
   "pass": {
-   "commit": "3a32a8b8f",
-   "state": "ws-precritic --copy-light: add_sub_10s ELIGIBLE (anchor add_facts on fact) with its sample; time_5min NOT ELIGIBLE (template clock never passed)"
+   "commit": "27545964d",
+   "state": "eligibility per DRAWING (template + payload kind / task / layout / mode / type / form): add_sub_10s ELIGIBLE (fact via add_facts), time_5min NOT (clock never passed), placevalue:compare NOT (pv/kind=compare never passed)"
   },
-  "command": "node {root}/tests/scripts/ws-precritic.cjs --skill addition:add_sub_10s --copy-light --dry-run && ! node tests/scripts/ws-copy-light.mjs --root {root} --skill measurement:time_5min --require > /dev/null && node tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require",
+  "command": "node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill addition:add_sub_10s --require > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill measurement:time_5min --require > /dev/null && ! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --skill placevalue:compare --require > /dev/null && echo 'copy-light: OK' || echo 'copy-light: FAIL'",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -6270,8 +6270,88 @@
    "state": "every screen gate defaulted to card 390 (ws-empty-band, ws-screen-ink-size, ws-screen-slots, ws-grade-render, ws-phone-card 390x844, ws-next-box card-390 ...), RUBRIC listed '390 phone': 21 findings"
   },
   "pass": {
-   "commit": "29ef1eb21",
-   "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts"
+   "commit": "27545964d",
+   "state": "the defaults read tests/lib/ws-screen-widths.cjs (1280, 1366, 820, 1024); RUBRIC and the brief template name the computer, Chromebook and tablet hosts (re-pointed from 29ef1eb21 by critic lf-tools r1 A2: the derived scan also reads ws-student-explorer, still 390 there)"
+  },
+  "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-drawing-batch",
+  "check": "critic lf-tools r1 B1: a copy-light BATCH must not carry a skill whose drawing never passed; placevalue:compare (pv kind=compare) + more_less_10 + more_less_100 read BATCH OK at f3ae7acca (one template id pv), and FAIL now (compare is not eligible: pv/kind=compare never passed)",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light --batch, eligibility per drawing (template + payload discriminator)",
+  "browser": false,
+  "fail": {
+   "commit": "f3ae7acca",
+   "state": "f3ae7acca's tool: BATCH OK on template pv (eligibility by template id)"
+  },
+  "pass": {
+   "commit": "27545964d",
+   "state": "BATCH FAIL: placevalue:compare is not copy-light eligible (pv/kind=compare never passed)"
+  },
+  "command": "! node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch placevalue:compare,placevalue:more_less_10,placevalue:more_less_100 > /dev/null && echo 'drawing-batch: OK' || echo 'drawing-batch: FAIL'",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-sample-widths",
+  "check": "critic lf-tools r1 B2: the copy-light / batch page sample shows every default screen width (1280, 1366, 820, 1024); at f3ae7acca a batch sample was all 1280 and a single sample 1280 / 820 only",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light buildSample widths (tests/lib/ws-screen-widths.cjs SCREEN_WIDTHS)",
+  "browser": false,
+  "fail": {
+   "commit": "f3ae7acca",
+   "state": "f3ae7acca's tool: the pv batch sample's screen pages are all 1280"
+  },
+  "pass": {
+   "commit": "27545964d",
+   "state": "the sample's screen pages cover 1280, 1366, 820 and 1024"
+  },
+  "command": "f=$(mktemp) && node {root}/tests/scripts/ws-copy-light.mjs --root {root} --batch placevalue:more_less_10,placevalue:more_less_100,placevalue:place_value_10x --sample-out $f > /dev/null && node -e \"const j=JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'));const w=new Set(j.skills.flatMap(s=>s.pages.filter(p=>p.host!=='print').map(p=>p.width)));console.log([1280,1366,820,1024].every(x=>w.has(x))?'widths: OK':'widths: FAIL ('+[...w].join(',')+')')\" $f; rm -f $f",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "copy-light-brief-names",
+  "check": "critic lf-tools r1 B4: the copy-light and batch critic briefs name the four criteria as RUBRIC.md does (C1 Ease of use, C2 Educational value, C3 Spacing and layout, C4 Standard fidelity); f3ae7acca's critic-copy-light.md said C1 correct maths, C2 one thing at a time, C3 design contract, C4 works for the pupil",
+  "kind": "commit-pair",
+  "rule": "ws-copy-light --brief-lint BRIEF-NAMES",
+  "browser": false,
+  "fail": {
+   "commit": "f3ae7acca",
+   "state": "critic-copy-light.md misnames all four criteria; critic-batch.md names none"
+  },
+  "pass": {
+   "commit": "27545964d",
+   "state": "both briefs carry RUBRIC's names"
+  },
+  "command": "node tests/scripts/ws-copy-light.mjs --brief-lint --root {root}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "no-phone-width-derived",
+  "check": "critic lf-tools r1 A2: ws-no-phone-width scans EVERY script precritic, the deploy gates or the opt-in rules name (derived, not a hand list), with an allow-list carrying reasons; at f3ae7acca the pupil gate ws-student-explorer (deploy session 1) still rendered 390 x 844 and 360 x 740 and the hand list never read it",
+  "kind": "commit-pair",
+  "rule": "ws-no-phone-width scanList (derived) + ALLOW",
+  "browser": false,
+  "fail": {
+   "commit": "f3ae7acca",
+   "state": "ws-student-explorer.cjs: [390, 844] / [360, 740] loops and a 390 touch viewport (3 findings)"
+  },
+  "pass": {
+   "commit": "27545964d",
+   "state": "ws-student-explorer runs at 1366 / 1024 / 820; teacher phone tests allow-listed with a reason"
   },
   "command": "node tests/scripts/ws-no-phone-width.mjs --root {root}",
   "expect": {
