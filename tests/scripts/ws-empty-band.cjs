@@ -36,8 +36,12 @@
 //   EB-FOOT   the drawn height vs the footprint: the cell's needed height (top pad + ink + empty slots + bottom pad) against
 //             the hMm the bridge measured for the item at the page's column count (buildSheet items[i].measured[cols].hMm);
 //             FAIL when they differ by more than 10 %. Judged on the grid roles that lay out from that measure (independent,
-//             more-practice, test, review, mixed-practice) where the page's cells and its measured items pair one to one; a
-//             role that draws its own cell (fact-probe rows, word-problems stories, the guided model) is not judged by it.
+//             more-practice, test, review, mixed-practice). EVERY cell is judged against the items it holds (the kit writes
+//             data-eb-item: one index, or the list for a cell holding several; lead ruling 2026-11-13), on any page shape
+//             (several sections, a Review drawing 16 of 28 dealt). A multi-item cell is judged against the bridge's measure of
+//             that combination; where the bridge gives none, or a cell has no index, it is a NOTE, never a silent pass. With no
+//             index on the page, the old one-to-one position pairing. A role that draws its own cell (fact-probe rows,
+//             word-problems stories, the guided model) is not judged by it.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
@@ -132,28 +136,37 @@ function uncovered(rows) {
 // lays it (a lone last-row cell of a 2-column grid is still at 2; a full-width problem in its own 1-column grid at 1); with no
 // grid read, the cells across its row (lf-placevalue 2026-11-08: mixed-practice's fits[0].cols is not the cells across)
 function footCols(c, cells) { return c.gridCols || cells.filter((d) => d.page === c.page && Math.abs(d.topPx - c.topPx) <= 4).length; }
-// EB-FOOT pairing, pure (critic eb-r5 m1): each cell against the footprint of ITS OWN item.
-//  - 'index': every cell carries the bridge's item index the kit wrote (data-eb-item -> c.item): cell -> m[c.item];
-//  - 'position' (fallback, no index): only where cells and measured items are one to one, by dealt order, or BY HEIGHT
+// EB-FOOT pairing, pure (critic eb-r5 m1; scope widened by lead ruling 2026-11-13 to every cell of every grid-role page).
+//  - 'index': the kit writes data-eb-item on each grid cell - the bridge's index of the item it holds, or the list of the items
+//    it holds ("3,4,5") - so EVERY indexed cell is judged against ITS OWN items, on any page: several sections, a Review that
+//    deals more items than it draws (28 dealt, 16 drawn), a mixed band at its own column count. One item: its measure at the
+//    cell's column count. Several: the bridge's measure for that combination (`combo(ids, k)`); with none, a NOTE. A cell with
+//    no index on an indexed page, an index outside the items or an unmeasured item is a NOTE too: never a silent pass.
+//  - 'position' (fallback, no cell indexed): only where cells and measured items are one to one, by dealt order, or BY HEIGHT
 //    (lf-ops-props, guarded) when every page's rows are sorted tallest first and that pairing fits every cell;
-//  - '' : not paired. Returns { mode, byH, out: [{c, fp, k}] } - out holds the cells off their footprint by more than FOOT.
-function footFindings(cells, m, cols, sections, FOOT = 0.10) {   // FOOT: the EB-FOOT limit (the const below)
-    const out = [];
+//  - '' : not paired (the caller notes it). Returns { mode, byH, out: [{c, fp, k, ids}], notes }.
+const idsOf = (c) => (Array.isArray(c.items) && c.items.length ? c.items : (Number.isInteger(c.item) && c.item >= 0 ? [c.item] : []));
+function footFindings(cells, m, cols, sections, FOOT = 0.10, combo = () => null) {   // FOOT: the EB-FOOT limit (the const below)
+    const out = [], notes = [];
     const fpOf = (mi, k) => (mi ? (mi[k] != null ? mi[k] : mi[cols]) : null);
     const off = (c, fp) => fp != null && Math.abs(c.neededMm - fp) > FOOT * fp;
-    // (the position rule's scope: one section, cells and items one to one. A Review page draws fewer cells than it deals - 16
-    // of 28 - and was never paired; widening EB-FOOT to it is a scope change for the lead, not part of m1: by index add_facts
-    // review reads 17-23 % over its footprint, eb-r5 builder note, routed)
-    if (sections <= 1 && m.length === cells.length && cells.length && cells.every((c) => Number.isInteger(c.item) && c.item >= 0 && c.item < m.length)) {
-        for (const c of cells) { const k = footCols(c, cells); const fp = fpOf(m[c.item], k); if (off(c, fp)) out.push({ c, fp, k }); }
-        return { mode: 'index', byH: false, out };
+    if (cells.some((c) => idsOf(c).length)) {
+        for (const c of cells) {
+            const ids = idsOf(c), k = footCols(c, cells), nm = `p${c.page} cell ${c.label || c.cell}`;
+            if (!ids.length) { notes.push(`${nm}: no item index on an indexed page, footprint not judged`); continue; }
+            if (ids.some((i) => !Number.isInteger(i) || i < 0 || i >= m.length)) { notes.push(`${nm}: item index ${ids.join(',')} outside the ${m.length} measured items, footprint not judged`); continue; }
+            const fp = ids.length === 1 ? fpOf(m[ids[0]], k) : combo(ids, k);
+            if (fp == null) { notes.push(ids.length > 1 ? `${nm}: holds items ${ids.map((i) => i + 1).join('+')}; the bridge gives no measure for that combination at ${k} across, footprint not judged` : `${nm}: item ${ids[0] + 1} has no measure at ${k} across, footprint not judged`); continue; }
+            if (off(c, fp)) out.push({ c, fp, k, ids });
+        }
+        return { mode: 'index', byH: false, out, notes };
     }
-    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) return { mode: '', byH: false, out };
+    if (!(sections <= 1 && m.length === cells.length && m.every((x) => x != null))) return { mode: '', byH: false, out, notes };
     const sortedPages = [...new Set(cells.map((c) => c.page))].every((pg) => { const rows = []; for (const c of cells.filter((d) => d.page === pg)) { const r = rows.find((x) => Math.abs(x.top - c.topPx) <= 4); if (r) r.h = Math.max(r.h, c.hMm); else rows.push({ top: c.topPx, h: c.hMm }); } rows.sort((x, y) => x.top - y.top); return rows.every((r, q) => !q || r.h <= rows[q - 1].h + 1); });
     const cs2 = cells.slice().sort((x, y) => y.neededMm - x.neededMm), ord = m.map((_, i) => i).sort((x, y) => (fpOf(m[y], cols) || 0) - (fpOf(m[x], cols) || 0));
     const byH = sortedPages && cells.some((c, i) => off(c, fpOf(m[i], footCols(c, cells)))) && !cs2.some((c, q) => off(c, fpOf(m[ord[q]], footCols(c, cells))));
-    if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k }); });
-    return { mode: 'position', byH, out };
+    if (!byH) cells.forEach((c, i) => { const k = footCols(c, cells); const fp = fpOf(m[i], k); if (off(c, fp)) out.push({ c, fp, k, ids: [i] }); });
+    return { mode: 'position', byH, out, notes };
 }
 if (argv.includes('--self-test')) {
     {   // rule coverage (critic eb-r3 D5): every rule of RULES and every case of RULE_CASES names a live backtest row, or is exempt
@@ -182,8 +195,21 @@ if (argv.includes('--self-test')) {
         const mk = (item, needed, cell) => ({ page: 1, cell, topPx: 10, hMm: 45, neededMm: needed, gridCols: 2, item });
         const m = [{ 2: 20 }, { 2: 40 }];
         const swapped = [mk(0, 40, 1), mk(1, 20, 2)], noIdx = swapped.map((c) => Object.assign({}, c, { item: -1 })), right = [mk(1, 40, 1), mk(0, 20, 2)];
+        // widened scope (lead 2026-11-13): a Review that deals 4 and draws 2, two sections, a cell holding several items
+        const m4 = [{ 2: 20 }, { 2: 40 }, { 1: 30, 2: 25 }, { 2: 22 }];
+        const review = [mk(3, 22, 1), mk(1, 48, 2)];                       // item 2 drawn 20 % over: 1 finding; item 4 fine
+        const twoSec = [mk(0, 20, 1), Object.assign(mk(2, 36, 2), { gridCols: 1 })];   // the mixed band at 1 across: 30 mm -> 20 % over
+        const multi = [Object.assign(mk(0, 40, 1), { items: [0, 1] })];
+        const unIdx = [mk(0, 20, 1), mk(-1, 90, 2)];
         const pc = [['index: swapped footprints', footFindings(swapped, m, 2, 1).out.length, 2], ['index: own footprints', footFindings(right, m, 2, 1).out.length, 0],
-            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: fallback', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).mode, 'position'], ['two sections: not paired', footFindings(swapped, m, 2, 2).mode, ''], ['fewer cells than items: not paired', footFindings([mk(1, 40, 1)], m, 2, 1).mode, '']];
+            ['no index: by-height fallback', footFindings(noIdx, m, 2, 1).mode, 'position'], ['index out of range: noted', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).notes.length, 1],
+            ['index out of range: the other cell judged', footFindings([mk(5, 40, 1), mk(1, 20, 2)], m, 2, 1).out.length, 1],
+            ['two sections: judged by index', footFindings(swapped, m, 2, 2).out.length, 2], ['fewer cells than items: judged by index', footFindings([mk(1, 48, 1)], m, 2, 1).out.length, 1],
+            ['review 4 dealt 2 drawn', footFindings(review, m4, 2, 1).out.length, 1], ['two sections, own column count', footFindings(twoSec, m4, 2, 2).out.map((x) => x.fp).join(), '30'],
+            ['multi-item cell, no bridge measure: noted', footFindings(multi, m4, 2, 1).notes.length, 1], ['multi-item cell, no bridge measure: not passed silently', footFindings(multi, m4, 2, 1).out.length + footFindings(multi, m4, 2, 1).notes.length, 1],
+            ['multi-item cell, measured combination: judged', footFindings(multi, m4, 2, 1, 0.10, (ids, k) => (ids.join() === '0,1' && k === 2 ? 30 : null)).out.length, 1],
+            ['unindexed cell on an indexed page: noted', footFindings(unIdx, m4, 2, 1).notes.length, 1],
+            ['no index, two sections: not paired', footFindings(noIdx, m, 2, 2).mode, ''], ['no index, fewer cells: not paired', footFindings([mk(-1, 40, 1)], m, 2, 1).mode, '']];
         const pbad = pc.filter(([, got, want]) => got !== want);
         for (const [n, got, want] of pbad) console.log(`self-test FAIL: EB-FOOT pairing ${n}: ${got}, want ${want}`);
         if (pbad.length) { console.log(`ws-empty-band self-test: FAIL (EB-FOOT pairing)`); process.exit(1); }
@@ -217,7 +243,7 @@ if (argv.includes('--self-test')) {
         ['guided', 'L', 7, true], ['guided', 'L', 19, true], ['independent', 'L', 30, false], ['guided', 'M', undefined, false]];
     const bad = cases.filter(([r, z, n, want]) => !!gdpCap(r, z, n) !== want);
     for (const c of bad) console.log(`self-test FAIL: gdpCap(${c.slice(0, 3).join(', ')}) should ${c[3] ? '' : 'not '}fail`);
-    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases)`);
+    console.log(`ws-empty-band self-test: ${bad.length ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP cases; EB-FOOT pairing 15 + columns 3)`);
     process.exit(bad.length ? 1 : 0);
 }
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -320,10 +346,12 @@ function measureCells(scope) {
                 neededMm: +(((box.b - cr.top - ((() => { const kids = [...c.children].filter((k) => !k.matches('[data-ws-label], .ws-letter, .ws-tab') && getComputedStyle(k).position !== 'absolute' && k.getBoundingClientRect().height > 0); return /center/.test(cs.justifyContent) && kids.length ? Math.max(0, kids[0].getBoundingClientRect().top - inner.t) : 0; })())) + (cr.bottom - inner.b)) / MM).toFixed(1), topPx: Math.round(cr.top), tmpl,
                 screen, step: Number(((c.querySelector('.mq-steptext em') || {}).textContent) || NaN),
                 // the bridge's item index the kit wrote on the cell (critic eb-r5 m1): EB-FOOT pairs by it; -1 when absent
-                item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item')) : -1, inkMm: +((box.b - cr.top) / MM).toFixed(1),
+                item: c.hasAttribute('data-eb-item') ? Number(c.getAttribute('data-eb-item').split(',')[0]) : -1, items: c.hasAttribute('data-eb-item') ? c.getAttribute('data-eb-item').split(',').map(Number) : [], inkMm: +((box.b - cr.top) / MM).toFixed(1),
                 // the column count of the grid that LAYS this cell (lf-roles 4e8eca14, accepted by lf-checks 2026-11-13): a lone cell
                 // on a 2-column grid's last row is still laid at 2 columns; a full-width problem in its own 1-column grid at 1
-                gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; return t && t !== 'none' ? t.trim().split(/\s+/).length : 0; })() });
+                gridCols: (() => { const g = c.closest('.ws-grid'); if (!g) return 0; const t = getComputedStyle(g).gridTemplateColumns || ''; const n = t && t !== 'none' ? t.trim().split(/\s+/).length : 0;
+                    // a RE-LAID grid (grid.js PG-15) is cut into lcm(cols, rem) tracks: its columns are the tracks over a full row's span
+                    if (!n || !g.classList.contains('relaid')) return n; const f = g.querySelector(':scope > [data-ws-cell]'); const sp = f && /span\s+(\d+)/.exec(f.style.gridColumn || f.getAttribute('style') || ''); return sp && +sp[1] > 0 ? Math.round(n / +sp[1]) : n; })() });
         });
     });
     return out;
@@ -641,10 +669,13 @@ async function main() {
                     }
                     // EB-FOOT: pairs only where the page's cells and the measured items are one to one
                     const m = b.measured;
-                    if (GRID_ROLES.has(j.role)) { const fr = footFindings(cells, m, b.cols, b.sections, FOOT);
+                    // (every cell against the items it holds, any page shape: lead ruling 2026-11-13; b.combo: the bridge's measure of
+                    // a multi-item cell, when it gives one - none today, so such a cell is a note, never a silent pass)
+                    if (GRID_ROLES.has(j.role)) { const fr = footFindings(cells, m, b.cols, b.sections, FOOT, (ids, k) => (b.combo && b.combo[`${ids.join(',')}@${k}`]) || null);
                         if (fr.byH) notes.push(`${key} ${j.tag}: footprint paired by height (the page sorts its rows tallest first)`);
-                        for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} across${x.c.item >= 0 && fr.mode === 'index' ? `, item ${x.c.item + 1}` : ''} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %; limit ${FOOT * 100} %)`); }
-                    if (j.role === 'independent' && !j.opts && !footFindings(cells, m, b.cols, b.sections).mode) notes.push(`${key} ${j.tag}: footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured)`);
+                        for (const n of fr.notes) notes.push(`${key} ${j.tag} EB-FOOT ${n}`);
+                        if (!fr.mode) notes.push(`${key} ${j.tag}: EB-FOOT footprint not paired (${cells.length} cells, ${m.length} items, ${m.filter((x) => x == null).length} unmeasured, no item index on the page)`);
+                        for (const x of fr.out) F('EB-FOOT', `${key} ${j.tag} p${x.c.page} cell ${x.c.label || x.c.cell}`, `drawn ${x.c.neededMm} mm, footprint hMm ${x.fp} mm at ${x.k} across${fr.mode === 'index' ? `, item ${x.ids.map((i) => i + 1).join('+')}` : ''} (${Math.round((x.c.neededMm - x.fp) / x.fp * 100)} %; limit ${FOOT * 100} %)`); }
                 } finally { await sh.close(); }
             }
             // screen hosts

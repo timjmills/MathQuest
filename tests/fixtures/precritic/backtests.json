@@ -4368,6 +4368,28 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "eb-foot-review-add-facts",
+  "check": "ws-empty-band EB-FOOT on every cell of a grid-role page, against the items it holds (data-eb-item; lead ruling 2026-11-13): a Review that deals 28 and draws 16, with a Mixed Review band, is judged cell by cell",
+  "kind": "commit-pair",
+  "rule": "ws-empty-band EB-FOOT (widened scope, lead 2026-11-13)",
+  "browser": true,
+  "fail": {
+   "commit": "8dc176e6",
+   "state": "addition:add_facts review S/M/L: 12 EB-FOOT, cells drawn 17-23 % over their own items' footprints (12.5/15/16 mm drawn 14.6/18.2/19.7 mm)"
+  },
+  "pass": {
+   "commit": "the lf-ops fix of the add_facts review cells",
+   "state": "EB-FOOT 0 on add_facts review"
+  },
+  "command": "node tests/scripts/ws-empty-band.cjs --skill addition:add_facts --roles review --hosts none --only EB-FOOT --no-baseline",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "pending": true,
+  "pendingReason": "no commit has fixed the add_facts review footprints yet (routed to lf-ops, pinned facts debt); arm with lf-ops' fix commit. The widened pairing itself is in --self-test 'EB-FOOT pairing' (15 cases: a Review dealing 4 / drawing 2, two sections at their own column counts, a multi-item cell with and without a bridge measure, an unindexed cell)"
  }
 ]
 }

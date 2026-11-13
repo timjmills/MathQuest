@@ -96,8 +96,10 @@ export function cell(inner, opts = {}) {
     let extra = /^data-ws-key-[a-z-]+$/.test(opts.keyAttr || '') ? ` ${opts.keyAttr}` : '';
     // CL-4b: after the style too, for the same reason
     if (opts.writeAbove || String(inner).includes(WRITE_ABOVE)) extra += ` ${WRITE_ABOVE}`;
-    // the bridge's item index (critic eb-r5 m1, ws-empty-band EB-FOOT pairing): after the style too; an integer only
-    if (Number.isInteger(opts.ebItem) && opts.ebItem >= 0) extra += ` data-eb-item="${opts.ebItem}"`;
+    // the bridge's item index (critic eb-r5 m1, ws-empty-band EB-FOOT pairing): after the style too; an integer, or the list of
+    // the items a cell holds ("3,4,5", lf-checks 2026-11-13: EB-FOOT judges every cell against the items it holds)
+    const ebList = (Array.isArray(opts.ebItem) ? opts.ebItem : [opts.ebItem]).filter((x) => Number.isInteger(x) && x >= 0);
+    if (ebList.length) extra += ` data-eb-item="${ebList.join(',')}"`;
     return `<div class="ws-cell ${cls}"${a} style="${style}"${extra}>${lab}${body}</div>`;
 }
 

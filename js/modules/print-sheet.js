@@ -3104,7 +3104,14 @@ function tagItemIndex(plan, items) {
     const idx = new Map((items || []).map((it, i) => [it && it.q, i]).filter(([q]) => q));
     const walk = (s) => {
         if (!s || typeof s !== 'object') return;
-        if (s.kind === 'grid') for (const pi of s.items || []) if (pi && pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
+        // (a plan item that holds several questions - `qs` - carries the list of their indices: data-eb-item="3,4")
+        if (s.kind === 'grid') for (const pi of s.items || []) {
+            if (!pi) continue;
+            const many = Array.isArray(pi.qs) ? pi.qs.filter((q) => idx.has(q)).map((q) => idx.get(q)) : [];
+            if (many.length > 1) pi.ebItem = many;
+            else if (pi.q && idx.has(pi.q)) pi.ebItem = idx.get(pi.q);
+            else if (many.length) pi.ebItem = many[0];
+        }
         if (Array.isArray(s.contents)) s.contents.forEach(walk);
         if (s.content) walk(s.content);
         if (Array.isArray(s.parts)) s.parts.forEach(walk);

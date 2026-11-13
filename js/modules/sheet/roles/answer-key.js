@@ -366,7 +366,7 @@ function gridPart(part, ctx, report) {
             keyAttr: keyModel && !/\sdata-ws-key-model\b/.test(html) ? 'data-ws-key-model' : '',
             // the item's index in the bridge's item list (buildSheet sets `ebItem`; critic eb-r5 m1): cell() writes it as
             // data-eb-item, by which ws-empty-band EB-FOOT pairs each cell with ITS OWN item's footprint. Nothing draws from it.
-            ebItem: Number.isInteger(item.ebItem) ? item.ebItem : undefined,
+            ebItem: Number.isInteger(item.ebItem) || Array.isArray(item.ebItem) ? item.ebItem : undefined,
         };
     });
     // CL-12: a label run continues across sections and across pages, so the counter lives on
