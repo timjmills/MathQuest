@@ -67,3 +67,10 @@ hundreds_chart_fill band=120 thinking roles re-checked clean (`logs/r6-hcf-band1
 | sibling-compare | FAIL (13 NO-SIBLING) | FAIL (NO-SIBLING) | SKIPPED by ruling 4: the critic grades the named pages |
 | spec-card-signed | INCOMPLETE (needs owner signature) | N/A (preset not on the card's §1) | |
 | every other gate | PASS | PASS | |
+
+## Owner plan 2026-11-13 (master 3c84e320 / 76bc11c6): no phone width, no print size S
+
+- **Size S dropped** (sizes M and L only): S-only findings no longer count and are recorded here as **out of scope**:
+  EB-SIDE 4 (review S, pre-skill-check S; `counters` cells) — was routed to lf-roles as master debt, now out of scope.
+  The lesson EB-BAND lines and the guided EB-BAND lines are at M/L too, so they stay as listed above.
+- **390 px dropped**: `card-390.png` is replaced by the card at 820 (`card-820.png`); `independent-S.png` by `independent-M.png`.
