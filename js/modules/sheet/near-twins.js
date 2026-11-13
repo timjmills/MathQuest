@@ -178,6 +178,15 @@ export function placePick(pool, n, seed) {
  * near twin of the band's others (the pool was dealt as one run, so it keeps the run's rules); none left: it stays. r6, critic r5
  * "78 twice" - the rounding 78 and the place-value 78 on one Mixed page. Pure.
  */
+/** The numbers an item prints that a page holds once (r6): a one-number item's number, a place-value compare item's two (10 or
+ *  more). [] for any other item. */
+export function pageNumsOf(it) {
+    const v = oneNumOf(it); if (v !== null) return [v];
+    const q = it && it.q ? it.q : it;
+    const p = (q && q.cell && q.cell.payload) || {};
+    return q && q.cell && q.cell.template === 'pv' && p.kind === 'compare' ? [p.a, p.b].map(Number).filter((x) => Number.isFinite(x) && x >= NEAR.minNum) : [];
+}
+
 export function pageUnique(take, pool, n, printed) {
     const out = (take || []).slice();
     const used = new Set(out);
@@ -192,4 +201,4 @@ export function pageUnique(take, pool, n, printed) {
     return out;
 }
 
-export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit, placeAnsOf, placeRunBad, placeOrder, placePick, pageUnique };
+export default { NEAR, nearNumbers, nearKeys, nearSubs, oneNumOf, oneAnsOf, oneNumFits, pageOneNumViolations, nearSplit, placeAnsOf, placeRunBad, placeOrder, placePick, pageUnique, pageNumsOf };

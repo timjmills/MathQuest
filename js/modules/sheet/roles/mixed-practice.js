@@ -36,7 +36,7 @@ import {
     ctxOf, frameOf, layoutHeader, bandMetrics, hMinAt, fitsAt, planItem, gridPart, instructionKeyOf,
     instructionText, assemble, poolItems, labelStyleOf, STRAND_BY_CATEGORY, deriveSeed,
 } from './compose.js';
-import { placePick, pageUnique, oneNumOf } from '../near-twins.js';
+import { placePick, pageUnique, oneNumOf, pageNumsOf } from '../near-twins.js';
 import { skillWords } from './practice.js';
 import { anchorPlanItem, anchorHeightMm } from '../anchors.js';
 import { interleave, dealCounts } from '../interleave.js';
@@ -691,7 +691,8 @@ export function plan(input = {}) {
         const take = sh.n * sh.per;
         const uniq = input.lessonFit ? pageUnique(pools[id].slice(0, take), pools[id], take, printedNums) : null;
         const its = uniq ? placePick(uniq.concat(pools[id].filter((it) => !uniq.includes(it))), take, deriveSeed(input.seed || 0, ROLE_ID, 'place', id)) : pools[id].slice(0, take);
-        for (const it of its) { const v = oneNumOf(it); if (v !== null) printedNums.add(v); }
+        // (a compare item's two numbers count too - compare Mixed printed 715 / 702 and the place partner's 715)
+        for (const it of its) for (const v of pageNumsOf(it)) printedNums.add(v);
         for (let s = 0; s < sh.n; s++) {
             let chunk = its.slice(s * sh.per, (s + 1) * sh.per);
             // SIDE: [twin | problem] pairs, the twin first (example, then problem).
