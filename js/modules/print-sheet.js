@@ -4869,8 +4869,10 @@ async function buildLesson(n, metaOf) {
     if (packNums) practiceSk = Object.assign({}, practiceSk, { avoidKeys: packNums, lr6: true, chartKeys }, n.edgeLast ? { edgeLast: n.edgeLast } : {});
     // (lf-engine PC r3 F4, LR-5: with the Prerequisite Check on, the sheet has no Warm-up and re-deals its Guided and
     // Independent cells, so Practice and Mixed could deal one of them again - sub L / S printed "50 - 36" on both. Its fact keys
-    // go into the practice ref's hard avoid set; a lesson without the check deals exactly as before.)
-    if (prereqs && !packNums) { const sheetKeys = planKeys(teach); if (sheetKeys.length) practiceSk = Object.assign({}, practiceSk, { hardAvoid: [...(Array.isArray(practiceSk.hardAvoid) ? practiceSk.hardAvoid : []), ...sheetKeys] }); }
+    // go into the hard avoid set of the practice ref and of the Mixed partners; a lesson without the check deals exactly as before.)
+    const sheetHard = prereqs && !packNums ? planKeys(teach) : [];
+    const withSheetHard = (r) => (sheetHard.length && r ? Object.assign({}, r, { hardAvoid: [...(Array.isArray(r.hardAvoid) ? r.hardAvoid : []), ...sheetHard] }) : r);
+    practiceSk = withSheetHard(practiceSk);
     // One-line answers: the engine fills the page (PAGE FILL, DN-1) - one frame, no row gaps,
     // because the count is the page's own. Taller problems: 12.1's six a page, 2 x 3, each cell
     // with its working space and Check line.
@@ -4972,7 +4974,7 @@ async function buildLesson(n, metaOf) {
     // skill its own section, the page filled in one frame per section.
     const buildMixed = (seed, avoid = (r) => r, avoidTexts = practiceTexts) => {
         const withSkills0 = n.mixedSkills || (data && data.mixWith ? data.mixWith.map(skillRef) : earlierSkills(sk, 2));
-        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(avoid);
+        const withSkills = (packNums ? withSkills0.map((w) => Object.assign({}, w, { avoidKeys: packNums.slice(), tries: Math.max(200, Number(w.tries) || 0), lr6: true })) : withSkills0).map(withSheetHard).map(avoid);
         // The mixed page (sheet/lesson-pages/mixed.js, the shared builder, §8c).
         return buildSheetInner(mixedRequest({
             common, lookAsked: n.lookAsked, lead: practiceSk, partners: withSkills, practiceTexts: avoidTexts, packNums,
