@@ -288,7 +288,7 @@ async function browser() {
             // (b) EB-ROWFIT: no lesson rows (0, off, or "no room") yet the sheet's foot holds a whole Independent row and its band head
             if (lastSheet && rowNeed && rowsPrinted === 0 && lastSheet.emptyMm >= rowNeed && changed(lastSheet)) F('EB-ROWFIT', `${where} p${lastSheet.i + 1}: no lesson rows, yet ${lastSheet.emptyMm} mm of the foot is empty - one Independent row and its head is ${rowNeed} mm`);
             // (c) "no room" is true: the screen says the rows have no room only where a row does not fit
-            if (lims.rows && lims.rows.none && lastSheet && rowNeed && lastSheet.emptyMm >= rowNeed) F('PO-NOROOM', `${where}: rows "${po.rangeText('rows', lims.rows)}", yet ${lastSheet.emptyMm} mm is empty at the sheet's foot and one row with its head is ${rowNeed} mm`);
+            if (lims.rows && lims.rows.none && /no room/.test(po.rangeText('rows', lims.rows)) && lastSheet && rowNeed && lastSheet.emptyMm >= rowNeed) F('PO-NOROOM', `${where}: rows "${po.rangeText('rows', lims.rows)}", yet ${lastSheet.emptyMm} mm is empty at the sheet's foot and one row with its head is ${rowNeed} mm`);
             // (d) Remember off: neither the Remember line nor the rule prints anywhere on the lesson sheet
             if (cur.remember && cur.remember.on === false) for (const t of b.remTexts) if (sheetPgs.some((x) => x.text.includes(t.replace(/\s+/g, ' ').trim()))) F('PO-REM', `${where}: Remember is off, yet the lesson sheet prints "${t}"`);
             // (f) N4: no one-pair match

@@ -90,7 +90,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             check(!lone.length, `${where}: a lone word wrapped onto its own line: ${lone.slice(0, 3).map((x) => `"${x}"`).join(', ')} (N6)`);
         }
     };
-    const click = async (sel) => { const b = await page.$(sel); if (!b || await b.evaluate((x) => x.disabled)) return false; await b.click(); await sleep(150); return true; };
+    // (a DOM click: the Print screen re-renders its controls while a build lands, so a held handle can be detached)
+    const click = async (sel) => { const ok = await page.evaluate((sel) => { const b = document.querySelector(sel); if (!b || b.disabled) return false; b.scrollIntoView({ block: 'center' }); b.click(); return true; }, sel); await sleep(150); return ok; };
     // (F5) overlapping boxes inside a part row
     const overlaps = () => page.evaluate(() => {
         const out = [];
@@ -125,7 +126,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
             const sk = skillOf(id);
             await page.evaluate(({ id, sk }) => { try { localStorage.removeItem('mq_teacher_sets'); } catch (e) { /* */ } window.setUserRole('teacher'); window.tvOpenPrintWith(sk ? [sk] : [{ role: 'lesson', lessonId: id }]); }, { id, sk });
             await sleep(500);
-            if (sk) { await click('[data-act="role"][data-sec="0"][data-v="lesson"]'); }
+            if (sk) { await click('[data-act="types"][data-sec="0"]'); await sleep(300); check(await click('[data-act="role"][data-sec="0"][data-v="lesson"]'), `${id}: could not choose the Lesson page type`); }
             await click('[data-act="size"][data-v="M"]');
             await idle();
             // (F9) the full-width card

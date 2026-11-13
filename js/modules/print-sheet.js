@@ -4742,6 +4742,28 @@ export function lessonPartSeed(seed, part, refresh = 0) {
 /** Support options the lesson packet turns off (practice-page working space; critic visual-quality r2 N1). */
 const LESSON_OFF_OPTS = ['familyChart'];
 
+/**
+ * lf-partopts (critic A r2 N3): the share of its page the LAST page of a built sheet uses, from its plan - the grids' own
+ * heights and a strip per band, against the fullest page (the sheet's pages share one frame). An estimate for the screen's
+ * pages note ("the last under half full"); ws-partopts-unit PO-CAP measures the printed page against it.
+ */
+function planLastFill(res) {
+    const plan = res && Array.isArray(res.partPlans) ? null : res && res.plan;
+    const pages = (plan && plan.pages) || [];
+    if (pages.length < 2) return 1;
+    const STRIP = 9.5;
+    const hOf = (sec) => {
+        if (!sec || typeof sec !== 'object') return 0;
+        const c = sec.content;
+        const g = c && (c.kind === 'grid' ? c : null);
+        const gh = g ? (parseFloat(g.height) || (Number(g.rows) || 1) * (Number(g.cellH) || 0)) : 0;
+        return sec.kind === 'band' ? STRIP + gh : 0;
+    };
+    const used = pages.map((pg) => (pg.sections || []).reduce((a, x) => a + hOf(x), 0));
+    const top = Math.max(...used);
+    return top > 0 ? +(used[used.length - 1] / top).toFixed(3) : 1;
+}
+
 async function buildLesson(n, metaOf) {
     const sk0 = n.sections[0].skills[0];
     // The lesson record (plan phase 0.4): a detailed lesson's own `lessonData`; else the library lesson asked for by
@@ -5143,7 +5165,7 @@ async function buildLesson(n, metaOf) {
             example: chart.plan && chart.plan.meta ? chart.plan.meta.example : '',
             chart: chart.plan && chart.plan.meta ? { zoom: chart.plan.meta.chartZoom, example2: chart.plan.meta.example2, example2Found: chart.plan.meta.example2Found, sizing: chart.plan.meta.chartSizing, example3: chart.plan.meta.example3, example4: chart.plan.meta.example4, exampleQs: chart.plan.meta.exampleQs || [] } : null,
             practiceTried,
-            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk } : null,
+            teach: teach.plan && teach.plan.meta ? { bands: teach.plan.meta.bandSizes, guided: teach.plan.meta.guided, independent: teach.plan.meta.independent, fill: teach.plan.meta.sheetFill, weDoSideOk: teach.plan.meta.weDoSideOk, freeMm: teach.plan.meta.sheetFreeMm, rowMm: teach.plan.meta.indepRowMm } : null,
             // lf-partopts (sheet/part-opts.js partLimits): each part's fit at this size, measured by its own planner before the
             // teacher's counts - the Parts table's ranges. null: the lesson has no such part (or it was not built).
             partFit: (() => {
@@ -5159,9 +5181,11 @@ async function buildLesson(n, metaOf) {
                     vocab: of.vocab ? { words: of.vocab.dflt, values: of.vocab.values, canOff: of.vocab.canOff } : null,
                     remember: { has: !!tm.remember, canOff: !!(of.remember && of.remember.canOff) },
                     wedo: of.wedo ? { fit: of.wedo.dflt, values: of.wedo.values, canOff: of.wedo.canOff } : null,
-                    rows: of.rows ? { fit: of.rows.dflt, perRow: of.rows.perRow || 1, values: of.rows.values, canOff: of.rows.canOff } : null,
+                    rows: of.rows ? Object.assign({ fit: of.rows.dflt, perRow: of.rows.perRow || 1, values: of.rows.values, canOff: of.rows.canOff }, of.rows.none ? { noRoom: of.rows.noRoom !== false } : {}) : null,
                     practice: practiceFit,
-                    mixed: mixedRes ? { count: (mixedRes.items || []).length, pages: Number(mixedRes.pageCount) || 1 } : null,
+                    mixed: mixedRes ? Object.assign({ count: (mixedRes.items || []).length, pages: Number(mixedRes.pageCount) || 1 }, Number(mixedRes.pageCount) > 1 ? { lastFill: planLastFill(mixedRes) } : {}) : null,
+                    // (critic A r2 N3: the pages the lesson sheet prints on and its last page's used share - the screen's caption)
+                    sheet: teach.plan && teach.plan.meta && Array.isArray(teach.plan.meta.sheetFill) && teach.plan.meta.sheetFill.length ? { pages: teach.plan.meta.sheetFill.length, lastFill: teach.plan.meta.sheetFill[teach.plan.meta.sheetFill.length - 1] } : null,
                 };
             })(),
             size,

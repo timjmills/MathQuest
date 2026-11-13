@@ -22,7 +22,7 @@
 
 import { rankByQuery, onSkillSearchReady } from './skill-finder.js';
 import { buildSheet, sheetDocument, LESSON_SIZE_NOTE, blankBack, lessonPartSeed } from './print-sheet.js';
-import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, rangeText, normalizePartOpts, partOptsFromSection, partsListOf, totalPages } from './sheet/part-opts.js';
+import { PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, allPartLimits, offeredValues, normalizePartOpts, partOptsFromSection, partsListOf, partRowText, sheetCaption, totalPages } from './sheet/part-opts.js';
 import { lessonById, practiceRef } from './lessons/library.js';
 import {
     icon, esc, toast, skillCatalogue, findSkill, levelText, currentSet, savedSets, printDefaults,
@@ -679,11 +679,10 @@ function renderParts(i, btn) {
     }
 }
 
-/** The pages a Practice / Mixed total prints on, for the screen ("2 pages of 15"). */
-function pagesNote(s, p, lim, n) {
-    const tp = n > 0 ? totalPages(p, n, lim) : null;
-    return tp ? `${tp.pages} page${tp.pages === 1 ? '' : 's'} of ${tp.per}` : '';
-}
+/** A row's text with its last two words (and each "n pages of k" phrase) bound, so no word wraps alone at 390 (critic A r2 N6). */
+const bindTail = (t) => esc(String(t || '')).replace(/(\d+) (pages?) of (\d+)/g, '$1\u00a0$2\u00a0of\u00a0$3').replace(/ (\S+)$/, '\u00a0$1');
+/** Why a part's tick may not be cleared, said in its row (critic A r2 N5: a hover title is no reason at 390). */
+const LOCK_WHY = 'Needed to fill the sheet';
 
 /** The Parts table of a Lesson section (DESIGN §1.1; one compact row per part at phone width, §1.2). */
 function partsHTML(s, i) {
@@ -702,24 +701,25 @@ function partsHTML(s, i) {
         const none = !!(lim && lim.none);
         // (F7: a part with no room on this sheet has no tick; a part whose page would not fill without it has a locked tick)
         const locked = on && lim && lim.canOff === false;
-        const tick = none ? '' : `<button type="button" class="tv-check tv-part-tick" role="checkbox" aria-checked="${on}" data-act="part-on" data-sec="${i}" data-part="${p}" aria-label="Print ${esc(name)}"${locked ? ` disabled title="Needed to fill the lesson sheet"` : ''}><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
+        const tick = none ? '' : `<button type="button" class="tv-check tv-part-tick" role="checkbox" aria-checked="${on}" data-act="part-on" data-sec="${i}" data-part="${p}" aria-label="Print ${esc(name)}"${locked ? ` disabled aria-describedby="${id}_why"` : ''}><span class="tv-check-box" aria-hidden="true">${icon('check', 14)}</span></button>`;
+        // (N5: the reason a tick is locked is visible text under the part's name, in every row and at every width)
+        const why = locked ? `<span class="tv-part-range tv-part-lock" id="${id}_why">${esc(LOCK_WHY)}</span>` : '';
         let many = '';
-        if (none) many = `<span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+        if (none) many = `<span class="tv-part-range">${bindTail(partRowText(p, lim, 0))}</span>`;
         else if (!lim) many = on ? '<span class="tv-part-range">Measured after the page is built</span>' : '';
-        else if (lim.toggle) many = locked ? '<span class="tv-part-range">Needed to fill the lesson sheet</span>' : '';
+        else if (lim.toggle) many = '';
         else {
             const vals = stepperValues(p, lim);
-            if (vals.length <= 1) many = `<span class="tv-part-range">${esc(rangeText(p, lim))}</span>`;
+            if (vals.length <= 1) many = `<span class="tv-part-range">${bindTail(partRowText(p, lim, partCount(s, p, lim, po)))}</span>`;
             else {
                 const n = partCount(s, p, lim, po);
                 const at = vals.indexOf(n);
-                const pn = (p === 'practice' || p === 'mixed') ? pagesNote(s, p, lim, n) : '';
-                const note = s.partNote && s.partNote[p] ? `<span class="tv-part-note" role="status">${esc(s.partNote[p])}</span>` : '';
+                const note = s.partNote && s.partNote[p] ? `<span class="tv-part-note" role="status">${bindTail(s.partNote[p])}</span>` : '';
                 many = `<span class="tv-stepper" role="group" aria-label="How many: ${esc(name)}">
         <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="-1" aria-label="Fewer: ${esc(name)}"${at <= 0 ? ' disabled' : ''}>${icon('minus', 16)}</button>
         <output class="tv-step-val" aria-live="polite">${n}</output>
         <button type="button" class="tv-step-btn" data-act="part-step" data-sec="${i}" data-part="${p}" data-dir="1" aria-label="More: ${esc(name)}"${at >= vals.length - 1 ? ' disabled' : ''}>${icon('plus', 16)}</button>
-      </span><span class="tv-part-range">${esc(lim.fixed ? `${lim.dflt}, or 0 to leave it off` : rangeText(p, lim))}${pn ? ` · ${esc(pn)}` : ''}</span>${note}`;
+      </span><span class="tv-part-range">${bindTail(partRowText(p, lim, n))}</span>${note}`;
             }
         }
         // (step B opens the Supports panel here; step A states the standard as plain text - F8)
@@ -728,7 +728,7 @@ function partsHTML(s, i) {
         const warn = p === 'prereq' && on && lim && partCount(s, p, lim, po) < Math.min(PREREQ_WARN_BELOW, lim.max) ? `<p class="tv-part-warn" role="status">${icon('info', 14)}<span>${esc(PREREQ_FEW_WARNING)}</span></p>` : '';
         return `<div class="tv-part${on && !none ? '' : ' is-off'}${SHEET_GROUP.has(p) ? ' is-sheet' : ''}" role="group" aria-labelledby="${id}" data-part-row="${p}">
     <div class="tv-part-print">${tick}</div>
-    <div class="tv-part-name"><span id="${id}">${esc(name)}</span></div>
+    <div class="tv-part-name"><span id="${id}">${esc(name)}</span>${why}</div>
     <div class="tv-part-many">${many}</div>
     <div class="tv-part-sup">${supports}</div>
     <div class="tv-part-ref">${refresh}</div>
@@ -743,7 +743,7 @@ function partsHTML(s, i) {
             // (F10: the lesson sheet's parts share one seed - one New numbers, for the whole sheet)
             rows += `<div class="tv-part tv-part-group" role="group" aria-labelledby="tvPartG${i}">
     <div class="tv-part-print"></div>
-    <div class="tv-part-name"><span id="tvPartG${i}">Lesson sheet</span><span class="tv-part-range">Vocabulary, Remember, We Do and practice rows: one page</span></div>
+    <div class="tv-part-name"><span id="tvPartG${i}">Lesson sheet</span><span class="tv-part-range">${bindTail(sheetCaption(fit))}</span></div>
     <div class="tv-part-many"></div><div class="tv-part-sup"></div>
     <div class="tv-part-ref"><button type="button" class="tv-icon-btn is-framed tv-part-new" data-act="part-new" data-sec="${i}" data-part="sheet" aria-label="New numbers: the whole lesson sheet" title="New numbers for the whole lesson sheet">${icon('reset', 18)}</button></div>
   </div>`;

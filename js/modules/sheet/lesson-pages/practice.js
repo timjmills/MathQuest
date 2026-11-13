@@ -35,6 +35,11 @@ export function stripItem(data, steps) {
     };
 }
 
+/** The margin past CL-8 a row keeps from its cell's side on a sheet the teacher changed. Critic A r2 N1: 1.5 mm here kept
+ * the standard sheet's own rows (nearest_10 at L, 3.3 mm, the same cells the standard sheet draws) off a sheet whose foot then
+ * stood 62 mm empty; the cells' own CL-8 (icKeep) is the rule, and ws-partopts-unit PO-2d judges EB-EDGE on every page. */
+export const INK_EDGE_MM = 0;
+
 /**
  * The lesson sheet's Independent Practice rows (roles/lesson.js planOnce, after the bands are packed):
  * whole rows of the skill filling the last page `cur` (PT-OPN-7, H5), lettered on from `letter`.
@@ -70,7 +75,9 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
     let inkShort = false;
     if (freed0) {
         // (and 1.5 mm more than CL-8 from its sides: a fact the We Do band used to hold came 0.7 mm from its border, EB-EDGE)
-        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + 1.5)); });
+        // (critic A r2 N1: one column across is the standard sheet's own full-width cell - its slack is the design's, as icKeep
+        // keeps it; the extra 1.5 mm stays for narrower columns only where the slack is near CL-8)
+        const inkOk = (c) => indepPool.slice(0, 21).every((it) => { const mm = it.measured && it.measured[c]; return !mm || ((!(mm.inkMm > 0) || mm.inkMm >= 0.5 * (186 / c - 4)) && (c === 1 || !(Number.isFinite(mm.slackMm) && mm.slackMm < CL8_MM + INK_EDGE_MM))); });
         if (!inkOk(ic)) inkShort = true;
     }
     const twins = new Map(extrasList.filter((x) => x.lessonIndepOf).map((x) => [x.lessonIndepOf, x]));
@@ -118,6 +125,9 @@ export function independentBand({ input, ctx, m, data, main, example, example2, 
         while (rows > 1 && rows * hRows(rows) > room) rows--;
         // (lf-partopts: the rows that fit are the part's fit - the Parts table's max; `lesson.partN.rows` caps them, 0 = none)
         cur.indepFit = { rows: rows >= 1 && hRows(rows) <= room ? rows : 0, ic };
+        // (critic A r2 N1, EB-ROWFIT: the height ONE row and its band head take - roles/lesson.js offers no sheet whose foot holds
+        // one and prints none, and says "no room" only where one does not fit)
+        cur.indepRowMm = +(hRows(1) + m.strip + stripExtraMm(ctx, 'Independent Practice:', iText) + safety).toFixed(1);
         const rN = input.lesson && input.lesson.partN && Number.isFinite(input.lesson.partN.rows) ? Math.max(0, input.lesson.partN.rows) : null;
         if (rN === 0 || inkShort) return indep;
         if (rN !== null && rN < rows) rows = rN;

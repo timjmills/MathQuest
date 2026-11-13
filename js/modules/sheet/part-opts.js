@@ -55,6 +55,8 @@ const int = (v) => (Number.isFinite(Number(v)) ? Math.round(Number(v)) : NaN);
 
 /** The most Practice pages (and Mixed pages) a total may take. */
 export const PRACTICE_MAX_PAGES = 5;
+/** The fewest Vocabulary words a match prints (critic A r2 N4: one pair is not a matching task). */
+export const VOCAB_MIN = 2;
 export const MIXED_MAX_PAGES = 2;
 
 /**
@@ -99,8 +101,10 @@ export function partLimits(part, ctx = {}) {
     const unit = UNIT[part] || ['', ''];
     const out = (o) => Object.assign({ step: 1, unit }, o);
     // (a probed part: its own values; one value is fixed, the reason said once)
+    // (critic A r2 N4: the Vocabulary task is a match - one pair is no task, so its fewest words is 2)
+    const lo1 = part === 'vocab' ? Math.min(VOCAB_MIN, int(f.words) || 1) : 1;
     const listed = (vals, dflt, canOff, why, extra = {}) => {
-        const v = [...new Set((vals || []).map(int).filter((x) => x >= 1))].sort((x, y) => x - y);
+        const v = [...new Set((vals || []).map(int).filter((x) => x >= lo1))].sort((x, y) => x - y);
         if (!v.includes(dflt)) v.push(dflt), v.sort((x, y) => x - y);
         return out(Object.assign({ min: v[0], max: v[v.length - 1], dflt, values: v, canOff: canOff !== false }, v.length === 1 ? { fixed: true, note: why } : {}, extra));
     };
@@ -118,8 +122,8 @@ export function partLimits(part, ctx = {}) {
         case 'vocab': {
             const w = int(f.words);
             if (!(w >= 1)) return null;
-            if (!Array.isArray(f.values)) return out({ min: 0, max: w, dflt: w, canOff: true });
-            return listed(f.values, w, f.canOff, `Fixed: ${w} (fewer would leave the page short)`);
+            if (!Array.isArray(f.values)) return out(w > lo1 ? { min: lo1, max: w, dflt: w, canOff: true } : { min: w, max: w, dflt: w, canOff: true, fixed: true, note: `Fixed: ${w} (the lesson's words)` });
+            return listed(f.values, w, f.canOff, `Fixed: ${w} (fewer would leave the lesson sheet short)`);
         }
         case 'remember':
             return f.has ? out({ min: 0, max: 1, dflt: 1, toggle: true, fixed: true, note: '', canOff: f.canOff !== false }) : null;
@@ -133,9 +137,10 @@ export function partLimits(part, ctx = {}) {
             const r = Math.max(0, int(f.fit) || 0);
             const per = Math.max(1, int(f.perRow) || 1);
             // (F7: no row fits on this sheet - the part is not on it: no tick, no New numbers)
-            if (r === 0) return out({ min: 0, max: 0, dflt: 0, fixed: true, none: true, perRow: per, canOff: false, note: 'Not on this lesson sheet (no room)' });
+            // (critic A r2 N1: "no room" only where no row fits - the engine's own room test, roles/lesson.js sheetOffers)
+            if (r === 0) return out({ min: 0, max: 0, dflt: 0, fixed: true, none: true, perRow: per, canOff: false, note: f.noRoom === false ? 'Not on this lesson sheet' : 'Not on this lesson sheet (no room)' });
             if (!Array.isArray(f.values)) return out({ min: 1, max: r, dflt: r, perRow: per, canOff: true });
-            return listed(f.values, r, f.canOff, `Fixed: ${r} (fills the page)`, { perRow: per });
+            return listed(f.values, r, f.canOff, `Fixed: ${r} (fewer would leave the lesson sheet short)`, { perRow: per });
         }
         case 'practice': {
             const per = int(f.perPage);
@@ -151,7 +156,8 @@ export function partLimits(part, ctx = {}) {
             const c = int(f.count);
             if (!(c >= 1)) return null;
             // (a Mixed sheet that already runs onto a second page is not repeated: its count stays the sheet's)
-            if (int(f.pages) > 1) return out({ min: c, max: c, dflt: c, fixed: true, canOff: true, note: `Fixed: ${c} (the Mixed sheet's own pages)` });
+            // (critic A r2 N3: it says its pages - and a last page under half used - wherever it prints more than one)
+            if (int(f.pages) > 1) return out({ min: c, max: c, dflt: c, fixed: true, canOff: true, total: true, sheetPages: int(f.pages), lastFill: f.lastFill, note: `Fixed: ${c} (the Mixed sheet's own pages)` });
             const vals = Array.from({ length: MIXED_MAX_PAGES }, (_, i) => c * (i + 1));
             return out({ min: c, max: vals[vals.length - 1], dflt: c, values: vals, step: c, perPage: c, total: true, canOff: true });
         }
@@ -194,7 +200,7 @@ export function rangeText(part, lim) {
     if (lim.fixed) return lim.note || '';
     const [one, many] = lim.unit || ['', ''];
     if (part === 'practice') return `${lim.min} to ${lim.max} problems, in rows of ${lim.step}`;
-    if (part === 'mixed') return `${lim.min} to ${lim.max} problems, ${lim.perPage} a page`;
+    if (part === 'mixed') return `${lim.min} to ${lim.max} problems`;
     if (part === 'rows') return `${lim.min} to ${lim.max} ${lim.max === 1 ? one : many} (${lim.perRow} a row)`;
     return `${lim.min} to ${lim.max} ${lim.max === 1 ? one : many}`;
 }
@@ -202,8 +208,48 @@ export function rangeText(part, lim) {
 /** The pages a Practice or Mixed total prints on ({pages, per}), or null. */
 export function totalPages(part, n, lim) {
     if (!lim || !lim.total) return null;
+    if (part === 'mixed' && lim.sheetPages) return { pages: lim.sheetPages, per: null, lastUnderHalf: Number.isFinite(lim.lastFill) && lim.lastFill < 0.5 };
     if (part === 'mixed') return { pages: Math.max(1, Math.round(n / lim.perPage)), per: lim.perPage };
     return practiceSplit(n, { perPage: lim.perPage, cols: lim.cols, minRows: lim.values ? Math.ceil(lim.values[0] / lim.cols) : undefined });
+}
+
+/** The parts whose stepper reaches 0 - the part's tick off - where the part may be off (teacher-print.js stepperValues). */
+export const ZERO_OFF_PARTS = Object.freeze(['vocab', 'wedo', 'rows', 'practice', 'mixed']);
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five'];
+const pagesWord = (n) => (n === 1 ? 'one page' : `${WORDS[n] || n} pages`);
+
+/**
+ * The How many text of a part's row on the Print screen (critic A r2 N3, N6): one form everywhere - "a to b units" or
+ * "n units", then ", or 0 to leave it off" wherever the stepper reaches 0, a fixed count once as "Fixed: n (why)", and the
+ * pages a Practice / Mixed total prints on ("2 pages of 15"; a last page under half used says so). Plain spaces: the
+ * screen binds the last words so none wraps alone.
+ */
+export function partRowText(part, lim, n) {
+    if (!lim) return '';
+    if (lim.none) return lim.note || '';
+    if (lim.toggle) return '';
+    const [one, many] = lim.unit || ['', ''];
+    const zero = ZERO_OFF_PARTS.includes(part) && lim.canOff !== false;
+    const vals = offeredValues(lim);
+    let t;
+    if (lim.fixed || vals.length <= 1) {
+        const d = lim.fixed ? lim.dflt : vals[0];
+        t = zero ? `${d} ${d === 1 ? one : many}${part === 'rows' ? ` (${lim.perRow} a row)` : ''}` : (lim.note || `Fixed: ${d}`);
+    } else t = rangeText(part, lim);
+    if (zero) t += ', or 0 to leave it off';
+    const tp = n > 0 ? totalPages(part, n, lim) : null;
+    if (tp) t += ` · ${tp.per ? `${tp.pages} page${tp.pages === 1 ? '' : 's'} of ${tp.per}` : pagesWord(tp.pages)}${tp.lastUnderHalf ? ', the last under half full' : ''}`;
+    return t;
+}
+
+/**
+ * The lesson sheet's caption on the Print screen (critic A r2 N3): the pages the sheet prints on, read from the build
+ * (`partFit.sheet` {pages, lastFill}), and a last page under half used said so.
+ */
+export function sheetCaption(fit) {
+    const sh = fit && fit.sheet;
+    const n = sh && int(sh.pages) >= 1 ? int(sh.pages) : 1;
+    return `Vocabulary, Remember, We Do and practice rows: ${pagesWord(n)}${n > 1 && Number.isFinite(sh.lastFill) && sh.lastFill < 0.5 ? ', the last under half full' : ''}`;
 }
 
 /**
@@ -274,4 +320,4 @@ export function lessonPartN(po) {
     return Object.keys(o).length ? o : null;
 }
 
-export default { PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };
+export default { VOCAB_MIN, ZERO_OFF_PARTS, partRowText, sheetCaption, PRACTICE_MAX_PAGES, MIXED_MAX_PAGES, practiceTotals, practiceSplit, totalPages, PRACTICE_GROW_CAP, PART_OPT_IDS, PART_OPT_NAMES, PREREQ_FEW_WARNING, PREREQ_WARN_BELOW, partLimits, allPartLimits, offeredValues, snapCount, rangeText, normalizePartOpts, partOptsEmpty, partOptsFromSection, partsListOf, lessonPartN };

@@ -297,7 +297,9 @@ function weDoBandOwn(env) {
         const rem = groups.find((g) => g.sections[0] && g.sections[0].label === 'Remember:');
         if (rem && data && data.chant) Object.assign(rem.sections[0], { label: 'Rule:', instr: data.chant });
         // (`noStripChant` - the detailed lesson maker, lesson 7: two Guided cells fill the page; the chant is on the chart)
-        const chantH = data && data.chant && !rem && !data.noStripChant ? m.instr : 0;
+        // (critic A r2 N2: Remember off - lesson.partN.remember false - takes the rule off the sheet with it, here too)
+        const remOff = !!(input && input.lesson && input.lesson.partN && input.lesson.partN.remember === false);
+        const chantH = data && data.chant && !rem && !data.noStripChant && !remOff ? m.instr : 0;
         const chantHtml = chantH ? `<div class="mq-lstripchant" style="height:${chantH.toFixed(2)}mm"><b>Rule:</b><span>${esc(data.chant)}</span></div>` : '';
         const content = { kind: 'col', cls: 'mq-lwedotop', parts: [{ kind: 'html', html: stripHtml(data, exSteps, ctx.size) + chantHtml }, grid] };
         groups.push(band(m.strip + stripH + chantH + top.h * (top.rows || 1), { kind: 'band', label: 'Guided Practice:', instr: instructionText(instructionKeyOf(weDo, input.skills), weDo), content }, { h: top.h * (top.rows || 1), grid: [grid], cap: 0.1, capIfEmpty: weInPlace ? 0.1 : 0.35 }));
