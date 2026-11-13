@@ -3997,6 +3997,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-band100-alias",
+   "check": "ws-two-step BAND-ALIAS: band 100 not offered on the seven two-step skills, and the share codes written with band 100 on 8438ca59d (M7~B100 ... ZE~B100) decode to their skill at no band and re-encode as the no-band code (the round trip)",
+   "kind": "commit-pair",
+   "rule": "ws-two-step BAND-ALIAS (lead ruling R2 2026-11-13: drop band 100; old codes alias to no band)",
+   "fail": {
+    "commit": "8438ca59d",
+    "state": "band 30 / 50 / 100 offered; M7~B100 decodes to band 100"
+   },
+   "pass": {
+    "commit": "910dd9f0b",
+    "state": "band 30 / 50 offered; OPTION_FOLDS rewrites band 100 to null, so every B100 code decodes to no band and re-encodes without a payload"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --n 30 --skill algebra:multi_step_word,algebra:multi_step_word_plain,algebra:two_step_mult_div_first,algebra:two_step_add_then_mult,algebra:two_step_add_then_div,algebra:two_step_letter_equation,algebra:two_step_estimate_check",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
 ]
 }
