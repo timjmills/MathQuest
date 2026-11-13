@@ -9,6 +9,7 @@ Updated: 2026-11-07
 Critic rounds: 2, FAIL min 6 (r2: N1 sub L sheet lost its Independent row)
 
 ## Now
+- BUDGET (lead 16:58, owner cap 70 % ≈ $1,960 this week): lf-engine allocation $280 above the session cost_usd baseline $777.61 → stop starting agents at $1,057.61. Checkpoint 16:58 UTC: $784.45 (+$6.84). Report spend each report; high effort on lesson design only.
 - 2026-11-13 ~16:00 UTC STOPPED: weekly usage limit hit (resets 2026-11-19 22:00 UTC). All work pushed. Resume points:
   - -pc @ 79ea333b8: round 6 (critic r5 R1-R5 + P1). Step 0 master merge done (dd2a4aff7); then a WIP mixed-practice.js commit (UNGATED, do not deploy). Next: checks first (PC-PV pattern on/off, PG-LR6/LR67 check-off all lessons, live PC-PVHEADS + value-slot instruction, part page-count vs pin, Mixed foot <= 15 %), fixes, live diff + re-pin, spread proof PNGs (Practice + Mixed per family, S and L - lead condition), then critic r6.
   - -roles @ a8ec3f2ac: fix round done except the coordinate_q1 opener L regression (fix side-by-side / ruled, check: no opener skill gains PG-12 / PG-21 / PG-13 vs master) and scoping capacity-pin to mixed-practice; then re-critic.
