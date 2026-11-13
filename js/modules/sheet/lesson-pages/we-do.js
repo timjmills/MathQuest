@@ -154,6 +154,12 @@ export function weDoBand(env) {
     weDoBandOwn(probe);
     env.weDoFit = probe.weDo.length;
     env.weDoMin = probe._weDoMin;
+    // (a count under the band's own minimum prints the minimum: never a half-empty cell)
+    const wN = weDoCap(env.input);
+    if (wN > 0 && Number.isFinite(env.weDoMin) && wN < env.weDoMin) {
+        const pm = Object.assign({}, env.input.lesson.partN, { wedo: env.weDoMin });
+        env.input = Object.assign({}, env.input, { lesson: Object.assign({}, env.input.lesson, { partN: pm }) });
+    }
     return weDoBandOwn(env);
 }
 

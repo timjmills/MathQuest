@@ -25,12 +25,13 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); };
     const ready = () => page.waitForFunction(() => { const s = document.querySelector('#tvStage'); return s && s.dataset.state !== 'building' && document.querySelector('.tv-parts'); }, { timeout: 180000, polling: 300 });
     try {
         // a lesson WITH a Prerequisite Check (its record's prereqs, switch live), else the first lesson
+        // a lesson with a live Prerequisite Check when one exists (none is live on 2026-11-13: every `prereqs` record has
+        // prereqsLive false), else the regrouping subtraction lesson
         const lessonId = arg('lesson') || await page.evaluate(async () => {
             const lib = await import('./js/modules/lessons/library.js');
-            const all = (lib.lessonList ? lib.lessonList() : lib.LESSONS || []);
-            const list = Array.isArray(all) ? all : Object.values(all);
-            const hit = list.find((l) => l && Array.isArray(l.prereqs) && l.prereqs.length >= 3 && l.prereqsLive !== false) || list[0];
-            return hit && hit.id;
+            const ids = Object.keys(lib.LESSONS);
+            return ids.find((k) => { const x = lib.LESSONS[k]; return x && Array.isArray(x.prereqs) && x.prereqs.length >= 3 && x.prereqsLive !== false; })
+                || ids.find((k) => /add_facts/.test(k)) || ids[0];
         });
         console.log(`lesson: ${lessonId}`);
         await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
@@ -74,6 +75,8 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); };
             }
         };
         await stepTo('wedo', 2);
+        await stepTo('chart', 1);
+        await stepTo('rows', 0);
         const pr = (await rowsOf()).find((x) => x.part === 'practice');
         if (pr && pr.range && /^(\d+)/.test(pr.range)) await stepTo('practice', Number(/^(\d+)/.exec(pr.range)[1]));
         await new Promise((r) => setTimeout(r, 500));
@@ -91,7 +94,10 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); };
         // phone
         await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
         await new Promise((r) => setTimeout(r, 800));
-        const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        // (the Print screen's own content: the off-screen legacy settings panel of the pupil app is not the teacher screen's - it is
+        // inert in teacher mode, ws-teacher-shell)
+        const wide = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('.tv-section, .tv-section *')].filter((e) => e.offsetParent).map((e) => Math.round(e.getBoundingClientRect().right - window.innerWidth))));
+        if (wide > 0) console.log('too wide:', JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('body *')].filter((e) => e.getBoundingClientRect().right > window.innerWidth + 1 && e.offsetParent).slice(0, 6).map((e) => `${e.tagName}.${String(e.className).slice(0, 40)} ${Math.round(e.getBoundingClientRect().right)}`))));
         check(wide <= 0, `sideways scroll at 390: ${wide} px`);
         const over = await page.evaluate(() => [...document.querySelectorAll('.tv-part')].filter((r) => r.scrollWidth > r.clientWidth + 1).map((r) => r.dataset.partRow));
         check(!over.length, `part cards wider than their box at 390: ${over.join(', ')}`);
@@ -108,7 +114,7 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); };
             const r0 = await window.buildSheet(fitReq);
             const f = r0.lesson.partFit;
             const prac = f.practice ? Math.max(f.practice.minRows * f.practice.cols, 1) : undefined;
-            const r = await window.buildSheet(Object.assign({}, fitReq, { partOpts: { wedo: { n: 2 }, prereq: f.prereq ? { n: 2 } : undefined, practice: prac !== undefined ? { n: prac } : undefined } }));
+            const r = await window.buildSheet(Object.assign({}, fitReq, { partOpts: { wedo: { n: 2 }, chart: f.chart && f.chart.min < f.chart.designed ? { n: f.chart.min } : undefined, vocab: { n: 2 }, prereq: f.prereq ? { n: 2 } : undefined, practice: prac !== undefined ? { n: prac } : undefined } }));
             window.__po = { fit: f, got: { prereq: r.lesson.prereqCheck && r.lesson.prereqCheck.length, wedo: r.lesson.teach.guided, practice: (r.items || []).filter((it) => it.part === 'practice').length } };
             return window.sheetDocument(r.pupilHtml, 'Lesson', { paper: 'A4' });
         }, lessonId);

@@ -525,7 +525,7 @@ function sectionHTML(s, i) {
   </div>
   ${s.role === 'more-practice' ? `<div class="tv-fields-cols"><div>${colsField}</div></div>${pagesField}`
         : `<div class="tv-fields-cols"><div>${colsField}</div>${pagesField}</div>`}
-  ${s.role === 'lesson' ? `<div class="tv-divided" id="tvParts${i}">${partsHTML(s, i)}</div>` : ''}
+  ${s.role === 'lesson' ? `<div class="tv-divided tv-parts-wrap" id="tvParts${i}">${partsHTML(s, i)}</div>` : ''}
 </div>`;
 }
 
