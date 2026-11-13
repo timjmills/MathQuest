@@ -6804,6 +6804,66 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "frame-title-place-long",
+  "check": "The teacher's page title (owner request 2026-11-13): titlePos above draws the title before the Name / Date / Score row, a custom title never shrinks, never passes two lines (cut at a word with an ellipsis and reported in res.titleFit for the dialog), and nothing overlaps the field row, the rule or the first row - every role and key, M and L",
+  "kind": "commit-pair",
+  "rule": "ws-frame-title TITLE-PLACE / TITLE-LONG",
+  "browser": true,
+  "fail": {
+   "commit": "f4294f68b",
+   "state": "origin/master + the checks: no title option (the title stays below and the custom words are ignored)"
+  },
+  "pass": {
+   "commit": "cbfb4e9ca",
+   "state": "the title option built (frame.js pageHeader, print-sheet.js fitTitle / withTitleOption)"
+  },
+  "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only geom,long",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "frame-title-ident-planted",
+  "check": "TITLE-IDENT detects a no-option page that is no longer byte-identical to origin/master (planted: one pinned hash of addition:add_facts independent L changed); the live pin of master fdfddfdd2 passes",
+  "kind": "fixture",
+  "rule": "ws-frame-title TITLE-IDENT",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/frame-title/bt-planted-changed-page.json",
+   "state": "planted: the pinned pupil page differs from the render"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/frame-title/master-hashes.json",
+   "state": "the hashes of origin/master fdfddfdd2 (no option)"
+  },
+  "command": "node tests/scripts/ws-frame-title.cjs --skills addition:add_facts --only ident --hashes-against {fixture}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "title-code-roundtrip",
+  "check": "The page title travels with the simple print's QP1 share code and link and reaches the request; old codes (pinned from origin/master) decode and re-encode unchanged with the defaults",
+  "kind": "commit-pair",
+  "rule": "ws-title-code TITLE-CODE-RT / -OLD / -REQ",
+  "browser": true,
+  "fail": {
+   "commit": "f4294f68b",
+   "state": "origin/master + the checks: the code drops the title"
+  },
+  "pass": {
+   "commit": "cbfb4e9ca",
+   "state": "cleanPrint appends pageTitle / titlePos only when set; titleHeaderOf"
+  },
+  "command": "node tests/scripts/ws-title-code.cjs",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
