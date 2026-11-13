@@ -13,6 +13,8 @@
 //   node tests/scripts/ws-cell-checks.cjs --skills k --roles reason-it,test --size S,L --opts '{"forms":[1]}'
 //   node tests/scripts/ws-cell-checks.cjs --rules OVERFLOW,TAGINK   # only these rules count
 //   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --h13-abs [--rule-skills k]   # + H13-ABS on option pages (opt-in, N6)
+//   node tests/scripts/ws-cell-checks.cjs --skills k --card --card-opts --words-rules [--rule-skills k]  # + the number-name rules
+//                                          CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y (opt-in, critic nwf r1)
 //   node tests/scripts/ws-cell-checks.cjs --self-test              # planted pages, each rule must fire / stay quiet
 // MQ_ROOT=<tree> serves another checkout (ws-backtest commit-pair rows); the card plan is read from that tree.
 // Last line `ws-cell-checks: OK (...)` / `FAIL - n finding(s) ...`; exit 1 on FAIL (--report-only: 0).
@@ -21,6 +23,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const H = require('../lib/ws-harness.cjs');
 const { cellChecksInPage, sizeSFindings } = require('../lib/ws-cell-checks.cjs');
+const { wordsChecksInPage } = require('../lib/ws-words-cells.cjs');
 
 const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i + 1] : d; };
@@ -35,6 +38,12 @@ if (H13ABS && !RULES.includes('H13-ABS')) RULES.push('H13-ABS');
 const RULE_SKILLS = list(arg('rule-skills', ''));
 const h13On = (j) => H13ABS && (has('h13-abs-all') || !!j.variant) && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 // TITLE and LESSON-OPT (lf-ops critic r1 check 7) are OPT-IN: --rules ...,TITLE,LESSON-OPT (opt-in-rules.json lane lf-ops-props)
+// --words-rules (OPT-IN; critic lf-placevalue nwf r1 N2 / N4 / N5 / N7 / N8, lead ruling D1): the number-name cell's checks
+// (tests/lib/ws-words-cells.cjs: CLAIM-INK, MODEL-ANSWER, WORDS-TEXT, WORDS-BREAK, ROW-SLOT-Y), judged on --rule-skills
+const WORDS_RULES = ['CLAIM-INK', 'MODEL-ANSWER', 'WORDS-TEXT', 'WORDS-BREAK', 'ROW-SLOT-Y'];
+// (an explicit --rules list stays the list: a backtest row proves one rule alone)
+if (has('words-rules') && !arg('rules', null)) for (const r of WORDS_RULES) if (!RULES.includes(r)) RULES.push(r);
+const wordsOn = (j) => has('words-rules') && (!RULE_SKILLS.length || RULE_SKILLS.includes(j.k));
 const SIZES = list(arg('size', 'S,M,L'));
 // the titles a signed card decided ({skill, opts, iCan, source}); the TITLE rule holds the page to them
 const DECIDED = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e) { try { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'precritic', 'card-titles.json'), 'utf8')).titles || []; } catch (e2) { return []; } } })();
@@ -46,7 +55,9 @@ async function checkDoc(sheet, html, ctx) {
     await sheet.setContent(html, { waitUntil: 'load', timeout: 60000 });
     await sheet.waitForFunction(() => document.documentElement.getAttribute('data-ws-fonts') === 'ready', { timeout: 15000 }).catch(() => {});
     await sheet.evaluate(() => document.fonts && document.fonts.ready);
-    return sheet.evaluate(cellChecksInPage, ctx);
+    const r = await sheet.evaluate(cellChecksInPage, ctx);
+    if (ctx.words) r.findings = r.findings.concat(await sheet.evaluate(wordsChecksInPage, { role: ctx.role, key: ctx.key }));
+    return r;
 }
 
 function selfTest() {
@@ -147,8 +158,8 @@ function selfTest() {
             if (/\(\d+ jumps\)|\(\w+=/.test(got)) findings.push({ rule: 'TITLE', msg: `${tag}: an option value in the title "${built.title}" (H17)` });
         }
         if (j.role === 'lesson') lessons.push({ k: j.k, size: j.size, opts: j.opts, want: built.want, rule: built.rule });
-        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j) });
-        const kk = await checkDoc(sheet, built.key, { role: j.role, key: true });
+        const p = await checkDoc(sheet, built.pupil, { role: j.role, key: false, h13abs: h13On(j), words: wordsOn(j) });
+        const kk = await checkDoc(sheet, built.key, { role: j.role, key: true, words: wordsOn(j) });
         const here = [
             ...p.problems.map((m) => ({ rule: 'OVERFLOW', msg: `pupil ${m}` })), ...kk.problems.map((m) => ({ rule: 'OVERFLOW', msg: `key ${m}` })),
             ...p.findings, ...kk.findings,

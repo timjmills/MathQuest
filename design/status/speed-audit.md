@@ -958,6 +958,16 @@ ws-backtest removes each checkout as soon as its state has run (c3245504). **Rul
 start it first, alone, detached, and re-run only the failed rows by `--row`.- 2026-11-12 lf-ops facts-roles critic r1 (FAIL, lowest 6): the cell-band fix moved the white from the cells to the page (Guided 38-69 %, Model 23-42 % used) - the same class as div_facts r6; the lane did not run a page-used measure before the critic. Checks: EB-PAGE (page used), EB-EDGE (ink at a divider / frame), MOD-MARKS / MOD-LINES (Scripted Model states differ, step text <= 2 lines). Speed-up: when a ruling moves space, ask the page-fill question before the build.
 
 
+### lf-placevalue week 2 (2026-11-12): number_word_form r1 FAIL
+**Lost:** the critic found 9 pv-owned findings no lane check covered (provider wrong answers / steps for 2-digit names, model states,
+chant vs slots, word breaks). **Speed-up next time:** before the critic, render scripted-model / guided / opener / true-false for a NEW
+skill and read its provider outputs per band (the 5 earlier pv skills had been through those roles; this one never had).
+
+### lf-placevalue number_word_form (2026-11-12/13): 3 critic rounds to pass
+**Lost:** r1 found 9 provider / cell findings no check covered (a new skill never rendered on scripted-model / guided / true-false
+before its critic); r2 found the N4 class again (N10) because the r1 fix keyed on one name's length. **Kept:** a builder (Opus medium)
+fixed 6 findings + 7 checks in one pass; the r3 narrow critic took 9 minutes. **Next skill:** run ws-cell-checks --words-rules and
+ws-words-checks style provider checks for compare / more_less BEFORE the first critic.
 ### lf-engine backtest re-run (2026-11-12/13): full table on master d34311d5, 163 rows, 10,628 s
 
 | Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
@@ -966,3 +976,16 @@ start it first, alone, detached, and re-run only the failed rows by `--row`.- 20
 | Rows whose pass commit was a placeholder (TBD-lf-ops-fix4, 8 cc-* / pl-* rows) ran their whole fail state and then ERRORed | ws-backtest: a non-hex commit reports PENDING at once | (tool rule; seen on cc-card-overflow etc.) | ws-backtest | ~15 min a run |
 | 12 commit-pair rows FAIL on their PASS commit because today's check grew past them: ws-simple-print (8 rows: later ORDER / COLNOTE / BRKINK / QROOM / SETSHAPE checks, and `lastSimpleRequests` not on the old tree), ws-providers-unit --pv-r2 (4 rows: PT-MOD-1 now fails 419 checks on 4a57b5c2), ws-empty-band (eb-fact-roles: EB-GDPCAP) | a row must name the check ids it backtests (the tool runs only those), or pin the check's own version; until then these rows are not proof | the 12 rows (listed in the log) | ws-backtest | owner of each check: re-scope the row |
 | ws-precritic-plan: 21 of 111 rows not on the lane's path (cc-* placeholder rows, ws-empty-band lesson / guided / scripted-model rows, opt-in lf-placevalue) | ws-precritic-plan (already) | - | ws-backtest end-of-run | - |
+
+### lf-engine live-fix (2026-11-13): critic lf-engine-pc r3 F5-F7 were LIVE on master, on pages the round never gated
+
+Process rule (from this round): **critic-ready means every page of the packet is gated, not only the pages that changed.**
+F5-F7 sat on Practice / Mixed pages the Prerequisite Check lane did not touch, so its gates never read them; the same
+three defects were live on master's short-lesson packets. A lane's precritic now runs PM-H13 and LIVE-PART on every
+Practice and Mixed page of the three pinned samples (ws-lesson-samples --check, gate lesson-samples-check).
+
+| Finding | Check that catches it | Backtest row | On precritic / ws-detailed-lesson path | Rounds saved |
+|---|---|---|---|---|
+| F5 add L Mixed: the Addition row's vertical facts on a 52-55 % band (row sized for the bond row below); the same check then found a 30 % band on add S Practice and the L count row | ws-lesson-samples PM-H13 (new, blocking: no cell band >= 30 % on any Practice / Mixed page) | lesson-pm-h13 (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F6 sub / round Mixed, add_100_regroup partner: a hundreds carry box over sums < 100 the key never fills (H15 dead part) | ws-lesson-samples LIVE-PART (new: every carry / regroup box a key draws is filled by >= 1 stack of its section) | lesson-live-carry (cf1e5abe FAIL 4 → ce1d96f5 OK) | precritic lesson-samples-check | 1 round |
+| F7 round L / S Practice: 49 % band in all 15 rounding cells | PM-H13 (as F5) | lesson-pm-h13 | precritic lesson-samples-check | 1 round |
