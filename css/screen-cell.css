@@ -1904,8 +1904,8 @@ html body .mq-scell input.ws-expanded-input.ws-expanded-input:focus:not(.mq-acti
 .mq-scell input.mq-gl-sign { border-radius: 50% !important; font-weight: 700; }
 
 /* lf-ops-props r4b (lf-algebra critic r2 G1; SCREEN-DIGIT 40 / 48 / 56 px): a worksheet card that holds a count-row box train
-   (number_patterns_rule) keeps the host's own digit size, not the grid cell's 29 px - its train wraps to the card's width. The
-   arcs train (count_by_tables) is excluded pending the lead's ruling on its screen line count. */
-.mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 40px; }
-@media (min-width: 600px) { .mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 48px; } }
-@media (min-width: 1200px) { .mq-scell.mq-grid-cell:has(.k2-countrow:not(.k2-countrow-arcs)) { --mq-digit: 56px; } }
+   (number_patterns_rule; count_by_tables' arcs train, lead ruling (a) 2026-11-13) keeps the host's own digit size, not the grid
+   cell's 29 px - its train wraps to the card's width. A train that still swipes (a number line under it: no k2-countrow-wrap) is excluded. */
+.mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 40px; }
+@media (min-width: 600px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 48px; } }
+@media (min-width: 1200px) { .mq-scell.mq-grid-cell:has(.k2-countrow-wrap) { --mq-digit: 56px; } }

@@ -676,7 +676,11 @@ register('count-row', {
         // input - number_patterns_rule's train read 15-28 px under 44 px inputs that ran onto its caption. The arcs train - the
         // count-by row, six a line with its jump arrows and step tab, swiped on a phone - keeps its own sizes: at the floor its
         // line ran 900 px into an 820 card and the host shrank the whole drawing to fit.)
-        const twinDigits = isTwin(ctx) && g.look !== 'arcs' ? rowMax : 0;
+        // (lead ruling (a) 2026-11-13: on screen the arcs train - no number line under it - is ONE wrapping line at the digit
+        // floor: as many numbers a line as fit (3-4), the jump arrow before each number carrying the count on to the next line
+        // as print's pair form does; no swipe row, no horizontal scroll, never shrunk under SCREEN-DIGIT. ws-screen-slots TRAIN-FIT)
+        const wrapTwin = isTwin(ctx) && g.look === 'arcs' && !g.axis;
+        const twinDigits = isTwin(ctx) && (g.look !== 'arcs' || wrapTwin) ? rowMax : 0;
         const cells = values.map((v, i) => {
             const k = blanks.indexOf(i);
             const over = shownAt(p, i);
@@ -705,27 +709,29 @@ register('count-row', {
             }
         }
         const rowsHtml = [];
-        const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab;
+        const swipeTabs = isTwin(ctx) && g.look === 'arcs' && !!g.tab && !wrapTwin;
+        const swipeRow = isTwin(ctx) && g.look === 'arcs' && !wrapTwin;
+        const nRows = wrapTwin ? 1 : g.rows, nPer = wrapTwin ? cells.length : g.perRow;
         const tabsCol = [];
         const lg = lineGapOf(ctx, g);
         if (g.tabAbove) rowsHtml.push(`<div class="k2-countrow-line k2-countrow-tabline" style="display:flex;margin-bottom:${L(ctx, lg)};">${stepTab(ctx, g, tabOf(p, ctx), p.tabHint && lvlOf(ctx) === 2 ? GREY : INK, tabLineH(g, ctx))}</div>`);
-        for (let r = 0; r < g.rows; r++) {
-            const part = cells.slice(r * g.perRow, (r + 1) * g.perRow);
+        for (let r = 0; r < nRows; r++) {
+            const part = cells.slice(r * nPer, (r + 1) * nPer);
             // skip_count_line keeps its hop arcs over a number line (owner 2026-10-09); every other row takes the short jump arrows
             const arcs = g.axis ? arcsSVG(ctx, g, part.length) + axisSVG(ctx, g, part.length) : '';
             const jumps = g.look === 'arcs' && !g.axis;
             const lineCells = jumps ? part.map((c, k) => (k ? `<span class="k2-jumpcell" style="position:relative;flex:none;display:block;">${jumpArrow(ctx, g, g.gap)}${c}</span>` : c)) : part;
-            const turns = g.look === 'arcs' && g.tab && g.rows > 1;
+            const turns = g.look === 'arcs' && g.tab && nRows > 1;
             const tabW = g.tab;
             const lift = g.hasLbl ? `margin-bottom:${L(ctx, g.lblH)};` : '';
             const tabCol = g.tab ? (r === 0 && !g.tabAbove ? stepTab(ctx, g, tabOf(p, ctx), p.tabHint && lvlOf(ctx) === 2 ? GREY : INK) : r === 0 ? `<span style="flex:none;width:${L(ctx, tabW)};"></span>` : `<span class="k2-steptab-in" style="flex:none;width:${L(ctx, tabW)};${lift}">${turns ? turnArrow(ctx, g, 'in', tabW) : ''}</span>`) : '';
             // screen twin (critic C2 r4): the step tab and the arrow column sit OUTSIDE the swiping row, in a fixed column beside it,
             // so no number or box can ever slide under them; wireSwipeRows (screen-cell.js) keeps each entry level with its line
             if (swipeTabs) { tabsCol.push(`<div data-mq-tabfor="${r}" style="display:flex;align-items:flex-end;${r ? `margin-top:${L(ctx, 2.5)};` : ''}">${tabCol}</div>`); }
-            const exitArrow = turns && r < g.rows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
-            rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-end;justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
+            const exitArrow = turns && r < nRows - 1 ? `<span style="flex:none;width:${L(ctx, 6)};margin-left:${L(ctx, 1.5)};${lift}">${turnArrow(ctx, g, 'out', 6)}</span>` : '';
+            rowsHtml.push(`<div class="k2-countrow-line"${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:${wrapTwin ? 'flex-start' : 'flex-end'};justify-content:${g.tab ? 'flex-start' : 'center'};${r ? `margin-top:${L(ctx, lg)};` : ''}">`
                 + `${swipeTabs ? '' : tabCol}<div style="display:flex;flex-direction:column;align-items:flex-start;">${arcs}`
-                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${isTwin(ctx) && g.look !== 'arcs' ? 'flex-wrap:wrap;justify-content:center;max-width:100%;' : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
+                + `<div${isTwin(ctx) ? ' data-mq-wrapped="1"' : ''} style="display:flex;align-items:flex-start;gap:${L(ctx, g.gap)};${isTwin(ctx) && (g.look !== 'arcs' || wrapTwin) ? `flex-wrap:wrap;justify-content:${wrapTwin ? 'flex-start' : 'center'};max-width:100%;${wrapTwin ? `row-gap:${L(ctx, 3)};` : ''}` : ''}">${lineCells.join('')}</div></div>${exitArrow}</div>`);
         }
         let caption = '';
         if (p.rule) {
@@ -750,11 +756,11 @@ register('count-row', {
             : '';
         const align = g.tab ? 'left' : 'center';
         const vp = vpadOf(p, ctx), inset = insetOf(ctx);
-        return root(ctx, `k2-countrow k2-countrow-${g.look}`,
+        return root(ctx, `k2-countrow k2-countrow-${g.look}${isTwin(ctx) && !swipeRow ? ' k2-countrow-wrap' : ''}`,
             `${caption}${swipeTabs ? `<div class="k2-countrow-frame" style="display:flex;align-items:flex-start;max-width:100%;min-width:0;"><div class="k2-countrow-tabs" data-mq-tabcol="1" style="flex:none;">${tabsCol.join('')}</div>` : ''}`
-            + `${isTwin(ctx) && g.look === 'arcs' ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
+            + `${swipeRow ? `<div data-mq-swiperow="1" style="overflow-x:auto;max-width:100%;padding-bottom:1px;${swipeTabs ? 'flex:1 1 auto;min-width:0;width:auto;' : ''}">` : ''}`
             + `<div class="k2-countrow-body" data-mq-join=", " style="display:inline-block;text-align:left;">${rowsHtml.join('')}</div>`
-            + `${isTwin(ctx) && g.look === 'arcs' ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
+            + `${swipeRow ? '<div class="k2-swipe-cues" aria-hidden="true"><span class="k2-swipe-back"><i>&#10229;</i> <b>Back<span class="k2-cue-long"> to the start</span></b></span><span class="k2-swipe-cue"><b>Swipe</b> <i>&#10142;</i> <b>for more boxes</b></span></div></div>' : ''}${swipeTabs ? '</div>' : ''}${keys}${ruleFrame}`,
             { style: `text-align:${align};${vp ? `padding:${L(ctx, vp)} 0;` : ''}${inset ? `padding-left:${L(ctx, inset)};` : koReserve(p, ctx) ? `padding-left:min(${KO_RESERVE_MM}mm, var(--ws-koin, 0mm));box-sizing:border-box;` : ''}` });
     },
     answerKey(p) {
