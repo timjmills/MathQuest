@@ -1719,7 +1719,11 @@ Retrieval-and-reasoning pages whose questions MathQuest generates from any skill
   pattern's terms, a function table's outputs: "12, 15, 18") writes one line a part, joined by commas, and wraps under the frame's
   words in a narrow cell. A sentence answer ("The ones digits go 0, 2, 4, 6, 8.") prints no frame row: the judgement is the
   answer. The same holds for Reason It's "The answer is ____." (its "__ is correct." names the sentence) and for an Error
-  Analysis fix (a sentence answer's fix is the item again, clean). Check: `ws-roles-unit` KEYJOIN-ROLE; ws-cell-checks KEYJOIN.
+  Analysis fix: a sentence answer is fixed by checking the right choice, or the item is skipped when it has no choices.
+  Check: `ws-roles-unit` KEYJOIN-ROLE; ws-cell-checks KEYJOIN.
+  Reason It (lead, delegated approval 2026-11-13, critic r3 D1/D2/D5): a LIST answer prints no "The answer is" frame either - the
+  panel the pupil names in "__ is correct." holds every part (H16); a unit form ("[ ] hundreds [ ] tens [ ] ones") keeps its frame,
+  full width under A and B. A count row's rule part is named with the item's own words ("Rule: add [ ] each time.").
 
 **Teacher options.** Count; share false; frame on or off. **Skill supplies.** `renderCell` with `state: answered | wrong`, `wrongAnswer`, a frame id from `strings`. Default adapter: the generic frame "The answer is ____." **Screen.** Tap True or False; the frame input opens after "False"; feedback on Check.
 
