@@ -3,8 +3,8 @@
  "written": "2026-11-13",
  "commit": "f7377b76",
  "totals": {
-  "keys": 42,
-  "findings": 99
+  "keys": 71,
+  "findings": 154
  },
  "skills": [
   "addition:add_facts",
@@ -202,6 +202,123 @@
   "division:div_facts {support array} quiz 1280px|SIZE-WIDTH|array|strip 3:1+": {
    "n": 1,
    "worst": 12
+  },
+  "addition:add_facts {support line} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 95
+  },
+  "addition:add_facts {support line} card 390px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 1,
+   "worst": 96
+  },
+  "addition:add_facts {support line} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 95
+  },
+  "addition:add_facts {support line} card 820px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 1,
+   "worst": 96
+  },
+  "addition:add_facts {support line} card 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 95
+  },
+  "addition:add_facts {support line} card 1280px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 1,
+   "worst": 96
+  },
+  "addition:add_facts {support line} worksheet 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "addition:add_facts {support line} worksheet 1280px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 3,
+   "worst": 96
+  },
+  "addition:add_facts {support line} quiz 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "subtraction:sub_facts {support line} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "subtraction:sub_facts {support line} card 390px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 2,
+   "worst": 96
+  },
+  "subtraction:sub_facts {support line} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "subtraction:sub_facts {support line} card 820px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 2,
+   "worst": 96
+  },
+  "subtraction:sub_facts {support line} card 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "subtraction:sub_facts {support line} card 1280px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 2,
+   "worst": 96
+  },
+  "subtraction:sub_facts {support line} worksheet 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "subtraction:sub_facts {support line} worksheet 1280px|TEXT-SIZE|label text|label 8 pt floor": {
+   "n": 3,
+   "worst": 96
+  },
+  "subtraction:sub_facts {support line} quiz 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 95
+  },
+  "multiplication:mult_facts {support skip} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 96
+  },
+  "multiplication:mult_facts {support skip} card 820px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 96
+  },
+  "multiplication:mult_facts {support skip} card 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 96
+  },
+  "multiplication:mult_facts {support skip} quiz 1280px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 1,
+   "worst": 96
+  },
+  "placevalue:identify {defaults} card 390px|TEXT-SIZE|digit text|digit floor 40 px": {
+   "n": 3,
+   "worst": 76
+  },
+  "placevalue:identify {defaults} card 820px|TEXT-SIZE|digit text|digit floor 48 px": {
+   "n": 3,
+   "worst": 63
+  },
+  "placevalue:identify {defaults} card 1280px|TEXT-SIZE|digit text|digit floor 56 px": {
+   "n": 3,
+   "worst": 54
+  },
+  "placevalue:identify {defaults} quiz 1280px|TEXT-SIZE|digit text|digit floor 56 px": {
+   "n": 1,
+   "worst": 54
+  },
+  "placevalue:unit_form {defaults} worksheet 1280px|TEXT-SIZE|label text|label print 15 pt+": {
+   "n": 4,
+   "worst": 92
+  },
+  "placevalue:value {defaults} worksheet 1280px|TEXT-SIZE|label text|label print 15 pt+": {
+   "n": 4,
+   "worst": 92
+  },
+  "division:div_facts {support boxsign} card 390px|TEXT-SIZE|label text|label print under 11 pt": {
+   "n": 2,
+   "worst": 94
   }
- }
+ },
+ "status": "2026-11-13 lf-checks queue 14-17 re-pin: the old 42 keys kept as they were; 29 NEW keys from the new TEXT-SIZE rule only (real findings, routed to the owning lanes in design/status/lf-checks.md: add_facts / sub_facts line labels, mult_facts skip labels, div_facts boxsign label -> lf-ops; placevalue identify / unit_form / value -> lf-placevalue). Owning lanes shrink them."
 }
