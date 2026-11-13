@@ -107,7 +107,8 @@ const ALLOW = new Set(list(arg('allow', '')));
     const fmt = (v) => (Number(v.pages) > 1 ? `${v.items} over ${v.pages} pages` : `${v.items}`);
     for (const [k, v] of Object.entries(now)) { if (v.na) continue; const m = /^(.*) ([SML])$/.exec(k); (groups[m[1]] = groups[m[1]] || {})[m[2]] = v; }
     for (const [g, z] of Object.entries(groups)) {
-        if (z.S && z.M && perPage(z.S) < perPage(z.M)) order.push(`${g}: S ${fmt(z.S)} < M ${fmt(z.M)} items a page (SIZE-ORDER)`);
+        // Size S is dropped (owner, 2026-11-13; CLAUDE.md fastest plan item 9): SIZE-ORDER compares M >= L only; S pages stay pinned
+        // for CAPACITY-NO-DROP but no longer order against M.
         if (z.M && z.L && perPage(z.M) < perPage(z.L)) order.push(`${g}: M ${fmt(z.M)} < L ${fmt(z.L)} items a page (SIZE-ORDER)`);
     }
     drops.push(...order);
