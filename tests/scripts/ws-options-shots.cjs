@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // ws-options-shots — GATE: the option panel's live sample shows the problem, for EVERY skill with an options panel.
 //
-//   node tests/scripts/ws-options-shots.cjs                       # every skill with options, at 1280 and 390 px
+//   node tests/scripts/ws-options-shots.cjs                       # every skill with options, at 1280x1000, 1366x768, 1024x768, 820x1180
 //   node tests/scripts/ws-options-shots.cjs --skill algebra:growing [--skill cat:skill ...]   (or a comma list)
 //   node tests/scripts/ws-options-shots.cjs --widths 1280 --workers 3 --shots <dir> --save-panels
 //   node tests/scripts/ws-options-shots.cjs algebra:growing ...   # (bare cat:skill refs, as the old screenshot tool took them)
@@ -24,10 +24,10 @@
 //   (e) a page error is thrown while the panel opens or redraws (critic-panel-r1 F4);
 //   (f) the drawing's scale is under 0.30 (its strokes are hairlines), or the frame ends shorter than its CSS height
 //       (critic-panel-r1 F3: a grown frame computed from clientHeight but written as a border-box height).
-// The main sweep is every skill at 1280×1000 and 390×844. The SPOT set (the critic's cases: the coordinates
+// The main sweep is every skill at 1280×1000, 1366×768, 1024×768 and 820×1180. The SPOT set (the critic's cases: the coordinates
 // transformation skills, the long algebra word problems, the skills whose footer fell off the window, ...) and every
 // --skill run also get: 1280×720 (`@1280x720`), a resize with the panel open from 1280×1000 to 1280×720
-// (`@1280x1000>720`), and an option change at 1280 and 390: the first select / checkbox of the panel is changed and
+// (`@1280x1000>720`), and an option change at every width: the first select / checkbox of the panel is changed and
 // (a)-(e) are re-measured 50 ms and 1.5 s after it (`@<w> changed +50ms`, `+1.5s`).
 // A skill whose sample is honestly unavailable (`.tvp-frame.is-unavailable`, its own message) is reported, not failed.
 // A --skill that has no options panel FAILs (a typo or a skill that lost its options); with --skip-no-panel (ws-precritic's
@@ -55,7 +55,9 @@ const flag = (k) => argv.includes('--' + k);
 const valued = new Set(['--skill', '--widths', '--workers', '--shots', '--fail-shots', '--shard', '--checks', '--inject']);
 const bare = argv.filter((a, i) => /^[a-z0-9_]+:[a-z0-9_]+$/i.test(a) && !valued.has(argv[i - 1]));
 const ONLY = [...new Set([...many('skill').flatMap((v) => v.split(',')).map((v) => v.trim()).filter(Boolean), ...bare])];
-const WIDTHS = String(one('widths', '1280,390')).split(',').map(Number).filter(Boolean);
+// The panel's widths (owner scope, 2026-11-13: 1280, 1366, 1024 and 820; 390 dropped). `--widths 1280,820` keeps their heights.
+const HEIGHT = { 1280: 1000, 1366: 768, 1024: 768, 820: 1180 };
+const WIDTHS = String(one('widths', '1280,1366,1024,820')).split(',').map(Number).filter(Boolean);
 const WORKERS = Math.max(1, Number(one('workers', 3)) || 1);
 const SHOTS = one('shots', '') ? path.resolve(one('shots')) : '';
 const FAIL_SHOTS = one('fail-shots', '') ? path.resolve(one('fail-shots')) : '';
@@ -69,15 +71,26 @@ const SHARD = (() => {
     return { i: +m[1], n: +m[2] };
 })();
 if (SHARD && (many('skill').length || bare.length)) { console.log('ws-options-shots: --shard and --skill do not go together'); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
-const HEIGHT = { 1280: 1000, 390: 844 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const INK_MIN = 0.005, TEXT_MIN = 9;
 const NO_SPOT = flag('no-spot');
 // --checks a,b: only these families fail a reading (the others are still measured and shown); a backtest row isolates its
 // own finding with it. inside (a), ink (b), text (c), controls (d), pageerror (e), scale (f).
-const CHECKS = new Set(String(one('checks', 'inside,ink,text,controls,pageerror,scale')).split(',').map((x) => x.trim()).filter(Boolean));
-const BAD_CHECK = [...CHECKS].filter((c) => !['inside', 'ink', 'text', 'controls', 'pageerror', 'scale'].includes(c));
-if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (inside, ink, text, controls, pageerror, scale)`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
+// critic-panel-r2 (round 3): clip (an overflow box inside the stage clips its content, F1), cover (the parts together
+// show every block of the item, F1/F2), choices (the answer choices one lettered part of their own, F2), svgtext (SVG
+// labels at the floor, F3), parts (every part walked), summary (the clamped
+// option summary has a keyboard/touch expand control, F5), repeat (no sentence shown twice, F6).
+const FAMILIES = ['inside', 'ink', 'text', 'controls', 'pageerror', 'scale', 'clip', 'cover', 'choices', 'svgtext', 'parts', 'summary', 'repeat'];
+const CHECKS = new Set(String(one('checks', FAMILIES.join(','))).split(',').map((x) => x.trim()).filter(Boolean));
+const BAD_CHECK = [...CHECKS].filter((c) => !FAMILIES.includes(c));
+if (BAD_CHECK.length) { console.log(`ws-options-shots: --checks ${BAD_CHECK.join(',')}: unknown (${FAMILIES.join(', ')})`); console.log('ws-options-shots: FAIL (usage)'); process.exit(2); }
+// SVG text floor (critic-panel-r2 F3): the same 9 px as HTML text. No lower SVG floor is allowed: a grid's tag or a
+// group's number is read by the teacher like any other word.
+const SVG_TEXT_MIN = 9;
+// Every part is walked; a sample with more parts than this FAILs [parts] (it is not a sample a teacher can page through).
+const PART_CAP = 40;
+// A part's own ink floor: dark pixels inside the drawn part's box (not the whole frame), the same 0.5 % as a whole sample.
+const PART_INK_MIN = 0.005;
 // --change: the option-change pass on every main check (a full run gives it to the spot set; a --skill run to every skill).
 const CHANGE_ALL = flag('change');
 // --changed-only: only the readings taken after the option change are judged (the backtest of that pass).
@@ -99,8 +112,8 @@ const SPOT = [
 ];
 
 // Count dark pixels of a PNG (base64) in the page itself: no image library in the repo.
-async function inkOf(page, b64) {
-    return page.evaluate(async (b64) => {
+async function inkOf(page, b64, part = null) {
+    return page.evaluate(async (b64, part) => {
         const img = new Image();
         await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = 'data:image/png;base64,' + b64; });
         const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
@@ -110,8 +123,20 @@ async function inkOf(page, b64) {
         const d = g.getImageData(IN, IN, W, H).data;
         let dark = 0;
         for (let i = 0; i < d.length; i += 4) if (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2] < 230) dark++;
-        return dark / (W * H);
-    }, b64);
+        // (the drawn part's own box, frame-relative: its density, so a near-blank part in a big frame cannot pass)
+        let own = null;
+        if (part) {
+            const x0 = Math.max(IN, Math.round(part.x)), y0 = Math.max(IN, Math.round(part.y));
+            const x1 = Math.min(c.width - IN, Math.round(part.x + part.w)), y1 = Math.min(c.height - IN, Math.round(part.y + part.h));
+            if (x1 > x0 && y1 > y0) {
+                const e = g.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+                let k = 0;
+                for (let i = 0; i < e.length; i += 4) if (0.299 * e[i] + 0.587 * e[i + 1] + 0.114 * e[i + 2] < 230) k++;
+                own = k / ((x1 - x0) * (y1 - y0));
+            }
+        }
+        return { ink: dark / (W * H), own };
+    }, b64, part);
 }
 
 // Everything the gate reads off the open panel, in one pass.
@@ -123,7 +148,7 @@ function measure(page) {
         const stage = frame.querySelector(':scope > .tvp-stage');
         const box = (el) => { if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; };
         // the sample's text as drawn: computed font-size × the element's effective scale (bounding width / layout width)
-        let minPx = Infinity, minText = '', svgPx = Infinity;
+        let minPx = Infinity, minText = '', svgPx = Infinity, svgText = '';
         if (stage) {
             const sk = stage.offsetWidth ? stage.getBoundingClientRect().width / stage.offsetWidth : 1;
             const tw = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
@@ -137,7 +162,7 @@ function measure(page) {
                 if (el.closest('svg')) {
                     const m = el.getScreenCTM && el.getScreenCTM();
                     const px = fsz * (m ? Math.hypot(m.a, m.b) : sk);
-                    if (px < svgPx) svgPx = px;
+                    if (px < svgPx) { svgPx = px; svgText = t.slice(0, 24); }
                     continue;
                 }
                 // (a ratio within 3 % of the stage's scale is the layout width's whole-pixel rounding: the stage's scale)
@@ -152,6 +177,79 @@ function measure(page) {
         frame.style.height = '';
         const cssH = frame.offsetHeight;
         frame.style.height = grown;
+        // (round 3) The item's atoms (every word outside a drawing, every outermost svg / img / canvas) as the UNPAGED item
+        // draws them: the parts' hidden blocks are shown for one synchronous read, then hidden again (no paint between).
+        const atomsOf = () => {
+            const out = [];
+            if (!stage) return out;
+            const tw2 = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
+            for (let n = tw2.nextNode(); n; n = tw2.nextNode()) {
+                const el = n.parentElement;
+                if (!n.textContent.trim() || !el || el.closest('svg')) continue;
+                out.push({ n, el, t: n.textContent.replace(/\s+/g, ' ').trim() });
+            }
+            for (const g of stage.querySelectorAll('svg, img, canvas')) if (!(g.parentElement && g.parentElement.closest('svg'))) out.push({ n: g, el: g, t: `<${g.tagName.toLowerCase()}>` });
+            return out;
+        };
+        const rectOf = (a) => {
+            if (a.n.nodeType === 3) { const rg = document.createRange(); rg.selectNodeContents(a.n); const rs = [...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0); if (!rs.length) return null; return { left: Math.min(...rs.map((r) => r.left)), top: Math.min(...rs.map((r) => r.top)), right: Math.max(...rs.map((r) => r.right)), bottom: Math.max(...rs.map((r) => r.bottom)) }; }
+            const r = a.n.getBoundingClientRect();
+            return r.width > 0 && r.height > 0 ? r : null;
+        };
+        const seen = (el) => { const cs = getComputedStyle(el); return cs.visibility !== 'hidden' && Number(cs.opacity) !== 0; };
+        const idMap = window.__osIds || (window.__osIds = new WeakMap());
+        const idOf = (n) => { if (!idMap.has(n)) { window.__osNext = (window.__osNext || 0) + 1; idMap.set(n, window.__osNext); } return idMap.get(n); };
+        const CHOICE = '.tvp-options > .tvp-opt, .opt-list > .opt';
+        const QLINE = '.tvp-q, .question-line, .tvp-instr';
+        const item = [];
+        let itemChoices = [];
+        if (stage) {
+            const hid = [...stage.querySelectorAll('[data-sko-hide]')];
+            const was = hid.map((e) => e.style.display);
+            hid.forEach((e) => { e.style.display = e.dataset.skoHide === '-' ? '' : e.dataset.skoHide; });
+            for (const a of atomsOf()) if (seen(a.el) && rectOf(a)) item.push([idOf(a.n), a.t.slice(0, 30)]);
+            itemChoices = [...stage.querySelectorAll(CHOICE)].filter((c) => c.getClientRects().length && seen(c));
+            hid.forEach((e, i) => { e.style.display = was[i]; });
+        }
+        // what of it a teacher sees now: drawn, and wholly inside the frame and inside every clipping box around it
+        const fR = frame.getBoundingClientRect();
+        const within = (r, b) => r.left >= b.left - 1.5 && r.top >= b.top - 1.5 && r.right <= b.right + 1.5 && r.bottom <= b.bottom + 1.5;
+        const clipOK = (from, r) => { for (let a = from; a && a !== frame; a = a.parentElement) { const cs = getComputedStyle(a); if ((cs.overflowX !== 'visible' || cs.overflowY !== 'visible') && !within(r, a.getBoundingClientRect())) return false; } return true; };
+        const visible = (a) => { if (!seen(a.el)) return false; const r = rectOf(a); return !!r && within(r, fR) && clipOK(a.n.parentElement, r); };
+        const vis = [];
+        const visText = [];
+        let qShown = false;
+        if (stage) for (const a of atomsOf()) if (visible(a)) { vis.push(idOf(a.n)); if (a.n.nodeType === 3) { visText.push(a.t); if (a.el.closest(QLINE)) qShown = true; } }
+        // F1: a box inside the stage that clips its own content (overflow not visible and content wider or taller than it)
+        const clips = [];
+        if (stage) for (const el of stage.querySelectorAll('*')) {
+            if (el.closest('svg') || !el.getClientRects().length) continue;
+            const cs = getComputedStyle(el);
+            const cx = cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1;
+            const cy = cs.overflowY !== 'visible' && el.scrollHeight > el.clientHeight + 1;
+            if (cx || cy) clips.push(`${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/)[0] : ''} ${cx ? `${el.scrollWidth}>${el.clientWidth} wide` : ''}${cx && cy ? ', ' : ''}${cy ? `${el.scrollHeight}>${el.clientHeight} tall` : ''}`);
+        }
+        // F2: the answer choices on this part, and whether each carries its letter or label (text outside its drawing)
+        const choiceVis = [], unlabeled = [];
+        itemChoices.forEach((c, i) => {
+            const r = c.getBoundingClientRect();
+            if (!(r.width > 0 && r.height > 0) || !seen(c) || !within(r, fR) || !clipOK(c.parentElement, r)) return;
+            choiceVis.push(i);
+            const label = [...c.querySelectorAll('*'), c].filter((e) => !e.closest('svg')).map((e) => [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('')).join('').trim();
+            if (!label) unlabeled.push(i);
+        });
+        // F6: a sentence of 20 or more characters shown twice
+        const sentences = new Map();
+        for (const t of visText) for (const snt of t.split(/(?<=[.?!])\s+/)) { const k = snt.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); if (k.length >= 20 && /[a-z]{3,}/.test(k)) sentences.set(k, (sentences.get(k) || 0) + 1); }
+        const repeats = [...sentences].filter(([, c]) => c > 1).map(([k]) => k.slice(0, 40));
+        // F4: the option body's own visible height (and whether it has more than that to show)
+        const bodyEl = pop.querySelector('.tv-sko-body');
+        // F5: a summary clamped to two lines has an expand control reachable by touch and keyboard
+        const sum = pop.querySelector('.tv-sko-sum');
+        const clamped = !!sum && sum.scrollHeight > sum.clientHeight + 1;
+        const more = pop.querySelector('.tv-sko-head button[aria-expanded]');
+        const moreOK = !!more && more.getClientRects().length > 0 && !more.disabled && more.tabIndex >= 0;
+        const sR = stage ? stage.getBoundingClientRect() : null;
         const foot = pop.querySelector('.tv-sko-foot');
         const done = foot && [...foot.querySelectorAll('button')].pop();
         const sample = frame.closest('.tv-sko-sample');
@@ -160,7 +258,10 @@ function measure(page) {
             unavailable: frame.classList.contains('is-unavailable'), cropped: frame.classList.contains('is-cropped'),
             f: box(frame), s: box(stage), cssH, frameH: frame.offsetHeight, pop: box(pop), foot: box(foot), done: box(done),
             vw: document.documentElement.clientWidth || window.innerWidth, vh: window.innerHeight,
-            transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null,
+            transform: stage ? stage.style.transform : '', minPx: Number.isFinite(minPx) ? minPx : null, minText, svgPx: Number.isFinite(svgPx) ? svgPx : null, svgText,
+            item, vis, clips, choices: { n: itemChoices.length, vis: choiceVis, unlabeled, q: qShown }, repeats,
+            body: bodyEl ? { h: bodyEl.clientHeight, sh: bodyEl.scrollHeight } : null, sum: { clamped, moreOK },
+            partBox: sR ? { x: Math.max(0, sR.left - fR.left), y: Math.max(0, sR.top - fR.top), w: Math.min(sR.right, fR.right) - Math.max(sR.left, fR.left), h: Math.min(sR.bottom, fR.bottom) - Math.max(sR.top, fR.top) } : null,
             part: part && !part.hidden ? String(part.querySelector('.tv-sko-part-n') ? part.querySelector('.tv-sko-part-n').textContent : part.textContent).replace(/\s+/g, ' ').trim() : '',
         };
     });
@@ -168,17 +269,26 @@ function measure(page) {
 
 const scaleOf = (t) => (/scale\(([\d.]+)\)/.exec(t || '') || [0, '1'])[1];
 // The verdict on one reading: (a) inside, (b) ink, (c) legible, (d) the controls in the window.
-function judge(m, ink) {
+function judge(m, inkR) {
     const fails = [];
+    const ink = inkR && typeof inkR === 'object' ? inkR.ink : inkR;
+    const own = inkR && typeof inkR === 'object' ? inkR.own : null;
     if (m.noFrame) return ['[inside] no sample frame in the panel'];
     const { f, s } = m;
     if (s) {
         const inside = s.x >= f.x - 1 && s.y >= f.y - 1 && s.x + s.w <= f.x + f.w + 1 && s.y + s.h <= f.y + f.h + 1;
         if (!m.unavailable && !inside) fails.push(`[inside] stage (${Math.round(s.x - f.x)},${Math.round(s.y - f.y)}) ${Math.round(s.w)}×${Math.round(s.h)} is not inside the ${Math.round(f.w)}×${Math.round(f.h)} frame (${m.cropped ? 'is-cropped, ' : ''}transform ${m.transform})`);
     } else if (!m.unavailable) fails.push('[inside] no .tvp-stage in the frame');
-    // (a part of a sample shown in parts that holds legible words, "Plot: A(-4,4)", is not blank: it needs some ink, not 0.5 %)
-    const inkMin = m.part && m.minPx != null ? 0.0003 : INK_MIN;
-    if (!m.unavailable && ink <= inkMin) fails.push(`[ink] the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > ${(inkMin * 100).toFixed(2)} %)`);
+    // A whole sample needs 0.5 % of its frame inked. A part (critic-panel-r2 soft spot: it needed only 0.03 %) needs 0.5 % of
+    // its OWN drawn box inked, so a part that is one stray word in an empty frame fails.
+    if (!m.unavailable && !m.part && ink <= INK_MIN) fails.push(`[ink] the frame's visible crop holds ${(ink * 100).toFixed(2)} % dark pixels (needs > ${(INK_MIN * 100).toFixed(2)} %)`);
+    if (!m.unavailable && m.part && !(own > PART_INK_MIN)) fails.push(`[ink] part ${m.part}: its drawn box holds ${own == null ? 'nothing' : (own * 100).toFixed(2) + ' %'} dark pixels (needs > ${(PART_INK_MIN * 100).toFixed(2)} %)`);
+    if (!m.unavailable && m.clips && m.clips.length) fails.push(`[clip] a box inside the stage clips its content: ${m.clips.slice(0, 3).join('; ')}`);
+    if (!m.unavailable && m.svgPx != null && m.svgPx < SVG_TEXT_MIN - 0.05) fails.push(`[svgtext] SVG text drawn at ${m.svgPx.toFixed(1)} px ("${m.svgText}"; needs >= ${SVG_TEXT_MIN} px)`);
+    if (m.sum && m.sum.clamped && !m.sum.moreOK) fails.push('[summary] the option summary is clamped and its full text has no expand control (title attribute only: not reachable by touch or keyboard)');
+    if (!m.unavailable && m.repeats && m.repeats.length) fails.push(`[repeat] the sample shows a sentence twice: "${m.repeats[0]}"`);
+    if (!m.unavailable && m.choices && m.choices.unlabeled.length) fails.push(`[choices] answer choice(s) ${m.choices.unlabeled.map((i) => String.fromCharCode(65 + i)).join(', ')} shown with no letter or label`);
+    if (!m.unavailable && m.part && m.choices && m.choices.vis.length && m.choices.q) fails.push(`[choices] part ${m.part}: answer choices share a part with the question`);
     if (!m.unavailable && s && m.minPx != null && m.minPx < TEXT_MIN - 0.05) fails.push(`[text] text drawn at ${m.minPx.toFixed(1)} px ("${m.minText}"; needs >= ${TEXT_MIN} px; ${m.transform})`);
     const k = Number(scaleOf(m.transform));
     if (!m.unavailable && s && k < 0.2995) fails.push(`[scale] drawn at scale ${k} (needs >= 0.30: below it a sample's strokes are hairlines)`);
@@ -189,14 +299,14 @@ function judge(m, ink) {
     return fails;
 }
 
-async function frameInk(page) {
+async function frameInk(page, partBox = null) {
     const fh = await page.$('#skillOptionsPopover .tv-sko-frame');
-    if (!fh) return { ink: 0, b64: '' };
+    if (!fh) return { ink: { ink: 0, own: null }, b64: '' };
     const b64 = await fh.screenshot({ encoding: 'base64' });
-    return { ink: await inkOf(page, b64), b64 };
+    return { ink: await inkOf(page, b64, partBox), b64 };
 }
 
-const note = (m, ink) => (m.noFrame ? '' : `ink ${(ink * 100).toFixed(2)} %, scale ${scaleOf(m.transform)}, text >= ${m.minPx != null ? m.minPx.toFixed(1) : '-'} px${m.svgPx != null ? ` (svg text ${m.svgPx.toFixed(1)} px)` : ''}, frame ${Math.round(m.f.h)} px${m.part ? `, part ${m.part}` : ''}${m.unavailable ? ' (sample unavailable)' : ''}`);
+const note = (m, inkR) => (m.noFrame ? '' : `ink ${(inkR.ink * 100).toFixed(2)} %${inkR.own != null ? ` (own box ${(inkR.own * 100).toFixed(1)} %)` : ''}, scale ${scaleOf(m.transform)}, text >= ${m.minPx != null ? m.minPx.toFixed(1) : '-'} px${m.svgPx != null ? ` (svg text ${m.svgPx.toFixed(1)} px)` : ''}, frame ${Math.round(m.f.h)} px${m.body ? `, options ${m.body.h}/${m.body.sh} px` : ''}${m.part ? `, part ${m.part}` : ''}${m.unavailable ? ' (sample unavailable)' : ''}`);
 
 // Change the panel's first option (the first select or tick box of its body).
 function changeFirstOption(page) {
@@ -238,7 +348,7 @@ async function checkSkill(app, ref, vp, mode = {}) {
     const out = [];
     const read = async (label, keep = true) => {
         const m = await measure(page);
-        const { ink, b64 } = m.noFrame ? { ink: 0, b64: '' } : await frameInk(page);
+        const { ink, b64 } = m.noFrame ? { ink: { ink: 0, own: null }, b64: '' } : await frameInk(page, m.partBox);
         const fails = judge(m, ink);
         const errs = app.problems.filter((p) => p.type === 'pageerror');
         if (errs.length > errs0) fails.push(`[pageerror] page error: ${errs.slice(errs0).map((e) => e.text.split('\n')[0]).join(' | ').slice(0, 200)}`);
@@ -251,32 +361,65 @@ async function checkSkill(app, ref, vp, mode = {}) {
         if (keep && FAIL_SHOTS && b64 && fails.length) { fs.mkdirSync(FAIL_SHOTS, { recursive: true }); fs.writeFileSync(path.join(FAIL_SHOTS, tag + '.png'), Buffer.from(b64, 'base64')); }
         const other = shown.filter((f) => !fails.includes(f));
         if (keep) out.push({ ref, width: label, fails, unavailable: !!m.unavailable, note: note(m, ink) + (other.length ? `; not judged here: ${other.join('; ')}` : '') });
+        return m;
+    };
+    // Judged across the readings of one walk (the whole item, or every part of it): (cover) every atom of the unpaged item
+    // was wholly visible on some part, and (choices) the answer choices sit on ONE part, never with the question.
+    const walkVerdict = (label, ms) => {
+        const fails = [];
+        const ok = ms.filter((x) => x && !x.noFrame && !x.unavailable);
+        if (!ok.length) return null;
+        const seenIds = new Set(ok.flatMap((x) => x.vis || []));
+        const missing = (ok[0].item || []).filter(([id]) => !seenIds.has(id));
+        if (missing.length) fails.push(`[cover] ${missing.length} of ${ok[0].item.length} blocks of the item appear on no part${ok.length > 1 ? ` (${ok.length} parts)` : ''}: ${missing.slice(0, 6).map(([, t]) => `"${t}"`).join(', ')}`);
+        const groups = ok.map((x) => (x.choices ? x.choices.vis : [])).filter((g) => g.length);
+        const n = ok[0].choices ? ok[0].choices.n : 0;
+        if (n && groups.length > 1) fails.push(`[choices] the ${n} answer choices are spread over ${groups.length} parts (${groups.map((g) => g.map((i) => String.fromCharCode(65 + i)).join('')).join(' | ')})`);
+        const sig = n ? groups.map((g) => g.join('')).join('|') : '';
+        return { fails, sig };
+    };
+    const walkPush = (label, ms) => {
+        const v = walkVerdict(label, ms);
+        if (!v) return;
+        const fails = CHANGED_ONLY && !/changed/.test(label) ? [] : v.fails.filter((f) => CHECKS.has((/^\[(\w+)\]/.exec(f) || [])[1]));
+        out.push({ ref, width: `${label} (all parts)`, fails, walk: true, sig: v.sig, note: `${ms.length} reading(s), choices ${v.sig || '-'}` });
     };
     // (a resize check's reading before the resize is the main sweep's own: not reported twice)
-    await read(vp.label, !mode.resizeTo);
+    const walk = [await read(vp.label, !mode.resizeTo)];
     if (SAVE_PANELS && vp.label === '1280' && !mode.resizeTo) {
         const el = await page.$('#skillOptionsPopover');
         if (el) await el.screenshot({ path: path.join(ROOT, 'design', 'audit', 'options-panels', `${categoryId}-${skillId}.png`) });
     }
     // A sample shown one part at a time: every part is read, each must be whole, legible and inked (critic-panel-r1 F1).
     if (!mode.resizeTo) {
-        for (let i = 2; i <= 12; i++) {
-            const moved = await page.evaluate(() => { const b = document.querySelector('#skillOptionsPopover .tv-sko-part:not([hidden]) [data-sko-part="1"]'); if (!b || b.disabled) return false; b.click(); return true; });
-            if (!moved) break;
+        const nextPart = () => page.evaluate(() => { const b = document.querySelector('#skillOptionsPopover .tv-sko-part:not([hidden]) [data-sko-part="1"]'); if (!b || b.disabled) return false; b.click(); return true; });
+        for (let i = 2; ; i++) {
+            if (i > PART_CAP) {
+                if (await page.evaluate(() => { const b = document.querySelector('#skillOptionsPopover .tv-sko-part:not([hidden]) [data-sko-part="1"]'); return !!b && !b.disabled; })) {
+                    const f = [`[parts] more than ${PART_CAP} parts: not a sample a teacher can page through`];
+                    out.push({ ref, width: `${vp.label} part ${i}`, fails: CHECKS.has('parts') ? f : [], note: f[0] });
+                }
+                break;
+            }
+            if (!await nextPart()) break;
             await sleep(100);
-            await read(`${vp.label} part ${i}`);
+            walk.push(await read(`${vp.label} part ${i}`));
         }
+        walkPush(vp.label, walk);
     }
     if (mode.resizeTo) {
         await page.setViewport({ width: vp.w, height: mode.resizeTo, deviceScaleFactor: 1 });
         await sleep(1500);
-        await read(`${vp.w}x${vp.h}>${mode.resizeTo}`);
+        const rz = await read(`${vp.w}x${vp.h}>${mode.resizeTo}`);
+        if (rz && !rz.part) walkPush(`${vp.w}x${vp.h}>${mode.resizeTo}`, [rz]);
     }
     if (mode.change && await changeFirstOption(page)) {
         await sleep(50);
         await read(`${vp.label} changed +50ms`);
         await sleep(1450);
-        await read(`${vp.label} changed +1.5s`);
+        const after = await read(`${vp.label} changed +1.5s`);
+        // (an unpaged redraw is judged whole; a paged one shows part 1 only here, its parts are the main walk's business)
+        if (after && !after.part) walkPush(`${vp.label} changed +1.5s`, [after]);
     }
     await page.evaluate(() => { if (window.closeSkillOptionsPanel) window.closeSkillOptionsPanel(); });
     return out;
@@ -340,6 +483,17 @@ async function checkSkill(app, ref, vp, mode = {}) {
             }
         }
     }));
+    // (choices) one split at every width: the answer-choice grouping of each main walk (1280, 1366, 1024, 820, 1280x720) is the same
+    if (CHECKS.has('choices')) {
+        const byRef = new Map();
+        for (const r of results) if (r.walk && /^(\d+|1280x720) \(all parts\)$/.test(r.width) && r.sig) { if (!byRef.has(r.ref)) byRef.set(r.ref, []); byRef.get(r.ref).push(`${r.width.split(' ')[0]}: ${r.sig}`); }
+        for (const [ref, sigs] of byRef) {
+            if (new Set(sigs.map((x) => x.split(': ')[1])).size < 2) continue;
+            const r = { ref, width: 'widths', fails: [`[choices] the answer choices are split differently by width (${sigs.join('; ')})`] };
+            results.push(r);
+            console.log(`FAIL ${r.ref} @${r.width}: ${r.fails.join('; ')}`);
+        }
+    }
     const pageErrors = apps.flatMap((a) => a.problems.filter((p) => p.type === 'pageerror'));
     for (const a of apps) await a.close();
     const unavailable = [...new Set(results.filter((r) => r.unavailable).map((r) => r.ref))];
