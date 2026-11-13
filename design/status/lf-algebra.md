@@ -9,6 +9,13 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-13 two-step precritic r12 (mq-opus-medium; after the merges): merged origin/master e76e0815f (ff455466d), lf-hosts-twostep
+  5719fe9b6 (f457eed3b), then origin/master a6883082c (3faaf82a9, pushed: lf-roles tests two-step on it). Fixed (check first): the
+  x / ÷ / add-first deals repeat on a page (ws-two-step PAGE-FRESH 33810c189 FAIL -> fix 5921196d7, backtest two-step-page-fresh).
+  Precritic r12 (on 5029a01fb, before the a6883082c merge) stopped at 46 of ~53 gates by the background time limit; NOT clean for
+  the critic. Card drift after a6883082c: master changed RUBRIC C1 / H6, so the two-step and patterns cards need --resign + the
+  lead's signature (not touched). tape_diagram (Part 2) held until after the two-step critic: its two checks are written, untracked
+  (tests/scripts/ws-story-pronouns.mjs, ws-tape-diagram.mjs), both FAIL on master as required; no fix yet.
 - 2026-11-13 two-step round 2 (mq-opus-medium; lead rulings R1-R4). Each finding a check first (owner rule), backtested, on
   precritic's path, a CHECKS_FROM_CRITICS row. R1: probe -> (c) cannot reach M 2 -> (a) M 1 ruled, the no-stretch routed to
   lf-roles (check ws-two-step --print CAP-BAND). R2: band 100 dropped, B100 codes fold to no band (BAND-ALIAS). Card re-signed
@@ -112,6 +119,7 @@ Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill p
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: precritic r11 + merge master x2 + lf-hosts-twostep + PAGE-FRESH fix + precritic r12, start 2026-11-13T17:15Z, end 2026-11-13T22:40Z, profile mq-opus-medium
 Times: two-step round 2 (R1 probe + CAP-BAND, R2 band alias, card re-sign x2, R3 four checks + backtests, R4 checks + frames part, gates, precritic r11), start 2026-11-13T14:10Z, end 2026-11-13T18:30Z, profile mq-opus-medium (rebuild after the precritic reds / lead rulings)
 Times: two-step build (bar model, within N, Visual default, decisions 6-10, lesson data, tags, ws-two-step + backtest, precritic of the 7), start 2026-11-13T11:15Z, end 2026-11-13T13:55Z, profile mq-opus-medium (first build of a new drawing)
 Times: two-step spec card (research, card.json, generate + coverage check), start 2026-11-13T09:30Z, end 2026-11-13T10:15Z, profile mq-opus-medium (first card on a new drawing part)
@@ -126,6 +134,30 @@ Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-m
 Times: fix r2, start 2026-11-07T08:36Z, end 2026-11-07T10:44Z, profile mq-opus-medium
 Times: builder r1 notice_patterns + growing_shape_patterns (new), start 2026-11-07T06:53Z, end 2026-11-07T08:31Z, profile mq-opus-medium
 Times: builder r1 function_table_easy + number_patterns_rule (fix), start 2026-11-07T07:16Z, end 2026-11-07T08:27Z, profile mq-opus-medium
+
+## Precritic two-step r12 (2026-11-13; 7 skills, --strict --browser-jobs 1; HEAD 5029a01fb = master e76e0815f + lf-hosts-twostep + PAGE-FRESH; logs /tmp/mq-precritic/20261113-192146-1169; stopped at 46 gates by the session's background time limit; S dropped (owner rule): S-only findings are not counted)
+Unit gates on 3faaf82a9 (after the a6883082c merge): boot-smoke OK, code-snapshot OK (738), ws-two-step OK, conflict-markers OK;
+spec-card --check-signed: function-table OK (lead 2d03850fc), two-step and patterns FAIL (RUBRIC C1 / H6 changed on master: lead
+re-sign). Backtest (lane rows + lf-hosts' 4 + two-step-page-fresh): 17 PASS on f457eed3b..5029a01fb.
+
+| Gate | M / L result | Whose / next |
+|---|---|---|
+| roles-unit, precritic-clean, patterns-cells, node-lint x2, two-step (+ PAGE-FRESH), lessonfit, code-snapshot, card-rulings x2, visual-quality (baseline), spec-card, conflict-markers, precritic-plan, capacity-pin, gate-agree screen-support-eq, presets-unit, coverage-matrix, slot-clip, screen-ink-size, print-lint kit M / L, grade-render --raster-fit | PASS | - |
+| ws-dealer-uniform | INCOMPLETE ("no single operation": a two-step item has two operations); PAGE repeats FIXED (was FAIL in r11) | tool (lf-checks); our page check is ws-two-step PAGE-FRESH |
+| ws-options-verify --skill | FAIL 2: band=50 on add_then_div / letter_equation identical in the 6-item sample; it bites on ~6 % of items (37 / 600, 38 / 600) | ours: lead ruling - hide band 50 on those two presets (card change + re-sign) or accept the sample |
+| ws-empty-band | FAIL 759 over S / M / L (EB-BAND 177, EB-SIDE 450, EB-EDGE 62, EB-PAGE 65, EB-ROLE 3, EB-READ 2); M / L part: practice EB-SIDE on _plain (two step columns 107 mm in a 185 mm full-width cell, 31-38 %), practice EB-BAND on (Visual) M / L (one row stretched), guided / opener / review EB-BAND, opener + reason-it EB-EDGE (ink 9.5-11.5 mm over the border), scripted-model / pre-skill-check / lesson EB-PAGE, opener EB-READ (a blank cell 2) | ours (lead: round cap 2): next round |
+| EB-ROLE + ws-fixit-words (error) | add_then_div Error analysis does not compose: wordWorkWrong's wrong-operation answer (27 x 3 = 81) cannot be written in the ÷ step's one-digit quotient box, so EA's showsWrong rejects every item | ours: next round (wrong for a ÷ last step that fits the quotient, or the box sized for the shown answer) |
+| ws-two-step --print CAP-BAND | FAIL 10 BAND ((Visual) M 41 % / L 32 %, letter + wpBar L 41-45 %) | ours now (lead): proposed fix the two-step footprint `tightRows` (rows held at 1.12 x the measured height), to try first in the next round |
+| ws-sibling-compare | FAIL: 130 unproven, no approved sibling | first family on template (no approved sibling on word-work two-step) |
+| print-lint --roles lesson L, grade-render --gate lesson M / L | FAIL: lesson pages overflow on all seven (estimate L: CL-4b 12, WRAP-OP, SECTION overlap, LONE) | ours now (lead): lesson chart / pages |
+| grade-render --gate other roles, cell-checks --card --card-opts | FAIL: opener OVERFLOW, reason-it OVERFLOW (S; M / L re-check) | ours now (lead) |
+| print-lint sections --pages 2 L | FAIL (LONE / PAGEFILL on the section sheet) | section engine |
+| not reached: phone-card, screen-slots, screen-answer, chromebook-fit, options-verify --render, the rest of render-gate | - | next run |
+
+Clean for the critic (M / L): none. Every one of the seven is red on the lesson pages (overflow) and on empty-band roles.
+
+Red, by owner (r12): all "ours" by the lead's routing (round cap 2) except the dealer-uniform INCOMPLETE (tool), the section-sheet
+LONE / PAGEFILL (section engine) and sibling-compare (first family on template). Card re-signs (two-step, patterns): lead.
 
 ## Precritic two-step r11 (2026-11-13; the 7 two-step skills, --strict --browser-jobs 1; HEAD 32ab8ffce BEFORE the master merge; logs /tmp/mq-precritic/20261113-174158-29946; stopped at 38 of 53 gates on the lead's re-order: merge master + lf-hosts-twostep, then re-run at M / L only - see "Precritic two-step r12")
 Unit gates on 32ab8ffce: ws-boot-smoke OK, ws-code-snapshot OK (736 codes), ws-two-step OK, ws-spec-card --check-signed OK on two-step,
@@ -1160,6 +1192,11 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 precritic r11 / r12 and merges: 8b7be2a64 r11 status | ff455466d merge master e76e0815f (18 conflicts: lane files ours,
+  function-table.js + master's traceNew ink, reason-it.js / ws-precritic-plan.mjs master's, registries both sides, backtests / ledger
+  both sides, LEAD_DECISIONS union) | 3dc61bb8d function-table card regenerated (lead re-signed 2d03850fc) | f457eed3b merge
+  lf-hosts-twostep 5719fe9b6 | 33810c189 check PAGE-FRESH (FAIL) | 5921196d7 fix: freshDeal on the msOps deals (OK) | 5029a01fb
+  backtest two-step-page-fresh + ledger row | 3faaf82a9 merge master a6883082c. Check for the fix: ws-two-step PAGE-FRESH.
 - 2026-11-13 round 2 (lead rulings R1-R4), commits in order: a1c55d93b R1 check (CAP-BAND) | 910dd9f0b R2 fix (+ check BAND-ALIAS) |
   791c84183 card re-sign | 95473c403 R3 checks | 9f963a32f add-first Steps fix + card re-sign | 35f427f4c R3 backtests |
   d88ab9aee R4 checks | b5d9a9cc7 R4 frames part. Check for each fix: R1 / R4a CAP-BAND (fix routed), R2 BAND-ALIAS, F6 two-step
