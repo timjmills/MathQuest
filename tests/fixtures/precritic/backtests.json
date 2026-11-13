@@ -3360,6 +3360,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "pv-words-rowy-1000",
+   "check": "composing:number_word_form band 1,000 with zeroPlace always: answer places of one grid row within 1 mm, lesson and guided rows included (critic nwf r2 N10 / N10b: 'one thousand' 7 mm high)",
+   "kind": "commit-pair",
+   "rule": "ws-cell-checks --words-rules ROW-SLOT-Y",
+   "browser": true,
+   "fail": {
+    "commit": "706d940a",
+    "state": "one thousand's boxes 6.6-7.2 mm above its row"
+   },
+   "pass": {
+    "commit": "5a4ca828",
+    "state": "twoLine on every band-1,000 name"
+   },
+   "command": "node tests/scripts/ws-cell-checks.cjs --skills composing:number_word_form --opts '{\"band\":1000,\"zeroPlace\":\"always\"}' --roles independent,lesson --words-rules",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "pv-words-towords-side",
+   "check": "composing:number_word_form numeral to words: no side band of 30 % (critic nwf r2 N11: one across, half the page empty)",
+   "kind": "commit-pair",
+   "rule": "ws-empty-band EB-SIDE",
+   "browser": true,
+   "fail": {
+    "commit": "706d940a",
+    "state": "one across at S"
+   },
+   "pass": {
+    "commit": "5a4ca828",
+    "state": "two across at S where the 70 mm line fits"
+   },
+   "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --opts '{\"wordform\":[\"to_words\"]}' --roles independent --sizes S --hosts none --no-baseline --only EB-SIDE",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -268,6 +268,20 @@
        "CLAIM-INK,MODEL-ANSWER,WORDS-TEXT,WORDS-BREAK,ROW-SLOT-Y"
       ]
      }
+    },
+    "words-rowy-1000": {
+     "newRow": {
+      "name": "ws-cell-checks --words-rules at band 1,000 + zeroPlace always (opt-in lf-placevalue critic nwf r2 N10: 'one thousand' dealt, lesson rows judged)",
+      "script": "ws-cell-checks",
+      "kind": "browser",
+      "args": [
+       "--opts",
+       "{\"band\":1000,\"zeroPlace\":\"always\"}",
+       "--roles",
+       "independent,lesson,guided",
+       "--words-rules"
+      ]
+     }
     }
    }
   },
