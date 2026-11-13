@@ -73,6 +73,7 @@
 //     PC-PV      also, on EVERY lesson page (sheet, Practice, Mixed; check on AND off, every lesson): a band's "name the place" answers
 //                are never 3+ of one place, never strictly alternating (T O T O T O, R1), never cycling H T O H T O (near-twins.js
 //                placeRunBad - the dealer's own reading)
+//     PG-LR6     also: one number never printed by two skills on one page (r5 "78 twice": the rounding 78 and the place 78)
 //     PG-LR6     now with the check OFF too, every lesson (--seeds builds before the no-check break, the 4242 build at every size of
 //                every lesson; R2: live nearest_10 Mixed 34 / 35 / 39, 40 three times); the check's near-twin read is the module's
 //                nearKeys (the gate's copy nearKeyPair is gone)
@@ -511,14 +512,18 @@ async function collectReads({ skill }) {
         });
         if (pi === 0) (pages[pp.part] = pages[pp.part] || []).push(rows.filter((x) => !x.model));
     } });
-    const lr67 = [];
+    const lr67 = [], lr6x = [];
     for (const [k, its] of byPg) {
         const subs = its.filter((x) => LR.opOfItem(x) === '-' && x.ops.length >= 2);
         for (let i = 0; i < subs.length; i++) for (let j = i + 1; j < subs.length; j++) if (LR.nearTwins(subs[i].ops, subs[j].ops)) lr67.push({ part: k, msg: `LR-6 ${subs[i].text} and ${subs[j].text} are near twins` });
         const ans = subs.map((x) => x.ops[0] - x.ops[1]); if (new Set(ans).size < ans.length) lr67.push({ part: k, msg: 'LR-6 two answers alike' });
         for (const [c, max] of Object.entries(caps)) { const n = its.filter((x) => LR.casesOf(x).includes(c)).length; if (n > max) lr67.push({ part: k, msg: `LR-7 ${n} ${c} items (at most ${max} a page)` }); }
     }
-    return { lr67, oneNum: [...one.entries()], pvpat, pages, own };
+    // (r6, critic r5 "78 twice": one number printed twice on a page by two skills - the rounding 78 and the place-value 78)
+    const cross = new Map(); for (const [k, its] of one) { const pgk = k.split('|')[0]; if (!cross.has(pgk)) cross.set(pgk, []); for (const x of its) cross.get(pgk).push(Object.assign({ skill: k.split('|')[1] }, x)); }
+    for (const [pgk, its] of cross) { const by = new Map(); for (const x of its) { if (!by.has(x.n)) by.set(x.n, new Set()); by.get(x.n).add(x.skill); }
+        for (const [n, sk] of by) if (sk.size > 1) lr6x.push({ part: pgk, msg: `${n} printed by ${sk.size} skills on one page (${[...sk].join(', ')})` }); }
+    return { lr67, oneNum: [...one.entries()], pvpat, pages, own, lr6x };
 }
 const ONLY_RULES0 = (arg('rules', '') || '').split(',').map((x) => x.trim()).filter(Boolean);
 
@@ -569,6 +574,7 @@ async function checkMain() {
                 for (const m of b.lr67 || []) F('PG-LR67', `${l.id} seed ${seed} ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
                 // (r6, critic r5 R2: PG-LR6 reads every page - check on OR off - before the no-check break)
                 for (const [k, its] of b.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} seed ${seed} ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
+                for (const x of b.lr6x || []) F('PG-LR6', `${l.id} seed ${seed} ${x.part.replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, x.msg);
                 // PC-PV pattern (r6, critic r5 R1): every lesson page's "name the place" items, per band - never all one place, never
                 // strictly alternating (sheet/near-twins.js placeRunBad; the check page keeps its per-question PC-PV below)
                 for (const x of b.pvpat || []) for (const m of NT.placeRunBad(x.seq)) F('PC-PV', `${l.id} seed ${seed} ${x.part.replace(/^teach/, 'sheet')} p${x.page} band ${x.band}`, m);
@@ -605,6 +611,7 @@ async function checkMain() {
                 if (l.spot) for (const m of built.lr67 || []) F('PG-LR67', `${l.id} ${size} seed 4242 ${m.part.replace(/^teach/, 'sheet')}`, m.msg);
                 for (const m of pageTurns(built.placed)) F('PG-TURN', `${l.id} ${size} seed 4242 ${m.part}`, m.msg);
                 for (const [k, its] of built.oneNum || []) for (const m of NT.pageOneNumViolations(its)) F('PG-LR6', `${l.id} ${size} seed 4242 ${k.split('|')[0].replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, `${k.split('|')[1]}: ${m}`);
+                for (const x of built.lr6x || []) F('PG-LR6', `${l.id} ${size} seed 4242 ${x.part.replace(/^teach/, 'sheet').replace(/^prereq/, 'check')}`, x.msg);
                 // PC-RANGE / PC-NAME at this size (critic r4 N1, N7: the S check dealt "20 - 11", the L check one "10 more" item)
                 if (built.prePre) { for (const it of built.preItems || []) { const k = Number(String(it.pool).replace(/\D/g, '')); const pre = built.prePre[k]; if (!pre) continue;
                     for (const m of floorCheck(it, (built.floors || [])[k])) F('PC-RANGE', `${l.id} ${size} seed 4242 Q${k + 1} (${pre.lesson})`, m); }
@@ -777,7 +784,7 @@ print(json.dumps(out))
 async function verifyGrey() {
     const app = await open({ seed: 1 }); const { page } = app; const bad = []; let n = 0;
     try {
-        for (const l of LESSONS.filter((x) => !x.spot)) for (const [size, sub] of [['L', ''], ['S', 'S']]) {
+        for (const l of LESSONS.filter((x) => !x.spot)) for (const [size, sub] of [['L', ''], ['M', 'M']]) {
             const dir = path.join(ROOT, 'design', 'lesson-samples', l.dir, sub);
             if (!fs.existsSync(path.join(dir, 'chart-grey.png'))) continue;
             const parts = await page.evaluate(async ({ skill, size }) => { const r = await window.buildSheet({ role: 'lesson', sections: [{ skills: [skill] }], size, paper: 'A4', seed: 4242, key: true, practicePages: 1, mixed: true, prereqsForce: true }); return (r.lesson && r.lesson.parts) || []; }, { skill: l.skill, size });
