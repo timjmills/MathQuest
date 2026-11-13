@@ -231,14 +231,15 @@ const withFade = (p, ctx) => {
 
 /* The find-the-rule machine with the frame inside (lf-algebra r1). Decided from the cell alone (never the column count), so
  * the footprint and every render agree: only where the whole machine row fits a third of the page's width. */
-const MERGE_ARROW_MM = 4.5, MERGE_GAP_MM = 1, MERGE_PAD_MM = 1.5, MERGE_MAX_MM = 52;
+const MERGE_ARROW_MM = 4.5, MERGE_GAP_MM = 1, MERGE_PAD_MM = 1.5, MERGE_MAX_MM = 52, MERGE_CHART_MAX_MM = 80;
 // the machine's slots are the writing height Hw on paper (a box no taller than the default machine's), boxH on screen
 const mergedH = (d) => d.mslot + 0.6;
 const mergedW = (g, d) => 5 * 0.55 * d.textMm + 2 * MERGE_ARROW_MM + 4 * MERGE_GAP_MM + 2 * MERGE_PAD_MM + d.frameW - 0.6 * g.E + 1;
 function ruleInMachine(p, g, d, ctx) {
     if (!p.machine || p.task !== 'rule' || p.support === 'line' || p._noMerge || p.ruleBelow || p.machineText || p.machineTried) return false;
-    if (fixMode(ctx) || (ctx && Array.isArray(ctx.ftNotes))) return false;
-    return mergedW(g, d) <= MERGE_MAX_MM;
+    if (fixMode(ctx) || (ctx && Array.isArray(ctx.ftNotes) && !ctx.ftMerge)) return false;
+    // (a chart state (ftMerge) has a whole 2 x 2 panel, about 84 mm, not a third of the page)
+    return mergedW(g, d) <= (ctx && ctx.ftMerge ? MERGE_CHART_MAX_MM : MERGE_MAX_MM);
 }
 
 function tableWidth(p, d) {
@@ -429,7 +430,17 @@ function ftStepState(p, steps, k, ctx) {
         if (k >= 2) { mt = { text: real, grey: k === 2 }; rows.forEach((r, i) => { notes[i] = { text: '✓', grey: k === 2 }; }); }
     }
     c.ftNotes = notes;
-    return this.render(Object.assign({}, p, mt ? { machineText: mt } : {}), c);
+    // (the 2 x 2 chart of a find-the-rule lesson at S: four states of machine + table + rule line ran 3-10 mm past their
+    // panels and the chart fell back to zoom 1, ws-cell-checks OVERFLOW on function_table_easy ftTask=rule lesson,
+    // precritic r5. One rule place a state, as on the item: the states before the last show the rule being tried in
+    // the machine and no empty rule line; the last writes the rule IN the machine, as the item's merged machine does.)
+    if (last && n === 4 && mt) {
+        const merged = Object.assign({}, p, { _noMerge: false });
+        if (ruleInMachine(merged, geo(c), dims(withFade(merged, c), geo(c)), Object.assign({}, c, { ftMerge: true }))) {
+            return this.render(merged, Object.assign({}, c, { ftMerge: true }));
+        }
+    }
+    return this.render(Object.assign({}, p, mt ? { machineText: mt } : {}, last ? {} : { _noRuleLine: true }), c);
 }
 
 /** The width a cell gives its content at the section's column count (unknown: one column). */
@@ -596,7 +607,7 @@ register('function-table', {
                 + '</div>';
         } else {
             inner += tableHtml(p, g, d, vals, ink, slotsById, ctx, fx);
-            if (p.task === 'rule' && !merged) inner += ruleAnswer(p, g, d, vals, ink, slots, ctx, fx);
+            if (p.task === 'rule' && !merged && !p._noRuleLine) inner += ruleAnswer(p, g, d, vals, ink, slots, ctx, fx);
             if (p.check && slotsById.chk) inner += checkRow(p, g, d, vals, ink, slotsById, ctx, false, fx);
         }
         if (p.note) inner += `<div class="ft-note" style="margin-top:${g.em(1.2)};text-align:center;line-height:1.2">${txt(g, esc(p.note), { em: g.zoneEm })}</div>`;

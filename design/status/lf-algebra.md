@@ -9,6 +9,11 @@ Builder profile: mq-opus-medium
 Critic rounds: 0, none
 
 ## Now
+- 2026-11-13 fix r6 (patterns card signed bd6c6cc6 by the lead): KEYJOIN on the feature sentences cleared (the check slot is the
+  box column, not the printed sentences); lesson anchor-chart overflows cleared on notice patTask=feature / band=25,
+  pattern_features patTask=truefalse / band=50 and function_table_easy ftTask=rule. Precritic r6 (below): 27 PASS, 16 FAIL;
+  notice_patterns cell-checks and render-gate OK, function_table_easy render-gate OK. Every red left but one class (function-table
+  lesson charts on 8 other option values, ours) is owned elsewhere: see "Red, by owner" under Precritic r6.
 - 2026-11-12 fix r5: merged origin/master d34311d5 (49096d74); lesson data moved to lessons/families/algebra.js with
   guidedRows: 1 on the 4 chartWide lessons; growing unit S 2.5 / M 2.8 / L 3.3 mm (37a7f4f5, patterns card UNSIGNED: the lead
   re-signs from 37a7f4f5); parity / true-false answers capitalised. Precritic r5 (below): 25 PASS, 17 FAIL; master brought
@@ -58,6 +63,7 @@ Critic rounds: 0, none
 - number_patterns_rule (goes on the patterns card): preset skill "Follow a given rule" = rule:false (lesson #20)? Suggested: yes.
 
 ## Times
+Times: fix r6 (KEYJOIN + lesson chart overflows + empty-band triage + precritic), start 2026-11-12T23:30Z, end 2026-11-13T01:35Z, profile mq-opus-low
 Times: fix r5 (merge master + growing sizes + precritic), start 2026-11-12T21:55Z, end 2026-11-12T23:40Z, profile mq-opus-medium
 Times: fix r4, start 2026-11-07T12:13Z, end 2026-11-07T12:50Z, profile mq-opus-medium
 Times: fix r3, start 2026-11-07T11:00Z, end 2026-11-07T12:11Z, profile mq-opus-medium
@@ -126,6 +132,60 @@ Remaining non-green rows, cause by cause:
   function_table_easy ftTask=make S: REPEAT (two make tables with the same rule look identical - no numbers printed) - ours,
   open.
 - spec-card INCOMPLETE: both cards unsigned by design (owner answers recorded; cards ready to sign).
+
+## Precritic r6 (bd6c6cc6 + r6 fixes, 6 skills, --strict --browser-jobs 1; logs /tmp/mq-precritic/20261112-235836-14314, wall ~5400 s)
+27 PASS (spec-card --check-signed now PASS: patterns card signed), 16 FAIL.
+| Gate | r5 | r6 | Automatic check that caught it / what changed |
+|---|---|---|---|
+| cell-checks notice_patterns | FAIL 88 (KEYJOIN 26, OVERFLOW lesson feature 48 + band25 12) | **OK** (126 pages) | ws-cell-checks KEYJOIN + OVERFLOW (--card-opts) |
+| cell-checks pattern_features | FAIL 437 (KEYJOIN 314, OVERFLOW 123) | FAIL 39 (KEYJOIN 12, OVERFLOW 27): error-analysis / true-false / reason-it KEYJOIN, pre-skill-check + true-false M + reason-it OVERFLOW | ws-cell-checks; the left rows are role-drawn (see owners) |
+| cell-checks function_table_easy | FAIL 425 (KEYJOIN 15, OVERFLOW 410) | FAIL 371 (KEYJOIN 15, OVERFLOW 356): ftTask=rule lesson 54 -> 0; 8 other option values' lesson charts still over (ours, below); true-false / reason-it KEYJOIN | ws-cell-checks OVERFLOW |
+| cell-checks number_patterns_rule / follow_given_rule | 192 / 85 | 192 / 81 | count-row lesson (places 1000, shape circle/hex/mixed) + reason-it train, true-false KEYJOIN: not ours |
+| cell-checks growing_shape_patterns | 34 | 34 | review L 1.3 mm body, pre-skill-check: not ours |
+| render-gate notice / function_table_easy | (notice FAIL in r3-r4 class) | OK / OK | ws-grade-render --gate other roles |
+| render-gate npr / fgr / pf / growing | 18 / 14 / 27 / 20 | 18 / 14 / 27 / 20 | count-row train; pre-skill-check sheet overflow; growing review L: not ours |
+| ws-empty-band | FAIL 157 | FAIL 157 | triaged below: no row is set by our cells' own drawing |
+| print-lint lesson S / L | FAIL 6 / 5 rows | FAIL 6 / 5 rows (same) | lf-engine chartWide packing (fgr H13 / PAGEFILL, notice PAGEFILL, pf DN-2 / PAGEFILL / LONE) |
+| print-lint sections --pages 2 S / L | FAIL | FAIL | section engine |
+| options-verify --render | FAIL 12 | FAIL 12 | lf-ops count-row capacity |
+| sibling-compare | FAIL | FAIL (106 unproven, 0 worse) | lead: first family, no siblings |
+
+Fixes (all in lane files):
+1. `sheet/cells/notice.js` sentenceList: the ONE answer slot (AK-2, shape check) is an empty overlay over the box column; the
+   sentences are printed choices outside the slot. KEYJOIN read "The ones digits go 4, 6, ..." as two answers in one slot
+   (314 + 26 findings). Caught by ws-cell-checks KEYJOIN. Screen ticks unchanged (wireTickBoxes reads the row divs):
+   ws-screen-slots, ws-screen-answer, ws-phone-card, ws-chromebook-fit, ws-slot-clip PASS.
+2. `notice.js` feature chart state drawn at one fixed width (64 mm at S): in a stretchy 2 x 2 panel the chart's zoom (1.6)
+   rewrapped the sentences to more lines than it measured at zoom 1 (panels 12-18 mm over). Parity chart state ntTight (no tab
+   pad, own width): Even / Odd and the ring left a zoomed panel (band=25). True / false in a full-width ROW panel drawn at S
+   (pattern_features patTask=truefalse: 66 mm drawing in a 53 mm row). Caught by ws-cell-checks OVERFLOW (--card-opts).
+3. `sheet/cells/function-table.js` ftStepState (plain find-the-rule chart): one rule place a state - the states before the last
+   show the tried rule in the machine and no empty rule line; the last writes the rule IN the machine (ruleInMachine with
+   `ftMerge`, a whole panel ~80 mm wide). ftTask=rule lesson 18 a size -> 0. Caught by ws-cell-checks OVERFLOW; detailed lesson
+   g3-oa9-input-output-rule (same stepState) ws-detailed-lesson --check OK before and after.
+
+Red, by owner (for the lead to route):
+- **ours (next round)**: function_table_easy lesson chart on ftTask make / outputs-check / rule-check / inputs-check / mixed-check,
+  band 1000, ftTable 51 / 52 (4-18 findings a size): the 2 x 2 chart falls back to zoom 1 (chart.js `fallback`), panels 4-9 mm
+  over at S. Same class as fix 3 (machine + table + Check row a state); needs a compact chart state per task (Check row on the
+  last state only) or the engine's option-aware chart layout. Check: ws-cell-checks --card-opts --roles lesson.
+- **lf-engine**: lesson chartWide packing (print-lint lesson S/L rows above); lesson pages of count-row options (npr places 1000,
+  shape circle / hex / mixed; fgr places 1000; npr pattern-all / places 1 L body 1.9 mm); pre-skill-check pages overflowing the
+  sheet (pf, growing: render-gate + cell-checks).
+- **lf-ops**: count-row.js reason-it train wrap (render-gate npr 18 / fgr 14; cell-checks reason-it), options-verify --render
+  capacity (12 values), our interim revert 2cfeb1d7 still in.
+- **section engine**: print-lint sections --pages 2 S / L (L-DENSITY).
+- **role owners**: KEYJOIN on true-false (all 6 skills; the role writes its statement into the slot), reason-it, error-analysis
+  (compose.js checkLine writes the sentence choices into the fix slot: pf 2), pre-skill-check KEYJOIN (npr / fgr); review L
+  1.3 mm body overflow (growing 8); true-false M overflow (pf).
+- **ws-empty-band 157** (no row from our cells' own drawing; the cell height is the role's): scripted-model role 44 (ft 20,
+  notice 20, pf 4: EB-BAND / EB-SIDE on the role's own [] cells); guided role 23 (ft 6, notice 11, pf 2, growing 5: the Model /
+  row height of the guided grid); count-row (lf-ops / lf-engine) 63 (npr / fgr lesson 36, reason-it 22 incl. EB-EDGE 18, opener 2,
+  error-analysis 2); error-analysis role 6 (ft); reason-it role 6 (ft 2, notice 2, pf 1, growing 1); pre-skill-check role 7 (ft
+  word-work EB-SIDE 4, pf legacy EB-EDGE 3); quiz host 3 (npr / fgr / ft legacy screen item, EB-SIDE); EB-FOOT 5 on pf independent
+  M: the bridge reports fits.cols 2 while the notice footprint (maxCols 1) lays one column, so the gate pairs the 1-column cell
+  with the 2-column measure (bridge / gate owner).
+- **lead**: sibling-compare (first family on the template).
 
 ## Precritic r5 (37a7f4f5 + the parity fix, 6 skills, --strict; logs /tmp/mq-precritic/20261112-221334-4592, wall 4632 s)
 25 PASS: node-lint, providers-unit, content-audit, options-verify (6 pinned, 0 new), presets-unit, lessonfit, coverage-matrix,
@@ -291,6 +351,12 @@ Remaining non-green rows and owners:
     shows the same CL40-INK x2 on sections/ex-group L (partner count, r2 sibling-compare). Engine (anchors band), not ours.
 
 ## Log
+- 2026-11-13 01:35: fix r6 (precritic r6 above). Pulled bd6c6cc6 (patterns card signed); design/cards/* untouched. Fixes 1-3 in
+  notice.js and function-table.js; boot-smoke OK, code-snapshot OK (736). Speed reflection: the KEYJOIN class (a check slot that
+  wraps printed choice text) and the chart-zoom reflow class (a stretchy drawing zoomed by the anchor chart) each cost a round;
+  proposals for lf-checks: (a) KEYJOIN skips text outside [data-ws-ink] or a node-lint rule "a check / choice slot holds no
+  printed sentence"; (b) a chart-state unit check that renders each stepState at zoom 1 and zoom z and fails when the height
+  grows faster than z (catches fix 2 without a page build).
 - 2026-11-12 23:40: fix r5. Merge of origin/master d34311d5 (49096d74): QUEUE.md/queue.json from master, regenerated;
   prereqs.js from master, our 6 records moved to families/algebra.js (6 ROUTINES + 6 skill: LESSONS; lessonFor equal to the old
   records except guidedRows: 1 on npr / pf / growing / fgr and fgr's match-anything example the library requires; notice and

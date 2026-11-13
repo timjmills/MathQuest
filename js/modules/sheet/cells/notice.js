@@ -26,7 +26,7 @@
 
 import { register } from '../registry.js';
 import { esc } from '../cell.js';
-import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES } from './k2kit.js';
+import { L, P, B, INK, GREY, root, textPt, digitPt, isTwin, sizeOf, inkOf, checkBox, checkedChoice, KEY_FEATURES, S } from './k2kit.js';
 
 export const NOTICE_TEMPLATE = 'notice';
 
@@ -165,8 +165,16 @@ function sentenceList(ctx, choices, on) {
             + `<span style="flex:1 1 auto;min-width:0;white-space:normal;text-align:left;font-size:${P(ctx, pt)};font-weight:700;line-height:1.25;">${esc(c)}</span>${box}</div>`;
     }).join('');
     const ink = on >= 0 && ctx.state === 'answered' ? ' data-ws-ink="solid"' : '';
-    return `<div class="k2-choices mq-nt-list" data-ws-slot="answer" data-ws-shape="check"${ink} style="display:block;text-align:left;">${rows}</div>`;
+    // The ONE graded slot (AK-2) is the column of boxes, not the printed sentences: a sentence ("The ones digits go 4,
+    // 6, 8") is a printed choice, never a written answer, so the key's slot holds only the tick (ws-cell-checks KEYJOIN,
+    // precritic r5: 314 + 26 findings when the slot wrapped the sentences). An empty overlay over the box column, no taps.
+    const side = S(ctx).checkMm;
+    const slot = `<div data-ws-slot="answer" data-ws-shape="check"${ink} aria-hidden="true" style="position:absolute;top:0;bottom:0;right:0;width:${L(ctx, side)};pointer-events:none;"></div>`;
+    return `<div class="k2-choices mq-nt-list" style="display:block;position:relative;text-align:left;">${rows}${slot}</div>`;
 }
+
+/** The anchor-chart state's drawing width (mm, drawn at S): the rule, the six tiles on one line, the three sentences. */
+const FEATURE_STATE_W = 64;
 
 function featureCell(p, ctx) {
     const choices = (p.choices || []).map(String);
@@ -183,7 +191,11 @@ function featureCell(p, ctx) {
     // track wraps under the rule
     const head = `<div class="mq-nt-head" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:${L(ctx, 4)};row-gap:${L(ctx, 1.5)};">${rule}${track}</div>`;
     const body = `${head}${list}`;
-    return root(ctx, 'mq-nt mq-nt--feature', body, { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:stretch;gap:${L(ctx, ctx.ntTight ? 1.2 : 2.5)};${pad(ctx)}` });
+    // An anchor-chart state (ntTight) is drawn at ONE fixed width, so the chart's zoom scales it as a picture: in a
+    // stretchy panel the zoomed sentences rewrapped to more lines than the chart measured at zoom 1 and the panels ran
+    // past their cells (ws-cell-checks OVERFLOW, precritic r5: notice_patterns patTask=feature lesson, 16 a size).
+    const fixedW = ctx.ntTight && !isTwin(ctx) ? `width:${L(ctx, FEATURE_STATE_W)};flex:none;align-self:center;box-sizing:border-box;` : '';
+    return root(ctx, 'mq-nt mq-nt--feature', body, { attrs: ' data-ws-inplace data-read', style: `display:flex;flex-direction:column;align-items:stretch;gap:${L(ctx, ctx.ntTight ? 1.2 : 2.5)};${pad(ctx)}${fixedW}` });
 }
 
 function trueFalseCell(p, ctx) {
@@ -250,6 +262,14 @@ function noticeStepState(p, steps, k, ctx) {
     const state = k >= n - 1 ? 'traced' : 'blank';
     // (only the sentence task needs the S-size state: the parity fact and the true / false sentence fill a 2 x 2 chart
     // panel at the chart's own size - drawn at S they left a third of each panel empty, H13)
-    if (p.task !== 'feature') return this.render(p, Object.assign({}, ctx, { state }));
+    // (a true / false sentence in a full-width ROW panel - the chart passes `hops` to column panels only - sits beside
+    // the step's words at S too: at the chart's size its ten-tile row made the drawing 66 mm in a 53 mm row panel and the
+    // panels ran past their cells, ws-cell-checks OVERFLOW on pattern_features patTask=truefalse lesson, precritic r5)
+    const tfRow = p.task === 'truefalse' && !ctx.hops;
+    // (the parity fact: no item-tab pad and no stretch (ntTight), so the drawing is its own width and the chart's zoom
+    // scales it as a picture - at 100 % of a zoomed panel with the tab pad, Even / Odd and the ring left the cell,
+    // ws-cell-checks OVERFLOW on notice_patterns band=25 lesson, precritic r5)
+    if (p.task === 'parity') return this.render(p, Object.assign({}, ctx, { state, ntTight: true }));
+    if (p.task !== 'feature' && !tfRow) return this.render(p, Object.assign({}, ctx, { state }));
     return this.render(p, Object.assign({}, ctx, { size: 'S', metrics: undefined, ntTight: true, state }));
 }
