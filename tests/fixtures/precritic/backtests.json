@@ -6982,6 +6982,46 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "c120-guided-echo",
+   "check": "no try on a Guided page shows the Model's own picture: the chart_to_120 Model's 96-120 window with 100 traced came back as a try with 100 blank (lf-roles critic r8b D5)",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo GUIDED-MODEL-ECHO",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "guided L seeds 3 and 7: a try draws the Model's window (3x5@96, 3x5@91)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "the window is the generator's dupKey: no window twice on a page while another is left"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 8 --only GUIDED-MODEL-ECHO",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
+  },
+  {
+   "id": "c120-score-slots",
+   "check": "a page's Score equals the answer places of its scored chart windows: Guided printed Score /3 over three windows holding 5 empty squares (lf-roles critic r8b n5); Error analysis stays one judgement a cell",
+   "kind": "commit-pair",
+   "rule": "ws-guided-echo SCORE-SLOTS",
+   "browser": true,
+   "fail": {
+    "commit": "a0ca6e221",
+    "state": "every scored chart page counted one point a window (guided /3 vs 5-7 squares, independent /6 vs 11-13)"
+   },
+   "pass": {
+    "commit": "280161c7e",
+    "state": "chartwindow footprint points = its blanks (slotPoints); error-analysis.js keeps 1 a cell"
+   },
+   "command": "node tests/scripts/ws-guided-echo.cjs --skills composing:chart_to_120 --seeds 4 --only SCORE-SLOTS",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
