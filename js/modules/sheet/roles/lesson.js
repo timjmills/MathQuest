@@ -57,7 +57,7 @@ import { hopsSvg } from '../lesson-arch/fact.js';
 import { roundLineSvg, roundLineMm, roundLinePad } from '../lesson-arch/line.js';
 import { isWordBar, chartStepsOf } from '../lesson-arch/story.js';
 import { winShare } from '../lesson-arch/grid.js';
-import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker, phase0On } from '../lesson-pages/common.js';
+import { EXAMPLE_KEYS, reflowsAt, stateGroups, kindOf, generalStep, namedSteps, stepMarker, phase0On, stripStepsFor } from '../lesson-pages/common.js';
 import { pickExample, pickSecond, otherExamples, chartLayout, stateItems, finalItems, secondItems, sameFactForms, chartPage } from '../lesson-pages/chart.js';
 import { vocabItem, vocabOrder } from '../lesson-pages/vocab.js';
 import { warmShape } from '../lesson-pages/warm-up.js';
@@ -65,6 +65,7 @@ import { pickWeDo, stepsItem } from '../lesson-pages/we-do.js';
 import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.js';
 import { sheetBands, lessonPart } from '../lesson-pages/index.js';
 import { VOCAB_MIN, ROWFIT_SLACK_MM, BAND_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
+import { slotScore } from '../paginate.js';
 
 // (The role's earlier exports, now homed in the builders.)
 export { reflowsAt, winShare, CASE_TESTS, pickExample, pickSecond, otherExamples, pickWeDo, stateGroups, hopsSvg, roundLineSvg, roundLineMm, roundLinePad };
@@ -163,7 +164,9 @@ export function extras(input = {}) {
     if (v) out.push(v);
     // (critic A r2 N2: Remember off takes the rule with it - the chant under the Steps list is the same rule; lesson.partN)
     const remOff = !!(lesson.partN && lesson.partN.remember === false);
-    if (steps.length) { out.push(stepsItem(remOff && data ? Object.assign({}, data, { chant: '' }) : data, steps)); out.push(stripItem(data, steps)); }
+    // (the zone and the strip stand beside the OTHER items: never the example's own numbers - critic r1 F5, stripStepsFor)
+    const zSteps = stripStepsFor(ex, steps, data);
+    if (zSteps.length) { out.push(stepsItem(remOff && data ? Object.assign({}, data, { chant: '' }) : data, zSteps)); out.push(stripItem(data, zSteps)); }
     // The Independent rows are drawn at level 1, but the pool was measured at the Guided cells'
     // level 3 (heads, grey boxes): a level-1 twin of each item is measured for the rows' height.
     for (const it of main) if (it !== ex) out.push(Object.assign({}, it, { measured: null, measureLevel: 1, lessonIndepOf: it, pool: 'extra' }));
@@ -332,7 +335,7 @@ function planOnce(input = {}) {
     const main = poolItems(input, 'main');
     const example = pickExample(main, data0);
     const data = chartDataOf(data0, example);
-    const exSteps = example ? workedStepsOf(example) : [];
+    const exSteps = example ? stripStepsFor(example, workedStepsOf(example), data) : [];
     const target = input.targetSkill ? [input.targetSkill] : (input.skills || []).slice(0, 1);
     const extrasList = input.extras || [];
     const states = extrasList.filter((x) => x.lessonState !== undefined);
@@ -436,7 +439,7 @@ function planOnce(input = {}) {
         }
     }
 
-    const score = warmCount + indep.length;
+    const score = warmCount + slotScore(indep);   // (answer slots: a chart window its empty squares - critic r1 F6)
     const frame = frameOf({ skills: target, input, tabId, score, footerLeft: lesson.tagLine });
     const out = [];
     let zoom = 0;

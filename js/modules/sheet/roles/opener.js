@@ -19,6 +19,7 @@ import {
     instructionKeyOf, instructionText, generalSteps, stepsHtml, stringsOf, oralFrameOf, assemble,
     poolItems, answerOf, labelStyleOf, stripExtraMm,
 } from './compose.js';
+import { slotScore } from '../paginate.js';
 
 /** Model and Guided cells draw grey supports and digit boxes (level 2-3): measure them there. */
 export const MEASURE_LEVEL = 3;
@@ -150,7 +151,7 @@ export function plan(input = {}) {
     const indep = rest.slice(g.gc, g.gc + g.iRows * g.gc);
     const guided = guided1.concat(g.gRows > 1 ? rest.slice(g.gc + indep.length, g.gc + indep.length + g.gc) : []);
     const lesson = Math.max(1, Number(input.lesson) || 1);
-    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: indep.length });
+    const frame = frameOf({ skills: input.skills || [], input, tabId: `Lesson ${lesson}`, score: slotScore(indep) });
     const key = instructionKeyOf(guided.length ? guided : items, input.skills);
     const traced = (it) => (c, o) => it.render(c, Object.assign({}, o, c.state === 'blank' && answerOf(it) ? { shown: answerOf(it), ink: 'trace' } : {}));
     // keyList (critic r2, R2-2): the second Model cell is the pupil's to write - the short key lists it
@@ -184,7 +185,7 @@ export function plan(input = {}) {
     if (!g.whatsNew) notes.push("What's New is omitted: the skill has no whatsNew string yet.");
     if (g.overBudget) notes.push('The Model and Guided bands are taller than the page budget at this size.');
     return assemble(ROLE_ID, input, frame, [{ sections }], {
-        meta: { items: models.length + guided.length + indep.length, scoreOutOf: indep.length, models: nModel, guided: guided.length, independent: indep.length,
+        meta: { items: models.length + guided.length + indep.length, scoreOutOf: slotScore(indep), models: nModel, guided: guided.length, independent: indep.length,
             fits: [{ cols: g.gc, rows: g.gRows + g.iRows, rowMm: g.gH, growMm: g.grow, line: `Fits: ${nModel} model${nModel > 1 ? 's' : ''}, ${guided.length} guided, ${indep.length} independent.` }], notes },
     });
 }

@@ -941,6 +941,39 @@ const POOL_LEGACY_TRIES = 16;
 /** Is the item drawn by a kit cell on paper (its own template, or one the host redraws it with)? */
 const kitDrawn = (q) => !!(q && ((q.cell && q.cell.template && q.cell.template !== 'legacy') || kitCellSpec(q) || numberFamilySpec(q)));
 
+/* CROSS-GIVEAWAY (chart_120 critic r1 F4 / F9): a chart window must never print, as a chart number, a square another window
+ * of the sheet leaves empty - the pupil copies the answer across. Band 120's three-rows grid and the chart to 10 have ONE
+ * window, so every second window gave the first one's answers away; overlapping 3 x 5 windows could too. Each kept window is
+ * recorded in the run's `seen` (`cw:` keys, so a later run of the same sheet reads it); a draw that gives an answer away
+ * is passed over while tries remain; when every try still shows the SAME squares as a kept window with other gaps (a
+ * one-window chart) the item is not dealt: the sheet holds the windows it can hold without giving an answer away. */
+function chartOfQ(q) {
+    const w = q && q.chartWindow;
+    if (!w || !Array.isArray(w.rows) || !Array.isArray(w.cols)) return null;
+    const raw = Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : String(q.ans === undefined ? '' : q.ans).split(/\s*,\s*/);
+    return { rows: w.rows.map(Number), cols: w.cols.map(Number), gaps: raw.map((x) => Number(String(x).replace(/,/g, ''))).filter(Number.isFinite) };
+}
+const cwKey = (c) => `cw:${c.rows.join('.')}:${c.cols.join('.')}:${c.gaps.join('.')}`;
+const cwParse = (k) => { const [, r, c, g] = k.split(':'); const L = (x) => (x ? x.split('.').map(Number) : []); return { rows: L(r), cols: L(c), gaps: L(g) }; };
+/** Does window `c` print `n` as a chart number (in it, and not one of its own empty squares)? */
+const cwPrints = (c, n) => !c.gaps.includes(n) && c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10);
+/**
+ * Would `q` give an answer away to, or take one from, a window already kept on the sheet? `same`: only a window of the SAME
+ * squares counts (the one-window charts - the hard rule); without it an overlapping window counts too (the dealer's
+ * preference: band 120's 30 squares cannot hold six windows that never overlap, so overlap is avoided while tries remain).
+ */
+export function chartGivesAway(q, seen, { same = false } = {}) {
+    const a = chartOfQ(q);
+    if (!a || !seen) return false;
+    for (const k of seen) {
+        if (typeof k !== 'string' || !k.startsWith('cw:')) continue;
+        const b = cwParse(k);
+        if (same && (a.rows.join('.') !== b.rows.join('.') || a.cols.join('.') !== b.cols.join('.'))) continue;
+        if (a.gaps.some((n) => cwPrints(b, n)) || b.gaps.some((n) => cwPrints(a, n))) return true;
+    }
+    return false;
+}
+
 /**
  * `want(q, sk)` (wave 1 lane D round 7): the page asks for an item of one KIND - a mixed pool's
  * column work, to fill that group's last row (buildSheetOnce, whole rows). A draw of another kind
@@ -1004,7 +1037,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // deals as before); absent on every other ref: skH is sk)
         const skH = Array.isArray(sk.onlyKeysAt) && sk.edgeLast && i < Number(sk.edgeLast.per) ? Object.assign({}, sk, { onlyKeys: edgeAt >= 0 ? sk.onlyKeysEdge : sk.onlyKeysAt }) : sk;
         const pass = (rotate, relaxLast, soft, words = true) => {
-            let got = null;
+            let got = null, altCw = null;
             for (let k = 0; k <= tries; k++) {
                 const seed = (runSeed + i + 7919 * k) >>> 0;
                 let cand = null;
@@ -1045,9 +1078,17 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
                 if (want && k < tries && !want(cand, sk)) { if (!got) got = cand; continue; }
                 // (a case the last row WANTS is kept for it: no other place of the page deals it)
                 if (strict && edgeAt < 0 && sk.edgeLast && Array.isArray(sk.edgeLast.wants) && sk.edgeLast.wants.some((w) => w && LESSON_CASE_TESTS[w] && LESSON_CASE_TESTS[w]({ q: cand }))) continue;
+                // (CROSS-GIVEAWAY: a window that would print another window's answer is passed over while tries remain)
+                if (k < tries && chartGivesAway(cand, seen)) {
+                    // (a NEW window that only overlaps a kept one is the fallback: never a repeat of a kept window)
+                    if (!altCw && !seen.has(signature(cand)) && !chartGivesAway(cand, seen, { same: true })) altCw = cand;
+                    if (!got) got = cand;
+                    continue;
+                }
                 got = cand;
                 if (!seen.has(signature(cand))) break;
             }
+            if (altCw && got && got !== altCw && (seen.has(signature(got)) || chartGivesAway(got, seen))) got = altCw;
             return got;
         };
         // (a detailed lesson's ref - `avoidKeys` - rotates the generator's case before it relaxes: a
@@ -1059,6 +1100,8 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         q = hard ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, false, false))
             : sk.avoidKeys ? (pass(false, false, true) || pass(true, false, true) || wordsOff() || pass(true, true, true)) : pass(false, true, true);
         if (!q) return;
+        // (CROSS-GIVEAWAY: every try gave an answer away - a one-window chart already on the sheet - so this item is not dealt)
+        if (chartGivesAway(q, seen, { same: true })) return;
         // A lesson's practice page (lessons r1): `check` on the skill ref puts the Check line
         // ("Check: add back") under every subtraction stack. Not a skill option - the page's.
         // `cellPayload` on a lesson's ref (the detailed lesson maker): fields merged into the item's
@@ -1077,6 +1120,7 @@ function generateRun(skills, count, baseSeed, { startIndex = 0, seen = new Set()
         // (`sectionLabel` on the ref: the Mixed page names the item's band by it - the detailed lesson maker)
         if (sk.sectionLabel) q = Object.assign({}, q, { sectionLabel: String(sk.sectionLabel) });
         seen.add(signature(q));
+        { const cw = chartOfQ(q); if (cw) seen.add(cwKey(cw)); }
         // (an `lr6Names` ref counts a story person twice on the page as relaxed too, so the next seed is tried)
         if (lr6Run && sk.lr6 && lr6Of(q).op && !refAccepts(sk, q, key, seen, kept, pg, rowK, sk.lr6Names ? 'names' : false)) relaxedAt.push(j);
         refRecord(sk, q, key, seen, kept, pg, rowK);

@@ -978,7 +978,7 @@ export function generateCountingQuestion(q, mappedSkill, helpers) {
         // chart_120 (card chartwindow M-C1 'writes-ten-ten', lead ruling 2026-11-13): the screen practice card names the
         // error of writing 100-120 as it is said (110 -> 1010) when the pupil types it; it is never drawn in a chart square
         if (_to120) {
-            const tt = blanks.findIndex((n) => n >= 100 && n <= 120);
+            const tt = blanks.findIndex((n) => n >= 101 && n <= 110);   // (101-110 only: lead ruling 2026-11-13, critic r1 F8)
             if (tt >= 0) {
                 const n = blanks[tt], w = `10${String(n - 100).padStart(2, '0')}`;
                 q.distractorTags[blanks.map((x, i) => (i === tt ? w : x)).join(', ')] = `wrote ${n} as it is said (${w}): ${n} has three digits, 1 hundred, ${Math.floor((n - 100) / 10)} ten${Math.floor((n - 100) / 10) === 1 ? '' : 's'} and ${n % 10} one${n % 10 === 1 ? '' : 's'}`;

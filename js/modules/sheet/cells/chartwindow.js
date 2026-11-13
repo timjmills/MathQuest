@@ -151,7 +151,9 @@ register('chartwindow', {
         // `hardCap`: the chart's tracks have a 12 mm floor its measurement cannot see (the table
         // squeezes rather than overflowing), so its 2 columns hold at every size (critic guided-r1).
         if (w <= 90 && topOf(p || {}) > 100) return { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true };
-        return w <= 90 ? { wMm: 93, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true }
+        // (a 1-100 window states its true width too - chart_120 critic r1 F10: Reason It at L laid band 100's A | B windows in
+        // half the room beside the response and squeezed the squares to 10.4 mm; with its width known it takes the wide form)
+        return w <= 90 ? { wMm: 93, inkWMm: w, hMm: null, measure: true, factLike: false, maxCols: 2, hardCap: true, points, slotPoints: true }
             : { wMm: Math.ceil(w + 4), hMm: null, measure: true, factLike: false, maxCols: 1, points, slotPoints: true };
     },
     inputs(p) {

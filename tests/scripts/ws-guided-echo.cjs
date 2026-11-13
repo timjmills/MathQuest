@@ -11,7 +11,21 @@
 //                      review (Error analysis: one judgement a cell, its shown work is not the pupil's), for the templates named by --score-templates (default chartwindow: a template that scores one
 //                      point a cell whatever its slots - a stack, a number family - is a separate ruling, not judged here).
 //
-//   node tests/scripts/ws-guided-echo.cjs --skill composing:chart_to_120 [--seeds 8] [--sizes M,L] [--only GUIDED-MODEL-ECHO]
+//   (chart_120 critic r1, 2026-11-13 - judged from the built plan's items, so they read what the role dealt:)
+//   SCORE-SLOTS        also on opener, mixed-practice, pre-skill-check and lesson (F6: Score /2 over 4 squares on the opener,
+//                      /6 over 13 on mixed practice): Score = the labelled (scored) cells, a chart window counting its empty squares.
+//   TF-FALSE           True or False? deals False statements (F1: 4 of 4 True - a multi-gap window had no wrong answer): every page
+//                      of 2+ statements holds at least one True and one False, and over the seeds 35-65 % are False (PT-TOF-1).
+//   EA-PATTERN         Error analysis cannot be answered by counting gaps (F2: every multi-gap window Correct): over the seeds, the
+//                      windows of 2+ gaps are judged both Correct and Fix it.
+//   CROSS-GIVEAWAY     no window prints, as a chart number, a square another window of the SAME squares leaves empty (F4: band 120
+//                      grid=rows - one window, three items copying each other's answers; F9: band 10). With --variants it also
+//                      runs hundreds_chart_fill's band x grid values on independent / more-practice. Overlapping (not identical)
+//                      windows that share an answer are counted and reported (OVERLAP-INFO), not failed.
+//   STRIP-NUMBERS      a lesson sheet's Steps zone and strip name no number (11 and up) that is not printed in, or a key of, a
+//                      cell on its page (F5: "The number before is 109 ... Write 110." beside windows with no 109 or 110).
+//
+//   node tests/scripts/ws-guided-echo.cjs --skill composing:chart_to_120 [--seeds 8] [--sizes M,L] [--only GUIDED-MODEL-ECHO] [--variants]
 //   MQ_ROOT=<tree> judges another checkout (ws-backtest commit-pair rows; the harness serves that tree)
 // Last line `ws-guided-echo: OK (...)` / `FAIL - n finding(s)`; exit 1 on FAIL, 2 on usage or error.
 'use strict';
@@ -27,12 +41,13 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
     const sizes = list(arg('sizes', 'M,L'));
     const only = arg('only', null) ? list(arg('only')) : null;
     const scoreTpl = list(arg('score-templates', 'chartwindow'));
-    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis'));
+    const scoreRoles = list(arg('score-roles', 'guided,independent,more-practice,test,review,error-analysis,opener,mixed-practice,pre-skill-check,lesson,true-false'));
+    const variants = argv.includes('--variants');
     const H = require('../lib/ws-harness.cjs');
     const app = await H.open({});
     let res;
     try {
-        res = await app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles }) => {
+        res = await app.page.evaluate(async ({ keys, N, sizes, only, scoreTpl, scoreRoles, variants }) => {
             const on = (id) => !only || only.includes(id);
             const out = []; let pages = 0;
             // a cell's PICTURE with its answers taken out. A chart window (table.k2-chart): its shape and the number its first
@@ -59,8 +74,64 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                 const d = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
                 return [...d.querySelectorAll('[data-ws-cell]')].filter((c) => !c.parentElement.closest('[data-ws-cell]'));
             };
+            // the built plan, page by page: its grid items (q, key, nolabel) and its html parts (the lesson's Steps zone and strip)
+            const planPages = (plan) => (plan && Array.isArray(plan.pages) ? plan.pages : []).map((pg) => {
+                const items = [], htmls = [];
+                const walk = (x) => {
+                    if (!x || typeof x !== 'object') return;
+                    if (Array.isArray(x)) { x.forEach(walk); return; }
+                    if (x.kind === 'grid' && Array.isArray(x.items)) items.push(...x.items.filter(Boolean));
+                    if (typeof x.html === 'string') htmls.push(x.html);
+                    for (const k of ['sections', 'parts', 'content']) if (x[k]) walk(x[k]);
+                };
+                walk(pg);
+                return { items, htmls };
+            });
+            const winOf = (q) => {
+                const w = q && q.chartWindow;
+                if (!w || !Array.isArray(w.rows) || !Array.isArray(w.cols)) return null;
+                const raw = Array.isArray(q.keyParts) && q.keyParts.length ? q.keyParts : String(q.ans === undefined ? '' : q.ans).split(/\s*,\s*/);
+                return { rows: w.rows.map(Number), cols: w.cols.map(Number), gaps: raw.map((x) => Number(String(x).replace(/,/g, ''))).filter(Number.isFinite) };
+            };
+            const printsN = (c, n) => !c.gaps.includes(n) && c.rows.includes(Math.floor((n - 1) / 10)) && c.cols.includes((n - 1) % 10);
+            const nums = (t) => (String(t || '').replace(/<[^>]+>/g, ' ').replace(/(\d),(?=\d{3})/g, '$1').match(/\d+/g) || []).map(Number);
+            const itemNums = (q) => {
+                const s = new Set();
+                const c = winOf(q);
+                if (c) for (const r of c.rows) for (const k of c.cols) s.add(r * 10 + k + 1);
+                else nums(JSON.stringify((q && q.cell && q.cell.payload) || {})).forEach((n) => s.add(n));
+                nums(q && q.text).forEach((n) => s.add(n));
+                nums(Array.isArray(q && q.ans) ? q.ans.join(' ') : q && q.ans).forEach((n) => s.add(n));
+                return s;
+            };
+            const tf = { pages: 0, falseN: 0, all: 0 };
+            const ea = { multiCorrect: 0, multiFix: 0 };
+            let overlap = 0;
+            const judgeGiveaway = (label, items) => {
+                const ws = items.map((it) => winOf(it.q)).filter(Boolean);
+                for (let i = 0; i < ws.length; i++) for (let j = 0; j < ws.length; j++) {
+                    if (i === j) continue;
+                    const a = ws[i], b = ws[j];
+                    const hit = a.gaps.filter((n) => printsN(b, n));
+                    if (!hit.length) continue;
+                    if (a.rows.join() === b.rows.join() && a.cols.join() === b.cols.join()) out.push(`CROSS-GIVEAWAY ${label}: window ${i + 1}'s answer ${hit.join(', ')} is printed in window ${j + 1} (the same squares)`);
+                    else overlap++;
+                }
+            };
             for (const key of keys) {
                 const [categoryId, skillId] = key.split(':');
+                if (variants && on('CROSS-GIVEAWAY')) {
+                    const base = skillId === 'chart_to_120' ? { band: 120 } : {};
+                    // (the chart's option values, card chartwindow §7a: "Numbers to" and the grid)
+                    const bands = skillId === 'chart_to_120' ? [120] : skillId === 'hundreds_chart_fill' ? [10, 20, 30, 40, 50, 100, 120] : [undefined];
+                    const grids = skillId === 'number_chart_fill' ? [undefined] : ['window', 'rows', 'whole'];
+                    for (const band of bands) for (const grid of grids) for (const role of ['independent', 'more-practice']) for (let s = 1; s <= Math.min(N, 4); s++) {
+                        const opts = Object.assign({}, base, band !== undefined ? { band } : {}, grid ? { grid } : {});
+                        let r; try { r = await window.buildSheet({ role, sections: [{ skills: [{ categoryId, skillId, opts }] }], size: 'L', paper: 'A4', seed: s, key: false }); } catch (e) { continue; }
+                        pages++;
+                        planPages(r.plan).forEach((pg, pi) => judgeGiveaway(`${key} ${JSON.stringify(opts)} ${role} L seed ${s} p${pi + 1}`, pg.items));
+                    }
+                }
                 for (const size of sizes) for (let s = 1; s <= N; s++) {
                     for (const role of on('SCORE-SLOTS') ? scoreRoles : ['guided']) {
                         if (role !== 'guided' && !on('SCORE-SLOTS')) continue;
@@ -73,23 +144,46 @@ const list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boole
                             const m = picture(cells[0]);
                             cells.slice(1).forEach((c, i) => { if (picture(c) === m) out.push(`GUIDED-MODEL-ECHO ${key} guided ${size} seed ${s}: try ${i + 1} shows the Model's own picture (${m.slice(0, 80)}) - the pupil can copy the Model's answer`); });
                         }
-                        if (on('SCORE-SLOTS') && Number.isFinite(Number(meta.scoreOutOf))) {
-                            const scored = role === 'guided' ? cells.slice(1) : cells;
-                            if (!scored.length || !scored.every((c) => scoreTpl.includes(c.getAttribute('data-ws-cell')))) continue;
-                            // (Error analysis: ONE judgement a cell - the shown work's squares are Sam's, not the pupil's)
-                            const want = role === 'error-analysis' ? scored.length : scored.reduce((a, c) => a + Math.max(1, c.querySelectorAll('[data-ws-slot]').length), 0);
-                            if (Number(meta.scoreOutOf) !== want) out.push(`SCORE-SLOTS ${key} ${role} ${size} seed ${s}: Score /${meta.scoreOutOf} but its ${scored.length} scored cell(s) hold ${want} answer places`);
+                        const pp = planPages(r.plan);
+                        const scoredItems = pp.flatMap((pg) => pg.items).filter((it) => !it.nolabel && !it.anchor && it.q);
+                        if (on('SCORE-SLOTS') && Number.isFinite(Number(meta.scoreOutOf)) && scoredItems.some((it) => it.q.cell && scoreTpl.includes(it.q.cell.template))) {
+                            // (Error analysis and True or False?: ONE judgement a cell - the shown work's squares are not the pupil's)
+                            const one = role === 'error-analysis' || role === 'true-false';
+                            const want = scoredItems.reduce((a, it) => a + (!one && it.q.cell && scoreTpl.includes(it.q.cell.template) ? Math.max(1, (Array.isArray(it.q.keyParts) && it.q.keyParts.length) || 1) : 1), 0);
+                            if (Number(meta.scoreOutOf) !== want) out.push(`SCORE-SLOTS ${key} ${role} ${size} seed ${s}: Score /${meta.scoreOutOf} but its ${scoredItems.length} scored cell(s) hold ${want} answer places`);
                         }
+                        if (on('TF-FALSE') && role === 'true-false') {
+                            const flags = scoredItems.map((it) => /^False/.test(String((it.key && it.key.short) || '')));
+                            tf.pages++; tf.all += flags.length; tf.falseN += flags.filter(Boolean).length;
+                            if (flags.length >= 2 && (flags.every(Boolean) || !flags.some(Boolean))) out.push(`TF-FALSE ${key} true-false ${size} seed ${s}: ${flags.filter(Boolean).length} of ${flags.length} statements False (every page holds a True and a False)`);
+                        }
+                        if (on('EA-PATTERN') && role === 'error-analysis') {
+                            for (const it of scoredItems) {
+                                const c = winOf(it.q); if (!c || c.gaps.length < 2) continue;
+                                if (/^Correct/i.test(String((it.key && it.key.short) || ''))) ea.multiCorrect++; else ea.multiFix++;
+                            }
+                        }
+                        if (on('CROSS-GIVEAWAY')) pp.forEach((pg, pi) => judgeGiveaway(`${key} ${role} ${size} seed ${s} p${pi + 1}`, pg.items));
+                        if (on('STRIP-NUMBERS') && role === 'lesson') pp.forEach((pg, pi) => {
+                            const strip = pg.htmls.filter((h) => /mq-lstrip|mq-lstepszone|mq-lsteps\b/.test(h)).join(' ');
+                            if (!strip) return;
+                            const have = new Set(); pg.items.forEach((it) => itemNums(it.q).forEach((n) => have.add(n)));
+                            const stray = [...new Set(nums(strip.replace(/<em class="mq-lnum"[^>]*>\d+<\/em>/g, '')).filter((n) => n >= 11 && !have.has(n)))];
+                            if (stray.length) out.push(`STRIP-NUMBERS ${key} lesson ${size} seed ${s} p${pi + 1}: the Steps name ${stray.join(', ')}, printed in no cell of the page`);
+                        });
                     }
                 }
             }
+            if (on('TF-FALSE') && tf.all) { const sh = tf.falseN / tf.all; if (sh < 0.35 || sh > 0.65) out.push(`TF-FALSE ${keys.join(',')}: ${tf.falseN} of ${tf.all} statements False over ${tf.pages} pages (${Math.round(sh * 100)} %, PT-TOF-1 40-60 %)`); }
+            if (on('EA-PATTERN') && ea.multiCorrect + ea.multiFix >= 4 && (!ea.multiCorrect || !ea.multiFix)) out.push(`EA-PATTERN ${keys.join(',')}: windows of 2+ gaps judged Correct ${ea.multiCorrect}, Fix it ${ea.multiFix} - the judgement follows the gap count`);
+            out.push(`OVERLAP-INFO ${overlap} answer(s) shared by overlapping (not identical) windows; TF ${tf.falseN}/${tf.all} False; EA multi-gap Correct ${ea.multiCorrect} / Fix it ${ea.multiFix}`);
             return { out, pages };
-        }, { keys, N, sizes, only, scoreTpl, scoreRoles });
+        }, { keys, N, sizes, only, scoreTpl, scoreRoles, variants });
     } catch (e) { console.log(`${TOOL}: FAIL - error ${String(e && e.message || e).slice(0, 200)}`); await app.close(); process.exit(2); }
     await app.close();
     for (const f of res.out) console.log('  ' + f);
-    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS) /.test(f));
-    const notComposed = res.out.length - bad.length;
+    const bad = res.out.filter((f) => /^(GUIDED-MODEL-ECHO|SCORE-SLOTS|TF-FALSE|EA-PATTERN|CROSS-GIVEAWAY|STRIP-NUMBERS) /.test(f));
+    const notComposed = res.out.filter((f) => / not composed /.test(f)).length;
     console.log(`${TOOL}: ${bad.length ? `FAIL - ${bad.length} finding(s)` : 'OK'} (${res.pages} pages, ${keys.join(', ')}, sizes ${sizes.join('/')}, ${N} seeds${notComposed ? `; ${notComposed} not composed` : ''})`);
     process.exit(bad.length ? 1 : 0);
 })();
