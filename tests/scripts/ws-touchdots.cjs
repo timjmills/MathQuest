@@ -257,7 +257,7 @@ function photocopy(img, sigma, cut) {
     log(`layout: ${shift.n} boxes compared, identical: ${shift.same}`);
 
     // ---------------------------------------------------------------- SCREEN (the specimen card)
-    for (const w of [390, 1280]) {
+    for (const w of [820, 1280]) { // owner 2026-11-13: no phone width (was 390)
       await page.setViewport({ width: w, height: 800, deviceScaleFactor: 1 });
       await page.goto(`${base}/design/specimens/touch-dots-card.html?w=${w}&fact=3%2B5&on=ab`, { waitUntil: 'networkidle0' });
       await page.waitForFunction(() => window.__ready === true, { timeout: 15000 });

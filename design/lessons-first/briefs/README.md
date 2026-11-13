@@ -54,6 +54,10 @@ calls pass `subagent_type: "mq-opus-medium"` and `model: "opus"`. Say in each su
 > A page or host carrying one does not pass. (Owner, 2026-11-13; LESSONS_LEARNED process rule 10; RUBRIC "How a page counts as
 > graded".)
 
+> **Screen hosts.** Grade the practice card at 1280 (computer), 1366 × 768 (Chromebook), 820 and 1024 (tablets), the online
+> worksheet at 1280 and the quiz at 1280. There is no phone width: do not render, grade or cite 390 px. Answer boxes are 48 px
+> touch targets on the tablets. (Owner rule, 2026-11-13; CLAUDE.md "Fastest-implementation plan" item 7; RUBRIC "Screen".)
+
 ## Briefs in wave 1
 
 | Brief | Lane id (status file) | Where |

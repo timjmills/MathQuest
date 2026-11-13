@@ -53,10 +53,11 @@ function READ(sel) {
 const YELLOW = 'rgb(242, 194, 0)';
 
 (async () => {
-    const app = await open({ seed: 1, viewport: { width: 390, height: 844, deviceScaleFactor: 1 } });
+    const app = await open({ seed: 1, viewport: { width: 820, height: 1180, deviceScaleFactor: 1 } });
     const { page } = app;
     const hosts = [
-        ['card-390', '#questionCard', 390, async (c, k) => page.evaluate((c, k) => {
+        // owner 2026-11-13: no phone width - the card host is the 820 px tablet (was card-390)
+        ['card-820', '#questionCard', 820, async (c, k) => page.evaluate((c, k) => {
             const st = window.state; st.quizMode = false; st.category = c; st.skill = k; st.gameMode = 'practice'; st.isMixedMode = false; st.hasAnswered = false;
             window.showView('gameView'); st.currentQ = window.generateQuestionFor({ category: c, skill: k, seed: 11 }); window.renderQuestion();
             document.activeElement && document.activeElement.blur && document.activeElement.blur();

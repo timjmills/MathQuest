@@ -343,7 +343,7 @@
     "fixture": "tests/fixtures/precritic/pilot-su-c/good.state.json",
     "state": "b3948d88 + tests/fixtures/precritic/pilot-su-c/good.patch, a SEEDED minimal fix never committed (the pilot branch had no fix commit on 2026-10-23 20:10): D5, binaryParts reads comma-formatted items, so the kit stack draws them on screen"
    },
-   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup --items 2",
+   "command": "node tests/fixtures/precritic/state-run.cjs --state {fixture} -- /tmp/mq-browser-run.sh node tests/scripts/ws-phone-card.cjs --skills subtraction:sub_100_no_regroup,subtraction:sub_10k_no_regroup,subtraction:sub_1m_no_regroup --items 2 --sizes 390x844,390x664",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -1246,7 +1246,7 @@
     "commit": "6f0c934",
     "state": "visual-quality fix r2: four-panel chart that fits, 48 px answer face"
    },
-   "command": "node tests/scripts/ws-grade-render.cjs --skills addition:add_wp_20_plain --roles lesson --size S --gate --out /tmp/mq-backtest-render-gate",
+   "command": "node tests/scripts/ws-grade-render.cjs --skills addition:add_wp_20_plain --roles lesson --size S --gate --widths 390 --out /tmp/mq-backtest-render-gate",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -3236,7 +3236,7 @@
    "commit": "d377e32b",
    "state": "0 findings: frame-array 12.0x35.8 on every host, 'no dots' frame on 0 ÷ n"
   },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ",
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only EQ --widths 1280,820,390",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3256,7 +3256,7 @@
    "commit": "d377e32b",
    "state": "0 findings: the cue follows var(--mq-digit) at paper's ratio"
   },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE",
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only CUE --widths 1280,820,390",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3276,7 +3276,7 @@
    "commit": "d377e32b",
    "state": "0 findings: every ÷ card under once one wraps"
   },
-  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE",
+  "command": "node tests/scripts/ws-screen-support-eq.cjs --skills division:div_facts --only PLACE --widths 1280,820,390",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3456,7 +3456,7 @@
    "command": "node tests/scripts/ws-screen-ink-size.cjs --html {fixture}",
    "state": "A FIXTURE, because no commit fixes div_facts yet (the lane that owns the skill does; this tool does not fix skills): the same 12-dot item, paper as on 73e96fc1 (1.96 mm dots), the screen array at 3 mm dots laid across 24 x 18 mm. Replace with the fixing commit when it lands."
   },
-  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline",
+  "command": "node tests/scripts/ws-screen-ink-size.cjs --skill division:div_facts --no-baseline --widths 390,820,1280",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -3596,7 +3596,7 @@
    "commit": "35bc76fe",
    "state": "the kit words cell on every host, the input in its line"
   },
-  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY",
+  "command": "node tests/scripts/ws-empty-band.cjs --skill composing:number_word_form --sizes L --variants 0 --no-baseline --screen-parity --rule-skills composing:number_word_form --only EB-PARITY --widths 390,820,1280",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5166,7 +5166,7 @@
    "commit": "75b0e131",
    "state": "twin fits the paper box, printFloor"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_pick3_words --opts '{\"vocabSet\": 3}' --no-baseline --only SIZE-INK --widths 390,820,1280",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5186,7 +5186,7 @@
    "commit": "75b0e131",
    "state": "worksheet picture slot 104 px"
   },
-  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK",
+  "command": "node tests/scripts/ws-integrate.mjs --apply --lanes lf-vocab --root {root} >/dev/null && node tests/scripts/ws-screen-ink-size.cjs --skill vocabulary:vocab_grade_pictures --opts '{\"vocabSet\": 0}' --no-baseline --only SIZE-INK --widths 390,820,1280",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
@@ -5854,7 +5854,7 @@
    "commit": "TBD-lf-ops-npr-digits",
    "state": "lf-ops' fix (pass commit to come)"
   },
-  "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit",
+  "command": "node tests/scripts/ws-screen-slots.cjs --skills patterns:number_patterns_rule --screen-digit --widths 1280,820,390",
   "expect": {
    "fail": "FAIL",
    "pass": "OK"
