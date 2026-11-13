@@ -3576,7 +3576,7 @@
     "commit": "1e3b128e",
     "state": "2-digit wrong answers (M-V9 / M-L3 / M-Z1), 2-digit steps"
    },
-   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE",
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-WRONG-RATE,WORDS-STEPS-TRUE --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6353,7 +6353,7 @@
     "commit": "1240f552",
     "state": "the live blockOrder mixes on a per-session value"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-LIVE",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-LIVE --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6372,7 +6372,7 @@
     "commit": "1240f552",
     "state": "comparePair shares 1 .. nd-1 digits"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only CLOSE-DEPTH",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only CLOSE-DEPTH --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6391,7 +6391,7 @@
     "commit": "1240f552",
     "state": "1 in 6, 60 of 120 the 89 / 312 trap"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only MIXED-1DIGIT",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only MIXED-1DIGIT --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6410,7 +6410,7 @@
     "commit": "1240f552",
     "state": "M6 only; an item M6 gets right has none"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only M6-WRONG",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only M6-WRONG --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6429,7 +6429,7 @@
     "commit": "1240f552",
     "state": "count / boxed digits / bigger digit / sign, every step marked"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only WORKED-STEP-DOES",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only WORKED-STEP-DOES --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6449,7 +6449,7 @@
     "commit": "1240f552",
     "state": "every shown error M6, the first-digit form on every mixed page"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only M6-SHOWN",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only M6-SHOWN --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6469,7 +6469,7 @@
     "commit": "1240f552",
     "state": "unequal same-length Models (4 worked steps; noModel)"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-MODEL",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-MODEL --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6489,7 +6489,7 @@
     "commit": "1240f552",
     "state": "count, boxed digits, underline, sign"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only STATE-MARKS",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only STATE-MARKS --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6608,7 +6608,7 @@
     "commit": "f0d0ac7d",
     "state": "the Model row 22.6 / 30.0 / 33.7 mm: 1-2 mm white under the hint line (max(tab, hint), rows at pads + line)"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-RESERVE",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-RESERVE --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6628,7 +6628,7 @@
     "commit": "0d61403a",
     "state": "provider roleOpts: support none on the unaided roles and the quiz; Practice / Mixed keep the heads"
    },
-   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ",
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-UNAIDED,PV-HEADS-TAUGHT,PV-HEADS-QUIZ --skills placevalue:identify",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6712,7 +6712,7 @@
     "commit": "827b394b",
     "state": "one / ones and ten / tens follow the count"
    },
-   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-STEPS-PLURAL",
+   "command": "node tests/scripts/ws-words-checks.mjs --root {root} --only WORDS-STEPS-PLURAL --skills composing:number_word_form",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6752,7 +6752,7 @@
     "commit": "10d3ce7c",
     "state": "provider falseNeedsWrong: the False slot skips such an item; every page half false"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only TOF-SHARE --seeds 2",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only TOF-SHARE --seeds 2 --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6772,7 +6772,7 @@
     "commit": "10d3ce7c",
     "state": "1.6 mm room each side of the deciding digit in every state, one box round an '=' number, the count 2 mm above"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MARK-CLEAR --seeds 1",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MARK-CLEAR --seeds 1 --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6792,7 +6792,7 @@
     "commit": "10d3ce7c",
     "state": "noModel on every item M6 gets right; the lesson anchor (pickExample) honours it"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-M6 --seeds 2",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only MODEL-M6 --seeds 2 --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6812,7 +6812,7 @@
     "commit": "10d3ce7c",
     "state": "the page plan: first '=' at item 3-7, then every 6th or 7th"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-SHARE-PAGE --seeds 2",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only EQ-SHARE-PAGE --seeds 2 --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6832,7 +6832,7 @@
     "commit": "10d3ce7c",
     "state": "the sign joined to its digits with no-break spaces"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only WRAP-SIGN --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6852,7 +6852,7 @@
     "commit": "10d3ce7c",
     "state": "the gaps give way to 1.6 mm: 5.19 mm"
    },
-   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only SIDE-PAD",
+   "command": "node tests/scripts/ws-pv-compare-pages.cjs --only SIDE-PAD --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6872,7 +6872,7 @@
     "commit": "54ec52ae",
     "state": "the page plan's seeded sign, no 4-long alternation or run"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only SIGN-PARITY",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only SIGN-PARITY --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6892,7 +6892,7 @@
     "commit": "cb2c9741",
     "state": "the page plan; step 2 'Every digit is the same: 724 and 724.'"
    },
-   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-SHARE",
+   "command": "node tests/scripts/ws-pv-compare-deal.mjs --root {root} --only EQ-SHARE --skills placevalue:compare",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6932,7 +6932,7 @@
     "commit": "cb2c9741",
     "state": "roleOpts replaces only the default (support absent or 'labels')"
    },
-   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-CHOSEN",
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-CHOSEN --skills placevalue:identify",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
@@ -6952,7 +6952,7 @@
     "commit": "cb2c9741",
     "state": "--quiz-builder: openQuizBuilder + addMultipleQuestions, quiz-1280.html written, 0 headed items"
    },
-   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-GRADE-QUIZ --grade-render {root}/tests/scripts/ws-grade-render.cjs",
+   "command": "node tests/scripts/ws-pv-identify-heads.cjs --only PV-HEADS-GRADE-QUIZ --grade-render {root}/tests/scripts/ws-grade-render.cjs --skills placevalue:identify",
    "expect": {
     "fail": "FAIL",
     "pass": "OK"
