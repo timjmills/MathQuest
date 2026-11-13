@@ -7105,6 +7105,89 @@
    "fail": "FAIL",
    "pass": "OK"
   }
+ },
+ {
+  "id": "touch-hit-word-work-tablet",
+  "check": "ws-phone-card TOUCH-HIT: a REAL tap (page.mouse.click) 1 px inside each of the 4 edge midpoints and 4 corners of every typed box's touch area leaves document.activeElement on that box; card, worksheet and quiz at 820 / 1024 / 1280 / 1366",
+  "kind": "commit-pair",
+  "rule": "ws-phone-card TOUCH-HIT (lf-hosts critic r2 F1)",
+  "browser": true,
+  "fail": {
+   "commit": "d53fa104e",
+   "state": "div_word_problems / add_wp_20 .mq-wwans: the column work's overflow-x:auto wrapper clipped the 48 px touch ring, so a tap 1 px inside the top edge of answer box 1 hit div.mq-wwstep and the cell focused box 0 (card, worksheet, quiz; 820 and 1280)"
+  },
+  "pass": {
+   "commit": "b024860c9",
+   "state": "screen-cell.css: the wrapper gets padding cancelled by a negative margin and the input is lifted (position:relative; z-index:2); the drawn boxes do not move"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --skills division:div_word_problems,subtraction:sub_word_problems,addition:add_wp_20 --items 1 --sizes 820x1180,1024x768,1280x900,1366x768 --only TOUCH-HIT --no-siblings-check",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  },
+  "timeoutS": 2400
+ },
+ {
+  "id": "cell-read-empty-card",
+  "check": "ws-phone-card CELL-READ: a card cell that carries a kind but holds no drawn mark and no answer slot is a finding (the host stamps 'legacy' on any paper, so r1's CELL-READ passed by construction)",
+  "kind": "fixture",
+  "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/phone-card/cell-empty.fail.html",
+   "state": "#questionPaper data-ws-cell=\"legacy\" with nothing in it"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+   "state": "a fact cell holding its numerals and answer slot, labelled 'fact'"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "cell-read-kind-card",
+  "check": "ws-phone-card CELL-READ: the card cell's [data-ws-cell] kinds include the kind the quiz stamps on the same item (msc, else the kit template's kind cellKindFor)",
+  "kind": "fixture",
+  "rule": "ws-phone-card CELL-READ (lf-hosts critic r2 F3)",
+  "browser": true,
+  "fail": {
+   "fixture": "tests/fixtures/precritic/phone-card/cell-kind.fail.html",
+   "state": "a 3 x 4 fact item (answerType text) labelled 'legacy' on the card while the quiz's rule labels it 'fact'"
+  },
+  "pass": {
+   "fixture": "tests/fixtures/precritic/phone-card/cell-ok.pass.html",
+   "state": "the same item labelled 'fact' on the card (question-render.js labels with the quiz's rule)"
+  },
+  "command": "node tests/scripts/ws-phone-card.cjs --fixture {fixture} --only CELL-READ",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
+ },
+ {
+  "id": "ws-reflow-shrink-r2",
+  "check": "ws-worksheet-reflow WS-REFLOW / WS-DIGIT: a sheet that SHRINKS (tallest card, any card, the answer place), a card width that changes either way, and a numeral drop on ANY card are findings, not only growth and the worst card's numeral",
+  "kind": "commit-pair",
+  "rule": "ws-worksheet-reflow WS-REFLOW (lf-hosts critic r2 F5)",
+  "browser": true,
+  "fail": {
+   "commit": "b024860c9",
+   "args": "--baseline tests/fixtures/precritic/worksheet-reflow/r2-f5-shrink.fail.json",
+   "state": "same commit, judged against master's baseline with mult_facts@1280 20 px taller / wider and card 1's numeral +4 px: the measured sheet reads as shrunk, re-widthed and one card's numeral dropped (r1's growth-only ratchet passed it)"
+  },
+  "pass": {
+   "commit": "b024860c9",
+   "args": "--baseline design/audit/baselines/worksheet-reflow.json",
+   "state": "the real baseline pinned from master 77f0acad2"
+  },
+  "command": "node tests/scripts/ws-worksheet-reflow.cjs --sample-only multiplication:mult_facts {args}",
+  "expect": {
+   "fail": "FAIL",
+   "pass": "OK"
+  }
  }
  ]
 }
