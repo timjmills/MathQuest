@@ -78,3 +78,34 @@ The height a cap refuses is never shrunk out of content and never passed into an
    - ws-precritic-plan: OK;
    - ws-backtest `eb-stretch-rowcap`: OK;
    - ws-empty-band `--self-test`: OK.
+
+## Round 2 (critic r1 F3, staged rollout stage 1)
+
+**F3 fix:** `layout.js resolveSectionLayoutCore probe` now COUNTS a capped template's rows at the height the cap draws them:
+`min(hMin, rowCapMm(max(drawnRowMm, floor + 1)))`. The floor (a wider sample's tallest measure) is kept. Every role that sizes
+through `resolveSectionLayout` / `hMinAt` (Independent, Review, Opener, Mixed, Guided's count) inherits it.
+
+**Check:** `tests/scripts/ws-rowcap-fill.mjs` (ROWCAP-FILL, pure node, `--root` for another tree; on precritic's node gates as
+`rowcap-fill`) + the same assertion in ws-layout-unit. Backtest `rowcap-fill`: FAIL 1b5c3b9c9 (Match 3 48 mm footprint: 3 rows
+of 53 mm leave 68-69 mm free at M and L) → OK f5c025e4c; ws-backtest OK. Ledger row added. LEAD_DECISIONS logs the staged rollout.
+
+**Rows before → after:**
+
+| Page | r1 (1b5c3b9c9) | r2 |
+|---|---|---|
+| Review L, vocab_grade_pictures (master) | 3 rows, ~75 mm white foot | 4 rows of 52.7 mm |
+| Review M (master) | 4 rows | 4 rows (unchanged) |
+| Match 3 Independent L (31d41507 + fix) | 3 rows, ~74 mm white foot | 4 rows of 52.5 mm (/12) |
+| Match 3 Independent M (31d41507 + fix) | 4 rows | 4 rows |
+| capacity-pin rises | — | vocab_grade_pictures guided L 2 → 3, mixed-practice L 3 → 4 (0 falls) |
+
+**Lesson pin:** re-pinned (24 changed + 4 new hashes): vocab_grade_pictures L p7-p9 changed and p10 NEW (the lesson grows
+9 → 10 pages), vocab_pick3_words M p6. Every other lesson identical.
+
+**New PNGs:** `review-{M,L}-{pupil,key}-after-r2.png`, `match3-{M,L}-{pupil,key}-after-r2-31d41507+fix.png`.
+
+**Gates r2:** ws-layout-unit 1 of 1769 (the known Guided 110 mm only), ws-roles-unit OK, ws-boot-smoke OK, ws-capacity-pin
+--check OK, ws-backtest rowcap-fill OK, syntax OK.
+
+**Stage 2 (not in this round):** F4 - invert ROW_ROOM_MM (every template capped by default, explicit exceptions); EB-STRETCH a
+FAIL on Guided, Scripted Model, Error Analysis, Pre-skill check; wide critic.
