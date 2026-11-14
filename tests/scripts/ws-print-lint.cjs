@@ -1486,10 +1486,8 @@ function wsLintPage(cfg) {
                 if (k < 0.8) F('L-DENSITY', 'CHART-WIDTH', 'major', cell, `the chart's count row spans ${Math.round(k * 100)} % of its ${mm(innerW)} mm panel (at least 80 %: the row keeps the chart's working size; critic cbt r1 D8)`, 'chart row shrunk');
                 // (critic cbt r2 E4, TY-10a: a 15-jump row drawn 9 + 6 in the chart panel, 9-11 mm boxes and touching arrows. A count row
                 // holds at most 6 numbers a line - 12 is 6 + 6, 15 is 5 + 5 + 5 - grouped by the numbers' centre lines)
-                const nums = [...row.querySelectorAll('[data-ws-slot], .k2-given')].filter(e => !e.parentElement.closest('[data-ws-slot], .k2-given, .k2-timeslbl'));
-                const ys = [];
-                for (const e of nums) { const q = e.getBoundingClientRect(); if (!q.height) continue; const y = (q.top + q.bottom) / 2; const g = ys.find(o => Math.abs(o.y - y) < 3 * 96 / 25.4); if (g) g.n++; else ys.push({ y, n: 1 }); }
-                const per = ys.map(o => o.n);
+                const TILE = '.k2-given, .k2-tile, .k2-shape, [data-ws-slot]';
+                const per = [...cell.querySelectorAll('.k2-countrow-line:not(.k2-countrow-tabline)')].map(ln => [...ln.querySelectorAll(TILE)].filter(e => !e.parentElement.closest(TILE)).length).filter(n => n > 0);
                 if (per.length && Math.max(...per) > 6) F('L-DENSITY', 'CHART-WIDTH', 'major', cell, `the chart's count row prints ${per.join(' + ')} numbers a line (at most 6 a line: 12 is 6 + 6, 15 is 5 + 5 + 5, TY-10a; critic cbt r2 E4)`, 'chart row lines');
             }
         }

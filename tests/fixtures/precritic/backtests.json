@@ -10365,6 +10365,106 @@
     "fail": "FAIL",
     "pass": "OK"
    }
-  }
+  },
+{
+ "id": "cbt-r2-e3-scripted-say",
+ "check": "critic cbt r2 E3 (H2): Scripted Model L - the fourth count-row state covered the Say band (L-OVERLAP SECTION); the role cover lints scripted-model at M and L",
+ "kind": "commit-pair",
+ "rule": "ws-role-cover lint (print-lint L-OVERLAP SECTION; precritic role-cover)",
+ "browser": true,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree"
+ },
+ "pass": {
+  "commit": "59f9eaf2e",
+  "state": "lf-ops cbt r3: count-row states planned with 2.5 mm slack"
+ },
+ "command": "bash -c 'node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles scripted-model 2>&1 | grep -q \"L-OVERLAP SECTION\" && echo \"ws-role-cover: FAIL (L-OVERLAP SECTION)\" || echo \"ws-role-cover: OK\"'",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r2-e5-opener-cl40",
+ "check": "critic cbt r2 E5: the Opener's step tab painted in the label keep-out (CL40-INK x4 M, x2 L); the role cover lints the opener at M and L",
+ "kind": "commit-pair",
+ "rule": "ws-role-cover lint (print-lint L-OVERLAP CL40-INK; precritic role-cover)",
+ "browser": true,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree"
+ },
+ "pass": {
+  "commit": "422d0a75a",
+  "state": "lf-ops cbt r3: the Opener row starts past the keep-out (4.5 / 5.5 mm)"
+ },
+ "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles opener",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r2-e6-ea-topstart",
+ "check": "critic cbt r2 E6: error analysis ~16 mm (M) / 9.5 mm (L) empty above 'Sam wrote:' (L-TOPSTART CL-4b x4); the role cover lints error-analysis at M and L",
+ "kind": "commit-pair",
+ "rule": "ws-role-cover lint (print-lint L-TOPSTART CL-4b; precritic role-cover)",
+ "browser": true,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree"
+ },
+ "pass": {
+  "commit": "8277ea52a",
+  "state": "lf-ops cbt r3: a REDO item starts at the top of its box"
+ },
+ "command": "node tests/scripts/ws-role-cover.mjs --root {root} --skill multiplication:count_by_tables --tools lint --defaults-only --sizes M,L --roles error-analysis",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r2-e4-chart-lines",
+ "check": "critic cbt r2 E4 (TY-10a): the jumps=15 lesson chart drew the row 9 + 6 (boxes 9-11 mm, arrows touching); a count row prints at most 6 numbers a line (15 = 5 + 5 + 5) and spans >= 80 % of its panel",
+ "kind": "commit-pair",
+ "rule": "ws-print-lint CHART-WIDTH (opt-in; lines a row)",
+ "browser": true,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree"
+ },
+ "pass": {
+  "commit": "422d0a75a",
+  "state": "lf-ops cbt r3: twoLines no longer splits a 15-jump row; 5 + 5 + 5 in two panels"
+ },
+ "command": "node tests/scripts/ws-print-lint.cjs --source kit --roles lesson --size L --opts '{\"jumps\":15}' --rules CHART-WIDTH --lints CHART-WIDTH --skills multiplication:count_by_tables",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
+ "id": "cbt-r2-m2-shape-page",
+ "check": "critic cbt r2 m2: circles and hexagons mixed as writing places on the Review and the Pre-skill check (number_seq_fill default) beside the count rows' boxes; a page writes in one outline shape",
+ "kind": "commit-pair",
+ "rule": "ws-print-lint SHAPE-ONE (opt-in; page-wide since r3)",
+ "browser": true,
+ "fail": {
+  "commit": "8f76b6401",
+  "state": "critic cbt r2 frozen tree"
+ },
+ "pass": {
+  "commit": "f1d360bd6",
+  "state": "lf-ops cbt r3: Review earlier step and Pre-skill check skills draw boxes"
+ },
+ "command": "bash -c 'for r in review pre-skill-check; do node tests/scripts/ws-print-lint.cjs --source kit --roles $r --size M --rules SHAPE-ONE --lints SHAPE-ONE --skills multiplication:count_by_tables 2>&1 | grep -q \"ws-print-lint: FAIL\" && { echo \"ws-print-lint: FAIL (SHAPE-ONE)\"; exit 0; }; done; echo \"ws-print-lint: OK\"'",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+}
 ]
 }

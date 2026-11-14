@@ -443,5 +443,18 @@ CHECKS_FROM_CRITICS (2026-11-14, `exempt: parked ...`, fail commit 8f76b6401), n
 - The routed EB reds (lf-roles Guided fit; lf-engine opener and vocab) stand as ledgered on 2026-11-13.
 - Part B (mult_properties / arrays_groups) is still held. Nothing from -props ships now.
 
+## cbt r3 rebuild (2026-11-14, Opus medium, final round, $38 cap) - master 7f2ca5e39 merged
+Each finding: check first (FAILs on 8f76b6401), then the fix; backtest row; ledger row re-armed.
+- E1 True or False? stem: fixed by master's hotfix; backtest `tof-stem` (master's TOF-STEM, cbt in its skills).
+- E2 Pre-skill check: provider `preSkills` (add a jump within 20; count by 10s / 5s / 2s in boxes) -> four quadrants. Check ws-node-lint PRE-QUADRANTS (precritic node-lint-s1); backtest `cbt-r2-e2-pre-quadrants`.
+- E3 Scripted Model L Say band: count-row states planned with 2.5 mm slack. Check role-cover lint L-OVERLAP SECTION; backtest `cbt-r2-e3-scripted-say`. (L-KEY AK-2 on its key stays: critic N4, a likely false positive.)
+- E4 jumps=15 chart: 5 + 5 + 5 in the chart panel (count-row ignores `twoLines` for 15 jumps). Check print-lint CHART-WIDTH now also caps 6 numbers a line; backtest `cbt-r2-e4-chart-lines`.
+- E5 Opener CL40-INK: the tight row starts 4.5 / 5.5 mm in (past the 6 / 7 mm keep-out). Role-cover lint; backtest `cbt-r2-e5-opener-cl40`.
+- E6 Error analysis top start: a REDO item's judge block starts at the top (CL-4b). Role-cover lint; backtest `cbt-r2-e6-ea-topstart`.
+- E7 NOT FIXED. Check ws-node-lint CHART-PANELS is on precritic's path and is RED (times each / given, jumps 15: chartMaxStates 2). Three full-width panels zoom the row to 65-73 % of the panel (CHART-WIDTH, the r1 D8 class), so E7 and D8 conflict at one page. Proposal for the lead: the look step as a numbered HEAD line over the panels (as `tailLast` does for the check step).
+- E8 onePage: provider `roleOpts` turns it off outside Independent / More practice / Test. Check ws-node-lint ROLE-SCOPE; backtest `cbt-r2-e8-role-scope`.
+- E9 NOT STARTED (budget): WS-REFLOW per-card exemption + FULLROW-USE stay parked.
+- m2: Review's earlier step and the Pre-skill check skills draw boxes; print-lint SHAPE-ONE judges the whole page; backtest `cbt-r2-m2-shape-page`.
+
 ## Queued after the weekly reset (lead 2026-11-14)
 - integers:add_int, range −23..1: the number-line labels touch (lf-engine -roles critic r2 F6). Planned check LABEL-GAP; the ledger row is in CHECKS_FROM_CRITICS. Fix when the budget returns: check first, then the fix.
