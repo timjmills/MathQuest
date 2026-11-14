@@ -27,7 +27,7 @@ import {
 } from '../index.js';
 import {
     resolveSectionLayout, resolveBandedLayout, paperOf, bodyHeightMm, instructionMm, fitsLine, LIVE_W_MM, itemInfo, itemCap, groupByHeight, rowShape, packByHeight, rowGapFor, DENSE_ROOM, measuredH, evenRows,
-    tightRows, rowStretches, capRowsToInk, isStoryWork,
+    tightRows, rowStretches, capRowsToInk, isStoryWork, rowCapMm,
 } from '../layout.js';
 import { paginate, labelStarts, lettersFit, scoreDenominator, scorePoints, placeSections } from '../paginate.js';
 import { renderSource, renderAnswerKey } from './answer-key.js';
@@ -688,7 +688,9 @@ export function spreadRows(items, cols, rows, baseMm, availMm, hMin = 0, cap = S
     // one stretch k for every row, but no row past SPREAD_CAP x its SHORTEST problem (a short
     // problem beside a tall one would otherwise sit in a band of a third of its cell)
     const k = Math.min(cap, (availMm - 1) / S);
-    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, cap * mins[r]))));
+    // (ROW-STRETCH CAP, layout.rowCapMm: a row of declared templates is spread at most to its drawn height + their writing room)
+    const rcap = w.map((x, r) => rowCapMm(x, items.slice(r * cols, (r + 1) * cols)));
+    const H = evenRows(w, w.map((x, r) => Math.max(x, Math.min(k * x, cap * mins[r], rcap[r]))));
     const total = H.reduce((a, b) => a + b, 0);
     if (total <= baseMm + 0.5) return null;
     return { heightMm: Math.round(total * 100) / 100, rowsTpl: H.map((x) => `${Math.round(x * 10) / 10}fr`).join(' ') };

@@ -66,6 +66,7 @@ import { stripHtml, stripItem, independentBand } from '../lesson-pages/practice.
 import { sheetBands, lessonPart } from '../lesson-pages/index.js';
 import { VOCAB_MIN, ROWFIT_SLACK_MM, BAND_SLACK_MM, rowFits, bandFails } from '../part-opts.js';
 import { slotScore } from '../paginate.js';
+import { rowCapMm } from '../layout.js';
 
 // (The role's earlier exports, now homed in the builders.)
 export { reflowsAt, winShare, CASE_TESTS, pickExample, pickSecond, otherExamples, pickWeDo, stateGroups, hopsSvg, roundLineSvg, roundLineMm, roundLinePad };
@@ -447,8 +448,11 @@ function planOnce(input = {}) {
             const cap = data && data.growAll ? Math.max(cap0, 0.5) : cap0;
             const share = data && data.growAll ? left / (grows.length - gi) : spare / grows.length + carry;
             const add0 = Math.min(share, g.h * cap);
-            const add = g.maxAdd !== undefined ? Math.min(add0, g.maxAdd) : add0;
+            let add = g.maxAdd !== undefined ? Math.min(add0, g.maxAdd) : add0;
             carry = data && data.growAll ? 0 : add0 - add;
+            // (ROW-STRETCH CAP, layout.rowCapMm: a band of declared templates - `tmpls`, its `rows` - grows at most their writing
+            // room past its drawn height; what the cap refuses is not carried to the bands after it: it stays white at the foot)
+            if (g.tmpls) add = Math.min(add, Math.max(0, rowCapMm(g.h, g.tmpls, g.rows || 1) - g.h));
             left -= add;
             pg.grown = (pg.grown || 0) + add;
             for (const part of g.grid) part.height = `${Math.round(((parseFloat(part.height) || g.h) + add) * 100) / 100}mm`;

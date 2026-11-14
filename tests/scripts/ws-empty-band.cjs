@@ -60,6 +60,10 @@
 //   EB-ITEMPARITY on the grid roles: the pupil page and key, with data-eb-item / data-eb-partial removed, are byte-identical to the
 //             same sheet built with no tags (buildSheet `ebItem: false`): the tags change nothing a pupil sees (critic ebitem-r1
 //             m3, its parity probe). With --html: the fixture's <template id="eb-key"> / <template id="eb-plain">.
+//   EB-STRETCH (lead ruling 2026-11-14, lf-engine row cap) a print cell of a template that declares its writing room
+//             (js/modules/sheet/layout.js ROW_ROOM_MM) in a row taller than its NATURAL height (the cell laid out of the grid with
+//             no row stretch; the tallest of its row) + that room by more than 1.5 mm. A cell beside non-cell content (the Opener
+//             Model beside its Steps) is not judged. --self-test checks it. EB_DUMP=1 prints every cell's height / natural height.
 //   EB-PAGE   (opt-in --page-fill) a page before the role's last with 30 % or more of its body empty under its last block.
 //   --margin N judges EB-BAND / EB-SIDE at 30 - N % (a fix must clear the limit, not graze it).
 //   EB-GDPCAP a Guided page (all its pages) holding more scored tries than the PAGE_TYPES §12.1 / design-standard 12.1 ceiling for
@@ -162,7 +166,7 @@ function gapBad(role, cells, i, lim) {
     return true;
 }
 // every rule this script judges (printed in this order); --self-test asserts each has a live backtest row (critic eb-r3 D5)
-const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT'];
+const RULES = ['EB-BAND', 'EB-SIDE', 'EB-EDGE', 'EB-SUPBAND', 'MOD-MARKS', 'MOD-LINES', 'MOD-GRID', 'EB-GAP', 'EB-FOOT', 'EB-ROLE', 'EB-READ', 'EB-VOCAB', 'EB-PAGE', 'EB-GDPCAP', 'EB-REFILL', 'EB-PARITY', 'EB-ITEMKEY', 'EB-ITEMPARITY', 'EB-GRIDFOOT', 'EB-STRETCH'];
 // the measured cases inside a rule that need a row of their own (named in the row's `rule` field)
 // --slot-ink off (opt-in, lf-vocab r6, critic r4 #1; carried into the pixel tool by lf-checks 2026-11-13): an empty PRINT answer
 // slot counts only for the pixels it draws (its line or box), never as one block over its whole box - the band reads as the
@@ -407,8 +411,17 @@ if (argv.includes('--self-test')) {
             ['top-aligned 25 mm under of 76.5 (33 %)', crun(ccell(0, 25)), true]];
         const cbad = cc.filter(([, got, want]) => got !== want);
         for (const [nm, , want] of cbad) console.log(`self-test FAIL: EB-BAND centred ${nm} should ${want ? 'fail' : 'pass'}`);
-        const n = bad.length + kbad.length + cbad.length;
-        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length})`);
+        // EB-STRETCH (lf-engine row cap): a declared template's row over its natural height + room by more than the tolerance fails;
+        // at the cap it passes; an undeclared template, a cell beside its Steps, and a short cell beside a taller one in its row pass
+        const sc = (h, nat, x) => Object.assign({ page: 1, cell: 1, topPx: 10, hMm: h, natMm: nat, tmpl: 'vocab-match3' }, x || {});
+        const R = { 'vocab-match3': 2 };
+        const st = [['57 mm row, 50 mm drawn (master Match 3 L)', stretchFindings([sc(57, 50)], R).length, 1], ['52.5 mm row, 50 mm drawn (capped)', stretchFindings([sc(52.5, 50)], R).length, 0],
+            ['undeclared template', stretchFindings([sc(57, 50, { tmpl: 'fact' })], R).length, 0], ['beside its Steps', stretchFindings([sc(70, 55, { beside: true })], R).length, 0],
+            ['short beside a tall one', stretchFindings([sc(57, 50), sc(57, 56, { cell: 2 })], R).length, 0]];
+        const sbad = st.filter(([, got, want]) => got !== want);
+        for (const [nm, got, want] of sbad) console.log(`self-test FAIL: EB-STRETCH ${nm}: ${got} finding(s), want ${want}`);
+        const n = bad.length + kbad.length + cbad.length + sbad.length;
+        console.log(`ws-empty-band self-test: ${n ? "FAIL" : "OK"} (EB-STRETCH ${st.length}; ${cases.length} EB-GDPCAP + 6 PT-MOD-3 + 6 EB-GAP + 6 EB-GRIDFOOT + 4 teacher-columns cases; EB-FOOT pairing 21 + columns 3; ebitem / slot-ink notes 13; ebItemOf ${kc.length}; EB-BAND centred ${cc.length})`);
         process.exit(n ? 1 : 0);
     }).catch((e) => { console.log(`self-test FAIL: cannot import the sheet kit (${e.message})`); console.log('ws-empty-band self-test: FAIL'); process.exit(1); });
     return;
@@ -543,7 +556,29 @@ function measureCells(scope) {
                 const top = ft - inner.t, bot = inner.b - fb;
                 if (Number.isFinite(top) && top > 0 && bot > 0 && Math.abs(top - bot) < MM) centreMm = top / MM;
             }
-            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
+            // EB-STRETCH: the cell's NATURAL height - what it draws with no row stretch: a copy laid out of the grid's flow (the grid's
+            // own classes kept, so the kit's selectors still match) at the cell's width, its height and its grid row released
+            let natMm = null;
+            try {
+                const g = c.parentElement; const host = g.cloneNode(false);
+                host.removeAttribute('style'); host.style.cssText = `position:absolute;left:0;top:0;visibility:hidden;display:block;height:auto;width:${cr.width}px`;
+                const k = c.cloneNode(true); k.removeAttribute('data-eb-i');
+                k.style.height = 'auto'; k.style.minHeight = '0'; k.style.maxHeight = 'none'; k.style.width = `${cr.width}px`; k.style.flex = 'none';
+                host.appendChild(k); g.parentElement.appendChild(host);
+                natMm = +(k.getBoundingClientRect().height / MM).toFixed(1); host.remove();
+            } catch (e) { natMm = null; }
+            // (a cell whose grid shares its row with content that is not a kit cell - the Opener's Model beside its Steps - is sized
+            // by that content: EB-STRETCH does not judge it, `beside`)
+            let beside = false;
+            try {
+                // (any ancestor under the page body that lays its children ACROSS, with a branch beside the cell's that holds no kit cell)
+                for (let br = c.parentElement, up = br && br.parentElement; up && !beside && !up.matches('.ws-body, .ws-page, body'); br = up, up = up.parentElement) {
+                    const rs = getComputedStyle(up);
+                    const across = (/grid/.test(rs.display) && (rs.gridTemplateColumns || '').trim().split(/\s+/).length > 1) || (/flex/.test(rs.display) && !/column/.test(rs.flexDirection));
+                    beside = across && [...up.children].some((k) => k !== br && !k.querySelector('[data-ws-cell]') && k.getBoundingClientRect().height > 0 && (k.textContent || '').trim().length > 0);
+                }
+            } catch (e) { beside = false; }
+            out.push({ page: pi + 1, cell: ci + 1, label, padMm, centreMm, natMm, beside, hMm: +(cr.height / MM).toFixed(1), wMm: +(cr.width / MM).toFixed(1),
                 innerMm: H / MM, belowMm: below / MM, aboveMm: above / MM, betweenMm: between / MM, sideMm: side / MM, innerW: W / MM, hRaw: cr.height / MM, edgeMm: +(edge / MM).toFixed(1),
                 // EB-FOOT without the centring offset (lf-ops-props 2026-11-13, accepted by lf-checks): a cell whose content is CENTRED
                 // in a taller row shares that free space out above its first block; it is not drawn height (EB-BAND still judges it)
@@ -805,7 +840,43 @@ function measureVocab(scope) {
     return out;
 }
 
+// EB-STRETCH (lead ruling 2026-11-14, lf-placevalue vocab deploy item (d); lf-engine row-stretch cap): a print row stretches
+// only to its DRAWN height plus the template's declared writing room (js/modules/sheet/layout.js ROW_ROOM_MM). A cell of a
+// declared template whose height passes the tallest drawn height of its row (its natural height, the cell
+// laid out with no row stretch, natMm) plus that room by more than STRETCH_TOL_MM FAILS: the page's spare height was shared into the row (the
+// lesson Vocabulary match asked 39.4 mm and got 50.7, the Opener count row 31.7 and got 39.2 / 43.4, the Match 3 practice row
+// 46 and got 57.5). The table is read from THIS script's tree, so a commit-pair backtest judges an old render by today's rule.
+// Screen hosts are not judged (their card is the app's). Pure: stretchFindings(cells, room, tol).
+let ROW_ROOM = null;
+const STRETCH_TOL_MM = 1.5;
+function rowRoom() {
+    if (ROW_ROOM) return ROW_ROOM;
+    // (read from the ESM source's one frozen literal: `export const ROW_ROOM_MM = Object.freeze({ 'tmpl': mm, ... })`)
+    ROW_ROOM = {};
+    try {
+        const src = fs.readFileSync(path.join(__dirname, '..', '..', 'js', 'modules', 'sheet', 'layout.js'), 'utf8');
+        const m = /export const ROW_ROOM_MM = Object\.freeze\(\{([^}]*)\}\)/.exec(src);
+        if (m) for (const [, k, v] of m[1].matchAll(/'([\w-]+)'\s*:\s*([\d.]+)/g)) ROW_ROOM[k] = Number(v);
+    } catch (e) { /* no table: nothing is judged */ }
+    return ROW_ROOM;
+}
+function stretchFindings(cells, room = rowRoom(), tol = STRETCH_TOL_MM) {
+    const out = [];
+    // (drawn = the cell's NATURAL height, natMm: the cell laid out with no row stretch - a template that flexes into its row
+    // (the Match 3 work, the vocabulary match lines) inks a stretched row, so its ink is not what it asks)
+    const live = (cells || []).filter((c) => c && !c.noInk && Number.isFinite(c.natMm) && c.natMm > 0 && Number.isFinite(c.hMm));
+    for (const c of live) {
+        if (!Object.prototype.hasOwnProperty.call(room, c.tmpl) || c.beside) continue;
+        const row = live.filter((d) => d.page === c.page && Math.abs((d.topPx || 0) - (c.topPx || 0)) < 2);
+        const need = Math.max(...row.map((d) => d.natMm));
+        const cap = need + room[c.tmpl];
+        if (c.hMm - cap > tol) out.push({ c, need, cap, over: +(c.hMm - cap).toFixed(1) });
+    }
+    return out;
+}
 function judge(cells, where, F, role) {
+    if (process.env.EB_DUMP) for (const c of cells) console.log("DUMP", where, c.page, c.cell, c.tmpl, c.hMm, c.neededMm, c.natMm, c.topPx, c.beside ? 'beside' : '');
+    if (!String(role || '').startsWith('host:')) for (const x of stretchFindings(cells)) F('EB-STRETCH', `${where} p${x.c.page} cell ${x.c.label || x.c.cell}`, `a ${x.c.hMm} mm row holds a cell drawn ${x.need.toFixed(1)} mm: its cap is drawn + ${rowRoom()[x.c.tmpl]} mm writing room = ${x.cap.toFixed(1)} mm, ${x.over} mm over (tolerance ${STRETCH_TOL_MM} mm; layout.js ROW_ROOM_MM) [${x.c.tmpl}]`);
     cells.forEach((c, i) => {
         // --slot-ink off judges the lane's KIT cells: a `legacy` cell (another skill's old print HTML) is a note (lf-vocab r6)
         if (!SLOT_INK && c.tmpl === 'legacy') { LEGACY_NOTES.push(legacyNote(where, c)); return; }
@@ -1110,4 +1181,4 @@ if (require.main === module && arg('judge-fixture', null)) {
     process.exit(got.length ? 1 : 0);
 }
 if (require.main === module && !arg('judge-fixture', null)) (HTML ? htmlMain() : main()).catch((e) => { console.error(e); console.log('ws-empty-band: FAIL'); process.exit(1); });
-module.exports = { measureCells, judge };
+module.exports = { measureCells, judge, stretchFindings };

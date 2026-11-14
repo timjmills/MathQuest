@@ -134,6 +134,36 @@ export const FILL_CAP = 1.8;
  * (items) where the role's count allows, else stays under the grid.
  */
 export const CONTENT_FILL = 1.5;
+/**
+ * ROW-STRETCH CAP (lead ruling 2026-11-14, lf-placevalue vocabulary deploy item (d); lane lf-engine): a row stretches only to
+ * its DRAWN height plus writing room - one engine rule. A template listed here declares its writing room (mm past the height
+ * it measures / its footprint draws); every row of its cells, on every role, is held to `rowCapMm`: the grid's fill and fill
+ * limit (resolveSectionLayout), the lesson bands' spare-height share (roles/lesson.js) and the Opener's PT-ENG-3 grow
+ * (roles/opener.js). The height a cap refuses is never shrunk out of content and never passed into another row: it stays
+ * white at the foot, or buys more items where the role fills to capacity (PAGE_FILL, DN-1). A template not listed keeps the
+ * fill limits above. ws-empty-band EB-STRETCH reads THIS literal (keep it one line of 'template': mm pairs).
+ */
+export const ROW_ROOM_MM = Object.freeze({ 'vocab-match3': 2, 'lesson-vocab': 2, 'count-row': 3 });
+/**
+ * The DRAWN height of a row of `items` at `cols` (mm): the tallest host measurement + 1 mm (as measuredH), or 0 when any item is
+ * unmeasured. Never the skill's floor or a footprint guess (a Match 3 row asked 56 mm by its floor and drew 50).
+ */
+export const drawnRowMm = (items, cols) => {
+    const hs = (items || []).map((i) => { const m = i && i.measured && i.measured[cols]; return m && Number(m.hMm) > 0 ? Number(m.hMm) + 1 : 0; });
+    return hs.length && hs.every((h) => h > 0) ? Math.max(...hs) : 0;
+};
+/** The writing room a template declares (mm), or null when it declares none. */
+export const rowRoomMm = (template) => (Object.prototype.hasOwnProperty.call(ROW_ROOM_MM, template) ? ROW_ROOM_MM[template] : null);
+/**
+ * The tallest a row of `items` may be drawn (mm) when it measures `drawnMm`: drawn + the largest room its templates declare;
+ * Infinity when any item's template declares none (that row keeps the fill limits) or nothing is measured.
+ */
+export const rowCapMm = (drawnMm, items, rows = 1) => {
+    const list = (Array.isArray(items) ? items : [items]).filter(Boolean);
+    if (!(drawnMm > 0) || !list.length) return Infinity;
+    const rooms = list.map((it) => rowRoomMm(typeof it === 'string' ? it : (it.template || (it.q && it.q.cell && it.q.cell.template) || '')));
+    return rooms.some((r) => r === null) ? Infinity : drawnMm + Math.max(1, rows) * Math.max(...rooms);
+};
 /** `noStretch` sections (div_facts' fade packet, owner 2026-11-08): a row takes its measured height and this much room. */
 export const NO_STRETCH_ROOM = 1.25;
 export const CELL_PAD_MM = 7;
@@ -385,7 +415,9 @@ export function itemInfo(item, ctx = {}) {
     if (!fp && it.q) {
         try { fp = cellFootprint(it.q, ctx); } catch (e) { fp = null; }
     }
-    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '' };
+    return { fp: fp || { wMm: 93, hMm: null, measure: true, maxCols: 2 }, fclass: it.fclass || '', measured: it.measured || null, size: ctx.size || it.size || '',
+        // (the template, for the ROW-STRETCH CAP: rowCapMm)
+        template: it.template || (it.q && it.q.cell && it.q.cell.template) || '' };
 }
 
 /**
@@ -901,6 +933,12 @@ function resolveSectionLayoutCore(section = {}, items = [], paper = DEFAULT_PAPE
     if (capped && rows * cellH < 0.8 * G && !section.noStretch) cellH = r3(Math.min(even, hMin * FILL_CAP));
     if (capped && section.noStretch) cellH = r3(Math.min(even, hMin * (typeof section.noStretch === 'number' ? section.noStretch : NO_STRETCH_ROOM)));
     // (IN_PLACE_FILL: an in-place cell keeps no working space, so its row stops just past its measured height)
+    // ROW-STRETCH CAP (lead 2026-11-14): a row of declared templates stops at its drawn height + their writing room, whatever
+    // the fill above allowed; the height it refuses stays under the grid (the fill above already bought the rows that fit).
+    // Drawn = what THESE items measure at the page's columns (+ 1 mm, as measuredH), never the skill's floor (a wider sample's
+    // tallest item: the vocabulary floor of 56 mm held rows of 50 mm pictures, lf-placevalue (d)); the floor still sets the count.
+    const rowCap = rowCapMm(drawnRowMm(infos, cols) || hMin, infos.map((i) => i.template));
+    if (cellH > rowCap) cellH = r3(rowCap);
     const inPlace = infos.length > 0 && infos.every((i) => i.fp && i.fp.inPlace);
     // (and to what THESE items measure: the skill's floor sized the page's rows for its tallest item - a K story with a
     // five-frame - but a page that deals none of those keeps its cells to its own items. Never so short that the rows

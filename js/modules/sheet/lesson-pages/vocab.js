@@ -245,7 +245,7 @@ export function vocabBands({ vocab, data, m, input }) {
         const vh = Math.max(20, hOf(vocab, 1));
         const vgrid = gridPart([planItem(vocab, { cols: 1, nolabel: true })], { cols: 1, rows: 1, cellH: vh, labels: 'none' });
         // (It takes a share of a page's spare height only when no Independent row fits, below.)
-        groups.push(band(m.strip + vh, { kind: 'band', label: 'Vocabulary:', instr: instructionText('match'), content: vgrid }, { h: vh, grid: [vgrid], cap: 0, capIfEmpty: 0.3 }));
+        groups.push(band(m.strip + vh, { kind: 'band', label: 'Vocabulary:', instr: instructionText('match'), content: vgrid }, { h: vh, grid: [vgrid], cap: 0, capIfEmpty: 0.3, tmpls: [vocab.template || 'lesson-vocab'] }));
     }
     // (lf-partopts: `lesson.partN.remember === false` - the teacher left the Remember strip off)
     const remOff = !!(input && input.lesson && input.lesson.partN && input.lesson.partN.remember === false);
