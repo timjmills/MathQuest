@@ -720,7 +720,9 @@ function factSentence(ctx, st, show, idx, p = {}, isAnswer = false) {
     const bx = boxMm(ctx), pt = digitPt(ctx);
     const put = filled(ctx);
     const x = (s) => (s.op === '*' ? s.a : s.top), y = (s) => (s.op === '*' ? s.b : s.bottom), res = (s) => (s.op === '/' ? s.q : s.ans);
-    const nw = (v) => Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx)));
+    // (critic r3 F6: on screen a one-digit number box is one digit box wide, so the sentence fits a two-up worksheet cell at 820 on
+    // ONE line - digits and box heights keep their size; only the spare width beside a single digit goes)
+    const nw = (v) => (isTwin(ctx) && String(v).length <= 1 ? bx : Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx))));
     const num = (id, v, e) => wbox(ctx, { id, value: put ? String(v) : '', expect: String(e), w: nw(e), h: bx, pt, kind: 'number' });
     const sym = (t) => `<span style="font-size:${P(ctx, pt)};font-weight:700;line-height:1;">${t}</span>`;
     const sign = wbox(ctx, { id: `w${idx}-sign`, value: put ? GLYPH[show.op] : '', expect: GLYPH[st.op], w: bx * 0.9, h: bx * 0.9, pt: pt * 0.85, kind: 'sign', round: true });
@@ -732,7 +734,7 @@ function factSentence(ctx, st, show, idx, p = {}, isAnswer = false) {
         const boxes = Array.from({ length: Math.max(T, sv.length) }, (_, i) => abox(ctx, { id: `ans-${i}`, value: put ? (sv[i] || '').trim() : '', expect: ev[i] || '', w: bx, pt })).join('');
         ansHtml = `<span style="display:inline-flex;gap:${L(ctx, GAP)};"${isTwin(ctx) ? ' data-mq-join=""' : ''}>${boxes}</span>`;
     } else ansHtml = num(`w${idx}-res`, res(show), res(st));
-    return `<div class="mq-wwfact" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;flex-wrap:${isTwin(ctx) ? 'wrap' : 'nowrap'};gap:${L(ctx, 2.2)};">`
+    return `<div class="mq-wwfact" role="group" aria-label="number sentence" style="display:inline-flex;align-items:center;flex-wrap:nowrap;gap:${L(ctx, isTwin(ctx) ? 0.8 : 2.2)};">`
         + `${num(`w${idx}-fa`, x(show), x(st))}${sign}${num(`w${idx}-fb`, y(show), y(st))}${sym('=')}${ansHtml}</div>`;
 }
 
@@ -855,7 +857,7 @@ function blockWidthMm(ctx, st, p = {}) {
     const signs = 4 * bx * 0.72 + 3 * 2.6 + 3.2;
     let work;
     if (factHere(p, st)) {
-        const nw = (v) => Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx)));
+        const nw = (v) => (isTwin(ctx) && String(v).length <= 1 ? bx : Math.max(bx * 1.25, blankWidth(Math.max(1, String(v).length), sizeOf(ctx))));
         const x = st.op === '*' ? st.a : st.top, y = st.op === '*' ? st.b : st.bottom;
         work = nw(x) + bx * 0.9 + nw(y) + 4 + factAnsT(st) * (bx + GAP) + 4 * 2.2;
     } else if (st.op === '/') {
