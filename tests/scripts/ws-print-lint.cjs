@@ -2399,8 +2399,11 @@ function lintKitGeometry(dom, pdf, info, F) {
                 const nx = pt.pages[1].spillMeas;
                 const next = nx && nx.firstBandMm;
                 info.notes.push(`SPILL-P1 page ${p.idx}: ${p.spillMeas.whiteMm} mm white of ${p.spillMeas.bodyMm} mm; page 2's first band ${next} mm`);
-                if (next && !spillP1Ok(p.spillMeas.whiteMm, p.spillMeas.bodyMm, next))
-                    F('L-DENSITY', 'SPILL-P1', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener leaves ${p.spillMeas.whiteMm} mm of its ${p.spillMeas.bodyMm} mm body white (over 30 %) and page 2's first band is ${next} mm: it fits page 1 (RUBRIC H5, PT-OPN-10 SPILL-P1)`, 'spill page 1 white');
+                // (the page engine plans to a budget 7 mm short of the drawn body - PT-ENG-3's reserve and the strip rounding: 232 of 239 mm
+                // at M and L - so a band fits page 1 only into the white beyond that reserve; the 30 % is of the planned body)
+                const usable = Math.max(0, p.spillMeas.whiteMm - SPILL_RESERVE_MM), planned = p.spillMeas.bodyMm - SPILL_RESERVE_MM;
+                if (next && !spillP1Ok(usable, planned, next))
+                    F('L-DENSITY', 'SPILL-P1', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener leaves ${p.spillMeas.whiteMm} mm of its ${p.spillMeas.bodyMm} mm body white (${usable.toFixed(1)} mm past the engine's 7 mm reserve, over 30 %) and page 2's first band is ${next} mm: it fits page 1 (RUBRIC H5, PT-OPN-10 SPILL-P1)`, 'spill page 1 white');
             }
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
@@ -3659,6 +3662,7 @@ const LEGACY_SELF_TESTS = [
 /** ONE-ROW strip (lead R1 / R4a; tightened after critic r9): a ruled one-row page's strip passes PAGEFILL only while it is shorter than
  * the row it holds - a strip a whole row tall means another row fits, and the page is under-filled. */
 /** SPILL-P1: the same test as js/modules/sheet/roles/opener.js spillP1Ok (lead r9b), on rendered numbers. */
+const SPILL_RESERVE_MM = 7;
 function spillP1Ok(whiteMm, bodyMm, nextMm) { return !(Number(whiteMm) > 0.3 * Number(bodyMm) && Number(whiteMm) >= Number(nextMm)); }
 function oneRowStripOk(oneRow, stripMm, rowMm) { return !!oneRow && Number(rowMm) > 0 && Number(stripMm) < Number(rowMm); }
 

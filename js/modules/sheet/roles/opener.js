@@ -281,7 +281,7 @@ function geometry(items, input, cap = {}) {
     // (lf-engine-roles critic N2: ONE Model only - two Model cells side by side keep the band's height, so the rule between
     // them runs down to the band's bottom rule; held short, it stopped 2.5 mm above it: ws-print-lint L-OVERLAP RULE)
     const modelTight = !twoModels && tightRows(items.slice(0, 1)) ? modelH + tightCapMm(modelH) : null;
-    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy, side, sideMm, stepsFullH, stepPairs, halfBand };
+    return { ctx, m, whatsNew, steps, twoModels, modelFull, mc, modelH, stepsH, modelBand, modelTight, gc, gH, gRows, iRows, grow, overBudget: used > budget, used, split, onePage, parity, legacy, side, sideMm, stepsFullH, stepPairs, halfBand, wideStory: !!(modelFull && halfOver) };
 }
 
 /**
@@ -320,9 +320,21 @@ function bestGeometry(items, input) {
     const all = geometry(items, input);
     // SPILL (lf-roles r9): a spilled word-work page takes the SHORTEST stories of its deal for the Model and the rows (counts() deals
     // spares): a stacked two-step bar draws 181-196 mm at L, and with the Steps and Say bands that Model ran 27 mm over page 1
-    if (all.spill) {
+    if (all.spill || all.wideStory) {
         const h1 = (it) => { const m = it && it.measured && it.measured[1]; return m && Number.isFinite(m.hMm) ? m.hMm : Infinity; };
         const sorted = items.map((it, i) => [it, i]).sort((a, b) => h1(a[0]) - h1(b[0]) || a[1] - b[1]).map((x) => x[0]);
+        // (lf-engine roles r4: a full-width story's page first tries ONE page from the shortest stories of the deal - the Model, Steps,
+        // Say and the Guided row, each row sized from the stories it places, never a spare's height; only when no such page closes
+        // does it spill. counts() deals the 3 spares for every full-width story page, so the probe's choice never decides it:
+        // two_step_letter_equation L went from one page to two when the r4 Steps estimate stopped the probe spilling)
+        for (let n = sorted.length; n >= 2; n--) {
+            const g1 = geometry(sorted.slice(0, n), input);
+            if (g1.spill || needOf(g1) > n) continue;
+            const take = sorted.slice(0, needOf(g1));
+            const g = geometry(take, input, { gMax: g1.gRows, iMax: g1.iRows });
+            if (!g.spill && !g.overBudget && needOf(g) === take.length) return { g, items: take };
+        }
+        if (!all.spill) return { g: all, items };
         const g = geometry(sorted, input);
         return g.spill ? { g, items: sorted } : { g: all, items };
     }
@@ -363,7 +375,7 @@ export function counts(pools, input) {
     // from the deal - plan() takes them first and leaves the rest unplaced; SPILL: three spare stories, so the plan can take
     // the shortest - bestGeometry; the two extras add)
     const kindExtra = mixedKinds(probe) ? 2 * g.gc : 0;
-    if (g.spill) return { main: needOf(g) + 3 + kindExtra };
+    if (g.spill || g.wideStory) return { main: needOf(g) + 3 + kindExtra };
     return { main: needOf(g) + kindExtra };
 }
 
