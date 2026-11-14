@@ -1445,9 +1445,9 @@ function renderWork(p, ctx) {
     // teaching cells only (scaffold level >= 2: Model, Guided) - never on practice, a test (level 0) or the screen.
     // (STEP-ALIGN, lead 2026-11-14: two fact-sentence steps stand on one row - the blocks top-align and the question lines over them
     // share one width and a two-line height, so both sign rows and both sentences sit on the same lines)
-    const factPair = two && p.steps.length === 2 && p.steps.every((st) => factHere(p, st));
-    const midW = factPair ? Math.max(...p.steps.map((st) => blockWidthMm(ctx, st, p))) : 0;
-    const midQ = (i) => (two ? midQuestion(p, ctx, factPair ? midW : blockWidthMm(ctx, p.steps[i], p), i, factPair ? 2 : 0) : '');
+    // (critic r2 F1b: EVERY two-step row top-aligns - a column step beside a sentence step too - so both question lines share the height)
+    const midW = two ? Math.max(...p.steps.map((st) => blockWidthMm(ctx, st, p))) : 0;
+    const midQ = (i) => (two ? midQuestion(p, ctx, midW, i, 2) : '');
     const blocks = p.steps.map((st, i) => stepBlock(ctx, st, sh.steps[i], put ? sh.picks[i] : null, i, two ? `Step ${i + 1}` : '', p, i === lastI ? unitHere : '', noSigns, midQ(i))).join('');
     const answer = inRow ? '' : answerBlock(ctx, p, put ? sh.ans : '', put ? p.unit : '');
     // In a column cell a separate "Answer:" block stands BESIDE a narrow stack; a wider stack
@@ -1482,7 +1482,11 @@ function renderWork(p, ctx) {
         // (lf-algebra r13, precritic two-step r12 EB-SIDE 31-38 %: a full-width two-step cell's two step columns are 107-126 mm of a
         // 185 mm interior; left-packed they left one 57-70 mm band on the right. Centred under the story, the space splits into
         // two 30-39 mm margins, each under the H13 30 % - the steps still read Step 1 then Step 2, left to right.)
-        : `<div style="display:flex;align-items:${factPair ? 'flex-start' : 'flex-end'};gap:${L(ctx, 8)};${two ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};` : ''}${two && !answer ? 'justify-content:center;' : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
+        // (critic r2 F5: two steps sit in a fit-content box centred in the cell - side by side it is centred; when Step 2 must wrap
+        // the box takes the full width and both steps start at its one left edge, so the = signs and answers stand in one column)
+        : two && !answer
+        ? `<div style="display:flex;justify-content:center;margin-top:${L(ctx, p.factDiv || p.steps[0].op === "*" ? 1 : 3)};"><div style="width:fit-content;max-width:100%;display:flex;flex-wrap:wrap;align-items:flex-start;gap:${L(ctx, 3)} ${L(ctx, 8)};">${blocks}</div></div>`
+        : `<div style="display:flex;align-items:${two ? 'flex-start' : 'flex-end'};gap:${L(ctx, 8)};${two ? `flex-wrap:wrap;row-gap:${L(ctx, 3)};` : ''}margin-top:${L(ctx, p.factDiv || (two && p.steps[0].op === "*") ? 1 : 3)};">${blocks}${answer ? `<div style="margin-left:auto;padding-right:${L(ctx, 4)};">${answer}</div>` : ''}</div>`;
     // A column cell that cannot hold its answer beside the work (a wide stack, two steps) is a
     // FULL-WIDTH item: it keeps its full-width layout's width, so the page's measurement reads
     // it as not fitting the column and prints it in the full-width group at the bottom
