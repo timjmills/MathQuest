@@ -2348,8 +2348,12 @@ function lintKitGeometry(dom, pdf, info, F) {
             // Guided cell side by side were tried and did not fit (the role writes that note when it splits)
             if (info.mode === 'kit' && !pt.key && p.role === 'opener' && pt.pages.length > 1 && p.usedFrac !== null && p.usedFrac !== undefined) {
                 info.notes.push(`OPN-SPLIT page ${p.idx}: ${Math.round(p.usedFrac * 100)} % of the body used`);
-                if (p.usedFrac < 0.5 && !(info.notes || []).some(t => /side by side[^.]*did not fit/i.test(t)))
-                    F('L-DENSITY', 'OPN-SPLIT', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener uses ${Math.round(p.usedFrac * 100)}% of its body: a split Opener page is at least half used, or the plan notes that the Model and one Guided cell side by side did not fit (RUBRIC H5, PT-OPN-2)`, 'half-blank split page');
+                // (... and a split page whose practice is ONE Guided cell alone - coordinate_q1 / shape_name_match_3d L at 27b8e540c, "one
+                // Guided cell alone on page 2" - fails the same way: the critic's H5 reading, whatever its ink height)
+                const loneGuided = p.items === 0 && p.guidedCells === 1;   // (Guided cells are not items: no Independent row on the page)
+                const sideNoted = (info.notes || []).some(t => /side by side[^.]*did not fit/i.test(t));
+                if ((p.usedFrac < 0.5 || loneGuided) && !sideNoted)
+                    F('L-DENSITY', 'OPN-SPLIT', 'major', { page: p.idx }, `page ${p.idx} of a ${pt.pages.length}-page Opener uses ${Math.round(p.usedFrac * 100)}% of its body${loneGuided ? ' and holds one Guided cell alone' : ''}: a split Opener page is at least half used and never one practice cell alone, or the plan notes that the Model and one Guided cell side by side did not fit (RUBRIC H5, PT-OPN-2)`, 'half-blank split page');
             }
             if (comparable && secLast && secPages.length > 1 && secMax > 0 && p.items > 0 && p.items < secMax / 3) F('L-DENSITY', 'PG-23', 'major', { page: p.idx }, `last page ${p.idx} holds ${p.items} item(s), under a third of a full page (${secMax}): rows are rebalanced across the ${subSec ? 'sub-section' : 'sheet'}'s pages (PG-23)`, 'short last page');
             // L-DENSITY PAGEFILL (owner 2026-09-25, RUBRIC H13): with the problem count on Auto (the
@@ -3142,6 +3146,21 @@ const SELF_TESTS = [
         p1.after(p2);
         [p1, p2].forEach((p, i) => { p.setAttribute('data-ws-role', 'opener'); p.querySelector('.ws-foot b').textContent = `${i + 1}/2`; });
         [...p2.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]')).slice(1).forEach(c => c.remove());
+    } },
+    // ... and one Guided cell alone on page 2 fails whatever its ink height (critic r2 F1: coordinate_q1 L at 27b8e540c)
+    { name: 'split opener with one Guided cell alone on page 2 (OPN-SPLIT lone)', mode: 'kit', expect: ['L-DENSITY', 'OPN-SPLIT'], msg: /one Guided cell alone/, fn: () => {
+        const p1 = document.querySelector('.ws-page');
+        const p2 = p1.cloneNode(true);
+        p1.after(p2);
+        [p1, p2].forEach((p, i) => { p.setAttribute('data-ws-role', 'opener'); p.querySelector('.ws-foot b').textContent = `${i + 1}/2`; });
+        const top = [...p2.querySelectorAll('[data-ws-cell]')].filter(x => !x.parentElement.closest('[data-ws-cell]'));
+        top.slice(1).forEach(c => c.remove());
+        const c = top[0];
+        c.style.height = '200mm';
+        c.insertAdjacentHTML('beforeend', '<div style="height:190mm"></div><span>end</span>');
+        const band = document.createElement('div'); band.className = 'ws-band';
+        band.innerHTML = '<div class="ws-strip"><b>Guided Practice:</b> Write it.</div>';
+        c.before(band); band.appendChild(c);
     } },
     // ... unless the plan notes that the Model and one Guided cell side by side were tried and did not fit
     { name: 'split opener with a half-blank page, side by side noted (OPN-SPLIT control)', mode: 'kit', notes: ['The Model and one Guided row are taller than one page at this size, and the Model and one Guided cell side by side did not fit: the practice is on page 2.'], expect: [], absent: ['L-DENSITY', 'OPN-SPLIT'], fn: () => {
