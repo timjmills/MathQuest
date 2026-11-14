@@ -537,20 +537,22 @@ async function screenAlignMode() {
     const app = await H.open({ seed: 1 });
     try {
         await app.page.waitForFunction(() => typeof window.initWorksheet === 'function', { timeout: 60000 });
-        const probe = () => {
+        await app.page.evaluate(() => document.fonts.ready);   // (the first deal before the webfonts load measures fallback-font boxes)
+        const probe = (VERBOSE_D) => {
             const mm = (px) => px / 96 * 25.4;
             const res = [];
             for (const f of document.querySelectorAll('#worksheetGrid .mq-wwfact, #questionCard .mq-wwfact')) {
                 const kids = [...f.children].map((c) => c.getBoundingClientRect()).filter((r) => r.width > 1 && r.height > 1);
                 if (kids.length < 2) continue;
                 const tops = kids.map((r) => r.top + r.height / 2);
-                res.push({ host: f.closest('#worksheetGrid') ? 'worksheet' : 'card', spread: mm(Math.max(...tops) - Math.min(...tops)), text: f.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) });
+                res.push({ host: f.closest('#worksheetGrid') ? 'worksheet' : 'card', dump: VERBOSE_D ? [...f.children].map((c) => `${c.tagName}.${c.className}@${Math.round(c.getBoundingClientRect().top)}h${Math.round(c.getBoundingClientRect().height)}w${Math.round(c.getBoundingClientRect().width)}`).join(' ') + ` disp=${getComputedStyle(f).display}/${getComputedStyle(f).flexWrap} fw=${Math.round(f.getBoundingClientRect().width)} last=${f.lastElementChild.outerHTML.slice(0,200)}` : '', spread: mm(Math.max(...tops) - Math.min(...tops)), text: f.textContent.replace(/\s+/g, ' ').trim().slice(0, 40) });
             }
             return res;
         };
         for (const key of mine) for (const w of WIDTHS) {
             const sk = key.split(':')[1];
             await app.page.setViewport({ width: w, height: w === 1366 ? 768 : 900, deviceScaleFactor: 1 });
+            await new Promise((r) => setTimeout(r, 500));   // (the resize from the previous width settles before the first deal is judged)
             for (let seed = 1; seed <= SEEDS; seed++) {
                 for (const host of ['worksheet', 'card']) {
                     const err = await app.page.evaluate(({ sk, seed, host }) => {
@@ -563,11 +565,17 @@ async function screenAlignMode() {
                         } catch (e) { return String(e && e.message || e); }
                     }, { sk, seed, host });
                     if (err) { out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w}: ${err}`); continue; }
+                    await app.page.evaluate(() => document.fonts.ready);
                     await new Promise((r) => setTimeout(r, host === 'worksheet' ? 1000 : 250));
-                    for (const x of await app.page.evaluate(probe)) {
+                    // the worksheet grid's scheduled layout passes (worksheet.js) end with data-mq-laid-out="1": judge the settled layout
+                    if (host === 'worksheet') await app.page.waitForFunction(() => { const g = document.getElementById('worksheetGrid'); return !g || g.dataset.mqLaidOut !== '0'; }, { timeout: 5000 }).catch(() => {});
+                    let got = await app.page.evaluate(probe);
+                    // a wrap seen while the grid is still settling (only ever the run's first deal) is measured once more after 800 ms
+                    if (got.some((x) => x.host === host && x.spread > 1)) { await new Promise((r) => setTimeout(r, 800)); got = await app.page.evaluate(probe, true); }
+                    for (const x of got) {
                         if (x.host !== host) continue;
                         judged++;
-                        if (x.spread > 1) out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w} seed ${seed}: the fact sentence "${x.text}" wraps (its slots ${x.spread.toFixed(1)} mm apart; one line)`);
+                        if (x.spread > 1) out.push(`STEP-ALIGN-SCREEN ${sk} ${host} ${w} seed ${seed}: the fact sentence "${x.text}" wraps (its slots ${x.spread.toFixed(1)} mm apart; one line)${VERBOSE ? ' ' + x.dump : ''}`);
                     }
                 }
             }
