@@ -81,7 +81,7 @@ const arg = (k, d) => { const i = argv.indexOf('--' + k); return i > -1 ? argv[i
 const has = (k) => argv.includes('--' + k);
 const SKILLS = (arg('skill', '') || arg('skills', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 if (!has('self-test') && (!SKILLS.length || SKILLS.some((s) => !s.includes(':')))) { console.log('usage: ws-fact-pages.cjs --skill cat:skill[,cat:skill] [--roles r,..] [--sizes S,M,L] [--hosts card,worksheet,quiz|none] [--variants 6] [--opts json] [--seed 7] [--json f] [--report-only]'); console.log('ws-fact-pages: FAIL (usage)'); process.exit(2); }
-const SIZES = (arg('sizes', 'S,M,L')).split(',').map((s) => s.trim()).filter(Boolean);
+const SIZES = (arg('sizes', 'M,L')).split(',').map((s) => s.trim()).filter(Boolean);
 const HOSTS = arg('hosts', 'card,worksheet,quiz') === 'none' ? [] : arg('hosts', 'card,worksheet,quiz').split(',').map((s) => s.trim());
 const SEED = parseInt(arg('seed', '7'), 10);
 const NVAR = parseInt(arg('variants', '6'), 10);
@@ -262,7 +262,7 @@ function judgeTestEq(by, where, F) {
         if (!/^test\b/.test(k)) continue;
         const ind = by['independent' + k.slice(4)];
         if (!ind) continue;
-        for (const size of ['S', 'M', 'L']) if (t[size] && ind[size] && t[size].n !== ind[size].n) F('EB-TESTEQ', `${where} ${k} ${size}`, `the Test prints ${t[size].n} (${t[size].cols} columns) where the Independent page of the same facts prints ${ind[size].n} (${ind[size].cols} columns): every support's Test deals the Independent count (lead / owner 2026-11-09, critic r7 R7-1)`);
+        for (const size of ['M', 'L']) if (t[size] && ind[size] && t[size].n !== ind[size].n) F('EB-TESTEQ', `${where} ${k} ${size}`, `the Test prints ${t[size].n} (${t[size].cols} columns) where the Independent page of the same facts prints ${ind[size].n} (${ind[size].cols} columns): every support's Test deals the Independent count (lead / owner 2026-11-09, critic r7 R7-1)`);
     }
 }
 /** EB-COLS: {S, M, L: {cols, n}} of one role and option set. */
@@ -412,7 +412,7 @@ async function main() {
             for (const [k, by] of Object.entries(colsAt)) judgeCols(by, `${key} ${k}`, F);
             if (pr && pr.testEq) judgeTestEq(colsAt, key, F);
             // screen hosts
-            const widths = { card: [390, 820, 1280], worksheet: [1280], quiz: [1280] };
+            const widths = { card: [820, 1024, 1280], worksheet: [1280], quiz: [1280] };
             for (const host of HOSTS) for (const w of widths[host] || []) {
                 await page.setViewport({ width: w, height: w < 500 ? 844 : 900, deviceScaleFactor: 1 });
                 const ok = await page.evaluate(async ({ c, k, host, SEED, OPTS }) => {

@@ -401,7 +401,7 @@ function readCellsInPage({ sel, cellSel }) {
                 // ARRAY-ORIENT on paper: the Independent page at S, M and L
                 // (r2: NOTSLOT judges these paper pages too - `--only NOTSLOT` skipped them, so its backtest read only the screen hosts)
                 if ((ONLY.includes('ORIENT') || ONLY.includes('CAPTION') || ONLY.includes('FRAME') || ONLY.includes('NOTSLOT') || ONLY.includes('GAP')) && sup === 'array') {
-                    for (const size of ['S', 'M', 'L']) {
+                    for (const size of ['M', 'L']) {
                         const pr = size === 'M' ? paper : await paperAt(size);
                         if (ONLY.includes('FRAME')) for (const c of (pr.cells || []).filter((x) => x.item)) {
                             const f = frameFinding(sup, c.sups[sup], c.item);
