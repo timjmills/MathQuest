@@ -426,8 +426,8 @@ export const mixFrameMm = (pt) => 3.45 * (EM_MM[pt] || (pt / 72) * 25.4) + 2 + 1
 /**
  * LDIV-FACT-ROOM (owner 2026-11-14: "10 ⟌ 70", "2 ⟌ 6" squished beside a fraction; lead ruling): in a grid mixing forms the
  * bracket's quotient is written on the frame's top line (1.07 em), under the tab's keep-out. When a bracket is in the grid
- * that line is shorter than the size's writing height, every frame of the grid starts this much lower (one baseline a row
- * kept), so the room over the bar is at least Hw. 0 without a bracket.
+ * that line is shorter than the size's writing height, the row grows by this and the BRACKET frames start this much lower
+ * (lead ruling 2026-11-14: Mix rows holding a bracket drop the one-baseline rule), so the room over the bar is at least Hw.
  */
 function mixQuotientLiftMm(forms, pt, size) {
     if (!forms || !forms.has('long')) return 0;
@@ -493,7 +493,7 @@ function formRows(items, input, ctx, G, labels, forms) {
     };
     return { across: false, forms, row, cols, rows, perPage, cellH: Math.min(G / rows, h * 1.3), hMin: h, digitPt: pt, tracks: geo.tracks || tracksOf(items), gridH: G, labels, mixed,
         // (a grid mixing forms: every cell drawn in the stacked fact's three lines, under the tab's keep-out - factCell)
-        mixGrid: forms.size > 1, keepOut: forms.size > 1 ? mixKeepOutMm(ctx.size, ctx.look, cols, labels) + mixQuotientLiftMm(forms, pt, ctx.size) : 0, note: notes.join(' ') };
+        mixGrid: forms.size > 1, keepOut: forms.size > 1 ? mixKeepOutMm(ctx.size, ctx.look, cols, labels) : 0, lift: forms.size > 1 ? mixQuotientLiftMm(forms, pt, ctx.size) : 0, note: notes.join(' ') };
 }
 
 /** The rung every form of a Mix page is drawn at: the Standard fact rows' across rung (20 pt). */
@@ -803,7 +803,13 @@ function divUnderTab(L, n = L.tracks) {
  * border"): every form drawn in one frame of the stacked fact's three lines (mixFrameMm), the frame below the tab's
  * keep-out and centred down the cell (css/sheet-kit.css, .ws-mixform), each drawing centred across it.
  */
-const mixWrap = (L, kind, html) => `<div class="ws-mixform" data-ws-mixform="${kind}" style="font-size:${L.digitPt}pt;height:${mixFrameMm(L.digitPt).toFixed(2)}mm;margin-top:${Math.max(0, (L.keepOut || 2) - 2).toFixed(2)}mm">${html}</div>`;
+// (LDIV-FACT-ROOM, lead ruling 2026-11-14: only a BRACKET frame is lowered by the lift - Mix rows holding a bracket drop the
+// one-baseline rule; the other frames keep the top of the box, CL-4b)
+const mixWrap = (L, kind, html) => {
+    const lift = Number(L.lift) || 0;
+    const top = Math.max(0, (L.keepOut || 2) - 2) + (kind === 'bracket' ? lift : 0);
+    return `<div class="ws-mixform" data-ws-mixform="${kind}" style="font-size:${L.digitPt}pt;height:${mixFrameMm(L.digitPt).toFixed(2)}mm;margin-top:${top.toFixed(2)}mm${lift > 0 && kind !== 'bracket' ? ';margin-bottom:auto' : ''}">${html}</div>`;
+};
 
 function factCell(it, L) {
     const q = it.q || {};
