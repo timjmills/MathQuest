@@ -11080,6 +11080,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "ldiv-room",
+   "check": "the long-division work grid uses the room a 4-a-page cell gives: grid >= 80 % of the cell's free height or rows at the 2x cap, block centred; 6 / 8 a page keep the floor row with no overflow (owner 2026-11-14: 'a lot of white area to work with'; d82acc06f grid 45 % M / 56 % L at 1x)",
+   "kind": "commit-pair",
+   "rule": "ws-ldiv-hug --room LDIV-ROOM",
+   "browser": true,
+   "fail": {
+    "commit": "d82acc06f",
+    "state": "work grid at its footprint size in a 106 mm cell: 45 % (M) / 56 % (L) of the free height, 25 mm white above and below"
+   },
+   "pass": {
+    "commit": "86950d488",
+    "state": "writing boxes grow to the cell (M rows 1.87x, 93 %; L 1.54x, 94 %), centred; 6 a page unchanged"
+   },
+   "command": "node tests/scripts/ws-ldiv-hug.cjs --room --skills division:long_div_2digit",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

@@ -38,6 +38,7 @@
 // --shape (LDIV-SHAPE, owner 2026-11-14: "I don't like the big curve ... make it straight or almost straight"): the arc's
 // bow - its greatest distance from the straight chord between its ends, in mm (screen at 96 px per inch) - is <= 0.6 mm on
 // paper (M, L) and on every screen host.
+// --room (LDIV-ROOM, owner 2026-11-14): the work grid uses the room a 4-a-page cell gives (see roomMain).
 // A skill x host that draws no bracket FAILS (it would pass unseen). word-work.js's own divide frame (M2 1 Q...) is
 // lf-algebra's and is not measured here.
 const fs = require('fs');
@@ -549,7 +550,78 @@ async function joinMain() {
     process.exit(fails ? 1 : 0);
 }
 
-if (process.argv.includes('--join')) joinMain();
+// ---- LDIV-ROOM (--room; owner 2026-11-14: "a lot of white area to work with" on the 4-a-page long-division page) ----
+// On the Independent page at M and L, for each long-division cell with a work grid:
+//   4 a page or fewer (counted on the printed page): the work grid's height >= 80 % of the cell's FREE height (the cell less the printed rows - quotient strip and
+//             dividend row - and the label keep-out, ROOM_KEEP_MM), or its rows at the 2x cap (>= 1.95 x the floor row);
+//             the block centred down the cell: top and bottom white within 20 % of each other;
+//   more a page (6, 8): every work row at least the floor row (d82acc06f's: M 9.0 mm, L 11.0 mm) and the block inside its cell.
+const ROOM = { fill: 0.8, centre: 0.2, keepMm: 6, capX: 1.95, floorMm: { M: 9.0, L: 11.0 } };
+const ROOM_SKILLS = {
+    'division:long_div_2digit': { opts: {} },
+    'division:divide': { opts: { notation: ['bracket'], tiles: 31 } },
+};
+function ROOMSCAN() {
+    const d = document.getElementById('mqRoomPaper').contentDocument, MM = 25.4 / 96;
+    return Array.from(d.querySelectorAll('[role="group"]')).filter((g) => /divided by/.test(g.getAttribute('aria-label') || '')).map((g) => {
+        const cell = g.closest('.ws-cell') || g.parentElement;
+        const c = cell.getBoundingClientRect(), b = g.getBoundingClientRect();
+        const rows = Array.from(g.children).filter((k) => { const st = k.getAttribute('style') || ''; const m = st.match(/grid-row:\s*(\d+)/); return m && +m[1] >= 3 && /height:/.test(st); });
+        if (!rows.length) return null;
+        const gr = rows.map((x) => x.getBoundingClientRect());
+        const gridH = (Math.max(...gr.map((x) => x.bottom)) - Math.min(...gr.map((x) => x.top))) * MM;
+        const pg = g.closest('.ws-page');
+        const perPage = pg ? Array.from(pg.querySelectorAll('[role="group"]')).filter((x) => /divided by/.test(x.getAttribute('aria-label') || '')).length : 0;
+        return { perPage, cellH: c.height * MM, cellW: c.width * MM, blkH: b.height * MM, gridH, rowH: Math.min(...gr.map((x) => x.height)) * MM,
+            top: (b.top - c.top) * MM, bottom: (c.bottom - b.bottom) * MM, left: (b.left - c.left) * MM, right: (c.right - b.right) * MM };
+    }).filter(Boolean);
+}
+async function roomMain() {
+    const want = String(arg('skills', Object.keys(ROOM_SKILLS).join(','))).split(',').map((x) => x.trim()).filter(Boolean);
+    const app = await open({ seed: 1, viewport: { width: 900, height: 1300, deviceScaleFactor: 1 } });
+    const { page } = app;
+    let fails = 0;
+    try {
+        for (const key of want) {
+            const c = ROOM_SKILLS[key];
+            if (!c) { fails++; console.log(`FAIL ${key}: not a work-grid skill of LDIV-ROOM`); continue; }
+            const [categoryId, skillId] = key.split(':');
+            for (const size of ['M', 'L']) for (const count of [4, 6, 8]) {
+                const ok = await page.evaluate(async (a) => {
+                    const r = await window.buildSheet({ role: 'independent', size: a.size, seed: 4242, key: false, sections: [{ skills: [{ categoryId: a.categoryId, skillId: a.skillId, opts: a.opts }], count: a.count }] });
+                    let f = document.getElementById('mqRoomPaper');
+                    if (!f) { f = document.createElement('iframe'); f.id = 'mqRoomPaper'; f.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:1300px;border:0;z-index:-1;visibility:hidden'; document.body.appendChild(f); }
+                    await new Promise((res) => { f.onload = res; f.srcdoc = window.sheetDocument(r.pupilHtml, 'room'); });
+                    await f.contentDocument.fonts.ready;
+                    return true;
+                }, { categoryId, skillId, opts: c.opts, size, count });
+                if (!ok) { fails++; continue; }
+                const cells = await page.evaluate(ROOMSCAN);
+                if (!cells.length) { fails++; console.log(`FAIL LDIV-ROOM ${key} ${size} ${count} a page: no work grid measured`); continue; }
+                const floor = ROOM.floorMm[size];
+                for (const [i, m] of cells.entries()) {
+                    const free = m.cellH - (m.blkH - m.gridH) - ROOM.keepMm;
+                    const fill = m.gridH / free, capped = m.rowH >= ROOM.capX * floor - 0.05;
+                    const skew = Math.abs(m.top - m.bottom) / Math.max(1e-6, Math.max(m.top, m.bottom));
+                    const bad = [];
+                    if (m.perPage <= 4 && !(fill >= ROOM.fill || capped)) bad.push(`grid ${(fill * 100).toFixed(0)} % of the free height < ${ROOM.fill * 100} % and rows ${m.rowH.toFixed(1)} mm under the 2x cap`);
+                    if (m.perPage <= 4 && skew > ROOM.centre) bad.push(`not centred: top ${m.top.toFixed(1)} / bottom ${m.bottom.toFixed(1)} mm`);
+                    if (m.rowH < floor - 0.05) bad.push(`row ${m.rowH.toFixed(1)} mm < floor ${floor}`);
+                    if (m.top < -0.1 || m.bottom < -0.1 || m.left < -0.1 || m.right < -0.1) bad.push('block outside its cell (overflow)');
+                    if (bad.length) fails++;
+                    if (i < 2 || bad.length) console.log(`${bad.length ? 'FAIL' : 'PASS'} LDIV-ROOM ${key} ${size} count ${count} (${m.perPage} a page) cell ${i + 1}: cell ${m.cellH.toFixed(1)} mm, grid ${m.gridH.toFixed(1)} mm = ${(fill * 100).toFixed(0)} % of free ${free.toFixed(1)} mm, row ${m.rowH.toFixed(1)} mm (${(m.rowH / floor).toFixed(2)}x floor), white top ${m.top.toFixed(1)} / bottom ${m.bottom.toFixed(1)} mm${bad.length ? '  <- ' + bad.join(', ') : ''}`);
+                }
+            }
+        }
+        const errs = app.problems.filter((p) => p.type !== 'requestfailed');
+        if (errs.length) { fails++; errs.slice(0, 5).forEach((e) => console.log(`FAIL console: ${e.text}`)); }
+    } catch (e) { console.log('FAIL ' + (e.stack || e.message)); fails++; } finally { await app.close(); }
+    console.log(fails ? `ws-ldiv-hug: FAIL (${fails})` : 'ws-ldiv-hug: OK');
+    process.exit(fails ? 1 : 0);
+}
+
+if (process.argv.includes('--room')) roomMain();
+else if (process.argv.includes('--join')) joinMain();
 else (async () => {
     const app = await open({ seed: 1, viewport: { width: 1280, height: 900, deviceScaleFactor: 1 } });
     const { page } = app;

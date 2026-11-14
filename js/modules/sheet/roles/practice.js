@@ -1242,9 +1242,11 @@ function composeSheet(role, input, norm0, sheetItems0, { tabId, seed, form }) {
             if (oneRow) sections.push({
                 kind: 'grid', cols: L.cols, rows: rowsN, labels: labelStyle, start, cls: `fixed mq-spread ${rowsN === 1 ? 'mq-onerow' : 'mq-inkrows'}`, height: `${oneRow.heightMm}mm`, rowsTpl: oneRow.rowsTpl,
                 rowGap: 0, availMm: avail, items: its.map((it) => planItem(it, level, L.cols)), _its: its,
+                roomFill: true,   // LDIV-ROOM: a practice grid hands each long-division cell its room
             });
             else sections.push({
                 kind: 'grid',
+                roomFill: true,   // LDIV-ROOM: a practice grid hands each long-division cell its room
                 cols: L.cols,
                 rows: part.chunk.rows,
                 labels: labelStyle,
