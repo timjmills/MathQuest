@@ -9,6 +9,12 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-14 ~07:00 TWO-STEP FAMILY READY TO DEPLOY (owner +10 %, stop $490). F6 closed: check ws-two-step --screen-align
+  STEP-ALIGN-SCREEN 339b134df / af490bbe5 (FAIL: the screen host wraps a fact sentence wider than its two-up cell at 820), fix
+  85bfa6313 (nowrap; on screen a one-digit box is one box wide, 0.8 mm gaps; digit size and box height unchanged), backtest
+  two-step-screen-sentence PASS, precritic gate two-step-screen-align. Narrow critic round 4 (screen hosts): PASS 8/8/8/8 (print
+  passed 8/8/8/8 at r3). Notes, not fails: N1 Step 1's 2-digit result is one box, Step 2's answer one box a digit (F2, by design);
+  N2 unit line left of / above the bank (F7). Merged master 7f2ca5e39. Next: LDIV-JOIN switch once lf-ops' bracketSvg is on master.
 - 2026-11-14 03:05 AT THE OWNER'S BUDGET STOP (session cost_usd $429.31 of the $461 stop). Head 488142df6, merged with master
   369173bc2 (b0050526d). STEP-FORM narrow critic, 3 rounds (verdict: scratchpad critic-stepform/verdict.md, copied to the evidence
   branch as design/audit/evidence/lf-algebra/step-form/verdict.md):
