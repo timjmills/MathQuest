@@ -472,5 +472,13 @@ Each finding: check first (FAILs on 8f76b6401), then the fix; backtest row; ledg
   this change), cbt spans at all four widths (D2 kept). ws-worksheet-reflow FULLROW-SPAN + FULLROW-USE (>= 50 % of the usable
   width), `--json`; backtest `cbt-r2-e9-fullrow` (fixture measured on 8f76b6401 / d6ef53e53); `ws-reflow-countrow-exempt` green.
 
+- Final precritic --skill multiplication:count_by_tables --strict (logs /tmp/mq-precritic/20261114-075314-20438): 47 PASS, 6 FAIL.
+  Routed / ruled: sibling-compare NO-SIBLING; empty-band opener M / L, lesson-vocab M p2 + EB-VOCAB (lf-engine), Guided EB-REFILL
+  (lf-roles). screen-slots: a quiz CELL-READ flake (passes alone). worksheet-reflow: only placevalue:expand@820 / 1024 - present
+  with these changes stashed (not this lane). role-cover: the same band rows, plus NOT ledgered and older than this round
+  (red on e6d1b2c19 as well): true-false L-KEY AK-2 (critic N4 named it too; the lead ruling covers the Scripted Model only),
+  opener M spaces=line SL-1 x40 (9.4 mm answer lines), error-analysis L spaces=line CL40-INK x4. Those three need a lead
+  decision or the next round.
+
 ## Queued after the weekly reset (lead 2026-11-14)
 - integers:add_int, range −23..1: the number-line labels touch (lf-engine -roles critic r2 F6). Planned check LABEL-GAP; the ledger row is in CHECKS_FROM_CRITICS. Fix when the budget returns: check first, then the fix.
