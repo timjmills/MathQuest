@@ -9123,6 +9123,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "tof-stem",
+   "check": "a True or False? frame restates the problem as 'a op b =' only when that equation is true of the answer: one number equal to the operands combined (lf-ops critic-cbt-r2 E1: count_by_tables printed '3 x 12 = 12, 18, 24, 30, 36'; 55 skills on master)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem TOF-STEM",
+   "browser": true,
+   "fail": {
+    "commit": "05dbd1149",
+    "state": "count_by_tables True or False? M: 'a x 12 =' stem over a 5-part list on pupil page and key"
+   },
+   "pass": {
+    "commit": "fc02a4642",
+    "state": "list / missing-part / 3-addend answers take the plain stem; true equation stems unchanged"
+   },
+   "command": "node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_missing_digit,addition:add_three --seeds 7,23",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }
