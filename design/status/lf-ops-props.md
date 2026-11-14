@@ -505,3 +505,9 @@ Each check first: the ws-print-lint rule FAILs on 9cf4d4a54 for that role / opti
   by id; divship's newer screen-support-eq-divfacts / screen-ink-size-divfacts rows taken, our cc-*-cbt rows kept - no size S).
   After the merge: boot-smoke OK, code-snapshot OK, print-lint self-test OK, the three lints OK, precritic-plan OK. The full
   precritic was not re-run on the merged tree (budget cap).
+
+## PARKED AGAIN: count_by_tables, critic cbt r3 FAIL (final round, lowest 7), 2026-11-14
+Report: design/audit/runs/lf-ops/critic-cbt-r3.md (graded at 3038af154). E1–E9, m2 and both r3 fixes are verified; every page and host scores ≥ 8 except the Pre-skill check at L.
+- **F1:** the Pre-skill check at L leaves an 84 mm foot. The gate misses it because EB-PAGE skips a role's last page. The planned EB-LASTPAGE and CAP-PARITY checks are for **lf-checks**.
+- **m1** opener title range (TITLE-RANGE); **m2** True or False? "Finish the sentence." wording; **m3** Scripted Model L merges two steps (SM-STATE-PARITY).
+All four are ledgered as parked, with their planned checks. **To resume:** land EB-LASTPAGE first, then fix F1 by filling the L quadrants with a second row; then m1–m3; then a narrow critic on the Pre-skill check at L plus the three minors.
