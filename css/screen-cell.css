@@ -2187,3 +2187,10 @@ html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeV
 html body :is(#gameView #questionCard #questionPaper, #worksheetView, #quizTakeView, body > .zoom-overlay .zoom-content) div[style*="overflow-x:auto"]:has(.mq-wwans[data-mq-cell] > input.mq-cellslot) {
     padding: 8px !important; margin: -8px !important; max-width: calc(100% + 16px) !important;
 }
+/* lf-builds chart_120 r2 (ws-phone-card TOUCH-HIT, lf-checks 2026-11-13): in a chart window sized from its digits the collapsed
+   borders let a NEIGHBOUR square's number (an absolute span over its own square) lie 1 px over an empty square's input, so a
+   tap on the input's edge or corner landed on "62" and focused nothing. The empty square's writing place stands above its
+   neighbours. Scoped to the chart window on the card, the quiz and the online worksheet. Additive. */
+html body #questionCard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
+html body .qt-question-card .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell],
+html body .mq-wscard .mq-scell .k2-chart:not(.k2-chart-ten) td > [data-mq-cell] { z-index: 1; }
