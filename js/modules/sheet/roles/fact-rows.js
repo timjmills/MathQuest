@@ -405,9 +405,12 @@ function rowFormHeightMm(forms, geo, size, labels, cols, look) {
     if (forms.has('fraction')) h = Math.max(h, padTop + 2.42 * em + 0.6 + sz.writeMm + 3);
     // the bracket (write-above, centred down the cell, CL-4b): the quotient zone and the bracket row
     if (forms.has('long')) {
-        h = Math.max(h, 2 + ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 1.33 * em + 2 + 2);
+        // (LDIV-FACT-ROOM, owner 2026-11-14: the quotient row over the bar is at least the writing height, cells/long-division.js)
+        const strip = Math.max((SLOT.digitStripMm || {})[size] || sz.writeMm, sz.writeMm);
+        h = Math.max(h, 2 + strip + 1.33 * em + 2 + 2);
         // QROOM (facts-print-fix r5, critic D-R5-5): the bracket is centred down its cell, so the cell is tall enough that the
         // room over the vinculum, under the tab, holds a written line of figures (1.15 em) - the stacked fact's answer row
+        // (the QROOM need is kept as it was laid - the old strip - so a long page keeps its rows; the taller strip only adds room)
         const qRow = ((SLOT.digitStripMm || {})[size] || sz.writeMm) + 0.08 * em;
         let tab = sz.tabMm;
         try { tab = Math.max(tab, metricsFor(size, look || DEFAULT_LOOK, { factColumns: cols }).tabMm || 0); } catch (e) { /* the size's tab */ }

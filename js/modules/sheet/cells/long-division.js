@@ -296,7 +296,11 @@ register('division', {
         // second line (1.15 em), so the dividend sits on the divisor's / denominator's line of the row and the quotient is
         // written on the vinculum, level with the dividends and numerators beside it.
         const mixRow = !!p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowMix) > 0;
-        const qH = mixRow ? 1.07 * g.E : g.stripMm;
+        // LDIV-FACT-ROOM (owner 2026-11-14: "10 ⟌ 70", "2 ⟌ 6" squished beside a fraction; lead ruling): a bracket FACT on a
+        // fact-rows page reserves a writing row over the bar at the size's writing height (Hw), as the fraction form's answer
+        // line does; the digits keep the fact size. Fact rows only (`factRowTrack`): the full long-division cells keep LDIV-ROOM.
+        const factRoom = !!p.fact && ctx.mode !== 'screen' && Number((ctx.metrics || {}).factRowTrack) > 0;
+        const qH = Math.max(mixRow ? 1.07 * g.E : g.stripMm, factRoom ? g.writeMm : 0);
         // A fact-rows page past 4 columns (owner ruling 2026-10-30: the bracket reaches 10 columns)
         // hands its own narrow gutter (`factRowGutter`, mm): the arc then hugs the space between the
         // divisor's last digit and the dividend's first (bracketArc's compact path).

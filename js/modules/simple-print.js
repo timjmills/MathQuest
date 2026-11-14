@@ -199,6 +199,9 @@ export function isFactSkill(s) {
     return ok;
 }
 const isDivisionFact = (s) => s.categoryId === 'division';
+/** A ÷ fact in the ÷ sign's own form (div_facts Standard / Vertical, or a ÷ fact skill without divForm): it mixes into the
+ *  + − × rows (MIXED-ALL-OPS); a bracket, a fraction or Mix does not. */
+const signDiv = (s) => isDivisionFact(s) && /^(standard|vertical)$/.test(String((s.opts && s.opts.divForm) || 'standard'));
 /**
  * What a fact skill can REACH (facts-print-fix r3 D2 / D4): the most digit tracks of its numbers and the digits of its
  * answers over one seeded probe of 60 items (x 1-12: 3 tracks, 3-digit answers; + − within 20: 2; ÷ 1-12: 3 for 144).
@@ -543,8 +546,14 @@ async function buildFacts(list, amounts, o) {
     // the groups: parts {s (the skill, its options), i (its place in the list), w (its share of the skill)}
     const DIV_SPLIT = ['standard', 'long', 'fraction'];
     const groups = [];
-    const mainParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => !isDivisionFact(p.s) && live(p.i));
-    const divParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => isDivisionFact(p.s) && live(p.i));
+    // MIXED-ALL-OPS (owner 2026-11-14, Mixed facts quick print: "÷ in its own Divide. section at the bottom"): a ÷ fact in
+    // the ÷ sign's own form (div_facts Standard / Vertical - the stacked ÷ fact, drawn as the stacked ÷ page draws it) joins
+    // the + − × rows whenever + − × facts are in the set, so every row mixes all four signs. A bracket, a fraction or Mix
+    // (the forms the teacher picks on purpose) keeps its own ÷ section; ÷ alone keeps the ÷ page.
+    const anyMain = list.some((s, i) => !isDivisionFact(s) && live(i));
+    const inRow = (s) => !isDivisionFact(s) || (anyMain && signDiv(s));
+    const mainParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => inRow(p.s) && live(p.i));
+    const divParts = list.map((s, i) => ({ s, i, w: 1 })).filter((p) => !inRow(p.s) && live(p.i));
     const splitDiv = !mixed && list.length >= 2 && divParts.length === 1 && divParts[0].s.skillId === 'div_facts' && (divParts[0].s.opts || {}).divForm === 'mix';
     const divGroups = () => (splitDiv
         ? DIV_SPLIT.map((f) => ({ parts: [{ s: Object.assign({}, divParts[0].s, { opts: Object.assign({}, divParts[0].s.opts, { divForm: f }) }), i: divParts[0].i, w: 1 / 3 }], div: true, form: f }))
@@ -561,7 +570,7 @@ async function buildFacts(list, amounts, o) {
         let run = null;
         let divDone = false;
         for (const p of [...mainParts, ...divParts].sort((a, b) => a.i - b.i)) {
-            if (!isDivisionFact(p.s)) { if (!run) { run = { parts: [], div: false }; groups.push(run); } run.parts.push(p); continue; }
+            if (inRow(p.s)) { if (!run) { run = { parts: [], div: false }; groups.push(run); } run.parts.push(p); continue; }
             run = null;
             if (!divDone) { groups.push(...divGroups()); divDone = true; }
         }
@@ -578,7 +587,7 @@ async function buildFacts(list, amounts, o) {
         const count = per ? per.reduce((t, x) => t + x, 0) : 0;
         return { skills: grp.parts.map((p, j) => Object.assign(skillRef(p.s), { weight: w[j] })).filter((x) => x.weight > 0), pages: 1, ...(count ? { count } : {}),
             tracks: reach[g].tracks, ansTracks: reach[g].ans, ...(cap ? { maxPt: cap } : {}), sizeCap: true,
-            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.div ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
+            ...(colsAsked(o) ? { columns: Math.min(colsAsked(o), grp.div || grp.parts.some((p) => isDivisionFact(p.s)) ? DIV_MAX_COLS : FACT_MAX_COLS), columnsMode: modeOf(o) } : {}) };
     };
     // one page: `parts` = [{g, per}] (per = how many of each of the group's parts; null: the full page by the shares)
     const page = (parts, stretch = null) => {
