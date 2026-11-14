@@ -356,7 +356,9 @@ function shownCmd(g) {
 // a non-zero exit (the tool exits 1 because of exactly those findings). judge() turns any other non-zero exit, and any
 // time-out, into FAIL whatever the parser read: a gate that crashed or was killed never shows PASS (critic r1, D1/D8).
 const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
+// a gate's verdict line: "<tool>: OK|FAIL ..." or, for a tool run in one of its modes, "<tool> --mode[ --mode2]: OK|FAIL ..."
+// (lf-ops 2026-11-13: `ws-no-size-s --browser: OK (73 checks)` read as "unparsed output" and turned every --strict run red)
+const lastVerdict = (out, name) => { const m = [...out.matchAll(new RegExp(`^${reEsc(name)}(?: --[\\w-]+)*: (OK|FAIL|WOULD FAIL)\\b.*$`, 'gm'))]; return m.length ? m[m.length - 1] : null; };
 const NOISE = /MODULE_TYPELESS_PACKAGE_JSON|Reparsing as ES module|eliminate this warning|--trace-warnings|^\$ /;
 const tailLines = (out, n = 6) => String(out).split('\n').map((l) => l.trimEnd()).filter((l) => l.trim() && !NOISE.test(l)).slice(-n);
 const unparsed = (what, out) => ({ result: 'FAIL', findings: `unparsed output (${what})`, detail: tailLines(out), explainsExit: false });
@@ -368,6 +370,14 @@ const fmtMin = (m) => String(+(+m).toFixed(3));
 const mentioned = (out, k) => new RegExp(`(^|[\\s,;()\\[\\]{}"'])${reEsc(k)}($|[\\s,;:()\\[\\]{}"'.])`, 'm').test(out);
 
 if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more cases go here
+    // the verdict line of a tool run in a mode (lf-ops 2026-11-13: ws-no-size-s --browser read as unparsed)
+    const vl = (out, name) => { const v = lastVerdict(out, name); return v ? v[1] : null; };
+    const tv = [['plain verdict', vl('x\nws-no-size-s: OK (205 app files)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict', vl('  ok   no page errors\nws-no-size-s --browser: OK (73 checks)\n', 'ws-no-size-s'), 'OK'],
+        ['mode verdict FAIL', vl('ws-no-size-s --browser: FAIL - 2 finding(s)\n', 'ws-no-size-s'), 'FAIL'],
+        ['two modes', vl('ws-x --a --b-c: OK\n', 'ws-x'), 'OK'],
+        ['another tool is not this one', vl('ws-no-size-s-extra: OK\n', 'ws-no-size-s'), null],
+        ['a non-flag word is not a mode', vl('ws-no-size-s browser: OK\n', 'ws-no-size-s'), null]];
     const t = [['one per line', mentioned('vocabulary:vocab_grade_pictures OK\n', 'vocabulary:vocab_grade_pictures'), true],
         ['comma list on one line', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_words'), true],
         ['last in the list', mentioned('no supports for vocabulary:vocab_grade_words, vocabulary:vocab_grade_pictures ... OK', 'vocabulary:vocab_grade_pictures'), true],
@@ -376,6 +386,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
         ['a prefixed id is not the key', mentioned('xaddition:add_facts OK', 'addition:add_facts'), false]];
     const bad = t.filter(([, got, want]) => got !== want);
     for (const [n, got, want] of bad) console.log(`self-test FAIL: mention ${n}: ${got}, want ${want}`);
+    for (const [n, got, want] of tv) if (got !== want) { bad.push([`verdict ${n}`, got, want]); console.log(`self-test FAIL: verdict ${n}: ${got}, want ${want}`); }
     // the copy-light eligibility, batch and sample cases (owner rule 2026-11-13) live in ws-copy-light --self-test
     const cl = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-copy-light.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const clLine = String(cl.stdout || '').trim().split('\n').pop();
@@ -384,7 +395,7 @@ if (has('self-test')) {   // the mention matcher (lf-vocab 2026-11-13) - more ca
     const dk = spawnSync(process.execPath, [path.join(SCRIPTS, 'ws-drawing-key.mjs'), '--self-test'], { cwd: ROOT, encoding: 'utf8' });
     const dkLine = String(dk.stdout || '').trim().split('\n').pop();
     if (dk.status !== 0) { bad.push(['drawing-key', dkLine, 'OK']); console.log(String(dk.stdout || '').trim()); }
-    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
+    console.log(`ws-precritic self-test: ${bad.length ? `FAIL (${bad.length})` : `OK (${t.length} mention cases, ${tv.length} verdict cases; ${clLine.replace(/^ws-copy-light --self-test: /, 'copy-light ')}; ${dkLine.replace(/^ws-drawing-key --self-test: /, 'drawing-key ')})`}`);
     process.exit(bad.length ? 1 : 0);
 }
 
@@ -882,6 +893,9 @@ function buildPlan(ctx) {
         add(gate('providers', 'ws-providers-unit --skill', scope, 'node', 'ws-providers-unit', ['--skill', keys.join(',')], { parse: PARSE.providers, needFlags: ['skill'], expect: { skills: keys.length } }));
         // (lf-roles 2026-11-13, lead: the shared roles' node unit - KEYJOIN-ROLE, REVIEW-TITLE, MOD-ACROSS - on every skill run)
         add(gate('roles-unit', 'ws-roles-unit (shared page roles)', 'shared roles', 'node', 'ws-roles-unit', [], { missingMsg: 'no tests/scripts/ws-roles-unit.mjs' }));
+        // (lf-roles 2026-11-13, owner request: the teacher's page title - TITLE-IDENT no-option pages unchanged, TITLE-PLACE above /
+        // below with no overlap, TITLE-LONG never shrinks / at most two lines / cut with a warning - on every role, M and L)
+        add(gate('frame-title', 'ws-frame-title (the page-title option on every role and key: TITLE-IDENT, TITLE-PLACE, TITLE-LONG)', `${scope} × every role × M/L`, 'browser', 'ws-frame-title', ['--skills', keys.join(',')], { missingMsg: 'no tests/scripts/ws-frame-title.cjs' }));
         // (lf-roles 2026-11-13, lead: CAPACITY-NO-DROP - a page never prints fewer items than the pinned master page)
         add(gate('capacity-pin', 'ws-capacity-pin --check (items a page never fall against the pinned master page)', scope, 'browser', 'ws-capacity-pin', ['--check', '--skills', keys.join(','), ...(ctx.role ? ['--roles', ctx.role] : [])], { missingMsg: 'no tests/scripts/ws-capacity-pin.cjs' }));
         add(gate('content-audit', 'ws-content-audit --skill', scope, 'browser', 'ws-content-audit', ['--skill', ids.join(','), ...catArg], { parse: PARSE.contentAudit, note: extraNote, expect: { skills: keys.length } }));
@@ -1245,6 +1259,11 @@ function buildPlan(ctx) {
         // pdf-preview lane 2026-10-31: the full print preview's pages === Chrome's PDF pages, and its timing
         add(gate('pdf-preview', 'ws-pdf-preview', 'full print preview (parity + timing)', 'browser', 'ws-pdf-preview', []));
         add(gate('plain-words', 'ws-plain-words --check', 'plain-word db', 'node', 'ws-plain-words', ['--check']));
+        // (lf-roles 2026-11-13: the page title travels with the simple print's share code; old codes decode unchanged)
+        add(gate('title-code', 'ws-title-code (TITLE-CODE-RT / -OLD / -REQ: the page title in the quick-print share code)', 'quick-print codes', 'browser', 'ws-title-code', [], { missingMsg: 'no tests/scripts/ws-title-code.cjs' }));
+        // (critic title r1 T1 / T4 / T5: the title boxes driven by real keystrokes - the cursor survives the redraw; Title off
+        // disables its controls; the simple print box is wide enough)
+        add(gate('title-ui', 'ws-frame-title-ui (UI-CARET / UI-TITLE-OFF / UI-WIDTH, both print dialogs, 1280 px)', 'teacher Print screen + simple print', 'browser', 'ws-frame-title-ui', ['--only', 'caret,off,width'], { missingMsg: 'no tests/scripts/ws-frame-title-ui.cjs' }));
         addPartOpts(add, ctx);
     }
     // lf-hosts critic r1 F2: a merge committed conflict markers into the ledger and backtests.json; every precritic run fails
