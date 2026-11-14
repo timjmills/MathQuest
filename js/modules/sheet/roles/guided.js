@@ -621,6 +621,13 @@ const GUIDED_STRETCH = FILL_CAP;
  */
 const rowLimit = (m) => fillLimit(m);
 
+/**
+ * `tightRows` on the Guided page only (footprint `guidedTight`, lf-placevalue live1, lf-roles critic r8b D2): an in-place cell
+ * whose Guided rows are held to their measured height - the Model row to the taller of its work lines and the tries' hint - and
+ * the spare page height stays under the grid. number_word_form's rows were stretched to 35-50 % empty under the answer line;
+ * its other roles keep their own fill (layout.tightRows is read on every role).
+ */
+const guidedTight = (xs) => tightRows(xs) || (Array.isArray(xs) && xs.length > 0 && xs.every((it) => !!(it && it.footprint && it.footprint.guidedTight)));
 /** An item's planned row height at `cols` (its measure + 1 mm, as the plan draws it). */
 const rowMmOf = (it, cols) => { const mm = it && it.measured && it.measured[cols]; return mm && Number.isFinite(mm.hMm) ? mm.hMm + 1 : 0; };
 /** The share of the Model's row the tries beside it fill at least (GUIDED-MODEL-ROW: under it, the band beside the try reaches 30 %). */
@@ -661,13 +668,32 @@ export function answerTokens(it) {
     return [...out];
 }
 
-/** Does this hint text hold the problem's answer (any of answerTokens)? */
+/** A place phrase of a hint: "2 tens", "6 ones", "3 hundreds" (its number, then the place). */
+const PLACE_RE = /\b(\d+)(\s+)(thousand|hundred|ten|one)s?\b/gi;
+const PLACE_VAL = { thousand: 1000, hundred: 100, ten: 10, one: 1 };
+/**
+ * The number a hint's place phrases build together ("2 tens, 6 ones" -> 26), or null when it names fewer than two places
+ * (lf-roles critic r8b D3: number_word_form's grey hint '"twenty-six": 2 tens, 6 ones.' holds no "26", yet it is the whole
+ * answer). GUIDED-HINT-LEAK reads the printed hint the same way.
+ */
+export function placeBuilt(text) {
+    let sum = 0, k = 0;
+    for (const m of String(text || '').replace(/,(?=\d{3}\b)/g, '').matchAll(PLACE_RE)) { sum += Number(m[1]) * PLACE_VAL[m[3].toLowerCase()]; k++; }
+    return k >= 2 ? sum : null;
+}
+/** Do the hint's place phrases build an answer number the problem does not print? */
+const placeLeak = (t, it, given) => {
+    const b = placeBuilt(t);
+    return b !== null && !given.has(String(b)) && answerTokens(it).includes(String(b));
+};
+
+/** Does this hint text hold the problem's answer (any of answerTokens, or its place phrases built together)? */
 export function hintGivesAnswer(text, it) {
     const t = String(text || '').replace(/,(?=\d{3}\b)/g, '');
     const nums = new Set((t.match(/\d+(?:\.\d+)?/g) || []).flatMap((n) => [n, String(Number(n))]));
     const words = t.toLowerCase().replace(/[.,:;!?]/g, ' ').split(/\s+/);
     const given = givenNumbers(it);
-    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a)));
+    return answerTokens(it).some((a) => (/\d/.test(a) ? nums.has(a) && !given.has(a) : words.includes(a))) || placeLeak(t, it, given);
 }
 
 /** The numbers the problem itself prints: naming one gives nothing away ("Circle groups of 4." on 16 ÷ 4 = 4). */
@@ -694,6 +720,15 @@ export function hintOf(it) {
     const own = (t) => /\d/.test(t) || (t.match(/\b[A-Z][a-z]{2,}\b/g) || []).slice(1).some((w) => src.includes(w));
     const all = providerWorkedSteps(it, 6).map((st) => String(st.text || '').trim())
         .filter((t) => t && !/^(Write|Check|Say)\b/i.test(t) && t.length <= 70);
+    // (lf-placevalue critic live1 N1, the CLASS: a number name written as a numeral - the `words` template, words to numeral -
+    // has an answer made only of its place counts, so ANY count in a hint is an answer digit ('"two hundred": 2 in the hundreds.'
+    // under 262). Its hint is always the first step's frame with every count a gap: '"two hundred": ___ in the hundreds.')
+    const wp = (q.cell && q.cell.payload) || {};
+    if (it.template === 'words' && wp.way !== 'to_words') {
+        const first = all.find((t) => /\d/.test(t));
+        if (!first) return '';
+        return first.replace(/,(?=\d{3}\b)/g, '').replace(/\d+/g, '___').replace(/___(\s+)(thousand|hundred|ten|one)\b(?!s)/gi, '___$1$2s');
+    }
     const steps = all.filter((t) => !hintGivesAnswer(t, it));
     if (steps.length) return steps.find(own) || steps[0];
     // Every step names part of the answer (a clock's first step gives its hour): the first step
@@ -702,7 +737,10 @@ export function hintOf(it) {
     if (!all.length) return '';
     const given = givenNumbers(it);
     const toks = new Set(answerTokens(it).filter((a) => /\d/.test(a) && !given.has(a)));
-    const masked = all[0].replace(/,(?=\d{3}\b)/g, '')
+    const first = all[0].replace(/,(?=\d{3}\b)/g, '');
+    // (place phrases that build the answer - "2 tens, 6 ones" for 26 - leave their numbers as gaps: "___ tens, ___ ones",
+    // lf-roles critic r8b D3; the place word always plural, so "1 one" does not show its 1 as "___ one")
+    const masked = (placeLeak(first, it, given) ? first.replace(PLACE_RE, (m, n, sp, pl) => `___${sp}${pl}s`) : first)
         .replace(/\d+(?:\.\d+)?/g, (n) => (toks.has(n) || toks.has(String(Number(n))) ? '___' : n));
     // One sentence of it: the first with a gap ("The short hand has passed ___.").
     const frame = masked.split(/(?<=[.!?])\s+/).find((s) => s.includes('___')) || '';
@@ -726,7 +764,11 @@ export function workLinesOf(it) {
     // A fact traces only its answer, so the skip count its Steps teach ("Count by 3, 7 times:
     // 3, 6, ... 21.") is written under the Model (critic guided-r1, mult_facts: a grey 21 alone
     // over tries hinted "10 × 9 is 10 groups of 9."). Other step templates trace their working.
-    if (stepTemplateOf(it)) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    // (a number name on its answer line - `words`, not in the H T O boxes - draws no step states of its own: its Model writes the
+    // first step under it, '"fifty-three": 5 tens, 3 ones.', as the hinted tries beside it write its frame - lf-roles critic r8b D2)
+    const wordsLine = it.template === 'words' && !((it.q && it.q.cell && it.q.cell.payload) || {}).slot && ((it.q && it.q.cell && it.q.cell.payload) || {}).way !== 'to_words';
+    if (stepTemplateOf(it) && !wordsLine) return it.template === 'fact' ? steps.filter((t) => /^Count by\b/i.test(t)).slice(0, 1) : [];
+    if (wordsLine) return steps.filter((t) => !/^Write\b/i.test(t)).slice(0, 1);
     const work = steps.filter((t) => !/^Write\b/i.test(t));
     return (work.length ? work : steps).slice(0, 3);
 }
@@ -837,8 +879,14 @@ function sideLinesMm(lines, cols, m, n = 2) {
     return lines.reduce((a, t) => a + Math.max(1, Math.ceil((t.length * charMm) / colW)), 0) * lineMm;
 }
 
-const workHtml = (lines) => (lines.length
-    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '');
+/**
+ * A number name's work and hint lines keep each count with its place word on one line (lf-roles critic r8b n3: "3" at a line's
+ * end and "ones." on the next). `html` is escaped text, a gap already a span; only the `words` template's lines are glued.
+ */
+const gluePlaces = (html, it) => (it && it.template === 'words'
+    ? html.replace(/(\d+|<span class="mq-hintgap"[^>]*><\/span>) (thousands?|hundreds?|tens?|ones?)\b/g, '<span style="white-space:nowrap">$1 $2</span>') : html);
+const workHtml = (lines, it = null) => (lines.length
+    ? `<ul class="mq-worklines ws-trace" data-ws-ink="trace">${lines.map((t) => `<li>${gluePlaces(esc(t), it)}</li>`).join('')}</ul>` : '');
 
 const GUIDED_CSS = `<style data-mq-guided>
 :is(.ws-page,.ws-sheet) .mq-worklines{list-style:none;margin:2mm 0 0;padding:0;width:100%;font-size:var(--ws-text);line-height:1.25;text-align:center}
@@ -1020,7 +1068,7 @@ function withCue(html, it, stage) {
  */
 function fadeRender(it, stage, ans, { hint = true, lines = true, side = false } = {}) {
     // (`side`: a two-cell Model, its working beside the drawing - sideLinesOf, GUIDED-MODEL-SPAN)
-    const work = stage === 'model' && lines ? workHtml(side ? sideLinesOf(it) : workLinesOf(it)) : '';
+    const work = stage === 'model' && lines ? workHtml(side ? sideLinesOf(it) : workLinesOf(it), it) : '';
     const cue = (html0) => {
         const html = stage === 'model' ? modelMarks(html0, it) : html0;
         if (work && side) return `<div class="mq-workwrap"><div class="mq-spandraw">${withCue(html, it, stage)}</div>${work}</div>`;
@@ -1031,7 +1079,7 @@ function fadeRender(it, stage, ans, { hint = true, lines = true, side = false } 
     const hintLine = stage === 'partial' && hint && it.template !== 'stack' ? hintOf(it) : '';
     // A framed hint's gap ("The short hand has passed ___.") is a short grey rule, never
     // underscore characters (SL-6).
-    const hintHtml = esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>');
+    const hintHtml = gluePlaces(esc(hintLine).replace(/_{3}/g, '<span class="mq-hintgap" aria-label="gap"></span>'), it);
     const withHint = (html) => `<div class="mq-workwrap">${html}<div class="mq-hintline ws-trace" data-ws-ink="trace">${hintHtml}</div></div>`;
     return (c, o) => {
         if (c.state !== 'blank') {
@@ -1128,7 +1176,9 @@ export function plan(input = {}) {
             })
             // A fact page (factRows): the tries beside the Model start where the Model's fact starts, under the tab's keep-out,
             // so the facts of the Model's row line up and each try's hint ends near the Model's (H13 under the try).
-            : facts && stage === 'partial' && !fit.span && i < cols
+            // (and a `guidedTight` number name - lf-roles critic r8b n6: the row-1 names sat a tab's keep-out above the Model's, and
+            // the hinted tries kept that height as a 28-30 % band under their hint)
+            : (facts || guidedTight([it])) && stage === 'partial' && !fit.span && i < cols
                 ? Object.assign({}, it, { cellStyle: [it.cellStyle || '', 'padding-top:calc(var(--ws-tab,6mm) + 1.5mm)'].filter(Boolean).join(';') })
                 : it;
         // (guided-tight-rows, lf-roles r8a: a `tightRows` try's row is its MEASURED height, which carries the label spacer and
@@ -1178,7 +1228,7 @@ export function plan(input = {}) {
         // (lf-placevalue compare r3, step 4: a `tightRows` host - in-place one-line cells - whose Model shares its row with the
         // hinted tries reserves the larger of the two, never their sum: the Model takes its tab's clearance, the tries their hint
         // line, side by side in one row; the sum left compare's Model row 38 mm at M for 10 mm of ink, EB-BAND)
-        const tightAdd = tightRows(use.slice(at, at + chunk.length));
+        const tightAdd = guidedTight(use.slice(at, at + chunk.length));
         const add = (r) => (pi === 0 && nModels > 1 ? mixRowAdd(r, cols, nModels, partialEnd, pg.extra || 0, fit.hint)
             : tightAdd && r === 0 && r === hintRow && !spanHere ? Math.max(pg.extra || 0, fit.hint)
             : (r === 0 ? pg.extra || 0 : 0) + (r === hintRow ? (facts && r === 0 ? Math.max(0, fit.hint - (pg.extra || 0)) : fit.hint) : 0));
@@ -1201,7 +1251,7 @@ export function plan(input = {}) {
         // (`tightRows` - layout.tightRows, lf-placevalue pv debt via the lead: in-place rows held to their ink keep their own
         // height here too, the spare height under the grid - compare's tries were stretched 31-38 % past their ink, EB-BAND;
         // it wins over evenRows only where the host sets tightRows - lead 2026-11-13)
-        const tight = tightRows(host);
+        const tight = guidedTight(host);
         let Hr = w.map((x, r) => (tight ? x : facts ? x + (tF[r] - x) * lam : Math.max(x, Math.min(kPage * x, rowLimit(mins[r])))));
         let modelRow = null;
         // GUIDED-MODEL-ROW (lf-roles r8b (a), lead via the coordinator; lf-builds chart_to_120 Guided M / L, EB-BAND 42 % / 36 %): the

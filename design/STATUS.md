@@ -834,3 +834,25 @@ for all of them was built and then reverted from the Steps-box / hint branch; se
 - placevalue:compare passes the 8/10 redesign on every page type and screen host; also number_word_form (earlier pass), the pv debt fixes, the CL-2c / CL-4d / PT-ENG-6 rulings with their checks, identify-heads off on the Prerequisite Check, screen text sizes.
 - Lead fixes at the deploy merge: ws-pv-identify-heads defaults to M,L (no size S); ws-screen-ink-size kept as master's copy (w2 had carried an unchecked WIP copy with 390 lines); backtest row pv-screen-text-size set PENDING until lf-hosts lands TEXT-SIZE.
 - Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, roles-unit, empty-band self-test, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, precritic-plan (234) + checks-from-critics, capacity-pin (0 drops), lesson baseline M,L 4242,1 (1772 identical).
+
+## 2026-11-13 — Content hotfix P-WP-19: story pronouns agree with the name (lf-algebra)
+- Six story templates (tape_diagram, tape_diagram_plain, write_equation, write_equation_story, multi_step_word +/- path) now repeat the name instead of a fixed he / she. ws-story-pronouns on precritic (727 skills, 21,810 items OK); backtest story-pronouns-p-wp-19 PASS; lesson baseline 1772 identical.
+- ws-tape-diagram.mjs (unwired, defaulted to size S) left out of this deploy; lf-algebra brings it with M,L.
+
+## 2026-11-13 — Deploy screen fixes (lf-hosts critic r3 PASS 8/8/8/8 on card, worksheet, quiz at 820/1024/1280/1366) + TOUCH-HIT de-flake (lf-checks critic PASS 9/9/8/8)
+- Word-problem answer boxes: a 48 px touch area owned by its own box (drawn boxes unchanged); add_wp_20 bottom-edge taps land; the practice card carries [data-ws-cell].
+- Checks: CELL-READ in 4 tools; TOUCH-TARGET / TOUCH-UNIQUE / TOUCH-HIT (real taps; now re-reads the tap point after 2 rAF and fails only a repeated miss) / FOCUS-RING; ws-worksheet-reflow (WS-REFLOW 1.5 px x tolerance); ws-screen-widths-plan; ink-size TEXT-SIZE; ws-touch-diff.
+- pv-screen-text-size un-pended (TEXT-SIZE present; row PASS).
+- Gates: boot-smoke, code-snapshot (734), redesign-passed (30), no-size-s, no-phone-width, screen-widths-plan, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test + touch / reflow rows, precritic self-test, precritic-plan + checks-from-critics, capacity-pin (0 drops), lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy custom page titles (owner request; lf-roles re-critic r2 PASS: pages 9/9/8/9, both dialogs 9/9/8/9) + precritic verdict-parser fix (lf-checks)
+- Print dialogs: the teacher can write the page title and place it below (default) or above the Name / Date / Score line; long titles wrap to two lines with a cut warning; the choice travels with share codes (old codes unchanged). Default pages are byte-identical (196 hashes). WDS HD-10 amended, HD-14a added; pageHeader(h) exported for the anchor-chart Name / Date line (lf-engine).
+- Owner note T3: on a two-line title the descenders sit 0.7–0.85 mm above the rule (critic accepted; the alternative costs a row of problems).
+- Precritic reads "tool --mode: OK" verdicts; ws-copy-light no longer truncates its verdict through a pipe (process.exitCode). Rows precritic-mode-verdict, copy-light-pipe-verdict.
+- Gates: boot-smoke, code-snapshot, redesign-passed, no-size-s, no-phone-width, frame-title (196), title-code, frame-title-ui, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, backtest self-test, precritic self-test, precritic-plan + checks-from-critics, capacity-pin, lesson baseline 1772 identical.
+
+## 2026-11-14 — Deploy pv live1 (lf-placevalue; expand + unit_form critic r2 PASS)
+- placevalue:expand: worksheet back to one line (boxes 103x76, 2 columns at 1280), card numerals 56 px, quiz / worksheet touch targets >= 48 px. placevalue:unit_form: worksheet boxes 50 px.
+- Global screen rule: a boxed answer slot (.mq-cellbox holding input.mq-cellslot) is at least 50 px tall (border-box: 48 px of input). 30-skill passed sweep: no non-pv screen changed.
+- number_word_form Guided D2-D4 and hint-gap fixes (equal or better on every changed page; not yet passed: one-kind root cause on live2).
+- Gates: code-snapshot, no-size-s, roles-unit, simple-print, screen-answer, pdf-preview, teacher-wrm, vocab-unit, backtest self-test, capacity-pin, frame-title (196), screen-widths-plan; lane: redesign-passed 30, precritic-plan, no-phone-width, boot-smoke, lesson baseline 1772 identical.
