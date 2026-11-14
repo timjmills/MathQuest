@@ -29,7 +29,9 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const TOOL = 'ws-merge-master';
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+// the repository you RUN it in (the current directory's work tree), never the one the script file lives in: a lane may run
+// another checkout's copy (found the hard way: run from a sibling worktree, it merged into the script's own tree)
+const ROOT = (() => { try { return execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: process.cwd(), encoding: 'utf8' }).trim(); } catch (e) { return resolve(dirname(fileURLToPath(import.meta.url)), '..', '..'); } })();
 const args = process.argv.slice(2);
 const val = (k, d) => { const i = args.indexOf(k); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
@@ -135,12 +137,13 @@ function main() {
         left.push(f);
     }
     for (const [label, cmd] of regen) {
-        const r = spawnSync(process.execPath, cmd, { cwd: ROOT, encoding: 'utf8', timeout: 300000 });
+        const r = spawnSync(process.execPath, cmd, { cwd: ROOT, encoding: 'utf8', timeout: 300000 });   // the merged tree's own generator
         console.log(`  regen  node ${label}: ${r.status === 0 ? 'OK' : `exit ${r.status}`}`);
         if (r.status !== 0) left.push(`regenerate: node ${label} failed`);
         for (const g of Object.keys(GENERATED)) if (GENERATED[g].join(' ') === label && existsSync(resolve(ROOT, g))) git(['add', g]);
     }
-    const cm = spawnSync(process.execPath, ['tests/scripts/ws-conflict-markers.mjs'], { cwd: ROOT, encoding: 'utf8' });
+    const cmTool = existsSync(resolve(ROOT, 'tests/scripts/ws-conflict-markers.mjs')) ? 'tests/scripts/ws-conflict-markers.mjs' : resolve(dirname(fileURLToPath(import.meta.url)), 'ws-conflict-markers.mjs');
+    const cm = spawnSync(process.execPath, [cmTool], { cwd: ROOT, encoding: 'utf8' });
     const cmLine = String(cm.stdout || '').trim().split('\n').pop();
     console.log(`  ${cmLine}`);
     if (cm.status !== 0) left.push('conflict markers remain (ws-conflict-markers)');

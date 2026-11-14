@@ -807,3 +807,5 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
 - Proof: `--self-test` (7 cases) is a deploy session-1 gate; a replay of the real lf-tools-roles merge (d47f0c59e +
   369173bc2: 3 conflicted files) produced exactly the hand-resolved 577b111da (backtests 486 rows, ledger and status
   identical).
+- Fix (found on first real use): ws-merge-master took its ROOT from the script's own location, so running another
+  checkout's copy merged into the script's tree. ROOT is now `git rev-parse --show-toplevel` of the current directory.
