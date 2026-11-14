@@ -124,7 +124,23 @@ const stepWords = (steps) => {
     return `by ${steps.length === 1 ? stepS(steps[0]) : `${steps.slice(0, -1).map(stepS).join(', ')} and ${stepS(steps[steps.length - 1])}`}`;
 };
 
+// The roles "All rows on one page" prints on (count-row card, signed; critic cbt r2 E8).
+const ONE_PAGE_ROLES = new Set(['independent', 'more-practice', 'test', 'test-a', 'test-b']);
 registerSkill('multiplication:count_by_tables', {
+    // The Pre-skill check's four prerequisites (critic cbt r2 E2: the earlier-skill fallback found one, number_seq_fill, and
+    // drew one quadrant on a 75 % empty page - PT-PRE-1 wants four). Nearest first (the role prints them reversed): add a
+    // jump within 20 (routine step 2), then the counts by 10s, 5s and 2s the tables extend. Every one writes in BOXES - one
+    // writing-place shape on the page (critic cbt r1 / r2 m2: number_seq_fill's default mixes circles and hexagons).
+    preSkills: () => [
+        { categoryId: 'addition', skillId: 'add_facts', opts: { band: 20 } },
+        { categoryId: 'counting', skillId: 'number_seq_fill', opts: { step: 10, dir: 'forward', shape: 'box' } },
+        { categoryId: 'counting', skillId: 'number_seq_fill', opts: { step: 5, dir: 'forward', shape: 'box' } },
+        { categoryId: 'counting', skillId: 'number_seq_fill', opts: { step: 2, dir: 'forward', shape: 'box' } },
+    ],
+    // "All rows on one page" belongs to the roles the card lists for it - Independent, More practice and Test (critic cbt r2
+    // E8: it leaked into the lesson's anchor chart, one 13 pt line of 12, and into Guided, 9 compact rows with 9 mm boxes).
+    // Every other role draws the rows as if it were off.
+    roleOpts: (role, opts) => (opts && opts.onePage && !ONE_PAGE_ROLES.has(role) ? Object.assign({}, opts, { onePage: false }) : opts),
     // The "I Can" line follows the row's length (12 or 15 jumps), the typed step, the direction and a typed start:
     // derived from the item (or the section's options), never fixed.
     strings: stringsBy((q, ref = {}) => {

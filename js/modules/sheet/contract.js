@@ -47,6 +47,9 @@ export const OPTIONAL_MEMBERS = Object.freeze([
     // first, when data.js order would give the wrong ones (lf-vocab r9: a picture vocabulary task checked four Grade 6
     // definition-matching skills). Absent: the role takes the skills listed before it (print-sheet.js earlierSkills).
     'preSkills',
+    // `preSkillsWhy: '...'`: why a hand-named preSkills list checks fewer than three skills (ws-node-lint PRE-QUADRANTS, critic
+    // cbt r2 E2: a list of one drew one quadrant on a 75 % empty page). Absent: the list names three or more.
+    'preSkillsWhy',
     // `roleOpts(role, opts) -> opts`: the skill's option values on one page role, when a support must follow the role (lead
     // ruling, PEDAGOGY 4.1a, lf-placevalue 2026-11-13: identify's place heads give the answer - the place name - so the
     // unaided roles Review / Test / pre-skill check, on paper and in the quiz, drop them). Absent: the opts as chosen.

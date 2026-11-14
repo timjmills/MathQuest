@@ -78,6 +78,7 @@ export function vocabPreSkills(sk = {}) {
 registerSkill('vocabulary:vocab_grade_pictures', {
     supports: Object.freeze([]),
     preSkills: vocabPreSkills,
+    preSkillsWhy: 'Two at most, so the check is one page at M and L (PT 2.10): the steps under this task in its own routine.',
     strings: vocabStrings,
     misconceptions: ['look-alike-swap', 'sound-not-meaning'],
     workedSteps: (q) => {

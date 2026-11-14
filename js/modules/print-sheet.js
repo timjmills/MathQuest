@@ -4464,7 +4464,8 @@ function settleMixedGrades(metas, items) {
 // (critic cbt r1 m4, PT-REV-3: an earlier step is one the skill BUILDS ON. Listed before count_by_tables in its category are the
 // multiply-by-10s skills - its Review mixed in 8 x 100 and 80 x 7. A skill named here takes these as its earlier steps.)
 const EARLIER_STEPS = Object.freeze({
-    'multiplication:count_by_tables': [{ categoryId: 'counting', skillId: 'number_seq_fill' }],
+    // (critic cbt r2 m2: in boxes - number_seq_fill's default mixes circles and hexagons beside the count rows' boxes)
+    'multiplication:count_by_tables': [{ categoryId: 'counting', skillId: 'number_seq_fill', opts: { dir: 'forward', shape: 'box' } }],
 });
 function earlierSkills(sk, count = 1, { fallback = false } = {}) {
     const fixed = EARLIER_STEPS[`${sk.categoryId}:${sk.skillId}`];
