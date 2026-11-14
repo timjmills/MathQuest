@@ -794,3 +794,8 @@ Checks first; each finding FAILs on c81e70178 and PASSes on 6b59329af.
   precritic-copy-light-role-cover-size: all PASS; role-cover-cbt-e3-e5-e6 and precritic-role-cover-plan re-run PASS.
 - N1 (numbers masked whole) not addressed.
 - checks-from-critics: 194 -> 197 pass, 14 fail (unchanged).
+
+## 2026-11-14 - ws-tof-stem sweep hardening (deploy timeouts)
+- ws-tof-stem.cjs now sweeps skill by skill: browser restart every 40 skills (--restart-every) and on crash/timeout, protocolTimeout 120 s (ws-harness open() option), one retry per skill, a skill lost twice is a FAIL. Verdict lines unchanged; new `sweep:` line (restarts, retried, seconds).
+- Backtest `tof-stem-retry` (MQ_TOF_CRASH_AT=2): crash retried, 4/4 measured. CHECKS_FROM_CRITICS row added.
+- Full sweep: 728 skills measured 728, 18 restarts, 0 retries, 348 s, ws-tof-stem: OK.

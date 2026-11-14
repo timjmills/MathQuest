@@ -11180,6 +11180,26 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "tof-stem-retry",
+   "check": "ws-tof-stem sweep survives a browser crash mid-sweep: the skill is retried once in a fresh browser and every skill is still reported (deploy timeouts 2026-11-14)",
+   "kind": "commit-pair",
+   "rule": "ws-tof-stem restart / retry (MQ_TOF_CRASH_AT)",
+   "browser": true,
+   "fail": {
+    "commit": "448bc5e74",
+    "state": "one evaluate over every skill: no restart, no retry, no sweep line"
+   },
+   "pass": {
+    "commit": "HEAD",
+    "state": "crash at skill 2 retried; 4 of 4 measured"
+   },
+   "command": "MQ_TOF_CRASH_AT=2 node tests/scripts/ws-tof-stem.cjs --skills multiplication:count_by_tables,addition:add_within_10,subtraction:subtract_within_10,multiplication:multiply --restart-every 2",
+   "expect": {
+    "fail": "ws-tof-stem: OK",
+    "pass": "measured 4, browser restarts 2, retried 1"
+   }
   }
  ]
 }
