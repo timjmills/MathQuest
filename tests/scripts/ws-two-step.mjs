@@ -37,6 +37,9 @@
 //              page composes on every two-step skill at M and L (seeds 7, 11): buildSheet does not refuse the skill and the page holds an
 //              item, so a wrong shown value fits the answer box it is written in (the ÷-last step's wrong operation, 27 x 3 = 81, did not fit
 //              the one-digit quotient box, so the role rejected every add_then_div item and the page came out empty)
+//   STEP-ALIGN (--align, browser; lead 2026-11-14 on the STEP-FORM Opener: Step 2 stood ~80 px above Step 1) in a two-step cell whose two
+//              steps are both fact sentences, the two step blocks top-align and their sentences sit on one line (tops within 1 mm), on
+//              the Opener, Guided and Independent pages and the key at M / L
 //   STEP-FORM  (owner 2026-11-14) a basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) of a column two-step
 //              story is a horizontal number sentence (mq-wwfact), never columns or a long-division frame; any other step keeps its frame
 //   LDIV-JOIN  (--ldiv, browser; owner 2026-11-14, lf-ops' rule) where a two-step step still draws long division (a synthetic 84 ÷ 4
@@ -63,6 +66,7 @@ if (!mine.length) { console.log(`${TOOL}: OK (n/a: no two-step skill in scope)`)
 if (args.includes('--print')) await printMode();
 if (args.includes('--ea')) await eaMode();
 if (args.includes('--ldiv')) await ldivMode();
+if (args.includes('--align')) await alignMode();
 
 const { loadApp, fnv } = await import(pathToFileURL(join(HERE, 'ws-card-rulings.mjs')).href);
 const app = await loadApp(ROOT);
@@ -458,5 +462,55 @@ async function ldivMode() {
     console.log(`LDIV-JOIN ${out.length ? `FAIL ${out.length}` : 'PASS'}`);
     for (const f of out) console.log(`  LDIV-JOIN ${f}`);
     console.log(out.length ? `${TOOL}: FAIL (--ldiv: ${out.length} finding(s))` : `${TOOL}: OK (--ldiv: LDIV-JOIN, ${judged} frame(s))`);
+    process.exit(out.length ? 1 : 0);
+}
+
+// STEP-ALIGN (--align, browser; lead 2026-11-14: on the STEP-FORM Opener Model Step 2 stood ~80 px higher than Step 1 - the step
+// row aligned the blocks' FEET, and Step 2's block is taller (two-line question, the unit bank)). In a cell whose two steps are both
+// fact sentences, the step blocks' tops and the sentences' tops each agree within 1 mm, pupil page and key, at M / L.
+async function alignMode() {
+    if (ROOT !== resolve(join(HERE, '..', '..')) && !process.env.MQ_ROOT) process.env.MQ_ROOT = ROOT;
+    const H = createRequire(import.meta.url)(join(HERE, '..', 'lib', 'ws-harness.cjs'));
+    const SIZES = String(arg('--sizes', 'M,L')).split(',').map((x) => x.trim()).filter(Boolean);
+    const ROLES_A = String(arg('--roles', 'opener,guided,independent')).split(',').map((x) => x.trim()).filter(Boolean);
+    const out = [];
+    let judged = 0;
+    const app = await H.open({});
+    try {
+        await app.page.waitForFunction(() => typeof window.buildSheet === 'function', { timeout: 60000 });
+        for (const key of mine) for (const role of ROLES_A) for (const size of SIZES) {
+            const sk = key.split(':')[1];
+            const r = await app.page.evaluate(async (a) => {
+                let s;
+                try { s = await window.buildSheet({ role: a.role, sections: [{ skills: [{ categoryId: 'algebra', skillId: a.sk }], columns: 'auto' }], size: a.size, look: 'auto', paper: 'A4', seed: 7, form: 'A', key: true }); } catch (e) { return { err: String(e && e.message || e) }; }
+                await document.fonts.ready;
+                const mm = (px) => px / 96 * 25.4;
+                const res = [];
+                for (const [which, html] of [['pupil', s.pupilHtml || ''], ['key', s.keyHtml || '']]) {
+                    const d = document.createElement('div'); d.innerHTML = html; document.body.appendChild(d);
+                    for (const c of d.querySelectorAll('.mq-ww')) {
+                        const steps = [...c.querySelectorAll('.mq-wwstep')];
+                        if (steps.length !== 2 || steps[0].parentElement !== steps[1].parentElement) continue;
+                        const facts = steps.map((x) => x.querySelector('.mq-wwfact'));
+                        if (!facts[0] || !facts[1]) continue;
+                        const t = steps.map((x) => x.getBoundingClientRect());
+                        if (Math.abs(t[0].top - t[1].top) > 0 && t[1].left < t[0].right - 1) continue;   // wrapped onto two rows: not side by side
+                        const f = facts.map((x) => x.getBoundingClientRect());
+                        res.push({ which, block: mm(Math.abs(t[0].top - t[1].top)), sent: mm(Math.abs(f[0].top - f[1].top)) });
+                    }
+                    d.remove();
+                }
+                return { res };
+            }, { sk, role, size });
+            if (r.err) { out.push(`STEP-ALIGN ${sk} ${role} ${size}: buildSheet threw ${r.err}`); continue; }
+            for (const x of r.res) {
+                judged++;
+                if (x.block > 1 || x.sent > 1) out.push(`STEP-ALIGN ${sk} ${role} ${size} ${x.which}: Step 1 / Step 2 stagger - blocks ${x.block.toFixed(1)} mm, sentences ${x.sent.toFixed(1)} mm apart (<= 1 mm)`);
+            }
+        }
+    } finally { await app.close(); }
+    console.log(`STEP-ALIGN ${out.length ? `FAIL ${out.length}` : 'PASS'} (${judged} fact-pair cell(s) judged)`);
+    for (const f of out.slice(0, 30)) console.log(`  ${f}`);
+    console.log(out.length ? `${TOOL}: FAIL (--align: ${out.length} finding(s))` : `${TOOL}: OK (--align: STEP-ALIGN, ${judged} cell(s))`);
     process.exit(out.length ? 1 : 0);
 }
