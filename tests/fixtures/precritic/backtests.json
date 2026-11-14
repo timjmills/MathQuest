@@ -8690,6 +8690,25 @@
     "fail": "FAIL",
     "pass": "OK"
    }
+  },
+  {
+   "id": "two-step-step-form",
+   "check": "ws-two-step STEP-FORM: a two-step column story's basic-fact step (+ / − within 20 no regrouping, × / ÷ in the 10 x 10 facts) is a horizontal number sentence (mq-wwfact) on paper (levels 3 and 0, blank and key) and on screen; any other step keeps its frame",
+   "kind": "commit-pair",
+   "rule": "ws-two-step STEP-FORM (owner 2026-11-14 via the lead: \"6 + 4 = [ ]\", \"10 ÷ 2 = [ ]\", the stray carry box over 6 + 4 on the add_then_div Opener Model)",
+   "fail": {
+    "commit": "d92f11216",
+    "state": "fact steps drawn as columns (a carry box over 6 + 4) and as long-division frames (24 ÷ 6, 10 ÷ 2)"
+   },
+   "pass": {
+    "commit": "22f10586f",
+    "state": "fact steps drawn as [a] (sign) [b] = [answer]; columns / long division only for non-fact steps"
+   },
+   "command": "node tests/scripts/ws-two-step.mjs --root {root} --rules STEP-FORM",
+   "expect": {
+    "fail": "FAIL",
+    "pass": "OK"
+   }
   }
  ]
 }

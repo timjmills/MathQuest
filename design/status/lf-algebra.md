@@ -9,6 +9,15 @@ Builder profile: mq-opus-medium
 Critic rounds: 2 (r1 2026-11-13: all six FAIL; fix r8. r2 2026-11-13: no skill passes, notice clean on its graded pages; fix r10)
 
 ## Now
+- 2026-11-14 STEP-FORM (owner via lead; then BUDGET STOP): check ws-two-step STEP-FORM + --ldiv LDIV-JOIN d92f11216 (both FAIL there),
+  fix 22f10586f (fact steps = horizontal sentence [a] (sign) [b] = [answer]; one-step stories unchanged), step row wraps when it
+  cannot fit (print-lint PG-12 0.3-1.6 mm at L on mult_div_first / add_then_mult -> 0); backtest two-step-step-form PASS
+  (commit-pair, not a fixture row). PNGs: scratchpad stepform-before/ and stepform-after/ (add_then_div opener M).
+  Red, by owner: LDIV-JOIN (4: bracket 4-5 mm from its bar, M / L, print / screen) - lf-ops bracketSvg helper pending, then
+  word-work's ÷ frame switches to it; print-lint ratchet add_then_div L-DENSITY PAGEFILL 0 -> 1 (independent L: the shorter fact
+  sentences leave a 52 mm strip, 22 %) - NOT re-pinned (a rise; role capacity lf-roles or a lead ruling). Precritic r13 partial
+  (shards A / N / D / B / C ran on scratch merge 7a750466b BEFORE STEP-FORM; re-run needed). Skipped by the budget stop: r13
+  re-run, the options-verify --render capacity rulings, grade-render TARGET tool disagreement, lesson overflow (lf-engine).
 - 2026-11-13 two-step round 3b (mq-opus-medium, resumed after a container restart). **CARD FOR THE LEAD TO SIGN: f05e43ed9**
   (design/cards/two-step regenerated --resign on top of 05c23756c, UNSIGNED; also check the reason-it "provider stories" line).
   Step 0 (lead ruling): band 50 hidden on two_step_mult_div_first / two_step_add_then_mult too. Check first 6b00bb989
