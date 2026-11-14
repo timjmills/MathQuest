@@ -51,6 +51,7 @@ export const ROLE_ID = 'error-analysis';
 // The item and its judgement centre in a cell the page's row stretches (the cell's height is the page's, not the item's): the
 // white splits above and below, never one band under short work (critic r2 N3: unit_form S/M 32-33 %, value S 40 %; owner CL-4b)
 const CENTRE = 'flex:0 0 auto;margin-top:auto;margin-bottom:auto';
+const TOP = 'flex:0 0 auto;margin-top:0;margin-bottom:auto';
 // The work's first element keeps no top margin (a stack's 5 mm): the "<Name> wrote:" label sits over the work's INK, not over an
 // empty margin (critic r4 n1, lead 2026-11-13: PUPILTAG measured on ink, 1.5-4 mm; the label floated 6-9 mm over stacks)
 const noLeadMargin = (html) => String(html).replace(/^(\s*<(?!svg)[a-z][a-z0-9]*\b)([^>]*)>/i, (m, tag, attrs) => (/\sstyle="/.test(attrs)
@@ -792,7 +793,10 @@ export function prepare(it, info = {}) {
         // judgement against the cell's right padding: the judgement column GREW into the free width (flex-grow 1) and its boxes
         // started right after the work, 69.5 vs 131.5 mm beside a 4- and an 8-term train; ws-cell-checks EA-ROWX, root cause r16)
         const judgeAt = !story && !widen && kind === 'redo' ? judge.replace('<div class="mq-judge-row ', '<div style="flex:0 0 auto;margin-left:auto" class="mq-judge-row ') : judge;
-        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${CENTRE}${spread}">`
+        // (critic cbt r2 E6, CL-4b: a REDO item - a count row and its fix line - starts at the top of its box; centred, the row stood
+        // ~16 mm under the cell's top at M (L-TOPSTART). Other kinds stay centred.)
+        const vAt = kind === 'redo' ? TOP : CENTRE;
+        return `<div class="mq-judge mq-judge3${ask}${modeCls}${drawnJudge ? ' mq-judge-drawn' : ''}"${mode ? ` data-judge-mode="${mode}"` : ''} style="--mq-jw:${Math.round(judgeMin(c.size))}mm;${vAt}${spread}">`
             + shownWork
             + judgeAt
             + (below ? fix : '')
