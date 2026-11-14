@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>On-screen keypad mock</title>
+<!-- The app's real CSS (same order as index.html). The keypad rules below are the PROPOSED css/keypad.css. -->
+<link rel="stylesheet" href="../../../../css/brand.css">
+<link rel="stylesheet" href="../../../../css/variables.css">
+<link rel="stylesheet" href="../../../../css/base.css">
+<link rel="stylesheet" href="../../../../css/ui-components.css">
+<link rel="stylesheet" href="../../../../css/skill-progress.css">
+<link rel="stylesheet" href="../../../../css/fonts/andika.css">
+<link rel="stylesheet" href="../../../../css/screen-cell.css">
+<link rel="stylesheet" href="../../../../css/teacher.css">
+<link rel="stylesheet" href="../../../../css/teacher-tokens.css">
+<link rel="stylesheet" href="../../../../css/play-teacher.css">
+<style>
+/* ---- mock-only scaffolding (not part of the proposal) ---- */
+body { margin: 0; padding: 0 !important; }
+.container { max-width: none; padding: 16px 24px; box-sizing: border-box; }
+.view { display: block !important; animation: none !important; }
+.scene { display: none; }
+body[data-scene="class"] .scene-class,
+body[data-scene="sign"] .scene-sign,
+body[data-scene="fraction"] .scene-fraction { display: block; }
+/* the B&W paper cell, as screen-cell.js draws it (Andika, black on white, boxed) */
+.mk-cell { background: #fff; color: #000; border: 2px solid #000; border-radius: 4px; padding: 20px 28px 28px;
+  font-family: "Andika", sans-serif; text-align: left; }
+.mk-instr { font-size: 28px; line-height: 1.3; margin: 0 0 18px; }
+.mk-eq { font-size: 64px; line-height: 1.1; display: flex; align-items: center; justify-content: center; gap: 18px; padding: 10px 0 6px; }
+.mk-box { display: inline-flex; align-items: center; justify-content: center; width: 1.5em; height: 1.2em; border: 3px solid #000; border-radius: 4px; box-sizing: border-box; position: relative; }
+.mk-box.is-focus { outline: 4px solid #2b6cb0; outline-offset: 3px; }
+.mk-box.is-focus::after { content: ""; position: absolute; left: 50%; top: 18%; bottom: 18%; width: 3px; background: #000; animation: none; }
+.mk-circle { display: inline-block; width: 1.05em; height: 1.05em; border: 3px solid #000; border-radius: 50%; box-sizing: border-box; position: relative; }
+.mk-circle.is-focus { outline: 4px solid #2b6cb0; outline-offset: 3px; }
+.mk-frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; }
+.mk-frac .bar { width: 1.2em; border-top: 4px solid #000; margin: 6px 0; }
+.mk-frac .mk-box { width: 1.2em; height: 1.05em; }
+.mk-signbank { display: flex; gap: 12px; justify-content: center; margin-top: 18px; }
+.mk-signbank span { width: 56px; height: 56px; border: 2px solid #000; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 34px; }
+.mk-note { font: 600 13px/1.3 Manrope, system-ui, sans-serif; color: #555; margin-top: 10px; text-align: center; }
+
+/* =====================================================================
+   PROPOSED css/keypad.css  (ADDITIVE ONLY: new .mq-kp* classes, plus a
+   host wrapper class added by keypad.js; nothing existing is restyled)
+   ===================================================================== */
+.mq-kp-host { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; }
+.mq-kp { --kp-key: 56px; --kp-gap: 8px;
+  display: grid; grid-template-columns: repeat(var(--kp-cols, 3), var(--kp-key)); gap: var(--kp-gap);
+  padding: 12px; background: #fff; border: 1px solid #c8ccd2; border-radius: 12px; align-content: start;
+  user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.mq-kp[data-extra] { --kp-cols: 4; }
+.mq-kp-key { width: var(--kp-key); height: var(--kp-key); box-sizing: border-box; margin: 0; padding: 0;
+  border: 2px solid #000; border-radius: 10px; background: #fff; color: #000; cursor: pointer;
+  font: 400 calc(var(--kp-key) * 0.52)/1 "Andika", sans-serif; display: inline-flex; align-items: center; justify-content: center; }
+.mq-kp-key:active { background: #e6e6e6; }
+.mq-kp-key--op { background: #f2f2f2; }                      /* the one grey: the extra keys this question needs */
+.mq-kp-key--wide { width: auto; grid-column: span 2; }
+.mq-kp-key--del { font-family: Manrope, system-ui, sans-serif; font-size: calc(var(--kp-key) * 0.4); font-weight: 700; }
+.mq-kp-key--next { font-family: Manrope, system-ui, sans-serif; font-size: calc(var(--kp-key) * 0.3); font-weight: 700; }
+.mq-kp-check { grid-column: 1 / -1; width: auto; height: calc(var(--kp-key) * 1.1); border-color: #1f5f3a; background: #1f7a45; color: #fff;
+  font: 700 calc(var(--kp-key) * 0.4)/1 Manrope, system-ui, sans-serif; gap: 10px; }
+.mq-kp-check:active { background: #17603a; }
+.mq-kp-toggle { font: 600 15px/20px Manrope, system-ui, sans-serif; height: 44px; padding: 0 14px; border: 1px solid #c8ccd2; border-radius: 8px; background: #fff; color: #1a1d21; cursor: pointer; }
+.mq-kp-toggle[aria-pressed="true"] { border-color: #1a1d21; box-shadow: inset 0 0 0 1px #1a1d21; }
+/* class view: keys >= 64 px (72 at >= 1200 px wide) */
+body.teacher-mode #gameView .mq-kp { --kp-key: 72px; --kp-gap: 10px; padding: 14px; }
+@media (max-width: 1199px) { body.teacher-mode #gameView .mq-kp { --kp-key: 66px; --kp-gap: 8px; } }
+/* below the card when the side column would squeeze the card under 560 px (tablet portrait) */
+@media (max-width: 899px) { .mq-kp-host { grid-template-columns: minmax(0, 1fr); } .mq-kp { justify-self: center; } }
+</style>
+</head>
+<body class="teacher-mode" data-scene="class">
+<div class="container">
+
+<!-- ========== Scene 1: CLASS VIEW, Boss Battle, "6 + 4 = [ ]" ========== -->
+<div class="scene scene-class">
+  <div class="view active" id="gameView">
+    <div class="game-header">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn btn-sm btn-secondary">Exit</button>
+        <span style="font-weight:800;">3 Correct</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span style="font-weight:800;">Add within 10</span>
+        <button class="mq-kp-toggle" aria-pressed="true" title="On-screen keypad">Keypad: On</button>
+      </div>
+    </div>
+    <div class="boss-status" style="display:block">Keep answering to defeat the boss!</div>
+    <div class="boss-arena" style="display:block; height:90px;">
+      <div class="char-sprite hero" style="left:22%">🦸</div>
+      <div class="char-sprite monster">🦖</div>
+      <div class="boss-track"></div>
+    </div>
+    <div class="mq-kp-host" style="margin-top:14px">
+      <div class="question-card" style="padding:22px">
+        <div class="mk-cell">
+          <p class="mk-instr">Add.</p>
+          <div class="mk-eq"><span>6</span><span>+</span><span>4</span><span>=</span><span class="mk-box is-focus"></span></div>
+        </div>
+      </div>
+      <div class="mq-kp" role="group" aria-label="On-screen keypad">
+        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button>
+        <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button>
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button>
+        <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button>
+        <button class="mq-kp-key mq-kp-check">✓ Check</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Scene 2: PRACTICE CARD, sign question ========== -->
+<div class="scene scene-sign">
+  <div class="view active" id="practiceSign">
+    <div class="game-header">
+      <div style="display:flex; gap:10px; align-items:center;"><button class="btn btn-sm btn-secondary">Exit</button><span style="font-weight:800;">Practice</span></div>
+      <div style="display:flex; gap:10px; align-items:center;"><span style="font-weight:800;">Missing sign</span><button class="mq-kp-toggle" aria-pressed="true">Keypad: On</button></div>
+    </div>
+    <div class="mq-kp-host" style="margin-top:18px">
+      <div class="question-card" style="padding:22px">
+        <div class="mk-cell">
+          <p class="mk-instr">Write the missing sign.</p>
+          <div class="mk-eq"><span>7</span><span class="mk-circle is-focus"></span><span>3</span><span>=</span><span>10</span></div>
+          <div class="mk-signbank"><span>+</span><span>−</span><span>×</span><span>÷</span></div>
+          <div class="mk-note">The sign tiles on the card stay as they are; the keypad adds the same signs in its grey column.</div>
+        </div>
+      </div>
+      <div class="mq-kp" data-extra="sign" role="group" aria-label="On-screen keypad">
+        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key mq-kp-key--op" aria-label="plus">+</button>
+        <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button><button class="mq-kp-key mq-kp-key--op" aria-label="minus">−</button>
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><button class="mq-kp-key mq-kp-key--op" aria-label="times">×</button>
+        <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button><button class="mq-kp-key mq-kp-key--op" aria-label="divided by">÷</button>
+        <button class="mq-kp-key mq-kp-check">✓ Check</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Scene 3: PRACTICE CARD, fraction question ========== -->
+<div class="scene scene-fraction">
+  <div class="view active" id="practiceFrac">
+    <div class="game-header">
+      <div style="display:flex; gap:10px; align-items:center;"><button class="btn btn-sm btn-secondary">Exit</button><span style="font-weight:800;">Practice</span></div>
+      <div style="display:flex; gap:10px; align-items:center;"><span style="font-weight:800;">Add fractions, same denominator</span><button class="mq-kp-toggle" aria-pressed="true">Keypad: On</button></div>
+    </div>
+    <div class="mq-kp-host" style="margin-top:18px">
+      <div class="question-card" style="padding:22px">
+        <div class="mk-cell">
+          <p class="mk-instr">Add.</p>
+          <div class="mk-eq">
+            <span class="mk-frac"><span>1</span><span class="bar"></span><span>5</span></span><span>+</span>
+            <span class="mk-frac"><span>2</span><span class="bar"></span><span>5</span></span><span>=</span>
+            <span class="mk-frac"><span class="mk-box">3</span><span class="bar"></span><span class="mk-box is-focus"></span></span>
+          </div>
+          <div class="mk-note">Typing 3 filled the top box and moved down, as the keyboard does. "/" also moves top → bottom.</div>
+        </div>
+      </div>
+      <div class="mq-kp" data-extra="fraction" role="group" aria-label="On-screen keypad">
+        <button class="mq-kp-key">7</button><button class="mq-kp-key">8</button><button class="mq-kp-key">9</button><button class="mq-kp-key mq-kp-key--op" aria-label="fraction bar, next box">/</button>
+        <button class="mq-kp-key">4</button><button class="mq-kp-key">5</button><button class="mq-kp-key">6</button><button class="mq-kp-key mq-kp-key--op mq-kp-key--next" aria-label="next box">Next →</button>
+        <button class="mq-kp-key">1</button><button class="mq-kp-key">2</button><button class="mq-kp-key">3</button><span></span>
+        <button class="mq-kp-key mq-kp-key--wide">0</button><button class="mq-kp-key mq-kp-key--del" aria-label="Delete">⌫</button><span></span>
+        <button class="mq-kp-key mq-kp-check">✓ Check</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+// ?scene=class|sign|fraction ; ?pupil=1 drops teacher-mode (pupil practice card)
+const p = new URLSearchParams(location.search);
+document.body.dataset.scene = p.get('scene') || 'class';
+if (p.get('pupil') === '1') document.body.classList.remove('teacher-mode');
+</script>
+</body>
+</html>
