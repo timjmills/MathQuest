@@ -10467,6 +10467,26 @@
  }
 },
 {
+ "id": "cbt-r3-ea-band",
+ "check": "cbt r3 (E6 side effect): with a REDO item top-started (CL-4b), the count_by_tables error-analysis M cells (114.8 mm, two to a page) left a 34 mm band UNDER the row (EB-BAND 29.6 %, limit 28 % with margin 2); a page of REDO items holds each row to its ink (layout capRowsToInk), the spare to the page foot",
+ "kind": "commit-pair",
+ "rule": "ws-empty-band EB-BAND (precritic empty-band, role-cover band)",
+ "browser": true,
+ "fail": {
+  "commit": "e6d1b2c19",
+  "state": "lf-ops cbt r3 E6 head: rows stretched to the page's grid, the work at the top"
+ },
+ "pass": {
+  "commit": "e464b4906",
+  "state": "lf-ops cbt r3: error-analysis REDO rows held to their ink / 0.72"
+ },
+ "command": "node tests/scripts/ws-empty-band.cjs --root {root} --skill multiplication:count_by_tables --roles error-analysis --sizes M,L --hosts none --margin 2",
+ "expect": {
+  "fail": "FAIL",
+  "pass": "OK"
+ }
+},
+{
  "id": "cbt-r2-e4-chart-lines",
  "check": "critic cbt r2 E4 (TY-10a): the jumps=15 lesson chart drew the row 9 + 6 (boxes 9-11 mm, arrows touching); a count row prints at most 6 numbers a line (15 = 5 + 5 + 5) and spans >= 80 % of its panel",
  "kind": "commit-pair",
