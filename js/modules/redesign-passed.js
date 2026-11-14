@@ -54,7 +54,7 @@ const PV4_IDS = [
     'placevalue:identify',
     'placevalue:unit_form',
 ];
-const PVW = 'Lane lf-placevalue week 2, critic nwf r1 FAIL, r2 FAIL, r3 PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every option value of the signed pv card, card 1280 / 820 / 390, worksheet, quiz >= 8; the live detailed lesson 1 re-graded; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-nwf1.md + critic-nwf2.md + critic-nwf3.md, 2026-11-13';
+const PVW = 'Lane lf-placevalue week 2, critic nwf r1 FAIL, r2 FAIL, r3 PASS (independent Opus medium critics; every pv-owned page type at S / M / L, every option value of the signed pv card, card 1280 / 820 / 390, worksheet, quiz >= 8; the live detailed lesson 1 re-graded; engine / role findings recorded, not held, lead D3); design/audit/runs/lf-placevalue/critic-nwf1.md + critic-nwf2.md + critic-nwf3.md, 2026-11-13; open live defects N3 / N6 / N7 (< 8: band-20 Opener kinds, band-20 / to_words lesson role, Opener L to_words overflow - pre-date live1), fix in live2 (critic-live1-r2.md)';
 const PVW_IDS = [
     'composing:number_word_form',
 ];
